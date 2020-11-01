@@ -1,4 +1,3 @@
-
 LibGimbal is a lightweight cross-platform framework used for creating low-overhead shared or dynamic libraries with an extensible C API.
 
 ==========
