@@ -1,0 +1,47 @@
+.build_common:
+  stage: build
+  artifacts:
+    paths:
+      - build/
+  script:
+    - mkdir build
+    - cd build
+    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=/home/falco/Qt/5.15.0/gcc_64 -G Ninja
+    - ninja
+    
+build gcc:
+  extends: .build_common
+  tags:
+    - linux
+  variables:
+    CC: gcc
+    CXX: g++
+    
+build clang:
+  extends: .build_common
+  tags:
+    - master
+  variables:
+     CC: clang
+     CXX: clang++
+    
+.test_common:
+  stage: test
+  script:
+    - build/test/ElysianLuaTests
+    
+test gcc:
+  extends: .test_common
+  needs: ["build gcc"]
+  dependencies:
+    - build gcc
+  tags:
+    - linux
+    
+test clang:
+  extends: .test_common
+  needs: ["build clang"]
+  dependencies:
+    - build clang
+  tags:
+    - master
