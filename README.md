@@ -1,12 +1,9 @@
-
 LibGimbal is a lightweight cross-platform framework used for creating low-overhead shared or dynamic libraries with an extensible C API.
 
-==========
 BACKGROUND
 ==========
 LibGimbal was born of me taking a long, hard look back at my work over the years, and finally identifying and conslidating all of the disjoint, duplicated, and nonstandardized core C code that tends to be reinvented for each C API that I have written. The name "libGimbal" is a play on the name "libGyro." Just as a gimbal can be used to orient and support a gyro it is the basic foundational support library used by libGyro and the other C APIs in the Elysian Shadows software ecosystem.
 
-==================================
 MAIN DESIGN GOALS AND PHILOSOPHIES
 ==================================
 1) Deduplicate all of the boilerplate shit used by all my standalone C libraries
@@ -38,7 +35,6 @@ MAIN DESIGN GOALS AND PHILOSOPHIES
 	d. Provides uniform API for client error checking and validation
 		a. client automatically adheres to feature-flag configuration
 
-===========
 FEATURE SET
 ===========
 - Hardware/Device Abstraction Mechanism
@@ -88,22 +84,18 @@ FEATURE SET
 - Wrappers to other Languages
 	a. Object-oriented C++ wrapper
 
-=======
 CREDITS
 =======
 Falco Girgis
 
-=====
 USAGE
 =====
 TODO
 
-=================
 API DOCUMENTATION
 =================
 TODO
 
-=======
 LICENSE
 =======
 Do-whatever-the-fuck-you-want anti-communist freedom-loving 'Murican software license.
