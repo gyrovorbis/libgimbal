@@ -1,74 +1,115 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(EVMU_VERSION_MAJOR 2)
-set(EVMU_VERSION_MINOR 0)
-set(EVMU_VERSION_PATCH 0)
-set(EVMU_VERSION
-  ${EVMU_VERSION_MAJOR}.${EVMU_VERSION_MINOR}.${EVMU_VERSION_PATCH})
-
-project(LibElysianVMU VERSION ${EVMU_VERSION} DESCRIPTION "Sega Dreamcast Visual Memory Unit Emulation Core Library" LANGUAGES C)
+project(LibGimbal 
+    VERSION 
+        ${GIMBAL_VERSION} 
+    DESCRIPTION 
+        "Lightweight cross-platform framework used for creating low-overhead shared or dynamic libraries with an extensible C API." 
+    LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-option(EVMU_RESULT_ERROR_ASSERT             "Assert upon encountering API errors" ON)
-option(EVMU_RESULT_ERROR_LOG                "Log API errors" ON)
-option(EVMU_RESULT_CONTEXT_TRACK_LAST_ERROR "Track most recent error in EVMUContext" ON)
-option(EVMU_RESULT_CALL_STACK_TRACKING      "Track calling source code location" ON)
+option(GIMBAL_RESULT_ERROR_ASSERT             "Assert upon encountering API errors" ON)
+option(GIMBAL_RESULT_ERROR_LOG                "Log API errors" ON)
+option(GIMBAL_RESULT_CONTEXT_TRACK_LAST_ERROR "Track most recent error in GIMBALContext" ON)
+option(GIMBAL_RESULT_CALL_STACK_TRACKING      "Track calling source code location" ON)
 
-set(EVMU_SOURCES
-    source/evmu_version.c
-    source/util/evmu_context.c
-    source/os/evmu_os_callbacks.c)
 
-set(EVMU_INCLUDES
-    api/evmu/evmu_defines.h
-    api/evmu/evmu_version.h
-    api/evmu/util/evmu_context.h
-    api/evmu/util/evmu_result.h
-    api/evmu/os/evmu_os.h)
+option(GIMBAL_EXT_CALLBACKS "Register function pointers upon context creation for EXT logic" ON)
+option(GIMBAL_EXT_EVENTS    "Use event system for EXT logic" ON)
+option(GIMBAL_EXT_DEFAULTS  "Use default C standard implementation for EXT logic" ON)
+
+
+option(GIMBAL_VARIANTS  "Enable variants" ON)
+option(GIMBAL_TABLES "Enable Tables" ON)
+
+
+set(GIMBAL_SOURCES
+     source/gimbal_version.c
+     source/gimbal_context.c
+#    source/util/GIMBAL_context.c
+#    source/os/GIMBAL_os_callbacks.c
+)
+
+set(GIMBAL_INCLUDES
+    api/gimbal/gimbal_macros.h
+    api/gimbal/gimbal_build.h
+    #api/gimbal/gimbal_version.h
+    api/gimbal/gimbal_context.h
+    api/gimbal/gimbal_result.h
+    #api/gimbal/gimbal_os.h
+    api/gimbal/gimbal_api.h
+    api/gimbal/gimbal_types.h
+    api/gimbal/gimbal_config.h
+    #api/gimbal/gimbal_generator.h
+    api/gimbal/gimbal_ext.h
+    api/gimbal/gimbal_variant.h
+    #api/gimbal/gimbal_table.h
+    #api/gimbal/gimbal_string.h
+    api/gimbal/gimbal_container.h
+    )
 
 #if(FALSE)
-#    api/evmu/hw/evmu_battery.h
-#    api/evmu/hw/evmu_buzzer.h
-#    api/evmu/hw/evmu_cpu.h
-#    api/evmu/hw/evmu_device.h
-#    api/evmu/hw/evmu_display.h
-#    api/evmu/hw/evmu_flash.h
-#    api/evmu/hw/evmu_gamepad.h
-#    api/evmu/hw/evmu_instr.h
-#    api/evmu/hw/evmu_battery.h
+#    api/GIMBAL/hw/GIMBAL_battery.h
+#    api/GIMBAL/hw/GIMBAL_buzzer.h
+#    api/GIMBAL/hw/GIMBAL_cpu.h
+#    api/GIMBAL/hw/GIMBAL_device.h
+#    api/GIMBAL/hw/GIMBAL_display.h
+#    api/GIMBAL/hw/GIMBAL_flash.h
+#    api/GIMBAL/hw/GIMBAL_gamepad.h
+#    api/GIMBAL/hw/GIMBAL_instr.h
+#    api/GIMBAL/hw/GIMBAL_battery.h
 #endif()
 
-if(EVMU_RESULT_ERROR_ASSERT)
+if(GIMBAL_RESULT_ERROR_ASSERT)
     list(APPEND
-        EVMU_DEFINES
-        EVMU_RESULT_ERROR_ASSERT)
+        GIMBAL_DEFINES
+        GIMBAL_RESULT_ERROR_ASSERT)
 endif()
 
-if(EVMU_RESULT_ERROR_LOG)
+if(GIMBAL_RESULT_ERROR_LOG)
     list(APPEND
-        EVMU_DEFINES
-        EVMU_RESULT_ERROR_LOG)
+        GIMBAL_DEFINES
+        GIMBAL_RESULT_ERROR_LOG)
 endif()
 
-if(EVMU_RESULT_CONTEXT_TRACK_LAST_ERROR)
+if(GIMBAL_RESULT_CONTEXT_TRACK_LAST_ERROR)
     list(APPEND
-        EVMU_DEFINES
-        EVMU_RESULT_CONTEXT_TRACK_LAST_ERROR)
+        GIMBAL_DEFINES
+        GIMBAL_RESULT_CONTEXT_TRACK_LAST_ERROR)
 endif()
 
-if(EVMU_RESULT_CALL_STACK_TRACKING)
+if(GIMBAL_RESULT_CALL_STACK_TRACKING)
     list(APPEND
-        EVMU_DEFINES
-        EVMU_RESULT_CALL_STACK_TRACKING)
+        GIMBAL_DEFINES
+        GIMBAL_RESULT_CALL_STACK_TRACKING)
 endif()
 
-add_library(libLibElysianVMU STATIC
-    ${EVMU_SOURCES}
-    ${EVMU_INCLUDES})
+if(GIMBAL_EXT_CALLBACKS)
+    list(APPEND
+        GIMBAL_DEFINES
+        GIMBAL_EXT_CALLBACKS)
+endif()
 
-target_include_directories(libLibElysianVMU
+if(GIMBAL_EXT_EVENTS)
+    list(APPEND
+        GIMBAL_DEFINES
+        GIMBAL_EXT_EVENTS)
+endif()
+
+if(GIMBAL_EXT_DEFAULTS)
+    list(APPEND
+        GIMBAL_DEFINES
+        GIMBAL_EXT_DEFAULTS)
+endif()
+
+
+add_library(libGimbal STATIC
+    ${GIMBAL_SOURCES}
+    ${GIMBAL_INCLUDES})
+
+target_include_directories(libGimbal
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>
         $<INSTALL_INTERFACE:api>
@@ -76,8 +117,8 @@ target_include_directories(libLibElysianVMU
         ${CMAKE_CURRENT_SOURCE_DIR}/api
 )
 
-target_compile_definitions(libLibElysianVMU
+target_compile_definitions(libGimbal
     PUBLIC
-    ${EVMU_DEFINES})
+    ${GIMBAL_DEFINES})
 
 
