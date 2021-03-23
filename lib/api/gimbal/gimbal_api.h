@@ -28,17 +28,20 @@ extern "C" {
         char cppCompat;             \
     } S
     
-
-#ifdef _MSC_VER
-#    ifdef GBL_API_EXPORTS
-#        define GBL_EXPORT __declspec(dllexport)
-#    else
-#        define GBL_EXPORT __declspec(dllimport)
-#    endif
-#elif defined(__clang__) || defined(__GNUC__)
-#    define GBL_EXPORT __attribute__((visibility("default")))
+#ifdef GBL_API_SHARED_LIB
+#   ifdef _MSC_VER
+#       ifdef GBL_API_EXPORTS
+#           define GBL_EXPORT __declspec(dllexport)
+#       else
+#           define GBL_EXPORT __declspec(dllimport)
+#       endif
+#   elif defined(__clang__) || defined(__GNUC__)
+#       define GBL_EXPORT __attribute__((visibility("default")))
+#   else
+#       define GBL_EXPORT
+#   endif
 #else
-#    define GBL_EXPORT
+#   define GBL_EXPORT
 #endif
 
 #define GBL_API GBL_RESULT GBL_EXPORT
