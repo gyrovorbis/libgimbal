@@ -1,5 +1,96 @@
 #include <gimbal/gimbal_context.h>
+#include <gimbal/gimbal_build.h>
+#include <gimbal/gimbal_types.h>
+#include <string.h>
 
+static const GblContextCreateInfo createInfoDefault_ = { };
+
+
+GBL_API gblContextVersion           (GblVersion* pVersion) {
+    GBL_ASSERT(pVersion, "NULL version output pointer!");
+    *pVersion = GBL_VERSION;
+}
+
+GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateInfo* pInfo) {
+
+    GBL_ASSERT(phCtx, "NULL context handle!");
+    if(!pInfo) {
+        pInfo = &createInfoDefault_;
+    }
+
+    GblContext_ tempCtx;
+    //  Default initialize
+    memset(&tempCtx, 0, sizeof(GblContext_));
+    // Handle Initialize
+    tempCtx.baseHandle.pUserdata = pInfo->pUserdata;
+    tempCtx.baseHandle.pParent   = NULL;
+    // Context Initialize
+    memcpy(&tempCtx.ext.log, pInfo->pExtLog, sizeof(GblContextExtLog));
+    memcpy(&tempCtx.ext.mem, pInfo->pExtMem, sizeof(GblContextExtMem));
+    memcpy(&tempCtx.ext.api, pInfo->pExtApi, sizeof(GblContextExtApi));
+
+
+
+
+    struct GblContext_* pCtx = *phCtx;
+}
+
+GBL_API_BEGIN(HANDLE, FMT, ...);
+GBL_API_END();
+
+
+
+
+GBL_API gblContextConstruct (GblContext hCtx, const GblContextCreateInfo* pInfo) {
+    GBL_ASSERT(hCtx, "NULL Context Handle!");
+
+    memset(hCtx, 0, sizeof(GblContext_));
+    hCtx->baseHandle.pParent = NULL;
+    hCtx->baseHandle.pContext = hCtx;
+    hCtx->baseHandle.pUserdata = pInfo->pUserdata;
+    memcpy(&hCtx->ext.log, pInfo->pExtLog, sizeof(GblContextExtLog));
+    memcpy(&hCtx->ext.mem, pInfo->pExtMem, sizeof(GblContextExtMem));
+    memcpy(&hCtx->ext.api, pInfo->pExtApi, sizeof(GblContextExtApi));
+
+    GBL_API_BEGIN(hCtx);
+
+    GblVersion verCur = 0;
+    GBL_API_VERIFY(gblContextVersion(&verCur));
+    GblVersionInfo verCurInfo = GBL_VERSION_EXTRACT(verCur);
+    GblVersionInfo verMinInfo = GBL_VERSION_EXTRACT(pInfo->versionMin);
+    char verCurString[GBL_VERSION_STRING_SIZE_MAX] = { '\0' };
+    char verMinString[GBL_VERSION_STRING_SIZE_MAX] = { '\0' };
+
+    GBL_API_ACCUM(gblVersionString(&verCurInfo, verCurString, sizeof(verCurString)));
+    GBL_API_ACCUM(gblVersionString(&verMinInfo, verMinString, sizeof(verMinString)));
+
+    GBL_API_VERBOSE("Version Minimum: %s", verMinString);
+    GBL_API_VERBOSE("Version Current: %s", verCurString);
+
+    GBL_API_VERIFY(verCur >= pInfo->versionMin, GBL_RESULT_VERSION_MISMATCH);
+
+    GBL_API_END();
+}
+
+
+GBL_API gblContextDestroy           (GblContext* phCtx);
+
+// VIRTUALS
+GBL_API gblContextExtLogWrite       (GblContext hCtx, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
+GBL_API gblContextExtLogPush        (GblContext hCtx);
+GBL_API gblContextExtLogPop         (GblContext hCtx, uint32_t count);
+
+GBL_API gblContextExtMemMalloc      (GblContext hCtx, GblSize size, GblSize alignment, void** ppData);
+GBL_API gblContextExtMemRealloc     (GblContext hCtx, const void* pData, GblSize newSize, GblSize newAlign, void** pNewData);
+GBL_API gblContextExtMemFree        (GblContext hCtx, void* pData);
+
+GBL_API gblContextExtApiBegin       (GblHandle hHandle);
+GBL_API gblContextExtApiEnd         (GblHandle hHandle);
+GBL_API gblContextExtApiLastError   (GblHandle hHandle, GblError** ppError);
+
+
+
+#if 0
 
 
 GBL_API gblContextInit(GblContext* pCtx,
@@ -48,7 +139,7 @@ GBL_API gblContextEnvTable(const GblContext* pctX, GblTable** ppEnv);
 GBL_API gblContextLastError(const GblContext* pCtx,
                                              const GblError** ppError);
 
-
+#endif
 #if 0
 typedef struct CtxDefaultUserdata_ {
     uint32_t logStackDepth;

@@ -2,6 +2,7 @@
 #define GIMBAL_API_H
 
 #include "gimbal_config.h"
+#include "gimbal_macros.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,9 +12,14 @@ extern "C" {
     struct S;                          \
     typedef struct S S
 
-#define GBL_DECLARE_ENUM(E)     \
-    typedef GBL_ENUM E;         \
-    enum E
+#ifndef __cplusplus
+#   define GBL_DECLARE_ENUM(E)     \
+        typedef GBL_ENUM E;        \
+        enum E
+#else
+#   define GBL_DECLARE_ENUM(E) \
+    enum E : GBL_ENUM
+#endif
 
 #define GBL_FORWARD_DECLARE_ENUM(E) \
     typedef GBL_ENUM E
@@ -51,6 +57,23 @@ extern "C" {
 #define GBL_API_CTX_UD() GBL_API_CTX()->createInfo.userdata
 #define GBL_API_RESULT() GBL_API_COOKIE().result
 
+
+#define GBL_API_SOURCE_LOCATION_PUSH(FILE, FUNCTION, LINE, COLUMN)              \
+    gblApiStackFrameSourceLocationCurrentPush(&GBL_API_COOKIE(),    \
+                    GBL_SOURCE_LOCATION(GBL_SOURCE_FILE, GBL_SOURCE_FUNC, GBL_SOURCE_LINE, GBL_SOURCE_COLUMN))
+
+#define GBL_API_SOURCE_LOCATION_POP() \
+    gblApiStackFrameSourceLocationCurrentPop(&GBL_API_COOKIE())
+
+#define GBL_API_SOURCE_TRACKED(FILE, FUNCTION, LINE, COLUMN, CALL) \
+    do {    \
+        GBL_API_SOURCE_LOCATION_PUSH(FILE, FUNCTION, LINE, COLUMN); \
+        (CALL)  \
+        GBL_API_SOURCE_LOCATION_POP()   \
+    while(0)
+
+#define GBL_API_ASSERT(expr) assert(expr)
+
 #define GBL_API_MALLOC(size, alignment) void
 #define GBL_API_REALLOC(pPtr, size, alignment) void
 #define GBL_API_FREE(pPtr) void
@@ -63,38 +86,102 @@ extern "C" {
 #define GBL_API_WARN(pFmt, ...)
 #define GBL_API_ERROR(pFmt, ...) void
 
+
+    static inline EVMUBool evmuResultHandler(const EVMUContext*     pCtx,
+                                             const EVMUDevice*      pDevice,
+                                             EVMUBool               exp,
+                                             EVMU_RESULT            result,
+                                             const char*            pFile,
+                                             const char*            pFunc,
+                                             uint64_t               line,
+                                             const char*            pFormat,
+                                            ...)
+    {
+        if(!exp) {
+            EVMU_VA_SNPRINTF(pFormat);
+            EVMU_RESULT_LOG(pCtx,
+                            pFile, pFunc, line,
+                            EVMU_RESULT_ERROR_LOG_LEVEL, buffer);
+            EVMU_RESULT_ASSERT(exp, buffer);
+            EVMU_RESULT_SET_LAST_ERROR(pCtx, pDevice, result, EVMU_RESULT_ERROR_LOG_LEVEL, pFile, pFunc, line, buffer);
+        } else {
+            EVMU_RESULT_CLEAR_LAST_ERROR(pCtx);
+        }
+
+        return exp;
+
+        #define GBL_ERROR_INIT(error, handle, result, src, ...) \
+
+#define GBL_RESULT_ERROR(handle, result, src, ...) \
+    do {
+        GblError error;
+        GBL_ERROR_INIT(&error, hHandle, result, src, __VA_ARGS__);
+        GBL_RESULT_ERROR_LOG(&error);
+        GBL_RESULT_ERROR_ASSERT(&error);
+        GBL_RESULT_ERROR_UPDATE(&error);
+    }   while(0)
+
+
 // Differentiate between API entrypoints and just random internal function entrypoints!!!
 
-#define GBL_API_BEGIN(pCtx, pFmt, ...)    \
-    GblApiCookie GBL_API_COOKIE_NAME_DEFAULT = { pCtx, NULL, initialResult, 0 };   \
-    GblContextApiCookiePush(GBL_API_CTX(), &GBL_API_COOKIE());      \
-    GBL_API_VERBOSE(pFmt, __VA_ARGS__);                                \
-    GBL_API_PUSH()
+#define GBL_API_BEGIN(pHandle, pFmt, ...)    \
+    GblApiStackFrame GBL_API_COOKIE_NAME_DEFAULT = gblApiStackFrameCreate(pHandle, GBL_RESULT_SUCCESS,  \
+                                                    GBL_SOURCE_LOCATION(GBL_SOURCE_FILE, GBL_SOURCE_FUNC, GBL_SOURCE_LINE, GBL_SOURCE_COLUMN)); \
+    GBL_API_SOURCE_LOCATION_PUSH(GBL_SOURCE_FILE, GBL_SOURCE_FUNC, GBL_SOURCE_LINE, GBL_SOURCE_COLUMN); \
+    GBL_API_VERBOSE(pFmt, __VA_ARGS__); \
+    GBL_API_PUSH()  \
+    GBL_API_SOURCE_LOCATION_POP()
 
 #define GBL_API_DONE()  \
-    goto GBL_API_END_LABEL_DEFAULT
+    goto GBL_API_END_LABEL;
 
 #define GBL_API_END()                             \
-    GBL_API_END_LABEL_DEFAULT:                    \
+    GBL_API_END_LABEL:                            \
         GBL_API_POP(GBL_API_COKIE().stackDepth);  \
         GblContextApiCookiePop(GBL_API_CTX());    \
         return GBL_API_RESULT()
 
 
-
-
 #define GBL_API_RESULT_ACCUM(result) void
 
-#define GBL_API_RESULT_SET(result, pFmt, ...) void
-#define GBL_API_RESULT_SET_CND(exp, result, pFmt, ...) void
-#define GBL_API_RESULT_SET_JMP(result, label, pFmt, ...) void
-#define GBL_API_RESULT_SET_JMP_CND(expr, result, label, pFmt, ...) void
 
-#define GBL_API_VERIFY(expr, label, pFmt, ...) void
-#define GBL_API_VERIFY_POINTER(pPtr, label, pFmt, ...) void
-#define GBL_API_VERIFY_HANDLE(pHandle, label, pFmt, ...) void
+#define GBL_API_RESULT_SET(result) // if failure, log with all info
 
-#define GBL_API_ASSERT(expr) assert(expr)
+
+#define GBL_API_RESULT_SET_JMP_CND(expr, result, label) \
+    do {                                                \
+        if((exp)) {                                     \
+            GBL_API_RESULT_SET(result);                 \
+            goto label;                                 \
+        }                                               \
+    proceed:                                            \
+    } while(0)
+
+
+
+#define GBL_API_RESULT_SET_CND(exp, result)             \
+    GBL_API_RESULT_SET_JMP_CND(exp, result, proceed)
+
+#define GBL_API_RESULT_SET_JMP(result, label)           \
+    GBL_API_RESULT_SET_JMP_CND(1, result, label)
+
+
+
+#define GBL_API_VERIFY(expr, result)                \
+    GBL_API_RESULT_SET_JMP_CND((expr),              \
+                               result,              \
+                               GBL_API_END_LABEL)
+
+#define GBL_API_VERIFY_POINTER(pPtr)                    \
+    GBL_API_VERIFY(hHandle != NULL,                     \
+                   GBL_RESULT_ERROR_INVALID_POINTER)
+#define GBL_API_SOURCE_TRACKED(FILE, FUNCTION, LINE, COLUMN, CALL) \
+
+#define GBL_API_VERIFY_HANDLE(hHandle)                  \
+    GBL_API_SOURCE_TRACKED(GBL_FILE, GBL_SOURCE_FILE, GBL_SOURCE_FUNCTION, GBL_SOURCE_LINE, GBL_SOURCE_COLUMN, \
+            GBL_MACRO_CALL(GBL_API_VERIFY, hHandle != NULL, GBL_RESULT_ERROR_INVALID_HANDLE))
+
+
 //#define GBL_API_TRY()
 
 

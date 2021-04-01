@@ -28,6 +28,7 @@ option(GIMBAL_TABLES "Enable Tables" ON)
 set(GIMBAL_SOURCES
      source/gimbal_version.c
      source/gimbal_context.c
+     source/gimbal_test.c
 #    source/util/GIMBAL_context.c
 #    source/os/GIMBAL_os_callbacks.c
 )
@@ -45,6 +46,11 @@ set(GIMBAL_INCLUDES
     #api/gimbal/gimbal_generator.h
     api/gimbal/gimbal_ext.h
     api/gimbal/gimbal_variant.h
+    api/gimbal/gimbal_test.h
+    api/gimbal/gimbal_handle.h
+    api/gimbal/gimbal_types.hpp
+    api/gimbal/gimbal_variant.hpp
+    api/gimbal/gimbal_object.h
     #api/gimbal/gimbal_table.h
     #api/gimbal/gimbal_string.h
     api/gimbal/gimbal_container.h

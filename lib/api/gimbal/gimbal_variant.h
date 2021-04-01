@@ -10,14 +10,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblTable);
 // 2 - basic fundamental proxy meta types (GblStringView, GblString, GblTable, GblError, etc)
 // 3 - userdata/table proxy metatypes + references
 
-typedef GBL_RESULT (*GblFunction)(GblContext*);
-
-#if 0
-typedef enum GblMetaObject {
-    GblMetaType* pType;
-    void* pUserdata;
-} GblMetaObject;
-#endif
+typedef GBL_RESULT (*GblFunction)(GblContext*, GblVariant);
 
 GBL_DECLARE_ENUM(GBL_VARIANT_TYPE_CLASS) {
     GBL_VARIANT_TYPE_CLASS_NIL,
@@ -39,6 +32,7 @@ GBL_DECLARE_ENUM(GBL_VARIANT_TYPE) {
     GBL_VARIANT_TYPE_FUNCTION,
     GBL_VARIANT_TYPE_VOID_PTR,
     GBL_VARIANT_TYPE_USERDATA,
+    GBL_VARIANT_TYPE_HANDLE,
     GBL_VARIANT_TYPE_COUNT
 };
 
@@ -49,30 +43,28 @@ typedef union GblVariantValue {
     GblFunction     func;
     const char*     pString;
     void*           pVoidPtr;
-
-#ifdef GBLBAL_EXT_TABLES
-    GblTable        table; metaType
-#endif
+    uintptr_t       uintptr;
+    uint64_t        uint64;
 } GblVariantValue;
 
-
-/* "Container" types
- * a. generically iterable/copyable/etc
- * b. contains internal element type
- * c. all generically iterable with next semantics and shit
- * d. size
- */
-
-/* First "custom" types:
-a. GblTable
-b. GblString
-c. GblRef
-d. GBL_RESULT (int, string, bool/nil conversions)
-*/
-typedef struct Gblariant {
-    GblVariantValue value;
-    GBL_VARIANT_TYPE type;
+typedef struct GblVariant {
+    GblVariantValue     value;
+    GBL_VARIANT_TYPE    type;
 } GblVariant;
+
+GBL_DECLARE_ENUM(GBL_VARIANT_METAKEY) {
+    GBL_VARIANT_METAKEY_INDEX,           // can be tables
+    GBL_VARIANT_METAKEY_NEW_INDEX,       // can be tables
+    GBL_VARIANT_METAKEY_CALL,
+
+    GBL_VARIANT_METAKEY_PAIRS,
+    GBL_VARIANT_METAKEY_IPAIRS,
+
+    GBL_VARIANT_METAKEY_NAME,
+    GBL_VARIANT_METAKEY_LENGTH,
+    GBL_VARIANT_METAKEY_OP,
+    GBL_VARIANT_METKEY_COUNT
+};
 
 GBL_DECLARE_ENUM(GBL_VARIANT_OP) {
     GBL_VARIANT_OP_CMP_EQUAL,
@@ -93,38 +85,56 @@ GBL_DECLARE_ENUM(GBL_VARIANT_OP) {
     GBL_VARIANT_OP_BINARY_MUL,
     GBL_VARIANT_OP_BINARY_DIV,
     GBL_VARIANT_OP_BINARY_MOD,
-    GBL_VARIANT_OP_BINARY_CAT,  //appending tables and strings!!
-    GBL_VARIANT_OP_COMPARISON_COUNT
+    GBL_VARIANT_OP_BINARY_CAT,
+    GBL_VARIANT_OP_COUNT
 };
 
-typedef GBL_RESULT (*GblMetaTypeVTableVariantGet)(const GblVariant*, GblVariant*);
-typedef GBL_RESULT (*GblMetaTypeVTableVariantSet)(GblVariant*, const GblVariant*);
-typedef GBL_RESULT (*GblMetaTypeVTableHash)(const GblVariant*, GblHash*);
-typedef GBL_RESULT (*GblMetaTypeVTableComp)(const GblVariant*, const GblVariant*, GBL_VARIANT_OP, GblBool*);
+typedef GBL_RESULT (*GblVariantMetaConstructorFn)   (GblVariant*, const GblVariant*);
+typedef GBL_RESULT (*GblVariantMetaDestructorFn)    (GblVariant*, const GblVariant*);
+typedef GBL_RESULT (*GblVariantMetaValueSetFn)      (const GblVariant*, GblVariant*);
+typedef GBL_RESULT (*GblVariantMetaValueGetFn)      (GblVariant*, const GblVariant*);
+typedef GBL_RESULT (*GblVariantMetaMethodFn)        (GBL_VARIANT_META_KEY, GblVariant*, const GblVariant*, const GblVariant*);
 
-GBL_DECLARE_ENUM(GBL_METATYPE_FLAGS) {
-    GBL_METATYPE_FLAGS_NONE,
-    GBL_METATYPE_FLAGS_VARIANT_COMPATIBLE,
-    GBL_METATYPE_FLAGS_CONTAINER,
-    GBL_METATYPE_FLAGS_USERDATA,
-    GBL_METATYPE_FLAGS_RESIZABLE
+GBL_DECLARE_ENUM(GBL_USERDATA_TYPE) {
+    GBL_METATYPE_USERDATA_UNKNOWN
 };
+
+GBL_DECLARE_ENUM(GBL_VARIANT_METATYPE_FLAGS) {
+    GBL_VARIANT_META_FLAGS_NONE,
+    GBL_VARIANT_META_REFERENCE_TYPE,
+    GBL_VARIANT_META_FLAGS_VARIANT_COMPATIBLE,
+    GBL_VARIANT_META_FLAGS_CONTAINER,
+    GBL_VARIANT_META_FLAGS_USERDATA,
+    GBL_VARIANT_META_FLAGS_RESIZABLE
+};
+
+typedef struct GblVariantMetaType {
+    GBL_VARIANT_TYPE                variantType;
+    const char*                     pTypeName;
+    GblEnum                         flags;
+    GblSize                         sizeOf;
+    GblSize                         alignOf;
+    GblVariantMetaConstructorFn     pFnConstructor;
+    GblVariantMetaDestructorFn      pFnDestructor;
+    GblVariantMetaValueGetFn        pFnValueGet;
+    GblVariantMetaValueSetFn        pFnValueSet;
+    GblVariantMetaMethodFn          pFnMetaMethod;
+} GblMetaType;
 
 typedef struct GblMetaType {
-    const char* pTypeName;
-    const char* pDescription;
-    GblMetaTypeVTableVariantGet     pGet;
-    GblMetaTypeVTableVariantSet     pSet;
-    GblMetaTypeVTableComp           pCompare;
-    //PROPERTIES
-    //METHODS
+
+
 } GblMetaType;
+
+// GblVariantMetaType <=> QMetaType
+// GblVariant <=> QMeta
 
 // Top-level Utilities
 GBL_API gblVariantType(const GblVariant* pVariant, GBL_VARIANT_TYPE* pType);
 GBL_API gblVariantTypeString(GBL_VARIANT_TYPE type, const char* pBuff, GblSize* pSize);
 GBL_API gblVariantTypeClass(GBL_VARIANT_TYPE type, GBL_VARIANT_TYPE_CLASS* pClass);
-GBL_API gblVariantMetaType(GBL_VARIANT_TYPE type, GblMetaType** ppMetaType);
+
+GBL_API gblVariantMetaType(GBL_VARIANT_TYPE type, const char* pTypeName, GblMetaType** ppMetaType);
 GBL_API gblVariantCompatibleTypes(GBL_VARIANT_TYPE type1, GBL_VARIANT_TYPE type2, GblBool* pResult);
 GBL_API gblVariantCommonType(const GblVariant* pLhs,
                              const GblVariant* pRhs,

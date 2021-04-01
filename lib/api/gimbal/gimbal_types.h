@@ -2,12 +2,11 @@
 #define GIMBAL_TYPES_H
 
 #include "gimbal_api.h"
+#include "gimbal_macros.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-GBL_FORWARD_DECLARE_STRUCT(GblContext);
 
 typedef GBL_BOOL                        GblBool;
 typedef GBL_SIZE                        GblSize;
@@ -72,7 +71,18 @@ typedef struct GblVersionInfo {
     uint8_t patch;
 } GblVersionInfo;
 
-GBL_API gblVersionString(const GblVersionInfo* pInfo, char* pBuffer, size_t size);
+inline GblVersionInfo GBL_VERSION_EXTRACT(GblVersion version) {
+    const GblVersionInfo info = {
+        GBL_VERSION_EXTRACT_MAJOR(version),
+        GBL_VERSION_EXTRACT_MINOR(version),
+        GBL_VERSION_EXTRACT_PATCH(version)
+    };
+    return info;
+}
+
+
+#define GBL_VERSION_STRING_SIZE_MAX     (3 * 3 + 2 + 1); // 3 chars * 3 subTypes + 2 dots + 1 null char
+GBL_API gblVersionInfoString(const GblVersionInfo* pInfo, char* pBuffer, size_t size);
 
 typedef struct GblSourceContext {
     const GblSourceLocation*    pSrcLoc;
@@ -80,22 +90,57 @@ typedef struct GblSourceContext {
 } GblSourceContext;
 
 typedef struct GblError {
-    char                msg[GBL_CONTEXT_LAST_ERROR_BUFFER_SIZE];
-    GblSourceContext    srcCtx;
+    char                msg[GBL_CONTEXT_ERROR_MESSAGE_BUFFER_SIZE];
+    GblSourceLocation   srcLocation;
+    GblHandle           hHandle;
     GBL_RESULT          result;
-    GBL_LOG_LEVEL       logLevel;
 } GblError;
 
-typedef struct GblApiCookie {
-#ifdef GBL_RESULT_CALL_STACK_TRACKING
-    GblSourceContext        sourceCtx;
-#endif
-    GblContext*             pContext;
-    const void*             pNext;
-    struct GblApiCookie*    pParent;
+#define GBL_ERROR_INIT(error, handle, result, src, ...) \
+    do {    \
+        snprintf(error->msg, GBL_CONTEXT_ERROR_MESSAGE_BUFFER_SIZE, __VA_ARGS__);   \
+        error->srcLocation = src;   \
+        error->hHandle = handle;    \
+        error->result = result; \
+    } while(0)
+
+typedef struct GblApiStackFrame {
+    GblSourceLocation       sourceEntry;
+    GblSourceLocation       sourceCurrent;
+    uint32_t                sourceCurrentCaptureDepth;
+    GblHandle               hHandle;
     GBL_RESULT              result;
     uint32_t                stackDepth;
-} GblApiCookie;
+} GblApiStackFrame;
+
+
+
+inline GblApiStackFrame gblApiStackFrameCreate(GblHandle hHandle, GBL_RESULT initialResult, GblSourceLocation pSrcLoc) {
+    const GblApiStackFrame frame = {
+        pSrcLoc,
+        pSrcLoc,
+        0,
+        hHandle,
+        initialResult,
+        0
+    };
+    return frame;
+}
+
+inline void gblApiStackFrameSourceLocationCurrentPush(GblApiStackFrame* pStackFrame, GblSourceLocation pSrcLoc) {
+    if(++sourceCurrentCaptureDepth == 1) { //we care about the first entry point
+        pStackFrame->sourceCurrent = pSrcLoc;
+    }
+}
+
+inline void gblApiStackFrameSourceLocationCurrentPop(GblApiStackFrame* pStackFrame) {
+    assert(pStackFrame->sourceCurrentCaptureDepth);
+    if(--sourceCurrentCaptureDepth == 0) {
+        pStackFrame->sourceCurrent = pStackFrame->sourceEntry;
+    }
+}
+
+
 
 typedef struct GblApiInfo {
     const char* pName;

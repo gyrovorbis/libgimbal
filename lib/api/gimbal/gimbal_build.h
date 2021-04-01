@@ -34,9 +34,9 @@
 #   ifdef PROJECT_VERSION
 #       define GBL_VERSION                  GBL_STRINGIFY(PROJECT_VERSION)
 #   else
-#       define GBL_VERSION                  GBL_VERSION_MAKE(GBL_VERSION_MAJOR,
-                                                         GBL_VERSION_MINOR,
-                                                         GBL_VERSION_PATCH)
+#       define GBL_VERSION                  GBL_VERSION_MAKE(GBL_VERSION_MAJOR, \
+                                                             GBL_VERSION_MINOR, \
+                                                             GBL_VERSION_PATCH)
 #   endif
 #endif
 

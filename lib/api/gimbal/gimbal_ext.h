@@ -3,14 +3,18 @@
 
 #include "gimbal_types.h"
 
-typedef GBL_RESULT (*GblExtLogWriteFn)(void*, GBL_LOG_LEVEL, const char*, va_list);
-typedef GBL_RESULT (*GblExtLogPushFn)(void*);
-typedef GBL_RESULT (*GblExtLogPopFn)(void*, uint32_t);
+typedef GBL_RESULT (*GblExtLogWriteFn)      (void*, GBL_LOG_LEVEL, const char*, va_list);
+typedef GBL_RESULT (*GblExtLogPushFn)       (void*);
+typedef GBL_RESULT (*GblExtLogPopFn)        (void*, uint32_t);
 
 //Custom allocators
-typedef GBL_RESULT (*GblExtMallocFn)(void*, GblSize, GblSize, void**);
-typedef GBL_RESULT (*GblExtReallocFn)(void*, const void*, GblSize, GblSize, void**);
-typedef GBL_RESULT (*GblExtFreeFn)(void*, void*);
+typedef GBL_RESULT (*GblExtMemMallocFn)     (void*, GblSize, GblSize, void**);
+typedef GBL_RESULT (*GblExtMemReallocFn)    (void*, const void*, GblSize, GblSize, void**);
+typedef GBL_RESULT (*GblExtMemFreeFn)       (void*, void*);
+
+typedef GBL_RESULT (*GblExtApiBeginFn)      (void*, void*);
+typedef GBL_RESULT (*GblExtApiEndFn)        (void*, void*);
+typedef GBL_RESULT (*GblExtApiLastErrorFn)  (void*, void*);
 
 //define all extension points and shit in one centralized location
 

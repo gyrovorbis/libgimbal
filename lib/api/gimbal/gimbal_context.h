@@ -5,8 +5,11 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#include "gimbal_handle.h"
 #include "gimbal_types.h"
 #include "gimbal_ext.h"
+
+typedef GBL_RESULT (*GblExtVariantMetaObject)(GblContext, GBL_VARIANT_TYPE, const GblVariantMetaType**);
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,73 +17,91 @@ extern "C" {
 
 #define GBL_CONTEXT_USERDATA_OFFSET (offsetof(GblContext, createInfo) + offsetof(GblContextCreateInfo, pUserdata))
 
+typedef struct GblContextExtLog {
+    GblExtLogWriteFn      pFnWrite;
+    GblExtLogPushFn       pFnPush;
+    GblExtLogPopFn        pFnPop;
+} GblContextExtLog;
+
+typedef struct GblContextExtMem {
+    GblExtMemMallocFn          pFnMalloc;
+    GblExtMemReallocFn         pFnRealloc;
+    GblExtMemFreeFn            pFnFree;
+} GblContextExtMem;
+
+typedef struct GblContextExtApi {
+    GblExtApiBeginFn        pFnBegin;
+    GblExtApiEndFn          pFnEnd;
+    GblExtApiLastErrorFn    pFnLastError;
+} GblContextExtApi;
+
 typedef struct GblContextCreateInfo {
-    void* pUserdata;
-
-    struct {
-        GblExtLogWriteFn      pFnWrite;
-        GblExtLogPushFn       pFnPush;
-        GblExtLogPopFn        pFnPop;
-    }                      logCallbacks;
-
-    struct {
-        GblExtMallocFn        pFnMalloc;
-        GblExtReallocFn       pFnRealloc;
-        GblExtFreeFn          pFnFree;
-    }                      allocCallbacks;
-
-    GblVersion             versionMin;
+    GblVersion          versionMin;
+    void*               pUserdata;
+    GblContextExtLog*   pExtLog;
+    GblContextExtMem*   pExtMem;
+    GblContextExtApi*   pExtApi;
 } GblContextCreateInfo;
 
 
-#define GBL_THREAD_NAME_SIZE 256
+GBL_DECLARE_HANDLE(GblContext);
 
 struct GblState;
 
-typedef struct GblThread {
-    char threadName[GBL_THREAD_NAME_SIZE];
-    struct GblState* pState;
-    GblApiCookie* pApiCookieTop;
-    GblError* pLastError;
-} GblThread;
+typedef struct GblContext_ {
+    GblHandle_                  baseHandle;
 
-// Actual top-level shared static state for all child contexts
-typedef struct GblState {
-    uint32_t contextCount;
-    GblContext* pContexts;
-    GblThread* pThread;
-    GblApiCookie* pApiCookieTop;
-} GblState;
+    struct {
+        GblContextExtLog        log;
+        GblContextExtMem        mem;
+        GblContextExtApi        api;
+    }                           ext;
 
-
-typedef struct GblContext {
-
-    GblError               lastError;
-    GblThread*             pgblThread;
-    void*                  pUserdata;
-
-    GblContextCreateInfo   createInfo;
-    GblApiCookie*          pApiCookieTop;
-#if 0
-    GblTable                envTable;
-#endif
-} GblContext;
+    //GblError               lastError;
+    //GblContextCreateInfo   createInfo;
+    //GblApiCookie*          pApiCookieTop;
+} GblContext_;
 
 
 /* Use GBL_VERSION_STRING for compile-time version.
  * Use GBLVersionString() for run-time version.
  */
-GBL_API gblContextVersion(GblVersionInfo** ppVersionInfo);
-
-GBL_API gblContextInit(GblContext* pCtx,
-                       GblContextCreateInfo* pInfo);
 
 
-GBL_API gblContextDeinit(GblContext* pCtx);
+GBL_API gblContextVersion           (GblVersion* pVersion); //hard-compiled
+GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateInfo* pInfo);
+GBL_API gblContextDestroy           (GblContext* phCtx);
+
+// VIRTUALS
+GBL_API gblContextExtLogWrite       (GblContext hCtx, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
+GBL_API gblContextExtLogPush        (GblContext hCtx);
+GBL_API gblContextExtLogPop         (GblContext hCtx, uint32_t count);
+
+GBL_API gblContextExtMemMalloc      (GblContext hCtx, GblSize size, GblSize alignment, void** ppData);
+GBL_API gblContextExtMemRealloc     (GblContext hCtx, const void* pData, GblSize newSize, GblSize newAlign, void** pNewData);
+GBL_API gblContextExtMemFree        (GblContext hCtx, void* pData);
+
+GBL_API gblContextExtApiBegin       (GblHandle hHandle);
+GBL_API gblContextExtApiEnd         (GblHandle hHandle);
+GBL_API gblContextExtApiLastError   (GblHandle hHandle, GblError** ppError);
 
 
-GBL_API gblContextUserdata(const GblContext* pCtx,
-                           void** ppUd);
+#if 0
+
+//Polymorphic API calls for gblContext
+
+GBL_API gblContextMetaType(GblContext* pCtx, void*);
+GBL_API gblContextExtMalloc();
+GBL_API gblContextExtWrite();
+
+#endif
+
+
+
+#if 0
+GBL_API gblContextVersion(GblVersionInfo** ppVersionInfo,
+                          GblContext* phCtx);
+
 
 GBL_API gblContextApiCookieTop(const GblContext* pCtx,
                                GblApiCookie** ppCookie);
@@ -90,9 +111,15 @@ GBL_API gblContextApiCookiePush(GblContext* pCtx,
 
 GBL_API gblContextApiCookiePop(GblContext* pCtx);
 
-
 GBL_API gblContextLastError(const GblContext* pCtx,
                             const GblError** ppError);
+#endif
+
+
+/* Should be inherited as a handle
+GBL_API gblContextUserdata(const GblContext* pCtx,
+                           void** ppUd);
+
 
 GBL_API gblContextParent(const GblContext* pCtx,
                          GblContext* pParent);
@@ -100,7 +127,7 @@ GBL_API gblContextParent(const GblContext* pCtx,
 GBL_API gblContextChild(const GblContext* pCtx,
                         uint32_t index,
                         GblContext* pChild);
-
+*/
 
 
 // gblContextLog
@@ -162,11 +189,10 @@ GBL_API gblContextUpdateLastError_(GblContext* pCtx,
 }
 
 
+#endif
+
 #ifdef __cplusplus
 }
 #endif
-#endif
-
-
 
 #endif // GBL_CONTEXT_H

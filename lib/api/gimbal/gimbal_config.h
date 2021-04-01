@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <assert.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,8 +64,8 @@ extern "C" {
 #   define GBL_API_COOKIE_NAME_DEFAULT          gblApiCookie
 #endif
 
-#ifndef GBL_API_END_LABEL_DEFAULT
-#   define GBL_API_END_LABEL_DEFAULT            gbl_api_end
+#ifndef GBL_API_END_LABEL
+#   define GBL_API_END_LABEL                    gbl_api_end
 #endif
 
 #ifndef GBL_VA_SNPRINTF_BUFFER_SIZE
@@ -75,21 +76,29 @@ extern "C" {
 #   define GBL_STRING_BUFFER_STACK_SIZE         64
 #endif
 
-#ifndef GBL_CONTEXT_LAST_ERROR_BUFFER_SIZE
-#   define GBL_CONTEXT_LAST_ERROR_BUFFER_SIZE   128
+#ifndef GBL_CONTEXT_ERROR_MESSAGE_BUFFER_SIZE
+#   define GBL_CONTEXT_ERROR_MESSAGE_BUFFER_SIZE   128
 #endif
 
+#define GBL_SOURCE_LOCATION_TRACKING 1
 
 #if GBL_SOURCE_LOCATION_TRACKING
 #   ifndef GBL_SOURCE_LOCATION
         typedef struct GblSourceLocation {
             const char* pFile;
             const char* pFunc;
-            GblSize     line;
-            GblSize     column;
+            GBL_SIZE     line;
+            GBL_SIZE     column;
         } GblSourceLocation;
 
-#       define GBL_SOURCE_LOCATION()     \
+inline GblSourceLocation GBL_SOURCE_LOCATION(const char* pFile, const char* pFunc, GBL_SIZE line, GBL_SIZE column) {
+    const GblSourceLocation location = {
+        pFile, pFunc, line, column
+    };
+    return location;
+}
+
+#       define GBL_SOURCE_LOCATION_CURRENT()     \
             GblSourceLocation {          \
                 GBL_SOURCE_FILE,         \
                 GBL_SOURCE_FUNC,         \

@@ -13,6 +13,8 @@ extern "C" {
 #define _GBL_STRINGIFY(a) #a
 #define GBL_STRINGIFY(a) _GBL_STRINGIFY(a)
 
+#define GBL_MACRO_CALL(macro, ...) macro(__VA_ARGS__)
+
 #define GBL_IDENTITY(A) A
 #define GBL_VA_ARGS(...) \
     __VA_ARGS__
