@@ -1,388 +1,312 @@
 #include <gimbal/gimbal_context.h>
-#include <gimbal/gimbal_build.h>
 #include <gimbal/gimbal_types.h>
+#include <gimbal/gimbal_api.h>
+#include <gimbal/gimbal_config.h>
 #include <string.h>
 
-static const GblContextCreateInfo createInfoDefault_ = { };
+
+
+typedef struct GblContext_ {
+    GblHandle_                  baseHandle;
+
+    struct {
+        GblContextExtLog        log;
+        GblContextExtMem        mem;
+        GblContextExtApi        api;
+    }                           ext;
+#if GBL_CONFIG_EXT_CONTEXT_DEFAULT_ENABLED
+    uint32_t logStackDepth;
+#endif
+    //GblError               lastError;
+    //GblContextCreateInfo   createInfo;
+    //GblApiCookie*          pApiCookieTop;
+} GblContext_;
+
+static const GblContextCreateInfo createInfoDefault_ = {
+    33,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
+
+static GBL_API gblContextLogBuildInfo(GblContext hContext) {
+    GBL_API_BEGIN(hContext, "swanky fucker: %d", 3);
+
+    GBL_API_PUSH();
+    void* pPtr = GBL_API_MALLOC(32);
+    pPtr = GBL_API_REALLOC(pPtr, 34);
+    GBL_API_FREE(pPtr);
+
+    GBL_API_END();
+}
+
 
 
 GBL_API gblContextVersion           (GblVersion* pVersion) {
     GBL_ASSERT(pVersion, "NULL version output pointer!");
-    *pVersion = GBL_VERSION;
+    *pVersion = GBL_VERSION_MAKE(GBL_PROJECT_VERSION_MAJOR, GBL_PROJECT_VERSION_MINOR, GBL_PROJECT_VERSION_PATCH);
+    return GBL_RESULT_SUCCESS;
 }
 
-GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateInfo* pInfo) {
 
-    GBL_ASSERT(phCtx, "NULL context handle!");
-    if(!pInfo) {
-        pInfo = &createInfoDefault_;
-    }
+static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
+    GBL_API_BEGIN(hCtx, "Build Info");
 
-    GblContext_ tempCtx;
-    //  Default initialize
-    memset(&tempCtx, 0, sizeof(GblContext_));
-    // Handle Initialize
-    tempCtx.baseHandle.pUserdata = pInfo->pUserdata;
-    tempCtx.baseHandle.pParent   = NULL;
-    // Context Initialize
-    memcpy(&tempCtx.ext.log, pInfo->pExtLog, sizeof(GblContextExtLog));
-    memcpy(&tempCtx.ext.mem, pInfo->pExtMem, sizeof(GblContextExtMem));
-    memcpy(&tempCtx.ext.api, pInfo->pExtApi, sizeof(GblContextExtApi));
+    GBL_API_PUSH("Project Info");
+    GBL_API_VERBOSE("%-20s: %40s", "Name", GBL_PROJECT_NAME);
+    GBL_API_VERBOSE("%-20s: %40s", "Version", GBL_PROJECT_VERSION);
+    GBL_API_VERBOSE("%-20s: %40s", "URL", GBL_PROJECT_URL);
+    GBL_API_VERBOSE("%-20s: %40s", "Description", GBL_PROJECT_DESCRIPTION);
+    GBL_API_POP(1);
 
+    GBL_API_PUSH("Build Info");
+    GBL_API_VERBOSE("%-20s: %40s", "Type", GBL_BUILD_TYPE);
+    GBL_API_VERBOSE("%-20s: %40s", "Config", GBL_BUILD_CONFIG);
+    GBL_API_POP(1);
 
+    GBL_API_PUSH("Compiler Info");
+    GBL_API_VERBOSE("%-20s: %40s", "C", GBL_BUILD_C_COMPILER);
+    GBL_API_VERBOSE("%-20s: %40s", "C++", GBL_BUILD_CPP_COMPILER);
+    GBL_API_POP(1);
 
+    GBL_API_PUSH("Environment Info");
+    GBL_API_PUSH("Host");
+    GBL_API_VERBOSE("%-20s: %40s", "Operating System", GBL_HOST_OS);
+    GBL_API_VERBOSE("%-20s: %40s", "Architecture", GBL_HOST_ARCH);
+    GBL_API_POP(1);
+    GBL_API_PUSH("Target");
+    GBL_API_VERBOSE("%-20s: %40s", "Operating System", GBL_TARGET_OS);
+    GBL_API_VERBOSE("%-20s: %40s", "Architecture", GBL_TARGET_ARCH);
+    GBL_API_POP(2);
 
-    struct GblContext_* pCtx = *phCtx;
+    GBL_API_END();
 }
-
-GBL_API_BEGIN(HANDLE, FMT, ...);
-GBL_API_END();
-
-
-
 
 GBL_API gblContextConstruct (GblContext hCtx, const GblContextCreateInfo* pInfo) {
     GBL_ASSERT(hCtx, "NULL Context Handle!");
 
+
+
     memset(hCtx, 0, sizeof(GblContext_));
-    hCtx->baseHandle.pParent = NULL;
-    hCtx->baseHandle.pContext = hCtx;
-    hCtx->baseHandle.pUserdata = pInfo->pUserdata;
+    hCtx->baseHandle.pContext   = hCtx;
+    hCtx->baseHandle.pParent    = pInfo->handleInfo.hParent;
+    hCtx->baseHandle.pUserdata  = pInfo->handleInfo.pUserdata;
     memcpy(&hCtx->ext.log, pInfo->pExtLog, sizeof(GblContextExtLog));
     memcpy(&hCtx->ext.mem, pInfo->pExtMem, sizeof(GblContextExtMem));
-    memcpy(&hCtx->ext.api, pInfo->pExtApi, sizeof(GblContextExtApi));
+   // memcpy(&hCtx->ext.api, pInfo->pExtApi, sizeof(GblContextExtApi));
 
-    GBL_API_BEGIN(hCtx);
+    GBL_API_BEGIN(hCtx, "Creating Context");
 
     GblVersion verCur = 0;
-    GBL_API_VERIFY(gblContextVersion(&verCur));
+    GBL_API_CALL(gblContextVersion(&verCur));
     GblVersionInfo verCurInfo = GBL_VERSION_EXTRACT(verCur);
     GblVersionInfo verMinInfo = GBL_VERSION_EXTRACT(pInfo->versionMin);
     char verCurString[GBL_VERSION_STRING_SIZE_MAX] = { '\0' };
     char verMinString[GBL_VERSION_STRING_SIZE_MAX] = { '\0' };
 
-    GBL_API_ACCUM(gblVersionString(&verCurInfo, verCurString, sizeof(verCurString)));
-    GBL_API_ACCUM(gblVersionString(&verMinInfo, verMinString, sizeof(verMinString)));
+    GBL_API_CALL(gblVersionInfoString(&verCurInfo, verCurString, sizeof(verCurString)));
+    GBL_API_CALL(gblVersionInfoString(&verMinInfo, verMinString, sizeof(verMinString)));
 
     GBL_API_VERBOSE("Version Minimum: %s", verMinString);
     GBL_API_VERBOSE("Version Current: %s", verCurString);
 
     GBL_API_VERIFY(verCur >= pInfo->versionMin, GBL_RESULT_VERSION_MISMATCH);
 
+    GBL_API_CALL(gblContextBuildInfoLog_(hCtx));
+
     GBL_API_END();
 }
 
 
-GBL_API gblContextDestroy           (GblContext* phCtx);
+GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateInfo* pInfo) {
 
-// VIRTUALS
-GBL_API gblContextExtLogWrite       (GblContext hCtx, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
-GBL_API gblContextExtLogPush        (GblContext hCtx);
-GBL_API gblContextExtLogPop         (GblContext hCtx, uint32_t count);
-
-GBL_API gblContextExtMemMalloc      (GblContext hCtx, GblSize size, GblSize alignment, void** ppData);
-GBL_API gblContextExtMemRealloc     (GblContext hCtx, const void* pData, GblSize newSize, GblSize newAlign, void** pNewData);
-GBL_API gblContextExtMemFree        (GblContext hCtx, void* pData);
-
-GBL_API gblContextExtApiBegin       (GblHandle hHandle);
-GBL_API gblContextExtApiEnd         (GblHandle hHandle);
-GBL_API gblContextExtApiLastError   (GblHandle hHandle, GblError** ppError);
+    *phCtx = malloc(sizeof(GblContext_));
+    return gblContextConstruct(*phCtx, pInfo);
 
 
 
-#if 0
-
-
-GBL_API gblContextInit(GblContext* pCtx,
-                       GblContextCreateInfo* pInfo);
-
-
-GBL_API gblContextDeinit(GblContext* pCtx);
-
-GBL_API gblContextUserdata(const GblContext* pCtx,
-                           void** pUd)
-{
-    *pUd = pCtx->pUserdata;
+    //struct GblContext_* pCtx = *phCtx;
 }
 
-#if 0
-GBL_API gblContextFromUserdata(const GblContextUd* pUd,
-                                                GblContext** pCtx)
-{
-    *pCtx = (GblContext*)(((uintptr_t)pUd) - GBL_CONTEXT_USERDATA_OFFSET);
-}
-#endif
-
-
-GBL_API gblContextApiCookieTop(const GblContext* pCtx,
-                                          GblApiCookie** ppCookie)
-{
-    *ppCookie = pCtx->pApiCookieTop;
+GBL_API gblContextDestroy(GblContext hCtx) {
+    return gblHandleDestruct((GblHandle)hCtx);
 }
 
-GBL_API gblContextApiCookiePush(GblContext* pCtx,
-                                              GblApiCookie* pCookie)
-{
-    pCookie->pParent = pCtx->pApiCookieTop;
-    pCtx->pApiCookieTop = pCookie;
-}
-
-GBL_API gblContextApiCookiePop(GblContext* pCtx) {
-
-    pCtx->pApiCookieTop = pCtx->pApiCookieTop->pParent;
-}
-#if 0
-GBL_API gblContextEnvTable(const GblContext* pctX, GblTable** ppEnv);
-#endif
-
-
-GBL_API gblContextLastError(const GblContext* pCtx,
-                                             const GblError** ppError);
-
-#endif
-#if 0
-typedef struct CtxDefaultUserdata_ {
-    uint32_t logStackDepth;
-} CtxDefaultUserdata_;
-
-CtxDefaultUserdata_* ctxDefaultUserdata_(const GblContext* pCtx) {
-    CtxDefaultUserdata_* pUd = NULL;
-
-    if(pCtx) {
-        pUd = (CtxDefaultUserdata_*)&pCtx->createInfo.pUserdata;
-        EVMU_RESULT_CTX_FOLD(pCtx, HANDLER, pUd, INVALID_HANDLE,  "Failed to retrieve default UD ptr from context!");
-    }
-
-    return pUd;
-}
-
-EVMU_API EVMU_RESULT GblContextInit(GblContext* pCtx, GblContextCreateInfo* pInfo) {
-    EVMU_RESULT_CTX_FOLD(pCtx, VALIDATE_HANDLE);
-    EVMU_RESULT result = EVMU_RESULT_SUCCESS;
-
-    memset(pCtx, 0, sizeof(GblContext));
-
-    if(pInfo) {
-        memcpy(&pCtx->createInfo, pInfo, sizeof(GblContextCreateInfo));
-    }
-
-    if(!EVMU_CTX_UD(pCtx)) {
-        void* pPtr = NULL;
-        result = evmuMalloc_(pCtx, sizeof(CtxDefaultUserdata_), 1, &pPtr);
-        if(EVMU_RESULT_SUCCESS(result)) {
-            memset(pPtr, 0, sizeof(CtxDefaultUserdata_));
-            EVMU_CTX_UD(pCtx) = pPtr;
+static inline GblContext gblContextParent_(GblContext hCtx) {
+    GBL_ASSERT(hCtx);
+    GblContext hCurrentCtx = hCtx;
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+    while(hCurrentCtx == hCtx) {
+        GblHandle hHandle = GBL_HANDLE_INVALID;
+        result = gblHandleParentGet((GblHandle)hCurrentCtx, &hHandle);
+        GBL_ASSERT(GBL_RESULT_SUCCESS(result));
+        if(hHandle) {
+            result = gblHandleContext(hHandle, &hCurrentCtx);
+            GBL_ASSERT(GBL_RESULT_SUCCESS(result));
+        } else {
+            hCurrentCtx = GBL_HANDLE_INVALID;
         }
     }
-
-    return result;
+    return hCurrentCtx;
 }
 
-EVMU_API void GblContextDeinit(GblContext* pCtx) {
-    if(pCtx) {
-        evmuFree_(pCtx, pCtx->ppDevices);
-        pCtx->deviceCount = 0;
+#define GBL_CONTEXT_EXT_IMPL_DEFAULT_CALL_(name, result, ...) \
+    if(result == GBL_RESULT_UNIMPLEMENTED || result == GBL_RESULT_INCOMPLETE || result == GBL_RESULT_UNSUPPORTED) \
+        result = gblContext##name##Default_(__VA_ARGS__)
+
+#define GBL_CONTEXT_EXT_IMPL_PARENT_CALL_(name, result, hCtx, ...) \
+    if(result == GBL_RESULT_UNIMPLEMENTED || result == GBL_RESULT_INCOMPLETE || result == GBL_RESULT_UNSUPPORTED) { \
+        GblContext hParent = gblContextParent_(hCtx);   \
+        if(hParent) result = gblContext##name (hParent GBL_VA_ARGS(__VA_ARGS__));   \
     }
-}
 
-EVMU_API EVMU_RESULT GblContextDeviceIndex(const GblContext* pCtx, uint32_t index, EVMUDevice** ppDevice) {
-    EVMU_RESULT_VALIDATE_HANDLE(pCtx);
-    EVMU_RESULT_CTX_FOLD(pCtx, VALIDATE_ARG, ppDevice);
+#define GBL_CONTEXT_EXT_DECL_(name, ...) \
+    GBL_API gblContext##name (GblContext hCtx, const GblStackFrame* pFrame GBL_VA_ARGS(GBL_MAP_LIST(GBL_DECL_VAR_PAIR, __VA_ARGS__)))
 
-    *ppDevice = (index < pCtx->deviceCount)?
-                pCtx->ppDevices[index] : NULL;
+#define GBL_CONTEXT_EXT_IMPL_(name, memberFn, ...) \
+    GBL_CONTEXT_EXT_DECL_(name, __VA_ARGS__) { \
+        GBL_ASSERT(hCtx && pFrame); \
+        GBL_RESULT result = GBL_RESULT_UNIMPLEMENTED; \
+        if(hCtx->ext. memberFn) { \
+            result = hCtx->ext.memberFn(pFrame GBL_VA_ARGS(GBL_MAP_LIST(GBL_DECL_VAR_PAIR_NAME, __VA_ARGS__))); \
+        } \
+        GBL_MACRO_CONDITIONAL_CALL(GBL_CONFIG_EXT_CONTEXT_PARENT_ENABLED, GBL_CONTEXT_EXT_IMPL_PARENT_CALL_, \
+                   name, result, hCtx, pFrame GBL_VA_ARGS(GBL_MAP_LIST(GBL_DECL_VAR_PAIR_NAME, __VA_ARGS__)));    \
+        GBL_MACRO_CONDITIONAL_CALL(GBL_CONFIG_EXT_CONTEXT_DEFAULT_ENABLED, GBL_CONTEXT_EXT_IMPL_DEFAULT_CALL_, \
+                       name, result, hCtx, pFrame GBL_VA_ARGS(GBL_MAP_LIST(GBL_DECL_VAR_PAIR_NAME, __VA_ARGS__))); \
+        return result; \
+    }
 
-    return EVMU_RESULT_SUCCESS;
-}
+GBL_CONTEXT_EXT_DECL_(LogWriteDefault_, (GBL_LOG_LEVEL, level), (const char*, pFmt), (va_list, varArgs)) {
+    GBL_API_BEGIN(hCtx);
+    GBL_API_VERIFY_POINTER(pFmt);
+    GBL_API_VERIFY_ARG(level >= 0 /*&& level < GBL_LOG_LEVEL_COUNT*/); // or not to allow for user levels!
 
-EVMU_API EVMU_RESULT evmuLogWriteDefault(const GblContext* pCtx,
-                                const char* pFileName,
-                                const char* pFunction,
-                                uint64_t line,
-                                EVMU_LOG_LEVEL level,
-                                const char* pFormat,
-                                ...)
-{
-    EVMU_RESULT_VALIDATE_HANDLE(pCtx);
-    EVMU_RESULT_CTX_FOLD(pCtx, VALIDATE_ARG, pFormat);
-    EVMU_RESULT_CTX_FOLD(pCtx, VALIDATE_ARG, level, level >= 0 && level <= EVMU_LOG_LEVEL_ERROR);
-
-    FILE* const pFile = (level >= EVMU_LOG_LEVEL_ERROR)?
+    char buffer[GBL_VA_SNPRINTF_BUFFER_SIZE] = { '\0' };
+    char tabBuff[GBL_VA_SNPRINTF_BUFFER_SIZE];// = { '\t' };
+    FILE* const pFile = (level >= GBL_LOG_LEVEL_ERROR)?
                 stderr : stdout;
-
     const char* pPrefix = NULL;
 
-    EVMU_RESULT result = EVMU_RESULT_SUCCESS;
-
     switch(level) {
-    case EVMU_LOG_LEVEL_WARNING: pPrefix = "! - "; break;
-    case EVMU_LOG_LEVEL_ERROR:   pPrefix = "X - "; break;
-    case EVMU_LOG_LEVEL_DEBUG:   pPrefix = "@ - "; break;
-    default:                     pPrefix = "";     break;
+    case GBL_LOG_LEVEL_WARNING: pPrefix = "! - "; break;
+    case GBL_LOG_LEVEL_ERROR:   pPrefix = "X - "; break;
+    case GBL_LOG_LEVEL_DEBUG:   pPrefix = "@ - "; break;
+    default:                    pPrefix = "";     break;
     }
 
-    EVMU_VA_SNPRINTF(pFormat);
+    const int vsnprintfBytes = vsnprintf(buffer, sizeof(buffer), pFmt, varArgs);
     if(vsnprintfBytes > (int)sizeof(buffer)) {
         pPrefix = "T - "; //Truncated prefix!
-        result = EVMU_RESULT_INCOMPLETE;
+        GBL_API_RESULT_SET(GBL_RESULT_TRUNCATED, "Log message truncated!");
     }
 
-    char tabBuff[EVMU_LOG_WRITE_DEFAULT_BUFFER_SIZE] = { '\t' };
-
-    CtxDefaultUserdata_* pUd = ctxDefaultUserdata_(pCtx);
-
-    EVMU_RESULT_CTX_FOLD(pCtx,
-                         ASSIGN_GOTO,
-                            pUd,
-                            INVALID_HANDLE,
-                            done,
-                         "Failed to retrieve default context userdata!");
-
-    tabBuff[pUd->logStackDepth] = '\0';
-
-    EVMU_RESULT_ASSIGN_GOTO(pCtx,
-                            (fprintf(pFile, "%s%s%s [%s:%zu %s]\n", tabBuff, pPrefix, buffer, pFileName, line, pFunction) >= 0),
-                            FILE_WRITE,
-                            done);
-
-    EVMU_RESULT_ASSIGN_GOTO(pCtx, fflush(pFile) == 0, FILE_WRITE, done);
-
-done:
-    return result;
-}
-
-
-EVMU_API EVMU_RESULT evmuLogWrite_(const GblContext* pCtx,
-                                   const char* pFile, const char* pFunction, uint64_t line,
-                                   EVMU_LOG_LEVEL level, const char* pFormat, ...)
-{
-    EVMU_RESULT_VALIDATE_HANDLE(pCtx);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, pFormat);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, level, level >= 0 && level <= EVMU_LOG_LEVEL_ERROR);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, pFile);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, pFunction);
-
-    EVMU_VA_SNPRINTF(pFormat);
-    const EVMULogWriteFn pWrite = pCtx->createInfo.logCallbacks.pWriteFn;
-
-    if(pWrite) {
-        return pWrite(EVMU_CTX_UD(pCtx),
-                    pFile, pFunction, line,
-                    level, buffer);
-    } else {
-        return evmuLogWriteDefault(pCtx, pFile, pFunction, line, level, buffer);
+    //not per byte!
+    for(unsigned t = 0; t < hCtx->logStackDepth; ++t) {
+        tabBuff[t] = '\t';
     }
-}
-
-EVMU_API EVMU_RESULT evmuLogPush_(const GblContext* pCtx)
-{
-    EVMU_RESULT_VALIDATE_HANDLE(pCtx);
-
-    EVMU_RESULT result = EVMU_RESULT_SUCCESS;
-    const EVMULogPushFn pPush = pCtx->createInfo.logCallbacks.pPushFn;
-
-    if(pPush) {
-        return pPush(EVMU_CTX_UD(pCtx));
-    } else {        CtxDefaultUserdata_* pUd = ctxDefaultUserdata_(pCtx);
-
-        EVMU_RESULT_ASSIGN_GOTO(pCtx,
-                                pUd,
-                                INVALID_HANDLE,
-                                done,
-                                "Failed to retrieve default context userdata!");
-
-        const uint32_t newDepth = pUd->logStackDepth + 1;
-        EVMU_RESULT_ASSIGN_GOTO(pCtx, (newDepth > pUd->logStackDepth), LOG_PUSH_OVERFLOW, done, "Overflowing log stack!");
-        ++pUd->logStackDepth;
-    }
-done:
-    return result;
-}
-
-
-EVMU_API EVMU_RESULT evmuLogPop_(const GblContext* pCtx,
-                                    uint32_t count)
-{
-    EVMU_RESULT_VALIDATE_HANDLE(pCtx);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, count);
-
-    EVMU_RESULT result = EVMU_RESULT_SUCCESS;
-    const EVMULogPopFn pPop = pCtx->createInfo.logCallbacks.pPopFn;
-
-    if(pPop) {
-        return pPop(EVMU_CTX_UD(pCtx), count);
-    } else {
-        CtxDefaultUserdata_* pUd = ctxDefaultUserdata_(pCtx);
-
-        EVMU_RESULT_ASSIGN_GOTO(pCtx,
-                                pUd,
-                                INVALID_HANDLE,
-                                end);
-        EVMU_RESULT_ASSIGN_GOTO(pCtx, pUd->logStackDepth == 0, LOG_POP_UNDERFLOW, end, "Underflowing log stack!");
-
-        --pUd->logStackDepth;
-
-    }
-end:
-    return result;
-}
-
-
-EVMU_API EVMU_RESULT evmuMalloc_(const GblContext* pCtx,
-                                    size_t size,
-                                    size_t alignment,
-                                    void** ppData)
-{
-    EVMU_RESULT_VALIDATE_HANDLE(pCtx);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, ppData);
-    EVMU_RESULT_VALIDATE_ARG(size);
-    EVMU_RESULT_VALIDATE_ARG(alignment);
-
-    const EVMUMallocFn pMalloc = pCtx->createInfo.allocCallbacks.pMallocFn;
-    if(pMalloc) {
-        return pMalloc(EVMU_CTX_UD(pCtx), size, alignment, ppData);
-    } else {
-        EVMU_LOG(WARNING, "Malloc %zu bytes ignoring alignment: %zu", size, alignment);
-        *ppData = malloc(size);
-        EVMU_RESULT_RETURN(pCtx, ppData, MEM_MALLOC);
-    }
-    return EVMU_RESULT_SUCCESS;
-}
-
-EVMU_API EVMU_RESULT evmuRealloc_(const GblContext* pCtx,
-                                     void* pExistingData,
-                                     size_t newSize,
-                                     size_t newAlignment,
-                                     void* ppNewData)
-{
-    EVMU_RESULT_VALIDATE_HANDLE(pCtx);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, pExistingData);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, newSize);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, newAlignment);
-    EVMU_RESULT_VALIDATE_ARG(pCtx, ppNewData);
-
-    const EVMUReallocFn pRealloc = pCtx->createInfo.allocCallbacks.pReallocFn;
-    if(pRealloc) {
-        return pRealloc(EVMU_CTX_UD(pCtx), pExistingData, newSize, newAlignment, ppNewData);
-    } else {
-        EVMU_LOG(WARNING, "Realloc %zu bytes ignoring alignment: %zu", newSize, newAlignment);
-        *ppData = realloc(pExistingData, newSize);
-        EVMU_RESULT_RETURN(pCtx, ppData, MEM_REALLOC);
-    }
-    return EVMU_RESULT_SUCCESS;
-}
-
-
-EVMU_API EVMU_RESULT evmuFree_(const GblContext* pCtx,
-                                  void* pData)
-{
-    EVMU_RESULT_VALIDATE_HANDLE(pCtx);
-    const EVMUFreeFn pFree = pCtx->createInfo.allocCallbacks.pFreeFn;
-    if(pFree) {
-        return pFree(EVMU_CTX_UD(pCtx), pData);
-    } else {
-        free(pData);
-    }
-    return EVMU_RESULT_SUCCESS;
-}
+    tabBuff[hCtx->logStackDepth] = '\0';
+#if 0
+    GBL_API_VERIFY((fprintf(pFile, "%s%s%s [%s:" GBL_SIZE_FMT " %s]\n",
+                            tabBuff, pPrefix, buffer,
+                            pFrame->sourceCurrent.pFile,
+                            pFrame->sourceCurrent.line,
+                            pFrame->sourceCurrent.pFunc)
+                    >= 0), GBL_RESULT_ERROR_FILE_WRITE);
+#else
+    GBL_UNUSED(pFrame);
+    GBL_API_VERIFY((fprintf(pFile, "%s%s%s\n",
+                            tabBuff, pPrefix, buffer)
+                    >= 0), GBL_RESULT_ERROR_FILE_WRITE);
 #endif
+    GBL_API_VERIFY(fflush(pFile) == 0, GBL_RESULT_ERROR_FILE_WRITE);
+
+    GBL_API_END();
+}
+
+
+GBL_CONTEXT_EXT_DECL_(LogPopDefault_, (uint32_t, count)) {
+    GBL_UNUSED(pFrame);
+    GBL_API_BEGIN(hCtx);
+    GBL_API_VERIFY(hCtx->logStackDepth >= count, GBL_RESULT_ERROR_UNDERFLOW);
+    hCtx->logStackDepth -= count;
+    GBL_API_END();
+}
+
+GBL_API gblContextLogPushDefault_(GblContext hCtx, const GblStackFrame* pFrame) {
+    GBL_UNUSED(pFrame);
+    GBL_API_BEGIN(hCtx);
+    GBL_API_VERIFY(hCtx->logStackDepth + 1 > hCtx->logStackDepth, GBL_RESULT_ERROR_OVERFLOW);
+    ++hCtx->logStackDepth;
+    GBL_API_END();
+}
+
+GBL_CONTEXT_EXT_DECL_(MemAllocDefault_, (GblSize, size), (GblSize, alignment), (void**, ppData)) {
+    GBL_UNUSED(pFrame);
+    GBL_API_BEGIN(hCtx);
+    GBL_API_VERIFY_ARG(size);
+    GBL_API_VERIFY_ARG(alignment <= size && alignment >= 0);
+    GBL_API_VERIFY_POINTER(ppData);
+    *ppData = malloc(size);
+    GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_MEM_ALLOC);
+    GBL_API_DEBUG("Malloc[Size: " GBL_SIZE_FMT ", Align: " GBL_SIZE_FMT "] => %p [%s:" GBL_SIZE_FMT " %s]",
+                  size, alignment, *ppData,
+                  pFrame->sourceCurrent.pFile, pFrame->sourceCurrent.line, pFrame->sourceCurrent.pFunc);
+    GBL_API_END();
+}
+
+GBL_CONTEXT_EXT_DECL_(MemReallocDefault_, (void*, pData), (GblSize, newSize), (GblSize, newAlign), (void**, ppNewData)) {
+    GBL_UNUSED(pFrame);
+    GBL_API_BEGIN(hCtx);
+    GBL_API_VERIFY_ARG(newSize);
+    GBL_API_VERIFY_ARG(newAlign <= newSize && newAlign >= 0);
+    GBL_API_VERIFY_POINTER(pData);
+    GBL_API_VERIFY_POINTER(ppNewData);
+    *ppNewData = realloc(pData, newSize);
+    GBL_API_VERIFY(*ppNewData, GBL_RESULT_ERROR_MEM_REALLOC);
+    GBL_API_DEBUG("Realloc[Size: " GBL_SIZE_FMT ", Align: " GBL_SIZE_FMT "] %p => %p [%s:" GBL_SIZE_FMT " %s]",
+                  newSize, newAlign, (uintptr_t)pData, *ppNewData,
+                  pFrame->sourceCurrent.pFile, pFrame->sourceCurrent.line, pFrame->sourceCurrent.pFunc);
+    GBL_API_END();
+}
+
+
+GBL_CONTEXT_EXT_DECL_(MemFreeDefault_, (void*, pData)) {
+    GBL_UNUSED(pFrame);
+    GBL_API_BEGIN(hCtx);
+    const uintptr_t ptrVal = (uintptr_t)pData;
+    free(pData);
+    GBL_API_DEBUG("Free %p [%s:" GBL_SIZE_FMT " %s]",
+                  ptrVal,
+                  pFrame->sourceCurrent.pFile, pFrame->sourceCurrent.line, pFrame->sourceCurrent.pFunc);
+    GBL_API_END();
+}
+
+GBL_CONTEXT_EXT_IMPL_(LogWrite, log.pFnWrite, (GBL_LOG_LEVEL, level), (const char*, pFmt), (va_list, varArgs))
+GBL_CONTEXT_EXT_IMPL_(LogPop, log.pFnPop, (uint32_t, count))
+
+GBL_CONTEXT_EXT_IMPL_(MemAlloc, mem.pFnAlloc, (GblSize, size), (GblSize, alignment), (void**, ppData))
+GBL_CONTEXT_EXT_IMPL_(MemRealloc, mem.pFnRealloc, (void*, pData), (GblSize, newSize), (GblSize, newAlign), (void**, ppNewData))
+GBL_CONTEXT_EXT_IMPL_(MemFree, mem.pFnFree, (void*, pData))
+
+GBL_API gblContextLogPush(GblContext hCtx, const GblStackFrame* pFrame) {
+    GBL_ASSERT(hCtx && pFrame);
+    GBL_RESULT result = GBL_RESULT_UNIMPLEMENTED;
+    if(hCtx->ext.log.pFnPush) {
+        result = hCtx->ext.log.pFnPush(pFrame);
+    }
+#if GBL_CONFIG_EXT_CONTEXT_PARENT_ENABLED
+    if(result == GBL_RESULT_UNIMPLEMENTED || result == GBL_RESULT_INCOMPLETE || result == GBL_RESULT_UNSUPPORTED) {
+        GblContext hParent = gblContextParent_(hCtx);
+        if(hParent) result = gblContextLogPush(hParent, pFrame);
+    }
+#endif
+#if GBL_CONFIG_EXT_CONTEXT_DEFAULT_ENABLED
+    if(result == GBL_RESULT_UNIMPLEMENTED || result == GBL_RESULT_INCOMPLETE || result == GBL_RESULT_UNSUPPORTED) {
+        result = gblContextLogPushDefault_(hCtx, pFrame);
+    }
+#endif
+    return result;
+}
+

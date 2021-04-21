@@ -7,13 +7,24 @@
 extern "C" {
 #endif
 
+GBL_DECLARE_OPAQUE(GblObject);
 
-typedef struct GblObject {
+GBL_DECLARE_ENUM(GBL_OBJECT_TYPE) {
+    GBL_OBJECT_TYPE_OBJECT,
+    GBL_OBJECT_TYPE_HANDLE,
+    GBL_OBJECT_TYPE_CONTEXT,
+    GBL_OBJECT_TYPE_BUILTIN_COUNT,
+    GBL_OBJECT_TYPE_USER,
+};
+
+#define GBL_OBJECT_INVALID NULL
+
+typedef struct GblObject_ {
     GblMetaType* pMetaType;
 
-} GblObject;
+} GblObject_;
 
-GBL_API gblObjectMetaType(GblObject* pObj, const GblMetaType** pMetaType);
+GBL_API gblObjectMetaType(GblObject pObj, const GblMetaType** pMetaType);
 
 
 

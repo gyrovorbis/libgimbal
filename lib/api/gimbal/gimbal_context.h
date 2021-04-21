@@ -24,7 +24,7 @@ typedef struct GblContextExtLog {
 } GblContextExtLog;
 
 typedef struct GblContextExtMem {
-    GblExtMemMallocFn          pFnMalloc;
+    GblExtMemAllocFn           pFnAlloc;
     GblExtMemReallocFn         pFnRealloc;
     GblExtMemFreeFn            pFnFree;
 } GblContextExtMem;
@@ -35,32 +35,20 @@ typedef struct GblContextExtApi {
     GblExtApiLastErrorFn    pFnLastError;
 } GblContextExtApi;
 
+// Let Contexts have parent contexts
 typedef struct GblContextCreateInfo {
-    GblVersion          versionMin;
-    void*               pUserdata;
-    GblContextExtLog*   pExtLog;
-    GblContextExtMem*   pExtMem;
-    GblContextExtApi*   pExtApi;
+    GblVersion                versionMin;
+    GblHandleCreateInfo       handleInfo;
+    const GblContextExtLog*   pExtLog;
+    const GblContextExtMem*   pExtMem;
+    const GblContextExtApi*   pExtApi;
 } GblContextCreateInfo;
 
 
-GBL_DECLARE_HANDLE(GblContext);
+GBL_DECLARE_OPAQUE(GblContext);
 
 struct GblState;
 
-typedef struct GblContext_ {
-    GblHandle_                  baseHandle;
-
-    struct {
-        GblContextExtLog        log;
-        GblContextExtMem        mem;
-        GblContextExtApi        api;
-    }                           ext;
-
-    //GblError               lastError;
-    //GblContextCreateInfo   createInfo;
-    //GblApiCookie*          pApiCookieTop;
-} GblContext_;
 
 
 /* Use GBL_VERSION_STRING for compile-time version.
@@ -68,128 +56,27 @@ typedef struct GblContext_ {
  */
 
 
-GBL_API gblContextVersion           (GblVersion* pVersion); //hard-compiled
-GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateInfo* pInfo);
-GBL_API gblContextDestroy           (GblContext* phCtx);
-
-// VIRTUALS
-GBL_API gblContextExtLogWrite       (GblContext hCtx, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
-GBL_API gblContextExtLogPush        (GblContext hCtx);
-GBL_API gblContextExtLogPop         (GblContext hCtx, uint32_t count);
-
-GBL_API gblContextExtMemMalloc      (GblContext hCtx, GblSize size, GblSize alignment, void** ppData);
-GBL_API gblContextExtMemRealloc     (GblContext hCtx, const void* pData, GblSize newSize, GblSize newAlign, void** pNewData);
-GBL_API gblContextExtMemFree        (GblContext hCtx, void* pData);
-
-GBL_API gblContextExtApiBegin       (GblHandle hHandle);
-GBL_API gblContextExtApiEnd         (GblHandle hHandle);
-GBL_API gblContextExtApiLastError   (GblHandle hHandle, GblError** ppError);
-
-
-#if 0
-
-//Polymorphic API calls for gblContext
-
-GBL_API gblContextMetaType(GblContext* pCtx, void*);
-GBL_API gblContextExtMalloc();
-GBL_API gblContextExtWrite();
-
-#endif
-
-
-
-#if 0
-GBL_API gblContextVersion(GblVersionInfo** ppVersionInfo,
-                          GblContext* phCtx);
-
-
-GBL_API gblContextApiCookieTop(const GblContext* pCtx,
-                               GblApiCookie** ppCookie);
-
-GBL_API gblContextApiCookiePush(GblContext* pCtx,
-                                GblApiCookie* pCookie);
-
-GBL_API gblContextApiCookiePop(GblContext* pCtx);
-
-GBL_API gblContextLastError(const GblContext* pCtx,
-                            const GblError** ppError);
-#endif
-
-
-/* Should be inherited as a handle
-GBL_API gblContextUserdata(const GblContext* pCtx,
-                           void** ppUd);
-
-
-GBL_API gblContextParent(const GblContext* pCtx,
-                         GblContext* pParent);
-
-GBL_API gblContextChild(const GblContext* pCtx,
-                        uint32_t index,
-                        GblContext* pChild);
-*/
-
-
-// gblContextLog
-//gblContextMalloc
-//gblContextEtc
+GBL_API gblContextVersion         (GblVersion* pVersion); //hard-compiled
+GBL_API gblContextCreate          (GblContext* phCtx, const GblContextCreateInfo* pInfo);
+//GBL_API gblContextBuildInfo
+GBL_API gblContextDestroy         (GblContext phCtx);
 
 
 
 
-#if 0
 
-GBL_API gblContextUpdateLastError_(GblContext* pCtx,
-                                                 GblDevice* pDevice,
-                                                 GBL_RESULT resultCode,
-                                                 GBL_LOG_LEVEL logLevel,
-                                                 const char* pFile,
-                                                 const char* pFunc,
-                                                 GblSize_t line,
-                                                 const char* pFormat,
-                                                 ...)
-{
-#ifdef GBL_RESULT_CONTEXT_TRACK_LAST_ERROR
-    if(!pCtx) return GBL_RESULT_ERROR_INVALID_HANDLE;
-    if(!pFormat) pFormat = "";
+/* these are not really actually public, really.... maybe hide them? */
+GBL_API gblContextLogWrite       (GblContext hCtx, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
+GBL_API gblContextLogPush        (GblContext hCtx, const GblStackFrame* pFrame);
+GBL_API gblContextLogPop         (GblContext hCtx, const GblStackFrame* pFrame, uint32_t count);
 
-    GBL_RESULT result = GBL_RESULT_SUCCESS;
-    GBLError* pError = &pCtx->lastError;
+GBL_API gblContextMemAlloc      (GblContext hCtx, const GblStackFrame* pFrame, GblSize size, GblSize alignment, void** ppData);
+GBL_API gblContextMemRealloc     (GblContext hCtx, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** pNewData);
+GBL_API gblContextMemFree        (GblContext hCtx, const GblStackFrame* pFrame, void* pData);
 
-    pError->result  = resultCode;
-    pError->pDevice = pDevice;
-    pError->pFile   = pFile;
-    pError->pFunc   = pFunc;
-    pError->line    = line;
+GBL_API gblContextApiBegin       (GblHandle hHandle);
+GBL_API gblContextApiEnd         (GblHandle hHandle);
 
-    va_list argptr;
-    va_start(argptr, pFormat);
-
-    if(!GBL_RESULT_SUCCESS(result)) {
-        va_list argptr;
-        va_start(argptr, pFormat);
-
-        const int retVal = vsnprintf(pError->msg, sizeof(pError->msg), pFormat, argptr);
-        va_end(argptr);
-
-        if(retVal < 0) {
-            result = GBL_RESULT_ERROR_VSNPRINTF;
-        } else if((unsigned long)retVal > sizeof(pError->msg)) {
-            result = GBL_RESULT_TRUNCATED;
-        }
-
-    } else {
-        pError->msg[0] = '\0';
-    }
-
-    return result;
-#else
-    return GBL_RESULT_UNIMPLEMENTED;
-#endif
-}
-
-
-#endif
 
 #ifdef __cplusplus
 }

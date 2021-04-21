@@ -26,9 +26,8 @@ typedef struct GblHandleMetaType {
 } GblHandleMetaType;
 #endif
 
-
-GBL_DECLARE_HANDLE(GblHandle);
-GBL_DECLARE_HANDLE(GblContext);
+GBL_DECLARE_OPAQUE(GblContext);
+GBL_DECLARE_OPAQUE(GblHandle);
 
 typedef struct GblHandleCreateInfo {
     GblHandle   hParent;
@@ -37,10 +36,11 @@ typedef struct GblHandleCreateInfo {
 
 
 typedef struct GblHandle_ {
-    GblObject               baseObject;
+    GblObject_*             baseObject;
     void*                   pUserdata;
     struct GblHandle_*      pParent;
     struct GblContext_*     pContext;
+    GblApiResult            lastError;
 } GblHandle_;
 
 GBL_API gblHandleConstruct(GblContext hContext,
@@ -49,8 +49,11 @@ GBL_API gblHandleConstruct(GblContext hContext,
 
 GBL_API gblHandleDestruct(GblHandle hHandle);
 
-GBL_API gblHandleParent(GblHandle hHandle,
+GBL_API gblHandleParentGet(GblHandle hHandle,
                         GblHandle* phParent);
+
+GBL_API gblHandleParentSet(GblHandle hHandle,   //useful for run-time dependency injection
+                           GblHandle hParent);
 
 GBL_API gblHandleContext(GblHandle hHandle,
                          GblContext* phCtx);
@@ -58,6 +61,15 @@ GBL_API gblHandleContext(GblHandle hHandle,
 GBL_API gblHandleUserdata(GblHandle hHandle,
                           void** ppUserdata);
 
+
+// this could be returning just a the base of a custom subclass
+GBL_API gblHandleLastErrorGet(GblHandle hHandle,
+                            const GblApiResult** pError);
+
+
+// this could theoretically construct or call into some userdata shit for more info
+GBL_API gblHandleLastErrorSet(GblHandle hHandle,
+                            const GblApiResult* pError);
 
 
 

@@ -1,16 +1,22 @@
-﻿#ifndef GBLBAL_VARIANT_H
-#define GBLBAL_VARIANT_H
+﻿#ifndef GIMBAL_VARIANT_H
+#define GIMBAL_VARIANT_H
 
 #include "gimbal_types.h"
 #include <stdint.h>
 
-GBL_FORWARD_DECLARE_STRUCT(GblTable);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+GBL_DECLARE_OPAQUE(GblContext);
+GBL_FORWARD_DECLARE_STRUCT(GblTable);
+GBL_FORWARD_DECLARE_STRUCT(GblVariant);
 // 1 - built-in stack compatible value types
 // 2 - basic fundamental proxy meta types (GblStringView, GblString, GblTable, GblError, etc)
 // 3 - userdata/table proxy metatypes + references
 
-typedef GBL_RESULT (*GblFunction)(GblContext*, GblVariant);
+
+typedef GBL_RESULT (*GblFunction)(GblContext, GblVariant);
 
 GBL_DECLARE_ENUM(GBL_VARIANT_TYPE_CLASS) {
     GBL_VARIANT_TYPE_CLASS_NIL,
@@ -51,6 +57,8 @@ typedef struct GblVariant {
     GblVariantValue     value;
     GBL_VARIANT_TYPE    type;
 } GblVariant;
+
+
 
 GBL_DECLARE_ENUM(GBL_VARIANT_METAKEY) {
     GBL_VARIANT_METAKEY_INDEX,           // can be tables
@@ -93,7 +101,7 @@ typedef GBL_RESULT (*GblVariantMetaConstructorFn)   (GblVariant*, const GblVaria
 typedef GBL_RESULT (*GblVariantMetaDestructorFn)    (GblVariant*, const GblVariant*);
 typedef GBL_RESULT (*GblVariantMetaValueSetFn)      (const GblVariant*, GblVariant*);
 typedef GBL_RESULT (*GblVariantMetaValueGetFn)      (GblVariant*, const GblVariant*);
-typedef GBL_RESULT (*GblVariantMetaMethodFn)        (GBL_VARIANT_META_KEY, GblVariant*, const GblVariant*, const GblVariant*);
+typedef GBL_RESULT (*GblVariantMetaMethodFn)        (GBL_VARIANT_METAKEY, GblVariant*, const GblVariant*, const GblVariant*);
 
 GBL_DECLARE_ENUM(GBL_USERDATA_TYPE) {
     GBL_METATYPE_USERDATA_UNKNOWN
@@ -119,11 +127,10 @@ typedef struct GblVariantMetaType {
     GblVariantMetaValueGetFn        pFnValueGet;
     GblVariantMetaValueSetFn        pFnValueSet;
     GblVariantMetaMethodFn          pFnMetaMethod;
-} GblMetaType;
+} GblVariantMetaType;
 
 typedef struct GblMetaType {
-
-
+    GBL_VARIANT_TYPE variantType;
 } GblMetaType;
 
 // GblVariantMetaType <=> QMetaType
@@ -177,7 +184,9 @@ GBL_API gblVariantCompare(const GblVariant* pLhs,
 //can call metamethods on tables and shit!
 
 
-
+#ifdef __cplusplus
+}
+#endif
 
 
 

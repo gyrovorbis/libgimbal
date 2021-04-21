@@ -1,207 +1,64 @@
-#ifndef EVMU_RESULT_H
-#define EVMU_RESULT_H
+#ifndef GIMBAL_RESULT_H
+#define GIMBAL_RESULT_H
 
-#include "evmu_context.h"
+#include "gimbal_macros.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define EVMU_LOG_WRITE(ctx, file, func, line, level, ...)  \
-    evmuLogWrite(ctx, file, func, line,                    \
-                 EVMU_LOG_LEVEL_##level,                   \
-                 __VA_ARGS__)
 
-#define EVMU_LOG(level, ctx, ...)                     \
-    EVMU_LOG_WRITE(ctx, __FILE__, __func__, __LINE__, \
-                   level, __VA_ARGS__)
+#define GBL_RESULT_TYPE_MASK 0xfff00000
 
+GBL_DECLARE_ENUM(GBL_RESULT) {
+    GBL_RESULT_UNKNOWN                          = 0x0,
+    GBL_RESULT_SUCCESS                          = 0x1,
+    GBL_RESULT_PARTIAL_SUCCESS                  = 0x2,          // Some inner stuff failed, but outer is okay (getlasterror)
+    GBL_RESULT_NOT_READY                        = 0x3,
+    GBL_RESULT_NOT_FOUND                        = 0x4,          // Finding an item by name or index with NULL return
+    GBL_RESULT_TIMEOUT                          = 0x5,
+    GBL_RESULT_INCOMPLETE                       = 0x6,
+    GBL_RESULT_TRUNCATED                        = 0x7,          // Buffer not large enough
+    GBL_RESULT_LOSSY_CONVERSION                 = 0x8,
+    GBL_RESULT_UNIMPLEMENTED                    = 0x9,          // Not implemented on this build yet (but planning)
+    GBL_RESULT_UNSUPPORTED                      = 0xa,          // Either cannot or will not support it intentionally
+    GBL_RESULT_VERSION_MISMATCH                 = 0xb,          // Requested version is greater than supported version
+    GBL_RESULT_ERROR                            = 0xbad00000,
+    GBL_RESULT_ERROR_INVALID_HANDLE             = GBL_RESULT_ERROR | 1,
+    GBL_RESULT_ERROR_INVALID_POINTER            = GBL_RESULT_ERROR | 2,
+    GBL_RESULT_ERROR_INVALID_ARG                = GBL_RESULT_ERROR | 3,
+    GBL_RESULT_ERROR_MEM_ALLOC                  = GBL_RESULT_ERROR | 4,
+    GBL_RESULT_ERROR_MEM_REALLOC                = GBL_RESULT_ERROR | 5,
+    GBL_RESULT_ERROR_MEM_FREE                   = GBL_RESULT_ERROR | 6,
+    GBL_RESULT_ERROR_FILE_OPEN                  = GBL_RESULT_ERROR | 7,
+    GBL_RESULT_ERROR_FILE_READ                  = GBL_RESULT_ERROR | 8,
+    GBL_RESULT_ERROR_FILE_WRITE                 = GBL_RESULT_ERROR | 9,
+    GBL_RESULT_ERROR_FILE_CLOSE                 = GBL_RESULT_ERROR | 10,
+    GBL_RESULT_ERROR_UNDERFLOW                  = GBL_RESULT_ERROR | 11, //integers, log depth, api cookie/context
+    GBL_RESULT_ERROR_OVERFLOW                   = GBL_RESULT_ERROR | 12,
+    GBL_RESULT_ERROR_VSNPRINTF                  = GBL_RESULT_ERROR | 13,
+    GBL_RESULT_ERROR_INTERNAL_ASSERT            = GBL_RESULT_ERROR | 14,
+    GBL_RESULT_ERROR_VARIANT_TYPE_INCOMPATIBLE  = GBL_RESULT_ERROR | 15,
+    GBL_RESULT_COUNT                            = GBL_RESULT_ERROR_VARIANT_TYPE_INCOMPATIBLE + 1
+};
 
-#define EVMU_LOG_PUSH_1(ctx) \
-    evmuLogPush(ctx)
+#define GBL_RESULT_SUCCESS(value) \
+    (value == GBL_RESULT_SUCCESS)
 
-#define EVMU_LOG_PUSH_N(ctx, ...)               \
-    do {                                        \
-        EVMU_LOG(VERBOSE, ctx, __VA_ARGS__);    \
-        EVMU_LOG_PUSH_1(ctx);                   \
-    while(0)
+#define GBL_RESULT_PARTIAL(value) \
+    (!GBL_RESULT_SUCCESS(value) && !GBL_RESULT_ERROR(value) && value != GBL_RESULT_UNKNOWN)
 
-#define EVMU_LOG_PUSH(...)                                 \
-    EVMU_VA_OVERLOAD_CALL(EVMU_LOG_PUSH,                   \
-                          EVMU_VA_OVERLOAD_SUFFIXER_1_N,   \
-                          __VA_ARGS__)
+#define GBL_RESULT_ERROR(value) \
+    (((value) & 0xfff00000) == GBL_RESULT_ERROR)
 
-
-#define EVMU_LOG_POP_1(ctx, count) \
-    evmuLogPop(ctx, count)
-
-#define EVMU_LOG_POP_0(ctx) \
-    EVMU_LOG_POP_1(ctx, 1)
-
-#define EVMU_LOG_POP(...)                                   \
-    EVMU_VA_OVERLOAD_CALL(EVMU_LOG_POP,                     \
-                          EVMU_VA_OVERLOAD_SUFFIXER_ARGC,   \
-                          __VA_ARGS__)
-
-
-#define EVMU_VA_ARGS(...) \
-    __VA_ARGS__
-
-#define EVMU_CTX_DEV(pCtx) \
-    EVMU_VA_ARGS(pCtx, NULL)
-
-#define EVMU_DEV_CTX(pDev) \
-    evmuDeviceContext(pDev), pDev
-
-#define EVMU_RESULT_CTX_FOLD(pCtx, HANDLER, ...) \
-    EVMU_RESULT_##HANDLER(pCtx, NULL, __VA_ARGS__)
-
-#define EVMU_RESULT_CLEAR_LAST_ERROR(pCtx) \
-    EVMU_RESULT_SET_LAST_ERROR(pCtx, NULL, EVMU_RESULT_SUCCESS, EVMU_LOG_LEVEL_VERBOSE, NULL, NULL, 0, NULL)
-
-#define EVMU_RESULT_ERROR_CAT(error) EVMU_APPEND_SUFFIX(EVMU_RESULT_ERROR, error)
-
-#define EVMU_RESULT_HANDLER(pCtx, pDev, exp, errorResult, ...)              \
-    evmuResultHandler(pCtx, pDev, (EVMUBool)(exp), EVMU_RESULT_ERROR_CAT(errorResult),   \
-                      EVMU_FILE, EVMU_FUNC, EVMU_LINE,                \
-                      __VA_ARGS__)
-
-#define EVMU_RESULT_RETURN(pCtx, pDev, exp, errorResult, ...)                     \
-    do {                                                                    \
-        if(!evmuResultHandler(pCtx, pDev, (EVMUBool)(exp), EVMU_RESULT_ERROR_CAT(errorResult),   \
-                              EVMU_FILE, EVMU_FUNC, EVMU_LINE,              \
-                              __VA_ARGS__))                                 \
-            return EVMU_RESULT_ERROR_CAT(errorResult);                                             \
-    } while(0)
-
-
-#define ELYSIAN_RESULT_ASSIGN_0(pCtx, pDev, exp, errorResult) \
-    do {                                                                       \
-        if(!evmuResultHandler(pCtx, pDev, exp, EVMU_RESULT_ERROR_CAT(errorResult),                          \
-                              EVMU_FILE, EVMU_FUNC, EVMU_LINE,                 \
-                              NULL))                                            \
-            result = EVMU_RESULT_ERROR_CAT(errorResult);                                              \
-        }                                                                      \
-    } while(0)
-
-#define EVMU_RESULT_ASSIGN_N(pCtx, pDev, exp, errorResult, ...)                     \
-    do {                                                                       \
-        if(!evmuResultHandler(pCtx, pDev, exp, EVMU_RESULT_ERROR_CAT(errorResult),                          \
-                              EVMU_FILE, EVMU_FUNC, EVMU_LINE,                 \
-                              __VA_ARGS__))                                    \
-            result = EVMU_RESULT_ERROR_CAT(errorResult);                                              \
-        }                                                                      \
-    } while(0)
-
-#define EVMU_RESULT_ASSIGN(...)                   \
-    EVMU_VA_OVERLOAD_CALL(EVMU_RESULT_ASSIGN,     \
-                          EVMU_VA_OVERLOAD_SUFFIXER_0_N,  \
-                          __VA_ARGS__)
-
-#define EVMU_RESULT_ASSIGN_GOTO_1(pCtx, pDev, exp, errorResult, label)            \
-    do {                                                                       \
-        if(!evmuResultHandler(pCtx, pDev, (exp), errorResult,    \
-                              EVMU_FILE, EVMU_FUNC, EVMU_LINE,                 \
-                              NULL)) {                                  \
-            result = errorResult;                                              \
-            goto label;                                                  \
-        }                                                                      \
-    } while(0)
-
-
-#define EVMU_RESULT_ASSIGN_GOTO_2(pCtx, pDev, exp, errorResult, label, pFormat)            \
-    do {                                                                       \
-        if(!evmuResultHandler(pCtx, pDev, (exp), errorResult,    \
-                              EVMU_FILE, EVMU_FUNC, EVMU_LINE,                 \
-                              pFormat)) {                                  \
-            result = errorResult;                                              \
-            goto label;                                    \
-        }                                                                      \
-    } while(0)
-
-#define EVMU_RESULT_ASSIGN_GOTO_N(pCtx, pDev, exp, errorResult, label, ...)            \
-    do {                                                                       \
-        if(!evmuResultHandler(pCtx, pDev, (exp), errorResult,    \
-                              EVMU_FILE, EVMU_FUNC, EVMU_LINE,                 \
-                              __VA_ARGS__)) {                                  \
-            result = errorResult;                                              \
-            goto label;                                    \
-        }                                                                      \
-    } while(0)
-
-#define EVMU_RESULT_ASSIGN_GOTO(pCtx, pDev, exp, errorResult, ...)                      \
-    EVMU_VA_OVERLOAD_CALL(EVMU_RESULT_ASSIGN_GOTO,               \
-                          EVMU_VA_OVERLOAD_SUFFIXER_ARGC,    \
-                          __VA_ARGS__)(pCtx, pDev, (exp), EVMU_RESULT_ERROR_CAT(errorResult),__VA_ARGS__)
-
-#define EVMU_RESULT_VALIDATE_ARG_2(pCtx, pDev, argName, exp)                      \
-    do {                                                                    \
-        if(!evmuResultHandler(pCtx, pDev, exp, EVMU_RESULT_ERROR_INVALID_ARG,     \
-                              EVMU_FILE, EVMU_FUNC, EVMU_LINE,              \
-                              "INVALID_ARG[%s]: %s (Value: %d)",            \
-                              EVMU_STRINGIFY(argName), EVMU_STRINGIFY((exp)), argName))                     \
-            return EVMU_RESULT_ERROR_INVALID_ARG;                           \
-    } while(0)
-
-
-#define EVMU_RESULT_VALIDATE_ARG_1(pCtx, pDev, argName)                            \
-    EVMU_RESULT_VALIDATE_ARG_2(pCtx, pDev, argName, argName!=0)
-
-#define EVMU_RESULT_VALIDATE_ARG(pCtx, pDev, ...)                       \
-    EVMU_VA_OVERLOAD_CALL(EVMU_RESULT_VALIDATE_ARG,         \
-                          EVMU_VA_OVERLOAD_SUFFIXER_ARGC,   \
-                          __VA_ARGS__) (pCtx, pDev, __VA_ARGS__)
-
-#define EVMU_RESULT_VALIDATE_HANDLE_3(pCtx, pDev, argName, exp)                   \
-    do {                                                                    \
-        if(!evmuResultHandler(pCtx, pDev, exp, EVMU_RESULT_ERROR_INVALID_ARG,     \
-                              EVMU_FILE, EVMU_FUNC, EVMU_LINE,              \
-                              "INVALID_HANDLE[%s]: %s (Value: %p)",         \
-                              #argName, #exp, argName))                     \
-            return EVMU_RESULT_ERROR_INVALID_HANDLE;                        \
-    } while(0)
-
-
-#define EVMU_RESULT_VALIDATE_HANDLE_2(pCtx, handle) \
-    EVMU_RESULT_VALIDATE_HANDLE_3(pCtx, handle, handle != 0)
-
-#define EVMU_RESULT_VALIDATE_HANDLE_1(pCtx) \
-    EVMU_RESULT_VALIDATE_HANDLE_2(pCtx, pCtx)
-
-
-#define EVMU_RESULT_VALIDATE_HANDLE(...)                   \
-    EVMU_VA_OVERLOAD_CALL(EVMU_RESULT_VALIDATE_HANDLE,     \
-                          EVMU_VA_OVERLOAD_SUFFIXER_ARGC,  \
-                          __VA_ARGS__)(__VA_ARGS__)
-
-
-static inline EVMUBool evmuResultHandler(const EVMUContext*     pCtx,
-                                         const EVMUDevice*      pDevice,
-                                         EVMUBool               exp,
-                                         EVMU_RESULT            result,
-                                         const char*            pFile,
-                                         const char*            pFunc,
-                                         uint64_t               line,
-                                         const char*            pFormat,
-                                        ...)
-{
-    if(!exp) {
-        EVMU_VA_SNPRINTF(pFormat);
-        EVMU_RESULT_LOG(pCtx,
-                        pFile, pFunc, line,
-                        EVMU_RESULT_ERROR_LOG_LEVEL, buffer);
-        EVMU_RESULT_ASSERT(exp, buffer);
-        EVMU_RESULT_SET_LAST_ERROR(pCtx, pDevice, result, EVMU_RESULT_ERROR_LOG_LEVEL, pFile, pFunc, line, buffer);
-    } else {
-        EVMU_RESULT_CLEAR_LAST_ERROR(pCtx);
-    }
-
-    return exp;
+static inline const char* gblResultString(GBL_RESULT code) {
+    return "LULZ";
 }
+
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // EVMU_RESULT_H
+#endif // GIMBAL_RESULT_H
