@@ -1,5 +1,7 @@
 .build_common:
   stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
   artifacts:
     paths:
       - build/
