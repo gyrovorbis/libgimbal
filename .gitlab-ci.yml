@@ -1,47 +1,140 @@
 .build_common:
   stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
   artifacts:
     paths:
       - build/
   script:
     - mkdir build
     - cd build
-    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=/home/falco/Qt/5.15.0/gcc_64 -G Ninja
+    - env
+    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -G Ninja
     - ninja
-    
-build gcc:
+
+.build_linux:
   extends: .build_common
+  variables:
+    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+
+build ubuntu20-gcc10:
+  extends: .build_linux
   tags:
     - linux
   variables:
     CC: gcc
     CXX: g++
     
-build clang:
-  extends: .build_common
+build ubuntu20-clang11:
+  extends: .build_linux
   tags:
-    - master
+    - linux, clang
   variables:
      CC: clang
      CXX: clang++
-    
+
+#build win10-vs2019:
+#  extends: .build_common 
+#  tags:
+#    - visual-studio, win10
+#  variables:   
+#    CC: cl
+#    CXX: cl
+#    PREFIX_PATH: C:/Qt/6.0.2/msvc2019_64
+
+build win10-cygwin-gcc10:
+  extends: .build_common
+  tags:
+    - gcc, win10
+  variables:
+    CC: gcc
+    CXX: g++
+    PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
+
+build win10-mingw8:
+  extends: .build_common
+  tags:
+    - mingw, win10
+  variables:
+    CC: C:/Qt/Tools/mingw810_64/bin/gcc
+    CXX: C:/Qt/Tools/mingw810_64/bin/g++
+  #  PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
+
+build macos-clang12:
+  extends: .build_common
+  tags:
+    - macos, clang
+  variables:
+    CC: clang
+    CXX: clang++
+    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
+
+build macos-gcc10:
+  extends: .build_common
+  tags:
+    - macos, gcc
+  variables:
+    CC: gcc-10
+    CXX: g++-10
+    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
+
 .test_common:
   stage: test
   script:
-    - build/test/ElysianLuaTests
+    - build/test/GimbalTests
     
-test gcc:
+test ubuntu20-gcc10:
   extends: .test_common
-  needs: ["build gcc"]
+  needs: ["build ubuntu20-gcc10"]
   dependencies:
-    - build gcc
+    - build ubuntu20-gcc10
   tags:
-    - linux
+    - linux, gcc
     
-test clang:
+test ubuntu20-clang11:
   extends: .test_common
-  needs: ["build clang"]
+  needs: ["build ubuntu20-clang11"]
   dependencies:
-    - build clang
+    - build ubuntu20-clang11
   tags:
-    - master
+    - linux, clang
+
+#test win10-vs2019:
+#  extends: .test_common
+#  needs: ["build win10-vs2019"]
+#  dependencies:
+#    - build win10-vs2019
+#  tags:
+#    - win10, visual-studio
+
+test win10-cygwin-gcc10:
+  extends: .test_common
+  needs: ["build win10-cygwin-gcc10"]
+  dependencies:
+    - build win10-cygwin-gcc10
+  tags:
+    - gcc, win10
+
+test win10-mingw8:
+  extends: .test_common
+  needs: ["build win10-mingw8"]
+  dependencies:
+    - build win10-mingw8
+  tags:
+    - mingw, win10
+
+test macos-clang12:
+  extends: .test_common
+  needs: ["build macos-clang12"]
+  dependencies:
+    - build macos-clang12
+  tags:
+    - macos, clang
+
+test macos-gcc10:
+  extends: .test_common
+  needs: ["build macos-gcc10"]
+  dependencies:
+    - build macos-gcc10
+  tags:
+    - macos, gcc
