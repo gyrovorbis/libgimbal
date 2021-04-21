@@ -207,8 +207,8 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame)
     do { \
         GBL_API_SOURCE_PUSH(SRC_FILE, SRC_FN, SRC_LN, SRC_COL); \
         const GBL_RESULT localResult = GBL_EXT_##prefix(GBL_API_FRAME(), ##__VA_ARGS__);    \
-        GBL_ASSERT(GBL_RESULT_SUCCESS(localResult), "Ext call failed ["#prefix"]"); \
-        (void)localResult; \
+        GBL_ASSERT(!(GBL_CONFIG_ASSERT_ERROR_ENABLED && GBL_RESULT_ERROR(localResult)), "Ext["#prefix"]: ERROR"); \
+        GBL_ASSERT(!(GBL_CONFIG_ASSERT_PARTIAL_ENABLED && GBL_RESULT_PARTIAL(localResult)), "Ext["#prefix"]: PARTIAL"); \
         GBL_API_SOURCE_POP(); \
     } while(0)
 
@@ -330,8 +330,8 @@ GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char* pFmt, ...) {
 // Base Enabled Logic
 #define GBL_API_RESULT_ASSERT_(result, test)                \
     do {                                                    \
-        GBL_ASSERT(test(result->resultCode), result->message);    \
-    } while(0)                                
+        GBL_ASSERT(!test(result->resultCode), result->message);    \
+    } while(0)
 
 // Base Conditional Logic
 #define GBL_API_RESULT_ASSERT_CONDITIONAL_(enabled, result, test)                   \
@@ -344,7 +344,7 @@ GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char* pFmt, ...) {
 // Error
 #define GBL_API_RESULT_ASSERT_ERROR(result)                                         \
     GBL_API_RESULT_ASSERT_CONDITIONAL_(GBL_CONFIG_ASSERT_ERROR_ENABLED,         \
-                                       result, GBL_RESULT_ERROR)          
+                                       result, GBL_RESULT_ERROR)
 // Both Together
 #define GBL_API_RESULT_ASSERT(result)                       \
     do {                                                    \

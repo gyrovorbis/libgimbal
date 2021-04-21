@@ -193,7 +193,7 @@ public:
 
         virtual ~StdResultException(void) override = default;
 
-        virtual const char* what() const noexcept {
+        virtual const char* what() const noexcept override {
             return ResultException::getResultString();
         }
     };
