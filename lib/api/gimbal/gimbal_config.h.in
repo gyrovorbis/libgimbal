@@ -42,10 +42,12 @@
 #   undef UNIX
 #endif
 
-#cmakedefine WIN32
-#ifdef WIN32
-#   define GBL_WIN32
-#   undef WIN32
+#ifndef WIN32
+#   cmakedefine WIN32
+#   ifdef WIN32
+#       define GBL_WIN32
+#       undef WIN32
+#   endif
 #endif
 
 #cmakedefine XCODE
