@@ -50,6 +50,7 @@ GBL_API gblContextVersion           (GblVersion* pVersion) {
 }
 
 
+
 static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_BEGIN(hCtx, "Build Info");
 
@@ -61,8 +62,31 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_POP(1);
 
     GBL_API_PUSH("Build Info");
+    GBL_API_VERBOSE("%-20s: %40s", "Timestamp", GBL_BUILD_TIMESTAMP);
     GBL_API_VERBOSE("%-20s: %40s", "Type", GBL_BUILD_TYPE);
     GBL_API_VERBOSE("%-20s: %40s", "Config", GBL_BUILD_CONFIG);
+    GBL_API_POP(1);
+
+    GBL_API_PUSH("CI Info");
+    GBL_API_VERBOSE("%-20s: %40s", "Project", GBL_BUILD_CI_PROJECT_TITLE);
+
+    GBL_API_PUSH("Commit Info");
+    GBL_API_VERBOSE("%-20s: %40s", "SHA", GBL_BUILD_CI_COMMIT_SHA);
+    GBL_API_VERBOSE("%-20s: %40s", "Tag", GBL_BUILD_CI_COMMIT_TAG);
+    GBL_API_VERBOSE("%-20s: %40s", "Ref", GBL_BUILD_CI_COMMIT_REF_NAME);
+    GBL_API_POP(1);
+
+    GBL_API_PUSH("Job Info");
+    GBL_API_VERBOSE("%-20s: %40s", "ID", GBL_BUILD_CI_JOB_ID);
+    GBL_API_VERBOSE("%-20s: %40s", "Name", GBL_BUILD_CI_JOB_NAME);
+    GBL_API_VERBOSE("%-20s: %40s", "Stage", GBL_BUILD_CI_JOB_STAGE);
+    GBL_API_VERBOSE("%-20s: %40s", "Build Node", GBL_BUILD_CI_RUNNER_DESCRIPTION);
+    GBL_API_VERBOSE("%-20s: %40s", "User", GBL_BUILD_CI_USER_EMAIL);
+    GBL_API_VERBOSE("%-20s: %40s", "Manual", GBL_BUILD_CI_JOB_MANUAL);
+    GBL_API_VERBOSE("%-20s: %40s", "Triggered", GBL_BUILD_CI_JOB_TRIGGERED);
+    GBL_API_POP(1);
+
+
     GBL_API_POP(1);
 
     GBL_API_PUSH("Compiler Info");
@@ -221,7 +245,6 @@ GBL_CONTEXT_EXT_DECL_(LogWriteDefault_, (GBL_LOG_LEVEL, level), (const char*, pF
                     >= 0), GBL_RESULT_ERROR_FILE_WRITE);
 #endif
     GBL_API_VERIFY(fflush(pFile) == 0, GBL_RESULT_ERROR_FILE_WRITE);
-
     GBL_API_END();
 }
 

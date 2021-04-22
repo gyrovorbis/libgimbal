@@ -27,6 +27,54 @@ function(GBL_CONFIG_OPTION name desc default)
     set(GBL_CONFIGURATION_DEFINES  ${GBL_CONFIGURATION_DEFINES} PARENT_SCOPE)
 endfunction()
 
+function(GBL_BUILD_DEFINE var buildDefine)
+    #if(NOT ${buildDefine})
+        #if(NOT "${var}" STREQUAL "")
+            list(APPEND
+                GBL_BUILD_DEFINES
+                ${buildDefine}=${var})
+            set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
+        #endif()
+   # endif()
+endfunction()
+
+
+function(GBL_GITLAB_CI_DEFINE suffix)
+    set(buildVar "GBL_BUILD_CI_${suffix}")
+    set(envVar "CI_${suffix}")
+    set(env $ENV{${envVar}})
+    if("${env}" STREQUAL "")
+        set(env "\"?\"")
+    endif()
+    GBL_BUILD_DEFINE("${env}" ${buildVar})
+    set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
+    message(${buildVar})
+endFunction()
+
+string(TIMESTAMP BUILD_TIME "%Y-%m-%dT%H%M")
+    GBL_BUILD_DEFINE("\"${BUILD_TIME}\"" GBL_BUILD_TIMESTAMP)
+
+    GBL_BUILD_DEFINE($<BOOL:$ENV{GITLAB_CI}> GBL_BUILD_CI)
+
+    GBL_BUILD_DEFINE($ENV{PATH} PATH)
+
+    GBL_GITLAB_CI_DEFINE(PROJECT_TITLE)
+
+    GBL_GITLAB_CI_DEFINE(COMMIT_SHA)
+    GBL_GITLAB_CI_DEFINE(COMMIT_TAG)
+    GBL_GITLAB_CI_DEFINE(COMMIT_REF_NAME)
+
+    GBL_GITLAB_CI_DEFINE(JOB_ID)
+    GBL_GITLAB_CI_DEFINE(JOB_NAME)
+    GBL_GITLAB_CI_DEFINE(JOB_STAGE)
+    GBL_GITLAB_CI_DEFINE(JOB_MANUAL)
+    GBL_GITLAB_CI_DEFINE(JOB_TRIGGERED)
+
+    GBL_GITLAB_CI_DEFINE(RUNNER_DESCRIPTION)
+    GBL_GITLAB_CI_DEFINE(USER_EMAIL)
+
+    message(${GBL_BUILD_DEFINES})
+
 GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/gimbal_config.h.in FILEPATH "Path to user API configuration file")
 
 GBL_CONFIG_OPTION(GBL_CONFIG_LAST_ERROR_ENABLED "Track most recent error in GblHandle" ON)
@@ -55,7 +103,6 @@ GBL_CONFIG_OPTION(GBL_FEATURE_VARIANTS      "Enable Variants" ON)
 GBL_CONFIG_OPTION(GBL_FEATURE_STRINGS       "Enable Strings" ON)
 GBL_CONFIG_OPTION(GBL_FEATURE_CONTAINERS    "Enable Containers" ON)
 
-#set(GBL_CONFIG_INPUT_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/gimbal_config.h.in" CACHE FILEPATH "Path to user API configuration file")
 set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/gimbal_config.h")
 
 set(GIMBAL_SOURCES
@@ -64,8 +111,6 @@ set(GIMBAL_SOURCES
      source/gimbal_test.c
      source/gimbal_handle.c
      source/gimbal_ext.c
-#    source/util/GIMBAL_context.c
-#    source/os/GIMBAL_os_callbacks.c
 )
 
 set(GIMBAL_INCLUDES
@@ -101,7 +146,8 @@ set(GIMBAL_INCLUDES
 
 list(APPEND
     GBL_DEFINES
-    ${GBL_CONFIGURATION_DEFINES})
+    ${GBL_CONFIGURATION_DEFINES}
+    ${GBL_BUILD_DEFINES})
 
 
 add_library(libGimbal STATIC
