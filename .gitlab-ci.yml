@@ -58,7 +58,16 @@ build win10-mingw8:
   variables:
     CC: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-gcc
     CXX: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-g++
-  #  PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
+    PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
+
+build win10-clang:
+  extends: .build_common
+  tags:
+    - clang, win10
+  variables:
+    CC: "C:/Program Files/LLVM/bin/clang.exe"
+    CXX: "C:/Program Files/LLVM/bin/clang.exe"
+    PREFIX_PATH: "C:/Program Files/LLVM/bin"
 
 build macos-clang12:
   extends: .build_common
