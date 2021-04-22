@@ -56,8 +56,8 @@ build win10-mingw8:
   tags:
     - mingw, win10
   variables:
-    CC: C:/Qt/Tools/mingw810_64/bin/gcc
-    CXX: C:/Qt/Tools/mingw810_64/bin/g++
+    CC: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-gcc
+    CXX: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-g++
   #  PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
 
 build macos-clang12:
