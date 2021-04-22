@@ -10,10 +10,6 @@ project(LibGimbal
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# create big-ass list of config variables to log!
-
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 function(GBL_CONFIG_VARIABLE name value type desc)
     set(${name} ${value} CACHE ${type} ${desc})
     option(${name} ${desc} ${default})

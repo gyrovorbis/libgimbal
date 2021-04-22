@@ -9,5 +9,5 @@ int main(int argc, char* argv[]) {
 qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Context);
 qDebug() << "DONEZ";
-    return testSuite.exec(argc, argv);
+    return !testSuite.exec(argc, argv);
 }

@@ -6,6 +6,7 @@
 #include <string_view>
 #include <exception>
 #include <cstring>
+#include <string>
 
 #define GBL_CHECK_C_CPP_TYPE_COMPAT(CppType, CType) \
     static_assert(sizeof(CppType) == sizeof(CType), "sizeof(" #CppType ") != sizeof(" #CType")")

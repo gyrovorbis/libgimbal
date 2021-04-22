@@ -5,6 +5,68 @@
 #include <stddef.h>
 #include <assert.h>
 
+// Useful compiler info for internals
+#cmakedefine MSVC
+#ifdef MSVC
+#   define GBL_MSVC
+#   undef MSVC
+#endif
+
+#cmakedefine MINGW
+#ifdef MINGW
+#   define GBL_MINGW
+#   undef MINGW
+#endif
+
+#cmakedefine CYGWIN
+#ifdef CYGWIN
+#   define GBL_CYGWIN
+#   undef CYGWIN
+#endif
+
+#cmakedefine IOS
+#ifdef IOS
+#   define GBL_IOS
+#   undef IOS
+#endif
+
+#cmakedefine MSYS
+#ifdef MSYS
+#   define GBL_MSYS
+#   undef MSYS
+#endif
+
+#cmakedefine UNIX
+#ifdef UNIX
+#   define GBL_UNIX
+#   undef UNIX
+#endif
+
+#cmakedefine WIN32
+#ifdef WIN32
+#   define GBL_WIN32
+#   undef WIN32
+#endif
+
+#cmakedefine XCODE
+#ifdef XCODE
+#   define GBL_XCODE
+#   undef XCODE
+#endif
+
+#cmakedefine ANDROID
+#ifdef ANDROID
+#   define GBL_ANDROID
+#   undef ANDROID
+#endif
+
+#cmakedefine APPLE
+#ifdef APPLE
+#   define GBL_APPLE
+#   undef APPLE
+#endif
+
+
 
 //project
 #define GBL_PROJECT_NAME                "@CMAKE_PROJECT_NAME@"

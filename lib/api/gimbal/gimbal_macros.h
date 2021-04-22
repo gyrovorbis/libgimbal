@@ -7,6 +7,22 @@
 #include <gimbal/gimbal_config.h>
 #include "gimbal_macros_map.h"
 
+#ifndef GBL_ALLOCA
+#   ifndef alloca
+#       if defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__)
+#           include <alloca.h>     // alloca
+#       elif defined(_WIN32)
+#           include <malloc.h>     // alloca
+#           ifndef alloca
+#               define alloca _alloca  // for clang with MS Codegen
+#           endif
+#       else
+#           include <stdlib.h>     // alloca
+#       endif
+#   endif
+#   define GBL_ALLOCA alloca
+#endif
+
 #ifdef __cplusplus
 #   if (__cplusplus >= 199711L)
 #       define GBL_CPP_98
