@@ -71,8 +71,8 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_VERBOSE("%-20s: %40s", "Project", GBL_BUILD_CI_PROJECT_TITLE);
 
     GBL_API_PUSH("Source Control Commit Info");
-    GBL_API_VERBOSE("%-20s: %40s", "Title", GBL_BUILD_CI_COMMIT_SHA);
-    GBL_API_VERBOSE("%-20s: %40s", "Timestamp", GBL_BUILD_CI_COMMIT_SHA);
+    GBL_API_VERBOSE("%-20s: %40s", "Title", GBL_BUILD_CI_COMMIT_TITLE);
+    GBL_API_VERBOSE("%-20s: %40s", "Timestamp", GBL_BUILD_CI_COMMIT_TIMESTAMP);
     GBL_API_VERBOSE("%-20s: %40s", "SHA", GBL_BUILD_CI_COMMIT_SHA);
     GBL_API_VERBOSE("%-20s: %40s", "Tag", GBL_BUILD_CI_COMMIT_TAG);
     GBL_API_VERBOSE("%-20s: %40s", "Ref", GBL_BUILD_CI_COMMIT_BRANCH);
