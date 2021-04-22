@@ -92,8 +92,8 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
 
     GBL_API_PUSH("Build Node Info");
     GBL_API_VERBOSE("%-20s: %40s", "Description", GBL_BUILD_CI_RUNNER_DESCRIPTION);
-    GBL_API_VERBOSE("%-20s: %40s", "Tags", GBL_BUILD_CI_RUNNER_DESCRIPTION);
-    GBL_API_VERBOSE("%-20s: %40s", "Architecture", GBL_BUILD_CI_RUNNER_DESCRIPTION);
+    GBL_API_VERBOSE("%-20s: %40s", "Tags", GBL_BUILD_CI_RUNNER_TAGS);
+    GBL_API_VERBOSE("%-20s: %40s", "Architecture", GBL_BUILD_CI_RUNNER_ARCHITECTURE);
     GBL_API_POP(1);
 
     GBL_API_POP(1);
