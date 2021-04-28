@@ -9,8 +9,12 @@
     - mkdir build
     - cd build
     - env
-    - CC=${CC} CXX=${CXX} ${ANALYZER} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
+    - CC=${CC} CXX=${CXX} ${ANALYZER} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=Debug -GNinja
     - ${ANALYZER} ninja
+  variables:
+    CC: 
+    CXX:
+    ANALYZER:
 
 .build_linux:
   extends: .build_common
@@ -117,7 +121,7 @@ test clang11-scan-build:
   tags:
     - scan-build
   variables:
-    ANALYZER: scan-build
+    ANALYZER: scan-build -o
 
 test ubuntu20-gcc10:
   extends: .test_common
