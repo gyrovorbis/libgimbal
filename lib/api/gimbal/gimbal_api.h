@@ -32,14 +32,17 @@ typedef struct GblStackFrame {
 } GblStackFrame;
 
 
-static inline GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblHandle hHandle, GBL_RESULT initialResult, GblSourceLocation entryLoc) {
+GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblHandle hHandle, GBL_RESULT initialResult, GblSourceLocation entryLoc) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
     GblContext hContext = NULL;
-    assert(GBL_RESULT_SUCCESS(gblHandleContext(hHandle, &hContext)));
+    result = gblHandleContext(hHandle, &hContext);
+    GBL_ASSERT(GBL_RESULT_SUCCESS(result));
     void* pHandleUserdata = NULL;
-    assert(GBL_RESULT_SUCCESS(gblHandleUserdata(hHandle, &pHandleUserdata)));
+    result = gblHandleUserdata(hHandle, &pHandleUserdata);
+    GBL_ASSERT(GBL_RESULT_SUCCESS(result));
     void* pContextUserdata = NULL;
-    assert(GBL_RESULT_SUCCESS(gblHandleUserdata((GblHandle)hContext, &pContextUserdata)));
+    result = gblHandleUserdata((GblHandle)hContext, &pContextUserdata);
+    GBL_ASSERT(GBL_RESULT_SUCCESS(result));
 
     memset(pFrame, 0, sizeof(GblStackFrame));
     GBL_API_RESULT_CONSTRUCT(&pFrame->result, hHandle, initialResult, entryLoc, "DefaultResult!");
@@ -476,7 +479,7 @@ GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char* pFmt, ...) {
     GBL_API_STACK_FRAME_CONSTRUCT(GBL_API_FRAME(), (GblHandle)hHandle, GBL_RESULT_SUCCESS, gblApiEntrySrcLoc_)
 
 #define GBL_API_BEGIN_LOG_5(file, func, line, col, hHandle)  \
-    GBL_API_BEGIN_FRAME(file, func, line, col, hHandle, (GblStackFrame*)alloca(sizeof(GblStackFrame)))
+    GBL_API_BEGIN_FRAME(file, func, line, col, hHandle, ((GblStackFrame*)alloca(sizeof(GblStackFrame))))
 
 #define GBL_API_BEGIN_LOG_N(file, func, line, col, hHandle, ...)    \
     GBL_API_BEGIN_LOG_5(file, func, line, col, hHandle); \

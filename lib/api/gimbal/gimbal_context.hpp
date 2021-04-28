@@ -13,7 +13,7 @@ namespace gimbal {
 class Context: public Handle, public PrimitiveCompatible<GblContext, Context> {
 public:
 
-    Context() {
+    Context(void) {
 
         const GblContextExtLog log = {
             &gblLogWrite_,

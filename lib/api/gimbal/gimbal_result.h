@@ -69,7 +69,7 @@ GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE);
 
 GBL_MAYBE_UNUSED GBL_INLINE const char* gblResultString(GBL_RESULT code) {
     GBL_ENUM_TABLE_TO_STRING(GBL_META_RESULT_TABLE, code);
-    return NULL;
+    return "NULL";
 }
 
 
