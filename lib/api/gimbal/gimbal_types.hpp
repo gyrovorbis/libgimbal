@@ -2,16 +2,51 @@
 #define GIMBAL_TYPES_HPP
 
 #include "gimbal_api.h"
+#include "gimbal_object.h"
 #include <type_traits>
 #include <string_view>
-#include <exception>
+#include <stdexcept>
 #include <cstring>
 #include <string>
 
+
 #define GBL_CHECK_C_CPP_TYPE_COMPAT(CppType, CType) \
-    static_assert(sizeof(CppType) == sizeof(CType), "sizeof(" #CppType ") != sizeof(" #CType")")
+    GBL_STATIC_ASSERT_MSG(sizeof(CppType) == sizeof(CType), "sizeof(" #CppType ") != sizeof(" #CType")")
+
+#define GBL_ENUM_TUPLE_DECL_ENUM_CPP(cName, value, name, string) \
+    name = value,
+
+
+#define GBL_ENUM_TABLE_DECLARE_CPP(table) \
+    class GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME)) : \
+        public gimbal::PrimitiveBase<GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME))> { \
+        using CppType = GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME));  \
+        using CType = GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME));   \
+        public: \
+        enum Value { \
+            GBL_MAP_TUPLES(GBL_ENUM_TUPLE_DECL_ENUM_CPP,  GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table))  \
+        };  \
+        constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(void) noexcept = default; \
+        constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(Value value) noexcept: CppType(static_cast<CType>(value)) {}  \
+        constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(CType code) noexcept: gimbal::PrimitiveBase<CType>(code) {}  \
+        constexpr operator Value() const noexcept { return getValue(); } \
+        constexpr CType getCode(void) const noexcept { return static_cast<CType>(getPrimitiveValue()); }    \
+        constexpr Value getValue(void) const noexcept { return static_cast<Value>(getPrimitiveValue()); }   \
+        constexpr std::string_view toString(void) const { \
+            GBL_ENUM_TABLE_TO_STRING(table, getCode());   \
+            throw std::runtime_error(std::string("Unhandled Error Code: ") + std::to_string(getCode()));    \
+            return "Unhandled";    \
+        } \
+        bool isInRange(void) const noexcept { return false; } \
+    }; \
+    GBL_CHECK_C_CPP_TYPE_COMPAT(GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME)), GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME)))
+
+
+
+
 
 namespace gimbal {
+
 
 template<typename P, typename CRTP>
 class PrimitiveCompatible {
@@ -22,13 +57,13 @@ private:
 public:
 
     template<typename T>
-    constexpr static std::enable_if_t<std::is_same_v<T, P>, P*> primitive_cast(CRTP* pDerived) { return &*static_cast<ThisType*>(pDerived); }
+    constexpr static std::enable_if_t<std::is_same_v<T, P>, P*> primitive_cast(CRTP* pDerived) noexcept { return &*static_cast<ThisType*>(pDerived); }
 
-    constexpr const P* primitive_cast(void) const { return reinterpret_cast<const P*>(derived()->getPrimitiveAddress()); }
+    constexpr const P* primitive_cast(void) const noexcept { return reinterpret_cast<const P*>(derived()->getPrimitiveAddress()); }
 
-    constexpr operator P() const { return reinterpret_cast<P>(derived()->getPrimitiveValue()); }
-    constexpr P* operator&(void) { return reinterpret_cast<P*>(derived()->getPrimitiveAddress()); }
-    constexpr const P* operator&(void) const { return reinterpret_cast<const P*>(derived()->getPrimitiveAddress()); }
+    constexpr operator P() const noexcept { return reinterpret_cast<P>(derived()->getPrimitiveValue()); }
+    constexpr P* operator&(void) noexcept { return reinterpret_cast<P*>(derived()->getPrimitiveAddress()); }
+    constexpr const P* operator&(void) const noexcept { return reinterpret_cast<const P*>(derived()->getPrimitiveAddress()); }
 };
 
 template<typename P>
@@ -38,12 +73,12 @@ protected:
 public:
     using PrimitiveType = P;
 
-    constexpr PrimitiveBase(void) = default;
-    constexpr PrimitiveBase(P p): primitive_(std::move(p)) {}
+    constexpr PrimitiveBase(void) noexcept = default;
+    constexpr PrimitiveBase(P p) noexcept: primitive_(std::move(p)) {}
 
-    constexpr P getPrimitiveValue(void) const { return primitive_; }
-    constexpr const P* getPrimitiveAddress(void) const { return &primitive_; }
-    constexpr P* getPrimitiveAddress(void) { return &primitive_; }
+    constexpr P getPrimitiveValue(void) const noexcept { return primitive_; }
+    constexpr const P* getPrimitiveAddress(void) const noexcept { return &primitive_; }
+    constexpr P* getPrimitiveAddress(void) noexcept { return &primitive_; }
 };
 
 
@@ -54,15 +89,10 @@ public:
     using Enum      = ::GblEnum;
     using Hash      = ::GblHash;
 
-    enum class LogLevel: Enum {
-        Debug   = GBL_LOG_LEVEL_DEBUG,
-        Verbose = GBL_LOG_LEVEL_VERBOSE,
-        Info    = GBL_LOG_LEVEL_INFO,
-        Warning = GBL_LOG_LEVEL_WARNING,
-        Error   = GBL_LOG_LEVEL_ERROR,
-        Count   = GBL_LOG_LEVEL_COUNT
-    };
 
+GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_LOG_LEVEL_TABLE);
+
+GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_OBJECT_TYPE_TABLE);
 
     class Version: public PrimitiveBase<GblVersion> {
     public:
@@ -98,13 +128,15 @@ public:
     class SourceLocation: public GblSourceLocation {
     public:
         SourceLocation(void);
-        SourceLocation(const GblSourceLocation& rhs);
+        SourceLocation(const GblSourceLocation& rhs) {
+            memcpy(this, &rhs, sizeof(GblSourceLocation));
+        }
 
-        std::string_view    getFilePath(void) const;
-        std::string_view    getFileName(void) const;
-        std::string_view    getFunctionName(void) const;
-        GblSize             getLineNumber(void) const;
-        GblSize             getColumn(void) const;
+        std::string_view    getFilePath(void) const { return pFile; }
+        std::string_view    getFileName(void) const { return pFile; }
+        std::string_view    getFunctionName(void) const { return pFunc; }
+        GblSize             getLineNumber(void) const { return line; }
+        GblSize             getColumn(void) const { return column; }
 
         bool                isValid(void) const;
         std::string         toPrettyString(void) const;
@@ -158,8 +190,13 @@ public:
                     }
                     StackFrame(const GblStackFrame& rhs);
 
+                    StackFrame& operator=(const GblStackFrame& rhs) {
+                        memcpy(this, &rhs, sizeof(GblStackFrame));
+                        return *this;
+                    }
+
         auto        getSourceCurrent(void) const -> const SourceLocation&;
-        auto        getSourceEntry(void) const -> const SourceLocation&;
+        auto        getSourceEntry(void) const -> const SourceLocation& { return *static_cast<const SourceLocation*>(&sourceEntry);}
         auto        getApiResult(void) const -> const ApiResult&;
         auto        getApiResult(void) -> ApiResult&;
         GblHandle     getHandle(void) const;
@@ -199,30 +236,48 @@ public:
         }
     };
 
-/*
-    // Check if there's an error message in getLastError to fetch
-    tryCallHandle(handle, function, args);
-    tryCall(function, args);
-    //construct shit yourself
-    tryResult(result, str, source)
-*/
 
-    class Result: public PrimitiveBase<GBL_RESULT> {
+
+    namespace INTERNAL {
+        GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_RESULT_TABLE);
+    }
+
+
+    class Result: public INTERNAL::Result {
     public:
-        Result(GBL_RESULT code): PrimitiveBase(code) {}
+        using INTERNAL::Result::Result;
+        constexpr Result(void) noexcept: INTERNAL::Result(GBL_RESULT_UNKNOWN) {}
+        constexpr Result(bool success) noexcept: INTERNAL::Result(success? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR) {}
 
-        std::string_view toString(void) const { return gblResultString(getPrimitiveValue()); }
+        std::string_view toString(void) const noexcept { return gblResultString(getCode()); }
 
-        static Result throwException(GBL_RESULT result) {
+        constexpr bool isUnknown(void) const noexcept { return GBL_RESULT_UNKNOWN(getCode()); }
+        constexpr bool isSuccess(void) const noexcept { return GBL_RESULT_SUCCESS(getCode()); }
+        constexpr bool isPartial(void) const noexcept { return GBL_RESULT_PARTIAL(getCode()); }
+        constexpr bool isError(void) const noexcept { return GBL_RESULT_ERROR(getCode()); }
+        constexpr bool isUnavailable(void) const noexcept { return GBL_RESULT_UNAVAILABLE(getCode()); }
+
+        constexpr operator bool() const noexcept { return isSuccess(); }
+
+        constexpr bool wouldThrow(void) const noexcept { return isError(); }
+
+        Result checkThrow(void) const {
+            if(wouldThrow()) {
+                return throwException(*this);
+            }
+            return *this;
+        }
+
+        // Statics
+
+
+        static Result throwException(Result result) {
             throw StdResultException<std::exception>(result);
             return result;
         }
 
-        static Result tryThrow(GBL_RESULT result) {
-            if(GBL_RESULT_ERROR(result)) {
-                return throwException(result);
-            }
-            return result;
+        static Result tryThrow(Result result) {
+            return result.checkThrow();
         }
 
     };

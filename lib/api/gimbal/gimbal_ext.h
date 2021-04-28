@@ -14,7 +14,7 @@ typedef GBL_RESULT (*GblExtLogPushFn)       (const GblStackFrame* pFrame);
 typedef GBL_RESULT (*GblExtLogPopFn)        (const GblStackFrame* pFrame, uint32_t);
 
 //Custom allocators
-typedef GBL_RESULT (*GblExtMemAllocFn)     (const GblStackFrame* pFrame, GblSize, GblSize, void**);
+typedef GBL_RESULT (*GblExtMemAllocFn)     (const GblStackFrame* pFrame, GblSize, GblSize, const char*, void**);
 typedef GBL_RESULT (*GblExtMemReallocFn)    (const GblStackFrame* pFrame, void*, GblSize, GblSize, void**);
 typedef GBL_RESULT (*GblExtMemFreeFn)       (const GblStackFrame* pFrame, void*);
 
@@ -80,7 +80,7 @@ GBL_API gblExtLogWrite       (const GblStackFrame* pFrame, GBL_LOG_LEVEL level, 
 GBL_API gblExtLogPush        (const GblStackFrame* pFrame);
 GBL_API gblExtLogPop         (const GblStackFrame* pFrame, uint32_t count);
 
-GBL_API gblExtMemAlloc      (const GblStackFrame* pFrame, GblSize size, GblSize alignment, void** ppData);
+GBL_API gblExtMemAlloc      (const GblStackFrame* pFrame, GblSize size, GblSize alignment, const char* pDebugInfoString, void** ppData);
 GBL_API gblExtMemRealloc     (const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
 GBL_API gblExtMemFree        (const GblStackFrame* pFrame, void* pData);
 

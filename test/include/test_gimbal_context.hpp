@@ -8,10 +8,220 @@
 
 namespace gimbal::test {
 
-class MonitorContext: public gimbal::Context {
+
+
+enum API_EXT_CB {
 
 
 };
+#if 1
+class MonitorContext: public gimbal::Context {
+public:
+
+    enum class ExtOverride: uint8_t {
+        LogPush,
+        LogPop,
+        LogWrite,
+        MemAlloc,
+        MemRealloc,
+        MemFree,
+        Count
+    } ExtOverride;
+
+    void resetCounters(void) {
+        activeAllocCount_ = 0;
+        errorCount_ = 0;
+        warnCount_ = 0;
+        logDepth_ = 0;
+        memset(countersLogWrite_, 0, sizeof(countersLogWrite_));
+    }
+
+    unsigned getAciveAllocCount(void) const { return activeAllocCount_; }
+    unsigned getErrorCount(void) const { return errorCount_; }
+    unsigned getWarnCount(void) const { return warnCount_; }
+    unsigned getLogDepth(void) const { return logDepth_; }
+    //unsigned getLogCount(LogLevel level) { return logCounts_[static_cast<GBL_LOG_LEVEL>(level)]; }
+
+    void setResultLogPush(Result result) { resultLogPush_ = result; }
+    void setResultLogPop(Result result) { resultLogPop_ = result; }
+    void setResultLogWrite(Result result) { resultLogWrite_ = result; }
+    void setResultMemAlloc(Result result) { resultMemAlloc_ = result; }
+    void setResultMemRealloc(Result result) { resultMemRealloc_ = result; }
+    void setResultMemFree(Result result) { resultMemFree_ = result; }
+
+protected:
+    virtual void    logPush(const StackFrame& frame) override {
+        ++counterLogPush_; ++logDepth_; resultLogPush_.checkThrow();
+    }
+    virtual void    logPop(const StackFrame& frame, uint32_t count) override {
+        ++counterLogPop_; --logDepth_; resultLogPop_.checkThrow();
+    }
+    virtual void    logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) override {
+     //   ++counterslogWrite_[static_cast<GBL_LOG_LEVEL>(level)]; resultLogWrite_.checkThrow();
+    }
+
+    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) override {
+        ++counterMemAlloc_; ++activeAllocCount_; resultMemAlloc_.checkThrow(); return nullptr;
+    }
+    virtual void*   memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) override {
+        ++counterMemRealloc_; resultMemRealloc_.checkThrow(); return nullptr;
+    }
+    virtual void    memFree(const StackFrame& frame, void* pPtr) override {
+        ++counterMemFree_; --activeAllocCount_; resultMemFree_.checkThrow();
+    }
+
+private:
+
+    MonitorContext*     pCtxParent_     = nullptr;
+
+    unsigned            activeAllocCount_                       = 0;
+    unsigned            errorCount_                             = 0;
+    unsigned            warnCount_                              = 0;
+    unsigned            logDepth_                               = 0;
+
+    unsigned            counterLogPush_                         = 0;
+    unsigned            counterLogPop_                          = 0;
+    unsigned            countersLogWrite_[GBL_LOG_LEVEL_COUNT]  = { 0 };
+    unsigned            counterMemAlloc_                        = 0;
+    unsigned            counterMemRealloc_                      = 0;
+    unsigned            counterMemFree_                         = 0;
+
+    Result              resultLogPush_                          = GBL_RESULT_UNIMPLEMENTED;
+    Result              resultLogPop_                           = true;
+    Result              resultLogWrite_                         = true;
+    Result              resultMemAlloc_                         = true;
+    Result              resultMemRealloc_                       = true;
+    Result              resultMemFree_                          = true;
+};
+
+#endif
+
+class Object: public elysian::UnitTestSet {
+Q_OBJECT
+    virtual gimbal::ObjectType expectedObjectType(void) const {
+        return gimbal::ObjectType::Object;
+       // return GL_OBJECT_TYPE_OBJECT;
+    }
+private slots:
+    void checkMetaType(void) {}
+    void isValid(void) {}
+    //check C object compatibiity
+    //check for equality/comparison with INVALID/NULL
+};
+
+/*
+ *
+GBL_API gblHandleConstruct(GblContext hContext,
+                        GblHandle* phHandle,
+                        const GblHandleCreateInfo* pInfo);
+
+GBL_API gblHandleDestruct(GblHandle hHandle);
+
+GBL_API gblHandleParentGet(GblHandle hHandle,
+                        GblHandle* phParent);
+
+GBL_API gblHandleParentSet(GblHandle hHandle,   //useful for run-time dependency injection
+                           GblHandle hParent);
+
+GBL_API gblHandleContext(GblHandle hHandle,
+                         GblContext* phCtx);
+
+GBL_API gblHandleUserdata(GblHandle hHandle,
+                          void** ppUserdata);
+
+
+// this could be returning just a the base of a custom subclass
+GBL_API gblHandleLastErrorGet(GblHandle hHandle,
+                            const GblApiResult** pError);
+
+
+// this could theoretically construct or call into some userdata shit for more info
+GBL_API gblHandleLastErrorSet(GblHandle hHandle,
+                            const GblApiResult* pError);
+
+ */
+
+class Handle: public Object {
+Q_OBJECT
+private:
+    virtual gimbal::ObjectType expectedObjectType(void) const {
+        return gimbal::ObjectType::Handle;
+        //return GL_OBJECT_TYPE_HANDLE;
+    }
+private slots:
+
+
+
+    void create(void) {}
+    void destroy(void) {}
+    void getParent(void) {}
+    void setParent(void) {}
+    void getContext(void) {}
+    void getUserdata(void) {}
+    void getLastError(void) {}
+
+};
+
+class ApiBlock {
+protected:
+    gimbal::StackFrame stackFrame_;
+    std::string name_;
+    Context* pCtx_ = nullptr;
+public:
+    ApiBlock(gimbal::Context* pCtx,
+             std::string name    = "unnamed",
+             const char* pFile   = nullptr,
+             const char* pFunc   = nullptr,
+             gimbal::Size line   = 0,
+             gimbal::Size column = 0):
+        stackFrame_(*pCtx,
+                    gimbal::Result(gimbal::Result::Success),
+                    GBL_SOURCE_LOCATION(pFile, pFunc, line, column)),
+        name_(std::move(name)),
+        pCtx_(pCtx)
+    {
+
+    }
+
+    template<typename F>
+    const ApiBlock& operator=(F&& funcBlock) {
+        [&]() {
+            GBL_API_BEGIN_FRAME(stackFrame_.getSourceEntry().getFileName().data(),
+                                stackFrame_.getSourceEntry().getFunctionName().data(),
+                                stackFrame_.getSourceEntry().getLineNumber(),
+                                stackFrame_.getSourceEntry().getColumn(),
+                                *pCtx_,
+                                &stackFrame_);
+            GBL_API_TRY {
+                funcBlock(&stackFrame_);
+            } GBL_API_CATCH();
+            GBL_API_END();
+        }();
+        return *this;
+    }
+
+    std::string_view getName(void) const { return name_; }
+    const gimbal::StackFrame& getFrame(void) const { return stackFrame_; }
+    Result getResult(void) const { return stackFrame_.getApiResult().getResult(); }
+
+    bool expectError(Result code, const char* pMsg);
+    bool expectWarn(Result code, const char* pMsg);
+
+    operator bool() const {
+        return getResult().isSuccess();
+    }
+  //  bool expectLog, expectException, expectStackDepth
+    // expectMallocCount
+
+};
+
+
+
+
+#define GBL_API_BLOCK(ctx_, name) \
+    ApiBlock(ctx_, name, GBL_SOURCE_FILE, GBL_SOURCE_FUNCTION, GBL_SOURCE_LINE, GBL_SOURCE_COLUMN) = [&](GBL_MAYBE_UNUSED GBL_API_FRAME_DECLARE)
+
+
 
 /* TO TEST
  * 1) version
@@ -35,15 +245,246 @@ class MonitorContext: public gimbal::Context {
  * 8) Query/extract build info
  */
 // test exception system (both sides)
-class Context: public elysian::UnitTestSet {
+class Context: public Handle {
 Q_OBJECT
 
 private:
-    Context* pCtx = nullptr;
+    gimbal::Context* pCtx_ = nullptr;
+
+    virtual gimbal::ObjectType expectedObjectType(void) const {
+        return gimbal::ObjectType::Context;
+        //return GL_OBJECT_TYPE_CONTEXT;
+    }
+protected:
+    GblContext ctx(void) {
+        return *pCtx_;
+    }
 private slots:
     void version(void);
     void create(void);
-   // void destroy(void);
+
+    // stack monitors!?!?
+
+    // === API TEST WHICH CAN TAKE A HANDLE ====
+
+    void begin(void) {
+        GBL_API_BLOCK(pCtx_, "BEGIN_1") {
+            {
+            GBL_API_BEGIN(ctx(), "Single");
+            }
+        };
+
+
+        auto test = GBL_API_BLOCK(pCtx_, "BEGIN_N") {
+            {
+            GBL_API_BEGIN(ctx(), "%s - %d", "Variadic", 33);
+            }
+        };
+
+
+       /*
+        GBL_API_CONTEXT();
+        GBL_API_CONTEXT_UD();
+        //GBL_API_SOURCE()
+        GBL_API_RESULT_CODE();*/
+
+        //GBL_API_END();
+    }
+
+
+
+
+    void logDebug(void) {
+        GBL_API_BLOCK(pCtx_, "DEBUG_1") {
+            GBL_API_DEBUG("Standard");
+        };
+        GBL_API_BLOCK(pCtx_, "DEBUG_N") {
+            GBL_API_DEBUG("Variadic - %s %d %c", "lul", 45, 'c');
+        };
+    }
+
+    void logVerbose(void) {
+        GBL_API_BLOCK(pCtx_, "VERBOSE_1") {
+            GBL_API_VERBOSE("Standard");
+        };
+        GBL_API_BLOCK(pCtx_, "VERBOSE_N") {
+            GBL_API_VERBOSE("Variadic - %s %d %c", "lul", 45, 'c');
+        };
+
+    }
+
+    void logInfo(void) {
+        GBL_API_BLOCK(pCtx_, "INFO_1") {
+            GBL_API_INFO("Standard");
+        };
+        GBL_API_BLOCK(pCtx_, "INFO_N") {
+            GBL_API_INFO("Variadic - %s %d %c", "lul", 45, 'c');
+        };
+    }
+
+    void logWarn(void) {
+        GBL_API_BLOCK(pCtx_, "WARN_1") {
+            GBL_API_WARN("Standard");
+        };
+        GBL_API_BLOCK(pCtx_, "WARN_N") {
+            GBL_API_WARN("Variadic - %s %d %c", "lul", 45, 'c');
+        };
+    }
+
+    void logError(void) {
+        GBL_API_BLOCK(pCtx_, "ERROR_1") {
+            GBL_API_ERROR("Standard");
+        };
+        GBL_API_BLOCK(pCtx_, "ERROR_N") {
+            GBL_API_ERROR("Variadic - %s %d %c", "lul", 45, 'c');
+        };
+    }
+
+    void logPush(void) {
+        GBL_API_BLOCK(pCtx_, "PUSH_0") {
+           // GBL_API_PUSH(); GCC fucked
+        };
+
+        GBL_API_BLOCK(pCtx_, "PUSH_1") {
+            GBL_API_PUSH("Single Push");
+        };
+
+        GBL_API_BLOCK(pCtx_, "PUSH_N") {
+            GBL_API_PUSH("%s %d %c", "Variadic Push", -33, 'q');
+        };
+
+    }
+
+    void logPop(void) {
+        GBL_API_BLOCK(pCtx_, "POP_0") {
+            //GBL_API_POP(); FUCKED OVERLOAD!!!
+        };
+        GBL_API_BLOCK(pCtx_, "POP_1") {
+            GBL_API_PUSH(""); //GCC FUCKED
+            GBL_API_PUSH("");
+            GBL_API_POP(2);
+        };
+    }
+
+    void memAlloc(void) {
+        GBL_API_BLOCK(pCtx_, "MALLOC_1") {
+           void* pPtr = GBL_API_MALLOC(32);
+            QVERIFY2(pPtr, "Malloc returned nullptr!");
+        };
+
+        GBL_API_BLOCK(pCtx_, "MALLOC_2") {
+           void* pPtr = GBL_API_MALLOC(32, 32);
+            QVERIFY2(pPtr, "Aligned malloc returned nullptr!");
+        };
+
+        GBL_API_BLOCK(pCtx_, "MALLOC_3") {
+            void* pPtr = GBL_API_MALLOC(34, 31, "Alloc Info!");
+             QVERIFY2(pPtr, "Aligned malloc with debug info returned nullptr!");
+        };
+    }
+
+    void memRealloc(void) {
+        GBL_API_BLOCK(pCtx_, "REALLOC_2") {
+            char* pPtr = (char*)GBL_API_MALLOC(15, 1, "Test");
+            QVERIFY2(pPtr, "Aligned malloc + debug info returned nullptr!");
+            QVERIFY(strncpy(pPtr, "LUL", 15));
+            pPtr = (char*)GBL_API_REALLOC(pPtr, 37);
+            QVERIFY2(pPtr, "Realloc returned nullptr!");
+            QVERIFY2(strncmp(pPtr, "LUL", 37) == 0, "Realloc lost its data!");
+        };
+
+        GBL_API_BLOCK(pCtx_, "REALLOC_3") {
+            char* pPtr = (char*)GBL_API_MALLOC(15, 1, "Test");
+            QVERIFY2(pPtr, "Aligned malloc + debug info returned nullptr!");
+            QVERIFY(strncpy(pPtr, "LUL", 15));
+            pPtr = (char*)GBL_API_REALLOC(pPtr, 64, 8);
+            QVERIFY2(pPtr, "Realloc returned nullptr!");
+            QVERIFY2(strncmp(pPtr, "LUL", 64) == 0, "Realloc lost its data!");
+        };
+    }
+
+    void memFree(void) {
+        GBL_API_BLOCK(pCtx_, "FREE") {
+            char* pPtr = (char*)GBL_API_MALLOC(15, 1, "Test");
+            QVERIFY2(pPtr, "Aligned malloc + debug info returned nullptr!");
+            GBL_API_FREE(pPtr);
+        };
+    }
+
+    void verifyHandle(void) {
+        GBL_API_BLOCK(pCtx_, "VERIFY_HANDLE_1") {
+
+            //GBL_API_VERIFY_HANDLE(pCtx_);
+
+            //expect fail?
+            //GBL_API_VERIFY_HANDLE(nullptr);
+        };
+
+        GBL_API_BLOCK(pCtx_, "VERIFY_HANDLE_2") {
+
+            //GBL_API_VERIFY_HANDLE(pCtx_, "Handle is fucking reested!");
+
+            //expect fail?
+            //GBL_API_VERIFY_HANDLE(nullptr, "Handle is fucking reested!");
+        };
+
+        GBL_API_BLOCK(pCtx_, "VERIFY_HANDLE_N") {
+
+            //GBL_API_VERIFY_HANDLE(pCtx_, "Handle is fucking reested to shit! %p %s %c!", pCtx_, "Test", 'q');
+
+            //expect fail?
+            //GBL_API_VERIFY_HANDLE(pCtx_, "Handle is fucking reested to shit! %p %s %c!", pCtx_, "Test", 'q');
+        };
+
+
+
+    }
+
+    void verifyPointer(void) {
+
+    }
+
+    void verifyArg(void) {
+
+    }
+
+    void verifyExpr(void) {
+
+    }
+
+    void forwardCall(void) {
+
+    }
+
+    //debug
+    //verbose
+    //warn
+    //error
+    //fatal
+
+    //alloc
+    //realloc
+    //free
+
+    //begin/end (begin with overload)
+    //push/pop (with overloads)
+
+    //verify handle (with overloads for string reasons)
+    //verify pointer
+    //verify arg
+    //verify exp
+
+    //validate calling/chaining into another
+    //validate lastError
+
+    //validate converting to exceptions
+
+    // ==== / API TEST ======
+
+    //void destroy(void);
+
+
+    // void destroy(void);
     //set/get userdata
     //override all shit
     //handle/parent shit
@@ -59,16 +500,21 @@ inline void Context::version(void) {
 
 inline void Context::create(void) {
     try {
-        gimbal::Context* pCtx = new gimbal::Context;
+        pCtx_ = new gimbal::Context;
 
 
-        GBL_API_BEGIN((GblContext)*pCtx, "Begin fuckers");
+        GBL_API_BEGIN((GblContext)*pCtx_, "Begin fuckers");
         void* pPtr = GBL_API_MALLOC(21);
         pPtr = GBL_API_REALLOC(pPtr, 32);
         GBL_API_FREE(pPtr);
         GBL_API_END_BLOCK();
 
-        delete pCtx;
+        qDebug() << QString(std::string(Result(GBL_RESULT_ERROR_INVALID_ARG).toString()).c_str());
+        qDebug() << QString(std::string(Result(GBL_RESULT_TRUNCATED).toString()).c_str());
+        qDebug() << QString(std::string(Result(GBL_RESULT_SUCCESS).toString()).c_str());
+        qDebug() << QString(std::string(Result(static_cast<GBL_RESULT>(INTERNAL::Result::ErrorTypeMismatch)).toString()).c_str());
+
+        qDebug() << std::string(Result(Result::InvalidPointer).toString()).c_str();
 
     } catch(const std::exception& ex) {
 

@@ -5,55 +5,8 @@
 #include <stdio.h>
 #include <limits.h>
 #include <gimbal/gimbal_config.h>
-#include "gimbal_macros_map.h"
-
-#ifndef GBL_ALLOCA
-#   ifndef alloca
-#       if defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__)
-#           include <alloca.h>     // alloca
-#       elif defined(_WIN32)
-#           include <malloc.h>     // alloca
-#           ifndef alloca
-#               define alloca _alloca  // for clang with MS Codegen
-#           endif
-#       else
-#           include <stdlib.h>     // alloca
-#       endif
-#   endif
-#   define GBL_ALLOCA alloca
-#endif
-
-#ifdef __cplusplus
-#   if (__cplusplus >= 199711L)
-#       define GBL_CPP_98
-#   endif
-#   if (__cplusplus >= 201103L)
-#       define GBL_CPP_11
-#   endif
-#   if (__cplusplus >= 201402L)
-#       define GBL_CPP_14
-#   endif
-#   if (__cplusplus >= 201703L)
-#       define GBL_CPP_17
-#   endif
-#   if (__cplusplus >= 202002L)
-#       define GBL_CPP_20
-#   endif
-#else
-#   define GBL_C_89
-#   if (__STDC_VERSION__ >= 199409L)
-#       define GBL_C_95
-#   endif
-#   if (__STDC_VERSION__ >= 199901L)
-#       define GBL_C_99
-#   endif
-#   if (__STDC_VERSION__ >= 201112L)
-#       define GBL_C_11
-#   endif
-#   if (__STDC_VERSION__ >= 201710L)
-#       define GBL_C_18
-#   endif
-#endif
+#include "gimbal_compiler.h"
+#include "gimbal_macros_utils.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,120 +47,20 @@ extern "C" {
 #define GBL_UNUSED(a) \
     (void)(a)
 
-#define GBL_DECL_VAR_TYPE(type, ...) \
-    type
-#define GBL_DECL_VAR_NAME(type, name) \
-    name
-
-#define GBL_DECL_VAR(type, name) \
-  GBL_DECL_VAR_TYPE(type, name) GBL_DECL_VAR_NAME(type, name)
-
-#define GBL_DECL_VAR_PAIR_TYPE(pair) \
-    GBL_DECL_VAR_TYPE pair
-
-#define GBL_DECL_VAR_PAIR_NAME(pair) \
-    GBL_DECL_VAR_NAME pair
-
-#define GBL_DECL_VAR_PAIR(pair) \
-  GBL_DECL_VAR pair
-
 
 #ifdef GBL_API_SHARED_LIB
-#   ifdef _MSC_VER
-#       ifdef GBL_API_EXPORTS
-#           define GBL_EXPORT __declspec(dllexport)
-#       else
-#           define GBL_EXPORT __declspec(dllimport)
-#       endif
-#   elif defined(__clang__) || defined(__GNUC__)
-#       define GBL_EXPORT __attribute__((visibility("default")))
+#   ifdef GBL_API_EXPORTS
+#       define GBL_EXPORT GBL_EXPORT_SHARED
 #   else
-#       define GBL_EXPORT
+#       define GBL_EXPORT GBL_IMPORT_SHARED
 #   endif
 #else
 #   define GBL_EXPORT
 #endif
 
+
 #define GBL_API GBL_RESULT GBL_EXPORT
 
-#define GBL_VA_ARGS(...) ,##__VA_ARGS__
-#define _GBL_STRINGIFY(a) #a
-#define GBL_STRINGIFY(a) _GBL_STRINGIFY(a)
-
-
-#define GBL_CAT(A, B) A##B
-
-#define GBL_MACRO_CALL(macro, ...)                  macro(__VA_ARGS__)
-#define GBL_MACRO_CALL_NULL(...)                       
-
-#define GBL_MACRO_CONDITIONAL_CALL_0(macro, ...) GBL_MACRO_CALL_NULL()
-#define GBL_MACRO_CONDITIONAL_CALL_1(macro, ...) GBL_MACRO_CALL(macro, __VA_ARGS__)
-
-#define GBL_MACRO_CONDITIONAL_CALL(enabled, ...) \
-    GBL_CAT(GBL_MACRO_CONDITIONAL_CALL_,enabled)(__VA_ARGS__)
-
-#define GBL_IDENTITY(A) A
-
-#define GBL_APPEND_SUFFIX(NAME, NUM) GBL_CAT(NAME##_, NUM)
-#define GBL_COMPOSE(NAME, ARGS) NAME ARGS
-
-#define GBL_VA_SLIDING_ARG(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, COUNT, ...) COUNT
-#define GBL_COMMA  ,
-#define GBL_EXPAND() ,,,,,,,,,, // 10 commas (or 11 empty tokens)
-
-#define GBL_VA_OVERLOAD_SUFFIXER(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, ...) \
-    GBL_COMPOSE(GBL_VA_SLIDING_ARG, (EXPAND __VA_ARGS__ (), _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10) )
-
-#define GBL_VA_OVERLOAD_SUFFIXER_ARGC(...) \
-    GBL_VA_OVERLOAD_SUFFIXER(0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, __VA_ARGS__)
-
-#define GBL_VA_OVERLOAD_SUFFIXER_1_N(...) \
-    GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, N, N, N, N, 1, __VA_ARGS__)
-
-#define GBL_VA_OVERLOAD_SUFFIXER_0_N(...) \
-    GBL_VA_OVERLOAD_SUFFIXER(N, N, N, N, N, N, N, N, N, N, 0, __VA_ARGS__)
-
-#define GBL_VA_OVERLOAD_SUFFIXER_2_N(...) \
-    GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, N, N, N, 2, 1, __VA_ARGS__)
-
-#define GBL_VA_OVERLOAD_SUFFIXER_5_N(...) \
-    GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, 5, 4, 3, 2, 1, __VA_ARGS__)
-
-
-#define GBL_VA_OVERLOAD_SELECT(BASE, SUFFIXER, ...) \
-    GBL_APPEND_SUFFIX(BASE, SUFFIXER(__VA_ARGS__))
-
-#define GBL_VA_OVERLOAD_CALL(BASE, SUFFIXER, ...) \
-    GBL_VA_OVERLOAD_SELECT(BASE, SUFFIXER, __VA_ARGS__)(__VA_ARGS__)
-
-
-#define GBL_VERSION_FIELD_MAJOR_BIT                 24u
-#define GBL_VERSION_FIELD_MAJOR_MASK                0xf
-
-#define GBL_VERSION_FIELD_MINOR_BIT                 8u
-#define GBL_VERSION_FIELD_MINOR_MASK                0xff
-
-#define GBL_VERSION_FIELD_PATCH_BIT                 0u
-#define GBL_VERSION_FIELD_PATCH_MASK                0xf
-
-#define GBL_VERSION_MAKE(major, minor, patch)                                               \
-    (uint32_t)((major & GBL_VERSION_FIELD_MAJOR_MASK) << GBL_VERSION_FIELD_MAJOR_BIT)   |   \
-    (uint32_t)((minor & GBL_VERSION_FIELD_MINOR_MASK) << GBL_VERSION_FIELD_MINOR_BIT)   |   \
-    (uint32_t)((patch & GBL_VERSION_FIELD_PATCH_MASK) << GBL_VERSION_FIELD_PATCH_BIT)
-
-#define GBL_VERSION_EXTRACT_MAJOR(version)                                                  \
-    (uint8_t)((uint32_t)((version >> GBL_VERSION_FIELD_MAJOR_BIT) & GBL_VERSION_FIELD_MAJOR_MASK))
-
-#define GBL_VERSION_EXTRACT_MINOR(version)                                                  \
-    (uint16_t)((uint32_t)((version >> GBL_VERSION_FIELD_MINOR_BIT) & GBL_VERSION_FIELD_MINOR_MASK))
-
-#define GBL_VERSION_EXTRACT_PATCH(version)                                                  \
-    (uint8_t)((uint32_t)((version >> GBL_VERSION_FIELD_PATCH_BIT) & GBL_VERSION_FIELD_PATCH_MASK))
-
-#define GBL_VERSION_STRINGIFY(major, minor, patch) \
-    GBL_STRINGIFY(major) "."                       \
-    GBL_STRINGIFY(minor) "."                       \
-    GBL_STRINGIFY(patch)
 
 #define GBL_SWITCH_CASE_STRINGIFY(s) \
     case s: return #s
@@ -231,8 +84,7 @@ https://stackoverflow.com/questions/8774567/c-macro-to-create-a-bit-mask-possibl
 #define GBL_BIT_FIELD_MASK(a, b)                            \
       (((unsigned) -1 >> (31 - (b))) & ~((1U << (a)) - 1))
 
-//#define GBL_BIT_MASK(...) \
-  //    GBL_VA_OVERLOAD_SUFFIXER_ARGC(GBL_BIT_COUNT_MASK, GBL_BIT_FIELD_MASK, __VA_ARGS__)
+
 
 #define GBL_ASSERT(...) \
     GBL_VA_OVERLOAD_SELECT(GBL_ASSERT, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)

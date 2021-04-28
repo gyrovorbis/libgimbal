@@ -50,7 +50,7 @@ public:
     virtual void    logPop(const StackFrame& frame, uint32_t count) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
     virtual void    logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
 
-    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr;}
+    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr;}
     virtual void*   memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr; }
     virtual void    memFree(const StackFrame& frame, void* pPtr) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
 
@@ -69,6 +69,7 @@ private:
 
 #define GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, UdType) \
     gimbal::Result result = GBL_RESULT_SUCCESS; \
+    GBL_UNUSED(result); \
     GBL_CONTEXT_EXT_C_TO_CPP_BEGIN_NO_THROW(pFrame, Context); \
     try { \
 
@@ -78,7 +79,7 @@ private:
 
     static GBL_RESULT gblLogWrite_     (const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs) {
         GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, Context);
-        pUd->logWrite(*static_cast<const StackFrame*>(pFrame), static_cast<LogLevel>(level), pFmt, varArgs);
+        pUd->logWrite(*static_cast<const StackFrame*>(pFrame),level, pFmt, varArgs);
         GBL_CONTEXT_EXT_C_TO_CPP_END();
     }
     static GBL_RESULT gblLogPush_      (const GblStackFrame* pFrame) {
@@ -93,9 +94,9 @@ private:
         GBL_CONTEXT_EXT_C_TO_CPP_END();
     }
 
-    static GBL_RESULT gblMemAlloc_     (const GblStackFrame* pFrame, GblSize size, GblSize align, void** ppPtr) {
+    static GBL_RESULT gblMemAlloc_     (const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDebugInfoStr, void** ppPtr) {
         GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, Context)
-        *ppPtr = pUd->memAlloc(*static_cast<const StackFrame*>(pFrame), size, align);
+        *ppPtr = pUd->memAlloc(*static_cast<const StackFrame*>(pFrame), size, align, pDebugInfoStr);
         GBL_API_VERIFY(*ppPtr, GBL_RESULT_ERROR_MEM_ALLOC);
         GBL_CONTEXT_EXT_C_TO_CPP_END();
     }

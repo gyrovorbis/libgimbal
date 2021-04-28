@@ -68,6 +68,7 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_POP(1);
 
     GBL_API_PUSH("CI Info");
+#if GBL_BUILD_CI
     GBL_API_VERBOSE("%-20s: %40s", "Project", GBL_BUILD_CI_PROJECT_TITLE);
 
     GBL_API_PUSH("Source Control Commit Info");
@@ -95,7 +96,9 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_VERBOSE("%-20s: %40s", "Tags", GBL_BUILD_CI_RUNNER_TAGS);
     GBL_API_VERBOSE("%-20s: %40s", "Architecture", GBL_BUILD_CI_RUNNER_ARCH);
     GBL_API_POP(1);
-
+#else
+    GBL_API_WARN("UNOFFICIAL LOCAL BUILD!");
+#endif
     GBL_API_POP(1);
 
     GBL_API_PUSH("Compiler Info");
@@ -104,6 +107,7 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_VERBOSE("%-20s: %40s", "Version", GBL_BUILD_C_COMPILER_VERSION);
     GBL_API_VERBOSE("%-20s: %40s", "Target", GBL_BUILD_C_COMPILER_TARGET);
     GBL_API_VERBOSE("%-20s: %40s", "Toolchain", GBL_BUILD_C_COMPILER_TOOLCHAIN);
+    GBL_API_VERBOSE("%-20s: %40s", "Language Standard", GBL_BUILD_C_STANDARD);
     GBL_API_POP(1);
 
     GBL_API_PUSH("C++");
@@ -111,6 +115,7 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_VERBOSE("%-20s: %40s", "Version", GBL_BUILD_CPP_COMPILER_VERSION);
     GBL_API_VERBOSE("%-20s: %40s", "Target", GBL_BUILD_CPP_COMPILER_TARGET);
     GBL_API_VERBOSE("%-20s: %40s", "Toolchain", GBL_BUILD_CPP_COMPILER_TOOLCHAIN);
+    GBL_API_VERBOSE("%-20s: %40s", "Language Standard", GBL_BUILD_CPP_STANDARD);
     GBL_API_POP(1);
     GBL_API_POP(1);
 
@@ -234,10 +239,11 @@ GBL_CONTEXT_EXT_DECL_(LogWriteDefault_, (GBL_LOG_LEVEL, level), (const char*, pF
     const char* pPrefix = NULL;
 
     switch(level) {
-    case GBL_LOG_LEVEL_WARNING: pPrefix = "! - "; break;
-    case GBL_LOG_LEVEL_ERROR:   pPrefix = "X - "; break;
-    case GBL_LOG_LEVEL_DEBUG:   pPrefix = "@ - "; break;
-    default:                    pPrefix = "";     break;
+    case GBL_LOG_LEVEL_WARNING: pPrefix = "! "; break;
+    case GBL_LOG_LEVEL_ERROR:   pPrefix = "X "; break;
+    case GBL_LOG_LEVEL_DEBUG:   pPrefix = "~ "; break;
+    case GBL_LOG_LEVEL_INFO:    pPrefix = "* "; break;
+    default:                    pPrefix = "";   break;
     }
 
     const int vsnprintfBytes = vsnprintf(buffer, sizeof(buffer), pFmt, varArgs);
@@ -285,7 +291,7 @@ GBL_API gblContextLogPushDefault_(GblContext hCtx, const GblStackFrame* pFrame) 
     GBL_API_END();
 }
 
-GBL_CONTEXT_EXT_DECL_(MemAllocDefault_, (GblSize, size), (GblSize, alignment), (void**, ppData)) {
+GBL_CONTEXT_EXT_DECL_(MemAllocDefault_, (GblSize, size), (GblSize, alignment), (const char*, pDebugInfoStr), (void**, ppData)) {
     GBL_UNUSED(pFrame);
     GBL_API_BEGIN(hCtx);
     GBL_API_VERIFY_ARG(size);
@@ -293,9 +299,13 @@ GBL_CONTEXT_EXT_DECL_(MemAllocDefault_, (GblSize, size), (GblSize, alignment), (
     GBL_API_VERIFY_POINTER(ppData);
     *ppData = malloc(size);
     GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_MEM_ALLOC);
-    GBL_API_DEBUG("Malloc[Size: " GBL_SIZE_FMT ", Align: " GBL_SIZE_FMT "] => %p [%s:" GBL_SIZE_FMT " %s]",
-                  size, alignment, *ppData,
-                  pFrame->sourceCurrent.pFile, pFrame->sourceCurrent.line, pFrame->sourceCurrent.pFunc);
+    GBL_API_DEBUG("Malloc(Size: " GBL_SIZE_FMT ", Align: " GBL_SIZE_FMT ") => %p", size, alignment, *ppData);
+    GBL_API_PUSH();
+    GBL_API_DEBUG("%-20s: %20s", "Debug Marker", pDebugInfoStr? pDebugInfoStr : "NULL");
+    GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
+    GBL_API_DEBUG("%-20s: %20zu", "Line", pFrame->sourceCurrent.line);
+    GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
+    GBL_API_POP(1);
     GBL_API_END();
 }
 
@@ -308,9 +318,14 @@ GBL_CONTEXT_EXT_DECL_(MemReallocDefault_, (void*, pData), (GblSize, newSize), (G
     GBL_API_VERIFY_POINTER(ppNewData);
     *ppNewData = realloc(pData, newSize);
     GBL_API_VERIFY(*ppNewData, GBL_RESULT_ERROR_MEM_REALLOC);
-    GBL_API_DEBUG("Realloc[Size: " GBL_SIZE_FMT ", Align: " GBL_SIZE_FMT "] %p => %p [%s:" GBL_SIZE_FMT " %s]",
-                  newSize, newAlign, (uintptr_t)pData, *ppNewData,
-                  pFrame->sourceCurrent.pFile, pFrame->sourceCurrent.line, pFrame->sourceCurrent.pFunc);
+
+    GBL_API_DEBUG("Realloc(Size: " GBL_SIZE_FMT ", Align: " GBL_SIZE_FMT ") %p => %p", newSize, newAlign, pData, *ppNewData);
+    GBL_API_PUSH();
+    GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
+    GBL_API_DEBUG("%-20s: %20zu", "Line", pFrame->sourceCurrent.line);
+    GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
+    GBL_API_POP(1);
+
     GBL_API_END();
 }
 
@@ -320,16 +335,21 @@ GBL_CONTEXT_EXT_DECL_(MemFreeDefault_, (void*, pData)) {
     GBL_API_BEGIN(hCtx);
     const uintptr_t ptrVal = (uintptr_t)pData;
     free(pData);
-    GBL_API_DEBUG("Free %p [%s:" GBL_SIZE_FMT " %s]",
-                  ptrVal,
-                  pFrame->sourceCurrent.pFile, pFrame->sourceCurrent.line, pFrame->sourceCurrent.pFunc);
+
+    GBL_API_DEBUG("Free(%p)", pData);
+    GBL_API_PUSH();
+    GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
+    GBL_API_DEBUG("%-20s: %20zu", "Line", pFrame->sourceCurrent.line);
+    GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
+    GBL_API_POP(1);
+
     GBL_API_END();
 }
 
 GBL_CONTEXT_EXT_IMPL_(LogWrite, log.pFnWrite, (GBL_LOG_LEVEL, level), (const char*, pFmt), (va_list, varArgs))
 GBL_CONTEXT_EXT_IMPL_(LogPop, log.pFnPop, (uint32_t, count))
 
-GBL_CONTEXT_EXT_IMPL_(MemAlloc, mem.pFnAlloc, (GblSize, size), (GblSize, alignment), (void**, ppData))
+GBL_CONTEXT_EXT_IMPL_(MemAlloc, mem.pFnAlloc, (GblSize, size), (GblSize, alignment), (const char*, pDebugInfoStr), (void**, ppData))
 GBL_CONTEXT_EXT_IMPL_(MemRealloc, mem.pFnRealloc, (void*, pData), (GblSize, newSize), (GblSize, newAlign), (void**, ppNewData))
 GBL_CONTEXT_EXT_IMPL_(MemFree, mem.pFnFree, (void*, pData))
 

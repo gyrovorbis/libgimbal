@@ -70,7 +70,7 @@ GBL_API gblContextLogWrite       (GblContext hCtx, const GblStackFrame* pFrame, 
 GBL_API gblContextLogPush        (GblContext hCtx, const GblStackFrame* pFrame);
 GBL_API gblContextLogPop         (GblContext hCtx, const GblStackFrame* pFrame, uint32_t count);
 
-GBL_API gblContextMemAlloc      (GblContext hCtx, const GblStackFrame* pFrame, GblSize size, GblSize alignment, void** ppData);
+GBL_API gblContextMemAlloc      (GblContext hCtx, const GblStackFrame* pFrame, GblSize size, GblSize alignment, const char* pDebugInfoStr, void** ppData);
 GBL_API gblContextMemRealloc     (GblContext hCtx, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** pNewData);
 GBL_API gblContextMemFree        (GblContext hCtx, const GblStackFrame* pFrame, void* pData);
 

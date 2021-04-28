@@ -90,6 +90,7 @@
 #define GBL_BUILD_C_COMPILER_VERSION    "@CMAKE_C_COMPILER_VERSION@"
 #define GBL_BUILD_C_COMPILER_TARGET     "@CMAKE_C_COMPILER_TARGET@"
 #define GBL_BUILD_C_COMPILER_TOOLCHAIN "@CMAKE_C_COMPILER_EXTERNAL_TOOLCHAIN@"
+#define GBL_BUILD_C_COMPILER_FLAGS       @$<TARGET_PROPERTY:LibGimbal,COMPILE_FLAGS>@
 
 #define GBL_BUILD_CPP_COMPILER_ID         "@CMAKE_CXX_COMPILER_ID@"
 #define GBL_BUILD_CPP_COMPILER_VERSION    "@CMAKE_CXX_COMPILER_VERSION@"
@@ -294,83 +295,7 @@ static inline GblSourceLocation GBL_SOURCE_LOCATION(const char* pFile, const cha
 
 #endif
 
-// Assert upon encountering an error result?
-#ifndef GBL_RESULT_ERROR_ASSERT
-#   define GBL_RESULT_ERROR_ASSERT      0
-#endif
 
-// Assertion operation upon encountering an error.
-#ifndef GBL_RESULT_ASSERT
-#   if GBL_RESULT_ERROR_ASSERT
-#       define GBL_RESULT_ASSERT(b, s)       GBL_ASSERT(b, s)
-#   else
-#       define GBL_RESULT_ASSERT(b, s)
-#   endif
-#endif
-
-// Write to log when after encountering an error result?
-#ifndef GBL_RESULT_LOG_ERRORS
-#   define GBL_RESULT_LOG_ERRORS         1
-#endif
-
-// Log severity of error result message
-#ifndef GBL_RESULT_ERROR_LOG_LEVEL
-#   define GBL_RESULT_LOG_ERROR_LEVEL    GBL_LOG_LEVEL_ERROR
-#endif
-
-// Write to log when after encountering a partial succcess result?
-#ifndef GBL_RESULT_LOG_PARTIAL_SUCCESSES
-#   define GBL_RESULT_LOG_PARTIAL_SUCCESSES         1
-#endif
-
-// Log severity of partial success result message
-#ifndef GBL_RESULT_LOG_PARTIAL_SUCCESS_LEVEL
-#   define GBL_RESULT_LOG_PARTIAL_SUCCESS_LEVEL    GBL_LOG_LEVEL_WARNING
-#endif
-
-// Write to log when after encountering a succcess result?
-#ifndef GBL_RESULT_LOG_SUCCESSES
-#   define GBL_RESULT_LOG_SUCCESSES         0
-#endif
-
-// Log severity of success result message
-#ifndef GBL_RESULT_LOG_SUCCESS_LEVEL
-#   define GBL_RESULT_LOG_SUCCESS_LEVEL    GBL_LOG_LEVEL_DEBUG
-#endif
-
-// .....fuck
-#ifndef GBL_RESULT_LOG
-#   ifdef GBL_RESULT_ERROR_LOG
-#       define GBL_RESULT_LOG(pCtx, file, func, line, exp, ...)     \
-            do {                                                     \
-                if(exp) GBLLogWrite_(pCtx,                          \
-                               file, func, line,                     \
-                               GBL_LOG_LEVEL_ERROR, __VA_ARGS__);   \
-            } while(0)
-#   else
-#       define GBL_RESULT_LOG(pCtx, file, func, line, exp, ...) void
-#   endif
-#endif
-
-
-// Log last error config
-
-
-
-#define GBL_RESULT_CTX_FOLD(pCtx, HANDLER, ...) \
-    GBL_RESULT_##HANDLER(pCtx, NULL, __VA_ARGS__)
-
-
-
-
-#ifndef GBL_RESULT_SET_LAST_ERROR
-#   ifdef GBL_RESULT_CONTEXT_TRACK_LAST_ERROR
-#       define GBL_RESULT_SET_LAST_ERROR(pCtx, pDevice, result, level, pFile, pFunc, line, ...) \
-            GBLContextUpdateLastError_(pCtx, pDevice, result, level, pFile, pFunc, line, __VA_ARGS__)
-#   else
-#       define GBL_RESULT_SET_LAST_ERROR(pCtx, pDevice, result, level, pFile, pFunc, line, pFormat, ...)
-#   endif
-#endif
 
 
 #ifdef __cplusplus

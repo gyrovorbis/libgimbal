@@ -53,10 +53,10 @@ typedef union GblVariantValue {
     uint64_t        uint64;
 } GblVariantValue;
 
-typedef struct GblVariant {
+struct GblVariant {
     GblVariantValue     value;
     GBL_VARIANT_TYPE    type;
-} GblVariant;
+};
 
 
 

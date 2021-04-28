@@ -9,13 +9,18 @@ extern "C" {
 
 GBL_DECLARE_OPAQUE(GblObject);
 
-GBL_DECLARE_ENUM(GBL_OBJECT_TYPE) {
-    GBL_OBJECT_TYPE_OBJECT,
-    GBL_OBJECT_TYPE_HANDLE,
-    GBL_OBJECT_TYPE_CONTEXT,
-    GBL_OBJECT_TYPE_BUILTIN_COUNT,
-    GBL_OBJECT_TYPE_USER,
-};
+#define GBL_META_OBJECT_TYPE_TABLE (                                                            \
+        ( GBL_OBJECT_TYPE, ObjectType, "Enum for GblObject runtime types"),                     \
+        (                                                                                       \
+            (GBL_OBJECT_TYPE_OBJECT,            0x0,    Object,         "Object"),              \
+            (GBL_OBJECT_TYPE_HANDLE,            0x1,    Handle,         "Handle"),              \
+            (GBL_OBJECT_TYPE_CONTEXT,           0x2,    Context,        "Context"),             \
+            (GBL_OBJECT_TYPE_BUILTIN_COUNT,     0x3,    BuiltinCount,   "# of Builtin Types"),  \
+            (GBL_OBJECT_TYPE_USER,              0x4,    User,           "First User Type")      \
+        )                                                                                       \
+    )
+
+GBL_ENUM_TABLE_DECLARE(GBL_META_OBJECT_TYPE_TABLE);
 
 #define GBL_OBJECT_INVALID NULL
 

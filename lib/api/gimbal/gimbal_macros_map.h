@@ -47,24 +47,91 @@
 #define GBL_MAP_NEXT1(test, next) GBL_MAP_NEXT0(test, next, 0)
 #define GBL_MAP_NEXT(test, next)  GBL_MAP_NEXT1(GBL_MAP_GET_END test, next)
 
+
 #define GBL_MAP0(f, x, peek, ...) f(x) GBL_MAP_NEXT(peek, GBL_MAP1)(f, peek, __VA_ARGS__)
 #define GBL_MAP1(f, x, peek, ...) f(x) GBL_MAP_NEXT(peek, GBL_MAP0)(f, peek, __VA_ARGS__)
-
-#define GBL_MAP_LIST_NEXT1(test, next) GBL_MAP_NEXT0(test, GBL_MAP_COMMA next, 0)
-#define GBL_MAP_LIST_NEXT(test, next)  GBL_MAP_LIST_NEXT1(GBL_MAP_GET_END test, next)
-
-#define GBL_MAP_LIST0(f, x, peek, ...) f(x) GBL_MAP_LIST_NEXT(peek, GBL_MAP_LIST1)(f, peek, __VA_ARGS__)
-#define GBL_MAP_LIST1(f, x, peek, ...) f(x) GBL_MAP_LIST_NEXT(peek, GBL_MAP_LIST0)(f, peek, __VA_ARGS__)
 
 /**
  * Applies the function macro `f` to each of the remaining parameters.
  */
 #define GBL_MAP(f, ...) GBL_EVAL(GBL_MAP1(f, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
 
+
 /**
  * Applies the function macro `f` to each of the remaining parameters and
  * inserts commas between the results.
  */
+
+#define GBL_MAP_LIST_NEXT1(test, next) GBL_MAP_NEXT0(test, GBL_MAP_COMMA next, 0)
+#define GBL_MAP_LIST_NEXT(test, next)  GBL_MAP_LIST_NEXT1(GBL_MAP_GET_END test, next)
+
+#define GBL_MAP_LIST0(f, x, peek, ...) f(x) GBL_MAP_LIST_NEXT(peek, GBL_MAP_LIST1)(f, peek, __VA_ARGS__)
+#define GBL_MAP_LIST1(f, x, peek, ...) f(x) GBL_MAP_LIST_NEXT(peek, GBL_MAP_LIST0)(f, peek, __VA_ARGS__)
 #define GBL_MAP_LIST(f, ...) GBL_EVAL(GBL_MAP_LIST1(f, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
+
+#define GBL_MAP_TUPLES0(f, x, peek, ...) f x GBL_MAP_NEXT(peek, GBL_MAP_TUPLES1)(f, peek, __VA_ARGS__)
+#define GBL_MAP_TUPLES1(f, x, peek, ...) f x GBL_MAP_NEXT(peek, GBL_MAP_TUPLES0)(f, peek, __VA_ARGS__)
+#define GBL_MAP_TUPLES(f, ...) GBL_EVAL(GBL_MAP_TUPLES1(f, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
+
+
+
+#define GBL_ENUM_TABLE_DECL_ENUM(cName, value, name, string) \
+    cName = value,
+
+
+#define GBL_ENUM_TABLE_DECLARE(table) \
+    GBL_DECLARE_ENUM(GBL_META_ENUM_CNAME(table)) { \
+        GBL_MAP_TUPLES(GBL_ENUM_TABLE_DECL_ENUM,  GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)) \
+    }
+
+#define GBL_ENUM_TABLE_RETURN_STRING(cName, value, name, string) \
+    case value: return string;
+
+#define GBL_ENUM_TABLE_TO_STRING(table, value) \
+    switch(value) { \
+        GBL_MAP_TUPLES(GBL_ENUM_TABLE_RETURN_STRING,  GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)) \
+    }
+
+
+// === CLEAN ME LATER, PART OF TUPLE/TABLE META SHIT ===========
+
+#define GBL_DECL_VAR_TYPE(type, ...) \
+    type
+#define GBL_DECL_VAR_NAME(type, name) \
+    name
+
+#define GBL_DECL_VAR(type, name) \
+  GBL_DECL_VAR_TYPE(type, name) GBL_DECL_VAR_NAME(type, name)
+
+#define GBL_DECL_VAR_PAIR_TYPE(pair) \
+    GBL_DECL_VAR_TYPE pair
+
+#define GBL_DECL_VAR_PAIR_NAME(pair) \
+    GBL_DECL_VAR_NAME pair
+
+#define GBL_DECL_VAR_PAIR(pair) \
+  GBL_DECL_VAR pair
+
+#define GBL_META_ENUM_TUPLE(tuple)
+
+#define GBL_META_ENUM_TUPLE_TYPE_INFO(typeInfo, valueTable) typeInfo
+
+#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_CNAME(cName, name, description) cName
+#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_NAME(cName, name, description) name
+#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_DESCRIPTION(cName, name, description) description
+
+#define GBL_META_ENUM_TUPLE_VALUE_ARRAY(typeInfo, valueArray) valueArray
+
+#define GBL_META_ENUM_TUPLE_VALUE_ARRAY_TUPLE_VALUE(...) GBL_EVAL __VA_ARGS__
+
+#define GBL_META_ENUM_TUPLE_VALUE_PROPERTY_CNAME(cName, value, name, string) cName
+#define GBL_META_ENUM_TUPLE_VALUE_PROPERTY_NAME(cName, value, name, string) name
+#define GBL_META_ENUM_TUPLE_VALUE_PROPERTY_VALUE(cName, value, name, string) value
+#define GBL_META_ENUM_TUPLE_VALUE_PROPERTY_STRING(cName, value, name, string) string
+
+#define GBL_META_ENUM_TYPE_PROPERTY(table, postfix) GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_##postfix GBL_META_ENUM_TUPLE_TYPE_INFO table
+#define GBL_META_ENUM_CNAME(table) GBL_META_ENUM_TYPE_PROPERTY(table, CNAME)
+
+
 
 #endif // GIMBAL_MACROS_MAP_H
