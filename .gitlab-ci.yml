@@ -92,6 +92,7 @@ build macos-gcc10:
 .clang_tidy_common:
   stage: test
   script:
+    - cd build
     - run-clang-tidy
 
 test clang11-tidy:
