@@ -110,7 +110,7 @@ build macos-gcc10:
     - cd build
     - run-clang-tidy
 
-analyze clang11-tidy:
+analyze clang-tidy:
   stage: analyze
   extends: .clang_tidy_common
   needs: ["build ubuntu20-clang11"]
@@ -119,11 +119,11 @@ analyze clang11-tidy:
   tags:
     - linux, clang, clang-tidy
 
-analyze clang11-scan-build:
+analyze scan-build-clang:
   extends: .build_linux_clang
   stage: analyze
-  dependencies:
-    - build ubuntu20-clang11
+  #dependencies:
+  #  - build ubuntu20-clang11
   tags:
     - linux, clang, scan-build
   variables:
