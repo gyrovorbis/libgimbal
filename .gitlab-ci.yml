@@ -115,7 +115,8 @@ analyze clang-tidy:
   tags:
     - linux, clang, clang-tidy
 
-analyze scan-build-clang:
+
+.scan_build_common:
   extends: .build_linux_clang
   stage: analyze
   dependencies: []
@@ -139,6 +140,21 @@ analyze scan-build-clang:
   artifacts:
     paths:
       - public/
+
+analyze scan-build-clang:
+  extends: .scan_build_common
+  variables:
+    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+    CC: clang
+    CXX: clang++
+
+analyze scan-build-gcc:
+  extends: .scan_build_common
+  variables:
+    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+    CC: gcc
+    CXX: g++
+ 
 
 test ubuntu20-gcc10:
   extends: .test_common
