@@ -136,11 +136,13 @@ analyze clang11-scan-build:
   after_script:
     - cd ../
     - mkdir -p public
-    - mv build/scan_build_report/*/* public
+    - pwd 
+    - ls
+    - mv build/scan_build_report/*/* ./public
   artifacts:
     paths:
-      - public/
       - build/
+      - public/
 
 test ubuntu20-gcc10:
   extends: .test_common
