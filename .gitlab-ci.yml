@@ -1,3 +1,9 @@
+stages:
+  - build
+  - analyze
+  - test
+
+
 .build_common:
   stage: build
   variables:
@@ -104,7 +110,8 @@ build macos-gcc10:
     - cd build
     - run-clang-tidy
 
-test clang11-tidy:
+analyze clang11-tidy:
+  stage: analyze
   extends: .clang_tidy_common
   needs: ["build ubuntu20-clang11"]
   dependencies:
@@ -112,9 +119,9 @@ test clang11-tidy:
   tags:
     - linux, clang, clang-tidy
 
-test clang11-scan-build:
+analyze clang11-scan-build:
   extends: .build_linux_clang
-  stage: test
+  stage: analyze
   dependencies:
     - build ubuntu20-clang11
   tags:
@@ -127,6 +134,7 @@ test clang11-scan-build:
     - mkdir -p scan_build_report  
     - cd ../
   after_script:
+    - cd ../
     - mkdir -p public
     - mv build/scan_build_report/*/* public
   artifacts:
