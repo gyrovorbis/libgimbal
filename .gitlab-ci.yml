@@ -111,9 +111,8 @@ test clang11-tidy:
 
 test clang11-scan-build:
   extends: .build_linux_clang
-#  needs: ["ubuntu20-clang11"]
   dependencies:
-    -build ubuntu20-clang11
+    - build ubuntu20-clang11
   tags:
     - scan-build
   variables:
