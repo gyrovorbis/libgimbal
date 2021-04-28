@@ -125,6 +125,7 @@ test clang11-scan-build:
     - mkdir -p build
     - cd build
     - mkdir -p scan_build_report  
+    - cd ../
 
 test ubuntu20-gcc10:
   extends: .test_common
