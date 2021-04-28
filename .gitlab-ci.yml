@@ -127,6 +127,7 @@ analyze scan-build-clang:
     - linux, clang, scan-build
   variables:
     ANALYZER: scan-build -o ./scan_build_report
+    GIT_SUBMODULE_STRATEGY: recursive
   before_script:
     - mkdir -p build
     - cd build
