@@ -9,7 +9,7 @@
     - mkdir build
     - cd build
     - env
-    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -G Ninja
+    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=Release G Ninja
     - ninja
 
 .build_linux:
@@ -42,32 +42,32 @@ build ubuntu20-clang11:
 #    CXX: cl
 #    PREFIX_PATH: C:/Qt/6.0.2/msvc2019_64
 
-build win10-cygwin-gcc10:
-  extends: .build_common
-  tags:
-    - gcc, win10
-  variables:
-    CC: gcc
-    CXX: g++
-    PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
+#build win10-cygwin-gcc10:
+#  extends: .build_common
+#  tags:
+#    - gcc, win10
+#  variables:
+#    CC: gcc
+#    CXX: g++
+#    PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
 
-build win10-mingw8:
-  extends: .build_common
-  tags:
-    - mingw, win10
-  variables:
-    CC: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-gcc
-    CXX: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-g++
-    PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
+#build win10-mingw8:
+#  extends: .build_common
+#  tags:
+#    - mingw, win10
+#  variables:
+#    CC: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-gcc
+#    CXX: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-g++
+#    PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
 
-build win10-clang:
-  extends: .build_common
-  tags:
-    - clang, win10
-  variables:
-    CC: "C:/Program Files/LLVM/bin/clang.exe"
-    CXX: "C:/Program Files/LLVM/bin/clang.exe"
-    PREFIX_PATH: "C:/Program Files/LLVM/bin"
+#build win10-clang:
+#  extends: .build_common
+#  tags:
+#    - clang, win10
+#  variables:
+#    CC: "C:/Program Files/LLVM/bin/clang.exe"
+#    CXX: "C:/Program Files/LLVM/bin/clang.exe"
+#   PREFIX_PATH: "C:/Program Files/LLVM/bin"
 
 build macos-clang12:
   extends: .build_common
@@ -116,21 +116,21 @@ test ubuntu20-clang11:
 #  tags:
 #    - win10, visual-studio
 
-test win10-cygwin-gcc10:
-  extends: .test_common
-  needs: ["build win10-cygwin-gcc10"]
-  dependencies:
-    - build win10-cygwin-gcc10
-  tags:
-    - gcc, win10
+#test win10-cygwin-gcc10:
+#  extends: .test_common
+#  needs: ["build win10-cygwin-gcc10"]
+#  dependencies:
+#    - build win10-cygwin-gcc10
+#  tags:
+#    - gcc, win10
 
-test win10-mingw8:
-  extends: .test_common
-  needs: ["build win10-mingw8"]
-  dependencies:
-    - build win10-mingw8
-  tags:
-    - mingw, win10
+#test win10-mingw8:
+#  extends: .test_common
+#  needs: ["build win10-mingw8"]
+#  dependencies:
+#    - build win10-mingw8
+#  tags:
+#    - mingw, win10
 
 test macos-clang12:
   extends: .test_common
