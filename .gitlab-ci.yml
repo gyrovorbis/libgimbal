@@ -9,8 +9,8 @@
     - mkdir build
     - cd build
     - env
-    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
-    - ninja
+    - CC=${CC} CXX=${CXX} ${ANALYZER} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
+    - ${ANALYZER} ninja
 
 .build_linux:
   extends: .build_common
@@ -102,6 +102,18 @@ test clang11-tidy:
     - build ubuntu20-clang11
   tags:
     - linux, clang, clang-tidy
+
+test clang11-scan-build:
+  stage: test
+  extends: ubuntu20-clang11
+  needs: ["ubuntu20-clang11"]
+  dependencies:
+    -build ubuntu20-clang11
+  tags:
+    - linux, clang, scan-build
+  variables:
+    ANALYZER: scan-build
+
 
 test ubuntu20-gcc10:
   extends: .test_common
