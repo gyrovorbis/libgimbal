@@ -3,6 +3,7 @@
 #include <gimbal/gimbal_api.h>
 #include <gimbal/gimbal_config.h>
 #include <string.h>
+#include <stdio.h>
 
 
 
@@ -22,34 +23,11 @@ typedef struct GblContext_ {
     //GblApiCookie*          pApiCookieTop;
 } GblContext_;
 
-static const GblContextCreateInfo createInfoDefault_ = {
-    33,
-    NULL,
-    NULL,
-    NULL,
-    NULL
-};
-
-static GBL_API gblContextLogBuildInfo(GblContext hContext) {
-    GBL_API_BEGIN(hContext, "swanky fucker: %d", 3);
-
-    GBL_API_PUSH();
-    void* pPtr = GBL_API_MALLOC(32);
-    pPtr = GBL_API_REALLOC(pPtr, 34);
-    GBL_API_FREE(pPtr);
-
-    GBL_API_END();
-}
-
-
-
 GBL_API gblContextVersion           (GblVersion* pVersion) {
     GBL_ASSERT(pVersion, "NULL version output pointer!");
     *pVersion = GBL_VERSION_MAKE(GBL_PROJECT_VERSION_MAJOR, GBL_PROJECT_VERSION_MINOR, GBL_PROJECT_VERSION_PATCH);
     return GBL_RESULT_SUCCESS;
 }
-
-
 
 static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_BEGIN(hCtx, "Build Info");
@@ -97,7 +75,7 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_VERBOSE("%-20s: %40s", "Architecture", GBL_BUILD_CI_RUNNER_ARCH);
     GBL_API_POP(1);
 #else
-    GBL_API_WARN("UNOFFICIAL LOCAL BUILD!");
+    GBL_API_WARN("UNOFFICIAL LOCAL BUILD !");
 #endif
     GBL_API_POP(1);
 
@@ -132,25 +110,26 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_END();
 }
 
-GBL_API gblContextConstruct (GblContext hCtx, const GblContextCreateInfo* pInfo) {
-    GBL_ASSERT(hCtx, "NULL Context Handle!");
-
-
-
+inline static GBL_RESULT gblContextInitializer(GblContext hCtx, const GblContextCreateInfo* pInfo) {
+    if(!hCtx) return GBL_RESULT_ERROR_INVALID_HANDLE;
     memset(hCtx, 0, sizeof(GblContext_));
     hCtx->baseHandle.pContext   = hCtx;
-    hCtx->baseHandle.pParent    = pInfo->handleInfo.hParent;
-    hCtx->baseHandle.pUserdata  = pInfo->handleInfo.pUserdata;
-    memcpy(&hCtx->ext.log, pInfo->pExtLog, sizeof(GblContextExtLog));
-    memcpy(&hCtx->ext.mem, pInfo->pExtMem, sizeof(GblContextExtMem));
-   // memcpy(&hCtx->ext.api, pInfo->pExtApi, sizeof(GblContextExtApi));
+    hCtx->baseHandle.pParent    = pInfo? pInfo->handleInfo.hParent : NULL;
+    hCtx->baseHandle.pUserdata  = pInfo? pInfo->handleInfo.pUserdata : NULL;
+    if(pInfo) {
+        if(pInfo->pExtLog) memcpy(&hCtx->ext.log, pInfo->pExtLog, sizeof(GblContextExtLog));
+        if(pInfo->pExtMem) memcpy(&hCtx->ext.mem, pInfo->pExtMem, sizeof(GblContextExtMem));
+    }
+    return GBL_RESULT_SUCCESS;
+}
 
-    GBL_API_BEGIN(hCtx, "Creating Context");
-
+GBL_API gblContextConstruct (GblContext hCtx, const GblContextCreateInfo* pInfo) {
+    GBL_API_BEGIN(hCtx, "Constructing Context");
     GblVersion verCur = 0;
     GBL_API_CALL(gblContextVersion(&verCur));
+    GblVersion verMin = pInfo? pInfo->versionMin : 0;
     GblVersionInfo verCurInfo = GBL_VERSION_EXTRACT(verCur);
-    GblVersionInfo verMinInfo = GBL_VERSION_EXTRACT(pInfo->versionMin);
+    GblVersionInfo verMinInfo = GBL_VERSION_EXTRACT(verMin);
     char verCurString[GBL_VERSION_STRING_SIZE_MAX] = { '\0' };
     char verMinString[GBL_VERSION_STRING_SIZE_MAX] = { '\0' };
 
@@ -160,7 +139,7 @@ GBL_API gblContextConstruct (GblContext hCtx, const GblContextCreateInfo* pInfo)
     GBL_API_VERBOSE("Version Minimum: %s", verMinString);
     GBL_API_VERBOSE("Version Current: %s", verCurString);
 
-    GBL_API_VERIFY(verCur >= pInfo->versionMin, GBL_RESULT_VERSION_MISMATCH);
+    GBL_API_VERIFY(verCur >= verMin, GBL_RESULT_VERSION_MISMATCH);
 
     GBL_API_CALL(gblContextBuildInfoLog_(hCtx));
 
@@ -169,17 +148,46 @@ GBL_API gblContextConstruct (GblContext hCtx, const GblContextCreateInfo* pInfo)
 
 
 GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateInfo* pInfo) {
+    // Temporary stack object so we can use the macro API without having to allocate shit first
+    GblContext_ stackCtx;
 
-    *phCtx = malloc(sizeof(GblContext_));
-    return gblContextConstruct(*phCtx, pInfo);
+    // Initializer for GlObject => GlHandle parents + GlContext properties
+    const GBL_RESULT result = gblContextInitializer(&stackCtx, pInfo);
+    if(!GBL_RESULT_SUCCESS(result)) {
+        return result;
+    }
 
+    // Use the temp stack context to get access to the malloc EXT macro
+    {
+        GBL_API_BEGIN(&stackCtx, "Creating Context");
+        *phCtx = GBL_API_MALLOC(sizeof(GblContext_), 1, "Context");
+        if(!GBL_RESULT_SUCCESS(GBL_API_RESULT_CODE())) {
+            return GBL_API_RESULT_CODE();
+        } else if(!phCtx) {
+            return GBL_RESULT_ERROR_MEM_ALLOC;
+        }
+    }
 
+    // Copy the temp stack context into the new heap address
+    memcpy(*phCtx, &stackCtx, sizeof(GblContext_));
+    // Fix up the inner Context handle!
+    (*phCtx)->baseHandle.pContext   = *phCtx; // have to fixup the damn self pointer!!!
 
-    //struct GblContext_* pCtx = *phCtx;
+    // Continue with the rest of the constructor
+    {
+        GBL_API_BEGIN(*phCtx);
+        GBL_API_CALL(gblContextConstruct(*phCtx, pInfo));
+        GBL_API_END();
+    }
+
 }
 
 GBL_API gblContextDestroy(GblContext hCtx) {
-    return gblHandleDestruct((GblHandle)hCtx);
+    GBL_API_BEGIN(hCtx);
+    const GBL_RESULT result = gblHandleDestruct((GblHandle)hCtx);
+    GBL_API_VERIFY(GBL_RESULT_SUCCESS(result), result);
+    GBL_API_FREE(hCtx);
+    GBL_API_END();
 }
 
 static inline GblContext gblContextParent_(GblContext hCtx) {
@@ -188,10 +196,10 @@ static inline GblContext gblContextParent_(GblContext hCtx) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
     while(hCurrentCtx == hCtx) {
         GblHandle hHandle = GBL_HANDLE_INVALID;
-        result = gblHandleParentGet((GblHandle)hCurrentCtx, &hHandle);
+        GBL_MAYBE_UNUSED result = gblHandleParentGet((GblHandle)hCurrentCtx, &hHandle);
         GBL_ASSERT(GBL_RESULT_SUCCESS(result));
         if(hHandle) {
-            result = gblHandleContext(hHandle, &hCurrentCtx);
+            GBL_MAYBE_UNUSED result = gblHandleContext(hHandle, &hCurrentCtx);
             GBL_ASSERT(GBL_RESULT_SUCCESS(result));
         } else {
             hCurrentCtx = GBL_HANDLE_INVALID;
@@ -246,6 +254,7 @@ GBL_CONTEXT_EXT_DECL_(LogWriteDefault_, (GBL_LOG_LEVEL, level), (const char*, pF
     default:                    pPrefix = "";   break;
     }
 
+    //replace me later
     const int vsnprintfBytes = vsnprintf(buffer, sizeof(buffer), pFmt, varArgs);
     if(vsnprintfBytes > (int)sizeof(buffer)) {
         pPrefix = "T - "; //Truncated prefix!
@@ -299,11 +308,11 @@ GBL_CONTEXT_EXT_DECL_(MemAllocDefault_, (GblSize, size), (GblSize, alignment), (
     GBL_API_VERIFY_POINTER(ppData);
     *ppData = malloc(size);
     GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_MEM_ALLOC);
-    GBL_API_DEBUG("Malloc(Size: " GBL_SIZE_FMT ", Align: " GBL_SIZE_FMT ") => %p", size, alignment, *ppData);
+    GBL_API_DEBUG("Malloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") => %p", size, alignment, *ppData);
     GBL_API_PUSH();
     GBL_API_DEBUG("%-20s: %20s", "Debug Marker", pDebugInfoStr? pDebugInfoStr : "NULL");
     GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
-    GBL_API_DEBUG("%-20s: %20zu", "Line", pFrame->sourceCurrent.line);
+    GBL_API_DEBUG("%-20s: %20"GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     GBL_API_POP(1);
     GBL_API_END();
@@ -316,13 +325,14 @@ GBL_CONTEXT_EXT_DECL_(MemReallocDefault_, (void*, pData), (GblSize, newSize), (G
     GBL_API_VERIFY_ARG(newAlign <= newSize && newAlign >= 0);
     GBL_API_VERIFY_POINTER(pData);
     GBL_API_VERIFY_POINTER(ppNewData);
+    const uintptr_t ptrVal = (uintptr_t)pData;
     *ppNewData = realloc(pData, newSize);
     GBL_API_VERIFY(*ppNewData, GBL_RESULT_ERROR_MEM_REALLOC);
 
-    GBL_API_DEBUG("Realloc(Size: " GBL_SIZE_FMT ", Align: " GBL_SIZE_FMT ") %p => %p", newSize, newAlign, pData, *ppNewData);
+    GBL_API_DEBUG("Realloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") %p => %p", newSize, newAlign, ptrVal, *ppNewData);
     GBL_API_PUSH();
     GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
-    GBL_API_DEBUG("%-20s: %20zu", "Line", pFrame->sourceCurrent.line);
+    GBL_API_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     GBL_API_POP(1);
 
@@ -335,11 +345,10 @@ GBL_CONTEXT_EXT_DECL_(MemFreeDefault_, (void*, pData)) {
     GBL_API_BEGIN(hCtx);
     const uintptr_t ptrVal = (uintptr_t)pData;
     free(pData);
-
-    GBL_API_DEBUG("Free(%p)", pData);
+    GBL_API_DEBUG("Free(%p)", ptrVal);
     GBL_API_PUSH();
     GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
-    GBL_API_DEBUG("%-20s: %20zu", "Line", pFrame->sourceCurrent.line);
+    GBL_API_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     GBL_API_POP(1);
 
@@ -360,13 +369,13 @@ GBL_API gblContextLogPush(GblContext hCtx, const GblStackFrame* pFrame) {
         result = hCtx->ext.log.pFnPush(pFrame);
     }
 #if GBL_CONFIG_EXT_CONTEXT_PARENT_ENABLED
-    if(result == GBL_RESULT_UNIMPLEMENTED || result == GBL_RESULT_INCOMPLETE || result == GBL_RESULT_UNSUPPORTED) {
+    if(GBL_RESULT_UNAVAILABLE(result)) {
         GblContext hParent = gblContextParent_(hCtx);
         if(hParent) result = gblContextLogPush(hParent, pFrame);
     }
 #endif
 #if GBL_CONFIG_EXT_CONTEXT_DEFAULT_ENABLED
-    if(result == GBL_RESULT_UNIMPLEMENTED || result == GBL_RESULT_INCOMPLETE || result == GBL_RESULT_UNSUPPORTED) {
+    if(GBL_RESULT_UNAVAILABLE(result)) {
         result = gblContextLogPushDefault_(hCtx, pFrame);
     }
 #endif

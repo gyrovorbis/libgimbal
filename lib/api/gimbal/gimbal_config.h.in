@@ -206,7 +206,7 @@ extern "C" {
 #ifndef GBL_SIZE
 #   define GBL_SIZE                             size_t
 #   define GBL_SIZE_MAX                         SIZE_MAX
-#   define GBL_SIZE_FMT                         "%zu"
+#   define GBL_SIZE_FMT                         "zu"
 #endif
 
 #ifndef GBL_HASH

@@ -137,11 +137,11 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame)
 #define GBL_API_RESULT_SET_JMP_CND_(expr, result, label, srcLoc) \
     do {                                                \
         GBL_API_SOURCE_LOC_PUSH(srcLoc); \
-        if(!(expr)) {                                     \
+        if(!(expr)) GBL_UNLIKELY {                                     \
             GBL_API_RESULT_SET(result, #expr);                 \
             GBL_API_SOURCE_POP();                       \
             label;                                 \
-        } else {                                        \
+        } else GBL_LIKELY {                             \
             GBL_API_SOURCE_POP();                       \
         }                                               \
     } while(0)
@@ -209,14 +209,14 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame)
 #define GBL_API_EXT(prefix, ...) \
     do { \
         GBL_API_SOURCE_PUSH(SRC_FILE, SRC_FN, SRC_LN, SRC_COL); \
-        const GBL_RESULT localResult = GBL_EXT_##prefix(GBL_API_FRAME(), ##__VA_ARGS__);    \
+        GBL_MAYBE_UNUSED const GBL_RESULT localResult = GBL_EXT_##prefix(GBL_API_FRAME(), ##__VA_ARGS__);    \
         GBL_ASSERT(!(GBL_CONFIG_ASSERT_ERROR_ENABLED && GBL_RESULT_ERROR(localResult)), "Ext["#prefix"]: ERROR"); \
         GBL_ASSERT(!(GBL_CONFIG_ASSERT_PARTIAL_ENABLED && GBL_RESULT_PARTIAL(localResult)), "Ext["#prefix"]: ERROR"); \
         GBL_API_SOURCE_POP(); \
     } while(0)
 
 
-GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, const char* pDebugStr) {
+GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, const char* pDebugStr) {
     GBL_API_INLINE_BEGIN(NULL);
 
     GBL_API_EXT(MALLOC, size, align, pDebugStr, &GBL_API_INLINE_RETVAL());
@@ -236,7 +236,7 @@ GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, const char* pDebugStr
 
 
 #define GBL_API_MALLOC(...)  \
-        GBL_VA_OVERLOAD_SELECT(GBL_API_MALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
+    GBL_VA_OVERLOAD_SELECT(GBL_API_MALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
 
 
 GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, GblSize newAlign) {
@@ -299,7 +299,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
     } while (0)
 
 
-GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char* pFmt, ...) {
+GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char* pFmt, ...) {
     GBL_API_INLINE_BEGIN(GBL_RESULT_SUCCESS);
     va_list varArgs;
     va_start(varArgs, pFmt);
@@ -379,7 +379,7 @@ GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char* pFmt, ...) {
 // Base Enabled Logic (udes a prefix prefix for all magic)
 #define GBL_API_RESULT_LOG_(prefix, result)                         \
         do {                                                        \
-            if(GBL_RESULT_##prefix(result->resultCode)) {                 \
+            if(GBL_RESULT_##prefix(result->resultCode)) GBL_UNLIKELY {  \
                 GBL_API_LOG(GBL_CONFIG_LOG_##prefix##_LEVEL,    \
                             "Result: %d, Message: %s",              \
                              result->resultCode, result->message);        \
@@ -462,7 +462,7 @@ GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char* pFmt, ...) {
     do {    \
         GBL_API_SOURCE_PUSH(SRC_FILE, SRC_FN, SRC_LN, SRC_COL); \
         const GBL_RESULT localResult = (funcCall);  \
-        if(!GBL_RESULT_SUCCESS(localResult)) {  \
+        if(!GBL_RESULT_SUCCESS(localResult)) GBL_UNLIKELY {  \
             GBL_API_RESULT_SET(localResult, "Call failed!");    \
         }   \
         GBL_API_SOURCE_POP();   \

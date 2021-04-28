@@ -36,7 +36,7 @@ typedef struct GblHandleCreateInfo {
 
 
 typedef struct GblHandle_ {
-    GblObject_*             baseObject;
+    GblObject_              baseObject;
     void*                   pUserdata;
     struct GblHandle_*      pParent;
     struct GblContext_*     pContext;

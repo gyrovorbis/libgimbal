@@ -82,6 +82,7 @@ public:
 };
 
 
+
     using Bool      = ::GblBool;
     using Size      = ::GblSize;
     using Real      = ::GblReal;
@@ -262,7 +263,7 @@ GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_OBJECT_TYPE_TABLE);
         constexpr bool wouldThrow(void) const noexcept { return isError(); }
 
         Result checkThrow(void) const {
-            if(wouldThrow()) {
+            if(wouldThrow()) GBL_UNLIKELY {
                 return throwException(*this);
             }
             return *this;
@@ -287,7 +288,7 @@ GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_OBJECT_TYPE_TABLE);
         code = resultException.getResult();  \
     }   \
     catch(...) {    \
-        code = GBL_RESULT_UNKNOWN;  \
+        code = Result(Result::ErrorUnhandledException);  \
     }
 
 }

@@ -7,8 +7,8 @@ project(LibGimbal
         "Lightweight cross-platform framework for creating static/dynamic libraries with a run-time extensible C API"
     LANGUAGES C)
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
+
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 GBL_BUILD_TIMESTAMP_DEFINE(GBL_BUILD_TIMESTAMP)
@@ -109,6 +109,9 @@ set(GIMBAL_INCLUDES
 add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}
     ${GIMBAL_INCLUDES})
+
+set_property(TARGET libGimbal PROPERTY C_STANDARD 11)
+set_property(TARGET libGimbal PROPERTY C_STANDARD_RQUIRED ON)
 
 GBL_TARGET_PROPERTY_DEFINE(GBL_BUILD_C_STANDARD libGimbal C_STANDARD)
 GBL_TARGET_PROPERTY_DEFINE(GBL_BUILD_CPP_STANDARD libGimbal CXX_STANDARD)

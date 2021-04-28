@@ -31,6 +31,7 @@ extern "C" {
             (GBL_RESULT_UNSUPPORTED,                    GBL_RESULT_PARTIAL + 8, Unsupported,            "Unsupported"),                             \
             (GBL_RESULT_VERSION_MISMATCH,               GBL_RESULT_PARTIAL + 9, VersionMismatch,        "Version Mismatch"),                        \
             (GBL_RESULT_ERROR,                          0xbad00000,             Error,                  "Generic Error"),                           \
+            (GBL_RESULT_ERROR_UNHANDLED_EXCEPTION,     GBL_RESULT_ERROR | 5,   ErrorUnhandledException, "Uncaught Exception from High-level Language"), \
             (GBL_RESULT_ERROR_INTERNAL,                 GBL_RESULT_ERROR | 1,   ErrorInternal,          "Unexpected Internal Error"),               \
             (GBL_RESULT_ERROR_TYPE_MISMATCH,            GBL_RESULT_ERROR | 2,   ErrorTypeMismatch,      "Type Mismatch"),                           \
             (GBL_RESULT_ERROR_UNDERFLOW,                GBL_RESULT_ERROR | 3,   ErrorUnderflow,         "Underflow"),                               \

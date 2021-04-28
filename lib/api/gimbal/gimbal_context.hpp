@@ -38,8 +38,11 @@ public:
             nullptr
         };
 
-        Result::tryThrow(gblContextCreate((GblContext*)getPrimitiveAddress(), &info));
+        Result::tryThrow(gblContextCreate(reinterpret_cast<GblContext*>(getPrimitiveAddress()), &info));
     }
+
+    using PrimitiveCompatible<GblContext, Context>::operator&;
+
     virtual ~Context(void) {
         Result::tryThrow(gblContextDestroy(*this));
     }
