@@ -122,8 +122,6 @@ analyze clang-tidy:
 analyze scan-build-clang:
   extends: .build_linux_clang
   stage: analyze
-  #dependencies:
-  #  - build ubuntu20-clang11
   tags:
     - linux, clang, scan-build
   variables:
@@ -141,7 +139,6 @@ analyze scan-build-clang:
     - mv build/scan_build_report/*/* ./public
   artifacts:
     paths:
-      - build/
       - public/
 
 test ubuntu20-gcc10:
