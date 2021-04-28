@@ -12,9 +12,9 @@
     - CC=${CC} CXX=${CXX} ${ANALYZER} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=Debug -GNinja
     - ${ANALYZER} ninja
   variables:
-    CC: 
-    CXX:
-    ANALYZER:
+    CC: ""
+    CXX: ""
+    ANALYZER: ""
 
 .build_linux:
   extends: .build_common
