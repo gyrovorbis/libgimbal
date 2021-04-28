@@ -16,6 +16,8 @@
   extends: .build_common
   variables:
     PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+  tags:
+    - linux
 
 build ubuntu20-gcc10:
   extends: .build_linux
@@ -25,13 +27,17 @@ build ubuntu20-gcc10:
     CC: gcc
     CXX: g++
     
-build ubuntu20-clang11:
+.build_linux_clang:
   extends: .build_linux
-  tags:
-    - linux, clang
+  tags: 
+    - clang
   variables:
-     CC: clang
-     CXX: clang++
+    CC: clang
+    CXX: clang++
+
+
+build ubuntu20-clang11:
+  extends: .build_linux_clang
 
   
 
@@ -104,16 +110,14 @@ test clang11-tidy:
     - linux, clang, clang-tidy
 
 test clang11-scan-build:
-  stage: test
-  extends: ubuntu20-clang11
-  needs: ["ubuntu20-clang11"]
+  extends: .build_linux_clang
+#  needs: ["ubuntu20-clang11"]
   dependencies:
     -build ubuntu20-clang11
   tags:
-    - linux, clang, scan-build
+    - scan-build
   variables:
     ANALYZER: scan-build
-
 
 test ubuntu20-gcc10:
   extends: .test_common
