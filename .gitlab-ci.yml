@@ -8,14 +8,14 @@ stages:
   stage: build
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  #artifacts:
-   # paths:
-    #  - build/
+  artifacts:
+    paths:
+       - build/
   script:
     - mkdir -p build
     - cd build
     - env
-    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=Debug -GNinja
+    - CC=${CC} CXX=${CXX} ${ANALYZER} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=Debug -GNinja
     - ${ANALYZER} ninja
   variables:
     CC: ""
