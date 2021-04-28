@@ -33,6 +33,8 @@ build ubuntu20-clang11:
      CC: clang
      CXX: clang++
 
+  
+
 #build win10-vs2019:
 #  extends: .build_common 
 #  tags:
@@ -87,6 +89,27 @@ build macos-gcc10:
     CXX: g++-10
     PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
 
+.clang_tidy_common:
+  stage: clang_tidy
+  script:
+    - run-clang-tidy
+
+clang_tidy ubuntu20-clang11:
+  extends: .clang_tidy_common
+  needs: ["build ubuntu20-clang11"]
+  dependencies:
+    - build ubuntu20-clang11
+  tags:
+    - linux, clang
+
+test ubuntu20-gcc10:
+  extends: .test_common
+  needs: ["build ubuntu20-gcc10"]
+  dependencies:
+    - build ubuntu20-gcc10
+  tags:
+    - linux, gcc
+    
 .test_common:
   stage: test
   script:
