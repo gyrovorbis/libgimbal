@@ -26,7 +26,7 @@
 build ubuntu20-gcc10:
   extends: .build_linux
   tags:
-    - linux
+    - linux, gcc
   variables:
     CC: gcc
     CXX: g++
@@ -34,11 +34,10 @@ build ubuntu20-gcc10:
 .build_linux_clang:
   extends: .build_linux
   tags: 
-    - clang
+    - linux, clang
   variables:
     CC: clang
     CXX: clang++
-
 
 build ubuntu20-clang11:
   extends: .build_linux_clang
@@ -119,9 +118,13 @@ test clang11-scan-build:
  # dependencies:
   #  - build ubuntu20-clang11
   tags:
-    - scan-build
+    - linux, clang, scan-build
   variables:
-    ANALYZER: scan-build -o ./
+    ANALYZER: scan-build -o ./scan_build_report
+  before_script:
+    - mkdir -p build
+    - cd build
+    - mkdir -p scan_build_report  
 
 test ubuntu20-gcc10:
   extends: .test_common
