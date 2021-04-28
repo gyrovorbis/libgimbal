@@ -2,14 +2,14 @@
   stage: build
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-  artifacts:
-    paths:
-      - build/
+  #artifacts:
+   # paths:
+    #  - build/
   script:
     - mkdir -p build
     - cd build
     - env
-    - CC=${CC} CXX=${CXX} ${ANALYZER} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=Debug -GNinja
+    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=Debug -GNinja
     - ${ANALYZER} ninja
   variables:
     CC: ""
@@ -114,9 +114,9 @@ test clang11-tidy:
 
 test clang11-scan-build:
   extends: .build_linux_clang
- # needs: ["build ubuntu20-clang11"]
- # dependencies:
-  #  - build ubuntu20-clang11
+  stage: test
+  dependencies:
+    - build ubuntu20-clang11
   tags:
     - linux, clang, scan-build
   variables:
@@ -126,6 +126,12 @@ test clang11-scan-build:
     - cd build
     - mkdir -p scan_build_report  
     - cd ../
+  after_script:
+    - mkdir -p public
+    - mv build/scan_build_report/*/* public
+  artifacts:
+    paths:
+      - public/
 
 test ubuntu20-gcc10:
   extends: .test_common
