@@ -122,6 +122,7 @@ analyze clang-tidy:
 analyze scan-build-clang:
   extends: .build_linux_clang
   stage: analyze
+  dependencies: []
   tags:
     - linux, clang, scan-build
   variables:
