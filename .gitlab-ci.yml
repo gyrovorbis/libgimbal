@@ -17,10 +17,6 @@ stages:
     - env
     - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=Debug -GNinja
     - ${ANALYZER} ninja
-  variables:
-    CC: ""
-    CXX: ""
-    ANALYZER: ""
 
 .build_linux:
   extends: .build_common
@@ -123,10 +119,11 @@ analyze scan-build-clang:
   extends: .build_linux_clang
   stage: analyze
   dependencies: []
+  needs: []
   tags:
     - linux, clang, scan-build
   variables:
-    ANALYZER: scan-build -o ./scan_build_report
+    ANALYZER: scan-build -v -v -o ./scan_build_report 
     GIT_SUBMODULE_STRATEGY: recursive
   before_script:
     - mkdir -p build
