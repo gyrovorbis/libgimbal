@@ -185,7 +185,7 @@ GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateIn
 GBL_API gblContextDestroy(GblContext hCtx) {
     if(hCtx == GBL_HANDLE_INVALID) {
         GBL_ASSERT(hCtx);
-        return GBL_RESULT_ERROR_INVALID_HANDLE:
+        return GBL_RESULT_ERROR_INVALID_HANDLE;
     }
 
     // Copy over to a temp so we can still use the API...
