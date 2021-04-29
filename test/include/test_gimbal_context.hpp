@@ -387,7 +387,7 @@ private slots:
         };
 
         GBL_API_BLOCK(pCtx_, "MALLOC_2") {
-           void* pPtr = GBL_API_MALLOC(32, 32);
+           void* pPtr = GBL_API_MALLOC(64, 32);
             QVERIFY2(pPtr, "Aligned malloc returned nullptr!");
         };
 
