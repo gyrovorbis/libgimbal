@@ -163,7 +163,9 @@ GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateIn
         *phCtx = GBL_API_MALLOC(sizeof(GblContext_), 1, "Context");
         if(!GBL_RESULT_SUCCESS(GBL_API_RESULT_CODE())) {
             return GBL_API_RESULT_CODE();
-        } else if(!phCtx) {
+        }
+
+        if(!phCtx) {
             return GBL_RESULT_ERROR_MEM_ALLOC;
         }
     }
@@ -187,6 +189,7 @@ GBL_API gblContextDestroy(GblContext hCtx) {
     const GBL_RESULT result = gblHandleDestruct((GblHandle)hCtx);
     GBL_API_VERIFY(GBL_RESULT_SUCCESS(result), result);
     GBL_API_FREE(hCtx);
+    // is this going to reest because we're still logging this shit!?
     GBL_API_END();
 }
 
@@ -209,11 +212,11 @@ static inline GblContext gblContextParent_(GblContext hCtx) {
 }
 
 #define GBL_CONTEXT_EXT_IMPL_DEFAULT_CALL_(name, result, ...) \
-    if(result == GBL_RESULT_UNIMPLEMENTED || result == GBL_RESULT_INCOMPLETE || result == GBL_RESULT_UNSUPPORTED) \
-        result = gblContext##name##Default_(__VA_ARGS__)
+    if(GBL_RESULT_UNAVAILABLE(result)) \
+        result = gblContext##name##Default_(GBL_EVAL(__VA_ARGS__))
 
 #define GBL_CONTEXT_EXT_IMPL_PARENT_CALL_(name, result, hCtx, ...) \
-    if(result == GBL_RESULT_UNIMPLEMENTED || result == GBL_RESULT_INCOMPLETE || result == GBL_RESULT_UNSUPPORTED) { \
+    if(GBL_RESULT_UNAVAILABLE(result)) { \
         GblContext hParent = gblContextParent_(hCtx);   \
         if(hParent) result = gblContext##name (hParent GBL_VA_ARGS(__VA_ARGS__));   \
     }
@@ -221,9 +224,10 @@ static inline GblContext gblContextParent_(GblContext hCtx) {
 #define GBL_CONTEXT_EXT_DECL_(name, ...) \
     GBL_API gblContext##name (GblContext hCtx, const GblStackFrame* pFrame GBL_VA_ARGS(GBL_MAP_LIST(GBL_DECL_VAR_PAIR, __VA_ARGS__)))
 
+      //  GBL_ASSERT(hCtx && pFrame);
+
 #define GBL_CONTEXT_EXT_IMPL_(name, memberFn, ...) \
     GBL_CONTEXT_EXT_DECL_(name, __VA_ARGS__) { \
-        GBL_ASSERT(hCtx && pFrame); \
         GBL_RESULT result = GBL_RESULT_UNIMPLEMENTED; \
         if(hCtx->ext. memberFn) { \
             result = hCtx->ext.memberFn(pFrame GBL_VA_ARGS(GBL_MAP_LIST(GBL_DECL_VAR_PAIR_NAME, __VA_ARGS__))); \
@@ -306,7 +310,7 @@ GBL_CONTEXT_EXT_DECL_(MemAllocDefault_, (GblSize, size), (GblSize, alignment), (
     GBL_API_VERIFY_ARG(size);
     GBL_API_VERIFY_ARG(alignment <= size && alignment >= 0);
     GBL_API_VERIFY_POINTER(ppData);
-    *ppData = malloc(size);
+    *ppData = GBL_ALLOC_ALIGNED(size, alignment);
     GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_MEM_ALLOC);
     GBL_API_DEBUG("Malloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") => %p", size, alignment, *ppData);
     GBL_API_PUSH();
@@ -351,7 +355,6 @@ GBL_CONTEXT_EXT_DECL_(MemFreeDefault_, (void*, pData)) {
     GBL_API_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     GBL_API_POP(1);
-
     GBL_API_END();
 }
 

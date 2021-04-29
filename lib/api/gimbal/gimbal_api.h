@@ -11,6 +11,11 @@
 extern "C" {
 #endif
 
+
+#ifdef __STDC_LIB_EXT1__
+asdfsdafsd
+#endif
+
 #define SRC_FILE    GBL_SOURCE_FILE
 #define SRC_FN      GBL_SOURCE_FUNCTION
 #define SRC_LN      GBL_SOURCE_LINE
@@ -64,7 +69,7 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_PUSH(GblStackFrame* pStackFrame
 }
 
 static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame) {
-    assert(pStackFrame->sourceCurrentCaptureDepth);
+    GBL_ASSERT(pStackFrame->sourceCurrentCaptureDepth);
     if(--pStackFrame->sourceCurrentCaptureDepth == 0) {
         pStackFrame->sourceCurrent = pStackFrame->sourceEntry;
         return GBL_TRUE;
@@ -298,7 +303,6 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
         GBL_VA_OVERLOAD_CALL(GBL_API_POP, GBL_VA_OVERLOAD_SUFFIXER_ARGC, loc, __VA_ARGS__); \
     } while (0)
 
-
 GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char* pFmt, ...) {
     GBL_API_INLINE_BEGIN(GBL_RESULT_SUCCESS);
     va_list varArgs;
@@ -461,7 +465,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_API_CALL(funcCall) \
     do {    \
         GBL_API_SOURCE_PUSH(SRC_FILE, SRC_FN, SRC_LN, SRC_COL); \
-        const GBL_RESULT localResult = (funcCall);  \
+        GBL_MAYBE_UNUSED const GBL_RESULT localResult = (funcCall);  \
         if(!GBL_RESULT_SUCCESS(localResult)) GBL_UNLIKELY {  \
             GBL_API_RESULT_SET(localResult, "Call failed!");    \
         }   \
@@ -501,6 +505,8 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_API_END()                             \
         GBL_API_END_BLOCK(); \
         return GBL_API_RESULT_CODE()
+
+
 
 
   

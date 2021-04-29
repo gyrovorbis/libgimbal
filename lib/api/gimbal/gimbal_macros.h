@@ -41,9 +41,6 @@ extern "C" {
         char cppCompat;             \
     } S
 
-#define GBL_INLINE \
-    static inline
-
 #define GBL_UNUSED(a) \
     (void)(a)
 
@@ -90,6 +87,29 @@ https://stackoverflow.com/questions/8774567/c-macro-to-create-a-bit-mask-possibl
     GBL_VA_OVERLOAD_SELECT(GBL_ASSERT, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 
 
+GBL_DEPRECATED("Dis shit's ancient!")
+GBL_MAYBE_UNUSED GBL_NODISCARD GBL_NORETURN GBL_INLINE GBL_EXPORT_SHARED
+int someFunc(void* GBL_RESTRICT pArray[GBL_STATIC_ARRAY(10)]) GBL_NOEXCEPT
+{
+    GBL_CONSTEXPR const void* pPtr = 0;
+    GBL_STATIC_ASSERT(pPtr == GBL_NULL);
+
+    void* pSomeShit = GBL_ALLOC_ALIGNED(sizeof(void*), GBL_ALIGNOF(void*));
+
+    switch((unsigned long)pSomeShit) {
+        default: break; GBL_FALLTHROUGH;
+        case 0: break;
+    };
+
+    if(pArray) GBL_UNLIKELY {
+        pSomeShit = GBL_ALLOCA(1337);
+        if(pSomeShit) GBL_LIKELY {
+            GBL_ALIGNAS(64) int goodVal;
+            GBL_UNUSED(goodVal);
+        }
+    }
+    GBL_QUICK_EXIT(0);
+}
 
 
 

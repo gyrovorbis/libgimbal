@@ -62,18 +62,18 @@ GBL_MAYBE_UNUSED GBL_INLINE void GBL_API_RESULT_CONSTRUCT(GblApiResult* pResult,
 // ============ VERSION ================
 
 #define GBL_VERSION_FIELD_MAJOR_BIT                 24u
-#define GBL_VERSION_FIELD_MAJOR_MASK                0xf
+#define GBL_VERSION_FIELD_MAJOR_MASK                0xff
 
 #define GBL_VERSION_FIELD_MINOR_BIT                 8u
-#define GBL_VERSION_FIELD_MINOR_MASK                0xff
+#define GBL_VERSION_FIELD_MINOR_MASK                0xffff
 
 #define GBL_VERSION_FIELD_PATCH_BIT                 0u
-#define GBL_VERSION_FIELD_PATCH_MASK                0xf
+#define GBL_VERSION_FIELD_PATCH_MASK                0xff
 
 #define GBL_VERSION_MAKE(major, minor, patch)                                               \
-    (uint32_t)((major & GBL_VERSION_FIELD_MAJOR_MASK) << GBL_VERSION_FIELD_MAJOR_BIT)   |   \
-    (uint32_t)((minor & GBL_VERSION_FIELD_MINOR_MASK) << GBL_VERSION_FIELD_MINOR_BIT)   |   \
-    (uint32_t)((patch & GBL_VERSION_FIELD_PATCH_MASK) << GBL_VERSION_FIELD_PATCH_BIT)
+    (uint32_t)((major & (uint8_t)GBL_VERSION_FIELD_MAJOR_MASK) << GBL_VERSION_FIELD_MAJOR_BIT)   |   \
+    (uint32_t)((minor & (uint16_t)GBL_VERSION_FIELD_MINOR_MASK) << GBL_VERSION_FIELD_MINOR_BIT)   |   \
+    (uint32_t)((patch & (uint8_t)GBL_VERSION_FIELD_PATCH_MASK) << GBL_VERSION_FIELD_PATCH_BIT)
 
 #define GBL_VERSION_EXTRACT_MAJOR(version)                                                  \
     (uint8_t)((uint32_t)((version >> GBL_VERSION_FIELD_MAJOR_BIT) & GBL_VERSION_FIELD_MAJOR_MASK))

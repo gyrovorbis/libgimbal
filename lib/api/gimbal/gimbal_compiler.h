@@ -1,8 +1,13 @@
 #ifndef GIMBAL_COMPILER_H
 #define GIMBAL_COMPILER_H
 
+#define __STDC_WANT_LIB_EXT1__ 1
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 // C Version
-#ifndef __cplusplus
+#ifdef __STDC_VERSION__
 #   define GBL_C_89
 #   if (__STDC_VERSION__ >= 199409L)
 #       define GBL_C_95
@@ -16,9 +21,10 @@
 #   if (__STDC_VERSION__ >= 201710L)
 #       define GBL_C_18
 #   endif
-#else
+#endif
 
 //C++ Version
+#ifdef __cplusplus
 #   if (__cplusplus >= 199711L)
 #       define GBL_CPP_98
 #   endif
@@ -34,6 +40,12 @@
 #   if (__cplusplus >= 202002L)
 #       define GBL_CPP_20
 #   endif
+#endif
+
+#ifdef GBL_CPP_11
+#   define GBL_NULL nullptr
+#else
+#   define GBL_NULL NULL
 #endif
 
 // Shared library symbol imports/exports
@@ -70,8 +82,22 @@
 // Exceptions
 #ifdef __cpp_exceptions
 #   define GBL_CPP_EXCEPTIONS  1
+#   define GBL_NOEXCEPT noexcept
 #else
 #   define GBL_CPP_EXCEPTIONS  0
+#   define GBL_NOEXCEPT
+#endif
+
+#ifdef GBL_CPP_11
+#   define GBL_CONSTEXPR        constexpr
+#   ifdef GBL_CPP_20
+#       define GBL_CONSTEVAL    consteval
+#   else
+#       define GBL_CONSTEVAL    constexpr
+#   endif
+#else
+#   define GBL_CONSTEXPR
+#   define GBL_CONSTEVAL
 #endif
 
 // Concepts
@@ -148,24 +174,29 @@
 // No_Discard
 #if defined(__has_cpp_attribute)
 #   if __has_cpp_attribute(nodiscard)
-#       define GBL_NO_DISCARD [[nodiscard]]
+#       define GBL_NODISCARD [[nodiscard]]
 #   else
-#       define GBL_NO_DISCARD
+#       define GBL_NODISCARD
 #   endif
 #else
-#   define GBL_NO_DISCARD
+#   define GBL_NODISCARD
 #endif
 
-// No_Return
+// No_Return (Cpp)
 #if defined(__has_cpp_attribute)
 #   if __has_cpp_attribute(noreturn)
-#       define GBL_NO_RETURN [[noreturn]]
+#       define GBL_NORETURN [[noreturn]]
 #   else
-#       define GBL_NO_RETURN
+#       define GBL_NORETURN
 #   endif
-#else
-#   define GBL_NO_RETURN
+# else
+#   ifdef GBL_C_11
+#       define GBL_NORETURN _Noreturn
+#   else
+#       define GBL_NORETURN
+#   endif
 #endif
+
 
 // Unlikely
 #if defined(__has_cpp_attribute)
@@ -185,13 +216,71 @@
 #       define GBL_STATIC_ASSERT(cond) static_assert(cond, #cond)
 #   endif
 #   define GBL_STATIC_ASSERT_MSG(cond, msg) static_assert(cond, msg)
+#elif defined(GBL_C_STD_11)
+#   define GBL_STATIC_ASSERT(cond)          _Static_assert(cond, #cond)
+#   define GBL_STATIC_ASSERT_MSG(cond, msg) _Static_assert(cond, msg)
 #else
 #   define GBL_STATIC_ASSERT(cond)
 #   define GBL_STATIC_ASSERT_MSG(cond, msg)
 #endif
 
 
+#ifdef GBL_C_99
+#   define GBL_RESTRICT restrict
+#else
+#   define GBL_RESTRICT
+#endif
+
+#ifdef GBL_C_99
+#   define GBL_STATIC_ARRAY(idx) static idx
+#else
+#   define GBL_STATIC_ARRAY(idx) idx
+#endif
+
+#if defined(GBL_C_11)
+#   include<stdalign.h>
+#   define GBL_ALIGNAS(e)           alignas(e)
+#   define GBL_ALIGNOF(e)           alignof(e)
+#   define GBL_ALLOC_ALIGNED(s, a)  aligned_alloc(s, a)
+#elif defined(GBL_CPP_11)
+#   define GBL_ALIGNAS(e)           alignas(e)
+#   define GBL_ALIGNOF(e)           alignof(e)
+#   ifdef GBL_CPP_17
+#       define GBL_ALLOC_ALIGNED(s, a)  std::aligned_alloc(s, a)
+#   else
+#       define GBL_ALLOC_ALIGNED(s, a)  std::malloc(s * a)
+#   endif
+#else
+#   define GBL_ALIGNAS(e)
+#   define GBL_ALIGNOF(e)
+#   define GBL_ALLOC_ALIGNED(s, a)  malloc(s * a)
+#endif
+
+#define GBL_INLINE \
+    static inline
+
 // ====== NONSTANDARD COMPILER-SPECIFIC C FUNCTIONS ==========
+
+// "Safer" C11 functions with boundaries
+#if 0
+#ifdef __STDC_WANT_LIB_EXT1__
+#define GBL_C11_EXT1    1
+#define GBL_VPRINTF     vprintf_s
+#define GBL_VFPRINTF    vfprintf_s
+#define GBL_VSPRINTF    vsprintf_s
+#define GBL_VSNPRINTF   vsnprintf_s
+#define GBL_MEMSET      memset_s
+#define GBL_MEMCPY      memcpy_s
+#else
+#define GBL_C11_EXT1    0
+#define GBL_VPRINTF     vprintf
+#define GBL_VFPRINTF    vfprintf
+#define GBL_VSPRINTF    vsprintf
+#define GBL_VSNPRINTF   vsnprintf
+#define GBL_MEMSET      memset
+#define GBL_MEMCPY      memcpy
+#endif
+#endif
 
 // alloca()
 #ifndef GBL_ALLOCA
@@ -210,8 +299,13 @@
 #   define GBL_ALLOCA alloca
 #endif
 
-
-
+#ifdef GBL_CPP_11
+#   define GBL_QUICK_EXIT(c) quick_exit(c)
+#elif defined(GBL_C_11)
+#   define GBL_QUICK_EXIT(c) quick_exit(c)
+#else
+#   define GBL_QUICK_EXIT(c) exit(c)
+#endif
 
 
 

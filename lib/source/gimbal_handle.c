@@ -2,6 +2,9 @@
 #include <string.h>
 
 GBL_API gblHandleDestruct(GblHandle hHandle) {
+    if(hHandle == GBL_HANDLE_INVALID) {
+        return GBL_RESULT_ERROR_INVALID_HANDLE;
+    }
     return GBL_RESULT_SUCCESS;
 }
 
