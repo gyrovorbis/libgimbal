@@ -299,10 +299,11 @@
 #   define GBL_ALLOCA alloca
 #endif
 
-#ifdef GBL_CPP_11
-#   define GBL_QUICK_EXIT(c) quick_exit(c)
-#elif __APPLE__  // at very least fucking MacOS headers are missing it!
+
+#if __APPLE__  // at very least fucking MacOS headers are missing it!
 #   define GBL_QUICK_EXIT(c) exit(c)
+#elif defined(GBL_CPP_11)
+#   define GBL_QUICK_EXIT(c) quick_exit(c)
 #elif defined(GBL_C_11) 
 #   define GBL_QUICK_EXIT(c) quick_exit(c)
 #else
