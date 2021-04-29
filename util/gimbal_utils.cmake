@@ -49,6 +49,23 @@ function(GBL_BUILD_TIMESTAMP_DEFINE varName)
     set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endfunction()
 
+include(TestBigEndian)
+
+function(GBL_BUILD_BIG_ENDIAN_DEFINE varName)
+    TEST_BIG_ENDIAN(${varName})
+    GBL_BUILD_DEFINE(${varName} ${${varName}})
+    set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
+endfunction()
+
+function(GBL_BUILD_HOST_INFO_DEFINE buildVar keyName)
+    cmake_host_system_information(RESULT ${buildVar} QUERY ${keyName})
+    if (NOT ${${buildVar}} MATCHES "^[0-9]+$")
+        set(${buildVar} "\"${${buildVar}}\"")
+    endif()
+    GBL_BUILD_DEFINE(${buildVar} "${${buildVar}}")
+    set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
+endfunction()
+
 function(GBL_TARGET_PROPERTY_DEFINE def tgt prop)
     get_target_property(${def} ${tgt} ${prop})
     GBL_BUILD_DEFINE(${def} "\"${${def}}\"")

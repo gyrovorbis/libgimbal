@@ -33,46 +33,46 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_BEGIN(hCtx, "Build Info");
 
     GBL_API_PUSH("Project Info");
-    GBL_API_VERBOSE("%-20s: %40s", "Name", GBL_PROJECT_NAME);
-    GBL_API_VERBOSE("%-20s: %40s", "Version", GBL_PROJECT_VERSION);
-    GBL_API_VERBOSE("%-20s: %40s", "URL", GBL_PROJECT_URL);
-    GBL_API_VERBOSE("%-20s: %40s", "Description", GBL_PROJECT_DESCRIPTION);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Name", GBL_PROJECT_NAME);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Version", GBL_PROJECT_VERSION);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "URL", GBL_PROJECT_URL);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Description", GBL_PROJECT_DESCRIPTION);
     GBL_API_POP(1);
 
     GBL_API_PUSH("Build Info");
-    GBL_API_VERBOSE("%-20s: %40s", "Timestamp", GBL_BUILD_TIMESTAMP);
-    GBL_API_VERBOSE("%-20s: %40s", "Type", GBL_BUILD_TYPE);
-    GBL_API_VERBOSE("%-20s: %40s", "Config", GBL_BUILD_CONFIG);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Timestamp", GBL_BUILD_TIMESTAMP);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Type", GBL_BUILD_TYPE);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Config", GBL_BUILD_CONFIG);
     GBL_API_POP(1);
 
     GBL_API_PUSH("CI Info");
 #if GBL_BUILD_CI
-    GBL_API_VERBOSE("%-20s: %40s", "Project", GBL_BUILD_CI_PROJECT_TITLE);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Project", GBL_BUILD_CI_PROJECT_TITLE);
 
     GBL_API_PUSH("Source Control Commit Info");
-    GBL_API_VERBOSE("%-20s: %40s", "Title", GBL_BUILD_CI_COMMIT_TITLE);
-    GBL_API_VERBOSE("%-20s: %40s", "Timestamp", GBL_BUILD_CI_COMMIT_TIMESTAMP);
-    GBL_API_VERBOSE("%-20s: %40s", "SHA", GBL_BUILD_CI_COMMIT_SHA);
-    GBL_API_VERBOSE("%-20s: %40s", "Tag", GBL_BUILD_CI_COMMIT_TAG);
-    GBL_API_VERBOSE("%-20s: %40s", "Ref", GBL_BUILD_CI_COMMIT_BRANCH);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Title", GBL_BUILD_CI_COMMIT_TITLE);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Timestamp", GBL_BUILD_CI_COMMIT_TIMESTAMP);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "SHA", GBL_BUILD_CI_COMMIT_SHA);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Tag", GBL_BUILD_CI_COMMIT_TAG);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Ref", GBL_BUILD_CI_COMMIT_BRANCH);
     GBL_API_POP(1);
 
     GBL_API_PUSH("Job Info");
-    GBL_API_VERBOSE("%-20s: %40s", "ID", GBL_BUILD_CI_JOB_ID);
-    GBL_API_VERBOSE("%-20s: %40s", "Name", GBL_BUILD_CI_JOB_NAME);
-    GBL_API_VERBOSE("%-20s: %40s", "Stage", GBL_BUILD_CI_JOB_STAGE);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "ID", GBL_BUILD_CI_JOB_ID);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Name", GBL_BUILD_CI_JOB_NAME);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Stage", GBL_BUILD_CI_JOB_STAGE);
     GBL_API_POP(1);
 
     GBL_API_PUSH("User Info");
-    GBL_API_VERBOSE("%-20s: %40s", "Login", GBL_BUILD_CI_USER_LOGIN);
-    GBL_API_VERBOSE("%-20s: %40s", "Name", GBL_BUILD_CI_USER_NAME);
-    GBL_API_VERBOSE("%-20s: %40s", "Email Address", GBL_BUILD_CI_USER_EMAIL);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Login", GBL_BUILD_CI_USER_LOGIN);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Name", GBL_BUILD_CI_USER_NAME);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Email Address", GBL_BUILD_CI_USER_EMAIL);
     GBL_API_POP(1);
 
     GBL_API_PUSH("Build Node Info");
-    GBL_API_VERBOSE("%-20s: %40s", "Description", GBL_BUILD_CI_RUNNER_DESCRIPTION);
-    GBL_API_VERBOSE("%-20s: %40s", "Tags", GBL_BUILD_CI_RUNNER_TAGS);
-    GBL_API_VERBOSE("%-20s: %40s", "Architecture", GBL_BUILD_CI_RUNNER_ARCH);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Description", GBL_BUILD_CI_RUNNER_DESCRIPTION);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Tags", GBL_BUILD_CI_RUNNER_TAGS);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Architecture", GBL_BUILD_CI_RUNNER_ARCH);
     GBL_API_POP(1);
 #else
     GBL_API_WARN("UNOFFICIAL LOCAL BUILD !");
@@ -81,30 +81,46 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
 
     GBL_API_PUSH("Compiler Info");
     GBL_API_PUSH("C");
-    GBL_API_VERBOSE("%-20s: %40s", "ID", GBL_BUILD_C_COMPILER_ID);
-    GBL_API_VERBOSE("%-20s: %40s", "Version", GBL_BUILD_C_COMPILER_VERSION);
-    GBL_API_VERBOSE("%-20s: %40s", "Target", GBL_BUILD_C_COMPILER_TARGET);
-    GBL_API_VERBOSE("%-20s: %40s", "Toolchain", GBL_BUILD_C_COMPILER_TOOLCHAIN);
-    GBL_API_VERBOSE("%-20s: %40s", "Language Standard", GBL_BUILD_C_STANDARD);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "ID", GBL_BUILD_C_COMPILER_ID);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Version", GBL_BUILD_C_COMPILER_VERSION);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Target", GBL_BUILD_C_COMPILER_TARGET);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Toolchain", GBL_BUILD_C_COMPILER_TOOLCHAIN);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Language Standard", GBL_BUILD_C_STANDARD);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Language Extensions", GBL_BUILD_C_EXTENSIONS);
     GBL_API_POP(1);
 
     GBL_API_PUSH("C++");
-    GBL_API_VERBOSE("%-20s: %40s", "ID", GBL_BUILD_CPP_COMPILER_ID);
-    GBL_API_VERBOSE("%-20s: %40s", "Version", GBL_BUILD_CPP_COMPILER_VERSION);
-    GBL_API_VERBOSE("%-20s: %40s", "Target", GBL_BUILD_CPP_COMPILER_TARGET);
-    GBL_API_VERBOSE("%-20s: %40s", "Toolchain", GBL_BUILD_CPP_COMPILER_TOOLCHAIN);
-    GBL_API_VERBOSE("%-20s: %40s", "Language Standard", GBL_BUILD_CPP_STANDARD);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "ID", GBL_BUILD_CPP_COMPILER_ID);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Version", GBL_BUILD_CPP_COMPILER_VERSION);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Target", GBL_BUILD_CPP_COMPILER_TARGET);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Toolchain", GBL_BUILD_CPP_COMPILER_TOOLCHAIN);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Language Standard", GBL_BUILD_CPP_STANDARD);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Language Extensions", GBL_BUILD_CPP_EXTENSIONS);
     GBL_API_POP(1);
     GBL_API_POP(1);
 
     GBL_API_PUSH("Environment Info");
     GBL_API_PUSH("Host");
-    GBL_API_VERBOSE("%-20s: %40s", "Operating System", GBL_HOST_OS);
-    GBL_API_VERBOSE("%-20s: %40s", "Architecture", GBL_HOST_ARCH);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Host Name", GBL_BUILD_HOST_NAME);
+    //GBL_API_VERBOSE("%-20s: %-100.100s", "Domain Name", GBL_BUILD_HOST_DOMAIN_NAME);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Operating System", GBL_BUILD_HOST_OS);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Architecture", GBL_BUILD_HOST_ARCH);
+    GBL_API_PUSH("Processor");
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Family", GBL_BUILD_HOST_PROCESSOR_NAME);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Description", GBL_BUILD_HOST_PROCESSOR_DESCRIPTION);
+    GBL_API_VERBOSE("%-20s: %-100.u", "Physical Cores", GBL_BUILD_HOST_PROCESSOR_CORES_PHYSICAL);
+    GBL_API_VERBOSE("%-20s: %-100.u", "Logical Cores", GBL_BUILD_HOST_PROCESSOR_CORES_LOGICAL);
+    GBL_API_POP(1);
+    GBL_API_PUSH("Physical Memory");
+    GBL_API_VERBOSE("%-20s: %-100u", "Total (MB)", GBL_BUILD_HOST_MEMORY_PHYSICAL_TOTAL);
+    GBL_API_VERBOSE("%-20s: %-100u", "Available (MB)", GBL_BUILD_HOST_MEMORY_PHYSICAL_AVAILABLE);
+    GBL_API_POP(1);
     GBL_API_POP(1);
     GBL_API_PUSH("Target");
-    GBL_API_VERBOSE("%-20s: %40s", "Operating System", GBL_TARGET_OS);
-    GBL_API_VERBOSE("%-20s: %40s", "Architecture", GBL_TARGET_ARCH);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Operating System", GBL_BUILD_TARGET_OS);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Architecture", GBL_BUILD_TARGET_ARCH);
+    GBL_API_VERBOSE("%-20s: %-100u", "Word Size", GBL_PTR_SIZE * 8);
+    GBL_API_VERBOSE("%-20s: %-100.100s", "Endianness", GBL_BIG_ENDIAN? "Big" : "Little");
     GBL_API_POP(2);
 
     GBL_API_END();

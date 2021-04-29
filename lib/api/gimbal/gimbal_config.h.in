@@ -34,6 +34,8 @@
 #define GBL_BUILD_TARGET_OS                 "@CMAKE_SYSTEM@"
 #define GBL_BUILD_TARGET_ARCH               "@CMAKE_SYSTEM_PROCESSOR@"
 
+#define GBL_PTR_SIZE                        @CMAKE_SIZEOF_VOID_P@
+
 // ========= GENERAL CONFIGURATION ITEMS ===============
 
 #ifdef __cplusplus
