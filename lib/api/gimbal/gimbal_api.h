@@ -11,11 +11,6 @@
 extern "C" {
 #endif
 
-
-#ifdef __STDC_LIB_EXT1__
-asdfsdafsd
-#endif
-
 #define SRC_FILE    GBL_SOURCE_FILE
 #define SRC_FN      GBL_SOURCE_FUNCTION
 #define SRC_LN      GBL_SOURCE_LINE

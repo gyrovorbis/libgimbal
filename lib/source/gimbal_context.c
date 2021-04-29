@@ -110,7 +110,7 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_END();
 }
 
-inline static GBL_RESULT gblContextInitializer(GblContext hCtx, const GblContextCreateInfo* pInfo) {
+GBL_INLINE GBL_RESULT gblContextInitializer(GblContext hCtx, const GblContextCreateInfo* pInfo) {
     if(!hCtx) return GBL_RESULT_ERROR_INVALID_HANDLE;
     memset(hCtx, 0, sizeof(GblContext_));
     hCtx->baseHandle.pContext   = hCtx;
@@ -185,12 +185,23 @@ GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateIn
 }
 
 GBL_API gblContextDestroy(GblContext hCtx) {
-    GBL_API_BEGIN(hCtx);
-    const GBL_RESULT result = gblHandleDestruct((GblHandle)hCtx);
-    GBL_API_VERIFY(GBL_RESULT_SUCCESS(result), result);
-    GBL_API_FREE(hCtx);
-    // is this going to reest because we're still logging this shit!?
-    GBL_API_END();
+    if(hCtx == GBL_HANDLE_INVALID) {
+        GBL_ASSERT(hCtx);
+        return GBL_RESULT_ERROR_INVALID_HANDLE;
+    }
+
+    // Copy over to a temp so we can still use the API...
+    GblContext_ stackCtx;
+    memcpy(&stackCtx, hCtx, sizeof(GblContext_));
+    stackCtx.baseHandle.pContext = &stackCtx;
+
+    {
+        GBL_API_BEGIN(&stackCtx);
+        const GBL_RESULT result = gblHandleDestruct((GblHandle)hCtx);
+        GBL_API_VERIFY(GBL_RESULT_SUCCESS(result), result);
+        GBL_API_FREE(hCtx);
+        GBL_API_END();
+    }
 }
 
 static inline GblContext gblContextParent_(GblContext hCtx) {

@@ -1,37 +1,48 @@
+stages:
+  - build
+  - analyze
+  - test
+
+
 .build_common:
   stage: build
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   artifacts:
     paths:
-      - build/
+       - build/
   script:
-    - mkdir build
+    - mkdir -p build
     - cd build
     - env
-    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
-    - ninja
+    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE:String=Debug -GNinja
+    - ${ANALYZER} cmake --build . --target all
 
 .build_linux:
   extends: .build_common
   variables:
     PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+  tags:
+    - linux
 
 build ubuntu20-gcc10:
   extends: .build_linux
   tags:
-    - linux
+    - linux, gcc
   variables:
     CC: gcc
     CXX: g++
     
-build ubuntu20-clang11:
+.build_linux_clang:
   extends: .build_linux
-  tags:
+  tags: 
     - linux, clang
   variables:
-     CC: clang
-     CXX: clang++
+    CC: clang
+    CXX: clang++
+
+build ubuntu20-clang11:
+  extends: .build_linux_clang
 
   
 
@@ -90,17 +101,60 @@ build macos-gcc10:
     PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
 
 .clang_tidy_common:
-  stage: clang_tidy
+  stage: test
   script:
+    - cd build
     - run-clang-tidy
 
-clang_tidy ubuntu20-clang11:
+analyze clang-tidy:
+  stage: analyze
   extends: .clang_tidy_common
   needs: ["build ubuntu20-clang11"]
   dependencies:
     - build ubuntu20-clang11
   tags:
-    - linux, clang
+    - linux, clang, clang-tidy
+
+
+.scan_build_common:
+  extends: .build_linux_clang
+  stage: analyze
+  dependencies: []
+  needs: []
+  tags:
+    - linux, clang, scan-build
+  variables:
+    ANALYZER: scan-build -v -v -o ./scan_build_report 
+    GIT_SUBMODULE_STRATEGY: recursive
+  before_script:
+    - mkdir -p build
+    - cd build
+    - mkdir -p scan_build_report  
+    - cd ../
+  after_script:
+    - cd ../
+    - mkdir -p public
+    - pwd 
+    - ls
+    - mv build/scan_build_report/*/* ./public
+  artifacts:
+    paths:
+      - public/
+
+analyze scan-build-clang:
+  extends: .scan_build_common
+  variables:
+    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+    CC: clang
+    CXX: clang++
+
+analyze scan-build-gcc:
+  extends: .scan_build_common
+  variables:
+    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+    CC: gcc
+    CXX: g++
+ 
 
 test ubuntu20-gcc10:
   extends: .test_common
