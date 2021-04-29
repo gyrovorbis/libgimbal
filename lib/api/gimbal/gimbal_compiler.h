@@ -239,21 +239,21 @@
 
 #if defined(GBL_C_11)
 #   include<stdalign.h>
-#   define GBL_ALIGNAS(e)           alignas(e)
-#   define GBL_ALIGNOF(e)           alignof(e)
-#   define GBL_ALLOC_ALIGNED(s, a)  aligned_alloc(s, a)
+#   define GBL_ALIGNAS(e)               alignas(e)
+#   define GBL_ALIGNOF(e)               alignof(e)
+#   define GBL_ALLOC_ALIGNED(s, a)      aligned_alloc(s, a)
 #elif defined(GBL_CPP_11)
-#   define GBL_ALIGNAS(e)           alignas(e)
-#   define GBL_ALIGNOF(e)           alignof(e)
+#   define GBL_ALIGNAS(e)               alignas(e)
+#   define GBL_ALIGNOF(e)               alignof(e)
 #   ifdef GBL_CPP_17
-#       define GBL_ALLOC_ALIGNED(s, a)  std::aligned_alloc(s, a)
+#       define GBL_ALLOC_ALIGNED(s, a)  aligned_alloc(s, a)
 #   else
-#       define GBL_ALLOC_ALIGNED(s, a)  std::malloc(s * a)
+#       define GBL_ALLOC_ALIGNED(s, a)   malloc(s * a)
 #   endif
 #else
 #   define GBL_ALIGNAS(e)
 #   define GBL_ALIGNOF(e)
-#   define GBL_ALLOC_ALIGNED(s, a)  malloc(s * a)
+#   define GBL_ALLOC_ALIGNED(s, a)      malloc(s * a)
 #endif
 
 #define GBL_INLINE \
@@ -301,7 +301,9 @@
 
 #ifdef GBL_CPP_11
 #   define GBL_QUICK_EXIT(c) quick_exit(c)
-#elif defined(GBL_C_11) && !defined(__APPLE__) // at very least fucking MacOS headers are missing it!
+#elif __APPLE__  // at very least fucking MacOS headers are missing it!
+#   define GBL_QUICK_EXIT(c) exit(c)
+#elif defined(GBL_C_11) 
 #   define GBL_QUICK_EXIT(c) quick_exit(c)
 #else
 #   define GBL_QUICK_EXIT(c) exit(c)
