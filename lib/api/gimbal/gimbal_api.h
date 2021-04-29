@@ -1,4 +1,4 @@
-#ifndef GIMBAL_API_H
+﻿#ifndef GIMBAL_API_H
 #define GIMBAL_API_H
 
 #include "gimbal_macros.h"
@@ -85,7 +85,7 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame)
 5) Make sure all of the flags determining error handling/propagation are all
     propagated as CMakeLists.txt properties correctly!
 6) Make everything use the GblExt concept again
-7) Exception-like Try blocks using longjump and returning GblResult 
+7) Exception-like Try blocks using longjump and returning GblResult
    structures analogously to excepitons
 
    ** PRETTY MUCH DID ALL THAT SHIT**
@@ -217,8 +217,8 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame)
 
 
 GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, const char* pDebugStr) {
-    GBL_API_INLINE_BEGIN(NULL);
-
+    GBL_API_INLINE_BEGIN(GBL_NULL);
+    GBL_ASSERT(size % align == 0);
     GBL_API_EXT(MALLOC, size, align, pDebugStr, &GBL_API_INLINE_RETVAL());
     GBL_API_INLINE_END();
     // modify/set return value based on result
@@ -232,7 +232,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
     GBL_API_MALLOC_4(src, size, align, NULL)
 
 #define GBL_API_MALLOC_2(src, size) \
-    GBL_API_MALLOC_3(src, size, 1)
+    GBL_API_MALLOC_3(src, size, GBL_ALIGNOF(max_align_t))
 
 
 #define GBL_API_MALLOC(...)  \
@@ -410,7 +410,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         GBL_API_RESULT_LOG_SUCCESS(result);             \
     } while(0)
 
-       
+
 // ================= RESULT => HANDLE::LAST_ERROR ==============
 #define GBL_API_RESULT_LAST_ERROR_(prefix, result)                              \
     do {                                                                        \
@@ -504,7 +504,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 
 
-  
+
 
 #ifdef __cplusplus
 }

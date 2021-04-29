@@ -380,6 +380,7 @@ private slots:
     }
 
     void memAlloc(void) {
+#if 1
         GBL_API_BLOCK(pCtx_, "MALLOC_1") {
            void* pPtr = GBL_API_MALLOC(32);
             QVERIFY2(pPtr, "Malloc returned nullptr!");
@@ -391,12 +392,14 @@ private slots:
         };
 
         GBL_API_BLOCK(pCtx_, "MALLOC_3") {
-            void* pPtr = GBL_API_MALLOC(34, 31, "Alloc Info!");
+            void* pPtr = GBL_API_MALLOC(34, 1, "Alloc Info!");
              QVERIFY2(pPtr, "Aligned malloc with debug info returned nullptr!");
         };
+#endif
     }
 
     void memRealloc(void) {
+#if 1
         GBL_API_BLOCK(pCtx_, "REALLOC_2") {
             char* pPtr = (char*)GBL_API_MALLOC(15, 1, "Test");
             QVERIFY2(pPtr, "Aligned malloc + debug info returned nullptr!");
@@ -414,14 +417,17 @@ private slots:
             QVERIFY2(pPtr, "Realloc returned nullptr!");
             QVERIFY2(strncmp(pPtr, "LUL", 64) == 0, "Realloc lost its data!");
         };
+#endif
     }
 
     void memFree(void) {
+#if 1
         GBL_API_BLOCK(pCtx_, "FREE") {
             char* pPtr = (char*)GBL_API_MALLOC(15, 1, "Test");
             QVERIFY2(pPtr, "Aligned malloc + debug info returned nullptr!");
             GBL_API_FREE(pPtr);
         };
+#endif
     }
 
     void verifyHandle(void) {

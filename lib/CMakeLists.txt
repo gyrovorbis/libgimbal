@@ -5,6 +5,8 @@ project(LibGimbal
         ${GIMBAL_VERSION} 
     DESCRIPTION 
         "Lightweight cross-platform framework for creating static/dynamic libraries with a run-time extensible C API"
+    HOMEPAGE_URL
+        "elysianshadows.com"
     LANGUAGES C)
 
 

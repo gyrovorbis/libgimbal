@@ -4,6 +4,7 @@
 #include <gimbal/gimbal_config.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 
 
@@ -176,7 +177,7 @@ GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateIn
     // Use the temp stack context to get access to the malloc EXT macro
     {
         GBL_API_BEGIN(&stackCtx, "Creating Context");
-        *phCtx = GBL_API_MALLOC(sizeof(GblContext_), 1, "Context");
+        *phCtx = GBL_API_MALLOC(sizeof(GblContext_), GBL_ALIGNOF(GblContext_), "Context");
         if(!GBL_RESULT_SUCCESS(GBL_API_RESULT_CODE())) {
             return GBL_API_RESULT_CODE();
         }
@@ -337,10 +338,14 @@ GBL_CONTEXT_EXT_DECL_(MemAllocDefault_, (GblSize, size), (GblSize, alignment), (
     GBL_API_VERIFY_ARG(size);
     GBL_API_VERIFY_ARG(alignment <= size && alignment >= 0);
     GBL_API_VERIFY_POINTER(ppData);
-    *ppData = GBL_ALLOC_ALIGNED(size, alignment);
+    GBL_API_DEBUG("Malloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ")", size, alignment);
+    errno = 0;
+    *ppData = GBL_ALLOC_ALIGNED(alignment, size);
+    const int errNum = errno;
+    if(errNum && errNum != ENOMSG) GBL_API_ERROR("C errno: %s", strerror(errno));
     GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_MEM_ALLOC);
-    GBL_API_DEBUG("Malloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") => %p", size, alignment, *ppData);
     GBL_API_PUSH();
+    GBL_API_DEBUG("%-20s: %20p", "Address", *ppData);
     GBL_API_DEBUG("%-20s: %20s", "Debug Marker", pDebugInfoStr? pDebugInfoStr : "NULL");
     GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
     GBL_API_DEBUG("%-20s: %20"GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
@@ -357,11 +362,11 @@ GBL_CONTEXT_EXT_DECL_(MemReallocDefault_, (void*, pData), (GblSize, newSize), (G
     GBL_API_VERIFY_POINTER(pData);
     GBL_API_VERIFY_POINTER(ppNewData);
     const uintptr_t ptrVal = (uintptr_t)pData;
+    GBL_API_DEBUG("Realloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") %p", newSize, newAlign, ptrVal);
     *ppNewData = realloc(pData, newSize);
     GBL_API_VERIFY(*ppNewData, GBL_RESULT_ERROR_MEM_REALLOC);
-
-    GBL_API_DEBUG("Realloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") %p => %p", newSize, newAlign, ptrVal, *ppNewData);
     GBL_API_PUSH();
+    GBL_API_DEBUG("%-20s: %20p", "Address", *ppNewData);
     GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
     GBL_API_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
