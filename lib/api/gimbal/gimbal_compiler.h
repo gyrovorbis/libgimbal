@@ -301,7 +301,7 @@
 
 #ifdef GBL_CPP_11
 #   define GBL_QUICK_EXIT(c) quick_exit(c)
-#elif defined(GBL_C_11)
+#elif defined(GBL_C_11) && !defined(__APPLE__) // at very least fucking MacOS headers are missing it!
 #   define GBL_QUICK_EXIT(c) quick_exit(c)
 #else
 #   define GBL_QUICK_EXIT(c) exit(c)
