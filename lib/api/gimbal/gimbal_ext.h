@@ -80,7 +80,7 @@ GBL_API gblExtLogWrite       (const GblStackFrame* pFrame, GBL_LOG_LEVEL level, 
 GBL_API gblExtLogPush        (const GblStackFrame* pFrame);
 GBL_API gblExtLogPop         (const GblStackFrame* pFrame, uint32_t count);
 
-GBL_API gblExtMemAlloc      (const GblStackFrame* pFrame, GblSize size, GblSize alignment, const char* pDebugInfoString, void** ppData);
+GBL_API gblExtMemAlloc       (const GblStackFrame* pFrame, GblSize size, GblSize alignment, const char* pDebugInfoString, void** ppData);
 GBL_API gblExtMemRealloc     (const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
 GBL_API gblExtMemFree        (const GblStackFrame* pFrame, void* pData);
 

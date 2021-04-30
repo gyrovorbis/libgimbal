@@ -304,6 +304,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     va_start(varArgs, pFmt);
 
     GBL_API_EXT(LOG_WRITE, level, pFmt, varArgs);
+    va_end(varArgs);
     GBL_API_INLINE_END();
     GBL_API_INLINE_RETURN();
 }

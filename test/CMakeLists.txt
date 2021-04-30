@@ -17,6 +17,7 @@ add_subdirectory(lib/elysian-test)
 
 add_executable(GimbalTests
     include/variant_tests.hpp
+    include/test_gimbal_string.hpp
     include/test_gimbal_api.hpp
     include/test_gimbal_context.hpp
     test_main.cpp)

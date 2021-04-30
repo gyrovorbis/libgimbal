@@ -117,12 +117,17 @@ extern "C" {
 #   define GBL_API_RESULT_MSG_BUFFER_SIZE       128
 #endif
 
-        typedef struct GblSourceLocation {
-            const char* pFile;
-            const char* pFunc;
-            GBL_SIZE     line;
-            GBL_SIZE     column;
-        } GblSourceLocation;
+#ifndef GBL_STRING_BUFFER_BASE_STACK_SIZE
+#   define GBL_STRING_BUFFER_BASE_STACK_SIZE    128
+#endif
+
+
+typedef struct GblSourceLocation {
+    const char* pFile;
+    const char* pFunc;
+    GBL_SIZE     line;
+    GBL_SIZE     column;
+} GblSourceLocation;
 
 static inline GblSourceLocation GBL_SOURCE_LOCATION(const char* pFile, const char* pFunc, GBL_SIZE line, GBL_SIZE column) {
     const GblSourceLocation location = {
