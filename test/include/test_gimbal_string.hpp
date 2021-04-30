@@ -56,15 +56,20 @@ typedef struct GblString {
             Result::tryThrow(gblStringConstruct(this, sizeof(String), pCtx? *pCtx : nullptr, GblStringView{stringView.data(), stringView.length()}));
         }
         // do it via conversion operator to std::string_view
-/*
-        template<GblSize OtherStackSize>
-        constexpr String(const String<OtherStackSize>& rhs, Context* pCtx=nullptr);
-        constexpr String(const GblString& rhs, Context* pCtx=nullptr);
-        */
 
         template<GblSize OtherStackSize>
-        constexpr String(String<OtherStackSize>&& rhs);
+        constexpr String(const String<OtherStackSize>& rhs, Context* pCtx=nullptr):
+            String(getStringView(), pCtx? pCtx : rhs.getContext()) {}
+// have to check stack sizes
+        constexpr String(const GblString& rhs, Context* pCtx) {
 
+            Result::tryThrow(gblStringConstruct(this, sizeof(String), ))
+        }
+        
+
+        //template<GblSize OtherStackSize> do it via conversion operator to GblString&&
+        //constexpr String(String<OtherStackSize>&& rhs);
+// have to check stack sizes
         constexpr String(GblString&& gblString);
 
         ~String(void) {
@@ -72,12 +77,41 @@ typedef struct GblString {
         }
 
         constexpr bool operator==(const GblString& rhs) const {
+            const char* pCStr = nullptr;
+            Result::tryThrow(gblStringCStr(&rhs, &pCStr));
+            return *this == pCstr;
         }
 
-        const String& operator+=(std::string_view view) {
+        constexpr bool operator==(std::string_view view) const {
+            if(isNull()) {
+                if(!view.length()) return true;
+                else return false;
+            } else {
+                if(!view.length()) return false;
+                else GBL_LIKELY return strncmp(getCStr(), view.data(), std::min(getLength(), view.size()));
+            }
+        }
+
+        constexpr bool operator==(const char* pCStr) const {
+            if(isNull()) {
+                if(!pCStr) return true;
+                else return false;
+            } else {
+                if(!pCStr) return false;
+                else GBL_LIKELY return *this == std::string_view{ pCstr };
+            }
+        }
+
+        constexpr bool operator==(const std::string& rhs) const {
+            return *this == rhs.c_str();
+        }
+
+        const ThisType& operator+=(std::string_view view) {
             Result::tryThrow(gblStringCat(this, { view.data(), static_cast<GblSize>(view.size()) } ));
             return *this;
         }
+
+        //std::string, GblString
 
         const char* getCStr(void) const {
             const char* pCstr = nullptr;
@@ -85,19 +119,19 @@ typedef struct GblString {
             return pCstr;
         }
 
-        GblSize getStackSize(void) const {
+        Size getStackSize(void) const {
             GblSize size = 0;
             Result::tryThrow(gblStringStackSize(this, &size));
             return size;
         }
 
-        constexpr GblSize getLength(void) const {
-            GblSize length = 0;
+        constexpr Size getLength(void) const {
+            Size length = 0;
             Result::tryThrow(gblStringLength(this, &length));
             return length;
         }
         constexpr GblSize getCapacity(void) const {
-            GblSize capacity = 0;
+            Size capacity = 0;
             Result::tryThrow(gblStringCapacity(this, &capacity));
             return capacity;
         }
