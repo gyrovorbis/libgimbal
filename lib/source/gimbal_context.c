@@ -339,12 +339,11 @@ GBL_CONTEXT_EXT_DECL_(MemAllocDefault_, (GblSize, size), (GblSize, alignment), (
     GBL_API_VERIFY_ARG(alignment <= size && alignment >= 0);
     GBL_API_VERIFY_POINTER(ppData);
     GBL_API_DEBUG("Malloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ")", size, alignment);
-    errno = 0;
+    GBL_API_ERRNO_CLEAR();
     *ppData = GBL_ALLOC_ALIGNED(alignment, size);
-    const int errNum = errno;
-    if(errNum && errNum != ENOMSG) GBL_API_ERROR("C errno: %s", strerror(errno));
-    GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_MEM_ALLOC);
     GBL_API_PUSH();
+    GBL_API_PERROR("Malloc Failed");
+    GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_MEM_ALLOC);
     GBL_API_DEBUG("%-20s: %20p", "Address", *ppData);
     GBL_API_DEBUG("%-20s: %20s", "Debug Marker", pDebugInfoStr? pDebugInfoStr : "NULL");
     GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);

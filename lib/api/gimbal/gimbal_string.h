@@ -1,5 +1,5 @@
-#ifndef GblBAL_STRING_H
-#define GblBAL_STRING_H
+#ifndef GIMBAL_STRING_H
+#define GIMBAL_STRING_H
 
 #include "gimbal_api.h"
 #include "gimbal_types.h"
@@ -9,13 +9,11 @@
 extern "C" {
 #endif
 
-
-
 typedef struct GblStringView { //contiguous sequence of chars, literally only has pointer and size
     const char* pBuffer;
     GblSize     size; // MAX == null terminated!
 } GblStringView;
-
+#if 0
 GBL_API GblStringView(GblStringView* pView);
 GblStringView gblStringViewFromBuffer(const char* pBuffer, GblSize count) {
     assert(count > 0 || !pBuffer);
@@ -35,7 +33,7 @@ GBL_API GblStringViewFromGblString(GblStringView* pDest, GblString* pString, Gbl
 GBL_API GblStringViewIsValid(GblStringView* pView);
 GBL_API GblStringViewSize(GblStringView* pView, GblSize* pCount);
 GBL_API GblStringViewBuffer(GblStringView* pView, const char** ppBuff); // NOT NULL TERMINATED!!!
-
+#endif
 
 /* C++ string view shit:
  *   copy, substr, compare, startsWith, endsWith, find, rFind, find_first_of, find_last_of

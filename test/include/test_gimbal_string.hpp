@@ -136,36 +136,45 @@ typedef struct GblString {
             return capacity;
         }
 
-        constexpr Context* getContext(void) const {
-            Context* pCtx;
-            gblStringContext(pStr, &pCtx);
+        Context* getContext(void) const {
+            Context* pCtx = nullptr;
+            Result::tryThrow(gblStringContext(pStr, &pCtx));
+            return pCtx;
         }
 
         constexpr bool isValid(void) const {
-            gblStringIsValid(const GblString* pStr, GblBool* pResult);
+            GblBool valid = GBL_FALSE;
+            Result::tryThrow(gblStringIsValid(this, &valid));
+            return valid;
         }
         constexpr bool isEmpty(void) const {
-            GBL_API gblStringIsEmpty(const GblString* pStr, GblBool* pResult);
+            GblBool empty = GBL_TRUE;
+            Result::tryThrow(gblStringIsEmpty(this, &empty));
+            return empty;
         }
         constexpr bool isNull(void) const {
-            gblStringIsNull(const GblString* pStr, GblBool* pResult);
+            GblBool null = GBL_TRUE;
+            Result::tryThrow(gblStringIsNull(this, &null));
+            return null;
         }
         constexpr bool isStack(void) const {
-                    GBL_API gblStringIsStack(const GblString* pStr);
+            GblBool stack = GBL_FALSE;
+            Result::tryThrow(gblStringIsStack(this, &stack));
+            return stack;
         }
         constexpr bool isHeap(void) const {
             return !isStack();
         }
 
-        void reserve(GblSize capacity) {
-            GblStringReserve(const GblString* pStr, GblSize capacity);
+        void reserve(Size capacity) {
+            Result::tryThrow(gblStringReserve(this, capacity));
         }
-        void resize(GblSize size) {
-            gblStringResize(const GblString* pStr, GblSize length);
+        void resize(Size size) {
+            Result::tryThrow(gblStringResize(this, size));
         }
 
         void vasnprintf(const char* pFmt, va_list varArgs) {
-            GblStringVaSnprintf(GblString* pStr, pFmt, varArgs);
+            Result::tryThrow(gblStringVaSnprintf(this, pFmt, varArgs));
         }
 
         void snprintf(const char* pFmt, ...) {

@@ -180,6 +180,34 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame)
     GBL_API_VERIFY_((expr),             \
                    GBL_RESULT_ERROR_INVALID_ARG, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL))
 
+#ifdef GBL_CONFIG_ERRNO_CHECKS
+#define     GBL_API_ERRNO_CLEAR()   errno = 0
+#else
+#define     GBL_API_ERRNO_CLEAR()
+#endif
+
+#ifdef GBL_CONFIG_ERRNO_CHECKS
+#   define GBL_API_PERROR(...)                      \
+    do {                                            \
+        if(errno) GBL_UNLIKELY {                    \
+            const GBL_RESULT code =                 \
+                GBL_ERRNO_RESULT(errno);            \
+            GBL_API_VERIFY(                         \
+                GBL_RESULT_SUCCESS(code),           \
+                code);                              \
+        }                                           \
+    } while(0)
+#else
+#   define GBL_API_PERROR(...)
+#endif
+
+GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
+    switch(ernum) {
+    case 0:     return GBL_RESULT_SUCCESS;
+    default:    return GBL_RESULT_ERROR;
+    }
+}
+
 // ======= GBL_API_INLINE API ======
 #define GBL_API_INLINE_RETVAL() GBL_API_INLINE_RETURN_VALUE_NAME
 

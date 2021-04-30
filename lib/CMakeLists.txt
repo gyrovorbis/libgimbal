@@ -57,6 +57,7 @@ GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api
 
 GBL_CONFIG_OPTION(GBL_CONFIG_LAST_ERROR_ENABLED "Track most recent error in GblHandle" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_SOURCE_TRACKING_ENABLED      "Track calling source code location" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS              "Enable C errno verification macros" ON)
 
 GBL_CONFIG_OPTION(GBL_CONFIG_LOG_SUCCESS_ENABLED           "Log all success results from API calls" OFF)
 GBL_CONFIG_OPTION(GBL_CONFIG_LOG_PARTIAL_ENABLED   "Log all partial success results from API calls" ON)
