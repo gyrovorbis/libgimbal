@@ -62,7 +62,7 @@ GBL_API gblStringDestruct(GblString* pStr);
 
 GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrView);
 GBL_API gblStringTake(GblString* pStr, const char** ppStrPtr, GblSize* pCapacity);
-GBL_API gblStringMove(GblString* pStr, const char* pData, GblSize capacity);
+GBL_API gblStringGive(GblString* pStr, const char* pData, GblSize capacity);
 GBL_API gblStringCStr(const GblString* pStr, const char** ppStr);
 
 GBL_API gblStringContext(const GblString* pStr, GblContext* pCtx);
@@ -132,7 +132,7 @@ GBL_API gblStringTake(GblString* pStr, const char** ppStrPtr, GblSize* pCapacity
     GBL_API_END();
 }
 
-GBL_API gblStringMove(GblString* pStr, const char* pData, GblSize capacity) {
+GBL_API gblStringGive(GblString* pStr, const char* pData, GblSize capacity) {
     GBL_API_BEGIN(pStr->hCtx);
     GBL_API_VERIFY_POINTER(pData);
     GBL_API_VERIFY_ARG(capacity);
