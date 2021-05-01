@@ -31,23 +31,24 @@ extern "C" {
             (GBL_RESULT_UNSUPPORTED,                    GBL_RESULT_PARTIAL + 8, Unsupported,            "Unsupported"),                             \
             (GBL_RESULT_VERSION_MISMATCH,               GBL_RESULT_PARTIAL + 9, VersionMismatch,        "Version Mismatch"),                        \
             (GBL_RESULT_ERROR,                          0xbad00000,             Error,                  "Generic Error"),                           \
-            (GBL_RESULT_ERROR_UNHANDLED_EXCEPTION,     GBL_RESULT_ERROR | 5,   ErrorUnhandledException, "Uncaught Exception from High-level Language"), \
-            (GBL_RESULT_ERROR_INTERNAL,                 GBL_RESULT_ERROR | 1,   ErrorInternal,          "Unexpected Internal Error"),               \
-            (GBL_RESULT_ERROR_TYPE_MISMATCH,            GBL_RESULT_ERROR | 2,   ErrorTypeMismatch,      "Type Mismatch"),                           \
-            (GBL_RESULT_ERROR_UNDERFLOW,                GBL_RESULT_ERROR | 3,   ErrorUnderflow,         "Underflow"),                               \
-            (GBL_RESULT_ERROR_OVERFLOW,                 GBL_RESULT_ERROR | 4,   ErrorOverflow,          "Overflow"),                                \
-            (GBL_RESULT_ERROR_INVALID_HANDLE,           GBL_RESULT_ERROR | 10,  InvalidHandle,          "Invalid Handle"),                          \
-            (GBL_RESULT_ERROR_INVALID_POINTER,          GBL_RESULT_ERROR | 11,  InvalidPointer,         "Invalid Pointer"),                         \
-            (GBL_RESULT_ERROR_INVALID_ARG,              GBL_RESULT_ERROR | 12,  InvalidArg,             "Invalid Argument"),                        \
-            (GBL_RESULT_ERROR_INVALID_EXPR,             GBL_RESULT_ERROR | 13,  InvalidExpr,            "Invalid Expression"),                      \
-            (GBL_RESULT_ERROR_MEM_ALLOC,                GBL_RESULT_ERROR | 14,  MemAlloc,               "Memory Allocation Failed"),                \
-            (GBL_RESULT_ERROR_MEM_REALLOC,              GBL_RESULT_ERROR | 15,  MemRealloc,             "Memory Reallocation Failed"),              \
-            (GBL_RESULT_ERROR_MEM_FREE,                 GBL_RESULT_ERROR | 16,  MemFree,                "Memory Free Failed"),                      \
-            (GBL_RESULT_ERROR_FILE_OPEN,                GBL_RESULT_ERROR | 17,  FileOpen,               "Failed to Open File Descriptor"),          \
-            (GBL_RESULT_ERROR_FILE_CLOSE,               GBL_RESULT_ERROR | 18,  FileClose,              "Failed to Close File Descriptor"),         \
-            (GBL_RESULT_ERROR_FILE_READ,                GBL_RESULT_ERROR | 19,  FileRead,               "Failed to Read from File Descriptor"),     \
-            (GBL_RESULT_ERROR_FILE_WRITE,               GBL_RESULT_ERROR | 20,  FileWrite,              "Failed to Write to File Descriptor"),      \
-            (GBL_RESULT_COUNT,                          GBL_RESULT_ERROR | 21,  Count,                   "# of Different Error Codes")              \
+            (GBL_RESULT_ERROR_UNHANDLED_EXCEPTION,     GBL_RESULT_ERROR | 1,   ErrorUnhandledException, "Uncaught Exception from High-level Language"), \
+            (GBL_RESULT_ERROR_INTERNAL,                 GBL_RESULT_ERROR | 2,   ErrorInternal,          "Unexpected Internal Error"),               \
+            (GBL_RESULT_ERROR_TYPE_MISMATCH,            GBL_RESULT_ERROR | 3,   ErrorTypeMismatch,      "Type Mismatch"),                           \
+            (GBL_RESULT_ERROR_UNDERFLOW,                GBL_RESULT_ERROR | 4,   ErrorUnderflow,         "Underflow"),                               \
+            (GBL_RESULT_ERROR_OVERFLOW,                 GBL_RESULT_ERROR | 5,   ErrorOverflow,          "Overflow"),                                \
+            (GBL_RESULT_ERROR_OUT_OF_BOUNDS,            GBL_RESULT_ERROR | 6,   ErrorOutOfBounds,       "Out of Bounds")                            \
+            (GBL_RESULT_ERROR_INVALID_HANDLE,           GBL_RESULT_ERROR | 7,  InvalidHandle,          "Invalid Handle"),                          \
+            (GBL_RESULT_ERROR_INVALID_POINTER,          GBL_RESULT_ERROR | 8,  InvalidPointer,         "Invalid Pointer"),                         \
+            (GBL_RESULT_ERROR_INVALID_ARG,              GBL_RESULT_ERROR | 9,  InvalidArg,             "Invalid Argument"),                        \
+            (GBL_RESULT_ERROR_INVALID_EXPR,             GBL_RESULT_ERROR | 10,  InvalidExpr,            "Invalid Expression"),                      \
+            (GBL_RESULT_ERROR_MEM_ALLOC,                GBL_RESULT_ERROR | 11,  MemAlloc,               "Memory Allocation Failed"),                \
+            (GBL_RESULT_ERROR_MEM_REALLOC,              GBL_RESULT_ERROR | 12,  MemRealloc,             "Memory Reallocation Failed"),              \
+            (GBL_RESULT_ERROR_MEM_FREE,                 GBL_RESULT_ERROR | 13,  MemFree,                "Memory Free Failed"),                      \
+            (GBL_RESULT_ERROR_FILE_OPEN,                GBL_RESULT_ERROR | 14,  FileOpen,               "Failed to Open File Descriptor"),          \
+            (GBL_RESULT_ERROR_FILE_CLOSE,               GBL_RESULT_ERROR | 15,  FileClose,              "Failed to Close File Descriptor"),         \
+            (GBL_RESULT_ERROR_FILE_READ,                GBL_RESULT_ERROR | 16,  FileRead,               "Failed to Read from File Descriptor"),     \
+            (GBL_RESULT_ERROR_FILE_WRITE,               GBL_RESULT_ERROR | 17,  FileWrite,              "Failed to Write to File Descriptor"),      \
+            (GBL_RESULT_COUNT,                          GBL_RESULT_ERROR | 18,  Count,                   "# of Different Error Codes")              \
         )                                                                                                                                           \
     )
 
