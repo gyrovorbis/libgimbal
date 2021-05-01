@@ -70,6 +70,7 @@ GBL_API gblStringStackSize(const GblString* pStr, GblSize* pSize);
 GBL_API gblStringLength(const GblString* pStr, GblSize* pLength);
 GBL_API gblStringCapacity(const GblString* pStr, GblSize* pCapacity);
 
+GBL_API gblStringClear(GblString* pStr);
 GBL_API gblStringReserve(GblString* pStr, GblSize capacity);
 GBL_API gblStringResize(GblString* pStr, GblSize length);
 
