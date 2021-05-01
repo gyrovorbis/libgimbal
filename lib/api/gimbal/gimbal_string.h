@@ -60,7 +60,9 @@ typedef struct GblString {
 GBL_API gblStringConstruct(GblString* pString, GblSize size, GblContext hCtx, const GblStringView* pView);
 GBL_API gblStringDestruct(GblString* pStr);
 
-GBL_API gblStringSet(GblString* pStr, const GblStringView* pStrView);
+GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrView);
+GBL_API gblStringTake(GblString* pStr, const char** ppStrPtr, GblSize* pCapacity);
+GBL_API gblStringMove(GblString* pStr, const char* pData, GblSize capacity);
 GBL_API gblStringCStr(const GblString* pStr, const char** ppStr);
 
 GBL_API gblStringContext(const GblString* pStr, GblContext* pCtx);
@@ -99,8 +101,10 @@ GBL_API gblStringConstruct(GblString* pString, GblSize size, GblContext hCtx, co
     GBL_API_END();
 }
 
+
+
 GBL_INLINE void gblStringInitialize_(GblString* pString) {
-    pString->data.capacity = sizeof(pString->stackSize);
+    pString->data.capacity = pString->stackSize;
     pString->data.pBuffer = pString->stackBuffer;
     pString->data.length = 0;
     pString->stackBuffer[0] = '\0';
@@ -108,10 +112,34 @@ GBL_INLINE void gblStringInitialize_(GblString* pString) {
 
 GBL_API gblStringDestruct(GblString* pStr) {
     GBL_API_BEGIN(pStr->hCtx);
-    // Check if we have a bufffer to free
+    // Check if we have a buffer to free
     if(pStr->data.pBuffer && pStr->data.pBuffer != pStr->stackBuffer) {
         GBL_API_FREE(pStr->data.pBuffer);
     }
+    GBL_API_END();
+}
+
+GBL_API gblStringTake(GblString* pStr, const char** ppStrPtr, GblSize* pCapacity) {
+    GBL_API_BEGIN(pStr->hCtx);
+    GBL_API_VERIFY_POINTER(ppStrPtr);
+    GBL_API_VERIFY_POINTER(pCapacity);
+    GblBool stack = GBL_FALSE;
+    GBL_API_CALL(gblStringIsStack(pStr, &stack));
+    GBL_API_VERIFY(!stack);
+    *ppStrPtr = pStr->data.pBuffer;
+    *pCapacity = pStr->data.capacity;
+    gblStringInitialize_(pStr);
+    GBL_API_END();
+}
+
+GBL_API gblStringMove(GblString* pStr, const char* pData, GblSize capacity) {
+    GBL_API_BEGIN(pStr->hCtx);
+    GBL_API_VERIFY_POINTER(pData);
+    GBL_API_VERIFY_ARG(capacity);
+    gblStringDestruct(pStr);
+    pStr->data.pBuffer = pData;
+    pStr->data.capacity = capacity;
+    pStr->data.length = strnlen(pData, pStr->data.capacity);
     GBL_API_END();
 }
 
@@ -140,7 +168,7 @@ GBL_INLINE GBL_API gblStringAlloc_(GblString* pStr, GblSize capacity) {
     GBL_API_END();
 }
 
-GBL_API gblStringSet(GblString* pStr, const GblStringView* pStrView) {
+GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrView) {
     GBL_API_BEGIN(pStr->hCtx);
     const GblSize newSize = pStrView ? pStrView->size : 0;
 
