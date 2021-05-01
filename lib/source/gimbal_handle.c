@@ -1,4 +1,5 @@
 #include <gimbal/gimbal_handle.h>
+#include <gimbal/gimbal_api.h>
 #include <string.h>
 
 GBL_API gblHandleDestruct(GblHandle hHandle) {
@@ -24,8 +25,10 @@ GBL_API gblHandleContext(GblHandle hHandle,
 
 GBL_API gblHandleUserdata(GblHandle hHandle,
                           void** ppUserdata) {
-    *ppUserdata = hHandle->pUserdata;
-    return GBL_RESULT_SUCCESS;
+   if(!hHandle) return GBL_RESULT_ERROR_INVALID_HANDLE;
+   if(!ppUserdata) return GBL_RESULT_ERROR_INVALID_POINTER;
+   *ppUserdata = hHandle->pUserdata;
+   return GBL_RESULT_SUCCESS;
 }
 
 // this could be returning just a the base of a custom subclass

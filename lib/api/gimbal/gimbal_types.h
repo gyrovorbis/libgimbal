@@ -54,6 +54,7 @@ GBL_MAYBE_UNUSED GBL_INLINE void GBL_API_RESULT_CONSTRUCT(GblApiResult* pResult,
     va_start(varArgs, pFmt);
     memset(pResult, 0, sizeof(GblApiResult));
     if(pFmt) vsnprintf(pResult->message, sizeof(pResult->message), pFmt, varArgs);
+    va_end(varArgs);
     pResult->srcLocation    = source;
     pResult->hHandle        = hHandle;
     pResult->resultCode     = resultCode;

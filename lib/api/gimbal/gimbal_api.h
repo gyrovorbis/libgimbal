@@ -33,19 +33,22 @@ typedef struct GblStackFrame {
 
 
 GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblHandle hHandle, GBL_RESULT initialResult, GblSourceLocation entryLoc) {
-    GBL_RESULT result = GBL_RESULT_SUCCESS;
-    GblContext hContext = NULL;
-    result = gblHandleContext(hHandle, &hContext);
-    GBL_ASSERT(GBL_RESULT_SUCCESS(result));
-    void* pHandleUserdata = NULL;
-    result = gblHandleUserdata(hHandle, &pHandleUserdata);
-    GBL_ASSERT(GBL_RESULT_SUCCESS(result));
-    void* pContextUserdata = NULL;
-    result = gblHandleUserdata((GblHandle)hContext, &pContextUserdata);
-    GBL_ASSERT(GBL_RESULT_SUCCESS(result));
+    GBL_RESULT result       = GBL_RESULT_SUCCESS;
+    GblContext hContext     = GBL_NULL;
+    void* pHandleUserdata   = GBL_NULL;
+    void* pContextUserdata  = GBL_NULL;
+
+    if(hHandle) {
+        result = gblHandleContext(hHandle, &hContext);
+        GBL_ASSERT(GBL_RESULT_SUCCESS(result));
+        result = gblHandleUserdata(hHandle, &pHandleUserdata);
+        GBL_ASSERT(GBL_RESULT_SUCCESS(result));
+        result = gblHandleUserdata((GblHandle)hContext, &pContextUserdata);
+        GBL_ASSERT(GBL_RESULT_SUCCESS(result));
+    }
 
     memset(pFrame, 0, sizeof(GblStackFrame));
-    GBL_API_RESULT_CONSTRUCT(&pFrame->result, hHandle, initialResult, entryLoc, "DefaultResult!");
+    GBL_API_RESULT_CONSTRUCT(&pFrame->result, hHandle, initialResult, entryLoc, gblResultString(initialResult));
     pFrame->sourceEntry     = entryLoc;
     pFrame->sourceCurrent   = entryLoc;
     pFrame->hHandle         = hHandle;
@@ -162,7 +165,7 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame)
                                result,              \
                                goto GBL_API_END_LABEL, srcLoc)
 
-#define GBL_API_VERIFY(expr, result)                \
+#define GBL_API_VERIFY(expr, result, ...)                \
     GBL_API_VERIFY_((expr),              \
                                result,              \
                                SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL))

@@ -116,6 +116,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/gimbal_object.h
     #api/gimbal/gimbal_table.h
     api/gimbal/gimbal_string.h
+    api/gimbal/gimbal_string.hpp
     api/gimbal/gimbal_container.h
     api/gimbal/gimbal_object.hpp
     api/gimbal/gimbal_handle.hpp

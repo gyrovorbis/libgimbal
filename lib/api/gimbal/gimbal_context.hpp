@@ -13,6 +13,12 @@ namespace gimbal {
 class Context: public Handle, public PrimitiveCompatible<GblContext, Context> {
 public:
 
+    static Context* fromHandle(GblContext hCtx) {
+        Context* pCtx = nullptr;
+        Result::tryThrow(gblHandleUserdata((GblHandle)hCtx, (void**)&pCtx));
+        return pCtx;
+    }
+
     Context(void) {
 
         const GblContextExtLog log = {

@@ -555,7 +555,8 @@ private slots:
         // confirm the try/catch shit works correctly
     }
 
-    void forwardCall(void) {
+    void call(void) {
+        //GBL_API_CALL();
         // try with no error
         // try with partial, error, etc
         // try multiple levels of chaining
