@@ -4,34 +4,9 @@
 #include <elysian_qtest.hpp>
 #include <gimbal/gimbal_types.hpp>
 #include <gimbal/gimbal_string.h>
+#include <iostream>
 
 namespace gimbal {
-
-
-GBL_API gblStringConstruct(GblString* pString, GblSize size, GblContext hCtx, const GblStringView* pView);
-
-GBL_API gblStringSet(GblString* pStr, const GblStringView* pStrView)
-
-
-
-
-
-typedef struct GblStringData {
-    char*       pBuffer;
-    GblSize     length;
-    GblSize     capacity;
-} GblStringData;
-
-typedef struct GblString {
-    GblContext hCtx;
-    GblStringData data;
-    char    stackBuffer[GIMBAL_STRING_BUFFER_STACK_SIZE];
-} GblString;
-
-    template<typename P, typename CRTP>
-    class TypeCompatible {
-
-    };
 
     /* Use variable-length array in C to increase stack size via alloca (but then I guess we gotta store it too)
      * use template argument in C++ to inherit and increase stack size...
@@ -39,11 +14,11 @@ typedef struct GblString {
      */
 
 // overflow when copying shit into the bitch without enough room on stack when no context is present
-    template<GblSize ExtraStackSize=0>
+    template<Size ExtraStackSize=0>
     class String final: public GblString {
     public:
         using ThisType = String<ExtraStackSize>;
-        constexpr static const inline ExtraStackSize = ExtraStackSize;
+        constexpr static const inline Size ExtraStackBufferSize = ExtraStackSize;
     private:
         char extraStackBuffer_[ExtraStackSize] = { '0' };
     public:
@@ -53,17 +28,21 @@ typedef struct GblString {
         constexpr String(const std::string& stdString, Context* pCtx=nullptr): String(std::string_view{stdString.c_str()}, pCtx) {}
         // make most shit go through here!
         constexpr String(std::string_view stringView, Context* pCtx=nullptr) {
-            Result::tryThrow(gblStringConstruct(this, sizeof(String), pCtx? *pCtx : nullptr, GblStringView{stringView.data(), stringView.length()}));
+            Result::tryThrow(gblStringConstruct(this,
+                                                sizeof(String),
+                                                pCtx? static_cast<GblContext>(*pCtx) : nullptr,
+                                                GblStringView{stringView.data(), stringView.length()})
+                             );
         }
         // do it via conversion operator to std::string_view
 
         template<GblSize OtherStackSize>
         constexpr String(const String<OtherStackSize>& rhs, Context* pCtx=nullptr):
-            String(getStringView(), pCtx? pCtx : rhs.getContext()) {}
+            String(rhs.getStringView(), pCtx? pCtx : rhs.getContext()) {}
 // have to check stack sizes
         constexpr String(const GblString& rhs, Context* pCtx) {
 
-            Result::tryThrow(gblStringConstruct(this, sizeof(String), ))
+            //Result::tryThrow(gblStringConstruct(this, sizeof(String), ))
         }
         
 
@@ -79,7 +58,7 @@ typedef struct GblString {
         constexpr bool operator==(const GblString& rhs) const {
             const char* pCStr = nullptr;
             Result::tryThrow(gblStringCStr(&rhs, &pCStr));
-            return *this == pCstr;
+            return *this == pCStr;
         }
 
         constexpr bool operator==(std::string_view view) const {
@@ -98,7 +77,7 @@ typedef struct GblString {
                 else return false;
             } else {
                 if(!pCStr) return false;
-                else GBL_LIKELY return *this == std::string_view{ pCstr };
+                else GBL_LIKELY return *this == std::string_view{ pCStr };
             }
         }
 
@@ -138,7 +117,7 @@ typedef struct GblString {
 
         Context* getContext(void) const {
             Context* pCtx = nullptr;
-            Result::tryThrow(gblStringContext(pStr, &pCtx));
+            Result::tryThrow(gblStringContext(this, &pCtx));
             return pCtx;
         }
 
@@ -180,13 +159,21 @@ typedef struct GblString {
         void snprintf(const char* pFmt, ...) {
             va_list varArgs;
             va_start(varArgs, pFmt);
-            vasnprintf(pCtx, pFmt, varArgs);
+            vasnprintf(pFmt, varArgs);
             va_end(varArgs);
+        }
+
+        friend std::ostream &operator<<(std::ostream& output, const ThisType& s) {
+            return output;
+        }
+
+        friend std::istream &operator>>(std::istream& input, ThisType &s) {
+            return input;
         }
 
     };
 
-    std::ostream <<
+
 
 
 }
