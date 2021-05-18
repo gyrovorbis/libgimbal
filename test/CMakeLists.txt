@@ -7,7 +7,7 @@ find_package(Qt6 COMPONENTS Core Test REQUIRED)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTO_RCC ON)
 set(CMAKE_AUTOIC ON)
@@ -16,6 +16,7 @@ set(CMAKE_AUTOIC ON)
 add_subdirectory(lib/elysian-test)
 
 add_executable(GimbalTests
+    include/test_gimbal.hpp
     include/variant_tests.hpp
     include/test_gimbal_string.hpp
     include/test_gimbal_api.hpp

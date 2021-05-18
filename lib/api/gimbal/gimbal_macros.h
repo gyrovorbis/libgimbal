@@ -3,6 +3,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <limits.h>
 #include <gimbal/gimbal_config.h>
 #include "gimbal_compiler.h"
@@ -85,6 +86,50 @@ https://stackoverflow.com/questions/8774567/c-macro-to-create-a-bit-mask-possibl
 
 #define GBL_ASSERT(...) \
     GBL_VA_OVERLOAD_SELECT(GBL_ASSERT, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
+
+
+GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+uint8_t GBL_POW2_NEXT_UINT8(uint8_t n) GBL_NOEXCEPT {
+    GBL_ASSERT(n >= 2);
+    --n;
+    n |= n >> 1; n |= n >> 2; n |= n >> 4;
+    return n + 1;
+}
+
+GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+uint16_t GBL_POW2_NEXT_UINT16(uint16_t n) GBL_NOEXCEPT {
+    GBL_ASSERT(n >= 2);
+    --n;
+    n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8;
+    return n + 1;
+}
+
+GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+uint32_t GBL_POW2_NEXT_UINT32(uint32_t n) GBL_NOEXCEPT {
+    GBL_ASSERT(n >= 2);
+    --n;
+    n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16;
+    return n + 1;
+}
+
+GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+uint64_t GBL_POW2_NEXT_UINT64(uint64_t n) GBL_NOEXCEPT {
+    GBL_ASSERT(n >= 2);
+    --n;
+    n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16; n |= n >> 32;
+    return n + 1;
+}
+
+#if 0
+#define GBL_POW2_NEXT(X)                    \
+    _Generic((X),                           \
+        uint8_t:    GBL_POW2_NEXT_UINT8,    \
+        uint16_t:   GBL_POW2_NEXT_UINT16,   \
+        uint32_t:   GBL_POW2_NEXT_UINT32,   \
+        uint64_t:   GBL_POW2_NEXT_UINT64,   \
+        default:    GBL_POW2_NEXT_UINT64    \
+    )(X)
+#endif
 
 
 GBL_DEPRECATED("Dis shit's ancient!")

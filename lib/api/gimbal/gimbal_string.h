@@ -87,18 +87,9 @@ GBL_API gblStringVaSnprintf(const GblString* pStr, const char* pFmt, va_list var
 #endif
 
 //IMPLEMENT ME FOR CUSTOM ALLOCATION SCHEMES
-GBL_INLINE GblSize GBL_STRING_CAPACITY_FROM_SIZE_(GblSize size) { return size; }
-
-#if 0
-GBL_INLINE GBL_API gblStringIsNull(const GblString* pStr, GblBool* pResult) {
-
-    GBL_ASSERT(pStr);
-    GBL_ASSERT(pResult);
-    //!pBuffer should be sufficient, if length is zero, better not have a buffer...
-    *pResult = (!pStr->data.pBuffer && !pStr->data.length);
-    return GBL_RESULT_SUCCESS;
+GBL_INLINE GblSize GBL_STRING_CAPACITY_FROM_SIZE_(GblSize size) {
+    return GBL_POW2_NEXT_UINT32(size);
 }
-#endif
 
 GBL_INLINE GBL_API gblStringIsEmpty(const GblString* pStr, GblBool* pResult) {
     GBL_ASSERT(pStr);
@@ -132,7 +123,8 @@ GBL_INLINE GBL_API gblStringDestruct(GblString* pStr) {
     GBL_API_BEGIN(pStr->hCtx);
     // Check if we have a buffer to free
     if(pStr->data.pBuffer && pStr->data.pBuffer != pStr->stackBuffer) {
-        GBL_API_FREE(pStr->data.pBuffer);
+        if(pStr->hCtx) GBL_API_FREE(pStr->data.pBuffer);
+        else free(pStr->data.pBuffer);
     }
     GBL_API_END();
 }
@@ -153,7 +145,10 @@ GBL_INLINE GBL_API gblStringAlloc_(GblString* pStr, GblSize capacity) {
         pStr->data.capacity = pStr->stackSize;
     } else {
         pStr->data.capacity = capacity;
-        pStr->data.pBuffer = (char*)GBL_API_MALLOC(pStr->data.capacity);
+
+        pStr->data.pBuffer = pStr->hCtx != GBL_HANDLE_INVALID?
+                    (char*)GBL_API_MALLOC(pStr->data.capacity) :
+                    (char*)malloc(pStr->data.capacity);
     }
     pStr->data.pBuffer[0] = '\0';
     pStr->data.length = 0;
@@ -164,14 +159,16 @@ GBL_INLINE GBL_API gblStringAlloc_(GblString* pStr, GblSize capacity) {
 
 GBL_INLINE GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrView) {
     GBL_API_BEGIN(pStr->hCtx);
-    const GblSize newSize = pStrView ? pStrView->size : 0;
+    const GblSize newSize = !pStrView ? 0 :
+                            !pStrView->size && pStrView->pBuffer? strlen(pStrView->pBuffer) :
+                            pStrView->size;
 
     if(pStr->data.capacity < newSize) {
         GBL_API_CALL(gblStringClear(pStr));
         if(newSize) GBL_API_CALL(gblStringAlloc_(pStr, GBL_STRING_CAPACITY_FROM_SIZE_(newSize + 1)));
     }
 
-    if(pStrView && pStrView->pBuffer) memcpy(pStr->data.pBuffer, pStrView->pBuffer, pStrView->size);
+    if(pStrView && pStrView->pBuffer) memcpy(pStr->data.pBuffer, pStrView->pBuffer, newSize);
     pStr->data.length = newSize;
     pStr->data.pBuffer[newSize] = '\0';
     GBL_API_END();
@@ -253,11 +250,14 @@ GBL_INLINE GBL_API gblStringReserve(GblString* pStr, GblSize capacity) {
         GblBool stack = GBL_FALSE;
         GBL_API_CALL(gblStringIsStack(pStr, &stack));
         if(stack) {
-            GblSize oldLength = pStr->data.length;
+            const GblSize oldLength = pStr->data.length;
             GBL_API_CALL(gblStringAlloc_(pStr, capacity));
             memcpy(pStr->data.pBuffer, pStr->stackBuffer, oldLength+1);
+            pStr->data.length = oldLength;
         } else {
-            pStr->data.pBuffer = (char*)GBL_API_REALLOC(pStr->data.pBuffer, capacity);
+            pStr->data.pBuffer = pStr->hCtx != GBL_HANDLE_INVALID?
+                        (char*)GBL_API_REALLOC(pStr->data.pBuffer, capacity) :
+                        (char*)realloc(pStr->data.pBuffer, capacity);
             pStr->data.capacity = capacity;
         }
     }
@@ -267,17 +267,16 @@ GBL_INLINE GBL_API gblStringReserve(GblString* pStr, GblSize capacity) {
 
 GBL_INLINE GBL_API gblStringResize(GblString* pStr, GblSize length) {
     GBL_API_BEGIN(pStr->hCtx);
-    if(pStr->data.length > length) {
-        pStr->data.pBuffer[length] = '\0';
+    if(length > pStr->data.length) {
 
-    } else if(pStr->data.length > length) {
-
-        if(length > pStr->data.capacity) {
-            gblStringReserve(pStr, GBL_STRING_CAPACITY_FROM_SIZE_(length));
+        if(length+1 > pStr->data.capacity) {
+            GBL_API_CALL(gblStringReserve(pStr, GBL_STRING_CAPACITY_FROM_SIZE_(length + 1)));
         }
-        // Do we fill this shit in with something?
+
+        //pStr->data.pBuffer[pStr->data.length] = ' '; remove old null character so strlen isn't wrong!
     }
 
+    pStr->data.pBuffer[length] = '\0';
     pStr->data.length = length;
     GBL_API_END();
 }
@@ -303,9 +302,51 @@ GBL_INLINE GBL_API GblStringCompare(const GblString* pStr1, const GblString* pSt
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API gblStringCat(const GblString* pStr, const GblStringView* pView);
-GBL_API gblStringSnprintf(const GblString* pStr, const char* pFmt, ...);
-GBL_API gblStringVaSnprintf(const GblString* pStr, const char* pFmt, va_list varArgs);
+GBL_INLINE GBL_API gblStringCat(GblString* pStr, const GblStringView* pView) {
+    GBL_API_BEGIN(pStr->hCtx);
+    GblSize expectedSize = 0;
+    GBL_API_VERIFY_POINTER(pView);
+    GBL_API_VERIFY_ARG(pView->pBuffer && pView->size);
+    GBL_API_CALL(gblStringLength(pStr, &expectedSize));
+    expectedSize += pView->size;
+    GBL_API_CALL(gblStringReserve(pStr, expectedSize + 1));
+    GBL_API_VERIFY(strncat(pStr->data.pBuffer, pView->pBuffer, pView->size), GBL_RESULT_ERROR_INTERNAL);
+    GBL_API_VERIFY(strlen(pStr->data.pBuffer) == expectedSize, GBL_RESULT_ERROR_INTERNAL);
+    pStr->data.length = expectedSize;
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringVaSprintf(GblString* pStr, const char* pFmt, va_list varArgs) {
+    GBL_API_BEGIN(pStr->hCtx);
+    GblSize newCapacity = 0;
+    size_t expectedSize = 0;
+    GBL_API_VERIFY_POINTER(pFmt);
+
+    //Check if shit's empty
+    expectedSize = strlen(pFmt) + 1;
+    if(expectedSize <= 1) {
+        pStr->data.pBuffer[0] = '\0';
+        pStr->data.length = 0;
+    } else {
+        //Make a first guess at the required size
+        newCapacity = GBL_STRING_CAPACITY_FROM_SIZE_(expectedSize);
+        GBL_API_CALL(gblStringReserve(pStr, newCapacity));
+        GBL_API_ERRNO_CLEAR();
+        expectedSize = vsnprintf(pStr->data.pBuffer, pStr->data.capacity, pFmt, varArgs);
+        pStr->data.length = expectedSize;
+        GBL_API_PERROR("vsnprintf failed with code: %zu", expectedSize);
+        //Multi-pass, try again with real size!
+        if(expectedSize >= newCapacity) {
+            newCapacity = GBL_STRING_CAPACITY_FROM_SIZE_(expectedSize + 1);
+            GBL_API_ERRNO_CLEAR();
+            expectedSize = vsnprintf(pStr->data.pBuffer, pStr->data.capacity, pFmt, varArgs);
+            pStr->data.length = expectedSize;
+            GBL_API_PERROR("vsnprintf failed with code: %zu", expectedSize);
+            GBL_API_VERIFY(expectedSize == newCapacity - 1, GBL_RESULT_TRUNCATED); //better have written it all
+        }
+    }
+    GBL_API_END();
+}
 
 /*
  * FIND, TOKENIZE, REPLACE, TO UPPER, TO LOWER, LOCATE LAST TOKEN FOR SUFFIX/EXTENSION SHIT

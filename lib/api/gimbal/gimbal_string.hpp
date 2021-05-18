@@ -5,7 +5,8 @@
 #include <gimbal/gimbal_string.h>
 #include <gimbal/gimbal_context.hpp>
 #include <iostream>
-
+#include <unordered_set>
+#include <compare>
 
 namespace gimbal {
 // string literal operator overload ""
@@ -22,25 +23,69 @@ WRITE:
 4. nonconst string, nonconst pointer
 */
 
+
+namespace tags {
+    struct StringBase {};
+}
+
+template<typename T>
+concept string_base = std::is_base_of_v<gimbal::tags::StringBase, T>;
+
+template<typename CTRP>
+class StringViewBase;
+
+class StringView;
+class String;
+
+template<gimbal::Size Size>
+class FlexibleString;
+
+
+
+auto operator<=>(const string_base auto& lhs, const std::string& rhs) noexcept;
+
+
 //ADD CONST ITERATORS
 template<typename CRTP>
-class StringViewBase {
+class StringViewBase:
+    public tags::StringBase,
+    public ReadWriteIndexable<StringViewBase<CRTP>, size_t, char>,
+    public RandomAccessIterable<StringViewBase<CRTP>, size_t, char>
+{
 public:
-    using StringViewType = StringViewBase<CRTP>;
+    using StringViewType    = StringViewBase<CRTP>;
+    using Derived           = CRTP;
 protected:
     decltype(auto) str_(void) const {
         return static_cast<const CRTP*>(this)->getString_();
     }
 
+    decltype(auto) str_(void) {
+        return static_cast<CRTP*>(this)->getString_();
+    }
+
 public:
 
-// Accessor wrappers
-
-    const char* getCStr(void) const {
-        const char* pCstr = nullptr;
-        Result::tryThrow(gblStringCStr(str_(), &pCstr));
-        return pCstr ? pCstr : "";
+    const char& getElement_(size_t index) const {
+        if(index >= getLength()) Result::tryThrow(Result::ErrorOutOfBounds);
+        return getCString()[index];
     }
+
+    char& getElement_(size_t index) {
+        if(index >= getLength()) Result::tryThrow(Result::ErrorOutOfBounds);
+        return getCString()[index];
+    }
+
+    void setElement_(size_t index, char value) {
+        if(index >= getLength()) Result::tryThrow(Result::ErrorOutOfBounds);
+        const_cast<char*>(getCString())[index] = value;
+    }
+
+    size_t getElementCount_(void) const {
+        return getLength();
+    }
+
+// Accessor wrappers
 
     Size getStackSize(void) const {
         Size size = 0;
@@ -71,13 +116,6 @@ public:
         Result::tryThrow(gblStringIsEmpty(str_(), &empty));
         return empty;
     }
-#if 0
-    constexpr bool isNull(void) const {
-        GblBool null = GBL_TRUE;
-        Result::tryThrow(gblStringIsNull(str_(), &null));
-        return null;
-    }
-#endif
 
     constexpr bool isStack(void) const {
         GblBool stack = GBL_FALSE;
@@ -97,84 +135,60 @@ public:
         return pCStr;
     }
 
+    char* getCString(void) {
+        return str_()->data.pBuffer;
+    }
+
     std::string toStdString(void) const {
-        return std::string(getCStr());
+        return std::string(getCString());
     }
 
     constexpr std::string_view toStringView(void) const {
         return getLength()?
-            std::string_view(getCStr(), getLength()) : std::string_view();
+            std::string_view(getCString(), getLength()) : std::string_view();
     }
 
-    char operator[](size_t index) const {
-        if(index >= getLength()) Result::tryThrow(Result::ErrorOutOfBounds);
-        return getCStr()[index];
+    friend constexpr bool operator==(const Derived& lhs, const char* pRhs) noexcept {
+        return (lhs.toStringView() == std::string_view(pRhs));
+    }
+    friend constexpr decltype(auto) operator<=>(const Derived& lhs, const char* pRhs) noexcept {
+        return (lhs.toStringView() <=> std::string_view(pRhs));
+    }
+    friend constexpr bool operator==(const Derived& lhs, const std::string& rhs) noexcept {
+        return (lhs.toStdString() == rhs);
+    }
+    friend constexpr decltype(auto) operator<=>(const Derived& lhs, const std::string& rhs) noexcept {
+        return (lhs.toStdString() <=> rhs);
+    }
+    friend constexpr bool operator==(const Derived& lhs, std::string_view rhs) noexcept {
+        return (lhs.toStringView() == rhs);
+    }
+    friend constexpr decltype(auto) operator<=>(const Derived& lhs, std::string_view rhs) noexcept {
+        return (lhs.toStringView() <=> rhs);
+    }
+    friend constexpr bool operator==(const Derived& lhs, const string_base auto& rhs) noexcept {
+        return (lhs.toStringView() == rhs.toStringView());
+    }
+    friend constexpr decltype(auto) operator<=>(const Derived& lhs, const string_base auto& rhs) noexcept {
+        return (lhs.toStringView() <=> rhs.toStringView());
     }
 
-    template<typename Other_CRTP>
-    friend constexpr decltype(auto) operator<=>(const StringViewType& lhs, const StringViewBase<Other_CRTP>& rhs) {
-        return lhs.toStringView() <=> rhs.toStringView();
+    friend std::ostream& operator<<(std::ostream& output, const Derived& s) {
+        return output << s.getCString();
     }
 
-    friend constexpr decltype(auto) operator<=>(const StringViewType& lhs, const std::string& rhs) {
-        return lhs <=> rhs.c_str();
-    }
-
-    friend constexpr decltype(auto) operator<=>(const StringViewType& lhs, const char* pRhs) {
-        return lhs <=> std::string_view(pRhs);
-    }
-
-    friend constexpr decltype(auto) operator<=>(const StringViewType& lhs, const std::string_view& rhs) {
-        return lhs.toStringView() <=> rhs;
-    }
-
-    friend std::ostream &operator<<(std::ostream& output, const StringViewType& s) {
-        return output << s.getCStr();
-    }
-
-#if 0
-    struct iterator
-       {
-           using value_type = T ;
-           using reference = T& ;
-           using pointer = T* ;
-           using difference_type = std::ptrdiff_t ;
-           using iterator_category	= std::forward_iterator_tag ;
-
-           reference operator* () { return *curr ; }
-           // pointer operator& () { return &**this ; }
-           pointer operator-> () { return &**this ; } // *** EDIT
-
-           iterator& operator++ () { ++curr ; return *this ; }
-           iterator operator++ (int) { const auto temp(*this) ; ++*this ; return temp ; }
-
-           bool operator== ( const iterator& that ) const { return curr == that.curr ; }
-           bool operator!= ( const iterator& that ) const { return !(*this==that) ; }
-
-           iterator& next_row()
-           {
-               if( std::distance( curr, end ) >= difference_type(ncols) ) std::advance( curr, ncols ) ;
-               else curr = end ;
-               return *this ;
-           }
-
-           typename std::vector<T>::iterator curr ;
-           typename std::vector<T>::iterator end ;
-           std::size_t ncols ;
-
-       };
-
-       iterator begin() { return { std::begin(items), std::end(items), ncols } ; }
-       iterator end() { return { std::end(items), std::end(items), ncols } ; }
-#endif
 };
 
 class StringView final: public StringViewBase<StringView> {
 private:
     const GblString* pGblStr_ = nullptr;
 public:
-    StringView(const GblString* pGblStr = nullptr):
-        pGblStr_(pGblStr) {}
+    StringView(void) = default;
+
+    StringView(const GblString& gblStr):
+        pGblStr_(&gblStr) {}
+
+    StringView(const gimbal::String& string);
 
     const GblString* getString_(void) const {
         return pGblStr_;
@@ -189,23 +203,14 @@ class String:
     public GblString,
     public StringViewBase<String>
 {
-protected:
-
-    std::pair<char*, Size> take(void) {
-        char* pCStr = nullptr;
-        Size capacity = 0;
-        Result::tryThrow(gblStringTake(this, &pCStr, &capacity));
-        return { pCStr, capacity };
-    }
-
-    void give(std::pair<char*, Size> data) {
-        Result::tryThrow(gblStringGive(this, data.first, data.second));
-    }
-
 public:
 
     const GblString* getString_(void) const {
         return static_cast<const GblString*>(this);
+    }
+
+    GblString* getString_(void) {
+        return static_cast<GblString*>(this);
     }
 
     // Default Ctors
@@ -217,16 +222,10 @@ public:
 
     // Value Ctors
     String(const std::string& stdString, Context* pCtx=nullptr, Size size=sizeof(String)):
-        String(std::string_view{stdString.c_str()}, pCtx) {}
+        String(std::string_view{stdString.c_str()}, pCtx, size) {}
 
     String(const char* pCStr, Context* pCtx=nullptr, Size size=sizeof(String)):
         String(pCStr? std::string_view{pCStr} : std::string_view{}, pCtx, size) {}
-
-    // Copy Ctors
-    //Hopefully doing a regular-ass GblString will automatically instantiate a GblStringView here?
-    template<typename T>
-    constexpr String(const StringViewBase<T>& other, Context* pCtx=nullptr, Size size = sizeof(String)):
-        String(other.toStringView(), pCtx? pCtx : other.getContext(), size) {}
 
     String(const std::string_view& stringView, Context* pCtx=nullptr, Size size=sizeof(String)) {
         GblStringView tempView = {stringView.data(), stringView.length()};
@@ -236,33 +235,57 @@ public:
                                             &tempView));
     }
 
+    // Copy Ctor
+    String(const String& rhs, Context* pCtx=nullptr, Size size=sizeof(String)):
+        String(StringView(rhs), pCtx, size) {}
+
+    String(StringView other, Context* pCtx=nullptr, Size size=sizeof(String)):
+        String(other.toStringView(), pCtx? pCtx : other.getContext(), size) {}
+
+    // Move Ctor
     String(String&& rhs, Context* pCtx=nullptr, Size size=sizeof(String)):
+        String(static_cast<GblString&&>(rhs), pCtx, size) {}
+
+    String(GblString&& rhs, Context* pCtx=nullptr, Size size=sizeof(String)):
         String(pCtx, size)
     {
-        pCtx = pCtx? pCtx : rhs.getContext();
-
-        if(pCtx == rhs.getContext() && rhs.isHeap()) {
-            give(rhs.take());
-        } else { //cannot move construct!
-            *this = rhs.toStringView();
-        }
+        *this = rhs;
     }
 
     ~String(void) {
         Result::tryThrow(gblStringDestruct(this));
     }
 
+    static std::pair<char*, Size> take(GblString* pGblStr) {
+        char* pCStr = nullptr;
+        Size capacity = 0;
+        Result::tryThrow(gblStringTake(pGblStr, &pCStr, &capacity));
+        return { pCStr, capacity };
+    }
+
+    auto take(void) {
+        return take(this);
+    }
+
+    void give(std::pair<char*, Size> data) {
+        Result::tryThrow(gblStringGive(this, data.first, data.second));
+    }
+
     void clear(void) {
         Result::tryThrow(gblStringClear(this));
     }
 
-    const String& operator=(const std::string_view& view) {
+    const String& operator=(std::string_view view) {
         GblStringView gview = { view.data(), view.size() };
         Result::tryThrow(gblStringAssign(this, &gview));
         return *this;
     }
 
-    const String& operator=(const String& string) {
+    const String& operator=(const String& rhs) {
+        return *this = StringView(rhs);
+    }
+
+    const String& operator=(StringView string) {
         return *this = string.toStringView();
     }
 
@@ -280,10 +303,30 @@ public:
         return *this;
     }
 
-    const String& operator+=(std::string_view view) {
-        GblStringView gview = { view.data(), view.size() };
-        Result::tryThrow(gblStringCat(this, &gview));
+    const String& operator=(String&& rhs) {
+        return *this = static_cast<GblString&&>(rhs);
+    }
+
+    const String& operator=(GblString&& rhs) {
+        StringView rhsView(rhs);
+        Context* pCtx = getContext()? getContext() : rhsView.getContext();
+
+        if(pCtx == rhsView.getContext() && rhsView.isHeap()) {
+            give(take(&rhs));
+        } else { //cannot move construct!
+            *this = rhsView.toStringView();
+        }
+
         return *this;
+    }
+
+    const String& operator+=(std::string_view view) {
+        concat(view);
+        return *this;
+    }
+
+    const String& operator+=(StringView view) {
+        return *this += view.toStringView();
     }
 
     void reserve(Size capacity) {
@@ -294,39 +337,50 @@ public:
         Result::tryThrow(gblStringResize(this, size));
     }
 
-    void vasnprintf(const char* pFmt, va_list varArgs) {
-        Result::tryThrow(gblStringVaSnprintf(this, pFmt, varArgs));
+    void concat(std::string_view view) {
+        const GblStringView gblView{ view.data(), view.size() };
+        Result::tryThrow(gblStringCat(this, &gblView));
+    }
+
+    void vasprintf(const char* pFmt, va_list varArgs) {
+        Result::tryThrow(gblStringVaSprintf(this, pFmt, varArgs));
     }
 
     //return the actual return value?
-    void snprintf(const char* pFmt, ...) {
+    void sprintf(const char* pFmt, ...) {
         va_list varArgs;
         va_start(varArgs, pFmt);
-        //retval?
-        vasnprintf(pFmt, varArgs);
+        vasprintf(pFmt, varArgs);
         va_end(varArgs);
     }
 
     // CHECK ERROR BITS
-    friend std::istream &operator>>(std::istream& input, String &s) {
+    friend std::istream& operator>>(std::istream& input, String &s) {
         std::string line;
-        //(input.rdState() & std::ifstream::failbit)
         std::getline(input, line);
         s = line;
         return input;
     }
 
-    //overloaded index operator with proxy for setting value
-
-    friend bool operator==(const String& lhs, const char* pCStr) {
-        return (pCStr && strcmp(lhs.getCString(), pCStr) == 0);
-    }
-
-    friend std::weak_ordering operator<=>(const String& lhs, const std::string& str) {
-        return lhs.toStringView() <=> std::string_view(str.c_str());
+    friend void swap(String& lhs, String& rhs) {
+        String temp = lhs;
+        lhs = std::move(rhs);
+        rhs = std::move(temp);
     }
 };
 
+inline String operator+(const gimbal::StringView& lhs, const gimbal::StringView& rhs) {
+    return String(lhs) += rhs;
+}
+
+inline String operator+(const gimbal::StringView& lhs, const std::string_view& rhs) {
+    return String(lhs) += rhs;
+}
+
+inline String operator"" _gstr(const char* pLiteral, std::size_t length) {
+   // static_assert(length < GBL_STRING_BUFFER_BASE_STACK_SIZE);
+    return String(std::string_view{pLiteral, length});
+}
 
 /* Use variable-length array in C to increase stack size via alloca (but then I guess we gotta store it too)
  * use template argument in C++ to inherit and increase stack size...
@@ -335,9 +389,9 @@ public:
 
 // overflow when copying shit into the bitch without enough room on stack when no context is present
 template<Size ExtraStackSize>
-class StringExt final: public String {
+class FlexibleString final: public String {
 public:
-    using StringExtType = StringExt<ExtraStackSize>;
+    using FlexibleStringType = FlexibleString<ExtraStackSize>;
     constexpr static const inline Size ExtraStackBufferSize = ExtraStackSize;
 private:
     char extraStackBuffer_[ExtraStackSize] = { '0' };
@@ -345,6 +399,20 @@ public:
 
 };
 
+
+inline StringView::StringView(const gimbal::String& string):
+    StringView(static_cast<const GblString&>(string)) {}
+
 }
+
+namespace std {
+    template<gimbal::string_base S>
+    struct hash<S> {
+        std::size_t operator()(const S& str) const {
+            return std::hash<std::string_view>{}(std::string_view(str.getCString()));
+        }
+    };
+}
+
 
 #endif // GIMBAL_STRING_HPP

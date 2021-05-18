@@ -3,6 +3,7 @@
 
 #include "gimbal_api.h"
 #include "gimbal_object.h"
+#include "gimbal_generics.hpp"
 #include <type_traits>
 #include <string_view>
 #include <stdexcept>
@@ -10,78 +11,7 @@
 #include <string>
 
 
-#define GBL_CHECK_C_CPP_TYPE_COMPAT(CppType, CType) \
-    GBL_STATIC_ASSERT_MSG(sizeof(CppType) == sizeof(CType), "sizeof(" #CppType ") != sizeof(" #CType")")
-
-#define GBL_ENUM_TUPLE_DECL_ENUM_CPP(cName, value, name, string) \
-    name = value,
-
-
-#define GBL_ENUM_TABLE_DECLARE_CPP(table) \
-    class GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME)) : \
-        public gimbal::PrimitiveBase<GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME))> { \
-        using CppType = GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME));  \
-        using CType = GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME));   \
-        public: \
-        enum Value { \
-            GBL_MAP_TUPLES(GBL_ENUM_TUPLE_DECL_ENUM_CPP,  GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table))  \
-        };  \
-        constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(void) noexcept = default; \
-        constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(Value value) noexcept: CppType(static_cast<CType>(value)) {}  \
-        constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(CType code) noexcept: gimbal::PrimitiveBase<CType>(code) {}  \
-        constexpr operator Value() const noexcept { return getValue(); } \
-        constexpr CType getCode(void) const noexcept { return static_cast<CType>(getPrimitiveValue()); }    \
-        constexpr Value getValue(void) const noexcept { return static_cast<Value>(getPrimitiveValue()); }   \
-        constexpr std::string_view toString(void) const { \
-            GBL_ENUM_TABLE_TO_STRING(table, getCode());   \
-            throw std::runtime_error(std::string("Unhandled Error Code: ") + std::to_string(getCode()));    \
-            return "Unhandled";    \
-        } \
-        bool isInRange(void) const noexcept { return false; } \
-    }; \
-    GBL_CHECK_C_CPP_TYPE_COMPAT(GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME)), GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME)))
-
-
-
-
-
 namespace gimbal {
-
-
-template<typename P, typename CRTP>
-class PrimitiveCompatible {
-private:
-    using ThisType = PrimitiveCompatible<P, CRTP>;
-    const CRTP* derived(void) const { return static_cast<const CRTP*>(this); }
-    CRTP* derived(void) { return static_cast<CRTP*>(this); }
-public:
-
-    template<typename T>
-    constexpr static std::enable_if_t<std::is_same_v<T, P>, P*> primitive_cast(CRTP* pDerived) noexcept { return &*static_cast<ThisType*>(pDerived); }
-
-    constexpr const P* primitive_cast(void) const noexcept { return reinterpret_cast<const P*>(derived()->getPrimitiveAddress()); }
-
-    constexpr operator P() const noexcept { return reinterpret_cast<P>(derived()->getPrimitiveValue()); }
-    constexpr P* operator&(void) noexcept { return reinterpret_cast<P*>(derived()->getPrimitiveAddress()); }
-    constexpr const P* operator&(void) const noexcept { return reinterpret_cast<const P*>(derived()->getPrimitiveAddress()); }
-};
-
-template<typename P>
-class PrimitiveBase: public PrimitiveCompatible<P, PrimitiveBase<P>> {
-protected:
-    P primitive_={};
-public:
-    using PrimitiveType = P;
-
-    constexpr PrimitiveBase(void) noexcept = default;
-    constexpr PrimitiveBase(P p) noexcept: primitive_(std::move(p)) {}
-
-    constexpr P getPrimitiveValue(void) const noexcept { return primitive_; }
-    constexpr const P* getPrimitiveAddress(void) const noexcept { return &primitive_; }
-    constexpr P* getPrimitiveAddress(void) noexcept { return &primitive_; }
-};
-
-
 
     using Bool      = ::GblBool;
     using Size      = ::GblSize;

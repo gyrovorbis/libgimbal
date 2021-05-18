@@ -100,6 +100,7 @@ set(GIMBAL_INCLUDES
     #api/gimbal/gimbal_os.h
     api/gimbal/gimbal_api.h
     api/gimbal/gimbal_api.hpp
+    api/gimbal/gimbal_generics.hpp
     api/gimbal/gimbal_types.h
     api/gimbal/gimbal_compiler.h
     api/gimbal/gimbal_macros_utils.h
