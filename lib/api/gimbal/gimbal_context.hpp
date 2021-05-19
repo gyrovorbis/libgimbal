@@ -5,12 +5,31 @@
 #include "gimbal_handle.hpp"
 #include "gimbal_api.hpp"
 #include <iostream>
+#include <memory_resource>
 
 namespace gimbal {
 
-//What about PMR allocator compatibility?!
+#define GBL_CONTEXT_EXT_C_TO_CPP_BEGIN_NO_THROW(pFrame, UdType) \
+    GBL_ASSERT(pFrame); \
+    GBL_API_BEGIN(pFrame->hContext);    \
+    UdType* pUd = static_cast<UdType*>(pFrame->pContextUd); \
+    GBL_API_VERIFY_POINTER(pUd)
 
-class Context: public Handle, public PrimitiveCompatible<GblContext, Context> {
+#define GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, UdType) \
+    gimbal::Result result = GBL_RESULT_SUCCESS; \
+    GBL_UNUSED(result); \
+    GBL_CONTEXT_EXT_C_TO_CPP_BEGIN_NO_THROW(pFrame, Context); \
+    try { \
+
+#define GBL_CONTEXT_EXT_C_TO_CPP_END()   \
+    } GBL_RESULT_CATCH(GBL_API_RESULT_CODE()); \
+    GBL_API_END();
+
+class Context:
+        public Handle,
+        public PrimitiveCompatible<GblContext, Context>,
+        public std::pmr::memory_resource
+{
 public:
 
     static Context* fromHandle(GblContext hCtx) {
@@ -27,6 +46,7 @@ public:
             &gblLogPop_
         };
 
+        // CONSIDER OPTIONALLY TAKING A PMR INSTANCE FOR HANDLING ALLOCATION
         const GblContextExtMem mem = {
             &gblMemAlloc_,
             &gblMemRealloc_,
@@ -55,6 +75,14 @@ public:
 
     Context* getParentContext(void) const; //use metatype info and getParentHandle
 
+    static Version getVersion(void) {
+        Version version;
+        Result::tryThrow(gblContextVersion(&version));
+        return version;
+    }
+
+    // ===== overriding GblContext C API user callbacks =====
+
     virtual void    logPush(const StackFrame& frame) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
     virtual void    logPop(const StackFrame& frame, uint32_t count) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
     virtual void    logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
@@ -63,28 +91,29 @@ public:
     virtual void*   memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr; }
     virtual void    memFree(const StackFrame& frame, void* pPtr) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
 
-    static Version getVersion(void) {
-        Version version;
-        Result::tryThrow(gblContextVersion(&version));
-        return version;
+    //===== overridden from std::pmr::memory_resource =====
+    virtual void*   do_allocate(size_t bytes, size_t align) override {
+        GBL_API_BEGIN(*this);
+        void* pValue = nullptr;
+        try {
+            pValue = GBL_API_MALLOC(bytes, align, "PMR SHIT!");
+        } GBL_RESULT_CATCH(GBL_API_RESULT_CODE());
+        GBL_API_END_BLOCK();
+        return pValue;
     }
+    virtual void    do_deallocate(void* pPtr, size_t bytes, size_t align) override {
+        GBL_UNUSED(bytes); GBL_UNUSED(align);
+        GBL_API_BEGIN(*this);
+        try {
+            GBL_API_FREE(pPtr);
+        } GBL_RESULT_CATCH(GBL_API_RESULT_CODE());
+        GBL_API_END_BLOCK();
+    }
+    virtual bool    do_is_equal(const std::pmr::memory_resource& other) const noexcept override {
+        return this == &other;
+    }
+
 private:
-
-#define GBL_CONTEXT_EXT_C_TO_CPP_BEGIN_NO_THROW(pFrame, UdType) \
-    GBL_ASSERT(pFrame); \
-    GBL_API_BEGIN(pFrame->hContext);    \
-    UdType* pUd = static_cast<UdType*>(pFrame->pContextUd); \
-    GBL_API_VERIFY_POINTER(pUd)
-
-#define GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, UdType) \
-    gimbal::Result result = GBL_RESULT_SUCCESS; \
-    GBL_UNUSED(result); \
-    GBL_CONTEXT_EXT_C_TO_CPP_BEGIN_NO_THROW(pFrame, Context); \
-    try { \
-
-#define GBL_CONTEXT_EXT_C_TO_CPP_END()   \
-    } GBL_RESULT_CATCH(GBL_API_RESULT_CODE()); \
-    GBL_API_END();
 
     static GBL_RESULT gblLogWrite_     (const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs) {
         GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, Context);

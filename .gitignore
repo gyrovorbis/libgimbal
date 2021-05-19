@@ -15,6 +15,7 @@
 *.bin
 build-*
 Makefile
+*.autosave
 *.pro.user
 CMakeLists.txt.user
 CMakeCache.txt

@@ -9,6 +9,12 @@ extern "C" {
 #include "gimbal_variant.h"
 
 
+/* 1) Do it like string with static, c standard, and context-based allocation
+ * 2) Try to be generic as fuck to reuse code for different types of containers
+ * 3) Create adapters in a way that make them easily representable, iterable, accessible in C++
+ *
+ */
+
 GBL_DECLARE_ENUM(GBL_CONTAINER_TYPE) {
     GBL_CONTAINER_TYPE_ARRAY,
     GBL_CONTAINER_TYPE_MAP,

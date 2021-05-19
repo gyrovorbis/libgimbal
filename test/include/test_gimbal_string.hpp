@@ -41,6 +41,7 @@ private slots:
     void createStackCString(void);
     void createStackLiteral(void);
     void createStackStdString(void);
+    void createStackStdPmrString(void);
     void createStackStringView(void);
     void createStackCCopy(void);
     void createStackCMove(void);
@@ -70,8 +71,8 @@ private slots:
     void resize(void);
 
     void sprintf(void);
+    void varArgs(void);
     void concat(void);
-
     void operatorAdd(void);
 };
 
@@ -151,6 +152,14 @@ inline void String::createStackStdString(void) {
     verifyStack_(string);
 }
 
+inline void String::createStackStdPmrString(void) {
+    gimbal::String string(std::pmr::string("CppStr", pCtx_));
+    QCOMPARE(string.getContext(), nullptr);
+    verifyString_(string, "CppStr");
+    QCOMPARE(string, "CppStr"_gstr);
+    verifyStack_(string);
+}
+
 inline void String::createStackStringView(void) {
     gimbal::String string(std::string_view("StrView"));
     QCOMPARE(string.getContext(), nullptr);
@@ -160,7 +169,7 @@ inline void String::createStackStringView(void) {
 }
 
 inline void String::createStackCCopy(void) {
-    const auto view = GblStringView { "CGblStr" };
+    const auto view = GblStringView { "CGblStr", 0 };
     GblString gStr;
     gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view);
 
@@ -172,7 +181,7 @@ inline void String::createStackCCopy(void) {
 }
 
 inline void String::createStackCMove(void) {
-    const auto view = GblStringView { "MovC" };
+    const auto view = GblStringView { "MovC", 0 };
     GblString gStr;
     GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view));
 
@@ -208,7 +217,7 @@ inline void String::createHeapCString(void) {
 
 inline void String::assignHeapCCopy(void) {
     const char* pCStr = "CGblStrHeap";
-    const auto view = GblStringView { pCStr };
+    const auto view = GblStringView { pCStr, 0 };
     GblString gStr;
 
     GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view));
@@ -223,7 +232,7 @@ inline void String::assignHeapCCopy(void) {
 
 inline void String::assignHeapCMove(void) {
     const char* pCStr = "CGblStrHeap";
-    const auto view = GblStringView { pCStr };
+    const auto view = GblStringView { pCStr, 0 };
     GblString gStr;
 
     GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view));
@@ -297,10 +306,10 @@ inline void String::operatorSubscriptRead(void) {
     testElements(str2, pCStr2);
 
     char c;
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str1[-1],  gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str1[9],   gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str2[3],   gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str3[0],   gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str1.at(-1),  gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str1.at(9),   gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str2.at(3),   gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str3.at(0),   gimbal::Result::ErrorOutOfBounds);
 }
 
 inline void String::operatorSubscriptWrite(void) {
@@ -312,8 +321,8 @@ inline void String::operatorSubscriptWrite(void) {
     }
 
     verifyString_(string, "abcdefghi");
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(string[-1] = 0,  gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(string[10] = 0,  gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(string.at(-1) = 0,  gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(string.at(10) = 0,  gimbal::Result::ErrorOutOfBounds);
 }
 
 inline void String::stdIteratorConst(void) {
@@ -327,6 +336,11 @@ inline void String::stdIteratorConst(void) {
     for(auto it = str1.crbegin(); it != str1.crend(); ++it) {
         QCOMPARE(*it, str1[index--]);
     }
+
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*str1.cend(),          gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(str1.cbegin()-1),    gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*str1.crend(),         gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(str1.crbegin()-1),   gimbal::Result::ErrorOutOfBounds);
 }
 
 inline void String::stdIterator(void) {
@@ -344,6 +358,11 @@ inline void String::stdIterator(void) {
         *it = 'a' + (offset++);
     }
     verifyString_(string, "ihgfedcba");
+
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*string.end() = 0,         gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(string.begin()-1) = 0,   gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(string.rend()) = 0,      gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(string.rbegin()-1),      gimbal::Result::ErrorOutOfBounds);
 }
 
 
@@ -353,6 +372,13 @@ inline void String::rangeBasedFor(void) {
     size_t index = 0;
     for(auto v : str1) {
         QCOMPARE(v, str1[index++]);
+    }
+
+    index = 0;
+    for(auto& v : str1) {
+        v = index;
+        QCOMPARE(str1.at(index), index);
+        ++index;
     }
 }
 
@@ -463,6 +489,12 @@ inline void String::sprintf(void) {
     str1.sprintf("String:%s Uint:%u Float:%.2f Char:%c", "Test", 12, -33.33f, 't');
     verifyString_(str1, "String:Test Uint:12 Float:-33.33 Char:t");
     verifyHeap_(str1);
+}
+
+inline void String::varArgs(void) {
+    const auto string = gimbal::String("Hello %s %.2f %u %c").varArgs("Bitches", -33.23f, 12, 'f');
+    verifyString_(string, "Hello Bitches -33.23 12 f");
+    verifyHeap_(string);
 }
 
 inline void String::concat(void) {

@@ -229,6 +229,16 @@ private slots:
 
     void end(void) { }
 
+    void stlPmr(void) {
+        std::pmr::vector<std::string> strings{1, pCtx_};
+        strings.emplace_back("324324324333333333");
+        strings.emplace_back("23432453453453452345234523452");
+
+        std::pmr::string str("LOLOSDFSDFSDFSDFfLOL", pCtx_);
+        str += "HEEAAAAAAAAAAAAAAAAAAAAAAP";
+
+    }
+
     void logDebug(void) {
         GBL_API_BLOCK(pCtx_, "DEBUG_1") {
             GBL_API_DEBUG("Standard");

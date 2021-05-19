@@ -9,43 +9,23 @@
 #include <compare>
 
 namespace gimbal {
-// string literal operator overload ""
-// string_view sv{ "Hello"sv };
-//  "Hello"gs -> gimbal string literal
-// hash overloads
-// implement all operators and shit
-/*
-READ:
-1. constant view, constant pointer
-WRITE:
-2. constant view, nonconst pointer
-3. nonconst view, nonconst pointer
-4. nonconst string, nonconst pointer
-*/
-
-
 namespace tags {
     struct StringBase {};
 }
 
+template<typename T, typename SFINAE>
+struct StringTraits {
+    template<typename F=T>
+    static F&& stringify(F&& value) { return std::forward<F>(value); }
+};
+
+
 template<typename T>
 concept string_base = std::is_base_of_v<gimbal::tags::StringBase, T>;
 
-template<typename CTRP>
-class StringViewBase;
-
-class StringView;
 class String;
 
-template<gimbal::Size Size>
-class FlexibleString;
-
-
-
-auto operator<=>(const string_base auto& lhs, const std::string& rhs) noexcept;
-
-
-//ADD CONST ITERATORS
+//support std::pmr::string ?
 template<typename CRTP>
 class StringViewBase:
     public tags::StringBase,
@@ -65,19 +45,15 @@ protected:
     }
 
 public:
-
     const char& getElement_(size_t index) const {
-        if(index >= getLength()) Result::tryThrow(Result::ErrorOutOfBounds);
         return getCString()[index];
     }
 
     char& getElement_(size_t index) {
-        if(index >= getLength()) Result::tryThrow(Result::ErrorOutOfBounds);
         return getCString()[index];
     }
 
     void setElement_(size_t index, char value) {
-        if(index >= getLength()) Result::tryThrow(Result::ErrorOutOfBounds);
         const_cast<char*>(getCString())[index] = value;
     }
 
@@ -147,7 +123,6 @@ public:
         return getLength()?
             std::string_view(getCString(), getLength()) : std::string_view();
     }
-
     friend constexpr bool operator==(const Derived& lhs, const char* pRhs) noexcept {
         return (lhs.toStringView() == std::string_view(pRhs));
     }
@@ -160,23 +135,31 @@ public:
     friend constexpr decltype(auto) operator<=>(const Derived& lhs, const std::string& rhs) noexcept {
         return (lhs.toStdString() <=> rhs);
     }
+    friend constexpr bool operator==(const Derived& lhs, const std::pmr::string& rhs) noexcept {
+        return (lhs == rhs.c_str());
+    }
+    friend constexpr decltype(auto) operator<=>(const Derived& lhs, const std::pmr::string& rhs) noexcept {
+        return (lhs.toStdString() <=> rhs);
+    }
     friend constexpr bool operator==(const Derived& lhs, std::string_view rhs) noexcept {
         return (lhs.toStringView() == rhs);
     }
     friend constexpr decltype(auto) operator<=>(const Derived& lhs, std::string_view rhs) noexcept {
         return (lhs.toStringView() <=> rhs);
     }
-    friend constexpr bool operator==(const Derived& lhs, const string_base auto& rhs) noexcept {
-        return (lhs.toStringView() == rhs.toStringView());
+    friend constexpr bool operator==(const Derived& lhs, const string_base auto& rhs) {
+        gimbal::Bool result = GBL_FALSE;
+        Result::tryThrow(gblStringCompare(&lhs, &rhs, &result));
+        return result;
     }
-    friend constexpr decltype(auto) operator<=>(const Derived& lhs, const string_base auto& rhs) noexcept {
-        return (lhs.toStringView() <=> rhs.toStringView());
+    friend constexpr decltype(auto) operator<=>(const Derived& lhs, const string_base auto& rhs) {
+        return (lhs <=> rhs);
     }
-
     friend std::ostream& operator<<(std::ostream& output, const Derived& s) {
-        return output << s.getCString();
+        output << s.getCString();
+        if(output.fail()) Result::tryThrow(Result::FileWrite);
+        return output;
     }
-
 };
 
 class StringView final: public StringViewBase<StringView> {
@@ -190,21 +173,15 @@ public:
 
     StringView(const gimbal::String& string);
 
-    const GblString* getString_(void) const {
-        return pGblStr_;
-    }
-
+    const GblString* getString_(void) const { return pGblStr_; }
     bool isValid(void) const { return pGblStr_; }
 };
-
-// add nonconst iterators
 
 class String:
     public GblString,
     public StringViewBase<String>
 {
 public:
-
     const GblString* getString_(void) const {
         return static_cast<const GblString*>(this);
     }
@@ -223,6 +200,9 @@ public:
     // Value Ctors
     String(const std::string& stdString, Context* pCtx=nullptr, Size size=sizeof(String)):
         String(std::string_view{stdString.c_str()}, pCtx, size) {}
+
+    String(const std::pmr::string& stdPmrString, Context* pCtx=nullptr, Size size=sizeof(String)):
+        String(std::string_view{stdPmrString.c_str()}, pCtx, size) {}
 
     String(const char* pCStr, Context* pCtx=nullptr, Size size=sizeof(String)):
         String(pCStr? std::string_view{pCStr} : std::string_view{}, pCtx, size) {}
@@ -293,6 +273,10 @@ public:
         return *this = stdString.c_str();
     }
 
+    const String& operator=(const std::pmr::string& stdString) {
+        return *this = stdString.c_str();
+    }
+
     const String& operator=(const char* pCStr) {
         if(pCStr) return *this = std::string_view(pCStr);
         else return *this = nullptr;
@@ -342,23 +326,41 @@ public:
         Result::tryThrow(gblStringCat(this, &gblView));
     }
 
-    void vasprintf(const char* pFmt, va_list varArgs) {
+    String& vasprintf(const char* pFmt, va_list varArgs) {
         Result::tryThrow(gblStringVaSprintf(this, pFmt, varArgs));
+        return *this;
     }
 
     //return the actual return value?
-    void sprintf(const char* pFmt, ...) {
+    String& sprintf(const char* pFmt, ...) {
         va_list varArgs;
         va_start(varArgs, pFmt);
         vasprintf(pFmt, varArgs);
         va_end(varArgs);
+        return *this;
+    }
+
+    //stringification traits
+    template<typename... Args>
+    String& varArgs(Args&&... args) {
+        String temp("", getContext());
+        temp.sprintf(getCString(), std::forward<Args>(args)...);
+        *this = temp;
+        return *this;
     }
 
     // CHECK ERROR BITS
     friend std::istream& operator>>(std::istream& input, String &s) {
         std::string line;
-        std::getline(input, line);
-        s = line;
+        // Still failes gracefully, so whatever...
+        //if(input.good()) {
+        //    input.clear();
+            std::getline(input, line);
+        //     if(input.fail()) {
+        //         Result::tryThrow(Result::FileRead);
+        //     }
+            s = line;
+        //}
         return input;
     }
 
@@ -398,7 +400,6 @@ private:
 public:
 
 };
-
 
 inline StringView::StringView(const gimbal::String& string):
     StringView(static_cast<const GblString&>(string)) {}

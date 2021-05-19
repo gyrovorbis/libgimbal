@@ -346,7 +346,7 @@ GBL_CONTEXT_EXT_DECL_(MemAllocDefault_, (GblSize, size), (GblSize, alignment), (
     GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_MEM_ALLOC);
     GBL_API_DEBUG("%-20s: %20p", "Address", *ppData);
     GBL_API_DEBUG("%-20s: %20s", "Debug Marker", pDebugInfoStr? pDebugInfoStr : "NULL");
-    GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
+    GBL_API_DEBUG("%-20s: %20s", "Function", pFrame->sourceCurrent.pFunc);
     GBL_API_DEBUG("%-20s: %20"GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     GBL_API_POP(1);
@@ -366,7 +366,7 @@ GBL_CONTEXT_EXT_DECL_(MemReallocDefault_, (void*, pData), (GblSize, newSize), (G
     GBL_API_VERIFY(*ppNewData, GBL_RESULT_ERROR_MEM_REALLOC);
     GBL_API_PUSH();
     GBL_API_DEBUG("%-20s: %20p", "Address", *ppNewData);
-    GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
+    GBL_API_DEBUG("%-20s: %20s", "Function", pFrame->sourceCurrent.pFunc);
     GBL_API_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     GBL_API_POP(1);
@@ -382,7 +382,7 @@ GBL_CONTEXT_EXT_DECL_(MemFreeDefault_, (void*, pData)) {
     free(pData);
     GBL_API_DEBUG("Free(%p)", ptrVal);
     GBL_API_PUSH();
-    GBL_API_DEBUG("%-20s: %20s", "Fuction", pFrame->sourceCurrent.pFunc);
+    GBL_API_DEBUG("%-20s: %20s", "Function", pFrame->sourceCurrent.pFunc);
     GBL_API_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     GBL_API_POP(1);

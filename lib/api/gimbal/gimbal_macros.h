@@ -120,16 +120,20 @@ uint64_t GBL_POW2_NEXT_UINT64(uint64_t n) GBL_NOEXCEPT {
     return n + 1;
 }
 
-#if 0
-#define GBL_POW2_NEXT(X)                    \
-    _Generic((X),                           \
-        uint8_t:    GBL_POW2_NEXT_UINT8,    \
-        uint16_t:   GBL_POW2_NEXT_UINT16,   \
-        uint32_t:   GBL_POW2_NEXT_UINT32,   \
-        uint64_t:   GBL_POW2_NEXT_UINT64,   \
-        default:    GBL_POW2_NEXT_UINT64    \
-    )(X)
-#endif
+
+//declare macro "trait" table
+#define GBL_POW2_NEXT_TRAITS (                  \
+        GBL_POW2_NEXT_UINT64,                   \
+        (                                       \
+            (uint8_t,  GBL_POW2_NEXT_UINT8),    \
+            (uint16_t, GBL_POW2_NEXT_UINT16),   \
+            (uint32_t, GBL_POW2_NEXT_UINT32),   \
+            (uint64_t, GBL_POW2_NEXT_UINT64)    \
+        )                                       \
+    )
+
+#define GBL_POW2_NEXT(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS)(X);
+
 
 
 GBL_DEPRECATED("Dis shit's ancient!")

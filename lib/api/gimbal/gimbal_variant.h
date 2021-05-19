@@ -2,6 +2,7 @@
 #define GIMBAL_VARIANT_H
 
 #include "gimbal_types.h"
+//#include "gimbal_string.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -17,6 +18,20 @@ GBL_FORWARD_DECLARE_STRUCT(GblVariant);
 
 
 typedef GBL_RESULT (*GblFunction)(GblContext, GblVariant);
+
+
+#define GBL_META_OBJECT_TYPE_TABLE (                                                            \
+        ( GBL_OBJECT_TYPE, ObjectType, "Enum for GblObject runtime types"),                     \
+        (                                                                                       \
+            (GBL_OBJECT_TYPE_OBJECT,            0x0,    Object,         "Object"),              \
+            (GBL_OBJECT_TYPE_HANDLE,            0x1,    Handle,         "Handle"),              \
+            (GBL_OBJECT_TYPE_CONTEXT,           0x2,    Context,        "Context"),             \
+            (GBL_OBJECT_TYPE_BUILTIN_COUNT,     0x3,    BuiltinCount,   "# of Builtin Types"),  \
+            (GBL_OBJECT_TYPE_USER,              0x4,    User,           "First User Type")      \
+        )                                                                                       \
+    )
+
+GBL_ENUM_TABLE_DECLARE(GBL_META_OBJECT_TYPE_TABLE);
 
 GBL_DECLARE_ENUM(GBL_VARIANT_TYPE_CLASS) {
     GBL_VARIANT_TYPE_CLASS_NIL,
@@ -42,19 +57,16 @@ GBL_DECLARE_ENUM(GBL_VARIANT_TYPE) {
     GBL_VARIANT_TYPE_COUNT
 };
 
-typedef union GblVariantValue {
-    GblInt          integer;
-    GblReal         real;
-    GblSize         size;
-    GblFunction     func;
-    const char*     pString;
-    void*           pVoidPtr;
-    uintptr_t       uintptr;
-    uint64_t        uint64;
-} GblVariantValue;
 
 struct GblVariant {
-    GblVariantValue     value;
+    union {
+        GblBool         boolean;
+        GblInt          integer;
+        GblFloat        floating;
+        void*           pPtr;
+        GblFunction     function;
+        //GblString       string;
+    };
     GBL_VARIANT_TYPE    type;
 };
 
@@ -155,7 +167,7 @@ GBL_API gblVariantGets(const GblVariant* pVariant,    const char** ppValue);
 GBL_API gblVariantGetv(const GblVariant* pVariant,    void**       pValue);
 GBL_API gblVariantGett(const GblVariant* pVariant,    GblTable**   ppTable);
 GBL_API gblVariantGeti(const GblVariant* pVariant,    GblInt*      pValue);
-GBL_API gblVariantGetf(const GblVariant* pVariant,    GblReal*    pValue);
+GBL_API gblVariantGetf(const GblVariant* pVariant,    GblFloat*    pValue);
 
 // Set Value
 GBL_API gblVariantSetNil(GblVariant* pVariant);
@@ -164,7 +176,7 @@ GBL_API gblVariantSets(GblVariant* pVariant,    const char* pValue);
 GBL_API gblVariantSetv(GblVariant* pVariant,    void*       pValue);
 GBL_API gblVariantSett(GblVariant* pVariant,    const GblTable* pTable);
 GBL_API gblVariantSeti(GblVariant* pVariant,    GblInt      value);
-GBL_API gblVariantSetf(GblVariant* pVariant,    GblReal       value);
+GBL_API gblVariantSetf(GblVariant* pVariant,    GblFloat       value);
 
 // (MAYBE) Convert Value
 GBL_API gblVariantNil(const GblVariant* pVariant,  GblBool*    pValue);
@@ -172,7 +184,7 @@ GBL_API gblVariantb(const GblVariant* pVariant,    GblBool*    pValue);
 GBL_API gblVariants(const GblVariant* pVariant,    const char* pBuffer, GblSize* pSize);
 GBL_API gblVariantv(const GblVariant* pVariant,    void**       pValue);
 GBL_API gblVarianti(const GblVariant* pVariant,    GblInt*     pValue);
-GBL_API gblVariantf(const GblVariant* pVariant,    GblReal*    pValue);
+GBL_API gblVariantf(const GblVariant* pVariant,    GblFloat*    pValue);
 
 GBL_API gblVariantCompare(const GblVariant* pLhs,
                           const GblVariant* pRhs,

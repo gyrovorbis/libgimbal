@@ -7,7 +7,6 @@
 extern "C" {
 #endif
 
-
 #if 0
 GBL_DECLARE_ENUM(GBL_HANDLE_TYPE) {
     GBL_HANDLE_CONTEXT,

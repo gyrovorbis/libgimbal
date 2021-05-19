@@ -16,7 +16,7 @@ extern "C" {
 
 typedef GBL_BOOL                        GblBool;
 typedef GBL_SIZE                        GblSize;
-typedef GBL_REAL                        GblReal;
+typedef GBL_FLOAT                       GblFloat;
 typedef GBL_INT                         GblInt;
 typedef GBL_ENUM                        GblEnum;
 typedef GBL_HASH                        GblHash;

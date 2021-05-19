@@ -54,8 +54,8 @@ extern "C" {
 #   define GBL_BOOL                             uint32_t
 #endif
 
-#ifndef GBL_REAL
-#   define GBL_REAL                             float
+#ifndef GBL_FLOAT
+#   define GBL_FLOAT                             float
 #endif
 
 #ifndef GBL_INT

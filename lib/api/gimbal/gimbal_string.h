@@ -88,7 +88,7 @@ GBL_API gblStringVaSnprintf(const GblString* pStr, const char* pFmt, va_list var
 
 //IMPLEMENT ME FOR CUSTOM ALLOCATION SCHEMES
 GBL_INLINE GblSize GBL_STRING_CAPACITY_FROM_SIZE_(GblSize size) {
-    return GBL_POW2_NEXT_UINT32(size);
+    return GBL_POW2_NEXT(size);
 }
 
 GBL_INLINE GBL_API gblStringIsEmpty(const GblString* pStr, GblBool* pResult) {
@@ -175,7 +175,7 @@ GBL_INLINE GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrVie
 }
 
 GBL_INLINE GBL_API gblStringConstruct(GblString* pString, GblSize size, GblContext hCtx, const GblStringView* pView) {
-    const GblStringView defaultView { GBL_NULL, 0 };
+    const GblStringView defaultView = { GBL_NULL, 0 };
     const GblSize extraSize = size - sizeof(GblString);
     GBL_API_BEGIN(hCtx);
 
@@ -282,7 +282,7 @@ GBL_INLINE GBL_API gblStringResize(GblString* pStr, GblSize length) {
 }
 
 
-GBL_INLINE GBL_API GblStringCompare(const GblString* pStr1, const GblString* pStr2, GblBool* pResult) {
+GBL_INLINE GBL_API gblStringCompare(const GblString* pStr1, const GblString* pStr2, GblBool* pResult) {
     GBL_ASSERT(pStr1);
     GBL_ASSERT(pStr2);
     GBL_ASSERT(pResult);
@@ -324,10 +324,10 @@ GBL_INLINE GBL_API gblStringVaSprintf(GblString* pStr, const char* pFmt, va_list
 
     //Check if shit's empty
     expectedSize = strlen(pFmt) + 1;
-    if(expectedSize <= 1) {
+    if(expectedSize <= 1) GBL_UNLIKELY {
         pStr->data.pBuffer[0] = '\0';
         pStr->data.length = 0;
-    } else {
+    } else GBL_LIKELY {
         //Make a first guess at the required size
         newCapacity = GBL_STRING_CAPACITY_FROM_SIZE_(expectedSize);
         GBL_API_CALL(gblStringReserve(pStr, newCapacity));
@@ -336,7 +336,7 @@ GBL_INLINE GBL_API gblStringVaSprintf(GblString* pStr, const char* pFmt, va_list
         pStr->data.length = expectedSize;
         GBL_API_PERROR("vsnprintf failed with code: %zu", expectedSize);
         //Multi-pass, try again with real size!
-        if(expectedSize >= newCapacity) {
+        if(expectedSize >= newCapacity) GBL_UNLIKELY {
             newCapacity = GBL_STRING_CAPACITY_FROM_SIZE_(expectedSize + 1);
             GBL_API_ERRNO_CLEAR();
             expectedSize = vsnprintf(pStr->data.pBuffer, pStr->data.capacity, pFmt, varArgs);

@@ -2,10 +2,11 @@
 #define GIMBAL_API_H
 
 #include "gimbal_macros.h"
-#include "gimbal_handle.h"
+#include "gimbal_context.h"
 #include "gimbal_ext.h"
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
 
 #ifdef __cplusplus
 extern "C" {

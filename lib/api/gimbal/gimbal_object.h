@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 GBL_DECLARE_OPAQUE(GblObject);
-
+#if 0
 #define GBL_META_OBJECT_TYPE_TABLE (                                                            \
         ( GBL_OBJECT_TYPE, ObjectType, "Enum for GblObject runtime types"),                     \
         (                                                                                       \
@@ -21,6 +21,7 @@ GBL_DECLARE_OPAQUE(GblObject);
     )
 
 GBL_ENUM_TABLE_DECLARE(GBL_META_OBJECT_TYPE_TABLE);
+#endif
 
 #define GBL_OBJECT_INVALID NULL
 

@@ -6,14 +6,13 @@
 #include <stdarg.h>
 
 #include "gimbal_handle.h"
-#include "gimbal_types.h"
 #include "gimbal_ext.h"
-
-typedef GBL_RESULT (*GblExtVariantMetaObject)(GblContext, GBL_VARIANT_TYPE, const GblVariantMetaType**);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+//typedef GBL_RESULT (*GblExtVariantMetaObject)(GblContext, GBL_VARIANT_TYPE, const GblVariantMetaType**);
 
 #define GBL_CONTEXT_USERDATA_OFFSET (offsetof(GblContext, createInfo) + offsetof(GblContextCreateInfo, pUserdata))
 
@@ -70,7 +69,7 @@ GBL_API gblContextLogWrite       (GblContext hCtx, const GblStackFrame* pFrame, 
 GBL_API gblContextLogPush        (GblContext hCtx, const GblStackFrame* pFrame);
 GBL_API gblContextLogPop         (GblContext hCtx, const GblStackFrame* pFrame, uint32_t count);
 
-GBL_API gblContextMemAlloc      (GblContext hCtx, const GblStackFrame* pFrame, GblSize size, GblSize alignment, const char* pDebugInfoStr, void** ppData);
+GBL_API gblContextMemAlloc       (GblContext hCtx, const GblStackFrame* pFrame, GblSize size, GblSize alignment, const char* pDebugInfoStr, void** ppData);
 GBL_API gblContextMemRealloc     (GblContext hCtx, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** pNewData);
 GBL_API gblContextMemFree        (GblContext hCtx, const GblStackFrame* pFrame, void* pData);
 

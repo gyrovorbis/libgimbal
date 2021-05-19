@@ -60,7 +60,7 @@ GBL_EXT_EVENT_HANDLER
 #endif
 
 #ifndef GBL_EXT_LOG_WRITE
-#   define GBL_EXT_LOG_WRITE            gblExtLogWrite
+#   define GBL_EXT_LOG_WRITE        gblExtLogWrite
 #endif
 
 #ifndef GBL_EXT_LOG_PUSH
