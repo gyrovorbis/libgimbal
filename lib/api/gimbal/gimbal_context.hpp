@@ -22,7 +22,7 @@ namespace gimbal {
     try { \
 
 #define GBL_CONTEXT_EXT_C_TO_CPP_END()   \
-    } GBL_RESULT_CATCH(GBL_API_RESULT_CODE()); \
+    } GBL_RESULT_CATCH(GBL_API_RESULT()); \
     GBL_API_END();
 
 class Context:
@@ -97,7 +97,7 @@ public:
         void* pValue = nullptr;
         try {
             pValue = GBL_API_MALLOC(bytes, align, "PMR SHIT!");
-        } GBL_RESULT_CATCH(GBL_API_RESULT_CODE());
+        } GBL_RESULT_CATCH(GBL_API_RESULT());
         GBL_API_END_BLOCK();
         return pValue;
     }
@@ -106,7 +106,7 @@ public:
         GBL_API_BEGIN(*this);
         try {
             GBL_API_FREE(pPtr);
-        } GBL_RESULT_CATCH(GBL_API_RESULT_CODE());
+        } GBL_RESULT_CATCH(GBL_API_RESULT());
         GBL_API_END_BLOCK();
     }
     virtual bool    do_is_equal(const std::pmr::memory_resource& other) const noexcept override {

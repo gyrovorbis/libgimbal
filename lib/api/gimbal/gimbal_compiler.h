@@ -310,6 +310,14 @@
 #   define GBL_QUICK_EXIT(c) exit(c)
 #endif
 
+#ifndef GBL_PRAGMA_MACRO_PUSH
+#   define GBL_PRAGMA_MACRO_PUSH(X) push_macro(X);
+#endif
+
+#ifndef GBL_PRAGMA_MACRO_POP
+#   define GBL_PRAGMA_MACRO_POP(X) pop_macro(X);
+#endif
+
 
 
 #endif // GIMBAL_COMPILER_H

@@ -1,0 +1,4 @@
+#ifndef GIMBAL_MONITOR_HPP
+#define GIMBAL_MONITOR_HPP
+
+#endif // GIMBAL_MONITOR_HPP

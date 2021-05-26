@@ -23,7 +23,7 @@ extern "C" {
 typedef struct GblStackFrame {
     GblSourceLocation       sourceEntry;
     GblSourceLocation       sourceCurrent;
-    GblApiResult            result;
+    GblCallRecord           record;
     uint32_t                sourceCurrentCaptureDepth;
     GblHandle               hHandle;
     GblContext              hContext;
@@ -49,7 +49,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFra
     }
 
     memset(pFrame, 0, sizeof(GblStackFrame));
-    GBL_API_RESULT_CONSTRUCT(&pFrame->result, hHandle, initialResult, entryLoc, gblResultString(initialResult));
+    GBL_CALL_RECORD_CONSTRUCT(&pFrame->record, hHandle, initialResult, entryLoc, gblResultString(initialResult));
     pFrame->sourceEntry     = entryLoc;
     pFrame->sourceCurrent   = entryLoc;
     pFrame->hHandle         = hHandle;
@@ -110,8 +110,8 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame)
 #define GBL_API_CONTEXT_UD()    GBL_API_FRAME()->pContextUd
 #define GBL_API_HANDLE()        GBL_API_FRAME()->hHandle
 #define GBL_API_HANDLE_UD()     GBL_API_FRAME()->pHandleUd
-#define GBL_API_RESULT()        GBL_API_FRAME()->result
-#define GBL_API_RESULT_CODE()   GBL_API_RESULT().resultCode
+#define GBL_API_RECORD()        GBL_API_FRAME()->record
+#define GBL_API_RESULT()        GBL_API_RECORD().result
 #define GBL_API_SOURCE()        GBL_API_FRAME()->sourceCurrent
 #define GBL_API_SOURCE_LOC_PUSH(srcLoc) \
     GBL_API_STACK_FRAME_SOURCE_PUSH(GBL_API_FRAME(), srcLoc)
@@ -130,59 +130,103 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame)
 
 // Convenience Accessors
 #define GBL_API_RESULT_SUCCESS() \
-        GBL_RESULT_SUCCESS(GBL_API_RESULT_CODE())
+        GBL_RESULT_SUCCESS(GBL_API_RESULT())
 #define GBL_API_RESULT_PARTIAL_SUCCESS() \
-        GBL_RESULT_PARTIAL_SUCCESS(GBL_API_RESULT_CODE())
+        GBL_RESULT_PARTIAL_SUCCESS(GBL_API_RESULT())
 #define GBL_API_RESULT_ERROR() \
-        GBL_RESULT_ERROR(GBL_API_RESULT_CODE())
+        GBL_RESULT_ERROR(GBL_API_RESULT())
 #define GBL_API_HANDLE_IS_CONTEXT() \
         (GBL_API_CONTEXT() == GBL_API_HANDLE())
 
-#define GBL_API_RESULT_SET_JMP_CND_(expr, result, label, srcLoc) \
-    do {                                                \
-        GBL_API_SOURCE_LOC_PUSH(srcLoc); \
-        if(!(expr)) GBL_UNLIKELY {                                     \
-            GBL_API_RESULT_SET(result, #expr);                 \
-            GBL_API_SOURCE_POP();                       \
-            label;                                 \
-        } else GBL_LIKELY {                             \
-            GBL_API_SOURCE_POP();                       \
-        }                                               \
+#define GBL_API_RECORD_SET_JMP_CND_(expr, result, label, srcLoc, ...)          \
+    do {                                                                       \
+        GBL_API_SOURCE_LOC_PUSH(srcLoc);                                       \
+        if(!(expr)) GBL_UNLIKELY {                                             \
+            GBL_API_RECORD_SET(result GBL_VA_ARGS(__VA_ARGS__));               \
+            GBL_API_SOURCE_POP();                                              \
+            label;                                                             \
+        } else GBL_LIKELY {                                                    \
+            GBL_API_SOURCE_POP();                                              \
+        }                                                                      \
     } while(0)
 
 // Verification/Control flow
-#define GBL_API_RESULT_SET_JMP_CND(expr, result, label) \
-    GBL_API_RESULT_SET_JMP_CND_(expr, result, goto label, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL))
+#define GBL_API_RECORD_SET_JMP_CND(expr, result, label, ...) \
+    GBL_API_RECORD_SET_JMP_CND_(expr, result, goto label, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL) GBL_VA_ARGS(__VA_ARGS__));
 
+#if 0
 #define GBL_API_RESULT_SET_CND(exp, result)             \
     GBL_API_RESULT_SET_JMP_CND_(exp, result, break, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL))
 
 #define GBL_API_RESULT_SET_JMP(result, label)           \
     GBL_API_RESULT_SET_JMP_CND_(1, result, goto label, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL))
+#endif
 
+//====== VERIFY =========
 
-#define GBL_API_VERIFY_(expr, result, srcLoc)                \
-    GBL_API_RESULT_SET_JMP_CND_((expr),              \
-                               result,              \
-                               goto GBL_API_END_LABEL, srcLoc)
+#define GBL_API_VERIFY_(expr, result, srcLoc, ...)              \
+    GBL_API_RECORD_SET_JMP_CND_((expr),                         \
+                               result,                          \
+                               goto GBL_API_END_LABEL,          \
+                               srcLoc GBL_VA_ARGS(__VA_ARGS__))
 
 #define GBL_API_VERIFY(expr, result, ...)                \
-    GBL_API_VERIFY_((expr),              \
-                               result,              \
-                               SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL))
+    GBL_API_VERIFY_((expr), result, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL) GBL_VA_ARGS(__VA_ARGS__))
 
-#define GBL_API_VERIFY_POINTER(pPtr)                    \
-    GBL_API_VERIFY_(pPtr != NULL,                     \
-                   GBL_RESULT_ERROR_INVALID_POINTER, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL))
+//====== VERIFY_EXPRESSION =========
+
+#define GBL_API_VERIFY_EXPRESSION_N(srcLoc, expr, ...) \
+    GBL_API_VERIFY_(expr, GBL_RESULT_ERROR_INVALID_EXPRESSION, srcLoc GBL_VA_ARGS(__VA_ARGS__))
+
+#define GBL_API_VERIFY_EXPRESSION_2(src, expr) \
+    GBL_API_VERIFY_EXPRESSION_N(src, expr, "Invalid Expression: "#expr)
+
+#define GBL_API_VERIFY_EXPRESSION(...) \
+    do { \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_EXPRESSION, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
+    } while(0)
+
+//====== VERIFY_POINTER=========
+#define GBL_API_VERIFY_POINTER_N(srcLoc, expr, ...) \
+    GBL_API_VERIFY_(expr, GBL_RESULT_ERROR_INVALID_POINTER, srcLoc GBL_VA_ARGS(__VA_ARGS__))
+
+#define GBL_API_VERIFY_POINTER_2(src, expr) \
+    GBL_API_VERIFY_POINTER_N(src, expr, "Invalid Pointer")
+
+#define GBL_API_VERIFY_POINTER(...) \
+    do { \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_POINTER, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
+    } while(0)
+
+//====== VERIFY_HANDLE=========
+#define GBL_API_VERIFY_HANDLE_N(srcLoc, expr, ...) \
+    GBL_API_VERIFY_(expr, GBL_RESULT_ERROR_INVALID_HANDLE, srcLoc GBL_VA_ARGS(__VA_ARGS__))
+
+#define GBL_API_VERIFY_HANDLE_2(src, expr) \
+    GBL_API_VERIFY_HANDLE_N(src, expr, "Invalid Handle")
+
+#define GBL_API_VERIFY_HANDLE(...) \
+    do { \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_HANDLE, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
+    } while(0)
 
 
-#define GBL_API_VERIFY_HANDLE(hHandle)                  \
-    GBL_API_VERIFY_(hHandle != GBL_HANDLE_INVALID,                     \
-                   GBL_RESULT_ERROR_INVALID_HANDLE, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL))
+//====== VERIFY_ARG=========
+#define GBL_API_VERIFY_ARG_N(srcLoc, expr, ...) \
+    GBL_API_VERIFY_(expr, GBL_RESULT_ERROR_INVALID_ARG, srcLoc GBL_VA_ARGS(__VA_ARGS__))
 
-#define GBL_API_VERIFY_ARG(expr) \
-    GBL_API_VERIFY_((expr),             \
-                   GBL_RESULT_ERROR_INVALID_ARG, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL))
+#define GBL_API_VERIFY_ARG_2(src, expr) \
+    GBL_API_VERIFY_ARG_N(src, expr, "Invalid Arg: "#expr);
+
+#define GBL_API_VERIFY_ARG(...) \
+    do { \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_ARG, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
+    } while(0)
+
 
 #ifdef GBL_CONFIG_ERRNO_CHECKS
 #define     GBL_API_ERRNO_CLEAR()   errno = 0
@@ -295,7 +339,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
     GBL_API_SOURCE_SCOPED(GBL_API_EXT, (SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL)), FREE, pData)
 
 
-#define GBL_API_PUSH_1(srcLoc, ...) \
+#define GBL_API_PUSH_(srcLoc, ...) \
     do {    \
         GBL_API_SOURCE_LOC_PUSH(srcLoc);   \
         GBL_API_EXT(LOG_PUSH);  \
@@ -303,17 +347,22 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
         ++GBL_API_FRAME()->stackDepth;   \
     } while(0)
 
-
-#define GBL_API_PUSH_N(srcLoc, pFmt, ...) \
-    do { \
-        GBL_API_SOURCE_SCOPED(GBL_API_VERBOSE, srcLoc, pFmt, ##__VA_ARGS__); \
-        GBL_API_PUSH_1(srcLoc); \
+#define GBL_API_PUSH()                                                  \
+    do {                                                                \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL); \
+        GBL_API_PUSH_(src_);                                            \
     } while(0)
 
-#define GBL_API_PUSH(...) \
+#define GBL_API_PUSH_VERBOSE_N(srcLoc, pFmt, ...) \
+    do { \
+        GBL_API_SOURCE_SCOPED(GBL_API_VERBOSE, srcLoc, pFmt, ##__VA_ARGS__); \
+        GBL_API_PUSH_(srcLoc); \
+    } while(0)
+
+#define GBL_API_PUSH_VERBOSE(...) \
     do { \
         const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
-        GBL_VA_OVERLOAD_SELECT(GBL_API_PUSH, GBL_VA_OVERLOAD_SUFFIXER_1_N, src_, ##__VA_ARGS__)(src_, ##__VA_ARGS__); \
+        GBL_VA_OVERLOAD_SELECT(GBL_API_PUSH_VERBOSE, GBL_VA_OVERLOAD_SUFFIXER_1_N, src_, ##__VA_ARGS__)(src_, ##__VA_ARGS__); \
     } while(0)
 
 #define GBL_API_POP_2(srcLoc, count) \
@@ -378,129 +427,172 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 
 
-// ===================== RESULT = > ASSERT =========================
+// ===================== RECORD = > ASSERT =========================
 
 // Base Enabled Logic
-#define GBL_API_RESULT_ASSERT_(result, test)                \
-    do {                                                    \
-        GBL_ASSERT(!test(result->resultCode), result->message);    \
+#define GBL_API_RECORD_ASSERT_(record, test)                    \
+    do {                                                        \
+        GBL_ASSERT(!test(record->result), record->message);     \
     } while(0)
 
 // Base Conditional Logic
-#define GBL_API_RESULT_ASSERT_CONDITIONAL_(enabled, result, test)                   \
-    GBL_MACRO_CONDITIONAL_CALL(enabled, GBL_API_RESULT_ASSERT_, result, test)
+#define GBL_API_RECORD_ASSERT_CONDITIONAL_(enabled, record, test)              \
+    GBL_MACRO_CONDITIONAL_CALL(enabled, GBL_API_RECORD_ASSERT_, record, test)
 
 // Partial Success
-#define GBL_API_RESULT_ASSERT_PARTIAL(result)                                   \
-    GBL_API_RESULT_ASSERT_CONDITIONAL_(GBL_CONFIG_ASSERT_PARTIAL_ENABLED,   \
-                                        result, GBL_RESULT_PARTIAL)
+#define GBL_API_RECORD_ASSERT_PARTIAL(record)                               \
+    GBL_API_RECORD_ASSERT_CONDITIONAL_(GBL_CONFIG_ASSERT_PARTIAL_ENABLED,   \
+                                        record, GBL_RESULT_PARTIAL)
 // Error
-#define GBL_API_RESULT_ASSERT_ERROR(result)                                         \
-    GBL_API_RESULT_ASSERT_CONDITIONAL_(GBL_CONFIG_ASSERT_ERROR_ENABLED,         \
-                                       result, GBL_RESULT_ERROR)
+#define GBL_API_RECORD_ASSERT_ERROR(record)                                 \
+    GBL_API_RECORD_ASSERT_CONDITIONAL_(GBL_CONFIG_ASSERT_ERROR_ENABLED,     \
+                                       record, GBL_RESULT_ERROR)
+
+// Unknown
+#define GBL_API_RECORD_ASSERT_UNKNOWN(record)                                 \
+    GBL_API_RECORD_ASSERT_CONDITIONAL_(GBL_CONFIG_ASSERT_UNKNOWN_ENABLED,     \
+                                       record, GBL_RESULT_UNKNOWN)
 // Both Together
-#define GBL_API_RESULT_ASSERT(result)                       \
+#define GBL_API_RECORD_ASSERT(record)                       \
     do {                                                    \
-            GBL_API_RESULT_ASSERT_ERROR(result);            \
-            GBL_API_RESULT_ASSERT_PARTIAL(result);  \
+            GBL_API_RECORD_ASSERT_ERROR(record);            \
+            GBL_API_RECORD_ASSERT_PARTIAL(record);          \
+            GBL_API_RECORD_ASSERT_UNKNOWN(record);          \
     } while(0)
 
 
-// ==========================  RESULT = > LOG ========================
+// ==========================  RECORD = > LOG ========================
 
-// Base Enabled Logic (udes a prefix prefix for all magic)
-#define GBL_API_RESULT_LOG_(prefix, result)                         \
+// Base Enabled Logic (uses a prefix prefix for all magic)
+#define GBL_API_RECORD_LOG_(prefix, record)                         \
         do {                                                        \
-            if(GBL_RESULT_##prefix(result->resultCode)) GBL_UNLIKELY {  \
-                GBL_API_LOG(GBL_CONFIG_LOG_##prefix##_LEVEL,    \
+            if(GBL_RESULT_##prefix(record->result)) GBL_UNLIKELY {  \
+                GBL_API_LOG(GBL_CONFIG_LOG_##prefix##_LEVEL,        \
                             "Result: %d, Message: %s",              \
-                             result->resultCode, result->message);        \
+                             record->result, record->message);      \
             }                                                       \
         } while(0)
 
 
 // Base Conditional Logic
-#define GBL_API_RESULT_LOG_CONDITIONAL_(prefix, result)                     \
+#define GBL_API_RECORD_LOG_CONDITIONAL_(prefix, record)                 \
         GBL_MACRO_CONDITIONAL_CALL(GBL_CONFIG_LOG_##prefix##_ENABLED,   \
-                                    GBL_API_RESULT_LOG_, prefix, result)
+                                    GBL_API_RECORD_LOG_, prefix, record)
 // Success
-#define GBL_API_RESULT_LOG_SUCCESS(result) \
-        GBL_API_RESULT_LOG_CONDITIONAL_(SUCCESS, result)
+#define GBL_API_RECORD_LOG_SUCCESS(record) \
+        GBL_API_RECORD_LOG_CONDITIONAL_(SUCCESS, record)
 
 // Partial Success
-#define GBL_API_RESULT_LOG_PARTIAL(result) \
-        GBL_API_RESULT_LOG_CONDITIONAL_(PARTIAL, result)
+#define GBL_API_RECORD_LOG_PARTIAL(record) \
+        GBL_API_RECORD_LOG_CONDITIONAL_(PARTIAL, record)
 
 // Error
-#define GBL_API_RESULT_LOG_ERROR(result) \
-        GBL_API_RESULT_LOG_CONDITIONAL_(ERROR, result)
+#define GBL_API_RECORD_LOG_ERROR(record) \
+        GBL_API_RECORD_LOG_CONDITIONAL_(ERROR, record)
+
+// Unknown
+#define GBL_API_RECORD_LOG_UNKNOWN(record) \
+        GBL_API_RECORD_LOG_CONDITIONAL_(UNKNOWN, record)
 
 // Combined
-#define GBL_API_RESULT_LOG(result)                      \
+#define GBL_API_RECORD_LOG(record)                      \
     do {                                                \
-        GBL_API_RESULT_LOG_ERROR(result);               \
-        GBL_API_RESULT_LOG_PARTIAL(result);     \
-        GBL_API_RESULT_LOG_SUCCESS(result);             \
+        GBL_API_RECORD_LOG_ERROR(record);               \
+        GBL_API_RECORD_LOG_PARTIAL(record);             \
+        GBL_API_RECORD_LOG_UNKNOWN(record);             \
+        GBL_API_RECORD_LOG_SUCCESS(record);             \
     } while(0)
 
 
-// ================= RESULT => HANDLE::LAST_ERROR ==============
-#define GBL_API_RESULT_LAST_ERROR_(prefix, result)                              \
+// ================= RECORD => HANDLE::LAST_ERROR ==============
+#define GBL_API_RECORD_LAST_RECORD_(prefix, record)                             \
     do {                                                                        \
-        if(GBL_RESULT_##prefix(result->resultCode)) {                                 \
-            GBL_ASSERT(gblHandleLastErrorSet(GBL_API_HANDLE(), result), "Last error failed!");   \
+        if(GBL_RESULT_##prefix(record->result)) {                               \
+            GBL_ASSERT(gblHandleLastCallRecordSet(GBL_API_HANDLE(), record),    \
+                        "Last error failed!");                                  \
         }                                                                       \
     } while(0)
 
 
-#define GBL_API_RESULT_LAST_ERROR_CONDITIONAL_(prefix, result) \
-    GBL_MACRO_CONDITIONAL_CALL(GBL_CONFIG_LAST_ERROR_##prefix##_ENABLED,    \
-                            GBL_API_RESULT_LAST_ERROR_, prefix, result)
+#define GBL_API_RECORD_LAST_RECORD_CONDITIONAL_(prefix, record)                     \
+    GBL_MACRO_CONDITIONAL_CALL(GBL_CONFIG_LAST_CALL_RECORD_##prefix##_ENABLED,      \
+                            GBL_API_RECORD_LAST_RECORD_, prefix, record)
 
-#define GBL_API_RESULT_LAST_ERROR_SUCCESS(result) \
-    GBL_API_RESULT_LAST_ERROR_CONDITIONAL_(SUCCESS, result)
+#define GBL_API_RECORD_LAST_RECORD_SUCCESS(record) \
+    GBL_API_RECORD_LAST_RECORD_CONDITIONAL_(SUCCESS, record)
 
-#define GBL_API_RESULT_LAST_ERROR_PARTIAL(result) \
-    GBL_API_RESULT_LAST_ERROR_CONDITIONAL_(PARTIAL, result)
+#define GBL_API_RECORD_LAST_RECORD_PARTIAL(record) \
+    GBL_API_RECORD_LAST_RECORD_CONDITIONAL_(PARTIAL, record)
 
-#define GBL_API_RESULT_LAST_ERROR_ERROR(result) \
-    GBL_API_RESULT_LAST_ERROR_CONDITIONAL_(ERROR, result)
+#define GBL_API_RECORD_LAST_RECORD_ERROR(record) \
+    GBL_API_RECORD_LAST_RECORD_CONDITIONAL_(ERROR, record)
 
-#define GBL_API_RESULT_LAST_ERROR(result) \
+#define GBL_API_RECORD_LAST_RECORD_UNKNOWN(record) \
+    GBL_API_RECORD_LAST_RECORD_CONDITIONAL_(UNKNOWN, record)
+
+#define GBL_API_RECORD_LAST_RECORD(record)          \
+    do {                                            \
+        GBL_API_RECORD_LAST_RECORD_ERROR(record);   \
+        GBL_API_RECORD_LAST_RECORD_PARTIAL(record); \
+        GBL_API_RECORD_LAST_RECORD_UNKNOWN(record); \
+        GBL_API_RECORD_LAST_RECORD_SUCCESS(record); \
+    } while(0)
+
+
+// ================= RECORD => TOP-LEVEL DISPATCH ==============
+#define GBL_API_RECORD_HANDLER(record)          \
+    do {                                        \
+        GBL_API_RECORD_LOG((record));           \
+        GBL_API_RECORD_ASSERT((record));        \
+        GBL_API_RECORD_LAST_RECORD((record));   \
+    } while(0)
+
+#define GBL_API_RECORD_SET_N(file, func, line, col, result, pFmt, ...)                                                                  \
+    do {                                                                                                                                \
+        GBL_API_SOURCE_LOC_PUSH(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL));                                                            \
+        GBL_CALL_RECORD_CONSTRUCT(&GBL_API_RECORD(), GBL_API_HANDLE(), result, GBL_API_SOURCE(), pFmt GBL_VA_ARGS(__VA_ARGS__));        \
+        GBL_API_RECORD_HANDLER(&GBL_API_RECORD());                                                                                      \
+        GBL_API_SOURCE_POP();                                                                                                           \
+    } while(0)
+
+#define GBL_API_RECORD_SET_5(file, func, line, col, result) \
+    GBL_API_RECORD_SET_N(file, func, line, col, result, gblResultString(result))
+
+#define GBL_API_RECORD_SET(...)  \
+    GBL_VA_OVERLOAD_CALL(GBL_API_RECORD_SET, GBL_VA_OVERLOAD_SUFFIXER_5_N, SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)
+
+
+
+#define GBL_API_VERIFY_HANDLE_N(srcLoc, expr, ...) \
+    GBL_API_VERIFY_(expr, GBL_RESULT_ERROR_INVALID_HANDLE, srcLoc GBL_VA_ARGS(__VA_ARGS__))
+
+#define GBL_API_VERIFY_HANDLE_2(src, expr) \
+    GBL_API_VERIFY_HANDLE_N(src, expr, "Invalid Handle")
+
+#define GBL_API_VERIFY_HANDLE(...) \
     do { \
-        GBL_API_RESULT_LAST_ERROR_ERROR(result);    \
-        GBL_API_RESULT_LAST_ERROR_PARTIAL(result);  \
-        GBL_API_RESULT_LAST_ERROR_SUCCESS(result);  \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_HANDLE, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
     } while(0)
 
-
-// ================= RESULT => TOP-LEVEL DISPATCH ==============
-#define GBL_API_RESULT_HANDLER(result)                                          \
+#define GBL_API_CALL_N(src, funcCall, ...)                                      \
     do {                                                                        \
-        GBL_API_RESULT_LOG((result));                                            \
-        GBL_API_RESULT_ASSERT((result));                                         \
-        GBL_API_RESULT_LAST_ERROR((result));                                         \
+        GBL_API_SOURCE_LOC_PUSH(src);                                           \
+        GBL_MAYBE_UNUSED const GBL_RESULT localResult = (funcCall);             \
+        if(!GBL_RESULT_SUCCESS(localResult)) GBL_UNLIKELY {                     \
+            GBL_API_RECORD_SET(localResult GBL_VA_ARGS(__VA_ARGS__));           \
+        }                                                                       \
+        GBL_API_SOURCE_POP();                                                   \
     } while(0)
 
-#define GBL_API_RESULT_SET(resultCode, ...) \
+#define GBL_API_CALL_2(src, funcCall) \
+    GBL_API_CALL_N(src, funcCall, "Call[%s] -> Result[%s]", #funcCall, gblResultString(localResult));
+
+#define GBL_API_CALL(...) \
     do {    \
-        GBL_API_SOURCE_LOC_PUSH(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL));  \
-        GBL_API_RESULT_CONSTRUCT(&GBL_API_RESULT(), GBL_API_HANDLE(), resultCode, GBL_API_SOURCE() GBL_VA_ARGS(__VA_ARGS__)); \
-        GBL_API_RESULT_HANDLER(&GBL_API_RESULT());                                                      \
-        GBL_API_SOURCE_POP(); \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        GBL_VA_OVERLOAD_SELECT(GBL_API_CALL, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
     } while(0)
-
-#define GBL_API_CALL(funcCall) \
-    do {    \
-        GBL_API_SOURCE_PUSH(SRC_FILE, SRC_FN, SRC_LN, SRC_COL); \
-        GBL_MAYBE_UNUSED const GBL_RESULT localResult = (funcCall);  \
-        if(!GBL_RESULT_SUCCESS(localResult)) GBL_UNLIKELY {  \
-            GBL_API_RESULT_SET(localResult, "Call failed!");    \
-        }   \
-        GBL_API_SOURCE_POP();   \
-    } while(0)
-
-
 
 // ================= TOP-LEVEL API UTILITIES ==============
 
@@ -515,7 +607,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 #define GBL_API_BEGIN_LOG_N(file, func, line, col, hHandle, ...)    \
     GBL_API_BEGIN_LOG_5(file, func, line, col, hHandle); \
-    GBL_API_PUSH(__VA_ARGS__);
+    GBL_API_PUSH_VERBOSE(__VA_ARGS__);
 
 // FIGURE ME THE FUCK OUT, PASS SRC_CONTEXT SHIT
 #define GBL_API_BEGIN(...) \
@@ -532,7 +624,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 #define GBL_API_END()                             \
         GBL_API_END_BLOCK(); \
-        return GBL_API_RESULT_CODE()
+        return GBL_API_RESULT()
 
 
 

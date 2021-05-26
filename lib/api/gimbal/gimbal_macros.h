@@ -120,8 +120,6 @@ uint64_t GBL_POW2_NEXT_UINT64(uint64_t n) GBL_NOEXCEPT {
     return n + 1;
 }
 
-
-//declare macro "trait" table
 #define GBL_POW2_NEXT_TRAITS (                  \
         GBL_POW2_NEXT_UINT64,                   \
         (                                       \
@@ -133,7 +131,6 @@ uint64_t GBL_POW2_NEXT_UINT64(uint64_t n) GBL_NOEXCEPT {
     )
 
 #define GBL_POW2_NEXT(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS)(X);
-
 
 
 GBL_DEPRECATED("Dis shit's ancient!")

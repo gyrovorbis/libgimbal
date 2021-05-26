@@ -42,22 +42,22 @@ GBL_ENUM_TABLE_DECLARE(GBL_META_LOG_LEVEL_TABLE);
 
 GBL_DECLARE_OPAQUE(GblHandle);
 
-typedef struct GblApiResult {
+typedef struct GblCallRecord {
     char                message[GBL_API_RESULT_MSG_BUFFER_SIZE];
     GblSourceLocation   srcLocation;
     GblHandle           hHandle;
-    GBL_RESULT          resultCode;
-} GblApiResult;
+    GBL_RESULT          result;
+} GblCallRecord;
 
-GBL_MAYBE_UNUSED GBL_INLINE void GBL_API_RESULT_CONSTRUCT(GblApiResult* pResult, GblHandle hHandle, GBL_RESULT resultCode, GblSourceLocation source, const char* pFmt, ...) {
+GBL_MAYBE_UNUSED GBL_INLINE void GBL_CALL_RECORD_CONSTRUCT(GblCallRecord* pRecord, GblHandle hHandle, GBL_RESULT resultCode, GblSourceLocation source, const char* pFmt, ...) {
     va_list varArgs;
     va_start(varArgs, pFmt);
-    memset(pResult, 0, sizeof(GblApiResult));
-    if(pFmt) vsnprintf(pResult->message, sizeof(pResult->message), pFmt, varArgs);
+    memset(pRecord, 0, sizeof(GblCallRecord));
+    if(pFmt) vsnprintf(pRecord->message, sizeof(pRecord->message), pFmt, varArgs);
     va_end(varArgs);
-    pResult->srcLocation    = source;
-    pResult->hHandle        = hHandle;
-    pResult->resultCode     = resultCode;
+    pRecord->srcLocation    = source;
+    pRecord->hHandle        = hHandle;
+    pRecord->result         = resultCode;
 }
 
 // ============ VERSION ================

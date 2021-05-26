@@ -29,7 +29,14 @@
             throw std::runtime_error(std::string("Unhandled Error Code: ") + std::to_string(getCode()));    \
             return "Unhandled";    \
         } \
-        bool isInRange(void) const noexcept { return false; } \
+        constexpr GblEnum toInt(void) const noexcept { return static_cast<GblEnum>(getCode()); } \
+        constexpr bool isInRange(void) const noexcept { return false; } \
+        constexpr friend bool operator==(CppType rhs, Value lhs) {    \
+            return rhs.getCode() == CppType(lhs);  \
+        }   \
+        constexpr friend bool operator!=(CppType rhs, Value lhs) {    \
+            return !(rhs == lhs);   \
+        }   \
     }; \
     GBL_CHECK_C_CPP_TYPE_COMPAT(GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME)), GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME)))
 
@@ -72,7 +79,9 @@ public:
 
 class SourceLocation: public GblSourceLocation {
 public:
-    SourceLocation(void);
+    SourceLocation(void) {
+        memset(this, 0, sizeof(SourceLocation));
+    }
     SourceLocation(const GblSourceLocation& rhs) {
         memcpy(this, &rhs, sizeof(GblSourceLocation));
     }
@@ -93,36 +102,95 @@ public:
 
 GBL_CHECK_C_CPP_TYPE_COMPAT(SourceLocation, GblSourceLocation);
 
-class ApiResult: public GblApiResult {
+namespace INTERNAL {
+    GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_RESULT_TABLE);
+}
+
+
+class Result: public INTERNAL::Result {
 public:
-    ApiResult(GblHandle hHandle, GBL_RESULT result, std::string_view message={}) {
-        resultCode = result;
-        this->hHandle = hHandle;
-        memset(this->message, 0, sizeof(this->message));
-        message.copy(this->message, sizeof(this->message));
+    enum class Type: uint8_t {
+        Success,
+        Partial,
+        Error,
+        Unknown,
+        Count
+    };
 
+    using INTERNAL::Result::Result;
+    constexpr Result(void) noexcept: INTERNAL::Result(GBL_RESULT_UNKNOWN) {}
+    constexpr Result(bool success) noexcept: INTERNAL::Result(success? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR) {}
 
+    std::string_view toString(void) const noexcept { return gblResultString(getCode()); }
+    constexpr Type getType(void) const noexcept {
+        if(isSuccess()) return Type::Success;
+        else if(isPartial()) return Type::Partial;
+        else if(isError()) return Type::Error;
+        else if(isUnknown()) return Type::Unknown;
+        else GBL_ASSERT(false, "Not typed!");
     }
 
-    bool                isError(void) const;
-    bool                isSuccess(void) const;
-    bool                isPartialSuccess(void) const;
+    constexpr bool isUnknown(void) const noexcept { return GBL_RESULT_UNKNOWN(getCode()); }
+    constexpr bool isSuccess(void) const noexcept { return GBL_RESULT_SUCCESS(getCode()); }
+    constexpr bool isPartial(void) const noexcept { return GBL_RESULT_PARTIAL(getCode()); }
+    constexpr bool isError(void) const noexcept { return GBL_RESULT_ERROR(getCode()); }
+    constexpr bool isUnavailable(void) const noexcept { return GBL_RESULT_UNAVAILABLE(getCode()); }
+    constexpr bool isType(Type type) const noexcept { return type == getType(); }
 
-    GblHandle             getHandle(void) const;
-    GBL_RESULT              getResult(void) const { return this->resultCode; }
-    SourceLocation          getSource(void) const;
+    constexpr operator bool() const noexcept { return isSuccess(); }
+
+    constexpr bool wouldThrow(void) const noexcept { return isError(); }
+
+    Result checkThrow(void) const {
+        if(wouldThrow()) GBL_UNLIKELY {
+            return throwException(*this);
+        }
+        return *this;
+    }
+
+    // Statics
 
 
-    std::string_view    getMessage(void) const;
-    const char*         getResultString(void) const { return message; }
-    std::string         getSourceString(void) const;
+    static Result throwException(Result result);
 
-    std::string         toString(void) const;
-
+    static Result tryThrow(Result result) {
+        return result.checkThrow();
+    }
 
 };
 
-GBL_CHECK_C_CPP_TYPE_COMPAT(ApiResult, GblApiResult);
+class Handle;
+
+class CallRecord: public GblCallRecord {
+public:
+    CallRecord(GblHandle hHandle, GBL_RESULT result, std::string_view message={}) {
+
+         //GBL_CALL_RECORD_CONSTRUCT(&pFrame->record, hHandle, initialResult, entryLoc, gblResultString(initialResult));
+        this->result = result;
+        this->hHandle = hHandle;
+        memset(this->message, 0, sizeof(this->message));
+        message.copy(this->message, sizeof(this->message));
+    }
+
+
+    Handle*             getHandle(void) const;
+    Result                getResult(void) const { return this->result; }
+    SourceLocation          getSource(void) const;
+
+
+    std::string_view    getMessage(void) const { return message; }
+    std::string         getSourceString(void) const;
+
+    std::string         toString(void) const;
+/*
+    static CallRecord& tryThrow(const CallRecord& record) {
+        return result.checkThrow();
+    }
+*/
+
+};
+
+GBL_CHECK_C_CPP_TYPE_COMPAT(CallRecord, GblCallRecord);
 
 class StackFrame: public GblStackFrame {
 public:
@@ -140,8 +208,8 @@ public:
 
     auto        getSourceCurrent(void) const -> const SourceLocation&;
     auto        getSourceEntry(void) const -> const SourceLocation& { return *static_cast<const SourceLocation*>(&sourceEntry);}
-    auto        getApiResult(void) const -> const ApiResult&;
-    auto        getApiResult(void) -> ApiResult&;
+    auto        getCallRecord(void) const -> const CallRecord& { return *static_cast<const CallRecord*>(&record); }
+    auto        getCallRecord(void) -> CallRecord&;
     GblHandle     getHandle(void) const;
     GblContext    getContext(void) const;
     void*       getHandleUd(void) const;
@@ -154,84 +222,121 @@ GBL_CHECK_C_CPP_TYPE_COMPAT(StackFrame, GblStackFrame);
 
 
 
-class ResultException: public ApiResult {
+class Exception: public CallRecord, virtual std::exception {
 public:
-    using ApiResult::ApiResult;
+    using CallRecord::CallRecord;
+
+    virtual const char* what(void) const noexcept override {
+        return getMessage().data();
+    }
+
 };
 
-//construct a cpp exception from C error
-//construct a c error from a cpp exception
 
 template<typename E>
-class StdResultException: public ResultException, public E {
+class StdException: public Exception, virtual E {
 public:
 
-    StdResultException(GBL_RESULT result) noexcept: ResultException(nullptr, result, gblResultString(result)) {}
-    StdResultException(const ResultException&) noexcept;
-    StdResultException& operator=(const ResultException&) noexcept;
+    StdException(GBL_RESULT result) noexcept: Exception(nullptr, result, Result(result).toString()) {}
+    StdException(const Exception&) noexcept;
+    StdException& operator=(const Exception&) noexcept;
 
-    StdResultException(ApiResult result);
+    StdException(CallRecord record);
 
-    virtual ~StdResultException(void) override = default;
+    virtual ~StdException(void) override = default;
 
     virtual const char* what() const noexcept override {
-        return ResultException::getResultString();
+        return Exception::getMessage().data();
     }
 };
 
 
+#if 0
+class E1 : public std::exception {};
+class E2 : public std::exception {};
+
+int main() {
+    try {
+        throw E2();
+    }
+    catch( ... ) {
+        try {
+            throw;
+        }
+        catch( const E1 & e ) {
+            std::cout << "E1\n";
+        }
+        catch( const E2 & e ) {
+            std::cout << "E2\n";
+        }
+    }
+}
+#endif
+
+
 #define GBL_RESULT_CATCH(code) \
-catch(const ResultException& resultException) {     \
+catch(const Exception& resultException) {     \
     code = resultException.getResult();  \
 }   \
 catch(...) {    \
     code = Result(Result::ErrorUnhandledException);  \
 }
+/*
+
+CPP_EXCEPTION_TABLE {
+    std::bad_alloc,
+    std::bad_cast,
+    std::bad_typeid,
+    std::bad_exception,
+    std::logic_failure,
+    std::runtime_error,
+    std::domain_error;
+    std::invalid_argument;
+    std::length_error;
+    std::out_of_range
+    std::overflow_error
+    std::range_error
+    std::underflow_error
+}*/
 
 
-namespace INTERNAL {
-    GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_RESULT_TABLE);
+#if 0
+
+void someFunc(gimbal::Context* pCtx) {
+    GBL_API_BEGIN(*pCtx);
+
+
+    try {
+       // maybeThrowShit();
+
+    } catch(...) {
+        Result result(Result::ErrorUnhandledException);
+        std::string message;
+
+        try {
+            throw;
+        } catch(const std::exception& except) {
+            message = except.what();
+        }
+
+        try {
+            throw;
+        } catch(const gimabl::Exception& gblExcept) {
+            result = gblExcept.getResult();
+        } catch(const std::bad_alloc& except) {
+            result = Result(Result::ErrorMemAlloc);
+        }
+
+        GBL_API_RECORD_SET(result, message);
+        GBL_API_DONE();
+    }
+
+    GBL_API_END();
+
 }
 
+#endif
 
-class Result: public INTERNAL::Result {
-public:
-    using INTERNAL::Result::Result;
-    constexpr Result(void) noexcept: INTERNAL::Result(GBL_RESULT_UNKNOWN) {}
-    constexpr Result(bool success) noexcept: INTERNAL::Result(success? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR) {}
-
-    std::string_view toString(void) const noexcept { return gblResultString(getCode()); }
-
-    constexpr bool isUnknown(void) const noexcept { return GBL_RESULT_UNKNOWN(getCode()); }
-    constexpr bool isSuccess(void) const noexcept { return GBL_RESULT_SUCCESS(getCode()); }
-    constexpr bool isPartial(void) const noexcept { return GBL_RESULT_PARTIAL(getCode()); }
-    constexpr bool isError(void) const noexcept { return GBL_RESULT_ERROR(getCode()); }
-    constexpr bool isUnavailable(void) const noexcept { return GBL_RESULT_UNAVAILABLE(getCode()); }
-
-    constexpr operator bool() const noexcept { return isSuccess(); }
-
-    constexpr bool wouldThrow(void) const noexcept { return isError(); }
-
-    Result checkThrow(void) const {
-        if(wouldThrow()) GBL_UNLIKELY {
-            return throwException(*this);
-        }
-        return *this;
-    }
-
-    // Statics
-
-
-    static Result throwException(Result result) {
-        throw StdResultException<std::exception>(result);
-        return result;
-    }
-
-    static Result tryThrow(Result result) {
-        return result.checkThrow();
-    }
-
-};
 
 template<typename CRTP, typename Index, typename Value>
 class ReadWriteIndexable {
@@ -395,6 +500,11 @@ public:
    const_iterator           cend(void) const { return {*static_cast<const CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()}; }
    const_reverse_iterator   crend(void) const { return {*static_cast<const CRTP*>(this), -1}; }
 };
+
+inline Result Result::throwException(Result result){
+       throw StdException<std::exception>(result);
+       return result;
+   }
 
 }
 

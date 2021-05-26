@@ -39,7 +39,7 @@ typedef struct GblHandle_ {
     void*                   pUserdata;
     struct GblHandle_*      pParent;
     struct GblContext_*     pContext;
-    GblApiResult            lastError;
+    GblCallRecord           lastRecord;
 } GblHandle_;
 
 GBL_API gblHandleConstruct(GblContext hContext,
@@ -62,13 +62,13 @@ GBL_API gblHandleUserdata(GblHandle hHandle,
 
 
 // this could be returning just a the base of a custom subclass
-GBL_API gblHandleLastErrorGet(GblHandle hHandle,
-                            const GblApiResult** pError);
+GBL_API gblHandleLastCallRecordGet(GblHandle hHandle,
+                            const GblCallRecord** ppRecord);
 
 
 // this could theoretically construct or call into some userdata shit for more info
-GBL_API gblHandleLastErrorSet(GblHandle hHandle,
-                            const GblApiResult* pError);
+GBL_API gblHandleLastCallRecordSet(GblHandle hHandle,
+                            const GblCallRecord* pRecord);
 
 
 

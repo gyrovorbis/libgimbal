@@ -11,8 +11,19 @@
 
 #define GBL_API_CATCH() \
         GBL_RESULT_CATCH(result); \
-        GBL_API_RESULT_SET(result, Result(result).toString().data()); \
+        if(!result.isSuccess()) GBL_API_RECORD_SET(result, Result(result).toString().data()); \
     } while(0)
 
+
+#if 0
+#define GBL_RESULT_CATCH(code) \
+catch(const ResultException& resultException) {     \
+    code = resultException.getResult();  \
+}   \
+catch(...) {    \
+    code = Result(Result::ErrorUnhandledException);  \
+}
+
+#endif
 
 #endif // GIMBAL_API_HPP

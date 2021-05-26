@@ -157,7 +157,7 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& output, const Derived& s) {
         output << s.getCString();
-        if(output.fail()) Result::tryThrow(Result::FileWrite);
+        if(output.fail()) Result::tryThrow(Result::ErrorFileWrite);
         return output;
     }
 };
@@ -355,7 +355,7 @@ public:
         // Still failes gracefully, so whatever...
         //if(input.good()) {
         //    input.clear();
-            std::getline(input, line);
+               std::getline(input, line);
         //     if(input.fail()) {
         //         Result::tryThrow(Result::FileRead);
         //     }

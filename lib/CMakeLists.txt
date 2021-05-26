@@ -55,24 +55,28 @@ GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_EMAIL GITLAB_USER_EMAIL)
 
 GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/gimbal_config.h.in FILEPATH "Path to user API configuration file")
 
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_ERROR_ENABLED "Track most recent error in GblHandle" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ENABLED "Track most recent call record in GblHandle" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_SOURCE_TRACKING_ENABLED      "Track calling source code location" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS              "Enable C errno verification macros" ON)
 
 GBL_CONFIG_OPTION(GBL_CONFIG_LOG_SUCCESS_ENABLED           "Log all success results from API calls" OFF)
 GBL_CONFIG_OPTION(GBL_CONFIG_LOG_PARTIAL_ENABLED   "Log all partial success results from API calls" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_LOG_ERROR_ENABLED             "Log all error results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LOG_UNKNOWN_ENABLED             "Log all unknown results from API calls" ON)
 
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_SUCCESS_LEVEL GBL_LOG_LEVEL_DEBUG STRING "Log level for reporting success results")
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL GBL_LOG_LEVEL_WARNING STRING "Log level for reporting partial results")
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL GBL_LOG_LEVEL_ERROR STRING "Log level for reporting error results")
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL GBL_LOG_LEVEL_ERROR STRING "Log level for reporting unknown results")
 
 GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_PARTIAL_ENABLED "Assert on all partial success results from API calls" OFF)
 GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_ERROR_ENABLED          "Assert on all error results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_UNKNOWN_ENABLED          "Assert on all unknown results from API calls" OFF)
 
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_ERROR_SUCCESS_ENABLED    "Update Handle's LastError on all success results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_ERROR_PARTIAL_ENABLED "Update Handle's LastError on all partial success results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_ERROR_ERROR_ENABLED      "Update Handle's LastError on all error results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_SUCCESS_ENABLED    "Update Handle's LastCallRecord on all success results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_PARTIAL_ENABLED "Update Handle's LastCallRecord on all partial success results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ERROR_ENABLED      "Update Handle's LastCallRecord on all error results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_UNKNOWN_ENABLED      "Update Handle's LastCallRecord on all unknown results from API calls" ON)
 
 GBL_CONFIG_OPTION(GBL_CONFIG_EXT_CONTEXT_CALLBACKS_ENABLED    "Context supports runtime user callback EXT functions provided upon creation" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_EXT_CONTEXT_DEFAULT_ENABLED         "Context falls-back to default EXT implementation using standard C library calls" ON)
@@ -115,6 +119,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/gimbal_types.hpp
     api/gimbal/gimbal_variant.hpp
     api/gimbal/gimbal_object.h
+    api/gimbal/gimbal_monitor.hpp
     #api/gimbal/gimbal_table.h
     api/gimbal/gimbal_string.h
     api/gimbal/gimbal_string.hpp

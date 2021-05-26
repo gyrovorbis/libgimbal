@@ -25,7 +25,7 @@ typedef struct GblContext_ {
 } GblContext_;
 
 GBL_API gblContextVersion           (GblVersion* pVersion) {
-    GBL_ASSERT(pVersion, "NULL version output pointer!");
+    if(!pVersion) return GBL_RESULT_ERROR_INVALID_POINTER;
     *pVersion = GBL_VERSION_MAKE(GBL_PROJECT_VERSION_MAJOR, GBL_PROJECT_VERSION_MINOR, GBL_PROJECT_VERSION_PATCH);
     return GBL_RESULT_SUCCESS;
 }
@@ -33,24 +33,24 @@ GBL_API gblContextVersion           (GblVersion* pVersion) {
 static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_BEGIN(hCtx, "Build Info");
 
-    GBL_API_PUSH("Project Info");
+    GBL_API_PUSH_VERBOSE("Project Info");
     GBL_API_VERBOSE("%-20s: %-100.100s", "Name", GBL_PROJECT_NAME);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Version", GBL_PROJECT_VERSION);
     GBL_API_VERBOSE("%-20s: %-100.100s", "URL", GBL_PROJECT_URL);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Description", GBL_PROJECT_DESCRIPTION);
     GBL_API_POP(1);
 
-    GBL_API_PUSH("Build Info");
+    GBL_API_PUSH_VERBOSE("Build Info");
     GBL_API_VERBOSE("%-20s: %-100.100s", "Timestamp", GBL_BUILD_TIMESTAMP);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Type", GBL_BUILD_TYPE);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Config", GBL_BUILD_CONFIG);
     GBL_API_POP(1);
 
-    GBL_API_PUSH("CI Info");
+    GBL_API_PUSH_VERBOSE("CI Info");
 #if GBL_BUILD_CI
     GBL_API_VERBOSE("%-20s: %-100.100s", "Project", GBL_BUILD_CI_PROJECT_TITLE);
 
-    GBL_API_PUSH("Source Control Commit Info");
+    GBL_API_PUSH_VERBOSE("Source Control Commit Info");
     GBL_API_VERBOSE("%-20s: %-100.100s", "Title", GBL_BUILD_CI_COMMIT_TITLE);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Timestamp", GBL_BUILD_CI_COMMIT_TIMESTAMP);
     GBL_API_VERBOSE("%-20s: %-100.100s", "SHA", GBL_BUILD_CI_COMMIT_SHA);
@@ -80,8 +80,8 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
 #endif
     GBL_API_POP(1);
 
-    GBL_API_PUSH("Compiler Info");
-    GBL_API_PUSH("C");
+    GBL_API_PUSH_VERBOSE("Compiler Info");
+    GBL_API_PUSH_VERBOSE("C");
     GBL_API_VERBOSE("%-20s: %-100.100s", "ID", GBL_BUILD_C_COMPILER_ID);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Version", GBL_BUILD_C_COMPILER_VERSION);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Target", GBL_BUILD_C_COMPILER_TARGET);
@@ -90,7 +90,7 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_VERBOSE("%-20s: %-100.100s", "Language Extensions", GBL_BUILD_C_EXTENSIONS);
     GBL_API_POP(1);
 
-    GBL_API_PUSH("C++");
+    GBL_API_PUSH_VERBOSE("C++");
     GBL_API_VERBOSE("%-20s: %-100.100s", "ID", GBL_BUILD_CPP_COMPILER_ID);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Version", GBL_BUILD_CPP_COMPILER_VERSION);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Target", GBL_BUILD_CPP_COMPILER_TARGET);
@@ -100,24 +100,24 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_POP(1);
     GBL_API_POP(1);
 
-    GBL_API_PUSH("Environment Info");
-    GBL_API_PUSH("Host");
+    GBL_API_PUSH_VERBOSE("Environment Info");
+    GBL_API_PUSH_VERBOSE("Host");
     GBL_API_VERBOSE("%-20s: %-100.100s", "Host Name", GBL_BUILD_HOST_NAME);
     //GBL_API_VERBOSE("%-20s: %-100.100s", "Domain Name", GBL_BUILD_HOST_DOMAIN_NAME);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Operating System", GBL_BUILD_HOST_OS);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Architecture", GBL_BUILD_HOST_ARCH);
-    GBL_API_PUSH("Processor");
+    GBL_API_PUSH_VERBOSE("Processor");
     GBL_API_VERBOSE("%-20s: %-100.100s", "Family", GBL_BUILD_HOST_PROCESSOR_NAME);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Description", GBL_BUILD_HOST_PROCESSOR_DESCRIPTION);
     GBL_API_VERBOSE("%-20s: %-100.u", "Physical Cores", GBL_BUILD_HOST_PROCESSOR_CORES_PHYSICAL);
     GBL_API_VERBOSE("%-20s: %-100.u", "Logical Cores", GBL_BUILD_HOST_PROCESSOR_CORES_LOGICAL);
     GBL_API_POP(1);
-    GBL_API_PUSH("Physical Memory");
+    GBL_API_PUSH_VERBOSE("Physical Memory");
     GBL_API_VERBOSE("%-20s: %-100u", "Total (MB)", GBL_BUILD_HOST_MEMORY_PHYSICAL_TOTAL);
     GBL_API_VERBOSE("%-20s: %-100u", "Available (MB)", GBL_BUILD_HOST_MEMORY_PHYSICAL_AVAILABLE);
     GBL_API_POP(1);
     GBL_API_POP(1);
-    GBL_API_PUSH("Target");
+    GBL_API_PUSH_VERBOSE("Target");
     GBL_API_VERBOSE("%-20s: %-100.100s", "Operating System", GBL_BUILD_TARGET_OS);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Architecture", GBL_BUILD_TARGET_ARCH);
     GBL_API_VERBOSE("%-20s: %-100u", "Word Size", GBL_PTR_SIZE * 8);
@@ -178,8 +178,8 @@ GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateIn
     {
         GBL_API_BEGIN(&stackCtx, "Creating Context");
         *phCtx = GBL_API_MALLOC(sizeof(GblContext_), GBL_ALIGNOF(GblContext_), "Context");
-        if(!GBL_RESULT_SUCCESS(GBL_API_RESULT_CODE())) {
-            return GBL_API_RESULT_CODE();
+        if(!GBL_RESULT_SUCCESS(GBL_API_RESULT())) {
+            return GBL_API_RESULT();
         }
 
         if(!phCtx) {
@@ -290,7 +290,7 @@ GBL_CONTEXT_EXT_DECL_(LogWriteDefault_, (GBL_LOG_LEVEL, level), (const char*, pF
     const int vsnprintfBytes = vsnprintf(buffer, sizeof(buffer), pFmt, varArgs);
     if(vsnprintfBytes > (int)sizeof(buffer)) {
         pPrefix = "T - "; //Truncated prefix!
-        GBL_API_RESULT_SET(GBL_RESULT_TRUNCATED, "Log message truncated!");
+        GBL_API_RECORD_SET(GBL_RESULT_TRUNCATED, "Log message truncated!");
     }
 
     //not per byte!

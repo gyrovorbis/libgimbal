@@ -1,13 +1,16 @@
 #ifndef TEST_GIMBAL_STRING_HPP
 #define TEST_GIMBAL_STRING_HPP
 
-#define GBL_STRING_BUFFER_BASE_STACK_SIZE_CACHE GBL_STRING_BUFFER_BASE_STACK_SIZE
+#include "test_gimbal.hpp"
+
+#pragma GBL_PRAGMA_MACRO_PUSH("GBL_STRING_BUFFER_BASE_STACK_SIZE");
 #undef GBL_STRING_BUFFER_BASE_STACK_SIZE
 #define GBL_STRING_BUFFER_BASE_STACK_SIZE 8
 
-#include "test_gimbal.hpp"
 #include <gimbal/gimbal_string.hpp>
 #include <sstream>
+
+
 namespace gimbal::test {
 
 /* Different types:
@@ -531,15 +534,7 @@ inline void String::operatorAdd(void) {
     GBL_TEST_VERIFY_RESULT(gblStringDestruct(&cStr));
 }
 
-
-
-
-
-
-
-#undef GBL_STRING_BUFFER_BASE_STACK_SIZE
-#define GBL_STRING_BUFFER_BASE_STACK_SIZE GBL_STRING_BUFFER_BASE_STACK_SIZE_CACHE
-#undef GBL_STRING_BUFFER_BASE_STACK_SIZE_CACHE
+#pragma GBL_PRAGMA_MACRO_POP("GBL_STRING_BUFFER_BASE_STACK_SIZE");
 
 
 
