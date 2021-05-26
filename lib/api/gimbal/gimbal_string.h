@@ -251,7 +251,8 @@ GBL_INLINE GBL_API gblStringReserve(GblString* pStr, GblSize capacity) {
         GBL_API_CALL(gblStringIsStack(pStr, &stack));
         if(stack) {
             const GblSize oldLength = pStr->data.length;
-            GBL_API_CALL(gblStringAlloc_(pStr, capacity));
+            GBL_API_CALL(gblStringAlloc_(pStr, GBL_STRING_CAPACITY_FROM_SIZE_(capacity + 1)));
+            //GBL_API_CALL(gblStringAlloc_(pStr, capacity));
             memcpy(pStr->data.pBuffer, pStr->stackBuffer, oldLength+1);
             pStr->data.length = oldLength;
         } else {

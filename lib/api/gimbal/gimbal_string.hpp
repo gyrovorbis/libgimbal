@@ -293,9 +293,8 @@ public:
 
     const String& operator=(GblString&& rhs) {
         StringView rhsView(rhs);
-        Context* pCtx = getContext()? getContext() : rhsView.getContext();
 
-        if(pCtx == rhsView.getContext() && rhsView.isHeap()) {
+        if(getContext() == rhsView.getContext() && rhsView.isHeap()) {
             give(take(&rhs));
         } else { //cannot move construct!
             *this = rhsView.toStringView();
@@ -365,11 +364,16 @@ public:
     }
 
     friend void swap(String& lhs, String& rhs) {
-        String temp = lhs;
-        lhs = std::move(rhs);
-        rhs = std::move(temp);
+        void* pTemp = GBL_ALLOCA(sizeof(String));
+        memcpy(pTemp, &lhs, sizeof(String));
+        memcpy(&lhs, &rhs, sizeof(String));
+        memcpy(&rhs, pTemp, sizeof(String));
     }
 };
+
+
+
+
 
 inline String operator+(const gimbal::StringView& lhs, const gimbal::StringView& rhs) {
     return String(lhs) += rhs;

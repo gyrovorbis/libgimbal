@@ -1,6 +1,44 @@
 #ifndef TEST_GIMBAL_HPP
 #define TEST_GIMBAL_HPP
 
+#include <gimbal/gimbal_macros.h>
+#include <QDebug>
+
+#pragma GBL_PRAGMA_MACRO_PUSH("GBL_ASSERT_1");
+#undef GBL_ASSERT_1
+#define GBL_ASSERT_1    gimbal::test::AssertMgr::assert_
+
+#pragma GBL_PRAGMA_MACRO_PUSH("GBL_ASSERT_2");
+#undef GBL_ASSERT_2
+#define GBL_ASSERT_2    gimbal::test::AssertMgr::assert_
+
+namespace gimbal::test {
+    struct AssertMgr {
+        static inline bool asserted = false;
+        static inline std::string message = std::string();
+
+        static void assert_(bool expr, std::string str=std::string()) {
+            if(!expr) {
+                asserted = true;
+                message = std::move(str);
+                qCritical() << "ASSERTED: " << message.c_str();
+            }
+        }
+
+        static void get(bool* pAssertion, std::string* pStr) {
+            *pAssertion = asserted;
+            *pStr = message;
+        }
+
+        static void clear(void) {
+            asserted = false;
+            message.clear();
+        }
+
+    };
+}
+
+
 #include <gimbal/gimbal_types.hpp>
 #include <gimbal/gimbal_context.hpp>
 #include <elysian_qtest.hpp>
@@ -22,6 +60,7 @@
     QVERIFY(GBL_RESULT_SUCCESS((expr)))
 
 namespace gimbal::test {
+
 
 #define GBL_CONFIG_OPTIONS_ASSERT_ENABLED_DECL()  \
 {   \
@@ -101,6 +140,7 @@ public:
         GBL_UNUSED(frame);
 
         auto it = allocations_.find(pPtr);
+        Q_ASSERT(it != allocations_.cend());
         if(it != allocations_.end()) {
             Allocation newAlloc = *it;
             newAlloc.size = newSize;
@@ -116,6 +156,7 @@ public:
     void freeEvent(const StackFrame& frame, void* pPtr) {
         GBL_UNUSED(frame);
         auto it = allocations_.find(pPtr);
+        Q_ASSERT(it != allocations_.cend());
         if(it != allocations_.end()) {
             allocations_.erase(it);
         }
@@ -271,6 +312,48 @@ private:
     ContextCounters     counters_;
 };
 
+class StandardContext: public gimbal::Context {
+protected:
+
+    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) { return malloc(size); }
+    virtual void*   memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) { return realloc(pPtr, newSize); }
+    virtual void    memFree(const StackFrame& frame, void* pPtr) { free(pPtr); }
+    virtual void    logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) {
+        QMessageLogger logger;
+
+#if 0
+        frame.getSourceEntry().getFilePath().data(),
+                              frame.getSourceEntry().getLineNumber(),
+                              frame.getSourceEntry().getFunctionName().data());
+#endif
+
+       QString buffer = QString::vasprintf(pFmt, varArgs);
+
+        switch(level.getValue()) {
+        case LogLevel::Warning:
+            logger.warning("%s", Q_CSTR(buffer));
+            break;
+        case LogLevel::Error:
+            logger.critical("%s", Q_CSTR(buffer));
+            break;
+        case LogLevel::Debug:
+            logger.debug("%s", Q_CSTR(buffer));
+            break;
+        case LogLevel::Verbose:
+        case LogLevel::Info:
+        default:
+            logger.info("%s", Q_CSTR(buffer));
+            break;
+        }
+    }
+};
+
+class TestContext: public MonitorableContext {
+public:
+    TestContext(void):
+        MonitorableContext(new StandardContext()) {}
+
+};
 
 
 struct MonitorBase{};
@@ -336,7 +419,6 @@ public:
 };
 
 
-
 class ContextCountersMonitor:
         public ContextMonitor<ContextCountersMonitor, ContextCounters>
 {
@@ -387,6 +469,122 @@ public:
 //using LogStackScopeGuard = ContextScopeGuard<LogDepthMonitor>;
 
 
+
+class ApiBlock {
+protected:
+    gimbal::StackFrame stackFrame_;
+    std::string name_;
+    gimbal::Handle* pHandle_    = nullptr;
+    ContextCountersMonitor countersMonitor_;
+    ContextActiveAllocMonitor activeAllocMonitor_;
+    bool asserted_ = false;
+    std::string assertMsg_;
+
+public:
+    ApiBlock(gimbal::Handle* pHandle,
+             std::string name    = "unnamed",
+             const char* pFile   = nullptr,
+             const char* pFunc   = nullptr,
+             gimbal::Size line   = 0,
+             gimbal::Size column = 0):
+        stackFrame_(*pHandle,
+                    gimbal::Result(gimbal::Result::Success),
+                    GBL_SOURCE_LOCATION(pFile, pFunc, line, column)),
+        name_(std::move(name)),
+        pHandle_(pHandle),
+        countersMonitor_(getContext()),
+        activeAllocMonitor_(getContext())
+    {
+
+    }
+
+    template<typename F>
+    const ApiBlock& operator=(F&& funcBlock) {
+        GBL_UNUSED([&]() {
+            GBL_API_BEGIN_FRAME(stackFrame_.getSourceEntry().getFileName().data(),
+                                stackFrame_.getSourceEntry().getFunctionName().data(),
+                                stackFrame_.getSourceEntry().getLineNumber(),
+                                stackFrame_.getSourceEntry().getColumn(),
+                                *pHandle_,
+                                &stackFrame_);
+            GBL_API_TRY {
+                countersMonitor_.begin();
+                activeAllocMonitor_.begin();
+                AssertMgr::clear();
+                getHandle()->clearLastCallRecord();
+                funcBlock(&stackFrame_);
+                AssertMgr::get(&asserted_, &assertMsg_);
+                countersMonitor_.end();
+                activeAllocMonitor_.end();
+            } GBL_API_CATCH();
+            GBL_API_END();
+        }());
+        return *this;
+    }
+
+    operator bool() const {
+        return getRecord().getResult().isSuccess() && !didAssert();
+    }
+
+    std::string_view getName(void) const { return name_; }
+    gimbal::Handle* getHandle(void) const { return pHandle_; }
+    MonitorableContext* getContext(void) const { return dynamic_cast<MonitorableContext*>(pHandle_->getContext()); }
+    const ContextCountersMonitor& getCountersMonitor(void) const { return countersMonitor_; }
+
+    const gimbal::StackFrame& getFrame(void) const { return stackFrame_; }
+    const gimbal::CallRecord& getRecord(void) const { return getFrame().getCallRecord(); }
+    //Result getResult(void) const { return getApiCallResult().getResult(); }
+
+    ContextCounters getCountersDelta(void) const { return getCountersMonitor().getEndDelta(); }
+    size_t getActiveAllocCount(void) const { return activeAllocMonitor_.getEndDelta(); }
+    decltype(auto) getLastCallRecord(void) const { return getHandle()->getLastCallRecord(); }
+
+    bool didAssert(void) const { return asserted_; }
+    std::string_view getAssertMessage(void) const { return assertMsg_; }
+};
+
+#define GBL_API_BLOCK(ctx_, name) \
+    ApiBlock(ctx_, name, GBL_SOURCE_FILE, GBL_SOURCE_FUNCTION, GBL_SOURCE_LINE, GBL_SOURCE_COLUMN) = [&](GBL_MAYBE_UNUSED GBL_API_FRAME_DECLARE)
+
+#define GBL_TEST_API_BLOCK() \
+    GBL_API_BLOCK(pCtx(), GBL_SOURCE_FUNCTION)
+
+class UnitTestSet: public elysian::UnitTestSet {
+public:
+
+    UnitTestSet(MonitorableContext* pCtx=nullptr):
+        pCtx_(pCtx) {}
+
+    void verifyBlock(const ApiBlock& block, const ConfigOptions& config, Result result, QString message) {
+        const auto resultType = static_cast<uint8_t>(result.getType());
+        QCOMPARE(block.getRecord().getResult(), result);
+        QCOMPARE(block.getRecord().getMessage().data(), message);
+
+        QCOMPARE(block.getCountersDelta().getLog(config.logLevels[resultType]), config.logEnabled[resultType]? 1 : 0);
+
+        if(config.recordEnabled[resultType]) {
+            QCOMPARE(block.getLastCallRecord().getResult(), result);
+            QCOMPARE(block.getLastCallRecord().getMessage().data(), message);
+        } else {
+            QVERIFY(block.getLastCallRecord().getResult().isUnknown());
+            QCOMPARE(block.getLastCallRecord().getMessage().data(), "");
+        }
+
+        if(config.assertEnabled[resultType]) {
+            QVERIFY(block.didAssert());
+            QCOMPARE(block.getAssertMessage().data(), message);
+        } else QVERIFY(!block.didAssert());
+    }
+
+    MonitorableContext* getContext(void) const { return pCtx(); }
+
+protected:
+    MonitorableContext* pCtx_ = nullptr;
+    GblContext gblCtx(void) const { return *pCtx_; }
+    MonitorableContext& ctx(void) const { return *pCtx_; }
+    MonitorableContext* pCtx(void) const { return pCtx_; }
+
+};
 
 
 template<typename CRTP, typename T>
@@ -496,5 +694,9 @@ protected:
 };
 
 }
+
+
+#pragma GBL_PRAGMA_MACRO_POP("GBL_ASSERT_1");
+#pragma GBL_PRAGMA_MACRO_POP("GBL_ASSERT_2");
 
 #endif // TEST_GIMBAL_HPP

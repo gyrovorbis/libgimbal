@@ -128,6 +128,7 @@ public:
         else if(isError()) return Type::Error;
         else if(isUnknown()) return Type::Unknown;
         else GBL_ASSERT(false, "Not typed!");
+        return Type::Unknown;
     }
 
     constexpr bool isUnknown(void) const noexcept { return GBL_RESULT_UNKNOWN(getCode()); }

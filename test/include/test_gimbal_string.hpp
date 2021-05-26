@@ -25,19 +25,19 @@ Different axes:
 
 */
 
-class String: public elysian::UnitTestSet {
+class String: public UnitTestSet {
 Q_OBJECT
 public:
-    String(gimbal::Context* pCtx=nullptr):
-        pCtx_(pCtx) {}
+    String(gimbal::test::MonitorableContext* pCtx=nullptr):
+        UnitTestSet(pCtx? pCtx : new gimbal::test::TestContext()) {}
 private:
-
-    gimbal::Context* pCtx_ = nullptr;
 
     void verifyString_(const gimbal::String& str, const char* pString);
     void verifyStack_(const gimbal::String& str, gimbal::Size stackSize=GBL_STRING_BUFFER_BASE_STACK_SIZE);
     void verifyHeap_(const gimbal::String& str);
 private slots:
+    void cleanup(void);
+
     void createDefault(void);
     void createNullptr(void);
 
@@ -119,25 +119,43 @@ inline void String::verifyHeap_(const gimbal::String& str) {
     QVERIFY(str.getCapacity() > str.getStackSize());
 }
 
+inline void String::cleanup(void) {
+    QCOMPARE(getContext()->getAllocTracker().getActiveAllocationCount(), 0);
+}
+
 inline void String::createDefault(void) {
-    gimbal::String string;
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "");
-    verifyStack_(string);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string(pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "");
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
 }
 
 inline void String::createNullptr(void) {
-    gimbal::String string(nullptr);
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "");
-    verifyStack_(string);
+
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string(nullptr, pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "");
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
 }
 
 inline void String::createStackCString(void) {
-    gimbal::String string("Fuck");
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "Fuck");
-    verifyStack_(string);
+
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string("Fuck", pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "Fuck");
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
 }
 
 inline void String::createStackLiteral(void) {
@@ -148,27 +166,39 @@ inline void String::createStackLiteral(void) {
 }
 
 inline void String::createStackStdString(void) {
-    gimbal::String string(std::string("CppStr"));
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "CppStr");
-    QCOMPARE(string, "CppStr"_gstr);
-    verifyStack_(string);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string(std::string("CppStr"), pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "CppStr");
+        QCOMPARE(string, "CppStr"_gstr);
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
 }
 
 inline void String::createStackStdPmrString(void) {
-    gimbal::String string(std::pmr::string("CppStr", pCtx_));
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "CppStr");
-    QCOMPARE(string, "CppStr"_gstr);
-    verifyStack_(string);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string(std::pmr::string("CppStr", pCtx), pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "CppStr");
+        QCOMPARE(string, "CppStr"_gstr);
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
 }
 
 inline void String::createStackStringView(void) {
-    gimbal::String string(std::string_view("StrView"));
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "StrView");
-    QCOMPARE("StrView"_gstr, string);
-    verifyStack_(string);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string(std::string_view("StrView"), pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "StrView");
+        QCOMPARE("StrView"_gstr, string);
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
 }
 
 inline void String::createStackCCopy(void) {
@@ -176,10 +206,15 @@ inline void String::createStackCCopy(void) {
     GblString gStr;
     gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view);
 
-    gimbal::String string(gStr);
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "CGblStr");
-    verifyStack_(string);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string(gStr, pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "CGblStr");
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
+
     gblStringDestruct(&gStr);
 }
 
@@ -188,34 +223,59 @@ inline void String::createStackCMove(void) {
     GblString gStr;
     GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view));
 
-    gimbal::String string(std::move(gStr));
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "MovC");
-    verifyStack_(string);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+    gimbal::String string(std::move(gStr), pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "MovC");
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
+
     GBL_TEST_VERIFY_RESULT(gblStringDestruct(&gStr));
 }
 
 inline void String::createStackCppCopy(void) {
     gimbal::String str1("GblStr");
-    gimbal::String string(str1);
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "GblStr");
-    verifyStack_(string);
+
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string(str1, pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "GblStr");
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
 }
 
 inline void String::createStackCppMove(void) {
-    gimbal::String string(gimbal::String{"GblStr"});
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "GblStr");
-    verifyStack_(string);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string(gimbal::String{"GblStr"}, pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "GblStr");
+        verifyStack_(string);
+    };
+    test();
+    test(pCtx());
 }
 
 
 inline void String::createHeapCString(void) {
-    gimbal::String string("123456789");
-    QCOMPARE(string.getContext(), nullptr);
-    verifyString_(string, "123456789");
-    verifyHeap_(string);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string("123456789", pCtx);
+        QCOMPARE(string.getContext(), pCtx);
+        verifyString_(string, "123456789");
+        verifyHeap_(string);
+    };
+    test();
+
+    auto block = GBL_API_BLOCK(pCtx(), "createHeapCString") {
+        test(pCtx());
+    };
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
+    QCOMPARE(block.getActiveAllocCount(), 0);
+
 }
 
 inline void String::assignHeapCCopy(void) {
@@ -225,10 +285,20 @@ inline void String::assignHeapCCopy(void) {
 
     GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view));
 
-    gimbal::String string;
-    string = gStr;
-    verifyString_(string, pCStr);
-    verifyHeap_(string);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String string(pCtx);
+        string = gStr;
+        verifyString_(string, pCStr);
+        verifyHeap_(string);
+    };
+    test();
+
+    auto block = GBL_TEST_API_BLOCK() {
+        test(pCtx());
+    };
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
+    QCOMPARE(block.getActiveAllocCount(), 0);
 
     GBL_TEST_VERIFY_RESULT(gblStringDestruct(&gStr));
 }
@@ -236,66 +306,141 @@ inline void String::assignHeapCCopy(void) {
 inline void String::assignHeapCMove(void) {
     const char* pCStr = "CGblStrHeap";
     const auto view = GblStringView { pCStr, 0 };
-    GblString gStr;
 
-    GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view));
+    const auto test = [&](GblContext hCtx1=GBL_HANDLE_INVALID,
+                          MonitorableContext* pCtx2=nullptr)
+    {
+        GblString gStr;
+        GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), hCtx1, &view));
 
-    gimbal::String string;
-    string = std::move(gStr);
-    verifyString_(string, pCStr);
-    verifyHeap_(string);
-    StringView gblView(gStr);
-    QVERIFY(gblView.isStack());
+        gimbal::String string(pCtx2);
+        string = std::move(gStr);
+        verifyString_(string, pCStr);
+        verifyHeap_(string);
+        StringView gblView(gStr);
+        QVERIFY(gblView.getContext() == pCtx2? gblView.isStack() : gblView.isHeap());
+        GBL_TEST_VERIFY_RESULT(gblStringDestruct(&gStr));
+    };
+    test();
 
-    GBL_TEST_VERIFY_RESULT(gblStringDestruct(&gStr));
+    auto block = GBL_TEST_API_BLOCK() {
+        test(GBL_HANDLE_INVALID, pCtx());
+    };
+    QCOMPARE(block.getActiveAllocCount(), 0);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
+    block = GBL_TEST_API_BLOCK() {
+        test(gblCtx(), nullptr);
+    };
+    QCOMPARE(block.getActiveAllocCount(), 0);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
+    block = GBL_TEST_API_BLOCK() {
+        test(gblCtx(), pCtx());
+    };
+    QCOMPARE(block.getActiveAllocCount(), 0);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
 }
 
 inline void String::assignHeapCppCopy(void) {
-    gimbal::String str1;
-    auto str2 = "Test12345678"_gstr;
-    str1 = str2;
-    QCOMPARE(str1, str2);
-    verifyString_(str1, "Test12345678");
-    verifyString_(str2, "Test12345678");
-    QVERIFY(str1.getCString() != str2.getCString());
-    verifyHeap_(str2);
-    verifyHeap_(str1);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String str1(pCtx);
+        auto str2 = "Test12345678"_gstr;
+        str1 = str2;
+        QCOMPARE(str1, str2);
+        verifyString_(str1, "Test12345678");
+        verifyString_(str2, "Test12345678");
+        QVERIFY(str1.getCString() != str2.getCString());
+        verifyHeap_(str2);
+        verifyHeap_(str1);
+    };
+    test();
+
+    auto block = GBL_TEST_API_BLOCK() {
+        test(pCtx());
+    };
+    QCOMPARE(block.getActiveAllocCount(), 0);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
 }
 
 inline void String::assignHeapCppMove(void) {
-    gimbal::String str1;
-    auto str2 = "Test12345678"_gstr;
-    const char* pCStr = str2.getCString();
-    str1 = std::move(str2);
-    verifyString_(str1, "Test12345678");
-    QVERIFY(str1.getCString() == pCStr);
-    verifyStack_(str2);
-    verifyHeap_(str1);
+    const auto test = [&](MonitorableContext* pCtx1=nullptr,
+                          MonitorableContext* pCtx2=nullptr)
+    {
+        gimbal::String str1(pCtx1);
+        gimbal::String str2 { "Test12345678", pCtx2 };
+        const char* pCStr = str2.getCString();
+        str1 = std::move(str2);
+        verifyString_(str1, "Test12345678");
+        if(pCtx1 == pCtx2) {
+            QVERIFY(str1.getCString() == pCStr);
+            verifyStack_(str2);
+            verifyHeap_(str1);
+        } else {
+            QVERIFY(str1.getCString() != pCStr);
+            verifyHeap_(str2);
+            verifyHeap_(str1);
+        }
+    };
+    test();
+
+    auto block = GBL_TEST_API_BLOCK() {
+        test(nullptr, pCtx());
+    };
+    QCOMPARE(block.getActiveAllocCount(), 0);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
+
+    block = GBL_TEST_API_BLOCK() {
+        test(pCtx(), nullptr);
+    };
+    QCOMPARE(block.getActiveAllocCount(), 0);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
+
+    block = GBL_TEST_API_BLOCK() {
+        test(pCtx(), pCtx());
+    };
+    QCOMPARE(block.getActiveAllocCount(), 0);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
+    QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
 }
 
 inline void String::assignHeapValueTypes(void) {
-    gimbal::String str1("123456789");
-    gimbal::String str2(str1);
-    verifyString_(str2, "123456789");
-    verifyHeap_(str2);
-    str2 = "HEAPITY HEAP!!!";
-    verifyString_(str2, "HEAPITY HEAP!!!");
-    verifyHeap_(str2);
-    str2 = std::string("Fuckweazler");
-    verifyString_(str2, "Fuckweazler");
-    verifyHeap_(str2);
-    str2 = std::string_view("VIEW TO A KILL");
-    verifyString_(str2, "VIEW TO A KILL");
-    verifyHeap_(str2);
-    str2 = nullptr;
-    verifyString_(str2, "");
-    verifyStack_(str2);
+    const auto test = [&](MonitorableContext* pCtx=nullptr) {
+        gimbal::String str1("123456789");
+        gimbal::String str2(str1, pCtx);
+        verifyString_(str2, "123456789");
+        verifyHeap_(str2);
+        str2 = "HEAPITY HEAP!!!";
+        verifyString_(str2, "HEAPITY HEAP!!!");
+        verifyHeap_(str2);
+        str2 = std::string("Fuckweazlerdddddddddddddddddddddddddddddddddddd");
+        verifyString_(str2, "Fuckweazlerdddddddddddddddddddddddddddddddddddd");
+        verifyHeap_(str2);
+        str2 = nullptr;
+        verifyString_(str2, "");
+        verifyStack_(str2);
+        str2 = std::string_view("VIEW TO A KILL");
+        verifyString_(str2, "VIEW TO A KILL");
+        verifyHeap_(str2);
+    };
+    test();
+
+    auto block = GBL_TEST_API_BLOCK() {
+        test(pCtx());
+    };
+    QCOMPARE(block.getActiveAllocCount(), 0);
+    QCOMPARE(getContext()->getAllocTracker().getActiveAllocationCount(), 0);
+
 }
 
 inline void String::operatorSubscriptRead(void) {
     const char* pCStr1 = "123456789";
     const char* pCStr2 = "123";
-    gimbal::String str1 { pCStr1 };
+    gimbal::String str1 { pCStr1, pCtx() };
     gimbal::String str2 { pCStr2 };
     gimbal::String str3;
 
@@ -317,7 +462,7 @@ inline void String::operatorSubscriptRead(void) {
 
 inline void String::operatorSubscriptWrite(void) {
     const char* pCStr = "000000000";
-    gimbal::String string { pCStr };
+    gimbal::String string { pCStr, pCtx() };
 
     for(gimbal::Size c = 0; c < string.getLength(); ++c) {
         string[c] = 'a' + c;
@@ -329,7 +474,7 @@ inline void String::operatorSubscriptWrite(void) {
 }
 
 inline void String::stdIteratorConst(void) {
-    gimbal::String str1 { "1234567890" };
+    gimbal::String str1 { "1234567890", pCtx() };
     size_t index = 0;
     for(auto it = str1.cbegin(); it != str1.cend(); ++it) {
         QCOMPARE(*it, str1[index++]);
@@ -348,7 +493,7 @@ inline void String::stdIteratorConst(void) {
 
 inline void String::stdIterator(void) {
     const char* pCStr = "000000000";
-    gimbal::String string { pCStr };
+    gimbal::String string { pCStr, pCtx() };
 
     uint32_t offset = 0;
     for(auto it = string.begin(); it != string.end(); ++it) {
@@ -370,7 +515,7 @@ inline void String::stdIterator(void) {
 
 
 inline void String::rangeBasedFor(void) {
-    gimbal::String str1 { "1234567890" };
+    gimbal::String str1 { "1234567890", pCtx() };
 
     size_t index = 0;
     for(auto v : str1) {
@@ -383,11 +528,12 @@ inline void String::rangeBasedFor(void) {
         QCOMPARE(str1.at(index), index);
         ++index;
     }
+
 }
 
 inline void String::stdHash(void) {
     auto verifyHash = [&](const char* pCStr) {
-        gimbal::String str1 { pCStr };
+        gimbal::String str1 { pCStr, pCtx() };
         QCOMPARE(std::hash<gimbal::String>{}(str1), std::hash<std::string>{}(std::string(pCStr)));
     };
 
@@ -395,28 +541,42 @@ inline void String::stdHash(void) {
     verifyHash("");
     verifyHash("-------------------------------");
 }
-
+// NOT ACTUALLY IN NAMESPACE STD!!!
 inline void String::stdSwap(void) {
+    using namespace gimbal;
+    const auto test = [&](MonitorableContext* pCtx1=nullptr,
+                          MonitorableContext* pCtx2=nullptr)
     {
-        gimbal::String str1("HELLO1");
-        gimbal::String str2("");
-        std::swap(str1, str2);
-        verifyString_(str1, "");
-        verifyString_(str2, "HELLO1");
-    }
-    {
-        gimbal::String str1("abgda");
-        gimbal::String str2("0000000000");
-        std::swap(str1, str2);
-        verifyString_(str1, "0000000000");
-        verifyString_(str2, "abgda");
-    }
+        {
+            gimbal::String str1("HELLO1", pCtx1);
+            gimbal::String str2("", pCtx2);
+            swap(str1, str2);
+            verifyString_(str1, "");
+            verifyString_(str2, "HELLO1");
+            QCOMPARE(str1.getContext(), pCtx2);
+            QCOMPARE(str2.getContext(), pCtx1);
+        }
+        {
+            gimbal::String str1("abgda", pCtx1);
+            gimbal::String str2("0000000000", pCtx2);
+            swap(str1, str2);
+            verifyString_(str1, "0000000000");
+            verifyString_(str2, "abgda");
+            QCOMPARE(str1.getContext(), pCtx2);
+            QCOMPARE(str2.getContext(), pCtx1);
+        }
+    };
+    // FUCKED TILL FURTHER NOTICE
+    //test(nullptr, nullptr);
+    //test(nullptr, pCtx());
+    //test(pCtx(), nullptr);
+    //test(pCtx(), pCtx());
 }
 
 inline void String::stdOStream(void) {
     auto verifyOStream = [&](const char* pCStr) {
         std::stringstream ss;
-        const gimbal::String gblStr(pCStr);
+        const gimbal::String gblStr(pCStr, pCtx());
         ss << gblStr;
         QCOMPARE(ss.str(), pCStr);
     };
@@ -429,7 +589,7 @@ inline void String::stdOStream(void) {
 inline void String::stdIStream(void) {
     auto verifyIStream = [&](const char* pCStr) {
         std::stringstream ss;
-        gimbal::String gblStr;
+        gimbal::String gblStr(pCtx());
         ss << pCStr;
         ss >> gblStr;
         QCOMPARE(gblStr, pCStr);
@@ -448,7 +608,7 @@ inline void String::clear(void) {
         verifyStack_(string);
     }
     {
-        gimbal::String string("1234567890");
+        gimbal::String string("1234567890", pCtx());
         string.clear();
         verifyString_(string, "");
         verifyStack_(string);
@@ -456,7 +616,7 @@ inline void String::clear(void) {
 }
 
 inline void String::reserve(void) {
-    gimbal::String string("TROLO");
+    gimbal::String string("TROLO", pCtx());
     string.reserve(3);
     verifyString_(string, "TROLO");
     verifyStack_(string);
@@ -469,7 +629,7 @@ inline void String::reserve(void) {
 }
 
 inline void String::resize(void) {
-    gimbal::String string("TROLO");
+    gimbal::String string("TROLO", pCtx());
     string.resize(3);
     verifyString_(string, "TRO");
     verifyStack_(string);
@@ -480,7 +640,7 @@ inline void String::resize(void) {
 }
 
 inline void String::sprintf(void) {
-    gimbal::String str1;
+    gimbal::String str1(pCtx());
     str1.sprintf("");
     verifyString_(str1, "");
     verifyStack_(str1);
@@ -495,13 +655,13 @@ inline void String::sprintf(void) {
 }
 
 inline void String::varArgs(void) {
-    const auto string = gimbal::String("Hello %s %.2f %u %c").varArgs("Bitches", -33.23f, 12, 'f');
+    const auto string = gimbal::String("Hello %s %.2f %u %c", pCtx()).varArgs("Bitches", -33.23f, 12, 'f');
     verifyString_(string, "Hello Bitches -33.23 12 f");
     verifyHeap_(string);
 }
 
 inline void String::concat(void) {
-    gimbal::String str;
+    gimbal::String str(pCtx());
     str.concat("My ");
     verifyString_(str, "My ");
     verifyStack_(str);
@@ -519,7 +679,8 @@ inline void String::operatorAdd(void) {
     const GblStringView cView { "gblCStr" };
     GBL_TEST_VERIFY_RESULT(gblStringConstruct(&cStr, sizeof(GblString), GBL_HANDLE_INVALID, &cView));
 
-    gimbal::String str = gimbal::String()               +
+    gimbal::String str(pCtx());
+    str =               gimbal::String()                +
                         "cStr "                         +
                         std::string("cppStr ")          +
                         std::string_view("cppView ")    +

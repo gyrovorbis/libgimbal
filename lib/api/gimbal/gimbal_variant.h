@@ -158,7 +158,6 @@ GBL_API gblVariantCompatibleTypes(GBL_VARIANT_TYPE type1, GBL_VARIANT_TYPE type2
 GBL_API gblVariantCommonType(const GblVariant* pLhs,
                              const GblVariant* pRhs,
                              GBL_VARIANT_TYPE* pType);
-GBL_API gblVariantIsNil(const GblVariant* pVariant,   GblBool*    pValue);
 GBL_API gblVariantCopy(GblVariant* pVariant, const GblVariant* pRhs);
 
 // Get (Actual) Value
