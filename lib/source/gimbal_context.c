@@ -58,19 +58,19 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_VERBOSE("%-20s: %-100.100s", "Ref", GBL_BUILD_CI_COMMIT_BRANCH);
     GBL_API_POP(1);
 
-    GBL_API_PUSH("Job Info");
+    GBL_API_PUSH_VERBOSE("Job Info");
     GBL_API_VERBOSE("%-20s: %-100.100s", "ID", GBL_BUILD_CI_JOB_ID);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Name", GBL_BUILD_CI_JOB_NAME);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Stage", GBL_BUILD_CI_JOB_STAGE);
     GBL_API_POP(1);
 
-    GBL_API_PUSH("User Info");
+    GBL_API_PUSH_VERBOSE("User Info");
     GBL_API_VERBOSE("%-20s: %-100.100s", "Login", GBL_BUILD_CI_USER_LOGIN);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Name", GBL_BUILD_CI_USER_NAME);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Email Address", GBL_BUILD_CI_USER_EMAIL);
     GBL_API_POP(1);
 
-    GBL_API_PUSH("Build Node Info");
+    GBL_API_PUSH_VERBOSE("Build Node Info");
     GBL_API_VERBOSE("%-20s: %-100.100s", "Description", GBL_BUILD_CI_RUNNER_DESCRIPTION);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Tags", GBL_BUILD_CI_RUNNER_TAGS);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Architecture", GBL_BUILD_CI_RUNNER_ARCH);
