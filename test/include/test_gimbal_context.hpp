@@ -716,7 +716,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
             GBL_API_TRY {
                 std::pmr::vector<int> vec(1, pCtx());
                 auto val = vec.at(5);
-                GBL_MAYBE_UNUSED(val);
+                GBL_UNUSED(val);
             } GBL_API_VERIFY_CATCH();
             GBL_API_END();
         };
