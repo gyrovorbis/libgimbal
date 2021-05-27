@@ -14,28 +14,6 @@ typedef struct GblStringView { //contiguous sequence of chars, literally only ha
     GblSize     size; // MAX == null terminated!
 } GblStringView;
 
-#if 0
-GBL_API GblStringView(GblStringView* pView);
-GblStringView gblStringViewFromBuffer(const char* pBuffer, GblSize count) {
-    assert(count > 0 || !pBuffer);
-    const GblStringView value = {
-        pBuffer,
-        count
-    };
-    return value;
-}
-GblStringView gblStringViewFromCString(const char* pCString) {
-    assert(pBuffer);
-    return GblStringViewFromBuffer(pCString, strlen(pCString));
-}
-GBL_API GblStringViewFromStringView(GblStringView* pDest, GblStringView* pSource, GblSize count);
-GBL_API GblStringViewFromGblString(GblStringView* pDest, GblString* pString, GblSize count);
-
-GBL_API GblStringViewIsValid(GblStringView* pView);
-GBL_API GblStringViewSize(GblStringView* pView, GblSize* pCount);
-GBL_API GblStringViewBuffer(GblStringView* pView, const char** ppBuff); // NOT NULL TERMINATED!!!
-#endif
-
 /* C++ string view shit:
  *   copy, substr, compare, startsWith, endsWith, find, rFind, find_first_of, find_last_of
  *   find_first_not_of, find_last_not_of, Sequential/Vector iterable char array container!
@@ -56,35 +34,7 @@ typedef struct GblString {
     char            stackBuffer[GBL_STRING_BUFFER_BASE_STACK_SIZE];
 } GblString;
 
-#if 0
-//macro overload me?
-GBL_API gblStringConstruct(GblString* pString, GblSize size, GblContext hCtx, const GblStringView* pView);
-GBL_API gblStringDestruct(GblString* pStr);
 
-GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrView);
-GBL_API gblStringTake(GblString* pStr, char** ppStrPtr, GblSize* pCapacity);
-GBL_API gblStringGive(GblString* pStr, char* pData, GblSize capacity);
-GBL_API gblStringCStr(const GblString* pStr, const char** ppStr);
-
-GBL_API gblStringContext(const GblString* pStr, GblContext* pCtx);
-GBL_API gblStringStackSize(const GblString* pStr, GblSize* pSize);
-GBL_API gblStringLength(const GblString* pStr, GblSize* pLength);
-GBL_API gblStringCapacity(const GblString* pStr, GblSize* pCapacity);
-
-GBL_API gblStringClear(GblString* pStr);
-GBL_API gblStringReserve(GblString* pStr, GblSize capacity);
-GBL_API gblStringResize(GblString* pStr, GblSize length);
-
-GBL_API gblStringIsNull(const GblString* pStr, GblBool* pResult);
-GBL_API gblStringIsEmpty(const GblString* pStr, GblBool* pResult);
-GBL_API gblStringIsStack(const GblString* pStr, GblBool* pResult);
-
-GBL_API gblStringCompare(const GblString* pStr1, const GblString* pStr2, GblBool* pResult);
-GBL_API gblStringCat(const GblString* pStr, const GblStringView* pView); //+=
-
-GBL_API gblStringSnprintf(const GblString* pStr, const char* pFmt, ...);
-GBL_API gblStringVaSnprintf(const GblString* pStr, const char* pFmt, va_list varArgs);
-#endif
 
 //IMPLEMENT ME FOR CUSTOM ALLOCATION SCHEMES
 GBL_INLINE GblSize GBL_STRING_CAPACITY_FROM_SIZE_(GblSize size) {

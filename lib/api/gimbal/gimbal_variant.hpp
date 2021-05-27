@@ -4,6 +4,7 @@
 
 #include "gimbal_variant.h"
 #include "gimbal_types.hpp"
+#include "gimbal_string.hpp"
 
 namespace gimbal {
 
@@ -34,29 +35,45 @@ namespace gimbal {
         };
 
         constexpr Variant(void);
+        constexpr Variant(std::nullptr_t);
+        constexpr Variant(bool val);
+        constexpr Variant(gimbal::Int val);
+        constexpr Variant(gimbal::Float val);
+        constexpr Variant(void* pUd);
+        constexpr Variant(gimbal::String str);
+        constexpr Variant(gimbal::Object* pObj);
 
+        constexpr Variant(const Variant& rhs);
+                  Variant(Variant&& rhs);
+
+        ~Variant(void) = default; //gotta free the stringz!
+
+        constexpr Type getType(void) const;
 
         template<typename T>
-        constexpr T     getValue(void) const;
+        constexpr T     getValue(void) const; //THROW BAD TYPE EXCEPTION
 
         template<typename T>
         constexpr void setValue(T&& value) const;
 
-        //SPACE SHIP FUCKING OPERATOR
+         template<typename T>
+         Variant &operator=(T&& value);
 
+         template<typename T>
+         Variant &operator+=(T&& value); //throw bad type exception if not numeric
+
+        //SPACE SHIP FUCKING OPERATOR
         template<typename T>
         constexpr bool operator==(T&& value) const;
 
         template<typename T>
-        constexpr bool operator!=(T&& value) const;
+        constexpr bool operator<=>(T&& value) const;
 
-        //Variant operator const();
-
-        constexpr Type        getType(void) const;
-        const char*           getTypeName(void) const;
-        constexpr bool        isNil(void) const;
-        constexpr bool        isRefType(void) const;
-        constexpr bool        isIndexible(void) const;
+        Variant asBool(void) const;
+        Variant asFloat(void) const;
+        Variant asInteger(void) const;
+        Variant asString(void) const;
+        Variant asUserdata(void) const;
     };
 
     static_assert(sizeof(Variant) == sizeof(GblVariant), "C and C++ types are not the same size!");

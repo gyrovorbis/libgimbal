@@ -94,6 +94,7 @@ set(GIMBAL_SOURCES
      source/gimbal_test.c
      source/gimbal_handle.c
      source/gimbal_ext.c
+     source/gimbal_generics.cpp
 )
 
 set(GIMBAL_INCLUDES

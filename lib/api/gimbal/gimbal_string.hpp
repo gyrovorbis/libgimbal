@@ -65,37 +65,37 @@ public:
 
     Size getStackSize(void) const {
         Size size = 0;
-        Result::tryThrow(gblStringStackSize(str_(), &size));
+        Exception::checkThrow(gblStringStackSize(str_(), &size));
         return size;
     }
 
     constexpr Size getLength(void) const {
         Size length = 0;
-        Result::tryThrow(gblStringLength(str_(), &length));
+        Exception::checkThrow(gblStringLength(str_(), &length));
         return length;
     }
 
     constexpr Size getCapacity(void) const {
         Size capacity = 0;
-        Result::tryThrow(gblStringCapacity(str_(), &capacity));
+        Exception::checkThrow(gblStringCapacity(str_(), &capacity));
         return capacity;
     }
 
     Context* getContext(void) const {
         GblContext hCtx = GBL_HANDLE_INVALID;
-        Result::tryThrow(gblStringContext(str_(), &hCtx));
+        Exception::checkThrow(gblStringContext(str_(), &hCtx));
         return hCtx == GBL_HANDLE_INVALID? nullptr : Context::fromHandle(hCtx);
     }
 
     constexpr bool isEmpty(void) const {
         GblBool empty = GBL_TRUE;
-        Result::tryThrow(gblStringIsEmpty(str_(), &empty));
+        Exception::checkThrow(gblStringIsEmpty(str_(), &empty));
         return empty;
     }
 
     constexpr bool isStack(void) const {
         GblBool stack = GBL_FALSE;
-        Result::tryThrow(gblStringIsStack(str_(), &stack));
+        Exception::checkThrow(gblStringIsStack(str_(), &stack));
         return stack;
     }
 
@@ -107,7 +107,7 @@ public:
 
     const char* getCString(void) const {
         const char* pCStr = nullptr;
-        Result::tryThrow(gblStringCStr(str_(), &pCStr));
+        Exception::checkThrow(gblStringCStr(str_(), &pCStr));
         return pCStr;
     }
 
@@ -149,7 +149,7 @@ public:
     }
     friend constexpr bool operator==(const Derived& lhs, const string_base auto& rhs) {
         gimbal::Bool result = GBL_FALSE;
-        Result::tryThrow(gblStringCompare(&lhs, &rhs, &result));
+        Exception::checkThrow(gblStringCompare(&lhs, &rhs, &result));
         return result;
     }
     friend constexpr decltype(auto) operator<=>(const Derived& lhs, const string_base auto& rhs) {
@@ -157,7 +157,7 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& output, const Derived& s) {
         output << s.getCString();
-        if(output.fail()) Result::tryThrow(Result::ErrorFileWrite);
+        if(output.fail()) Exception::checkThrow(Result::ErrorFileWrite);
         return output;
     }
 };
@@ -209,7 +209,7 @@ public:
 
     String(const std::string_view& stringView, Context* pCtx=nullptr, Size size=sizeof(String)) {
         GblStringView tempView = {stringView.data(), stringView.length()};
-        Result::tryThrow(gblStringConstruct(this,
+        Exception::checkThrow(gblStringConstruct(this,
                                             size,
                                             pCtx? static_cast<GblContext>(*pCtx) : nullptr,
                                             &tempView));
@@ -233,13 +233,13 @@ public:
     }
 
     ~String(void) {
-        Result::tryThrow(gblStringDestruct(this));
+        Exception::checkThrow(gblStringDestruct(this));
     }
 
     static std::pair<char*, Size> take(GblString* pGblStr) {
         char* pCStr = nullptr;
         Size capacity = 0;
-        Result::tryThrow(gblStringTake(pGblStr, &pCStr, &capacity));
+        Exception::checkThrow(gblStringTake(pGblStr, &pCStr, &capacity));
         return { pCStr, capacity };
     }
 
@@ -248,16 +248,16 @@ public:
     }
 
     void give(std::pair<char*, Size> data) {
-        Result::tryThrow(gblStringGive(this, data.first, data.second));
+        Exception::checkThrow(gblStringGive(this, data.first, data.second));
     }
 
     void clear(void) {
-        Result::tryThrow(gblStringClear(this));
+        Exception::checkThrow(gblStringClear(this));
     }
 
     const String& operator=(std::string_view view) {
         GblStringView gview = { view.data(), view.size() };
-        Result::tryThrow(gblStringAssign(this, &gview));
+        Exception::checkThrow(gblStringAssign(this, &gview));
         return *this;
     }
 
@@ -313,20 +313,20 @@ public:
     }
 
     void reserve(Size capacity) {
-        Result::tryThrow(gblStringReserve(this, capacity));
+        Exception::checkThrow(gblStringReserve(this, capacity));
     }
 
     void resize(Size size) {
-        Result::tryThrow(gblStringResize(this, size));
+        Exception::checkThrow(gblStringResize(this, size));
     }
 
     void concat(std::string_view view) {
         const GblStringView gblView{ view.data(), view.size() };
-        Result::tryThrow(gblStringCat(this, &gblView));
+        Exception::checkThrow(gblStringCat(this, &gblView));
     }
 
     String& vasprintf(const char* pFmt, va_list varArgs) {
-        Result::tryThrow(gblStringVaSprintf(this, pFmt, varArgs));
+        Exception::checkThrow(gblStringVaSprintf(this, pFmt, varArgs));
         return *this;
     }
 
@@ -356,7 +356,7 @@ public:
         //    input.clear();
                std::getline(input, line);
         //     if(input.fail()) {
-        //         Result::tryThrow(Result::FileRead);
+        //         Exception::checkThrow(Result::FileRead);
         //     }
             s = line;
         //}

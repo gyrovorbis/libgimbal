@@ -3,6 +3,7 @@
 
 #include <gimbal/gimbal_macros.h>
 #include <QDebug>
+#include <stdexcept>
 
 #pragma GBL_PRAGMA_MACRO_PUSH("GBL_ASSERT_1");
 #undef GBL_ASSERT_1
@@ -14,6 +15,19 @@
 
 namespace gimbal::test {
     struct AssertMgr {
+
+        class AssertionException: public std::exception {
+        private:
+            std::string message_;
+        public:
+            AssertionException(std::string message):
+                message_(std::move(message)) {}
+
+            virtual const char* what(void) const noexcept override {
+                return message_.c_str();
+            }
+        };
+
         static inline bool asserted = false;
         static inline std::string message = std::string();
 
@@ -22,6 +36,7 @@ namespace gimbal::test {
                 asserted = true;
                 message = std::move(str);
                 qCritical() << "ASSERTED: " << message.c_str();
+               // throw AssertionException(message);
             }
         }
 
@@ -479,6 +494,7 @@ protected:
     ContextActiveAllocMonitor activeAllocMonitor_;
     bool asserted_ = false;
     std::string assertMsg_;
+    std::exception_ptr pException_;
 
 public:
     ApiBlock(gimbal::Handle* pHandle,
@@ -507,23 +523,33 @@ public:
                                 stackFrame_.getSourceEntry().getColumn(),
                                 *pHandle_,
                                 &stackFrame_);
-            GBL_API_TRY {
-                countersMonitor_.begin();
-                activeAllocMonitor_.begin();
-                AssertMgr::clear();
-                getHandle()->clearLastCallRecord();
+            countersMonitor_.begin();
+            activeAllocMonitor_.begin();
+            AssertMgr::clear();
+            getHandle()->clearLastCallRecord();
+            try {
                 funcBlock(&stackFrame_);
-                AssertMgr::get(&asserted_, &assertMsg_);
-                countersMonitor_.end();
-                activeAllocMonitor_.end();
-            } GBL_API_CATCH();
+            } catch(const gimbal::Exception& gblEx) {
+                try {
+                    throw std::exception(gblEx.asStdException());
+                } catch(...) {
+                    pException_ = std::current_exception();
+                }
+                throw;
+            } catch(...) {
+                pException_ = std::current_exception();
+                throw;
+            }
+            AssertMgr::get(&asserted_, &assertMsg_);
+            countersMonitor_.end();
+            activeAllocMonitor_.end();
             GBL_API_END();
         }());
         return *this;
     }
 
     operator bool() const {
-        return getRecord().getResult().isSuccess() && !didAssert();
+        return getRecord().getResult().isSuccess() && !didAssert() && !didThrow();
     }
 
     std::string_view getName(void) const { return name_; }
@@ -541,6 +567,9 @@ public:
 
     bool didAssert(void) const { return asserted_; }
     std::string_view getAssertMessage(void) const { return assertMsg_; }
+
+    bool didThrow(void) const { return static_cast<bool>(pException_); }
+    std::exception_ptr getExceptionPtr(void) const { return pException_; }
 };
 
 #define GBL_API_BLOCK(ctx_, name) \
@@ -555,24 +584,24 @@ public:
     UnitTestSet(MonitorableContext* pCtx=nullptr):
         pCtx_(pCtx) {}
 
-    void verifyBlock(const ApiBlock& block, const ConfigOptions& config, Result result, QString message) {
+    void verifyBlock(const ApiBlock& block, const ConfigOptions& config, Result result, QString message=QString()) {
         const auto resultType = static_cast<uint8_t>(result.getType());
         QCOMPARE(block.getRecord().getResult(), result);
-        QCOMPARE(block.getRecord().getMessage().data(), message);
+        if(!message.isNull()) QCOMPARE(block.getRecord().getMessage().data(), message);
 
         QCOMPARE(block.getCountersDelta().getLog(config.logLevels[resultType]), config.logEnabled[resultType]? 1 : 0);
 
         if(config.recordEnabled[resultType]) {
             QCOMPARE(block.getLastCallRecord().getResult(), result);
-            QCOMPARE(block.getLastCallRecord().getMessage().data(), message);
+            if(!message.isNull()) QCOMPARE(block.getLastCallRecord().getMessage().data(), message);
         } else {
             QVERIFY(block.getLastCallRecord().getResult().isUnknown());
-            QCOMPARE(block.getLastCallRecord().getMessage().data(), "");
+            if(!message.isNull()) QCOMPARE(block.getLastCallRecord().getMessage().data(), "");
         }
 
         if(config.assertEnabled[resultType]) {
             QVERIFY(block.didAssert());
-            QCOMPARE(block.getAssertMessage().data(), message);
+            if(!message.isNull()) QCOMPARE(block.getAssertMessage().data(), message);
         } else QVERIFY(!block.didAssert());
     }
 
@@ -581,6 +610,7 @@ public:
 protected:
     MonitorableContext* pCtx_ = nullptr;
     GblContext gblCtx(void) const { return *pCtx_; }
+    GblContext hCtx(void) const { return gblCtx(); }
     MonitorableContext& ctx(void) const { return *pCtx_; }
     MonitorableContext* pCtx(void) const { return pCtx_; }
 

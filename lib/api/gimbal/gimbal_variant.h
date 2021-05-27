@@ -161,7 +161,21 @@ GBL_API gblVariantCommonType(const GblVariant* pLhs,
 GBL_API gblVariantCopy(GblVariant* pVariant, const GblVariant* pRhs);
 
 // Get (Actual) Value
-GBL_API gblVariantGetb(const GblVariant* pVariant,    GblBool*     pValue);
+GBL_INLINE GBL_API gblVariantGetb(const GblVariant* pVariant, GblBool* pValue) {
+#if 0
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_POINTER(pVariant);
+    GBL_API_VERIFY_POINTER(pValue);
+    GBL_VARIANT_TYPE type = GBL_VARIANT_TYPE_NIL;
+    GBL_API_CALL(gblVariantType(pVariant, &type));
+    GBL_API_VERIFY(type == GBL_VARIANT_TYPE_BOOL,
+                   GBL_RESULT_ERROR_TYPE_MISMATCH);
+    *pValue = pVariant->boolean;
+    GBL_API_END();
+#endif
+    return GBL_RESULT_SUCCESS;
+}
+
 GBL_API gblVariantGets(const GblVariant* pVariant,    const char** ppValue);
 GBL_API gblVariantGetv(const GblVariant* pVariant,    void**       pValue);
 GBL_API gblVariantGett(const GblVariant* pVariant,    GblTable**   ppTable);

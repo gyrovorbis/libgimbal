@@ -454,10 +454,10 @@ inline void String::operatorSubscriptRead(void) {
     testElements(str2, pCStr2);
 
     char c;
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str1.at(-1),  gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str1.at(9),   gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str2.at(3),   gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str3.at(0),   gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str1.at(-1),  gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str1.at(9),   gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str2.at(3),   gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(c = str3.at(0),   gimbal::Result::ErrorOutOfRange);
 }
 
 inline void String::operatorSubscriptWrite(void) {
@@ -469,8 +469,8 @@ inline void String::operatorSubscriptWrite(void) {
     }
 
     verifyString_(string, "abcdefghi");
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(string.at(-1) = 0,  gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(string.at(10) = 0,  gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(string.at(-1) = 0,  gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(string.at(10) = 0,  gimbal::Result::ErrorOutOfRange);
 }
 
 inline void String::stdIteratorConst(void) {
@@ -485,10 +485,10 @@ inline void String::stdIteratorConst(void) {
         QCOMPARE(*it, str1[index--]);
     }
 
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(*str1.cend(),          gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(str1.cbegin()-1),    gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(*str1.crend(),         gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(str1.crbegin()-1),   gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*str1.cend(),          gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(str1.cbegin()-1),    gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*str1.crend(),         gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(str1.crbegin()-1),   gimbal::Result::ErrorOutOfRange);
 }
 
 inline void String::stdIterator(void) {
@@ -507,10 +507,10 @@ inline void String::stdIterator(void) {
     }
     verifyString_(string, "ihgfedcba");
 
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(*string.end() = 0,         gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(string.begin()-1) = 0,   gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(string.rend()) = 0,      gimbal::Result::ErrorOutOfBounds);
-    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(string.rbegin()-1),      gimbal::Result::ErrorOutOfBounds);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*string.end() = 0,         gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(string.begin()-1) = 0,   gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(string.rend()) = 0,      gimbal::Result::ErrorOutOfRange);
+    GBL_TEST_VERIFY_EXCEPTION_THROWN(*(string.rbegin()-1),      gimbal::Result::ErrorOutOfRange);
 }
 
 

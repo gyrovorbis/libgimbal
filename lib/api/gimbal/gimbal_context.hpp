@@ -9,6 +9,14 @@
 
 namespace gimbal {
 
+#define GBL_RESULT_CATCH(code) \
+catch(const Exception& resultException) {     \
+    code = resultException.getResult();  \
+}   \
+catch(...) {    \
+    code = Result(Result::ErrorUnhandledException);  \
+}
+
 #define GBL_CONTEXT_EXT_C_TO_CPP_BEGIN_NO_THROW(pFrame, UdType) \
     GBL_ASSERT(pFrame); \
     GBL_API_BEGIN(pFrame->hContext);    \
@@ -34,7 +42,7 @@ public:
 
     static Context* fromHandle(GblContext hCtx) {
         Context* pCtx = nullptr;
-        Result::tryThrow(gblHandleUserdata((GblHandle)hCtx, (void**)&pCtx));
+        Exception::checkThrow(gblHandleUserdata((GblHandle)hCtx, (void**)&pCtx));
         return pCtx;
     }
 
@@ -64,32 +72,32 @@ public:
             nullptr
         };
 
-        Result::tryThrow(gblContextCreate(reinterpret_cast<GblContext*>(getPrimitiveAddress()), &info));
+        Exception::checkThrow(gblContextCreate(reinterpret_cast<GblContext*>(getPrimitiveAddress()), &info));
     }
 
     using PrimitiveCompatible<GblContext, Context>::operator&;
 
     virtual ~Context(void) {
-        Result::tryThrow(gblContextDestroy(*this));
+        Exception::checkThrow(gblContextDestroy(*this));
     }
 
     Context* getParentContext(void) const; //use metatype info and getParentHandle
 
     static Version getVersion(void) {
         Version version;
-        Result::tryThrow(gblContextVersion(&version));
+        Exception::checkThrow(gblContextVersion(&version));
         return version;
     }
 
     // ===== overriding GblContext C API user callbacks =====
 
-    virtual void    logPush(const StackFrame& frame) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
-    virtual void    logPop(const StackFrame& frame, uint32_t count) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
-    virtual void    logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
+    virtual void    logPush(const StackFrame& frame) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); }
+    virtual void    logPop(const StackFrame& frame, uint32_t count) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); }
+    virtual void    logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); }
 
-    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr;}
-    virtual void*   memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr; }
-    virtual void    memFree(const StackFrame& frame, void* pPtr) { Result::throwException(GBL_RESULT_UNIMPLEMENTED); }
+    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr;}
+    virtual void*   memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr; }
+    virtual void    memFree(const StackFrame& frame, void* pPtr) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); }
 
     //===== overridden from std::pmr::memory_resource =====
     virtual void*   do_allocate(size_t bytes, size_t align) override {

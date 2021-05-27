@@ -15,7 +15,7 @@ public:
 
     Handle*         getParent(void) const {
         Handle* pHandle = nullptr;
-        Result::tryThrow(gblHandleParentGet(*this, reinterpret_cast<GblHandle*>(&pHandle)));
+        Exception::checkThrow(gblHandleParentGet(*this, reinterpret_cast<GblHandle*>(&pHandle)));
         return pHandle;
     }
     void            setParent(Handle* pParent) const;
@@ -23,23 +23,23 @@ public:
     Context*        getContext(void) const {
         GblContext hCtx = GBL_HANDLE_INVALID;
         Context* pCtx = nullptr;
-        Result::tryThrow(gblHandleContext(*this, &hCtx));
-        Result::tryThrow(gblHandleUserdata(reinterpret_cast<GblHandle>(hCtx), reinterpret_cast<void**>(&pCtx)));
+        Exception::checkThrow(gblHandleContext(*this, &hCtx));
+        Exception::checkThrow(gblHandleUserdata(reinterpret_cast<GblHandle>(hCtx), reinterpret_cast<void**>(&pCtx)));
         return pCtx;
     }
     void*           getUserdata(void) const {
         void* pUd = nullptr;
-        Result::tryThrow(gblHandleUserdata(*this, &pUd));
+        Exception::checkThrow(gblHandleUserdata(*this, &pUd));
         return pUd;
     }
     const CallRecord&    getLastCallRecord(void) const {
         const CallRecord* pCallRecord = nullptr;
-        Result::tryThrow(gblHandleLastCallRecordGet(*this, reinterpret_cast<const GblCallRecord**>(&pCallRecord)));
+        Exception::checkThrow(gblHandleLastCallRecordGet(*this, reinterpret_cast<const GblCallRecord**>(&pCallRecord)));
         return *pCallRecord;
     }
 
     void clearLastCallRecord(void) const {
-        Result::tryThrow(gblHandleLastCallRecordSet(*this, nullptr));
+        Exception::checkThrow(gblHandleLastCallRecordSet(*this, nullptr));
     }
 
 };

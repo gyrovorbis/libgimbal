@@ -142,7 +142,7 @@ private slots:
             qDebug() << QString(std::string(Result(GBL_RESULT_SUCCESS).toString()).c_str());
             qDebug() << QString(std::string(Result(static_cast<GBL_RESULT>(INTERNAL::Result::ErrorTypeMismatch)).toString()).c_str());
 
-            qDebug() << std::string(Result(Result::InvalidPointer).toString()).c_str();
+            qDebug() << std::string(Result(Result::ErrorInvalidPointer).toString()).c_str();
 
         } catch(const std::exception& ex) {
             QFAIL(ex.what());
@@ -501,13 +501,13 @@ private slots:
             GBL_API_VERIFY_EXPRESSION(3 < 1);
             GBL_API_END();
         };
-        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::InvalidExpression, "Invalid Expression: 3 < 1");
+        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidExpression, "Invalid Expression: 3 < 1");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_EXPR_2_ERROR") {
             GBL_API_VERIFY_EXPRESSION(sizeof(int) < sizeof(char), "Fucked");
             GBL_API_END();
         };
-        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::InvalidExpression, "Fucked");
+        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidExpression, "Fucked");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_EXPR_N_SUCCESS") {
             GBL_API_VERIFY_EXPRESSION(sizeof(int) > sizeof(char), "Random Shit: %d, %s, %c, %f", -12, "lulz", 'a', 12.2f);
@@ -521,7 +521,7 @@ private slots:
             GBL_API_VERIFY_HANDLE(GBL_HANDLE_INVALID);
             GBL_API_END();
         };
-        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::InvalidHandle, "Invalid Handle");
+        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidHandle, "Invalid Handle");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_HANDLE_2_PASS") {
             GBL_API_VERIFY_HANDLE(pCtx(), "Valid as fuck");
@@ -541,7 +541,7 @@ private slots:
             GBL_API_VERIFY_POINTER(NULL);
             GBL_API_END();
         };
-        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::InvalidPointer, "Invalid Pointer");
+        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidPointer, "Invalid Pointer");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_POINTER_2_PASS") {
             GBL_API_VERIFY_POINTER(pCtx(), "Valid as fuck");
@@ -563,7 +563,7 @@ private slots:
             GBL_API_VERIFY_ARG(arg2 > 50);
             GBL_API_END();
         };
-        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::InvalidArg, "Invalid Arg: arg2 > 50");
+        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidArg, "Invalid Arg: arg2 > 50");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_ARG_2_PASS") {
             float argIn = -33.0f;
@@ -620,7 +620,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
             GBL_API_CALL(gblContextVersion(nullptr));
             GBL_API_END();
         };
-        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::InvalidPointer, "Call[gblContextVersion(nullptr)] -> Result[Invalid Pointer]");
+        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidPointer, "Call[gblContextVersion(nullptr)] -> Result[Invalid Pointer]");
 
         test = GBL_API_BLOCK(pCtx(), "CALL_2_PASS") {
             GblVersion version;
@@ -646,15 +646,113 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
         // check stack and lastError to ensure it's the inner error
     }
 
+    void exceptionsThrow(void) {
+        try {
+            auto test = GBL_TEST_API_BLOCK() {
+                Exception::checkThrow(Result::ErrorUnhandledException);
+            };
+            QFAIL("Expected Exception!");
+        } catch(const gimbal::Exception& gblExcept) {
+            QCOMPARE(gblExcept.getResult(), Result(Result::ErrorUnhandledException));
+            QCOMPARE(gblExcept.getMessage(), "Unhandled Exception");
+        }
 
-    void cppExceptions(void) {
-        // try to throw success shit
-        // try to throw failure shit
-        // try to throw partial shit
-        // confirm it converts correctly to error code
-        // confirm what()'s string is right
-        // make sure C++ exceptions are caught and propagated as GBL_UNHANDLED_EXCEPTION type with correct error and shit!
-        // confirm the try/catch shit works correctly
+        try {
+            auto test = GBL_TEST_API_BLOCK() {
+                int arg1 = 0;
+                GBL_API_VERIFY_ARG(arg1 > 44);
+                GBL_API_END_BLOCK();
+                gimbal::Exception::checkThrow(GBL_API_RECORD());
+            };
+            QFAIL("Expected Exception!");
+        } catch(std::invalid_argument& invalid_arg) {
+            qDebug() << "WHAT: " << invalid_arg.what();
+        } catch(std::exception& except) {
+            qDebug() << "WTF: " << except.what();
+        } catch(gimbal::Exception& except) {
+            qDebug() << "EXCEPT: " << except.what();
+        }
+    }
+
+    void exceptionsCatch(void) {
+
+        auto block = Exception::TryBlock({SRC_FILE, SRC_FN, SRC_LN, SRC_COL}) = [&](){
+            throw std::invalid_argument("fucked argc");
+        };
+        QVERIFY(!block);
+        QCOMPARE(block.getResult(), Result::ErrorInvalidArg);
+        QCOMPARE(block.getMessage(), "fucked argc");
+
+
+        block = Exception::TryBlock({SRC_FILE, SRC_FN, SRC_LN, SRC_COL}) = [&](){
+            GBL_API_BEGIN(hCtx());
+            GBL_API_VERIFY_EXPRESSION(3 > 5);
+            GBL_API_END_BLOCK();
+            Exception::throwException(GBL_API_RECORD());
+        };
+        QVERIFY(!block);
+        QCOMPARE(block.getResult(), Result::ErrorInvalidExpression);
+        QCOMPARE(block.getMessage(), "Invalid Expression: 3 > 5");
+
+        block = Exception::TryBlock({SRC_FILE, SRC_FN, SRC_LN, SRC_COL}) = [&](){
+            throw std::bad_cast();
+        };
+        QVERIFY(!block);
+        QCOMPARE(block.getResult(), Result::ErrorUnhandledException);
+        QCOMPARE(block.getMessage(), "std::bad_cast");
+
+        block = Exception::TryBlock({SRC_FILE, SRC_FN, SRC_LN, SRC_COL}) = [&](){
+            throw "fuck off";
+        };
+        QVERIFY(!block);
+        QCOMPARE(block.getResult(), Result::ErrorUnhandledException);
+        QCOMPARE(block.getMessage(), "Unknown Exception Type!");
+
+    }
+
+    void exceptionInterop(void) {
+
+        auto test = GBL_API_BLOCK(pCtx(), "C_TO_CPP_CALL") {
+            GBL_API_TRY {
+                std::pmr::vector<int> vec(1, pCtx());
+                auto val = vec.at(5);
+                GBL_MAYBE_UNUSED(val);
+            } GBL_API_VERIFY_CATCH();
+            GBL_API_END();
+        };
+        QVERIFY(!test.didThrow());
+        QString message = test.getRecord().getMessage().data();
+        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+
+        auto block = GBL_API_TRY_BLOCK {
+            Exception::throwException(test.getRecord());
+        };
+        QVERIFY(!block);
+        QCOMPARE(block.getResult(), Result::ErrorOutOfRange);
+        QCOMPARE(block.getMessage(), message);
+
+
+        ApiBlock ptrTest(pCtx());
+        try {
+            ptrTest = GBL_TEST_API_BLOCK() {
+                Exception::checkThrow(block.getRecord());
+            };
+            QFAIL("Expected Exception!");
+        } catch(const gimbal::Exception& gblExcept) {
+            QCOMPARE(gblExcept.getResult(), Result::ErrorOutOfRange);
+            QCOMPARE(gblExcept.getMessage().data(), message);
+        }
+
+#if 0
+        QVERIFY(ptrTest.didThrow());
+
+        try {
+            throw ptrTest.getExceptionPtr();
+            QFAIL("Expected Exception!");
+        } catch(const std::exception& stdExcept) {
+            QCOMPARE(stdExcept.what(), message);
+        }
+    #endif
     }
 
     void destroy(void) {

@@ -2,12 +2,30 @@
 #define GIMBAL_GENERICS_HPP
 
 #include <stdexcept>
+#include "gimbal_api.hpp"
 
 #define GBL_CHECK_C_CPP_TYPE_COMPAT(CppType, CType) \
     GBL_STATIC_ASSERT_MSG(sizeof(CppType) == sizeof(CType), "sizeof(" #CppType ") != sizeof(" #CType")")
 
 #define GBL_ENUM_TUPLE_DECL_ENUM_CPP(cName, value, name, string) \
     name = value,
+#if 0
+
+template<typename E>
+concept enum_type {
+    requires(E e) {
+        typename E::CppType;
+        typename E::CType;
+        {
+
+
+    };
+
+template<typename E, typename T>
+concept EnumCompatible =
+    std::is_same_v<E
+        #endif
+
 
 #define GBL_ENUM_TABLE_DECLARE_CPP(table) \
     class GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME)) : \
@@ -79,6 +97,9 @@ public:
 
 class SourceLocation: public GblSourceLocation {
 public:
+    SourceLocation(const char* pFile, const char* pFunc, GblSize line, GblSize col):
+        GblSourceLocation{pFile, pFunc, line, col} {}
+
     SourceLocation(void) {
         memset(this, 0, sizeof(SourceLocation));
     }
@@ -139,7 +160,7 @@ public:
     constexpr bool isType(Type type) const noexcept { return type == getType(); }
 
     constexpr operator bool() const noexcept { return isSuccess(); }
-
+#if 0
     constexpr bool wouldThrow(void) const noexcept { return isError(); }
 
     Result checkThrow(void) const {
@@ -157,41 +178,133 @@ public:
     static Result tryThrow(Result result) {
         return result.checkThrow();
     }
+#endif
 
 };
 
 class Handle;
 
+
 class CallRecord: public GblCallRecord {
 public:
-    CallRecord(GblHandle hHandle, GBL_RESULT result, std::string_view message={}) {
 
-         //GBL_CALL_RECORD_CONSTRUCT(&pFrame->record, hHandle, initialResult, entryLoc, gblResultString(initialResult));
-        this->result = result;
-        this->hHandle = hHandle;
-        memset(this->message, 0, sizeof(this->message));
-        message.copy(this->message, sizeof(this->message));
+    template<typename R>
+        requires (std::is_constructible_v<Result, R> && !std::is_same_v<Result, R>)
+    CallRecord(R resultValue, const char* pMessage=nullptr, Handle* pHandle=nullptr, SourceLocation srcLoc={}) noexcept:
+        CallRecord(Result(resultValue), pMessage, pHandle, std::move(srcLoc)) {}
+
+    CallRecord(Result result, const char* pMessage=nullptr, Handle* pHandle=nullptr, SourceLocation srcLoc={}) noexcept;
+
+    CallRecord(const GblCallRecord& other) {
+        memcpy(this, &other, sizeof(GblCallRecord));
     }
-
 
     Handle*             getHandle(void) const;
     Result                getResult(void) const { return this->result; }
-    SourceLocation          getSource(void) const;
+    const SourceLocation&          getSource(void) const {
+        return static_cast<const SourceLocation&>(srcLocation);
+    }
 
 
     std::string_view    getMessage(void) const { return message; }
     std::string         getSourceString(void) const;
 
     std::string         toString(void) const;
-/*
-    static CallRecord& tryThrow(const CallRecord& record) {
-        return result.checkThrow();
-    }
-*/
 
 };
 
 GBL_CHECK_C_CPP_TYPE_COMPAT(CallRecord, GblCallRecord);
+
+
+
+class Exception: public CallRecord {
+public:
+
+
+    using CallRecord::CallRecord;
+    Exception(const CallRecord& record) noexcept:
+        CallRecord(record) {}
+    Exception(CallRecord&& record) noexcept:
+        CallRecord(std::move(record)) {}
+
+    virtual const char* what(void) const noexcept {
+        return getMessage().data();
+    }
+
+    virtual const std::exception&   asStdException(void) const = 0;
+    virtual std::exception&         asStdException(void) = 0;
+
+    static const CallRecord& throwException(const CallRecord& record);
+
+    static const CallRecord& checkThrow(const CallRecord& record) {
+        if(record.getResult().isError()) {
+            return throwException(record);
+        }
+        return record;
+    }
+
+    static CallRecord tryCatchRecord(std::invocable auto fn, SourceLocation loc=SourceLocation(SRC_FILE, nullptr, SRC_LN, SRC_COL));
+
+    class TryBlock {
+    private:
+        CallRecord record_;
+    public:
+
+        TryBlock(SourceLocation src=SourceLocation(SRC_FILE, "TryBlock::TryBlock()", SRC_LN, SRC_COL)):
+            record_(Result::Success, "Success", nullptr, src) {}
+
+        TryBlock& operator=(std::invocable auto fn) {
+            record_ = Exception::tryCatchRecord(std::forward<decltype(fn)>(fn), std::move(getRecord().getSource()));
+            return *this;
+        }
+
+        const CallRecord& getRecord(void) const { return record_; }
+        Result getResult(void) const { return getRecord().getResult(); }
+        const SourceLocation& getSource(void) const {return getRecord().getSource(); }
+        const char* getMessage(void) const { return getRecord().getMessage().data(); }
+
+        operator bool() const { return getRecord().getResult().isSuccess(); }
+    };
+};
+
+
+template<typename StdType>
+class StdException: public Exception, public StdType {
+public:
+
+    template<typename V>
+    requires std::is_constructible_v<CallRecord,V> && std::is_default_constructible_v<StdType>
+    StdException(V&& v) noexcept:
+        Exception(std::move(v)) {}
+
+    template<typename V1, typename V2>
+    requires std::is_constructible_v<CallRecord, V1> && std::is_constructible_v<StdType, V2>
+    StdException(V1&& v1, V2&& v2) noexcept:
+        Exception(std::move(v1)),
+        StdType(std::forward<V2>(v2)) {}
+
+    template<typename V>
+    requires std::is_constructible_v<CallRecord,V> && std::is_constructible_v<StdType, const char*>
+    StdException(V&& v) noexcept:
+        Exception(std::move(v)),
+        StdType(getMessage().data()) {}
+
+    virtual ~StdException(void) override = default;
+
+    virtual const char* what(void) const noexcept override {
+        return Exception::what();
+    }
+
+    virtual const std::exception& asStdException(void) const override {
+        return *this;
+    }
+
+    virtual std::exception& asStdException(void) override {
+        return *this;
+    }
+};
+
+
 
 class StackFrame: public GblStackFrame {
 public:
@@ -220,123 +333,6 @@ public:
 };
 
 GBL_CHECK_C_CPP_TYPE_COMPAT(StackFrame, GblStackFrame);
-
-
-
-class Exception: public CallRecord, virtual std::exception {
-public:
-    using CallRecord::CallRecord;
-
-    virtual const char* what(void) const noexcept override {
-        return getMessage().data();
-    }
-
-};
-
-
-template<typename E>
-class StdException: public Exception, virtual E {
-public:
-
-    StdException(GBL_RESULT result) noexcept: Exception(nullptr, result, Result(result).toString()) {}
-    StdException(const Exception&) noexcept;
-    StdException& operator=(const Exception&) noexcept;
-
-    StdException(CallRecord record);
-
-    virtual ~StdException(void) override = default;
-
-    virtual const char* what() const noexcept override {
-        return Exception::getMessage().data();
-    }
-};
-
-
-#if 0
-class E1 : public std::exception {};
-class E2 : public std::exception {};
-
-int main() {
-    try {
-        throw E2();
-    }
-    catch( ... ) {
-        try {
-            throw;
-        }
-        catch( const E1 & e ) {
-            std::cout << "E1\n";
-        }
-        catch( const E2 & e ) {
-            std::cout << "E2\n";
-        }
-    }
-}
-#endif
-
-
-#define GBL_RESULT_CATCH(code) \
-catch(const Exception& resultException) {     \
-    code = resultException.getResult();  \
-}   \
-catch(...) {    \
-    code = Result(Result::ErrorUnhandledException);  \
-}
-/*
-
-CPP_EXCEPTION_TABLE {
-    std::bad_alloc,
-    std::bad_cast,
-    std::bad_typeid,
-    std::bad_exception,
-    std::logic_failure,
-    std::runtime_error,
-    std::domain_error;
-    std::invalid_argument;
-    std::length_error;
-    std::out_of_range
-    std::overflow_error
-    std::range_error
-    std::underflow_error
-}*/
-
-
-#if 0
-
-void someFunc(gimbal::Context* pCtx) {
-    GBL_API_BEGIN(*pCtx);
-
-
-    try {
-       // maybeThrowShit();
-
-    } catch(...) {
-        Result result(Result::ErrorUnhandledException);
-        std::string message;
-
-        try {
-            throw;
-        } catch(const std::exception& except) {
-            message = except.what();
-        }
-
-        try {
-            throw;
-        } catch(const gimabl::Exception& gblExcept) {
-            result = gblExcept.getResult();
-        } catch(const std::bad_alloc& except) {
-            result = Result(Result::ErrorMemAlloc);
-        }
-
-        GBL_API_RECORD_SET(result, message);
-        GBL_API_DONE();
-    }
-
-    GBL_API_END();
-
-}
-
-#endif
 
 
 template<typename CRTP, typename Index, typename Value>
@@ -368,7 +364,7 @@ private:
 
 public:
     void checkBounds(Index index) const {
-       if(index >= size()) Result::tryThrow(Result::ErrorOutOfBounds);
+       if(index >= size()) Exception::checkThrow({Result::ErrorOutOfRange, "index > size"});
     }
 
     Value operator[](Index index) const {
@@ -439,7 +435,7 @@ protected:
         using iterator_category     = std::random_access_iterator_tag;
 
         void checkBounds(Index index) const {
-           if(index >= obj_.getElementCount_()) Result::tryThrow(Result::ErrorOutOfBounds);
+           if(index >= obj_.getElementCount_()) Exception::checkThrow({Result::ErrorOutOfRange, "Index >= obj.elementCount"});
         }
         reference operator* () {
             checkBounds(index_);
@@ -502,11 +498,36 @@ public:
    const_reverse_iterator   crend(void) const { return {*static_cast<const CRTP*>(this), -1}; }
 };
 
+CallRecord Exception::tryCatchRecord(std::invocable auto fn, SourceLocation loc) {
+    try {
+        fn();
+    } catch(const Exception& gblExcept) {
+        return gblExcept;
+    } catch(const std::underflow_error& ex) {
+        return { Result::ErrorUnderflow, ex.what() };
+    } catch(const std::overflow_error& ex) {
+        return { Result::ErrorOverflow, ex.what() };
+    } catch(const std::out_of_range& ex) {
+        return { Result::ErrorOutOfRange, ex.what() };
+    } catch(const std::invalid_argument& ex) {
+        return { Result::ErrorInvalidArg, ex.what() };
+    } catch(const std::bad_alloc& ex) {
+        return { Result::ErrorMemAlloc, ex.what() };
+    } catch(const std::exception& stdEx) {
+        return { Result::ErrorUnhandledException, stdEx.what() };
+    } catch(...) {
+        return { Result::ErrorUnhandledException, "Unknown Exception Type!" };
+    }
+    return Result::Success;
+}
+
+#if 0
 inline Result Result::throwException(Result result){
-       throw StdException<std::exception>(result);
+    throw Exception(CallRecord(result));
+     //  throw StdException<std::exception>(CallRecord(result));
        return result;
    }
-
+#endif
 }
 
 #endif // GIMBAL_GENERICS_HPP
