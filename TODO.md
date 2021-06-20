@@ -11,23 +11,23 @@ The Ultimate C17 and C++20 Cross-Language Runtime Framework
     - [ ] gimbal::Vector<char> compatibility? 
   
 ## Containers 
-  ### Vector 
-    - [ ] C++
-      - [ ] Add exceptions + error bounds checking
-      - [ ] Clean up + move + leverage container/iterator-compatibility concepts
-    - [ ] Testing
-      - [ ] Test errors, out-of-bounds, bad insertions, exceptions, etc
-      - [ ] Generalize + Leverage gimbal::test::String() 
-        - Heap/Stack allocation checks, move semantics verification, allocator-support
-      - [ ] Nontrivial C++ Object Type Testing
-        - nontrivial destructors, move semantics, etc need to be validated 
-      - FlexibleVector C/++ static stack storage validation (both sides)
-  ### Map 
-    - two-way tree-based associative container backed by a vector/array 
-    - full C++ std::map type compatibilty 
-    - Use C stdlib bsp qsort/find functions 
-  ### Generalized Iterators 
-    - Or is that better modeled by leveraging GblObject mechanism?
+### Vector 
+  - [ ] C++
+    - [ ] Add exceptions + error bounds checking
+    - [ ] Clean up + move + leverage container/iterator-compatibility concepts
+  - [ ] Testing
+    - [ ] Test errors, out-of-bounds, bad insertions, exceptions, etc
+    - [ ] Generalize + Leverage gimbal::test::String() 
+      - Heap/Stack allocation checks, move semantics verification, allocator-support
+    - [ ] Nontrivial C++ Object Type Testing
+      - nontrivial destructors, move semantics, etc need to be validated 
+    - FlexibleVector C/++ static stack storage validation (both sides)
+### Map 
+  - two-way tree-based associative container backed by a vector/array 
+  - full C++ std::map type compatibilty 
+  - Use C stdlib bsp qsort/find functions 
+ ### Generalized Iterators 
+  - Or is that better modeled by leveraging GblObject mechanism?
 
 - [ ] Command Line Parser 
   - [ ] C++
