@@ -1,8 +1,8 @@
 # LibGimbal
 The Ultimate C17 and C++20 Cross-Language Runtime Framework
 
-## TODO
-### String
+# TODO
+## String
   - [ ] C
     - [ ] Leverage more GblVector API calls
   - [ ] C++
@@ -10,8 +10,8 @@ The Ultimate C17 and C++20 Cross-Language Runtime Framework
     - [ ] Generalized char* container/iterator compatibilty
     - [ ] gimbal::Vector<char> compatibility? 
   
-### Containers 
-  #### Vector 
+## Containers 
+  ### Vector 
     - [ ] C++
       - [ ] Add exceptions + error bounds checking
       - [ ] Clean up + move + leverage container/iterator-compatibility concepts
@@ -22,11 +22,11 @@ The Ultimate C17 and C++20 Cross-Language Runtime Framework
       - [ ] Nontrivial C++ Object Type Testing
         - nontrivial destructors, move semantics, etc need to be validated 
       - FlexibleVector C/++ static stack storage validation (both sides)
-  #### Map 
+  ### Map 
     - two-way tree-based associative container backed by a vector/array 
     - full C++ std::map type compatibilty 
     - Use C stdlib bsp qsort/find functions 
-  #### Generalized Iterators 
+  ### Generalized Iterators 
     - Or is that better modeled by leveraging GblObject mechanism?
 
 - [ ] Command Line Parser 
