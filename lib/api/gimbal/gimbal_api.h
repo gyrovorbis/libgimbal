@@ -542,9 +542,11 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 // ================= RECORD => TOP-LEVEL DISPATCH ==============
 #define GBL_API_RECORD_HANDLER(record)          \
     do {                                        \
-        GBL_API_RECORD_LOG((record));           \
+        if(GBL_API_HANDLE()) {  \
+            GBL_API_RECORD_LOG((record));           \
+            GBL_API_RECORD_LAST_RECORD((record));   \
+        }   \
         GBL_API_RECORD_ASSERT((record));        \
-        GBL_API_RECORD_LAST_RECORD((record));   \
     } while(0)
 
 #define GBL_API_RECORD_SET_N(file, func, line, col, result, pFmt, ...)                                                                  \

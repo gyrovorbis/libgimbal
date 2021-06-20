@@ -74,6 +74,7 @@ namespace gimbal::test {
 #define GBL_TEST_VERIFY_RESULT(expr)    \
     QVERIFY(GBL_RESULT_SUCCESS((expr)))
 
+
 namespace gimbal::test {
 
 
@@ -310,6 +311,7 @@ protected:
     }
     virtual void* memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) override {
         incExtCounter(ContextCounters::ApiExtCall::MemRealloc);
+        GBL_ASSERT(allocTracker_.getActiveAllocations().constFind(pPtr) != allocTracker_.getActiveAllocations().constEnd());
         void* pRetPtr = ProxyContext::memRealloc(frame, pPtr, newSize, newAlign);
         allocTracker_.reallocEvent(frame, pPtr, newSize, newAlign, pRetPtr);
         return pRetPtr;
@@ -730,3 +732,15 @@ protected:
 #pragma GBL_PRAGMA_MACRO_POP("GBL_ASSERT_2");
 
 #endif // TEST_GIMBAL_HPP
+
+
+
+
+
+
+
+
+
+
+
+

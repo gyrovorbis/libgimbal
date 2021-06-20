@@ -106,6 +106,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/gimbal_api.h
     api/gimbal/gimbal_api.hpp
     api/gimbal/gimbal_generics.hpp
+    api/gimbal/gimbal_container.hpp
     api/gimbal/gimbal_types.h
     api/gimbal/gimbal_compiler.h
     api/gimbal/gimbal_macros_utils.h
@@ -117,6 +118,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/gimbal_variant.h
     api/gimbal/gimbal_test.h
     api/gimbal/gimbal_handle.h
+    api/gimbal/gimbal_meta.h
+    api/gimbal/gimbal_cmdline_parser.h
     api/gimbal/gimbal_types.hpp
     api/gimbal/gimbal_variant.hpp
     api/gimbal/gimbal_object.h

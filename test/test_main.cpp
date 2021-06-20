@@ -1,6 +1,7 @@
 #include <elysian_qtest.hpp>
-#include <variant_tests.hpp>
+#include <test_gimbal_variant.hpp>
 #include <test_gimbal_context.hpp>
+#include <test_gimbal_vector.hpp>
 #include <test_gimbal_string.hpp>
 #include <test_gimbal_api.hpp>
 
@@ -13,7 +14,9 @@ int main(int argc, char* argv[]) {
 qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Api);
     testSuite.enqueueTestSet(new gimbal::test::Context());
+    testSuite.enqueueTestSet(new gimbal::test::Vector());
     testSuite.enqueueTestSet(new gimbal::test::String());
+    testSuite.enqueueTestSet(new gimbal::test::Variant());
 qDebug() << "DONEZ";
     return !testSuite.exec(argc, argv);
 }

@@ -1,8 +1,7 @@
 #ifndef GIMBAL_STRING_H
 #define GIMBAL_STRING_H
 
-#include "gimbal_api.h"
-#include "gimbal_types.h"
+#include "gimbal_container.h"
 #include <stdarg.h>
 
 #ifdef __cplusplus
@@ -21,217 +20,98 @@ typedef struct GblStringView { //contiguous sequence of chars, literally only ha
 
 // GBL API BEGIN WITH NULL CONTEXT CAN STILL DO SHIT?
 
-typedef struct GblStringData {
-    char*       pBuffer;
-    GblSize     length;
-    GblSize     capacity;
-} GblStringData;
-
 typedef struct GblString {
-    GblContext      hCtx;
-    GblStringData   data;
-    GblSize         stackSize;
-    char            stackBuffer[GBL_STRING_BUFFER_BASE_STACK_SIZE];
+    GblVector data; //continue dereestification
 } GblString;
 
 
-
-//IMPLEMENT ME FOR CUSTOM ALLOCATION SCHEMES
-GBL_INLINE GblSize GBL_STRING_CAPACITY_FROM_SIZE_(GblSize size) {
-    return GBL_POW2_NEXT(size);
-}
-
 GBL_INLINE GBL_API gblStringIsEmpty(const GblString* pStr, GblBool* pResult) {
-    GBL_ASSERT(pStr);
-    GBL_ASSERT(pResult);
-    *pResult = (!pStr->data.length);
-    return GBL_RESULT_SUCCESS;
+    return gblVectorIsEmpty(&pStr->data, pResult);
 }
 
 GBL_INLINE GBL_API gblStringIsStack(const GblString* pStr, GblBool* pResult) {
-    GBL_ASSERT(pStr);
-    GBL_ASSERT(pResult);
-    *pResult = (pStr->data.pBuffer == pStr->stackBuffer);
-    return GBL_RESULT_SUCCESS;
+    return gblVectorIsStack(&pStr->data, pResult);
 }
 
 GBL_INLINE GBL_API gblStringCStr(const GblString* pStr, const char** ppStr) {
     GBL_ASSERT(pStr);
     GBL_ASSERT(ppStr);
-    *ppStr = pStr->data.pBuffer;
+    *ppStr = (const char*)pStr->data.pBuffer;
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_INLINE void gblStringInitialize_(GblString* pString) {
-    pString->data.capacity = pString->stackSize;
-    pString->data.pBuffer = pString->stackBuffer;
-    pString->data.length = 0;
-    pString->stackBuffer[0] = '\0';
-}
-
 GBL_INLINE GBL_API gblStringDestruct(GblString* pStr) {
-    GBL_API_BEGIN(pStr->hCtx);
-    // Check if we have a buffer to free
-    if(pStr->data.pBuffer && pStr->data.pBuffer != pStr->stackBuffer) {
-        if(pStr->hCtx) GBL_API_FREE(pStr->data.pBuffer);
-        else free(pStr->data.pBuffer);
-    }
-    GBL_API_END();
+    return gblVectorDestruct(&pStr->data);
 }
-
 
 GBL_INLINE GBL_API gblStringClear(GblString* pStr) {
-    GBL_API_BEGIN(pStr->hCtx);
-    GBL_API_CALL(gblStringDestruct(pStr));
-    gblStringInitialize_(pStr);
-    GBL_API_END();
+    return gblVectorClear(&pStr->data);
 }
-
-GBL_INLINE GBL_API gblStringAlloc_(GblString* pStr, GblSize capacity) {
-    GBL_API_BEGIN(pStr->hCtx);
-
-    if(capacity <= pStr->stackSize) {
-        pStr->data.pBuffer = pStr->stackBuffer;
-        pStr->data.capacity = pStr->stackSize;
-    } else {
-        pStr->data.capacity = capacity;
-
-        pStr->data.pBuffer = pStr->hCtx != GBL_HANDLE_INVALID?
-                    (char*)GBL_API_MALLOC(pStr->data.capacity) :
-                    (char*)malloc(pStr->data.capacity);
-    }
-    pStr->data.pBuffer[0] = '\0';
-    pStr->data.length = 0;
-
-    GBL_API_END();
-}
-
 
 GBL_INLINE GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrView) {
-    GBL_API_BEGIN(pStr->hCtx);
-    const GblSize newSize = !pStrView ? 0 :
-                            !pStrView->size && pStrView->pBuffer? strlen(pStrView->pBuffer) :
-                            pStrView->size;
-
-    if(pStr->data.capacity < newSize) {
-        GBL_API_CALL(gblStringClear(pStr));
-        if(newSize) GBL_API_CALL(gblStringAlloc_(pStr, GBL_STRING_CAPACITY_FROM_SIZE_(newSize + 1)));
+    GBL_API_BEGIN(pStr->data.hCtx);
+    const void* pData = NULL;
+    GblSize newSize = 0;
+    if(pStrView) {
+        if(pStrView->pBuffer) {
+            pData = pStrView->pBuffer;
+            newSize = pStrView->size? pStrView->size : strlen(pStrView->pBuffer);
+        }
     }
-
-    if(pStrView && pStrView->pBuffer) memcpy(pStr->data.pBuffer, pStrView->pBuffer, newSize);
-    pStr->data.length = newSize;
-    pStr->data.pBuffer[newSize] = '\0';
+    GBL_API_CALL(gblVectorAssign(&pStr->data, pData, newSize));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringConstruct(GblString* pString, GblSize size, GblContext hCtx, const GblStringView* pView) {
-    const GblStringView defaultView = { GBL_NULL, 0 };
+    GblStringView defaultView = { GBL_NULL, 0 };
     const GblSize extraSize = size - sizeof(GblString);
     GBL_API_BEGIN(hCtx);
-
-    GBL_API_VERIFY_POINTER(pView);
-    GBL_API_VERIFY_ARG(size >= sizeof(GblString));
-
-    pString->hCtx       = hCtx;
-    pString->stackSize  = sizeof(pString->stackBuffer) + extraSize;
-    gblStringInitialize_(pString);
-
-    if(!pView) pView = &defaultView;
-
-    GBL_API_CALL(gblStringAssign(pString, pView));
+    if(!pView) {
+        pView = &defaultView;
+    } else if(!pView->size && pView->pBuffer) {
+        defaultView.pBuffer = pView->pBuffer;
+        defaultView.size = strlen(pView->pBuffer);
+        pView = &defaultView;
+    }
+    GBL_API_CALL(gblVectorConstruct_6(&pString->data, hCtx, 1, size, pView->pBuffer, pView->size));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringTake(GblString* pStr, char** ppStrPtr, GblSize* pCapacity) {
-    GBL_API_BEGIN(pStr->hCtx);
-    GblBool stack = GBL_FALSE;
-    GBL_API_VERIFY_POINTER(ppStrPtr);
-    GBL_API_VERIFY_POINTER(pCapacity);
-    GBL_API_CALL(gblStringIsStack(pStr, &stack));
-    GBL_API_VERIFY(!stack, GBL_RESULT_ERROR_INVALID_OPERATION, "Cannot Take Stack Buffer!");
-    *ppStrPtr = pStr->data.pBuffer;
-    *pCapacity = pStr->data.capacity;
-    gblStringInitialize_(pStr);
-    GBL_API_END();
+    GblSize size = 0;
+    return gblVectorTake(&pStr->data, (void**)ppStrPtr, &size, pCapacity);
 }
 
 GBL_INLINE GBL_API gblStringGive(GblString* pStr, char* pData, GblSize capacity) {
-    GBL_API_BEGIN(pStr->hCtx);
-    GBL_API_VERIFY_POINTER(pData);
-    GBL_API_VERIFY_ARG(capacity);
-    gblStringDestruct(pStr);
-    pStr->data.pBuffer = pData;
-    pStr->data.capacity = capacity;
-    pStr->data.length = strnlen(pData, pStr->data.capacity);
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_CALL(gblVectorGive(&pStr->data, pData, capacity, capacity));
+    pStr->data.size = strlen((const char*)pStr->data.pBuffer);
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringContext(const GblString* pStr, GblContext* pCtx) {
-    GBL_API_BEGIN(pStr->hCtx);
-    GBL_API_VERIFY_POINTER(pCtx);
-    *pCtx = pStr->hCtx;
-    GBL_API_END();
+    return gblVectorContext(&pStr->data, pCtx);
 }
 
-GBL_INLINE GBL_API gblStringStackSize(const GblString* pStr, GblSize* pSize) {
-    GBL_API_BEGIN(pStr->hCtx);
-    GBL_API_VERIFY_POINTER(pSize);
-    *pSize = pStr->stackSize;
-    GBL_API_END();
+GBL_INLINE GBL_API gblStringStackBytes(const GblString* pStr, GblSize* pSize) {
+    return gblVectorStackBytes(&pStr->data, pSize);
 }
 
 GBL_INLINE GBL_API gblStringLength(const GblString* pStr, GblSize* pLength) {
-    GBL_API_BEGIN(pStr->hCtx);
-    GBL_API_VERIFY_POINTER(pLength);
-    *pLength = pStr->data.length;
-    GBL_API_END();
+    return gblVectorSize(&pStr->data, pLength);
 }
 
 GBL_INLINE GBL_API gblStringCapacity(const GblString* pStr, GblSize* pCapacity) {
-    GBL_API_BEGIN(pStr->hCtx);
-    GBL_API_VERIFY_POINTER(pCapacity);
-    *pCapacity = pStr->data.capacity;
-    GBL_API_END();
+    return gblVectorCapacity(&pStr->data, pCapacity);
 }
 
 GBL_INLINE GBL_API gblStringReserve(GblString* pStr, GblSize capacity) {
-    GBL_API_BEGIN(pStr->hCtx);
-    if(pStr->data.capacity < capacity) {
-        GblBool stack = GBL_FALSE;
-        GBL_API_CALL(gblStringIsStack(pStr, &stack));
-        if(stack) {
-            const GblSize oldLength = pStr->data.length;
-            GBL_API_CALL(gblStringAlloc_(pStr, GBL_STRING_CAPACITY_FROM_SIZE_(capacity + 1)));
-            //GBL_API_CALL(gblStringAlloc_(pStr, capacity));
-            memcpy(pStr->data.pBuffer, pStr->stackBuffer, oldLength+1);
-            pStr->data.length = oldLength;
-        } else {
-            pStr->data.pBuffer = pStr->hCtx != GBL_HANDLE_INVALID?
-                        (char*)GBL_API_REALLOC(pStr->data.pBuffer, capacity) :
-                        (char*)realloc(pStr->data.pBuffer, capacity);
-            pStr->data.capacity = capacity;
-        }
-    }
-    GBL_API_END();
+    return gblVectorReserve(&pStr->data, capacity);
 }
 
-
-GBL_INLINE GBL_API gblStringResize(GblString* pStr, GblSize length) {
-    GBL_API_BEGIN(pStr->hCtx);
-    if(length > pStr->data.length) {
-
-        if(length+1 > pStr->data.capacity) {
-            GBL_API_CALL(gblStringReserve(pStr, GBL_STRING_CAPACITY_FROM_SIZE_(length + 1)));
-        }
-
-        //pStr->data.pBuffer[pStr->data.length] = ' '; remove old null character so strlen isn't wrong!
-    }
-
-    pStr->data.pBuffer[length] = '\0';
-    pStr->data.length = length;
-    GBL_API_END();
+GBL_INLINE GBL_API gblStringResize(GblString* pStr, GblSize size) {
+    return gblVectorResize(&pStr->data, size);
 }
-
 
 GBL_INLINE GBL_API gblStringCompare(const GblString* pStr1, const GblString* pStr2, GblBool* pResult) {
     GBL_ASSERT(pStr1);
@@ -253,51 +133,152 @@ GBL_INLINE GBL_API gblStringCompare(const GblString* pStr1, const GblString* pSt
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_INLINE GBL_API gblStringCat(GblString* pStr, const GblStringView* pView) {
-    GBL_API_BEGIN(pStr->hCtx);
-    GblSize expectedSize = 0;
+GBL_INLINE GBL_API gblStringInsert(GblString* pStr, GblSize index, const GblStringView* pView) {
+    GblSize count = 0;
+    GBL_API_BEGIN(pStr->data.hCtx);
     GBL_API_VERIFY_POINTER(pView);
-    GBL_API_VERIFY_ARG(pView->pBuffer && pView->size);
-    GBL_API_CALL(gblStringLength(pStr, &expectedSize));
-    expectedSize += pView->size;
-    GBL_API_CALL(gblStringReserve(pStr, expectedSize + 1));
-    GBL_API_VERIFY(strncat(pStr->data.pBuffer, pView->pBuffer, pView->size), GBL_RESULT_ERROR_INTERNAL);
-    GBL_API_VERIFY(strlen(pStr->data.pBuffer) == expectedSize, GBL_RESULT_ERROR_INTERNAL);
-    pStr->data.length = expectedSize;
+    if(pView->size) {
+        count = pView->size;
+    } else if(pView->pBuffer) {
+        count = strlen(pView->pBuffer);
+    }
+    GBL_API_VERIFY_EXPRESSION(count != 0);
+    GBL_API_CALL(gblVectorInsert(&pStr->data, index, count, pView->pBuffer, NULL));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringVaSprintf(GblString* pStr, const char* pFmt, va_list varArgs) {
-    GBL_API_BEGIN(pStr->hCtx);
+    GBL_API_BEGIN(pStr->data.hCtx);
     GblSize newCapacity = 0;
     size_t expectedSize = 0;
+    va_list varArgsCopy;
+
     GBL_API_VERIFY_POINTER(pFmt);
 
     //Check if shit's empty
     expectedSize = strlen(pFmt) + 1;
     if(expectedSize <= 1) GBL_UNLIKELY {
         pStr->data.pBuffer[0] = '\0';
-        pStr->data.length = 0;
+        pStr->data.size = 0;
     } else GBL_LIKELY {
         //Make a first guess at the required size
-        newCapacity = GBL_STRING_CAPACITY_FROM_SIZE_(expectedSize);
+        newCapacity = GBL_VECTOR_CAPACITY_FROM_SIZE_(expectedSize);
         GBL_API_CALL(gblStringReserve(pStr, newCapacity));
         GBL_API_ERRNO_CLEAR();
-        expectedSize = vsnprintf(pStr->data.pBuffer, pStr->data.capacity, pFmt, varArgs);
-        pStr->data.length = expectedSize;
+        va_copy(varArgsCopy, varArgs);
+        expectedSize = vsnprintf(pStr->data.pBuffer, pStr->data.capacity, pFmt, varArgsCopy);
+        pStr->data.size = expectedSize;
+        va_end(varArgsCopy);
         GBL_API_PERROR("vsnprintf failed with code: %zu", expectedSize);
         //Multi-pass, try again with real size!
-        if(expectedSize >= newCapacity) GBL_UNLIKELY {
-            newCapacity = GBL_STRING_CAPACITY_FROM_SIZE_(expectedSize + 1);
+        if(expectedSize >= pStr->data.capacity) GBL_UNLIKELY {
+            newCapacity = GBL_VECTOR_CAPACITY_FROM_SIZE_(expectedSize + 1);
+            GBL_API_CALL(gblStringReserve(pStr, newCapacity));
             GBL_API_ERRNO_CLEAR();
             expectedSize = vsnprintf(pStr->data.pBuffer, pStr->data.capacity, pFmt, varArgs);
-            pStr->data.length = expectedSize;
+            pStr->data.size = expectedSize;
             GBL_API_PERROR("vsnprintf failed with code: %zu", expectedSize);
-            GBL_API_VERIFY(expectedSize == newCapacity - 1, GBL_RESULT_TRUNCATED); //better have written it all
+            GBL_API_VERIFY(expectedSize < pStr->data.capacity, GBL_RESULT_TRUNCATED); //better have written it all
         }
     }
     GBL_API_END();
 }
+
+GBL_INLINE GBL_API gblStringSprintf(GblString* pStr, const char* pFmt, ...) {
+    GBL_API_BEGIN(pStr->data.hCtx);
+    va_list varArgs;
+    va_start(varArgs, pFmt);
+    GBL_API_CALL(gblStringVaSprintf(pStr, pFmt, varArgs));
+    va_end(varArgs);
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringToi(const GblString* pStr, GblInt* pValue) {
+    const char* pCStr = NULL;
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_VERIFY_POINTER(pValue);
+    GBL_API_CALL(gblStringCStr(pStr, &pCStr));
+    *pValue = atoi(pCStr);
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringTof(const GblString* pStr, GblFloat* pValue) {
+    const char* pCStr = NULL;
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_VERIFY_POINTER(pValue);
+    GBL_API_CALL(gblStringCStr(pStr, &pCStr));
+    *pValue = atof(pCStr);
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringTob(const GblString* pStr, GblBool* pValue) {
+    const char* pCStr = NULL;
+    *pValue = GBL_FALSE;
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_VERIFY_POINTER(pValue);
+    GBL_API_CALL(gblStringCStr(pStr, &pCStr));
+    if(strncmp(pCStr, "true", sizeof("true")) == 0) {
+        *pValue = GBL_TRUE;
+    } else {
+        GblInt integer = 0;
+        GBL_API_CALL(gblStringToi(pStr, &integer));
+        *pValue = (integer != 0)? GBL_TRUE : GBL_FALSE;
+    }
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringToNil(const GblString* pStr, GblBool* pValue) {
+    const char* pCStr = NULL;
+    GblSize length = 0;
+    *pValue = GBL_FALSE;
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_VERIFY_POINTER(pValue);
+    GBL_API_CALL(gblStringCStr(pStr, &pCStr));
+    GBL_API_CALL(gblStringLength(pStr, &length));
+    if(!length || strncmp(pCStr, "nil", sizeof("nil")) == 0) {
+        *pValue = GBL_TRUE;
+    }
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringFromNil(GblString* pStr) {
+    GblStringView view;
+    GBL_API_BEGIN(pStr->data.hCtx);
+    view.pBuffer = "nil"; view.size = sizeof("nil");
+    GBL_API_CALL(gblStringAssign(pStr, &view));
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringFromb(GblString* pStr, GblBool value) {
+    GblStringView view;
+    GBL_API_BEGIN(pStr->data.hCtx);
+    if(value) {
+        view.pBuffer = "true"; view.size = sizeof("true");
+    } else {
+        view.pBuffer = "false"; view.size = sizeof("false");
+    }
+    GBL_API_CALL(gblStringAssign(pStr, &view));
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringFromi(GblString* pStr, GblInt value) {
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_CALL(gblStringSprintf(pStr, "%d", value));
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringFromf(GblString* pStr, GblFloat value) {
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_CALL(gblStringSprintf(pStr, "%." GBL_STRINGIFY(GBL_STRING_FLOAT_DECIMAL_PLACES) "f", value));
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringFromp(GblString* pStr, const void* pPtr) {
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_CALL(gblStringSprintf(pStr, "0x%x", pPtr));
+    GBL_API_END();
+}
+
 
 /*
  * FIND, TOKENIZE, REPLACE, TO UPPER, TO LOWER, LOCATE LAST TOKEN FOR SUFFIX/EXTENSION SHIT

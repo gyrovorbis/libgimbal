@@ -140,7 +140,6 @@ private slots:
             qDebug() << QString(std::string(Result(GBL_RESULT_ERROR_INVALID_ARG).toString()).c_str());
             qDebug() << QString(std::string(Result(GBL_RESULT_TRUNCATED).toString()).c_str());
             qDebug() << QString(std::string(Result(GBL_RESULT_SUCCESS).toString()).c_str());
-            qDebug() << QString(std::string(Result(static_cast<GBL_RESULT>(INTERNAL::Result::ErrorTypeMismatch)).toString()).c_str());
 
             qDebug() << std::string(Result(Result::ErrorInvalidPointer).toString()).c_str();
 

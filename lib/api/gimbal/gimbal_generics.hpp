@@ -2,6 +2,7 @@
 #define GIMBAL_GENERICS_HPP
 
 #include <stdexcept>
+#include <iterator>
 #include "gimbal_api.hpp"
 
 #define GBL_CHECK_C_CPP_TYPE_COMPAT(CppType, CType) \
@@ -27,7 +28,7 @@ concept EnumCompatible =
         #endif
 
 
-#define GBL_ENUM_TABLE_DECLARE_CPP(table) \
+#define GBL_ENUM_TABLE_DECLARE_CPP_BEGIN(table) \
     class GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME)) : \
         public gimbal::PrimitiveBase<GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME))> { \
         using CppType = GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME));  \
@@ -36,16 +37,18 @@ concept EnumCompatible =
         enum Value { \
             GBL_MAP_TUPLES(GBL_ENUM_TUPLE_DECL_ENUM_CPP,  GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table))  \
         };  \
-        constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(void) noexcept = default; \
+        constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(void) noexcept: gimbal::PrimitiveBase<CType>(static_cast<CType>(0)) {} \
         constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(Value value) noexcept: CppType(static_cast<CType>(value)) {}  \
         constexpr GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME))(CType code) noexcept: gimbal::PrimitiveBase<CType>(code) {}  \
         constexpr operator Value() const noexcept { return getValue(); } \
         constexpr CType getCode(void) const noexcept { return static_cast<CType>(getPrimitiveValue()); }    \
         constexpr Value getValue(void) const noexcept { return static_cast<Value>(getPrimitiveValue()); }   \
-        constexpr std::string_view toString(void) const { \
-            GBL_ENUM_TABLE_TO_STRING(table, getCode());   \
-            throw std::runtime_error(std::string("Unhandled Error Code: ") + std::to_string(getCode()));    \
-            return "Unhandled";    \
+        std::string_view toString(void) const { \
+            const char* pStr = GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, STRINGIFIER))(getCode()); \
+            if(strcmp(pStr, "") == 0) { \
+                throw std::runtime_error(std::string("Unhandled Enum Value ") + std::to_string(getCode()));    \
+            }   \
+            return pStr; \
         } \
         constexpr GblEnum toInt(void) const noexcept { return static_cast<GblEnum>(getCode()); } \
         constexpr bool isInRange(void) const noexcept { return false; } \
@@ -54,9 +57,16 @@ concept EnumCompatible =
         }   \
         constexpr friend bool operator!=(CppType rhs, Value lhs) {    \
             return !(rhs == lhs);   \
-        }   \
+        }
+
+
+#define GBL_ENUM_TABLE_DECLARE_CPP_END(table) \
     }; \
     GBL_CHECK_C_CPP_TYPE_COMPAT(GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, NAME)), GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME)))
+
+#define GBL_ENUM_TABLE_DECLARE_CPP(table) \
+    GBL_ENUM_TABLE_DECLARE_CPP_BEGIN(table) \
+    GBL_ENUM_TABLE_DECLARE_CPP_END(table)
 
 
 namespace gimbal {
@@ -123,12 +133,8 @@ public:
 
 GBL_CHECK_C_CPP_TYPE_COMPAT(SourceLocation, GblSourceLocation);
 
-namespace INTERNAL {
-    GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_RESULT_TABLE);
-}
 
-
-class Result: public INTERNAL::Result {
+GBL_ENUM_TABLE_DECLARE_CPP_BEGIN(GBL_META_RESULT_TABLE)
 public:
     enum class Type: uint8_t {
         Success,
@@ -138,11 +144,8 @@ public:
         Count
     };
 
-    using INTERNAL::Result::Result;
-    constexpr Result(void) noexcept: INTERNAL::Result(GBL_RESULT_UNKNOWN) {}
-    constexpr Result(bool success) noexcept: INTERNAL::Result(success? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR) {}
+    constexpr Result(bool success) noexcept: Result(success? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR) {}
 
-    std::string_view toString(void) const noexcept { return gblResultString(getCode()); }
     constexpr Type getType(void) const noexcept {
         if(isSuccess()) return Type::Success;
         else if(isPartial()) return Type::Partial;
@@ -160,27 +163,7 @@ public:
     constexpr bool isType(Type type) const noexcept { return type == getType(); }
 
     constexpr operator bool() const noexcept { return isSuccess(); }
-#if 0
-    constexpr bool wouldThrow(void) const noexcept { return isError(); }
-
-    Result checkThrow(void) const {
-        if(wouldThrow()) GBL_UNLIKELY {
-            return throwException(*this);
-        }
-        return *this;
-    }
-
-    // Statics
-
-
-    static Result throwException(Result result);
-
-    static Result tryThrow(Result result) {
-        return result.checkThrow();
-    }
-#endif
-
-};
+GBL_ENUM_TABLE_DECLARE_CPP_END(GBL_META_RESULT_TABLE);
 
 class Handle;
 
@@ -243,7 +226,7 @@ public:
         return record;
     }
 
-    static CallRecord tryCatchRecord(std::invocable auto fn, SourceLocation loc=SourceLocation(SRC_FILE, nullptr, SRC_LN, SRC_COL));
+    static CallRecord tryCatchRecord(std::invocable auto fn, SourceLocation loc=SourceLocation(SRC_FILE, nullptr, SRC_LN, SRC_COL)) noexcept;
 
     class TryBlock {
     private:
@@ -336,7 +319,7 @@ GBL_CHECK_C_CPP_TYPE_COMPAT(StackFrame, GblStackFrame);
 
 
 template<typename CRTP, typename Index, typename Value>
-class ReadWriteIndexable {
+class ReadWriteContiguousIndexable {
 private:
 
     class IndexableProxy {
@@ -359,7 +342,6 @@ private:
             pObject_->setElement_(index_, std::forward<RValue>(rhs));
             return *this;
         }
-
     };
 
 public:
@@ -412,22 +394,26 @@ public:
     }
 };
 
+    namespace tags {
+        struct RandomAccessIteratorBase {};
+    }
 
-template<typename CRTP, typename Index, typename Value>
-class RandomAccessIterable {
-protected:
-
-    template<typename O, bool Reverse>
-    struct iterator_base {
+    template<typename O, typename Index, typename Value, bool Reverse>
+    struct RandomAccessIterator:
+            public tags::RandomAccessIteratorBase,
+            public std::iterator<std::random_access_iterator_tag, Value> {
         constexpr static inline bool
               reverse               = Reverse;
         using object_type           = O;
-        using iterator_type         = iterator_base<O, Reverse>;
+        using iterator_type         = RandomAccessIterator<O, Index, Value, Reverse>;
+        using const_iterator_type   = RandomAccessIterator<std::add_const_t<O>, Index, Value, Reverse>;
+        using nonconst_iterator_type  = RandomAccessIterator<std::remove_const_t<O>, Index, Value, Reverse>;
         using value_type            = Value;
         using index_type            = std::make_signed_t<Index>;
         using reference             = std::conditional_t<std::is_const_v<O>,
                                         std::add_lvalue_reference_t<std::add_const_t<Value>>,
                                         std::add_lvalue_reference_t<Value>>;
+        using const_reference       = std::add_const_t<reference>;
         using pointer               = std::conditional_t<std::is_const_v<O>,
                                         std::add_pointer_t<std::add_const_t<Value>>,
                                         std::add_pointer_t<Value>>;
@@ -435,17 +421,29 @@ protected:
         using iterator_category     = std::random_access_iterator_tag;
 
         void checkBounds(Index index) const {
-           if(index >= obj_.getElementCount_()) Exception::checkThrow({Result::ErrorOutOfRange, "Index >= obj.elementCount"});
+           if(index >= pObj_->getElementCount_()) Exception::checkThrow({Result::ErrorOutOfRange, "Index >= obj.elementCount"});
         }
+#if 0
+        template<typename T = reference>
+        std::enable_if_t<!std::is_const_v<object_type>, T> operator* () {
+            checkBounds(index_);
+            return pObj_->getElement_(index_);
+        }
+#else
         reference operator* () {
             checkBounds(index_);
-            return obj_.getElement_(index_) ;
+            return pObj_->getElement_(index_);
         }
+#endif
+        const_reference operator* () const {
+            checkBounds(index_);
+            return const_cast<const O*>(pObj_)->getElement_(index_);
+        }
+
         pointer operator& () {
             checkBounds(index_);
-            return &obj_.getElement_(index_);
+            return &pObj_->getElement_(index_);
         }
-        //pointer operator-> () { return &**this ; } // *** EDIT
 
         iterator_type& operator++ () {
             if constexpr(Reverse) --index_;
@@ -471,34 +469,76 @@ protected:
         }
         iterator_type& operator+=(index_type offset) { if constexpr(Reverse) index_ -= offset; else index_ += offset; return *this; }
         iterator_type& operator-=(index_type offset) { if constexpr(Reverse) index_ += offset; else index_ -= offset; return *this; }
-        iterator_type operator+(index_type offset) { auto temp(*this); if constexpr(Reverse) temp.index_ -= offset; else temp.index_ += offset; return temp; }
-        iterator_type operator-(index_type offset) { auto temp(*this); if constexpr(Reverse) temp.index_ += offset; else temp.index_ -= offset; return temp; }
 
-        bool operator== (const iterator_type& rhs) const { return &obj_ == &rhs.obj_ && index_ == rhs.index_; }
+        friend iterator_type operator+(const iterator_type& it, index_type offset) { auto temp(it); if constexpr(Reverse) temp.index_ -= offset; else temp.index_ += offset; return temp; }
+        friend iterator_type operator+(index_type offset, const iterator_type& it) { if constexpr(!Reverse) return it + offset; else return it - offset; }
+        friend iterator_type operator-(const iterator_type& it, index_type offset) { auto temp(it); if constexpr(Reverse) temp.index_ += offset; else temp.index_ -= offset; return temp; }
+        iterator_type operator+(const iterator_type& rhs) const { if constexpr(!Reverse) return *this + rhs.index_; else return *this - rhs.index_; }
+        //difference_type operator-(const iterator_type& rhs) const { auto temp(*this); if constexpr(Reverse) temp.index_ += rhs.index_; else temp.index_ -= rhs.index_; return temp.index_; }
+        difference_type operator-(const iterator_type& rhs) const { auto temp(*this); temp.index_ -= rhs.index_; return temp.index_; }
+
+        reference operator[](difference_type offset) const {
+            return pObj_->getElement_(index_ + offset);
+        }
+
+        bool operator== (const iterator_type& rhs) const { return pObj_ == pObj_ && index_ == rhs.index_; }
+        bool operator<=  (const iterator_type& rhs) const { return pObj_ == rhs.pObj_ && index_ <= rhs.index_; }
+        bool operator<  (const iterator_type& rhs) const { return pObj_ == rhs.pObj_ && index_ < rhs.index_; }
+        bool operator>  (const iterator_type& rhs) const { return pObj_ == rhs.pObj_ && index_ > rhs.index_; }
+        bool operator>=  (const iterator_type& rhs) const { return pObj_ == rhs.pObj_ && index_ >= rhs.index_; }
         bool operator!= (const iterator_type& rhs) const { return !(*this == rhs); }
 
-        O&    obj_;
-        index_type index_={};
+        RandomAccessIterator(void)=default;
+
+        RandomAccessIterator(const const_iterator_type& rhs) requires(std::is_const_v<O>):
+            pObj_(rhs.pObj_), index_(rhs.index_) {}
+
+        RandomAccessIterator(O& objType, index_type index=-1):
+            pObj_(&objType), index_(index) {}
+
+        RandomAccessIterator(const nonconst_iterator_type& rhs):
+            RandomAccessIterator(*rhs.pObj_, rhs.index_) {}
+
+        O*    pObj_         =   nullptr;
+        index_type index_   =   -1;
     };
+
+
+template<typename CRTP, typename Index, typename Value>
+class RandomAccessIterable {
 public:
 
-    using iterator                  = iterator_base<CRTP, false>;
-    using reverse_iterator          = iterator_base<CRTP, true>;
-    using const_iterator            = iterator_base<std::add_const_t<CRTP>, false>;
-    using const_reverse_iterator    = iterator_base<std::add_const_t<CRTP>, true>;
+    using iterator                  = RandomAccessIterator<CRTP, Index, Value, false>;
+    using reverse_iterator          = RandomAccessIterator<CRTP, Index, Value, true>;
+    using const_iterator            = RandomAccessIterator<std::add_const_t<CRTP>, Index, Value, false>;
+    using reverse_const_iterator    = RandomAccessIterator<std::add_const_t<CRTP>, Index, Value, true>;
+
+    static_assert(std::random_access_iterator<iterator>,                "iterator_not STL-compatible!");
+    static_assert(std::random_access_iterator<reverse_iterator>,        "reverse_iterator not STL-compatible!");
+    static_assert(std::random_access_iterator<const_iterator>,          "const_iterator not STL-compatible!");
+    static_assert(std::random_access_iterator<reverse_const_iterator>,  "reverse_const_iterator not STL-compatible!");
 
 public:
+    //return revierse iterators
    iterator                 begin(void) { return {*static_cast<CRTP*>(this), 0}; }
-   reverse_iterator         rbegin(void) { return {*static_cast<CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()-1 }; }
+   auto                     begin(void) const { return cbegin(); }
+   //reverse_iterator         rbegin(void) { return {*static_cast<CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()-1 }; }
+   auto         rbegin(void) { return std::make_reverse_iterator(end()); }
+   auto                     rbegin(void) const { return crbegin(); }
    iterator                 end(void) { return {*static_cast<CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()}; }
-   reverse_iterator         rend(void) { return {*static_cast<CRTP*>(this), -1}; }
+   auto                     end(void) const { return cend(); }
+   //reverse_iterator         rend(void) { return {*static_cast<CRTP*>(this), -1}; }
+   auto         rend(void) { return std::make_reverse_iterator(begin()); }
+   auto                     rend(void) const { return crend(); }
    const_iterator           cbegin(void) const { return {*static_cast<const CRTP*>(this), 0}; }
-   const_reverse_iterator   crbegin(void) const { return {*static_cast<const CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()-1}; }
+   //reverse_const_iterator   crbegin(void) const { return {*static_cast<const CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()-1}; }
+   auto   crbegin(void) const { return std::make_reverse_iterator(cend()); }
    const_iterator           cend(void) const { return {*static_cast<const CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()}; }
-   const_reverse_iterator   crend(void) const { return {*static_cast<const CRTP*>(this), -1}; }
+   //reverse_const_iterator   crend(void) const { return {*static_cast<const CRTP*>(this), -1}; }
+   auto crend(void) const { return std::make_reverse_iterator(cbegin()); }
 };
 
-CallRecord Exception::tryCatchRecord(std::invocable auto fn, SourceLocation loc) {
+CallRecord Exception::tryCatchRecord(std::invocable auto fn, SourceLocation loc) noexcept {
     try {
         fn();
     } catch(const Exception& gblExcept) {
@@ -521,13 +561,6 @@ CallRecord Exception::tryCatchRecord(std::invocable auto fn, SourceLocation loc)
     return Result::Success;
 }
 
-#if 0
-inline Result Result::throwException(Result result){
-    throw Exception(CallRecord(result));
-     //  throw StdException<std::exception>(CallRecord(result));
-       return result;
-   }
-#endif
 }
 
 #endif // GIMBAL_GENERICS_HPP

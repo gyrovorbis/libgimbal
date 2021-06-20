@@ -3,30 +3,15 @@
 
 #include "gimbal_object.h"
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if 0
-GBL_DECLARE_ENUM(GBL_HANDLE_TYPE) {
-    GBL_HANDLE_CONTEXT,
-    GBL_HANDLE_COUNT
-    GBL_HANDLE_USERTYPE=GBL_HANDLE_COUNT
-};
-
-typedef GBL_API_RESULT (*GblHandleConstructorFn)(GblHandleBase* pBase);
-typedef GBL_API_RESULT (*GblHandleDestructorFn)(GblHandleBase* pBase);
-
-
-typedef struct GblHandleMetaType {
-    GBL_HANDLE_TYPE type;
-    GblHandleConstructorFn  pFnVConstructor;
-    GblHandleDestructorFn   pFnVDestructor;
-} GblHandleMetaType;
-#endif
-
 GBL_DECLARE_OPAQUE(GblContext);
 GBL_DECLARE_OPAQUE(GblHandle);
+
+// ADD EVENTHANDLER CALLBACK SHIT
 
 typedef struct GblHandleCreateInfo {
     GblHandle   hParent;

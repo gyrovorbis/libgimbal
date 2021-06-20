@@ -25,7 +25,7 @@ typedef uint32_t                        GblVersion;
 // ======== Log Level ============
 
 #define GBL_META_LOG_LEVEL_TABLE (                                              \
-        ( GBL_LOG_LEVEL, LogLevel, "Log Message Severity Level"),               \
+        ( GBL_LOG_LEVEL, LogLevel, "Log Message Severity Level", gblLogLevelString),               \
         (                                                                       \
             (GBL_LOG_LEVEL_DEBUG,       0x0,    Debug,      "Debug"),           \
             (GBL_LOG_LEVEL_VERBOSE,     0x1,    Verbose,    "Verbose"),         \
@@ -37,6 +37,25 @@ typedef uint32_t                        GblVersion;
     )
 
 GBL_ENUM_TABLE_DECLARE(GBL_META_LOG_LEVEL_TABLE);
+
+
+// ======== Events ============
+
+#define GBL_META_EVENT_TYPE_TABLE (                                                             \
+        ( GBL_EVENT_TYPE, EventType, "EventType", gblEventTypeString),                                              \
+        (                                                                                       \
+            (GBL_EVENT_TYPE_CONTEXT_CREATE,     0x0,    ContextCreate,     "ContextCreate"),    \
+            (GBL_EVENT_TYPE_CONTEXT_DESTROY,    0x1,    ContextDestroy,    "ContextDestroy"),   \
+            (GBL_EVENT_TYPE_BUILTIN_COUNT,      0x2,    BuiltinCount,      "BuiltinCount")      \
+        )                                                                                       \
+    )
+
+GBL_ENUM_TABLE_DECLARE(GBL_META_EVENT_TYPE_TABLE);
+
+typedef struct GblEvent {
+    GBL_EVENT_TYPE  eventType;
+    GblSize         size;
+} GblEvent;
 
 // =============== API RESULT ==================
 

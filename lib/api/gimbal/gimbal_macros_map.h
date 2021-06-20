@@ -75,26 +75,7 @@
 
 
 
-#define GBL_ENUM_TABLE_DECL_ENUM(cName, value, name, string) \
-    cName = value,
-
-
-#define GBL_ENUM_TABLE_DECLARE(table) \
-    GBL_DECLARE_ENUM(GBL_META_ENUM_CNAME(table)) { \
-        GBL_MAP_TUPLES(GBL_ENUM_TABLE_DECL_ENUM,  GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)) \
-    }
-
-#define GBL_ENUM_TABLE_RETURN_STRING(cName, value, name, string) \
-    case value: return string;
-
-#define GBL_ENUM_TABLE_TO_STRING(table, value) \
-    switch(value) { \
-        GBL_MAP_TUPLES(GBL_ENUM_TABLE_RETURN_STRING, GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)) \
-    }
-
-
-// === CLEAN ME LATER, PART OF TUPLE/TABLE META SHIT ===========
-
+// ===== MISC META SHIT TO CLEAN LATER ====
 #define GBL_DECL_VAR_TYPE(type, ...) \
     type
 #define GBL_DECL_VAR_NAME(type, name) \
@@ -112,13 +93,47 @@
 #define GBL_DECL_VAR_PAIR(pair) \
   GBL_DECL_VAR pair
 
+
+
+
+// === ENUM SHIT CLEAN ME LATER!!!===========
+
+#define GBL_ENUM_TABLE_DECL_ENUM(cName, value, name, string) \
+    cName = value,
+
+
+#define GBL_ENUM_TABLE_DECLARE(table) \
+    GBL_DECLARE_ENUM(GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME))) { \
+        GBL_MAP_TUPLES(GBL_ENUM_TABLE_DECL_ENUM,  GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)) \
+    }; \
+    GBL_ENUM_TABLE_DECLARE_STRINGIFIER(table)
+
+#define GBL_ENUM_TABLE_RETURN_STRING(cName, value, name, string) \
+    case value: return string;
+
+#define GBL_ENUM_TABLE_TO_STRING(table, value) \
+    switch(value) { \
+        GBL_MAP_TUPLES(GBL_ENUM_TABLE_RETURN_STRING, GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)) \
+    }
+
+#define GBL_ENUM_TABLE_DECLARE_STRINGIFIER(table) \
+    GBL_MAYBE_UNUSED GBL_CONSTEXPR GBL_INLINE const char* GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, STRINGIFIER))(GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME)) value) { \
+        GBL_ENUM_TABLE_TO_STRING(table, value); \
+        return ""; \
+    }
+
+
+
+
+
 #define GBL_META_ENUM_TUPLE(tuple)
 
 #define GBL_META_ENUM_TUPLE_TYPE_INFO(typeInfo, valueTable) typeInfo
 
-#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_CNAME(cName, name, description) cName
-#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_NAME(cName, name, description) name
-#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_DESCRIPTION(cName, name, description) description
+#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_CNAME(cName, name, description, stringifier) cName
+#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_NAME(cName, name, description, stringifier) name
+#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_DESCRIPTION(cName, name, description, stringifier) description
+#define GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_STRINGIFIER(cName, name, description, stringifier) stringifier
 
 #define GBL_META_ENUM_TUPLE_VALUE_ARRAY(typeInfo, valueArray) valueArray
 
@@ -130,7 +145,6 @@
 #define GBL_META_ENUM_TUPLE_VALUE_PROPERTY_STRING(cName, value, name, string) string
 
 #define GBL_META_ENUM_TYPE_PROPERTY(table, postfix) GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_##postfix GBL_META_ENUM_TUPLE_TYPE_INFO table
-#define GBL_META_ENUM_CNAME(table) GBL_META_ENUM_TYPE_PROPERTY(table, CNAME)
 
 #define GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_DEFAULT(defaultFunc, overloads)    defaultFunc
 #define GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_OVERLOADS(defaultFunc, overloads)  overloads
@@ -141,66 +155,25 @@
     type: function,
 
 #define GBL_META_GENERIC_MACRO_TRAIT_OVERLOADS_DECLARE_CASE_CPP(type, function) \
-    if constexpr(std::is_same_v<decltype(arg), type>) return function(std::forward<decltype(arg)>(arg));
+    else if constexpr(std::is_same_v<GenericType, type>) return function(std::forward<decltype(args)>(args)...);
 
 
 #ifndef __cplusplus
-#   define GBL_META_GENERIC_MACRO_GENERATE(traits)   \
+#   define GBL_META_GENERIC_MACRO_GENERATE(traits, X)   \
     _Generic((X),                                                                               \
         GBL_MAP_TUPLES(GBL_META_GENERIC_MACRO_TRAIT_OVERLOADS_DECLARE_CASE_C, GBL_MAP_TUPLES(GBL_EVAL, GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_OVERLOADS traits))   \
         default:  GBL_EVAL(GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_DEFAULT traits)                \
     )
 #else
-#   define GBL_META_GENERIC_MACRO_GENERATE(traits) \
-     [](auto arg) -> decltype(auto) {    \
-        GBL_MAP_TUPLES(GBL_META_GENERIC_MACRO_TRAIT_OVERLOADS_DECLARE_CASE_CPP,                                         \
-                        GBL_MAP_TUPLES(GBL_EVAL, GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_OVERLOADS traits))               \
-        else return GBL_EVAL(GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_DEFAULT traits)(std::forward<decltype(arg)>(arg));   \
+#   define GBL_META_GENERIC_MACRO_GENERATE(traits, X) \
+     [](auto&&... args) {    \
+        using GenericType = decltype(X); \
+        using DefaultFuncType = decltype(GBL_EVAL(GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_DEFAULT traits)); \
+        if constexpr(false); \
+        GBL_MAP_TUPLES(GBL_META_GENERIC_MACRO_TRAIT_OVERLOADS_DECLARE_CASE_CPP, GBL_MAP_TUPLES(GBL_EVAL, GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_OVERLOADS traits))               \
+        else if constexpr(std::is_invocable_v<DefaultFuncType, decltype(args)...>) return GBL_EVAL(GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_DEFAULT traits)(std::forward<decltype(args)>(args)...); \
     }
 #endif
-
-
-#if 0
-
-//declare macro "trait" table
-#define GBL_POW2_NEXT
-    GBL_GENERIC_MACRO(
-        GBL_POW2_NEXT_UINT64,               // default
-        (uint8_t,  GBL_POW2_NEXT_UINT8),    // per-type overloads
-        (uint16_t, GBL_POW2_NEXT_UINT16),
-        (uint32_t, GBL_POW2_NEXT_UINT32),
-        (uint64_t, GBL_POW2_NEXT_UINT64)
-    )
-
-//shit out respective code from the "trait" table
-GBL_GENERIC_MACRO_GENERATE_C(GBL_POW2_NEXT);
-GBL_GENERIC_MACRO_GENERATE_CPP(GBL_POW2_NEXT);
-GBL_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT); //call into the correct one depending on build flags
-
-
-
-inline constexpr decltype(auto) GBL_POW2_NEXT(auto arg) {
-    if constexpr(std::is_same_v<decltype(arg), uint8_t>) return GBL_POW2_NEXT_UINT8(arg);
-    if constexpr(std::is_same_v<decltype(arg), uint16_t>) return GBL_POW2_NEXT_UINT16(arg);
-    if constexpr(std::is_same_v<decltype(arg), uint32_t>) return GBL_POW2_NEXT_UINT32(arg);
-    if constexpr(std::is_same_v<decltype(arg), uint64_t>) return GBL_POW2_NEXT_UINT64(arg);
-    else return GBL_POW2_NEXT_UINT64(arg);
-}
-
-#define GBL_POW2_NEXT(X)                    \
-    _Generic((X),                           \
-        uint8_t:    GBL_POW2_NEXT_UINT8,    \
-        uint16_t:   GBL_POW2_NEXT_UINT16,   \
-        uint32_t:   GBL_POW2_NEXT_UINT32,   \
-        uint64_t:   GBL_POW2_NEXT_UINT64,   \
-        default:    GBL_POW2_NEXT_UINT64    \
-    )(X)
-
-
-#endif
-
-
-
 
 
 #endif // GIMBAL_MACROS_MAP_H

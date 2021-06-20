@@ -252,8 +252,6 @@ static inline GblContext gblContextParent_(GblContext hCtx) {
 #define GBL_CONTEXT_EXT_DECL_(name, ...) \
     GBL_API gblContext##name (GblContext hCtx, const GblStackFrame* pFrame GBL_VA_ARGS(GBL_MAP_LIST(GBL_DECL_VAR_PAIR, __VA_ARGS__)))
 
-      //  GBL_ASSERT(hCtx && pFrame);
-
 #define GBL_CONTEXT_EXT_IMPL_(name, memberFn, ...) \
     GBL_CONTEXT_EXT_DECL_(name, __VA_ARGS__) { \
         GBL_RESULT result = GBL_RESULT_UNIMPLEMENTED; \
@@ -389,12 +387,25 @@ GBL_CONTEXT_EXT_DECL_(MemFreeDefault_, (void*, pData)) {
     GBL_API_END();
 }
 
+GBL_CONTEXT_EXT_DECL_(EventHandlerDefault_, (const GblEvent*, pEvent)) {
+    GBL_UNUSED(pFrame);
+    GBL_API_BEGIN(hCtx);
+    GBL_API_VERIFY_POINTER(pEvent);
+    GBL_API_INFO("Unhandled Event: %u [%s]", pEvent->eventType, gblEventTypeString(pEvent->eventType));
+    GBL_API_END();
+}
+
+
 GBL_CONTEXT_EXT_IMPL_(LogWrite, log.pFnWrite, (GBL_LOG_LEVEL, level), (const char*, pFmt), (va_list, varArgs))
 GBL_CONTEXT_EXT_IMPL_(LogPop, log.pFnPop, (uint32_t, count))
 
 GBL_CONTEXT_EXT_IMPL_(MemAlloc, mem.pFnAlloc, (GblSize, size), (GblSize, alignment), (const char*, pDebugInfoStr), (void**, ppData))
 GBL_CONTEXT_EXT_IMPL_(MemRealloc, mem.pFnRealloc, (void*, pData), (GblSize, newSize), (GblSize, newAlign), (void**, ppNewData))
 GBL_CONTEXT_EXT_IMPL_(MemFree, mem.pFnFree, (void*, pData))
+
+GBL_API gblContextEventHandler(GblContext hCtx, const GblStackFrame* pFrame, const GblEvent* pEvent) {
+    return gblContextEventHandlerDefault_(hCtx, pFrame, pEvent);
+}
 
 GBL_API gblContextLogPush(GblContext hCtx, const GblStackFrame* pFrame) {
     GBL_ASSERT(hCtx && pFrame);

@@ -9,18 +9,19 @@ extern "C" {
 
 GBL_FORWARD_DECLARE_STRUCT(GblStackFrame);
 
-typedef GBL_RESULT (*GblExtLogWriteFn)      (const GblStackFrame* pFrame, GBL_LOG_LEVEL, const char*, va_list);
-typedef GBL_RESULT (*GblExtLogPushFn)       (const GblStackFrame* pFrame);
-typedef GBL_RESULT (*GblExtLogPopFn)        (const GblStackFrame* pFrame, uint32_t);
+typedef GBL_RESULT (*GblExtLogWriteFn)      (const GblStackFrame*, GBL_LOG_LEVEL, const char*, va_list);
+typedef GBL_RESULT (*GblExtLogPushFn)       (const GblStackFrame*);
+typedef GBL_RESULT (*GblExtLogPopFn)        (const GblStackFrame*, uint32_t);
 
 //Custom allocators
-typedef GBL_RESULT (*GblExtMemAllocFn)     (const GblStackFrame* pFrame, GblSize, GblSize, const char*, void**);
-typedef GBL_RESULT (*GblExtMemReallocFn)    (const GblStackFrame* pFrame, void*, GblSize, GblSize, void**);
-typedef GBL_RESULT (*GblExtMemFreeFn)       (const GblStackFrame* pFrame, void*);
+typedef GBL_RESULT (*GblExtMemAllocFn)      (const GblStackFrame*, GblSize, GblSize, const char*, void**);
+typedef GBL_RESULT (*GblExtMemReallocFn)    (const GblStackFrame*, void*, GblSize, GblSize, void**);
+typedef GBL_RESULT (*GblExtMemFreeFn)       (const GblStackFrame*, void*);
 
 typedef GBL_RESULT (*GblExtApiBeginFn)      (void*, void*);
 typedef GBL_RESULT (*GblExtApiEndFn)        (void*, void*);
 typedef GBL_RESULT (*GblExtApiLastErrorFn)  (void*, void*);
+typedef GBL_RESULT (*GblExtEventHandlerFn)  (const GblStackFrame*, const GblEvent*);
 
 //define all extension points and shit in one centralized location
 
@@ -87,6 +88,7 @@ GBL_API gblExtMemFree        (const GblStackFrame* pFrame, void* pData);
 GBL_API gblExtApiBegin       (GblHandle hHandle);
 GBL_API gblExtApiEnd         (GblHandle hHandle);
 
+GBL_API gblExtEventHandler  (const GblStackFrame* pFrame, const GblEvent* pEvent);
 
 #ifdef __cplusplus
 }

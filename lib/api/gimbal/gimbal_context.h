@@ -36,11 +36,12 @@ typedef struct GblContextExtApi {
 
 // Let Contexts have parent contexts
 typedef struct GblContextCreateInfo {
-    GblVersion                versionMin;
-    GblHandleCreateInfo       handleInfo;
-    const GblContextExtLog*   pExtLog;
-    const GblContextExtMem*   pExtMem;
-    const GblContextExtApi*   pExtApi;
+    GblVersion                  versionMin;
+    GblHandleCreateInfo         handleInfo;
+    const GblContextExtLog*     pExtLog;
+    const GblContextExtMem*     pExtMem;
+    const GblContextExtApi*     pExtApi;
+    const GblExtEventHandlerFn  pEventHandlerFn;
 } GblContextCreateInfo;
 
 
@@ -48,21 +49,10 @@ GBL_DECLARE_OPAQUE(GblContext);
 
 struct GblState;
 
-
-
-/* Use GBL_VERSION_STRING for compile-time version.
- * Use GBLVersionString() for run-time version.
- */
-
-
 GBL_API gblContextVersion         (GblVersion* pVersion); //hard-compiled
 GBL_API gblContextCreate          (GblContext* phCtx, const GblContextCreateInfo* pInfo);
 //GBL_API gblContextBuildInfo
 GBL_API gblContextDestroy         (GblContext phCtx);
-
-
-
-
 
 /* these are not really actually public, really.... maybe hide them? */
 GBL_API gblContextLogWrite       (GblContext hCtx, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
@@ -72,6 +62,7 @@ GBL_API gblContextLogPop         (GblContext hCtx, const GblStackFrame* pFrame, 
 GBL_API gblContextMemAlloc       (GblContext hCtx, const GblStackFrame* pFrame, GblSize size, GblSize alignment, const char* pDebugInfoStr, void** ppData);
 GBL_API gblContextMemRealloc     (GblContext hCtx, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** pNewData);
 GBL_API gblContextMemFree        (GblContext hCtx, const GblStackFrame* pFrame, void* pData);
+GBL_API gblContextEventHandler   (GblContext hCtx, const GblStackFrame* pFrame, const GblEvent* pEvent);
 
 GBL_API gblContextApiBegin       (GblHandle hHandle);
 GBL_API gblContextApiEnd         (GblHandle hHandle);

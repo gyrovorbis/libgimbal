@@ -25,16 +25,21 @@ concept string_base = std::is_base_of_v<gimbal::tags::StringBase, T>;
 
 class String;
 
+//make this all compatible with gimbal::Vector<char>
+
 //support std::pmr::string ?
 template<typename CRTP>
 class StringViewBase:
     public tags::StringBase,
-    public ReadWriteIndexable<StringViewBase<CRTP>, size_t, char>,
+    public ReadWriteContiguousIndexable<StringViewBase<CRTP>, size_t, char>,
     public RandomAccessIterable<StringViewBase<CRTP>, size_t, char>
 {
 public:
     using StringViewType    = StringViewBase<CRTP>;
     using Derived           = CRTP;
+    using Iterable          = RandomAccessIterable<StringViewType, size_t, char>;
+    using iterator          = typename Iterable::iterator;
+    using const_iterator    = typename Iterable::const_iterator;
 protected:
     decltype(auto) str_(void) const {
         return static_cast<const CRTP*>(this)->getString_();
@@ -45,6 +50,10 @@ protected:
     }
 
 public:
+
+    operator const GblString*() const { return str_(); }
+
+
     const char& getElement_(size_t index) const {
         return getCString()[index];
     }
@@ -63,9 +72,9 @@ public:
 
 // Accessor wrappers
 
-    Size getStackSize(void) const {
+    Size getStackBytes(void) const {
         Size size = 0;
-        Exception::checkThrow(gblStringStackSize(str_(), &size));
+        Exception::checkThrow(gblStringStackBytes(str_(), &size));
         return size;
     }
 
@@ -173,6 +182,9 @@ public:
 
     StringView(const gimbal::String& string);
 
+    StringView(const GblString* pGblString):
+        pGblStr_(pGblString) {}
+
     const GblString* getString_(void) const { return pGblStr_; }
     bool isValid(void) const { return pGblStr_; }
 };
@@ -182,13 +194,16 @@ class String:
     public StringViewBase<String>
 {
 public:
+
     const GblString* getString_(void) const {
         return static_cast<const GblString*>(this);
     }
-
+// iterator constructors!
     GblString* getString_(void) {
         return static_cast<GblString*>(this);
     }
+
+    //operator const GblString*() const { return getString_(); }
 
     // Default Ctors
     String(std::nullptr_t, Size size=sizeof(String)):
@@ -320,9 +335,18 @@ public:
         Exception::checkThrow(gblStringResize(this, size));
     }
 
+    void insert(const_iterator pos, const char* pString, GblSize count=0) {
+        GBL_ASSERT(pString);
+        if(!count) count = strlen(pString);
+        const auto index = std::distance(cbegin(), pos);
+        const GblStringView view{pString, count};
+        Exception::checkThrow(gblStringInsert(this, index, &view));
+      //  return iterator(*this, index);
+    }
+
     void concat(std::string_view view) {
-        const GblStringView gblView{ view.data(), view.size() };
-        Exception::checkThrow(gblStringCat(this, &gblView));
+        //insert(cend(), view.data(), view.size());
+        Exception::checkThrow(gblVectorConcat(&this->data, view.data(), view.size()));
     }
 
     String& vasprintf(const char* pFmt, va_list varArgs) {

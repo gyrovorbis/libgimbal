@@ -3,9 +3,9 @@
 
 #include "test_gimbal.hpp"
 
-#pragma GBL_PRAGMA_MACRO_PUSH("GBL_STRING_BUFFER_BASE_STACK_SIZE");
-#undef GBL_STRING_BUFFER_BASE_STACK_SIZE
-#define GBL_STRING_BUFFER_BASE_STACK_SIZE 8
+#pragma GBL_PRAGMA_MACRO_PUSH("GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE");
+#undef GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE
+#define GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE 8
 
 #include <gimbal/gimbal_string.hpp>
 #include <sstream>
@@ -33,7 +33,7 @@ public:
 private:
 
     void verifyString_(const gimbal::String& str, const char* pString);
-    void verifyStack_(const gimbal::String& str, gimbal::Size stackSize=GBL_STRING_BUFFER_BASE_STACK_SIZE);
+    void verifyStack_(const gimbal::String& str, gimbal::Size stackSize=GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE);
     void verifyHeap_(const gimbal::String& str);
 private slots:
     void cleanup(void);
@@ -106,17 +106,17 @@ inline void String::verifyString_(const gimbal::String& str, const char* pCStr) 
 
 inline void String::verifyStack_(const gimbal::String& str, gimbal::Size stackSize) {
     QCOMPARE(str.getCapacity(), stackSize);
-    QCOMPARE(str.getStackSize(), stackSize);
+    QCOMPARE(str.getStackBytes(), stackSize);
     QVERIFY(str.isStack());
     QVERIFY(!str.isHeap());
-    QCOMPARE(str.getCString(), str.stackBuffer);
+    QCOMPARE(str.getCString(), str.data.stackBuffer);
 }
 
 inline void String::verifyHeap_(const gimbal::String& str) {
     QVERIFY(!str.isStack());
     QVERIFY(str.isHeap());
-    QVERIFY(str.getCString() != str.stackBuffer);
-    QVERIFY(str.getCapacity() > str.getStackSize());
+    QVERIFY(str.getCString() != str.data.stackBuffer);
+    QVERIFY(str.getCapacity() > str.getStackBytes());
 }
 
 inline void String::cleanup(void) {
@@ -620,7 +620,7 @@ inline void String::reserve(void) {
     string.reserve(3);
     verifyString_(string, "TROLO");
     verifyStack_(string);
-    string.reserve(GBL_STRING_BUFFER_BASE_STACK_SIZE+1);
+    string.reserve(GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE+1);
     verifyString_(string, "TROLO");
     verifyHeap_(string);
     string.reserve(string.getCapacity() + 256);
@@ -633,8 +633,8 @@ inline void String::resize(void) {
     string.resize(3);
     verifyString_(string, "TRO");
     verifyStack_(string);
-    string.resize(GBL_STRING_BUFFER_BASE_STACK_SIZE+1);
-    QCOMPARE(string.getLength(), GBL_STRING_BUFFER_BASE_STACK_SIZE+1);
+    string.resize(GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE+1);
+    QCOMPARE(string.getLength(), GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE+1);
     verifyHeap_(string);
     QCOMPARE(string.toStringView().substr(0, 3), "TRO");
 }
@@ -695,7 +695,7 @@ inline void String::operatorAdd(void) {
     GBL_TEST_VERIFY_RESULT(gblStringDestruct(&cStr));
 }
 
-#pragma GBL_PRAGMA_MACRO_POP("GBL_STRING_BUFFER_BASE_STACK_SIZE");
+#pragma GBL_PRAGMA_MACRO_POP("GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE");
 
 
 

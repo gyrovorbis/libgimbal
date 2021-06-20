@@ -117,10 +117,13 @@ extern "C" {
 #   define GBL_API_RESULT_MSG_BUFFER_SIZE       128
 #endif
 
-#ifndef GBL_STRING_BUFFER_BASE_STACK_SIZE
-#   define GBL_STRING_BUFFER_BASE_STACK_SIZE    128
+#ifndef GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE
+#   define GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE 1
 #endif
 
+#ifndef GBL_STRING_FLOAT_DECIMAL_PLACES
+#   define GBL_STRING_FLOAT_DECIMAL_PLACES      3
+#endif
 
 typedef struct GblSourceLocation {
     const char* pFile;

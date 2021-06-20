@@ -130,32 +130,7 @@ uint64_t GBL_POW2_NEXT_UINT64(uint64_t n) GBL_NOEXCEPT {
         )                                       \
     )
 
-#define GBL_POW2_NEXT(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS)(X);
-
-
-GBL_DEPRECATED("Dis shit's ancient!")
-GBL_MAYBE_UNUSED GBL_NODISCARD GBL_NORETURN GBL_INLINE GBL_EXPORT_SHARED
-int someFunc(void* GBL_RESTRICT pArray[GBL_STATIC_ARRAY(10)]) GBL_NOEXCEPT
-{
-    GBL_CONSTEXPR const void* pPtr = 0;
-    GBL_STATIC_ASSERT(pPtr == GBL_NULL);
-
-    void* pSomeShit = GBL_ALLOC_ALIGNED(sizeof(void*), GBL_ALIGNOF(void*));
-
-    switch((unsigned long)pSomeShit) {
-        default: break; GBL_FALLTHROUGH;
-        case 0: break;
-    };
-
-    if(pArray) GBL_UNLIKELY {
-        pSomeShit = GBL_ALLOCA(1337);
-        if(pSomeShit) GBL_LIKELY {
-            GBL_ALIGNAS(64) int goodVal;
-            GBL_UNUSED(goodVal);
-        }
-    }
-    GBL_QUICK_EXIT(0);
-}
+#define GBL_POW2_NEXT(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS, X)(X);
 
 
 
