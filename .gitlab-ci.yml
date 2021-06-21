@@ -82,14 +82,14 @@ build ubuntu20-clang11:
 #    CXX: "C:/Program Files/LLVM/bin/clang.exe"
 #   PREFIX_PATH: "C:/Program Files/LLVM/bin"
 
-build macos-clang12:
-  extends: .build_common
-  tags:
-    - macos, clang
-  variables:
-    CC: clang
-    CXX: clang++
-    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
+#build macos-clang12:
+#  extends: .build_common
+#  tags:
+#    - macos, clang
+#  variables:
+#    CC: clang
+#    CXX: clang++
+#    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
 
 build macos-gcc10:
   extends: .build_common
@@ -209,13 +209,13 @@ test ubuntu20-clang11:
 #  tags:
 #    - mingw, win10
 
-test macos-clang12:
-  extends: .test_common
-  needs: ["build macos-clang12"]
-  dependencies:
-    - build macos-clang12
-  tags:
-    - macos, clang
+#test macos-clang12:
+#  extends: .test_common
+#  needs: ["build macos-clang12"]
+#  dependencies:
+#    - build macos-clang12
+#  tags:
+#    - macos, clang
 
 test macos-gcc10:
   extends: .test_common
