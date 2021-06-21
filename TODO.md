@@ -9,7 +9,6 @@ The Ultimate C17 and C++20 Cross-Language Runtime Framework
   - [ ] Ensure whole std::string() API is implemented
   - [ ] Generalized char* container/iterator compatibilty
   - [ ] gimbal::Vector<char> compatibility? 
-  
 ##### Vector 
 - [ ] C++
   - [ ] Add exceptions + error bounds checking
@@ -21,21 +20,18 @@ The Ultimate C17 and C++20 Cross-Language Runtime Framework
   - [ ] Nontrivial C++ Object Type Testing
     - nontrivial destructors, move semantics, etc need to be validated 
   - FlexibleVector C/++ static stack storage validation (both sides)
-
 ##### Map 
   - two-way tree-based associative container backed by a vector/array 
   - full C++ std::map type compatibilty 
   - Use C stdlib bsp qsort/find functions 
-
  ##### Generalized Iterators 
   - Or is that better modeled by leveraging GblObject mechanism?
-
 ##### Command Line Parser 
   - [ ] C++
     - Whole fucking API
   - [ ] Testing
     - All Unit Tests
-    
+  
 ##### Variant
 - [ ] C 
   - [ ] Dynamic user MetaType support 
@@ -45,7 +41,6 @@ The Ultimate C17 and C++20 Cross-Language Runtime Framework
   - [ ] std::variant, std::any, std::optional<T> support (use nil)
 - [ ] Testing
   - Make sure heap string lifetime/allocation shit is bulletproof
-
 #### Object 
 - [ ] C 
   - [ ] Implement GblMetaObject back-end + API 
@@ -62,12 +57,10 @@ The Ultimate C17 and C++20 Cross-Language Runtime Framework
 - [ ] Testing 
   - C/++ interop 
   - Variant compatibility 
-
 #### Handle 
   - Event handler override? 
   - API override? 
   - Subclass Object 
-
 #### Context 
 - [ ] API
   - Event routing/management 
@@ -85,10 +78,8 @@ The Ultimate C17 and C++20 Cross-Language Runtime Framework
 - [ ] gimbal_macros_map.hpp
   - Clean up, organize shit by property/enum types and shit 
   - Make sure naming scheme is standardized 
-
 - [ ] gimbal_test.h 
   - Generic C-style unit test API 
-
 - [ ] gimbal_config.h.in 
   - typedef-ing common values for client APIs (GblSize -> EvmuSize, GblEnum -> EvmuEnum)
   - UserExt compile-time function names 
