@@ -58,7 +58,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblVariant);
 
 typedef GBL_RESULT (*GblMetaTypeDestructorFn)(GblVariant*);
 typedef GBL_RESULT (*GblMetaTypeToFn)(const GblVariant*, GblVariant*);
-typedef GBL_RESULT (*GblMetaTypeCompareFn)(const GblVariant*, GblVariant*, GBL_VARIANT_OP_CMP_TYPE, GblBool*);
+//typedef GBL_RESULT (*GblMetaTypeCompareFn)(const GblVariant*, GblVariant*, GBL_VARIANT_OP_CMP_TYPE, GblBool*);
 
 typedef void* GblVirtualFn;
 

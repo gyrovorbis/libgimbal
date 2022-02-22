@@ -6,7 +6,7 @@ typedef union GblTypeInfo {
     GblTypeClassInfo            klass;
 } GblTypeInfo;
 
-typedef struct GblMetaType {
+typedef struct GblMetaType_ {
     GblRefCount         refCount;
 #ifdef GBL_TYPE_DEBUG
     GblRefCount         instanceRefCount;
@@ -15,7 +15,7 @@ typedef struct GblMetaType {
     GblString           name;
     void*               pModule; //module
     void*               pClass;
-} GblMetaType;
+} GblMetaType_;
 
 
 typedef struct GblTypeState {
@@ -30,21 +30,21 @@ static GblTypeState*    pTypeState_  = &typeStateDefault_;
 
 #define GBL_TYPE_ID_MASK    ((GblType)((1 << GBL_TYPE_FUNDAMENTAL_SHIFT) - 1))
 
-static inline GblMetaType* gblMetaFromType_(GblType typeId) {
+static inline GblMetaType_* gblMetaFromType_(GblType typeId) {
     void* pEntry = NULL;
-    GBL_API_BEGIN();
+    GBL_API_BEGIN(NULL);
     if(typeId > GBL_TYPE_FUNDAMENTAL_MAX) {
         pEntry = (GblMetaType*)(typeId & GBL_TYPE_ID_MASK);
     } else {
         GBL_API_CALL(gblVectorAt(&pTypeState_->fundamentalTypes, typeId >> GBL_TYPE_FUNDAMENTAL_SHIFT, &pEntry));
     }
-    GBL_API_DONE();
+    GBL_API_END();
     return pEntry;
 }
 
 
 static GBL_RESULT gblTypeStateInit_(void) {
-    GBL_API_BEGIN_ONCE();
+    GBL_API_BEGIN_ONCE(NULL);
     memset(pTypeState_, 0, sizeof(GblTypeState));
     GBL_API_CALL(gblVectorConstruct(&pTypeState_->staticTypes, NULL, sizeof(GblMetaType)));
     GBL_API_CALL(gblVectorConstruct(&pTypeState_->fundamentalTypes, NULL, sizeof(GblMetaType)));
@@ -61,17 +61,17 @@ static GBL_RESULT gblTypeRegisterBase_(const char*                            pT
                                        GblType*                               pNewType,
                                        GblVector*                             pVector)
 {
-    GBL_API_BEGIN();
+    GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pTypeName);
 
     {
-        GblMetaType metaType = {
+        GblMetaType_ metaType = {
             .refCount           = 0,
 #ifdef GBL_TYPE_DEBUG
             .instanceRefCount   = 0,
 #endif
             .pModule            = NULL,
-            .pClass             = NULL;
+            .pClass             = NULL
         };
 
         GBL_API_CALL(gblStringConstruct(&metaType.name, 0, NULL, &(const GblStringView){
@@ -92,8 +92,8 @@ GBL_API gblTypeRegisterClass(const char*                            pTypeName,
                              const GblTypeClassInfo*                pClassInfo,
                              GblType*                               pNewType)
 {
-    GBL_API_BEGIN();
-    gblTypeRegisterBase_(pTypeName,
+    GBL_API_BEGIN(NULL);
+ //   gblTypeRegisterBase_(pTypeName,
     GBL_API_END();
 }
 
@@ -106,6 +106,3 @@ GBL_API gblTypeRegisterFundamental(const char*                      pTypeName,
 }
 
 
-
-
-#endif

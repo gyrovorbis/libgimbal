@@ -90,7 +90,7 @@ GBL_DECLARE_FLAGS(GblTypeFlags) {
 GBL_CONSTEXPR GBL_INLINE GblBool GBL_TYPE_FLAGS_TEST(GblType gblType, GblTypeFlags flags) {
     //GBL_API_BEGIN(NULL);
     //GBL_API_VERIFY_POINTER(pResult);
-    return (GblBool)GBL_FLAGS_FIELD_GET(gblType, GBL_BITFIELD_FROM_MASK(flags));
+    //return (GblBool)GBL_FLAGS_FIELD_GET(gblType, GBL_BITFIELD_FROM_MASK(flags));
     //GBL_API_END();
 }
 
@@ -437,8 +437,6 @@ typedef struct _GblTypeQuery		GblTypeQuery;
 #endif
 
 
-
-#endif
 
 
 #endif // GIMBAL_TYPE_H

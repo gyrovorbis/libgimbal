@@ -394,19 +394,19 @@ private slots:
     void verify(void) {
         auto test = GBL_API_BLOCK(pCtx(), "VERIFY_2_SUCCESS") {
             GBL_API_VERIFY(1 < 3, Result(Result::ErrorUnhandledException));
-            GBL_API_END();
+               GBL_API_END_EMPTY();
         };
         QVERIFY(test);
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_3_ERROR") {
+       test = GBL_API_BLOCK(pCtx(), "VERIFY_3_ERROR") {
             GBL_API_VERIFY(false == true, Result(Result::ErrorTypeMismatch), "Impossibru!");
-            GBL_API_END();
+               GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_TYPE_MISMATCH, "Impossibru!");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_4_WARN") {
             GBL_API_VERIFY(sizeof(int) < sizeof(char), GBL_RESULT_TRUNCATED, "Truncated: %d", -12);
-            GBL_API_END();
+               GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::Truncated, "Truncated: -12");
     }
@@ -414,19 +414,19 @@ private slots:
     void verifyExpression(void) {
         auto test = GBL_API_BLOCK(pCtx(), "VERIFY_EXPR_1_ERROR") {
             GBL_API_VERIFY_EXPRESSION(3 < 1);
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidExpression, "Invalid Expression: 3 < 1");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_EXPR_2_ERROR") {
             GBL_API_VERIFY_EXPRESSION(sizeof(int) < sizeof(char), "Fucked");
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidExpression, "Fucked");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_EXPR_N_SUCCESS") {
             GBL_API_VERIFY_EXPRESSION(sizeof(int) > sizeof(char), "Random Shit: %d, %s, %c, %f", -12, "lulz", 'a', 12.2f);
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         QVERIFY(test);
     }
@@ -434,19 +434,19 @@ private slots:
     void verifyHandle(void) {
         auto test = GBL_API_BLOCK(pCtx(), "VERIFY_HANDLE_1_FAIL") {
             GBL_API_VERIFY_HANDLE(GBL_HANDLE_INVALID);
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidHandle, "Invalid Handle");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_HANDLE_2_PASS") {
             GBL_API_VERIFY_HANDLE(pCtx(), "Valid as fuck");
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         QVERIFY(test);
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_HANDLE_N_FAIL") {
             GBL_API_VERIFY_HANDLE(GBL_HANDLE_INVALID, "Assdouchery %s %d %c", "lul", -33, 'b');
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_INVALID_HANDLE, "Assdouchery lul -33 b");
     }
@@ -454,19 +454,19 @@ private slots:
     void verifyPointer(void) {
         auto test = GBL_API_BLOCK(pCtx(), "VERIFY_POINTER_1_FAIL") {
             GBL_API_VERIFY_POINTER(NULL);
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidPointer, "Invalid Pointer");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_POINTER_2_PASS") {
             GBL_API_VERIFY_POINTER(pCtx(), "Valid as fuck");
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         QVERIFY(test);
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_POINTER_N_FAIL") {
             GBL_API_VERIFY_POINTER(NULL, "Assdouchery %s %d %c", "lul", -33, 'b');
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_INVALID_POINTER, "Assdouchery lul -33 b");
     }
@@ -476,21 +476,21 @@ private slots:
             int arg1 = 3; int arg2 = 44;
             GBL_API_VERIFY_ARG(arg1 != 0);
             GBL_API_VERIFY_ARG(arg2 > 50);
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidArg, "Invalid Arg: arg2 > 50");
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_ARG_2_PASS") {
             float argIn = -33.0f;
             GBL_API_VERIFY_ARG(fabs(argIn) > 30.0f, "Your argument sucks!");
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         QVERIFY(test);
 
         test = GBL_API_BLOCK(pCtx(), "VERIFY_ARG_N_FAIL") {
             const char* pName = "Fuckwhisp";
             GBL_API_VERIFY_ARG(strcmp(pName, "DickWheeze") == 0, "Assdouchery %s %d %c", "lul", -33, 'b');
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_INVALID_ARG, "Assdouchery lul -33 b");
     }
@@ -533,7 +533,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
     void call(void) {
         auto test = GBL_API_BLOCK(pCtx(), "CALL_1_FAIL") {
             GBL_API_CALL(gblContextVersion(nullptr, nullptr));
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidPointer, "Call[gblContextVersion(nullptr, nullptr)] -> Result[Invalid Pointer]");
 
@@ -541,14 +541,14 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
             GblVersion version;
             GBL_API_CALL(gblContextVersion(&version, nullptr),
                          "Getting the goddamn version!");
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         QVERIFY(test);
 
         test = GBL_API_BLOCK(pCtx(), "CALL_N_FAIL") {
             GBL_API_CALL(gblHandleUserdata(GBL_API_HANDLE(), nullptr),
                          "Variadicery %s %d %c %.2f", "lul", -33, 'b', 22.43f);
-            GBL_API_END();
+            GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_INVALID_POINTER, "Variadicery lul -33 b 22.43");
 

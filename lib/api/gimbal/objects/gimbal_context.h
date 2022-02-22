@@ -48,6 +48,8 @@ typedef struct GblContextCreateInfo {
 
 
 GBL_API gblContextVersion         (GblVersion* pVersion, const char** ppString); //hard-compiled
+
+
 GBL_API gblContextCreate          (GblContext* phCtx, const GblContextCreateInfo* pInfo);
 //GBL_API gblContextBuildInfo
 GBL_API gblContextDestroy         (GblContext phCtx);

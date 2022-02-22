@@ -3,8 +3,7 @@
 
 #include <hashmap.c/hashmap.h>
 #include <time.h>
-#include "../gimbal_container.h"
-#include "../gimbal_api.h"
+#include "../core/gimbal_api_frame.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -131,7 +130,7 @@ GBL_INLINE GBL_RESULT gblHashMapGet(GblHashMap* pMap, const void* pItem, void** 
     GBL_API_VERIFY_POINTER(pItem);
     GBL_API_VERIFY_POINTER(ppData);
     *ppData = hashmap_get(pMap->pImpl_, pItem);
-    GBL_API_VERIFY_POINTER(*ppData, GBL_RESULT_ERROR_INTERNAL, "Invalid data pointer returned!");
+    GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_INTERNAL, "Invalid data pointer returned!");
     GBL_API_END();
 }
 
@@ -151,7 +150,7 @@ GBL_INLINE GBL_RESULT gblHashMapDelete(GblHashMap* pMap, void* pItem, void** ppD
     GBL_API_VERIFY_POINTER(pItem);
     GBL_API_VERIFY_POINTER(ppData);
     *ppData = hashmap_delete(pMap->pImpl_, pItem);
-    GBL_API_VERIFY_POINTER(*ppData, GBL_RESULT_ERROR_INTERNAL, "Invalid data pointer returned!");
+    GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_INTERNAL, "Invalid data pointer returned!");
     GBL_API_END();
 }
 

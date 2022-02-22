@@ -3,6 +3,7 @@
 
 #include "../types/gimbal_typedefs.h"
 #include "gimbal_state.h"
+#include "gimbal_thread.h"
 #include "../objects/gimbal_handle.h"
 
 #ifdef __cplusplus
@@ -73,6 +74,8 @@ typedef struct GblStackFrame {
     void*                   pHandleUd;
     void*                   pContextUd;
     uint32_t                stackDepth;
+    const GblThread*        pThread;
+    GblStackFrame*          pPrevFrame;
 } GblStackFrame;
 
 
