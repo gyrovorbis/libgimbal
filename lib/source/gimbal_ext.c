@@ -1,6 +1,6 @@
-#include <gimbal/gimbal_ext.h>
-#include <gimbal/gimbal_context.h>
-#include <gimbal/gimbal_api.h>
+#include <gimbal/core/gimbal_ext.h>
+#include <gimbal/objects/gimbal_context.h>
+#include <gimbal/core/gimbal_api_frame.h>
 
 #define GBL_EXT_FN_DEFINE_(prefixName, ...) \
     GBL_API gblExt##prefixName (GBL_MAP_LIST(GBL_DECL_VAR_PAIR, __VA_ARGS__)) { \
@@ -16,5 +16,9 @@ GBL_EXT_FN_DEFINE_(MemAlloc,        (const GblStackFrame*, pFrame), (GblSize, si
 
 GBL_EXT_FN_DEFINE_(MemRealloc,      (const GblStackFrame*, pFrame), (void*, pData), (GblSize, newSize), (GblSize, newAlign), (void**, ppNewData))
 GBL_EXT_FN_DEFINE_(MemFree,         (const GblStackFrame*, pFrame), (void*, pData))
+#if 0
+GBL_API gblExtApiEvent(const GblStackFrame* pFrame, GBL_EVENT_TYPE type, const void* pData, GblSize size) {
+    return gblObjectEvent(pFrame->hHandle, pFrame, type, pData, size);
+}
+#endif
 
-GBL_EXT_FN_DEFINE_(EventHandler,    (const GblStackFrame*, pFrame), (const GblEvent*, pEvent))

@@ -1,5 +1,5 @@
 //include <evmu/evmu_version.h>
-#include <gimbal/gimbal_types.h>
+#include <gimbal/types/gimbal_typedefs.h>
 
 GBL_API gblVersionInfoString(const GblVersionInfo* pInfo, char* pBuffer, size_t size) {
     GBL_ASSERT(pInfo, "");

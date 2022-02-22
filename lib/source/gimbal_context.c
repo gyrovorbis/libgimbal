@@ -1,7 +1,7 @@
-#include <gimbal/gimbal_context.h>
-#include <gimbal/gimbal_types.h>
-#include <gimbal/gimbal_api.h>
-#include <gimbal/gimbal_config.h>
+#include <gimbal/objects/gimbal_context.h>
+#include <gimbal/types/gimbal_typedefs.h>
+#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_config.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -18,15 +18,19 @@ typedef struct GblContext_ {
     }                           ext;
 #if GBL_CONFIG_EXT_CONTEXT_DEFAULT_ENABLED
     uint32_t logStackDepth;
+    GblCallRecord               record;
 #endif
     //GblError               lastError;
     //GblContextCreateInfo   createInfo;
     //GblApiCookie*          pApiCookieTop;
 } GblContext_;
 
-GBL_API gblContextVersion           (GblVersion* pVersion) {
+
+
+GBL_API gblContextVersion           (GblVersion* pVersion, const char** ppString) {
     if(!pVersion) return GBL_RESULT_ERROR_INVALID_POINTER;
     *pVersion = GBL_VERSION_MAKE(GBL_PROJECT_VERSION_MAJOR, GBL_PROJECT_VERSION_MINOR, GBL_PROJECT_VERSION_PATCH);
+    if(ppString) *ppString = GBL_PROJECT_VERSION;
     return GBL_RESULT_SUCCESS;
 }
 
@@ -130,12 +134,14 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
 GBL_INLINE GBL_RESULT gblContextInitializer(GblContext hCtx, const GblContextCreateInfo* pInfo) {
     if(!hCtx) return GBL_RESULT_ERROR_INVALID_HANDLE;
     memset(hCtx, 0, sizeof(GblContext_));
-    hCtx->baseHandle.pContext   = hCtx;
-    hCtx->baseHandle.pParent    = pInfo? pInfo->handleInfo.hParent : NULL;
-    hCtx->baseHandle.pUserdata  = pInfo? pInfo->handleInfo.pUserdata : NULL;
+    hCtx->baseHandle.hContext       = hCtx;
+    hCtx->baseHandle.hParent        = pInfo? pInfo->handleInfo.hParent          : NULL;
+    hCtx->baseHandle.pUserdata      = pInfo? pInfo->handleInfo.pUserdata        : NULL;
+    //hCtx->baseHandle.pFnEventHandler = pInfo? pInfo->handleInfo.pFnEventHandler : NULL;
     if(pInfo) {
         if(pInfo->pExtLog) memcpy(&hCtx->ext.log, pInfo->pExtLog, sizeof(GblContextExtLog));
         if(pInfo->pExtMem) memcpy(&hCtx->ext.mem, pInfo->pExtMem, sizeof(GblContextExtMem));
+
     }
     return GBL_RESULT_SUCCESS;
 }
@@ -143,7 +149,7 @@ GBL_INLINE GBL_RESULT gblContextInitializer(GblContext hCtx, const GblContextCre
 GBL_API gblContextConstruct (GblContext hCtx, const GblContextCreateInfo* pInfo) {
     GBL_API_BEGIN(hCtx, "Constructing Context");
     GblVersion verCur = 0;
-    GBL_API_CALL(gblContextVersion(&verCur));
+    GBL_API_CALL(gblContextVersion(&verCur, NULL));
     GblVersion verMin = pInfo? pInfo->versionMin : 0;
     GblVersionInfo verCurInfo = GBL_VERSION_EXTRACT(verCur);
     GblVersionInfo verMinInfo = GBL_VERSION_EXTRACT(verMin);
@@ -163,10 +169,11 @@ GBL_API gblContextConstruct (GblContext hCtx, const GblContextCreateInfo* pInfo)
     GBL_API_END();
 }
 
-
-GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateInfo* pInfo) {
+GBL_API gblContextCreate(GblContext* phCtx, const GblContextCreateInfo* pInfo) {
     // Temporary stack object so we can use the macro API without having to allocate shit first
     GblContext_ stackCtx;
+    GblMemAllocInfo mallocInfo = { sizeof(GblContext_), GBL_ALIGNOF(GblContext_), "GblContext" };
+
 
     // Initializer for GlObject => GlHandle parents + GlContext properties
     const GBL_RESULT result = gblContextInitializer(&stackCtx, pInfo);
@@ -176,8 +183,15 @@ GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateIn
 
     // Use the temp stack context to get access to the malloc EXT macro
     {
+        //GBL_MEM_ALLOC_INFO_APPEND(&mallocInfo, pInfo->handleInfo.pAllocExtraSpaceInfo);
+        if(pInfo->handleInfo.objectInfo.pExtraSpaceInfo) {
+            mallocInfo.extraBytes += pInfo->handleInfo.objectInfo.pExtraSpaceInfo->extraBytes;
+            if(pInfo->handleInfo.objectInfo.pExtraSpaceInfo->align > mallocInfo.align)
+                mallocInfo.align = pInfo->handleInfo.objectInfo.pExtraSpaceInfo->align;
+        }
+
         GBL_API_BEGIN(&stackCtx, "Creating Context");
-        *phCtx = GBL_API_MALLOC(sizeof(GblContext_), GBL_ALIGNOF(GblContext_), "Context");
+        *phCtx = GBL_API_MALLOC(mallocInfo.extraBytes, mallocInfo.align, mallocInfo.pDebugStr);
         if(!GBL_RESULT_SUCCESS(GBL_API_RESULT())) {
             return GBL_API_RESULT();
         }
@@ -186,11 +200,12 @@ GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateIn
             return GBL_RESULT_ERROR_MEM_ALLOC;
         }
     }
-
+    // Reset the shit
+    memset(*phCtx, 0, mallocInfo.extraBytes);
     // Copy the temp stack context into the new heap address
     memcpy(*phCtx, &stackCtx, sizeof(GblContext_));
     // Fix up the inner Context handle!
-    (*phCtx)->baseHandle.pContext   = *phCtx; // have to fixup the damn self pointer!!!
+    (*phCtx)->baseHandle.hContext   = *phCtx; // have to fixup the damn self pointer!!!
 
     // Continue with the rest of the constructor
     {
@@ -198,7 +213,73 @@ GBL_API gblContextCreate            (GblContext* phCtx, const GblContextCreateIn
         GBL_API_CALL(gblContextConstruct(*phCtx, pInfo));
         GBL_API_END();
     }
+}
 
+GBL_API gblContextRegisterMetaTypes_(GblContext_* pCtx) {
+#if 0
+    static const GblMetaObject objMetaObject = {
+        {
+            (const GblMetaTypeVTable*)&((const GblObjectVTable) {
+                {
+                    .pFnConstructor             = &gblObjectConstructV_,
+                    .pFnDestructor              = &gblObjectDestroyV_,
+                    .pFnConvertFn               = &gblObjectConvertV_,  //bool/nil
+                    .pFnCompareFn               = &gblObjectConvertV_,   //direct ptr compare
+                    .pFnSerialize               = &gblObjectSerializeV_,    // iterate over properties
+                    .pFnDeserialize             = &gblObjectDeserializeV_,  //read properties
+                },
+                .pFnMetaObjectPropertyGetFn     = &gblObjectGetV_, //return not shit
+                .pFnMetaObjectPropertySetFn     = &gblObjectSetV_,
+                .pFnMetaObjectPropertyNextFn    = &gblObjectNextV_
+            }),
+            sizeof(GblObject_),
+            sizeof(GblMetaObjectVTable)/sizeof(void*),
+            "GblObject",
+            GBL_VARIANT_TYPE_OBJECT,
+            GBL_META_TYPE_FLAG_NONE
+        },
+        GBL_OBJECT_TYPE_OBJECT,
+        NULL
+    };
+
+    GblObject object;
+    GblMetaTypeId id = gblMetaTypeRegister(&objMetaObject);
+    gblMetaTypeCreate(hCtx, id, NULL, &object);
+    int result = 0;
+    gblMetaTypeCompare(hCtx, &object, &object, id, &result);
+    char data[1024];
+    GblSize size = sizeof(data);
+    gblMetaTypeSerialize(hCtx, id, pData, &size);
+    gblMetaTypeDeserialize(hCtx, id, pData, &size);
+    GblBool boolean = GBL_FALSE;
+    gblMetaTypeConvert(hCtx, &object, id, &boolean, 0);
+    gblMetaTypeDestroy(hCtx, id, &object);
+
+
+
+    // create a handle, set context, userdata, call record properties
+    // call virtual function on object to confirm shit works
+
+
+
+
+
+
+
+
+
+
+    GBL_API gblMetaTypeCreate(GblContext hCtx, GblMetaTypeId type, void* pOther, void** ppData);
+    GBL_API gblMetaTypeConstruct(GblContext hCtx, GblMetaTypeId type, void* pData, void* pOther);
+    GBL_API gblMetaTypeDestruct(GblContext hCtx, GblMetaTypeId type, void* pData);
+    GBL_API gblMetaTypeDestroy(GblContext hCtx, GblMetaTypeId type, void* pData);
+    GBL_API gblMetaTypeConvert(GblContext hCtx, const void* pFrom, int fromTypeId, void* pTo, GblMetaTypeId toTypeId);
+    GBL_API gblMetaTypeCompare(GblContext hCtx, const void* pLhs, const void* pRhs, GblMetaTypeId typeId, int* pResult);
+    GBL_API gblMetaTypeSerialize(GblContext hCtx, GblMetaTypeId type, const void* pData, char* pString, GblSize* pSize);
+    GBL_API gblMetaTypeDeserialize(GblContext hCtx, GblMetaTypeId type, void* pData, char* pString, GblSize size);
+    GBL_API gblMetaTypeMetaObject(GblContext hCtx, GblMetaTypeId type);
+#endif
+    return GBL_RESULT_SUCCESS;
 }
 
 GBL_API gblContextDestroy(GblContext hCtx) {
@@ -210,12 +291,12 @@ GBL_API gblContextDestroy(GblContext hCtx) {
     // Copy over to a temp so we can still use the API...
     GblContext_ stackCtx;
     memcpy(&stackCtx, hCtx, sizeof(GblContext_));
-    stackCtx.baseHandle.pContext = &stackCtx;
+    stackCtx.baseHandle.hContext = &stackCtx;
 
     {
         GBL_API_BEGIN(&stackCtx);
-        const GBL_RESULT result = gblHandleDestruct((GblHandle)hCtx);
-        GBL_API_VERIFY(GBL_RESULT_SUCCESS(result), result);
+        //const GBL_RESULT result = gblHandleDestroy((GblHandle)hCtx);
+        //GBL_API_VERIFY(GBL_RESULT_SUCCESS(result), result);
         GBL_API_FREE(hCtx);
         GBL_API_END();
     }
@@ -387,7 +468,7 @@ GBL_CONTEXT_EXT_DECL_(MemFreeDefault_, (void*, pData)) {
     GBL_API_END();
 }
 
-GBL_CONTEXT_EXT_DECL_(EventHandlerDefault_, (const GblEvent*, pEvent)) {
+GBL_CONTEXT_EXT_DECL_(EventDefault_, (const GblEvent*, pEvent)) {
     GBL_UNUSED(pFrame);
     GBL_API_BEGIN(hCtx);
     GBL_API_VERIFY_POINTER(pEvent);
@@ -403,8 +484,8 @@ GBL_CONTEXT_EXT_IMPL_(MemAlloc, mem.pFnAlloc, (GblSize, size), (GblSize, alignme
 GBL_CONTEXT_EXT_IMPL_(MemRealloc, mem.pFnRealloc, (void*, pData), (GblSize, newSize), (GblSize, newAlign), (void**, ppNewData))
 GBL_CONTEXT_EXT_IMPL_(MemFree, mem.pFnFree, (void*, pData))
 
-GBL_API gblContextEventHandler(GblContext hCtx, const GblStackFrame* pFrame, const GblEvent* pEvent) {
-    return gblContextEventHandlerDefault_(hCtx, pFrame, pEvent);
+GBL_API gblContextEvent(GblContext hCtx, const GblStackFrame* pFrame, const GblEvent* pEvent) {
+    return gblContextEventDefault_(hCtx, pFrame, pEvent);
 }
 
 GBL_API gblContextLogPush(GblContext hCtx, const GblStackFrame* pFrame) {
@@ -425,5 +506,22 @@ GBL_API gblContextLogPush(GblContext hCtx, const GblStackFrame* pFrame) {
     }
 #endif
     return result;
+}
+
+GBL_API gblContextCallRecordGet(GblContext hCtx, const GblCallRecord** ppRecord) {
+    GBL_API_BEGIN(hCtx);
+    GBL_API_VERIFY_POINTER(ppRecord);
+    *ppRecord = &hCtx->record;
+    GBL_API_END();
+}
+
+GBL_API gblContextCallRecordSet(GblContext hCtx, const GblCallRecord* pRecord) {
+    GBL_ASSERT(hCtx);
+    if(pRecord) {
+        memcpy(&hCtx->record, pRecord, sizeof(GblCallRecord));
+    } else {
+        memset(&hCtx->record, 0, sizeof(GblCallRecord));
+    }
+    return GBL_RESULT_SUCCESS;
 }
 

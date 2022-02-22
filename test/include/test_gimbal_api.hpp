@@ -1,7 +1,7 @@
 #ifndef TEST_GIMBAL_API_HPP
 #define TEST_GIMBAL_API_HPP
 
-#include <gimbal/gimbal_api.h>
+#include <gimbal/core/gimbal_api_frame.hpp>
 #include <elysian_qtest.hpp>
 #include <concepts>
 #include <limits>

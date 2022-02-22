@@ -53,7 +53,7 @@ GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_LOGIN GITLAB_USER_LOGIN)
 GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_EMAIL GITLAB_USER_EMAIL)
 
 
-GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/gimbal_config.h.in FILEPATH "Path to user API configuration file")
+GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/core/gimbal_config.h.in FILEPATH "Path to user API configuration file")
 
 GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ENABLED "Track most recent call record in GblHandle" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_SOURCE_TRACKING_ENABLED      "Track calling source code location" ON)
@@ -86,56 +86,113 @@ GBL_CONFIG_OPTION(GBL_FEATURE_VARIANTS      "Enable Variants" ON)
 GBL_CONFIG_OPTION(GBL_FEATURE_STRINGS       "Enable Strings" ON)
 GBL_CONFIG_OPTION(GBL_FEATURE_CONTAINERS    "Enable Containers" ON)
 
-set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/gimbal_config.h")
+set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/core/gimbal_config.h")
 
 set(GIMBAL_SOURCES
      source/gimbal_version.c
      source/gimbal_context.c
-     source/gimbal_test.c
+#     source/gimbal_test.c
      source/gimbal_handle.c
+     source/gimbal_state.c
+#     source/gimbal_meta.c
+#     source/gimbal_object.c
+#     source/gimbal_context_object.c
      source/gimbal_ext.c
+#     source/gimbal_type.c
      source/gimbal_generics.cpp
+#     source/meta2/gimbal_object.c
+     lib/hashmap.c/hashmap.c
+     lib/btree.c/btree.c
 )
 
 set(GIMBAL_INCLUDES
-    api/gimbal/gimbal_macros.h
+    api/gimbal/core/gimbal_api_generators.h
     #api/gimbal/gimbal_version.h
-    api/gimbal/gimbal_context.h
-    api/gimbal/gimbal_result.h
+    api/gimbal/objects/gimbal_context.h
+    api/gimbal/types/gimbal_result.h
+    api/gimbal/core/gimbal_call_stack.hpp
+    api/gimbal/core/gimbal_api_generators.hpp
+    api/gimbal/types/gimbal_version.hpp
+    api/gimbal/types/gimbal_exception.hpp
     #api/gimbal/gimbal_os.h
-    api/gimbal/gimbal_api.h
-    api/gimbal/gimbal_api.hpp
-    api/gimbal/gimbal_generics.hpp
-    api/gimbal/gimbal_container.hpp
-    api/gimbal/gimbal_types.h
-    api/gimbal/gimbal_compiler.h
-    api/gimbal/gimbal_macros_utils.h
+    api/gimbal/core/gimbal_api_frame.h
+    api/gimbal/core/gimbal_api_frame.hpp
+    api/gimbal/containers/gimbal_generics.hpp
+#    api/gimbal/containers/gimbal_container.hpp
+    api/gimbal/core/gimbal_call_stack.h
+    api/gimbal/types/gimbal_result.hpp
+    api/gimbal/types/gimbal_typedefs.h
+    api/gimbal/preprocessor/gimbal_compiler.h
+    api/gimbal/preprocessor/gimbal_macro_composition.h
+    api/gimbal/preprocessor/gimbal_macro_utils.h
     ${GBL_CONFIGURATION_INPUT_PATH}
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH}
-    api/gimbal/gimbal_macros_map.h
-    #api/gimbal/gimbal_generator.h
-    api/gimbal/gimbal_ext.h
-    api/gimbal/gimbal_variant.h
-    api/gimbal/gimbal_test.h
-    api/gimbal/gimbal_handle.h
-    api/gimbal/gimbal_meta.h
-    api/gimbal/gimbal_cmdline_parser.h
-    api/gimbal/gimbal_types.hpp
-    api/gimbal/gimbal_variant.hpp
-    api/gimbal/gimbal_object.h
-    api/gimbal/gimbal_monitor.hpp
-    #api/gimbal/gimbal_table.h
-    api/gimbal/gimbal_string.h
-    api/gimbal/gimbal_string.hpp
-    api/gimbal/gimbal_container.h
-    api/gimbal/gimbal_object.hpp
-    api/gimbal/gimbal_handle.hpp
-    api/gimbal/gimbal_context.hpp
-    )
+    api/gimbal/preprocessor/gimbal_macro_sequences.h
+    api/gimbal/core/gimbal_ext.h
+#    api/gimbal/types/gimbal_variant.h
+    api/gimbal/util/gimbal_test.h
+    api/gimbal/objects/gimbal_handle.h
+    api/gimbal/meta/gimbal_meta.h
+    api/gimbal/containers/gimbal_hashmap.h
+    api/gimbal/containers/gimbal_btree.h
+    api/gimbal/containers/gimbal_table.h
+#    api/gimbal/meta/gimbal_type.h
+    api/gimbal/meta/gimbal_meta.hpp
+#    api/gimbal/util/gimbal_cmdline_parser.h
+#    api/gimbal/core/gimbal_runtime.h
+    api/gimbal/core/gimbal_log.h
+    api/gimbal/core/gimbal_state.h
+    api/gimbal/types/gimbal_typedefs.hpp
+    api/gimbal/types/gimbal_variant.hpp
+#    api/gimbal/objects/gimbal_instance.h
+    api/gimbal/objects/gimbal_object.h
+#    api/gimbal/objects/gimbal_context_object.h
+#    api/gimbal/util/gimbal_monitor.hpp
+    api/gimbal/containers/gimbal_table.h
+    api/gimbal/containers/gimbal_vector.h
+    api/gimbal/containers/gimbal_vector.hpp
+#    api/gimbal/meta/gimbal_boxed.h
+#    api/gimbal/meta/gimbal_weak_ref.h
+#    api/gimbal/util/gimbal_lson.h
+    api/gimbal/types/gimbal_string.h
+    #api/gimbal/ifaces/gimbal_icomponent.h
+    #api/gimbal/ifaces/gimbal_ichild.h
+    #api/gimbal/ifaces/gimbal_iparent.h
+    #api/gimbal/ifaces/gimbal_iallocator.h
+    #api/gimbal/ifaces/gimbal_ilogger.h
+    #api/gimbal/ifaces/gimbal_ievent_handler.h
+    #api/gimbal/ifaces/gimbal_ilast_error.h
+    #api/gimbal/ifaces/gimbal_ivalue.h
+    #api/gimbal/ifaces/gimbal_icontext.h
+    #api/gimbal/ifaces/gimbal_iobject.h
+#    api/gimbal/meta2/gimbal_object.h
+#    api/gimbal/meta2/gimbal_class.h
+#    api/gimbal/meta2/gimbal_type.h
+#    api/gimbal/meta2/gimbal_primitive.h
+    #api/gimbal/ifaces/gimbal_inamed.h
+    #api/gimbal/ifaces/gimbal_icontainer.h
+    #api/gimbal/ifaces/gimbal_iuserdata.h
+    #api/gimbal/ifaces/gimbal_iiterable.h
+    #api/gimbal/ifaces/gimbal_itable.h
+#    api/gimbal/types/gimbal_dispatcher.h
+#    api/gimbal/types/gimbal_buffer.h
+    api/gimbal/types/gimbal_version.h
+#    api/gimbal/types/gimbal_value.h
+#    api/gimbal/util/gimbal_alloc.h
+    api/gimbal/types/gimbal_string.hpp
+#    api/gimbal/containers/gimbal_container.h
+    api/gimbal/objects/gimbal_object.hpp
+    api/gimbal/objects/gimbal_handle.hpp
+    api/gimbal/objects/gimbal_context.hpp
+    lib/hashmap.c/hashmap.h
+    lib/btree.c/btree.h)
 
 add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}
     ${GIMBAL_INCLUDES})
+
+add_subdirectory(lib/interface99)
+target_link_libraries(libGimbal interface99)
 
 #set_property(TARGET libGimbal PROPERTY C_STANDARD 11)
 #set_property(TARGET libGimbal PROPERTY C_STANDARD_REQUIRED ON)
@@ -150,11 +207,21 @@ list(APPEND
     ${GBL_CONFIGURATION_DEFINES}
     ${GBL_BUILD_DEFINES})
 
+
 target_include_directories(libGimbal
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>
         $<INSTALL_INTERFACE:api>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/api>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/metalang99/include>
+        $<INSTALL_INTERFACE:lib/metalang99/include>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib/metalang99/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/C99-Lambda>
+        $<INSTALL_INTERFACE:lib/C99-Lambda>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib/C99-Lambda>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib>
+        $<INSTALL_INTERFACE:lib>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/api
 )

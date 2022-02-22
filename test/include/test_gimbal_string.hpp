@@ -7,7 +7,7 @@
 #undef GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE
 #define GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE 8
 
-#include <gimbal/gimbal_string.hpp>
+#include <gimbal/types/gimbal_string.hpp>
 #include <sstream>
 
 

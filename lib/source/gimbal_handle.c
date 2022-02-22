@@ -1,5 +1,5 @@
-#include <gimbal/gimbal_handle.h>
-#include <gimbal/gimbal_api.h>
+#include <gimbal/objects/gimbal_handle.h>
+#include <gimbal/core/gimbal_api_frame.h>
 #include <string.h>
 
 GBL_API gblHandleDestruct(GblHandle hHandle) {
@@ -13,7 +13,7 @@ GBL_API gblHandleParentGet(GblHandle hHandle,
                         GblHandle* phParent) {
     if(hHandle == GBL_HANDLE_INVALID) return GBL_RESULT_ERROR_INVALID_HANDLE;
     if(!phParent) return GBL_RESULT_ERROR_INVALID_POINTER;
-    *phParent = hHandle->pParent;
+    *phParent = hHandle->hParent;
     return GBL_RESULT_SUCCESS;
 }
 
@@ -21,7 +21,7 @@ GBL_API gblHandleContext(GblHandle hHandle,
                          GblContext* phCtx) {
     if(hHandle == GBL_HANDLE_INVALID) return GBL_RESULT_ERROR_INVALID_HANDLE;
     if(!phCtx) return GBL_RESULT_ERROR_INVALID_POINTER;
-    *phCtx = hHandle->pContext;
+    *phCtx = hHandle->hContext;
     return GBL_RESULT_SUCCESS;
 }
 
@@ -33,6 +33,7 @@ GBL_API gblHandleUserdata(GblHandle hHandle,
    return GBL_RESULT_SUCCESS;
 }
 
+#if 0
 // this could be returning just a the base of a custom subclass
 GBL_API gblHandleLastCallRecordGet(GblHandle hHandle,
                               const GblCallRecord** ppRecord) {
@@ -55,3 +56,4 @@ GBL_API gblHandleLastCallRecordSet(GblHandle hHandle,
 
     return GBL_RESULT_SUCCESS;
 }
+#endif

@@ -1,5 +1,5 @@
-#include <gimbal/gimbal_generics.hpp>
-#include <gimbal/gimbal_handle.hpp>
+#include <gimbal/objects/gimbal_handle.hpp>
+#include <gimbal/containers/gimbal_generics.hpp>
 
 namespace gimbal {
 

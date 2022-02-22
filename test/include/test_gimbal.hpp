@@ -1,7 +1,7 @@
 #ifndef TEST_GIMBAL_HPP
 #define TEST_GIMBAL_HPP
 
-#include <gimbal/gimbal_macros.h>
+#include <gimbal/preprocessor/gimbal_macro_utils.h>
 #include <QDebug>
 #include <stdexcept>
 
@@ -54,22 +54,22 @@ namespace gimbal::test {
 }
 
 
-#include <gimbal/gimbal_types.hpp>
-#include <gimbal/gimbal_context.hpp>
+#include <gimbal/types/gimbal_typedefs.hpp>
+#include <gimbal/objects/gimbal_context.hpp>
 #include <elysian_qtest.hpp>
 #include <QHash>
 #include <concepts>
 #include <type_traits>
 
 #define GBL_TEST_VERIFY_EXCEPTION_THROWN(expr, result)              \
-    do {                                                            \
+    GBL_STMT_START {                                                            \
         QVERIFY_EXCEPTION_THROWN((expr), gimbal::Exception);  \
         try {                                                       \
             (expr);                                                 \
         } catch(const gimbal::Exception& except) {            \
             QCOMPARE(except.getResult(), result);                   \
         }                                                           \
-    } while(0)
+    } GBL_STMT_END
 
 #define GBL_TEST_VERIFY_RESULT(expr)    \
     QVERIFY(GBL_RESULT_SUCCESS((expr)))
@@ -528,7 +528,7 @@ public:
             countersMonitor_.begin();
             activeAllocMonitor_.begin();
             AssertMgr::clear();
-            getHandle()->clearLastCallRecord();
+            getContext()->clearCallRecord();
             try {
                 funcBlock(&stackFrame_);
             } catch(const gimbal::Exception& gblEx) {
@@ -565,7 +565,7 @@ public:
 
     ContextCounters getCountersDelta(void) const { return getCountersMonitor().getEndDelta(); }
     size_t getActiveAllocCount(void) const { return activeAllocMonitor_.getEndDelta(); }
-    decltype(auto) getLastCallRecord(void) const { return getHandle()->getLastCallRecord(); }
+    decltype(auto) getLastCallRecord(void) const { return getContext()->getCallRecord(); }
 
     bool didAssert(void) const { return asserted_; }
     std::string_view getAssertMessage(void) const { return assertMsg_; }
@@ -584,7 +584,7 @@ class UnitTestSet: public elysian::UnitTestSet {
 public:
 
     UnitTestSet(MonitorableContext* pCtx=nullptr):
-        pCtx_(pCtx) {}
+        pCtx_(pCtx? pCtx : new gimbal::test::TestContext()) {}
 
     void verifyBlock(const ApiBlock& block, const ConfigOptions& config, Result result, QString message=QString()) {
         const auto resultType = static_cast<uint8_t>(result.getType());

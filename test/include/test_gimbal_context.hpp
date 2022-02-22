@@ -3,7 +3,7 @@
 
 #include "test_gimbal.hpp"
 
-#include <gimbal/gimbal_context.hpp>
+#include <gimbal/objects/gimbal_context.hpp>
 #include <elysian_qtest.hpp>
 #include <QObject>
 #include <QDebug>
@@ -17,10 +17,7 @@ namespace gimbal::test {
 
 class Object: public UnitTestSet {
 Q_OBJECT
-    virtual gimbal::ObjectType expectedObjectType(void) const {
-        return gimbal::ObjectType::Object;
-       // return GL_OBJECT_TYPE_OBJECT;
-    }
+
 private slots:
     void checkMetaType(void) {}
     void isValid(void) {}
@@ -62,11 +59,7 @@ GBL_API gblHandleLastErrorSet(GblHandle hHandle,
 
 class Handle: public Object {
 Q_OBJECT
-private:
-    virtual gimbal::ObjectType expectedObjectType(void) const {
-        return gimbal::ObjectType::Handle;
-        //return GL_OBJECT_TYPE_HANDLE;
-    }
+
 private slots:
 
 
@@ -111,20 +104,6 @@ Q_OBJECT
 private:
 
     char* ppPtr[3] = { nullptr };
-
-    virtual gimbal::ObjectType expectedObjectType(void) const {
-        return gimbal::ObjectType::Context;
-        //return GL_OBJECT_TYPE_CONTEXT;
-    }
-protected:
-#if 0
-    void assert_(bool value, QString string) {
-        if(!value) {
-            qDebug() << "Asserting: " << string;
-        }
-    }
-#endif
-
 
 private slots:
 
@@ -311,69 +290,6 @@ private slots:
         QVERIFY(test);
         QCOMPARE(test.getCountersDelta().getLogDepth(), 1);
         QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::LogPop), 1);
-
-    }
-
-    void memAlloc(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "MALLOC_1") {
-            this->ppPtr[0] = (char*)GBL_API_MALLOC(15, 1, "Test");
-            QVERIFY2(ppPtr[0], "Malloc returned nullptr!");
-            QVERIFY(strncpy(ppPtr[0], "LUL", 15));
-        };
-        QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
-        QCOMPARE(test.getActiveAllocCount(), 1);
-
-        GBL_API_BLOCK(pCtx_, "MALLOC_2") {
-            this->ppPtr[1] = (char*)GBL_API_MALLOC(15, 1, "Test");
-            QVERIFY2(ppPtr[1], "Aligned malloc returned nullptr!");
-            QVERIFY(strncpy(ppPtr[1], "LUL", 15));
-        };
-        QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
-        QCOMPARE(test.getActiveAllocCount(), 1);
-
-        GBL_API_BLOCK(pCtx_, "MALLOC_3") {
-             this->ppPtr[2] = (char*)GBL_API_MALLOC(34, 1, "Alloc Info!");
-             QVERIFY2(ppPtr[2], "Aligned malloc with debug info returned nullptr!");
-        };
-        QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
-        QCOMPARE(test.getActiveAllocCount(), 1);
-
-        QCOMPARE(ctx().getAllocTracker().getActiveAllocationCount(), 3);
-    }
-
-    void memRealloc(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "REALLOC_2") {
-            this->ppPtr[0] = (char*)GBL_API_REALLOC(this->ppPtr[0], 37);
-            QVERIFY2(this->ppPtr[0], "Realloc returned nullptr!");
-            QVERIFY2(strncmp(this->ppPtr[0], "LUL", 37) == 0, "Realloc lost its data!");
-        };
-        QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemRealloc), 1);
-
-        test = GBL_API_BLOCK(pCtx_, "REALLOC_3") {
-            this->ppPtr[1] = (char*)GBL_API_REALLOC(this->ppPtr[1], 64, 8);
-            QVERIFY2(this->ppPtr[1], "Realloc returned nullptr!");
-            QVERIFY2(strncmp(this->ppPtr[1], "LUL", 64) == 0, "Realloc lost its data!");
-        };
-        QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemRealloc), 1);
-
-        QCOMPARE(ctx().getAllocTracker().getActiveAllocationCount(), 3);
-    }
-
-    void memFree(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "FREE") {
-            GBL_API_FREE(this->ppPtr[0]);
-        };
-        QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
-        QCOMPARE(test.getActiveAllocCount(), -1);
-        QCOMPARE(ctx().getAllocTracker().getActiveAllocationCount(), 2);
-
-        test = GBL_API_BLOCK(pCtx_, "FREE_2") {
-            GBL_API_FREE(this->ppPtr[1]);
-            GBL_API_FREE(this->ppPtr[2]);
-        };
-        QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 2);
-        QCOMPARE(test.getActiveAllocCount(), -2);
-        QCOMPARE(ctx().getAllocTracker().getActiveAllocationCount(), 0);
     }
 
     void stlPmr(void) {
@@ -591,7 +507,7 @@ private slots:
 
 #ifdef GBL_CONFIG_ERRNO_CHECKS
 #   define GBL_API_PERROR(...)                      \
-    do {                                            \
+    GBL_STMT_START {                                            \
         if(errno) GBL_UNLIKELY {                    \
             const GBL_RESULT code =                 \
                 GBL_ERRNO_RESULT(errno);            \
@@ -599,7 +515,7 @@ private slots:
                 GBL_RESULT_SUCCESS(code),           \
                 code);                              \
         }                                           \
-    } while(0)
+    } GBL_STMT_END
 #else
 #   define GBL_API_PERROR(...)
 #endif
@@ -616,14 +532,14 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
 
     void call(void) {
         auto test = GBL_API_BLOCK(pCtx(), "CALL_1_FAIL") {
-            GBL_API_CALL(gblContextVersion(nullptr));
+            GBL_API_CALL(gblContextVersion(nullptr, nullptr));
             GBL_API_END();
         };
-        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidPointer, "Call[gblContextVersion(nullptr)] -> Result[Invalid Pointer]");
+        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidPointer, "Call[gblContextVersion(nullptr, nullptr)] -> Result[Invalid Pointer]");
 
         test = GBL_API_BLOCK(pCtx(), "CALL_2_PASS") {
             GblVersion version;
-            GBL_API_CALL(gblContextVersion(&version),
+            GBL_API_CALL(gblContextVersion(&version, nullptr),
                          "Getting the goddamn version!");
             GBL_API_END();
         };

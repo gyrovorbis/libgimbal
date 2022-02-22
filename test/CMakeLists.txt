@@ -22,6 +22,8 @@ add_executable(GimbalTests
     include/test_gimbal_vector.hpp
     include/test_gimbal_api.hpp
     include/test_gimbal_context.hpp
+#    include/test_gimbal_meta.hpp
+    include/test_gimbal_object.hpp
     test_main.cpp)
 
 

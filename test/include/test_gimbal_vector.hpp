@@ -2,7 +2,7 @@
 #define TEST_GIMBAL_VECTOR_HPP
 
 #include "test_gimbal.hpp"
-#include <gimbal/gimbal_container.hpp>
+#include <gimbal/containers/gimbal_container.hpp>
 #include <sstream>
 
 
@@ -346,7 +346,6 @@ inline void Vector::assign(void) {
     test({-8, -9, -10}, init2);
     test({1, 2, 3}, vec.cbegin(), vec.cend());
     test({3, 2, 1}, vec.crbegin(), vec.crend());
-    // FUCKIN FIX ME
     test({10, 9, 8, 7, 6, 5}, stdVec.crbegin(), stdVec.crend());
     test({-9, -10}, std::cbegin(init2)+1, std::cend(init2));
     test({68, 67, 64}, std::crbegin(array), std::crend(array));
