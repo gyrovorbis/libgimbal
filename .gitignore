@@ -17,7 +17,7 @@ build-*
 Makefile
 *.autosave
 *.pro.user
-CMakeLists.txt.user
+CMakeLists.txt.user*
 CMakeCache.txt
 *.pdb
 build/
