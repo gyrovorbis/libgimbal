@@ -38,8 +38,6 @@ struct VariantCompatibleTypeTraitsDefault {
     using ForwardType = T;
     struct Forwarder {
         static ForwardType forward(Type value) { return static_cast<ForwardType>(value); }
-
-
     };
 
     constexpr static auto variantType  = VariantType(VariantType::Nil);

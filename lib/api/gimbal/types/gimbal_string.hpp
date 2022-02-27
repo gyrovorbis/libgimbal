@@ -156,9 +156,9 @@ public:
         return (lhs.toStringView() <=> rhs);
     }
     friend constexpr bool operator==(const Derived& lhs, const string_base auto& rhs) {
-        gimbal::Bool result = GBL_FALSE;
+        gimbal::Int result = GBL_FALSE;
         Exception::checkThrow(gblStringCompare(&lhs, &rhs, &result));
-        return result;
+        return result == 0;
     }
     friend constexpr decltype(auto) operator<=>(const Derived& lhs, const string_base auto& rhs) {
         return (lhs <=> rhs);

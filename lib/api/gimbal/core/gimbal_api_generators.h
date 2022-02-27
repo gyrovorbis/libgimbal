@@ -12,6 +12,14 @@
 extern "C" {
 #endif
 
+#ifdef __cplusplus
+#   define GBL_BEGIN_DECLS  extern "C" {
+#   define GBL_END_DECLS    }
+#else
+#   define GBL_BEGIN_DECLS
+#   define GBL_END_DECLS
+#endif
+
 #define GBL_FORWARD_DECLARE_STRUCT(S)  \
     struct S;                          \
     typedef struct S S

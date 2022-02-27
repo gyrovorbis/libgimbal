@@ -42,12 +42,12 @@ GBL_API_INLINE_HELPER((void*, NULL), VECTOR_AT, (const GblVector* pVector, GblSi
 #endif
 
 #define GBL_VARIANT_CONSTRUCT_TRAITS (                      \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,                \
+        GBL_META_GENERIC_MACRO_NO_DEFAULT,                  \
         (                                                   \
             (GblBool,           gblVariantConstructb),      \
             (GblInt,            gblVariantConstructi),      \
             (GblFloat,          gblVariantConstructf),      \
-            (void*,             gblVariantConstructp),     \
+            (void*,             gblVariantConstructp),      \
             (const GblString*,  gblVariantConstructs),      \
             (GblString*,        gblVariantConstructs),      \
             (const char*,       gblVariantConstructc),      \
@@ -56,8 +56,8 @@ GBL_API_INLINE_HELPER((void*, NULL), VECTOR_AT, (const GblVector* pVector, GblSi
         )                                                   \
     )
 #define gblVariantConstruct_N(pVariant, pValue, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TRAITS, pValue)(pVariant, pValue GBL_VA_ARGS(__VA_ARGS__))
-#define gblVariantConstruct_1(pVariant) gblVariantConstructDefault(pVariant)
-#define gblVariantConstruct(...) GBL_VA_OVERLOAD_CALL(gblVariantConstruct, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
+#define gblVariantConstruct_1(pVariant)              gblVariantConstructDefault(pVariant)
+#define gblVariantConstruct(...)                    GBL_VA_OVERLOAD_CALL(gblVariantConstruct, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
 
 #define gblVariantSetc(...) GBL_VA_OVERLOAD_CALL(gblVariantSetc, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
@@ -89,7 +89,7 @@ GBL_API_INLINE_HELPER((void*, NULL), VECTOR_AT, (const GblVector* pVector, GblSi
 
 
 #define GBL_VARIANT_GET_TRAITS (                    \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,                             \
+        GBL_META_GENERIC_MACRO_NO_DEFAULT,          \
         (                                           \
             (GblBool*,          gblVariantGetb),    \
             (GblInt*,           gblVariantGeti),    \
@@ -102,7 +102,7 @@ GBL_API_INLINE_HELPER((void*, NULL), VECTOR_AT, (const GblVector* pVector, GblSi
 #define gblVariantGet(pVariant, pValue) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_GET_TRAITS, pValue)(pVariant, pValue)
 
 #define GBL_VARIANT_TO_TRAITS (                 \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,                          \
+        GBL_META_GENERIC_MACRO_NO_DEFAULT,      \
         (                                       \
             (GblBool*,      gblVariantTob),     \
             (GblInt*,       gblVariantToi),     \
@@ -114,7 +114,7 @@ GBL_API_INLINE_HELPER((void*, NULL), VECTOR_AT, (const GblVector* pVector, GblSi
     )
 
 #define GBL_VARIANT_COMPARE_TRAITS (                    \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,                             \
+        GBL_META_GENERIC_MACRO_NO_DEFAULT,              \
         (                                               \
             (GblBool,           gblVariantCompareb),    \
             (GblInt,            gblVariantComparei),    \
@@ -126,7 +126,7 @@ GBL_API_INLINE_HELPER((void*, NULL), VECTOR_AT, (const GblVector* pVector, GblSi
             (const GblVariant*, gblVariantComparev),    \
             (GblVariant*,       gblVariantComparev),    \
             (const char*,       gblVariantComparec),    \
-            (char*,             gblVariantComparec)    \
+            (char*,             gblVariantComparec)     \
         )                                               \
     )
 
@@ -459,13 +459,18 @@ GBL_INLINE GBL_API gblVariantCompares(const GblVariant* pVariant, const GblStrin
         pThisString = &tempString;
     }
     switch(op) {
-    case GBL_VARIANT_OP_CMP_EQUAL:
-        GBL_API_CALL(gblStringCompare(pThisString, pString, pResult));
+    case GBL_VARIANT_OP_CMP_EQUAL: {
+        GblInt result = 0;
+        GBL_API_CALL(gblStringCompare(pThisString, pString, &result));
+        *pResult = result == 0;
         break;
-    case GBL_VARIANT_OP_CMP_NEQUAL:
-        GBL_API_CALL(gblStringCompare(pThisString, pString, pResult));
-        *pResult = !*pResult;
+    }
+    case GBL_VARIANT_OP_CMP_NEQUAL: {
+        GblInt result = 1;
+        GBL_API_CALL(gblStringCompare(pThisString, pString, &result));
+        *pResult = result != 0;
         break;
+    }
     default: {
         const char* pBuffer1 = NULL;
         const char* pBuffer2 = NULL;
@@ -652,6 +657,7 @@ GBL_INLINE GBL_API gblVariantMovev(GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_END();
 }
 
+//== MAKE ME TAKE A BUFFER INSTEAD ===
 GBL_INLINE GBL_API gblVariantMovec(GblVariant* pVariant, char* pBuffer, GblSize capacity) {
     GBL_API_BEGIN(GBL_HANDLE_INVALID);
     GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_VARIANT_TYPE_STRING));

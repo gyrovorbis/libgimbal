@@ -10,6 +10,8 @@
 extern "C" {
 #endif
 
+// Warezed from the linux kernel
+#define GBL_CONTAINER_OF(p, t, m) ((t*)((char*)(p) - offsetof(t, m)))
 #define GBL_SWITCH_CASE_STRINGIFY(s) \
     case s: return #s
 
@@ -42,7 +44,7 @@ https://stackoverflow.com/questions/8774567/c-macro-to-create-a-bit-mask-possibl
 // HIGHEST TOP LEVEL SHIT:
 GBL_FLAGS_FIELD_SET(flags, EVMU_SFR_PSW, CY, 0x20);
 EVMU_SFR_PSW_FLAGS_FIELD_SET(flags, AC, 110);
-
+s
 EVMU_SFR_PSW_FLAGS_SET(flags,
                       (
                         (AC, 110),

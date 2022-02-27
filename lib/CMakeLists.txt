@@ -133,12 +133,10 @@ set(GIMBAL_INCLUDES
 #    api/gimbal/types/gimbal_variant.h
     api/gimbal/util/gimbal_test.h
     api/gimbal/objects/gimbal_handle.h
-    api/gimbal/meta/gimbal_meta.h
     api/gimbal/containers/gimbal_hashmap.h
     api/gimbal/containers/gimbal_btree.h
     api/gimbal/containers/gimbal_table.h
     api/gimbal/meta/gimbal_type.h
-    api/gimbal/meta/gimbal_meta.hpp
 #    api/gimbal/util/gimbal_cmdline_parser.h
 #    api/gimbal/core/gimbal_runtime.h
     api/gimbal/core/gimbal_log.h
@@ -170,6 +168,8 @@ set(GIMBAL_INCLUDES
 #    api/gimbal/meta2/gimbal_object.h
 #    api/gimbal/meta2/gimbal_class.h
     api/gimbal/meta2/gimbal_type.h
+    api/gimbal/meta/gimbal_class.h
+    api/gimbal/meta/gimbal_instance.h
 #    api/gimbal/meta2/gimbal_primitive.h
     #api/gimbal/ifaces/gimbal_inamed.h
     #api/gimbal/ifaces/gimbal_icontainer.h
@@ -177,7 +177,6 @@ set(GIMBAL_INCLUDES
     #api/gimbal/ifaces/gimbal_iiterable.h
     #api/gimbal/ifaces/gimbal_itable.h
 #    api/gimbal/types/gimbal_dispatcher.h
-#    api/gimbal/types/gimbal_buffer.h
     api/gimbal/types/gimbal_version.h
 #    api/gimbal/types/gimbal_value.h
 #    api/gimbal/util/gimbal_alloc.h

@@ -6,6 +6,7 @@ typedef struct GblThread_ {
     GblCallRecord   callRecord;
     const char*     pName;
     uint32_t        logStackDepth;
+    GblContext*     pContext;
     GblStackFrame*  pStackFrameTop;
 } GblThread_;
 
@@ -30,6 +31,10 @@ GBL_API gblThreadCurrent(GblThread** ppThread) {
     GBL_ASSERT(ppThread);
     *ppThread = &thread_;
     return GBL_RESULT_SUCCESS;
+}
+
+GBL_API gblThreadContext(GblThread* pThread) {
+
 }
 
 GBL_API gblThreadCallRecordGet(const GblThread* pThread, const GblCallRecord** ppRecord) {

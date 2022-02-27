@@ -1,7 +1,6 @@
 #ifndef GIMBAL_TYPE_H
 #define GIMBAL_TYPE_H
 
-#include <stdatomic.h>
 
 #include "../types/gimbal_typedefs.h"
 #include "../core/gimbal_api_frame.h"
@@ -57,22 +56,11 @@ extern "C" {
  * larger alignment than this, but we don't need to
  * do better than malloc.
  */
-#define STRUCT_ALIGNMENT (2 * sizeof (gsize))
-#define ALIGN_STRUCT(offset) \
-      ((offset + (STRUCT_ALIGNMENT - 1)) & -STRUCT_ALIGNMENT)
+#define GBL_STRUCT_ALIGNMENT (2 * sizeof (size_t))
+#define GBL_ALIGN_STRUCT(offset) \
+      ((offset + (GBL_STRUCT_ALIGNMENT - 1)) & -GBL_STRUCT_ALIGNMENT)
 
 
-struct GblClass_ {
-    GblType     gblType;
-};
-
-struct GblInterface_ {
-    GblType     gblType;
-};
-
-struct GblInstance_ {
-    GblClass*   pClass;
-};
 
 // wrap using DSL
 GBL_DECLARE_FLAGS(GblTypeFundamentalFlags) {
@@ -95,37 +83,64 @@ GBL_CONSTEXPR GBL_INLINE GblBool GBL_TYPE_FLAGS_TEST(GblType gblType, GblTypeFla
 }
 
 
-typedef GBL_RESULT (*GblTypeBaseInitFn)     (void*, void*);
-typedef GBL_RESULT (*GblTypeBaseFinalizeFn) (void*, void*);
-typedef GBL_RESULT (*GblClassInitFn)        (void* /*pIface*/, void* /*pIfaceData*/);
-typedef GBL_RESULT (*GblClassFinalizeFn)    (void* /*pIface*/, void* /*pIfaceData*/);
-typedef GBL_RESULT (*GblInstanceInitFn)     (GblInstance*, GblClass*);
-
-// ======= META TYPES =======
+typedef GBL_RESULT (*GblClassBaseInitFn)    (GblClass*, const void*);
+typedef GBL_RESULT (*GblClassBaseFinalizeFn)(GblClass*, const void*);
+typedef GBL_RESULT (*GblClassConstructFn)   (GblClass*, const void* /*pClassData*/);
+typedef GBL_RESULT (*GblClassDestructFn)    (GblClass*, const void* /*pClassData*/);
 
 
-typedef GBL_RESULT (*GblMetaTypeConstructFn)    (void*, GblContext, const GblVariant*);
-typedef GBL_RESULT (*GblMetaTypeDestructFn)     (void*, GblContext);
-typedef GBL_RESULT (*GblMetaTypeMoveFn)         (void*, GblContext, void*);
-typedef GBL_RESULT (*GblMetaTypeConvertFn)      (const void*, GblContext, GblVariant*);
-typedef GBL_RESULT (*GblMetaTypeCompareFn)      (const void*, GblContext, const GblVariant*, GblCmpResult*);
-typedef GBL_RESULT (*GblMetaTypeSerializeFn)    (const void*, GblContext, void*, GblSize*);
-typedef GBL_RESULT (*GblMetaTypeDeserializeFn)  (void*, GblContext, const void*, GblSize*);
+typedef struct GblTypeInfo {
+    GblSize                 instanceSize;
+    GblSize                 instanceAlign;
+    GblSize                 classSize;
+    GblSize                 classAlign;
+    const void*             pClassData;
+    GblClassBaseInitFn      pFnClassInit;
+    GblClassBaseFinalizeFn  pFnClassFinalize;
+    GblClassConstructFn     pFnClassConstruct;
+    GblClassDestructFn      pFnClassDestruct;
+} GblTypeInfo;
 
-typedef struct GblMetaTypeVTable {
-    GblMetaTypeConstructFn      pFnConstruct;
-    GblMetaTypeDestructFn       pFnDestruct;
-    GblMetaTypeMoveFn           pFnMove;
-    GblMetaTypeConvertFn        pFnConvert;
-    GblMetaTypeCompareFn        pFnCompare;
-    GblMetaTypeSerializeFn      pFnSerialize;
-    GblMetaTypeDeserializeFn    pFnDeserialize;
-} GblMetaTypeVTable;
+
+//GBL_EXPORT GBL_RESULT           gblTypeInit(void);  // init API, done automatically
+//GBL_EXPORT GBL_RESULT           gblTypeDeinit(void); // in case you want to restart
+
+GBL_EXPORT GblType              gblTypeRegister(GblType              parent,
+                                                const char*          pName,
+                                                const GblTypeInfo*   pInfo,
+                                                GblFlags             flags);
+GBL_EXPORT void                 gblTypeUnregister(GblType type);
+GBL_EXPORT GblType              gblTypeFind(const char* pName);
+GBL_EXPORT GblSize              gblTypeCount(void);
+
+GBL_EXPORT const char*          gblTypeName(GblType type);
+GBL_EXPORT GblType              gblTypeParent(GblType type);
+GBL_EXPORT GblType              gblTypeBase(GblType type);
+GBL_EXPORT GblTypeFlags         gblTypeFlags(GblType type);
+GBL_EXPORT const GblTypeInfo*   gblTypeInfo(GblType type);
+GBL_EXPORT GblBool              gblTypeIsA(GblType derived, GblType base);
+GBL_EXPORT GblRefCount          gblTypeClassRefCount(GblType type);
+#ifdef GBL_TYPE_DEBUG
+GBL_EXPORT GblRefCount          gblTypeInstanceRefCount(GblType type);
+#endif
+
+
+GBL_EXPORT GblClass*            gblTypeClassRef(GblType typeId);
+GBL_EXPORT GblClass*            gblTypeClassPeek(GblType typeId);
+GBL_EXPORT GblRefCount          gblTypeClassUnref(GblClass* pClass);
+
+GBL_EXPORT GblInstance*         gblTypeInstanceCreate(GblType type);
+GBL_EXPORT GblRefCount          gblTypeInstanceDestroy(GblInstance* pInstance);
+
+
+
+
+
 
 // ===== / META TYPES =======
 
 // ========= STATIC TYPES ===========
-
+#if 0
 typedef struct GblTypeBaseInfo {
     GblType             parentType;
     GblTypeFlags        typeFlags;
@@ -134,35 +149,13 @@ typedef struct GblTypeBaseInfo {
 typedef struct GblTypeFundamentalInfo {
     struct GblTypeBaseInfo      baseTypeInfo;
 } GblTypeFundamentalInfo;
-
-typedef struct GblTypeClassInfo {
-    struct GblTypeBaseInfo      baseTypeInfo;
-
-    uint16_t                    classSize;
-    uint16_t                    classAlign;
-
-    //GblTypeBaseInitFn           pFnBaseInit;
-    //GblTypeBaseFinalizeFn       pFnBaseFinalize;
-
-    GblClassInitFn              pFnClassInit;
-    GblClassFinalizeFn          pFnClassFinalize;
-    const void*                 pClassData;
-    const void*                 pDefaultVTable;
-
-    uint16_t                    instanceSize;
-    uint16_t                    instanceAlign;
-
-    GblInstanceInitFn           pFnInstanceInit;
-} GblTypeClassInfo;
+#endif
 
 
 
 
-typedef uint32_t    GblRefCount;
 
-
-
-
+#if 0
 GBL_API gblTypeRegisterClass(const char*                            pTypeName,
                              const GblTypeClassInfo*                pClassInfo,
                              GblType*                               pNewType);
@@ -171,7 +164,7 @@ GBL_API gblTypeRegisterClass(const char*                            pTypeName,
 GBL_API gblTypeRegisterFundamental(const char*                      pTypeName,
                                    const GblTypeFundamentalInfo*    pFundamentalInfo,
                                    GblType*                         pNewType);
-
+#endif
 
 // ========= / STATIC TYPES ============
 

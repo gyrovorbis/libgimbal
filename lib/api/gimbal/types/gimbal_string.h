@@ -115,7 +115,7 @@ GBL_INLINE GBL_API gblStringResize(GblString* pStr, GblSize size) {
     return gblVectorResize(&pStr->data, size);
 }
 
-GBL_INLINE GBL_API gblStringCompare(const GblString* pStr1, const GblString* pStr2, GblBool* pResult) {
+GBL_INLINE GBL_API gblStringCompare(const GblString* pStr1, const GblString* pStr2, GblInt* pResult) {
     GBL_ASSERT(pStr1);
     GBL_ASSERT(pStr2);
     GBL_ASSERT(pResult);
@@ -123,13 +123,13 @@ GBL_INLINE GBL_API gblStringCompare(const GblString* pStr1, const GblString* pSt
         return GBL_RESULT_ERROR_INVALID_POINTER;
 
     if(pStr1 == pStr2) GBL_UNLIKELY {
-        *pResult = GBL_TRUE;
+        *pResult = 0;
     } else if(!pStr1->data.pBuffer) {
-        *pResult = GBL_FALSE;
-    } else if(!pStr1->data.pBuffer) {
-        *pResult = GBL_FALSE;
+        *pResult = INT_MIN;
+    } else if(!pStr2->data.pBuffer) {
+        *pResult = INT_MAX;
     } else GBL_LIKELY { //both valid
-        *pResult = (strcmp(pStr1->data.pBuffer, pStr2->data.pBuffer) == 0);
+        *pResult = strcmp(pStr1->data.pBuffer, pStr2->data.pBuffer);
     }
 
     return GBL_RESULT_SUCCESS;
