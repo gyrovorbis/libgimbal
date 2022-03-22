@@ -7,44 +7,58 @@
 
 namespace gimbal {
 
+template<typename CRTP, typename Key, typename Value, bool Writable>
+class ReadWriteIndexable {
+protected:
 
-template<typename CRTP, typename Index, typename Value>
-class ReadWriteContiguousIndexable {
-private:
-
-    class IndexableProxy {
-    private:
-        using ThisType = IndexableProxy;
-
-        CRTP* pObject_{};
-        Index index_{};
-
+    class SubscriptProxy {
     public:
-        IndexableProxy(CRTP* pObject, Index index):
-            pObject_(pObject), index_(index) {}
+        using                   ThisType          = SubscriptProxy;
+        static constexpr bool   ReadWrite         = Writable;
+        using                   DerivedPtrType    = std::conditional_t<ReadWrite, CRTP*, const CRTP*>;
+
+        DerivedPtrType      pObject_{};
+        Key                 key_{};
+    public:
+        SubscriptProxy(DerivedPtrType pObject, Key key):
+            pObject_(pObject), key_(std::move(key)) {}
 
         operator Value() const {
-            return pObject_->getElement_(index_);
+            return pObject_->getElement_(key_);
         }
 
         template<typename RValue>
+            requires ReadWrite
          ThisType operator=(RValue&& rhs) {
-            pObject_->setElement_(index_, std::forward<RValue>(rhs));
+            pObject_->setElement_(key_, std::forward<RValue>(rhs));
             return *this;
         }
     };
 
 public:
+
+    Value operator[](Key key) const {
+        return static_cast<const CRTP*>(this)->getElement_(key);
+    }
+
+    SubscriptProxy operator[](Key key) requires SubscriptProxy::ReadWrite {
+        return SubscriptProxy { static_cast<CRTP*>(this), key };
+    }
+};
+
+
+
+template<typename CRTP, typename Index, typename Value>
+class ReadWriteContiguousIndexable:
+    public ReadWriteIndexable<CRTP, Index, Value, true>
+{
+private:
+
+    using IndexableProxy = typename ReadWriteIndexable<CRTP, Index, Value, true>::SubscriptProxy;
+
+public:
     void checkBounds(Index index) const {
        if(index >= size()) Exception::checkThrow({Result::ErrorOutOfRange, "index > size"});
-    }
-
-    Value operator[](Index index) const {
-        return static_cast<const CRTP*>(this)->getElement_(index);
-    }
-
-    IndexableProxy operator[](Index index) {
-        return IndexableProxy { static_cast<CRTP*>(this), index };
     }
 
     Index size(void) const {

@@ -6,7 +6,7 @@
 //#include <test_gimbal_meta.hpp>
 #include <test_gimbal_algorithms.hpp>
 #include <test_gimbal_api.hpp>
-#include <test_gimbal_hash.hpp>
+#include <test_gimbal_hashmap.hpp>
 
 using namespace elysian;
 
@@ -22,6 +22,7 @@ qDebug() << "\n";
   //  testSuite.enqueueTestSet(new gimbal::test::MetaType());
     testSuite.enqueueTestSet(new gimbal::test::Variant());
     testSuite.enqueueTestSet(new gimbal::test::Algorithms());
+    testSuite.enqueueTestSet(new gimbal::test::HashMap());
 qDebug() << "DONEZ";
     return !testSuite.exec(argc, argv);
 }

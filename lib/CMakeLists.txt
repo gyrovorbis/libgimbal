@@ -140,6 +140,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/objects/gimbal_handle.h
     api/gimbal/containers/gimbal_hashset.h
     api/gimbal/containers/gimbal_hashset.hpp
+    api/gimbal/containers/gimbal_hashmap.hpp
     api/gimbal/containers/gimbal_btree.h
     api/gimbal/containers/gimbal_table.h
     api/gimbal/meta/gimbal_type.h

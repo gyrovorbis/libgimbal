@@ -11,6 +11,15 @@ namespace tags {
     struct HashSet {};
 }
 
+/* TODUZ:
+ * 1) Exceptions:
+ *    * need to propagate Thread::lastError from C API to C++ wrapper as exception
+ *    * generalize, because this will be used frequently
+ * 2) C++ STL std::unordered_set interop
+ * 3) Iterator, ForwardIterator generalization
+ * 4) C++ STL container-compatible iterator overloads
+ */
+
 template<typename K = void*,
          typename H = std::hash<K>,
          typename P = std::equal_to<K>>
@@ -18,6 +27,22 @@ class HashSet;
 
 template<typename K = void*>
 class HashSetView;
+
+
+template<typename C,
+         typename K>
+struct HashSetIterator:
+        public GblHashSetIterator,
+        public std::iterator<std::forward_iterator_tag, K>
+{
+    HashSetIterator(C* pCont=nullptr, Size bucketIdx=-1):
+        GblHashSetIterator({pCont, bucketIdx}) {}
+
+    const C* getContainer(void) const { return reinterpret_cast<C*>(GblHashSetIterator_container(this)); }
+    bool     Valid(void) const { return GblHashSetIterator_valid(this); }
+    K&       value(void) { return *reinterpret_cast<K*>(GblHashSetIterator_value(this)); }
+
+};
 
 template<typename CRTP, typename K=void*>
 class HashSetBase:
@@ -50,24 +75,26 @@ public:
 
     operator const GblHashSet*() const;
 
-    decltype(auto)  getSet(void) const;
-    decltype(auto)  getSet(void);
+    decltype(auto)  getSet      (void) const;
+    decltype(auto)  getSet      (void);
 
-    size_type       size(void) const noexcept;
+    size_type       size        (void) const noexcept;
     size_type       bucket_count(void) const noexcept;
-    size_type       bucket_size(void) const noexcept;
-    bool            empty(void) const noexcept;
-    GblContext      context(void) const noexcept;
+    size_type       bucket_size (void) const noexcept;
+    bool            empty       (void) const noexcept;
+    GblContext      context     (void) const noexcept;
 
-    const_pointer   get(const key_type& key) const noexcept;
+    const_pointer   get         (const key_type& key) const noexcept;
 
-    const_reference at(const key_type& key) const;
+    const_reference at          (const key_type& key) const;
 
-    size_type       count(const key_type& key) const noexcept;
-    bool            contains(const key_type& key) const noexcept;
-    const_pointer   probe(size_type position) const noexcept;
+    size_type       count       (const key_type& key) const noexcept;
+    bool            contains    (const key_type& key) const noexcept;
+    const_pointer   probe       (size_type position) const noexcept;
 
-    bool            foreach(std::invocable<const key_type&> auto fn) const noexcept;
+    template<typename F>
+        requires std::is_invocable_r_v<bool, F, const K&>
+    bool            for_each     (F&& fn) const noexcept;
 };
 
 
@@ -78,13 +105,13 @@ class HashSetView final: public HashSetBase<HashSetView<K>, K> {
 private:
     const GblHashSet* pGblHashSet_ = nullptr;
 protected:
-    const GblHashSet*   set_(void) const;
+    const GblHashSet*   set_        (void) const;
 public:
-                        HashSetView(void) = default;
-                        HashSetView(const GblHashSet& gblHashSet);
-                        HashSetView(const GblHashSet* pGblHashSet);
+                        HashSetView (void) = default;
+                        HashSetView (const GblHashSet& gblHashSet);
+                        HashSetView (const GblHashSet* pGblHashSet);
 
-    bool                isValid(void) const;
+    bool                isValid     (void) const;
 };
 
 
@@ -122,37 +149,32 @@ private:
     static void destructCb_    (const GblHashSet* pSet, void* pKey);
 
 protected:
-    const GblHashSet*   set_(void) const;
-    GblHashSet*         set_(void);
+    const GblHashSet*   set_    (void) const;
+    GblHashSet*         set_    (void);
 
 public:
 
-                HashSet(size_type   capacity    = 0,
-                        H&          hash        = H(),
-                        P&          pred        = P(),
-                        Context*    pCtx        = nullptr);
+                HashSet         (size_type   capacity    = 0,
+                                 H&          hash        = H(),
+                                 P&          pred        = P(),
+                                 Context*    pCtx        = nullptr);
 
-    pointer     get(const K& key) noexcept;
+    pointer     get             (const key_type& key) noexcept;
+    pointer     set             (key_type& key) noexcept;
 
-    pointer     set(K& key) noexcept;
-    bool        insert(K& key) noexcept;
-    void        insert_or_assign(K& key) noexcept;
+    bool        insert          (key_type& key) noexcept;         //needs to throw exception
+    void        insert_or_assign(key_type& key) noexcept;
 
-    bool        erase(const K& key) noexcept;
-    pointer     extract(const K& key) noexcept;
-    void        clear(void) noexcept;
+    bool        erase           (const key_type& key) noexcept;
+    pointer     extract         (const key_type& key) noexcept;
+    void        clear           (void) noexcept;
 
-    pointer     probe(Size position) noexcept;
-
-    /*
-    template<typename... Args>
-    reference   emplace(Args&&... args) noexcept ;
+    pointer     probe           (size_type position) noexcept;
 
     template<typename... Args>
-    pointer     tryEmplace(Args&&... args) noexcept;
-    */
-
-
+    bool        emplace         (const key_type& key, Args&&... args);   //needs to throw exception
+    template<typename... Args>
+    bool        try_emplace     (const key_type& key, Args&&... args) noexcept;
 };
 
 
@@ -221,13 +243,16 @@ inline auto HashSetBase<CRTP, K>::probe(size_type position) const noexcept -> co
 }
 
 template<typename CRTP, typename K>
-inline bool HashSetBase<CRTP, K>::foreach(std::invocable<const key_type&> auto fn) const noexcept {
+template<typename F>
+        requires std::is_invocable_r_v<bool, F, const K&>
+inline bool HashSetBase<CRTP, K>::for_each(F&& fn) const noexcept {
     return GblHashSet_foreach(getSet(), [](const GblHashSet* pSelf,
-                                         void*             pKey,
-                                         void*             pUd)
+                                         void*               pKey,
+                                         void*               pUd)
                                       {
                                           GBL_UNUSED(pSelf);
-                                          return std::invoke(*static_cast<decltype(fn)>(pUd), *static_cast<const_pointer>(pKey));
+                                          auto* pFn = static_cast<decltype(fn)*>(pUd);
+                                          return *pFn(*static_cast<const_pointer>(pKey));
                                       },
                                       &fn);
 }
@@ -277,32 +302,32 @@ inline HashSet<K, H, P>::HashSet(size_type   capacity,
 }
 
 template<typename K, typename H, typename P>
-inline auto HashSet<K, H, P>::get(const K& key) noexcept -> pointer {
+inline auto HashSet<K, H, P>::get(const key_type& key) noexcept -> pointer {
     return static_cast<pointer>(GblHashSet_get(this, &key));
 }
 
 template<typename K, typename H, typename P>
-inline auto HashSet<K, H, P>::set(K& key) noexcept -> pointer {
+inline auto HashSet<K, H, P>::set(key_type& key) noexcept -> pointer {
     return static_cast<pointer>(GblHashSet_set(this, &key));
 }
 
 template<typename K, typename H, typename P>
-inline bool HashSet<K, H, P>::insert(K& key) noexcept {
+inline bool HashSet<K, H, P>::insert(key_type& key) noexcept {
     return GblHashSet_insert(this, &key);
 }
 
 template<typename K, typename H, typename P>
-inline void HashSet<K, H, P>::insert_or_assign(K& key) noexcept {
+inline void HashSet<K, H, P>::insert_or_assign(key_type& key) noexcept {
     GblHashSet_insertOrAssign(this, &key);
 }
 
 template<typename K, typename H, typename P>
-inline bool HashSet<K, H, P>::erase(const K& key) noexcept {
+inline bool HashSet<K, H, P>::erase(const key_type& key) noexcept {
     return GblHashSet_erase(this, &key);
 }
 
 template<typename K, typename H, typename P>
-inline auto HashSet<K, H, P>::extract(const K& key) noexcept -> pointer {
+inline auto HashSet<K, H, P>::extract(const key_type& key) noexcept -> pointer {
     return GblHashSet_extract(this, &key);
 }
 
@@ -312,18 +337,35 @@ inline void HashSet<K, H, P>::clear(void) noexcept {
 }
 
 template<typename K, typename H, typename P>
-inline auto HashSet<K, H, P>::probe(Size position) noexcept -> pointer{
+inline auto HashSet<K, H, P>::probe(size_type position) noexcept -> pointer {
     return GblHashSet_probe(this, position);
 }
 
 template<typename K, typename H, typename P>
+template<typename... Args>
+inline bool HashSet<K, H, P>::try_emplace(const key_type& key, Args&&... args) noexcept {
+    pointer pData = static_cast<pointer>(GblHashSet_emplace(this, &key));
+    if(pData) new (pData) key_type(std::forward<Args>(args)...);
+    return pData;
+}
+
+template<typename K, typename H, typename P>
+template<typename... Args>
+inline bool HashSet<K, H, P>::emplace(const key_type& key, Args&&... args) {
+    pointer pData = static_cast<pointer>(GblHashSet_emplace(this, &key));
+    GBL_ASSERT(pData);
+    new (pData) key_type(std::forward<Args>(args)...);
+    return true;
+}
+
+template<typename K, typename H, typename P>
 inline Hash HashSet<K, H, P>::hasherCb_(const GblHashSet* pSet, const void* pKey) {
-    static_cast<HashSet<K, H, P>*>(pSet)->hasher_(*static_cast<const K*>(pKey));
+    return static_cast<HashSet<K, H, P>*>(pSet)->hasher_(*static_cast<const K*>(pKey));
 }
 
 template<typename K, typename H, typename P>
 inline Int HashSet<K, H, P>::comparatorCb_ (const GblHashSet* pSet, const void* pKey1, const void* pKey2) {
-    static_cast<HashSet<K, H, P>*>(pSet)->comparator_(*static_cast<const K*>(pKey1), *static_cast<const K*>(pKey2));
+    return static_cast<HashSet<K, H, P>*>(pSet)->comparator_(*static_cast<const K*>(pKey1), *static_cast<const K*>(pKey2));
 }
 
 template<typename K, typename H, typename P>

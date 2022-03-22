@@ -126,7 +126,7 @@ GBL_EXPORT void*                GblHashSetIterator_value(CSELF)                 
 // ======== INLINE IMPLEMENTATION ======
 
 
-GBL_INLINE GBL_MAYBE_UNUSED void* GblHashSet_userdata(const GblHashSet* pSelf) GBL_NOEXCEPT {
+GBL_INLINE void* GblHashSet_userdata(const GblHashSet* pSelf) GBL_NOEXCEPT {
     return pSelf->pUserdata;
 }
 
