@@ -17,7 +17,7 @@ struct GblVariant {
         GblFloat        floating;
         void*           pVoidPtr;
         GblString       string;
-        GblObject       hObject;
+        GblObject_      hObject;
     };
     GBL_VARIANT_TYPE    type;
 };

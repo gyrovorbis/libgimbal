@@ -71,7 +71,7 @@ GBL_INLINE GBL_RESULT gblTableFinalize(GblTable* pTable) {
 
 GBL_INLINE GBL_RESULT gblTableValueGet(GblTable* pTable, const GblVariant* pKey, GblVariant* pValue) {
     GblTableField* pField = NULL;
-    GBL_API_ASSERT(pTable);
+    GBL_ASSERT(pTable);
     GBL_API_BEGIN(pTable->hashBase.hCtx);
     GBL_API_VERIFY_POINTER(pKey);
     GBL_API_VERIFY_POINTER(pValue);
@@ -89,7 +89,7 @@ GBL_INLINE GBL_RESULT gblTableValueSet(GblTable* pTable, const GblVariant* pKey,
     GblTableField field;
     GBL_VARIANT_TYPE valueType = GBL_VARIANT_TYPE_NIL;
     void* pData = NULL;
-    GBL_API_ASSERT(pTable);
+    GBL_ASSERT(pTable);
     GBL_API_BEGIN(pTable->hashBase.hCtx);
     GBL_API_VERIFY_POINTER(pKey);
     GBL_API_CALL(gblVariantCopy(&field.key, pKey));
@@ -107,7 +107,7 @@ GBL_INLINE GBL_RESULT gblTableValueSet(GblTable* pTable, const GblVariant* pKey,
 
 GBL_INLINE GBL_RESULT gblTableFieldRemove(GblTable* pTable, GblVariant* pKey) {
     void* pData = NULL;
-    GBL_API_ASSERT(pTable);
+    GBL_ASSERT(pTable);
     GBL_API_BEGIN(pTable->hashBase.hCtx);
     GBL_API_VERIFY_POINTER(pKey);
     GBL_API_CALL(gblHashMapDelete(pTable, pKey, &pData));

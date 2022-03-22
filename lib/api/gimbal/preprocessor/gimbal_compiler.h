@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 // C Version
 #ifdef __STDC_VERSION__
@@ -256,8 +257,11 @@
 #   define GBL_ALLOC_ALIGNED(s, a)      malloc(s * a)
 #endif
 
-#define GBL_INLINE \
-    static inline
+#ifdef __cplusplus
+#   define GBL_INLINE   inline
+#else
+#   define GBL_INLINE   static inline
+#endif
 
 // ====== NONSTANDARD COMPILER-SPECIFIC C FUNCTIONS ==========
 

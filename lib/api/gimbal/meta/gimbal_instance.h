@@ -4,7 +4,7 @@
 
 #include "gimbal_class.h"
 
-GBL_BEGIN_DECLS
+GBL_DECLS_BEGIN
 
 #define SELF    GblInstance*       pSelf
 #define CSELF   const GblInstance* pSelf
@@ -54,6 +54,6 @@ GBL_EXPORT GblInstance* GblInstance_cast(SELF, GblType toType) {
 #undef SELF
 #undef CSELF
 
-GBL_END_DECLS
+GBL_DECLS_END
 
 #endif // GIMBAL_INSTANCE_H

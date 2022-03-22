@@ -1,5 +1,5 @@
-#ifndef GIMBAL_OBJECT_H
-#define GIMBAL_OBJECT_H
+#ifndef GIMBAL_OBJECT__H
+#define GIMBAL_OBJECT__H
 
 #include "../types/gimbal_typedefs.h"
 #include "../meta/gimbal_meta.h"
@@ -10,11 +10,10 @@ extern "C" {
 
 #define GBL_OBJECT_INVALID NULL
 
-
-//typedef GBL_RESULT (*GblMetaObjectPropertyInfoFn)(const GblObject, const GblVariant*, const GblProperty**);
-typedef GBL_RESULT (*GblMetaObjectPropertyGetFn)(const GblObject, const GblVariant*, GblVariant*);
-typedef GBL_RESULT (*GblMetaObjectPropertySetFn)(const GblObject, const GblVariant*, const GblVariant*);
-typedef GBL_RESULT (*GblMetaObjectPropertyNextFn)(const GblObject, const GblVariant*, GblVariant*, GblVariant*);
+//typedef GBL_RESULT (*GblMetaObjectPropertyInfoFn)(const GblObject_, const GblVariant*, const GblProperty**);
+typedef GBL_RESULT (*GblMetaObjectPropertyGetFn)(const GblObject_, const GblVariant*, GblVariant*);
+typedef GBL_RESULT (*GblMetaObjectPropertySetFn)(const GblObject_, const GblVariant*, const GblVariant*);
+typedef GBL_RESULT (*GblMetaObjectPropertyNextFn)(const GblObject_, const GblVariant*, GblVariant*, GblVariant*);
 
 #if 0
 typedef struct GblProperty {
@@ -50,9 +49,9 @@ typedef struct GblMetaObject {
 } GblMetaObject;
 
 
-typedef struct GblObject_ {
+typedef struct GblObject__ {
     GblMetaObject* pMetaObject;
-} GblObject_;
+} GblObject__;
 
 
 #define GBL_OBJECT_VCALL(obj, methodIdx, ...)                           \
@@ -69,15 +68,15 @@ typedef struct GblObjectCreateInfo {
 } GblObjectCreateInfo;
 
 
-GBL_RESULT gblObjectMetaObject(const GblObject hObject, const GblMetaObject**);
-GBL_RESULT gblObjectPropertyGet(const GblObject hObject, const GblVariant* pkey, GblVariant* pValue);
-GBL_RESULT gblObjectPropertySet(GblObject hObject, const GblVariant* pKey, const GblVariant* pValue);
-GBL_RESULT gblObjectPropertyNext(const GblObject hObject, const GblVariant* pCurKey, GblVariant* pNextKey, GblVariant* pNextValue);
-GBL_RESULT gblObjectVirtualMethod(const GblObject hObject, GblEnum methodIndex, const GblVirtualFn** pMethod);
-GBL_RESULT gblObjectParentVirtualMethod(const GblObject hObject, GblEnum methodIndex, const GblVirtualFn** pMethod);
+GBL_RESULT gblObjectMetaObject(const GblObject_ hObject, const GblMetaObject**);
+GBL_RESULT gblObjectPropertyGet(const GblObject_ hObject, const GblVariant* pkey, GblVariant* pValue);
+GBL_RESULT gblObjectPropertySet(GblObject_ hObject, const GblVariant* pKey, const GblVariant* pValue);
+GBL_RESULT gblObjectPropertyNext(const GblObject_ hObject, const GblVariant* pCurKey, GblVariant* pNextKey, GblVariant* pNextValue);
+GBL_RESULT gblObjectVirtualMethod(const GblObject_ hObject, GblEnum methodIndex, const GblVirtualFn** pMethod);
+GBL_RESULT gblObjectParentVirtualMethod(const GblObject_ hObject, GblEnum methodIndex, const GblVirtualFn** pMethod);
 
-GBL_RESULT gblObjectConstruct(GblObject* phObject, const GblMetaObject* pMetaObject);
-GBL_RESULT gblObjectDestruct(GblObject hObject);
+GBL_RESULT gblObjectConstruct(GblObject_* phObject, const GblMetaObject* pMetaObject);
+GBL_RESULT gblObjectDestruct(GblObject_ hObject);
 
 //GBL_RESULT gblObjectConstructFromString();
 //GBL_RESULT gblObjectCopyConstruct();

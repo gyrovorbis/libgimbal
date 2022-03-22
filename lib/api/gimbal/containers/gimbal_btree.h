@@ -33,7 +33,7 @@ GBL_INLINE void gblBTreeFree_(void* pData) {
 
 
 GBL_INLINE GBL_RESULT gblBTreeOom(GblBTree* pTree, GblBool* pResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pResult);
     btree_oom(pTree->pImpl_);
@@ -64,14 +64,14 @@ GBL_INLINE GBL_RESULT gblBtreeInit(GblBTree* pTree, GblContext hCtx, GblSize elS
 }
 
 GBL_INLINE GBL_RESULT gblBTreeFinalize(GblBTree* pTree) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     btree_free(pTree);
     GBL_API_END();
 }
 
 GBL_INLINE GBL_RESULT gblBTreeHeight(GblBTree* pTree, GblSize* pHeight) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pHeight);
     *pHeight = btree_height(pTree->pImpl_);
@@ -79,7 +79,7 @@ GBL_INLINE GBL_RESULT gblBTreeHeight(GblBTree* pTree, GblSize* pHeight) {
 }
 
 GBL_INLINE GBL_RESULT gblBTreeCount(GblBTree* pTree, GblSize* pCount) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pCount);
     *pCount = btree_count(pTree->pImpl_);
@@ -87,7 +87,7 @@ GBL_INLINE GBL_RESULT gblBTreeCount(GblBTree* pTree, GblSize* pCount) {
 }
 
 GBL_INLINE GBL_RESULT gblBTreeSet(GblBTree* pTree, void* pItem, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pItem);
     GBL_API_VERIFY_POINTER(ppResult);
@@ -97,7 +97,7 @@ GBL_INLINE GBL_RESULT gblBTreeSet(GblBTree* pTree, void* pItem, void** ppResult)
 }
 
 GBL_INLINE GBL_RESULT gblBTreeGet(GblBTree* pTree, void* pKey, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pKey);
     GBL_API_VERIFY_POINTER(ppResult);
@@ -106,7 +106,7 @@ GBL_INLINE GBL_RESULT gblBTreeGet(GblBTree* pTree, void* pKey, void** ppResult) 
 }
 
 GBL_INLINE GBL_RESULT gblBTreeDelete(GblBTree* pTree, void* pKey, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pKey);
     GBL_API_VERIFY_POINTER(ppResult);
@@ -115,7 +115,7 @@ GBL_INLINE GBL_RESULT gblBTreeDelete(GblBTree* pTree, void* pKey, void** ppResul
 }
 
 GBL_INLINE GBL_RESULT gblBTreePopMin(GblBTree* pTree, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(ppResult);
     *ppResult = btree_pop_min(pTree->pImpl_);
@@ -123,7 +123,7 @@ GBL_INLINE GBL_RESULT gblBTreePopMin(GblBTree* pTree, void** ppResult) {
 }
 
 GBL_INLINE GBL_RESULT gblBTreePopMax(GblBTree* pTree, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(ppResult);
     *ppResult = btree_pop_max(pTree->pImpl_);
@@ -131,7 +131,7 @@ GBL_INLINE GBL_RESULT gblBTreePopMax(GblBTree* pTree, void** ppResult) {
 }
 
 GBL_INLINE GBL_RESULT gblBTreeMin(GblBTree* pTree, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(ppResult);
     *ppResult = btree_min(pTree->pImpl_);
@@ -139,7 +139,7 @@ GBL_INLINE GBL_RESULT gblBTreeMin(GblBTree* pTree, void** ppResult) {
 }
 
 GBL_INLINE GBL_RESULT gblBTreeMax(GblBTree* pTree, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(ppResult);
     *ppResult = btree_max(pTree->pImpl_);
@@ -147,7 +147,7 @@ GBL_INLINE GBL_RESULT gblBTreeMax(GblBTree* pTree, void** ppResult) {
 }
 
 GBL_INLINE GBL_RESULT gblBTreeLoad(GblBTree* pTree, void* pItem, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pItem);
     GBL_API_VERIFY_POINTER(ppResult);
@@ -157,7 +157,7 @@ GBL_INLINE GBL_RESULT gblBTreeLoad(GblBTree* pTree, void* pItem, void** ppResult
 }
 
 GBL_INLINE GBL_RESULT gblBTreeAcend(GblBTree* pTree, void* pPivot, bool (*pFnIter)(const void *item, void *udata), void *pUdata, GblBool* pResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pPivot);
     GBL_API_VERIFY_POINTER(pResult);
@@ -166,7 +166,7 @@ GBL_INLINE GBL_RESULT gblBTreeAcend(GblBTree* pTree, void* pPivot, bool (*pFnIte
 }
 
 GBL_INLINE GBL_RESULT gblBTreeDescend(GblBTree* pTree, void* pPivot, bool (*pFnIter)(const void *item, void *udata), void *pUdata, GblBool* pResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pPivot);
     GBL_API_VERIFY_POINTER(pResult);
@@ -185,7 +185,7 @@ enum btree_action {
 
 
 GBL_INLINE GBL_RESULT gblBTreeActionAcend(GblBTree* pTree, void* pPivot, bool (*pFnIter)(const void *item, void *udata), void *pUdata, GblBool* pResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pPivot);
     GBL_API_VERIFY_POINTER(pResult);
@@ -194,7 +194,7 @@ GBL_INLINE GBL_RESULT gblBTreeActionAcend(GblBTree* pTree, void* pPivot, bool (*
 }
 
 GBL_INLINE GBL_RESULT gblBTreeActionDescend(GblBTree* pTree, void* pPivot, bool (*pFnIter)(const void *item, void *udata), void *pUdata, GblBool* pResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pPivot);
     GBL_API_VERIFY_POINTER(pResult);
@@ -205,7 +205,7 @@ GBL_INLINE GBL_RESULT gblBTreeActionDescend(GblBTree* pTree, void* pPivot, bool 
 // functions that support hints
 
 GBL_INLINE GBL_RESULT gblBTreeSetHint(GblBTree* pTree, void* pItem, uint64_t* pHint, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pItem);
     GBL_API_VERIFY_POINTER(pHint);
@@ -216,7 +216,7 @@ GBL_INLINE GBL_RESULT gblBTreeSetHint(GblBTree* pTree, void* pItem, uint64_t* pH
 }
 
 GBL_INLINE GBL_RESULT gblBTreeDeleteHint(GblBTree* pTree, void* pKey, uint64_t* pHint, void** ppResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pItem);
     GBL_API_VERIFY_POINTER(pHint);
@@ -227,7 +227,7 @@ GBL_INLINE GBL_RESULT gblBTreeDeleteHint(GblBTree* pTree, void* pKey, uint64_t* 
 
 
 GBL_INLINE GBL_RESULT gblBTreeAcendHint(GblBTree* pTree, void* pPivot, bool (*pFnIter)(const void *item, void *udata), void *pUdata, uint64_t* pHint, GblBool* pResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pPivot);
     GBL_API_VERIFY_POINTER(pResult);
@@ -238,7 +238,7 @@ GBL_INLINE GBL_RESULT gblBTreeAcendHint(GblBTree* pTree, void* pPivot, bool (*pF
 }
 
 GBL_INLINE GBL_RESULT gblBTreeDescendHint(GblBTree* pTree, void* pPivot, bool (*pFnIter)(const void *item, void *udata), void *pUdata, uint64_t* pHint, GblBool* pResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pPivot);
     GBL_API_VERIFY_POINTER(pResult);
@@ -249,7 +249,7 @@ GBL_INLINE GBL_RESULT gblBTreeDescendHint(GblBTree* pTree, void* pPivot, bool (*
 }
 
 GBL_INLINE GBL_RESULT gblBTreeActionAcendHint(GblBTree* pTree, void* pPivot, bool (*pFnIter)(const void *item, void *udata), void *pUdata, uint64_t* pHint, GblBool* pResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pPivot);
     GBL_API_VERIFY_POINTER(pResult);
@@ -260,7 +260,7 @@ GBL_INLINE GBL_RESULT gblBTreeActionAcendHint(GblBTree* pTree, void* pPivot, boo
 }
 
 GBL_INLINE GBL_RESULT gblBTreeActionDescendHint(GblBTree* pTree, void* pPivot, bool (*pFnIter)(const void *item, void *udata), void *pUdata, uint64_t* pHint, GblBool* pResult) {
-    GBL_API_ASSERT(pTree);
+    GBL_ASSERT(pTree);
     GBL_API_BEGIN(pTree->hCtx);
     GBL_API_VERIFY_POINTER(pPivot);
     GBL_API_VERIFY_POINTER(pResult);

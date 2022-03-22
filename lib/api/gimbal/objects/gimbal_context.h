@@ -49,6 +49,9 @@ typedef struct GblContextCreateInfo {
 
 GBL_API gblContextVersion         (GblVersion* pVersion, const char** ppString); //hard-compiled
 
+GBL_API     GblContext_globalSet(GblContext pCtx);
+GblContext  GblContext_globalGet(void);
+
 
 GBL_API gblContextCreate          (GblContext* phCtx, const GblContextCreateInfo* pInfo);
 //GBL_API gblContextBuildInfo

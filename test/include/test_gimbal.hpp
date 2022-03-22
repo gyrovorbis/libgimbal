@@ -31,10 +31,10 @@ namespace gimbal::test {
         static inline bool asserted = false;
         static inline std::string message = std::string();
 
-        static void assert_(bool expr, std::string str=std::string()) {
+        static void constexpr assert_(bool expr, const char* pMsg=nullptr) {
             if(!expr) {
                 asserted = true;
-                message = std::move(str);
+                message = pMsg;
                 qCritical() << "ASSERTED: " << message.c_str();
                // throw AssertionException(message);
             }

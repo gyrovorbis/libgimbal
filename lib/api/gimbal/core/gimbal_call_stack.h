@@ -86,7 +86,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFra
     void* pContextUserdata          = GBL_NULL;
 
     if(!hHandle) {
-        result = gblStateContextGet(&hContext);
+        hContext = gblThreadContext(NULL);
     }
 
     if(hHandle) {

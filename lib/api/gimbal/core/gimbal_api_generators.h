@@ -13,11 +13,11 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
-#   define GBL_BEGIN_DECLS  extern "C" {
-#   define GBL_END_DECLS    }
+#   define GBL_DECLS_BEGIN  extern "C" {
+#   define GBL_DECLS_END  }
 #else
-#   define GBL_BEGIN_DECLS
-#   define GBL_END_DECLS
+#   define GBL_DECLS_BEGIN
+#   define GBL_DECLS_END
 #endif
 
 #define GBL_FORWARD_DECLARE_STRUCT(S)  \
@@ -60,6 +60,7 @@ extern "C" {
 #define GBL_DECLARE_OPAQUE(S)   \
     struct S##_;                \
     typedef struct S##_* S
+
 
 //sizeof(emptyStruct) is 1 in Cpp, 0 in C!
 #define GBL_DEFINE_EMPTY_STRUCT(S)  \

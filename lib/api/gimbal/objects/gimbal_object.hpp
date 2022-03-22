@@ -21,7 +21,7 @@ T* gblobject_cast(auto& obj) {
 class MetaObject;
 
 class Object:
-        public PrimitiveBase<GblObject> /*,
+        public PrimitiveBase<GblObject_> /*,
        public ReadWriteContiguousIndexable<Object, Varienter, Varienter>,*/
         //public RandomAccessIterable<Object, Varienter, Varienter>
 {

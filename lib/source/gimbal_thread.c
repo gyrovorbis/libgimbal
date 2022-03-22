@@ -1,4 +1,5 @@
 #include <gimbal/core/gimbal_thread.h>
+#include <gimbal/objects/gimbal_context.h>
 #include <gimbal/core/gimbal_call_stack.h>
 #include <threads.h>
 
@@ -33,8 +34,9 @@ GBL_API gblThreadCurrent(GblThread** ppThread) {
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API gblThreadContext(GblThread* pThread) {
-
+GblContext gblThreadContext(const GblThread* pThread) {
+    if(!pThread) gblThreadCurrent((GblThread**)&pThread);
+    return pThread->pStackFrameTop? pThread->pStackFrameTop->hContext : GblContext_globalGet();
 }
 
 GBL_API gblThreadCallRecordGet(const GblThread* pThread, const GblCallRecord** ppRecord) {
@@ -51,7 +53,8 @@ GBL_API gblThreadCallRecordSet(GblThread* pThread, const GblCallRecord* pRecord)
     if(pRecord) {
         memcpy(&pThread->callRecord, pRecord, sizeof(GblCallRecord));
     } else {
-        memset(&pThread->callRecord, 0, sizeof(GblCallRecord));
+        //memset(&pThread->callRecord, 0, sizeof(GblCallRecord));
+        pThread->callRecord.result = GBL_RESULT_UNKNOWN;
     }
     return GBL_RESULT_SUCCESS;
 }

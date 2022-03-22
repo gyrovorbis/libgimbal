@@ -68,7 +68,7 @@
  *              * dynamic ISlot lookup mechanism
  *              * hopefully intelligently map to virtual functions if they are alread part of GblClass vtable?
  *              * builtin interfaces for Meta type functionality
- *                  1.   Allocator, Logger, CallRecorder, EventHandler, Context (aggregate of all previous)
+ *                  1.   Allocator, Logger, set_er, EventHandler, Context (aggregate of all previous)
  *                  ii.  ChildObject, ParentObject, TreeNodeObject (both)
  *                  iii. Iterable, Aggregate, PropertyIndexible
  *                  iv.  ValueCompatible (GblMetaTypeVTable as interface)
@@ -548,10 +548,10 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_API_RECORD_LAST_RECORD_(prefix, record)                             \
     GBL_STMT_START {                                                            \
         if(GBL_RESULT_##prefix(record->result)) {                               \
-            GBL_ASSERT(gblContextCallRecordSet(GBL_API_CONTEXT(), record),    \
-                        "Context Last error failed!");                                  \
-            GBL_ASSERT(gblThreadCallRecordSet(NULL, record),                          \
-                "Thread Last error failed!");                                  \
+            GBL_ASSERT(gblContextCallRecordSet(GBL_API_CONTEXT(), record),       \
+                        "Context Last error failed!");                          \
+            GBL_ASSERT(gblThreadCallRecordSet(NULL, record),                    \
+                "Thread Last error failed!");                                   \
         }                                                                       \
     } GBL_STMT_END
 
@@ -663,7 +663,6 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     GBL_API_BEGIN_LOG_5(file, func, line, col, hHandle); \
     GBL_API_PUSH_VERBOSE(__VA_ARGS__);
 
-// FIGURE ME THE FUCK OUT, PASS SRC_CONTEXT SHIT
 #define GBL_API_BEGIN(...) \
         GBL_VA_OVERLOAD_CALL(GBL_API_BEGIN_LOG, GBL_VA_OVERLOAD_SUFFIXER_5_N, SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)
 
@@ -673,7 +672,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 #define GBL_API_END_BLOCK()                             \
     goto GBL_API_END_LABEL;                             \
-    GBL_API_END_LABEL: { ; }                            \
+    GBL_LABEL_EMPTY(GBL_API_END_LABEL);                 \
         if(GBL_API_FRAME()->stackDepth)                 \
             GBL_API_POP(GBL_API_FRAME()->stackDepth);   \
     GBL_ASSERT(GBL_RESULT_SUCCESS(gblThreadStackFramePop(NULL)))
@@ -682,8 +681,8 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         GBL_API_END_BLOCK();        \
         return GBL_API_RESULT()
 
-#define GBL_API_END_EMPTY()\
-               GBL_API_END_LABEL: { ; }
+#define GBL_API_END_EMPTY()         \
+        GBL_LABEL_EMPTY(GBL_API_END_LABEL)
 
 #define GBL_API_BEGIN_ONCE(...)                         \
     static GblBool GBL_API_ONCE_NAME = GBL_FALSE;       \

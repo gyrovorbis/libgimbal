@@ -491,6 +491,7 @@ public:
     iterator erase(const_iterator first, const_iterator last) {
         const auto index = std::distance<const_iterator>(this->begin(), first);
         const auto count = std::distance(first, last);
+        destruct_(index, count);
         Exception::checkThrow(gblVectorErase(this, index, count));
         return iterator(*this, index+count);
     }

@@ -23,6 +23,7 @@ namespace gimbal {
     using Hash          = ::GblHash;
     using FnPtr         = ::GblFnPtr;
     using Ptr           = ::GblPtr;
+    using Hash          = ::GblHash;
 
 
 class Context;

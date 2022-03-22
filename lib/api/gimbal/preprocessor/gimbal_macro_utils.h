@@ -12,8 +12,12 @@ extern "C" {
 
 // Warezed from the linux kernel
 #define GBL_CONTAINER_OF(p, t, m) ((t*)((char*)(p) - offsetof(t, m)))
+
 #define GBL_SWITCH_CASE_STRINGIFY(s) \
     case s: return #s
+
+#define GBL_LABEL_EMPTY(name) \
+    name: {;}
 
 #define GBL_VA_SNPRINTF(pFormat)                            \
     char buffer[GBL_VA_SNPRINTF_BUFFER_SIZE] = { '\0' };    \
@@ -150,61 +154,6 @@ GBL_FLAGS_TABLE_DECLARE(EVMU_SFR_PSW_FLAGS_TABLE);
         else if constexpr(requires { GBL_EVAL(GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_DEFAULT traits)(std::forward<decltype(args)>(args)...); }) return GBL_EVAL(GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_DEFAULT traits)(std::forward<decltype(args)>(args)...);\
     }
 #endif
-
-
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
-uint8_t GBL_POW2_NEXT_UINT8(uint8_t n) GBL_NOEXCEPT {
-    GBL_ASSERT(n >= 2);
-    --n;
-    n |= n >> 1; n |= n >> 2; n |= n >> 4;
-    return n + 1;
-}
-
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
-uint16_t GBL_POW2_NEXT_UINT16(uint16_t n) GBL_NOEXCEPT {
-    GBL_ASSERT(n >= 2);
-    --n;
-    n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8;
-    return n + 1;
-}
-
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
-uint32_t GBL_POW2_NEXT_UINT32(uint32_t n) GBL_NOEXCEPT {
-    GBL_ASSERT(n >= 2);
-    --n;
-    n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16;
-    return n + 1;
-}
-
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
-uint64_t GBL_POW2_NEXT_UINT64(uint64_t n) GBL_NOEXCEPT {
-    GBL_ASSERT(n >= 2);
-    --n;
-    n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16; n |= n >> 32;
-    return n + 1;
-}
-
-#define GBL_POW2_NEXT_TRAITS (                  \
-        GBL_POW2_NEXT_UINT64,                   \
-        (                                       \
-            (uint8_t,  GBL_POW2_NEXT_UINT8),    \
-            (uint16_t, GBL_POW2_NEXT_UINT16),   \
-            (uint32_t, GBL_POW2_NEXT_UINT32),   \
-            (uint64_t, GBL_POW2_NEXT_UINT64)    \
-        )                                       \
-    )
-
-#define GBL_POW2_NEXT(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS, X)(X);
-
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
-GBL_SIZE GBL_ALIGNED_ALLOC_SIZE(GBL_SIZE bytes) {
-    const GBL_SIZE remainder = bytes % GBL_ALLOC_MIN_SIZE;
-    GBL_SIZE newSize = bytes;
-    if(remainder) {
-        newSize += GBL_ALLOC_MIN_SIZE - remainder;
-    }
-    return newSize;
-}
 
 #ifdef __cplusplus
 }

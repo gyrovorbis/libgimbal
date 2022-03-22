@@ -93,23 +93,25 @@ set(GIMBAL_SOURCES
      source/gimbal_context.c
 #     source/gimbal_test.c
      source/gimbal_handle.c
-     source/gimbal_state.c
      source/gimbal_thread.c
 #     source/gimbal_meta.c
 #     source/gimbal_object.c
 #     source/gimbal_context_object.c
      source/gimbal_ext.c
      source/gimbal_type.c
+     source/gimbal_hashset.c
      source/gimbal_generics.cpp
 #     source/meta2/gimbal_object.c
      lib/hashmap.c/hashmap.c
      lib/btree.c/btree.c
+     lib/jenkins/lookup3.c
 )
 
 set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_api_generators.h
     #api/gimbal/gimbal_version.h
     api/gimbal/objects/gimbal_context.h
+    api/gimbal/types/gimbal_buffer.h
     api/gimbal/types/gimbal_result.h
     api/gimbal/core/gimbal_call_stack.hpp
     api/gimbal/core/gimbal_api_generators.hpp
@@ -119,8 +121,11 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_api_frame.h
     api/gimbal/core/gimbal_api_frame.hpp
     api/gimbal/containers/gimbal_generics.hpp
-#    api/gimbal/containers/gimbal_container.hpp
+    api/gimbal/containers/gimbal_container.hpp
     api/gimbal/core/gimbal_call_stack.h
+    api/gimbal/containers/gimbal_list.h
+    api/gimbal/meta/gimbal_interface.h
+    api/gimbal/meta/gimbal_object.h
     api/gimbal/types/gimbal_result.hpp
     api/gimbal/types/gimbal_typedefs.h
     api/gimbal/preprocessor/gimbal_compiler.h
@@ -130,26 +135,30 @@ set(GIMBAL_INCLUDES
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH}
     api/gimbal/preprocessor/gimbal_macro_sequences.h
     api/gimbal/core/gimbal_ext.h
-#    api/gimbal/types/gimbal_variant.h
+    api/gimbal/types/gimbal_variant.h
     api/gimbal/util/gimbal_test.h
     api/gimbal/objects/gimbal_handle.h
-    api/gimbal/containers/gimbal_hashmap.h
+    api/gimbal/containers/gimbal_hashset.h
+    api/gimbal/containers/gimbal_hashset.hpp
     api/gimbal/containers/gimbal_btree.h
     api/gimbal/containers/gimbal_table.h
     api/gimbal/meta/gimbal_type.h
 #    api/gimbal/util/gimbal_cmdline_parser.h
 #    api/gimbal/core/gimbal_runtime.h
     api/gimbal/core/gimbal_log.h
-    api/gimbal/core/gimbal_state.h
     api/gimbal/core/gimbal_thread.h
     api/gimbal/types/gimbal_typedefs.hpp
     api/gimbal/types/gimbal_variant.hpp
 #    api/gimbal/objects/gimbal_instance.h
     api/gimbal/objects/gimbal_object.h
+    api/gimbal/meta/gimbal_plugin.h
 #    api/gimbal/objects/gimbal_context_object.h
 #    api/gimbal/util/gimbal_monitor.hpp
     api/gimbal/containers/gimbal_table.h
     api/gimbal/containers/gimbal_vector.h
+    api/gimbal/algorithms/gimbal_sort.h
+    api/gimbal/algorithms/gimbal_numeric.h
+    api/gimbal/algorithms/gimbal_hash.h
     api/gimbal/containers/gimbal_vector.hpp
 #    api/gimbal/meta/gimbal_boxed.h
 #    api/gimbal/meta/gimbal_weak_ref.h
@@ -186,7 +195,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/objects/gimbal_handle.hpp
     api/gimbal/objects/gimbal_context.hpp
     lib/hashmap.c/hashmap.h
-    lib/btree.c/btree.h)
+    lib/btree.c/btree.h
+    lib/jenkins/lookup3.h)
 
 add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}

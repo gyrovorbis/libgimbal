@@ -26,6 +26,17 @@ typedef struct GblContext_ {
 } GblContext_;
 
 
+static GblContext hGlobalCtx_ = NULL;
+
+GblContext GblContext_globalGet(void) {
+    return hGlobalCtx_;
+}
+
+GBL_API GblContext_globalSet(GblContext hCtx) {
+    hGlobalCtx_ = hCtx;
+    return GBL_RESULT_SUCCESS;
+}
+
 
 GBL_API gblContextVersion           (GblVersion* pVersion, const char** ppString) {
     if(!pVersion) return GBL_RESULT_ERROR_INVALID_POINTER;

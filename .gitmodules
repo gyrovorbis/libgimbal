@@ -16,3 +16,6 @@
 [submodule "lib/lib/interface99"]
 	path = lib/lib/interface99
 	url = https://github.com/Hirrolot/interface99.git
+[submodule "lib/lib/xxHash"]
+	path = lib/lib/xxHash
+	url = https://github.com/Cyan4973/xxHash.git

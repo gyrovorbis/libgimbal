@@ -3,15 +3,8 @@
 
 
 #include "../types/gimbal_typedefs.h"
-#include "../core/gimbal_api_frame.h"
-#include "../containers/gimbal_hashmap.h"
-#include "../containers/gimbal_vector.h"
-#include "../types/gimbal_string.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+GBL_DECLS_BEGIN
 
 #define GBL_TYPE_FUNDAMENTAL(type)              (gblTypeFundamental(type))
 #define	GBL_TYPE_FUNDAMENTAL_MAX                (255 << GBL_TYPE_FUNDAMENTAL_SHIFT)
@@ -82,34 +75,47 @@ GBL_CONSTEXPR GBL_INLINE GblBool GBL_TYPE_FLAGS_TEST(GblType gblType, GblTypeFla
     //GBL_API_END();
 }
 
+typedef enum GBL_META_CALL {
+    GBL_META_CALL_IFACE_INFO,
+    GBL_META_CALL_COUNT
+} GBL_META_CALL;
 
-typedef GBL_RESULT (*GblClassBaseInitFn)    (GblClass*, const void*);
-typedef GBL_RESULT (*GblClassBaseFinalizeFn)(GblClass*, const void*);
-typedef GBL_RESULT (*GblClassConstructFn)   (GblClass*, const void* /*pClassData*/);
-typedef GBL_RESULT (*GblClassDestructFn)    (GblClass*, const void* /*pClassData*/);
+typedef GBL_RESULT (*GblTypeMetaCallFn)         (void*, GBL_META_CALL call, GblUint id, void** ppArgs);
+typedef GBL_RESULT (*GblTypeClassInitFn)        (GblClass*, const void*);
+typedef GBL_RESULT (*GblTypeClassFinalizeFn)    (GblClass*, const void*);
+typedef GBL_RESULT (*GblTypeInstanceInitFn)     (GblInstance*);
 
+typedef struct GblTypeInterfaceEntry {
+    GblType     interfaceType;
+    GblSize     classOffset;
+} GblTypeInterfaceEntry;
 
 typedef struct GblTypeInfo {
-    GblSize                 instanceSize;
-    GblSize                 instanceAlign;
-    GblSize                 classSize;
-    GblSize                 classAlign;
-    const void*             pClassData;
-    GblClassBaseInitFn      pFnClassInit;
-    GblClassBaseFinalizeFn  pFnClassFinalize;
-    GblClassConstructFn     pFnClassConstruct;
-    GblClassDestructFn      pFnClassDestruct;
+    GblTypeMetaCallFn           pFnMetaCall;
+    GblTypeClassInitFn          pFnClassInit;
+    GblTypeClassFinalizeFn      pFnClassFinalize;
+    GblTypeInstanceInitFn       pFnInstanceInit;
+    GblSize                     classSize;
+    GblSize                     classAlign;
+    const void*                 pClassData;
+    GblSize                     instanceSize;
+    GblSize                     instanceAlign;
 } GblTypeInfo;
 
 
 //GBL_EXPORT GBL_RESULT           gblTypeInit(void);  // init API, done automatically
 //GBL_EXPORT GBL_RESULT           gblTypeDeinit(void); // in case you want to restart
 
-GBL_EXPORT GblType              gblTypeRegister(GblType              parent,
-                                                const char*          pName,
-                                                const GblTypeInfo*   pInfo,
-                                                GblFlags             flags);
+GBL_EXPORT GBL_RESULT           gblTypeReinit(GblContext hCtx);
+
+GBL_EXPORT GblType              gblTypeRegister(GblType                         parent,
+                                                const char*                     pName,
+                                                const GblTypeInfo*              pInfo,
+                                                GblFlags                        flags,
+                                                const GblTypeInterfaceEntry*  pIterfaces[]);
 GBL_EXPORT void                 gblTypeUnregister(GblType type);
+
+
 GBL_EXPORT GblType              gblTypeFind(const char* pName);
 GBL_EXPORT GblSize              gblTypeCount(void);
 
@@ -118,22 +124,30 @@ GBL_EXPORT GblType              gblTypeParent(GblType type);
 GBL_EXPORT GblType              gblTypeBase(GblType type);
 GBL_EXPORT GblTypeFlags         gblTypeFlags(GblType type);
 GBL_EXPORT const GblTypeInfo*   gblTypeInfo(GblType type);
+GBL_EXPORT GblPlugin*           gblTypePlugin(GblType type);
+
+
 GBL_EXPORT GblBool              gblTypeIsA(GblType derived, GblType base);
 GBL_EXPORT GblRefCount          gblTypeClassRefCount(GblType type);
 #ifdef GBL_TYPE_DEBUG
 GBL_EXPORT GblRefCount          gblTypeInstanceRefCount(GblType type);
 #endif
 
-
 GBL_EXPORT GblClass*            gblTypeClassRef(GblType typeId);
 GBL_EXPORT GblClass*            gblTypeClassPeek(GblType typeId);
 GBL_EXPORT GblRefCount          gblTypeClassUnref(GblClass* pClass);
 
-GBL_EXPORT GblInstance*         gblTypeInstanceCreate(GblType type);
-GBL_EXPORT GblRefCount          gblTypeInstanceDestroy(GblInstance* pInstance);
+GBL_EXPORT GblInstance*         gblTypeInstanceNew(GblType type);
+//GBL_EXPORT GblInstance*         gblTypeInstanceInit(GblType type, GblInstance* pExisting);
+//GBL_EXPORT GblInstance*         gblTypeInstanceFinalize(GblInstance* pInstance);
+GBL_EXPORT GblRefCount          gblTypeInstanceDelete(GblInstance* pInstance);
 
+GBL_EXPORT GblInterfaceClass*   gblTypeInterfaceClassPeek(GblClass* pClass, GblType ifaceType);
+GBL_EXPORT GblInterfaceClass*   gblTypeInterfaceClassPeekParent(GblClass* pClass, GblType ifaceType);
+//GBL_EXPORT GblInterfaceClass* gblTypeInterfaceClassDefaultRef(GblType type);
+//GBL_EXPORT GblInterfaceClass* gblTypeInterfaceClassDefaultUnref(GblInterfaceClass* pClass);
 
-
+GBL_EXPORT GblInterface*        gblTypeInterfaceInit(GblInterface* pSelf, GblType ifaceType, GblInstance* pInstance);
 
 
 
@@ -425,9 +439,7 @@ typedef struct _GblTypeQuery		GblTypeQuery;
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+GBL_DECLS_END
 
 
 
