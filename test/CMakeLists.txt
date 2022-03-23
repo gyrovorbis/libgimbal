@@ -22,6 +22,7 @@ add_executable(GimbalTests
     include/test_gimbal_string.hpp
     include/test_gimbal_vector.hpp
     include/test_gimbal_hashmap.hpp
+    include/test_gimbal_buffer.hpp
     include/test_gimbal_api.hpp
     include/test_gimbal_context.hpp
 #    include/test_gimbal_meta.hpp

@@ -112,6 +112,7 @@ set(GIMBAL_INCLUDES
     #api/gimbal/gimbal_version.h
     api/gimbal/objects/gimbal_context.h
     api/gimbal/types/gimbal_buffer.h
+    api/gimbal/types/gimbal_buffer.hpp
     api/gimbal/types/gimbal_result.h
     api/gimbal/core/gimbal_call_stack.hpp
     api/gimbal/core/gimbal_api_generators.hpp

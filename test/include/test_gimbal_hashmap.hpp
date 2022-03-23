@@ -1,11 +1,10 @@
 #ifndef TEST_GIMBAL_HASH_HPP
 #define TEST_GIMBAL_HASH_HPP
 
-
 #include <gimbal/containers/gimbal_hashmap.hpp>
 #include "test_gimbal.hpp"
 
-#define GBL_TEST_HASH_MAP_BENCHMARK_READ_ENTRIES    1000
+#define GBL_TEST_HASH_MAP_BENCHMARK_READ_ENTRIES    10000
 #define GBL_TEST_HASH_MAP_BENCHMARK_KEY_SIZE        30
 
 namespace gimbal::test {
@@ -94,7 +93,6 @@ inline void HashMap::sanityChecks(void) {
         qDebug() << QString("It->first = %1, It->second = %2").arg(it->first).arg(it->second);
     }
 
-
     hash.clear();
     QCOMPARE(hash.size(), 0);
     QVERIFY(hash.empty());
@@ -102,12 +100,8 @@ inline void HashMap::sanityChecks(void) {
 
 
 inline void HashMap::benchmarkReadStd(void) {
-    std::unordered_map<const char*, int> stdhash({
-                                                 { "Hello", 3 },
-                                                 { "Bitch", 4 },
-                                                 { "Bitcher", 5},
-                                                 { "Bitchy", 6}
-                                             });
+    std::unordered_map<const char*, int> stdhash;
+
     for(unsigned i = 0; i < GBL_TEST_HASH_MAP_BENCHMARK_READ_ENTRIES; ++i)
         stdhash[Q_CSTR(elysian::generateRandomString(GBL_TEST_HASH_MAP_BENCHMARK_KEY_SIZE))] = 33;
 
@@ -118,12 +112,7 @@ inline void HashMap::benchmarkReadStd(void) {
 }
 
 inline void HashMap::benchmarkReadQt(void) {
-    QHash<const char*, int> qhash({
-                                     { "Hello", 3 },
-                                     { "Bitch", 4 },
-                                     { "Bitcher", 5},
-                                     { "Bitchy", 6}
-                                 });
+    QHash<const char*, int> qhash;
 
     for(unsigned i = 0; i < GBL_TEST_HASH_MAP_BENCHMARK_READ_ENTRIES; ++i)
         qhash[Q_CSTR(elysian::generateRandomString(GBL_TEST_HASH_MAP_BENCHMARK_KEY_SIZE))] = 33;
@@ -135,12 +124,7 @@ inline void HashMap::benchmarkReadQt(void) {
 }
 
 inline void HashMap::benchmarkReadGimbal(void) {
-    gimbal::HashMap<const char*, int> hash({
-                             { "Hello", 3 },
-                             { "Bitch", 4 },
-                             { "Bitcher", 5},
-                             { "Bitchy", 6}
-                         }, 0, pCtx());
+    gimbal::HashMap<const char*, int> hash(pCtx());
     for(unsigned i = 0; i < GBL_TEST_HASH_MAP_BENCHMARK_READ_ENTRIES; ++i)
         hash[Q_CSTR(elysian::generateRandomString(GBL_TEST_HASH_MAP_BENCHMARK_KEY_SIZE))] = 33;
 
@@ -151,24 +135,14 @@ inline void HashMap::benchmarkReadGimbal(void) {
 }
 
 inline void HashMap::benchmarkWriteStd(void) {
-    std::unordered_map<const char*, int> stdhash({
-                                                 { "Hello", 3 },
-                                                 { "Bitch", 4 },
-                                                 { "Bitcher", 5},
-                                                 { "Bitchy", 6}
-                                             });
+    std::unordered_map<const char*, int> stdhash;
     QBENCHMARK {
         stdhash[Q_CSTR(elysian::generateRandomString(GBL_TEST_HASH_MAP_BENCHMARK_KEY_SIZE))] = 33;
     }
 }
 
 inline void HashMap::benchmarkWriteQt(void) {
-    QHash<const char*, int> qhash({
-                                     { "Hello", 3 },
-                                     { "Bitch", 4 },
-                                     { "Bitcher", 5},
-                                     { "Bitchy", 6}
-                                 });
+    QHash<const char*, int> qhash;
 
     QBENCHMARK {
         qhash[Q_CSTR(elysian::generateRandomString(GBL_TEST_HASH_MAP_BENCHMARK_KEY_SIZE))] = 33;
@@ -176,12 +150,7 @@ inline void HashMap::benchmarkWriteQt(void) {
 }
 
 inline void HashMap::benchmarkWriteGimbal(void) {
-    gimbal::HashMap<const char*, int> hash({
-                             { "Hello", 3 },
-                             { "Bitch", 4 },
-                             { "Bitcher", 5},
-                             { "Bitchy", 6}
-                         }, 0, pCtx());
+    gimbal::HashMap<const char*, int> hash(pCtx());
     QBENCHMARK {
         hash[Q_CSTR(elysian::generateRandomString(GBL_TEST_HASH_MAP_BENCHMARK_KEY_SIZE))] = 33;
     }

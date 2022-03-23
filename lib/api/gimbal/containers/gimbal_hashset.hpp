@@ -46,7 +46,7 @@ public:
     using const_reference           = const value_type&;
     using pointer                   = value_type*;
     using const_pointer             = const value_type*;
-    using const_iterator          = HashSetIterator<std::add_const_t<HashSetBase<CRTP, K>>, K>;
+    using const_iterator            = HashSetIterator<std::add_const_t<HashSetBase<CRTP, K>>, K>;
     using allocator_type            = Context*;
     using size_type                 = Size;
     using difference_type           = ptrdiff_t;
@@ -126,6 +126,7 @@ public:
     using const_pointer     = typename BaseType::const_pointer;
     using size_type         = typename BaseType::size_type;
     using key_type          = typename BaseType::key_type;
+    using value_type        = typename BaseType::value_type;
     using hasher            = H;
     using key_equal         = P;
     using iterator          = HashSetIterator<HashSet<K, H, P>, K>;
@@ -143,10 +144,59 @@ protected:
 
 public:
 
-                HashSet         (size_type   capacity    = 0,
+                HashSet         (size_type   capacity,
                                  const H&    hash        = H(),
                                  const P&    pred        = P(),
                                  Context*    pCtx        = nullptr);
+                HashSet         (size_type   capacity,
+                                 const H&    hash,
+                                 Context*    pContext);
+                HashSet         (size_type   capacity,
+                                 Context*    pContext);
+                HashSet         (void);
+
+                HashSet         (type_compatible_container_readable<value_type> auto&& init,
+                                 size_type      capacity    = 0,
+                                 const H        hasher      = H(),
+                                 const P        pred        = P(),
+                                 Context*       pCtx        = nullptr);
+                HashSet         (type_compatible_container_readable<value_type> auto&& init,
+                                 size_type      capacity,
+                                 H              hasher,
+                                 Context*       pCtx);
+                HashSet         (type_compatible_container_readable<value_type> auto&& init,
+                                 size_type      capacity,
+                                 Context*       pCtx);
+
+                HashSet         (type_compatible_iterator_readable<value_type> auto first,
+                                 type_compatible_iterator_readable<value_type> auto last,
+                                 size_type      capacity = 0,
+                                 const H&       hash     = H(),
+                                 const P&       pred     = P(),
+                                 Context*       pCtx     = nullptr);
+
+                HashSet         (type_compatible_iterator_readable<value_type> auto first,
+                                 type_compatible_iterator_readable<value_type> auto last,
+                                 size_type      capacity,
+                                 const H&       hash,
+                                 Context*       pCtx);
+
+                HashSet         (type_compatible_iterator_readable<value_type> auto first,
+                                 type_compatible_iterator_readable<value_type> auto last,
+                                 size_type      capacity,
+                                 Context*       pCtx);
+
+                HashSet         (HashSet& other);
+                HashSet         (HashSet& other, Context* pCtx);
+
+                HashSet         (HashSet&& other);
+                HashSet         (HashSet&& other, Context* pCtx);
+
+                ~HashSet        (void);
+
+    HashSet&    operator=       (const HashSet& other);
+    HashSet&    operator=       (const HashSet&& other);
+    HashSet&    operator=       (type_compatible_container_readable<value_type> auto&& init);
 
     pointer     get             (const key_type& key) noexcept;
     reference   at              (const key_type& key);
@@ -389,6 +439,109 @@ inline HashSet<K, H, P>::HashSet(size_type   capacity,
                          capacity,
                          pCtx? static_cast<GblContext>(*pCtx) : nullptr,
                          this);
+}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(size_type   capacity,
+                 const H&    hash,
+                 Context*    pContext):
+    HashSet(capacity, hash, P(), pContext) {}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(size_type   capacity,
+                 Context*    pContext):
+    HashSet(capacity, H(), pContext) {}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(void):
+    HashSet(0) {}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(type_compatible_container_readable<value_type> auto&& init,
+                 size_type      capacity,
+                 const H        hasher,
+                 const P        pred,
+                 Context*       pCtx):
+    HashSet(capacity, hasher, pred, pCtx)
+{
+    for(auto&& it: init) insert(std::forward<decltype(it)>(it));
+}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(type_compatible_container_readable<value_type> auto&& init,
+                 size_type      capacity,
+                 H              hasher,
+                 Context*       pCtx):
+    HashSet(std::forward<decltype(init)>(init), capacity, hasher, P(), pCtx) {}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(type_compatible_container_readable<value_type> auto&& init,
+                 size_type      capacity,
+                 Context*       pCtx):
+    HashSet(std::forward<decltype(init)>(init), capacity, H(), pCtx) {}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(type_compatible_iterator_readable<value_type> auto first,
+                 type_compatible_iterator_readable<value_type> auto last,
+                 size_type      capacity,
+                 const          H& hash,
+                 const          P& pred,
+                 Context*       pCtx):
+    HashSet(capacity, hash, pred, pCtx)
+{
+    for(auto it = first; it < last; ++it) {
+        insert(*it);
+    }
+}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(type_compatible_iterator_readable<value_type> auto first,
+                 type_compatible_iterator_readable<value_type> auto last,
+                 size_type      capacity,
+                 const          H& hash,
+                 Context*       pCtx):
+    HashSet(std::move(first), std::move(last), capacity, hash, P(), pCtx) {}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(type_compatible_iterator_readable<value_type> auto first,
+                 type_compatible_iterator_readable<value_type> auto last,
+                 size_type      capacity,
+                 Context*       pCtx):
+    HashSet(std::move(first), std::move(last), capacity, H(), pCtx) {}
+
+
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(HashSet& other, Context* pCtx) {
+    GblHashSet_clone(this, &other, pCtx? static_cast<GblContext>(*pCtx) : nullptr);
+}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::HashSet(HashSet& other):
+    HashSet(other, other.context()) {}
+
+template<typename K, typename H, typename P>
+inline HashSet<K, H, P>::~HashSet(void) {
+    GblHashSet_destruct(this);
+}
+
+template<typename K, typename H, typename P>
+inline auto HashSet<K, H, P>::operator=(const HashSet& other) -> HashSet& {
+    GblHashSet_assignClone(this, &other);
+    return *this;
+}
+
+template<typename K, typename H, typename P>
+inline auto HashSet<K, H, P>::operator=(const HashSet&& other) -> HashSet& {
+    GblHashSet_assignMove(this, &other);
+    return *this;
+}
+
+template<typename K, typename H, typename P>
+inline auto HashSet<K, H, P>::operator=(type_compatible_container_readable<value_type> auto&& init) -> HashSet& {
+    clear();
+    for(auto&& it: init) insert(std::forward<decltype(it)>(it));
+    return *this;
 }
 
 template<typename K, typename H, typename P>

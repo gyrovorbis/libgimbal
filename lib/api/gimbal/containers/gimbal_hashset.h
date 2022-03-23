@@ -70,9 +70,11 @@ GBL_API             GblHashSet_construct_4(GblHashSet*                 pMap,
                                            GblHashSetEntryCompareFn    pFnCompare) GBL_NOEXCEPT;
 #define GblHashSet_construct(...) \
     GBL_VA_OVERLOAD_SELECT(GblHashSet_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
-//GBL_API               GblHashSet_constructCopy(SELF, const GblHashSet* pRhs) GBL_NOEXCEPT;
-//GBL_API               GblHashSet_clone            (SELF, const GblHashSet* pRhs)  GBL_NOEXCEPT;
-GBL_API                 GblHashSet_constructMove    (SELF, GblHashSet* pRhs)        GBL_NOEXCEPT;
+GBL_API                 GblHashSet_clone            (SELF, const GblHashSet* pRhs,
+                                                     GblContext hCtx)               GBL_NOEXCEPT;
+GBL_API                 GblHashSet_constructMove    (SELF, GblHashSet* pRhs,
+                                                     GblContext hCtx)               GBL_NOEXCEPT;
+GBL_API                 GblHashSet_constructClone   (SELF, GblHashSet* pRhs)        GBL_NOEXCEPT;
 GBL_API                 GblHashSet_assignMove       (SELF, GblHashSet* pRhs)        GBL_NOEXCEPT;
 GBL_EXPORT void         GblHashSet_destruct         (SELF)                          GBL_NOEXCEPT;
 

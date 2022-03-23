@@ -5,8 +5,8 @@
 
 #define GBL_OBJECT_TYPE     (GblObject_type())
 
-#define SELF                GblObject* pSelf
-#define CSELF               const GblObject* pSelf
+#define SELF                struct GblObject* pSelf
+#define CSELF               const SELF
 
 #define GBL_OBJECT_VCALL_BODY(VFUNC, ...)                                       \
     if(!pSelf)                  return GBL_RESULT_ERROR_INVALID_INSTANCE;       \
@@ -25,7 +25,7 @@ typedef GBL_RESULT (*GblObjectCompareFn)   (CSELF, const GblVariant*, GblCmpResu
 typedef GBL_RESULT (*GblObjectConvertFn)   (CSELF, GblVariant*);
 typedef GBL_RESULT (*GblObjectDebugFn)     (CSELF, GblString*);
 typedef GBL_RESULT (*GblObjectLoadFn)      (SELF, const GblString*);
-typedef GBL_RESULT (*GblObjectSaveFn)      (SELF, GblString*);
+typedef GBL_RESULT (*GblObjectSaveFn)      (CSELF, GblString*);
 
 typedef struct GblObjectClass {
     GblClass                base;

@@ -7,6 +7,7 @@
 #include <test_gimbal_algorithms.hpp>
 #include <test_gimbal_api.hpp>
 #include <test_gimbal_hashmap.hpp>
+#include <test_gimbal_buffer.hpp>
 
 using namespace elysian;
 
@@ -23,6 +24,7 @@ qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Variant());
     testSuite.enqueueTestSet(new gimbal::test::Algorithms());
     testSuite.enqueueTestSet(new gimbal::test::HashMap());
+    testSuite.enqueueTestSet(new gimbal::test::Buffer());
 qDebug() << "DONEZ";
     return !testSuite.exec(argc, argv);
 }

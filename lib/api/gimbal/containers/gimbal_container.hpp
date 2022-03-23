@@ -45,6 +45,11 @@ concept contiguous_iterator =
     (std::is_base_of_v<std::contiguous_iterator_tag, It> ||
      std::is_base_of_v<gimbal::tags::RandomAccessIteratorBase, It>);
 
+template<typename It>
+concept forward_iterator =
+    std::input_or_output_iterator<It> &&
+    std::is_base_of_v<std::forward_iterator_tag, It>;
+
 template<typename C, typename T>
 concept type_compatible_container_readable =
     requires(C c) {
@@ -92,7 +97,6 @@ template<typename C, typename T>
 concept type_compatible_contiguous_container_read_only =
     type_compatible_contiguous_container_readable<C, T> &&
     !type_compatible_container_writable<C, T>;
-
 
 template<typename C>
 concept generic_container_readable =
