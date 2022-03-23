@@ -533,6 +533,7 @@ public:
                 funcBlock(&stackFrame_);
             } catch(const gimbal::Exception& gblEx) {
                 try {
+                    //gblThreadStackFramePop(nullptr);
                     throw std::exception(gblEx.asStdException());
                 } catch(...) {
                     pException_ = std::current_exception();
@@ -540,6 +541,7 @@ public:
                 throw;
             } catch(...) {
                 pException_ = std::current_exception();
+                //gblThreadStackFramePop(nullptr);
                 throw;
             }
             AssertMgr::get(&asserted_, &assertMsg_);
@@ -574,11 +576,11 @@ public:
     std::exception_ptr getExceptionPtr(void) const { return pException_; }
 };
 
-#define GBL_API_BLOCK(ctx_, name) \
+#define GBL_TEST_CASE_API_BLOCK(ctx_, name) \
     ApiBlock(ctx_, name, GBL_SOURCE_FILE, GBL_SOURCE_FUNCTION, GBL_SOURCE_LINE, GBL_SOURCE_COLUMN) = [&](GBL_MAYBE_UNUSED GBL_API_FRAME_DECLARE)
 
 #define GBL_TEST_API_BLOCK() \
-    GBL_API_BLOCK(pCtx(), GBL_SOURCE_FUNCTION)
+    GBL_TEST_CASE_API_BLOCK(pCtx(), GBL_SOURCE_FUNCTION)
 
 class UnitTestSet: public elysian::UnitTestSet {
 public:

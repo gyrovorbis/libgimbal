@@ -334,7 +334,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
     GBL_API_MALLOC_4(src, size, align, NULL)
 
 #define GBL_API_MALLOC_2(src, size) \
-    GBL_API_MALLOC_3(src, size, GBL_ALIGNOF(max_align_t))
+    GBL_API_MALLOC_3(src, gblAlignedAllocSize(size), GBL_ALIGNOF(max_align_t))
 
 #define GBL_API_MALLOC(...)  \
     GBL_VA_OVERLOAD_SELECT(GBL_API_MALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
@@ -607,7 +607,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 
 #define GBL_API_CALL_N(src, funcCall, ...)                                      \
-    GBL_STMT_START {                                                                        \
+    GBL_STMT_START {                                                            \
         GBL_API_SOURCE_LOC_PUSH(src);                                           \
         GBL_MAYBE_UNUSED const GBL_RESULT localResult = (funcCall);             \
         if(!GBL_RESULT_SUCCESS(localResult)) GBL_UNLIKELY {                     \
@@ -624,7 +624,6 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
         GBL_VA_OVERLOAD_SELECT(GBL_API_CALL, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
     } GBL_STMT_END
-
 
 //====== VERIFY_OBJECT TYPE=========
 #define GBL_API_VERIFY_OBJECT_TYPE_N(srcLoc, hObject, baseType, ...)                                    \
@@ -669,7 +668,6 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_API_DONE()  \
     goto GBL_API_END_LABEL
 
-
 #define GBL_API_END_BLOCK()                             \
     goto GBL_API_END_LABEL;                             \
     GBL_LABEL_EMPTY(GBL_API_END_LABEL);                 \
@@ -683,6 +681,35 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 #define GBL_API_END_EMPTY()         \
         GBL_LABEL_EMPTY(GBL_API_END_LABEL)
+
+#define GBL_API_BLOCK_7(file, func, line, col, hHandle, frame, block)       \
+    GBL_API_BEGIN_FRAME(file, func, line, col, hHandle, frame);             \
+    block;                                                                  \
+    GBL_API_END_BLOCK()
+
+#define GBL_API_BLOCK_6(file, func, line, col, hHandle, block) \
+    GBL_API_BLOCK_7(file, func, line, col, hHandle, ((GblStackFrame*)GBL_ALLOCA(sizeof(GblStackFrame))), block)
+
+#define GBL_API_BLOCK_5(file, func, line, col, block) \
+    GBL_API_BLOCK_6(file, func, line, col, NULL, block)
+
+#define GBL_API_BLOCK(...) \
+    GBL_VA_OVERLOAD_SELECT(GBL_API_BLOCK, GBL_VA_OVERLOAD_SUFFIXER_ARGC, SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)(SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)
+
+
+#define GBL_API_FUNCTION_7(file, func, line, col, hHandle, frame, block)    \
+    GBL_API_BEGIN_FRAME(file, func, line, col, hHandle, frame);             \
+    block;                                                                  \
+    GBL_API_END()
+
+#define GBL_API_FUNCTION_6(file, func, line, col, hHandle, block) \
+    GBL_API_FUNCTION_7(file, func, line, col, hHandle, ((GblStackFrame*)GBL_ALLOCA(sizeof(GblStackFrame))), block)
+
+#define GBL_API_FUNCTION_5(file, func, line, col, block) \
+    GBL_API_FUNCTION_6(file, func, line, col, NULL, block)
+
+#define GBL_API_FUNCTION(...) \
+    GBL_VA_OVERLOAD_SELECT(GBL_API_FUNCTION, GBL_VA_OVERLOAD_SUFFIXER_ARGC, SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)(SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)
 
 #define GBL_API_BEGIN_ONCE(...)                         \
     static GblBool GBL_API_ONCE_NAME = GBL_FALSE;       \

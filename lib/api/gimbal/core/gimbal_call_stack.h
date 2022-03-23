@@ -68,6 +68,7 @@ typedef struct GblStackFrame {
     GblSourceLocation       sourceEntry;
     GblSourceLocation       sourceCurrent;
     GblCallRecord           record;
+    GblCallRecord           lastFailure;
     uint32_t                sourceCurrentCaptureDepth;
     GblHandle               hHandle;
     GblContext              hContext;
@@ -106,6 +107,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFra
     pFrame->hContext        = hContext;
     pFrame->pContextUd      = pContextUserdata;
     pFrame->pHandleUd       = pHandleUserdata;
+    pFrame->pPrevFrame      = NULL;
     return result;
 }
 

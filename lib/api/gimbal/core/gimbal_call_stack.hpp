@@ -72,18 +72,17 @@ GBL_CHECK_C_CPP_TYPE_COMPAT(CallRecord, GblCallRecord);
 
 class StackFrame: public GblStackFrame {
 public:
-                StackFrame(void) = default;
-                StackFrame(GblHandle hHandle, GBL_RESULT initialResult, SourceLocation entryLoc) {
+                StackFrame(GblHandle hHandle=nullptr, GBL_RESULT initialResult=GBL_RESULT_UNKNOWN, SourceLocation entryLoc=SourceLocation()) {
                     GBL_API_STACK_FRAME_CONSTRUCT(this, hHandle, initialResult, entryLoc);
 
                 }
-                StackFrame(const GblStackFrame& rhs);
-
+                //StackFrame(const GblStackFrame& rhs);
+/*
                 StackFrame& operator=(const GblStackFrame& rhs) {
                     memcpy(this, &rhs, sizeof(GblStackFrame));
                     return *this;
                 }
-
+*/
     auto        getSourceCurrent(void) const -> const SourceLocation&;
     auto        getSourceEntry(void) const -> const SourceLocation& { return *static_cast<const SourceLocation*>(&sourceEntry);}
     auto        getCallRecord(void) const -> const CallRecord& { return *static_cast<const CallRecord*>(&record); }

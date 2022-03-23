@@ -28,6 +28,7 @@ static thread_local GblThread_ thread_ = {
     .pStackFrameTop     = NULL
 };
 
+
 GBL_API gblThreadCurrent(GblThread** ppThread) {
     GBL_ASSERT(ppThread);
     *ppThread = &thread_;
@@ -88,16 +89,26 @@ GBL_API gblThreadLogPop(GblThread* pThread, uint32_t count) {
 
 GBL_API gblThreadStackFramePush(GblThread* pThread, GblStackFrame* pFrame) {
     if(!pThread) gblThreadCurrent(&pThread);
-    GBL_ASSERT(pFrame);
-    pFrame->pPrevFrame      = pThread->pStackFrameTop;
-    pFrame->pThread         = pThread;
+    if(pFrame) {
+        pFrame->pPrevFrame      = pThread->pStackFrameTop;
+        pFrame->pThread         = pThread;
+    }
     pThread->pStackFrameTop = pFrame;
     return GBL_RESULT_SUCCESS;
 }
 GBL_API gblThreadStackFramePop(GblThread* pThread) {
     if(!pThread) gblThreadCurrent(&pThread);
     GBL_ASSERT(pThread->pStackFrameTop);
-    pThread->pStackFrameTop = pThread->pStackFrameTop->pPrevFrame;
+    /*if(pThread->pStackFrameTop->pPrevFrame) {
+        if(GBL_RESULT_ERROR(pThread->pStackFrameTop->record.result)) {
+            memcpy(&pThread->pStackFrameTop->pPrevFrame->lastFailure,
+                   &pThread->pStackFrameTop->record,
+                   sizeof(GblCallRecord));
+        }
+    }*/
+    GblStackFrame* pPrevFrame = pThread->pStackFrameTop;
+    pThread->pStackFrameTop = pThread->pStackFrameTop? pThread->pStackFrameTop->pPrevFrame : NULL;
+    pPrevFrame->pPrevFrame = NULL;
     return GBL_RESULT_SUCCESS;
 }
 

@@ -145,7 +145,7 @@ private:
     const key_equal&        comparator_;
 
     static Hash hasherCb_      (const GblHashSet* pSet, const void* pKey);
-    static Int  comparatorCb_  (const GblHashSet* pSet, const void* pKey1, const void* pKey2);
+    static Bool comparatorCb_  (const GblHashSet* pSet, const void* pKey1, const void* pKey2);
     static void destructCb_    (const GblHashSet* pSet, void* pKey);
 
 protected:
@@ -155,15 +155,17 @@ protected:
 public:
 
                 HashSet         (size_type   capacity    = 0,
-                                 H&          hash        = H(),
-                                 P&          pred        = P(),
+                                 const H&    hash        = H(),
+                                 const P&    pred        = P(),
                                  Context*    pCtx        = nullptr);
 
     pointer     get             (const key_type& key) noexcept;
-    pointer     set             (key_type& key) noexcept;
+    reference   at              (const key_type& key);
 
-    bool        insert          (key_type& key) noexcept;         //needs to throw exception
-    void        insert_or_assign(key_type& key) noexcept;
+    pointer     set             (const key_type& key) noexcept;
+
+    bool        insert          (const key_type& key) noexcept;         //needs to throw exception
+    void        insert_or_assign(const key_type& key) noexcept;
 
     bool        erase           (const key_type& key) noexcept;
     pointer     extract         (const key_type& key) noexcept;
@@ -285,9 +287,9 @@ inline GblHashSet* HashSet<K, H, P>::set_(void) { return static_cast<GblHashSet*
 
 template<typename K, typename H, typename P>
 inline HashSet<K, H, P>::HashSet(size_type   capacity,
-                                 H&          hash,
-                                 P&          pred,
-                                 Context*    pCtx):
+                                 const H&          hash,
+                                 const P&          pred,
+                                 Context*          pCtx):
     hasher_(hash),
     comparator_(pred)
 {
@@ -297,7 +299,7 @@ inline HashSet<K, H, P>::HashSet(size_type   capacity,
                          comparatorCb_,
                          destructCb_,
                          capacity,
-                         pCtx,
+                         pCtx? static_cast<GblContext>(*pCtx) : nullptr,
                          this);
 }
 
@@ -307,17 +309,28 @@ inline auto HashSet<K, H, P>::get(const key_type& key) noexcept -> pointer {
 }
 
 template<typename K, typename H, typename P>
-inline auto HashSet<K, H, P>::set(key_type& key) noexcept -> pointer {
+inline auto HashSet<K, H, P>::at(const key_type& key) -> reference {
+    const GblCallRecord* pRecord = nullptr;
+    key_type* pKey = nullptr;
+    gblThreadCallRecordSet(NULL, NULL);
+    pKey = reinterpret_cast<key_type*>(GblHashSet_at(this, &key));
+    gblThreadCallRecordGet(NULL, &pRecord);
+    Exception::checkThrow(*pRecord);
+    return *pKey;
+}
+
+template<typename K, typename H, typename P>
+inline auto HashSet<K, H, P>::set(const key_type& key) noexcept -> pointer {
     return static_cast<pointer>(GblHashSet_set(this, &key));
 }
 
 template<typename K, typename H, typename P>
-inline bool HashSet<K, H, P>::insert(key_type& key) noexcept {
+inline bool HashSet<K, H, P>::insert(const key_type& key) noexcept {
     return GblHashSet_insert(this, &key);
 }
 
 template<typename K, typename H, typename P>
-inline void HashSet<K, H, P>::insert_or_assign(key_type& key) noexcept {
+inline void HashSet<K, H, P>::insert_or_assign(const key_type& key) noexcept {
     GblHashSet_insertOrAssign(this, &key);
 }
 
@@ -360,12 +373,12 @@ inline bool HashSet<K, H, P>::emplace(const key_type& key, Args&&... args) {
 
 template<typename K, typename H, typename P>
 inline Hash HashSet<K, H, P>::hasherCb_(const GblHashSet* pSet, const void* pKey) {
-    return static_cast<HashSet<K, H, P>*>(pSet)->hasher_(*static_cast<const K*>(pKey));
+    return static_cast<const HashSet<K, H, P>*>(pSet)->hasher_(*static_cast<const K*>(pKey));
 }
 
 template<typename K, typename H, typename P>
-inline Int HashSet<K, H, P>::comparatorCb_ (const GblHashSet* pSet, const void* pKey1, const void* pKey2) {
-    return static_cast<HashSet<K, H, P>*>(pSet)->comparator_(*static_cast<const K*>(pKey1), *static_cast<const K*>(pKey2));
+inline Bool HashSet<K, H, P>::comparatorCb_ (const GblHashSet* pSet, const void* pKey1, const void* pKey2) {
+    return static_cast<const HashSet<K, H, P>*>(pSet)->comparator_(*static_cast<const K*>(pKey1), *static_cast<const K*>(pKey2));
 }
 
 template<typename K, typename H, typename P>

@@ -388,7 +388,7 @@ static GblBool resize(struct GblHashSet *map, size_t new_cap) {
     return GBL_TRUE;
 }
 
-GBL_EXPORT GblBool GblHashSet_insert(GblHashSet* pMap, void* pItem) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblHashSet_insert(GblHashSet* pMap, const void* pItem) GBL_NOEXCEPT {
     GblBool inserted = GBL_FALSE;
     GBL_API_BEGIN(pMap->hCtx);
     {
@@ -403,7 +403,7 @@ GBL_EXPORT GblBool GblHashSet_insert(GblHashSet* pMap, void* pItem) GBL_NOEXCEPT
     return inserted;
 }
 
-GBL_EXPORT void GblHashSet_insertOrAssign(GblHashSet* pMap, void* pEntry) GBL_NOEXCEPT {
+GBL_EXPORT void GblHashSet_insertOrAssign(GblHashSet* pMap, const void* pEntry) GBL_NOEXCEPT {
     GBL_API_BEGIN(pMap->hCtx);
     GBL_API_VERIFY_POINTER(pEntry);
     {
@@ -414,7 +414,7 @@ GBL_EXPORT void GblHashSet_insertOrAssign(GblHashSet* pMap, void* pEntry) GBL_NO
 }
 
 
-static GBL_EXPORT void* GblHashSet_rawSet_(GblHashSet* map, void* item, void** ppNewEntry) GBL_NOEXCEPT {
+static GBL_EXPORT void* GblHashSet_rawSet_(GblHashSet* map, const void* item, void** ppNewEntry) GBL_NOEXCEPT {
     void* pPrevItem = NULL;
     GBL_API_BEGIN(map->hCtx); {
         void* edata = GBL_ALLOCA(map->bucketSize);
@@ -437,7 +437,7 @@ static GBL_EXPORT void* GblHashSet_rawSet_(GblHashSet* map, void* item, void** p
                 if(ppNewEntry) *ppNewEntry = bucket_item(bucket);
                 break;
             }
-            if (entry->hash == bucket->hash && map->pFnCompare(map, bucket_item(entry), bucket_item(bucket)) == 0)
+            if (entry->hash == bucket->hash && map->pFnCompare(map, bucket_item(entry), bucket_item(bucket)))
             {
                 memcpy(map->pSpare, bucket_item(bucket), map->entrySize);
                 memcpy(bucket_item(bucket), bucket_item(entry), map->entrySize);
@@ -457,7 +457,7 @@ static GBL_EXPORT void* GblHashSet_rawSet_(GblHashSet* map, void* item, void** p
     return pPrevItem;
 }
 
-GBL_EXPORT void* GblHashSet_emplace(GblHashSet* pMap, void* pKey) GBL_NOEXCEPT {
+GBL_EXPORT void* GblHashSet_emplace(GblHashSet* pMap, const void* pKey) GBL_NOEXCEPT {
     void* pNewEntry = NULL;
     GBL_API_BEGIN(pMap->hCtx);
     {
@@ -469,7 +469,7 @@ GBL_EXPORT void* GblHashSet_emplace(GblHashSet* pMap, void* pKey) GBL_NOEXCEPT {
     return pNewEntry;
 }
 
-GBL_EXPORT void* GblHashSet_tryEmplace(GblHashSet* pMap, void* pKey) GBL_NOEXCEPT {
+GBL_EXPORT void* GblHashSet_tryEmplace(GblHashSet* pMap, const void* pKey) GBL_NOEXCEPT {
     void* pPrevEntry = NULL;
     GBL_API_BEGIN(pMap->hCtx);
     if(GblHashSet_contains(pMap, pKey)) {
@@ -488,7 +488,7 @@ GBL_EXPORT void* GblHashSet_tryEmplace(GblHashSet* pMap, void* pKey) GBL_NOEXCEP
 // replaced then it is returned otherwise NULL is returned. This operation
 // may allocate memory. If the system is unable to allocate additional
 // memory then NULL is returned and hashmap_oom() returns true.
-GBL_EXPORT void* GblHashSet_set(GblHashSet *map, void *item) GBL_NOEXCEPT {
+GBL_EXPORT void* GblHashSet_set(GblHashSet *map, const void *item) GBL_NOEXCEPT {
     return GblHashSet_rawSet_(map, item, NULL);
 }
 
@@ -506,7 +506,7 @@ GBL_EXPORT void* GblHashSet_get(const GblHashSet *map, const void *key) GBL_NOEX
                 break;
             }
             if (bucket->hash == hash &&
-                map->pFnCompare(map, key, bucket_item(bucket)) == 0)
+                map->pFnCompare(map, key, bucket_item(bucket)))
             {
                 pEntry = bucket_item(bucket);
                 break;
@@ -556,7 +556,7 @@ GBL_EXPORT void* GblHashSet_extract(GblHashSet *map, const void* pKey) GBL_NOEXC
             if (!bucket->dib) {
                 break;
             }
-            if (bucket->hash == hash && map->pFnCompare(map, pKey, bucket_item(bucket)) == 0)
+            if (bucket->hash == hash && map->pFnCompare(map, pKey, bucket_item(bucket)))
             {
                 memcpy(map->pSpare, bucket_item(bucket), map->entrySize);
                 bucket->dib = 0;

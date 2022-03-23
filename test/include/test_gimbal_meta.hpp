@@ -142,7 +142,7 @@ public:
     void create(const gimbal::Variant& constructValue, const auto* pExpected=nullptr, gimbal::Result expectedResult=gimbal::Result::Success, T** ppOut=nullptr) {
         T* pData = nullptr;
 
-        auto testBlk = GBL_API_BLOCK(pCtx(), "create") {
+        auto testBlk = GBL_TEST_CASE_API_BLOCK(pCtx(), "create") {
             auto blk = GBL_API_TRY_BLOCK {
                 pData = getMetaType().create(pCtx(), constructValue);
             };
@@ -167,7 +167,7 @@ public:
 
     void destroy(const gimbal::Variant& constructValue, gimbal::Result expectedResult=gimbal::Result::Success) {
         T* pData = create_(constructValue);
-        auto testBlk = GBL_API_BLOCK(pCtx(), "destroy") {
+        auto testBlk = GBL_TEST_CASE_API_BLOCK(pCtx(), "destroy") {
             auto blk = GBL_API_TRY_BLOCK {
                 getMetaType().destroy(pCtx(), pData);
             };

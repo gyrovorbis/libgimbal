@@ -148,6 +148,7 @@ set(GIMBAL_INCLUDES
 #    api/gimbal/core/gimbal_runtime.h
     api/gimbal/core/gimbal_log.h
     api/gimbal/core/gimbal_thread.h
+    api/gimbal/core/gimbal_thread.hpp
     api/gimbal/types/gimbal_typedefs.hpp
     api/gimbal/types/gimbal_variant.hpp
 #    api/gimbal/objects/gimbal_instance.h

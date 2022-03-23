@@ -134,7 +134,7 @@ private slots:
     // === API TEST WHICH CAN TAKE A HANDLE ====
 
     void begin(void) {
-        auto test = GBL_API_BLOCK(pCtx(), "BEGIN_0") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "BEGIN_0") {
             {
                 GBL_API_BEGIN(gblCtx());
             }
@@ -142,7 +142,7 @@ private slots:
         QVERIFY(test);
         QCOMPARE(test.getCountersDelta().getLogDepth(), 0);
 
-        test = GBL_API_BLOCK(pCtx(), "BEGIN_1") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "BEGIN_1") {
             {
                 GBL_API_BEGIN(gblCtx(), "Single");
             }
@@ -151,7 +151,7 @@ private slots:
         QCOMPARE(test.getCountersDelta().getLogDepth(), 1);
         QCOMPARE(test.getCountersDelta().getLog(LogLevel::Verbose), 1);
 
-        test = GBL_API_BLOCK(pCtx_, "BEGIN_N") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx_, "BEGIN_N") {
             {
                 GBL_API_BEGIN(gblCtx(), "%s - %d", "Variadic", 33);
             }
@@ -163,7 +163,7 @@ private slots:
 
     void end(void) {
 
-        auto test = GBL_API_BLOCK(pCtx(), "END") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "END") {
             {
                 GBL_API_BEGIN(gblCtx(), "Layer1");
                 GBL_API_END();
@@ -174,13 +174,13 @@ private slots:
     }
 
     void logDebug(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "DEBUG_1") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx_, "DEBUG_1") {
             GBL_API_DEBUG("Standard");
         };
         QVERIFY(test);
         QCOMPARE(test.getCountersDelta().getLog(LogLevel::Debug), 1);
 
-        test = GBL_API_BLOCK(pCtx_, "DEBUG_N") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx_, "DEBUG_N") {
             GBL_API_DEBUG("Variadic - %s %d %c", "lul", 45, 'c');
         };
         QVERIFY(test);
@@ -188,13 +188,13 @@ private slots:
     }
 
     void logVerbose(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "VERBOSE_1") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx_, "VERBOSE_1") {
             GBL_API_VERBOSE("Standard");
         };
         QVERIFY(test);
         QCOMPARE(test.getCountersDelta().getLog(LogLevel::Verbose), 1);
 
-        test = GBL_API_BLOCK(pCtx_, "VERBOSE_N") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx_, "VERBOSE_N") {
             GBL_API_VERBOSE("Variadic - %s %d %c", "lul", 45, 'c');
         };
         QVERIFY(test);
@@ -203,13 +203,13 @@ private slots:
     }
 
     void logInfo(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "INFO_1") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx_, "INFO_1") {
             GBL_API_INFO("Standard");
         };
         QVERIFY(test);
         QCOMPARE(test.getCountersDelta().getLog(LogLevel::Info), 1);
 
-        test = GBL_API_BLOCK(pCtx_, "INFO_N") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx_, "INFO_N") {
             GBL_API_INFO("Variadic - %s %d %c", "lul", 45, 'c');
         };
         QVERIFY(test);
@@ -217,13 +217,13 @@ private slots:
     }
 
     void logWarn(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "WARN_1") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx_, "WARN_1") {
             GBL_API_WARN("Standard");
         };
         QVERIFY(test);
         QCOMPARE(test.getCountersDelta().getLog(LogLevel::Warning), 1);
 
-        test = GBL_API_BLOCK(pCtx_, "WARN_N") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx_, "WARN_N") {
             GBL_API_WARN("Variadic - %s %d %c", "lul", 45, 'c');
         };
         QVERIFY(test);
@@ -231,13 +231,13 @@ private slots:
     }
 
     void logError(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "ERROR_1") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx_, "ERROR_1") {
             GBL_API_ERROR("Standard");
         };
         QVERIFY(test);
         QCOMPARE(test.getCountersDelta().getLog(LogLevel::Error), 1);
 
-        test = GBL_API_BLOCK(pCtx_, "ERROR_N") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx_, "ERROR_N") {
             GBL_API_ERROR("Variadic - %s %d %c", "lul", 45, 'c');
         };
         QVERIFY(test);
@@ -245,14 +245,14 @@ private slots:
     }
 
     void logPush(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "PUSH_0") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx_, "PUSH_0") {
             GBL_API_PUSH();
         };
         QVERIFY(test);
         QCOMPARE(test.getCountersDelta().getLogDepth(), 1);
         QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::LogPush), 1);
 
-        test = GBL_API_BLOCK(pCtx_, "PUSH_1") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx_, "PUSH_1") {
             GBL_API_PUSH_VERBOSE("Single Push");
         };
         QVERIFY(test);
@@ -260,7 +260,7 @@ private slots:
         QCOMPARE(test.getCountersDelta().getLog(LogLevel::Verbose), 1);
         QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::LogPush), 1);
 
-        test = GBL_API_BLOCK(pCtx_, "PUSH_N") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx_, "PUSH_N") {
             GBL_API_PUSH_VERBOSE("%s %d %c", "Variadic Push", -33, 'q');
         };
         QVERIFY(test);
@@ -271,7 +271,7 @@ private slots:
     }
 
     void logPop(void) {
-        auto test = GBL_API_BLOCK(pCtx_, "POP_BALANCED") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx_, "POP_BALANCED") {
             GBL_API_PUSH();
             GBL_API_POP(1);
         };
@@ -280,7 +280,7 @@ private slots:
         QCOMPARE(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::LogPop), 1);
 
 
-        test = GBL_API_BLOCK(pCtx_, "POP_FAIL") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx_, "POP_FAIL") {
             GBL_API_PUSH_VERBOSE("Trolo"); //GCC FUCKED
             GBL_API_PUSH();
             GBL_API_PUSH();
@@ -293,7 +293,7 @@ private slots:
     }
 
     void stlPmr(void) {
-        auto test = GBL_API_BLOCK(pCtx(), "PMR_VECTOR") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "PMR_VECTOR") {
             std::pmr::vector<std::string> strings{1, pCtx()};
             strings.emplace_back("324324324333333333");
             strings.emplace_back("23432453453453452345234523452");
@@ -303,7 +303,7 @@ private slots:
         QVERIFY(test.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree) >= 2);
         QCOMPARE(test.getActiveAllocCount(), 0);
 
-        test = GBL_API_BLOCK(pCtx(), "PMR_STRING") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "PMR_STRING") {
             std::pmr::string str("LOLOSDFSDFSDFSDFfLOL", pCtx());
             str += "HEEAAAAAAAAAAAAAAAAAAAAAAP";
         };
@@ -318,22 +318,22 @@ private slots:
     void recordSet(void) {
 #define RUN_TEST_SET(options)                                                           \
         [&](const ConfigOptions& options) {                                             \
-            auto test = GBL_API_BLOCK(pCtx(), "RESULT_SET_1") {                         \
+            auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "RESULT_SET_1") {                         \
                 GBL_API_RECORD_SET(GBL_RESULT_UNKNOWN);                                 \
             };                                                                          \
             verifyBlock(test, options, Result::Unknown, "Unknown");                     \
                                                                                         \
-            test = GBL_API_BLOCK(pCtx_, "RESULT_SET_2") {                               \
+            test = GBL_TEST_CASE_API_BLOCK(pCtx_, "RESULT_SET_2") {                               \
                 GBL_API_RECORD_SET(GBL_RESULT_SUCCESS, "WORX!");                        \
             };                                                                          \
             verifyBlock(test, options, Result::Success, "WORX!");                       \
                                                                                         \
-            test = GBL_API_BLOCK(pCtx_, "RESULT_SET_N") {                               \
+            test = GBL_TEST_CASE_API_BLOCK(pCtx_, "RESULT_SET_N") {                               \
                 GBL_API_RECORD_SET(GBL_RESULT_TRUNCATED, "Reested to %s.", "fuck");     \
             };                                                                          \
             verifyBlock(test, options, Result::Truncated, "Reested to fuck.");          \
                                                                                         \
-            test = GBL_API_BLOCK(pCtx_, "RESULT_SET_N") {                               \
+            test = GBL_TEST_CASE_API_BLOCK(pCtx_, "RESULT_SET_N") {                               \
                 GBL_API_RECORD_SET(GBL_RESULT_ERROR_INTERNAL, "Error: %s",              \
                                     Result(Result::ErrorInternal).toString().data());   \
             };                                                                          \
@@ -392,19 +392,19 @@ private slots:
     }
 
     void verify(void) {
-        auto test = GBL_API_BLOCK(pCtx(), "VERIFY_2_SUCCESS") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_2_SUCCESS") {
             GBL_API_VERIFY(1 < 3, Result(Result::ErrorUnhandledException));
                GBL_API_END_EMPTY();
         };
         QVERIFY(test);
 
-       test = GBL_API_BLOCK(pCtx(), "VERIFY_3_ERROR") {
+       test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_3_ERROR") {
             GBL_API_VERIFY(false == true, Result(Result::ErrorTypeMismatch), "Impossibru!");
                GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_TYPE_MISMATCH, "Impossibru!");
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_4_WARN") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_4_WARN") {
             GBL_API_VERIFY(sizeof(int) < sizeof(char), GBL_RESULT_TRUNCATED, "Truncated: %d", -12);
                GBL_API_END_EMPTY();
         };
@@ -412,19 +412,19 @@ private slots:
     }
 
     void verifyExpression(void) {
-        auto test = GBL_API_BLOCK(pCtx(), "VERIFY_EXPR_1_ERROR") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_EXPR_1_ERROR") {
             GBL_API_VERIFY_EXPRESSION(3 < 1);
             GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidExpression, "Invalid Expression: 3 < 1");
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_EXPR_2_ERROR") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_EXPR_2_ERROR") {
             GBL_API_VERIFY_EXPRESSION(sizeof(int) < sizeof(char), "Fucked");
             GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidExpression, "Fucked");
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_EXPR_N_SUCCESS") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_EXPR_N_SUCCESS") {
             GBL_API_VERIFY_EXPRESSION(sizeof(int) > sizeof(char), "Random Shit: %d, %s, %c, %f", -12, "lulz", 'a', 12.2f);
             GBL_API_END_EMPTY();
         };
@@ -432,19 +432,19 @@ private slots:
     }
 
     void verifyHandle(void) {
-        auto test = GBL_API_BLOCK(pCtx(), "VERIFY_HANDLE_1_FAIL") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_HANDLE_1_FAIL") {
             GBL_API_VERIFY_HANDLE(GBL_HANDLE_INVALID);
             GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidHandle, "Invalid Handle");
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_HANDLE_2_PASS") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_HANDLE_2_PASS") {
             GBL_API_VERIFY_HANDLE(pCtx(), "Valid as fuck");
             GBL_API_END_EMPTY();
         };
         QVERIFY(test);
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_HANDLE_N_FAIL") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_HANDLE_N_FAIL") {
             GBL_API_VERIFY_HANDLE(GBL_HANDLE_INVALID, "Assdouchery %s %d %c", "lul", -33, 'b');
             GBL_API_END_EMPTY();
         };
@@ -452,19 +452,19 @@ private slots:
     }
 
     void verifyPointer(void) {
-        auto test = GBL_API_BLOCK(pCtx(), "VERIFY_POINTER_1_FAIL") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_POINTER_1_FAIL") {
             GBL_API_VERIFY_POINTER(NULL);
             GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidPointer, "Invalid Pointer");
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_POINTER_2_PASS") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_POINTER_2_PASS") {
             GBL_API_VERIFY_POINTER(pCtx(), "Valid as fuck");
             GBL_API_END_EMPTY();
         };
         QVERIFY(test);
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_POINTER_N_FAIL") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_POINTER_N_FAIL") {
             GBL_API_VERIFY_POINTER(NULL, "Assdouchery %s %d %c", "lul", -33, 'b');
             GBL_API_END_EMPTY();
         };
@@ -472,7 +472,7 @@ private slots:
     }
 
     void verifyArg(void) {
-        auto test = GBL_API_BLOCK(pCtx(), "VERIFY_ARG_1_FAIL") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_ARG_1_FAIL") {
             int arg1 = 3; int arg2 = 44;
             GBL_API_VERIFY_ARG(arg1 != 0);
             GBL_API_VERIFY_ARG(arg2 > 50);
@@ -480,14 +480,14 @@ private slots:
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidArg, "Invalid Arg: arg2 > 50");
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_ARG_2_PASS") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_ARG_2_PASS") {
             float argIn = -33.0f;
             GBL_API_VERIFY_ARG(fabs(argIn) > 30.0f, "Your argument sucks!");
             GBL_API_END_EMPTY();
         };
         QVERIFY(test);
 
-        test = GBL_API_BLOCK(pCtx(), "VERIFY_ARG_N_FAIL") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_ARG_N_FAIL") {
             const char* pName = "Fuckwhisp";
             GBL_API_VERIFY_ARG(strcmp(pName, "DickWheeze") == 0, "Assdouchery %s %d %c", "lul", -33, 'b');
             GBL_API_END_EMPTY();
@@ -531,13 +531,13 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
     }
 
     void call(void) {
-        auto test = GBL_API_BLOCK(pCtx(), "CALL_1_FAIL") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "CALL_1_FAIL") {
             GBL_API_CALL(gblContextVersion(nullptr, nullptr));
             GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidPointer, "Call[gblContextVersion(nullptr, nullptr)] -> Result[Invalid Pointer]");
 
-        test = GBL_API_BLOCK(pCtx(), "CALL_2_PASS") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "CALL_2_PASS") {
             GblVersion version;
             GBL_API_CALL(gblContextVersion(&version, nullptr),
                          "Getting the goddamn version!");
@@ -545,7 +545,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
         };
         QVERIFY(test);
 
-        test = GBL_API_BLOCK(pCtx(), "CALL_N_FAIL") {
+        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "CALL_N_FAIL") {
             GBL_API_CALL(gblHandleUserdata(GBL_API_HANDLE(), nullptr),
                          "Variadicery %s %d %c %.2f", "lul", -33, 'b', 22.43f);
             GBL_API_END_EMPTY();
@@ -627,7 +627,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
 
     void exceptionInterop(void) {
 
-        auto test = GBL_API_BLOCK(pCtx(), "C_TO_CPP_CALL") {
+        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "C_TO_CPP_CALL") {
             GBL_API_TRY {
                 std::pmr::vector<int> vec(1, pCtx());
                 auto val = vec.at(5);

@@ -13,7 +13,7 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblHashSet);
 
 typedef GblHash       (*GblHashSetEntryHashFn)    (CSELF, const void*);
-typedef GblInt        (*GblHashSetEntryCompareFn) (CSELF, const void*, const void*);
+typedef GblBool       (*GblHashSetEntryCompareFn) (CSELF, const void*, const void*);
 typedef void          (*GblHashSetEntryDestructFn)(CSELF, void*);
 typedef GblBool       (*GblHashSetIterateFn)      (CSELF, void*, void*);
 
@@ -88,12 +88,12 @@ GBL_EXPORT void*        GblHashSet_at               (CSELF, const void* pKey)   
 GBL_EXPORT GblBool      GblHashSet_contains         (CSELF, const void* pKey)       GBL_NOEXCEPT; //true if entry exists
 GBL_EXPORT GblSize      GblHashSet_count            (CSELF, const void* pKey)       GBL_NOEXCEPT; //# of matching entries (0 or 1)
 
-GBL_EXPORT void*        GblHashSet_set              (SELF, void* pEntry)            GBL_NOEXCEPT; //raw set, returns existing item w/o deleting
-GBL_EXPORT GblBool      GblHashSet_insert           (SELF, void* pEntry)            GBL_NOEXCEPT; //throws duplicate error
-GBL_EXPORT void         GblHashSet_insertOrAssign   (SELF, void* pEntry)            GBL_NOEXCEPT; //deletes any overwritten value
+GBL_EXPORT void*        GblHashSet_set              (SELF, const void* pEntry)            GBL_NOEXCEPT; //raw set, returns existing item w/o deleting
+GBL_EXPORT GblBool      GblHashSet_insert           (SELF, const void* pEntry)            GBL_NOEXCEPT; //throws duplicate error
+GBL_EXPORT void         GblHashSet_insertOrAssign   (SELF, const void* pEntry)            GBL_NOEXCEPT; //deletes any overwritten value
 // Returns a raw data pointer to the buffer that you have to emplace over!
-GBL_EXPORT void*        GblHashSet_emplace          (SELF, void* pKey)              GBL_NOEXCEPT; //throws duplicate error
-GBL_EXPORT void*        GblHashSet_tryEmplace       (SELF, void* pKey)              GBL_NOEXCEPT; //gracefully returns NULL if already exists
+GBL_EXPORT void*        GblHashSet_emplace          (SELF, const void* pKey)              GBL_NOEXCEPT; //throws duplicate error
+GBL_EXPORT void*        GblHashSet_tryEmplace       (SELF, const void* pKey)              GBL_NOEXCEPT; //gracefully returns NULL if already exists
 
 GBL_EXPORT GblBool      GblHashSet_erase            (SELF, const void* pKey)        GBL_NOEXCEPT; //deletes entry, not found is fine
 GBL_EXPORT void*        GblHashSet_extract          (SELF, const void* pKey)        GBL_NOEXCEPT; //removes entry, no deletion, not found is fine
@@ -131,7 +131,7 @@ GBL_INLINE void* GblHashSet_userdata(const GblHashSet* pSelf) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GblBool GblHashSet_empty(const GblHashSet* pSelf) GBL_NOEXCEPT {
-    return pSelf->count? GBL_TRUE : GBL_FALSE;
+    return pSelf->count? GBL_FALSE : GBL_TRUE;
 }
 
 GBL_INLINE GblContext GblHashSet_context(const GblHashSet* pSelf) GBL_NOEXCEPT {

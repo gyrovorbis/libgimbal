@@ -269,7 +269,7 @@ inline void String::createHeapCString(void) {
     };
     test();
 
-    auto block = GBL_API_BLOCK(pCtx(), "createHeapCString") {
+    auto block = GBL_TEST_CASE_API_BLOCK(pCtx(), "createHeapCString") {
         test(pCtx());
     };
     QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
