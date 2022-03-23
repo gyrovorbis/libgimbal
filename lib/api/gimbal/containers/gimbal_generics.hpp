@@ -156,8 +156,8 @@ public:
         }
         iterator_type operator++ (int) {
             const auto temp(*this);
-            if constexpr(Reverse) ++*this;
-            else --*this;
+            if constexpr(Reverse) --*this;
+            else ++*this;
             return temp;
         }
         iterator_type& operator--() {
@@ -167,8 +167,8 @@ public:
         }
         iterator_type operator--(int) {
             const auto temp(*this);
-            if constexpr(Reverse) ++**this;
-            else --**this;
+            if constexpr(Reverse) ++*this;
+            else --*this;
             return temp;
         }
         iterator_type& operator+=(index_type offset) { if constexpr(Reverse) index_ -= offset; else index_ += offset; return *this; }

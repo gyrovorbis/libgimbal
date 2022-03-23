@@ -34,7 +34,7 @@ typedef struct GblHashSet {
 } GblHashSet;
 
 typedef struct GblHashSetIterator {
-    const GblHashSet*   pMap;
+    GblHashSet*         pSet;
     GblSize             bucketIdx;
 } GblHashSetIterator;
 

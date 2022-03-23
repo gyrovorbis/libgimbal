@@ -28,45 +28,25 @@ class HashSet;
 template<typename K = void*>
 class HashSetView;
 
-
 template<typename C,
          typename K>
-struct HashSetIterator:
-        public GblHashSetIterator,
-        public std::iterator<std::forward_iterator_tag, K>
-{
-    HashSetIterator(C* pCont=nullptr, Size bucketIdx=-1):
-        GblHashSetIterator({pCont, bucketIdx}) {}
-
-    const C* getContainer(void) const { return reinterpret_cast<C*>(GblHashSetIterator_container(this)); }
-    bool     Valid(void) const { return GblHashSetIterator_valid(this); }
-    K&       value(void) { return *reinterpret_cast<K*>(GblHashSetIterator_value(this)); }
-
-};
+struct HashSetIterator;
 
 template<typename CRTP, typename K=void*>
 class HashSetBase:
     public tags::HashSet
-    //,public ForwardIterable<CRTP, K>
 {
 public:
     using HashSetBaseType           = HashSetBase<CRTP, K>;
     using DerivedType               = CRTP;
     using KeyType                   = K;
-    //using IterableType            = ForwardIterable<CRTP, K>;
-
     using key_type                  = KeyType;
     using value_type                = KeyType;
     using reference                 = value_type&;
     using const_reference           = const value_type&;
     using pointer                   = value_type*;
     using const_pointer             = const value_type*;
-
-    //using iterator                = IterableType::iterator;
-    //using const_iterator          = IterableType::const_iterator;
-    //using local_iterator          = IterableType::local_iterator;
-    //using const_local_iterator    = IterableType::const_local_iterator;
-
+    using const_iterator          = HashSetIterator<std::add_const_t<HashSetBase<CRTP, K>>, K>;
     using allocator_type            = Context*;
     using size_type                 = Size;
     using difference_type           = ptrdiff_t;
@@ -95,6 +75,14 @@ public:
     template<typename F>
         requires std::is_invocable_r_v<bool, F, const K&>
     bool            for_each     (F&& fn) const noexcept;
+
+    const_iterator  next(const_iterator* pPrev) const;
+
+    const_iterator  cbegin(void) const;
+    auto            begin(void) const;
+
+    const_iterator  cend(void) const;
+    auto            end(void) const;
 };
 
 
@@ -140,6 +128,7 @@ public:
     using key_type          = typename BaseType::key_type;
     using hasher            = H;
     using key_equal         = P;
+    using iterator          = HashSetIterator<HashSet<K, H, P>, K>;
 private:
     const hasher&           hasher_;
     const key_equal&        comparator_;
@@ -171,17 +160,97 @@ public:
     pointer     extract         (const key_type& key) noexcept;
     void        clear           (void) noexcept;
 
-    pointer     probe           (size_type position) noexcept;
-
     template<typename... Args>
     bool        emplace         (const key_type& key, Args&&... args);   //needs to throw exception
     template<typename... Args>
     bool        try_emplace     (const key_type& key, Args&&... args) noexcept;
+
+    pointer     probe           (size_type position) noexcept;
+
+    iterator    next            (iterator* pPrev);
+
+    iterator    begin           (void);
+    iterator    end             (void);
 };
 
+template<typename C,
+         typename K>
+struct HashSetIterator:
+        public GblHashSetIterator,
+        public std::iterator<std::forward_iterator_tag, K>
+{
+    using                   object_type             = C;
+    constexpr static bool   is_const                = std::is_const_v<C>;
+    using                   iterator_type           = HashSetIterator<C, K>;
+    using                   const_iterator_type     = HashSetIterator<std::add_const_t<C>, K>;
+    using                   nonconst_iterator_type  = HashSetIterator<std::remove_const_t<C>, K>;
+    using                   value_type              = K;
+    using                   reference               = std::conditional_t<std::is_const_v<C>,
+                                                            std::add_lvalue_reference_t<std::add_const_t<K>>,
+                                                            std::add_lvalue_reference_t<K>>;
+    using                   const_reference         = std::add_const_t<reference>;
+    using                   pointer                 = std::conditional_t<std::is_const_v<C>,
+                                                            std::add_pointer_t<std::add_const_t<K>>,
+                                                            std::add_pointer_t<K>>;
+    using                   difference_type         = std::ptrdiff_t;
+    using                   iterator_category       = std::forward_iterator_tag;
+
+    C* set(void) { return static_cast<C*>(this->pSet); }
+    const C* set(void) const { return static_cast<const C*>(this->pSet); }
+
+    reference operator*(void) {
+        return *reinterpret_cast<pointer>(set()->probe(this->bucketIdx));
+    }
+
+    const_reference operator*(void) const {
+        return *reinterpret_cast<const pointer>(set()->probe(this->bucketIdx));
+    }
+
+    pointer operator->(void) {
+        return reinterpret_cast<pointer>(set()->probe(this->bucketIdx));
+    }
+
+    const pointer operator->(void) const {
+        return reinterpret_cast<const pointer>(set()->probe(this->bucketIdx));
+    }
+
+    iterator_type& operator++ () {
+        auto nextIt = set()->next(this);
+        this->bucketIdx = nextIt.bucketIdx;
+        return *this;
+    }
+
+    iterator_type operator++ (int) {
+        const auto temp(*this);
+        ++*this;
+        return temp;
+    }
+
+    bool operator== (const iterator_type& rhs) const { return this->pSet == rhs.pSet && this->bucketIdx == rhs.bucketIdx; }
+    bool operator<= (const iterator_type& rhs) const { return this->pSet == rhs.pSet && this->bucketIdx <= rhs.bucketIdx; }
+    bool operator<  (const iterator_type& rhs) const { return this->pSet == rhs.pSet && this->bucketIdx < rhs.bucketIdx; }
+    bool operator>  (const iterator_type& rhs) const { return this->pSet == rhs.pSet && this->bucketIdx > rhs.bucketIdx; }
+    bool operator>= (const iterator_type& rhs) const { return this->pSet == rhs.pSet && this->bucketIdx >= rhs.bucketIdx; }
+    bool operator!= (const iterator_type& rhs) const { return !(*this == rhs); }
 
 
+    HashSetIterator(C* pCont=nullptr, Size bucketIdx=-1):
+        GblHashSetIterator({pCont, bucketIdx}) {}
 
+    HashSetIterator(const GblHashSetIterator gblIt):
+        HashSetIterator(static_cast<C*>(gblIt.pSet), gblIt.bucketIdx) {}
+
+    HashSetIterator(const const_iterator_type& rhs) requires is_const:
+        HashSetIterator(rhs.pSet, rhs.bucketIdx) {}
+
+    HashSetIterator(const nonconst_iterator_type& rhs):
+        HashSetIterator(rhs.pSet, rhs.bucketIdx) {}
+
+    const C* getContainer(void) const { return reinterpret_cast<C*>(GblHashSetIterator_container(this)); }
+    bool     valid(void) const { return GblHashSetIterator_valid(this); }
+    K&       value(void) { return *reinterpret_cast<K*>(GblHashSetIterator_value(this)); }
+
+};
 
 
 // ========== INLINE IMPLEMENTATIONS ==========
@@ -250,14 +319,33 @@ template<typename F>
 inline bool HashSetBase<CRTP, K>::for_each(F&& fn) const noexcept {
     return GblHashSet_foreach(getSet(), [](const GblHashSet* pSelf,
                                          void*               pKey,
-                                         void*               pUd)
+                                         void*               pUd) -> Bool
                                       {
                                           GBL_UNUSED(pSelf);
-                                          auto* pFn = static_cast<decltype(fn)*>(pUd);
-                                          return *pFn(*static_cast<const_pointer>(pKey));
+                                          auto* pFn = static_cast<F*>(pUd);
+                                          return (*pFn)(*static_cast<const_pointer>(pKey));
                                       },
                                       &fn);
 }
+
+template<typename CRTP, typename K>
+inline auto HashSetBase<CRTP, K>::next(const_iterator* pPrev) const -> const_iterator {
+    return GblHashSet_next(getSet(), pPrev);
+}
+
+template<typename CRTP, typename K>
+inline auto HashSetBase<CRTP, K>::cbegin(void) const -> const_iterator {
+    return GblHashSet_next(getSet(), nullptr);
+}
+
+template<typename CRTP, typename K>
+inline auto HashSetBase<CRTP, K>::begin(void) const { return cbegin(); }
+
+template<typename CRTP, typename K>
+inline auto HashSetBase<CRTP, K>::cend(void) const -> const_iterator { return const_iterator(this, bucket_count()); }
+
+template<typename CRTP, typename K>
+inline auto HashSetBase<CRTP, K>::end(void) const { return cend(); }
 
 
 // -------- HashSetView ---------
@@ -351,7 +439,7 @@ inline void HashSet<K, H, P>::clear(void) noexcept {
 
 template<typename K, typename H, typename P>
 inline auto HashSet<K, H, P>::probe(size_type position) noexcept -> pointer {
-    return GblHashSet_probe(this, position);
+    return reinterpret_cast<pointer>(GblHashSet_probe(this, position));
 }
 
 template<typename K, typename H, typename P>
@@ -369,6 +457,21 @@ inline bool HashSet<K, H, P>::emplace(const key_type& key, Args&&... args) {
     GBL_ASSERT(pData);
     new (pData) key_type(std::forward<Args>(args)...);
     return true;
+}
+
+template<typename K, typename H, typename P>
+inline auto HashSet<K, H, P>::next(iterator* pPrev) -> iterator {
+    return GblHashSet_next(this, pPrev);
+}
+
+template<typename K, typename H, typename P>
+inline auto HashSet<K, H, P>::begin(void) -> iterator {
+    return next(nullptr);
+}
+
+template<typename K, typename H, typename P>
+inline auto HashSet<K, H, P>::end(void) -> iterator {
+    return iterator(this, this->bucket_count());
 }
 
 template<typename K, typename H, typename P>

@@ -1,5 +1,6 @@
 #include <gimbal/containers/gimbal_hashset.h>
 #include <gimbal/algorithms/gimbal_hash.h>
+#include <gimbal/algorithms/gimbal_numeric.h>
 
 
 //-----------------------------------------------------------------------------
@@ -184,7 +185,7 @@ static inline uint64_t get_hash(const struct GblHashSet *map, const void *key) {
 
 
 
-GBL_API             GblHashSet_construct_8(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_8(GblHashSet*                 pSet,
                                            GblSize                     elsize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
@@ -196,7 +197,7 @@ GBL_API             GblHashSet_construct_8(GblHashSet*                 pMap,
 
     GBL_API_BEGIN(hCtx);
     {
-        GBL_API_VERIFY_POINTER(pMap);
+        GBL_API_VERIFY_POINTER(pSet);
         GblSize ncap = 16;
         if (capacity < ncap) {
             capacity = ncap;
@@ -211,58 +212,58 @@ GBL_API             GblHashSet_construct_8(GblHashSet*                 pMap,
             bucketsz++;
         }
         // hashmap + pSpare + edata
-        memset(pMap, 0, sizeof(GblHashSet));
-        pMap->hCtx           = hCtx;
-        pMap->pUserdata      = pUserdata;
-        pMap->entrySize      = elsize;
-        pMap->bucketSize     = bucketsz;
-        pMap->pFnHash        = pFnHash;
-        pMap->pFnCompare     = pFnCompare;
-        pMap->pFnDestruct    = pFnDestruct;
-        pMap->pSpare         = GBL_API_MALLOC(pMap->bucketSize);
-        pMap->capacity       = capacity;
-        pMap->bucketCount    = capacity;
-        pMap->mask           = pMap->bucketCount-1;
-        pMap->pBuckets        = GBL_API_MALLOC(pMap->bucketSize*pMap->bucketCount);
-        memset(pMap->pBuckets, 0, pMap->bucketSize*pMap->bucketCount);
+        memset(pSet, 0, sizeof(GblHashSet));
+        pSet->hCtx           = hCtx;
+        pSet->pUserdata      = pUserdata;
+        pSet->entrySize      = elsize;
+        pSet->bucketSize     = bucketsz;
+        pSet->pFnHash        = pFnHash;
+        pSet->pFnCompare     = pFnCompare;
+        pSet->pFnDestruct    = pFnDestruct;
+        pSet->pSpare         = GBL_API_MALLOC(pSet->bucketSize);
+        pSet->capacity       = capacity;
+        pSet->bucketCount    = capacity;
+        pSet->mask           = pSet->bucketCount-1;
+        pSet->pBuckets        = GBL_API_MALLOC(pSet->bucketSize*pSet->bucketCount);
+        memset(pSet->pBuckets, 0, pSet->bucketSize*pSet->bucketCount);
     }
     GBL_API_END();
 
 }
-GBL_API             GblHashSet_construct_7(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_7(GblHashSet*                 pSet,
                                            GblSize                     elsize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
                                            GblHashSetEntryDestructFn   pFnDestruct,
                                            GblSize                     capacity,
                                            GblContext                  hCtx) GBL_NOEXCEPT {
-    return GblHashSet_construct_8(pMap, elsize, pFnHash, pFnCompare, pFnDestruct, capacity, hCtx, NULL);
+    return GblHashSet_construct_8(pSet, elsize, pFnHash, pFnCompare, pFnDestruct, capacity, hCtx, NULL);
 }
 
-GBL_API             GblHashSet_construct_6(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_6(GblHashSet*                 pSet,
                                            GblSize                     elsize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
                                            GblHashSetEntryDestructFn   pFnDestruct,
                                            GblSize                     capacity) GBL_NOEXCEPT
 {
-    return GblHashSet_construct_7(pMap, elsize, pFnHash, pFnCompare, pFnDestruct, capacity, NULL);
+    return GblHashSet_construct_7(pSet, elsize, pFnHash, pFnCompare, pFnDestruct, capacity, NULL);
 }
 
-GBL_API             GblHashSet_construct_5(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_5(GblHashSet*                 pSet,
                                            GblSize                     elsize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
                                            GblHashSetEntryDestructFn   pFnDestruct) GBL_NOEXCEPT
 {
-    return GblHashSet_construct_6(pMap, elsize, pFnHash, pFnCompare, pFnDestruct, 0);
+    return GblHashSet_construct_6(pSet, elsize, pFnHash, pFnCompare, pFnDestruct, 0);
 }
 
-GBL_API             GblHashSet_construct_4(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_4(GblHashSet*                 pSet,
                                            GblSize                     elsize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare) GBL_NOEXCEPT {
-    return GblHashSet_construct_5(pMap, elsize, pFnHash, pFnCompare, NULL);
+    return GblHashSet_construct_5(pSet, elsize, pFnHash, pFnCompare, NULL);
 }
 
 
@@ -283,27 +284,27 @@ GBL_API GblHashSet_assignMove(GblHashSet* pLhs, GblHashSet* pRhs) GBL_NOEXCEPT {
     return GblHashSet_constructMove(pLhs, pRhs);
 }
 
-GBL_EXPORT void* GblHashSet_at(const GblHashSet* pMap, const void* pKey) GBL_NOEXCEPT {
+GBL_EXPORT void* GblHashSet_at(const GblHashSet* pSet, const void* pKey) GBL_NOEXCEPT {
     void* pEntry = NULL;
-    GBL_API_BEGIN(pMap->hCtx);
-    pEntry = GblHashSet_get(pMap, pKey);
+    GBL_API_BEGIN(pSet->hCtx);
+    pEntry = GblHashSet_get(pSet, pKey);
     GBL_API_VERIFY(pEntry, GBL_RESULT_ERROR_OUT_OF_RANGE, "The requested key was not found in the hash map!");
     GBL_API_END_BLOCK();
     return pEntry;
 }
 
-GBL_EXPORT GblBool GblHashSet_contains(const GblHashSet* pMap, const void* pKey) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblHashSet_contains(const GblHashSet* pSet, const void* pKey) GBL_NOEXCEPT {
     GblBool found = GBL_FALSE;
-    GBL_API_BEGIN(pMap->hCtx);
-    if(GblHashSet_get(pMap, pKey)) found = GBL_TRUE;
+    GBL_API_BEGIN(pSet->hCtx);
+    if(GblHashSet_get(pSet, pKey)) found = GBL_TRUE;
     GBL_API_END_BLOCK();
     return found;
 }
 
-GBL_EXPORT GblSize GblHashSet_count(const GblHashSet* pMap, const void* pKey) GBL_NOEXCEPT {
+GBL_EXPORT GblSize GblHashSet_count(const GblHashSet* pSet, const void* pKey) GBL_NOEXCEPT {
     GblSize count = 0;
-    GBL_API_BEGIN(pMap->hCtx);
-    if(GblHashSet_get(pMap, pKey)) ++count;
+    GBL_API_BEGIN(pSet->hCtx);
+    if(GblHashSet_get(pSet, pKey)) ++count;
     GBL_API_END_BLOCK();
     return count;
 }
@@ -388,14 +389,14 @@ static GblBool resize(struct GblHashSet *map, size_t new_cap) {
     return GBL_TRUE;
 }
 
-GBL_EXPORT GblBool GblHashSet_insert(GblHashSet* pMap, const void* pItem) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblHashSet_insert(GblHashSet* pSet, const void* pItem) GBL_NOEXCEPT {
     GblBool inserted = GBL_FALSE;
-    GBL_API_BEGIN(pMap->hCtx);
+    GBL_API_BEGIN(pSet->hCtx);
     {
-        void* pValue = GblHashSet_get(pMap, pItem);
+        void* pValue = GblHashSet_get(pSet, pItem);
         if(pValue) GBL_API_DONE();
 
-        pValue = GblHashSet_set(pMap, pItem);
+        pValue = GblHashSet_set(pSet, pItem);
         GBL_API_VERIFY_EXPRESSION(!pValue, "Somehow the item wsn't found in the map before inserting it, but it was there!");
         inserted = GBL_TRUE;
     }
@@ -403,12 +404,12 @@ GBL_EXPORT GblBool GblHashSet_insert(GblHashSet* pMap, const void* pItem) GBL_NO
     return inserted;
 }
 
-GBL_EXPORT void GblHashSet_insertOrAssign(GblHashSet* pMap, const void* pEntry) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pMap->hCtx);
+GBL_EXPORT void GblHashSet_insertOrAssign(GblHashSet* pSet, const void* pEntry) GBL_NOEXCEPT {
+    GBL_API_BEGIN(pSet->hCtx);
     GBL_API_VERIFY_POINTER(pEntry);
     {
-        void* pOldEntry = GblHashSet_set(pMap, pEntry);
-        if(pOldEntry && pMap->pFnDestruct) pMap->pFnDestruct(pMap, pOldEntry);
+        void* pOldEntry = GblHashSet_set(pSet, pEntry);
+        if(pOldEntry && pSet->pFnDestruct) pSet->pFnDestruct(pSet, pOldEntry);
     }
     GBL_API_END_BLOCK();
 }
@@ -457,11 +458,11 @@ static GBL_EXPORT void* GblHashSet_rawSet_(GblHashSet* map, const void* item, vo
     return pPrevItem;
 }
 
-GBL_EXPORT void* GblHashSet_emplace(GblHashSet* pMap, const void* pKey) GBL_NOEXCEPT {
+GBL_EXPORT void* GblHashSet_emplace(GblHashSet* pSet, const void* pKey) GBL_NOEXCEPT {
     void* pNewEntry = NULL;
-    GBL_API_BEGIN(pMap->hCtx);
+    GBL_API_BEGIN(pSet->hCtx);
     {
-        GblHashSet_rawSet_(pMap, pKey, &pNewEntry);
+        GblHashSet_rawSet_(pSet, pKey, &pNewEntry);
         GBL_API_VERIFY_EXPRESSION(pNewEntry, "Somehow we did a set and didn't get a new entry?");
         //GBL_API_VERIFY(!pOldEntry, GBL_RESULT_ERROR_OVERFLOW, "Could not emplace over existing hash map entry!");
     }
@@ -469,13 +470,13 @@ GBL_EXPORT void* GblHashSet_emplace(GblHashSet* pMap, const void* pKey) GBL_NOEX
     return pNewEntry;
 }
 
-GBL_EXPORT void* GblHashSet_tryEmplace(GblHashSet* pMap, const void* pKey) GBL_NOEXCEPT {
+GBL_EXPORT void* GblHashSet_tryEmplace(GblHashSet* pSet, const void* pKey) GBL_NOEXCEPT {
     void* pPrevEntry = NULL;
-    GBL_API_BEGIN(pMap->hCtx);
-    if(GblHashSet_contains(pMap, pKey)) {
+    GBL_API_BEGIN(pSet->hCtx);
+    if(GblHashSet_contains(pSet, pKey)) {
         GBL_API_DONE();
     } else {
-        pPrevEntry = GblHashSet_emplace(pMap, pKey);
+        pPrevEntry = GblHashSet_emplace(pSet, pKey);
         GBL_API_VERIFY_EXPRESSION(pPrevEntry, "Fetching the previous entry should've succeeded after 'contains(key)' returned true!");
     }
     GBL_API_END_BLOCK();
@@ -530,13 +531,13 @@ GBL_EXPORT void* GblHashSet_probe(const GblHashSet *map, GblSize position) GBL_N
 }
 
 
-GBL_EXPORT GblBool GblHashSet_erase(GblHashSet* pMap, const void* pKey) {
+GBL_EXPORT GblBool GblHashSet_erase(GblHashSet* pSet, const void* pKey) {
     GblBool removed = GBL_FALSE;
     void* pExtracted = NULL;
-    GBL_API_BEGIN(pMap->hCtx);
-    pExtracted = GblHashSet_extract(pMap, pKey);
+    GBL_API_BEGIN(pSet->hCtx);
+    pExtracted = GblHashSet_extract(pSet, pKey);
     if(pExtracted) {
-        if(pMap->pFnDestruct) pMap->pFnDestruct(pMap, pExtracted);
+        if(pSet->pFnDestruct) pSet->pFnDestruct(pSet, pExtracted);
         removed = GBL_TRUE;
     }
     GBL_API_END_BLOCK();
@@ -635,18 +636,18 @@ GBL_EXPORT GblHashSetIterator GblHashSet_next(const GblHashSet* pSelf, const Gbl
 
 
 GBL_EXPORT const GblHashSet* GblHashSetIterator_container(const GblHashSetIterator* pSelf) {
-    return pSelf->pMap;
+    return pSelf->pSet;
 }
 
 GBL_EXPORT GblBool GblHashSetIterator_valid(const GblHashSetIterator* pSelf) GBL_NOEXCEPT {
-    return pSelf && pSelf->pMap && pSelf->bucketIdx < pSelf->pMap->bucketCount;
+    return pSelf && pSelf->pSet && pSelf->bucketIdx < pSelf->pSet->bucketCount;
 }
 
 GBL_EXPORT void* GblHashSetIterator_value(const GblHashSetIterator* pSelf) {
     void* pKey = NULL;
     if(GblHashSetIterator_valid(pSelf)) {
-        GBL_API_BEGIN(pSelf->pMap);
-        pKey = GblHashSet_probe(pSelf->pMap, pSelf->bucketIdx);
+        GBL_API_BEGIN(pSelf->pSet);
+        pKey = GblHashSet_probe(pSelf->pSet, pSelf->bucketIdx);
         GBL_API_VERIFY_EXPRESSION(pKey, "No key for what should be a valid iterator!");
         GBL_API_END_BLOCK();
     }
