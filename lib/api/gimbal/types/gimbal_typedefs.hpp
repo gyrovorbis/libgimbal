@@ -24,6 +24,11 @@ namespace gimbal {
     using FnPtr         = ::GblFnPtr;
     using Ptr           = ::GblPtr;
     using Hash          = ::GblHash;
+    using RefCount      = ::GblRefCount;
+
+class Class;
+class Object;
+class Instance;
 
 
 class Context;

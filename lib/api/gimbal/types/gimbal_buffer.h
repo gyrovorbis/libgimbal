@@ -119,7 +119,7 @@ GBL_INLINE GBL_RESULT   GblBuffer_construct_4(SELF, GblSize bytes, const void* p
                               "Cannot copy buffer of unknown size!");
     pSelf->size     = 0;
     pSelf->pData    = NULL;
-    pSelf->hCtx     = hCtx;
+    pSelf->hCtx     = GBL_API_CONTEXT();
     if(bytes) {
         GBL_API_CALL(GblBuffer_resize(pSelf, bytes));
         if(pData) {
@@ -147,10 +147,16 @@ GBL_RESULT GblBuffer_compare(CSELF, const GblBuffer* pOther, GblCmpResult* pResu
         *pResult = INT_MAX;
     else if(GblBuffer_size(pSelf) < GblBuffer_size(pOther))
         *pResult = INT_MIN;
-    else
+    else if(GblBuffer_data(pSelf) == GblBuffer_data(pOther))
+        *pResult = 0;
+    else if(GblBuffer_data(pSelf) && GblBuffer_data(pOther))
         *pResult =  memcmp(GblBuffer_data(pSelf),
                            GblBuffer_data(pOther),
-                           GblSize(pSelf));
+                           GblBuffer_size(pSelf));
+    else if(GblBuffer_data(pSelf))
+        *pResult = INT_MAX;
+    else
+        *pResult = INT_MIN;
     GBL_API_END();
 }
 
@@ -171,6 +177,7 @@ GBL_RESULT GblBuffer_move(SELF, GblBuffer* pOther) GBL_NOEXCEPT {
     GBL_API_VERIFY_POINTER(pOther);
 
     if(pSelf->hCtx == pOther->hCtx) {
+        GBL_API_CALL(GblBuffer_clear(pSelf));
         pSelf->size     = pOther->size;
         pSelf->pData    = pOther->pData;
         pOther->size    = 0;
@@ -187,6 +194,7 @@ GBL_RESULT GblBuffer_clear(SELF) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->hCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     if(pSelf->pData) GBL_API_FREE(pSelf->pData);
+    pSelf->pData = NULL;
     pSelf->size = 0;
     GBL_API_END();
 }
@@ -215,17 +223,11 @@ GBL_RESULT GblBuffer_resize(SELF, GblSize bytes) GBL_NOEXCEPT {
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_acquire(SELF, GblSize bytes, void* pData) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->hCtx);
-    if(!bytes) {
-        if(!pData) {
-            GBL_API_CALL(GblBuffer_clear(pSelf));
-        } else GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_ARG,
-                                  "GblBuffer_acquire(self, 0, NON-NULL-DATA)");
-    } else {
-        if(!pData) GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_ARG,
-                                      "GblBuffer_acquire(self, %u, NULL-DATA)", bytes);
-        GBL_API_CALL(GblBuffer_resize(pSelf, bytes));
-        memcpy(pSelf->pData, pData, bytes);
-    }
+    GBL_API_VERIFY_ARG(bytes > 0);
+    GBL_API_VERIFY_POINTER(pData);
+    GBL_API_CALL(GblBuffer_clear(pSelf));
+    pSelf->size = bytes;
+    pSelf->pData = pData;
     GBL_API_END();
 }
 

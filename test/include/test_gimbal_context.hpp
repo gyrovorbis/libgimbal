@@ -75,7 +75,7 @@ private slots:
 /* TO TEST
  * 1) version
  * 2) throwing C++ exceptions from C return codes
- * 3) catching C++ exceptions as C return codes
+ * 3) catching C++ exc eptions as C return codes
  * 4) results result stringification + getLastError
  * 5) subclass context with validator
  * 6) test API macros for all overloads

@@ -36,8 +36,8 @@ GBL_API gblThreadCurrent(GblThread** ppThread) {
 }
 
 GblContext gblThreadContext(const GblThread* pThread) {
-    if(!pThread) gblThreadCurrent((GblThread**)&pThread);
-    return pThread->pStackFrameTop? pThread->pStackFrameTop->hContext : GblContext_globalGet();
+    //if(!pThread) gblThreadCurrent((GblThread**)&pThread);
+    return GblContext_globalGet();
 }
 
 GBL_API gblThreadCallRecordGet(const GblThread* pThread, const GblCallRecord** ppRecord) {

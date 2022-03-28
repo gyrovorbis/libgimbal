@@ -27,12 +27,13 @@ public:
     bool        operator!=(const Buffer& rhs) const;
 
     Size        getSize(void) const;
-    void*       getData(void) const;
+    template<typename T=void*>
+    T           getData(void) const;
     bool        isEmpty(void) const;
     Context*    getContext(void) const;
 
     void        clear(void);
-    void        acquire(Size bytes, void* pData);
+    void        acquire(std::pair<Size, void*> data);
     auto        release(void) -> std::pair<Size, void*>;
 
     template<typename T>
@@ -43,6 +44,7 @@ public:
     void        resize(Size bytes);
     void        grow(Size bytes);
     void        shrink(Size bytes);
+
     void        erase(Size offset, Size bytes);
 
     template<typename T>
@@ -112,8 +114,9 @@ inline Size Buffer::getSize(void) const {
     return GblBuffer_size(this);
 }
 
-inline void* Buffer::getData(void) const {
-    return GblBuffer_data(this);
+template<typename T>
+inline T Buffer::getData(void) const {
+    return reinterpret_cast<T>(GblBuffer_data(this));
 }
 
 inline bool Buffer::isEmpty(void) const {
@@ -128,8 +131,8 @@ inline void Buffer::clear(void) {
     Exception::checkThrow(GblBuffer_clear(this));
 }
 
-inline void Buffer::acquire(Size bytes, void* pData) {
-    Exception::checkThrow(GblBuffer_acquire(this, bytes, pData));
+inline void Buffer::acquire(std::pair<Size, void*> data) {
+    Exception::checkThrow(GblBuffer_acquire(this, data.first, data.second));
 }
 
 inline auto Buffer::release(void) -> std::pair<Size, void*> {

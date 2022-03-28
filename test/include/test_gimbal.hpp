@@ -483,6 +483,8 @@ public:
     ValueType end(void);
 };
 
+using ContextAllocScopeGuard = ContextScopeGuard<ContextActiveAllocMonitor>;
+
 //using LogStackScopeGuard = ContextScopeGuard<LogDepthMonitor>;
 
 

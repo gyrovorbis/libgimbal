@@ -180,8 +180,13 @@ set(GIMBAL_INCLUDES
 #    api/gimbal/meta2/gimbal_object.h
 #    api/gimbal/meta2/gimbal_class.h
     api/gimbal/meta2/gimbal_type.h
+    api/gimbal/meta/gimbal_type.hpp
+    api/gimbal/meta/gimbal_instance.hpp
+    api/gimbal/meta/gimbal_interface.hpp
     api/gimbal/meta/gimbal_class.h
+    api/gimbal/meta/gimbal_class.hpp
     api/gimbal/meta/gimbal_instance.h
+    api/gimbal/meta/gimbal_ivariant.h
 #    api/gimbal/meta2/gimbal_primitive.h
     #api/gimbal/ifaces/gimbal_inamed.h
     #api/gimbal/ifaces/gimbal_icontainer.h

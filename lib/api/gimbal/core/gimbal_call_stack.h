@@ -95,6 +95,9 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFra
         GBL_ASSERT(GBL_RESULT_SUCCESS(result));
         result = gblHandleUserdata(hHandle, &pHandleUserdata);
         GBL_ASSERT(GBL_RESULT_SUCCESS(result));
+    }
+
+    if(hContext) {
         result = gblHandleUserdata((GblHandle)hContext, &pContextUserdata);
         GBL_ASSERT(GBL_RESULT_SUCCESS(result));
     }

@@ -8,12 +8,13 @@ GBL_DECLS_BEGIN
 
 #define GBL_TYPE_FUNDAMENTAL(type)              (gblTypeFundamental(type))
 #define	GBL_TYPE_FUNDAMENTAL_MAX                (255 << GBL_TYPE_FUNDAMENTAL_SHIFT)
-#define GBL_TYPE_INVALID                        GBL_TYPE_MAKE_FUNDAMENTAL(0)
-#define GBL_TYPE_NIL                            GBL_TYPE_MAKE_FUNDAMENTAL(1)
-#define GBL_TYPE_INTERFACE                      GBL_TYPE_MAKE_FUNDAMENTAL(2)
-#define GBL_TYPE_BOOL                           GBL_TYPE_MAKE_FUNDAMENTAL(3)
-#define GBL_TYPE_CHAR                           GBL_TYPE_MAKE_FUNDAMENTAL(4)
-#define GBL_TYPE_UCHAR                          GBL_TYPE_MAKE_FUNDAMENTAL(5)
+#define GBL_TYPE_INVALID                        (0)
+#define GBL_TYPE_INTERFACE                      (gblTypeBuiltin(0))
+#define GBL_TYPE_IVARIANT                       (gblTypeBuiltin(1))
+#define GBL_TYPE_NIL                            (gblTypeBuiltin(2))
+#define GBL_TYPE_BOOL                           (gblTypeBuiltin(2))
+#define GBL_TYPE_CHAR                           (gblTypeBuiltin(3))
+#define GBL_TYPE_UCHAR                          (gblTypeBuiltin(4))
 #define GBL_TYPE_INT16                          GBL_TYPE_MAKE_FUNDAMENTAL(6)
 #define GBL_TYPE_UINT16                         GBL_TYPE_MAKE_FUNDAMENTAL(7)
 #define GBL_TYPE_INT32                          GBL_TYPE_MAKE_FUNDAMENTAL(8)
@@ -32,48 +33,38 @@ GBL_DECLS_BEGIN
 //#define GBL_TYPE_META_INSTANCE                  GBL_TYPE_MAKE_FUNDAMENTAL(21)
 //#define GBL_TYPE_DISPATCHABLE
 
-
-#define	GBL_TYPE_FUNDAMENTAL_SHIFT              (2)
-#define	GBL_TYPE_MAKE_FUNDAMENTAL(x)            ((GblType)((x) << GBL_TYPE_FUNDAMENTAL_SHIFT))
-#define GBL_TYPE_ID_MASK                        ((GblType)((1 << G_TYPE_FUNDAMENTAL_SHIFT) - 1))
-#define GBL_TYPE_RESERVED_INTERNAL_FIRST        (22)
-#define GBL_TYPE_RESERVED_INTERNAL_LAST         (31)
-
-#define GBL_TYPE_RESERVED_USER_FIRST            (49)
-
-/* The 2*sizeof(size_t) alignment here is borrowed from
- * GNU libc, so it should be good most everywhere.
- * It is more conservative than is needed on some 64-bit
- * platforms, but ia64 does require a 16-byte alignment.
- * The SIMD extensions for x86 and ppc32 would want a
- * larger alignment than this, but we don't need to
- * do better than malloc.
- */
-#define GBL_STRUCT_ALIGNMENT (2 * sizeof (size_t))
-#define GBL_ALIGN_STRUCT(offset) \
-      ((offset + (GBL_STRUCT_ALIGNMENT - 1)) & -GBL_STRUCT_ALIGNMENT)
+#define GBL_TYPE_BUILTIN_COUNT                  3
 
 
+#define GBL_TYPE_FLAGS_TEST(type, flags)    ((GblBool)(gblTypeFlags(type) & flags))
+#define GBL_TYPE_IS_CLASSED(type)           (GBL_TYPE_FLAGS_TEST(type, (GblTypeFlags)GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED))
+#define GBL_TYPE_IS_INSTANTIABLE(type)      (GBL_TYPE_FLAGS_TEST(type, (GblTypeFlags)GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE))
+#define GBL_TYPE_IS_DERIVABLE(type)         (GBL_TYPE_FLAGS_TEST(type, (GblTypeFlags)GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE))
+#define GBL_TYPE_IS_DEEP_DERIVABLE(type)    (GBL_TYPE_FLAGS_TEST(type, (GblTypeFlags)GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE))
+#define GBL_TYPE_IS_ABSTRACT(type)          (GBL_TYPE_FLAGS_TEST(type, GBL_TYPE_FLAG_ABSTRACT))
+#define GBL_TYPE_IS_FINAL(type)             (GBL_TYPE_FLAGS_TEST(type, GBL_TYPE_FLAG_FINAL))
+#define GBL_TYPE_IS_FUNDAMENTAL(type)       (type == gblTypeFundamental(type))
+#define GBL_TYPE_IS_INTERFACE(type)         (gblTypeFundamental(type) == GBL_TYPE_INTERFACE)
+
+#define GBL_TYPE_INSTANCE_TO(instance, toType, cType)           ((cType*)gblTypeInstanceCastCheck((GblInstance*)instance, toType))
+#define GBL_TYPE_INSTANCE_IS_A(instance, toType)                (gblTypeInstanceIsA(instance, toType))
+#define GBL_TYPE_CLASS_TO(klass, toType, cType)                 ((cType*)gblTypeClassCastCheck((GblClass*)klass, toType))
+#define GBL_TYPE_CLASS_IS_A(klass, toType)                      (gblTypeClassIsA(klass, toType))
+#define GBL_TYPE_INSTANCE_CLASS_TO(instance, toType, cType)     ((cType*)gblTypeInstanceClassCastCheck((GblInstance*)instance, toType))
 
 // wrap using DSL
 GBL_DECLARE_FLAGS(GblTypeFundamentalFlags) {
-    GBL_TYPE_FLAG_CLASSED             = (1 << 0),
-    GBL_TYPE_FLAG_INSTANTIATABLE      = (1 << 1),
-    GBL_TYPE_FLAG_DERIVABLE           = (1 << 2),
-    GBL_TYPE_FLAG_DEEP_DERIVABLE      = (1 << 3)
+    GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED             = (1 << 0),
+    GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE        = (1 << 1),
+    GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE           = (1 << 2),
+    GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE      = (1 << 3)
 };
 
 GBL_DECLARE_FLAGS(GblTypeFlags) {
     GBL_TYPE_FLAG_ABSTRACT            = (1 << 4),
-    GBL_TYPE_FLAG_VALUE_ABSTRACT      = (1 << 5)
+    GBL_TYPE_FLAG_VARIANT_ABSTRACT    = (1 << 5),
+    GBL_TYPE_FLAG_FINAL               = (1 << 6)
 };
-
-GBL_CONSTEXPR GBL_INLINE GblBool GBL_TYPE_FLAGS_TEST(GblType gblType, GblTypeFlags flags) {
-    //GBL_API_BEGIN(NULL);
-    //GBL_API_VERIFY_POINTER(pResult);
-    //return (GblBool)GBL_FLAGS_FIELD_GET(gblType, GBL_BITFIELD_FROM_MASK(flags));
-    //GBL_API_END();
-}
 
 typedef enum GBL_META_CALL {
     GBL_META_CALL_IFACE_INFO,
@@ -85,70 +76,77 @@ typedef GBL_RESULT (*GblTypeClassInitFn)        (GblClass*, const void*);
 typedef GBL_RESULT (*GblTypeClassFinalizeFn)    (GblClass*, const void*);
 typedef GBL_RESULT (*GblTypeInstanceInitFn)     (GblInstance*);
 
-typedef struct GblTypeInterfaceEntry {
-    GblType     interfaceType;
-    GblSize     classOffset;
-} GblTypeInterfaceEntry;
+typedef struct GblTypeInterfaceMapEntry {
+    GblType      interfaceType;
+    uint16_t     classOffset;
+} GblTypeInterfaceMapEntry;
 
 typedef struct GblTypeInfo {
-    GblTypeMetaCallFn           pFnMetaCall;
-    GblTypeClassInitFn          pFnClassInit;
-    GblTypeClassFinalizeFn      pFnClassFinalize;
-    GblTypeInstanceInitFn       pFnInstanceInit;
-    GblSize                     classSize;
-    GblSize                     classAlign;
-    const void*                 pClassData;
-    GblSize                     instanceSize;
-    GblSize                     instanceAlign;
+    GblTypeMetaCallFn               pFnMetaCall;
+    GblTypeClassInitFn              pFnClassInit;
+    GblTypeClassFinalizeFn          pFnClassFinalize;
+    GblSize                         classSize;
+    GblSize                         classAlign;
+    const void*                     pClassData;
+    GblSize                         interfaceCount;
+    const GblTypeInterfaceMapEntry* pInterfaceMap;
+    GblTypeInstanceInitFn           pFnInstanceInit;
+    GblSize                         instanceSize;
+    GblSize                         instanceAlign;
 } GblTypeInfo;
 
 
-//GBL_EXPORT GBL_RESULT           gblTypeInit(void);  // init API, done automatically
-//GBL_EXPORT GBL_RESULT           gblTypeDeinit(void); // in case you want to restart
-
 GBL_EXPORT GBL_RESULT           gblTypeReinit(GblContext hCtx);
 
-GBL_EXPORT GblType              gblTypeRegister(GblType                         parent,
+GBL_EXPORT GblType              gblTypeRegisterFundamental(const char*              pName,
+                                                           const GblTypeInfo*       pInfo,
+                                                           GblTypeFundamentalFlags  fundamentalFlags,
+                                                           GblTypeFlags             flags);
+
+GBL_EXPORT GblType              gblTypeRegisterStatic(GblType                   parent,
                                                 const char*                     pName,
                                                 const GblTypeInfo*              pInfo,
-                                                GblFlags                        flags,
-                                                const GblTypeInterfaceEntry*  pIterfaces[]);
-GBL_EXPORT void                 gblTypeUnregister(GblType type);
+                                                GblFlags                        flags);
+GBL_EXPORT GBL_RESULT           gblTypeUnregister(GblType type);
 
-
+GBL_EXPORT GblType              gblTypeBuiltin(GblUint index);
 GBL_EXPORT GblType              gblTypeFind(const char* pName);
 GBL_EXPORT GblSize              gblTypeCount(void);
 
 GBL_EXPORT const char*          gblTypeName(GblType type);
 GBL_EXPORT GblType              gblTypeParent(GblType type);
-GBL_EXPORT GblType              gblTypeBase(GblType type);
+GBL_EXPORT GblType              gblTypeFundamental(GblType type);
 GBL_EXPORT GblTypeFlags         gblTypeFlags(GblType type);
 GBL_EXPORT const GblTypeInfo*   gblTypeInfo(GblType type);
 GBL_EXPORT GblPlugin*           gblTypePlugin(GblType type);
 
-
+GBL_EXPORT GblBool              gblTypeValid(GblType type);
 GBL_EXPORT GblBool              gblTypeIsA(GblType derived, GblType base);
+GBL_EXPORT GblBool              gblTypeIsFundamentallyA(GblType derived, GblType fundamentalBase);
 GBL_EXPORT GblRefCount          gblTypeClassRefCount(GblType type);
 #ifdef GBL_TYPE_DEBUG
 GBL_EXPORT GblRefCount          gblTypeInstanceRefCount(GblType type);
 #endif
-
 GBL_EXPORT GblClass*            gblTypeClassRef(GblType typeId);
 GBL_EXPORT GblClass*            gblTypeClassPeek(GblType typeId);
 GBL_EXPORT GblRefCount          gblTypeClassUnref(GblClass* pClass);
+GBL_EXPORT GblBool              gblTypeClassIsA(GblClass* pClass, GblType toType);
+GBL_EXPORT GblClass*            gblTypeClassCast(GblClass* pClass, GblType toType);
+GBL_EXPORT GblClass*            gblTypeClassCastCheck(GblClass* pClass, GblType toType);
+GBL_EXPORT GblInterface*        gblTypeClassInterfacePeek(GblClass* pClass, GblType ifaceType);
+GBL_EXPORT GblInterface*        gblTypeClassInterfacePeekParent(GblClass* pClass, GblType ifaceType);
+GBL_EXPORT GblType              gblTypeClassType(GblClass* pClass);
 
-GBL_EXPORT GblInstance*         gblTypeInstanceNew(GblType type);
-//GBL_EXPORT GblInstance*         gblTypeInstanceInit(GblType type, GblInstance* pExisting);
-//GBL_EXPORT GblInstance*         gblTypeInstanceFinalize(GblInstance* pInstance);
-GBL_EXPORT GblRefCount          gblTypeInstanceDelete(GblInstance* pInstance);
-
-GBL_EXPORT GblInterfaceClass*   gblTypeInterfaceClassPeek(GblClass* pClass, GblType ifaceType);
-GBL_EXPORT GblInterfaceClass*   gblTypeInterfaceClassPeekParent(GblClass* pClass, GblType ifaceType);
-//GBL_EXPORT GblInterfaceClass* gblTypeInterfaceClassDefaultRef(GblType type);
-//GBL_EXPORT GblInterfaceClass* gblTypeInterfaceClassDefaultUnref(GblInterfaceClass* pClass);
-
-GBL_EXPORT GblInterface*        gblTypeInterfaceInit(GblInterface* pSelf, GblType ifaceType, GblInstance* pInstance);
-
+GBL_EXPORT GblInstance*         gblTypeInstanceCreate(GblType type);
+GBL_EXPORT GBL_RESULT           gblTypeInstanceConstruct(GblType type, GblInstance* pInstance);
+GBL_EXPORT GblRefCount          gblTypeInstanceDestruct(GblInstance* pInstance);
+GBL_EXPORT GblRefCount          gblTypeInstanceDestroy(GblInstance* pInstance);
+GBL_EXPORT GblBool              gblTypeInstanceIsA(GblInstance* pInstance, GblType toType);
+GBL_EXPORT GblInstance*         gblTypeInstanceCast(GblInstance* pInstance, GblType toType);
+GBL_EXPORT GblInstance*         gblTypeInstanceCastCheck(GblInstance* pInstance, GblType toType);
+GBL_EXPORT GblClass*            gblTypeInstanceClassCast(GblInstance* pInstance, GblType toType);
+GBL_EXPORT GblClass*            gblTypeInstanceClassCastCheck(GblInstance* pInstance, GblType toType);
+GBL_EXPORT GblClass*            gblTypeInstanceClass(GblInstance* pInstance);
 
 
 // ===== / META TYPES =======

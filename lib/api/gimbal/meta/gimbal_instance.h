@@ -21,15 +21,13 @@ GBL_INLINE GblClass*    GblInstance_classOf     (CSELF);
 GBL_INLINE GblClass*    GblInstance_parentOf    (CSELF);
 GBL_INLINE GblInstance* GblInstance_cast        (SELF, GblType toType);
 
-GBL_API                 GblInstance_vMetaCall  (SELF,   GBL_META_CALL call, GblUint id, void** ppArgs);
-GBL_API                 GblInstance_vConstruct (SELF);
-GBL_API                 GblInstance_vDestruct  (SELF);
-GBL_API                 GblInstance_vCopy      (SELF,   const GblInstance* pSrc);
-GBL_API                 GblInstance_vMove      (SELF,   const GblInstance* pSrc);
-GBL_API                 GblInstance_vCompare   (CSELF,  const GblVariant* pVariant);
-GBL_API                 GblInstance_vConvert   (CSELF,  GblVariant* pVariant);
-GBL_API                 GblInstance_vLoad      (SELF,   const void* pInstance, const GblString* pString);
-GBL_API                 GblInstance_vSave      (CSELF,  const void* pInstance, GblString* pString);
+
+
+
+
+
+
+// ====== INLINEZ ======
 
 
 GBL_INLINE GblType      GblInstance_typeOf      (CSELF) {

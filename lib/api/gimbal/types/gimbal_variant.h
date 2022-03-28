@@ -22,25 +22,6 @@ struct GblVariant {
     GBL_VARIANT_TYPE    type;
 };
 
-#if 0
-//Implement utility convenience macros around this bitch!
-GBL_API_INLINE_HELPER((GblSize, 0), VECTOR_SIZE, (const GblVector* pVector), {
-    GBL_API_CALL(gblVectorSize(pVector, &GBL_API_INLINE_RETVAL()));
-});
-
-GBL_API_INLINE_HELPER((GblSize, 0), VECTOR_CAPACITY, (const GblVector* pVector), {
-    GBL_API_CALL(gblVectorCapacity(pVector, &GBL_API_INLINE_RETVAL()));
-});
-
-GBL_API_INLINE_HELPER((const void*, NULL), VECTOR_DATA, (const GblVector* pVector), {
-    GBL_API_CALL(gblVectorData(pVector, &GBL_API_INLINE_RETVAL()));
-});
-
-GBL_API_INLINE_HELPER((void*, NULL), VECTOR_AT, (const GblVector* pVector, GblSize index), {
-    GBL_API_CALL(gblVectorAt(pVector, index, &GBL_API_INLINE_RETVAL()));
-});
-#endif
-
 #define GBL_VARIANT_CONSTRUCT_TRAITS (                      \
         GBL_META_GENERIC_MACRO_NO_DEFAULT,                  \
         (                                                   \

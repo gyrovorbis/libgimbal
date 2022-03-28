@@ -16,7 +16,7 @@ typedef GBL_RESULT (*GblPluginTypeInfoFn)   (CSELF, GblType, GblTypeInfo*);
 
 
 typedef struct GblPluginClass {
-    GblInterfaceClass       base;
+    GblInterface            base;
     GblPluginUseFn          pFnUse;
     GblPluginUnuseFn        pFnUnuse;
     GblPluginTypeInfoFn     pFnTypeInfo;

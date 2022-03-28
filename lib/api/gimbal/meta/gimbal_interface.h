@@ -3,30 +3,39 @@
 
 #include "gimbal_instance.h"
 
-#define         GBL_INTERFACE_TYPE (GblInterface_type())
-
 #define SELF    GblInterface* pSelf
 #define CSELF   const GblInterface* pSelf
 
 GBL_DECLS_BEGIN
 
-typedef struct GblInterfaceClass {
+typedef struct GblInterface {
     GblClass            base;
     int16_t             offsetToTop;
-} GblInterfaceClass;
-
-
-typedef struct GblInterface {
-    union {
-        void*           pVTable;
-        GblInstance     base;
-    };
-    GblInstance*        pInstance;
 } GblInterface;
 
 
-GBL_INLINE int16_t              GblInterfaceClass_classOffset(const GblInterfaceClass* pClass);
-GBL_INLINE const GblClass*      GblInterfaceClass_instanceClass(const GblInterfaceClass* pClass);
+GBL_INLINE int16_t              GblInterface_classOffset(CSELF);
+GBL_INLINE GblClass*            GblInterface_outerClass(CSELF);
+
+
+
+
+GBL_MAYBE_UNUSED GBL_INLINE
+uint16_t GblInterface_offsetOf(CSELF) {
+    return pSelf? pSelf->offsetToTop : 0;
+}
+
+GBL_MAYBE_UNUSED GBL_INLINE
+GblClass* GblInterface_outerClass(CSELF) {
+    if(!pSelf)              return NULL;
+    if(!pSelf->offsetToTop) return NULL;
+    else
+        return (GblClass*)((uint8_t*)pSelf + pSelf->offsetToTop);
+}
+
+
+#if 0
+
 
 GBL_INLINE const GblInstance*   GblInterface_instance(CSELF);
 GBL_INLINE const void*          GblInterface_vtable(CSELF);
@@ -34,18 +43,6 @@ GBL_INLINE GblBool              GblInterface_isValid(CSELF);
 
 
 
-GBL_MAYBE_UNUSED GBL_INLINE
-uint16_t GblInterfaceClass_offsetOf(const GblInterfaceClass* pSelf) {
-    return pSelf? pSelf->offsetToTop : 0;
-}
-
-GBL_MAYBE_UNUSED GBL_INLINE
-const GblClass* GblInterfaceClass_instanceClass(const GblInterfaceClass* pSelf) {
-    if(!pSelf)              return NULL;
-    if(!pSelf->offsetToTop) return NULL;
-    else
-        return (const GblClass*)((uint8_t*)pSelf + pSelf->offsetToTop);
-}
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GblType GblInterface_instanceTypeOf(CSELF) {
@@ -74,6 +71,20 @@ GblBool GblInterface_isValid(CSELF) {
     //if(!pSelf->pInstance)   return GBL_FALSE;
     return GBL_TRUE;
 }
+
+
+
+typedef struct GblInterface {
+    union {
+        void*           pVTable;
+        GblInstance     base;
+    };
+    GblInstance*        pInstance;
+} GblInterface;
+
+
+
+#endif
 
 
 GBL_DECLS_END

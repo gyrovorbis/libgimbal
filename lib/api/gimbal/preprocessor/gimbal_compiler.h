@@ -337,17 +337,22 @@
  *  Graciously stolen from GLib. Imitation is the most sincere form of flattery.
  *          --Falco Girgis
  */
-#if !(defined (GBL_STMT_START) && defined (GBL_STMT_END))
-#  if defined (__GNUC__) && !defined (__STRICT_ANSI__) && !defined (__cplusplus)
+/* REMOVED WHILE TRYING TO AVOID CLANG WARNINGS AND TO BE STANDARD COMPLIANT
+ * #  if defined (__GNUC__) && !defined (__STRICT_ANSI__) && !defined (__cplusplus)
 #    define GBL_STMT_START    (void) __extension__ (
 #    define GBL_STMT_END      )
+# */
+#if !(defined (GBL_STMT_START) && defined (GBL_STMT_END))
+#  if defined (__GNUC__) && !defined (__STRICT_ANSI__) && !defined (__cplusplus)
+#    define GBL_STMT_START    do
+#    define GBL_STMT_END      while(0)
 #  else
 #    if (defined (sun) || defined (__sun__))
-#      define GBL_STMT_START  if (1)
-#      define GBL_STMT_END    else (void)0
+#      define GBL_STMT_START  if(1)
+#      define GBL_STMT_END    else(void)0
 #    else
 #      define GBL_STMT_START  do
-#      define GBL_STMT_END    while (0)
+#      define GBL_STMT_END    while(0)
 #    endif
 #  endif
 #endif

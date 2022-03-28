@@ -340,9 +340,9 @@ GBL_INLINE GBL_API gblVectorInsert(GblVector* pVector, GblSize index, GblSize co
     GBL_API_BEGIN(pVector->hCtx);
     GBL_API_VERIFY_ARG(index <= pVector->size);
     GBL_API_CALL(gblVectorResize(pVector, pVector->size + count));
-    slideSize = pVector->size - index;
+    slideSize = (pVector->size-1) - index;
     insertionPoint = (uintptr_t)pVector->pBuffer + index * pVector->elementSize;
-    memmove((char*)insertionPoint + pVector->elementSize * count, (const char*)insertionPoint, slideSize * pVector->elementSize);
+    if(slideSize) memmove((char*)insertionPoint + pVector->elementSize * count, (const char*)insertionPoint, slideSize * pVector->elementSize);
     if(pDataIn) {
         memcpy((void*)insertionPoint, pDataIn, pVector->elementSize * count);
     }

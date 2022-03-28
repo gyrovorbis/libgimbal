@@ -55,7 +55,8 @@ extern "C" {
             (GBL_RESULT_ERROR_INVALID_PROPERTY,         GBL_RESULT_ERROR | 22,  ErrorInvalidProperty,       "Invalid Property"),    \
             (GBL_RESULT_ERROR_INVALID_INSTANCE,         GBL_RESULT_ERROR | 23,  ErrorInvalidInstance,       "Invalid Instance"),\
             (GBL_RESULT_ERROR_INVALID_CLASS,            GBL_RESULT_ERROR | 24,  ErrorInvalidClass,          "Invalid Class"),\
-            (GBL_RESULT_COUNT,                          GBL_RESULT_ERROR | 25,  Count,                      "# of Different Error Codes")               \
+            (GBL_RESULT_ERROR_INVALID_TYPE,             GBL_RESULT_ERROR | 25,  ErrorInvalidType,          "Invalid Type"),\
+            (GBL_RESULT_COUNT,                          GBL_RESULT_ERROR | 26,  Count,                      "# of Different Error Codes")               \
         )                                                                                                                                               \
     )
 
