@@ -144,14 +144,14 @@ analyze clang-tidy:
 analyze scan-build-clang:
   extends: .scan_build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
     CC: clang
     CXX: clang++
 
 analyze scan-build-gcc:
   extends: .scan_build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
     CC: gcc
     CXX: g++
  
