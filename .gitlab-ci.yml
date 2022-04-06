@@ -136,6 +136,7 @@ analyze clang-tidy:
     - mkdir -p public
     - pwd 
     - ls
+    - mkdir -p build/scan_build_report
     - mv build/scan_build_report/*/* ./public
   artifacts:
     paths:
@@ -145,8 +146,8 @@ analyze scan-build-clang:
   extends: .scan_build_common
   variables:
     PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
-    CC: clang
-    CXX: clang++
+    CC: clang-11
+    CXX: clang++-11
 
 analyze scan-build-gcc:
   extends: .scan_build_common
