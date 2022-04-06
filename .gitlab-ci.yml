@@ -21,7 +21,7 @@ stages:
 .build_linux:
   extends: .build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
   tags:
     - linux
 
