@@ -217,10 +217,10 @@ test ubuntu20-clang11:
 #  tags:
 #    - macos, clang
 
-test macos-gcc10:
-  extends: .test_common
-  needs: ["build macos-gcc10"]
-  dependencies:
-    - build macos-gcc10
-  tags:
-    - macos, gcc
+#test macos-gcc10:
+#  extends: .test_common
+#  needs: ["build macos-gcc10"]
+#  dependencies:
+#    - build macos-gcc10
+#  tags:
+#    - macos, gcc
