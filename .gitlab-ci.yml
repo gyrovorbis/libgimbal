@@ -38,8 +38,8 @@ build ubuntu20-gcc10:
   tags: 
     - linux, clang
   variables:
-    CC: clang
-    CXX: clang++
+    CC: clang-11
+    CXX: clang++-11
 
 build ubuntu20-clang11:
   extends: .build_linux_clang
@@ -91,14 +91,14 @@ build ubuntu20-clang11:
 #    CXX: clang++
 #    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
 
-build macos-gcc10:
-  extends: .build_common
-  tags:
-    - macos, gcc
-  variables:
-    CC: gcc-10
-    CXX: g++-10
-    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
+#build macos-gcc10:
+#  extends: .build_common
+#  tags:
+#    - macos, gcc
+#  variables:
+#    CC: gcc-10
+#    CXX: g++-10
+#    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
 
 .clang_tidy_common:
   stage: test
