@@ -2,7 +2,7 @@ LibGimbal is a lightweight cross-platform framework used for creating low-overhe
 
 BACKGROUND
 ==========
-LibGimbal was born of me taking a long, hard look back at my work over the years, and finally identifying and conslidating all of the disjoint, duplicated, and nonstandardized core C code that tends to be reinvented for each C API that I have written. The name "libGimbal" is a play on the name "libGyro." Just as a gimbal can be used to orient and support a gyro it is the basic foundational support library used by libGyro and the other C APIs in the Elysian Shadows software ecosystem.
+LibGimbal was born of me taking a long, hard look back at my work over the years, and finally identifying and consolidating all of the disjoint, duplicated, and nonstandardized core C code that tends to be reinvented for each C API that I have written. The name "libGimbal" is a play on the name "libGyro." Just as a gimbal can be used to orient and support a gyro it is the basic foundational support library used by libGyro and the other C APIs in the Elysian Shadows software ecosystem.
 
 MAIN DESIGN GOALS AND PHILOSOPHIES
 ==================================
