@@ -21,7 +21,7 @@ stages:
 .build_linux:
   extends: .build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
   tags:
     - linux
 
@@ -38,8 +38,8 @@ build ubuntu20-gcc10:
   tags: 
     - linux, clang
   variables:
-    CC: clang
-    CXX: clang++
+    CC: clang-11
+    CXX: clang++-11
 
 build ubuntu20-clang11:
   extends: .build_linux_clang
@@ -91,14 +91,14 @@ build ubuntu20-clang11:
 #    CXX: clang++
 #    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
 
-build macos-gcc10:
-  extends: .build_common
-  tags:
-    - macos, gcc
-  variables:
-    CC: gcc-10
-    CXX: g++-10
-    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
+#build macos-gcc10:
+#  extends: .build_common
+#  tags:
+#    - macos, gcc
+#  variables:
+#    CC: gcc-10
+#    CXX: g++-10
+#    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
 
 .clang_tidy_common:
   stage: test
@@ -136,6 +136,7 @@ analyze clang-tidy:
     - mkdir -p public
     - pwd 
     - ls
+    - mkdir -p build/scan_build_report
     - mv build/scan_build_report/*/* ./public
   artifacts:
     paths:
@@ -144,14 +145,14 @@ analyze clang-tidy:
 analyze scan-build-clang:
   extends: .scan_build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
-    CC: clang
-    CXX: clang++
+    PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
+    CC: clang-11
+    CXX: clang++-11
 
 analyze scan-build-gcc:
   extends: .scan_build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.0.2/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
     CC: gcc
     CXX: g++
  
@@ -217,10 +218,10 @@ test ubuntu20-clang11:
 #  tags:
 #    - macos, clang
 
-test macos-gcc10:
-  extends: .test_common
-  needs: ["build macos-gcc10"]
-  dependencies:
-    - build macos-gcc10
-  tags:
-    - macos, gcc
+#test macos-gcc10:
+#  extends: .test_common
+#  needs: ["build macos-gcc10"]
+#  dependencies:
+#    - build macos-gcc10
+#  tags:
+#    - macos, gcc
