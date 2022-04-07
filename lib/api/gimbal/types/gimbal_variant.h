@@ -1,17 +1,35 @@
-﻿#ifndef GIMBAL_VARIANT_H
-#define GIMBAL_VARIANT_H
+﻿#ifndef GIMBAL_VARIANT__H
+#define GIMBAL_VARIANT__H
 
 #include "../objects/gimbal_object.h"
 #include "../types/gimbal_string.h"
+#include "../meta/gimbal_ivariant.h"
+#include "../types/gimbal_typedefs.h"
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define SELF    GblVariant* pSelf
+#define CSELF   const SELF
 
-struct GblVariant {
+GBL_DECLS_BEGIN
+
+typedef struct GblVariant {
     union {
         GblBool         boolean;
+        char            character;
+        uint8_t         u8;
+        uint16_t        u16;
+        int16_t         i16;
+        uint32_t        u32;
+        int32_t         i32;
+        uint64_t        u64;
+        int16_t         i64;
+        GblEnum         enumeration;
+        GblFlags        flags;
+        float           f32;
+        double          f64;
+        void*           pVoid;
+
+
         GblInt          integer;
         uint64_t        uinteger64;
         GblFloat        floating;
@@ -20,7 +38,7 @@ struct GblVariant {
         GblObject_      hObject;
     };
     GBL_VARIANT_TYPE    type;
-};
+} GblVariant;
 
 #define GBL_VARIANT_CONSTRUCT_TRAITS (                      \
         GBL_META_GENERIC_MACRO_NO_DEFAULT,                  \
@@ -117,22 +135,6 @@ struct GblVariant {
 #define gblVariantCompare(pVariant, rhs, op, result) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_COMPARE_TRAITS, rhs)(pVariant, rhs, op, result)
 
 
-
-
-
-// GblVariantMetaType <=> QMetaType
-// GblVariant <=> QMeta
-
-//gblVariantConstructi
-//gblVariantConstructf
-//gblVariantConstructv // copy constructor
-
-//gblVariantGive/gblVariantTake (move semantics)
-
-//gblVariantTypeInfo();
-
-
-
 GBL_INLINE GBL_API gblVariantTypeSet(GblVariant* pVariant, GBL_VARIANT_TYPE type) {
     GBL_API_BEGIN(GBL_HANDLE_INVALID);
     GBL_API_VERIFY_ARG(type <= GBL_VARIANT_TYPE_BUILTIN_COUNT);
@@ -153,6 +155,7 @@ GBL_INLINE GBL_API gblVariantTypeGet(const GblVariant* pVariant, GBL_VARIANT_TYP
     *pType = pVariant->type;
     GBL_API_END();
 }
+
 
 // Get (Actual) Value
 GBL_INLINE GBL_API gblVariantGetb(const GblVariant* pVariant, GblBool* pValue) {
@@ -793,16 +796,17 @@ GBL_DECLARE_ENUM(GBL_VARIANT_TYPE_CLASS) {
 #endif
 
 
-
-#ifdef __cplusplus
-}
-#endif
+#undef CSELF
+#undef SELF
 
 
-
+GBL_DECLS_END
 
 
 
 
 
-#endif // GBLBAL_PROPERTIES_H
+
+
+
+#endif // GBLBAL_VARIANT__H

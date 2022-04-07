@@ -2,7 +2,7 @@
 #include <gimbal/meta/gimbal_class.h>
 #include <gimbal/meta/gimbal_instance.h>
 #include <gimbal/meta/gimbal_interface.h>
-#include <gimbal/containers/gimbal_hashset.h>
+#include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/algorithms/gimbal_sort.h>
 #include <gimbal/containers/gimbal_vector.h>
@@ -15,6 +15,7 @@
 
 typedef atomic_uint_fast16_t            GblRefCounter;
 
+extern GBL_RESULT gblValueTypesRegister_(GblContext hCtx);
 
 // === STATIC DATA ====
 
@@ -69,6 +70,44 @@ static void metaClassElementFree_(const GblHashSet* pMap, void* item) {
     GBL_API_END_BLOCK();
 }
 
+static GblClass* typeInterfaceOuterClass_(GblInterface* pInterface) {
+    if(!pInterface)              return NULL;
+    if(!pInterface->offsetToTop) return NULL;
+    else
+        return (GblClass*)((uint8_t*)pInterface + pInterface->offsetToTop);
+}
+
+GBL_EXPORT GblInterface* typeClassInterfacePeek_(GblClass* pClass, GblType ifaceType) {
+    GblInterface* pIClass = NULL;
+    GBL_API_BEGIN(pCtx_);
+    GBL_API_VERIFY_POINTER(pClass);
+    GBL_API_VERIFY_EXPRESSION(pClass->type != GBL_TYPE_INVALID);
+    GBL_API_VERIFY_ARG(ifaceType != GBL_TYPE_INVALID);
+    {
+        GblMetaClass* pMeta = (GblMetaClass*)pClass->type;
+        while(pMeta) {
+            for(unsigned i = 0; i < pMeta->info.interfaceCount; ++i) {
+                GblInterface* pCurIClass = (GblInterface*)((char*)pClass + pMeta->info.pInterfaceMap[i].classOffset);
+                GBL_API_VERIFY_EXPRESSION(pMeta->info.pInterfaceMap[i].interfaceType == pCurIClass->base.type);
+                GBL_API_VERIFY_EXPRESSION(pCurIClass->base.type != GBL_TYPE_INVALID);
+                if(pCurIClass->base.type == ifaceType) {
+                    pIClass = pCurIClass;
+                    break;
+                } else {
+                    pCurIClass = typeClassInterfacePeek_(&pCurIClass->base, ifaceType);
+                    if(pCurIClass) {
+                        GBL_API_VERIFY_EXPRESSION(pCurIClass->base.type == ifaceType);
+                        pIClass = pCurIClass;
+                        break;
+                    }
+                }
+            }
+            pMeta = pMeta->pParent;
+        }
+    }
+    GBL_API_END_BLOCK();
+    return pIClass;
+}
 
 static GblType typeRegister_(GblType parent,
                             const char* pName,
@@ -76,6 +115,7 @@ static GblType typeRegister_(GblType parent,
                             GblFlags flags)
 {
     GblBool hasMutex = GBL_FALSE;
+    GblBool fundamental = GBL_FALSE;
     GblType newType = GBL_TYPE_INVALID;
     GblMetaClass* pParent = (GblMetaClass*)parent;
     GBL_API_BEGIN(pCtx_);
@@ -122,7 +162,10 @@ static GblType typeRegister_(GblType parent,
 
     GBL_API_POP(2);
 
-    if(pParent) { // not a fundamental type
+    GblFlags fundamentalFlags = 0;
+    if(pParent && !(flags & GBL_TYPE_FUNDAMENTAL_FLAGS_MASK)) { // not a fundamental type
+        GblMetaClass* pFundamental = (GblMetaClass*)gblTypeFundamental((GblType)pParent);
+        fundamentalFlags = pFundamental? pFundamental->flags : 0;
 
         GBL_API_VERIFY_ARG(pInfo->classSize >= pParent->info.classSize,
                             "Class size [%u] must be >= to parent's class size [%u]!",
@@ -152,10 +195,46 @@ static GblType typeRegister_(GblType parent,
         GBL_API_VERIFY_ARG(!(flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE),
                            "Invalid use of DEEP_DERIVABLE type flag on non-fundamental type!");
 
-    } else {    //assumed to be a fundamental type
-        //verify args here
+        if(!(fundamentalFlags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)) {
+            GBL_API_VERIFY(fundamentalFlags & GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE, GBL_RESULT_ERROR_INVALID_TYPE,
+                           "Cannot derive from NON DERIVABLE type!");
 
+            GBL_API_VERIFY(gblTypeFundamental((GblType)pParent), GBL_RESULT_ERROR_INVALID_TYPE,
+                           "Cannot derive from DERIVABLE type more than once!");
+        }
+
+
+    } else {    //assumed to be a fundamental type
+        GBL_API_VERBOSE("Fundamental Type!");
+        fundamental = GBL_TRUE;
+
+        if(flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE) flags |= GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE;
+        if(flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE)   flags |= GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED;
+
+        fundamentalFlags = flags;
     }
+
+    if(fundamentalFlags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED) {
+        GBL_API_VERIFY(pInfo->classSize > 0, GBL_RESULT_ERROR_INVALID_TYPE,
+                       "Cannot register a CLASSED type with a class size of 0!");
+    } else {
+        GBL_API_VERIFY(pInfo->classSize == 0, GBL_RESULT_ERROR_INVALID_TYPE,
+                       "Cannot register a NON CLASSED type with a class size > 0!");
+    }
+
+    if(fundamentalFlags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE) {
+        GBL_API_VERIFY(pInfo->instanceSize > 0, GBL_RESULT_ERROR_INVALID_TYPE,
+                       "Cannot register an INSTANTIABLE type with an instance size of 0!");
+        GBL_API_VERIFY(fundamentalFlags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED, GBL_RESULT_ERROR_INVALID_TYPE,
+                       "Cannot register an INSTANTIABLE type without it being CLASSED!");
+    } else {
+        GBL_API_VERIFY(pInfo->instanceSize == 0, GBL_RESULT_ERROR_INVALID_TYPE,
+                       "Cannot register a NON INSTANTIABLE type with an instance size > 0!");
+    }
+
+    GBL_API_VERIFY(!(pParent && (pParent->flags & GBL_TYPE_FLAG_FINAL)), GBL_RESULT_ERROR_INVALID_TYPE,
+                   "Cannot derive from a FINAL type!");
+
 
     {
         GblSize metaSize = sizeof(GblMetaClass);
@@ -190,10 +269,13 @@ static GblType typeRegister_(GblType parent,
         const GblMetaClass* pOldData = GblHashSet_set(&typeRegistry_,
                                                       &pMeta);
 
-        newType = (GblType)pMeta;
-
         GBL_API_VERIFY(!pOldData, GBL_RESULT_ERROR_INVALID_ARG,
                        "A previous metatype entry named %s existed already!", pName);
+
+        newType = (GblType)pMeta;
+        if(fundamental) {
+             GBL_API_CALL(gblVectorPushBack(&typeBuiltins_.vector, &newType));
+        }
 
     }
     GBL_API_POP(1);
@@ -203,70 +285,29 @@ static GblType typeRegister_(GblType parent,
 
 }
 
-static GBL_RESULT registerBuiltinType_(GblSize                          expectedIndex,
-                                       GblType                          parentType,
-                                       const char*                      pName,
-                                       const GblTypeInfo*               pTypeInfo,
-                                       GblTypeFlags                     flags)
+GBL_RESULT gblTypeRegisterBuiltinType(GblSize            expectedIndex,
+                                      GblType            parentType,
+                                      const char*        pName,
+                                      const GblTypeInfo* pTypeInfo,
+                                      GblTypeFlags       flags)
 {
     GblType type = GBL_TYPE_INVALID;
     GblSize size = 0;
     GBL_API_BEGIN(pCtx_);
     GBL_API_PUSH_VERBOSE("[GblType] Registering Builtin Type: %s", pName);
     type = typeRegister_(parentType, pName, pTypeInfo, flags);
-    GBL_API_CALL(gblVectorPushBack(&typeBuiltins_.vector, &type));
     GBL_API_CALL(gblVectorSize(&typeBuiltins_.vector, &size));
     GBL_API_VERIFY_EXPRESSION(size == expectedIndex+1,
                               "Failed to obtain expected index! "
                               "[expected: %u, actual: %u]", expectedIndex, size-1);
-    GBL_API_POP(1);
-    GBL_API_END();
-}
-
-typedef struct GblPrimitiveClass {
-    GblClass        base;
-    GblIVariant     iVariant;
-} GblPrimitiveClass;
-
-GBL_RESULT GblPrimitiveClass_init(GblPrimitiveClass* pClass, GblIVariant* pIVariant) {
-    GBL_API_BEGIN(pCtx_);
-    memcpy(&pClass->iVariant.flags,
-           &pIVariant->flags,
-           sizeof(GblIVariant) - offsetof(GblIVariant, flags));
-    GBL_API_END();
-}
-
-static GBL_RESULT registerBuiltinTypes_(void) {
-    GBL_API_BEGIN(pCtx_);
-    GBL_API_PUSH_VERBOSE("[GblType] Registering Builtin Types");
-    GBL_API_CALL(registerBuiltinType_(0,
-                                      GBL_TYPE_INVALID,
-                                      "Interface",
-                                      &((const GblTypeInfo) {
-                                          .classSize    = sizeof(GblInterface),
-                                          .classAlign   = GBL_ALIGNOF(GblInterface),
-                                      }),
-                                      GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED | GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE));
-    GBL_API_CALL(registerBuiltinType_(1,
-                                      GBL_TYPE_INTERFACE,
-                                      "IVariant",
-                                      &((const GblTypeInfo) {
-                                          .classSize    = sizeof(GblIVariant),
-                                          .classAlign   = GBL_ALIGNOF(GblIVariant),
-                                      }),
-                                      0));
-    GBL_API_CALL(registerBuiltinType_(2,
-                                      GBL_TYPE_INVALID,
-                                      "nil",
-                                      &((const GblTypeInfo) {
-                                          .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                                          .classSize    = sizeof(GblPrimitiveClass),
-                                          .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                                          .pClassData   = &((const GblIVariant) {
-
-                                          })
-                                      }),
-                                      0));
+    // create initial/static instance of class if builtin
+    {
+        const GblTypeInfo* pInfo = gblTypeInfo(type);
+        GBL_API_VERIFY_POINTER(pInfo);
+        if(pInfo->classSize) {
+            //gblTypeClassRef(type);
+        }
+    }
     GBL_API_POP(1);
     GBL_API_END();
 }
@@ -289,7 +330,7 @@ static void gblTypeInit_(void) {
                                     pCtx_,
                                     sizeof(GblMetaClass*),
                                     sizeof(typeBuiltins_)));
-    GBL_API_CALL(registerBuiltinTypes_());
+    GBL_API_CALL(gblValueTypesRegister_(pCtx_));
     GBL_API_POP(1);
     initialized_ = GBL_TRUE;
     GBL_API_END_BLOCK();
@@ -374,7 +415,7 @@ GBL_EXPORT GblSize gblTypeCount(void) {
     return count;
 }
 
-GBL_EXPORT GblBool gblTypeValid(GblType type) {
+GBL_EXPORT GblBool gblTypeIsValid(GblType type) {
     return type != GBL_TYPE_INVALID;
 }
 
@@ -404,21 +445,50 @@ GBL_EXPORT GblType gblTypeFundamental(GblType type) {
     GblType base      = GBL_TYPE_INVALID;
     GblMetaClass* pMeta = (GblMetaClass*)type;
     GBL_API_BEGIN(pCtx_);
-    if(pMeta) {
-        while(pMeta->pParent) pMeta = pMeta->pParent;
-        base = (GblType)pMeta;
+    while(pMeta) {
+        if(!pMeta->pParent || pMeta->flags & GBL_TYPE_FUNDAMENTAL_FLAGS_MASK) {
+            base = (GblType)pMeta;
+            break;
+        }
+        pMeta = pMeta->pParent;
     }
     GBL_API_END_BLOCK();
     return base;
 }
 
-GBL_EXPORT GblTypeFlags gblTypeFlags(GblType type) {
-    GblTypeFlags flags      = 0;
-    GblMetaClass* pMeta = (GblMetaClass*)type;
+GBL_EXPORT GblUint gblTypeDepth(GblType type) {
+    GblUint depth = 0;
     GBL_API_BEGIN(pCtx_);
-    if(pMeta) flags = pMeta->flags;
+    GblMetaClass* pMeta = (GblMetaClass*)type;
+    if(pMeta) {
+        while(pMeta->pParent) {
+            pMeta = pMeta->pParent;
+            ++depth;
+        }
+    }
     GBL_API_END_BLOCK();
-    return flags;
+    return depth;
+}
+
+GBL_EXPORT GblBool gblTypeFlagsTest(GblType type, GblFlags mask) {
+    GblBool result = GBL_FALSE;
+    GBL_API_BEGIN(pCtx_); {
+        GblMetaClass* pMeta = (GblMetaClass*)type;
+        if(pMeta) {
+            GblFlags typeMask = (mask & GBL_TYPE_FLAGS_MASK & pMeta->flags);
+            GblFlags fundamentalMask = (mask & GBL_TYPE_FUNDAMENTAL_FLAGS_MASK);
+            if(fundamentalMask) {
+                GblMetaClass* pFundamental = (GblMetaClass*)gblTypeFundamental(type);
+                if(pFundamental) {
+                    fundamentalMask &= pFundamental->flags;
+                } else {
+                    fundamentalMask = 0; // FLAGS FOR INVALID TYPE
+                }
+            }
+            result = ((typeMask | fundamentalMask) != 0);
+        }
+    } GBL_API_END_BLOCK();
+    return result;
 }
 
 GBL_EXPORT const GblTypeInfo*   gblTypeInfo(GblType type) {
@@ -452,7 +522,7 @@ GBL_EXPORT GblRefCount gblInstanceRefCount(GblType type) {
 #endif
 
 
-static GblBool typeIsA_(GblType derived, GblType base, GblBool ifaceChecks) {
+static GblBool typeIsA_(GblType derived, GblType base, GblBool classChecks, GblBool ifaceChecks) {
     GblBool result      = 0;
     GblMetaClass* pDerived = (GblMetaClass*)derived;
     GblMetaClass* pBase    = (GblMetaClass*)base;
@@ -465,12 +535,12 @@ static GblBool typeIsA_(GblType derived, GblType base, GblBool ifaceChecks) {
         while(pIter) {
             // check if current class level is base
             if(pIter == pBase) {
-                result = GBL_TRUE;
+                result = classChecks? GBL_TRUE : GBL_FALSE;
                 break;
             } else if(ifaceChecks) {
                 // recurse over interfaces checking
                 for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
-                    if(typeIsA_(pIter->info.pInterfaceMap[i].interfaceType, base, ifaceChecks)) {
+                    if(typeIsA_(pIter->info.pInterfaceMap[i].interfaceType, base, classChecks, ifaceChecks)) {
                         result = GBL_TRUE;
                         GBL_API_DONE();
                     }
@@ -483,12 +553,16 @@ static GblBool typeIsA_(GblType derived, GblType base, GblBool ifaceChecks) {
     return result;
 }
 
-GBL_EXPORT GblBool gblTypeIsA(GblType derived, GblType base) {
-    return typeIsA_(derived, base, GBL_TRUE);
+GBL_EXPORT GblBool gblTypeIsA(GblType type, GblType other) {
+    return typeIsA_(type, other, GBL_TRUE, GBL_TRUE);
 }
 
-GBL_EXPORT GblBool gblTypeIsFundamentallyA(GblType derived, GblType base) {
-    return typeIsA_(derived, base, GBL_FALSE);
+GBL_EXPORT GblBool gblTypeIsOrInherits(GblType derived, GblType base) {
+    return typeIsA_(derived, base, GBL_TRUE, GBL_FALSE);
+}
+
+GBL_EXPORT GblBool gblTypeMapsInterface(GblType concrete, GblType iface) {
+    return typeIsA_(concrete, iface, GBL_FALSE, GBL_TRUE);
 }
 
 
@@ -569,7 +643,7 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta) 
     GBL_API_VERBOSE("TypeId: %u", (GblType)pMeta);
 
     //IMMEDIATELY initialize its type!!!
-    pClass->typeId = (GblType)pMeta;
+    pClass->type = (GblType)pMeta;
 
     if(pMeta->pParent) {
         GBL_API_PUSH_VERBOSE("Adding reference to parent class: ", pMeta->pParent->pName);
@@ -620,7 +694,7 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta) 
         GBL_API_POP(1);
 
         if(pIter->info.pFnClassInit) {
-            GBL_API_CALL(pIter->info.pFnClassInit(pClass, pMeta->info.pClassData));
+            GBL_API_CALL(pIter->info.pFnClassInit(pClass, pMeta->info.pClassData, pCtx_));
         } else {
             GBL_API_DEBUG("No class ctor: [%s]", pIter->pName);
         }
@@ -676,7 +750,7 @@ GBL_EXPORT GblClass* gblTypeClassRef(GblType typeId) {
     call_once(&initOnce_, gblTypeInit_);
 
     // Return existing reference to class data
-    if(pMeta->pClass && pMeta->pClass->typeId != GBL_TYPE_INVALID) {
+    if(pMeta->pClass && pMeta->pClass->type != GBL_TYPE_INVALID) {
         GBL_API_VERIFY_EXPRESSION(atomic_load(&pMeta->refCount),
                                   "No references to an initialized class!?");
         GBL_API_DEBUG("Using existing class data");
@@ -698,13 +772,17 @@ GBL_EXPORT GblClass* gblTypeClassRef(GblType typeId) {
 }
 
 GBL_EXPORT GblClass* gblTypeClassPeek(GblType typeId) {
-    GblClass* pClass    = NULL;
-    GblMetaClass* pMeta = (GblMetaClass*)typeId;
+    GblClass*       pClass  = NULL;
+    GblMetaClass*   pMeta   = (GblMetaClass*)typeId;
     GBL_API_BEGIN(pCtx_);
     GBL_API_VERIFY_ARG(typeId != GBL_TYPE_INVALID);
+    GBL_API_VERIFY(pMeta->pClass, GBL_RESULT_ERROR_INVALID_OPERATION,
+                  "[GblType] gblClassPeek(%s): no class!", gblTypeName(typeId));
     pClass = pMeta->pClass;
+
     GBL_API_END_BLOCK();
     return pClass;
+
 }
 
 GBL_EXPORT GblRefCount gblTypeClassUnref(GblClass* pClass) {
@@ -713,13 +791,13 @@ GBL_EXPORT GblRefCount gblTypeClassUnref(GblClass* pClass) {
     GBL_API_BEGIN(pCtx_);
     if(!pClass) GBL_API_DONE(); //valid to Unref NULL pointer
 
-    GBL_API_PUSH_VERBOSE("[GblType] Unreferencing class for type: %s", gblTypeName(pClass->typeId));
+    GBL_API_PUSH_VERBOSE("[GblType] Unreferencing class for type: %s", gblTypeName(pClass->type));
 
-    GBL_API_VERIFY(pClass->typeId != GBL_TYPE_INVALID,
+    GBL_API_VERIFY(pClass->type != GBL_TYPE_INVALID,
                    GBL_RESULT_ERROR_INTERNAL,
                    "The specified class has an invalid ID!");
 
-    pMeta = (GblMetaClass*)pClass->typeId;
+    pMeta = (GblMetaClass*)pClass->type;
     GBL_API_VERIFY(atomic_load(&pMeta->refCount) != 0,
                    GBL_RESULT_ERROR_INTERNAL,
                    "The refcount for the given class was already at 0!");
@@ -747,7 +825,7 @@ GBL_EXPORT GblRefCount gblTypeClassUnref(GblClass* pClass) {
         do {
             if(pIter->info.pFnClassFinalize) {
                 GBL_API_DEBUG("Calling class dtor: [%s]", pIter->pName);
-                GBL_API_CALL(pIter->info.pFnClassFinalize(pMeta->pClass, pMeta->info.pClassData));
+                GBL_API_CALL(pIter->info.pFnClassFinalize(pMeta->pClass, pMeta->info.pClassData, pCtx_));
             } else {
                 GBL_API_DEBUG("No class dtor: [%s]", pIter->pName);
             }
@@ -767,7 +845,7 @@ GBL_EXPORT GblRefCount gblTypeClassUnref(GblClass* pClass) {
         if(pParentClass) gblTypeClassUnref(pParentClass);
 
         // clear the type so it's not looking initialized
-        pMeta->pClass->typeId = GBL_TYPE_INVALID;
+        pMeta->pClass->type = GBL_TYPE_INVALID;
 
         GBL_API_POP(1);
     }
@@ -777,11 +855,28 @@ GBL_EXPORT GblRefCount gblTypeClassUnref(GblClass* pClass) {
     return refCount;
 }
 
+GBL_RESULT typeInstanceConstructValidate_(GblType type) {
+    GblMetaClass* pMeta = (GblMetaClass*)type;
+    GBL_API_BEGIN(pCtx_);
+    GBL_API_VERIFY_ARG(type != GBL_TYPE_INVALID, "[GblType] Instance Construct: Invalid type!");
+    GBL_API_VERIFY(GBL_TYPE_IS_INSTANTIABLE(type),
+                   GBL_RESULT_ERROR_INVALID_TYPE,
+                   "Cannot instantiate NON INSTANTIABLE type!");
+    GBL_API_VERIFY(!GBL_TYPE_IS_ABSTRACT(type),
+                   GBL_RESULT_ERROR_INVALID_TYPE,
+                   "Cannot instantiate ABSTRACT type!");
+    GBL_API_VERIFY(pMeta->info.instanceSize,
+                   GBL_RESULT_ERROR_INVALID_ARG,
+                   "Cannot instantiate type with instance of size 0!");
+    GBL_API_END();
+}
+
+
 GBL_EXPORT GBL_RESULT gblTypeInstanceConstruct(GblType type, GblInstance* pInstance) {
     GblMetaClass*   pMeta = (GblMetaClass*)type;
     GblClass*       pClass = NULL;
     GBL_API_BEGIN(pCtx_);
-    GBL_API_VERIFY_ARG(type != GBL_TYPE_INVALID, "[GblType] Instance Construct: Invalid type!");
+    GBL_API_CALL(typeInstanceConstructValidate_(type));
     GBL_API_PUSH_VERBOSE("[GblType] Instance Construct: type %s", pMeta->pName);
 
     pClass = gblTypeClassRef(type);
@@ -815,7 +910,7 @@ GBL_EXPORT GBL_RESULT gblTypeInstanceConstruct(GblType type, GblInstance* pInsta
         pIter = *ppIter;
         if(pIter->info.pFnInstanceInit) {
             GBL_API_DEBUG("Calling instance initializers: [%s]", pIter->pName);
-            GBL_API_CALL(pIter->info.pFnInstanceInit(pInstance));
+            GBL_API_CALL(pIter->info.pFnInstanceInit(pInstance, pCtx_));
         } else {
             GBL_API_DEBUG("No instance ctor: [%s]", pIter->pName);
         }
@@ -841,13 +936,14 @@ GBL_EXPORT GblInstance* gblTypeInstanceCreate(GblType type) {
     GblInstance* pInstance = NULL;
     GblMetaClass* pMeta     = (GblMetaClass*)type;
     GBL_API_BEGIN(pCtx_);
-    GBL_API_VERIFY_ARG(type != GBL_TYPE_INVALID, "[GblType] Instance Create: Invalid type!");
+    GBL_API_CALL(typeInstanceConstructValidate_(type));
     GBL_API_PUSH_VERBOSE("[GblType] Instance Create: type %s", pMeta->pName);
-    GBL_API_VERIFY(pMeta->info.instanceSize,
-                   GBL_RESULT_ERROR_INVALID_ARG,
-                   "Cannot instantiate type with instance of size 0!");
 
     GBL_API_DEBUG("Allocating %u bytes.", pMeta->info.instanceSize);
+
+    GBL_API_VERIFY(GBL_TYPE_IS_INSTANTIABLE(type) && !GBL_TYPE_IS_ABSTRACT(type),
+                   GBL_RESULT_ERROR_INVALID_TYPE,
+                   "Cannot instantiate non-instantiable or abstract types!");
 
     pInstance = GBL_API_MALLOC(pMeta->info.instanceSize, pMeta->info.instanceAlign, pMeta->pName);
 
@@ -861,7 +957,7 @@ GBL_EXPORT GblInstance* gblTypeInstanceCreate(GblType type) {
 GBL_EXPORT GblRefCount gblTypeInstanceDestruct(GblInstance* pInstance) {
     GblRefCount refCount = 0;
     GBL_API_BEGIN(pCtx_);
-    refCount = gblTypeClassUnref(GblInstance_classOf(pInstance));
+    refCount = gblTypeClassUnref(gblTypeClassFromInstance(pInstance));
     GBL_API_END_BLOCK();
     return refCount;
 }
@@ -872,7 +968,7 @@ GBL_EXPORT GblRefCount gblTypeInstanceDestroy(GblInstance* pInstance) {
        if(!pInstance) GBL_API_DONE();
        else {
             GBL_API_PUSH_VERBOSE("[GblType] Instance Destroy: %s",
-                                 GblClass_name(GblInstance_classOf(pInstance)));
+                                 gblTypeName(gblTypeClassFromInstance(pInstance)->type));
 
             refCount = gblTypeInstanceDestruct(pInstance);
             GBL_API_FREE(pInstance);
@@ -884,18 +980,18 @@ GBL_EXPORT GblRefCount gblTypeInstanceDestroy(GblInstance* pInstance) {
     return refCount;
 }
 
-GBL_EXPORT GblBool gblTypeClassIsA(GblClass* pClass, GblType type) {
+GBL_EXPORT GblBool gblTypeClassIsA(const GblClass* pClass, GblType type) {
     GblBool result = GBL_FALSE;
     GBL_API_BEGIN(pCtx_);
     if(!(!pClass && type == GBL_TYPE_INVALID)) {
         GBL_API_VERIFY_POINTER(pClass);
-        result = gblTypeIsA(pClass->typeId, type);
+        result = gblTypeIsA(pClass->type, type);
     }
     GBL_API_END_BLOCK();
     return result;
 }
 
-static GblClass* typeClassCast_(GblClass* pClass, GblType toType, GblBool check) {
+static GblClass* typeClassCast_(const GblClass* pClass, GblType toType, GblBool check) {
     GblClass* pClassStart = pClass;
     GblClass* pToClass = NULL;
     GBL_API_BEGIN(pCtx_);
@@ -903,18 +999,18 @@ static GblClass* typeClassCast_(GblClass* pClass, GblType toType, GblBool check)
     // Casting a NULL pointer or to an invalid type returns NULL
     if(pClass && toType != GBL_TYPE_INVALID) GBL_LIKELY {
         //early exit
-        if(pClass->typeId == toType) GBL_LIKELY {
+        if(pClass->type == toType) GBL_LIKELY {
             pToClass = pClass;
         } else {
 
             // If current node is an interface class, attempt to "back out" to root class node
-            while(gblTypeFundamental(pClass->typeId) == GBL_TYPE_INTERFACE) {
+            while(gblTypeFundamental(pClass->type) == GBL_TYPE_INTERFACE) {
                 // Move class pointer to interface's concrete class
-                pClass = GblInterface_outerClass((GblInterface*)pClass);
+                pClass = typeInterfaceOuterClass_((GblInterface*)pClass);
                 GBL_API_VERIFY_POINTER(pClass);
             }
 
-            GblMetaClass* pMeta = (GblMetaClass*)pClass->typeId;
+            GblMetaClass* pMeta = (GblMetaClass*)pClass->type;
             GBL_API_VERIFY_POINTER(pMeta);
 
             // itatere from derived to base class, breadth-first searching
@@ -925,7 +1021,7 @@ static GblClass* typeClassCast_(GblClass* pClass, GblType toType, GblBool check)
                     break;
                 // check current class's interfaces
                 } else {
-                    GblInterface* pInterface = gblTypeClassInterfacePeek(pClass, toType);
+                    GblInterface* pInterface = typeClassInterfacePeek_(pClass, toType);
                     if(pInterface) {
                         pToClass = &pInterface->base;
                         break;
@@ -940,87 +1036,34 @@ static GblClass* typeClassCast_(GblClass* pClass, GblType toType, GblBool check)
     if(check && !pToClass) {
         if(toType == GBL_TYPE_INVALID) {
             GBL_API_WARN("Attempted to cast from type %s to TYPE_INVALID!",
-                         GblClass_name(pClassStart));
+                         gblTypeName(pClassStart->type));
         } else {
             GBL_API_WARN("Failed to cast from type %s to %s!",
-                         GblClass_name(pClassStart), gblTypeName(toType));
+                         gblTypeName(pClassStart->type), gblTypeName(toType));
         }
     }
     return pToClass;
 }
 
-GBL_EXPORT GblClass* gblTypeClassCast(GblClass* pClass, GblType toType) {
+GBL_EXPORT GblClass* gblTypeClassTryCast(const GblClass* pClass, GblType toType) {
     return typeClassCast_(pClass, toType, GBL_FALSE);
 }
 
-GBL_EXPORT GblClass* gblTypeClassCastCheck(GblClass* pClass, GblType toType) {
+GBL_EXPORT GblClass* gblTypeClassCast(const GblClass* pClass, GblType toType) {
     return typeClassCast_(pClass, toType, GBL_TRUE);
 }
 
-GBL_EXPORT GblType gblTypeClassType(GblClass* pClass) {
+GBL_EXPORT GblType gblTypeFromClass(const GblClass* pClass) {
     GblType type = GBL_TYPE_INVALID;
     GBL_API_BEGIN(pCtx_);
     if(pClass) {
-        type = pClass->typeId;
+        type = pClass->type;
     }
     GBL_API_END_BLOCK();
     return type;
 }
 
-
-//should be able to make this a binary search!
-GBL_EXPORT GblInterface* gblTypeClassInterfacePeek(GblClass* pClass, GblType ifaceType) {
-    GblInterface* pIClass = NULL;
-    GBL_API_BEGIN(pCtx_);
-    GBL_API_VERIFY_POINTER(pClass);
-    GBL_API_VERIFY_EXPRESSION(pClass->typeId != GBL_TYPE_INVALID);
-    GBL_API_VERIFY_ARG(ifaceType != GBL_TYPE_INVALID);
-    {
-        GblMetaClass* pMeta = (GblMetaClass*)pClass->typeId;
-        while(pMeta) {
-            for(unsigned i = 0; i < pMeta->info.interfaceCount; ++i) {
-                GblInterface* pCurIClass = (GblInterface*)((char*)pClass + pMeta->info.pInterfaceMap[i].classOffset);
-                GBL_API_VERIFY_EXPRESSION(pMeta->info.pInterfaceMap[i].interfaceType == pCurIClass->base.typeId);
-                GBL_API_VERIFY_EXPRESSION(pCurIClass->base.typeId != GBL_TYPE_INVALID);
-                if(pCurIClass->base.typeId == ifaceType) {
-                    pIClass = pCurIClass;
-                    break;
-                } else {
-                    pCurIClass = gblTypeClassInterfacePeek(&pCurIClass->base, ifaceType);
-                    if(pCurIClass) {
-                        GBL_API_VERIFY_EXPRESSION(pCurIClass->base.typeId == ifaceType);
-                        pIClass = pCurIClass;
-                        break;
-                    }
-                }
-            }
-            pMeta = pMeta->pParent;
-        }
-    }
-    GBL_API_END_BLOCK();
-    return pIClass;
-}
-
-GBL_EXPORT GblInterface* gblTypeClassInterfacePeekParent(GblClass* pClass, GblType ifaceType) {
-    GblInterface* pIClass = NULL;
-    GBL_API_BEGIN(pCtx_);
-    GBL_API_VERIFY_POINTER(pClass);
-    GBL_API_VERIFY_EXPRESSION(pClass->typeId != GBL_TYPE_INVALID);
-    GBL_API_VERIFY_ARG(ifaceType != GBL_TYPE_INVALID);
-    {
-        GblType parentType = gblTypeParent(GblClass_typeOf(pClass));
-        GBL_API_VERIFY_EXPRESSION(parentType != GBL_TYPE_INVALID);
-        GblClass* pParentClass = gblTypeClassPeek(parentType);
-        if(pParentClass) {
-            pIClass = gblTypeClassInterfacePeek(pParentClass, ifaceType);
-        }
-    }
-    GBL_API_END_BLOCK();
-    return pIClass;
-}
-
-
-GBL_EXPORT GblBool gblTypeInstanceIsA(GblInstance* pInstance, GblType type) {
+GBL_EXPORT GblBool gblTypeInstanceIsA(const GblInstance* pInstance, GblType type) {
     GblBool result = GBL_FALSE;
     GBL_API_BEGIN(pCtx_);
     if(!(!pInstance && type == GBL_TYPE_INVALID)) {
@@ -1031,7 +1074,7 @@ GBL_EXPORT GblBool gblTypeInstanceIsA(GblInstance* pInstance, GblType type) {
     return result;
 }
 
-GBL_EXPORT GblInstance* typeInstanceCast_(GblInstance* pInstance, GblType type, GblBool check) {
+GBL_EXPORT GblInstance* typeInstanceCast_(const GblInstance* pInstance, GblType type, GblBool check) {
     GblInstance* pOutInstance = NULL;
     GBL_API_BEGIN(pCtx_);
     if(!(!pInstance && type == GBL_TYPE_INVALID)) {
@@ -1040,7 +1083,7 @@ GBL_EXPORT GblInstance* typeInstanceCast_(GblInstance* pInstance, GblType type, 
             pOutInstance = pInstance;
         } else if(check) {
             GBL_API_WARN("Failed to cast instance from %s to %s.",
-                         GblClass_name(GblInstance_classOf(pInstance)),
+                         gblTypeName(gblTypeClassFromInstance(pInstance)->type),
                          gblTypeName(type));
         }
     }
@@ -1049,35 +1092,15 @@ GBL_EXPORT GblInstance* typeInstanceCast_(GblInstance* pInstance, GblType type, 
 }
 
 
-GBL_EXPORT GblInstance* gblTypeInstanceCast(GblInstance* pInstance, GblType type) {
+GBL_EXPORT GblInstance* gblTypeInstanceTryCast(const GblInstance* pInstance, GblType type) {
     return typeInstanceCast_(pInstance, type, GBL_FALSE);
 }
 
-GBL_EXPORT GblInstance* gblTypeInstanceCastCheck(GblInstance* pInstance, GblType type) {
+GBL_EXPORT GblInstance* gblTypeInstanceCast(const GblInstance* pInstance, GblType type) {
     return typeInstanceCast_(pInstance, type, GBL_TRUE);
 }
 
-
-static GblClass* typeInstanceClassCast_(GblInstance* pInstance, GblType type, GblBool check) {
-    GblClass* pToClass = NULL;
-    GBL_API_BEGIN(pCtx_);
-    if(!(!pInstance && type == GBL_TYPE_INVALID)) {
-        GBL_API_VERIFY_POINTER(pInstance);
-        pToClass = typeClassCast_(pInstance->pClass, type, check);
-    }
-    GBL_API_END_BLOCK();
-    return pToClass;
-}
-
-GBL_EXPORT GblClass* gblTypeInstanceClassCast(GblInstance* pInstance, GblType type) {
-    return typeInstanceClassCast_(pInstance, type, GBL_FALSE);
-}
-
-GBL_EXPORT GblClass* gblTypeInstanceClassCastCheck(GblInstance* pInstance, GblType type) {
-    return typeInstanceClassCast_(pInstance, type, GBL_TRUE);
-}
-
-GBL_EXPORT GblClass* gblTypeInstanceClass(GblInstance* pInstance) {
+GBL_EXPORT GblClass* gblTypeClassFromInstance(const GblInstance* pInstance) {
     GblClass* pClass = NULL;
     GBL_API_BEGIN(pCtx_);
     if(pInstance) {

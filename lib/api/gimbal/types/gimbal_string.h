@@ -213,6 +213,15 @@ GBL_INLINE GBL_API gblStringTof(const GblString* pStr, GblFloat* pValue) {
     GBL_API_END();
 }
 
+GBL_INLINE GBL_API gblStringTod(const GblString* pStr, double* pValue) {
+    const char* pCStr = NULL;
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_VERIFY_POINTER(pValue);
+    GBL_API_CALL(gblStringCStr(pStr, &pCStr));
+    *pValue = atof(pCStr);
+    GBL_API_END();
+}
+
 GBL_INLINE GBL_API gblStringTob(const GblString* pStr, GblBool* pValue) {
     const char* pCStr = NULL;
     *pValue = GBL_FALSE;
@@ -272,6 +281,12 @@ GBL_INLINE GBL_API gblStringFromi(GblString* pStr, GblInt value) {
 GBL_INLINE GBL_API gblStringFromf(GblString* pStr, GblFloat value) {
     GBL_API_BEGIN(pStr->data.hCtx);
     GBL_API_CALL(gblStringSprintf(pStr, "%." GBL_STRINGIFY(GBL_STRING_FLOAT_DECIMAL_PLACES) "f", value));
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringFromd(GblString* pStr, double value) {
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_CALL(gblStringSprintf(pStr, "%." GBL_STRINGIFY(GBL_STRING_FLOAT_DECIMAL_PLACES) "lf", value));
     GBL_API_END();
 }
 

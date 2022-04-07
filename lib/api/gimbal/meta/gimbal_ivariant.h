@@ -2,49 +2,88 @@
 #define GIMBAL_IVARIANT_H
 
 #include "gimbal_interface.h"
+#include "../core/gimbal_api_frame.h"
 
-#if 0
-#define GBL_IVARIANT_FLAGS_TABLE (                                                                                                                         \
-        ( GBL_IVARIANT_FLAGS, IVarantFlags, "Variant-Compatible Type Flags", gblIVariantFlagsString),                                                                             \
-        (                                                                                                                                               \
-            (GBL_IVARIANT_FLAGS_CONSTRUCT_DEFAULT,    0x0, ConstructDefault, "Unknown"),                                 \
-            (GBL_IVARIANT_FLAGS_CONSTRUCT_VALUE,      0x1, ConstructValue,   "Success"),                                 \
-            (GBL_IVARIANT_FLAGS_CONSTRUCT_COPY,       25,  ConstructCopy,    "Invalid Type"),\
-            (GBL_IVARIANT_FLAGS_CONSTRUCT_MOVE,       26,  ConstructMove,    "# of Different Error Codes")               \
-            (GBL_IVARIANT_FLAGS_ASSIGN_COPY,          26,  AssignCopy,       "# of Different Error Codes")               \
-            (GBL_IVARIANT_FLAGS_ASSIGN_MOVE,          26,  AssignMove,       "# of Different Error Codes")               \
-            (GBL_IVARIANT_FLAGS_COUNT,                26,  Count,            "# of Different Error Codes")               \
-    )                                                                                                                                               \
-)
+#define GBL_IVARIANT(instance)                  GBL_TYPE_INSTANCE_CAST(instance, GBL_TYPE_IVARIANT GblIVariant)
+#define GBL_IVARIANT_COMPATIBLE(instance)       GBL_TYPE_INSTANCE_IS_A(instance, GBL_TYPE_IVARIANT)
+#define GBL_IVARIANT_IFACE(klass)               GBL_TYPE_CLASS_CAST(klass, GBL_TYPE_IVARIANT, GblIVariantIFace)
+#define GBL_IVARIANT_CLASS_COMPATIBLE(klass)    GBL_TYPE_CLASS_IS_A(klass, GBL_TYPE_IVARIANT)
+#define GBL_IVARIANT_GET_IFACE(instance)        GBL_TYPE_INSTANCE_CLASS_CAST(instance, GBL_TYPE_IVARIANT, GblIVariantIface)
 
-GBL_FLAGS_TABLE_DECLARE(GBL_IVARIANT_FLAGS_TABLE);
+#define GBL_IVARIANT_VALUE_VAR_ARG_MAX          4
 
-#else
-typedef enum GBL_IVARIANT_FLAGS {
-    GBL_IVARIANT_CONSTRUCT_DEFAULT  = 0x1,
-    GBL_IVARIANT_CONTRUCT_VALUE     = 0x2,
-    GBL_IVARIANT_CONTRUCT_COPY      = 0x4,
-    GBL_IVARIANT_CONSTRUCT_MOVE     = 0x8,
-    GBL_IVARIANT_ASSIGN_COPY        = 0x10,
-    GBL_IVARIANT_ASSIGN_MOVE        = 0x20
-} GBL_IVARIANT_FLAGS;
+GBL_DECLS_BEGIN
 
-#endif
-typedef GBL_RESULT (*GblIVariantConstructFn)(GblVariant*, const GblVariant*, GblBool);
-typedef GBL_RESULT (*GblIVariantDestructFn) (GblVariant*);
-typedef GBL_RESULT (*GblIVariantAssignFn)   (GblVariant*, const GblVariant*, GblBool);
-typedef GBL_RESULT (*GblIVariantCompareFn)  (const GblVariant*, const GblVariant*, GblInt*);
+GBL_FORWARD_DECLARE_STRUCT_PRIVATE(GblIVariant);
 
-typedef struct GblIVariant {
+typedef enum GBL_IVARIANT_OP_FLAGS {
+    GBL_IVARIANT_OP_FLAG_RELOCATABLE           = 0x0001,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT     = 0x0002,  //without this, assume default 0 init is fine
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY        = 0x0004,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE        = 0x0008,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY  = 0x0010,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE  = 0x0020,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_MASK        = 0x003e,
+    GBL_IVARIANT_OP_FLAG_SET_COPY              = 0x0040,  //without this, assume memcpy works
+    GBL_IVARIANT_OP_FLAG_SET_MOVE              = 0x0080,
+    GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY        = 0x0100,
+    GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE        = 0x0200,
+    GBL_IVARIANT_OP_FLAG_SET_MASK              = 0x03c0,
+    GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY        = 0x0400,
+    GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK        = 0x0800,
+    GBL_IVARIANT_OP_FLAG_GET_MASK              = 0x0c00,
+    GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE        = 0x1000
+} GBL_IVARIANT_OP_FLAGS;
+
+
+#define VARIANT     GblVariant* pVariant
+#define CVARIANT    const VARIANT
+
+typedef struct GblIVariantIFace {
     GblInterface            base;
-    GBL_IVARIANT_FLAGS      flags;
-    GblIVariantConstructFn  pFnConstruct;
-    GblIVariantDestructFn   pFnDestruct;
-    GblIVariantAssignFn     pFnAssign;
-    GblIVariantCompareFn    pFnCompare;
-} GblIVariant;
+    GBL_IVARIANT_OP_FLAGS   supportedOps;
+    char                    pSetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
+    char                    pGetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
+
+    GBL_RESULT (*pFnConstruct)(VARIANT,  GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnSet)      (VARIANT,  GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnGet)      (CVARIANT, GblUint argc, GblVariant*       pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnDestruct) (VARIANT);
+    GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, GblInt* pResult);
+    GBL_RESULT (*pFnSave)     (CVARIANT, GblString* pString);
+    GBL_RESULT (*pFnLoad)     (VARIANT,  const GblString* pString);
+} GblIVariantIFace;
+
+
+#define SELF    GblIVariantIFace* pSelf
+#define CSELF   const SELF
+
+GBL_API GblIVariantIFace_validate            (CSELF)                                        GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructDefault    (CSELF, VARIANT)                               GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructCopy       (CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructMove       (CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructValueCopy  (CSELF, VARIANT,  va_list varArgs)             GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructValueMove  (CSELF, VARIANT,  va_list varArgs)             GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setCopy             (CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setMove             (CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setValueCopy        (CSELF, VARIANT,  va_list varArgs)             GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setValueMove        (CSELF, VARIANT,  va_list varArgs)             GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_getValueCopy        (CSELF, CVARIANT, va_list varArgs)             GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_getValuePeek        (CSELF, CVARIANT, va_list varArgs)             GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_destruct            (CSELF, VARIANT)                               GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_compare             (CSELF, CVARIANT, const GblVariant* pOther,
+                                              GblInt* pCmpResult)                           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_save                (CSELF, CVARIANT, GblString* pString)          GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_load                (CSELF, VARIANT, const GblString* pString)     GBL_NOEXCEPT;
+
+#undef CVARIANT
+#undef VARIANT
+
+#undef CSELF
+#undef SELF
 
 
 
+GBL_DECLS_END
 
 #endif // GIMBAL_IVARIANT_H

@@ -6,7 +6,7 @@
 //#include <test_gimbal_meta.hpp>
 #include <test_gimbal_algorithms.hpp>
 #include <test_gimbal_api.hpp>
-#include <test_gimbal_hashmap.hpp>
+#include <test_gimbal_hash_map.hpp>
 #include <test_gimbal_buffer.hpp>
 #include <test_gimbal_type.hpp>
 

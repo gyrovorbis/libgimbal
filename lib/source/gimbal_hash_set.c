@@ -1,4 +1,4 @@
-#include <gimbal/containers/gimbal_hashset.h>
+#include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/algorithms/gimbal_numeric.h>
 
@@ -527,7 +527,7 @@ GBL_EXPORT void* GblHashSet_get(const GblHashSet *map, const void *key) GBL_NOEX
     void* pEntry = NULL;
     GBL_API_BEGIN(map->hCtx); {
         GBL_API_VERIFY_POINTER(key);
-        uint64_t hash = get_hash(map, key);
+        const uint64_t hash = get_hash(map, key);
         size_t i = hash & map->mask;
         for (;;) {
             struct bucket *bucket = bucket_at(map, i);
@@ -544,6 +544,35 @@ GBL_EXPORT void* GblHashSet_get(const GblHashSet *map, const void *key) GBL_NOEX
         }
     } GBL_API_END_BLOCK();
     return pEntry;
+}
+
+
+
+GBL_EXPORT GblHashSetIterator GblHashSet_find(const GblHashSet* map, const void* key) GBL_NOEXCEPT {
+    GblHashSetIterator it = {
+        (GblHashSet*)map,
+        map->bucketCount
+    };
+    GBL_API_BEGIN(map->hCtx); {
+        GBL_API_VERIFY_POINTER(key);
+        uint64_t hash = get_hash(map, key);
+        size_t i = hash & map->mask;
+        for (;;) {
+            struct bucket *bucket = bucket_at(map, i);
+            if (!bucket->dib) {
+                break;
+            }
+            if (bucket->hash == hash &&
+                map->pFnCompare(map, key, bucket_item(bucket)))
+            {
+                it.bucketIdx = i;
+                break;
+            }
+            i = (i + 1) & map->mask;
+        }
+    } GBL_API_END_BLOCK();
+    return it;
+
 }
 
 // hashmap_probe returns the item in the bucket at position or NULL if an item

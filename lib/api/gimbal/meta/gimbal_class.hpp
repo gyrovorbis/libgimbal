@@ -13,11 +13,7 @@ public:
 
     const char*     getName(void) const;
     Type            getType(void) const;
-    Size            getAlignment(void) const;
-    Size            getSize(void) const;
     RefCount        getRefCount(void) const;
-    Class*          cast(Type toType);
-    const Class*    cast(Type toType) const;
 };
 #if o
 template<typename C>
@@ -44,19 +40,13 @@ public:
 
 
 inline const char* Class::getName(void) const {
-    return GblClass_name(this);
+    return gblTypeName(getType());
 }
 inline Type Class::getType(void) const {
-    return GblClass_typeOf(this);
-}
-inline Size Class::getAlignment(void) const {
-    return GblClass_alignOf(this);
-}
-inline Size Class::getSize(void) const {
-    return GblClass_sizeOf(this);
+    return gblTypeFromClass(this);
 }
 inline RefCount Class::getRefCount(void) const {
-    return GblClass_refCount(this);
+    return gblTypeClassRefCount(getType());
 }
 
 

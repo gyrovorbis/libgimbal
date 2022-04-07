@@ -8,15 +8,11 @@ GBL_DECLS_BEGIN
 #define SELF    GblClass*           pSelf
 #define CSELF   const GblClass*     pSelf
 
+#if 0
 #define GBL_CLASS_VCALL_BODY(VFUNC, ...)                                \
     if(!pSelf)          return GBL_RESULT_ERROR_INVALID_ARG;            \
     if(!pSelf->VFUNC)   return GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL;   \
     else                return pSelf->VFUNC(__VA_ARGS__)
-
-
-typedef struct GblClass {
-    GblType             typeId;
-} GblClass;
 
 
 GBL_INLINE GblType      GblClass_typeOf     (CSELF);
@@ -34,39 +30,42 @@ GBL_INLINE GblRefCount  GblClass_unref      (SELF);
 
 
 GBL_MAYBE_UNUSED GBL_INLINE GblType      GblClass_typeOf     (CSELF) {
-    return pSelf? pSelf->typeId : GBL_TYPE_INVALID;
+    return pSelf? pSelf->type : GBL_TYPE_INVALID;
 }
 GBL_MAYBE_UNUSED GBL_INLINE GblClass*    GblClass_parentOf   (CSELF) {
-    return pSelf? gblTypeClassPeek(gblTypeParent(pSelf->typeId)) : NULL;
+    return pSelf? gblTypeClassPeek(gblTypeParent(pSelf->type)) : NULL;
 }
 GBL_MAYBE_UNUSED GBL_INLINE GblSize      GblClass_sizeOf     (CSELF) {
-    return pSelf? gblTypeInfo(pSelf->typeId)->classSize : 0;
+    return pSelf? gblTypeInfo(pSelf->type)->classSize : 0;
 }
 
 GBL_MAYBE_UNUSED GBL_INLINE GblSize      GblClass_alignOf    (CSELF) {
-    return pSelf? gblTypeInfo(pSelf->typeId)->classAlign : 0;
+    return pSelf? gblTypeInfo(pSelf->type)->classAlign : 0;
 }
 
 GBL_MAYBE_UNUSED GBL_INLINE const char*  GblClass_name       (CSELF) {
-    return pSelf? gblTypeName(pSelf->typeId) : "Invalid";
+    return pSelf? gblTypeName(pSelf->type) : "Invalid";
 }
 
 GBL_MAYBE_UNUSED GBL_INLINE GblRefCount  GblClass_refCount   (CSELF) {
-    return pSelf? gblTypeClassRefCount(pSelf->typeId) : 0;
+    return pSelf? gblTypeClassRefCount(pSelf->type) : 0;
 }
 GBL_MAYBE_UNUSED GBL_INLINE GblClass*    GblClass_cast       (SELF,  GblType isAType) {
-    if(pSelf && gblTypeIsA(pSelf->typeId, isAType)) {
+  #if 0
+    if(pSelf && gblTypeIsA(pSelf->type, isAType)) {
         return pSelf;
     } else {
         return NULL;
     }
+#endif
 }
 GBL_MAYBE_UNUSED GBL_INLINE GblClass*    GblClass_ref        (SELF) {
-    return pSelf? gblTypeClassRef(pSelf->typeId) : NULL;
+    return pSelf? gblTypeClassRef(pSelf->type) : NULL;
 }
 GBL_MAYBE_UNUSED GBL_INLINE GblRefCount    GblClass_unref      (SELF) {
     return pSelf? gblTypeClassUnref(pSelf) : 0;
 }
+#endif
 
 #undef SELF
 #undef CSELF

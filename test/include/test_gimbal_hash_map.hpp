@@ -1,7 +1,7 @@
 #ifndef TEST_GIMBAL_HASH_HPP
 #define TEST_GIMBAL_HASH_HPP
 
-#include <gimbal/containers/gimbal_hashmap.hpp>
+#include <gimbal/containers/gimbal_hash_map.hpp>
 #include "test_gimbal.hpp"
 
 #define GBL_TEST_HASH_MAP_BENCHMARK_READ_ENTRIES    10000
@@ -72,6 +72,14 @@ inline void HashMap::sanityChecks(void) {
     hash["Briggsby"] = -333;
     QCOMPARE(hash.size(), 4);
     QCOMPARE(hash["Briggsby"], -333);
+
+    auto it = hash.find("Briggsby");
+    QVERIFY(it != hash.end());
+    QCOMPARE((*it).first, "Briggsby");
+    QCOMPARE((*it).second, -333);
+
+    auto it2 = hash.find("NOPE");
+    QVERIFY(it2 == hash.end());
 
     hash.for_each([](const std::pair<const char*, int>& item) -> bool {
         qDebug() << QString("<%1, %2>").arg(item.first).arg(item.second);

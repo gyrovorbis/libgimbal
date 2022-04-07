@@ -1,7 +1,7 @@
 #ifndef GIMBAL_HASHMAP_HPP
 #define GIMBAL_HASHMAP_HPP
 
-#include "gimbal_hashset.hpp"
+#include "gimbal_hash_set.hpp"
 
 namespace gimbal {
 
@@ -46,6 +46,8 @@ public:
     using const_reference   = const value_type&;
     using pointer           = value_type*;
     using const_pointer     = const pointer;
+    using iterator          = typename HashSetType::iterator;
+    using const_iterator    = typename HashSetType::const_iterator;
  /* using iterator         =
     using const_iterator   =
     using local_iterator   =
@@ -90,6 +92,9 @@ public:
 
     auto    at(const key_type& key) const -> const mapped_type&;
     auto    at(const key_type& key) -> mapped_type&;
+
+    auto    find(const key_type& key) const noexcept -> const_iterator;
+    auto    find(const key_type& key) noexcept -> iterator;
 
     bool    contains(const key_type& key) const noexcept;
     //iterator find(const key_type& key) const;
@@ -229,6 +234,18 @@ inline auto HashMap<K, T, H, P>::at(const key_type& k) -> mapped_type& {
     std::pair<K, T> pair { k, T{} };
     auto& result = HashSetType::at(pair);
     return result.second;
+}
+
+template<typename K, typename T, typename H, typename P>
+inline auto HashMap<K, T, H, P>::find(const key_type& k) const noexcept -> const_iterator {
+    std::pair<K, T> pair (k, T{});
+    return HashSetType::find(pair);
+}
+
+template<typename K, typename T, typename H, typename P>
+inline auto HashMap<K, T, H, P>::find(const key_type& k) noexcept -> iterator {
+    std::pair<K, T> pair (k, T{});
+    return HashSetType::find(pair);
 }
 
 template<typename K, typename T, typename H, typename P>

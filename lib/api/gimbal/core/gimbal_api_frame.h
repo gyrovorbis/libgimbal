@@ -2,6 +2,7 @@
 #define GIMBAL_API_FRAME_H
 
 #include "gimbal_api_generators.h"
+#include "../algorithms/gimbal_numeric.h"
 #include "../objects/gimbal_context.h"
 #include "gimbal_ext.h"
 #include "gimbal_call_stack.h"
@@ -209,7 +210,7 @@ extern "C" {
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_EXPRESSION, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
     } GBL_STMT_END
 
-//====== VERIFY_POINTER=========
+//====== VERIFY_POINTER =========
 #define GBL_API_VERIFY_POINTER_N(srcLoc, expr, ...) \
     GBL_API_VERIFY_(expr, GBL_RESULT_ERROR_INVALID_POINTER, srcLoc GBL_VA_ARGS(__VA_ARGS__))
 
@@ -222,7 +223,7 @@ extern "C" {
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_POINTER, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
     } GBL_STMT_END
 
-//====== VERIFY_HANDLE=========
+//====== VERIFY_HANDLE =========
 #define GBL_API_VERIFY_HANDLE_N(srcLoc, expr, ...) \
     GBL_API_VERIFY_(expr, GBL_RESULT_ERROR_INVALID_HANDLE, srcLoc GBL_VA_ARGS(__VA_ARGS__))
 
@@ -236,7 +237,7 @@ extern "C" {
     } GBL_STMT_END
 
 
-//====== VERIFY_ARG=========
+//====== VERIFY_ARG =========
 #define GBL_API_VERIFY_ARG_N(srcLoc, expr, ...) \
     GBL_API_VERIFY_(expr, GBL_RESULT_ERROR_INVALID_ARG, srcLoc GBL_VA_ARGS(__VA_ARGS__))
 
@@ -248,6 +249,20 @@ extern "C" {
         const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_ARG, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
     } GBL_STMT_END
+
+//===== VERIFY_TYPE =======
+#define GBL_API_VERIFY_TYPE_N(srcLoc, actualType, expectedType, ...) \
+    GBL_API_VERIFY_(gblTypeIsA(actualType, expectedType), GBL_RESULT_ERROR_TYPE_MISMATCH, srcLoc GBL_VA_ARGS(__VA_ARGS__))
+
+#define GBL_API_VERIFY_TYPE_2(srcLoc, actualType) \
+    GBL_API_VERIFY_(actualType != GBL_TYPE_INVALID, GBL_RESULT_ERROR_INVALID_TYPE, srcLoc GBL_VA_ARGS(__VA_ARGS__))
+
+#define GBL_API_VERIFY_TYPE(...) \
+    GBL_STMT_START { \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                 \
+        GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_TYPE, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__); \
+    } GBL_STMT_END
+
 
 
 #ifdef GBL_CONFIG_ERRNO_CHECKS
@@ -314,6 +329,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
         GBL_MAYBE_UNUSED const GBL_RESULT localResult = GBL_EXT_##prefix(GBL_API_FRAME(), ##__VA_ARGS__);    \
         GBL_ASSERT(!(GBL_CONFIG_ASSERT_ERROR_ENABLED && GBL_RESULT_ERROR(localResult)), "Ext["#prefix"]: ERROR"); \
         GBL_ASSERT(!(GBL_CONFIG_ASSERT_PARTIAL_ENABLED && GBL_RESULT_PARTIAL(localResult)), "Ext["#prefix"]: ERROR"); \
+        GBL_UNUSED(localResult);    \
         GBL_API_SOURCE_POP(); \
     } GBL_STMT_END
 

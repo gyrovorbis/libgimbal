@@ -43,6 +43,7 @@ inline void Type::invalidType(void) {
     QVERIFY(invalidType.getFundamentalType() == InvalidType());
     QVERIFY(invalidType.getParentType() == InvalidType());
     QVERIFY(!invalidType.getInfo());
+    QCOMPARE(invalidType.getDepth(), 0);
     QCOMPARE(invalidType.getName(), "Invalid");
     QVERIFY(invalidType.isFundamental());
     QVERIFY(!invalidType.isClassed());
@@ -58,14 +59,17 @@ inline void Type::builtinTypes(void) {
     gimbal::Type nilType = GBL_TYPE_NIL;
     QCOMPARE(gimbal::Type::fromName("nil"), nilType);
     QVERIFY(nilType.isValid());
+    QCOMPARE(nilType.getDepth(), 0);
     QVERIFY(nilType.isFundamental());
     QVERIFY(!nilType.isInstantiable());
-    QVERIFY(!nilType.isClassed());
+    QVERIFY(nilType.isClassed());
+    QVERIFY(!nilType.isDerivable());
 
     gimbal::Type interfaceType = GBL_TYPE_INTERFACE;
     QCOMPARE(gimbal::Type::fromName("Interface"), interfaceType);
     QVERIFY(interfaceType.isValid());
     QVERIFY(interfaceType.isFundamental());
+    QVERIFY(interfaceType.isDeepDerivable());
     QVERIFY(interfaceType.isDerivable());
     QVERIFY(interfaceType.isClassed());
 }
@@ -122,11 +126,11 @@ inline void Type::unregisterType(void) {
 struct CInstance;
 
 #define CINSTANCE_TYPE                      (CInstance_type())
-#define CINSTANCE(instance)                 GBL_TYPE_INSTANCE_TO(instance, CINSTANCE_TYPE, CInstance)
+#define CINSTANCE(instance)                 GBL_TYPE_INSTANCE_CAST(instance, CINSTANCE_TYPE, CInstance)
 #define CINSTANCE_COMPATIBLE(instance)      GBL_TYPE_INSTANCE_IS_A(instance, CINSTANCE_TYPE)
-#define CINSTANCE_CLASS(klass)              GBL_TYPE_CLASS_TO(klass, CINSTANCE_TYPE, CInstanceClass)
+#define CINSTANCE_CLASS(klass)              GBL_TYPE_CLASS_CAST(klass, CINSTANCE_TYPE, CInstanceClass)
 #define CINSTANCE_CLASS_COMPATIBLE(klass)   GBL_TYPE_CLASS_IS_A(klass, CINSTANCE_TYPE)
-#define CINSTANCE_GET_CLASS(instance)       GBL_TYPE_INSTANCE_CLASS_TO(instance, CINSTANCE_TYPE, CInstanceClass)
+#define CINSTANCE_GET_CLASS(instance)       GBL_TYPE_INSTANCE_CLASS_CAST(instance, CINSTANCE_TYPE, CInstanceClass)
 
 
 struct CInstanceClass {
@@ -152,8 +156,8 @@ static int CInstanceClass_vPrint(const CInstance* pSelf, int value) {
     return value * (pSelf? pSelf->integer: 2);
 }
 
-static GBL_RESULT CInstanceClass_init(GblClass* pClass, const void* pData) {
-    GBL_API_BEGIN(NULL);
+static GBL_RESULT CInstanceClass_init(GblClass* pClass, const void* pData, GblContext hCtx) {
+    GBL_API_BEGIN(hCtx);
     CInstanceClass* pSelf = reinterpret_cast<CInstanceClass*>(pClass);
     pSelf->pHeapInteger = (int*)malloc(sizeof(int));
     *pSelf->pHeapInteger = (uintptr_t)pData;
@@ -162,16 +166,16 @@ static GBL_RESULT CInstanceClass_init(GblClass* pClass, const void* pData) {
     GBL_API_END();
 }
 
-static GBL_RESULT CInstanceClass_final(GblClass* pClass, const void* pData) {
-    GBL_API_BEGIN(NULL);
+static GBL_RESULT CInstanceClass_final(GblClass* pClass, const void* pData, GblContext hCtx) {
+    GBL_API_BEGIN(hCtx);
     GBL_UNUSED(pData);
     CInstanceClass* pSelf = reinterpret_cast<CInstanceClass*>(pClass);
     free(pSelf->pHeapInteger);
     GBL_API_END();
 }
 
-static GBL_RESULT CInstance_init(GblInstance* pInstance) {
-    GBL_API_BEGIN(NULL);
+static GBL_RESULT CInstance_init(GblInstance* pInstance, GblContext hCtx) {
+    GBL_API_BEGIN(hCtx);
     CInstance* pSelf = (CInstance*)pInstance;
     pSelf->floating = 10.0f;
     pSelf->integer = 2;
@@ -212,12 +216,13 @@ inline void Type::cClassedType(void) {
     QVERIFY(cType.isDerivable());
     QVERIFY(cType.isFundamental());
     QVERIFY(cType.isInstantiable());
+    QCOMPARE(cType.getDepth(), 0);
 
     // Verify Class
     QCOMPARE(cType.getClassRefCount(), 0);
     CInstanceClass* pClass = CINSTANCE_CLASS(cType.classReference());
     QCOMPARE(cType.getClassRefCount(), 1);
-    QCOMPARE(pClass->base.typeId, cType);
+    QCOMPARE(pClass->base.type, cType);
     QCOMPARE(*pClass->pHeapInteger, 13);
     QCOMPARE(pClass->floater, 12.0f);
     QCOMPARE(pClass->vPrint(NULL, 3), 6);
@@ -237,9 +242,9 @@ inline void Type::cClassedType(void) {
 }
 
 #define CPPINSTANCE_TYPE                  (CppInstance_type())
-#define CPPINSTANCE(instance)             GBL_TYPE_INSTANCE_TO(instance, CPPINSTANCE_TYPE, CppInstance)
-#define CPPINSTANCE_CLASS(klass)          GBL_TYPE_CLASS_TO(klass, CPPINSTANCE_TYPE, CppInstanceClass)
-#define CPPINSTANCE_GET_CLASS(instance)   GBL_TYPE_INSTANCE_CLASS_TO(instance, CPPINSTANCE_TYPE, CppInstanceClass)
+#define CPPINSTANCE(instance)             GBL_TYPE_INSTANCE_CAST(instance, CPPINSTANCE_TYPE, CppInstance)
+#define CPPINSTANCE_CLASS(klass)          GBL_TYPE_CLASS_CAST(klass, CPPINSTANCE_TYPE, CppInstanceClass)
+#define CPPINSTANCE_GET_CLASS(instance)   GBL_TYPE_INSTANCE_CLASS_CAST(instance, CPPINSTANCE_TYPE, CppInstanceClass)
 
 struct CppInstanceClass: public CInstanceClass {
     QString qString;
@@ -256,9 +261,9 @@ inline GblType (*CppInstance_type)(void) = []() -> GblType {
             "CppInstance",
             gimbal::TypeInfo {
                 {
-                    .pFnClassInit = [](GblClass* pClass, const void*) {
+                    .pFnClassInit = [](GblClass* pClass, const void*, GblContext hCtx) {
                         auto* pSelf = (CppInstanceClass*)(pClass);
-                        GBL_API_FUNCTION(NULL, ({
+                        GBL_API_FUNCTION(hCtx, ({
                             new (&pSelf->qString) QString("QSTRING CLASS");
                             pSelf->vPrint = [](const CInstance*, int value) -> int {
                                 printf("virtual overload!!!");
@@ -266,16 +271,16 @@ inline GblType (*CppInstance_type)(void) = []() -> GblType {
                             };
                         }));
                     },
-                    .pFnClassFinalize = [](GblClass* pClass, const void*) {
-                        GBL_API_FUNCTION(NULL, ({
+                    .pFnClassFinalize = [](GblClass* pClass, const void*, GblContext hCtx) {
+                        GBL_API_FUNCTION(hCtx, ({
                             reinterpret_cast<CppInstanceClass*>(pClass)->qString.~QString();
                         }));
                     },
                     .classSize = sizeof(CppInstanceClass),
                     .classAlign = alignof(CppInstanceClass),
                     .pClassData = (void*)(uintptr_t)44,
-                    .pFnInstanceInit = [](GblInstance* pInstance) {
-                        GBL_API_FUNCTION(NULL, ({
+                    .pFnInstanceInit = [](GblInstance* pInstance, GblContext hCtx) {
+                        GBL_API_FUNCTION(hCtx, ({
                             new (&reinterpret_cast<CppInstance*>(pInstance)->qString) QString("QSTRING INSTANCE");
                         }));
                     },
@@ -296,10 +301,11 @@ inline void Type::derivedType(void) {
     QVERIFY(!cppInstanceType.isFundamental());
     QCOMPARE(cppInstanceType.getFundamentalType(),  gimbal::Type(CINSTANCE_TYPE));
     QCOMPARE(cppInstanceType.getParentType(),       gimbal::Type(CINSTANCE_TYPE));
+    QCOMPARE(cppInstanceType.getDepth(), 1);
 
     auto* pClass = CPPINSTANCE_CLASS(cppInstanceType.classReference());
     QVERIFY(pClass);
-    QCOMPARE(pClass->base.typeId, cppInstanceType);
+    QCOMPARE(pClass->base.type, cppInstanceType);
     QCOMPARE(pClass->qString, "QSTRING CLASS");
     QCOMPARE(pClass->floater, 12.0f);
     QCOMPARE(*pClass->pHeapInteger, 44);
@@ -329,7 +335,7 @@ inline void Type::placementDerivedType(void) {
 
     auto* pClass = CPPINSTANCE_CLASS(cppInstance.pClass);
     QVERIFY(pClass);
-    QCOMPARE(pClass->base.typeId, type);
+    QCOMPARE(pClass->base.type, type);
     QCOMPARE(pClass->qString, "QSTRING CLASS");
     QCOMPARE(pClass->floater, 12.0f);
     QCOMPARE(*pClass->pHeapInteger, 44);
@@ -341,9 +347,9 @@ inline void Type::placementDerivedType(void) {
 
 
 #define CINTERFACE_TYPE                  (CInterface_type())
-#define CINTERFACE(instance)             GBL_TYPE_INSTANCE_TO(instance, CINTERFACE_TYPE, CInterface)
-#define CINTERFACE_CLASS(klass)          GBL_TYPE_CLASS_TO(klass, CINTERFACE_TYPE, CInterface)
-#define CINTERFACE_GET_CLASS(instance)   GBL_TYPE_INSTANCE_CLASS_TO(instance, CINTERFACE_TYPE, CInterface)
+#define CINTERFACE(instance)             GBL_TYPE_INSTANCE_CAST(instance, CINTERFACE_TYPE, CInterface)
+#define CINTERFACE_CLASS(klass)          GBL_TYPE_CLASS_CAST(klass, CINTERFACE_TYPE, CInterface)
+#define CINTERFACE_GET_CLASS(instance)   GBL_TYPE_INSTANCE_CLASS_CAST(instance, CINTERFACE_TYPE, CInterface)
 
 struct CInterface {
     GblInterface        baseClass;
@@ -361,9 +367,9 @@ inline GblType (*CInterface_type)(void) = []() -> GblType {
         "CInterface",
         gimbal::TypeInfo {
             {
-                .pFnClassInit = [](GblClass* pClass, const void* pUd) {
+                .pFnClassInit = [](GblClass* pClass, const void* pUd, GblContext hCtx) {
                     auto* pSelf = reinterpret_cast<CInterface*>(pClass);
-                    GBL_API_FUNCTION(NULL, ({
+                    GBL_API_FUNCTION(hCtx, ({
                         pSelf->staticInt = (int)(uintptr_t)pUd;
                         pSelf->pVClassStringer = [](void) {
                             return "CInterface::classStringer";
@@ -406,9 +412,9 @@ struct ICppInstance: public CppInstance {
 };
 
 #define ICPPINSTANCE_TYPE                  (ICppInstance_type())
-#define ICPPINSTANCE(instance)             GBL_TYPE_INSTANCE_TO(instance, ICPPINSTANCE_TYPE, ICppInstance)
-#define ICPPINSTANCE_CLASS(klass)          GBL_TYPE_CLASS_TO(klass, ICPPINSTANCE_TYPE, ICppInstanceClass)
-#define ICPPINSTANCE_GET_CLASS(instance)   GBL_TYPE_INSTANCE_CLASS_TO(instance, ICPPINSTANCE_TYPE, ICppInstanceClass)
+#define ICPPINSTANCE(instance)             GBL_TYPE_INSTANCE_CAST(instance, ICPPINSTANCE_TYPE, ICppInstance)
+#define ICPPINSTANCE_CLASS(klass)          GBL_TYPE_CLASS_CAST(klass, ICPPINSTANCE_TYPE, ICppInstanceClass)
+#define ICPPINSTANCE_GET_CLASS(instance)   GBL_TYPE_INSTANCE_CLASS_CAST(instance, ICPPINSTANCE_TYPE, ICppInstanceClass)
 
 inline GblType (*ICppInstance_type)(void) = []() {
     static GblType type = GBL_TYPE_INVALID;
@@ -421,8 +427,8 @@ inline GblType (*ICppInstance_type)(void) = []() {
         "ICppInstance",
         gimbal::TypeInfo {
             {
-                .pFnClassInit = [](GblClass* pClass, const void*) {
-                    GBL_API_FUNCTION(NULL, {
+                .pFnClassInit = [](GblClass* pClass, const void*, GblContext hCtx) {
+                    GBL_API_FUNCTION(hCtx, {
                         auto* pSelf = reinterpret_cast<ICppInstanceClass*>(pClass);
                         pSelf->staticFloat = -3.33f;
                         pSelf->cInterfaceClass.pVClassStringer = [](void) {
@@ -437,8 +443,8 @@ inline GblType (*ICppInstance_type)(void) = []() {
                 .classAlign = alignof(ICppInstanceClass),
                 .interfaceCount = 1,
                 .pInterfaceMap = &entry,
-                .pFnInstanceInit = [](GblInstance* pInstance) {
-                    GBL_API_FUNCTION(NULL, {
+                .pFnInstanceInit = [](GblInstance* pInstance, GblContext hCtx) {
+                    GBL_API_FUNCTION(hCtx, {
                         reinterpret_cast<ICppInstance*>(pInstance)->instanceFloat = 3.33f;
                     });
                 },
@@ -454,6 +460,7 @@ inline GblType (*ICppInstance_type)(void) = []() {
 inline void Type::implementInterfaceType(void) {
     // retrieve metatype from type system (will force registry)
     gimbal::Type type = ICPPINSTANCE_TYPE;
+    QCOMPARE(type.getDepth(), 2);
 
     // create a new instance from a metatype
     auto* pInstance = ICPPINSTANCE(type.instanceCreate());
@@ -477,6 +484,7 @@ inline void Type::implementInterfaceType(void) {
     // verify class has overridden interface's virtual method
     QCOMPARE(pInterface->pVClassStringer(), "ICppInstanceClass::ClassStringer");
 
+    // test casting operatprs between interface and class types
     auto* pClass2 = ICPPINSTANCE_CLASS(pClass);
     QCOMPARE(pClass2, pClass);
 
@@ -490,7 +498,6 @@ inline void Type::implementInterfaceType(void) {
     QCOMPARE(pInterface3, pInterface2);
 
     type.instanceDestroy(pInstance);
-
 }
 
 

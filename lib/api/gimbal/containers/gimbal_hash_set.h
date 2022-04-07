@@ -38,7 +38,7 @@ typedef struct GblHashSetIterator {
     GblSize             bucketIdx;
 } GblHashSetIterator;
 
-GBL_API             GblHashSet_construct_8(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_8(SELF,
                                            GblSize                     entrySize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
@@ -46,25 +46,25 @@ GBL_API             GblHashSet_construct_8(GblHashSet*                 pMap,
                                            GblSize                     capacity,
                                            GblContext                  hCtx,
                                            void*                       pUserdata) GBL_NOEXCEPT;
-GBL_API             GblHashSet_construct_7(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_7(SELF,
                                            GblSize                     entrySize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
                                            GblHashSetEntryDestructFn   pFnDestruct,
                                            GblSize                     capacity,
                                            GblContext                  hCtx) GBL_NOEXCEPT;
-GBL_API             GblHashSet_construct_6(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_6(SELF,
                                            GblSize                     entrySize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
                                            GblHashSetEntryDestructFn   pFnDestruct,
                                            GblSize                     capacity) GBL_NOEXCEPT;
-GBL_API             GblHashSet_construct_5(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_5(SELF,
                                            GblSize                     entrySize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
                                            GblHashSetEntryDestructFn   pFnDestruct) GBL_NOEXCEPT;
-GBL_API             GblHashSet_construct_4(GblHashSet*                 pMap,
+GBL_API             GblHashSet_construct_4(SELF,
                                            GblSize                     entrySize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare) GBL_NOEXCEPT;
@@ -89,6 +89,8 @@ GBL_EXPORT void*        GblHashSet_get              (CSELF, const void* pKey)   
 GBL_EXPORT void*        GblHashSet_at               (CSELF, const void* pKey)       GBL_NOEXCEPT; //throws range error
 GBL_EXPORT GblBool      GblHashSet_contains         (CSELF, const void* pKey)       GBL_NOEXCEPT; //true if entry exists
 GBL_EXPORT GblSize      GblHashSet_count            (CSELF, const void* pKey)       GBL_NOEXCEPT; //# of matching entries (0 or 1)
+GBL_EXPORT GblHashSetIterator
+                        GblHashSet_find(CSELF, const void* pKey) GBL_NOEXCEPT;
 
 GBL_EXPORT void*        GblHashSet_set              (SELF, const void* pEntry)      GBL_NOEXCEPT; //raw set, returns existing item w/o deleting
 GBL_EXPORT GblBool      GblHashSet_insert           (SELF, const void* pEntry)      GBL_NOEXCEPT; //throws duplicate error

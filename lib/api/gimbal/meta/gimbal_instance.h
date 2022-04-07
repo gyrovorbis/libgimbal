@@ -9,11 +9,7 @@ GBL_DECLS_BEGIN
 #define SELF    GblInstance*       pSelf
 #define CSELF   const GblInstance* pSelf
 
-typedef struct GblInstance {
-    GblClass*   pClass;
-} GblInstance;
-
-
+#if 0
 GBL_INLINE GblType      GblInstance_typeOf      (CSELF);
 GBL_INLINE GblSize      GblInstance_sizeOf      (CSELF);
 GBL_INLINE GblSize      GblInstance_alignOf     (CSELF);
@@ -49,6 +45,7 @@ GBL_INLINE GblInstance* GblInstance_cast(SELF, GblType toType) {
     return pSelf && GblClass_cast(pSelf->pClass, toType) ? pSelf : NULL;
 }
 
+#endif
 #undef SELF
 #undef CSELF
 

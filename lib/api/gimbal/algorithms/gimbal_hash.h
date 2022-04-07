@@ -19,7 +19,7 @@ GBL_INLINE uint64_t gblSeed              (uint8_t index)    GBL_NOEXCEPT;
 typedef    GblHash (*GblHashFn)(const void*, GblSize);
 
 // make default hash function of entire bitch
-GBL_INLINE GblHash  gblHash              (const void* pData, GblSize size, GblHashFn pFnHash)              GBL_NOEXCEPT;
+GBL_INLINE GblHash  gblHash              (const void* pData, GblSize size, GblHashFn pFnHash) GBL_NOEXCEPT;
 
 
 GBL_EXPORT GblHash  gblHashSip           (const void* pData, GblSize size) GBL_NOEXCEPT;
@@ -27,6 +27,15 @@ GBL_EXPORT GblHash  gblHashMurmur        (const void* pData, GblSize size) GBL_N
 GBL_INLINE GblHash  gblHashJenkins       (const void* pData, GblSize size) GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHashCrc           (const void* pData, GblSize size) GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHashXX            (const void* pData, GblSize size) GBL_NOEXCEPT;
+
+
+
+
+
+
+
+
+
 
 // ===== INLINE IMPLEMENTATIONS =====
 

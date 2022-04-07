@@ -38,10 +38,10 @@ public:
         Type(GblType type=GBL_TYPE_INVALID);
 
         const char*     getName(void) const;
-        TypeFlags       getFlags(void) const;
         Type            getParentType(void) const;
         Type            getFundamentalType(void) const;
         const TypeInfo* getInfo(void) const;
+        Uint            getDepth(void) const;
 
         bool            isValid(void) const;
         bool            isClassed(void) const;
@@ -54,6 +54,7 @@ public:
         bool            isFundamental(void) const;
 
         bool            isA(Type base) const;
+        bool            isFundamentallyA(Type base) const;
         RefCount        getClassRefCount(void) const;
 #ifdef GBL_TYPE_DEBUG
         RefCount        getInstanceRefCount(void) const;
@@ -65,7 +66,6 @@ public:
         void            instanceDestroy     (void* pInstance) const;
 
         void*           classReference      (void) const;
-        void*           classPeek           (void) const;
         void            classUnreference    (void* pClass) const;
 
 // static API
@@ -133,13 +133,13 @@ GBL_TYPE_DECLARE_CPP(InterfaceType, GBL_TYPE_INTERFACE)
 // ==== INLINEZ =====
 inline Type::Type(GblType type): PrimitiveBase(type) {}
 inline const char* Type::getName(void) const { return gblTypeName(*this); }
-inline TypeFlags Type::getFlags(void) const { return gblTypeFlags(*this); }
 inline Type Type::getParentType(void) const { return gblTypeParent(*this); }
+inline Uint Type::getDepth(void) const { return gblTypeDepth(*this); }
 inline Type Type::getFundamentalType(void) const { return gblTypeFundamental(*this); }
 inline const TypeInfo* Type::getInfo(void) const { return static_cast<const TypeInfo*>(gblTypeInfo(*this)); }
 inline bool Type::isA(Type base) const { return gblTypeIsA(*this, base); }
 inline RefCount Type::getClassRefCount(void) const { return gblTypeClassRefCount(*this); }
-inline bool Type::isValid(void) const { return gblTypeValid(*this); }
+inline bool Type::isValid(void) const { return *this != GBL_TYPE_INVALID; }
 
 inline bool Type::isClassed(void) const { return GBL_TYPE_IS_CLASSED(*this); }
 inline bool Type::isInstantiable(void) const { return GBL_TYPE_IS_INSTANTIABLE(*this); }
@@ -156,7 +156,6 @@ inline void  Type::instanceDestruct    (void* pInstance) const { Type::instanceD
 inline void  Type::instanceDestroy     (void* pInstance) const { Type::instanceDestroy(*this, pInstance); }
 
 inline void* Type::classReference      (void) const { return Type::classReference(*this); }
-inline void* Type::classPeek           (void) const { return Type::classPeek(*this); }
 inline void  Type::classUnreference    (void* pClass) const { return Type::classUnreference(*this, pClass); }
 
 inline Result Type::reinit(Context* pCtx) {
@@ -191,7 +190,6 @@ inline void  Type::instanceDestruct    (Type type, void* pInstance) { gblTypeIns
 inline void  Type::instanceDestroy     (Type type, void* pInstance) { gblTypeInstanceDestroy(reinterpret_cast<GblInstance*>(pInstance)); }
 
 inline void* Type::classReference      (Type type) { return gblTypeClassRef(type); }
-inline void* Type::classPeek           (Type type) { return gblTypeClassPeek(type); }
 inline void  Type::classUnreference    (Type type, void* pClass) { gblTypeClassUnref(reinterpret_cast<GblClass*>(pClass)); }
 
 }

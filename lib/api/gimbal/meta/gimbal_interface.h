@@ -7,12 +7,7 @@
 #define CSELF   const GblInterface* pSelf
 
 GBL_DECLS_BEGIN
-
-typedef struct GblInterface {
-    GblClass            base;
-    int16_t             offsetToTop;
-} GblInterface;
-
+#if 0
 
 GBL_INLINE int16_t              GblInterface_classOffset(CSELF);
 GBL_INLINE GblClass*            GblInterface_outerClass(CSELF);
@@ -27,14 +22,11 @@ uint16_t GblInterface_offsetOf(CSELF) {
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GblClass* GblInterface_outerClass(CSELF) {
-    if(!pSelf)              return NULL;
-    if(!pSelf->offsetToTop) return NULL;
-    else
-        return (GblClass*)((uint8_t*)pSelf + pSelf->offsetToTop);
+
 }
 
 
-#if 0
+
 
 
 GBL_INLINE const GblInstance*   GblInterface_instance(CSELF);

@@ -2,7 +2,7 @@
 #define GIMBAL_HASHSET_HPP
 
 #include "gimbal_container.hpp"
-#include "gimbal_hashset.h"
+#include "gimbal_hash_set.h"
 #include "../objects/gimbal_context.hpp"
 
 namespace gimbal {
@@ -71,6 +71,7 @@ public:
     size_type       count       (const key_type& key) const noexcept;
     bool            contains    (const key_type& key) const noexcept;
     const_pointer   probe       (size_type position) const noexcept;
+    const_iterator  find        (const key_type& key) const noexcept;
 
     template<typename F>
         requires std::is_invocable_r_v<bool, F, const K&>
@@ -200,6 +201,7 @@ public:
 
     pointer     get             (const key_type& key) noexcept;
     reference   at              (const key_type& key);
+    iterator    find            (const key_type& key) noexcept;
 
     pointer     set             (const key_type& key) noexcept;
 
@@ -356,6 +358,11 @@ inline auto HashSetBase<CRTP, K>::count(const key_type& key) const noexcept -> s
 template<typename CRTP, typename K>
 inline bool HashSetBase<CRTP, K>::contains(const key_type& key) const noexcept {
     return GblHashSet_contains(getSet(), &key);
+}
+
+template<typename CRTP, typename K>
+inline auto HashSetBase<CRTP, K>::find(const key_type& key) const noexcept -> const_iterator {
+    return GblHashSet_find(getSet(), &key);
 }
 
 template<typename CRTP, typename K>
@@ -558,6 +565,11 @@ inline auto HashSet<K, H, P>::at(const key_type& key) -> reference {
     gblThreadCallRecordGet(NULL, &pRecord);
     Exception::checkThrow(*pRecord);
     return *pKey;
+}
+
+template<typename K, typename H, typename P>
+inline auto HashSet<K, H, P>::find(const key_type& key) noexcept -> iterator {
+    return GblHashSet_find(this, &key);
 }
 
 template<typename K, typename H, typename P>
