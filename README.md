@@ -84,6 +84,48 @@ FEATURE SET
 - Wrappers to other Languages
 	a. Object-oriented C++ wrapper
 
+WHAT'S THE POINT EXPLANATION
+============================
+1) exposing compiler/language specific functionality in a language-agnostic manner
+2) macro meta programming utilities
+3) API generation and validation utilities 
+    * automatically generate macros for both C and C++ from a single meta macro definition
+    * entire suite of unified API declarators and valadator macros for configurable customizable error handling
+         a. handle errors as warnings, errors, log them, assert them, save them, return values, etc all configurable via Cmake
+         b. enable/disable runtime API validations for debug builds
+         c. unified stack tracing mechanism for API errors
+         e. unified structured logging mechanism
+         f. unified custom allocation mechanism
+         g. unified variadic/generic function overloading mechanism (works in both C and C++)
+4) Cross-language containers that work in both C and C++ simultaneously
+    a. GblVector
+    b. GblHashSet (and gimbal::HashMap in C++)
+    c. GblTreeSet
+    e. GblFlatSet (WIP)
+    f. GblList singly and doubly linked lists
+    * All are 100% STL compatible and complaint APIs with custom allocator support
+5) Cross-language algorithms and utilities
+   a. sorting algorithms (shell, quick, insertion, bubble, etc)
+   c. hashing algorithms (Murmur, Sip, Jenkins, etc)
+   e. Unified Rand() random number API with multiple seed support for custom generators and sharing seeds across runtime
+   f. lots of quality of life common numeric algorithms like next power of 2, GCD, calculating minimal alignment/offset for allocations
+   g. logging and capturing all build system and GIT commit shit for all projects in the build system
+6) Custom Primitive Data Types
+   a. GblString and the C++ gimbal::string equivalent which are std:;string/string_view compatible yet have stack allocation optimizations
+   b. GblVariant as a type-erased generic value holder with C++-20-style std::variant API
+   c. Custom error results: which have corresponding C and C++ types contain messages, error codes, and can be converted to and from C++ exceptions
+   d. GblBuffer
+7) Thread system with thread-local storage
+8) Generic event-system
+9) Runtime Extensible Object-Oriented Meta Type System
+  a. Instances, Classes, Objects
+  b. support for inheritance, virtual methods
+  c. support for interfaces
+  d. new user types can be registered to be compatible with the existing GblVariant type
+  f. property system for Object types (still WIP)
+10) Common Unit Test framework and Utilities
+11) Generic Module system (WIP)
+
 CREDITS
 =======
 Falco Girgis
