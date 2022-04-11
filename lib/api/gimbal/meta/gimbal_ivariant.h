@@ -31,8 +31,9 @@ typedef enum GBL_IVARIANT_OP_FLAGS {
     GBL_IVARIANT_OP_FLAG_SET_MASK              = 0x03c0,
     GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY        = 0x0400,
     GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK        = 0x0800,
-    GBL_IVARIANT_OP_FLAG_GET_MASK              = 0x0c00,
-    GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE        = 0x1000
+    GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE        = 0x1000,
+    GBL_IVARIANT_OP_FLAG_GET_MASK              = 0x1c00,
+    GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE        = 0x2000
 } GBL_IVARIANT_OP_FLAGS;
 
 
@@ -45,9 +46,9 @@ typedef struct GblIVariantIFace {
     char                    pSetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
     char                    pGetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
 
-    GBL_RESULT (*pFnConstruct)(VARIANT,  GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
-    GBL_RESULT (*pFnSet)      (VARIANT,  GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
-    GBL_RESULT (*pFnGet)      (CVARIANT, GblUint argc, GblVariant*       pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnConstruct)(VARIANT,  GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnSet)      (VARIANT,  GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnGet)      (VARIANT,  GblUint argc, GblVariant*       pArgs, GBL_IVARIANT_OP_FLAGS op);
     GBL_RESULT (*pFnDestruct) (VARIANT);
     GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, GblInt* pResult);
     GBL_RESULT (*pFnSave)     (CVARIANT, GblString* pString);
@@ -70,6 +71,7 @@ GBL_API GblIVariantIFace_setValueCopy        (CSELF, VARIANT,  va_list varArgs) 
 GBL_API GblIVariantIFace_setValueMove        (CSELF, VARIANT,  va_list varArgs)             GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_getValueCopy        (CSELF, CVARIANT, va_list varArgs)             GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_getValuePeek        (CSELF, CVARIANT, va_list varArgs)             GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_getValueTake        (CSELF, CVARIANT, va_list varArgs)             GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_destruct            (CSELF, VARIANT)                               GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_compare             (CSELF, CVARIANT, const GblVariant* pOther,
                                               GblInt* pCmpResult)                           GBL_NOEXCEPT;

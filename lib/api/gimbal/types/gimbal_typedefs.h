@@ -28,6 +28,7 @@ typedef GBL_FLAGS                       GblFlags;
 typedef uint64_t                        GblHash;
 typedef GblHash                         GblGuid;
 typedef uintptr_t                       GblType;
+typedef uintptr_t                       GblQuark;
 typedef uint16_t                        GblRefCount;
 typedef GBL_CMP_RESULT                  GblCmpResult;
 typedef uint32_t                        GblVersion;

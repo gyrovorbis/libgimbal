@@ -86,6 +86,7 @@ GBL_INLINE GBL_API gblStringTake(GblString* pStr, char** ppStrPtr, GblSize* pCap
 
 GBL_INLINE GBL_API gblStringGive(GblString* pStr, char* pData, GblSize capacity) {
     GBL_API_BEGIN(pStr->data.hCtx);
+    if(!capacity) capacity = strlen(pData);
     GBL_API_CALL(gblVectorGive(&pStr->data, pData, capacity, capacity));
     pStr->data.size = strlen((const char*)pStr->data.pBuffer);
     GBL_API_END();
@@ -275,6 +276,12 @@ GBL_INLINE GBL_API gblStringFromb(GblString* pStr, GblBool value) {
 GBL_INLINE GBL_API gblStringFromi(GblString* pStr, GblInt value) {
     GBL_API_BEGIN(pStr->data.hCtx);
     GBL_API_CALL(gblStringSprintf(pStr, "%d", value));
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_API gblStringFromu(GblString* pStr, GblUint value) {
+    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_CALL(gblStringSprintf(pStr, "%u", value));
     GBL_API_END();
 }
 

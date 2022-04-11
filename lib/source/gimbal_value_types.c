@@ -2,6 +2,8 @@
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/meta/gimbal_ivariant.h>
 #include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_string.h>
+#include <gimbal/types/gimbal_variant.h>
 
 typedef struct GblPrimitiveClass {
     GblClass            base;
@@ -12,7 +14,12 @@ static GBL_RESULT GblPrimitiveClass_init(GblPrimitiveClass* pClass, GblIVariantI
     GBL_API_BEGIN(hCtx);
     memcpy(&pClass->iVariantIFace.supportedOps,
            &pIFace->supportedOps,
+           sizeof(GblIVariantIFace)-offsetof(GblIVariantIFace, supportedOps));
+#if 0
+    memcpy(&pClass->iVariantIFace.supportedOps,
+           &pIFace->supportedOps,
            sizeof(GblIVariantIFace) - offsetof(GblIVariantIFace, supportedOps));
+#endif
     GBL_API_END();
 }
 
@@ -45,7 +52,7 @@ static GBL_RESULT boolLoad_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT boolSet_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT boolSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -53,7 +60,7 @@ static GBL_RESULT boolSet_(GblVariant* pVariant, GblUint argc, const GblVariant*
     GBL_API_END();
 }
 
-static GBL_RESULT boolGet_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT boolGet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -82,7 +89,7 @@ static GBL_RESULT charLoad_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT charSet_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT charSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -91,7 +98,7 @@ static GBL_RESULT charSet_(GblVariant* pVariant, GblUint argc, const GblVariant*
     GBL_API_END();
 }
 
-static GBL_RESULT charGet_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT charGet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -115,7 +122,7 @@ static GBL_RESULT u8Load_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT u8Set_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u8Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -124,7 +131,7 @@ static GBL_RESULT u8Set_(GblVariant* pVariant, GblUint argc, const GblVariant* p
     GBL_API_END();
 }
 
-static GBL_RESULT u8Get_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u8Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -148,7 +155,7 @@ static GBL_RESULT i16Load_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT i16Set_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i16Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -157,7 +164,7 @@ static GBL_RESULT i16Set_(GblVariant* pVariant, GblUint argc, const GblVariant* 
     GBL_API_END();
 }
 
-static GBL_RESULT i16Get_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i16Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -180,7 +187,7 @@ static GBL_RESULT u16Load_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT u16Set_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u16Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -189,7 +196,7 @@ static GBL_RESULT u16Set_(GblVariant* pVariant, GblUint argc, const GblVariant* 
     GBL_API_END();
 }
 
-static GBL_RESULT u16Get_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u16Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -212,7 +219,7 @@ static GBL_RESULT i32Load_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT i32Set_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i32Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -221,7 +228,7 @@ static GBL_RESULT i32Set_(GblVariant* pVariant, GblUint argc, const GblVariant* 
     GBL_API_END();
 }
 
-static GBL_RESULT i32Get_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i32Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -244,7 +251,7 @@ static GBL_RESULT u32Load_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT u32Set_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u32Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -253,7 +260,7 @@ static GBL_RESULT u32Set_(GblVariant* pVariant, GblUint argc, const GblVariant* 
     GBL_API_END();
 }
 
-static GBL_RESULT u32Get_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u32Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -277,7 +284,7 @@ static GBL_RESULT i64Load_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT i64Set_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i64Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -286,7 +293,7 @@ static GBL_RESULT i64Set_(GblVariant* pVariant, GblUint argc, const GblVariant* 
     GBL_API_END();
 }
 
-static GBL_RESULT i64Get_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i64Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -309,7 +316,7 @@ static GBL_RESULT u64Load_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT u64Set_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u64Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -318,7 +325,7 @@ static GBL_RESULT u64Set_(GblVariant* pVariant, GblUint argc, const GblVariant* 
     GBL_API_END();
 }
 
-static GBL_RESULT u64Get_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u64Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -339,7 +346,7 @@ static GBL_RESULT f32Load_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT f32Set_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT f32Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -348,7 +355,7 @@ static GBL_RESULT f32Set_(GblVariant* pVariant, GblUint argc, const GblVariant* 
     GBL_API_END();
 }
 
-static GBL_RESULT f32Get_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT f32Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -369,7 +376,7 @@ static GBL_RESULT f64Load_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT f64Set_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT f64Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -378,7 +385,7 @@ static GBL_RESULT f64Set_(GblVariant* pVariant, GblUint argc, const GblVariant* 
     GBL_API_END();
 }
 
-static GBL_RESULT f64Get_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT f64Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -386,7 +393,6 @@ static GBL_RESULT f64Get_(const GblVariant* pVariant, GblUint argc, GblVariant* 
     *((double*)pArgs->pVoidPtr) = pVariant->f64;
     GBL_API_END();
 }
-
 
 static GBL_RESULT pSave_(const GblVariant* pVariant, GblString* pString) {
     GBL_API_BEGIN(NULL);
@@ -400,7 +406,7 @@ static GBL_RESULT pLoad_(GblVariant* pVariant, const GblString* pString) {
     GBL_API_END();
 }
 
-static GBL_RESULT pSet_(GblVariant* pVariant, GblUint argc, const GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT pSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -409,7 +415,7 @@ static GBL_RESULT pSet_(GblVariant* pVariant, GblUint argc, const GblVariant* pA
     GBL_API_END();
 }
 
-static GBL_RESULT pGet_(const GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT pGet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
@@ -418,343 +424,631 @@ static GBL_RESULT pGet_(const GblVariant* pVariant, GblUint argc, GblVariant* pA
     GBL_API_END();
 }
 
+static GBL_RESULT stringConstruct_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_POINTER(pVariant);
+
+    // Default constructor
+    if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT) {
+        GBL_API_CALL(gblStringConstruct(&pVariant->string, sizeof(GblString), NULL, NULL));
+
+    // Copy constructor
+    } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY) {
+        GBL_API_VERIFY_ARG(argc == 1);
+        GBL_API_VERIFY_TYPE(GblVariant_type(&pArgs[0]), GBL_TYPE_STRING);
+        GBL_API_CALL(gblVectorConstruct_6(&pVariant->string.data,
+                                          pArgs[0].string.data.hCtx,
+                                          pArgs[0].string.data.elementSize,
+                                          sizeof(GblString),
+                                          pArgs[0].string.data.pBuffer,
+                                          pArgs[0].string.data.size));
+    // Move constructor
+    } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE) {
+        GBL_API_VERIFY_ARG(argc == 1);
+        GBL_API_VERIFY_TYPE(GblVariant_type(&pArgs[0]), GBL_TYPE_STRING);
+        GblSize outSize   = 0;
+        char*   pOutPtr   = NULL;
+        GBL_API_CALL(gblStringTake(&pArgs[0].string, &pOutPtr, &outSize));
+        GBL_API_CALL(gblStringConstruct(&pVariant->string,
+                                        sizeof(GblString),
+                                        pArgs[0].string.data.hCtx,
+                                        NULL));
+        GBL_API_CALL(gblStringGive(&pVariant->string, pOutPtr, outSize));
+
+    // Value copying constructor
+    } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY) {
+        GBL_API_VERIFY_ARG(argc == 3);
+        GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_TYPE_POINTER);
+        GBL_API_VERIFY_TYPE(pArgs[1].type, GBL_TYPE_INT32);
+        GBL_API_VERIFY_TYPE(pArgs[2].type, GBL_TYPE_POINTER);
+        GblStringView view = {
+            .pBuffer    = pArgs[0].pVoid,
+            .size       = pArgs[1].i32
+        };
+        GBL_API_CALL(gblStringConstruct(&pVariant->string, sizeof(GblString), pArgs[2].pVoid, &view));
+
+    // Value moving constructor
+    } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE) {
+        GBL_API_VERIFY_ARG(argc == 3);
+        GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_TYPE_POINTER);
+        GBL_API_VERIFY_TYPE(pArgs[1].type, GBL_TYPE_INT32);
+        GBL_API_VERIFY_TYPE(pArgs[2].type, GBL_TYPE_POINTER);
+        GBL_API_CALL(gblStringConstruct(&pVariant->string, sizeof(GblString), pArgs[2].pVoid, NULL));
+        GBL_API_CALL(gblStringGive(&pVariant->string, pArgs[0].pVoid, pArgs[1].i32));
+    }
+    GBL_API_END();
+}
+
+static GBL_RESULT stringDestruct_(GblVariant* pVariant) {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_TYPE(pVariant->type, GBL_TYPE_STRING);
+    GBL_API_CALL(gblStringDestruct(&pVariant->string));
+    GBL_API_END();
+}
+
+static GBL_RESULT stringSave_(const GblVariant* pVariant, GblString* pString) {
+    GBL_API_BEGIN(NULL);
+    GblStringView view = { 0 };
+    GBL_API_CALL(gblStringCStr(&pVariant->string, &view.pBuffer));
+    GBL_API_CALL(gblStringAssign(pString, &view));
+    GBL_API_END();
+}
+
+static GBL_RESULT stringLoad_(GblVariant* pVariant, const GblString* pString) {
+    GBL_API_BEGIN(NULL);
+    GblStringView view = { 0 };
+    GBL_API_CALL(gblStringCStr(pString, &view.pBuffer));
+    GBL_API_CALL(gblStringAssign(&pVariant->string, &view));
+    GBL_API_END();
+}
+
+static GBL_RESULT stringSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_API_BEGIN(NULL);
+    GBL_UNUSED(argc);
+    GBL_API_VERIFY_TYPE(pArgs->type, GBL_TYPE_POINTER);
+    if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY) {
+        GBL_API_VERIFY_ARG(argc == 3);
+        GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_TYPE_POINTER);
+        GBL_API_VERIFY_TYPE(pArgs[1].type, GBL_TYPE_INT32);
+        GBL_API_VERIFY_TYPE(pArgs[2].type, GBL_TYPE_POINTER);
+        const GblStringView view = {
+            .pBuffer = pArgs[0].pVoid,
+            .size    = pArgs[1].i32
+        };
+        GBL_API_CALL(gblStringAssign(&pVariant->string, &view));
+    } else if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE) {
+        GBL_API_VERIFY_ARG(argc == 3);
+        GBL_API_CALL(gblStringGive(&pVariant->string, pArgs[0].pVoid, pArgs[0].i32));
+
+    } else if(op & GBL_IVARIANT_OP_FLAG_SET_COPY) {
+        GblStringView view;
+        GBL_API_VERIFY_ARG(argc == 1);
+        GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_TYPE_STRING);
+        GBL_API_CALL(gblStringCStr(&pArgs[0].string, &view.pBuffer));
+        GBL_API_CALL(gblStringLength(&pArgs[0].string, &view.size));
+        GBL_API_CALL(gblStringAssign(&pVariant->string, &view));
+
+    } else if(op & GBL_IVARIANT_OP_FLAG_SET_MOVE) {
+        GBL_API_VERIFY_ARG(argc == 1);
+        GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_TYPE_STRING);
+        char* pBuffer = NULL;
+        GblSize capacity = 0;
+        GBL_API_CALL(gblStringTake(&pArgs[0].string, &pBuffer, &capacity));
+        GBL_API_CALL(gblStringGive(&pVariant->string, pBuffer, capacity));
+    }
+    GBL_API_END();
+}
+
+static GBL_RESULT stringGet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_API_BEGIN(NULL);
+    GBL_UNUSED(argc);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_TYPE_POINTER);
+    // these two probably shouldn't be unified?
+    if(op & (GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK))
+    {
+        GBL_API_CALL(gblStringCStr(&pVariant->string, pArgs->pVoidPtr));
+    } else if(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE) {
+        GblSize capacity = 0;
+        GBL_API_CALL(gblStringTake(&pVariant->string, pArgs->pVoidPtr, &capacity));
+    }
+    GBL_API_END();
+}
+
+static GBL_RESULT stringCompare_(const GblVariant* pVariant, const GblVariant* pOther, GblInt* pResult) {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_POINTER(pVariant);
+    GBL_API_VERIFY_POINTER(pOther);
+    GBL_API_VERIFY_POINTER(pResult);
+    GBL_API_VERIFY_TYPE(pVariant->type, GBL_TYPE_STRING);
+    GBL_API_VERIFY_TYPE(pOther->type, GBL_TYPE_STRING);
+    GBL_API_CALL(gblStringCompare(&pVariant->string, &pOther->string, pResult));
+    GBL_API_END();
+}
 
 
 GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
+
     GBL_API_BEGIN(hCtx);
     GBL_API_PUSH_VERBOSE("[GblType] Registering Builtin Types");
-    GBL_API_CALL(gblTypeRegisterBuiltinType(0,
-                  GBL_TYPE_INVALID,
-                  "Interface",
-                  &((const GblTypeInfo) {
-                      .classSize    = sizeof(GblInterface),
-                      .classAlign   = GBL_ALIGNOF(GblInterface),
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED |
-                 GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE | GBL_TYPE_FLAG_ABSTRACT));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(1,
-                  GBL_TYPE_INTERFACE,
-                  "IVariant",
-                  &((const GblTypeInfo) {
-                      .classSize    = sizeof(GblIVariantIFace),
-                      .classAlign   = GBL_ALIGNOF(GblIVariantIFace),
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED | GBL_TYPE_FLAG_ABSTRACT));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(2,
-                  GBL_TYPE_INVALID,
-                  "nil",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE |
-                                            GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE,
-                            .pFnSave = nilSave_,
-                            .pFnLoad = nilLoad_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(3,
-                  GBL_TYPE_INVALID,
-                  "bool",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "i"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = boolSet_,
-                            .pFnGet  = boolGet_,
-                            .pFnSave = boolSave_,
-                            .pFnLoad = boolLoad_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(4,
-                  GBL_TYPE_INVALID,
-                  "char",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "i"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = charSet_,
-                            .pFnGet  = charGet_,
-                            .pFnSave = charSave_,
-                            .pFnLoad = charLoad_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(5,
-                  GBL_TYPE_INVALID,
-                  "uint8",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "i"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = u8Set_,
-                            .pFnGet  = u8Get_,
-                            .pFnSave = u8Save_,
-                            .pFnLoad = u8Load_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(6,
-                  GBL_TYPE_INVALID,
-                  "int16",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "i"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = i16Set_,
-                            .pFnGet  = i16Get_,
-                            .pFnSave = i16Save_,
-                            .pFnLoad = i16Load_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(7,
-                  GBL_TYPE_INVALID,
-                  "uint16",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "i"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = u16Set_,
-                            .pFnGet  = u16Get_,
-                            .pFnSave = u16Save_,
-                            .pFnLoad = u16Load_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(8,
-                  GBL_TYPE_INVALID,
-                  "int32",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "i"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = i32Set_,
-                            .pFnGet  = i32Get_,
-                            .pFnSave = i32Save_,
-                            .pFnLoad = i32Load_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(9,
-                  GBL_TYPE_INVALID,
-                  "uint32",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "l"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = u32Set_,
-                            .pFnGet  = u32Get_,
-                            .pFnSave = u32Save_,
-                            .pFnLoad = u32Load_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(10,
-                  GBL_TYPE_INVALID,
-                  "int64",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "q"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = i64Set_,
-                            .pFnGet  = i64Get_,
-                            .pFnSave = i64Save_,
-                            .pFnLoad = i64Load_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(11,
-                  GBL_TYPE_INVALID,
-                  "uint64",
-                  &((const GblTypeInfo) {
-                      .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
-                      .classSize    = sizeof(GblPrimitiveClass),
-                      .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "q"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = u64Set_,
-                            .pFnGet  = u64Get_,
-                            .pFnSave = u64Save_,
-                            .pFnLoad = u64Load_
-                      })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(12,
+
+    // =============== INTERFACE ===============
+    const GblType ifaceType = gblTypeRegisterBuiltinType(0,
+          GBL_TYPE_INVALID,
+          "Interface",
+          &((const GblTypeInfo) {
+              .classSize    = sizeof(GblInterface),
+              .classAlign   = GBL_ALIGNOF(GblInterface),
+          }),
+          GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED |
+         GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE | GBL_TYPE_FLAG_ABSTRACT);
+
+    // =============== IVARIANT ===============
+    const GblType iVariantType = gblTypeRegisterBuiltinType(1,
+      ifaceType,
+      "IVariant",
+      &((const GblTypeInfo) {
+          .classSize    = sizeof(GblIVariantIFace),
+          .classAlign   = GBL_ALIGNOF(GblIVariantIFace),
+      }),
+      GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED | GBL_TYPE_FLAG_ABSTRACT);
+
+    // =============== NIL ===============
+    static GblIVariantIFace nilIVariantIFace = {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE |
+                        GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE,
+        .pFnDestruct = NULL,
+        .pFnSave = nilSave_,
+        .pFnLoad = nilLoad_
+    };
+    gblTypeRegisterBuiltinType(2,
+      GBL_TYPE_INVALID,
+      "nil",
+      &((const GblTypeInfo) {
+          .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+          .classSize    = sizeof(GblPrimitiveClass),
+          .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+          .pClassData   = &nilIVariantIFace,
+          .interfaceCount = 1,
+          .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+               .interfaceType  = iVariantType,
+               .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+          })
+      }),
+      GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== BOOL ===============
+    static GblIVariantIFace boolIVariantIFace = {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+            .pSetValueFmt = { "i"},
+            .pGetValueFmt = { "p" },
+            .pFnSet  = boolSet_,
+            .pFnGet  = boolGet_,
+            .pFnSave = boolSave_,
+            .pFnLoad = boolLoad_
+      };
+    gblTypeRegisterBuiltinType(3,
+      GBL_TYPE_INVALID,
+      "bool",
+      &((const GblTypeInfo) {
+          .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+          .classSize    = sizeof(GblPrimitiveClass),
+          .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+          .pClassData   = &boolIVariantIFace,
+          .interfaceCount = 1,
+          .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+             .interfaceType   = iVariantType,
+             .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+        })
+      }),
+      GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== CHAR ===============
+    static const GblIVariantIFace charIVariantIFace = {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+            .pSetValueFmt = { "i"},
+            .pGetValueFmt = { "p" },
+            .pFnSet  = charSet_,
+            .pFnGet  = charGet_,
+            .pFnSave = charSave_,
+            .pFnLoad = charLoad_
+      };
+    gblTypeRegisterBuiltinType(4,
+          GBL_TYPE_INVALID,
+          "char",
+          &((const GblTypeInfo) {
+              .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+              .classSize    = sizeof(GblPrimitiveClass),
+              .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+              .pClassData   = &charIVariantIFace,
+              .interfaceCount = 1,
+              .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                   .interfaceType   = iVariantType,
+                   .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+              })
+          }),
+          GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+     // =============== UINT8 ===============
+    static const GblIVariantIFace uint8IVariantIFace = {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+            .pSetValueFmt = { "i"},
+            .pGetValueFmt = { "p" },
+            .pFnSet  = u8Set_,
+            .pFnGet  = u8Get_,
+            .pFnSave = u8Save_,
+            .pFnLoad = u8Load_
+    };
+    gblTypeRegisterBuiltinType(5,
+      GBL_TYPE_INVALID,
+      "uint8",
+      &((const GblTypeInfo) {
+          .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+          .classSize    = sizeof(GblPrimitiveClass),
+          .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+          .pClassData   = &uint8IVariantIFace,
+          .interfaceCount = 1,
+          .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+               .interfaceType   = iVariantType,
+               .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+          })
+      }),
+      GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== INT16 ===============
+    static const GblIVariantIFace int16IVariantIFace = {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+        .pSetValueFmt = { "i"},
+        .pGetValueFmt = { "p" },
+        .pFnSet  = i16Set_,
+        .pFnGet  = i16Get_,
+        .pFnSave = i16Save_,
+        .pFnLoad = i16Load_
+    };
+    gblTypeRegisterBuiltinType(6,
+          GBL_TYPE_INVALID,
+          "int16",
+          &((const GblTypeInfo) {
+              .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+              .classSize    = sizeof(GblPrimitiveClass),
+              .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+              .pClassData   = &int16IVariantIFace,
+              .interfaceCount = 1,
+              .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                   .interfaceType   = iVariantType,
+                   .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+              })
+          }),
+          GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== UNT16 ===============
+    static const GblIVariantIFace uint16IVariantIFace = {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+        .pSetValueFmt = { "i"},
+        .pGetValueFmt = { "p" },
+        .pFnSet  = u16Set_,
+        .pFnGet  = u16Get_,
+        .pFnSave = u16Save_,
+        .pFnLoad = u16Load_
+    };
+    gblTypeRegisterBuiltinType(7,
+          GBL_TYPE_INVALID,
+          "uint16",
+          &((const GblTypeInfo) {
+              .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+              .classSize    = sizeof(GblPrimitiveClass),
+              .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+              .pClassData   = &uint16IVariantIFace,
+              .interfaceCount = 1,
+              .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                   .interfaceType  = iVariantType,
+                   .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+              })
+          }),
+          GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== INT32 ===============
+    const static GblIVariantIFace int32IVariantIFace = {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+            .pSetValueFmt = { "i"},
+            .pGetValueFmt = { "p" },
+            .pFnSet  = i32Set_,
+            .pFnGet  = i32Get_,
+            .pFnSave = i32Save_,
+            .pFnLoad = i32Load_
+      };
+    gblTypeRegisterBuiltinType(8,
+          GBL_TYPE_INVALID,
+          "int32",
+          &((const GblTypeInfo) {
+              .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+              .classSize    = sizeof(GblPrimitiveClass),
+              .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+              .pClassData   = &int32IVariantIFace,
+              .interfaceCount = 1,
+              .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                   .interfaceType  = iVariantType,
+                   .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+              })
+          }),
+          GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== UINT32 ===============
+    const static GblIVariantIFace uint32IVariantIFace = {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+        .pSetValueFmt = { "l"},
+        .pGetValueFmt = { "p" },
+        .pFnSet  = u32Set_,
+        .pFnGet  = u32Get_,
+        .pFnSave = u32Save_,
+        .pFnLoad = u32Load_
+    };
+    gblTypeRegisterBuiltinType(9,
+          GBL_TYPE_INVALID,
+          "uint32",
+          &((const GblTypeInfo) {
+              .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+              .classSize    = sizeof(GblPrimitiveClass),
+              .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+              .pClassData   = &uint32IVariantIFace,
+              .interfaceCount = 1,
+              .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                   .interfaceType  = iVariantType,
+                   .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+              })
+          }),
+          GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== INT64 ===============
+    const static GblIVariantIFace int64IVariantIFace =  {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+        .pSetValueFmt = { "q"},
+        .pGetValueFmt = { "p" },
+        .pFnSet  = i64Set_,
+        .pFnGet  = i64Get_,
+        .pFnSave = i64Save_,
+        .pFnLoad = i64Load_
+    };
+    gblTypeRegisterBuiltinType(10,
+          GBL_TYPE_INVALID,
+          "int64",
+          &((const GblTypeInfo) {
+              .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+              .classSize    = sizeof(GblPrimitiveClass),
+              .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+              .pClassData   = &int64IVariantIFace,
+              .interfaceCount = 1,
+              .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                   .interfaceType  = iVariantType,
+                   .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+              })
+          }),
+          GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== UINT64 ===============
+    const static GblIVariantIFace uint64IVariantIFace =  {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+            .pSetValueFmt = { "q"},
+            .pGetValueFmt = { "p" },
+            .pFnSet  = u64Set_,
+            .pFnGet  = u64Get_,
+            .pFnSave = u64Save_,
+            .pFnLoad = u64Load_
+      };
+    gblTypeRegisterBuiltinType(11,
+          GBL_TYPE_INVALID,
+          "uint64",
+          &((const GblTypeInfo) {
+              .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
+              .classSize    = sizeof(GblPrimitiveClass),
+              .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
+              .pClassData   = &uint64IVariantIFace,
+              .interfaceCount = 1,
+              .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                   .interfaceType  = iVariantType,
+                   .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+              })
+          }),
+          GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== ENUM  ===============
+    const static GblIVariantIFace enumIVariantIFace =  {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+            .pSetValueFmt = { "q"},
+            .pGetValueFmt = { "p" },
+            .pFnSet  = u64Set_,
+            .pFnGet  = u64Get_,
+            .pFnSave = u64Save_,
+            .pFnLoad = u64Load_
+      };
+    gblTypeRegisterBuiltinType(12,
                   GBL_TYPE_INVALID,
                   "enum",
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
                       .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "q"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = u64Set_,
-                            .pFnGet  = u64Get_,
-                            .pFnSave = u64Save_,
-                            .pFnLoad = u64Load_
+                      .pClassData   = &enumIVariantIFace,
+                      .interfaceCount = 1,
+                      .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                           .interfaceType  = iVariantType,
+                           .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
                       })
                   }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(13,
+                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== FLAGS  ===============
+    static const GblIVariantIFace flagsIVariantIFace =  {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+        .pSetValueFmt = { "q"},
+        .pGetValueFmt = { "p" },
+        .pFnSet  = u64Set_,
+        .pFnGet  = u64Get_,
+        .pFnSave = u64Save_,
+        .pFnLoad = u64Load_
+    };
+    gblTypeRegisterBuiltinType(13,
                   GBL_TYPE_INVALID,
                   "flags",
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
                       .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "q"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = u64Set_,
-                            .pFnGet  = u64Get_,
-                            .pFnSave = u64Save_,
-                            .pFnLoad = u64Load_
+                      .pClassData   = &flagsIVariantIFace,
+                      .interfaceCount = 1,
+                      .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                           .interfaceType  = iVariantType,
+                           .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
                       })
                   }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(14,
+                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== FLOAT ===============
+    static const GblIVariantIFace floatIVariantIFace = {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+        .pSetValueFmt = { "d"},
+        .pGetValueFmt = { "p" },
+        .pFnSet  = f32Set_,
+        .pFnGet  = f32Get_,
+        .pFnSave = f32Save_,
+        .pFnLoad = f32Load_
+    };
+    gblTypeRegisterBuiltinType(14,
                   GBL_TYPE_INVALID,
                   "float",
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
                       .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "d"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = f32Set_,
-                            .pFnGet  = f32Get_,
-                            .pFnSave = f32Save_,
-                            .pFnLoad = f32Load_
+                      .pClassData   = &floatIVariantIFace,
+                      .interfaceCount = 1,
+                      .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                           .interfaceType   = iVariantType,
+                           .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
                       })
-                  }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(15,
+                   }),
+                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== DOUBLE ===============
+    static const GblIVariantIFace doubleIVariantIFace =  {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+            .pSetValueFmt = { "d"},
+            .pGetValueFmt = { "p" },
+            .pFnSet  = f64Set_,
+            .pFnGet  = f64Get_,
+            .pFnSave = f64Save_,
+            .pFnLoad = f64Load_
+      };
+    gblTypeRegisterBuiltinType(15,
                   GBL_TYPE_INVALID,
                   "double",
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
                       .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "d"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = f64Set_,
-                            .pFnGet  = f64Get_,
-                            .pFnSave = f64Save_,
-                            .pFnLoad = f64Load_
+                      .pClassData   = &doubleIVariantIFace,
+                      .interfaceCount = 1,
+                      .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                           .interfaceType  = iVariantType,
+                           .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
                       })
                   }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(16,
+                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== POINTER ===============
+    static const GblIVariantIFace pointerIVariantIFace =  {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+        .pSetValueFmt = { "p"},
+        .pGetValueFmt = { "p" },
+        .pFnSet  = pSet_,
+        .pFnGet  = pGet_,
+        .pFnSave = pSave_,
+        .pFnLoad = pLoad_
+    };
+
+    gblTypeRegisterBuiltinType(16,
                   GBL_TYPE_INVALID,
                   "pointer",
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
                       .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "p"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = pSet_,
-                            .pFnGet  = pGet_,
-                            .pFnSave = pSave_,
-                            .pFnLoad = pLoad_
+                      .pClassData   = &pointerIVariantIFace,
+                      .interfaceCount = 1,
+                      .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                           .interfaceType  = iVariantType,
+                           .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
                       })
                   }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_CALL(gblTypeRegisterBuiltinType(17,
+                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    // =============== STRING ===============
+    static const GblIVariantIFace stringIface = {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY   |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE   |
+                        GBL_IVARIANT_OP_FLAG_SET_COPY               |
+                        GBL_IVARIANT_OP_FLAG_SET_MOVE               |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY         |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE         |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY         |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK         |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE,
+        .pSetValueFmt   = { "pip"},
+        .pGetValueFmt   = { "p" },
+        .pFnConstruct   = stringConstruct_,
+        .pFnDestruct    = stringDestruct_,
+        .pFnSet         = stringSet_,
+        .pFnGet         = stringGet_,
+        .pFnCompare     = stringCompare_,
+        .pFnSave        = stringSave_,
+        .pFnLoad        = stringLoad_
+    };
+    gblTypeRegisterBuiltinType(17,
                   GBL_TYPE_INVALID,
                   "string",
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
                       .classAlign   = GBL_ALIGNOF(GblPrimitiveClass),
-                      .pClassData   = &((const GblIVariantIFace) {
-                            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
-                            .pSetValueFmt = { "p"},
-                            .pGetValueFmt = { "p" },
-                            .pFnSet  = pSet_,
-                            .pFnGet  = pGet_,
-                            .pFnSave = pSave_,
-                            .pFnLoad = pLoad_
+                      .pClassData   = &stringIface,
+                      .interfaceCount = 1,
+                      .pInterfaceMap = &((const GblTypeInterfaceMapEntry) {
+                             .interfaceType   = iVariantType,
+                             .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
                       })
                   }),
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
+                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
     GBL_API_POP(1);
     GBL_API_END();
 }

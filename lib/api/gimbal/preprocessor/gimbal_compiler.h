@@ -357,6 +357,7 @@
 #  endif
 #endif
 
+#define GBL_NULL_TERMINATED
 
 // Low-Level BitMask Operations
 #ifdef GBL_CPP_20

@@ -5,6 +5,7 @@
 #include "gimbal_variant.h"
 #include "gimbal_typedefs.hpp"
 #include "gimbal_string.hpp"
+#include "../meta/gimbal_type.hpp"
 
 namespace gimbal {
 
@@ -40,7 +41,7 @@ struct VariantCompatibleTypeTraitsDefault {
         static ForwardType forward(Type value) { return static_cast<ForwardType>(value); }
     };
 
-    constexpr static auto variantType  = VariantType(VariantType::Nil);
+    inline const static auto variantType  = NilType();
 
 };
 
@@ -65,32 +66,37 @@ concept variant_compatible =
 
         template<>
         struct VariantCompatibleTypeTraits<gimbal::Bool>: public VariantCompatibleTypeTraitsDefault<gimbal::Bool> {
-            constexpr static auto variantType = VariantType(VariantType::Bool);
+            inline static auto variantType  = BoolType();
         };
 
         template<>
         struct VariantCompatibleTypeTraits<gimbal::Int>: public VariantCompatibleTypeTraitsDefault<gimbal::Int> {
-            constexpr static auto variantType = VariantType(VariantType::Int);
+            inline const static auto variantType  = Int32Type();
+        };
+
+        template<>
+        struct VariantCompatibleTypeTraits<gimbal::UInt>: public VariantCompatibleTypeTraitsDefault<gimbal::UInt> {
+            inline const static auto variantType  = Int32Type();
         };
 
         template<>
         struct VariantCompatibleTypeTraits<gimbal::Float>: public VariantCompatibleTypeTraitsDefault<gimbal::Float> {
-            constexpr static auto variantType = VariantType(VariantType::Float);
+            inline const static auto variantType  = FloatType();
         };
 
         template<>
         struct VariantCompatibleTypeTraits<void*>: public VariantCompatibleTypeTraitsDefault<void*> {
-            constexpr static auto variantType = VariantType(VariantType::VoidPtr);
+            inline const static auto variantType  = PointerType();
         };
 
         template<>
         struct VariantCompatibleTypeTraits<bool>: public VariantCompatibleTypeTraitsDefault<gimbal::Bool> {
-            constexpr static auto variantType = VariantType(VariantType::Bool);
+            inline const static auto variantType  = BoolType();
         };
 
         template<>
         struct VariantCompatibleTypeTraits<GblString>: public VariantCompatibleTypeTraitsDefault<GblString> {
-            constexpr static auto variantType = VariantType(VariantType::String);
+            inline const static auto variantType  = StringType();
             struct Forwarder {
                 static const GblString* forward(const GblString& gblString) { return &gblString; }
             };
@@ -98,7 +104,7 @@ concept variant_compatible =
 
         template<>
         struct VariantCompatibleTypeTraits<gimbal::String>: public VariantCompatibleTypeTraitsDefault<gimbal::String> {
-            constexpr static auto variantType = VariantType(VariantType::String);
+            inline const static auto variantType  = StringType();
 
             struct Forwarder {
                 static const GblString* forward(const gimbal::String& string) { return &string; }
@@ -137,7 +143,7 @@ concept variant_compatible =
     class Variant: public GblVariant {
     public:
         // GIVE A CONSTRUCTOR THAT JUST TAKES A TYPE ID
-        using Type = VariantType;
+     //   using Type = VariantType;
 
         GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_VARIANT_OP_CMP_TYPE_TABLE);
         using OpCmpType = VariantOpCmpType;
@@ -149,7 +155,7 @@ concept variant_compatible =
         }
 
         Variant(std::nullptr_t):
-            Variant(Type::Nil) {}
+            Variant(NilType()) {}
 
         template<typename V>
             requires (!std::is_convertible_v<V, GblVariant> && !std::is_convertible_v<V, Type> && !std::is_convertible_v<V, GblString>)
@@ -177,7 +183,7 @@ concept variant_compatible =
             if constexpr(std::is_lvalue_reference_v<decltype(rhs)>) {
                 Exception::checkThrow(gblVariantConstruct(this, static_cast<const GblString*>(&rhs)));
             } else if constexpr(std::is_rvalue_reference_v<decltype(rhs)>) {
-                Exception::checkThrow(gblVariantConstructt(this, Type(Type::String)));
+                Exception::checkThrow(gblVariantConstructt(this, StringType()));
                 Exception::checkThrow(gblVariantMoves(this, static_cast<GblString*>(&rhs)));
             }
         }
@@ -185,7 +191,7 @@ concept variant_compatible =
 
         ~Variant(void) { Exception::checkThrow(gblVariantDestruct(this)); }
 
-        constexpr Type getType(void) const noexcept { return type; }
+         Type getType(void) const noexcept { return type; }
 
         template<typename T>
         constexpr T getValue(void) const {

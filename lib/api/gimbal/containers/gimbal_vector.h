@@ -20,7 +20,7 @@ typedef struct GblVector {
     GblSize         capacity;
     GblSize         elementSize;
     GblSize         stackSize;
-    char            stackBuffer[GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE];
+    char            stackBuffer[GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE]; // delete me eventually
 } GblVector;
 
 

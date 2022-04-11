@@ -26,7 +26,14 @@ typedef struct GblContext_ {
 } GblContext_;
 
 
-static GblContext hGlobalCtx_ = NULL;
+static GblContext_ defaultCtx = {
+    .ext.log.pFnPush = NULL,
+    .ext.log.pFnPop = NULL,
+    .ext.mem.pFnAlloc = NULL,
+    .ext.mem.pFnFree = NULL
+};
+
+static GblContext hGlobalCtx_ = &defaultCtx;
 
 GblContext GblContext_globalGet(void) {
     return hGlobalCtx_;
@@ -336,7 +343,7 @@ static inline GblContext gblContextParent_(GblContext hCtx) {
         result = gblContext##name##Default_(GBL_EVAL(__VA_ARGS__))
 
 #define GBL_CONTEXT_EXT_IMPL_PARENT_CALL_(name, result, hCtx, ...) \
-    if(GBL_RESULT_UNAVAILABLE(result)) { \
+    if(hCtx && GBL_RESULT_UNAVAILABLE(result)) { \
         GblContext hParent = gblContextParent_(hCtx);   \
         if(hParent) result = gblContext##name (hParent GBL_VA_ARGS(__VA_ARGS__));   \
     }
@@ -347,7 +354,7 @@ static inline GblContext gblContextParent_(GblContext hCtx) {
 #define GBL_CONTEXT_EXT_IMPL_(name, memberFn, ...) \
     GBL_CONTEXT_EXT_DECL_(name, __VA_ARGS__) { \
         GBL_RESULT result = GBL_RESULT_UNIMPLEMENTED; \
-        if(hCtx->ext. memberFn) { \
+        if(hCtx && hCtx->ext. memberFn) { \
             result = hCtx->ext.memberFn(pFrame GBL_VA_ARGS(GBL_MAP_LIST(GBL_DECL_VAR_PAIR_NAME, __VA_ARGS__))); \
         } \
         GBL_MACRO_CONDITIONAL_CALL(GBL_CONFIG_EXT_CONTEXT_PARENT_ENABLED, GBL_CONTEXT_EXT_IMPL_PARENT_CALL_, \
@@ -384,10 +391,14 @@ GBL_CONTEXT_EXT_DECL_(LogWriteDefault_, (GBL_LOG_LEVEL, level), (const char*, pF
     }
 
     //not per byte!
-    for(unsigned t = 0; t < hCtx->logStackDepth; ++t) {
-        tabBuff[t] = '\t';
+    if(hCtx) {
+        for(unsigned t = 0; t < hCtx->logStackDepth; ++t) {
+            tabBuff[t] = '\t';
+        }
+        tabBuff[hCtx->logStackDepth] = '\0';
+    } else {
+        tabBuff[0] = '\0';
     }
-    tabBuff[hCtx->logStackDepth] = '\0';
 #if 0
     GBL_API_VERIFY((fprintf(pFile, "%s%s%s [%s:" GBL_SIZE_FMT " %s]\n",
                             tabBuff, pPrefix, buffer,

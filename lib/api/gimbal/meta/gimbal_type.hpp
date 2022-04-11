@@ -11,7 +11,7 @@
     class cppName final: public Type {          \
     public:                                     \
         cppName(void): Type(cName) {}           \
-    };
+    }
 
 namespace gimbal {
 
@@ -35,13 +35,16 @@ public:
 class Type: public PrimitiveBase<GblType> {
 public:
 
-        Type(GblType type=GBL_TYPE_INVALID);
+       Type(GblType type=GBL_TYPE_INVALID);
+       Type(float) = delete;
+       Type(double) = delete;
+       Type(unsigned) = delete;
 
         const char*     getName(void) const;
         Type            getParentType(void) const;
         Type            getFundamentalType(void) const;
         const TypeInfo* getInfo(void) const;
-        Uint            getDepth(void) const;
+        UInt            getDepth(void) const;
 
         bool            isValid(void) const;
         bool            isClassed(void) const;
@@ -125,16 +128,32 @@ protected:
 
 };
 
-GBL_TYPE_DECLARE_CPP(InvalidType,   GBL_TYPE_INVALID)
-GBL_TYPE_DECLARE_CPP(InterfaceType, GBL_TYPE_INTERFACE)
-
+GBL_TYPE_DECLARE_CPP(InvalidType,   (GblType)GBL_TYPE_INVALID);
+GBL_TYPE_DECLARE_CPP(InterfaceType, GBL_TYPE_INTERFACE);
+GBL_TYPE_DECLARE_CPP(IVariantType,  GBL_TYPE_IVARIANT);
+GBL_TYPE_DECLARE_CPP(NilType,       GBL_TYPE_NIL);
+GBL_TYPE_DECLARE_CPP(BoolType,      GBL_TYPE_BOOL);
+GBL_TYPE_DECLARE_CPP(CharType,      GBL_TYPE_CHAR);
+GBL_TYPE_DECLARE_CPP(Uint8Type,     GBL_TYPE_UINT8);
+GBL_TYPE_DECLARE_CPP(Uint16Type,    GBL_TYPE_UINT16);
+GBL_TYPE_DECLARE_CPP(Int16Type,     GBL_TYPE_INT16);
+GBL_TYPE_DECLARE_CPP(Uint32Type,    GBL_TYPE_UINT32);
+GBL_TYPE_DECLARE_CPP(Int32Type,     GBL_TYPE_INT32);
+GBL_TYPE_DECLARE_CPP(Uint64Type,    GBL_TYPE_UINT64);
+GBL_TYPE_DECLARE_CPP(Int64Type,     GBL_TYPE_INT64);
+GBL_TYPE_DECLARE_CPP(EnumType,      GBL_TYPE_ENUM);
+GBL_TYPE_DECLARE_CPP(FlagsType,     GBL_TYPE_FLAGS);
+GBL_TYPE_DECLARE_CPP(FloatType,     GBL_TYPE_FLOAT);
+GBL_TYPE_DECLARE_CPP(DoubleType,    GBL_TYPE_DOUBLE);
+GBL_TYPE_DECLARE_CPP(PointerType,   GBL_TYPE_POINTER);
+GBL_TYPE_DECLARE_CPP(StringType,    GBL_TYPE_STRING);
 
 
 // ==== INLINEZ =====
 inline Type::Type(GblType type): PrimitiveBase(type) {}
 inline const char* Type::getName(void) const { return gblTypeName(*this); }
 inline Type Type::getParentType(void) const { return gblTypeParent(*this); }
-inline Uint Type::getDepth(void) const { return gblTypeDepth(*this); }
+inline UInt Type::getDepth(void) const { return gblTypeDepth(*this); }
 inline Type Type::getFundamentalType(void) const { return gblTypeFundamental(*this); }
 inline const TypeInfo* Type::getInfo(void) const { return static_cast<const TypeInfo*>(gblTypeInfo(*this)); }
 inline bool Type::isA(Type base) const { return gblTypeIsA(*this, base); }

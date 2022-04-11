@@ -19,7 +19,7 @@ namespace gimbal {
     using Size          = ::GblSize;
     using Float         = ::GblFloat;
     using Int           = ::GblInt;
-    using Uint          = ::GblUint;
+    using UInt          = ::GblUint;
     using Enum          = ::GblEnum;
     using Hash          = ::GblHash;
     using FnPtr         = ::GblFnPtr;

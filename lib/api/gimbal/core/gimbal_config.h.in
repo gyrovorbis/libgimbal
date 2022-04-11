@@ -51,7 +51,7 @@ extern "C" {
 #endif
 
 #ifndef GBL_BOOL
-#   define GBL_BOOL                             uint32_t
+#   define GBL_BOOL                             uint8_t
 #endif
 
 #ifndef GBL_FLOAT

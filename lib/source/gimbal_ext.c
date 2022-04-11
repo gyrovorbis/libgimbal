@@ -5,6 +5,7 @@
 #define GBL_EXT_FN_DEFINE_(prefixName, ...) \
     GBL_API gblExt##prefixName (GBL_MAP_LIST(GBL_DECL_VAR_PAIR, __VA_ARGS__)) { \
         GBL_ASSERT(pFrame); \
+        if(!pFrame->hContext) return GBL_RESULT_UNIMPLEMENTED; \
         return gblContext##prefixName (pFrame->hContext, GBL_MAP_LIST(GBL_DECL_VAR_PAIR_NAME, __VA_ARGS__)); \
     }
 

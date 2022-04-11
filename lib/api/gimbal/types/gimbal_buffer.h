@@ -119,7 +119,7 @@ GBL_INLINE GBL_RESULT   GblBuffer_construct_4(SELF, GblSize bytes, const void* p
                               "Cannot copy buffer of unknown size!");
     pSelf->size     = 0;
     pSelf->pData    = NULL;
-    pSelf->hCtx     = GBL_API_CONTEXT();
+    pSelf->hCtx     = hCtx;
     if(bytes) {
         GBL_API_CALL(GblBuffer_resize(pSelf, bytes));
         if(pData) {

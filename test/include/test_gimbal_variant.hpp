@@ -3,6 +3,7 @@
 
 #include "test_gimbal.hpp"
 #include <gimbal/types/gimbal_variant.hpp>
+#include <gimbal/meta/gimbal_type.hpp>
 
 namespace gimbal::test {
 
@@ -27,8 +28,7 @@ private slots:
 
         gimbal::Variant v(static_cast<const GblString*>(&str));
 
-        qDebug() << "STRTYPE: " << v.getType().toString().data();
-        QCOMPARE(v.getType(), gimbal::Variant::Type::String);
+        QCOMPARE(v.getType(), StringType());
 
         gimbal::StringView strView = v.getValue<const GblString*>();
         QCOMPARE(strView.getCString(), "test");
@@ -59,6 +59,7 @@ private slots:
        stringifyTest(static_cast<const GblString*>(&strLong), gimbal::String(pCStr));
        stringifyTest((GblBool)GBL_FALSE, "false");
        stringifyTest(128, "128");
+       stringifyTest(128u, "128");
        stringifyTest(static_cast<void*>(this));
         auto str3 = gimbal::String("Stringificator");
        //gimbal::Variant v3(str3);
@@ -104,21 +105,21 @@ private slots:
     }
 
     void constructCopy(void) {
-        GblVariant g1{.floating=-33.0f, .type=GBL_VARIANT_TYPE_FLOAT};
+        GblVariant g1{.floating=-33.0f, .type=GBL_TYPE_FLOAT};
         gimbal::Variant v1(g1);
-        QCOMPARE(v1.getType(), VariantType::Float);
+        QCOMPARE(v1.getType(), gimbal::FloatType());
 
         gimbal::Variant v2(34);
         gimbal::Variant v3(v2);
-        QCOMPARE(v3.getType(), VariantType::Int);
+        QCOMPARE(v3.getType(), gimbal::Int32Type());
     }
 
     void constructMove(void) {
-        gimbal::Variant v1(GblVariant{.floating=-33.0f, .type=GBL_VARIANT_TYPE_FLOAT});
-        QCOMPARE(v1.getType(), VariantType::Float);
+        gimbal::Variant v1(GblVariant{.floating=-33.0f, .type=GBL_TYPE_FLOAT});
+        QCOMPARE(v1.getType(), gimbal::FloatType());
 
         gimbal::Variant v2(gimbal::Variant(34));
-        QCOMPARE(v2.getType(), VariantType::Int);
+        QCOMPARE(v2.getType(), gimbal::Int32Type());
     }
 
     void getValue(void) {
@@ -150,7 +151,7 @@ private slots:
         test(-33.0f, -33.0f);
         test(GblBool(false), gimbal::Bool(GBL_FALSE));
         test(reinterpret_cast<void*>(this), reinterpret_cast<void*>(this));
-        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_VARIANT_TYPE_BOOL};
+        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_TYPE_BOOL};
         test(g, GblBool(GBL_TRUE));
         test(std::move(g), gimbal::Bool(true));
         auto v = gimbal::Variant(reinterpret_cast<void*>(this));
@@ -223,7 +224,7 @@ private slots:
         test(-33.0f, -33.0f);
         test(GblBool(false), gimbal::Bool(GBL_FALSE));
         test(reinterpret_cast<void*>(this), reinterpret_cast<void*>(this));
-        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_VARIANT_TYPE_BOOL};
+        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_TYPE_BOOL};
         test(g, GblBool(GBL_TRUE));
         test(std::move(g), gimbal::Bool(true));
         auto v = gimbal::Variant(reinterpret_cast<void*>(this));
@@ -246,7 +247,7 @@ private slots:
         test(true, true);
         test(GBL_FALSE, GBL_FALSE);
         test(reinterpret_cast<void*>(this), reinterpret_cast<void*>(this));
-        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_VARIANT_TYPE_BOOL};
+        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_TYPE_BOOL};
         test(g, -35433.0f);
         test("fucktwix", "fucktwix");
         test(gimbal::String(std::string("lul")), gimbal::String("lul"));

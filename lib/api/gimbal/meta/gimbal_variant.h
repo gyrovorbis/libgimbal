@@ -2,7 +2,7 @@
 #define GIMBAL_VARIANT_H
 
 #include "../types/gimbal_typedefs.h"
-#include "../types/gimbal_variant.h"
+
 
 #define SELF    GblVariant* pSelf
 #define CSELF   const SELF
@@ -12,7 +12,7 @@ GBL_DECLS_BEGIN
 #define GBL_VARIANT_INIT { .type = GBL_TYPE_NIL }
 
 
-GBL_EXPORT GblType  GblVariant_type(CSELF)                                                           GBL_NOEXCEPT;
+GBL_EXPORT GblType  GblVariant_type                (CSELF)                                           GBL_NOEXCEPT;
 
 GBL_API             GblVariant_constructCopy       (SELF,  const GblVariant* pOther)                 GBL_NOEXCEPT;
 GBL_API             GblVariant_constructMove       (SELF,  GblVariant* pOther)                       GBL_NOEXCEPT;
@@ -25,11 +25,14 @@ GBL_API             GblVariant_load                (SELF, const GblString* pStri
 GBL_API             GblVariant_constructDefault    (SELF,  GblType type)                             GBL_NOEXCEPT;
 
 GBL_API             GblVariant_constructValueCopy  (SELF,  GblType type, ...)                        GBL_NOEXCEPT;
+GBL_API             GblVariant_constructValueCopyVaList(SELF, GblType type, va_list list)            GBL_NOEXCEPT;
+
 GBL_API             GblVariant_constructValueMove  (SELF,  GblType type, ...)                        GBL_NOEXCEPT;
 GBL_API             GblVariant_setValueCopy        (SELF,  GblType type, ...)                        GBL_NOEXCEPT;
 GBL_API             GblVariant_setValueMove        (SELF,  GblType type, ...)                        GBL_NOEXCEPT;
-GBL_API             GblVariant_getValueCopy        (CSELF, ...)                                      GBL_NOEXCEPT;
+GBL_API             GblVariant_getValueCopy        (CSELF,  ...)                                     GBL_NOEXCEPT;
 GBL_API             GblVariant_getValuePeek        (CSELF,  ...)                                     GBL_NOEXCEPT;
+GBL_API             GblVariant_getValueTake        (SELF,  ...)                                      GBL_NOEXCEPT;
 
 GBL_EXPORT GblInt   GblVariant_compare             (CSELF, const GblVariant* pOther)                 GBL_NOEXCEPT;
 GBL_API             GblVariant_convert             (CSELF, GblType toType, GblVariant* pToVariant)   GBL_NOEXCEPT;

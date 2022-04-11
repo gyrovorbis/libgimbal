@@ -1,61 +1,80 @@
 #ifndef GIMBAL_PLUGIN_H
 #define GIMBAL_PLUGIN_H
 
-#include "gimbal_interface.h"
-
-#define SELF    GblPlugin* pSelf
-#define CSELF   const GblPlugin* pSelf
+#include "gimbal_type.h"
 
 GBL_DECLS_BEGIN
 
-struct GblPlugin;
+#define GBL_IPLUGIN_TYPE (GblIPlugin_type())
+#define GBL_IPLUGIN(instance)                GBL_TYPE_INSTANCE_CAST(instance, GBL_IPLUGIN_TYPE, GblIPlugin)
+#define GBL_IPLUGIN_COMPAPTIBLE(instance)    GBL_TYPE_INSTANCE_IS_A(instance, GBL_IPLUGIN_TYPE)
+#define GBL_IPLUGIN_IFACE(klass)             GBL_TYPE_CLASS_CAST(klass, GBL_IPLUGIN_TYPE, GblIPluginIFace)
+#define GBL_IPLUGIN_IFACE_COMPATIBLE(klass)  GBL_TYPE_CLASS_IS_A(klass, GBL_IPLUGIN_TYPE)
+#define GBL_IPLUGIN_GET_IFACE(instance)      GBL_TYPE_INSTANCE_CLASS_CAST(instance, GBL_IPLUGIN_TYPE, GblIPluginIFace)
 
-typedef GBL_RESULT (*GblPluginUseFn)        (SELF);
-typedef GBL_RESULT (*GblPluginUnuseFn)      (SELF);
-typedef GBL_RESULT (*GblPluginTypeInfoFn)   (CSELF, GblType, GblTypeInfo*);
+#define SELF    GblIPlugin* pSelf
+#define CSELF   const GblIPlugin* pSelf
 
 
-typedef struct GblPluginClass {
+typedef GBL_RESULT (*GblIPluginUseFn)        (SELF);
+typedef GBL_RESULT (*GblIPluginUnuseFn)      (SELF);
+typedef GBL_RESULT (*GblIPluginTypeInfoFn)   (CSELF, GblType, GblTypeInfo*);
+
+
+typedef struct GblIPluginIface {
     GblInterface            base;
-    GblPluginUseFn          pFnUse;
-    GblPluginUnuseFn        pFnUnuse;
-    GblPluginTypeInfoFn     pFnTypeInfo;
-} GblPluginClass;
-
-
-typedef struct GblPlugin {
-    union {
-        GblPluginClass*     pVTable;
-        GblInterface        base;
-    };
-} GblPlugin;
-
-GBL_INLINE GBL_RESULT GblPlugin_use         (SELF);
-GBL_INLINE GBL_RESULT GblPlugin_unuse       (SELF);
-GBL_INLINE GBL_RESULT GblPlugin_typeInfo    (CSELF, GblType requestedType, GblTypeInfo* pInfo);
+    GblIPluginUseFn          pFnUse;
+    GblIPluginUnuseFn        pFnUnuse;
+    GblIPluginTypeInfoFn     pFnTypeInfo;
+} GblIPluginIFace;
 
 
 
+GBL_EXPORT GblType    GblIPlugin_type        (void);
+GBL_EXPORT GBL_RESULT GblIPlugin_use         (SELF);
+GBL_EXPORT GBL_RESULT GblIPlugin_unuse       (SELF);
+GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo    (CSELF, GblType requestedType, GblTypeInfo* pInfo);
 
 
-
-GBL_INLINE GBL_RESULT GblPlugin_use(SELF) {
-    if(!pSelf)                  return GBL_ERROR_INVALID_INSTANCE;
-    if(!pSelf->pVTable)         return GBL_ERROR_INVALID_CLASS;
-    if(!pSelf->pVTable->pFnUse) return GBL_ERROR_INVALID_VIRTUAL_CALL
-    return pSelf->pVTable->pFnUse(pSelf);
+GBL_EXPORT GblType GblIPlugin_type(void) {
+    static GblType type = GBL_TYPE_INVALID;
+    if(type == GBL_TYPE_INVALID) {
+        type = gblTypeRegisterStatic(GBL_TYPE_INTERFACE,
+                                     "IPlugin",
+                                     &((const GblTypeInfo) {
+                                         .classSize    = sizeof(GblIPluginIFace),
+                                         .classAlign   = GBL_ALIGNOF(GblIPluginIFace),
+                                     }),
+                                     GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED | GBL_TYPE_FLAG_ABSTRACT);
+    }
+    return type;
 }
-GBL_INLINE GBL_RESULT GblPlugin_unuse(SELF) {
-    if(!pSelf)                      return GBL_ERROR_INVALID_INSTANCE;
-    if(!pSelf->pVTable)             return GBL_ERROR_INVALID_CLASS;
-    if(!pSelf->pVTable->pFnUnuse)   return GBL_ERROR_INVALID_VIRTUAL_CALL;
-    return pSelf->pVTable->pFnUnuse(pSelf);
+
+
+
+GBL_INLINE GBL_RESULT GblIPlugin_use(SELF) {
+    GBL_API_BEGIN(NULL); {
+        GblIPluginIFace* pIFace = GBL_IPLUGIN_GET_IFACE(pSelf);
+        GBL_API_VERIFY_POINTER(pIFace->pFnUse);
+        GBL_API_CALL(pIFace->pFnUse(pSelf));
+
+    } GBL_API_END();
 }
-GBL_INLINE GBL_RESULT GblPlugin_typeInfo(CSELF, GblType requestedType, GblTypeInfo* pInfo) {
-    if(!pSelf)                          return GBL_ERROR_INVALID_INSTANCE;
-    if(!pSelf->pVTable)                 return GBL_ERROR_INVALID_CLASS;
-    if(!pSelf->pVTable->pFntypeInfo)    return GBL_ERROR_INVALID_VIRTUAL_CALL;
-    return pSelf->pVTable->pFTypeInfo(pSelf, requesedType, pInfo);
+GBL_INLINE GBL_RESULT GblIPlugin_unuse(SELF) {
+    GBL_API_BEGIN(NULL); {
+        GblIPluginIFace* pIFace = GBL_IPLUGIN_GET_IFACE(pSelf);
+        GBL_API_VERIFY_POINTER(pIFace->pFnUnuse);
+        GBL_API_CALL(pIFace->pFnUnuse(pSelf));
+
+    } GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblIPlugin_typeInfo(CSELF, GblType requestedType, GblTypeInfo* pInfo) {
+    GBL_API_BEGIN(NULL); {
+        GblIPluginIFace* pIFace = GBL_IPLUGIN_GET_IFACE(pSelf);
+        GBL_API_VERIFY_POINTER(pIFace->pFnTypeInfo);
+        GBL_API_CALL(pIFace->pFnTypeInfo(pSelf, requestedType, pInfo));
+
+    } GBL_API_END();
 }
 
 

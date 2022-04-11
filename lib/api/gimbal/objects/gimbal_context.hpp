@@ -43,7 +43,7 @@ public:
 
     static Context* fromHandle(GblContext hCtx) {
         Context* pCtx = nullptr;
-        Exception::checkThrow(gblHandleUserdata((GblHandle)hCtx, (void**)&pCtx));
+        if(hCtx) Exception::checkThrow(gblHandleUserdata((GblHandle)hCtx, (void**)&pCtx));
         return pCtx;
     }
 

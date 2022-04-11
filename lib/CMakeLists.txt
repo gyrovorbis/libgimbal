@@ -104,8 +104,10 @@ set(GIMBAL_SOURCES
      source/gimbal_value_types.c
      source/gimbal_hash_set.c
      source/gimbal_tree_set.c
+     source/gimbal_itable.c
+     source/gimbal_quark.c
      source/gimbal_generics.cpp
-#     source/meta2/gimbal_object.c
+     #source/meta2/gimbal_object.c
      lib/hashmap.c/hashmap.c
      lib/btree.c/btree.c
      lib/jenkins/lookup3.c
@@ -141,6 +143,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/preprocessor/gimbal_macro_sequences.h
     api/gimbal/core/gimbal_ext.h
     api/gimbal/types/gimbal_variant.h
+    api/gimbal/types/gimbal_quark.h
+    api/gimbal/types/gimbal_quark.hpp
     api/gimbal/util/gimbal_test.h
     api/gimbal/objects/gimbal_handle.h
     api/gimbal/containers/gimbal_hash_set.h
@@ -191,6 +195,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/gimbal_class.hpp
     api/gimbal/meta/gimbal_instance.h
     api/gimbal/meta/gimbal_ivariant.h
+    api/gimbal/meta/gimbal_itable.h
     api/gimbal/meta/gimbal_variant.h
 #    api/gimbal/meta2/gimbal_primitive.h
     #api/gimbal/ifaces/gimbal_inamed.h

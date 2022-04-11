@@ -87,7 +87,7 @@ private slots:
 };
 
 inline void Buffer::init(void) {
-    GblContext_globalSet(hCtx());
+  //  GblContext_globalSet(hCtx());
 }
 
 inline void Buffer::constructDefault(void) {
@@ -146,7 +146,7 @@ inline void Buffer::constructCopy(void) {
         gimbal::Buffer  buffer3(sizeof(srcBuff), srcBuff);
         gimbal::Buffer  buffer4(buffer3);
         gimbal::Buffer  buffer5(buffer4, pCtx());
-        QCOMPARE(allocGuard.getCurrentDelta(), 3);
+        QCOMPARE(allocGuard.getCurrentDelta(), 1);
 
         QVERIFY(buffer3 == buffer4);
         QVERIFY(buffer4 == buffer5);
@@ -176,13 +176,13 @@ inline void Buffer::constructMove(void) {
 inline void Buffer::assignCopy(void) {
     ContextScopeGuard<ContextActiveAllocMonitor> allocGuard(pCtx());
     {
-        StringBuffer src1("xxxxx");
+        StringBuffer src1("xxxxx", pCtx());
         QCOMPARE(allocGuard.getCurrentDelta(), 1);
 
         gimbal::Buffer dst(src1);
         QCOMPARE(allocGuard.getCurrentDelta(), 2);
 
-        StringBuffer src2("zzzzz");
+        StringBuffer src2("zzzzz", pCtx());
         QCOMPARE(allocGuard.getCurrentDelta(), 3);
 
         dst = src2;
@@ -226,8 +226,8 @@ inline void Buffer::assignMove(void) {
 inline void Buffer::acquireRelease(void) {
     ContextScopeGuard<ContextActiveAllocMonitor> allocGuard(pCtx());
     {
-        StringBuffer src("AssDoucher");
-        StringBuffer dst("DickLicker");
+        StringBuffer src("AssDoucher", pCtx());
+        StringBuffer dst("DickLicker", pCtx());
 
         dst.acquire(src.release());
 
@@ -248,7 +248,7 @@ inline void Buffer::clear(void) {
 inline void Buffer::resize(void) {
     ContextScopeGuard<ContextActiveAllocMonitor> allocGuard(pCtx());
     {
-        StringBuffer buffer1("CuntBezoar");
+        StringBuffer buffer1("CuntBezoar", pCtx());
         StringBuffer buffer2(buffer1);
         buffer1.resize(buffer1.getSize());
 

@@ -524,7 +524,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         GBL_STMT_START {                                            \
             if(GBL_RESULT_##prefix(record->result)) GBL_UNLIKELY {  \
                 GBL_API_LOG(GBL_CONFIG_LOG_##prefix##_LEVEL,        \
-                            "Result: %d, Message: %s",              \
+                            "Result: %x, Message: %s",              \
                              record->result, record->message);      \
             }                                                       \
         } GBL_STMT_END
@@ -600,10 +600,8 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 // ================= RECORD => TOP-LEVEL DISPATCH ==============
 #define GBL_API_RECORD_HANDLER(record)          \
     GBL_STMT_START {                                        \
-        if(GBL_API_HANDLE()) {  \
             GBL_API_RECORD_LOG((record));           \
             GBL_API_RECORD_LAST_RECORD((record));   \
-        }   \
         GBL_API_RECORD_ASSERT((record));        \
     } GBL_STMT_END
 
