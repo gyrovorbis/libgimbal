@@ -1,7 +1,6 @@
 #include <gimbal/core/gimbal_thread.h>
 #include <gimbal/objects/gimbal_context.h>
 #include <gimbal/core/gimbal_call_stack.h>
-#include <threads.h>
 
 typedef struct GblThread_ {
     GblCallRecord   callRecord;
@@ -11,7 +10,7 @@ typedef struct GblThread_ {
     GblStackFrame*  pStackFrameTop;
 } GblThread_;
 
-static thread_local GblThread_ thread_ = {
+static GBL_THREAD_LOCAL GblThread_ thread_ = {
     .callRecord = {
         .message        = { '\0' },
         .srcLocation    = {

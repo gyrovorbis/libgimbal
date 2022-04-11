@@ -221,7 +221,12 @@ add_library(libGimbal STATIC
     ${GIMBAL_INCLUDES})
 
 add_subdirectory(lib/interface99)
-target_link_libraries(libGimbal interface99)
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
+
+target_link_libraries(libGimbal interface99 Threads::Threads)
 
 #set_property(TARGET libGimbal PROPERTY C_STANDARD 11)
 #set_property(TARGET libGimbal PROPERTY C_STANDARD_REQUIRED ON)

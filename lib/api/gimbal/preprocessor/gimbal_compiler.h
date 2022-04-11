@@ -61,6 +61,13 @@
 #   define GBL_IMPORT_SHARED
 #endif
 
+// Thread-local storage
+#ifdef _MSC_VER
+#   define GBL_THREAD_LOCAL __declspec(thread)
+#else
+#   define GBL_THREAD_LOCAL __thread
+#endif
+
 //====== C++ FEATURE SUPPORT ==============
 
 // RTTI
