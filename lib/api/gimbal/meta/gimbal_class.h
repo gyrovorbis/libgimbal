@@ -8,7 +8,7 @@ GBL_DECLS_BEGIN
 #define SELF    GblClass*           pSelf
 #define CSELF   const GblClass*     pSelf
 
-#if 0
+#if 1
 #define GBL_CLASS_VCALL_BODY(VFUNC, ...)                                \
     if(!pSelf)          return GBL_RESULT_ERROR_INVALID_ARG;            \
     if(!pSelf->VFUNC)   return GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL;   \

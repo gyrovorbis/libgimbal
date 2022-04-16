@@ -25,14 +25,17 @@ GBL_API             GblVariant_load                (SELF, const GblString* pStri
 GBL_API             GblVariant_constructDefault    (SELF,  GblType type)                             GBL_NOEXCEPT;
 
 GBL_API             GblVariant_constructValueCopy  (SELF,  GblType type, ...)                        GBL_NOEXCEPT;
-GBL_API             GblVariant_constructValueCopyVaList(SELF, GblType type, va_list list)            GBL_NOEXCEPT;
+GBL_API             GblVariant_constructValueCopyVaList(SELF, GblType type, va_list* pList)            GBL_NOEXCEPT;
 
 GBL_API             GblVariant_constructValueMove  (SELF,  GblType type, ...)                        GBL_NOEXCEPT;
 GBL_API             GblVariant_setValueCopy        (SELF,  GblType type, ...)                        GBL_NOEXCEPT;
 GBL_API             GblVariant_setValueMove        (SELF,  GblType type, ...)                        GBL_NOEXCEPT;
 GBL_API             GblVariant_getValueCopy        (CSELF,  ...)                                     GBL_NOEXCEPT;
+GBL_API             GblVariant_getValueCopyVaList  (CSELF, va_list* pVarArgs)                        GBL_NOEXCEPT;
 GBL_API             GblVariant_getValuePeek        (CSELF,  ...)                                     GBL_NOEXCEPT;
+GBL_API             GblVariant_getValuePeekVaList  (SELF, va_list* pVarArgs)                         GBL_NOEXCEPT;
 GBL_API             GblVariant_getValueTake        (SELF,  ...)                                      GBL_NOEXCEPT;
+GBL_API             GblVariant_getValueTakeVaList  (SELF, va_list* pVarArgs)                         GBL_NOEXCEPT;
 
 GBL_EXPORT GblInt   GblVariant_compare             (CSELF, const GblVariant* pOther)                 GBL_NOEXCEPT;
 GBL_API             GblVariant_convert             (CSELF, GblType toType, GblVariant* pToVariant)   GBL_NOEXCEPT;

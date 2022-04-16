@@ -20,6 +20,8 @@ extern "C" {
         (                                                                                                                                               \
             (GBL_RESULT_UNKNOWN,                        0x0,                    Unknown,                    "Unknown"),                                 \
             (GBL_RESULT_SUCCESS,                        0x1,                    Success,                    "Success"),                                 \
+            (GBL_RESULT_EVENT_IGNORED,                  0x2,                    EventIgnored,               "Event Ignored"),                           \
+            (GBL_RESULT_EVENT_ACCEPTED,                 0x3,                    EventAccepted,              "Event Accepted"),                          \
             (GBL_RESULT_PARTIAL,                        0xa,                    Partial,                    "Generic Partial Success"),                 \
             (GBL_RESULT_TRUNCATED,                      GBL_RESULT_PARTIAL + 1, Truncated,                  "Truncated"),                               \
             (GBL_RESULT_LOSSY_CONVERSION,               GBL_RESULT_PARTIAL + 2, LossyConversion,            "Lossy Conversion"),                        \
@@ -43,7 +45,7 @@ extern "C" {
             (GBL_RESULT_ERROR_INVALID_ARG,              GBL_RESULT_ERROR | 10,  ErrorInvalidArg,            "Invalid Argument"),                        \
             (GBL_RESULT_ERROR_INVALID_CMDLINE_ARG,      GBL_RESULT_ERROR | 11,  ErrorInvalidCmdLineArg,     "Invalid CmdLine Argument"),                \
             (GBL_RESULT_ERROR_INVALID_EXPRESSION,       GBL_RESULT_ERROR | 12,  ErrorInvalidExpression,     "Invalid Expression"),                      \
-            (GBL_RESULT_ERROR_INVALID_OPERATION,        GBL_RESULT_ERROR | 13,  ErrorInvalidOperation,      "Invalid Operation"),      \
+            (GBL_RESULT_ERROR_INVALID_OPERATION,        GBL_RESULT_ERROR | 13,  ErrorInvalidOperation,      "Invalid Operation"),                       \
             (GBL_RESULT_ERROR_MEM_ALLOC,                GBL_RESULT_ERROR | 14,  ErrorMemAlloc,              "Memory Allocation Failed"),                \
             (GBL_RESULT_ERROR_MEM_REALLOC,              GBL_RESULT_ERROR | 15,  ErrorMemRealloc,            "Memory Reallocation Failed"),              \
             (GBL_RESULT_ERROR_MEM_FREE,                 GBL_RESULT_ERROR | 16,  ErrorMemFree,               "Memory Free Failed"),                      \
@@ -52,10 +54,10 @@ extern "C" {
             (GBL_RESULT_ERROR_FILE_READ,                GBL_RESULT_ERROR | 19,  ErrorFileRead,              "Failed to Read from File Descriptor"),     \
             (GBL_RESULT_ERROR_FILE_WRITE,               GBL_RESULT_ERROR | 20,  ErrorFileWrite,             "Failed to Write to File Descriptor"),      \
             (GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL,     GBL_RESULT_ERROR | 21,  ErrorInvalidVzirtualCall,   "Attempted to call invalid virtual function"), \
-            (GBL_RESULT_ERROR_INVALID_PROPERTY,         GBL_RESULT_ERROR | 22,  ErrorInvalidProperty,       "Invalid Property"),    \
-            (GBL_RESULT_ERROR_INVALID_INSTANCE,         GBL_RESULT_ERROR | 23,  ErrorInvalidInstance,       "Invalid Instance"),\
-            (GBL_RESULT_ERROR_INVALID_CLASS,            GBL_RESULT_ERROR | 24,  ErrorInvalidClass,          "Invalid Class"),\
-            (GBL_RESULT_ERROR_INVALID_TYPE,             GBL_RESULT_ERROR | 25,  ErrorInvalidType,          "Invalid Type"),\
+            (GBL_RESULT_ERROR_INVALID_PROPERTY,         GBL_RESULT_ERROR | 22,  ErrorInvalidProperty,       "Invalid Property"),                         \
+            (GBL_RESULT_ERROR_INVALID_INSTANCE,         GBL_RESULT_ERROR | 23,  ErrorInvalidInstance,       "Invalid Instance"),                        \
+            (GBL_RESULT_ERROR_INVALID_CLASS,            GBL_RESULT_ERROR | 24,  ErrorInvalidClass,          "Invalid Class"),                           \
+            (GBL_RESULT_ERROR_INVALID_TYPE,             GBL_RESULT_ERROR | 25,  ErrorInvalidType,          "Invalid Type"),                             \
             (GBL_RESULT_COUNT,                          GBL_RESULT_ERROR | 26,  Count,                      "# of Different Error Codes")               \
         )                                                                                                                                               \
     )
@@ -66,7 +68,7 @@ GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE);
     (value == GBL_RESULT_UNKNOWN)
 
 #define GBL_RESULT_SUCCESS(value) \
-    (value == GBL_RESULT_SUCCESS)
+    (value == GBL_RESULT_SUCCESS || value == GBL_RESULT_EVENT_IGNORED || value == GBL_RESULT_EVENT_ACCEPTED)
 
 #define GBL_RESULT_PARTIAL(value) \
     (!(GBL_RESULT_SUCCESS(value) || GBL_RESULT_ERROR(value) || GBL_RESULT_UNKNOWN(value)))
@@ -76,7 +78,6 @@ GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE);
 
 #define GBL_RESULT_ERROR(value) \
     (((value) & 0xfff00000) == GBL_RESULT_ERROR)
-
 
 
 

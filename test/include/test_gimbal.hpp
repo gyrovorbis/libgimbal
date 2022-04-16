@@ -62,11 +62,11 @@ namespace gimbal::test {
 #include <type_traits>
 
 #define GBL_TEST_VERIFY_EXCEPTION_THROWN(expr, result)              \
-    GBL_STMT_START {                                                            \
-        QVERIFY_EXCEPTION_THROWN((expr), gimbal::Exception);  \
+    GBL_STMT_START {                                                \
+        QVERIFY_EXCEPTION_THROWN((expr), gimbal::Exception);        \
         try {                                                       \
             (expr);                                                 \
-        } catch(const gimbal::Exception& except) {            \
+        } catch(const gimbal::Exception& except) {                  \
             QCOMPARE(except.getResult(), result);                   \
         }                                                           \
     } GBL_STMT_END
@@ -609,6 +609,10 @@ public:
             QVERIFY(block.didAssert());
             if(!message.isNull()) QCOMPARE(block.getAssertMessage().data(), message);
         } else QVERIFY(!block.didAssert());
+    }
+
+    void verifyResult(Result result) {
+        QVERIFY(result.isSuccess());
     }
 
     MonitorableContext* getContext(void) const { return pCtx(); }

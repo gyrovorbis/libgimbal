@@ -2,6 +2,7 @@
 #include <test_gimbal_variant.hpp>
 #include <test_gimbal_context.hpp>
 #include <test_gimbal_vector.hpp>
+#include <test_gimbal_quark.hpp>
 #include <test_gimbal_string.hpp>
 //#include <test_gimbal_meta.hpp>
 #include <test_gimbal_algorithms.hpp>
@@ -9,6 +10,7 @@
 #include <test_gimbal_hash_map.hpp>
 #include <test_gimbal_buffer.hpp>
 #include <test_gimbal_type.hpp>
+#include <test_gimbal_object.hpp>
 
 using namespace elysian;
 
@@ -21,12 +23,14 @@ qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Context());
     testSuite.enqueueTestSet(new gimbal::test::Vector());
     testSuite.enqueueTestSet(new gimbal::test::String());
+ //   testSuite.enqueueTestSet(new gimbal::test::Quark());
   //  testSuite.enqueueTestSet(new gimbal::test::MetaType());
     testSuite.enqueueTestSet(new gimbal::test::Variant());
     testSuite.enqueueTestSet(new gimbal::test::Algorithms());
     testSuite.enqueueTestSet(new gimbal::test::HashMap());
     testSuite.enqueueTestSet(new gimbal::test::Buffer());
     testSuite.enqueueTestSet(new gimbal::test::Type());
+    testSuite.enqueueTestSet(new gimbal::test::CObject());
 qDebug() << "DONEZ";
     return !testSuite.exec(argc, argv);
 }

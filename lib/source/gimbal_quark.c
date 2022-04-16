@@ -39,18 +39,17 @@ static GblContext       hCtx_           = NULL;
 static GblSize          pageSize_       = GBL_QUARK_PAGE_SIZE_DEFAULT_;
 static GblSize          registryCap_    = GBL_QUARK_REGISTRY_CAPACITY_DEFAULT_;
 
-static int registryComparator_(const GblHashSet* pSet, const char* pA, const char* pB) {
+static int registryComparator_(const GblHashSet* pSet, const char** pA, const char** pB) {
     GBL_UNUSED(pSet);
-    if(!pA) return INT_MIN;
-    else if(!pB) return INT_MAX;
-    else return strcmp(pA, pB);
+    if(!pA || !*pA) return INT_MIN;
+    else if(!pB || !*pB) return INT_MAX;
+    else return (strcmp(*pA, *pB) == 0);
 }
 
-static GblHash registryHasher_(const GblHashSet* pSet, const char* pStr) {
+static GblHash registryHasher_(const GblHashSet* pSet, const char** pStr) {
     GBL_UNUSED(pSet);
-    return gblHashMurmur(pStr, strlen(pStr));
+    return gblHashMurmur(*pStr, strlen(*pStr));
 }
-
 
 static void gblQuarkInit_(void) GBL_NOEXCEPT {
     GblBool mtxLocked = GBL_FALSE;
@@ -156,8 +155,10 @@ GBL_EXPORT GblQuark gblQuarkTryString(const char* pString) GBL_NOEXCEPT {
     GblQuark quark = 0;
     GBL_API_BEGIN(hCtx_);
     if(initialized_ && pString) {
+        GblQuark* pQuark = NULL;
         pthread_mutex_lock(&registryMtx_);
-        quark = (GblQuark)GblHashSet_get(&registry_, pString);
+        pQuark = (GblQuark*)GblHashSet_get(&registry_, &pString);
+        if(pQuark) quark = *pQuark;
         pthread_mutex_unlock(&registryMtx_);
         GBL_API_END_BLOCK();
     }
@@ -169,6 +170,9 @@ const char* quarkStringAllocCopy_(const char* pString) {
     GBL_API_BEGIN(hCtx_); {
         GBL_API_VERIFY_POINTER(pString);
         GblSize size = strlen(pString) + 1;
+        GBL_API_VERIFY(size <= pageSize_, GBL_RESULT_ERROR_OVERFLOW,
+                       "Cannot allocate storage for Quark that is larger than page size! (%d vs %d)",
+                       size, pageSize_);
         if(pPageCurrent_->position + size >= pPageCurrent_->pageSize) {
             QuarkAllocPage_* pPage = GBL_API_MALLOC(sizeof(QuarkAllocPage_)-1 + pageSize_);
             pPageCurrent_->pNext = pPage;
@@ -192,7 +196,8 @@ GBL_EXPORT GblQuark quarkFromString_(const char* pString, GblBool alloc) GBL_NOE
             pthread_mutex_lock(&registryMtx_);
             if(alloc) pString = quarkStringAllocCopy_(pString);
             GBL_API_VERIFY_EXPRESSION(pString);
-            GblBool inserted = GblHashSet_insert(&registry_, pString);
+            GblBool inserted = GblHashSet_insert(&registry_, &pString);
+            GBL_API_VERBOSE("[GblQuark] Adding: %s", pString);
             pthread_mutex_unlock(&registryMtx_);
             GBL_API_VERIFY(inserted, GBL_RESULT_ERROR_INTERNAL,
                            "[GblQuark]: Failed to add string to hash map: %s", pString);

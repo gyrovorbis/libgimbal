@@ -28,7 +28,7 @@ GBL_INLINE GBL_API gblVectorConstruct_6 (SELF, GblContext hCtx, GblSize elementS
                                          GblSize structSize, const void* pInitialData,
                                          GblSize elementCount)                                              GBL_NOEXCEPT;
 GBL_INLINE GBL_API gblVectorConstruct_4 (SELF, GblContext hCtx, GblSize elementSize, GblSize structSize)    GBL_NOEXCEPT;
-GBL_INLINE GBL_API gblVectorConstruct_3 (SELF, GblContext hCtx, GblSize elementSize) GBL_NOEXCEPT;
+GBL_INLINE GBL_API gblVectorConstruct_3 (SELF, GblContext hCtx, GblSize elementSize)                        GBL_NOEXCEPT;
 #define            gblVectorConstruct(...) \
                         GBL_VA_OVERLOAD_SELECT(gblVectorConstruct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 GBL_INLINE GBL_API gblVectorDestruct    (SELF)                                                              GBL_NOEXCEPT;

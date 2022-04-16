@@ -457,15 +457,15 @@ static GBL_RESULT stringConstruct_(GblVariant* pVariant, GblUint argc, GblVarian
 
     // Value copying constructor
     } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY) {
-        GBL_API_VERIFY_ARG(argc == 3);
+        GBL_API_VERIFY_ARG(argc == 1);
         GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_TYPE_POINTER);
-        GBL_API_VERIFY_TYPE(pArgs[1].type, GBL_TYPE_INT32);
-        GBL_API_VERIFY_TYPE(pArgs[2].type, GBL_TYPE_POINTER);
+        //GBL_API_VERIFY_TYPE(pArgs[1].type, GBL_TYPE_INT32);
+        //GBL_API_VERIFY_TYPE(pArgs[2].type, GBL_TYPE_POINTER);
         GblStringView view = {
             .pBuffer    = pArgs[0].pVoid,
-            .size       = pArgs[1].i32
+            .size       = pArgs[0].pVoid? strlen(pArgs[0].pVoid) : 0
         };
-        GBL_API_CALL(gblStringConstruct(&pVariant->string, sizeof(GblString), pArgs[2].pVoid, &view));
+        GBL_API_CALL(gblStringConstruct(&pVariant->string, sizeof(GblString), NULL, &view));
 
     // Value moving constructor
     } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE) {
@@ -507,13 +507,13 @@ static GBL_RESULT stringSet_(GblVariant* pVariant, GblUint argc, GblVariant* pAr
     GBL_UNUSED(argc);
     GBL_API_VERIFY_TYPE(pArgs->type, GBL_TYPE_POINTER);
     if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY) {
-        GBL_API_VERIFY_ARG(argc == 3);
+        GBL_API_VERIFY_ARG(argc == 1);
         GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_TYPE_POINTER);
-        GBL_API_VERIFY_TYPE(pArgs[1].type, GBL_TYPE_INT32);
-        GBL_API_VERIFY_TYPE(pArgs[2].type, GBL_TYPE_POINTER);
+        //GBL_API_VERIFY_TYPE(pArgs[1].type, GBL_TYPE_INT32);
+        //GBL_API_VERIFY_TYPE(pArgs[2].type, GBL_TYPE_POINTER);
         const GblStringView view = {
             .pBuffer = pArgs[0].pVoid,
-            .size    = pArgs[1].i32
+            .size    = pArgs[0].pVoid ? strlen(pArgs[0].pVoid) : 0
         };
         GBL_API_CALL(gblStringAssign(&pVariant->string, &view));
     } else if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE) {
@@ -567,31 +567,12 @@ static GBL_RESULT stringCompare_(const GblVariant* pVariant, const GblVariant* p
 }
 
 
-GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
+extern GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
 
     GBL_API_BEGIN(hCtx);
     GBL_API_PUSH_VERBOSE("[GblType] Registering Builtin Types");
 
-    // =============== INTERFACE ===============
-    const GblType ifaceType = gblTypeRegisterBuiltinType(0,
-          GBL_TYPE_INVALID,
-          "Interface",
-          &((const GblTypeInfo) {
-              .classSize    = sizeof(GblInterface),
-              .classAlign   = GBL_ALIGNOF(GblInterface),
-          }),
-          GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED |
-         GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE | GBL_TYPE_FLAG_ABSTRACT);
-
-    // =============== IVARIANT ===============
-    const GblType iVariantType = gblTypeRegisterBuiltinType(1,
-      ifaceType,
-      "IVariant",
-      &((const GblTypeInfo) {
-          .classSize    = sizeof(GblIVariantIFace),
-          .classAlign   = GBL_ALIGNOF(GblIVariantIFace),
-      }),
-      GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED | GBL_TYPE_FLAG_ABSTRACT);
+    const GblType iVariantType = GBL_TYPE_IVARIANT;
 
     // =============== NIL ===============
     static GblIVariantIFace nilIVariantIFace = {
@@ -601,7 +582,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
         .pFnSave = nilSave_,
         .pFnLoad = nilLoad_
     };
-    gblTypeRegisterBuiltinType(2,
+    gblTypeRegisterBuiltin(2,
       GBL_TYPE_INVALID,
       "nil",
       &((const GblTypeInfo) {
@@ -629,7 +610,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
             .pFnSave = boolSave_,
             .pFnLoad = boolLoad_
       };
-    gblTypeRegisterBuiltinType(3,
+    gblTypeRegisterBuiltin(3,
       GBL_TYPE_INVALID,
       "bool",
       &((const GblTypeInfo) {
@@ -657,7 +638,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
             .pFnSave = charSave_,
             .pFnLoad = charLoad_
       };
-    gblTypeRegisterBuiltinType(4,
+    gblTypeRegisterBuiltin(4,
           GBL_TYPE_INVALID,
           "char",
           &((const GblTypeInfo) {
@@ -685,7 +666,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
             .pFnSave = u8Save_,
             .pFnLoad = u8Load_
     };
-    gblTypeRegisterBuiltinType(5,
+    gblTypeRegisterBuiltin(5,
       GBL_TYPE_INVALID,
       "uint8",
       &((const GblTypeInfo) {
@@ -713,7 +694,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
         .pFnSave = i16Save_,
         .pFnLoad = i16Load_
     };
-    gblTypeRegisterBuiltinType(6,
+    gblTypeRegisterBuiltin(6,
           GBL_TYPE_INVALID,
           "int16",
           &((const GblTypeInfo) {
@@ -741,7 +722,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
         .pFnSave = u16Save_,
         .pFnLoad = u16Load_
     };
-    gblTypeRegisterBuiltinType(7,
+    gblTypeRegisterBuiltin(7,
           GBL_TYPE_INVALID,
           "uint16",
           &((const GblTypeInfo) {
@@ -769,7 +750,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
             .pFnSave = i32Save_,
             .pFnLoad = i32Load_
       };
-    gblTypeRegisterBuiltinType(8,
+    gblTypeRegisterBuiltin(8,
           GBL_TYPE_INVALID,
           "int32",
           &((const GblTypeInfo) {
@@ -797,7 +778,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
         .pFnSave = u32Save_,
         .pFnLoad = u32Load_
     };
-    gblTypeRegisterBuiltinType(9,
+    gblTypeRegisterBuiltin(9,
           GBL_TYPE_INVALID,
           "uint32",
           &((const GblTypeInfo) {
@@ -825,7 +806,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
         .pFnSave = i64Save_,
         .pFnLoad = i64Load_
     };
-    gblTypeRegisterBuiltinType(10,
+    gblTypeRegisterBuiltin(10,
           GBL_TYPE_INVALID,
           "int64",
           &((const GblTypeInfo) {
@@ -853,7 +834,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
             .pFnSave = u64Save_,
             .pFnLoad = u64Load_
       };
-    gblTypeRegisterBuiltinType(11,
+    gblTypeRegisterBuiltin(11,
           GBL_TYPE_INVALID,
           "uint64",
           &((const GblTypeInfo) {
@@ -881,7 +862,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
             .pFnSave = u64Save_,
             .pFnLoad = u64Load_
       };
-    gblTypeRegisterBuiltinType(12,
+    gblTypeRegisterBuiltin(12,
                   GBL_TYPE_INVALID,
                   "enum",
                   &((const GblTypeInfo) {
@@ -909,7 +890,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
         .pFnSave = u64Save_,
         .pFnLoad = u64Load_
     };
-    gblTypeRegisterBuiltinType(13,
+    gblTypeRegisterBuiltin(13,
                   GBL_TYPE_INVALID,
                   "flags",
                   &((const GblTypeInfo) {
@@ -937,7 +918,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
         .pFnSave = f32Save_,
         .pFnLoad = f32Load_
     };
-    gblTypeRegisterBuiltinType(14,
+    gblTypeRegisterBuiltin(14,
                   GBL_TYPE_INVALID,
                   "float",
                   &((const GblTypeInfo) {
@@ -965,7 +946,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
             .pFnSave = f64Save_,
             .pFnLoad = f64Load_
       };
-    gblTypeRegisterBuiltinType(15,
+    gblTypeRegisterBuiltin(15,
                   GBL_TYPE_INVALID,
                   "double",
                   &((const GblTypeInfo) {
@@ -994,7 +975,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
         .pFnLoad = pLoad_
     };
 
-    gblTypeRegisterBuiltinType(16,
+    gblTypeRegisterBuiltin(16,
                   GBL_TYPE_INVALID,
                   "pointer",
                   &((const GblTypeInfo) {
@@ -1024,7 +1005,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY         |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK         |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE,
-        .pSetValueFmt   = { "pip"},
+        .pSetValueFmt   = { "p"},
         .pGetValueFmt   = { "p" },
         .pFnConstruct   = stringConstruct_,
         .pFnDestruct    = stringDestruct_,
@@ -1034,7 +1015,7 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
         .pFnSave        = stringSave_,
         .pFnLoad        = stringLoad_
     };
-    gblTypeRegisterBuiltinType(17,
+    gblTypeRegisterBuiltin(17,
                   GBL_TYPE_INVALID,
                   "string",
                   &((const GblTypeInfo) {
@@ -1049,6 +1030,19 @@ GBL_RESULT gblValueTypesRegister_(GblContext hCtx) {
                       })
                   }),
                   GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    gblTypeRegisterBuiltin(18,
+                               GBL_TYPE_INVALID,
+                               "type",
+                               &((const GblTypeInfo) {}),
+                               GBL_TYPE_FLAG_ABSTRACT);
+
+    gblTypeRegisterBuiltin(19,
+                               GBL_TYPE_INVALID,
+                               "boxed",
+                               &((const GblTypeInfo) {}),
+                               GBL_TYPE_FLAG_ABSTRACT);
+
     GBL_API_POP(1);
     GBL_API_END();
 }

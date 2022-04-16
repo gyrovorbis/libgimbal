@@ -24,27 +24,28 @@ class Variant: public UnitTestSet {
 
 private slots:
     void testString(void) {
-        const auto str = gimbal::String("test", pCtx());
+        {
+            const auto str = gimbal::String("test", pCtx());
 
-        gimbal::Variant v(static_cast<const GblString*>(&str));
+            gimbal::Variant v(static_cast<const GblString*>(&str));
 
-        QCOMPARE(v.getType(), StringType());
+            QCOMPARE(v.getType(), StringType());
 
-        gimbal::StringView strView = v.getValue<const GblString*>();
-        QCOMPARE(strView.getCString(), "test");
+            gimbal::StringView strView = v.getValue<const GblString*>();
+            QCOMPARE(strView.getCString(), "test");
 
-        gimbal::String string = v.toValue<GblString>();
-        QCOMPARE(strView.getCString(), string.getCString());
+            gimbal::String string = v.toValue<GblString>();
+            QCOMPARE(strView.getCString(), string.getCString());
 
-        gimbal::Variant v2(v);
+            gimbal::Variant v2(v);
 
-        QCOMPARE(v, v2);
-        QVERIFY(v <= v2);
-        QVERIFY(v >= v2);
-        QVERIFY(!(v != v2));
-        QVERIFY(!(v < v2));
-        QVERIFY(!(v > v2));
-
+            QCOMPARE(v, v2);
+            QVERIFY(v <= v2);
+            QVERIFY(v >= v2);
+            QVERIFY(!(v != v2));
+            QVERIFY(!(v < v2));
+            QVERIFY(!(v > v2));
+        }
 
         auto stringifyTest = [&](auto&& construct, gimbal::String expected=nullptr) {
             gimbal::Variant sv(std::forward<decltype(construct)>(construct));

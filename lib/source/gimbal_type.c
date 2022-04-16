@@ -12,12 +12,19 @@
 
 #define GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT 32
 #define GBL_META_TYPE_NAME_SIZE_MAX                 1024
+#define GBL_TYPE_BASES_VECTOR_STACK_COUNT           20
 #define GBL_TYPE_ENSURE_INITIALIZED_()  \
     if(!initializing_) pthread_once(&initOnce_, gblTypeInit_)
+#define GBL_META_CLASS(type) ((GblMetaClass*)type)
 
-typedef atomic_uint_fast16_t            GblRefCounter;
+typedef atomic_uint_fast16_t GblRefCounter;
 
-extern GBL_RESULT gblValueTypesRegister_(GblContext hCtx);
+extern GBL_RESULT GblIVariant_typeRegister_     (GblContext hCtx);
+extern GBL_RESULT gblValueTypesRegister_        (GblContext hCtx);
+extern GBL_RESULT GblITable_typeRegister_       (GblContext hCtx);
+extern GBL_RESULT GblIEventHandler_typeRegister_(GblContext hCtx);
+extern GBL_RESULT GblIEventFilter_typeRegister_ (GblContext hCtx);
+extern GBL_RESULT GblObject_typeRegister_       (GblContext hCtx);
 
 // === STATIC DATA ====
 
@@ -30,22 +37,22 @@ typedef struct GblMetaClass {
 #endif
     GblTypeInfo             info;
     GblFlags                flags;
-    void*                   pModule; //module
+    GblIPlugin*             pPlugin;
     GblClass*               pClass;
+    uint8_t                 depth;
+    struct GblMetaClass**   pBases;
 } GblMetaClass;
 
-
-
-static  GblContext              pCtx_           = NULL;
-static  pthread_once_t          initOnce_       = PTHREAD_ONCE_INIT;
-static  GblBool                 initialized_    = GBL_FALSE;
+static GblContext               pCtx_           = NULL;
+static pthread_once_t           initOnce_       = PTHREAD_ONCE_INIT;
+static GblBool                  initialized_    = GBL_FALSE;
 static GBL_THREAD_LOCAL GblBool initializing_   = GBL_FALSE;
-static  pthread_mutex_t         typeRegMtx_;
-static  GblHashSet              typeRegistry_;
+static pthread_mutex_t          typeRegMtx_;
+static GblHashSet               typeRegistry_;
 static struct {
-    GblVector       vector;
-    uint8_t         stackBuffer[sizeof(GblType)*GBL_TYPE_BUILTIN_COUNT];
-}                   typeBuiltins_;
+    GblVector   vector;
+    uint8_t     stackBuffer[sizeof(GblType)*GBL_TYPE_BUILTIN_COUNT];
+}               typeBuiltins_;
 
 static int metaClassIFaceEntryComparator_(const void* pA, const void* pB) {
     const GblTypeInterfaceMapEntry* pIFaceA = pA;
@@ -86,6 +93,7 @@ GBL_EXPORT GblInterface* typeClassInterfacePeek_(GblClass* pClass, GblType iface
     GBL_API_VERIFY_POINTER(pClass);
     GBL_API_VERIFY_EXPRESSION(pClass->type != GBL_TYPE_INVALID);
     GBL_API_VERIFY_ARG(ifaceType != GBL_TYPE_INVALID);
+    GBL_API_VERIFY_ARG(GBL_TYPE_IS_INTERFACE(ifaceType));
     {
         GblMetaClass* pMeta = (GblMetaClass*)pClass->type;
         while(pMeta) {
@@ -118,7 +126,6 @@ static GblType typeRegister_(GblType parent,
                             GblFlags flags)
 {
     GblBool hasMutex = GBL_FALSE;
-    GblBool fundamental = GBL_FALSE;
     GblType newType = GBL_TYPE_INVALID;
     GblMetaClass* pParent = (GblMetaClass*)parent;
     GBL_API_BEGIN(pCtx_);
@@ -131,12 +138,13 @@ static GblType typeRegister_(GblType parent,
     GBL_API_VERBOSE("%-20s: %-100.100s", "Parent Type", gblTypeName(parent));
 
     GBL_API_PUSH_VERBOSE("flags");
-    GBL_API_VERBOSE("%-20s: %-100u", "CLASSED",         (flags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED));
-    GBL_API_VERBOSE("%-20s: %-100u", "INSTANTIABLE",    (flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE));
-    GBL_API_VERBOSE("%-20s: %-100u", "DERIVABLE",       (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE));
-    GBL_API_VERBOSE("%-20s: %-100u", "DEEP_DERIVABLE",  (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE));
-    GBL_API_VERBOSE("%-20s: %-100u", "ABSTRACT",        (flags & GBL_TYPE_FLAG_ABSTRACT));
-    GBL_API_VERBOSE("%-20s: %-100u", "FINAL",           (flags & GBL_TYPE_FLAG_FINAL));
+    GBL_API_VERBOSE("%-20s: %-100u", "CLASSED",         (flags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "INSTANTIABLE",    (flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DERIVABLE",       (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DEEP_DERIVABLE",  (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "BUILTIN",         (flags & GBL_TYPE_FLAG_BUILTIN)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "ABSTRACT",        (flags & GBL_TYPE_FLAG_ABSTRACT)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "FINAL",           (flags & GBL_TYPE_FLAG_FINAL)? 1 : 0);
     GBL_API_POP(1);
 
     GBL_API_PUSH_VERBOSE("Class Info");
@@ -209,7 +217,6 @@ static GblType typeRegister_(GblType parent,
 
     } else {    //assumed to be a fundamental type
         GBL_API_VERBOSE("Fundamental Type!");
-        fundamental = GBL_TRUE;
 
         if(flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE) flags |= GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE;
         if(flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE)   flags |= GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED;
@@ -240,11 +247,19 @@ static GblType typeRegister_(GblType parent,
 
 
     {
+        uint8_t baseCount = 0;
+        GblMetaClass* pParentIt = pParent;
+        while(pParentIt) {
+            ++baseCount;
+            pParentIt = pParentIt->pParent;
+        }
+
         GblSize metaSize = sizeof(GblMetaClass);
         const GblSize ifaceOffset = metaSize;
         const GblSize nameOffset = metaSize += sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount;
         const GblSize classOffset = metaSize += strlen(pName)+1;
-        metaSize += pInfo->classSize;
+        const GblSize basesOffset = metaSize += pInfo->classSize;
+        metaSize += baseCount * sizeof(GblMetaType*);
 
         GblMetaClass* pMeta = GBL_API_MALLOC(metaSize);
 
@@ -256,15 +271,26 @@ static GblType typeRegister_(GblType parent,
 #endif
         strcpy(((char*)pMeta + nameOffset), pName);
         pMeta->flags                = flags;
+        pMeta->depth                = baseCount;
         pMeta->pParent              = (struct GblMetaClass*)parent;
         pMeta->pName                = ((const char*)pMeta + nameOffset);
         pMeta->pClass               = pInfo->classSize?
                                             (GblClass*)((char*)pMeta + classOffset) : NULL;
         pMeta->info.pInterfaceMap   = pInfo->interfaceCount?
                                             (GblTypeInterfaceMapEntry*)((char*)pMeta + ifaceOffset) : NULL;
-        memcpy((GblTypeInterfaceMapEntry*)pMeta->info.pInterfaceMap, pInfo->pInterfaceMap, sizeof(GblTypeInterfaceMapEntry)*pInfo->interfaceCount);
+        pMeta->pBases               = baseCount?
+                                            (GblMetaClass**)((char*)pMeta + basesOffset) : NULL;
 
-        gblSortQuick((GblTypeInterfaceMapEntry*)pMeta->info.pInterfaceMap, pMeta->info.interfaceCount, sizeof(GblTypeInterfaceMapEntry), metaClassIFaceEntryComparator_);
+        memcpy((GblTypeInterfaceMapEntry*)pMeta->info.pInterfaceMap, pInfo->pInterfaceMap, sizeof(GblTypeInterfaceMapEntry)*pInfo->interfaceCount);
+        //gblSortQuick((GblTypeInterfaceMapEntry*)pMeta->info.pInterfaceMap, pMeta->info.interfaceCount, sizeof(GblTypeInterfaceMapEntry), metaClassIFaceEntryComparator_);
+
+        pParentIt = pParent;
+        baseCount = 0;
+        while(pParentIt) {
+            pMeta->pBases[pMeta->depth-(++baseCount)] = pParentIt;
+            pParentIt = pParentIt->pParent;
+        }
+        GBL_API_VERIFY_EXPRESSION(baseCount == pMeta->depth);
 
         pthread_mutex_lock(&typeRegMtx_);
         hasMutex = GBL_TRUE;
@@ -276,7 +302,7 @@ static GblType typeRegister_(GblType parent,
                        "A previous metatype entry named %s existed already!", pName);
 
         newType = (GblType)pMeta;
-        if(fundamental) {
+        if(flags & GBL_TYPE_FLAG_BUILTIN) {
              GBL_API_CALL(gblVectorPushBack(&typeBuiltins_.vector, &newType));
         }
 
@@ -285,7 +311,27 @@ static GblType typeRegister_(GblType parent,
     GBL_API_END_BLOCK();
     if(hasMutex) pthread_mutex_unlock(&typeRegMtx_);
     return newType;
+}
 
+static GBL_RESULT gblTypeRegisterBuiltins_(void) {
+    GBL_API_BEGIN(pCtx_);
+    gblTypeRegisterBuiltin(0,
+              GBL_TYPE_INVALID,
+              "Interface",
+              &((const GblTypeInfo) {
+                  .classSize    = sizeof(GblInterface),
+                  .classAlign   = GBL_ALIGNOF(GblInterface),
+              }),
+              GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED         |
+              GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE  |
+              GBL_TYPE_FLAG_ABSTRACT);
+    GBL_API_CALL(GblIVariant_typeRegister_(pCtx_));
+    GBL_API_CALL(gblValueTypesRegister_(pCtx_));
+    GBL_API_CALL(GblITable_typeRegister_(pCtx_));
+    GBL_API_CALL(GblIEventHandler_typeRegister_(pCtx_));
+    GBL_API_CALL(GblIEventFilter_typeRegister_(pCtx_));
+    GBL_API_CALL(GblObject_typeRegister_(pCtx_));
+    GBL_API_END();
 }
 
 static void gblTypeInit_(void) {
@@ -309,7 +355,7 @@ static void gblTypeInit_(void) {
                                     pCtx_,
                                     sizeof(GblMetaClass*),
                                     sizeof(typeBuiltins_)));
-    GBL_API_CALL(gblValueTypesRegister_(pCtx_));
+    GBL_API_CALL(gblTypeRegisterBuiltins_());
     GBL_API_POP(1);
     initialized_    = GBL_TRUE;
     initializing_   = GBL_FALSE;
@@ -317,17 +363,18 @@ static void gblTypeInit_(void) {
     pthread_mutex_unlock(&typeRegMtx_);
 }
 
-GblType gblTypeRegisterBuiltinType(GblSize            expectedIndex,
-                                   GblType            parentType,
-                                   const char*        pName,
-                                   const GblTypeInfo* pTypeInfo,
-                                   GblTypeFlags       flags)
+GblType gblTypeRegisterBuiltin(GblSize            expectedIndex,
+                               GblType            parentType,
+                               const char*        pName,
+                               const GblTypeInfo* pTypeInfo,
+                               GblTypeFlags       flags)
 {
     GblType type = GBL_TYPE_INVALID;
     GblSize size = 0;
     GBL_API_BEGIN(pCtx_);
     GBL_TYPE_ENSURE_INITIALIZED_();
     GBL_API_PUSH_VERBOSE("[GblType] Registering Builtin Type: %s", pName);
+    flags |= GBL_TYPE_FLAG_BUILTIN;
     type = typeRegister_(parentType, pName, pTypeInfo, flags);
     GBL_API_CALL(gblVectorSize(&typeBuiltins_.vector, &size));
     GBL_API_VERIFY_EXPRESSION(size == expectedIndex+1,
@@ -381,8 +428,6 @@ GBL_API gblTypeReinit(GblContext hCtx) {
     }
     GBL_API_END();
 }
-
-
 
 GBL_EXPORT GblType gblTypeBuiltin(GblUint index) {
     GblType type = GBL_TYPE_INVALID;
@@ -472,15 +517,42 @@ GBL_EXPORT GblType gblTypeFundamental(GblType type) {
     return base;
 }
 
+GBL_EXPORT GblType gblTypeBase(GblType type, GblUint depth) {
+    GblType base = GBL_TYPE_INVALID;
+    GblMetaClass* pMeta =  GBL_META_CLASS(type);
+    GBL_API_BEGIN(pCtx_);
+    if(pMeta) {
+        if(depth < pMeta->depth) {
+            base = (GblType)pMeta->pBases[depth];
+        } else if(depth == pMeta->depth) {
+            base = (GblType)pMeta;
+        }
+    }
+    GBL_API_END_BLOCK();
+    return base;
+}
+
+GBL_EXPORT GblType gblTypeAncestor(GblType type, GblUint level) {
+    GblType ancestor = GBL_TYPE_INVALID;
+    GblMetaClass* pMeta =  GBL_META_CLASS(type);
+    GBL_API_BEGIN(pCtx_);
+    if(pMeta) {
+        if(level == 0) {
+            ancestor = (GblType)pMeta;
+        } else if(level <= pMeta->depth) {
+            ancestor = (GblType)pMeta->pBases[pMeta->depth-level];
+        }
+    }
+    GBL_API_END_BLOCK();
+    return ancestor;
+}
+
 GBL_EXPORT GblUint gblTypeDepth(GblType type) {
     GblUint depth = 0;
     GBL_API_BEGIN(pCtx_);
     GblMetaClass* pMeta = (GblMetaClass*)type;
     if(pMeta) {
-        while(pMeta->pParent) {
-            pMeta = pMeta->pParent;
-            ++depth;
-        }
+        depth = pMeta->depth;
     }
     GBL_API_END_BLOCK();
     return depth;
@@ -507,13 +579,22 @@ GBL_EXPORT GblBool gblTypeFlagsTest(GblType type, GblFlags mask) {
     return result;
 }
 
-GBL_EXPORT const GblTypeInfo*   gblTypeInfo(GblType type) {
+GBL_EXPORT const GblTypeInfo* gblTypeInfo(GblType type) {
     const GblTypeInfo* pInfo      = NULL;
     GblMetaClass* pMeta = (GblMetaClass*)type;
     GBL_API_BEGIN(pCtx_);
     if(pMeta) pInfo = &pMeta->info;
     GBL_API_END_BLOCK();
     return pInfo;
+}
+
+GBL_EXPORT GblIPlugin* gblTypePlugin(GblType type) {
+    return type == GBL_TYPE_INVALID? NULL : GBL_META_CLASS(type)->pPlugin;
+}
+
+GBL_EXPORT GblContext gblTypeContext(GblType type) {
+    GBL_UNUSED(type);
+    return pCtx_;
 }
 
 GBL_EXPORT GblRefCount gblTypeClassRefCount(GblType type) {
@@ -597,6 +678,10 @@ GBL_EXPORT GblType gblTypeRegisterStatic(GblType                     parent,
 
     GBL_API_VERIFY_ARG(gblTypeFind(pName) == GBL_TYPE_INVALID,
                         "Existing entry for the given type name was found!");
+
+    GBL_API_VERIFY_ARG(!(flags & GBL_TYPE_FLAG_BUILTIN),
+                       "Cannot register a builtin type as a static type!");
+
     GBL_TYPE_ENSURE_INITIALIZED_();
 
     newType = typeRegister_(parent, pName, pInfo, flags);
@@ -637,6 +722,7 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta);
 static GBL_RESULT gblTypeInterfaceClassConstruct_(GblInterface* pClass, GblMetaClass* pMeta, int16_t offset) {
     GBL_API_BEGIN(pCtx_);
     GBL_API_PUSH_VERBOSE("InterfaceClass::construct(%s)", pMeta->pName);
+
     GBL_API_VERBOSE("offset: %d", offset);
     pClass->offsetToTop = offset;
     GBL_API_PUSH_VERBOSE("Default Class Ref");
@@ -658,6 +744,9 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta) 
     GBL_API_PUSH_VERBOSE("Class::construct(%s)", pMeta->pName);
     GBL_API_VERBOSE("Type: %p", pMeta);
 
+    // Zero initiailze class - NOPE OVERWRITING IFACE IF WE DO THAT!
+    //memset(pClass, 0, pMeta->info.classSize);
+
     //IMMEDIATELY initialize its type!!!
     pClass->type = (GblType)pMeta;
 
@@ -670,30 +759,9 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta) 
         GBL_API_VERBOSE("Parent Class Ref: None");
     }
 
-    // Create a structure to hold all base types
-    const GblSize vecStackSize = sizeof(GblVector) + 20*sizeof(GblMetaClass*);
-    GblVector* pBases = GBL_ALLOCA(vecStackSize);
-    GBL_API_CALL(gblVectorConstruct(pBases, GBL_API_CONTEXT(), sizeof(GblMetaClass*), vecStackSize));
-
-    // Populate structure by traversing hierarchy
-    GblMetaClass* pIter = pMeta;
-    while(pIter) {
-        GBL_API_CALL(gblVectorPushBack(pBases, &pIter));
-        pIter = pIter->pParent;
-    }
-
-    //GBL_API_VERBOSE("Initializing inheritance chain");
-    //GBL_API_PUSH();
-
-    // Iterate backwards over the structure calling ctors from base to derived order
-    GblSize count = 0;
-    GBL_API_CALL(gblVectorSize(pBases, &count));
-    GBL_API_VERIFY(count, GBL_RESULT_ERROR_INTERNAL);
-    for(int idx = count-1; idx >= 0; --idx) {
-        GblMetaClass** ppIter = NULL;
-        GBL_API_CALL(gblVectorAt(pBases, idx, (void**)&ppIter));
-        pIter = *ppIter;
-        GBL_API_PUSH_VERBOSE("Class[%u]: %s", count - idx-1, pIter->pName);
+    for(uint8_t idx = 0; idx <= pMeta->depth; ++idx) {
+        GblMetaClass* pIter = GBL_META_CLASS(gblTypeBase((GblType)pMeta, idx));
+        GBL_API_PUSH_VERBOSE("Class[%u]: %s", idx, pIter->pName);
 
         //GBL_API_PUSH_VERBOSE("Constructing Interfaces");
         if(!pIter->info.interfaceCount) {
@@ -701,7 +769,7 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta) 
         } else {
             for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
                 const GblTypeInterfaceMapEntry* pIEntry = &pIter->info.pInterfaceMap[i];
-                const GblMetaClass* pIMeta = (const GblMetaClass*)pIEntry->interfaceType;
+                GblMetaClass* pIMeta = (GblMetaClass*)pIEntry->interfaceType;
                 GBL_API_VERIFY_EXPRESSION(pIMeta);
                 GBL_API_PUSH_VERBOSE("Interface[%u]: %s", i, pIMeta->pName);
                 GblInterface* pIClass = (GblInterface*)((char*)pClass + pIEntry->classOffset);
@@ -722,10 +790,6 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta) 
     }
 
    // GBL_API_POP(1);
-
-    // Free the class heirarchy structure
-    GBL_API_CALL(gblVectorDestruct(pBases));
-
     GBL_API_POP(1);
     GBL_API_END();
 }
@@ -783,7 +847,7 @@ GBL_EXPORT GblClass* gblTypeClassRef(GblType typeId) {
 
     // Either way, we're returning a new reference, add refcount
     GblRefCount oldCount = atomic_fetch_add(&pMeta->refCount, 1);
-    //GBL_API_VERBOSE("++RefCount: %"GBL_SIZE_FMT, oldCount+1);
+    GBL_API_VERBOSE("++[%s].refCount: %"GBL_SIZE_FMT, pMeta->pName, oldCount+1);
 
     //GBL_API_POP(1);
     GBL_API_END_BLOCK();
@@ -804,6 +868,50 @@ GBL_EXPORT GblClass* gblTypeClassPeek(GblType typeId) {
     GBL_API_END_BLOCK();
     return pClass;
 
+}
+
+static GBL_EXPORT GBL_RESULT gblTypeClassDestruct_(GblClass* pClass) {
+    GblMetaClass* pMeta = GBL_META_CLASS(GBL_CLASS_TYPE(pClass));
+    GBL_API_BEGIN(pCtx_);
+    GBL_API_DEBUG("Destroying %s class!", pMeta->pName);
+    GBL_API_PUSH();
+    GblMetaClass* pIter = pMeta;
+    // walk up the destructor chain
+    GBL_API_PUSH_VERBOSE("Walking class destructors.");
+    do {
+        if(pIter->info.pFnClassFinalize) {
+            GBL_API_DEBUG("Calling class dtor: [%s]", pIter->pName);
+            GBL_API_CALL(pIter->info.pFnClassFinalize(pMeta->pClass, pMeta->info.pClassData, pCtx_));
+        } else {
+            GBL_API_DEBUG("No class dtor: [%s]", pIter->pName);
+        }
+
+        for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
+            GblInterface* pInterface = (GblInterface*)((const char*)pClass + pIter->info.pInterfaceMap[i].classOffset);
+            GblClass* pDefaultIFaceClass = gblTypeClassPeek(GBL_CLASS_TYPE(pInterface));
+            gblTypeClassUnref(pDefaultIFaceClass);
+
+            gblTypeClassDestruct_(GBL_CLASS(pInterface));
+            //gblTypeClassUnref(GBL_CLASS(pInterface));
+            // unreference default interface class too!
+            //gblTypeClassUnref(gblTypeClassPeek(GBL_CLASS_TYPE(pInterface)));
+        }
+        pIter = pIter->pParent;
+    } while(pIter);
+    GBL_API_POP(1);
+
+    // Store parent pointer then deallocate
+    GblClass* pParentClass = pMeta->pParent? pMeta->pParent->pClass : NULL;
+   // GBL_API_FREE(pMeta->pClass);
+
+    //Release reference to parent class;
+    if(pParentClass) gblTypeClassUnref(pParentClass);
+
+    // clear the type so it's not looking initialized
+    pClass->type = GBL_TYPE_INVALID;
+
+    GBL_API_POP(1);
+    GBL_API_END();
 }
 
 GBL_EXPORT GblRefCount gblTypeClassUnref(GblClass* pClass) {
@@ -827,11 +935,8 @@ GBL_EXPORT GblRefCount gblTypeClassUnref(GblClass* pClass) {
     refCount = atomic_fetch_sub(&pMeta->refCount, 1);
 
     if(refCount-1) {
-        //GBL_API_VERBOSE("--refCount: %u", refCount-1);
+        GBL_API_VERBOSE("--[%s].refCount: %u", pMeta->pName, refCount-1);
     } else {
-        GBL_API_DEBUG("Destroying %s class!", pMeta->pName);
-        GBL_API_PUSH();
-
 #ifdef GBL_TYPE_DEBUG
         {
             GblRefCount instanceRefCount = 0;
@@ -841,35 +946,7 @@ GBL_EXPORT GblRefCount gblTypeClassUnref(GblClass* pClass) {
         }
 #endif
 
-        GblMetaClass* pIter = pMeta;
-        // walk up the destructor chain
-        GBL_API_PUSH_VERBOSE("Walking class destructors.");
-        do {
-            if(pIter->info.pFnClassFinalize) {
-                GBL_API_DEBUG("Calling class dtor: [%s]", pIter->pName);
-                GBL_API_CALL(pIter->info.pFnClassFinalize(pMeta->pClass, pMeta->info.pClassData, pCtx_));
-            } else {
-                GBL_API_DEBUG("No class dtor: [%s]", pIter->pName);
-            }
-
-            for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
-                gblTypeClassUnref((GblClass*)((const char*)pClass + pIter->info.pInterfaceMap[i].classOffset));
-            }
-            pIter = pIter->pParent;
-        } while(pIter);
-        GBL_API_POP(1);
-
-        // Store parent pointer then deallocate
-        GblClass* pParentClass = pMeta->pParent? pMeta->pParent->pClass : NULL;
-       // GBL_API_FREE(pMeta->pClass);
-
-        //Release reference to parent class;
-        if(pParentClass) gblTypeClassUnref(pParentClass);
-
-        // clear the type so it's not looking initialized
-        pMeta->pClass->type = GBL_TYPE_INVALID;
-
-        GBL_API_POP(1);
+        GBL_API_CALL(gblTypeClassDestruct_(pClass));
     }
 
     GBL_API_POP(1);
@@ -901,35 +978,19 @@ GBL_EXPORT GBL_RESULT gblTypeInstanceConstruct(GblType type, GblInstance* pInsta
     GBL_API_CALL(typeInstanceConstructValidate_(type));
     GBL_API_PUSH_VERBOSE("[GblType] Instance Construct: type %s", pMeta->pName);
 
+    // Zero Initialize
+    memset(pInstance, 0, pMeta->info.instanceSize);
+
+    // Set Class
     pClass = gblTypeClassRef(type);
     GBL_API_VERIFY_EXPRESSION(pClass, "Failed to retrieve class reference!");
     pInstance->pClass = pClass;
 
-    // Create a structure to hold all base types
-    const GblSize vecStackSize = sizeof(GblVector) + 20*sizeof(GblMetaClass*);
-    GblVector* pBases = GBL_ALLOCA(vecStackSize);
-    GBL_API_CALL(gblVectorConstruct(pBases, GBL_API_CONTEXT(), sizeof(GblMetaClass*), vecStackSize));
-
-    GBL_API_DEBUG("Populating constructor chain.");
-
-    // Populate structure by traversing hierarchy
-    GblMetaClass* pIter = pMeta;
-    while(pIter) {
-        GBL_API_CALL(gblVectorPushBack(pBases, &pIter));
-        pIter = pIter->pParent;
-    }
-
     GBL_API_DEBUG("Calling constructor chain.");
     GBL_API_PUSH();
 
-    // Iterate backwards over the structure calling ctors from base to derived order
-    GblSize count = 0;
-    GBL_API_CALL(gblVectorSize(pBases, &count));
-    GBL_API_VERIFY(count, GBL_RESULT_ERROR_INTERNAL);
-    for(int idx = count-1; idx >= 0; --idx) {
-        GblMetaClass** ppIter = NULL;
-        GBL_API_CALL(gblVectorAt(pBases, idx, (void**)&ppIter));
-        pIter = *ppIter;
+    for(uint8_t idx = 0; idx <= pMeta->depth; ++idx) {
+        GblMetaClass* pIter = GBL_META_CLASS(gblTypeBase((GblType)pMeta, idx));
         if(pIter->info.pFnInstanceInit) {
             GBL_API_DEBUG("Calling instance initializers: [%s]", pIter->pName);
             GBL_API_CALL(pIter->info.pFnInstanceInit(pInstance, pCtx_));
@@ -939,9 +1000,6 @@ GBL_EXPORT GBL_RESULT gblTypeInstanceConstruct(GblType type, GblInstance* pInsta
     }
 
     GBL_API_POP(1);
-
-    // Free the class heirarchy structure
-    GBL_API_CALL(gblVectorDestruct(pBases));
 
 #ifdef GBL_TYPE_DEBUG
     {
@@ -1024,6 +1082,8 @@ static GblClass* typeClassCast_(const GblClass* pClass, GblType toType, GblBool 
         if(pClass->type == toType) GBL_LIKELY {
             pToClass = pClass;
         } else {
+            GblBool toInterface = GBL_FALSE;
+            if(GBL_TYPE_IS_INTERFACE(toType)) toInterface = GBL_TRUE;
 
             // If current node is an interface class, attempt to "back out" to root class node
             while(gblTypeFundamental(pClass->type) == GBL_TYPE_INTERFACE) {
@@ -1035,22 +1095,23 @@ static GblClass* typeClassCast_(const GblClass* pClass, GblType toType, GblBool 
             GblMetaClass* pMeta = (GblMetaClass*)pClass->type;
             GBL_API_VERIFY_POINTER(pMeta);
 
-            // itatere from derived to base class, breadth-first searching
+            // iterate from derived to base class, breadth-first searching
             do {
                 //check current class
                 if((GblType)pMeta == toType) {
                     pToClass = pClass;
                     break;
                 // check current class's interfaces
-                } else {
-                    GblInterface* pInterface = typeClassInterfacePeek_(pClass, toType);
-                    if(pInterface) {
-                        pToClass = &pInterface->base;
-                        break;
-                    }
                 }
                 pMeta = pMeta->pParent;
             } while(pMeta);
+
+            if(!pToClass && toInterface) {
+                GblInterface* pInterface = typeClassInterfacePeek_(pClass, toType);
+                if(pInterface) {
+                    pToClass = &pInterface->base;
+                }
+            }
         }
 
     }

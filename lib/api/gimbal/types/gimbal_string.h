@@ -303,6 +303,12 @@ GBL_INLINE GBL_API gblStringFromp(GblString* pStr, const void* pPtr) {
     GBL_API_END();
 }
 
+GBL_INLINE GBL_API gblStringConcat(GblString* pStr, const char* pOther) {
+    GBL_API_BEGIN(NULL);
+    GBL_API_CALL(gblVectorConcat(&pStr->data, pOther, strlen(pOther)));
+    GBL_API_END();
+}
+
 /*
 #if 0
 

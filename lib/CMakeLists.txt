@@ -97,16 +97,19 @@ set(GIMBAL_SOURCES
      source/gimbal_ivariant.c
      source/gimbal_variant.c
 #     source/gimbal_meta.c
-#     source/gimbal_object.c
+     source/gimbal_object.c
 #     source/gimbal_context_object.c
      source/gimbal_ext.c
      source/gimbal_type.c
      source/gimbal_value_types.c
      source/gimbal_hash_set.c
      source/gimbal_tree_set.c
+     source/gimbal_property.c
      source/gimbal_itable.c
      source/gimbal_quark.c
      source/gimbal_generics.cpp
+     source/gimbal_ievent_handler.c
+     source/gimbal_ievent_filter.c
      #source/meta2/gimbal_object.c
      lib/hashmap.c/hashmap.c
      lib/btree.c/btree.c
@@ -133,6 +136,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_list.h
     api/gimbal/meta/gimbal_interface.h
     api/gimbal/meta/gimbal_object.h
+    api/gimbal/meta/gimbal_object.hpp
     api/gimbal/types/gimbal_result.hpp
     api/gimbal/types/gimbal_typedefs.h
     api/gimbal/preprocessor/gimbal_compiler.h
@@ -162,7 +166,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/types/gimbal_variant.hpp
 #    api/gimbal/objects/gimbal_instance.h
     api/gimbal/objects/gimbal_object.h
-    api/gimbal/meta/gimbal_plugin.h
+    api/gimbal/meta/gimbal_iplugin.h
 #    api/gimbal/objects/gimbal_context_object.h
 #    api/gimbal/util/gimbal_monitor.hpp
     api/gimbal/containers/gimbal_table.h
@@ -195,6 +199,9 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/gimbal_class.hpp
     api/gimbal/meta/gimbal_instance.h
     api/gimbal/meta/gimbal_ivariant.h
+    api/gimbal/meta/gimbal_ievent_handler.h
+    api/gimbal/meta/gimbal_ievent_filter.h
+    api/gimbal/meta/gimbal_property.h
     api/gimbal/meta/gimbal_itable.h
     api/gimbal/meta/gimbal_variant.h
 #    api/gimbal/meta2/gimbal_primitive.h

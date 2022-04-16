@@ -28,7 +28,7 @@ namespace gimbal {
     using RefCount      = ::GblRefCount;
 
 class Class;
-class Object;
+//class Object;
 class Instance;
 
 

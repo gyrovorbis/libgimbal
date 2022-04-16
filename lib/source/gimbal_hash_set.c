@@ -425,7 +425,7 @@ GBL_EXPORT GblBool GblHashSet_insert(GblHashSet* pSet, const void* pItem) GBL_NO
         if(pValue) GBL_API_DONE();
 
         pValue = GblHashSet_set(pSet, pItem);
-        GBL_API_VERIFY_EXPRESSION(!pValue, "Somehow the item wsn't found in the map before inserting it, but it was there!");
+        GBL_API_VERIFY_EXPRESSION(!pValue, "Somehow the item wasn't found in the map before inserting it, but it was there!");
         inserted = GBL_TRUE;
     }
     GBL_API_END_BLOCK();

@@ -4,7 +4,7 @@
 #include "../core/gimbal_api_frame.hpp"
 #include "gimbal/core/gimbal_api_generators.hpp"
 #include "gimbal_quark.h"
-#include "gimbal_string.hpp"
+//#include "gimbal_string.hpp"
 #include <string>
 
 namespace gimbal {
@@ -29,12 +29,14 @@ namespace gimbal {
         const Quark& operator=(const std::string& stdString);
         const Quark& operator=(const std::pmr::string& stdPmrString);
         const Quark& operator=(const std::string_view& stringView);
-        const Quark& operator=(const String& gblString);
-        const Quark& operator=(const StringView& gblStringView);
+     //   const Quark& operator=(const String& gblString);
+     //   const Quark& operator=(const StringView& gblStringView);
 
 
 
     };
+
+    //const char* Quark::intern()
 
 
     inline Quark::Quark(auto&& v) {
@@ -42,9 +44,6 @@ namespace gimbal {
     }
 
 }
-
-
-callFunc(Quark::intern("fuckYou"));
 
 
 #endif // GIMBAL_QUARK_HPP

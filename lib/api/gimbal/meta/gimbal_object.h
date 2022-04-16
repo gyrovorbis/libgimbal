@@ -4,57 +4,34 @@
 #include "gimbal_type.h"
 #include "gimbal_ivariant.h"
 #include "gimbal_itable.h"
+#include "gimbal_ievent_handler.h"
+#include "gimbal_ievent_filter.h"
+#include "gimbal_property.h"
+#include "../types/gimbal_quark.h"
+#include "../containers/gimbal_list.h"
 
-#define GBL_OBJECT_TYPE                     (GblObject_type())
 #define GBL_OBJECT(instance)                GBL_TYPE_INSTANCE_CAST(instance, GBL_TYPE_OBJECT, GblObject)
 #define GBL_OBJECT_COMPATIBLE(instance)     GBL_TYPE_INSTANCE_IS_A(instance, GBL_TYPE_OBJECT)
 #define GBL_OBJECT_CLASS(klass)             GBL_TYPE_CLASS_CAST(klass, GBL_TYPE_OBJECT, GblObjectClass)
 #define GBL_OBJECT_CLASS_COMPATIBLE(klass)  GBL_TYPE_CLASS_IS_A(klass, GBL_TYPE_OBJECT)
 #define GBL_OBJECT_GET_CLASS(instance)      GBL_TYPE_INSTANCE_CLASS_CAST(instance, GBL_TYPE_OBJECT, GblObjectClass)
 
-#define SELF               GblObject* pSelf
+#define SELF                GblObject* pSelf
 #define CSELF               const SELF
 
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblObject);
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
-
-typedef enum GBL_PROPERTY_FLAGS {
-    GBL_PROPERTY_FLAG_CONSTRUCT,
-    GBL_PROPERTY_FLAG_READ,
-    GBL_PROPERTY_FLAG_WRITE,
-    GBL_PROPERTY_FLAG_SAVE,
-    GBL_PROPERTY_FLAG_LOAD
-} GBL_OBJECT_PROPERTY_FLAGS;
-
-typedef struct GblProperty {
-    struct GblProperty*                 pNext;
-    GblSize                             slot;
-    GBL_PROPERTY_FLAGS                  flags;
-    GblType                             valueType;
-    GblType                             objectType;
-    const char                          name[1];
-} GblProperty;
-
-
-/*
-GblIPropertyContainer (uses property System)
-    - PropertyGet(slot, GblPropertyDescriptor)
-    - PropertySet(slot, GblPropertyDescriptor)
-    - PropertyNotify?
-GblITable
-    - GblIIterable
-    - index()
-    - newIndex
-GblIEventHandler
-GblIEventFilter
-*/
+GBL_FORWARD_DECLARE_STRUCT(GblVector);
+GBL_FORWARD_DECLARE_STRUCT(GblObjectExtraData_);
 
 typedef struct GblObjectClass {
     GblClass                base;
     GblIVariantIFace        iVariantIFace;
     GblITableIFace          iTableIFace;
+    GblIEventHandlerIFace   iEventHandlerIFace;
+    GblIEventFilterIFace    iEventFilterIFace;
 
     GBL_RESULT (*pFnConstructor)        (SELF);
     GBL_RESULT (*pFnDestructor)         (SELF);
@@ -62,112 +39,181 @@ typedef struct GblObjectClass {
 
     GBL_RESULT (*pFnPropertyGet)        (CSELF, GblUint slot, GblVariant* pValue, const GblProperty* pProp);
     GBL_RESULT (*pFnPropertySet)        (SELF,  GblUint slot, const GblVariant* pValue, const GblProperty* pProp);
-    GBL_RESULT (*pFnPropertyNotify)     (SELF, GblProperty* pProperty);    // signal
-    GBL_RESULT (*pFnPropertiesDynamic)  (SELF, GblITable** ppItable);
-
-    GBL_RESULT (*pFnEventHandler)       (SELF, GblEvent* pEvent);   //handle all events
-    GBL_RESULT (*pFnEventFilter)        (SELF, GblObject* pWatched, GblEvent* pEvent);  //installing into other objectsl
+    GBL_RESULT (*pFnPropertyNotify)     (SELF,  GblProperty* pProperty);    // signal
 } GblObjectClass;
-
-GBL_API GblObjectClass_init(GblObjectClass* pClass, void* pData, GblContext hCtx) GBL_NOEXCEPT;
-GBL_API GblObjectClass_final(GblObjectClass* pClass, GblContext hCtx) GBL_NOEXCEPT;
 
 typedef struct GblObject {
     union {
         GblObjectClass*     pClass;
         GblInstance         base;
     };
-    GblRefCount             refCounter;
-    struct GblObject*       pParent;
-    struct GblObject*       pSiblingNext;
-    struct GblObject*       pChildFirst;
+    GblRefCount             refCounter; // should be atomic
 
-    uint32_t                childEventsSend                        : 1;
-    uint32_t                childEventsReceive                     : 1;
-    uint32_t                parentITableIndexFallthrough           : 1;
-    uint32_t                parentITableNewIndexFallthrough        : 1;
-    uint32_t                hasName                                : 1;
-    uint32_t                hasUserdata                            : 1;
-    uint32_t                hasEventFilter                         : 1;
+    uint16_t                childEventsSend                        : 1;
+    uint16_t                childEventsReceive                     : 1;
+    uint16_t                parentITableIndexFallthrough           : 1;
+    uint16_t                parentITableNewIndexFallthrough        : 1;
 
-    //struct ExtraData {
-    //    GblString*          pName;
-    //    void*               pUserdata;
-    //    struct GblObject*   pEventFilters;
-    //}* pExtraData;
-    // GblDataSet
+    GblObjectExtraData_*    pExtraData;
 } GblObject;
 
+GBL_EXPORT GblObject*         GblObject_new                 (GblType type, ...) GBL_NULL_TERMINATED                             GBL_NOEXCEPT;
+GBL_EXPORT GblObject*         GblObject_newVaList           (GblType type, va_list* pList)                                      GBL_NOEXCEPT;
+GBL_EXPORT GblObject*         GblObject_newVariants         (GblType type,
+                                                             GblUint propertyCount,
+                                                             const char* pNames[],
+                                                             const GblVariant* pValues)                                         GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*   GblObject_new(GblType type, const char* pFirstPropertyName, ...) GBL_NULL_TERMINATED GBL_NOEXCEPT;
-GBL_EXPORT GblObject*   GblObject_newVaList(GblType type, const char* pFirstPropertyName, va_list list);
-GBL_EXPORT GblObject*   GblObject_newv(GblType type, GblUint propertyCount, const char* pNames[], const GblVariant values[]);
+GBL_API                       GblObject_get                 (CSELF, ...) GBL_NULL_TERMINATED                                    GBL_NOEXCEPT;
+GBL_API                       GblObject_set                 (SELF, ...) GBL_NULL_TERMINATED                                     GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*   GblObject_ref(GblObject* pObject) GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblObject_unref(GblObject* pObject) GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblObject_refCount(const GblObject* pObject) GBL_NOEXCEPT;
+GBL_API                       GblObject_getVaList           (CSELF, va_list* pList)                                             GBL_NOEXCEPT;
+GBL_API                       GblObject_setVaList           (SELF, va_list* pList)                                              GBL_NOEXCEPT;
 
-GBL_INLINE void         GblObject_userdataSet(SELF, void* pUserdata) GBL_NOEXCEPT;
-GBL_INLINE void*        GblObject_userdataGet(CSELF) GBL_NOEXCEPT;
+GBL_API                       GblObject_getVariants         (CSELF,
+                                                             GblUint propertyCount,
+                                                             const char* pNames[],
+                                                             GblVariant* pValues)                                               GBL_NOEXCEPT;
+GBL_API                       GblObject_setVariants         (SELF,
+                                                             GblUint propertyCount,
+                                                             const char* pNames[],
+                                                             const GblVariant* pValues)                                         GBL_NOEXCEPT;
 
-GBL_INLINE GblObject*   GblObject_parentGet(CSELF) GBL_NOEXCEPT;
-GBL_INLINE void         GblObject_parentSet(SELF, GblObject* pParent) GBL_NOEXCEPT;
+GBL_EXPORT GblObject*         GblObject_ref                 (GblObject* pObject)                                                GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount        GblObject_unref               (GblObject* pObject)                                                GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount        GblObject_refCount            (const GblObject* pObject)                                          GBL_NOEXCEPT;
 
-GBL_INLINE GblObject*   GblObject_ancestorFindByType(CSELF, GblType ancestorType) GBL_NOEXCEPT;
+GBL_INLINE const GblProperty* GblObject_propertyFindString  (CSELF, const char* pName)                                          GBL_NOEXCEPT;
+GBL_INLINE const GblProperty* GblObject_propertyFindQuark   (CSELF, GblQuark name)                                              GBL_NOEXCEPT;
+GBL_INLINE const GblProperty* GblObject_propertyNext        (CSELF, const GblProperty* pPrev, GBL_PROPERTY_FLAGS mask)          GBL_NOEXCEPT;
 
-GBL_INLINE void         GblObject_childAdd(SELF, GblObject* pChild) GBL_NOEXCEPT;
-GBL_INLINE GblBool      GblObject_childRemove(SELF, GblObject* pChild) GBL_NOEXCEPT;
-GBL_INLINE GblObject*   GblObject_childFindByType(CSELF, GblType childType) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT         GblObject_propertyGet         (CSELF, const GblProperty* pProperty, GblVariant* pValue)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT         GblObject_propertySet         (SELF, const GblProperty* pProperty, const GblVariant* pValue)      GBL_NOEXCEPT;
 
-GBL_INLINE GblObject*   GblObject_siblingFindByType(CSELF, GblType siblingType) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT         GblObject_propertyGetQuark    (CSELF, GblQuark name, GblVariant* pValue)                          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT         GblObject_propertySetQuark    (SELF,  GblQuark name, const GblVariant* pValue)                    GBL_NOEXCEPT;
 
+GBL_INLINE GBL_RESULT         GblObject_propertyGetString   (CSELF, const char* pName, GblVariant* pValue)                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT         GblObject_propertySetString   (SELF,  const char* pName, const GblVariant* pValue)                GBL_NOEXCEPT;
 
+GBL_INLINE void               GblObject_userdataSet         (SELF, void* pUserdata)                                             GBL_NOEXCEPT;
+GBL_INLINE void*              GblObject_userdataGet         (CSELF)                                                             GBL_NOEXCEPT;
 
-// =========
-GBL_API                 GblObject_propertyGet(CSELF, const char* pName, GblVariant* pValue) GBL_NOEXCEPT;
-GBL_API                 GblObject_propertySet(SELF,  const char* pName, const GblVariant* pValue) GBL_NOEXCEPT;
+GBL_INLINE GblObject*         GblObject_parentGet           (CSELF)                                                             GBL_NOEXCEPT;
+GBL_INLINE void               GblObject_parentSet           (SELF, GblObject* pParent)                                          GBL_NOEXCEPT;
 
-GBL_API                 GblObject_getVaList(CSELF, const char* pFirstPropertyName, va_list list) GBL_NOEXCEPT;
-GBL_API                 GblObject_setVaList(SELF, const char* pFirstPropertyName, va_list list) GBL_NOEXCEPT;
+GBL_INLINE const char*        GblObject_nameGet             (CSELF) GBL_NOEXCEPT;
+GBL_INLINE void               GblObject_nameSet             (SELF, const char* pName)                                           GBL_NOEXCEPT;
 
-GBL_API                 GblObject_set(CSELF, const char* pFirstPropertyName, ...) GBL_NULL_TERMINATED GBL_NOEXCEPT;
-GBL_API                 GblObject_get(SELF, const char* pFirstPropertyName, ...) GBL_NULL_TERMINATED GBL_NOEXCEPT;
+GBL_INLINE GblObject*         GblObject_ancestorFindByType  (CSELF, GblType ancestorType)                                       GBL_NOEXCEPT;
+GBL_INLINE GblObject*         GblObject_ancestorFindByName  (CSELF, const char* pName)                                          GBL_NOEXCEPT;
 
-GBL_API                 GblObject_setv(CSELF, GblUint propertyCount, const char* pNames[], const GblVariant values[]) GBL_NOEXCEPT;
-GBL_API                 GblObject_getv(SELF, GblUint propertyCount, const char* pNames[], GblVariant values[]) GBL_NOEXCEPT;
+GBL_INLINE GblObject*         GblObject_childFirst          (CSELF)                                                             GBL_NOEXCEPT;
+GBL_INLINE void               GblObject_childAdd            (SELF, GblObject* pChild)                                           GBL_NOEXCEPT;
+GBL_INLINE GblBool            GblObject_childRemove         (SELF, GblObject* pChild)                                           GBL_NOEXCEPT;
+GBL_INLINE GblObject*         GblObject_childFindByType     (CSELF, GblType childType)                                          GBL_NOEXCEPT;
+GBL_INLINE GblObject*         GblObject_childFindByName     (CSELF, const char* pName)                                          GBL_NOEXCEPT;
 
-// ========
+GBL_INLINE GblObject*         GblObject_siblingNext         (CSELF)                                                             GBL_NOEXCEPT;
+GBL_INLINE GblObject*         GblObject_siblingFindByType   (CSELF, GblType siblingType)                                        GBL_NOEXCEPT;
+GBL_INLINE GblObject*         Gblobject_siblingFindByName   (CSELF, const char* pName)                                          GBL_NOEXCEPT;
+
+GBL_API                       GblObject_eventNotify         (SELF, GblEvent* pEvent, GblObject* pSource)                        GBL_NOEXCEPT;
+
+GBL_API                       GblObject_eventFilterInstall  (SELF, GblIEventFilter* pFilter)                                    GBL_NOEXCEPT;
+GBL_API                       GblObject_eventFilterUninstall(SELF, GblIEventFilter* pFilter)                                    GBL_NOEXCEPT;
+GblIEventFilter*              GblObject_eventFilterAt       (CSELF, GblSize index)                                              GBL_NOEXCEPT;
+GblSize                       GblObject_eventFilterCount    (CSELF)                                                             GBL_NOEXCEPT;
+
 
 //GBL_API                 GblObject_load(SELF, GblIStructuredReader* pReader) GBL_NOEXCEPT;
-//GBL_API                 GblObject_save(SELF, GblIStructuredWrite* pWriter) GBL_NOEXCEPT;
+//GBL_API                 GblObject_save(SELF, GblIStructuredWriter* pWriter) GBL_NOEXCEPT;
 
-// =======
+
+
+
+
 
 
 // ============ INLINEZ ===============
-/*
-GBL_INLINE void GblObject_userdataSet(SELF, void* pUserdata) GBL_NOEXCEPT {
-    pSelf->pUserdata = pUserdata;
+
+typedef struct GblObjectExtraData_ {
+    struct GblObject*       pParent;
+    struct GblObject*       pSiblingNext;
+    struct GblObject*       pChildFirst;
+    void*                   pUserdata;
+    GblQuark                name;
+    GblVector*              pEventFilters;
+} GblObjectExtraData_;
+
+GBL_INLINE GBL_RESULT GblObject_ensureExtraData_(SELF) GBL_NOEXCEPT {
+    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
+    if(!pSelf->pExtraData) {
+        pSelf->pExtraData = (GblObjectExtraData_*)GBL_API_MALLOC(sizeof(GblObjectExtraData_));
+        memset(pSelf->pExtraData, 0, sizeof(GblObjectExtraData_));
+    }
+    GBL_API_END();
 }
-GBL_INLINE void* GblObject_userdataGet(CSELF) GBL_NOEXCEPT {
-    return pSelf->pUserdata;
+
+GBL_INLINE const GblProperty* GblObject_propertyFindString(CSELF, const char* pName) GBL_NOEXCEPT {
+    return gblPropertyTableFind(GblInstance_typeOf(GBL_INSTANCE(pSelf)), gblQuarkFromString(pName));
 }
-*/
+GBL_INLINE const GblProperty* GblObject_propertyFindQuark(CSELF, GblQuark name) GBL_NOEXCEPT {
+    return gblPropertyTableFind(GblInstance_typeOf(GBL_INSTANCE(pSelf)), name);
+}
+GBL_INLINE const GblProperty* GblObject_propertyNext(CSELF, const GblProperty* pPrev, GBL_PROPERTY_FLAGS mask) GBL_NOEXCEPT {
+    return gblPropertyTableNext(GblInstance_typeOf(GBL_INSTANCE(pSelf)), pPrev, mask);
+}
+GBL_INLINE GBL_RESULT GblObject_propertySet(SELF, const GblProperty* pProperty, const GblVariant* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
+    GblClass* pClass = gblTypeClassPeek(GblProperty_objectType(pProperty));
+    GBL_API_VERIFY_EXPRESSION(pClass);
+    GBL_API_CALL(GBL_OBJECT_CLASS(pClass)->pFnPropertySet(pSelf, GblProperty_id(pProperty), pValue, pProperty));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblObject_propertyGet(CSELF, const GblProperty* pProperty, GblVariant* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
+    GblClass* pClass = gblTypeClassPeek(GblProperty_objectType(pProperty));
+    GBL_API_VERIFY_EXPRESSION(pClass);
+    GBL_API_CALL(GBL_OBJECT_CLASS(pClass)->pFnPropertyGet(pSelf, GblProperty_id(pProperty), pValue, pProperty));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblObject_propertyGetQuark(CSELF, GblQuark name, GblVariant* pValue) GBL_NOEXCEPT {
+    return GblObject_propertyGet(pSelf, GblObject_propertyFindQuark(pSelf, name), pValue);
+}
+GBL_INLINE GBL_RESULT GblObject_propertySetQuark(SELF,  GblQuark name, const GblVariant* pValue) GBL_NOEXCEPT {
+    return GblObject_propertySet(pSelf, GblObject_propertyFindQuark(pSelf, name), pValue);
+}
+GBL_INLINE GBL_RESULT GblObject_propertyGetString(CSELF, const char* pName, GblVariant* pValue) GBL_NOEXCEPT {
+    return GblObject_propertyGetQuark(pSelf, gblQuarkFromString(pName), pValue);
+}
+GBL_INLINE GBL_RESULT GblObject_propertySetString(SELF,  const char* pName, const GblVariant* pValue) GBL_NOEXCEPT {
+        return GblObject_propertySetQuark(pSelf, gblQuarkFromString(pName), pValue);
+}
+
 GBL_INLINE GblObject* GblObject_parentGet(CSELF) GBL_NOEXCEPT {
-    return pSelf->pParent;
+    return pSelf->pExtraData ? pSelf->pExtraData->pParent : NULL;
 }
 
 GBL_INLINE void GblObject_parentSet(SELF, GblObject* pParent) GBL_NOEXCEPT {
-    if(pSelf->pParent) {
-        GblObject_childRemove(pSelf->pParent, pSelf);
+    GblObject* pOldParent = GblObject_parentGet(pSelf);
+    if(pOldParent) {
+        GblObject_childRemove(pOldParent, pSelf);
     }
 
-    GblObject_childAdd(pParent, pSelf);
+    if(pParent) GblObject_childAdd(pParent, pSelf);
+}
+
+GBL_INLINE GblObject* GblObject_childFirst(CSELF) GBL_NOEXCEPT {
+    return pSelf->pExtraData? pSelf->pExtraData->pChildFirst : NULL;
+}
+GBL_INLINE GblObject*  GblObject_siblingNext(CSELF) GBL_NOEXCEPT {
+    return pSelf->pExtraData? pSelf->pExtraData->pSiblingNext : NULL;
 }
 
 GBL_INLINE GblObject* GblObject_ancestorFindByType(CSELF, GblType ancestorType) GBL_NOEXCEPT {
     GblObject* pAncestor = NULL;
-    GBL_API_BEGIN(NULL); {
+    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf))); {
         GblObject* pNode = GblObject_parentGet(pSelf);
         while(pNode) {
             if(GBL_TYPE_INSTANCE_IS_A(pNode, ancestorType)) {
@@ -181,6 +227,23 @@ GBL_INLINE GblObject* GblObject_ancestorFindByType(CSELF, GblType ancestorType) 
     return pAncestor;
 }
 
+GBL_INLINE GblObject* GblObject_ancestorFindByName(CSELF, const char* pName) GBL_NOEXCEPT {
+    GblObject* pAncestor = NULL;
+        GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf))); {
+            GblObject* pNode = GblObject_parentGet(pSelf);
+            while(pNode) {
+                const char* pNodeName = GblObject_nameGet(pNode);
+                if(pNodeName && strcmp(pNodeName, pName) == 0) {
+                    pAncestor = pNode;
+                    break;
+                }
+                pNode = GblObject_parentGet(pNode);
+            }
+
+        } GBL_API_END_BLOCK();
+        return pAncestor;
+}
+
 GBL_INLINE GblContext GblObject_contextFind(const GblObject* pSelf) GBL_NOEXCEPT {
     return NULL;
     GBL_UNUSED(pSelf);
@@ -189,49 +252,51 @@ GBL_INLINE GblContext GblObject_contextFind(const GblObject* pSelf) GBL_NOEXCEPT
 
 
 GBL_INLINE void GblObject_childAdd(SELF, GblObject* pChild) GBL_NOEXCEPT {
-    GBL_API_BEGIN(NULL);
+    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
     GBL_API_VERIFY_POINTER(pChild);
     {
-        GblObject* pNode = pSelf->pChildFirst;
+        GblObject* pNode = GblObject_childFirst(pSelf);
         if(!pNode) {
-            pSelf->pChildFirst = pChild;
+            GblObject_ensureExtraData_(pSelf);
+            pSelf->pExtraData->pChildFirst = pChild;
         } else {
-            while(pNode->pSiblingNext)
-            {
-                GBL_API_VERIFY_EXPRESSION(pNode != pChild);
-                pNode = pNode->pSiblingNext;
-            }
-            pNode->pSiblingNext = pChild;
+            GblObject* pSibling = NULL;
+            while((pSibling = GblObject_siblingNext(pNode))) {
+                GBL_API_VERIFY_EXPRESSION(pSibling != pChild);
+                pNode = pSibling;
+            };
+            pNode->pExtraData->pSiblingNext = pChild;
         }
-        pChild->pParent = pSelf;
-        pChild->pSiblingNext = NULL;
+        GblObject_ensureExtraData_(pChild);
+        pChild->pExtraData->pParent = pSelf;
+        pChild->pExtraData->pSiblingNext = NULL;
     }
     GBL_API_END_BLOCK();
 }
 
 GBL_INLINE GblBool GblObject_childRemove(SELF, GblObject* pChild) GBL_NOEXCEPT {
     GblBool success = GBL_FALSE;
-    GBL_API_BEGIN(NULL);
+    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
     GBL_API_VERIFY_POINTER(pChild);
-    GBL_API_VERIFY_POINTER(pSelf->pChildFirst);
+    GBL_API_VERIFY_POINTER(pSelf->pExtraData && pSelf->pExtraData->pChildFirst);
     {
-        GblObject* pNode = pSelf->pChildFirst;
+        GblObject* pNode = GblObject_childFirst(pSelf);
         if(pNode == pChild) {
-            pSelf->pChildFirst = pChild->pSiblingNext;
+            pSelf->pExtraData->pChildFirst = pChild->pExtraData->pSiblingNext;
             success = GBL_TRUE;
         } else {
-            while(pNode->pSiblingNext) {
-                if(pNode->pSiblingNext == pChild) {
-                    pNode->pSiblingNext = pChild->pSiblingNext;
+            while(pNode->pExtraData->pSiblingNext) {
+                if(pNode->pExtraData->pSiblingNext == pChild) {
+                    pNode->pExtraData->pSiblingNext = pChild->pExtraData->pSiblingNext;
                     success = GBL_TRUE;
                     break;
                 }
-                pNode = pNode->pSiblingNext;
+                pNode = GblObject_siblingNext(pNode);
             }
         }
         if(success) {
-            pChild->pSiblingNext = NULL;
-            pChild->pParent = NULL;
+            pChild->pExtraData->pSiblingNext = NULL;
+            pChild->pExtraData->pParent = NULL;
         }
     }
     GBL_API_END_BLOCK();
@@ -240,12 +305,29 @@ GBL_INLINE GblBool GblObject_childRemove(SELF, GblObject* pChild) GBL_NOEXCEPT {
 
 GBL_INLINE GblObject* GblObject_childFindByType(CSELF, GblType childType) GBL_NOEXCEPT {
     GblObject* pChild = NULL;
-    GBL_API_BEGIN(NULL); {
-        for(GblObject* pIt = pSelf->pChildFirst;
+    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf))); {
+        for(GblObject* pIt = GblObject_childFirst(pSelf);
             pIt != NULL;
-            pIt = pIt->pSiblingNext)
+            pIt = GblObject_siblingNext(pIt))
         {
             if(GBL_TYPE_INSTANCE_IS_A(pIt, childType)) {
+                pChild = pIt;
+                break;
+            }
+        }
+    } GBL_API_END_BLOCK();
+    return pChild;
+}
+
+GBL_INLINE GblObject* GblObject_childFindByName(CSELF, const char* pName) GBL_NOEXCEPT {
+    GblObject* pChild = NULL;
+    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf))); {
+        for(GblObject* pIt = GblObject_childFirst(pSelf);
+            pIt != NULL;
+            pIt = GblObject_siblingNext(pIt))
+        {
+            const char* pNodeName = GblObject_nameGet(pIt);
+            if(pNodeName && strcmp(pNodeName, pName) == 0) {
                 pChild = pIt;
                 break;
             }
@@ -262,103 +344,41 @@ GBL_INLINE GblObject* GblObject_siblingFindByType(CSELF, GblType siblingType) GB
     return pObject;
 }
 
-
-
-
-
-#if 0
-/*
-void                    GblObject_nameSet(SELF, const char* pName);
-const char*             GblObject_nameGet(CSELF);
-*/
-GblObject*              GblObject_ancestorFindByName(CSELF, const char* pName);
-
-
-
-
-GblSize                 GblObject_childCount(CSELF);
-GblObject*              GblObject_childAt(CSELF, GblSize index);
-GblObject*              GblObject_childFindByName(CSELF, const char* pName);
-
-GblObject*              GblObject_descendentFindByName(CSELF, const char* pName);
-GblObject*              GblObject_descendentFindByType(CSELF, GblType childType);
-
-GblSize                 GblObject_siblingCount(CSELF);
-GblObject*              GblObject_siblingAt(CSELF, GblSize index);
-GblObject*              GblObject_siblingFindByName(CSELF, const char* pName);
-
-
-
-
-GBL_RESULT              GblObject_propertyNext(CSELF, const GblVariant* pPrevKey, GblVariant* pNextKey, GblVariant* pNextValue);
-
-GBL_RESULT              GblObject_get(CSELF, const char* pFirstProperty, ...);
-GBL_RESULT              GblObject_getVaList(CSELF, const char* pFirstProperty, va_list varArgs);
-GBL_RESULT              GblObject_getVariants(CSELF, GblSize propertyCount, const char* pNames[], GblVariant pVariants[]);
-GBL_RESULT              GblObject_toLson(CSELF, GblString* pString);
-GBL_RESULT              GblObject_fromLson(SELF, const char* pString);
-
-GBL_RESULT              GblObject_set(SELF, const char* pFirstProperty, ...);
-GBL_RESULT              GblObject_setVaList(SELF, va_list varArgs);
-GBL_RESULT              GblObject_setVariants(SELF, GblSize propertyCount, const char* pNames[], const GblVariant pVariants[]);
-
-GBL_RESULT              GblObject_eventSend(SELF, GblEvent* pEvent);
-void                    GblObject_eventFilterInstall(SELF, GblObject* pFilterObj);
-void                    GblObject_eventFilterUninstall(SELF, const GblObject* pFilterObj);
-
-GblContext              GblObject_findContext(CSELF);
-
-#endif
-
-
-
-/*
-
-
-#define GBL_OBJECT_VCALL_BODY(VFUNC, ...)                                       \
-    if(!pSelf)                  return GBL_RESULT_ERROR_INVALID_INSTANCE;       \
-    if(!pSelf->pClass)          return GBL_RESULT_ERROR_INVALID_CLASS;          \
-    if(!pSelf->pClass->VFUNC)   return GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL;   \
-    else                        return pSelf->pClass->VFUNC(__VA_ARGS__)
-
-GBL_DECLS_BEGIN
-
-GBL_INLINE GBL_RESULT   GblObject_vConstruct (SELF);
-GBL_INLINE GBL_RESULT   GblObject_vDestruct  (SELF);
-GBL_INLINE GBL_RESULT   GblObject_vCopy      (SELF, const void* pSrc);
-GBL_INLINE GBL_RESULT   GblObject_vMove      (SELF, void* pSrc);
-GBL_INLINE GBL_RESULT   GblObject_vCompare   (CSELF, const GblVariant* pVariant, GblCmpResult* pResult);
-GBL_INLINE GBL_RESULT   GblObject_vConvert   (CSELF, GblVariant* pVariant);
-GBL_INLINE GBL_RESULT   GblObject_vLoad      (SELF, const GblString* pString);
-GBL_INLINE GBL_RESULT   GblObject_vSave      (CSELF, GblString* pString);
-*/
-#if 0
-GBL_INLINE GBL_RESULT GblObject_vConstruct(SELF) {
-    GBL_OBJECT_VCALL_BODY(pFnConstruct, pSelf);
-}
-GBL_INLINE GBL_RESULT GblObject_vDestruct(SELF) {
-    GBL_OBJECT_VCALL_BODY(pFnDestruct, pSelf);
-}
-GBL_INLINE GBL_RESULT GblObject_vCopy(SELF, const void* pSrc) {
-    GBL_OBJECT_VCALL_BODY(pFnCopy, pSelf, pSrc);
-}
-GBL_INLINE GBL_RESULT GblObject_vMove(SELF, void* pSrc) {
-    GBL_OBJECT_VCALL_BODY(pFnMove, pSelf, pSrc);
-}
-GBL_INLINE GBL_RESULT GblObject_vCompare(CSELF, const GblVariant* pVariant, GblCmpResult* pResult) {
-    GBL_OBJECT_VCALL_BODY(pFnCompare, pSelf, pVariant, pResult);
-}
-GBL_INLINE GBL_RESULT GblObject_vConvert(CSELF, GblVariant* pVariant) {
-    GBL_OBJECT_VCALL_BODY(pFnConvert, pSelf, pVariant);
-}
-GBL_INLINE GBL_RESULT GblObject_vLoad(SELF, const GblString* pString) {
-    GBL_OBJECT_VCALL_BODY(pFnLoad, pSelf, pString);
-}
-GBL_INLINE GBL_RESULT GblObject_vSave(CSELF, GblString* pString) {
-    GBL_OBJECT_VCALL_BODY(pFnSave, pSelf, pString);
+GBL_INLINE GblObject* GblObject_siblingFindByName(CSELF, const char* pName) GBL_NOEXCEPT {
+    GblObject* pObject = NULL;
+    GblObject* pParent = GblObject_parentGet(pSelf);
+    if(pParent) {
+        pObject = GblObject_childFindByName(pParent, pName);
+    }
+    return pObject;
 }
 
-#endif
+GBL_INLINE void GblObject_nameSet(SELF, const char* pName) GBL_NOEXCEPT {
+    if(pName) {
+        GblObject_ensureExtraData_(pSelf);
+        pSelf->pExtraData->name = gblQuarkFromString(pName);
+    } else if(pSelf->pExtraData) {
+        pSelf->pExtraData->name = GBL_QUARK_INVALID;
+    }
+}
+GBL_INLINE const char* GblObject_nameGet(CSELF) GBL_NOEXCEPT {
+    return pSelf->pExtraData? gblQuarkToString(pSelf->pExtraData->name) : NULL;
+}
+
+GBL_INLINE void* GblObject_userdataGet(CSELF) GBL_NOEXCEPT {
+    return pSelf->pExtraData? pSelf->pExtraData->pUserdata : NULL;
+}
+
+
+GBL_INLINE void GblObject_userdataSet(SELF, void* pUserdata) GBL_NOEXCEPT {
+    if(pUserdata) {
+        GblObject_ensureExtraData_(pSelf);
+        pSelf->pExtraData->pUserdata = pUserdata;
+    } else if(pSelf->pExtraData) {
+        pSelf->pExtraData->pUserdata = NULL;
+    }
+}
+
 GBL_DECLS_END
 
 

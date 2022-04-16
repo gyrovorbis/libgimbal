@@ -29,7 +29,10 @@ add_executable(GimbalTests
 #    include/test_gimbal_meta.hpp
     include/test_gimbal_object.hpp
     include/test_gimbal_algorithms.hpp
-    test_main.cpp)
+    include/test_gimbal_quark.hpp
+    source/test_gimbal_object.cpp
+    source/test_gimbal_string.cpp
+    source/test_main.cpp)
 
 
 target_link_libraries(GimbalTests

@@ -4,11 +4,11 @@
 #include "gimbal_interface.h"
 #include "../core/gimbal_api_frame.h"
 
-#define GBL_IVARIANT(instance)                  GBL_TYPE_INSTANCE_CAST(instance, GBL_TYPE_IVARIANT GblIVariant)
+#define GBL_IVARIANT(instance)                  GBL_TYPE_INSTANCE_CAST(instance, GBL_TYPE_IVARIANT, GblIVariant)
 #define GBL_IVARIANT_COMPATIBLE(instance)       GBL_TYPE_INSTANCE_IS_A(instance, GBL_TYPE_IVARIANT)
 #define GBL_IVARIANT_IFACE(klass)               GBL_TYPE_CLASS_CAST(klass, GBL_TYPE_IVARIANT, GblIVariantIFace)
-#define GBL_IVARIANT_CLASS_COMPATIBLE(klass)    GBL_TYPE_CLASS_IS_A(klass, GBL_TYPE_IVARIANT)
-#define GBL_IVARIANT_GET_IFACE(instance)        GBL_TYPE_INSTANCE_CLASS_CAST(instance, GBL_TYPE_IVARIANT, GblIVariantIface)
+#define GBL_IVARIANT_IFACE_COMPATIBLE(klass)    GBL_TYPE_CLASS_IS_A(klass, GBL_TYPE_IVARIANT)
+#define GBL_IVARIANT_GET_IFACE(instance)        GBL_TYPE_INSTANCE_CLASS_CAST(instance, GBL_TYPE_IVARIANT, GblIVariantIFace)
 
 #define GBL_IVARIANT_VALUE_VAR_ARG_MAX          4
 
@@ -48,7 +48,7 @@ typedef struct GblIVariantIFace {
 
     GBL_RESULT (*pFnConstruct)(VARIANT,  GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
     GBL_RESULT (*pFnSet)      (VARIANT,  GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
-    GBL_RESULT (*pFnGet)      (VARIANT,  GblUint argc, GblVariant*       pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnGet)      (VARIANT,  GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
     GBL_RESULT (*pFnDestruct) (VARIANT);
     GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, GblInt* pResult);
     GBL_RESULT (*pFnSave)     (CVARIANT, GblString* pString);
@@ -63,15 +63,15 @@ GBL_API GblIVariantIFace_validate            (CSELF)                            
 GBL_API GblIVariantIFace_constructDefault    (CSELF, VARIANT)                               GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_constructCopy       (CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_constructMove       (CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_constructValueCopy  (CSELF, VARIANT,  va_list varArgs)             GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_constructValueMove  (CSELF, VARIANT,  va_list varArgs)             GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructValueCopy  (CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructValueMove  (CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_setCopy             (CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_setMove             (CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_setValueCopy        (CSELF, VARIANT,  va_list varArgs)             GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_setValueMove        (CSELF, VARIANT,  va_list varArgs)             GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_getValueCopy        (CSELF, CVARIANT, va_list varArgs)             GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_getValuePeek        (CSELF, CVARIANT, va_list varArgs)             GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_getValueTake        (CSELF, CVARIANT, va_list varArgs)             GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setValueCopy        (CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setValueMove        (CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_getValueCopy        (CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_getValuePeek        (CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_getValueTake        (CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_destruct            (CSELF, VARIANT)                               GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_compare             (CSELF, CVARIANT, const GblVariant* pOther,
                                               GblInt* pCmpResult)                           GBL_NOEXCEPT;

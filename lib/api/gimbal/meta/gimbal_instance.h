@@ -9,7 +9,7 @@ GBL_DECLS_BEGIN
 #define SELF    GblInstance*       pSelf
 #define CSELF   const GblInstance* pSelf
 
-#if 0
+#if 1
 GBL_INLINE GblType      GblInstance_typeOf      (CSELF);
 GBL_INLINE GblSize      GblInstance_sizeOf      (CSELF);
 GBL_INLINE GblSize      GblInstance_alignOf     (CSELF);
