@@ -1,12 +1,19 @@
 #ifndef GIMBAL_INTERFACE_H
 #define GIMBAL_INTERFACE_H
 
-#include "gimbal_instance.h"
+#include "gimbal_class.h"
+
+#define GBL_INTERFACE(klass)                GBL_TYPE_CAST_CLASS(klass, GBL_TYPE_INTERFACE, GblInterface)
 
 #define SELF    GblInterface* pSelf
 #define CSELF   const GblInterface* pSelf
 
 GBL_DECLS_BEGIN
+
+typedef struct GblInterface {
+    GblClass    base;
+    int16_t     offsetToTop;
+} GblInterface;
 
 GBL_INLINE int16_t              GblInterface_classOffset(CSELF);
 GBL_INLINE GblClass*            GblInterface_outerClass(CSELF);

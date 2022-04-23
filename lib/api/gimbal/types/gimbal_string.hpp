@@ -90,9 +90,9 @@ public:
     }
 
     Context* getContext(void) const {
-        GblContext hCtx = GBL_HANDLE_INVALID;
-        Exception::checkThrow(gblStringContext(str_(), &hCtx));
-        return hCtx == GBL_HANDLE_INVALID? nullptr : Context::fromHandle(hCtx);
+        GblContext* pCtx = nullptr;
+        Exception::checkThrow(gblStringContext(str_(), &pCtx));
+        return pCtx == nullptr? nullptr : Context::fromGblObj(pCtx);
     }
 
     constexpr bool isEmpty(void) const {
@@ -225,7 +225,7 @@ public:
         GblStringView tempView = {stringView.data(), stringView.length()};
         Exception::checkThrow(gblStringConstruct(this,
                                             size,
-                                            pCtx? static_cast<GblContext>(*pCtx) : nullptr,
+                                            pCtx,
                                             &tempView));
     }
 

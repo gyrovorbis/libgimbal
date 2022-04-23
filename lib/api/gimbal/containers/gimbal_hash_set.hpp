@@ -62,7 +62,7 @@ public:
     size_type       bucket_count(void) const noexcept;
     size_type       bucket_size (void) const noexcept;
     bool            empty       (void) const noexcept;
-    GblContext      context     (void) const noexcept;
+    GblContext*     context     (void) const noexcept;
 
     const_pointer   get         (const key_type& key) const noexcept;
 
@@ -329,7 +329,7 @@ template<typename CRTP, typename K>
 inline bool HashSetBase<CRTP, K>::empty(void) const noexcept { return GblHashSet_empty(getSet()); }
 
 template<typename CRTP, typename K>
-inline GblContext HashSetBase<CRTP, K>::context(void) const noexcept { return GblHashSet_context(getSet()); }
+inline GblContext* HashSetBase<CRTP, K>::context(void) const noexcept { return GblHashSet_context(getSet()); }
 
 template<typename CRTP, typename K>
 inline HashSetBase<CRTP, K>::operator const GblHashSet*() const { return getSet(); }
@@ -444,7 +444,7 @@ inline HashSet<K, H, P>::HashSet(size_type   capacity,
                          comparatorCb_,
                          destructCb_,
                          capacity,
-                         pCtx? static_cast<GblContext>(*pCtx) : nullptr,
+                         pCtx,
                          this);
 }
 
@@ -520,7 +520,7 @@ inline HashSet<K, H, P>::HashSet(type_compatible_iterator_readable<value_type> a
 
 template<typename K, typename H, typename P>
 inline HashSet<K, H, P>::HashSet(HashSet& other, Context* pCtx) {
-    GblHashSet_clone(this, &other, pCtx? static_cast<GblContext>(*pCtx) : nullptr);
+    GblHashSet_clone(this, &other, pCtx);
 }
 
 template<typename K, typename H, typename P>

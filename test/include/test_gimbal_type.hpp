@@ -126,11 +126,11 @@ inline void Type::unregisterType(void) {
 struct CInstance;
 
 #define CINSTANCE_TYPE                      (CInstance_type())
-#define CINSTANCE(instance)                 GBL_TYPE_INSTANCE_CAST(instance, CINSTANCE_TYPE, CInstance)
-#define CINSTANCE_COMPATIBLE(instance)      GBL_TYPE_INSTANCE_IS_A(instance, CINSTANCE_TYPE)
-#define CINSTANCE_CLASS(klass)              GBL_TYPE_CLASS_CAST(klass, CINSTANCE_TYPE, CInstanceClass)
-#define CINSTANCE_CLASS_COMPATIBLE(klass)   GBL_TYPE_CLASS_IS_A(klass, CINSTANCE_TYPE)
-#define CINSTANCE_GET_CLASS(instance)       GBL_TYPE_INSTANCE_CLASS_CAST(instance, CINSTANCE_TYPE, CInstanceClass)
+#define CINSTANCE(instance)                 GBL_TYPE_CAST_INSTANCE(instance, CINSTANCE_TYPE, CInstance)
+#define CINSTANCE_COMPATIBLE(instance)      GBL_TYPE_CHECK_INSTANCE(instance, CINSTANCE_TYPE)
+#define CINSTANCE_CLASS(klass)              GBL_TYPE_CAST_CLASS(klass, CINSTANCE_TYPE, CInstanceClass)
+#define CINSTANCE_CLASS_COMPATIBLE(klass)   GBL_TYPE_CHECK_CLASS(klass, CINSTANCE_TYPE)
+#define CINSTANCE_GET_CLASS(instance)       GBL_TYPE_CAST_GET_CLASS(instance, CINSTANCE_TYPE, CInstanceClass)
 
 
 struct CInstanceClass {
@@ -156,8 +156,8 @@ static int CInstanceClass_vPrint(const CInstance* pSelf, int value) {
     return value * (pSelf? pSelf->integer: 2);
 }
 
-static GBL_RESULT CInstanceClass_init(GblClass* pClass, const void* pData, GblContext hCtx) {
-    GBL_API_BEGIN(hCtx);
+static GBL_RESULT CInstanceClass_init(GblClass* pClass, const void* pData, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
     CInstanceClass* pSelf = reinterpret_cast<CInstanceClass*>(pClass);
     pSelf->pHeapInteger = (int*)malloc(sizeof(int));
     *pSelf->pHeapInteger = (uintptr_t)pData;
@@ -166,16 +166,16 @@ static GBL_RESULT CInstanceClass_init(GblClass* pClass, const void* pData, GblCo
     GBL_API_END();
 }
 
-static GBL_RESULT CInstanceClass_final(GblClass* pClass, const void* pData, GblContext hCtx) {
-    GBL_API_BEGIN(hCtx);
+static GBL_RESULT CInstanceClass_final(GblClass* pClass, const void* pData, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
     GBL_UNUSED(pData);
     CInstanceClass* pSelf = reinterpret_cast<CInstanceClass*>(pClass);
     free(pSelf->pHeapInteger);
     GBL_API_END();
 }
 
-static GBL_RESULT CInstance_init(GblInstance* pInstance, GblContext hCtx) {
-    GBL_API_BEGIN(hCtx);
+static GBL_RESULT CInstance_init(GblInstance* pInstance, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
     CInstance* pSelf = (CInstance*)pInstance;
     pSelf->floating = 10.0f;
     pSelf->integer = 2;
@@ -242,9 +242,9 @@ inline void Type::cClassedType(void) {
 }
 
 #define CPPINSTANCE_TYPE                  (CppInstance_type())
-#define CPPINSTANCE(instance)             GBL_TYPE_INSTANCE_CAST(instance, CPPINSTANCE_TYPE, CppInstance)
-#define CPPINSTANCE_CLASS(klass)          GBL_TYPE_CLASS_CAST(klass, CPPINSTANCE_TYPE, CppInstanceClass)
-#define CPPINSTANCE_GET_CLASS(instance)   GBL_TYPE_INSTANCE_CLASS_CAST(instance, CPPINSTANCE_TYPE, CppInstanceClass)
+#define CPPINSTANCE(instance)             GBL_TYPE_CAST_INSTANCE(instance, CPPINSTANCE_TYPE, CppInstance)
+#define CPPINSTANCE_CLASS(klass)          GBL_TYPE_CAST_CLASS(klass, CPPINSTANCE_TYPE, CppInstanceClass)
+#define CPPINSTANCE_GET_CLASS(instance)   GBL_TYPE_CAST_GET_CLASS(instance, CPPINSTANCE_TYPE, CppInstanceClass)
 
 struct CppInstanceClass: public CInstanceClass {
     QString qString;
@@ -261,9 +261,9 @@ inline GblType (*CppInstance_type)(void) = []() -> GblType {
             "CppInstance",
             gimbal::TypeInfo {
                 {
-                    .pFnClassInit = [](GblClass* pClass, const void*, GblContext hCtx) {
+                    .pFnClassInit = [](GblClass* pClass, const void*, GblContext* pCtx) {
                         auto* pSelf = (CppInstanceClass*)(pClass);
-                        GBL_API_FUNCTION(hCtx, ({
+                        GBL_API_FUNCTION(pCtx, ({
                             new (&pSelf->qString) QString("QSTRING CLASS");
                             pSelf->vPrint = [](const CInstance*, int value) -> int {
                                 printf("virtual overload!!!");
@@ -271,16 +271,16 @@ inline GblType (*CppInstance_type)(void) = []() -> GblType {
                             };
                         }));
                     },
-                    .pFnClassFinalize = [](GblClass* pClass, const void*, GblContext hCtx) {
-                        GBL_API_FUNCTION(hCtx, ({
+                    .pFnClassFinalize = [](GblClass* pClass, const void*, GblContext* pCtx) {
+                        GBL_API_FUNCTION(pCtx, ({
                             reinterpret_cast<CppInstanceClass*>(pClass)->qString.~QString();
                         }));
                     },
                     .classSize = sizeof(CppInstanceClass),
                     .classAlign = alignof(CppInstanceClass),
                     .pClassData = (void*)(uintptr_t)44,
-                    .pFnInstanceInit = [](GblInstance* pInstance, GblContext hCtx) {
-                        GBL_API_FUNCTION(hCtx, ({
+                    .pFnInstanceInit = [](GblInstance* pInstance, GblContext* pCtx) {
+                        GBL_API_FUNCTION(pCtx, ({
                             new (&reinterpret_cast<CppInstance*>(pInstance)->qString) QString("QSTRING INSTANCE");
                         }));
                     },
@@ -347,9 +347,9 @@ inline void Type::placementDerivedType(void) {
 
 
 #define CINTERFACE_TYPE                  (CInterface_type())
-#define CINTERFACE(instance)             GBL_TYPE_INSTANCE_CAST(instance, CINTERFACE_TYPE, CInterface)
-#define CINTERFACE_CLASS(klass)          GBL_TYPE_CLASS_CAST(klass, CINTERFACE_TYPE, CInterface)
-#define CINTERFACE_GET_CLASS(instance)   GBL_TYPE_INSTANCE_CLASS_CAST(instance, CINTERFACE_TYPE, CInterface)
+#define CINTERFACE(instance)             GBL_TYPE_CAST_INSTANCE(instance, CINTERFACE_TYPE, CInterface)
+#define CINTERFACE_CLASS(klass)          GBL_TYPE_CAST_CLASS(klass, CINTERFACE_TYPE, CInterface)
+#define CINTERFACE_GET_CLASS(instance)   GBL_TYPE_CAST_GET_CLASS(instance, CINTERFACE_TYPE, CInterface)
 
 struct CInterface {
     GblInterface        baseClass;
@@ -367,9 +367,9 @@ inline GblType (*CInterface_type)(void) = []() -> GblType {
         "CInterface",
         gimbal::TypeInfo {
             {
-                .pFnClassInit = [](GblClass* pClass, const void* pUd, GblContext hCtx) {
+                .pFnClassInit = [](GblClass* pClass, const void* pUd, GblContext* pCtx) {
                     auto* pSelf = reinterpret_cast<CInterface*>(pClass);
-                    GBL_API_FUNCTION(hCtx, ({
+                    GBL_API_FUNCTION(pCtx, ({
                         pSelf->staticInt = (int)(uintptr_t)pUd;
                         pSelf->pVClassStringer = [](void) {
                             return "CInterface::classStringer";
@@ -412,9 +412,9 @@ struct ICppInstance: public CppInstance {
 };
 
 #define ICPPINSTANCE_TYPE                  (ICppInstance_type())
-#define ICPPINSTANCE(instance)             GBL_TYPE_INSTANCE_CAST(instance, ICPPINSTANCE_TYPE, ICppInstance)
-#define ICPPINSTANCE_CLASS(klass)          GBL_TYPE_CLASS_CAST(klass, ICPPINSTANCE_TYPE, ICppInstanceClass)
-#define ICPPINSTANCE_GET_CLASS(instance)   GBL_TYPE_INSTANCE_CLASS_CAST(instance, ICPPINSTANCE_TYPE, ICppInstanceClass)
+#define ICPPINSTANCE(instance)             GBL_TYPE_CAST_INSTANCE(instance, ICPPINSTANCE_TYPE, ICppInstance)
+#define ICPPINSTANCE_CLASS(klass)          GBL_TYPE_CAST_CLASS(klass, ICPPINSTANCE_TYPE, ICppInstanceClass)
+#define ICPPINSTANCE_GET_CLASS(instance)   GBL_TYPE_CAST_GET_CLASS(instance, ICPPINSTANCE_TYPE, ICppInstanceClass)
 
 inline GblType (*ICppInstance_type)(void) = []() {
     static GblType type = GBL_TYPE_INVALID;
@@ -427,8 +427,8 @@ inline GblType (*ICppInstance_type)(void) = []() {
         "ICppInstance",
         gimbal::TypeInfo {
             {
-                .pFnClassInit = [](GblClass* pClass, const void*, GblContext hCtx) {
-                    GBL_API_FUNCTION(hCtx, {
+                .pFnClassInit = [](GblClass* pClass, const void*, GblContext* pCtx) {
+                    GBL_API_FUNCTION(pCtx, {
                         auto* pSelf = reinterpret_cast<ICppInstanceClass*>(pClass);
                         pSelf->staticFloat = -3.33f;
                         pSelf->cInterfaceClass.pVClassStringer = [](void) {
@@ -443,8 +443,8 @@ inline GblType (*ICppInstance_type)(void) = []() {
                 .classAlign = alignof(ICppInstanceClass),
                 .interfaceCount = 1,
                 .pInterfaceMap = &entry,
-                .pFnInstanceInit = [](GblInstance* pInstance, GblContext hCtx) {
-                    GBL_API_FUNCTION(hCtx, {
+                .pFnInstanceInit = [](GblInstance* pInstance, GblContext* pCtx) {
+                    GBL_API_FUNCTION(pCtx, {
                         reinterpret_cast<ICppInstance*>(pInstance)->instanceFloat = 3.33f;
                     });
                 },

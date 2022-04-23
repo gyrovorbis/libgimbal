@@ -235,11 +235,11 @@ void String::assignHeapCMove(void) {
     const char* pCStr = "CGblStrHeap";
     const auto view = GblStringView { pCStr, 0 };
 
-    const auto test = [&](GblContext hCtx1=GBL_HANDLE_INVALID,
+    const auto test = [&](GblContext* pCtx1=nullptr,
                           MonitorableContext* pCtx2=nullptr)
     {
         GblString gStr;
-        GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), hCtx1, &view));
+        GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), pCtx1, &view));
 
         gimbal::String string(pCtx2);
         string = std::move(gStr);
@@ -252,7 +252,7 @@ void String::assignHeapCMove(void) {
     test();
 
     auto block = GBL_TEST_API_BLOCK() {
-        test(GBL_HANDLE_INVALID, pCtx());
+        test(nullptr, pCtx());
     };
     QCOMPARE(block.getActiveAllocCount(), 0);
     QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemAlloc), 1);
@@ -605,7 +605,7 @@ void String::concat(void) {
 void String::operatorAdd(void) {
     GblString cStr{};
     const GblStringView cView { "gblCStr" };
-    GBL_TEST_VERIFY_RESULT(gblStringConstruct(&cStr, sizeof(GblString), GBL_HANDLE_INVALID, &cView));
+    GBL_TEST_VERIFY_RESULT(gblStringConstruct(&cStr, sizeof(GblString), nullptr, &cView));
 
     gimbal::String str(pCtx());
     str =               gimbal::String()                +

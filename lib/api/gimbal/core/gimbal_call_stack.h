@@ -2,9 +2,7 @@
 #define GIMBAL_CALL_STACK_H
 
 #include "../types/gimbal_typedefs.h"
-#include "gimbal_state.h"
 #include "gimbal_thread.h"
-#include "../objects/gimbal_handle.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,18 +40,18 @@ GBL_INLINE void GBL_MEM_ALLOC_INFO_APPEND(GblMemAllocInfo* pInfo1, const GblMemA
 typedef struct GblCallRecord {
     char                message[GBL_API_RESULT_MSG_BUFFER_SIZE];
     GblSourceLocation   srcLocation;
-    struct GblHandle_*  hHandle;
+    struct GblObject*   pObject;
     GBL_RESULT          result;
 } GblCallRecord;
 
-GBL_MAYBE_UNUSED GBL_INLINE void GBL_CALL_RECORD_CONSTRUCT(GblCallRecord* pRecord, struct GblHandle_* hHandle, GBL_RESULT resultCode, GblSourceLocation source, const char* pFmt, ...) {
+GBL_MAYBE_UNUSED GBL_INLINE void GBL_CALL_RECORD_CONSTRUCT(GblCallRecord* pRecord, struct GblObject* pObject, GBL_RESULT resultCode, GblSourceLocation source, const char* pFmt, ...) {
     va_list varArgs;
     va_start(varArgs, pFmt);
     memset(pRecord, 0, sizeof(GblCallRecord));
     if(pFmt) vsnprintf(pRecord->message, sizeof(pRecord->message), pFmt, varArgs);
     va_end(varArgs);
     pRecord->srcLocation    = source;
-    pRecord->hHandle        = hHandle;
+    pRecord->pObject        = pObject;
     pRecord->result         = resultCode;
 }
 
@@ -70,9 +68,9 @@ typedef struct GblStackFrame {
     GblCallRecord           record;
     GblCallRecord           lastFailure;
     uint32_t                sourceCurrentCaptureDepth;
-    GblHandle               hHandle;
-    GblContext              hContext;
-    void*                   pHandleUd;
+    GblObject*              pObject;
+    GblContext*             pContext;
+    void*                   pObjectUd;
     void*                   pContextUd;
     uint32_t                stackDepth;
     const GblThread*        pThread;
@@ -80,39 +78,7 @@ typedef struct GblStackFrame {
 } GblStackFrame;
 
 
-GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblHandle hHandle, GBL_RESULT initialResult, GblSourceLocation entryLoc) {
-    GBL_RESULT result               = GBL_RESULT_SUCCESS;
-    GblContext hContext             = GBL_NULL;
-    void* pHandleUserdata           = GBL_NULL;
-    void* pContextUserdata          = GBL_NULL;
-
-    if(!hHandle) {
-        hContext = gblThreadContext(NULL);
-    }
-
-    if(hHandle) {
-        result = gblHandleContext(hHandle, &hContext);
-        GBL_ASSERT(GBL_RESULT_SUCCESS(result));
-        result = gblHandleUserdata(hHandle, &pHandleUserdata);
-        GBL_ASSERT(GBL_RESULT_SUCCESS(result));
-    }
-
-    if(hContext) {
-        result = gblHandleUserdata((GblHandle)hContext, &pContextUserdata);
-        GBL_ASSERT(GBL_RESULT_SUCCESS(result));
-    }
-
-    memset(pFrame, 0, sizeof(GblStackFrame));
-    GBL_CALL_RECORD_CONSTRUCT(&pFrame->record, hHandle, initialResult, entryLoc, gblResultString(initialResult));
-    pFrame->sourceEntry     = entryLoc;
-    pFrame->sourceCurrent   = entryLoc;
-    pFrame->hHandle         = hHandle;
-    pFrame->hContext        = hContext;
-    pFrame->pContextUd      = pContextUserdata;
-    pFrame->pHandleUd       = pHandleUserdata;
-    pFrame->pPrevFrame      = NULL;
-    return result;
-}
+GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObject, GBL_RESULT initialResult, GblSourceLocation entryLoc);
 
 static inline GblBool GBL_API_STACK_FRAME_SOURCE_PUSH(GblStackFrame* pStackFrame, GblSourceLocation current) {
     if(++pStackFrame->sourceCurrentCaptureDepth == 1) { //we care about the first entry point

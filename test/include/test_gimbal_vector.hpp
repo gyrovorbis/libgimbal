@@ -30,7 +30,7 @@ private:
             pCtx_(pCtx), x_(x), y_(y) {}
 
         ~Emplacer_(void) {
-            GBL_API_BEGIN(static_cast<GblContext>(*pCtx_));
+            GBL_API_BEGIN(static_cast<GblContext*>(pCtx_));
             GBL_API_WARN("DELETING EMPLACER[%f, %d]", x_, y_);
             GBL_API_END_BLOCK();
         }

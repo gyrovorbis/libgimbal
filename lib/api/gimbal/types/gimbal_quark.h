@@ -1,13 +1,13 @@
 #ifndef GIMBAL_QUARK_H
 #define GIMBAL_QUARK_H
 
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/types/gimbal_typedefs.h>
 
 GBL_DECLS_BEGIN
 
 #define GBL_QUARK_INVALID ((GblQuark)0)
 
-GBL_API                 gblQuarkReinit(GblContext hCtx, GblSize pageSize, GblSize initialEntries) GBL_NOEXCEPT;
+GBL_API                 gblQuarkReinit(GblContext* pCtx, GblSize pageSize, GblSize initialEntries) GBL_NOEXCEPT;
 GblSize                 gblQuarkPageCount(void) GBL_NOEXCEPT;
 GblSize                 gblQuarkBytesUsed(void) GBL_NOEXCEPT;
 GblSize                 gblQuarkCount(void) GBL_NOEXCEPT;

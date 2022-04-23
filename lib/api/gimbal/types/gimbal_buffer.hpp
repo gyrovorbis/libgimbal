@@ -59,7 +59,7 @@ public:
 
 // ======= IMPLEMENTATION =======
 inline Buffer::Buffer(Size bytes, const void* pData, Context* pCtx) {
-    Exception::checkThrow(GblBuffer_construct(this, bytes, pData, pCtx? static_cast<GblContext>(*pCtx) : nullptr));
+    Exception::checkThrow(GblBuffer_construct(this, bytes, pData, pCtx));
 }
 inline Buffer::Buffer(Size bytes, Context* pCtx):
     Buffer(bytes, nullptr, pCtx) {}
@@ -124,7 +124,7 @@ inline bool Buffer::isEmpty(void) const {
 }
 
 inline Context* Buffer::getContext(void) const {
-    return Context::fromHandle(GblBuffer_context(this));
+    return Context::fromGblObj(GblBuffer_context(this));
 }
 
 inline void Buffer::clear(void) {

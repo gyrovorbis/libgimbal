@@ -79,7 +79,8 @@ GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE);
 #define GBL_RESULT_ERROR(value) \
     (((value) & 0xfff00000) == GBL_RESULT_ERROR)
 
-
+#define GBL_RESULT_ISSUE(value) \
+    (!GBL_RESULT_SUCCESS(value))
 
 #ifdef __cplusplus
 }

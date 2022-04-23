@@ -164,6 +164,8 @@
 #   else
 #       define GBL_MAYBE_UNUSED
 #   endif
+#elif defined(__clang__) || defined(__GNUC__)
+#   define GBL_MAYBE_UNUSED __attribute__((unused))
 #else
 #   define GBL_MAYBE_UNUSED
 #endif
@@ -265,9 +267,9 @@
 #endif
 
 #ifdef __cplusplus
-#   define GBL_INLINE   inline
+#   define GBL_INLINE   GBL_MAYBE_UNUSED inline
 #else
-#   define GBL_INLINE   static inline
+#   define GBL_INLINE   GBL_MAYBE_UNUSED static inline
 #endif
 
 // ====== NONSTANDARD COMPILER-SPECIFIC C FUNCTIONS ==========

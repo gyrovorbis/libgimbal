@@ -11,7 +11,7 @@ GBL_FORWARD_DECLARE_STRUCT_PRIVATE(GblThread);
 
 GBL_API         gblThreadCurrent        (GblThread** pThread);
 
-GblContext      gblThreadContext        (const GblThread* pThread);
+GblContext*      gblThreadContext        (const GblThread* pThread);
 
 GBL_API         gblThreadNameGet        (const GblThread* pThread,  const char** ppName);
 GBL_API         gblThreadNameSet        (GblThread* pThread,        const char* pName);

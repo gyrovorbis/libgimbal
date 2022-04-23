@@ -19,11 +19,25 @@ private slots:
     void unref(void);
     void extendedData(void);
     void newVaArgs(void);
+    void newInPlaceVaArgs(void);
+    void newVaArgsWithClass(void);
+    void newInPlaceVaArgsWithClass(void);
+    void newInPlaceVaArgsWithClassInPlace(void);
     void newVariants(void);
+    void newVariantsWithClass(void);
+    void newInPlaceVariants(void);
+    void newInPlaceVariantsWithClass(void);
     void propertyGet(void);
     void propertySet(void);
     void parenting(void);
+    void classSwizzle(void);
+    void eventNotify(void);
+    void eventNotifyAncestors(void);
+    void eventSendAncestors(void);
+    void eventFilters(void);
 
+
+    // iteration, saving, loading, variant interop
 
 };
 

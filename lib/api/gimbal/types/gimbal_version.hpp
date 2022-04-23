@@ -1,6 +1,7 @@
 #ifndef GIMBAL_VERSION_HPP
 #define GIMBAL_VERSION_HPP
 
+#include <string>
 #include "gimbal_version.h"
 #include "../core/gimbal_api_generators.hpp"
 

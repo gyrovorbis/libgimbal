@@ -7,7 +7,7 @@
 GBL_DECLS_BEGIN
 
 
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+GBL_INLINE GBL_CONSTEXPR
 uint8_t gblPow2Next_u8(uint8_t n) GBL_NOEXCEPT {
     GBL_ASSERT(n >= 2);
     --n;
@@ -15,7 +15,7 @@ uint8_t gblPow2Next_u8(uint8_t n) GBL_NOEXCEPT {
     return n + 1;
 }
 
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+GBL_INLINE GBL_CONSTEXPR
 uint16_t gblPow2Next_u16(uint16_t n) GBL_NOEXCEPT {
     GBL_ASSERT(n >= 2);
     --n;
@@ -23,7 +23,7 @@ uint16_t gblPow2Next_u16(uint16_t n) GBL_NOEXCEPT {
     return n + 1;
 }
 
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+GBL_INLINE GBL_CONSTEXPR
 uint32_t gblPow2Next_u32(uint32_t n) GBL_NOEXCEPT {
     GBL_ASSERT(n >= 2);
     --n;
@@ -31,7 +31,7 @@ uint32_t gblPow2Next_u32(uint32_t n) GBL_NOEXCEPT {
     return n + 1;
 }
 
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+GBL_INLINE GBL_CONSTEXPR
 uint64_t gblPow2Next_u64(uint64_t n) GBL_NOEXCEPT {
     GBL_ASSERT(n >= 2);
     --n;
@@ -51,7 +51,7 @@ uint64_t gblPow2Next_u64(uint64_t n) GBL_NOEXCEPT {
 
 #define gblPow2Next(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS, X)(X);
 
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+GBL_INLINE GBL_CONSTEXPR
 GblSize gblAlignedAllocSize(GblSize bytes) GBL_NOEXCEPT {
     const GblSize remainder = bytes % GBL_ALLOC_MIN_SIZE;
     GblSize newSize = bytes;
@@ -62,7 +62,7 @@ GblSize gblAlignedAllocSize(GblSize bytes) GBL_NOEXCEPT {
 }
 
 // GCD using Euclid's algorithm, only >0 values
-GBL_MAYBE_UNUSED GBL_INLINE GBL_CONSTEXPR
+GBL_INLINE GBL_CONSTEXPR
 GblInt gblGcd(GblInt u, GblInt v) GBL_NOEXCEPT {
     GblInt R;
     //if(!u) return v;
@@ -75,7 +75,17 @@ GblInt gblGcd(GblInt u, GblInt v) GBL_NOEXCEPT {
     return v;
 }
 
-GBL_MAYBE_UNUSED GBL_INLINE
+GBL_INLINE GBL_CONSTEXPR
+GblInt gblParity(uint8_t n) {
+    int p = 0;
+    while(n) GBL_LIKELY {
+        p = !p;
+        n &= (n-1);
+    }
+    return p;
+}
+
+GBL_INLINE
 uint32_t gblntohl(uint32_t n) GBL_NOEXCEPT {
     unsigned char *np = (unsigned char *)&n;
     return ((uint32_t)np[0] << 24) |
@@ -84,7 +94,7 @@ uint32_t gblntohl(uint32_t n) GBL_NOEXCEPT {
             (uint32_t)np[3];
 }
 
-GBL_MAYBE_UNUSED GBL_INLINE
+GBL_INLINE
 uint32_t gblhtonl(uint32_t x) GBL_NOEXCEPT {
 #if GBL_BIG_ENDIAN == 0
     uint8_t *s = (uint8_t *)&x;

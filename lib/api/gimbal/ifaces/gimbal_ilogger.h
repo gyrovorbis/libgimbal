@@ -1,34 +1,56 @@
 #ifndef GIMBAL_ILOGGER_H
 #define GIMBAL_ILOGGER_H
 
-#include "gimbal_icomponent.h"
 
-#define GBL_META_LOG_LEVEL_TABLE (                                                          \
-        ( GBL_LOG_LEVEL, LogLevel, "Log Message Severity Level", gblLogLevelString),        \
-        (                                                                                   \
-            (GBL_LOG_LEVEL_DEBUG,       0x0,    Debug,      "Debug"),                       \
-            (GBL_LOG_LEVEL_VERBOSE,     0x1,    Verbose,    "Verbose"),                     \
-            (GBL_LOG_LEVEL_INFO,        0x2,    Info,       "Info"),                        \
-            (GBL_LOG_LEVEL_WARNING,     0x3,    Warning,    "Warning"),                     \
-            (GBL_LOG_LEVEL_ERROR,       0x4,    Error,      "Error"),                       \
-            (GBL_LOG_LEVEL_COUNT,       0x5,    Count,      "# of Levels")                  \
-        )                                                                                   \
-    )
+#include "../meta/gimbal_interface.h"
+#include "../core/gimbal_api_frame.h"
 
-GBL_ENUM_TABLE_DECLARE(GBL_META_LOG_LEVEL_TABLE);
+#define GBL_ILOGGER_TYPE                GBL_TYPE_ILOGGER
+#define GBL_ILOGGER_STRUCT              GblILogger
+#define GBL_ILOGGER_CLASS_STRUCT        GblILoggerIFace
+#define GBL_ILOGGER(inst)               (GBL_TYPE_CAST_INSTANCE_PREFIX  (inst,  GBL_ILOGGER))
+#define GBL_ILOGGER_CHECK(inst)         (GBL_TYPE_CHECK_INSTANCE_PREFIX (inst,  GBL_ILOGGER))
+#define GBL_ILOGGER_IFACE(klass)        (GBL_TYPE_CAST_CLASS_PREFIX     (klass, GBL_ILOGGER))
+#define GBL_ILOGGER_IFACE_CHECK(klass)  (GBL_TYPE_CHECK_CLASS_PREFIX    (klass, GBL_ILOGGER))
+#define GBL_ILOGGER_GET_IFACE(inst)     (GBL_TYPE_CAST_GET_CLASS_PREFIX (inst,  GBL_ILOGGER))
 
-// MAKE #defines FOR THIS SHIT
-typedef struct GblLogDomain {
-    const char* pModule;
-} GbLogDomain;
+#define SELF    GblILogger* pSelf
+#define CSELF   const SELF
 
-#define ILogger_IFACE                                                                                                     \
-    vfunc(GBL_RESULT, write, VSelf, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs)  \
-    vfunc(GBL_RESULT, push,  VSelf, const GblStackFrame* pFrame)                                                          \
-    vfunc(GBL_RESULT, pop,   VSelf, const GblStackFrame* pFrame, uint32_t count)
+GBL_DECLS_BEGIN
 
-#define ILogger_EXTENDS (IComponent)
+GBL_FORWARD_DECLARE_STRUCT(GblILogger);
 
-interface(ILogger);
+
+typedef struct GblILoggerIFace {
+    GblInterface base;
+    GBL_RESULT (*pFnWrite)  (SELF, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
+    GBL_RESULT (*pFnPush)   (SELF, const GblStackFrame* pFrame);
+    GBL_RESULT (*pFnPop)    (SELF, const GblStackFrame* pFrame, uint32_t count);
+} GblILoggerIFace;
+
+
+GBL_API GblILogger_write(SELF,
+                         const GblStackFrame*   pFrame,
+                         GBL_LOG_LEVEL          level,
+                         const char*            pFmt,
+                         va_list                varArgs)    GBL_NOEXCEPT;
+
+GBL_API GblILogger_push(SELF,
+                        const GblStackFrame* pFrame)        GBL_NOEXCEPT;
+
+GBL_API GblILogger_pop(SELF,
+                       const GblStackFrame* pFrame,
+                       uint32_t             count)          GBL_NOEXCEPT;
+
+
+
+GBL_DECLS_END
+
+#undef CSELF
+#undef SELF
+
+
+
 
 #endif // GIMBAL_ILOGGER_H

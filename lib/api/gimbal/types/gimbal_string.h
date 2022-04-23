@@ -51,7 +51,7 @@ GBL_INLINE GBL_API gblStringClear(GblString* pStr) {
 }
 
 GBL_INLINE GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrView) {
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     const void* pData = NULL;
     GblSize newSize = 0;
     if(pStrView) {
@@ -64,10 +64,10 @@ GBL_INLINE GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrVie
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblStringConstruct(GblString* pString, GblSize size, GblContext hCtx, const GblStringView* pView) {
+GBL_INLINE GBL_API gblStringConstruct(GblString* pString, GblSize size, GblContext* pCtx, const GblStringView* pView) {
     GblStringView defaultView = { GBL_NULL, 0 };
     //const GblSize extraSize = size - sizeof(GblString);
-    GBL_API_BEGIN(hCtx);
+    GBL_API_BEGIN(pCtx);
     if(!pView) {
         pView = &defaultView;
     } else if(!pView->size && pView->pBuffer) {
@@ -75,7 +75,7 @@ GBL_INLINE GBL_API gblStringConstruct(GblString* pString, GblSize size, GblConte
         defaultView.size = strlen(pView->pBuffer);
         pView = &defaultView;
     }
-    GBL_API_CALL(gblVectorConstruct_6(&pString->data, hCtx, 1, size, pView->pBuffer, pView->size));
+    GBL_API_CALL(gblVectorConstruct_6(&pString->data, pCtx, 1, size, pView->pBuffer, pView->size));
     GBL_API_END();
 }
 
@@ -85,14 +85,14 @@ GBL_INLINE GBL_API gblStringTake(GblString* pStr, char** ppStrPtr, GblSize* pCap
 }
 
 GBL_INLINE GBL_API gblStringGive(GblString* pStr, char* pData, GblSize capacity) {
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     if(!capacity) capacity = strlen(pData);
     GBL_API_CALL(gblVectorGive(&pStr->data, pData, capacity, capacity));
     pStr->data.size = strlen((const char*)pStr->data.pBuffer);
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblStringContext(const GblString* pStr, GblContext* pCtx) {
+GBL_INLINE GBL_API gblStringContext(const GblString* pStr, GblContext** pCtx) {
     return gblVectorContext(&pStr->data, pCtx);
 }
 
@@ -138,7 +138,7 @@ GBL_INLINE GBL_API gblStringCompare(const GblString* pStr1, const GblString* pSt
 
 GBL_INLINE GBL_API gblStringInsert(GblString* pStr, GblSize index, const GblStringView* pView) {
     GblSize count = 0;
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_VERIFY_POINTER(pView);
     if(pView->size) {
         count = pView->size;
@@ -151,7 +151,7 @@ GBL_INLINE GBL_API gblStringInsert(GblString* pStr, GblSize index, const GblStri
 }
 
 GBL_INLINE GBL_API gblStringVaSprintf(GblString* pStr, const char* pFmt, va_list varArgs) {
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GblSize newCapacity = 0;
     size_t expectedSize = 0;
     va_list varArgsCopy;
@@ -188,7 +188,7 @@ GBL_INLINE GBL_API gblStringVaSprintf(GblString* pStr, const char* pFmt, va_list
 }
 
 GBL_INLINE GBL_API gblStringSprintf(GblString* pStr, const char* pFmt, ...) {
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     va_list varArgs;
     va_start(varArgs, pFmt);
     GBL_API_CALL(gblStringVaSprintf(pStr, pFmt, varArgs));
@@ -198,7 +198,7 @@ GBL_INLINE GBL_API gblStringSprintf(GblString* pStr, const char* pFmt, ...) {
 
 GBL_INLINE GBL_API gblStringToi(const GblString* pStr, GblInt* pValue) {
     const char* pCStr = NULL;
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_VERIFY_POINTER(pValue);
     GBL_API_CALL(gblStringCStr(pStr, &pCStr));
     *pValue = atoi(pCStr);
@@ -207,7 +207,7 @@ GBL_INLINE GBL_API gblStringToi(const GblString* pStr, GblInt* pValue) {
 
 GBL_INLINE GBL_API gblStringTof(const GblString* pStr, GblFloat* pValue) {
     const char* pCStr = NULL;
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_VERIFY_POINTER(pValue);
     GBL_API_CALL(gblStringCStr(pStr, &pCStr));
     *pValue = atof(pCStr);
@@ -216,7 +216,7 @@ GBL_INLINE GBL_API gblStringTof(const GblString* pStr, GblFloat* pValue) {
 
 GBL_INLINE GBL_API gblStringTod(const GblString* pStr, double* pValue) {
     const char* pCStr = NULL;
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_VERIFY_POINTER(pValue);
     GBL_API_CALL(gblStringCStr(pStr, &pCStr));
     *pValue = atof(pCStr);
@@ -226,7 +226,7 @@ GBL_INLINE GBL_API gblStringTod(const GblString* pStr, double* pValue) {
 GBL_INLINE GBL_API gblStringTob(const GblString* pStr, GblBool* pValue) {
     const char* pCStr = NULL;
     *pValue = GBL_FALSE;
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_VERIFY_POINTER(pValue);
     GBL_API_CALL(gblStringCStr(pStr, &pCStr));
     if(strncmp(pCStr, "true", sizeof("true")) == 0) {
@@ -243,7 +243,7 @@ GBL_INLINE GBL_API gblStringToNil(const GblString* pStr, GblBool* pValue) {
     const char* pCStr = NULL;
     GblSize length = 0;
     *pValue = GBL_FALSE;
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_VERIFY_POINTER(pValue);
     GBL_API_CALL(gblStringCStr(pStr, &pCStr));
     GBL_API_CALL(gblStringLength(pStr, &length));
@@ -255,7 +255,7 @@ GBL_INLINE GBL_API gblStringToNil(const GblString* pStr, GblBool* pValue) {
 
 GBL_INLINE GBL_API gblStringFromNil(GblString* pStr) {
     GblStringView view;
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     view.pBuffer = "nil"; view.size = sizeof("nil");
     GBL_API_CALL(gblStringAssign(pStr, &view));
     GBL_API_END();
@@ -263,7 +263,7 @@ GBL_INLINE GBL_API gblStringFromNil(GblString* pStr) {
 
 GBL_INLINE GBL_API gblStringFromb(GblString* pStr, GblBool value) {
     GblStringView view;
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     if(value) {
         view.pBuffer = "true"; view.size = sizeof("true");
     } else {
@@ -274,31 +274,31 @@ GBL_INLINE GBL_API gblStringFromb(GblString* pStr, GblBool value) {
 }
 
 GBL_INLINE GBL_API gblStringFromi(GblString* pStr, GblInt value) {
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_CALL(gblStringSprintf(pStr, "%d", value));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringFromu(GblString* pStr, GblUint value) {
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_CALL(gblStringSprintf(pStr, "%u", value));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringFromf(GblString* pStr, GblFloat value) {
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_CALL(gblStringSprintf(pStr, "%." GBL_STRINGIFY(GBL_STRING_FLOAT_DECIMAL_PLACES) "f", value));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringFromd(GblString* pStr, double value) {
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_CALL(gblStringSprintf(pStr, "%." GBL_STRINGIFY(GBL_STRING_FLOAT_DECIMAL_PLACES) "lf", value));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringFromp(GblString* pStr, const void* pPtr) {
-    GBL_API_BEGIN(pStr->data.hCtx);
+    GBL_API_BEGIN(pStr->data.pCtx);
     GBL_API_CALL(gblStringSprintf(pStr, "0x%x", pPtr));
     GBL_API_END();
 }

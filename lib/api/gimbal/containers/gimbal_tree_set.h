@@ -37,7 +37,7 @@ typedef struct GblTreeSetPool {
  } GblTreeSetPool;
 
 typedef struct GblTreeSet {
-    GblContext                  hCtx;
+    GblContext*                 pCtx;
     GblSize                     entrySize;
     GblTreeSetEntryCompareFn    pFnCompare;
     GblTreeSetEntryDestructFn   pFnDestruct;
@@ -65,14 +65,14 @@ GBL_API                 GblTreeSet_construct_7  (SELF,
                                                 GblTreeSetEntryCompareFn  pFnCompare,
                                                 GblTreeSetEntryDestructFn pFnDestruct,
                                                 GblSize                   maxEntries,
-                                                GblContext                hCtx,
+                                                GblContext*               pCtx,
                                                 void*                     pUserdata)    GBL_NOEXCEPT;
 GBL_API                 GblTreeSet_construct_6  (SELF,
                                                 GblSize                   entrySize,
                                                 GblTreeSetEntryCompareFn  pFnCompare,
                                                 GblTreeSetEntryDestructFn pFnDestruct,
                                                 GblSize                   maxEntries,
-                                                GblContext                hCtx)         GBL_NOEXCEPT;
+                                                GblContext*               pCtx)         GBL_NOEXCEPT;
 GBL_API                 GblTreeSet_construct_5  (SELF,
                                                 GblSize                   entrySize,
                                                 GblTreeSetEntryCompareFn  pFnCompare,
@@ -92,7 +92,7 @@ GBL_API                 GblTreeSet_destruct     (SELF)                          
 
 GBL_INLINE GblSize      GblTreeSet_size         (CSELF)                                 GBL_NOEXCEPT;
 GBL_INLINE GblSize      GblTreeSet_height       (CSELF)                                 GBL_NOEXCEPT;
-GBL_INLINE GblContext   GblTreeSet_context      (CSELF)                                 GBL_NOEXCEPT;
+GBL_INLINE GblContext*  GblTreeSet_context      (CSELF)                                 GBL_NOEXCEPT;
 GBL_INLINE GblBool      GblTreeSet_empty        (CSELF)                                 GBL_NOEXCEPT;
 GBL_INLINE void*        GblTreeSet_userdata     (CSELF)                                 GBL_NOEXCEPT;
 
@@ -118,8 +118,8 @@ GBL_INLINE GblSize GblTreeSet_height(CSELF) GBL_NOEXCEPT {
     return pSelf->height;
 }
 
-GBL_INLINE GblContext GblTreeSet_context(CSELF) GBL_NOEXCEPT {
-    return pSelf->hCtx;
+GBL_INLINE GblContext* GblTreeSet_context(CSELF) GBL_NOEXCEPT {
+    return pSelf->pCtx;
 }
 
 GBL_INLINE GblBool GblTreeSet_empty(CSELF) GBL_NOEXCEPT {

@@ -14,7 +14,7 @@ class Variant: public UnitTestSet {
     struct Cuntass {
         GblInt i;
         struct VariantCompatibleTypeTraits: public VariantCompatibleTypeTraitsDefault<Cuntass> {
-            constexpr static auto variantType  = VariantType(VariantType::Int);
+            inline static auto variantType  = Int32Type();
             struct Forwarder {
                 static GblInt forward(const Cuntass& cunt) { return cunt.i; }
             };

@@ -29,8 +29,6 @@ friend bool operator()
 #endif
 
 
-GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_VARIANT_TYPE_TABLE);
-
 
 template<typename T>
 struct VariantCompatibleTypeTraitsDefault {
@@ -55,7 +53,7 @@ struct VariantCompatibleTypeTraits: public VariantCompatibleTypeTraitsDefault<T>
 template<typename T>
 concept variant_compatible =
         requires(T t) {
-            VariantCompatibleTypeTraits<T>::variantType != VariantType::Nil;
+            VariantCompatibleTypeTraits<T>::variantType != NilType();
         };
 
         template<typename Class>

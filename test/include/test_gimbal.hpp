@@ -359,7 +359,17 @@ protected:
         case LogLevel::Verbose:
         case LogLevel::Info:
         default:
-            logger.info("%s", Q_CSTR(buffer));
+        {
+#if 0
+            if(GBL_TYPE_CONTEXT != GBL_TYPE_INVALID) {
+                GBL_API_BEGIN(static_cast<GblContext*>(this));
+                GBL_INSTANCE_VCALL_SUPER(GBL_TYPE_CONTEXT, GblContextClass, iLoggerIFace.pFnWrite, (GblILogger*)static_cast<GblContext*>(this), &frame, level, pFmt, varArgs);
+                GBL_API_END_BLOCK();
+            } else
+#else
+                logger.info("%s", Q_CSTR(buffer));
+#endif
+        }
             break;
         }
     }
@@ -493,7 +503,7 @@ class ApiBlock {
 protected:
     gimbal::StackFrame stackFrame_;
     std::string name_;
-    gimbal::Handle* pHandle_    = nullptr;
+    GblObject* pObject_    = nullptr;
     ContextCountersMonitor countersMonitor_;
     ContextActiveAllocMonitor activeAllocMonitor_;
     bool asserted_ = false;
@@ -501,17 +511,17 @@ protected:
     std::exception_ptr pException_;
 
 public:
-    ApiBlock(gimbal::Handle* pHandle,
+    ApiBlock(GblObject* pObject,
              std::string name    = "unnamed",
              const char* pFile   = nullptr,
              const char* pFunc   = nullptr,
              gimbal::Size line   = 0,
              gimbal::Size column = 0):
-        stackFrame_(*pHandle,
+        stackFrame_(pObject,
                     gimbal::Result(gimbal::Result::Success),
                     GBL_SOURCE_LOCATION(pFile, pFunc, line, column)),
         name_(std::move(name)),
-        pHandle_(pHandle),
+        pObject_(pObject),
         countersMonitor_(getContext()),
         activeAllocMonitor_(getContext())
     {
@@ -525,7 +535,7 @@ public:
                                 stackFrame_.getSourceEntry().getFunctionName().data(),
                                 stackFrame_.getSourceEntry().getLineNumber(),
                                 stackFrame_.getSourceEntry().getColumn(),
-                                *pHandle_,
+                                pObject_,
                                 &stackFrame_);
             countersMonitor_.begin();
             activeAllocMonitor_.begin();
@@ -559,8 +569,10 @@ public:
     }
 
     std::string_view getName(void) const { return name_; }
-    gimbal::Handle* getHandle(void) const { return pHandle_; }
-    MonitorableContext* getContext(void) const { return dynamic_cast<MonitorableContext*>(pHandle_->getContext()); }
+    GblObject* getObject(void) const { return pObject_; }
+    MonitorableContext* getContext(void) const {
+        return dynamic_cast<MonitorableContext*>(Context::fromGblObj(GblObject_contextFind(getObject())));
+    }
     const ContextCountersMonitor& getCountersMonitor(void) const { return countersMonitor_; }
 
     const gimbal::StackFrame& getFrame(void) const { return stackFrame_; }
@@ -579,7 +591,7 @@ public:
 };
 
 #define GBL_TEST_CASE_API_BLOCK(ctx_, name) \
-    ApiBlock(ctx_, name, GBL_SOURCE_FILE, GBL_SOURCE_FUNCTION, GBL_SOURCE_LINE, GBL_SOURCE_COLUMN) = [&](GBL_MAYBE_UNUSED GBL_API_FRAME_DECLARE)
+    ApiBlock(GBL_OBJECT(static_cast<GblContext*>(ctx_)), name, GBL_SOURCE_FILE, GBL_SOURCE_FUNCTION, GBL_SOURCE_LINE, GBL_SOURCE_COLUMN) = [&](GBL_MAYBE_UNUSED GBL_API_FRAME_DECLARE)
 
 #define GBL_TEST_API_BLOCK() \
     GBL_TEST_CASE_API_BLOCK(pCtx(), GBL_SOURCE_FUNCTION)
@@ -619,8 +631,8 @@ public:
 
 protected:
     MonitorableContext* pCtx_ = nullptr;
-    GblContext gblCtx(void) const { return *pCtx_; }
-    GblContext hCtx(void) const { return gblCtx(); }
+    GblContext* gblCtx(void) const { return pCtx_; }
+    GblContext* hCtx(void) const { return gblCtx(); }
     MonitorableContext& ctx(void) const { return *pCtx_; }
     MonitorableContext* pCtx(void) const { return pCtx_; }
 

@@ -3,7 +3,6 @@
 
 #include "gimbal_api_generators.h"
 #include "../algorithms/gimbal_numeric.h"
-#include "../objects/gimbal_context.h"
 #include "gimbal_ext.h"
 #include "gimbal_call_stack.h"
 #include "gimbal_thread.h"
@@ -137,10 +136,10 @@ extern "C" {
     //initial allocation uses ALLOCA, can proxy to inline functions!!
 #define GBL_API_FRAME_DECLARE   GblStackFrame* GBL_API_FRAME_NAME
 #define GBL_API_FRAME()         (GBL_API_FRAME_NAME)
-#define GBL_API_CONTEXT()       GBL_API_FRAME()->hContext
+#define GBL_API_CONTEXT()       GBL_API_FRAME()->pContext
 #define GBL_API_CONTEXT_UD()    GBL_API_FRAME()->pContextUd
-#define GBL_API_HANDLE()        GBL_API_FRAME()->hHandle
-#define GBL_API_HANDLE_UD()     GBL_API_FRAME()->pHandleUd
+#define GBL_API_OBJECT()        GBL_API_FRAME()->pObject
+#define GBL_API_OBJECT_UD()     GBL_API_FRAME()->pObjectUd
 #define GBL_API_RECORD()        GBL_API_FRAME()->record
 #define GBL_API_RESULT()        GBL_API_RECORD().result
 #define GBL_API_SOURCE()        GBL_API_FRAME()->sourceCurrent
@@ -255,7 +254,7 @@ extern "C" {
     GBL_API_VERIFY_(gblTypeIsA(actualType, expectedType), GBL_RESULT_ERROR_TYPE_MISMATCH, srcLoc GBL_VA_ARGS(__VA_ARGS__))
 
 #define GBL_API_VERIFY_TYPE_2(srcLoc, actualType) \
-    GBL_API_VERIFY_(actualType != GBL_TYPE_INVALID, GBL_RESULT_ERROR_INVALID_TYPE, srcLoc GBL_VA_ARGS(__VA_ARGS__))
+    GBL_API_VERIFY_(actualType != GBL_TYPE_INVALID, GBL_RESULT_ERROR_INVALID_TYPE, srcLoc)
 
 #define GBL_API_VERIFY_TYPE(...) \
     GBL_STMT_START { \
@@ -467,19 +466,14 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     } GBL_STMT_END
 
 
-#define GBL_API_EVENT_2(srcLoc, type) \
+#define GBL_API_EVENT_2(srcLoc, event) \
     GBL_API_SOURCE_SCOPED(GBL_API_EXT, srcLoc, EVENT, type, NULL, 0)
 
-#define GBL_API_EVENT_3(srcLoc, type, data) \
-    GBL_API_SOURCE_SCOPED(GBL_API_EXT, srcLoc, EVENT, type, data, sizeof(data))
-
-#define GBL_API_EVENT_4(srcLoc, type, data, size) \
-    GBL_API_SOURCE_SCOPED(GBL_API_EXT, srcLoc, EVENT, type, data, size)
-
-#define GBL_API_EVENT(...) \
+#define GBL_API_EVENT(event) \
     GBL_STMT_START { \
         const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
-        GBL_VA_OVERLOAD_SELECT(GBL_API_EVENT, GBL_VA_OVERLOAD_SUFFIXER_ARGC, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
+        GBL_UNUSED(src_);                                                \
+       GblObject_eventSend(GBL_API_OBJECT(), event);                     \
     } GBL_STMT_END
 
 
@@ -564,7 +558,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_API_RECORD_LAST_RECORD_(prefix, record)                             \
     GBL_STMT_START {                                                            \
         if(GBL_RESULT_##prefix(record->result)) {                               \
-            GBL_ASSERT(gblContextCallRecordSet(GBL_API_CONTEXT(), record),       \
+            GBL_ASSERT(gblExtCallRecordSet(GBL_API_FRAME(), record),       \
                         "Context Last error failed!");                          \
             GBL_ASSERT(gblThreadCallRecordSet(NULL, record),                    \
                 "Thread Last error failed!");                                   \
@@ -608,7 +602,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_API_RECORD_SET_N(file, func, line, col, result, pFmt, ...)                                                                  \
     GBL_STMT_START {                                                                                                                                \
         GBL_API_SOURCE_LOC_PUSH(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL));                                                            \
-        GBL_CALL_RECORD_CONSTRUCT(&GBL_API_RECORD(), GBL_API_HANDLE(), result, GBL_API_SOURCE(), pFmt GBL_VA_ARGS(__VA_ARGS__));        \
+        GBL_CALL_RECORD_CONSTRUCT(&GBL_API_RECORD(), GBL_API_OBJECT(), result, GBL_API_SOURCE(), pFmt GBL_VA_ARGS(__VA_ARGS__));        \
         GBL_API_RECORD_HANDLER(&GBL_API_RECORD());                                                                                      \
         GBL_API_SOURCE_POP();                                                                                                           \
     } GBL_STMT_END
@@ -639,34 +633,14 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         GBL_VA_OVERLOAD_SELECT(GBL_API_CALL, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
     } GBL_STMT_END
 
-//====== VERIFY_OBJECT TYPE=========
-#define GBL_API_VERIFY_OBJECT_TYPE_N(srcLoc, hObject, baseType, ...)                                    \
-    GBL_API_VERIFY_HANDLE_N(srcLoc, hObject, "Invalid Object Handle");                                  \
-    GBL_STMT_START {                                                                                    \
-        const GblMetaObject* pMetaObject = NULL;                                                        \
-        GblBool hasBase = GBL_FALSE;                                                                    \
-        GBL_API_CALL_2(srcLoc, gblObjectMetaObject(hObject, GBL_API_CONTEXT(), &pMetaObject));          \
-        GBL_API_CALL_2(srcLoc, gblMetaObjectCheckType(pMetaObject, baseType, &hasBase));                \
-        GBL_API_VERIFY_(hasBase, GBL_RESULT_ERROR_TYPE_MISMATCH, srcLoc GBL_VA_ARGS(__VA_ARGS__));      \
-    } GBL_STMT_END
-
-#define GBL_API_VERIFY_OBJECT_TYPE_3(srcLoc, hObject, baseType) \
-    GBL_API_VERIFY_OBJECT_TYPE_N(srcLoc, hObject, baseType, "Object Type Check Failed. Expected Base: "#baseType);
-
-
-#define GBL_API_VERIFY_OBJECT_TYPE_(...) \
-    GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_OBJECT_TYPE, GBL_VA_OVERLOAD_SUFFIXER_3_N, __VA_ARGS__)(__VA_ARGS__);
-
-#define GBL_API_VERIFY_OBJECT_TYPE(...) \
-        GBL_API_VERIFY_OBJECT_TYPE_(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__);
 
 // ================= TOP-LEVEL API UTILITIES ==============
 
 
-#define GBL_API_BEGIN_FRAME(file, func, line, col, hHandle, frame) \
+#define GBL_API_BEGIN_FRAME(file, func, line, col, pObject, frame) \
     const SrcLoc gblApiEntrySrcLoc_ = SRC_LOC(file, func, line, col); \
     GBL_API_FRAME_DECLARE = frame;   \
-    GBL_API_STACK_FRAME_CONSTRUCT(GBL_API_FRAME(), (GblHandle)hHandle, GBL_RESULT_SUCCESS, gblApiEntrySrcLoc_); \
+    GBL_API_STACK_FRAME_CONSTRUCT(GBL_API_FRAME(), (GblObject*)pObject, GBL_RESULT_SUCCESS, gblApiEntrySrcLoc_); \
     GBL_ASSERT(GBL_RESULT_SUCCESS(gblThreadStackFramePush(NULL, GBL_API_FRAME())))
 
 #define GBL_API_BEGIN_LOG_5(file, func, line, col, hHandle)  \

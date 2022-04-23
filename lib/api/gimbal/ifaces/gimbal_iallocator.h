@@ -1,15 +1,56 @@
 #ifndef GIMBAL_IALLOCATOR_H
 #define GIMBAL_IALLOCATOR_H
 
-#include "gimbal_icomponent.h"
+#include "../meta/gimbal_interface.h"
+#include "../core/gimbal_api_frame.h"
 
-#define IAllocator_IFACE \
-    vfunc(GBL_RESULT, alloc,    VSelf, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) \
-    vfunc(GBL_RESULT, realloc,  VSelf, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewPtr) \
-    vfunc(GBL_RESULT, free,     VSelf, const GblStackFrame* pFrame, void* pData)
+#define GBL_IALLOCATOR_TYPE                 GBL_TYPE_IALLOCATOR
+#define GBL_IALLOCATOR_STRUCT               GblIAllocator
+#define GBL_IALLOCATOR_CLASS_STRUCT         GblIAllocatorIFace
+#define GBL_IALLOCATOR(inst)                (GBL_TYPE_CAST_INSTANCE_PREFIX  (inst,  GBL_IALLOCATOR))
+#define GBL_IALLOCATOR_CHECK(inst)          (GBL_TYPE_CHECK_INSTANCE_PREFIX (insta, GBL_IALLOCATOR))
+#define GBL_IALLOCATOR_IFACE(klass)         (GBL_TYPE_CAST_CLASS_PREFIX     (klass, GBL_IALLOCATOR))
+#define GBL_IALLOCATOR_IFACE_CHECK(klass)   (GBL_TYPE_CHECK_CLASS_PREFIX    (klass, GBL_IALLOCATOR))
+#define GBL_IALLOCATOR_GET_IFACE(inst)      (GBL_TYPE_CAST_GET_CLASS_PREFIX (inst,  GBL_IALLOCATOR))
 
-#define IAllocator_EXTENDS (IComponent)
+#define SELF    GblIAllocator* pSelf
+#define CSELF   const SELF
 
-interface(IAllocator)
+GBL_DECLS_BEGIN
+
+GBL_FORWARD_DECLARE_STRUCT(GblIAllocator);
+
+typedef struct GblIAllocatorIFace {
+    GblInterface base;
+    GBL_RESULT (*pFnAlloc)      (SELF, const GblStackFrame* pStackFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData);
+    GBL_RESULT (*pFnRealloc)    (SELF, const GblStackFrame* pStackFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
+    GBL_RESULT (*pFnFree)       (SELF, const GblStackFrame* pStackFrame, void* pData);
+} GblIAllocatorIFace;
+
+
+
+GBL_RESULT GblIAllocator_alloc  (SELF,
+                                 const GblStackFrame* pStackFrame,
+                                 GblSize size,
+                                 GblSize alignment,
+                                 const char* pDebugString,
+                                 void** ppData)                     GBL_NOEXCEPT;
+GBL_RESULT GblIAllocator_realloc(SELF,
+                                 const GblStackFrame* pStackFrame,
+                                 void* pData,
+                                 GblSize newSize,
+                                 GblSize newAlign,
+                                 void** ppNewData)                  GBL_NOEXCEPT;
+GBL_RESULT GblIAllocator_free   (SELF,
+                                 const GblStackFrame* pStackFrame,
+                                 void* pData)                       GBL_NOEXCEPT;
+
+
+
+GBL_DECLS_END
+
+#undef CSELF
+#undef SELF
+
 
 #endif // GIMBAL_IALLOCATOR_H

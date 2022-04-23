@@ -2,7 +2,7 @@
 #define GIMBAL_BUFFER_H
 
 #include "../core/gimbal_api_frame.h"
-#include "../meta/gimbal_object.h"
+#include "../objects/gimbal_object.h"
 
 #define SELF                GblBuffer*          pSelf
 #define CSELF               const GblBuffer*    pSelf
@@ -19,7 +19,7 @@ typedef struct GblBuffer {
         GblBufferClass* pClass;
         GblObject       base;
     };
-    GblContext          hCtx;
+    GblContext*         pCtx;
     GblSize             size;
     void*               pData;
 } GblBuffer;
@@ -30,7 +30,7 @@ GBL_EXPORT GblType      GblBuffer_type      (void);
 GBL_INLINE GBL_RESULT   GblBuffer_construct_1(SELF)                                                     GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblBuffer_construct_2(SELF, GblSize bytes)                                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblBuffer_construct_3(SELF, GblSize bytes, const void* pData)                   GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT   GblBuffer_construct_4(SELF, GblSize bytes, const void* pData, GblContext hCtx)  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblBuffer_construct_4(SELF, GblSize bytes, const void* pData, GblContext* pCtx)  GBL_NOEXCEPT;
 #define GblBuffer_construct(...) \
         GBL_VA_OVERLOAD_SELECT(GblBuffer_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 
@@ -43,7 +43,7 @@ GBL_INLINE GBL_RESULT   GblBuffer_debug     (CSELF, GblString* pStr)            
 
 GBL_INLINE GblSize      GblBuffer_size      (CSELF)                                                     GBL_NOEXCEPT;
 GBL_INLINE void*        GblBuffer_data      (CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE GblContext   GblBuffer_context   (CSELF)                                                     GBL_NOEXCEPT;
+GBL_INLINE GblContext*  GblBuffer_context   (CSELF)                                                     GBL_NOEXCEPT;
 GBL_INLINE GblBool      GblBuffer_empty     (CSELF)                                                     GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT   GblBuffer_valueRead (CSELF, GblSize offset, GblSize bytes, void* pDataOut)      GBL_NOEXCEPT;
@@ -77,8 +77,8 @@ void* GblBuffer_data(CSELF) GBL_NOEXCEPT {
 }
 
 GBL_MAYBE_UNUSED GBL_INLINE
-GblContext GblBuffer_context(CSELF) GBL_NOEXCEPT {
-    return pSelf->hCtx;
+GblContext* GblBuffer_context(CSELF) GBL_NOEXCEPT {
+    return pSelf->pCtx;
 }
 
 GBL_MAYBE_UNUSED GBL_INLINE
@@ -93,33 +93,33 @@ GblBool GblBuffer_empty(CSELF) GBL_NOEXCEPT {
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_construct_1(SELF) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_CALL(GblBuffer_construct_2(pSelf, 0));
     GBL_API_END();
 }
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_construct_2(SELF, GblSize bytes) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_CALL(GblBuffer_construct_3(pSelf, bytes, NULL));
     GBL_API_END();
 }
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_construct_3(SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_CALL(GblBuffer_construct_4(pSelf, bytes, pData, NULL));
     GBL_API_END();
 }
 
 GBL_MAYBE_UNUSED
-GBL_INLINE GBL_RESULT   GblBuffer_construct_4(SELF, GblSize bytes, const void* pData, GblContext hCtx)  GBL_NOEXCEPT {
-    GBL_API_BEGIN(hCtx);
+GBL_INLINE GBL_RESULT   GblBuffer_construct_4(SELF, GblSize bytes, const void* pData, GblContext* pCtx)  GBL_NOEXCEPT {
+    GBL_API_BEGIN(pCtx);
     GBL_API_VERIFY_EXPRESSION(!(bytes == 0 && pData != NULL),
                               "Cannot copy buffer of unknown size!");
     pSelf->size     = 0;
     pSelf->pData    = NULL;
-    pSelf->hCtx     = hCtx;
+    pSelf->pCtx     = pCtx;
     if(bytes) {
         GBL_API_CALL(GblBuffer_resize(pSelf, bytes));
         if(pData) {
@@ -131,7 +131,7 @@ GBL_INLINE GBL_RESULT   GblBuffer_construct_4(SELF, GblSize bytes, const void* p
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_destruct(SELF) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_CALL(GblBuffer_clear(pSelf));
     GBL_API_END();
@@ -139,7 +139,7 @@ GBL_RESULT GblBuffer_destruct(SELF) GBL_NOEXCEPT {
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_compare(CSELF, const GblBuffer* pOther, GblCmpResult* pResult) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_POINTER(pOther);
     GBL_API_VERIFY_POINTER(pResult);
@@ -162,7 +162,7 @@ GBL_RESULT GblBuffer_compare(CSELF, const GblBuffer* pOther, GblCmpResult* pResu
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_copy(SELF, const GblBuffer* pOther) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_POINTER(pOther);
     GBL_API_CALL(GblBuffer_resize(pSelf, GblBuffer_size(pOther)));
@@ -172,11 +172,11 @@ GBL_RESULT GblBuffer_copy(SELF, const GblBuffer* pOther) GBL_NOEXCEPT {
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_move(SELF, GblBuffer* pOther) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_POINTER(pOther);
 
-    if(pSelf->hCtx == pOther->hCtx) {
+    if(pSelf->pCtx == pOther->pCtx) {
         GBL_API_CALL(GblBuffer_clear(pSelf));
         pSelf->size     = pOther->size;
         pSelf->pData    = pOther->pData;
@@ -191,7 +191,7 @@ GBL_RESULT GblBuffer_move(SELF, GblBuffer* pOther) GBL_NOEXCEPT {
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_clear(SELF) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     if(pSelf->pData) GBL_API_FREE(pSelf->pData);
     pSelf->pData = NULL;
@@ -201,7 +201,7 @@ GBL_RESULT GblBuffer_clear(SELF) GBL_NOEXCEPT {
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_resize(SELF, GblSize bytes) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     if(!bytes) GBL_API_CALL(GblBuffer_clear(pSelf));
     else {
@@ -222,7 +222,7 @@ GBL_RESULT GblBuffer_resize(SELF, GblSize bytes) GBL_NOEXCEPT {
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_acquire(SELF, GblSize bytes, void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_ARG(bytes > 0);
     GBL_API_VERIFY_POINTER(pData);
     GBL_API_CALL(GblBuffer_clear(pSelf));
@@ -233,7 +233,7 @@ GBL_RESULT GblBuffer_acquire(SELF, GblSize bytes, void* pData) GBL_NOEXCEPT {
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_release(SELF, GblSize* pSize, void** ppData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pSize);
     GBL_API_VERIFY_POINTER(ppData);
     *pSize  = pSelf->size;
@@ -245,14 +245,14 @@ GBL_RESULT GblBuffer_release(SELF, GblSize* pSize, void** ppData) GBL_NOEXCEPT {
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_grow(SELF, GblSize bytes) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GblBuffer_resize(pSelf, GblBuffer_size(pSelf) + bytes);
     GBL_API_END();
 }
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_shrink(SELF, GblSize bytes) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_CALL(GblBuffer_resize(pSelf, GblBuffer_size(pSelf) - bytes));
     GBL_API_END();
 }
@@ -260,7 +260,7 @@ GBL_RESULT GblBuffer_shrink(SELF, GblSize bytes) GBL_NOEXCEPT {
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_insert(SELF, GblSize offset, GblSize bytes, const void* pDataIn) GBL_NOEXCEPT {
     uintptr_t insertionPoint = 0;
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_ARG(offset <= GblBuffer_size(pSelf));
     GBL_API_CALL(GblBuffer_resize(pSelf, GblBuffer_size(pSelf) + bytes));
@@ -275,7 +275,7 @@ GBL_RESULT GblBuffer_insert(SELF, GblSize offset, GblSize bytes, const void* pDa
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_append(SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_ARG(bytes > 0);
     GBL_API_VERIFY_POINTER(pData);
@@ -289,7 +289,7 @@ GBL_RESULT GblBuffer_append(SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT
 
 GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_prepend(SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GblBuffer_insert(pSelf, 0, bytes, pData);
     GBL_API_END();
 }
@@ -298,7 +298,7 @@ GBL_MAYBE_UNUSED GBL_INLINE
 GBL_RESULT GblBuffer_erase(SELF, GblSize offset, GblSize bytes) GBL_NOEXCEPT {
     GblSize lastPos = 0;
     GblSize remainderSize  = 0;
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_EXPRESSION(GblBuffer_size(pSelf) > 0);
     GBL_API_VERIFY_ARG(offset < GblBuffer_size(pSelf));
     lastPos = offset + bytes - 1;
@@ -315,7 +315,7 @@ GBL_RESULT GblBuffer_erase(SELF, GblSize offset, GblSize bytes) GBL_NOEXCEPT {
 
 GBL_MAYBE_UNUSED
 GBL_INLINE GBL_RESULT GblBuffer_valueRead (CSELF, GblSize offset, GblSize bytes, void* pDataOut) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY(offset < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_API_VERIFY(offset + bytes <= pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_API_VERIFY_POINTER(pDataOut);
@@ -325,7 +325,7 @@ GBL_INLINE GBL_RESULT GblBuffer_valueRead (CSELF, GblSize offset, GblSize bytes,
 
 GBL_MAYBE_UNUSED
 GBL_INLINE GBL_RESULT GblBuffer_valueWrite(SELF, GblSize offset, GblSize bytes, const void* pDataIn) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY(offset < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_API_VERIFY(offset + bytes <= pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_API_VERIFY_POINTER(pDataIn);
@@ -335,7 +335,7 @@ GBL_INLINE GBL_RESULT GblBuffer_valueWrite(SELF, GblSize offset, GblSize bytes, 
 
 GBL_MAYBE_UNUSED
 GBL_INLINE GBL_RESULT GblBuffer_debug(CSELF, GblString* pStr) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
 #if 0
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_POINTER(pStr);
@@ -348,7 +348,7 @@ GBL_INLINE GBL_RESULT GblBuffer_debug(CSELF, GblString* pStr) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GBL_RESULT GblBuffer_convert(CSELF, GblVariant* pVariant) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->hCtx);
+    GBL_API_BEGIN(pSelf->pCtx);
     //convert to: nil, bool, pointer, string
   #if 0
     switch(gblVariantType(pVariant)) {

@@ -89,37 +89,31 @@ GBL_CONFIG_OPTION(GBL_FEATURE_CONTAINERS    "Enable Containers" ON)
 set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/core/gimbal_config.h")
 
 set(GIMBAL_SOURCES
-     source/gimbal_version.c
-     source/gimbal_context.c
-#     source/gimbal_test.c
-     source/gimbal_handle.c
-     source/gimbal_thread.c
-     source/gimbal_ivariant.c
-     source/gimbal_variant.c
-#     source/gimbal_meta.c
-     source/gimbal_object.c
-#     source/gimbal_context_object.c
-     source/gimbal_ext.c
-     source/gimbal_type.c
-     source/gimbal_value_types.c
-     source/gimbal_hash_set.c
-     source/gimbal_tree_set.c
-     source/gimbal_property.c
-     source/gimbal_itable.c
-     source/gimbal_quark.c
-     source/gimbal_generics.cpp
-     source/gimbal_ievent_handler.c
-     source/gimbal_ievent_filter.c
-     #source/meta2/gimbal_object.c
-     lib/hashmap.c/hashmap.c
-     lib/btree.c/btree.c
+     source/types/gimbal_version.c
+     source/objects/gimbal_context.c
+     source/core/gimbal_thread.c
+     source/ifaces/gimbal_ivariant.c
+     source/types/gimbal_variant.c
+     source/objects/gimbal_object.c
+     source/core/gimbal_ext.c
+     source/meta/gimbal_type.c
+     source/meta/gimbal_value_types.c
+     source/containers/gimbal_hash_set.c
+     source/containers/gimbal_tree_set.c
+     source/objects/gimbal_property.c
+     source/ifaces/gimbal_itable.c
+     source/types/gimbal_quark.c
+     source/ifaces/gimbal_ievent_handler.c
+     source/ifaces/gimbal_ievent_filter.c
+     source/core/gimbal_call_stack.c
+     source/ifaces/gimbal_iallocator.c
+     source/ifaces/gimbal_ilogger.c
+     source/objects/gimbal_event.c
      lib/jenkins/lookup3.c
 )
 
 set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_api_generators.h
-    #api/gimbal/gimbal_version.h
-    api/gimbal/objects/gimbal_context.h
     api/gimbal/types/gimbal_buffer.h
     api/gimbal/types/gimbal_buffer.hpp
     api/gimbal/types/gimbal_result.h
@@ -127,7 +121,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_api_generators.hpp
     api/gimbal/types/gimbal_version.hpp
     api/gimbal/types/gimbal_exception.hpp
-    #api/gimbal/gimbal_os.h
     api/gimbal/core/gimbal_api_frame.h
     api/gimbal/core/gimbal_api_frame.hpp
     api/gimbal/containers/gimbal_generics.hpp
@@ -135,8 +128,11 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_call_stack.h
     api/gimbal/containers/gimbal_list.h
     api/gimbal/meta/gimbal_interface.h
-    api/gimbal/meta/gimbal_object.h
-    api/gimbal/meta/gimbal_object.hpp
+    api/gimbal/objects/gimbal_object.h
+    api/gimbal/ifaces/gimbal_iallocator.h
+    api/gimbal/ifaces/gimbal_ilogger.h
+    api/gimbal/objects/gimbal_context.h
+    api/gimbal/objects/gimbal_object.hpp
     api/gimbal/types/gimbal_result.hpp
     api/gimbal/types/gimbal_typedefs.h
     api/gimbal/preprocessor/gimbal_compiler.h
@@ -149,78 +145,41 @@ set(GIMBAL_INCLUDES
     api/gimbal/types/gimbal_variant.h
     api/gimbal/types/gimbal_quark.h
     api/gimbal/types/gimbal_quark.hpp
-    api/gimbal/util/gimbal_test.h
-    api/gimbal/objects/gimbal_handle.h
     api/gimbal/containers/gimbal_hash_set.h
     api/gimbal/containers/gimbal_hash_set.hpp
     api/gimbal/containers/gimbal_hash_map.hpp
     api/gimbal/containers/gimbal_tree_set.h
     api/gimbal/containers/gimbal_table.h
     api/gimbal/meta/gimbal_type.h
-#    api/gimbal/util/gimbal_cmdline_parser.h
-#    api/gimbal/core/gimbal_runtime.h
-    api/gimbal/core/gimbal_log.h
     api/gimbal/core/gimbal_thread.h
     api/gimbal/core/gimbal_thread.hpp
     api/gimbal/types/gimbal_typedefs.hpp
     api/gimbal/types/gimbal_variant.hpp
-#    api/gimbal/objects/gimbal_instance.h
-    api/gimbal/objects/gimbal_object.h
-    api/gimbal/meta/gimbal_iplugin.h
-#    api/gimbal/objects/gimbal_context_object.h
-#    api/gimbal/util/gimbal_monitor.hpp
+    api/gimbal/ifaces/gimbal_iplugin.h
     api/gimbal/containers/gimbal_table.h
     api/gimbal/containers/gimbal_vector.h
     api/gimbal/algorithms/gimbal_sort.h
     api/gimbal/algorithms/gimbal_numeric.h
     api/gimbal/algorithms/gimbal_hash.h
     api/gimbal/containers/gimbal_vector.hpp
-#    api/gimbal/meta/gimbal_boxed.h
-#    api/gimbal/meta/gimbal_weak_ref.h
-#    api/gimbal/util/gimbal_lson.h
     api/gimbal/types/gimbal_string.h
-    #api/gimbal/ifaces/gimbal_icomponent.h
-    #api/gimbal/ifaces/gimbal_ichild.h
-    #api/gimbal/ifaces/gimbal_iparent.h
-    #api/gimbal/ifaces/gimbal_iallocator.h
-    #api/gimbal/ifaces/gimbal_ilogger.h
-    #api/gimbal/ifaces/gimbal_ievent_handler.h
-    #api/gimbal/ifaces/gimbal_ilast_error.h
-    #api/gimbal/ifaces/gimbal_ivalue.h
-    #api/gimbal/ifaces/gimbal_icontext.h
-    #api/gimbal/ifaces/gimbal_iobject.h
-#    api/gimbal/meta2/gimbal_object.h
-#    api/gimbal/meta2/gimbal_class.h
-    api/gimbal/meta2/gimbal_type.h
     api/gimbal/meta/gimbal_type.hpp
     api/gimbal/meta/gimbal_instance.hpp
     api/gimbal/meta/gimbal_interface.hpp
     api/gimbal/meta/gimbal_class.h
     api/gimbal/meta/gimbal_class.hpp
     api/gimbal/meta/gimbal_instance.h
-    api/gimbal/meta/gimbal_ivariant.h
-    api/gimbal/meta/gimbal_ievent_handler.h
-    api/gimbal/meta/gimbal_ievent_filter.h
-    api/gimbal/meta/gimbal_property.h
-    api/gimbal/meta/gimbal_itable.h
+    api/gimbal/ifaces/gimbal_ivariant.h
+    api/gimbal/ifaces/gimbal_ievent_handler.h
+    api/gimbal/ifaces/gimbal_ievent_filter.h
+    api/gimbal/objects/gimbal_property.h
+    api/gimbal/ifaces/gimbal_itable.h
     api/gimbal/meta/gimbal_variant.h
-#    api/gimbal/meta2/gimbal_primitive.h
-    #api/gimbal/ifaces/gimbal_inamed.h
-    #api/gimbal/ifaces/gimbal_icontainer.h
-    #api/gimbal/ifaces/gimbal_iuserdata.h
-    #api/gimbal/ifaces/gimbal_iiterable.h
-    #api/gimbal/ifaces/gimbal_itable.h
-#    api/gimbal/types/gimbal_dispatcher.h
     api/gimbal/types/gimbal_version.h
-#    api/gimbal/types/gimbal_value.h
-#    api/gimbal/util/gimbal_alloc.h
     api/gimbal/types/gimbal_string.hpp
-#    api/gimbal/containers/gimbal_container.h
-    api/gimbal/objects/gimbal_object.hpp
-    api/gimbal/objects/gimbal_handle.hpp
     api/gimbal/objects/gimbal_context.hpp
-    lib/hashmap.c/hashmap.h
-    lib/btree.c/btree.h
+    api/gimbal/objects/gimbal_event.h
+    api/gimbal/utils/gimbal_cmdline_parser.h
     lib/jenkins/lookup3.h)
 
 add_library(libGimbal STATIC

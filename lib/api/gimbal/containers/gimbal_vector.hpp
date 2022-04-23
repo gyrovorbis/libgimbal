@@ -131,9 +131,9 @@ public:
     }
 
     Context* getContext(void) const {
-        GblContext hCtx = GBL_HANDLE_INVALID;
-        Exception::checkThrow(gblVectorContext(vec_(), &hCtx));
-        return hCtx == GBL_HANDLE_INVALID? nullptr : Context::fromHandle(hCtx);
+        GblContext* pCtx = nullptr;
+        Exception::checkThrow(gblVectorContext(vec_(), &pCtx));
+        return pCtx == nullptr? nullptr : Context::fromGblObj(pCtx);
     }
 
     allocator_type get_allocator(void) const {
@@ -310,14 +310,14 @@ public:
 
     // raw pointer constructor
     explicit Vector(const T* pInitialData, Size elementCount, Context* pCtx=nullptr, Size allocSize=sizeof(VectorType), Size elementSize=sizeof(T)) {
-        Exception::checkThrow(gblVectorConstruct(this,  pCtx? static_cast<GblContext>(*pCtx) : nullptr, elementSize, allocSize, pInitialData, elementCount));
+        Exception::checkThrow(gblVectorConstruct(this, pCtx, elementSize, allocSize, pInitialData, elementCount));
     }
 
     // fill constructor
     explicit Vector(Size count, const T& value=T(), Context* pCtx=nullptr, Size allocSize=sizeof(VectorType)) {
         T* pTempArray = static_cast<T*>(GBL_ALLOCA(count * sizeof(T)));
         std::fill(pTempArray, pTempArray+count, value);
-        Exception::checkThrow(gblVectorConstruct(this, pCtx? static_cast<GblContext>(*pCtx) : nullptr, sizeof(T), allocSize, pTempArray, count));
+        Exception::checkThrow(gblVectorConstruct(this, pCtx, sizeof(T), allocSize, pTempArray, count));
     }
 
     // initializer list constructor

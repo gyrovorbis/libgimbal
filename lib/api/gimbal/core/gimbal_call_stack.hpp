@@ -43,10 +43,10 @@ public:
 
     template<typename R>
         requires (std::is_constructible_v<Result, R> && !std::same_as<Result, R>)
-    CallRecord(R resultValue, const char* pMessage=nullptr, Handle* pHandle=nullptr, SourceLocation srcLoc={}) noexcept:
-        CallRecord(Result(resultValue), pMessage, pHandle, std::move(srcLoc)) {}
+    CallRecord(R resultValue, const char* pMessage=nullptr, GblObject* pObject=nullptr, SourceLocation srcLoc={}) noexcept:
+        CallRecord(Result(resultValue), pMessage, pObject, std::move(srcLoc)) {}
 
-    CallRecord(Result result, const char* pMessage=nullptr, Handle* pHandle=nullptr, SourceLocation srcLoc={}) noexcept;
+    CallRecord(Result result, const char* pMessage=nullptr, GblObject* pObject=nullptr, SourceLocation srcLoc={}) noexcept;
 
     CallRecord(const GblCallRecord& other) {
         memcpy(this, &other, sizeof(GblCallRecord));
@@ -72,8 +72,8 @@ GBL_CHECK_C_CPP_TYPE_COMPAT(CallRecord, GblCallRecord);
 
 class StackFrame: public GblStackFrame {
 public:
-                StackFrame(GblHandle hHandle=nullptr, GBL_RESULT initialResult=GBL_RESULT_UNKNOWN, SourceLocation entryLoc=SourceLocation()) {
-                    GBL_API_STACK_FRAME_CONSTRUCT(this, hHandle, initialResult, entryLoc);
+                StackFrame(GblObject* pObject=nullptr, GBL_RESULT initialResult=GBL_RESULT_UNKNOWN, SourceLocation entryLoc=SourceLocation()) {
+                    GBL_API_STACK_FRAME_CONSTRUCT(this, pObject, initialResult, entryLoc);
 
                 }
                 //StackFrame(const GblStackFrame& rhs);
@@ -87,8 +87,8 @@ public:
     auto        getSourceEntry(void) const -> const SourceLocation& { return *static_cast<const SourceLocation*>(&sourceEntry);}
     auto        getCallRecord(void) const -> const CallRecord& { return *static_cast<const CallRecord*>(&record); }
     auto        getCallRecord(void) -> CallRecord&;
-    GblHandle     getHandle(void) const;
-    GblContext    getContext(void) const;
+    GblObject*  getObject(void) const;
+    GblContext* getContext(void) const;
     void*       getHandleUd(void) const;
     void*       getContextUd(void) const;
 
@@ -96,6 +96,13 @@ public:
 };
 
 GBL_CHECK_C_CPP_TYPE_COMPAT(StackFrame, GblStackFrame);
+
+
+inline CallRecord::CallRecord(Result result, const char* pMessage, GblObject* pObject, SourceLocation srcLoc) noexcept {
+    GBL_CALL_RECORD_CONSTRUCT(this, pObject, result.getCode(), srcLoc, "%s", pMessage? pMessage : result.toString().data());
+}
+
+
 
 }
 
