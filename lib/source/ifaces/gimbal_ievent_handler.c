@@ -14,12 +14,11 @@ GBL_API  GblIEventHandler_event(GblIEventHandler* pSelf, GblEvent* pEvent) GBL_N
 
 extern GBL_RESULT GblIEventHandler_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-    gblTypeRegisterBuiltin(21,
-                            GBL_TYPE_INTERFACE,
+    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_IEVENT_HANDLER,
+                            GBL_INTERFACE_TYPE,
                            "IEventHandler",
                            &((const GblTypeInfo) {
-                               .classSize    = sizeof(GblIEventHandlerIFace),
-                               .classAlign   = GBL_ALIGNOF(GblIEventHandlerIFace),
+                               .classSize    = sizeof(GblIEventHandlerIFace)
                            }),
                            GBL_TYPE_FLAG_ABSTRACT);
     GBL_API_END();

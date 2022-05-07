@@ -3,11 +3,15 @@
 
 #include "../meta/gimbal_interface.h"
 
-#define GBL_IEVENT_HANDLER(instance)                GBL_TYPE_CAST_INSTANCE(instance, GBL_TYPE_IEVENT_HANDLER, GblIEventHandler)
-#define GBL_IEVENT_HANDLER_CHECK(instance)     GBL_TYPE_CHECK_INSTANCE(instance, GBL_TYPE_IEVENT_HANDLER)
-#define GBL_IEVENT_HANDLER_IFACE(klass)             GBL_TYPE_CAST_CLASS(klass, GBL_ITYPE_IEVENT_HANDLER, GblIEventHandlerIFace)
-#define GBL_IEVENT_HANDLER_IFACE_CHECK(klass)  GBL_TYPE_CHECK_CLASS(klass, GBL_TYPE_IVENT_HANDLER)
-#define GBL_IEVENT_HANDLER_GET_IFACE(instance)      GBL_TYPE_CAST_GET_CLASS(instance, GBL_TYPE_IEVENT_HANDLER, GblIEventHandlerIFace)
+#define GBL_IEVENT_HANDLER_TYPE                     GBL_BUILTIN_TYPE(IEVENT_HANDLER)
+#define GBL_IEVENT_HANDLER_STRUCT                   GblIEventHandler
+#define GBL_IEVENT_HANDLER_CLASS_STRUCT             GblIEventHandlerIFace
+#define GBL_IEVENT_HANDLER(instance)                GBL_INSTANCE_CAST_PREFIX(instance, GBL_IEVENT_HANDLER)
+#define GBL_IEVENT_HANDLER_CHECK(instance)          GBL_INSTANCE_CHECK_PREFIX(instance, GBL_IEVENT_HANDLER)
+#define GBL_IEVENT_HANDLER_IFACE(klass)             GBL_CLASS_CAST_PREFIX(klass, GBL_IEVENT_HANDLER)
+#define GBL_IEVENT_HANDLER_IFACE_CHECK(klass)       GBL_CLASS_CHECK_PREFIX(klass, GBL_IEVENT_HANDLER)
+#define GBL_IEVENT_HANDLER_GET_IFACE(instance)      GBL_INSTANCE_CAST_CLASS_PREFIX(instance, GBL_IEVENT_HANDLER)
+#define GBL_IEVENT_HANDLER_TRY_IFACE(instance)      GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_IEVENT_HANDLER)
 
 #define SELF    GblIEventHandler* pSelf
 #define CSELF   const SELF

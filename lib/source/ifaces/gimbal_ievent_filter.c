@@ -14,12 +14,11 @@ GBL_API GblIEventFilter_eventFilter(GblIEventFilter* pSelf, GblIEventHandler* pH
 
 extern GBL_RESULT GblIEventFilter_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-    gblTypeRegisterBuiltin(22,
-                            GBL_TYPE_INTERFACE,
+    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_IEVENT_FILTER,
+                            GBL_INTERFACE_TYPE,
                            "IEventFilter",
                            &((const GblTypeInfo) {
                                .classSize    = sizeof(GblIEventFilterIFace),
-                               .classAlign   = GBL_ALIGNOF(GblIEventFilterIFace),
                            }),
                            GBL_TYPE_FLAG_ABSTRACT);
 

@@ -135,7 +135,7 @@ static GBL_RESULT GblContext_ILogger_push_(GblILogger* pILogger, const GblStackF
 static GBL_RESULT GblContext_constructor_(GblObject* pSelf) GBL_NOEXCEPT {
     pSelf->contextType = 1;
     GBL_API_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL_SUPER(GBL_TYPE_OBJECT, GblObjectClass, pFnConstructor, pSelf);
+    GBL_INSTANCE_VCALL_SUPER(GBL_OBJECT_TYPE, GblObjectClass, pFnConstructor, pSelf);
     GBL_API_END();
 }
 
@@ -182,22 +182,20 @@ GBL_EXPORT GblContext* GblContext_global(void) GBL_NOEXCEPT {
 
 extern GBL_RESULT GblContext_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
-    gblTypeRegisterBuiltin(26,
-      GBL_TYPE_OBJECT,
+    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_CONTEXT,
+      GBL_OBJECT_TYPE,
       "Context",
       &((const GblTypeInfo) {
-          .pFnClassInit     = (GblTypeClassInitFn)GblContextClass_init_,
+          .pFnClassInit     = (GblTypeClassInitializeFn)GblContextClass_init_,
           .classSize        = sizeof(GblContextClass),
-          .classAlign       = GBL_ALIGNOF(GblContextClass),
           .instanceSize     = sizeof(GblContext),
-          .instanceAlign    = GBL_ALIGNOF(GblContext),
           .interfaceCount   = 2,
           .pInterfaceMap    = ((const GblTypeInterfaceMapEntry[]) {
               {
-                  .interfaceType = GBL_TYPE_IALLOCATOR,
+                  .interfaceType = GBL_IALLOCATOR_TYPE,
                   .classOffset   = offsetof(GblContextClass, iAllocatorIFace)
               }, {
-                  .interfaceType = GBL_TYPE_ILOGGER,
+                  .interfaceType = GBL_ILOGGER_TYPE,
                   .classOffset   = offsetof(GblContextClass, iLoggerIFace)
               }
           })

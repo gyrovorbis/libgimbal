@@ -20,7 +20,7 @@ protected:
     }
 public:
     Type getType(void) const {
-        return gblTypeFromClass(class_());
+        return GblType_fromClass(class_());
     }
 
     RefCount getRefCount(void) const {

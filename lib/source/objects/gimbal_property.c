@@ -2,6 +2,8 @@
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/types/gimbal_quark.h>
+#include <gimbal/objects/gimbal_object.h>
+#include <gimbal/meta/gimbal_value_types.h>
 
 /*
  * Really should add more data like info and shit
@@ -101,10 +103,10 @@ GBL_EXPORT const GblProperty* gblPropertyTableInsert          (GblType          
 {
     GblProperty* pProp = NULL;
     GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_));
-    GBL_API_VERIFY_TYPE(objectType, GBL_TYPE_OBJECT);
+    GBL_API_VERIFY_TYPE(objectType, GBL_OBJECT_TYPE);
     GBL_API_VERIFY_POINTER(name);
-    GBL_API_PUSH_VERBOSE("[GblObject] Installing property: %s[%s]", gblTypeName(objectType), gblQuarkToString(name));
-    GBL_API_VERIFY_ARG(valueType != GBL_TYPE_NIL);
+    GBL_API_PUSH_VERBOSE("[GblObject] Installing property: %s[%s]", GblType_name(objectType), gblQuarkToString(name));
+    GBL_API_VERIFY_ARG(valueType != GBL_NIL_TYPE);
     GBL_API_VERIFY_ARG(flags); // make sure SOME flag is there
 
     GblProperty* pFirst = propertyRoot_(objectType);
@@ -145,9 +147,9 @@ GBL_EXPORT const GblProperty* gblPropertyTableInsert          (GblType          
 GBL_EXPORT GblBool gblPropertyTableErase(GblType objectType, GblQuark name) GBL_NOEXCEPT {
     GblBool success = GBL_FALSE;
     GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_));
-    GBL_API_VERIFY_ARG(objectType != GBL_TYPE_INVALID);
+    GBL_API_VERIFY_ARG(objectType != GBL_INVALID_TYPE);
     GBL_API_PUSH_VERBOSE("[GblObject] Uninstalling property: %s[%s]",
-                         gblTypeName(objectType), gblQuarkToString(name));
+                         GblType_name(objectType), gblQuarkToString(name));
 
     // Find root node
     GblProperty* pFirst = propertyRoot_(objectType);
@@ -215,13 +217,13 @@ GBL_EXPORT const GblProperty* gblPropertyTableFind(GblType objectType, GblQuark 
         pKey->name                  = name;
         pKey->objectType            = objectType;
 
-        while(pKey->objectType != GBL_TYPE_INVALID) {
+        while(pKey->objectType != GBL_INVALID_TYPE) {
             const GblProperty** ppRet = (const GblProperty**)GblHashSet_get(&propertyRegistry_, &pKey);
             if(ppRet) {
                 pProperty = *ppRet;
                 break;
             }
-            pKey->objectType = gblTypeParent(pKey->objectType);
+            pKey->objectType = GblType_parent(pKey->objectType);
         }
 
     } GBL_API_END_BLOCK();
@@ -230,9 +232,9 @@ GBL_EXPORT const GblProperty* gblPropertyTableFind(GblType objectType, GblQuark 
 
 GBL_INLINE const GblProperty* propertyRootBase_(GblType objectType) {
     const GblProperty* pRoot = NULL;
-    const uint8_t depth = gblTypeDepth(objectType);
+    const uint8_t depth = GblType_depth(objectType);
     for(uint8_t d = 0; d <= depth; ++d) {
-        GblType type = gblTypeBase(objectType, d);
+        GblType type = GblType_base(objectType, d);
         pRoot = propertyRoot_(type);
         if(pRoot) break;
     }
@@ -241,12 +243,12 @@ GBL_INLINE const GblProperty* propertyRootBase_(GblType objectType) {
 
 GBL_INLINE const GblProperty* propertyFirstNextBase_(GblType objectType, GblType prevType) {
     const GblProperty* pRoot = NULL;
-    const uint8_t depth = gblTypeDepth(objectType);
+    const uint8_t depth = GblType_depth(objectType);
     for(uint8_t d = 0; d <= depth; ++d) {
-        GblType type = gblTypeBase(objectType, d);
+        GblType type = GblType_base(objectType, d);
         if(type == prevType) {
             if(d + 1 <= depth) {
-                prevType = gblTypeBase(objectType, d+1);
+                prevType = GblType_base(objectType, d+1);
                 pRoot = propertyFirst_(prevType);
                 if(pRoot) break;
             }
@@ -293,12 +295,12 @@ GBL_EXPORT const GblProperty* gblPropertyTableNext(GblType objectType, const Gbl
 
 GBL_EXPORT GblSize gblPropertyTableCount(GblType objectType) GBL_NOEXCEPT {
     GblSize count = 0;
-    while(objectType != GBL_TYPE_INVALID) {
+    while(objectType != GBL_INVALID_TYPE) {
         const GblProperty* pProp = propertyRoot_(objectType);
         if(pProp) {
             count += pProp->propertyCount;
         }
-        objectType = gblTypeParent(objectType);
+        objectType = GblType_parent(objectType);
     }
     return count;
 }
@@ -316,10 +318,10 @@ GBL_EXPORT const char* GblProperty_nameString(const GblProperty* pSelf) GBL_NOEX
     return pSelf? gblQuarkToString(pSelf->name) : NULL;
 }
 GBL_EXPORT GblType GblProperty_valueType(const GblProperty* pSelf) GBL_NOEXCEPT {
-    return pSelf? pSelf->valueType : GBL_TYPE_INVALID;
+    return pSelf? pSelf->valueType : GBL_INVALID_TYPE;
 }
 GBL_EXPORT GblType GblProperty_objectType(const GblProperty* pSelf) GBL_NOEXCEPT {
-    return pSelf? pSelf->objectType : GBL_TYPE_INVALID;
+    return pSelf? pSelf->objectType : GBL_INVALID_TYPE;
 }
 GBL_EXPORT GblSize GblProperty_id(const GblProperty* pSelf) GBL_NOEXCEPT {
     return pSelf? pSelf->id : 0;

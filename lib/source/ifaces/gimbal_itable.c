@@ -1,11 +1,12 @@
 #include <gimbal/ifaces/gimbal_itable.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/meta/gimbal_value_types.h>
 
 static GBL_RESULT GblITableIFace_index_(const GblITable* pTable, const GblVariant* pKey, GblVariant* pValue) {
     GBL_UNUSED(pTable); GBL_UNUSED(pKey);
     GBL_API_BEGIN(NULL);
-    GBL_API_CALL(GblVariant_setValueCopy(pValue, GBL_TYPE_NIL));
+    GBL_API_CALL(GblVariant_setValueCopy(pValue, GBL_NIL_TYPE));
     GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY);
     GBL_API_END();
 }
@@ -22,8 +23,8 @@ static GBL_RESULT GblITableIFace_newIndex_(GblITable* pTable, const GblVariant* 
 static GBL_RESULT GblITableIFace_nextIndex_(const GblITable* pTable, const GblVariant* pKey, GblVariant* pNextKey, GblVariant* pNextValue) {
     GBL_UNUSED(pTable); GBL_UNUSED(pKey);
     GBL_API_BEGIN(NULL);
-    GBL_API_CALL(GblVariant_setValueCopy(pNextKey, GBL_TYPE_NIL));
-    GBL_API_CALL(GblVariant_setValueCopy(pNextValue, GBL_TYPE_NIL));
+    GBL_API_CALL(GblVariant_setValueCopy(pNextKey, GBL_NIL_TYPE));
+    GBL_API_CALL(GblVariant_setValueCopy(pNextValue, GBL_NIL_TYPE));
     GBL_API_END();
 }
 
@@ -39,13 +40,12 @@ static GBL_RESULT GblITableIFace_init_(GblITableIFace* pIFace, void* pClassData,
 
 extern GBL_RESULT GblITable_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-    gblTypeRegisterBuiltin(20,
-                            GBL_TYPE_INTERFACE,
+    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_ITABLE,
+                            GBL_INTERFACE_TYPE,
                            "ITable",
                            &((const GblTypeInfo) {
-                               .pFnClassInit = (GblTypeClassInitFn)GblITableIFace_init_,
-                               .classSize    = sizeof(GblITableIFace),
-                               .classAlign   = GBL_ALIGNOF(GblITableIFace),
+                               .pFnClassInit = (GblTypeClassInitializeFn)GblITableIFace_init_,
+                               .classSize    = sizeof(GblITableIFace)
                            }),
                            GBL_TYPE_FLAG_ABSTRACT);
 

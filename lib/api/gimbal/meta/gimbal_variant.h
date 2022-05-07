@@ -9,7 +9,7 @@
 
 GBL_DECLS_BEGIN
 
-#define GBL_VARIANT_INIT { .type = GBL_TYPE_NIL }
+#define GBL_VARIANT_INIT { .type = GBL_NIL_TYPE }
 
 
 GBL_EXPORT GblType  GblVariant_type                (CSELF)                                           GBL_NOEXCEPT;
@@ -130,10 +130,10 @@ GBL_VARIANT_OP_CMP_TYPE
 
 
 GBL_API GblVariant_initNil(SELF) {
-    return GblVariant_constructDefault(pSelf, GBL_TYPE_NIL);
+    return GblVariant_constructDefault(pSelf, GBL_NIL_TYPE);
 }
 GBL_API GblVariant_fromString(SELF, const char* pString, GblSize count) {
-    return GblVariant_constructValue(pSelf, GBL_TYPE_STRING, pString, count);
+    return GblVariant_constructValue(pSelf, GBL_STRING_TYPE, pString, count);
 }
 GBL_API GblVariant_constructNil();
 GBL_API GblVariant_valueGetString();
@@ -141,7 +141,7 @@ GBL_API GblVariant_valueSetString();
 
 const char* GblVariant_asString(SELF) {
     const char* pResult = NULL;
-    if(GblVariant_type(pSelf) == GBL_TYPE_STRING);
+    if(GblVariant_type(pSelf) == GBL_STRING_TYPE);
     GblVariant_valueGet(pSelf, &pResult);
     return pResult;
 }
@@ -153,13 +153,13 @@ GBL_EXPORT GblVariant_setValues(SELF, ...);
 GBL_EXPORT GblVariant_getValues(CSELF, ...);
 
 GblVariant fVar = GBL_VARIANT_INIT;
-GblVariant_constructWithValue(&fVar, GBL_TYPE_FLOAT, 32.0f); //pVaFmt
+GblVariant_constructWithValue(&fVar, GBL_FLOAT_TYPE, 32.0f); //pVaFmt
 GblVariant_setValue(&fVar, 48.0f);
 float floater;
 GblVariant_getValue(&fVar, &floater);
 
 GblVariant sVar = GBL_VARIANT_INIT;
-GblVariant_constructWithValue(&sVar, GBL_TYPE_STRING, "char array", 4); //array + length
+GblVariant_constructWithValue(&sVar, GBL_STRING_TYPE, "char array", 4); //array + length
 GblVariant_setValue(&sVar, "nuther array", 21);
 GblString pStr;
 const char* pArray;

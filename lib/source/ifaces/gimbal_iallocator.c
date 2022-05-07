@@ -10,7 +10,6 @@ static GBL_RESULT GblIAllocatorIFace_alloc_(GblIAllocator* pIAllocator, const Gb
     GBL_API_END();
 }
 
-
 static GBL_RESULT GblIAllocatorIFace_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData) GBL_NOEXCEPT {
     GBL_UNUSED(pFrame && pIAllocator && newAlign);
     GBL_API_BEGIN(NULL);
@@ -36,13 +35,12 @@ static GBL_RESULT GblIAllocatorIFace_init_(GblIAllocatorIFace* pIFace, void* pDa
 
 extern GBL_RESULT GblIAllocator_typeRegister_(GblIAllocator* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
-    gblTypeRegisterBuiltin(24,
-      GBL_TYPE_INTERFACE,
+    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_IALLOCATOR,
+      GBL_INTERFACE_TYPE,
       "IAllocator",
       &((const GblTypeInfo) {
-          .pFnClassInit     = (GblTypeClassInitFn)GblIAllocatorIFace_init_,
-          .classSize        = sizeof(GblIAllocatorIFace),
-          .classAlign       = GBL_ALIGNOF(GblIAllocatorIFace),
+          .pFnClassInit     = (GblTypeClassInitializeFn)GblIAllocatorIFace_init_,
+          .classSize        = sizeof(GblIAllocatorIFace)
       }),
       GBL_TYPE_FLAGS_NONE);
     GBL_API_END();
@@ -57,7 +55,7 @@ GBL_RESULT GblIAllocator_alloc  (GblIAllocator* pSelf,
                                  void** ppData)                     GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_PREFIX_VCALL(GBL_IALLOCATOR, pFnAlloc,
+    GBL_INSTANCE_VCALL_PREFIX(GBL_IALLOCATOR, pFnAlloc,
                               pSelf, pStackFrame, size, alignment, pDebugString, ppData);
     GBL_API_END();
 }
@@ -70,7 +68,7 @@ GBL_RESULT GblIAllocator_realloc(GblIAllocator* pSelf,
                                  void** ppNewData)                  GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_PREFIX_VCALL(GBL_IALLOCATOR, pFnRealloc,
+    GBL_INSTANCE_VCALL_PREFIX(GBL_IALLOCATOR, pFnRealloc,
                               pSelf, pStackFrame, pData, newSize, newAlign, ppNewData);
     GBL_API_END();
 }
@@ -80,7 +78,7 @@ GBL_RESULT GblIAllocator_free   (GblIAllocator* pSelf,
                                  void* pData)                       GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_PREFIX_VCALL(GBL_IALLOCATOR, pFnFree,
+    GBL_INSTANCE_VCALL_PREFIX(GBL_IALLOCATOR, pFnFree,
                               pSelf, pStackFrame, pData);
     GBL_API_END();
 }

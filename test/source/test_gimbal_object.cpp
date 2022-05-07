@@ -6,11 +6,11 @@
 #define TEST_OBJECT_TYPE                    (TestObject_type())
 #define TEST_OBJECT_STRUCT                  TestObject
 #define TEST_OBJECT_CLASS_STRUCT            TestObjectClass
-#define TEST_OBJECT(instance)               GBL_TYPE_CAST_INSTANCE_PREFIX(instance, TEST_OBJECT)
-#define TEST_OBJECT_CHECK(instance)         GBL_TYPE_CHECK_INSTANCE_PREFIX(instance, TEST_OBJECT)
-#define TEST_OBJECT_CLASS(klass)            GBL_TYPE_CAST_CLASS_PREFIX(klass, TEST_OBJECT)
-#define TEST_OBJECT_CLASS_CHECK(klass)      GBL_TYPE_CHECK_CLASS_PREFIX(klass, TEST_OBJECT)
-#define TEST_OBJECT_GET_CLASS(instance)     GBL_TYPE_CAST_GET_CLASS_PREFIX(instance, TEST_OBJECT)
+#define TEST_OBJECT(instance)               GBL_INSTANCE_CAST_PREFIX(instance, TEST_OBJECT)
+#define TEST_OBJECT_CHECK(instance)         GBL_INSTANCE_CHECK_PREFIX(instance, TEST_OBJECT)
+#define TEST_OBJECT_CLASS(klass)            GBL_CLASS_CAST_PREFIX(klass, TEST_OBJECT)
+#define TEST_OBJECT_CLASS_CHECK(klass)      GBL_CLASS_CHECK_PREFIX(klass, TEST_OBJECT)
+#define TEST_OBJECT_GET_CLASS(instance)     GBL_INSTANCE_CAST_CLASS_PREFIX(instance, TEST_OBJECT)
 
 namespace gimbal::test {
 
@@ -56,7 +56,7 @@ static GBL_RESULT TestObject_IEventFilter_filterEvent(GblIEventFilter* pFilter, 
 
 static GBL_RESULT TestObject_constructor(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GblInstance_superOf(GBL_INSTANCE(pSelf)));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_SUPER(pSelf));
     pParentClass->pFnConstructor(pSelf);
     TestObject* pTest = TEST_OBJECT(pSelf);
     pTest->floater = -NAN;
@@ -66,14 +66,14 @@ static GBL_RESULT TestObject_constructor(GblObject* pSelf) {
 
 static GBL_RESULT TestObject_constructed(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GblInstance_superOf(GBL_INSTANCE(pSelf)));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_SUPER(pSelf));
     if(pParentClass->pFnConstructed) pParentClass->pFnConstructed(pSelf);
     GBL_API_END();
 }
 
 static GBL_RESULT TestObject_destructor(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GblInstance_superOf(GBL_INSTANCE(pSelf)));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_SUPER(pSelf));
     pParentClass->pFnDestructor(pSelf);
     GBL_API_END();
 }
@@ -138,8 +138,8 @@ static GBL_RESULT TestObject_propertySet(GblObject* pSelf, GblUint slot, const G
 
 
 static GblType TestObject_type(void) {
-    static GblType type = GBL_TYPE_INVALID;
-    if(type == GBL_TYPE_INVALID) {
+    static GblType type = GBL_INVALID_TYPE;
+    if(type == GBL_INVALID_TYPE) {
         const GblTypeInfo info = {
             .pFnClassInit = [](GblClass* pClass,
                                const void* pData,
@@ -150,22 +150,22 @@ static GblType TestObject_type(void) {
                     gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
                                            gblQuarkFromStringStatic("floater"),
                                            TEST_OBJECT_PROPERTY_FLOATER,
-                                           GBL_TYPE_FLOAT,
+                                           GBL_FLOAT_TYPE,
                                            GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT);
                     gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
                                            gblQuarkFromStringStatic("stringer"),
                                            TEST_OBJECT_PROPERTY_STRINGER,
-                                           GBL_TYPE_STRING,
+                                           GBL_STRING_TYPE,
                                            GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT);
                     gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
                                            gblQuarkFromStringStatic("staticInt32"),
                                            TEST_OBJECT_PROPERTY_STATICINT32,
-                                           GBL_TYPE_INT32,
+                                           GBL_INT32_TYPE,
                                            GBL_PROPERTY_FLAG_READ);
                     gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
                                            gblQuarkFromStringStatic("userdata"),
                                            TEST_OBJECT_PROPERTY_USERDATA,
-                                           GBL_TYPE_POINTER,
+                                           GBL_POINTER_TYPE,
                                            GBL_PROPERTY_FLAG_CONSTRUCT | GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_OVERRIDE);
                 }
                 pTestClass->staticInt32 = 77;
@@ -180,13 +180,11 @@ static GblType TestObject_type(void) {
                 GBL_API_END();
             },
             .classSize      = sizeof(TestObjectClass),
-            .classAlign     = alignof(TestObjectClass),
             .pClassData     = (void*)"Davey Havoc",
-            .instanceSize   = sizeof(TestObject),
-            .instanceAlign  = alignof(TestObject)
+            .instanceSize   = sizeof(TestObject)
         };
 
-        type = gblTypeRegisterStatic(GBL_TYPE_OBJECT,
+        type = GblType_registerStatic(GBL_OBJECT_TYPE,
                                      "TestObject",
                                     &info,
                                     GBL_TYPE_FLAGS_NONE);
@@ -198,31 +196,31 @@ void CObject::newDefault(void) {
     TestObject* pObj = TEST_OBJECT(GblObject_new(TEST_OBJECT_TYPE, NULL));
     pTestObj_ = pObj;
 
-    QCOMPARE(gblTypeClassRefCount(TEST_OBJECT_TYPE), 1);
+    QCOMPARE(GblClass_refCountFromType(TEST_OBJECT_TYPE), 1);
 
     // validate class
     TestObjectClass* pClass = TEST_OBJECT_GET_CLASS(pObj);
-    QCOMPARE(gblTypeFromClass(GBL_CLASS(pClass)), TEST_OBJECT_TYPE);
+    QCOMPARE(GblType_fromClass(GBL_CLASS(pClass)), TEST_OBJECT_TYPE);
     QCOMPARE(&pClass->base, GBL_OBJECT_CLASS(pClass));
     QCOMPARE(QString(pClass->string), "Davey Havoc");
     QCOMPARE(pClass->staticInt32, 77);
 
     // validate interfaces
     GblIVariantIFace* pIVariantIFace = GBL_IVARIANT_GET_IFACE(pObj);
-    QCOMPARE(gblTypeFromClass(GBL_CLASS(pIVariantIFace)), GBL_TYPE_IVARIANT);
+    QCOMPARE(GblType_fromClass(GBL_CLASS(pIVariantIFace)), GBL_IVARIANT_TYPE);
     QCOMPARE(pClass, TEST_OBJECT_CLASS(pIVariantIFace));
     QCOMPARE(QString(pIVariantIFace->pGetValueFmt), QString("p"));
 
     GblITableIFace* pITableIFace = GBL_ITABLE_GET_IFACE(pObj);
-    QCOMPARE(gblTypeFromClass(GBL_CLASS(pITableIFace)), GBL_TYPE_ITABLE);
+    QCOMPARE(GblType_fromClass(GBL_CLASS(pITableIFace)), GBL_ITABLE_TYPE);
     QCOMPARE(pClass, TEST_OBJECT_CLASS(pITableIFace));
 
-    GblIEventHandlerIFace* pIEventHandlerIFace = GBL_IEVENT_HANDLER_GET_IFACE(pObj);
-    QCOMPARE(gblTypeFromClass(GBL_CLASS(pIEventHandlerIFace)), GBL_TYPE_IEVENT_HANDLER);
+    GblIEventHandlerIFace* pIEventHandlerIFace = GBL_IEVENT_HANDLER_TRY_IFACE(pObj);
+    QCOMPARE(GblType_fromClass(GBL_CLASS(pIEventHandlerIFace)), GBL_IEVENT_HANDLER_TYPE);
     QCOMPARE(pClass, TEST_OBJECT_CLASS(pIEventHandlerIFace));
 
     GblIEventFilterIFace* pIEventFilterIFace = GBL_IEVENT_FILTER_GET_IFACE(pObj);
-    QCOMPARE(gblTypeFromClass(GBL_CLASS(pIEventFilterIFace)), GBL_TYPE_IEVENT_FILTER);
+    QCOMPARE(GblType_fromClass(GBL_CLASS(pIEventFilterIFace)), GBL_IEVENT_FILTER_TYPE);
     QCOMPARE(pClass, TEST_OBJECT_CLASS(pIEventFilterIFace));
 
     // validate sanity of random casts
@@ -236,11 +234,11 @@ void CObject::newDefault(void) {
     QVERIFY(GBL_ITABLE_IFACE_CHECK(GBL_OBJECT_CLASS(pITableIFace)));
 
     //validate insanity
-    QCOMPARE(pClass, TEST_OBJECT_CLASS(GBL_ITABLE_IFACE(GBL_OBJECT_CLASS(GBL_OBJECT_CLASS(GBL_IEVENT_FILTER_IFACE(TEST_OBJECT_GET_CLASS(pObj)))))));
+    QCOMPARE(pClass, TEST_OBJECT_CLASS(GBL_ITABLE_IFACE(GBL_OBJECT_CLASS(GBL_OBJECT_CLASS_TRY(GBL_IEVENT_FILTER_IFACE(TEST_OBJECT_GET_CLASS(pObj)))))));
 
     // validate instance checks and casts
     QVERIFY(GBL_IVARIANT_CHECK(pObj));
-    QVERIFY(GBL_IEVENT_FILTER_CHECK(GBL_OBJECT(GBL_IEVENT_FILTER(pObj))));
+    QVERIFY(GBL_IEVENT_FILTER_CHECK(GBL_OBJECT_TRY(GBL_IEVENT_FILTER(pObj))));
     QCOMPARE(pObj, TEST_OBJECT(GBL_IVARIANT(GBL_OBJECT(GBL_IEVENT_FILTER(TEST_OBJECT(pObj))))));
 }
 
@@ -254,7 +252,7 @@ void CObject::ref(void) {
 void CObject::unref(void) {
     QCOMPARE(GblObject_unref(GBL_OBJECT(pTestObj_)), 1);
     QCOMPARE(GblObject_unref(GBL_OBJECT(pTestObj_)), 0);
-    QCOMPARE(gblTypeClassRefCount(TEST_OBJECT_TYPE), 0);
+    QCOMPARE(GblClass_refCountFromType(TEST_OBJECT_TYPE), 0);
 
     // K now replace what we deleted... lulz.
     pTestObj_ = nullptr;
@@ -329,7 +327,7 @@ void CObject::newVaArgsWithClass(void) {
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
-    verifyResult(gblTypeClassDestroyFloating(GBL_CLASS(pClass)));
+    verifyResult(GblClass_destroyFloating(GBL_CLASS(pClass)));
 }
 
 void CObject::newInPlaceVaArgsWithClass(void) {
@@ -346,7 +344,7 @@ void CObject::newInPlaceVaArgsWithClass(void) {
     QCOMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
     QCOMPARE(GblObject_unref(GBL_OBJECT(&obj)), 0);
-    verifyResult(gblTypeClassDestroyFloating(GBL_CLASS(pClass)));
+    verifyResult(GblClass_destroyFloating(GBL_CLASS(pClass)));
 }
 
 void CObject::newInPlaceVaArgsWithClassInPlace(void) {
@@ -380,8 +378,8 @@ void CObject::newVariants(void) {
         "userdata"
     };
 
-    GblVariant_constructValueCopy(&variants[0], GBL_TYPE_STRING, "Fuckwad");
-    GblVariant_constructValueCopy(&variants[1], GBL_TYPE_POINTER, (void*)0xdeadbeef);
+    GblVariant_constructValueCopy(&variants[0], GBL_STRING_TYPE, "Fuckwad");
+    GblVariant_constructValueCopy(&variants[1], GBL_POINTER_TYPE, (void*)0xdeadbeef);
 
     GblObject* pObj = GblObject_newVariants(TEST_OBJECT_TYPE, 2, keys, variants);
 
@@ -403,8 +401,8 @@ void CObject::newVariantsWithClass(void) {
         "userdata"
     };
 
-    GblVariant_constructValueCopy(&variants[0], GBL_TYPE_STRING, "Fuckwad");
-    GblVariant_constructValueCopy(&variants[1], GBL_TYPE_POINTER, (void*)0xdeadbeef);
+    GblVariant_constructValueCopy(&variants[0], GBL_STRING_TYPE, "Fuckwad");
+    GblVariant_constructValueCopy(&variants[1], GBL_POINTER_TYPE, (void*)0xdeadbeef);
 
     GblObjectClass* pClass = GBL_OBJECT_CLASS(GblClass_createFloating(TEST_OBJECT_TYPE));
 
@@ -416,7 +414,7 @@ void CObject::newVariantsWithClass(void) {
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
-    verifyResult(gblTypeClassDestroyFloating(GBL_CLASS(pClass)));
+    verifyResult(GblClass_destroyFloating(GBL_CLASS(pClass)));
 }
 
 
@@ -430,8 +428,8 @@ void CObject::newInPlaceVariants(void) {
         "userdata"
     };
 
-    GblVariant_constructValueCopy(&variants[0], GBL_TYPE_STRING, "Fuckwad");
-    GblVariant_constructValueCopy(&variants[1], GBL_TYPE_POINTER, (void*)0xdeadbeef);
+    GblVariant_constructValueCopy(&variants[0], GBL_STRING_TYPE, "Fuckwad");
+    GblVariant_constructValueCopy(&variants[1], GBL_POINTER_TYPE, (void*)0xdeadbeef);
 
     TestObject obj;
     GblObject* pObj = &obj.base;
@@ -456,8 +454,8 @@ void CObject::newInPlaceVariantsWithClass(void) {
         "userdata"
     };
 
-    GblVariant_constructValueCopy(&variants[0], GBL_TYPE_STRING, "Fuckwad");
-    GblVariant_constructValueCopy(&variants[1], GBL_TYPE_POINTER, (void*)0xdeadbeef);
+    GblVariant_constructValueCopy(&variants[0], GBL_STRING_TYPE, "Fuckwad");
+    GblVariant_constructValueCopy(&variants[1], GBL_POINTER_TYPE, (void*)0xdeadbeef);
 
     TestObject obj;
     GblObject* pObj = &obj.base;
@@ -472,11 +470,11 @@ void CObject::newInPlaceVariantsWithClass(void) {
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
-    verifyResult(gblTypeClassDestroyFloating(GBL_CLASS(pClass)));
+    verifyResult(GblClass_destroyFloating(GBL_CLASS(pClass)));
 }
 
 void CObject::propertyGet(void) {
-    GblObject* pObj0 = GblObject_new(GBL_TYPE_OBJECT, NULL);
+    GblObject* pObj0 = GblObject_new(GBL_OBJECT_TYPE, NULL);
     QVERIFY(pObj0);
 
     GblObject* pObj1 = GblObject_new(TEST_OBJECT_TYPE,
@@ -525,7 +523,7 @@ void CObject::propertySet(void) {
                                     nullptr);
     GblVariant variant;
     void* pUd;
-    GblVariant_constructValueCopy(&variant, GBL_TYPE_POINTER, (void*)0xcafebabe);
+    GblVariant_constructValueCopy(&variant, GBL_POINTER_TYPE, (void*)0xcafebabe);
     GblObject_propertySetString(pObj, "userdata",  &variant);
 
     GblObject_getValue(pObj, "userdata", &pUd);
@@ -550,13 +548,13 @@ void CObject::propertySet(void) {
 }
 
 void CObject::parenting(void) {
-    GblObject* pChild1 = GblObject_new(GBL_TYPE_OBJECT,
+    GblObject* pChild1 = GblObject_new(GBL_OBJECT_TYPE,
                                     "name",     "Child1",
                                     NULL);
-    GblObject* pChild2 = GblObject_new(GBL_TYPE_OBJECT,
+    GblObject* pChild2 = GblObject_new(GBL_OBJECT_TYPE,
                                     "name",     "Child2",
                                     NULL);
-    GblObject* pChild3 = GblObject_new(GBL_TYPE_OBJECT,
+    GblObject* pChild3 = GblObject_new(GBL_OBJECT_TYPE,
                                     "name",     "Child3",
                                     "parent",   pChild2,
                                     NULL);
@@ -576,7 +574,7 @@ void CObject::parenting(void) {
 
     QCOMPARE(GblObject_ancestorFindByType(pChild3, TEST_OBJECT_TYPE), pParent);
     QCOMPARE(GblObject_ancestorFindByName(pChild2, "Parent"), pParent);
-    QCOMPARE(GblObject_childFindByType(pChild2, GBL_TYPE_OBJECT), pChild3);
+    QCOMPARE(GblObject_childFindByType(pChild2, GBL_OBJECT_TYPE), pChild3);
     QCOMPARE(GblObject_siblingFindByName(pChild1, "Child2"), pChild2);
     QCOMPARE(GblObject_childFindByName(pParent, "Child1"), pChild1);
 
@@ -610,7 +608,7 @@ void CObject::classSwizzle(void) {
     pClass->staticInt32 = -666;
 
     // overwrite the existing class for the given object
-    QVERIFY(GBL_RESULT_SUCCESS(gblTypeInstanceClassSwizzle(GBL_INSTANCE(pObj), GBL_CLASS(pClass))));
+    QVERIFY(GBL_RESULT_SUCCESS(GblInstance_classSwizzle(GBL_INSTANCE(pObj), GBL_CLASS(pClass))));
 
     // now check the value of the static class property has changed accordingly
     QVERIFY(GBL_RESULT_SUCCESS(GblObject_getValue(pObj, "staticInt32", &value)));
@@ -625,16 +623,16 @@ void CObject::eventNotify(void) {
                                     "name", "DickWhisp",
                                     NULL);
     GblEvent event;
-    verifyResult(GblEvent_construct(&event, GBL_TYPE_EVENT));
+    verifyResult(GblEvent_construct(&event, GBL_EVENT_TYPE));
 
     QCOMPARE(pObj->eventHandlerCount, 0);
-    QCOMPARE(pObj->eventHandlerLastType, GBL_TYPE_INVALID);
+    QCOMPARE(pObj->eventHandlerLastType, GBL_INVALID_TYPE);
     QCOMPARE(GblEvent_state(&event), GBL_EVENT_STATE_PENDING);
 
     verifyResult(GblObject_eventNotify(GBL_OBJECT(pObj), &event));
 
     QCOMPARE(pObj->eventHandlerCount, 1);
-    QCOMPARE(pObj->eventHandlerLastType, GBL_TYPE_EVENT);
+    QCOMPARE(pObj->eventHandlerLastType, GBL_EVENT_TYPE);
     QCOMPARE(GblEvent_state(&event), GBL_EVENT_STATE_PENDING);
 
     pObj->eventHandlerAccept = GBL_TRUE;
@@ -642,7 +640,7 @@ void CObject::eventNotify(void) {
     verifyResult(GblObject_eventNotify(GBL_OBJECT(pObj), &event));
 
     QCOMPARE(pObj->eventHandlerCount, 2);
-    QCOMPARE(pObj->eventHandlerLastType, GBL_TYPE_EVENT);
+    QCOMPARE(pObj->eventHandlerLastType, GBL_EVENT_TYPE);
     QCOMPARE(GblEvent_state(&event), GBL_EVENT_STATE_ACCEPTED);
 
 
@@ -665,7 +663,7 @@ void CObject::eventNotifyAncestors(void) {
                                     NULL);
 
     GblEvent event;
-    verifyResult(GblEvent_construct(&event, GBL_TYPE_EVENT));
+    verifyResult(GblEvent_construct(&event, GBL_EVENT_TYPE));
 
     verifyResult(GblObject_eventNotify(GBL_OBJECT(pChild), &event));
 
@@ -701,7 +699,7 @@ void CObject::eventSendAncestors(void) {
                                     NULL);
 
     GblEvent event;
-    verifyResult(GblEvent_construct(&event, GBL_TYPE_EVENT));
+    verifyResult(GblEvent_construct(&event, GBL_EVENT_TYPE));
     pGrand->eventHandlerAccept = GBL_TRUE;
 
     {
@@ -738,7 +736,7 @@ void CObject::eventFilters(void) {
     verifyResult(GblObject_eventFilterInstall(GBL_OBJECT(pParent), GBL_IEVENT_FILTER(pChild)));
 
     GblEvent event;
-    verifyResult(GblEvent_construct(&event, GBL_TYPE_EVENT));
+    verifyResult(GblEvent_construct(&event, GBL_EVENT_TYPE));
 
     verifyResult(GblObject_eventNotify(GBL_OBJECT(pChild), &event));
 
@@ -746,7 +744,7 @@ void CObject::eventFilters(void) {
     QCOMPARE(pParent->eventHandlerCount, 1);
     QCOMPARE(pGrand->eventHandlerCount, 1);
     QCOMPARE(pChild->eventFilterCount, 1);
-    QCOMPARE(pChild->eventFilterLastType, GBL_TYPE_EVENT);
+    QCOMPARE(pChild->eventFilterLastType, GBL_EVENT_TYPE);
     QCOMPARE(pChild->eventFilterLastTarget, GBL_IEVENT_HANDLER(pParent));
 
     pChild->eventFilterAccept = GBL_TRUE;

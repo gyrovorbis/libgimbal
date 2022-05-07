@@ -109,6 +109,8 @@ set(GIMBAL_SOURCES
      source/ifaces/gimbal_iallocator.c
      source/ifaces/gimbal_ilogger.c
      source/objects/gimbal_event.c
+     source/meta/gimbal_class.c
+     source/meta/gimbal_instance.c
      lib/jenkins/lookup3.c
 )
 
@@ -169,6 +171,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/gimbal_class.h
     api/gimbal/meta/gimbal_class.hpp
     api/gimbal/meta/gimbal_instance.h
+    api/gimbal/meta/gimbal_builtin_types.h
+    api/gimbal/meta/gimbal_value_types.h
     api/gimbal/ifaces/gimbal_ivariant.h
     api/gimbal/ifaces/gimbal_ievent_handler.h
     api/gimbal/ifaces/gimbal_ievent_filter.h
@@ -180,6 +184,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/objects/gimbal_context.hpp
     api/gimbal/objects/gimbal_event.h
     api/gimbal/utils/gimbal_cmdline_parser.h
+    source/meta/gimbal_type_.h
     lib/jenkins/lookup3.h)
 
 add_library(libGimbal STATIC

@@ -4,14 +4,12 @@
 
 extern GBL_RESULT GblEvent_typeRegister_(GblEvent* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
-    gblTypeRegisterBuiltin(27,
-      GBL_TYPE_INVALID,
+    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_EVENT,
+      GBL_INVALID_TYPE,
       "Event",
       &((const GblTypeInfo) {
           .classSize        = sizeof(GblEventClass),
-          .classAlign       = GBL_ALIGNOF(GblEventClass),
           .instanceSize     = sizeof(GblEvent),
-          .instanceAlign    = GBL_ALIGNOF(GblEvent),
       }),
       GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED         |
       GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE    |

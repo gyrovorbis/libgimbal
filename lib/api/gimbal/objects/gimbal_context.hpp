@@ -49,7 +49,7 @@ public:
 
     Context(void) {
 
-        GblContextClass* pClass = GBL_CONTEXT_CLASS(gblTypeClassCreateFloating(GBL_TYPE_CONTEXT));
+        GblContextClass* pClass = GBL_CONTEXT_CLASS(GblClass_createFloating(GBL_CONTEXT_TYPE));
 
         pClass->iAllocatorIFace.pFnAlloc = gblMemAlloc_;
         pClass->iAllocatorIFace.pFnRealloc = gblMemRealloc_;
@@ -58,14 +58,14 @@ public:
         pClass->iLoggerIFace.pFnPush = gblLogPush_;
         pClass->iLoggerIFace.pFnPop = gblLogPop_;
 
-        Exception::checkThrow(gblTypeInstanceConstructWithClass(GBL_INSTANCE(static_cast<GblContext*>(this)), GBL_CLASS(pClass)));
+        Exception::checkThrow(GblInstance_constructWithClass(GBL_INSTANCE(static_cast<GblContext*>(this)), GBL_CLASS(pClass)));
         GblObject_userdataSet(GBL_OBJECT(static_cast<GblContext*>(this)), this);
 
     }
 
 
     virtual ~Context(void) {
-        gblTypeInstanceDestruct(GBL_INSTANCE(static_cast<GblContext*>(this)));
+        GblInstance_destruct(GBL_INSTANCE(static_cast<GblContext*>(this)));
     }
 
 

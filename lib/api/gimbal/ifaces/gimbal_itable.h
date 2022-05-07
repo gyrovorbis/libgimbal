@@ -5,12 +5,14 @@
 
 GBL_DECLS_BEGIN
 
-//#define GBL_ITABLE_TYPE                     (GblITable_type())
-#define GBL_ITABLE(instance)                GBL_TYPE_CAST_INSTANCE(instance, GBL_TYPE_ITABLE, GblITable)
-#define GBL_ITABLE_CHECK(instance)     GBL_TYPE_CHECK_INSTANCE(instance, GBL_TYPE_ITABLE,)
-#define GBL_ITABLE_IFACE(klass)             GBL_TYPE_CAST_CLASS(klass, GBL_TYPE_ITABLE, GblITableIFace)
-#define GBL_ITABLE_IFACE_CHECK(klass)  GBL_TYPE_CHECK_CLASS(klass, GBL_TYPE_ITABLE)
-#define GBL_ITABLE_GET_IFACE(instance)      GBL_TYPE_CAST_GET_CLASS(instance, GBL_TYPE_ITABLE, GblITableIFace)
+#define GBL_ITABLE_TYPE                 (GBL_BUILTIN_TYPE(ITABLE))
+#define GBL_ITABLE_STRUCT               GblITable
+#define GBL_ITABLE_CLASS_STRUCT         GblITableIFace
+#define GBL_ITABLE(instance)            (GBL_INSTANCE_CAST_PREFIX       (instance, GBL_ITABLE))
+#define GBL_ITABLE_CHECK(instance)      (GBL_INSTANCE_CHECK_PREFIX      (instance, GBL_ITABLE))
+#define GBL_ITABLE_IFACE(klass)         (GBL_CLASS_CAST_PREFIX          (klass,    GBL_ITABLE))
+#define GBL_ITABLE_IFACE_CHECK(klass)   (GBL_CLASS_CHECK_PREFIX         (klass,    GBL_ITABLE))
+#define GBL_ITABLE_GET_IFACE(instance)  (GBL_INSTANCE_CAST_CLASS_PREFIX (instance, GBL_ITABLE))
 
 #define SELF    GblITable* pSelf
 #define CSELF   const SELF

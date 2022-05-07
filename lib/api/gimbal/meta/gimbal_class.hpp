@@ -40,13 +40,13 @@ public:
 
 
 inline const char* Class::getName(void) const {
-    return gblTypeName(getType());
+    return GblType_name(getType());
 }
 inline Type Class::getType(void) const {
-    return gblTypeFromClass(this);
+    return GblType_fromClass(this);
 }
 inline RefCount Class::getRefCount(void) const {
-    return gblTypeClassRefCount(getType());
+    return GblClass_refCountFromType(getType());
 }
 
 

@@ -6,6 +6,7 @@
 #include "../core/gimbal_api_generators.hpp"
 #include "../types/gimbal_result.hpp"
 #include "../objects/gimbal_context.hpp"
+#include "../meta/gimbal_value_types.h"
 
 #define GBL_TYPE_DECLARE_CPP(cppName, cName)    \
     class cppName final: public Type {          \
@@ -35,7 +36,7 @@ public:
 class Type: public PrimitiveBase<GblType> {
 public:
 
-       Type(GblType type=GBL_TYPE_INVALID);
+       Type(GblType type=GBL_INVALID_TYPE);
        Type(float) = delete;
        Type(double) = delete;
        Type(unsigned) = delete;
@@ -128,37 +129,37 @@ protected:
 
 };
 
-GBL_TYPE_DECLARE_CPP(InvalidType,   (GblType)GBL_TYPE_INVALID);
-GBL_TYPE_DECLARE_CPP(InterfaceType, GBL_TYPE_INTERFACE);
-GBL_TYPE_DECLARE_CPP(IVariantType,  GBL_TYPE_IVARIANT);
-GBL_TYPE_DECLARE_CPP(NilType,       GBL_TYPE_NIL);
-GBL_TYPE_DECLARE_CPP(BoolType,      GBL_TYPE_BOOL);
-GBL_TYPE_DECLARE_CPP(CharType,      GBL_TYPE_CHAR);
-GBL_TYPE_DECLARE_CPP(Uint8Type,     GBL_TYPE_UINT8);
-GBL_TYPE_DECLARE_CPP(Uint16Type,    GBL_TYPE_UINT16);
-GBL_TYPE_DECLARE_CPP(Int16Type,     GBL_TYPE_INT16);
-GBL_TYPE_DECLARE_CPP(Uint32Type,    GBL_TYPE_UINT32);
-GBL_TYPE_DECLARE_CPP(Int32Type,     GBL_TYPE_INT32);
-GBL_TYPE_DECLARE_CPP(Uint64Type,    GBL_TYPE_UINT64);
-GBL_TYPE_DECLARE_CPP(Int64Type,     GBL_TYPE_INT64);
-GBL_TYPE_DECLARE_CPP(EnumType,      GBL_TYPE_ENUM);
-GBL_TYPE_DECLARE_CPP(FlagsType,     GBL_TYPE_FLAGS);
-GBL_TYPE_DECLARE_CPP(FloatType,     GBL_TYPE_FLOAT);
-GBL_TYPE_DECLARE_CPP(DoubleType,    GBL_TYPE_DOUBLE);
-GBL_TYPE_DECLARE_CPP(PointerType,   GBL_TYPE_POINTER);
-GBL_TYPE_DECLARE_CPP(StringType,    GBL_TYPE_STRING);
+GBL_TYPE_DECLARE_CPP(InvalidType,   GBL_INVALID_TYPE);
+GBL_TYPE_DECLARE_CPP(InterfaceType, GBL_INTERFACE_TYPE);
+GBL_TYPE_DECLARE_CPP(IVariantType,  GBL_IVARIANT_TYPE);
+GBL_TYPE_DECLARE_CPP(NilType,       GBL_NIL_TYPE);
+GBL_TYPE_DECLARE_CPP(BoolType,      GBL_BOOL_TYPE);
+GBL_TYPE_DECLARE_CPP(CharType,      GBL_CHAR_TYPE);
+GBL_TYPE_DECLARE_CPP(Uint8Type,     GBL_UINT8_TYPE);
+GBL_TYPE_DECLARE_CPP(Uint16Type,    GBL_UINT16_TYPE);
+GBL_TYPE_DECLARE_CPP(Int16Type,     GBL_INT16_TYPE);
+GBL_TYPE_DECLARE_CPP(Uint32Type,    GBL_UINT32_TYPE);
+GBL_TYPE_DECLARE_CPP(Int32Type,     GBL_INT32_TYPE);
+GBL_TYPE_DECLARE_CPP(Uint64Type,    GBL_UINT64_TYPE);
+GBL_TYPE_DECLARE_CPP(Int64Type,     GBL_INT64_TYPE);
+GBL_TYPE_DECLARE_CPP(EnumType,      GBL_ENUM_TYPE);
+GBL_TYPE_DECLARE_CPP(FlagsType,     GBL_FLAGS_TYPE);
+GBL_TYPE_DECLARE_CPP(FloatType,     GBL_FLOAT_TYPE);
+GBL_TYPE_DECLARE_CPP(DoubleType,    GBL_DOUBLE_TYPE);
+GBL_TYPE_DECLARE_CPP(PointerType,   GBL_POINTER_TYPE);
+GBL_TYPE_DECLARE_CPP(StringType,    GBL_STRING_TYPE);
 
 
 // ==== INLINEZ =====
 inline Type::Type(GblType type): PrimitiveBase(type) {}
-inline const char* Type::getName(void) const { return gblTypeName(*this); }
-inline Type Type::getParentType(void) const { return gblTypeParent(*this); }
-inline UInt Type::getDepth(void) const { return gblTypeDepth(*this); }
-inline Type Type::getFundamentalType(void) const { return gblTypeFundamental(*this); }
-inline const TypeInfo* Type::getInfo(void) const { return static_cast<const TypeInfo*>(gblTypeInfo(*this)); }
-inline bool Type::isA(Type base) const { return gblTypeIsA(*this, base); }
-inline RefCount Type::getClassRefCount(void) const { return gblTypeClassRefCount(*this); }
-inline bool Type::isValid(void) const { return *this != GBL_TYPE_INVALID; }
+inline const char* Type::getName(void) const { return GblType_name(*this); }
+inline Type Type::getParentType(void) const { return GblType_parent(*this); }
+inline UInt Type::getDepth(void) const { return GblType_depth(*this); }
+inline Type Type::getFundamentalType(void) const { return GblType_fundamental(*this); }
+inline const TypeInfo* Type::getInfo(void) const { return static_cast<const TypeInfo*>(GblType_info(*this)); }
+inline bool Type::isA(Type base) const { return GblType_check(*this, base); }
+inline RefCount Type::getClassRefCount(void) const { return GblClass_refCountFromType(*this); }
+inline bool Type::isValid(void) const { return *this != GBL_INVALID_TYPE; }
 
 inline bool Type::isClassed(void) const { return GBL_TYPE_IS_CLASSED(*this); }
 inline bool Type::isInstantiable(void) const { return GBL_TYPE_IS_INSTANTIABLE(*this); }
@@ -178,7 +179,7 @@ inline void* Type::classReference      (void) const { return Type::classReferenc
 inline void  Type::classUnreference    (void* pClass) const { return Type::classUnreference(*this, pClass); }
 
 inline Result Type::reinit(Context* pCtx) {
-    return gblTypeReinit(pCtx);
+    return GblType_init(pCtx);
 }
 
 inline Type Type::registerStatic(Type parentType,
@@ -186,30 +187,30 @@ inline Type Type::registerStatic(Type parentType,
                                  TypeInfo typeInfo,
                                  TypeFlags flags)
 {
-    return gblTypeRegisterStatic(parentType,
+    return GblType_registerStatic(parentType,
                            pName,
                            &typeInfo,
                            flags);
 }
 
 inline void Type::unregister(Type type) {
-    Exception::checkThrow(gblTypeUnregister(type));
+    Exception::checkThrow(GblType_unregister(type));
 }
 
 inline Type Type::fromName(const char* pName) {
-    return gblTypeFind(pName);
+    return GblType_fromName(pName);
 }
 inline Size Type::count(void) {
-    return gblTypeCount();
+    return GblType_registeredCount();
 }
 
-inline void* Type::instanceCreate      (Type type) { return gblTypeInstanceCreate(type); }
-inline void  Type::instanceConstruct   (Type type, void* pInstance) { gblTypeInstanceConstruct(type, reinterpret_cast<GblInstance*>(pInstance)); }
-inline void  Type::instanceDestruct    (Type type, void* pInstance) { gblTypeInstanceDestruct(reinterpret_cast<GblInstance*>(pInstance)); }
-inline void  Type::instanceDestroy     (Type type, void* pInstance) { gblTypeInstanceDestroy(reinterpret_cast<GblInstance*>(pInstance)); }
+inline void* Type::instanceCreate      (Type type) { return GblInstance_create(type); }
+inline void  Type::instanceConstruct   (Type type, void* pInstance) { GblInstance_construct(reinterpret_cast<GblInstance*>(pInstance), type); }
+inline void  Type::instanceDestruct    (Type type, void* pInstance) { GblInstance_destruct(reinterpret_cast<GblInstance*>(pInstance)); }
+inline void  Type::instanceDestroy     (Type type, void* pInstance) { GblInstance_destroy(reinterpret_cast<GblInstance*>(pInstance)); }
 
-inline void* Type::classReference      (Type type) { return gblTypeClassRef(type); }
-inline void  Type::classUnreference    (Type type, void* pClass) { gblTypeClassUnref(reinterpret_cast<GblClass*>(pClass)); }
+inline void* Type::classReference      (Type type) { return GblClass_refFromType(type); }
+inline void  Type::classUnreference    (Type type, void* pClass) { GblClass_unref(reinterpret_cast<GblClass*>(pClass)); }
 
 }
 

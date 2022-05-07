@@ -106,7 +106,7 @@ private slots:
     }
 
     void constructCopy(void) {
-        GblVariant g1{.floating=-33.0f, .type=GBL_TYPE_FLOAT};
+        GblVariant g1{.floating=-33.0f, .type=GBL_FLOAT_TYPE};
         gimbal::Variant v1(g1);
         QCOMPARE(v1.getType(), gimbal::FloatType());
 
@@ -116,7 +116,7 @@ private slots:
     }
 
     void constructMove(void) {
-        gimbal::Variant v1(GblVariant{.floating=-33.0f, .type=GBL_TYPE_FLOAT});
+        gimbal::Variant v1(GblVariant{.floating=-33.0f, .type=GBL_FLOAT_TYPE});
         QCOMPARE(v1.getType(), gimbal::FloatType());
 
         gimbal::Variant v2(gimbal::Variant(34));
@@ -152,7 +152,7 @@ private slots:
         test(-33.0f, -33.0f);
         test(GblBool(false), gimbal::Bool(GBL_FALSE));
         test(reinterpret_cast<void*>(this), reinterpret_cast<void*>(this));
-        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_TYPE_BOOL};
+        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_BOOL_TYPE};
         test(g, GblBool(GBL_TRUE));
         test(std::move(g), gimbal::Bool(true));
         auto v = gimbal::Variant(reinterpret_cast<void*>(this));
@@ -225,7 +225,7 @@ private slots:
         test(-33.0f, -33.0f);
         test(GblBool(false), gimbal::Bool(GBL_FALSE));
         test(reinterpret_cast<void*>(this), reinterpret_cast<void*>(this));
-        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_TYPE_BOOL};
+        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_BOOL_TYPE};
         test(g, GblBool(GBL_TRUE));
         test(std::move(g), gimbal::Bool(true));
         auto v = gimbal::Variant(reinterpret_cast<void*>(this));
@@ -248,7 +248,7 @@ private slots:
         test(true, true);
         test(GBL_FALSE, GBL_FALSE);
         test(reinterpret_cast<void*>(this), reinterpret_cast<void*>(this));
-        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_TYPE_BOOL};
+        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_BOOL_TYPE};
         test(g, -35433.0f);
         test("fucktwix", "fucktwix");
         test(gimbal::String(std::string("lul")), gimbal::String("lul"));

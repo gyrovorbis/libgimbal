@@ -3,11 +3,14 @@
 
 #include "../meta/gimbal_interface.h"
 
-#define GBL_IVARIANT(instance)                  GBL_TYPE_CAST_INSTANCE(instance, GBL_TYPE_IVARIANT, GblIVariant)
-#define GBL_IVARIANT_CHECK(instance)            GBL_TYPE_CHECK_INSTANCE(instance, GBL_TYPE_IVARIANT)
-#define GBL_IVARIANT_IFACE(klass)               GBL_TYPE_CAST_CLASS(klass, GBL_TYPE_IVARIANT, GblIVariantIFace)
-#define GBL_IVARIANT_IFACE_CHECK(klass)         GBL_TYPE_CHECK_CLASS(klass, GBL_TYPE_IVARIANT)
-#define GBL_IVARIANT_GET_IFACE(instance)        GBL_TYPE_CAST_GET_CLASS(instance, GBL_TYPE_IVARIANT, GblIVariantIFace)
+#define GBL_IVARIANT_TYPE                       (GBL_BUILTIN_TYPE(IVARIANT))
+#define GBL_IVARIANT_STRUCT                     GblIVariant
+#define GBL_IVARIANT_CLASS_STRUCT               GblIVariantIFace
+#define GBL_IVARIANT(instance)                  (GBL_INSTANCE_CAST_PREFIX       (instance,  GBL_IVARIANT))
+#define GBL_IVARIANT_CHECK(instance)            (GBL_INSTANCE_CHECK_PREFIX      (instance,  GBL_IVARIANT))
+#define GBL_IVARIANT_IFACE(klass)               (GBL_CLASS_CAST_PREFIX          (klass,     GBL_IVARIANT))
+#define GBL_IVARIANT_IFACE_CHECK(klass)         (GBL_CLASS_CHECK_PREFIX         (klass,     GBL_IVARIANT))
+#define GBL_IVARIANT_GET_IFACE(instance)        (GBL_INSTANCE_CAST_CLASS_PREFIX (instance,  GBL_IVARIANT))
 
 #define GBL_IVARIANT_VALUE_VAR_ARG_MAX          4
 

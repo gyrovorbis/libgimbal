@@ -5,14 +5,14 @@
 #include "../meta/gimbal_interface.h"
 #include "../core/gimbal_api_frame.h"
 
-#define GBL_ILOGGER_TYPE                GBL_TYPE_ILOGGER
+#define GBL_ILOGGER_TYPE                (GBL_BUILTIN_TYPE(ILOGGER))
 #define GBL_ILOGGER_STRUCT              GblILogger
 #define GBL_ILOGGER_CLASS_STRUCT        GblILoggerIFace
-#define GBL_ILOGGER(inst)               (GBL_TYPE_CAST_INSTANCE_PREFIX  (inst,  GBL_ILOGGER))
-#define GBL_ILOGGER_CHECK(inst)         (GBL_TYPE_CHECK_INSTANCE_PREFIX (inst,  GBL_ILOGGER))
-#define GBL_ILOGGER_IFACE(klass)        (GBL_TYPE_CAST_CLASS_PREFIX     (klass, GBL_ILOGGER))
-#define GBL_ILOGGER_IFACE_CHECK(klass)  (GBL_TYPE_CHECK_CLASS_PREFIX    (klass, GBL_ILOGGER))
-#define GBL_ILOGGER_GET_IFACE(inst)     (GBL_TYPE_CAST_GET_CLASS_PREFIX (inst,  GBL_ILOGGER))
+#define GBL_ILOGGER(inst)               (GBL_INSTANCE_CAST_PREFIX       (inst,  GBL_ILOGGER))
+#define GBL_ILOGGER_CHECK(inst)         (GBL_INSTANCE_CHECK_PREFIX      (inst,  GBL_ILOGGER))
+#define GBL_ILOGGER_IFACE(klass)        (GBL_CLASS_CAST_PREFIX          (klass, GBL_ILOGGER))
+#define GBL_ILOGGER_IFACE_CHECK(klass)  (GBL_CLASS_CHECK_PREFIX         (klass, GBL_ILOGGER))
+#define GBL_ILOGGER_GET_IFACE(inst)     (GBL_INSTANCE_CAST_CLASS_PREFIX (inst,  GBL_ILOGGER))
 
 #define SELF    GblILogger* pSelf
 #define CSELF   const SELF

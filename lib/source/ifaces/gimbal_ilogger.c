@@ -39,13 +39,12 @@ static GBL_RESULT GblILoggerIFace_init_(GblILoggerIFace* pIFace, void* pData, Gb
 
 extern GBL_RESULT GblILogger_typeRegister_(GblILogger* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
-    gblTypeRegisterBuiltin(25,
-      GBL_TYPE_INTERFACE,
+    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_ILOGGER,
+      GBL_INTERFACE_TYPE,
       "ILogger",
       &((const GblTypeInfo) {
-          .pFnClassInit     = (GblTypeClassInitFn)GblILoggerIFace_init_,
-          .classSize        = sizeof(GblILoggerIFace),
-          .classAlign       = GBL_ALIGNOF(GblILoggerIFace),
+          .pFnClassInit     = (GblTypeClassInitializeFn)GblILoggerIFace_init_,
+          .classSize        = sizeof(GblILoggerIFace)
       }),
       GBL_TYPE_FLAGS_NONE);
     GBL_API_END();
@@ -59,7 +58,7 @@ GBL_API GblILogger_write(GblILogger* pSelf,
                          va_list                varArgs) GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_PREFIX_VCALL(GBL_ILOGGER, pFnWrite,
+    GBL_INSTANCE_VCALL_PREFIX(GBL_ILOGGER, pFnWrite,
                               pSelf, pFrame, level, pFmt, varArgs);
     GBL_API_END();
 }
@@ -68,7 +67,7 @@ GBL_API GblILogger_push(GblILogger* pSelf,
                         const GblStackFrame* pFrame) GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_PREFIX_VCALL(GBL_ILOGGER, pFnPush,
+    GBL_INSTANCE_VCALL_PREFIX(GBL_ILOGGER, pFnPush,
                               pSelf, pFrame);
     GBL_API_END();
 }
@@ -78,7 +77,7 @@ GBL_API GblILogger_pop(GblILogger* pSelf,
                        uint32_t             count) GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_PREFIX_VCALL(GBL_ILOGGER, pFnPop,
+    GBL_INSTANCE_VCALL_PREFIX(GBL_ILOGGER, pFnPop,
                               pSelf, pFrame, count);
     GBL_API_END();
 }

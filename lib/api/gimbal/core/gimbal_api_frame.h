@@ -251,10 +251,10 @@ extern "C" {
 
 //===== VERIFY_TYPE =======
 #define GBL_API_VERIFY_TYPE_N(srcLoc, actualType, expectedType, ...) \
-    GBL_API_VERIFY_(gblTypeIsA(actualType, expectedType), GBL_RESULT_ERROR_TYPE_MISMATCH, srcLoc GBL_VA_ARGS(__VA_ARGS__))
+    GBL_API_VERIFY_(GblType_check(actualType, expectedType), GBL_RESULT_ERROR_TYPE_MISMATCH, srcLoc GBL_VA_ARGS(__VA_ARGS__))
 
 #define GBL_API_VERIFY_TYPE_2(srcLoc, actualType) \
-    GBL_API_VERIFY_(actualType != GBL_TYPE_INVALID, GBL_RESULT_ERROR_INVALID_TYPE, srcLoc)
+    GBL_API_VERIFY_(actualType != GBL_INVALID_TYPE, GBL_RESULT_ERROR_INVALID_TYPE, srcLoc)
 
 #define GBL_API_VERIFY_TYPE(...) \
     GBL_STMT_START { \
@@ -473,7 +473,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     GBL_STMT_START { \
         const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
         GBL_UNUSED(src_);                                                \
-       GblObject_eventSend(GBL_API_OBJECT(), event);                     \
+       GblObject_eventSend(GBL_API_OBJECT(), (GblEvent*)event);          \
     } GBL_STMT_END
 
 

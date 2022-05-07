@@ -5,11 +5,14 @@
 
 GBL_DECLS_BEGIN
 
-#define GBL_IEVENT_FILTER(instance)                 GBL_TYPE_CAST_INSTANCE(instance, GBL_TYPE_IEVENT_FILTER, GblIEventFilter)
-#define GBL_IEVENT_FILTER_CHECK(instance)      GBL_TYPE_CHECK_INSTANCE(instance, GBL_TYPE_IEVENT_FILTER)
-#define GBL_IEVENT_FILTER_IFACE(klass)              GBL_TYPE_CAST_CLASS(klass, GBL_TYPE_IEVENT_FILTER, GblIEventFilterIFace)
-#define GBL_IEVENT_FILTER_IFACE_CHECK(klass)   GBL_TYPE_CHECK_CLASS(klass, GBL_TYPE_IEVENT_FILTER)
-#define GBL_IEVENT_FILTER_GET_IFACE(instance)       GBL_TYPE_CAST_GET_CLASS(instance, GBL_TYPE_IEVENT_FILTER, GblIEventFilterIFace)
+#define GBL_IEVENT_FILTER_TYPE                      GBL_BUILTIN_TYPE(IEVENT_FILTER)
+#define GBL_IEVENT_FILTER_STRUCT                    GblIEventFilter
+#define GBL_IEVENT_FILTER_CLASS_STRUCT              GblIEventFilterIFace
+#define GBL_IEVENT_FILTER(instance)                 GBL_INSTANCE_CAST_PREFIX(instance, GBL_IEVENT_FILTER)
+#define GBL_IEVENT_FILTER_CHECK(instance)           GBL_INSTANCE_CHECK_PREFIX(instance, GBL_IEVENT_FILTER)
+#define GBL_IEVENT_FILTER_IFACE(klass)              GBL_CLASS_CAST_PREFIX(klass, GBL_IEVENT_FILTER)
+#define GBL_IEVENT_FILTER_IFACE_CHECK(klass)        GBL_CLASS_CHECK_PREFIX(klass, GBL_IEVENT_FILTER)
+#define GBL_IEVENT_FILTER_GET_IFACE(instance)       GBL_INSTANCE_CAST_CLASS_PREFIX(instance, GBL_IEVENT_FILTER)
 
 #define SELF    GblIEventFilter* pSelf
 #define CSELF   const SELF

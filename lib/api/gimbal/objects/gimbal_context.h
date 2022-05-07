@@ -5,14 +5,14 @@
 #include "../ifaces/gimbal_iallocator.h"
 #include "../ifaces/gimbal_ilogger.h"
 
-#define GBL_CONTEXT_TYPE                (gblTypeBuiltin(26))
+#define GBL_CONTEXT_TYPE                (GBL_BUILTIN_TYPE(CONTEXT))
 #define GBL_CONTEXT_STRUCT              GblContext
 #define GBL_CONTEXT_CLASS_STRUCT        GblContextClass
-#define GBL_CONTEXT(inst)               GBL_TYPE_CAST_INSTANCE_PREFIX (inst,  GBL_CONTEXT)
-#define GBL_CONTEXT_CHECK(inst)         GBL_TYPE_CHECK_INSTANCE_PREFIX(inst,  GBL_CONTEXT)
-#define GBL_CONTEXT_CLASS(klass)        GBL_TYPE_CAST_CLASS_PREFIX    (klass, GBL_CONTEXT)
-#define GBL_CONTEXT_CLASS_CHECK(klass)  GBL_TYPE_CHECK_CLASS_PREFIX   (klass, GBL_CONTEXT)
-#define GBL_CONTEXT_GET_CLASS(inst)     GBL_TYPE_CAST_GET_CLASS_PREFIX(inst,  GBL_CONTEXT)
+#define GBL_CONTEXT(inst)               GBL_INSTANCE_CAST_PREFIX (inst,  GBL_CONTEXT)
+#define GBL_CONTEXT_CHECK(inst)         GBL_INSTANCE_CHECK_PREFIX(inst,  GBL_CONTEXT)
+#define GBL_CONTEXT_CLASS(klass)        GBL_CLASS_CAST_PREFIX    (klass, GBL_CONTEXT)
+#define GBL_CONTEXT_CLASS_CHECK(klass)  GBL_CLASS_CHECK_PREFIX   (klass, GBL_CONTEXT)
+#define GBL_CONTEXT_GET_CLASS(inst)     GBL_INSTANCE_CAST_CLASS_PREFIX(inst,  GBL_CONTEXT)
 
 #define SELF    GblContext* pSelf
 #define CSELF   const SELF

@@ -11,13 +11,21 @@
 #include "../types/gimbal_quark.h"
 #include "../containers/gimbal_list.h"
 
+#define GBL_OBJECT_TYPE                     (GBL_BUILTIN_TYPE(OBJECT))
+#define GBL_OBJECT_PARENT_PREFIX            GBL_INVALID
 #define GBL_OBJECT_STRUCT                   GblObject
 #define GBL_OBJECT_CLASS_STRUCT             GblObjectClass
-#define GBL_OBJECT(instance)                GBL_TYPE_CAST_INSTANCE(instance, GBL_TYPE_OBJECT, GblObject)
-#define GBL_OBJECT_CHECK(instance)          GBL_TYPE_CHECK_INSTANCE(instance, GBL_TYPE_OBJECT)
-#define GBL_OBJECT_CLASS(klass)             GBL_TYPE_CAST_CLASS(klass, GBL_TYPE_OBJECT, GblObjectClass)
-#define GBL_OBJECT_CLASS_CHECK(klass)       GBL_TYPE_CHECK_CLASS(klass, GBL_TYPE_OBJECT)
-#define GBL_OBJECT_GET_CLASS(instance)      GBL_TYPE_CAST_GET_CLASS(instance, GBL_TYPE_OBJECT, GblObjectClass)
+
+#define GBL_OBJECT(instance)                GBL_INSTANCE_CAST_PREFIX(instance, GBL_OBJECT)
+#define GBL_OBJECT_CHECK(instance)          GBL_INSTANCE_CHECK_PREFIX(instance, GBL_OBJECT)
+#define GBL_OBJECT_TRY(instance)            GBL_INSTANCE_TRY_PREFIX(instance, GBL_OBJECT)
+
+#define GBL_OBJECT_CLASS(klass)             GBL_CLASS_CAST_PREFIX(klass, GBL_OBJECT)
+#define GBL_OBJECT_CLASS_CHECK(klass)       GBL_CLASS_CHECK_PREFIX(klass, GBL_OBJECT)
+#define GBL_OBJECT_CLASS_TRY(klass)         GBL_CLASS_TRY_PREFIX(klass, GBL_OBJECT)
+
+#define GBL_OBJECT_GET_CLASS(instance)      GBL_INSTANCE_CAST_CLASS_PREFIX(instance, GBL_OBJECT)
+#define GBL_OBJECT_TRY_CLASS(instance)      GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_OBJECT)
 
 #define GBL_OBJECT_REF(object)              (GblObject_ref((GblObject*)object))
 #define GBL_OBJECT_UNREF(object)            (GblObject_unref((GblObject*)object))
@@ -57,7 +65,6 @@ GBL_DECLARE_ENUM(GBL_OBJECT_ATTRIBUTE) {
     GBL_OBJECT_ATTRIBUTE_CLASS_CONSTRUCTED_IN_PLACE,
     GBL_OBJECT_ATTRIBUTE_COUNT
 };
-
 
 typedef struct GblObject {
     union {
@@ -203,7 +210,7 @@ typedef struct GblObjectExtraData_ {
 } GblObjectExtraData_;
 
 GBL_INLINE GBL_RESULT GblObject_ensureExtraData_(SELF) GBL_NOEXCEPT {
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
     if(!pSelf->pExtraData) {
         pSelf->pExtraData = (GblObjectExtraData_*)GBL_API_MALLOC(sizeof(GblObjectExtraData_));
         memset(pSelf->pExtraData, 0, sizeof(GblObjectExtraData_));
@@ -212,24 +219,24 @@ GBL_INLINE GBL_RESULT GblObject_ensureExtraData_(SELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE const GblProperty* GblObject_propertyFindString(CSELF, const char* pName) GBL_NOEXCEPT {
-    return gblPropertyTableFind(GblInstance_typeOf(GBL_INSTANCE(pSelf)), gblQuarkFromString(pName));
+    return gblPropertyTableFind(GBL_INSTANCE_TYPE(pSelf), gblQuarkFromString(pName));
 }
 GBL_INLINE const GblProperty* GblObject_propertyFindQuark(CSELF, GblQuark name) GBL_NOEXCEPT {
-    return gblPropertyTableFind(GblInstance_typeOf(GBL_INSTANCE(pSelf)), name);
+    return gblPropertyTableFind(GBL_INSTANCE_TYPE(pSelf), name);
 }
 GBL_INLINE const GblProperty* GblObject_propertyNext(CSELF, const GblProperty* pPrev, GBL_PROPERTY_FLAGS mask) GBL_NOEXCEPT {
-    return gblPropertyTableNext(GblInstance_typeOf(GBL_INSTANCE(pSelf)), pPrev, mask);
+    return gblPropertyTableNext(GBL_INSTANCE_TYPE(pSelf), pPrev, mask);
 }
 GBL_INLINE GBL_RESULT GblObject_propertySet(SELF, const GblProperty* pProperty, const GblVariant* pValue) GBL_NOEXCEPT {
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
-    GblClass* pClass = gblTypeClassPeek(GblProperty_objectType(pProperty));
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
+    GblClass* pClass = GblClass_peekFromType(GblProperty_objectType(pProperty));
     GBL_API_VERIFY_EXPRESSION(pClass);
     GBL_API_CALL(GBL_OBJECT_CLASS(pClass)->pFnPropertySet(pSelf, GblProperty_id(pProperty), pValue, pProperty));
     GBL_API_END();
 }
 GBL_INLINE GBL_RESULT GblObject_propertyGet(CSELF, const GblProperty* pProperty, GblVariant* pValue) GBL_NOEXCEPT {
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
-    GblClass* pClass = gblTypeClassPeek(GblProperty_objectType(pProperty));
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
+    GblClass* pClass = GblClass_peekFromType(GblProperty_objectType(pProperty));
     GBL_API_VERIFY_EXPRESSION(pClass);
     GBL_API_CALL(GBL_OBJECT_CLASS(pClass)->pFnPropertyGet(pSelf, GblProperty_id(pProperty), pValue, pProperty));
     GBL_API_END();
@@ -269,10 +276,10 @@ GBL_INLINE GblObject*  GblObject_siblingNext(CSELF) GBL_NOEXCEPT {
 
 GBL_INLINE GblObject* GblObject_ancestorFindByType(CSELF, GblType ancestorType) GBL_NOEXCEPT {
     GblObject* pAncestor = NULL;
-    //GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf))); {
+    //GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf))); {
         GblObject* pNode = GblObject_parent(pSelf);
         while(pNode) {
-            if(GBL_TYPE_CHECK_INSTANCE(pNode, ancestorType)) {
+            if(GBL_INSTANCE_CHECK(pNode, ancestorType)) {
                 pAncestor = pNode;
                 break;
             }
@@ -285,7 +292,7 @@ GBL_INLINE GblObject* GblObject_ancestorFindByType(CSELF, GblType ancestorType) 
 
 GBL_INLINE GblObject* GblObject_ancestorFindByName(CSELF, const char* pName) GBL_NOEXCEPT {
     GblObject* pAncestor = NULL;
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf))); {
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf))); {
         GblObject* pNode = GblObject_parent(pSelf);
         while(pNode) {
             const char* pNodeName = GblObject_name(pNode);
@@ -302,7 +309,7 @@ GBL_INLINE GblObject* GblObject_ancestorFindByName(CSELF, const char* pName) GBL
 
 
 GBL_INLINE void GblObject_childAdd(SELF, GblObject* pChild) GBL_NOEXCEPT {
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
     GBL_API_VERIFY_POINTER(pChild);
     {
         GblObject* pNode = GblObject_childFirst(pSelf);
@@ -326,7 +333,7 @@ GBL_INLINE void GblObject_childAdd(SELF, GblObject* pChild) GBL_NOEXCEPT {
 
 GBL_INLINE GblBool GblObject_childRemove(SELF, GblObject* pChild) GBL_NOEXCEPT {
     GblBool success = GBL_FALSE;
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
     GBL_API_VERIFY_POINTER(pChild);
     GBL_API_VERIFY_POINTER(pSelf->pExtraData && pSelf->pExtraData->pChildFirst);
     {
@@ -355,12 +362,12 @@ GBL_INLINE GblBool GblObject_childRemove(SELF, GblObject* pChild) GBL_NOEXCEPT {
 
 GBL_INLINE GblObject* GblObject_childFindByType(CSELF, GblType childType) GBL_NOEXCEPT {
     GblObject* pChild = NULL;
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf))); {
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf))); {
         for(GblObject* pIt = GblObject_childFirst(pSelf);
             pIt != NULL;
             pIt = GblObject_siblingNext(pIt))
         {
-            if(GBL_TYPE_CHECK_INSTANCE(pIt, childType)) {
+            if(GBL_INSTANCE_CHECK(pIt, childType)) {
                 pChild = pIt;
                 break;
             }
@@ -371,7 +378,7 @@ GBL_INLINE GblObject* GblObject_childFindByType(CSELF, GblType childType) GBL_NO
 
 GBL_INLINE GblObject* GblObject_childFindByName(CSELF, const char* pName) GBL_NOEXCEPT {
     GblObject* pChild = NULL;
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf))); {
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf))); {
         for(GblObject* pIt = GblObject_childFirst(pSelf);
             pIt != NULL;
             pIt = GblObject_siblingNext(pIt))
@@ -388,7 +395,7 @@ GBL_INLINE GblObject* GblObject_childFindByName(CSELF, const char* pName) GBL_NO
 
 GBL_INLINE GblObject* GblObject_childFindByIndex(CSELF, GblSize index) GBL_NOEXCEPT {
     GblObject* pChild = NULL;
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));\
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));\
     GblSize count = 0;
     for(GblObject* pObj = GblObject_childFirst(GBL_OBJECT(pSelf));
         pObj != NULL;
@@ -405,7 +412,7 @@ GBL_INLINE GblObject* GblObject_childFindByIndex(CSELF, GblSize index) GBL_NOEXC
 
 GBL_INLINE GblSize GblObject_childCount(CSELF) GBL_NOEXCEPT {
     GblSize count = 0;
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
     for(GblObject* pObj = GblObject_childFirst(GBL_OBJECT(pSelf));
         pObj != NULL;
         pObj = GblObject_siblingNext(GBL_OBJECT(pObj)))
@@ -461,7 +468,7 @@ GBL_INLINE void GblObject_userdataSet(SELF, void* pUserdata) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GBL_RESULT GblObject_attributeSet(SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value) GBL_NOEXCEPT {
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
     GBL_API_VERIFY_ARG(attrib < GBL_OBJECT_ATTRIBUTE_COUNT);
     switch(attrib) {
     case GBL_OBJECT_ATTRIBUTE_CLASS_CONSTRUCTED_IN_PLACE:
@@ -479,7 +486,7 @@ GBL_INLINE GBL_RESULT GblObject_attributeSet(SELF, GBL_OBJECT_ATTRIBUTE attrib, 
 
 GBL_INLINE GblBool GblObject_attribute(CSELF, GBL_OBJECT_ATTRIBUTE attrib) GBL_NOEXCEPT {
     GblBool value = GBL_FALSE;
-    GBL_API_BEGIN(gblTypeContext(GBL_INSTANCE_TYPE(pSelf)));
+    GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
     switch(attrib) {
     case GBL_OBJECT_ATTRIBUTE_CONSTRUCTED_IN_PLACE:
         value = pSelf->constructedInPlace;

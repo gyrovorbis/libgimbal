@@ -21,7 +21,6 @@
 #define GBL_ARG_1(_1, ...) _1
 #define GBL_ARG_N(N, A) GBL_ARG ## N(A)
 
-
 #define GBL_CAT(A, B) A##B
 
 #define GBL_MACRO_CALL(macro, ...)                  macro(__VA_ARGS__)

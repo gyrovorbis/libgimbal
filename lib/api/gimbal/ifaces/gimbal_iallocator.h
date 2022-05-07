@@ -4,14 +4,14 @@
 #include "../meta/gimbal_interface.h"
 #include "../core/gimbal_api_frame.h"
 
-#define GBL_IALLOCATOR_TYPE                 GBL_TYPE_IALLOCATOR
+#define GBL_IALLOCATOR_TYPE                 GBL_BUILTIN_TYPE(IALLOCATOR)
 #define GBL_IALLOCATOR_STRUCT               GblIAllocator
 #define GBL_IALLOCATOR_CLASS_STRUCT         GblIAllocatorIFace
-#define GBL_IALLOCATOR(inst)                (GBL_TYPE_CAST_INSTANCE_PREFIX  (inst,  GBL_IALLOCATOR))
-#define GBL_IALLOCATOR_CHECK(inst)          (GBL_TYPE_CHECK_INSTANCE_PREFIX (insta, GBL_IALLOCATOR))
-#define GBL_IALLOCATOR_IFACE(klass)         (GBL_TYPE_CAST_CLASS_PREFIX     (klass, GBL_IALLOCATOR))
-#define GBL_IALLOCATOR_IFACE_CHECK(klass)   (GBL_TYPE_CHECK_CLASS_PREFIX    (klass, GBL_IALLOCATOR))
-#define GBL_IALLOCATOR_GET_IFACE(inst)      (GBL_TYPE_CAST_GET_CLASS_PREFIX (inst,  GBL_IALLOCATOR))
+#define GBL_IALLOCATOR(inst)                (GBL_INSTANCE_CAST_PREFIX  (inst,  GBL_IALLOCATOR))
+#define GBL_IALLOCATOR_CHECK(inst)          (GBL_INSTANCE_CHECK_PREFIX (insta, GBL_IALLOCATOR))
+#define GBL_IALLOCATOR_IFACE(klass)         (GBL_CLASS_CAST_PREFIX     (klass, GBL_IALLOCATOR))
+#define GBL_IALLOCATOR_IFACE_CHECK(klass)   (GBL_CLASS_CHECK_PREFIX    (klass, GBL_IALLOCATOR))
+#define GBL_IALLOCATOR_GET_IFACE(inst)      (GBL_INSTANCE_CAST_CLASS_PREFIX (inst,  GBL_IALLOCATOR))
 
 #define SELF    GblIAllocator* pSelf
 #define CSELF   const SELF

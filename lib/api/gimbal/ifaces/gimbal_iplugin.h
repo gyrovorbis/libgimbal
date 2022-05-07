@@ -6,11 +6,11 @@
 GBL_DECLS_BEGIN
 
 #define GBL_IPLUGIN_TYPE (GblIPlugin_type())
-#define GBL_IPLUGIN(instance)                GBL_TYPE_CAST_INSTANCE(instance, GBL_IPLUGIN_TYPE, GblIPlugin)
-#define GBL_IPLUGIN_CHECK(instance)    GBL_TYPE_CHECK_INSTANCE(instance, GBL_IPLUGIN_TYPE)
-#define GBL_IPLUGIN_IFACE(klass)             GBL_TYPE_CAST_CLASS(klass, GBL_IPLUGIN_TYPE, GblIPluginIFace)
-#define GBL_IPLUGIN_IFACE_CHECK(klass)  GBL_TYPE_CHECK_CLASS(klass, GBL_IPLUGIN_TYPE)
-#define GBL_IPLUGIN_GET_IFACE(instance)      GBL_TYPE_CAST_GET_CLASS(instance, GBL_IPLUGIN_TYPE, GblIPluginIFace)
+#define GBL_IPLUGIN(instance)                GBL_INSTANCE_CAST(instance, GBL_IPLUGIN_TYPE, GblIPlugin)
+#define GBL_IPLUGIN_CHECK(instance)    GBL_INSTANCE_CHECK(instance, GBL_IPLUGIN_TYPE)
+#define GBL_IPLUGIN_IFACE(klass)             GBL_CLASS_CAST(klass, GBL_IPLUGIN_TYPE, GblIPluginIFace)
+#define GBL_IPLUGIN_IFACE_CHECK(klass)  GBL_CLASS_CHECK(klass, GBL_IPLUGIN_TYPE)
+#define GBL_IPLUGIN_GET_IFACE(instance)      GBL_INSTANCE_CAST_CLASS(instance, GBL_IPLUGIN_TYPE, GblIPluginIFace)
 
 #define SELF    GblIPlugin* pSelf
 #define CSELF   const GblIPlugin* pSelf
@@ -37,9 +37,9 @@ GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo    (CSELF, GblType requestedType, GblT
 
 
 GBL_EXPORT GblType GblIPlugin_type(void) {
-    static GblType type = GBL_TYPE_INVALID;
-    if(type == GBL_TYPE_INVALID) {
-        type = gblTypeRegisterStatic(GBL_TYPE_INTERFACE,
+    static GblType type = GBL_INVALID_TYPE;
+    if(type == GBL_INVALID_TYPE) {
+        type = GblType_registerStatic(GBL_INTERFACE_TYPE,
                                      "IPlugin",
                                      &((const GblTypeInfo) {
                                          .classSize    = sizeof(GblIPluginIFace),

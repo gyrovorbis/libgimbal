@@ -332,7 +332,7 @@ private:
 class StandardContext: public gimbal::Context {
 protected:
 
-    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) { return malloc(size); }
+    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) { return GBL_ALLOC_ALIGNED(alignment, size); }
     virtual void*   memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) { return realloc(pPtr, newSize); }
     virtual void    memFree(const StackFrame& frame, void* pPtr) { free(pPtr); }
     virtual void    logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) {
@@ -361,7 +361,7 @@ protected:
         default:
         {
 #if 0
-            if(GBL_TYPE_CONTEXT != GBL_TYPE_INVALID) {
+            if(GBL_TYPE_CONTEXT != GBL_INVALID_TYPE) {
                 GBL_API_BEGIN(static_cast<GblContext*>(this));
                 GBL_INSTANCE_VCALL_SUPER(GBL_TYPE_CONTEXT, GblContextClass, iLoggerIFace.pFnWrite, (GblILogger*)static_cast<GblContext*>(this), &frame, level, pFmt, varArgs);
                 GBL_API_END_BLOCK();
