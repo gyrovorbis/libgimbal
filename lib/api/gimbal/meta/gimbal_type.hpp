@@ -119,9 +119,7 @@ protected:
         const TypeInfo info = {
             {
                 .classSize = sizeof(C),
-                .classAlign = alignof(C),
-                .instanceSize = sizeof(I),
-                .instanceAlign = alignof(I)
+                .instanceSize = sizeof(I)
             }
         };
         return Type::registerStatic(P(), pName, info, flags);
