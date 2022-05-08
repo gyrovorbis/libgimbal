@@ -22,16 +22,16 @@ private slots:
 };
 
 inline void Quark::reinit(void) {
-    verifyResult(gblQuarkReinit(hCtx(), 64, 12));
+    verifyResult(GblQuark_init(hCtx(), 64, 12));
 }
 
 inline void Quark::fromStatic(void) {
-    GblQuark quark = gblQuarkFromStringStatic("staticString");
+    GblQuark quark = GblQuark_fromStringStatic("staticString");
     QCOMPARE(QString(quark_cast(quark)), "staticString");
-    quark = gblQuarkFromStringStatic("Staxy");
+    quark = GblQuark_fromStringStatic("Staxy");
     QCOMPARE(QString(quark_cast(quark)), "Staxy");
-    QCOMPARE(gblQuarkCount(), 2);
-    QCOMPARE(gblQuarkBytesUsed(), 0);
+    QCOMPARE(GblQuark_count(), 2);
+    QCOMPARE(GblQuark_bytesUsed(), 0);
 }
 
 

@@ -1,7 +1,6 @@
 #include <gimbal/objects/gimbal_context.h>
 
 static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
-    GblContext* pSelf = GBL_CONTEXT(pIAllocator);
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_ARG(size);
     GBL_API_VERIFY_ARG(align <= size && align >= 0);
@@ -76,7 +75,7 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
     switch(level) {
     case GBL_LOG_LEVEL_WARNING: pPrefix = "! "; break;
     case GBL_LOG_LEVEL_ERROR:   pPrefix = "X "; break;
-    case GBL_LOG_LEVEL_DEBUG:   pPrefix = "~ "; break;
+    case GBL_LOG_LEVEL_DEBUG:   pPrefix = "# "; break;
     case GBL_LOG_LEVEL_INFO:    pPrefix = "* "; break;
     default:                    pPrefix = "";   break;
     }
@@ -184,7 +183,7 @@ extern GBL_RESULT GblContext_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_CONTEXT,
       GBL_OBJECT_TYPE,
-      "Context",
+      GblQuark_internStringStatic("Context"),
       &((const GblTypeInfo) {
           .pFnClassInit     = (GblTypeClassInitializeFn)GblContextClass_init_,
           .classSize        = sizeof(GblContextClass),

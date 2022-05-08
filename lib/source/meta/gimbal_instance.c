@@ -24,7 +24,7 @@ GBL_EXPORT GBL_RESULT GblInstance_construct_(GblType type, GblInstance* pInstanc
     GblMetaClass*   pMeta = GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
     GBL_API_CALL(typeInstanceConstructValidate_(type));
-    GBL_API_PUSH_VERBOSE("[GblType] Instance Construct: type %s", pMeta->pName);
+    GBL_API_PUSH_VERBOSE("[GblType] Instance Construct: type %s", GblType_name(GBL_TYPE_(pMeta)));
 
     // Zero Initialize
     memset(pInstance, 0, pMeta->info.instanceSize);
@@ -41,10 +41,10 @@ GBL_EXPORT GBL_RESULT GblInstance_construct_(GblType type, GblInstance* pInstanc
     for(uint8_t idx = 0; idx <= pMeta->depth; ++idx) {
         GblMetaClass* pIter = GBL_META_CLASS_(GblType_base((GblType)pMeta, idx));
         if(pIter->info.pFnInstanceInit) {
-            GBL_API_VERBOSE("Calling instance initializers: [%s]", pIter->pName);
+            GBL_API_VERBOSE("Calling instance initializers: [%s]", GblType_name(GBL_TYPE_(pIter)));
             GBL_API_CALL(pIter->info.pFnInstanceInit(pInstance, pCtx_));
         } else {
-            GBL_API_VERBOSE("No instance ctor: [%s]", pIter->pName);
+            GBL_API_VERBOSE("No instance ctor: [%s]", GblType_name(GBL_TYPE_(pIter)));
         }
     }
 
@@ -79,7 +79,7 @@ GBL_EXPORT GblInstance* GblInstance_create_(GblType type, GblClass* pClass) {
     GblMetaClass* pMeta     = GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
     GBL_API_CALL(typeInstanceConstructValidate_(type));
-    GBL_API_PUSH_VERBOSE("[GblType] Instance Create: type %s", pMeta->pName);
+    GBL_API_PUSH_VERBOSE("[GblType] Instance Create: type %s", GblType_name(GBL_TYPE_(pMeta)));
 
     GBL_API_DEBUG("Allocating %u bytes.", pMeta->info.instanceSize);
 
@@ -89,7 +89,7 @@ GBL_EXPORT GblInstance* GblInstance_create_(GblType type, GblClass* pClass) {
 
     pInstance = GBL_API_MALLOC(gblAlignedAllocSize(pMeta->info.instanceSize),
                                GBL_ALIGNOF(max_align_t),
-                               pMeta->pName);
+                               GblType_name(GBL_TYPE_(pMeta)));
 
     GBL_API_CALL(GblInstance_construct_(type, pInstance, pClass));
 

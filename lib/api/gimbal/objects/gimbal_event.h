@@ -45,11 +45,7 @@ GBL_INLINE GBL_EVENT_STATE  GblEvent_state      (CSELF)                 GBL_NOEX
 GBL_INLINE GBL_RESULT       GblEvent_accept     (SELF)                  GBL_NOEXCEPT;
 
 
-
-
-
-
-// ========== INLINE IMPLEMENTATIONS ===========
+// ========== INLINE IMPLS ===========
 
 GBL_INLINE GblEvent* GblEvent_create(GblType type) GBL_NOEXCEPT {
     return GblType_check(type, GBL_EVENT_TYPE)?

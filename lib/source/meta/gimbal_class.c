@@ -40,7 +40,7 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta, 
 
 static GBL_RESULT gblTypeInterfaceClassConstruct_(GblInterface* pClass, GblMetaClass* pMeta, int16_t offset) {
     GBL_API_BEGIN(pCtx_);
-    GBL_API_PUSH_VERBOSE("InterfaceClass::construct(%s)", pMeta->pName);
+    GBL_API_PUSH_VERBOSE("InterfaceClass::construct(%s)", GblType_name(GBL_TYPE_(pMeta)));
 
     GBL_API_VERBOSE("offset: %d", offset);
     pClass->outerClassOffset = offset;
@@ -60,7 +60,7 @@ static GBL_RESULT gblTypeInterfaceClassConstruct_(GblInterface* pClass, GblMetaC
  */
 static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta, GblFlags classFlags) {
     GBL_API_BEGIN(pCtx_);
-    GBL_API_PUSH_VERBOSE("Class::construct(%s)", pMeta->pName);
+    GBL_API_PUSH_VERBOSE("Class::construct(%s)", GblType_name(GBL_TYPE_(pMeta)));
     GBL_API_VERBOSE("Type: %p", pMeta);
 
     // Zero initiailze class - NOPE OVERWRITING IFACE IF WE DO THAT!
@@ -84,7 +84,7 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta, 
 
     for(uint8_t idx = 0; idx <= pMeta->depth; ++idx) {
         GblMetaClass* pIter = GBL_META_CLASS_(GblType_base((GblType)pMeta, idx));
-        GBL_API_PUSH_VERBOSE("Class[%u]: %s", idx, pIter->pName);
+        GBL_API_PUSH_VERBOSE("Class[%u]: %s", idx, GblType_name(GBL_TYPE_(pIter)));
 
         //GBL_API_PUSH_VERBOSE("Constructing Interfaces");
         if(!pIter->info.interfaceCount) {
@@ -94,7 +94,7 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta, 
                 const GblTypeInterfaceMapEntry* pIEntry = &pIter->info.pInterfaceMap[i];
                 GblMetaClass* pIMeta = (GblMetaClass*)pIEntry->interfaceType;
                 GBL_API_VERIFY_EXPRESSION(pIMeta);
-                GBL_API_PUSH_VERBOSE("Interface[%u]: %s", i, pIMeta->pName);
+                GBL_API_PUSH_VERBOSE("Interface[%u]: %s", i, GblType_name(GBL_TYPE_(pIMeta)));
                 GblInterface* pIClass = (GblInterface*)((char*)pClass + pIEntry->classOffset);
                 GBL_API_CALL(gblTypeInterfaceClassConstruct_(pIClass, pIMeta, -pIEntry->classOffset));
                 GBL_API_POP(1);
@@ -103,10 +103,10 @@ static GBL_RESULT gblTypeClassConstruct_(GblClass* pClass, GblMetaClass* pMeta, 
         //GBL_API_POP(1);
 
         if(pIter->info.pFnClassInit) {
-            //GBL_API_VERBOSE("ClassInit(%s)", pIter->pName);
+            //GBL_API_VERBOSE("ClassInit(%s)", GblType_name(GBL_TYPE_(pIter)));
             GBL_API_CALL(pIter->info.pFnClassInit(pClass, pMeta->info.pClassData, pCtx_));
         } else {
-            //GBL_API_VERBOSE("Ctor: NULL", pIter->pName);
+            //GBL_API_VERBOSE("Ctor: NULL", GblType_name(GBL_TYPE_(pIter)));
         }
 
         GBL_API_POP(1);
@@ -123,7 +123,7 @@ static GblClass* gblTypeClassCreate_(GblMetaClass* pMeta, GblBool floating) {
     GblClass** ppClass       = &pFloatingClass;
     GBL_API_BEGIN(pCtx_);
     GBL_API_VERIFY_ARG(pMeta);
-    //GBL_API_PUSH_VERBOSE("Class::create(%s)", pMeta->pName);
+    //GBL_API_PUSH_VERBOSE("Class::create(%s)", GblType_name(GBL_TYPE_(pMeta)));
 
     if(!floating) {
         GBL_API_VERIFY_EXPRESSION(!atomic_load(&pMeta->refCount),
@@ -138,7 +138,7 @@ static GblClass* gblTypeClassCreate_(GblMetaClass* pMeta, GblBool floating) {
         GBL_API_VERBOSE("Allocating separate class structure!");
         *ppClass = GBL_API_MALLOC(gblAlignedAllocSize(pMeta->info.classSize),
                                   GBL_ALIGNOF(max_align_t),
-                                  pMeta->pName);
+                                  GblType_name(GBL_TYPE_(pMeta)));
     //Class must've been allocated with Meta class. Use existing data.
     } else {
        //GBL_API_VERBOSE("Using existing inline class allocation.");
@@ -162,7 +162,7 @@ GBL_EXPORT GblClass* GblClass_refFromType(GblType type) GBL_NOEXCEPT {
                    GBL_RESULT_UNIMPLEMENTED,
                    "[GblType] Attempt to reference a class of size 0!");
 
-    //GBL_API_PUSH_VERBOSE("Class::reference(%s)", pMeta->pName);
+    //GBL_API_PUSH_VERBOSE("Class::reference(%s)", GblType_name(GBL_TYPE_(pMeta)));
     GBL_TYPE_ENSURE_INITIALIZED_();
 
     // Return existing reference to class data
@@ -180,7 +180,7 @@ GBL_EXPORT GblClass* GblClass_refFromType(GblType type) GBL_NOEXCEPT {
 
     // Either way, we're returning a new reference, add refcount
     GblRefCount oldCount = atomic_fetch_add(&pMeta->refCount, 1);
-    GBL_API_VERBOSE("++[%s].refCount: %"GBL_SIZE_FMT, pMeta->pName, oldCount+1);
+    GBL_API_VERBOSE("++[%s].refCount: %"GBL_SIZE_FMT, GblType_name(GBL_TYPE_(pMeta)), oldCount+1);
 
     //GBL_API_POP(1);
     GBL_API_END_BLOCK();
@@ -227,17 +227,17 @@ GBL_EXPORT GblClass* GblClass_createFloating(GblType type) GBL_NOEXCEPT {
 static GBL_EXPORT GBL_RESULT gblTypeClassDestruct_(GblClass* pClass) {
     GblMetaClass* pMeta = GBL_META_CLASS_(GBL_CLASS_TYPE(pClass));
     GBL_API_BEGIN(pCtx_);
-    GBL_API_DEBUG("Destroying %s class!", pMeta->pName);
+    GBL_API_DEBUG("Destroying %s class!", GblType_name(GBL_TYPE_(pMeta)));
     GBL_API_PUSH();
     GblMetaClass* pIter = pMeta;
     // walk up the destructor chain
     GBL_API_PUSH_VERBOSE("Walking class destructors.");
     do {
         if(pIter->info.pFnClassFinal) {
-            GBL_API_DEBUG("Calling class dtor: [%s]", pIter->pName);
+            GBL_API_DEBUG("Calling class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
             GBL_API_CALL(pIter->info.pFnClassFinal(pMeta->pClass, pMeta->info.pClassData, pCtx_));
         } else {
-            GBL_API_DEBUG("No class dtor: [%s]", pIter->pName);
+            GBL_API_DEBUG("No class dtor: [%s]", GblType_name(GBL_TYPE_(pMeta)));
         }
 
         for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
@@ -308,7 +308,7 @@ GBL_EXPORT GblRefCount GblClass_unref(GblClass* pSelf) GBL_NOEXCEPT {
     refCount = atomic_fetch_sub(&pMeta->refCount, 1);
 
     if(refCount-1) {
-        GBL_API_VERBOSE("--[%s].refCount: %u", pMeta->pName, refCount-1);
+        GBL_API_VERBOSE("--[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), refCount-1);
     } else {
 #ifdef GBL_TYPE_DEBUG
         {

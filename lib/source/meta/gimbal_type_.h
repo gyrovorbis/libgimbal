@@ -4,6 +4,7 @@
 #include <gimbal/meta/gimbal_type.h>
 #include <gimbal/containers/gimbal_vector.h>
 #include <gimbal/containers/gimbal_hash_set.h>
+#include <gimbal/types/gimbal_quark.h>
 #include <stdatomic.h>
 #include <pthread.h>
 
@@ -24,8 +25,9 @@
 #define GBL_META_CLASS_ALIGNMENT_               (1 << (GBL_CLASS_FLAGS_BIT_COUNT_))
 #define GBL_META_CLASS_(type)                   ((GblMetaClass*)type)
 
+#define GBL_TYPE_(meta)              ((GblType)meta)
+
 #define GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT 32
-#define GBL_META_TYPE_NAME_SIZE_MAX                 1024
 #define GBL_TYPE_ENSURE_INITIALIZED_()  \
     if(!initializing_) pthread_once(&initOnce_, GblType_init_)
 
@@ -36,15 +38,15 @@ GBL_DECLARE_ENUM(GBL_CLASS_FLAGS_) {
     GBL_CLASS_FLAG_IN_PLACE_        = (1 << 1),
     GBL_CLASS_FLAG_IFACE_IMPL_      = (1 << 2),
     GBL_CLASS_FLAG_CONTEXT_         = (1 << 3),
-    GBL_CLASS_FLAG_5_               = (1 << 4),
-    GBL_CLASS_FLAG_6_               = (1 << 5)
+    GBL_CLASS_FLAG_CONTANER_        = (1 << 4), // + 16 byte header
+    GBL_CLASS_FLAG_EXTENDED_INFO_   = (1 << 5)
 };
 
 typedef atomic_uint_fast16_t GblRefCounter;
 
 typedef struct GblMetaClass {
     struct GblMetaClass*    pParent;
-    const char*             pName;
+    GblQuark                name;
     GblRefCounter           refCount;
 #ifdef GBL_TYPE_DEBUG
     GblRefCounter           instanceRefCount;

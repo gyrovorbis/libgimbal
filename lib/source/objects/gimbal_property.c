@@ -105,7 +105,7 @@ GBL_EXPORT const GblProperty* gblPropertyTableInsert          (GblType          
     GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_));
     GBL_API_VERIFY_TYPE(objectType, GBL_OBJECT_TYPE);
     GBL_API_VERIFY_POINTER(name);
-    GBL_API_PUSH_VERBOSE("[GblObject] Installing property: %s[%s]", GblType_name(objectType), gblQuarkToString(name));
+    GBL_API_PUSH_VERBOSE("[GblObject] Installing property: %s[%s]", GblType_name(objectType), GblQuark_toString(name));
     GBL_API_VERIFY_ARG(valueType != GBL_NIL_TYPE);
     GBL_API_VERIFY_ARG(flags); // make sure SOME flag is there
 
@@ -149,7 +149,7 @@ GBL_EXPORT GblBool gblPropertyTableErase(GblType objectType, GblQuark name) GBL_
     GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_));
     GBL_API_VERIFY_ARG(objectType != GBL_INVALID_TYPE);
     GBL_API_PUSH_VERBOSE("[GblObject] Uninstalling property: %s[%s]",
-                         GblType_name(objectType), gblQuarkToString(name));
+                         GblType_name(objectType), GblQuark_toString(name));
 
     // Find root node
     GblProperty* pFirst = propertyRoot_(objectType);
@@ -315,7 +315,7 @@ GBL_EXPORT GblQuark GblProperty_nameQuark(const GblProperty* pSelf) GBL_NOEXCEPT
     return pSelf? pSelf->name : GBL_QUARK_INVALID;
 }
 GBL_EXPORT const char* GblProperty_nameString(const GblProperty* pSelf) GBL_NOEXCEPT {
-    return pSelf? gblQuarkToString(pSelf->name) : NULL;
+    return pSelf? GblQuark_toString(pSelf->name) : NULL;
 }
 GBL_EXPORT GblType GblProperty_valueType(const GblProperty* pSelf) GBL_NOEXCEPT {
     return pSelf? pSelf->valueType : GBL_INVALID_TYPE;

@@ -16,7 +16,10 @@
 #define GBL_TYPE_IS_FUNDAMENTAL(type)       (type == GblType_fundamental(type))
 #define GBL_TYPE_IS_INTERFACE(type)         (GblType_fundamental(type) == GBL_INTERFACE_TYPE)
 #define GBL_TYPE_IS_ROOT(type)              (GblType_base(type, 0) == type)
-#define GBL_TYPE_IS_VALID(type)             (GblType_name(type) != GBL_NULL)
+//#define GBL_TYPE_IS_PROTOCOL
+#define GBL_TYPE_IS_VALUE(type)             (!GblType_flagsTest(type, GBL_TYPE_FLAG_FUNDAMENTAL_FLAG_INSTANTIABLE) \
+                                               && GblType_check(type, GBL_IVARIANT_TYPE))
+#define SELF    GblType type
 
 GBL_DECLS_BEGIN
 
@@ -54,55 +57,58 @@ typedef struct GblTypeInterfaceMapEntry {
 typedef struct GblTypeInfo {
     GblTypeClassInitializeFn        pFnClassInit;
     GblTypeClassFinalizeFn          pFnClassFinal;
-    GblSize                         classSize;
+    uint16_t                        classSize;
     const void*                     pClassData;
-    GblSize                         interfaceCount;
+    uint16_t                        interfaceCount;
     const GblTypeInterfaceMapEntry* pInterfaceMap;
+    uint16_t                        prerequesiteCount;
+    GblType*                        pPrerequesites;
     GblTypeInstanceInitializeFn     pFnInstanceInit;
-    GblSize                         instanceSize;
+    uint16_t                        instanceSize;
 } GblTypeInfo;
 
+GBL_EXPORT GBL_RESULT           GblType_init            (GblContext* pDefaultCtx,
+                                                         GblSize     typeBuiltinInitialCount,
+                                                         GblSize     typeTotalInitialCount) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT           GblType_final           (void)                              GBL_NOEXCEPT;
+GBL_EXPORT GblContext*          GblType_contextDefault  (void)                              GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT           GblType_init(GblContext* pDefaultCtx/*, GblSize builtinCount, GblSize totalCount*/) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT           GblType_final(void)                                                          GBL_NOEXCEPT;
-GBL_EXPORT GblContext*          GblType_contextDefault(void)                                                 GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_registerStatic  (GblType              parent,
+                                                         const char*          pName,
+                                                         const GblTypeInfo*   pInfo,
+                                                         GblFlags             flags)        GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_registerBuiltin (GblSize              expectedIndex,
+                                                         GblType              parentType,
+                                                         const char*          pName,
+                                                         const GblTypeInfo*   pTypeInfo,
+                                                         GblTypeFlags         flags)        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT           GblType_unregister      (GblType type)                      GBL_NOEXCEPT;
+GBL_EXPORT GblSize              GblType_registeredCount (void)                              GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_nextRegistered  (GblType previousType)              GBL_NOEXCEPT;
 
-GBL_EXPORT GblType              GblType_registerStatic(GblType              parent,
-                                                const char*                 pName,
-                                                const GblTypeInfo*          pInfo,
-                                                GblFlags                    flags)                          GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_registerBuiltin(GblSize             expectedIndex,
-                                                       GblType              parentType,
-                                                       const char*          pName,
-                                                       const GblTypeInfo*   pTypeInfo,
-                                                       GblTypeFlags         flags)                          GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT           GblType_unregister(GblType type)                                            GBL_NOEXCEPT;
-GBL_EXPORT GblSize              GblType_registeredCount(void)                                               GBL_NOEXCEPT;
-//GBL_EXPORT GblType            GblType_nextRegistered(GblType type)                                        GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_fromClass       (const GblClass* pClass)            GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_fromBuiltinIndex(GblUint index)                     GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_fromName        (const char* pName)                 GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_fromNameQuark   (GblQuark quark)                    GBL_NOEXCEPT;
 
-
-GBL_EXPORT GblType              GblType_fromClass(const GblClass* pClass)                                   GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_fromBuiltinIndex(GblUint index)                                     GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_fromName(const char* pName)                                         GBL_NOEXCEPT;
-//GBL_EXPORT GblType              GblType_fromNameQuark(GblQuark quark)                                       GBL_NOEXCEPT;
-
-
-GBL_EXPORT const char*          GblType_name(GblType type)                                                   GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_parent(GblType type)                                                 GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_fundamental(GblType type)                                            GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_base(GblType type, GblUint depth)                                    GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_ancestor(GblType type, GblUint level)                                GBL_NOEXCEPT;
-GBL_EXPORT GblUint              GblType_depth(GblType type)                                                  GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_flagsTest(GblType type, GblFlags mask)                               GBL_NOEXCEPT;
-GBL_EXPORT GblContext*          GblType_context(GblType type)                                                GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_check(GblType type, GblType other)                                   GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_subsumes(GblType subType, GblType superType)                         GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_implements(GblType concrete, GblType iface)                          GBL_NOEXCEPT;
-GBL_EXPORT const GblTypeInfo*   GblType_info(GblType type)                                                   GBL_NOEXCEPT;
-GBL_EXPORT GblIPlugin*          GblType_plugin(GblType type)                                                 GBL_NOEXCEPT;
-
+GBL_EXPORT const char*          GblType_name            (SELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GblQuark             GblType_nameQuark       (SELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_parent          (SELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_fundamental     (SELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_base            (SELF, GblUint depth)               GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_ancestor        (SELF, GblUint level)               GBL_NOEXCEPT;
+GBL_EXPORT GblUint              GblType_depth           (SELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_flagsTest       (SELF, GblFlags mask)               GBL_NOEXCEPT;
+GBL_EXPORT GblContext*          GblType_context         (SELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_check           (SELF, GblType other)               GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_subsumes        (SELF, GblType superType)           GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_implements      (SELF, GblType iface)               GBL_NOEXCEPT;
+//GBL_EXPORT GblBool            GblType_conforms        (SELF, GblType protocol)            GBL_NOEXCEPT;
+GBL_EXPORT const GblTypeInfo*   GblType_info            (SELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GblIPlugin*          GblType_plugin          (SELF)                              GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
+#undef SELF
 
 #endif // GIMBAL_TYPE_H

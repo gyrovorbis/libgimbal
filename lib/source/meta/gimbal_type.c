@@ -6,8 +6,6 @@
 #include <gimbal/algorithms/gimbal_sort.h>
 #include <gimbal/ifaces/gimbal_ivariant.h>
 
-// === STATIC DATA ====
-
 GblContext*              pCtx_           = NULL;
 pthread_once_t           initOnce_       = PTHREAD_ONCE_INIT;
 GblBool                  initialized_    = GBL_FALSE;
@@ -15,6 +13,13 @@ GBL_THREAD_LOCAL GblBool initializing_   = GBL_FALSE;
 pthread_mutex_t          typeRegMtx_;
 GblHashSet               typeRegistry_;
 struct TypeBuiltins_     typeBuiltins_;
+
+
+// === STATIC DATA ====
+
+static GblSize           initialTypeBuiltinCount_ = GBL_TYPE_BUILTIN_COUNT;
+static GblSize           initialTypeTotalCount_   = GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT;
+
 
 GBL_MAYBE_UNUSED static int metaClassIFaceEntryComparator_(const void* pA, const void* pB) {
     const GblTypeInterfaceMapEntry* pIFaceA = pA;
@@ -25,13 +30,13 @@ GBL_MAYBE_UNUSED static int metaClassIFaceEntryComparator_(const void* pA, const
 static GblHash metaClassHasher_(const GblHashSet* pMap, const void* pItem) {
     GBL_UNUSED(pMap);
     const GblMetaClass** pMeta = (const GblMetaClass**)pItem;
-    return gblHashMurmur((*pMeta)->pName, strnlen((*pMeta)->pName, GBL_META_TYPE_NAME_SIZE_MAX));
+    return gblHashMurmur(&(*pMeta)->name, sizeof(GblQuark));
 }
 
 static GblBool metaClassComparator_(const GblHashSet* pMap, const void* pA, const void* pB) {
     GBL_UNUSED(pMap);
     const GblMetaClass** ppRhs = (const GblMetaClass**)pA, **ppLhs = (const GblMetaClass**)pB;
-    return strncmp((*ppRhs)->pName, (*ppLhs)->pName, GBL_META_TYPE_NAME_SIZE_MAX) == 0;
+    return (*ppRhs)->name == (*ppLhs)->name;
 }
 
 static void metaClassElementFree_(const GblHashSet* pMap, void* item) {
@@ -83,6 +88,17 @@ static GblType typeRegister_(GblType parent,
                             i,
                             GblType_name(pInfo->pInterfaceMap[i].interfaceType),
                             pInfo->pInterfaceMap[i].classOffset);
+        }
+        GBL_API_POP(1);
+    }
+
+    if(pInfo->prerequesiteCount) {
+        GBL_API_PUSH_VERBOSE("Prerequesites");
+        for(GblSize p = 0; p < pInfo->prerequesiteCount; ++p) {
+            GBL_API_VERBOSE("%u: [Type: %s]",
+                            p,
+                            GblType_name(pInfo->pPrerequesites[p]));
+
         }
         GBL_API_POP(1);
     }
@@ -157,7 +173,72 @@ static GblType typeRegister_(GblType parent,
     GBL_API_VERIFY(!(pParent && (pParent->flags & GBL_TYPE_FLAG_FINAL)), GBL_RESULT_ERROR_INVALID_TYPE,
                    "Cannot derive from a FINAL type!");
 
+    if(pInfo->prerequesiteCount) {
+        GBL_API_VERIFY(!(fundamentalFlags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE),
+                       GBL_RESULT_ERROR_INVALID_TYPE,
+                       "INSTANTIABLE types cannot have PREREQUESITE types!");
 
+        GblSize instantiableCount = 0;
+        for(GblSize p = 0; p < pInfo->prerequesiteCount; ++p) {
+            if(GBL_TYPE_IS_INSTANTIABLE(pInfo->pPrerequesites[p]))
+                ++instantiableCount;
+        }
+        GBL_API_VERIFY(instantiableCount <= 1, GBL_RESULT_ERROR_INVALID_TYPE,
+                       "Cannot have multiple INSTANTIABLE PREREQUESITE types: [%u]",
+                       instantiableCount);
+    }
+
+    if(pInfo->interfaceCount) {
+        GBL_API_VERIFY((fundamentalFlags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED),
+                       GBL_RESULT_ERROR_INVALID_TYPE,
+                       "Only CLASSED types can map INTERFACES!");
+
+        for(GblSize i = 0; i < pInfo->interfaceCount; ++i) {
+            const GblTypeInterfaceMapEntry* pEntry = &pInfo->pInterfaceMap[i];
+            const GblType ifaceType = pEntry->interfaceType;
+            GblMetaClass* pIMeta = GBL_META_CLASS_(ifaceType);
+
+            GBL_API_VERIFY(pEntry->classOffset <= pInfo->classSize,
+                           GBL_RESULT_ERROR_INVALID_TYPE,
+                           "Cannot map INTERFACE type with offset greater than CLASS size: [%u > %u]",
+                           pEntry->classOffset, pInfo->classSize);
+
+            GBL_API_VERIFY(pInfo->classSize >= pIMeta->info.classSize,
+                           GBL_RESULT_ERROR_INVALID_TYPE,
+                           "Cannot map INTERFACE type with size less than CLASS size: [%u < %u]",
+                           pInfo->classSize, pIMeta->info.classSize);
+
+            for(GblSize p = 0; p < pIMeta->info.prerequesiteCount; ++p) {
+                GblType prereqType = pIMeta->info.pPrerequesites[p];
+
+                GblBool satisfied = GBL_FALSE;
+                if(GblType_check(parent, prereqType)) {
+                    continue;
+                }
+
+                for(GblSize ii = 0; ii < i; ++ii) {
+                    GblType prevIFaceType = pInfo->pInterfaceMap[ii].interfaceType;
+                    if(GblType_check(prevIFaceType, prereqType)) {
+                        satisfied = GBL_TRUE;
+                        break;
+                    }
+
+                    for(GblSize pp = 0; pp < p; ++pp) {
+                        GblType prevPrereqType = pIMeta->info.pPrerequesites[pp];
+                        if(GblType_check(prevPrereqType, prereqType)) {
+                            satisfied = GBL_TRUE;
+                            break;
+                        }
+                    }
+                }
+
+                GBL_API_VERIFY(satisfied, GBL_RESULT_ERROR_INVALID_TYPE,
+                               "Failed to satisfy PREREQUISITE type [%s] on INTERFACE type [%s]",
+                               GblType_name(prereqType),
+                               GblType_name(ifaceType));
+            }
+        }
+    }
     {
         uint8_t baseCount = 0;
         GblMetaClass* pParentIt = pParent;
@@ -167,10 +248,10 @@ static GblType typeRegister_(GblType parent,
         }
 
         GblSize metaSize = sizeof(GblMetaClass);
-        const GblSize ifaceOffset = metaSize;
-        const GblSize nameOffset = metaSize += sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount;
-        const GblSize classOffset = metaSize += strlen(pName)+1;
-        const GblSize basesOffset = metaSize += pInfo->classSize;
+        const GblSize ifaceOffset   = metaSize;
+        const GblSize prereqOffset  = metaSize += sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount;
+        const GblSize classOffset   = metaSize += sizeof(GblType)                  * pInfo->prerequesiteCount;
+        const GblSize basesOffset   = metaSize += pInfo->classSize;
         metaSize += baseCount * sizeof(GblMetaClass*);
 
         const GblSize alignRem = (metaSize % GBL_META_CLASS_ALIGNMENT_);
@@ -190,20 +271,27 @@ static GblType typeRegister_(GblType parent,
 #ifdef GBL_TYPE_DEBUG
         atomic_init(&pMeta->instanceRefCount, 0);
 #endif
-        strcpy(((char*)pMeta + nameOffset), pName);
         pMeta->flags                = flags;
         pMeta->depth                = baseCount;
         pMeta->pParent              = (struct GblMetaClass*)parent;
-        pMeta->pName                = ((const char*)pMeta + nameOffset);
+        pMeta->name                 = GblQuark_fromString(pName);
         pMeta->pClass               = pInfo->classSize?
                                             (GblClass*)((char*)pMeta + classOffset) : NULL;
         pMeta->info.pInterfaceMap   = pInfo->interfaceCount?
                                             (GblTypeInterfaceMapEntry*)((char*)pMeta + ifaceOffset) : NULL;
+        pMeta->info.pPrerequesites  = pInfo->prerequesiteCount?
+                                            (GblType*)((char*)pMeta + prereqOffset) : NULL;
         pMeta->pBases               = baseCount?
                                             (GblMetaClass**)((char*)pMeta + basesOffset) : NULL;
 
-        memcpy((GblTypeInterfaceMapEntry*)pMeta->info.pInterfaceMap, pInfo->pInterfaceMap, sizeof(GblTypeInterfaceMapEntry)*pInfo->interfaceCount);
+        memcpy((GblTypeInterfaceMapEntry*)pMeta->info.pInterfaceMap,
+               pInfo->pInterfaceMap,
+               sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount);
         //gblSortQuick((GblTypeInterfaceMapEntry*)pMeta->info.pInterfaceMap, pMeta->info.interfaceCount, sizeof(GblTypeInterfaceMapEntry), metaClassIFaceEntryComparator_);
+
+        memcpy((GblType*)pMeta->info.pPrerequesites,
+               pInfo->pPrerequesites,
+               sizeof(GblType*) * pInfo->prerequesiteCount);
 
         pParentIt = pParent;
         baseCount = 0;
@@ -237,7 +325,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
     GBL_API_BEGIN(pCtx_);
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INTERFACE,
               GBL_INVALID_TYPE,
-              "Interface",
+              GblQuark_internStringStatic("Interface"),
               &((const GblTypeInfo) {
                   .classSize    = sizeof(GblInterface)
               }),
@@ -287,7 +375,7 @@ void GblType_init_(void) {
 
 // === PUBLIC API ====
 
-GblType GblType_registerBuiltin(GblSize            expectedIndex,
+GblType GblType_registerBuiltin(GblSize           expectedIndex,
                                GblType            parentType,
                                const char*        pName,
                                const GblTypeInfo* pTypeInfo,
@@ -338,11 +426,15 @@ GBL_EXPORT GBL_RESULT GblType_final(void) {
     return GBL_API_RESULT();
 }
 
-GBL_API GblType_init(GblContext* pCtx) {
+GBL_API GblType_init(GblContext*    pCtx,
+                     GblSize        typeBuiltinInitialCount,
+                     GblSize        typeTotalInitialCount) {
     GBL_API_BEGIN(NULL);
     if(!initialized_) {
        // GBL_API_PUSH_VERBOSE("[GblType]: Inititalizing.");
         pCtx_ = pCtx;
+        if(typeBuiltinInitialCount) initialTypeBuiltinCount_    = typeBuiltinInitialCount;
+        if(typeTotalInitialCount)   initialTypeTotalCount_      = typeTotalInitialCount;
         GBL_TYPE_ENSURE_INITIALIZED_();
     } else {
         GBL_API_PUSH_VERBOSE("[GblType]: ReInititalizing.");
@@ -371,17 +463,14 @@ GBL_EXPORT GblType GblType_fromBuiltinIndex(GblUint index) {
     return type;
 }
 
-GBL_EXPORT GblType GblType_fromName(const char* pTypeName) {
+GBL_EXPORT GblType GblType_fromNameQuark(GblQuark name) {
     GblType foundType = GBL_INVALID_TYPE;
     GBL_API_BEGIN(pCtx_);
-    GBL_API_VERIFY_POINTER(pTypeName);
+    if(name == GBL_QUARK_INVALID) GBL_API_DONE();
     GBL_TYPE_ENSURE_INITIALIZED_();
 
     GblMetaClass* pTempClass = GBL_ALLOCA(sizeof(GblMetaClass));
-    pTempClass->pName = pTypeName;
-
-    if(strnlen(pTypeName, GBL_META_TYPE_NAME_SIZE_MAX+1) > GBL_META_TYPE_NAME_SIZE_MAX)
-        GBL_API_WARN("Typename is too large and will be truncated: %s", pTypeName);
+    pTempClass->name = name;
 
     pthread_mutex_lock(&typeRegMtx_);
     GblMetaClass** ppReturnValue = (GblMetaClass**)GblHashSet_get(&typeRegistry_, &pTempClass);
@@ -392,6 +481,10 @@ GBL_EXPORT GblType GblType_fromName(const char* pTypeName) {
 
     GBL_API_END_BLOCK();
     return foundType;
+}
+
+GBL_EXPORT GblType GblType_fromName(const char* pTypeName) {
+    return GblType_fromNameQuark(GblQuark_tryString(pTypeName));
 }
 
 GBL_EXPORT GblSize GblType_registeredCount(void) {
@@ -405,16 +498,42 @@ GBL_EXPORT GblSize GblType_registeredCount(void) {
     return count;
 }
 
-
-GBL_EXPORT const char* GblType_name(GblType type) {
-    const char*     pName   = "Invalid";
-    GblMetaClass*   pMeta   = GBL_META_CLASS_(type);
+GBL_EXPORT GblType GblType_nextRegistered(GblType prevType) {
+    GblType next = GBL_INVALID_TYPE;
     GBL_API_BEGIN(pCtx_);
-    if(pMeta) {
-        pName = pMeta->pName;
+
+    GblBool useNext = (prevType == GBL_INVALID_TYPE);
+    for(GblSize p = 0; p < GblHashSet_bucketCount(&typeRegistry_); ++p) {
+        GblMetaClass** ppMeta = GblHashSet_probe(&typeRegistry_, p);
+        if(ppMeta) {
+            GblType type = GBL_TYPE_(*ppMeta);
+            if(useNext) {
+                next = type;
+                break;
+            } else if(type == prevType) {
+                useNext = GBL_TRUE;
+            }
+        }
     }
     GBL_API_END_BLOCK();
-    return pName;
+    return next;
+}
+
+GBL_EXPORT GblQuark GblType_nameQuark(GblType type) {
+    GblQuark name         = GBL_QUARK_INVALID;
+    GblMetaClass* pMeta   = GBL_META_CLASS_(type);
+    GBL_API_BEGIN(pCtx_);
+    if(pMeta) {
+        name = pMeta->name;
+    }
+    GBL_API_END_BLOCK();
+    return name;
+}
+
+GBL_EXPORT const char* GblType_name(GblType type) {
+    return type != GBL_INVALID_TYPE?
+                GblQuark_toString(GblType_nameQuark(type)) :
+                "Invalid";
 }
 
 GBL_EXPORT GblType GblType_parent(GblType type) {
@@ -518,7 +637,6 @@ GBL_EXPORT GblIPlugin* GblType_plugin(GblType type) {
     return type == GBL_INVALID_TYPE? NULL : GBL_META_CLASS_(type)->pPlugin;
 }
 
-
 GBL_EXPORT GblContext* GblType_contextDefault(void) {
     return pCtx_;
 }
@@ -575,6 +693,12 @@ GBL_EXPORT GblBool GblType_implements(GblType concrete, GblType iface) {
     return typeIsA_(concrete, iface, GBL_FALSE, GBL_TRUE);
 }
 
+GBL_EXPORT GblBool GblType_conforms(GblType type, GblType protocol) {
+    GblBool conforms = GBL_FALSE;
+
+    return conforms;
+}
+
 
 // ==== MAKE SURE TO ITERATE OVER PARENTS AND CHECK THAT CLASS/INSTANCE SIZE IS VALID =====
 GBL_EXPORT GblType GblType_registerStatic(GblType                    parent,
@@ -607,7 +731,7 @@ GBL_EXPORT GBL_RESULT GblType_unregister(GblType type) {
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
     GBL_API_VERIFY_ARG(type != GBL_INVALID_TYPE);
-    GBL_API_PUSH_VERBOSE("[GblType] Unregister: %s", pMeta->pName);
+    GBL_API_PUSH_VERBOSE("[GblType] Unregister: %s", GblType_name(type));
     GBL_TYPE_ENSURE_INITIALIZED_();
     {
         GblRefCount refCount = GblClass_refCountFromType(type);
@@ -632,10 +756,10 @@ GBL_EXPORT GBL_RESULT GblType_unregister(GblType type) {
 
 GBL_EXPORT GblType GblType_fromClass(const GblClass* pClass) {
     GblType type = GBL_INVALID_TYPE;
-    GBL_API_BEGIN(pCtx_);
+    //GBL_API_BEGIN(pCtx_);
     if(pClass) {
         type = GBL_CLASS_TYPE_(pClass);
     }
-    GBL_API_END_BLOCK();
+    //GBL_API_END_BLOCK();
     return type;
 }

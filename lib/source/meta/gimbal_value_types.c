@@ -4,6 +4,7 @@
 #include <gimbal/meta/gimbal_variant.h>
 #include <gimbal/types/gimbal_string.h>
 #include <gimbal/types/gimbal_variant.h>
+#include <gimbal/types/gimbal_quark.h>
 
 typedef struct GblPrimitiveClass {
     GblClass            base;
@@ -584,7 +585,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_NIL,
       GBL_INVALID_TYPE,
-      "nil",
+      GblQuark_internStringStatic("nil"),
       &((const GblTypeInfo) {
           .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
           .classSize    = sizeof(GblPrimitiveClass),
@@ -611,7 +612,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
       };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_BOOL,
       GBL_INVALID_TYPE,
-      "bool",
+      GblQuark_internStringStatic("bool"),
       &((const GblTypeInfo) {
           .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
           .classSize    = sizeof(GblPrimitiveClass),
@@ -638,7 +639,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
       };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_CHAR,
           GBL_INVALID_TYPE,
-          "char",
+          GblQuark_internStringStatic("char"),
           &((const GblTypeInfo) {
               .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
               .classSize    = sizeof(GblPrimitiveClass),
@@ -665,7 +666,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_UINT8,
       GBL_INVALID_TYPE,
-      "uint8",
+      GblQuark_internStringStatic("uint8"),
       &((const GblTypeInfo) {
           .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
           .classSize    = sizeof(GblPrimitiveClass),
@@ -692,7 +693,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INT16,
           GBL_INVALID_TYPE,
-          "int16",
+          GblQuark_internStringStatic("int16"),
           &((const GblTypeInfo) {
               .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
               .classSize    = sizeof(GblPrimitiveClass),
@@ -719,7 +720,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_UINT16,
           GBL_INVALID_TYPE,
-          "uint16",
+          GblQuark_internStringStatic("uint16"),
           &((const GblTypeInfo) {
               .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
               .classSize    = sizeof(GblPrimitiveClass),
@@ -746,7 +747,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
       };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INT32,
           GBL_INVALID_TYPE,
-          "int32",
+          GblQuark_internStringStatic("int32"),
           &((const GblTypeInfo) {
               .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
               .classSize    = sizeof(GblPrimitiveClass),
@@ -773,7 +774,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_UINT32,
           GBL_INVALID_TYPE,
-          "uint32",
+          GblQuark_internStringStatic("uint32"),
           &((const GblTypeInfo) {
               .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
               .classSize    = sizeof(GblPrimitiveClass),
@@ -800,7 +801,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INT64,
           GBL_INVALID_TYPE,
-          "int64",
+          GblQuark_internStringStatic("int64"),
           &((const GblTypeInfo) {
               .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
               .classSize    = sizeof(GblPrimitiveClass),
@@ -827,7 +828,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
       };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_UINT64,
           GBL_INVALID_TYPE,
-          "uint64",
+          GblQuark_internStringStatic("uint64"),
           &((const GblTypeInfo) {
               .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
               .classSize    = sizeof(GblPrimitiveClass),
@@ -854,7 +855,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
       };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_ENUM,
                   GBL_INVALID_TYPE,
-                  "enum",
+                  GblQuark_internStringStatic("enum"),
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
@@ -881,7 +882,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_FLAGS,
                   GBL_INVALID_TYPE,
-                  "flags",
+                  GblQuark_internStringStatic("flags"),
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
@@ -908,7 +909,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_FLOAT,
                   GBL_INVALID_TYPE,
-                  "float",
+                  GblQuark_internStringStatic("float"),
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
@@ -935,7 +936,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
       };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_DOUBLE,
                   GBL_INVALID_TYPE,
-                  "double",
+                  GblQuark_internStringStatic("double"),
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
@@ -963,7 +964,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
 
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_POINTER,
                   GBL_INVALID_TYPE,
-                  "pointer",
+                  GblQuark_internStringStatic("pointer"),
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
@@ -1002,7 +1003,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     };
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_STRING,
                   GBL_INVALID_TYPE,
-                  "string",
+                  GblQuark_internStringStatic("string"),
                   &((const GblTypeInfo) {
                       .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
                       .classSize    = sizeof(GblPrimitiveClass),
@@ -1017,13 +1018,13 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
 
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_TYPE,
                                GBL_INVALID_TYPE,
-                               "type",
+                               GblQuark_internStringStatic("type"),
                                &((const GblTypeInfo) {}),
                                GBL_TYPE_FLAG_ABSTRACT);
 
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_BOXED,
                                GBL_INVALID_TYPE,
-                               "boxed",
+                               GblQuark_internStringStatic("boxed"),
                                &((const GblTypeInfo) {}),
                                GBL_TYPE_FLAG_ABSTRACT);
 

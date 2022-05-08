@@ -177,7 +177,7 @@ inline void* Type::classReference      (void) const { return Type::classReferenc
 inline void  Type::classUnreference    (void* pClass) const { return Type::classUnreference(*this, pClass); }
 
 inline Result Type::reinit(Context* pCtx) {
-    return GblType_init(pCtx);
+    return GblType_init(pCtx, 0, 0);
 }
 
 inline Type Type::registerStatic(Type parentType,

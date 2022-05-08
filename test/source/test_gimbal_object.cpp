@@ -148,22 +148,22 @@ static GblType TestObject_type(void) {
                 GBL_API_BEGIN(pCtx);
                 if(GBL_CLASS_TYPE(pTestClass) == TEST_OBJECT_TYPE) {
                     gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
-                                           gblQuarkFromStringStatic("floater"),
+                                           GblQuark_fromStringStatic("floater"),
                                            TEST_OBJECT_PROPERTY_FLOATER,
                                            GBL_FLOAT_TYPE,
                                            GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT);
                     gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
-                                           gblQuarkFromStringStatic("stringer"),
+                                           GblQuark_fromStringStatic("stringer"),
                                            TEST_OBJECT_PROPERTY_STRINGER,
                                            GBL_STRING_TYPE,
                                            GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT);
                     gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
-                                           gblQuarkFromStringStatic("staticInt32"),
+                                           GblQuark_fromStringStatic("staticInt32"),
                                            TEST_OBJECT_PROPERTY_STATICINT32,
                                            GBL_INT32_TYPE,
                                            GBL_PROPERTY_FLAG_READ);
                     gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
-                                           gblQuarkFromStringStatic("userdata"),
+                                           GblQuark_fromStringStatic("userdata"),
                                            TEST_OBJECT_PROPERTY_USERDATA,
                                            GBL_POINTER_TYPE,
                                            GBL_PROPERTY_FLAG_CONSTRUCT | GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_OVERRIDE);

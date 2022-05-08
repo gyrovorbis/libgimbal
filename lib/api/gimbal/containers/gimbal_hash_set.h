@@ -121,13 +121,8 @@ GBL_EXPORT const GblHashSet*    GblHashSetIterator_container(CSELF)             
 GBL_EXPORT GblBool              GblHashSetIterator_valid(CSELF)                     GBL_NOEXCEPT;
 GBL_EXPORT GblHash              GblHashSetIterator_hash(CSELF)                      GBL_NOEXCEPT;
 GBL_EXPORT void*                GblHashSetIterator_value(CSELF)                     GBL_NOEXCEPT;
-//GBL_EXPORT GblInt       GblHashSetIterator_compare(CSELF, const void* pEntry)       GBL_NOEXCEPT;
-//GBL_EXPORT GblInt       GblHashSetIterator_compare(CSELF,
- //                                                  const GblHashSetIterator* pOther) GBL_NOEXCEPT;
 
-
-
-// ======== INLINE IMPLEMENTATION ======
+// ======== INLINE IMPL ======
 
 
 GBL_INLINE void* GblHashSet_userdata(const GblHashSet* pSelf) GBL_NOEXCEPT {

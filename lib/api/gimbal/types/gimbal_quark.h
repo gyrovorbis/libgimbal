@@ -7,21 +7,25 @@ GBL_DECLS_BEGIN
 
 #define GBL_QUARK_INVALID ((GblQuark)0)
 
-GBL_API                 gblQuarkReinit(GblContext* pCtx, GblSize pageSize, GblSize initialEntries) GBL_NOEXCEPT;
-GblSize                 gblQuarkPageCount(void) GBL_NOEXCEPT;
-GblSize                 gblQuarkBytesUsed(void) GBL_NOEXCEPT;
-GblSize                 gblQuarkCount(void) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblQuark_init               (GblContext* pCtx,
+                                                     GblSize pageSize,
+                                                     GblSize initialEntries)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblQuark_final              (void)                      GBL_NOEXCEPT;
 
-GBL_EXPORT GblQuark     gblQuarkTryString(const char* pString) GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     gblQuarkFromString(const char* pString) GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     gblQuarkFromStringStatic(const char* pSstring) GBL_NOEXCEPT;
+GblSize                 GblQuark_pageCount          (void)                      GBL_NOEXCEPT;
+GblSize                 GblQuark_bytesUsed          (void)                      GBL_NOEXCEPT;
+GblSize                 GblQuark_count              (void)                      GBL_NOEXCEPT;
+GblContext*             GblQuark_context            (void)                      GBL_NOEXCEPT;
 
-GBL_EXPORT const char*  gblQuarkToString(GblQuark quark) GBL_NOEXCEPT;
-GBL_EXPORT const char*  gblQuarkInternString(const char* pStr) GBL_NOEXCEPT;
-GBL_EXPORT const char*  gblQuarkInternStringStatic(const char* pStr) GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_tryString          (const char* pString)       GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_fromString         (const char* pString)       GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_fromStringStatic   (const char* pSstring)      GBL_NOEXCEPT;
+
+GBL_EXPORT const char*  GblQuark_toString           (GblQuark quark)            GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblQuark_internString       (const char* pStr)          GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblQuark_internStringStatic (const char* pStr)          GBL_NOEXCEPT;
 
 GBL_DECLS_END
-
 
 
 #endif // GIMBAL_QUARK_H

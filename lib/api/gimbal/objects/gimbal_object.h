@@ -219,7 +219,7 @@ GBL_INLINE GBL_RESULT GblObject_ensureExtraData_(SELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE const GblProperty* GblObject_propertyFindString(CSELF, const char* pName) GBL_NOEXCEPT {
-    return gblPropertyTableFind(GBL_INSTANCE_TYPE(pSelf), gblQuarkFromString(pName));
+    return gblPropertyTableFind(GBL_INSTANCE_TYPE(pSelf), GblQuark_fromString(pName));
 }
 GBL_INLINE const GblProperty* GblObject_propertyFindQuark(CSELF, GblQuark name) GBL_NOEXCEPT {
     return gblPropertyTableFind(GBL_INSTANCE_TYPE(pSelf), name);
@@ -248,10 +248,10 @@ GBL_INLINE GBL_RESULT GblObject_propertySetQuark(SELF,  GblQuark name, const Gbl
     return GblObject_propertySet(pSelf, GblObject_propertyFindQuark(pSelf, name), pValue);
 }
 GBL_INLINE GBL_RESULT GblObject_propertyGetString(CSELF, const char* pName, GblVariant* pValue) GBL_NOEXCEPT {
-    return GblObject_propertyGetQuark(pSelf, gblQuarkFromString(pName), pValue);
+    return GblObject_propertyGetQuark(pSelf, GblQuark_fromString(pName), pValue);
 }
 GBL_INLINE GBL_RESULT GblObject_propertySetString(SELF,  const char* pName, const GblVariant* pValue) GBL_NOEXCEPT {
-        return GblObject_propertySetQuark(pSelf, gblQuarkFromString(pName), pValue);
+        return GblObject_propertySetQuark(pSelf, GblQuark_fromString(pName), pValue);
 }
 
 GBL_INLINE GblObject* GblObject_parent(CSELF) GBL_NOEXCEPT {
@@ -444,13 +444,13 @@ GBL_INLINE GblObject* GblObject_siblingFindByName(CSELF, const char* pName) GBL_
 GBL_INLINE void GblObject_nameSet(SELF, const char* pName) GBL_NOEXCEPT {
     if(pName) {
         GblObject_ensureExtraData_(pSelf);
-        pSelf->pExtraData->name = gblQuarkFromString(pName);
+        pSelf->pExtraData->name = GblQuark_fromString(pName);
     } else if(pSelf->pExtraData) {
         pSelf->pExtraData->name = GBL_QUARK_INVALID;
     }
 }
 GBL_INLINE const char* GblObject_name(CSELF) GBL_NOEXCEPT {
-    return pSelf->pExtraData? gblQuarkToString(pSelf->pExtraData->name) : NULL;
+    return pSelf->pExtraData? GblQuark_toString(pSelf->pExtraData->name) : NULL;
 }
 
 GBL_INLINE void* GblObject_userdata(CSELF) GBL_NOEXCEPT {
