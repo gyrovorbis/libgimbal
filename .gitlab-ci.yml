@@ -47,7 +47,7 @@ build ubuntu20-clang11:
 build win10-vs2022:
   extends: .build_common 
   tags:
-    - visual-studio, win10
+    - win10
   variables:   
     CC: cl
     CXX: cl
