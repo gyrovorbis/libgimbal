@@ -137,7 +137,7 @@ GBL_INLINE GblTreeSetNode* gimme_branch_(GblTreeSet* pSelf) {
 }
 
 GBL_INLINE void* get_item_at_(GblTreeSetNode* pNode, GblSize entrySize, GblSize index) {
-    return pNode->pEntries + entrySize*index;
+    return (uint8_t*)pNode->pEntries + entrySize*index;
 }
 
 GBL_INLINE void set_item_at_(GblTreeSetNode* pNode, GblSize entrySize, GblSize index, const void* pEntry) {
@@ -237,7 +237,7 @@ static void node_split_(GblTreeSet* pSelf, GblTreeSetNode* pNode,
     (*ppRight)->leaf = pNode->leaf;
     (*ppRight)->entryCount = pNode->entryCount - ((uint16_t)mid+1);
     memmove((*ppRight)->pEntries,
-            pNode->pEntries + (int)pSelf->entrySize*(mid+1),
+            (uint8_t*)pNode->pEntries + (int)pSelf->entrySize*(mid+1),
             (size_t)(*ppRight)->entryCount * pSelf->entrySize);
     if(!pNode->leaf) {
         for(int e = 0; e <= (*ppRight)->entryCount; ++e) {
@@ -248,7 +248,7 @@ static void node_split_(GblTreeSet* pSelf, GblTreeSetNode* pNode,
 }
 
 static void node_join_(GblTreeSetNode* pLeft, GblTreeSetNode* pRight, GblSize entrySize) {
-    memcpy(pLeft->pEntries + entrySize*(size_t)pLeft->entryCount,
+    memcpy((uint8_t*)pLeft->pEntries + entrySize*(size_t)pLeft->entryCount,
            pRight->pEntries,
            (size_t)pRight->entryCount * entrySize);
     if(!pLeft->leaf) {
@@ -261,8 +261,8 @@ static void node_join_(GblTreeSetNode* pLeft, GblTreeSetNode* pRight, GblSize en
 
 
 GBL_INLINE void node_shift_right_(GblTreeSetNode* pNode, GblSize entrySize, GblSize index) {
-    memmove(pNode->pEntries + entrySize*(index+1),
-            pNode->pEntries + entrySize*index,
+    memmove((uint8_t*)pNode->pEntries + entrySize*(index+1),
+            (uint8_t*)pNode->pEntries + entrySize*index,
             ((size_t)pNode->entryCount-index)*entrySize);
 
     if (!pNode->leaf) {
@@ -276,8 +276,8 @@ GBL_INLINE void node_shift_right_(GblTreeSetNode* pNode, GblSize entrySize, GblS
 GBL_INLINE void node_shift_left_(GblTreeSetNode* pNode, GblSize entrySize, size_t index,
                             GblBool forMerge)
 {
-    memmove(pNode->pEntries + entrySize*index,
-            pNode->pEntries + entrySize*(index+1),
+    memmove((uint8_t*)pNode->pEntries + entrySize*index,
+            (uint8_t*)pNode->pEntries + entrySize*(index+1),
             ((size_t)pNode->entryCount-index)*entrySize);
     if (!pNode->leaf) {
         if (forMerge) {

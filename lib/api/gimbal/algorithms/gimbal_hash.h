@@ -128,7 +128,7 @@ int gblRandRange(int min, int max) GBL_NOEXCEPT {
     GBL_ASSERT(max <= RAND_MAX);
     static GblBool seeded = GBL_FALSE;
     if(!seeded) {
-        srand(gblSeed(0));
+        srand((unsigned)gblSeed(0));
         seeded = GBL_TRUE;
     }
     return (rand() % (max - min + 1)) + min;

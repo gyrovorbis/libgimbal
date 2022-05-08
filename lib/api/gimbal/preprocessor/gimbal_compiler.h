@@ -20,7 +20,7 @@
 #       define GBL_C_11
 #   endif
 #   if (__STDC_VERSION__ >= 201710L)
-#       define GBL_C_18
+#       define GBL_C_17
 #   endif
 #endif
 
@@ -248,10 +248,14 @@
 #endif
 
 #if defined(GBL_C_11)
-#   include<stdalign.h>
-#   define GBL_ALIGNAS(e)               alignas(e)
-#   define GBL_ALIGNOF(e)               alignof(e)
-#   define GBL_ALLOC_ALIGNED(s, a)      aligned_alloc(s, a)
+#   define GBL_ALIGNAS(e)               _Alignas(e)
+#   define GBL_ALIGNOF(e)               _Alignof(e)
+#   ifdef _MSC_VER
+#       define GBL_ALLOC_ALIGNED(s, a)  _aligned_malloc(s, a)
+#   else
+#       include<stdalign.h>
+#       define GBL_ALLOC_ALIGNED(s, a)      aligned_alloc(s, a)
+#   endif
 #elif defined(GBL_CPP_11)
 #   define GBL_ALIGNAS(e)               alignas(e)
 #   define GBL_ALIGNOF(e)               alignof(e)
@@ -331,6 +335,9 @@
 #   define GBL_PRAGMA_MACRO_POP(X) pop_macro(X);
 #endif
 
+#ifdef _MSC_VER
+#   define max_align_t double
+#endif
 #define GBL_ALLOC_MIN_SIZE GBL_ALIGNOF(max_align_t)
 
 /* ==========================================================
