@@ -44,16 +44,14 @@ build ubuntu20-gcc10:
 build ubuntu20-clang11:
   extends: .build_linux_clang
 
-  
-
-#build win10-vs2019:
-#  extends: .build_common 
-#  tags:
-#    - visual-studio, win10
-#  variables:   
-#    CC: cl
-#    CXX: cl
-#    PREFIX_PATH: C:/Qt/6.0.2/msvc2019_64
+build win10-vs2022:
+  extends: .build_common 
+  tags:
+    - visual-studio, win10
+  variables:   
+    CC: cl
+    CXX: cl
+    PREFIX_PATH: C:/Qt/6.2.1/msvc2019_64
 
 #build win10-cygwin-gcc10:
 #  extends: .build_common
