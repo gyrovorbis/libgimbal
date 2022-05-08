@@ -2,7 +2,7 @@
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <pthread.h>
-
+#include <threads.h>
 
 #define GBL_QUARK_PAGE_SIZE_DEFAULT_            1024
 #define GBL_QUARK_REGISTRY_CAPACITY_DEFAULT_    32

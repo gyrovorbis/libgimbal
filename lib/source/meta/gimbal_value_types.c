@@ -1019,13 +1019,17 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_TYPE,
                                GBL_INVALID_TYPE,
                                GblQuark_internStringStatic("type"),
-                               &((const GblTypeInfo) {}),
+                               &((const GblTypeInfo) {
+                                    .classSize = 0
+                                }),
                                GBL_TYPE_FLAG_ABSTRACT);
 
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_BOXED,
                                GBL_INVALID_TYPE,
                                GblQuark_internStringStatic("boxed"),
-                               &((const GblTypeInfo) {}),
+                               &((const GblTypeInfo) {
+                                     .classSize = 0
+                               }),
                                GBL_TYPE_FLAG_ABSTRACT);
 
     GBL_API_POP(1);

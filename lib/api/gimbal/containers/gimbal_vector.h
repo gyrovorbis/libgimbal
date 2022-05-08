@@ -100,14 +100,14 @@ GBL_INLINE void gblVectorInitialize_(GblVector* pVec) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GBL_API gblVectorDestruct(GblVector* pVec) GBL_NOEXCEPT {
-    GBL_API_FUNCTION(pVec->pCtx, ({
-       // Check if we have a buffer to free
-       if(pVec->pBuffer && pVec->pBuffer != pVec->stackBuffer) {
-           if(pVec->pCtx) GBL_API_FREE(pVec->pBuffer);
-           else free(pVec->pBuffer);
-           pVec->pBuffer = pVec->stackBuffer;
-       }
-    }));
+    GBL_API_BEGIN(pVec->pCtx);
+   // Check if we have a buffer to free
+   if(pVec->pBuffer && pVec->pBuffer != pVec->stackBuffer) {
+       if(pVec->pCtx) GBL_API_FREE(pVec->pBuffer);
+       else free(pVec->pBuffer);
+       pVec->pBuffer = pVec->stackBuffer;
+   }
+    GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblVectorClear(GblVector* pVec) GBL_NOEXCEPT {
@@ -210,10 +210,10 @@ GBL_INLINE GBL_API gblVectorGive(GblVector* pVec, void* pData, GblSize size, Gbl
 }
 
 GBL_INLINE GBL_API gblVectorContext(const GblVector* pVec, GblContext** pCtx) GBL_NOEXCEPT {
-    GBL_API_FUNCTION(pVec->pCtx, ({
-        GBL_API_VERIFY_POINTER(pCtx);
-        *pCtx = pVec->pCtx;
-    }));
+    GBL_API_BEGIN(pVec->pCtx);
+    GBL_API_VERIFY_POINTER(pCtx);
+    *pCtx = pVec->pCtx;
+    GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblVectorStackBytes(const GblVector* pVec, GblSize* pSize) GBL_NOEXCEPT {
@@ -238,10 +238,10 @@ GBL_INLINE GBL_API gblVectorCapacity(const GblVector* pVec, GblSize* pCapacity) 
 }
 
 GBL_INLINE GBL_API gblVectorElementSize(const GblVector* pVec, GblSize* pElemSize) GBL_NOEXCEPT {
-    GBL_API_FUNCTION(pVec->pCtx, ({
-        GBL_API_VERIFY_POINTER(pElemSize);
-        *pElemSize = pVec->elementSize;
-    }));
+    GBL_API_BEGIN(pVec->pCtx);
+    GBL_API_VERIFY_POINTER(pElemSize);
+    *pElemSize = pVec->elementSize;
+    GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblVectorData(const GblVector* pVec, const void** ppData) GBL_NOEXCEPT {
