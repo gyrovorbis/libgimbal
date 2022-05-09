@@ -432,6 +432,7 @@ private slots:
     }
 
     void verifyHandle(void) {
+#if 0
         auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_HANDLE_1_FAIL") {
             GBL_API_VERIFY_HANDLE(NULL);
             GBL_API_END_EMPTY();
@@ -449,6 +450,7 @@ private slots:
             GBL_API_END_EMPTY();
         };
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_INVALID_HANDLE, "Assdouchery lul -33 b");
+#endif
     }
 
     void verifyPointer(void) {

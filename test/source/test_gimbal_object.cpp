@@ -86,7 +86,7 @@ enum TEST_OBJECT_PROPERTIES {
     TEST_OBJECT_PROPERTY_COUNT
 };
 
-static GBL_RESULT TestObject_propertyGet(const GblObject* pSelf, GblUint slot, GblVariant* pValue, const GblProperty* pProp) {
+static GBL_RESULT TestObject_propertyGet(const GblObject* pSelf, GblSize slot, GblVariant* pValue, const GblProperty* pProp) {
     GBL_API_BEGIN(pSelf);
     switch(slot) {
     case TEST_OBJECT_PROPERTY_FLOATER:
@@ -108,7 +108,7 @@ static GBL_RESULT TestObject_propertyGet(const GblObject* pSelf, GblUint slot, G
     GBL_API_END();
 }
 
-static GBL_RESULT TestObject_propertySet(GblObject* pSelf, GblUint slot, const GblVariant* pValue, const GblProperty* pProp) {
+static GBL_RESULT TestObject_propertySet(GblObject* pSelf, GblSize slot, const GblVariant* pValue, const GblProperty* pProp) {
     GBL_API_BEGIN(pSelf);
     switch(slot) {
     case TEST_OBJECT_PROPERTY_FLOATER: {

@@ -34,28 +34,32 @@
 #define GBL_INSTANCE_TRY_CLASS_PREFIX(instance, typePrefix) \
     (GBL_INSTANCE_TRY_CLASS(instance, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
 
-
-#define GBL_INSTANCE_VCALL_(op, type, classType, method, inst, ...)             \
-    GBL_STMT_START {                                                            \
-        classType* pClass = GBL_INSTANCE_CAST_CLASS(inst, type, classType);\
-        pClass = (classType*)op(pClass);                                        \
-        GBL_API_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);          \
-        GBL_API_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);  \
-        GBL_API_CALL(pClass->method(inst GBL_VA_ARGS(__VA_ARGS__)));            \
+#define GBL_INSTANCE_VCALL__N(method, ...)      \
+    GBL_API_CALL(pClass->method(__VA_ARGS__))
+#define GBL_INSTANCE_VCALL__2(method, inst)     \
+    GBL_API_VCALL__N(method, inst)
+#define GBL_INSTANCE_VCALL__(...)               \
+    GBL_VA_OVERLOAD_SELECT(GBL_INSTANCE_VCALL_, GBL_VA_OVERLOAD_SUFFIXER_2_N, __VA_ARGS__)(__VA_ARGS__);
+#define GBL_INSTANCE_VCALL_(op, type, classType, method, ...)                                   \
+    GBL_STMT_START {                                                                            \
+        classType* pClass = GBL_INSTANCE_CAST_CLASS(GBL_ARG_1(__VA_ARGS__), type, classType);   \
+        pClass = (classType*)op(pClass);                                                        \
+        GBL_API_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                          \
+        GBL_API_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                  \
+        GBL_API_CALL(pClass->method(__VA_ARGS__));                                              \
     } GBL_STMT_END
 
-#define GBL_INSTANCE_VCALL(type, classType, method, inst, ...)                  \
-    GBL_INSTANCE_VCALL_((void*), type, classType, method, inst, __VA_ARGS__)
-#define GBL_INSTANCE_VCALL_PREFIX(prefix, method, inst, ...)                    \
-    GBL_INSTANCE_VCALL_((void*), prefix##_TYPE, prefix##_CLASS_STRUCT, method,  \
-                        inst, __VA_ARGS__)
+#define GBL_INSTANCE_VCALL(type, classType, method, ...)                            \
+    GBL_INSTANCE_VCALL_((void*), type, classType, method, __VA_ARGS__)
+#define GBL_INSTANCE_VCALL_PREFIX(prefix, method, ...)                              \
+    GBL_INSTANCE_VCALL(prefix##_TYPE, prefix##_CLASS_STRUCT, method, __VA_ARGS__)
 
-#define GBL_INSTANCE_VCALL_SUPER(type, classType, method, inst, ...)            \
-    GBL_INSTANCE_VCALL_(GBL_CLASS_SUPER, type, classType,                       \
-                        method, inst, __VA_ARGS__)
-#define GBL_INSTANCE_VCALL_SUPER_PREFIX(prefix, method, inst, ...)              \
-    GBL_INSTANCE_VCALL_(GBL_CLASS_SUPER, prefix##_TYPE, prefix##_CLASS_STRUCT,  \
-                        method, inst, __VA_ARGS__)
+#define GBL_INSTANCE_VCALL_SUPER(type, classType, method, ...)                      \
+    GBL_INSTANCE_VCALL_(GBL_CLASS_SUPER, type, classType,                           \
+                        method, __VA_ARGS__)
+#define GBL_INSTANCE_VCALL_SUPER_PREFIX(prefix, method, ...)                        \
+    GBL_INSTANCE_VCALL_SUPER(prefix##_TYPE, prefix##_CLASS_STRUCT,                  \
+                        method, __VA_ARGS__)
 
 
 #define SELF    GblInstance*       pSelf

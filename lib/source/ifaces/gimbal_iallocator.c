@@ -7,21 +7,21 @@ static GBL_RESULT GblIAllocatorIFace_alloc_(GblIAllocator* pIAllocator, const Gb
     GBL_UNUSED(pFrame);
     GBL_UNUSED(pDbgStr);
     GBL_API_BEGIN(NULL);
-    *ppData = GBL_ALLOC_ALIGNED(align, size);
+    *ppData = GBL_ALIGNED_ALLOC(align, size);
     GBL_API_END();
 }
 
 static GBL_RESULT GblIAllocatorIFace_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData) GBL_NOEXCEPT {
     GBL_UNUSED(pFrame && pIAllocator && newAlign);
     GBL_API_BEGIN(NULL);
-    *ppNewData = realloc(pData, newSize);
+    *ppNewData = GBL_ALIGNED_REALLOC(pData, newAlign, newSize);
     GBL_API_END();
 }
 
 static GBL_RESULT GblIAllocatorIFace_free_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData) GBL_NOEXCEPT {
     GBL_UNUSED(pFrame && pIAllocator);
     GBL_API_BEGIN(NULL);
-    free(pData);
+    GBL_ALIGNED_FREE(pData);
     GBL_API_END();
 }
 

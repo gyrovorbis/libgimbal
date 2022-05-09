@@ -8,7 +8,7 @@ static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const
     GBL_API_DEBUG("Malloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ")", size, align);
     GBL_API_ERRNO_CLEAR();
 
-    *ppData = GBL_ALLOC_ALIGNED(align, size);
+    *ppData = GBL_ALIGNED_ALLOC(align, size);
 
     GBL_API_PUSH();
     GBL_API_PERROR("Malloc Failed");
@@ -32,7 +32,7 @@ static GBL_RESULT GblContext_IAllocator_realloc_(GblIAllocator* pIAllocator, con
     const uintptr_t ptrVal = (uintptr_t)pData;
     GBL_API_DEBUG("Realloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") %p", newSize, newAlign, ptrVal);
 
-    *ppNewData = realloc(pData, newSize);
+    *ppNewData = GBL_ALIGNED_REALLOC(pData, newAlign, newSize);
 
     GBL_API_VERIFY(*ppNewData, GBL_RESULT_ERROR_MEM_REALLOC);
     GBL_API_PUSH();
@@ -49,7 +49,7 @@ static GBL_RESULT GblContext_IAllocator_free_(GblIAllocator* pIAllocator, const 
     GBL_API_BEGIN(NULL);
     const uintptr_t ptrVal = (uintptr_t)pData;
 
-    free(pData);
+    GBL_ALIGNED_FREE(pData);
 
     GBL_API_DEBUG("Free(%p)", ptrVal);
     GBL_API_PUSH();
@@ -134,7 +134,7 @@ static GBL_RESULT GblContext_ILogger_push_(GblILogger* pILogger, const GblStackF
 static GBL_RESULT GblContext_constructor_(GblObject* pSelf) GBL_NOEXCEPT {
     pSelf->contextType = 1;
     GBL_API_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL_SUPER(GBL_OBJECT_TYPE, GblObjectClass, pFnConstructor, pSelf);
+    GBL_INSTANCE_VCALL_SUPER_PREFIX(GBL_OBJECT, pFnConstructor, pSelf);
     GBL_API_END();
 }
 

@@ -54,12 +54,14 @@ static GBL_RESULT GblObjectClass_ivariantIFace_get_(GblVariant* pSelf, GblUint a
 
 static GBL_RESULT GblObjectClass_ivariantIFace_set_(GblVariant* pSelf, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
+    GBL_API_BEGIN(NULL);
     pSelf->pVoid = pArgs[0].pVoid;
     if(op == GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY || op == GBL_IVARIANT_OP_FLAG_SET_COPY) {
         GblObject_ref(GBL_OBJECT(pSelf->pVoid));
     } else if(op == GBL_IVARIANT_OP_FLAG_SET_MOVE || op == GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE) {
         pArgs[0].type = GBL_NIL_TYPE;
     }
+    GBL_API_END();
 }
 
 static GBL_RESULT GblObjectClass_ivariantIFace_load_(GblVariant* pVariant, const GblString* pString) {
@@ -306,7 +308,7 @@ static GBL_RESULT GblObjectClass_destructor_(GblObject* pSelf) {
 }
 
 
-static GBL_RESULT GblObjectClass_propertyGet_(const GblObject* pSelf, GblUint slot, GblVariant* pValue, const GblProperty* pProp)  {
+static GBL_RESULT GblObjectClass_propertyGet_(const GblObject* pSelf, GblSize slot, GblVariant* pValue, const GblProperty* pProp)  {
     GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
     switch(slot) {
     case OBJECT_PROPERTY_ID_NAME_:      GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblObject_name(pSelf));   break;
@@ -318,7 +320,7 @@ static GBL_RESULT GblObjectClass_propertyGet_(const GblObject* pSelf, GblUint sl
     GBL_API_END();
 }
 
-static GBL_RESULT GblObjectClass_propertySet_(GblObject* pSelf, GblUint slot, const GblVariant* pValue, const GblProperty* pProp) {
+static GBL_RESULT GblObjectClass_propertySet_(GblObject* pSelf, GblSize slot, const GblVariant* pValue, const GblProperty* pProp) {
     GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf)));
     GBL_UNUSED(pProp);
     switch(slot) {

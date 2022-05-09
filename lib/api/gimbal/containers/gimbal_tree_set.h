@@ -85,7 +85,7 @@ GBL_API                 GblTreeSet_construct_4  (SELF,
 GBL_API                 GblTreeSet_construct_3  (SELF,
                                                 GblSize                   entrySize,
                                                 GblTreeSetEntryCompareFn  pFnCompare)   GBL_NOEXCEPT;
-#define                 GblTreeSet_construct    (...)                                               \
+#define                 GblTreeSet_construct(...)                                               \
                                                   GBL_VA_OVERLOAD_SELECT(GblTreeSet_construct,      \
                                                   GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 GBL_API                 GblTreeSet_destruct     (SELF)                                  GBL_NOEXCEPT;

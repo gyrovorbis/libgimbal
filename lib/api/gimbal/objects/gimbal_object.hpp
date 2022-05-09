@@ -18,9 +18,7 @@ private:
 
     Object(void) = delete;
 
-    static Object takePtr(GblObject* pObject) {
 
-    }
 };
 
 

@@ -39,7 +39,7 @@ typedef struct GblVariant {
         uint32_t        u32;
         int32_t         i32;
         uint64_t        u64;
-        int16_t         i64;
+        int64_t         i64;
         GblEnum         enumeration;
         GblFlags        flags;
         float           f32;
@@ -70,7 +70,7 @@ typedef struct GblVariant {
             (const GblVariant*, gblVariantConstructCopy)    \
         )                                                   \
     )
-#define gblVariantConstruct_N(pVariant, pValue, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TRAITS, pValue)(pVariant, pValue GBL_VA_ARGS(__VA_ARGS__))
+#define gblVariantConstruct_N(pVariant, ...)        GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
 #define gblVariantConstruct_1(pVariant)              gblVariantConstructDefault(pVariant)
 #define gblVariantConstruct(...)                    GBL_VA_OVERLOAD_CALL(gblVariantConstruct, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
 
@@ -89,7 +89,7 @@ typedef struct GblVariant {
             (char*,             gblVariantSetc_2) \
         )                                           \
     )
-#define gblVariantSet(pVariant, value, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_SET_TRAITS, value)(pVariant, value GBL_VA_ARGS(__VA_ARGS__))
+#define gblVariantSet(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_SET_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
 
 
 #define GBL_VARIANT_MOVE_TRAITS (                    \
@@ -99,7 +99,7 @@ typedef struct GblVariant {
             (GblString*,        gblVariantMoves)    \
         )                                           \
     )
-#define gblVariantMove(pVariant, value, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_MOVE_TRAITS, value)(pVariant, value GBL_VA_ARGS(__VA_ARGS__))
+#define gblVariantMove(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_MOVE_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
 
 
 

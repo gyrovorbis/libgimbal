@@ -247,27 +247,26 @@
 #   define GBL_STATIC_ARRAY(idx) idx
 #endif
 
-#if defined(GBL_C_11)
-#   define GBL_ALIGNAS(e)               _Alignas(e)
-#   define GBL_ALIGNOF(e)               _Alignof(e)
-#   ifdef _MSC_VER
-#       define GBL_ALLOC_ALIGNED(s, a)  _aligned_malloc(s, a)
-#   else
-#       include<stdalign.h>
-#       define GBL_ALLOC_ALIGNED(s, a)      aligned_alloc(s, a)
-#   endif
-#elif defined(GBL_CPP_11)
+#if defined(GBL_CPP_11)
 #   define GBL_ALIGNAS(e)               alignas(e)
 #   define GBL_ALIGNOF(e)               alignof(e)
-#   ifdef GBL_CPP_17
-#       define GBL_ALLOC_ALIGNED(s, a)  aligned_alloc(s, a)
-#   else
-#       define GBL_ALLOC_ALIGNED(s, a)   malloc(s * a)
-#   endif
-#else
-#   define GBL_ALIGNAS(e)
-#   define GBL_ALIGNOF(e)
-#   define GBL_ALLOC_ALIGNED(s, a)      malloc(s * a)
+#elif defined(GBL_C_11)
+#   define GBL_ALIGNAS(e)               _Alignas(e)
+#   define GBL_ALIGNOF(e)               _Alignof(e)
+#endif
+
+#if defined(_MSVC_VER) || defined(__MINGW64__)
+#       define GBL_ALIGNED_ALLOC(a, s)      _aligned_malloc(s, a)
+#       define GBL_ALIGNED_REALLOC(p, a, s) _aligned_realloc(p, s, a)
+#       define GBL_ALIGNED_FREE(p)          _aligned_free(p)
+#elif defined(__MINGW32__)
+#       define GBL_ALIGNED_ALLOC(a, s)      __mingw_aligned_malloc(s, a)
+#       define GBL_ALIGNED_REALLOC(p, a, s) __mingw_aligned_realloc(p, s, a)
+#       define GBL_ALIGNED_FREE(p)          __mingw_aligned_free(p)
+#elif defined(GBL_C_11) || defined(GBL_CPP_17)
+#       define GBL_ALIGNED_ALLOC(a, s)      aligned_alloc(a, s)
+#       define GBL_ALIGNED_REALLOC(p, a, s) realloc(p, s)
+#       define GBL_ALIGNED_FREE(p)          free(p)
 #endif
 
 #ifdef __cplusplus

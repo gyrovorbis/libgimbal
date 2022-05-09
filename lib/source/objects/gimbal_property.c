@@ -326,7 +326,7 @@ GBL_EXPORT GblType GblProperty_objectType(const GblProperty* pSelf) GBL_NOEXCEPT
 GBL_EXPORT GblSize GblProperty_id(const GblProperty* pSelf) GBL_NOEXCEPT {
     return pSelf? pSelf->id : 0;
 }
-GBL_EXPORT GBL_PROPERTY_FLAGS GblProperty_flags(const GblProperty* pSelf)  GBL_NOEXCEPT {
+GBL_EXPORT GblFlags GblProperty_flags(const GblProperty* pSelf)  GBL_NOEXCEPT {
     return pSelf? pSelf->flags : 0;
 }
 

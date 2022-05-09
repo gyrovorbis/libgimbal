@@ -53,9 +53,9 @@ typedef struct GblObjectClass {
     GBL_RESULT (*pFnDestructor)         (SELF);
     GBL_RESULT (*pFnConstructed)        (SELF);
 
-    GBL_RESULT (*pFnPropertyGet)        (CSELF, GblUint slot, GblVariant* pValue, const GblProperty* pProp);
-    GBL_RESULT (*pFnPropertySet)        (SELF,  GblUint slot, const GblVariant* pValue, const GblProperty* pProp);
-    GBL_RESULT (*pFnSlotCall)           (SELF,  GblUint slot, GblVariant* pRet, GblUint argc, GblVariant* pArgs, const GblSlot* pSlot);
+    GBL_RESULT (*pFnPropertyGet)        (CSELF, GblSize slot, GblVariant* pValue, const GblProperty* pProp);
+    GBL_RESULT (*pFnPropertySet)        (SELF,  GblSize slot, const GblVariant* pValue, const GblProperty* pProp);
+    GBL_RESULT (*pFnSlotCall)           (SELF,  GblSize slot, GblVariant* pRet, GblUint argc, GblVariant* pArgs, const GblSlot* pSlot);
     GBL_RESULT (*pFnPropertyNotify)     (SELF,  GblProperty* pProperty);    // signal
 } GblObjectClass;
 

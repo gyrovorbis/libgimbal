@@ -43,7 +43,7 @@ GBL_EXPORT const GblProperty* gblPropertyTableNext      (GblType objectType,
                                                          const GblProperty* pPrev,
                                                          GblFlags           mask)                   GBL_NOEXCEPT;
 GBL_EXPORT GblSize            gblPropertyTableCount     (GblType objectType)                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_PROPERTY_FLAGS gblPropertyTableFlags     (GblType objectType)                        GBL_NOEXCEPT;
+GBL_EXPORT GblFlags           gblPropertyTableFlags     (GblType objectType)                        GBL_NOEXCEPT;
 
 
 GBL_DECLS_END
