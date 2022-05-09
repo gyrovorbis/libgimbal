@@ -197,7 +197,8 @@ GBL_EXPORT GblBool gblPropertyTableEraseAll(GblType objectType) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_));
     const GblProperty* pRoot = propertyRoot_(objectType);
     if(pRoot) {
-        while(pRoot->propertyCount) {
+        const unsigned propertyCount = pRoot->propertyCount;
+        for(unsigned p = 0; p < propertyCount; ++p) { // last property removed will remove root!
             GBL_API_VERIFY_EXPRESSION(pRoot->pLast);
             const GblBool result = gblPropertyTableErase(objectType, pRoot->pLast->name);
             GBL_API_VERIFY_EXPRESSION(result);
