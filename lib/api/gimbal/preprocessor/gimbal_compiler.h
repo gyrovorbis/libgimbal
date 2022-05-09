@@ -221,9 +221,9 @@
 
 #if __cpp_static_assert
 #   if __cpp_static_assert > 201400
-#       define GBL_STATIC_ASSERT(cond) static_assert(cond)
+#       define GBL_STATIC_ASSERT(cond)      static_assert(cond)
 #   else
-#       define GBL_STATIC_ASSERT(cond) static_assert(cond, #cond)
+#       define GBL_STATIC_ASSERT(cond)      static_assert(cond, #cond)
 #   endif
 #   define GBL_STATIC_ASSERT_MSG(cond, msg) static_assert(cond, msg)
 #elif defined(GBL_C_STD_11)

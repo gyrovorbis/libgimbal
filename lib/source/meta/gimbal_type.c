@@ -7,10 +7,10 @@
 #include <gimbal/ifaces/gimbal_ivariant.h>
 
 GblContext*              pCtx_           = NULL;
-pthread_once_t           initOnce_       = PTHREAD_ONCE_INIT;
+once_flag                initOnce_       = PTHREAD_ONCE_INIT;
 GblBool                  initialized_    = GBL_FALSE;
 GBL_THREAD_LOCAL GblBool initializing_   = GBL_FALSE;
-pthread_mutex_t          typeRegMtx_;
+mtx_t                    typeRegMtx_;
 GblHashSet               typeRegistry_;
 struct TypeBuiltins_     typeBuiltins_;
 
@@ -18,7 +18,7 @@ struct TypeBuiltins_     typeBuiltins_;
 // === STATIC DATA ====
 
 static GblSize           initialTypeBuiltinCount_ = GBL_TYPE_BUILTIN_COUNT;
-static GblSize           initialTypeTotalCount_   = GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT;
+static GblSize           initialTypeTotalCount_   = GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT_;
 
 
 GBL_MAYBE_UNUSED static int metaClassIFaceEntryComparator_(const void* pA, const void* pB) {
@@ -267,9 +267,9 @@ static GblType typeRegister_(GblType parent,
 
         memset(pMeta, 0, metaSize);
         memcpy(&pMeta->info, pInfo, sizeof(GblTypeInfo));
-        atomic_init(&pMeta->refCount, 0);
+        GBL_ATOMIC_UINT16_INIT(pMeta->refCount, 0);
 #ifdef GBL_TYPE_DEBUG
-        atomic_init(&pMeta->instanceRefCount, 0);
+        GBL_ATOMIC_UINT16_INIT(&pMeta->instanceRefCount, 0);
 #endif
         pMeta->flags                = flags;
         pMeta->depth                = baseCount;
@@ -301,7 +301,7 @@ static GblType typeRegister_(GblType parent,
         }
         GBL_API_VERIFY_EXPRESSION(baseCount == pMeta->depth);
 
-        pthread_mutex_lock(&typeRegMtx_);
+        mtx_lock(&typeRegMtx_);
         hasMutex = GBL_TRUE;
 
         const GblMetaClass* pOldData = GblHashSet_set(&typeRegistry_,
@@ -317,7 +317,7 @@ static GblType typeRegister_(GblType parent,
 
     }
     GBL_API_END_BLOCK();
-    if(hasMutex) pthread_mutex_unlock(&typeRegMtx_);
+    if(hasMutex) mtx_unlock(&typeRegMtx_);
     return newType;
 }
 
@@ -350,16 +350,14 @@ void GblType_init_(void) {
     GBL_API_BEGIN(pCtx_);
     GBL_API_PUSH_VERBOSE("[GblType]: Initializing.");
     GBL_API_VERIFY(!initialized_, GBL_RESULT_ERROR_INVALID_OPERATION, "Already initialized!");
-    pthread_mutexattr_t mutexAttr;
-    pthread_mutexattr_settype(&mutexAttr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init(&typeRegMtx_, &mutexAttr);
-    pthread_mutex_lock(&typeRegMtx_);
+    mtx_init(&typeRegMtx_, mtx_recursive);
+    mtx_lock(&typeRegMtx_);
     GBL_API_CALL(GblHashSet_construct(&typeRegistry_,
                                       sizeof(GblMetaClass*),
                                       metaClassHasher_,
                                       metaClassComparator_,
                                       metaClassElementFree_,
-                                      GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT,
+                                      initialTypeTotalCount_,
                                       pCtx_));
     GBL_API_CALL(gblVectorConstruct(&typeBuiltins_.vector,
                                     pCtx_,
@@ -370,7 +368,7 @@ void GblType_init_(void) {
     initialized_    = GBL_TRUE;
     initializing_   = GBL_FALSE;
     GBL_API_END_BLOCK();
-    pthread_mutex_unlock(&typeRegMtx_);
+    mtx_unlock(&typeRegMtx_);
 }
 
 // === PUBLIC API ====
@@ -409,7 +407,7 @@ GBL_EXPORT GBL_RESULT GblType_final(void) {
     GblBool hasMutex = GBL_FALSE;
     GBL_API_BEGIN(pCtx_);
     GBL_API_PUSH_VERBOSE("[GblType]: Finalizing");
-    pthread_mutex_lock(&typeRegMtx_);
+    mtx_lock(&typeRegMtx_);
     hasMutex = GBL_TRUE;
 
     GBL_API_CALL(gblVectorClear(&typeBuiltins_.vector));
@@ -420,8 +418,8 @@ GBL_EXPORT GBL_RESULT GblType_final(void) {
     initialized_ = GBL_FALSE;
     GBL_API_END_BLOCK();
     if(hasMutex) {
-        pthread_mutex_unlock(&typeRegMtx_);
-        if(!initialized_) pthread_mutex_destroy(&typeRegMtx_);
+        mtx_unlock(&typeRegMtx_);
+        if(!initialized_) mtx_destroy(&typeRegMtx_);
     }
     return GBL_API_RESULT();
 }
@@ -472,12 +470,12 @@ GBL_EXPORT GblType GblType_fromNameQuark(GblQuark name) {
     GblMetaClass* pTempClass = GBL_ALLOCA(sizeof(GblMetaClass));
     pTempClass->name = name;
 
-    pthread_mutex_lock(&typeRegMtx_);
+    mtx_lock(&typeRegMtx_);
     GblMetaClass** ppReturnValue = (GblMetaClass**)GblHashSet_get(&typeRegistry_, &pTempClass);
     if(ppReturnValue) {
         foundType = (GblType)*ppReturnValue;
     }
-    pthread_mutex_unlock(&typeRegMtx_);
+    mtx_unlock(&typeRegMtx_);
 
     GBL_API_END_BLOCK();
     return foundType;
@@ -491,9 +489,9 @@ GBL_EXPORT GblSize GblType_registeredCount(void) {
     GblSize count = 0;
     GBL_API_BEGIN(pCtx_);
     GBL_TYPE_ENSURE_INITIALIZED_();
-    pthread_mutex_lock(&typeRegMtx_);
+    mtx_lock(&typeRegMtx_);
     count = GblHashSet_size(&typeRegistry_);
-    pthread_mutex_unlock(&typeRegMtx_);
+    mtx_unlock(&typeRegMtx_);
     GBL_API_END_BLOCK();
     return count;
 }
@@ -745,9 +743,9 @@ GBL_EXPORT GBL_RESULT GblType_unregister(GblType type) {
             GBL_API_WARN("Attempting to unregister type with active class references: %u", refCount);
         }
 #endif
-        pthread_mutex_lock(&typeRegMtx_);
+        mtx_lock(&typeRegMtx_);
         const GblBool success = GblHashSet_erase(&typeRegistry_, &pMeta);
-        pthread_mutex_unlock(&typeRegMtx_);
+        mtx_unlock(&typeRegMtx_);
         GBL_API_VERIFY(success, GBL_RESULT_ERROR_INVALID_TYPE, "Failed to remove the type from the registry HashSet!");
     }
     GBL_API_POP(1);

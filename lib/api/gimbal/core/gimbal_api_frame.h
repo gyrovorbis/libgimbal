@@ -258,7 +258,7 @@ extern "C" {
 
 #define GBL_API_VERIFY_TYPE(...) \
     GBL_STMT_START { \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                 \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_TYPE, GBL_VA_OVERLOAD_SUFFIXER_3_N, src_, __VA_ARGS__)(src_, __VA_ARGS__); \
     } GBL_STMT_END
 
@@ -593,19 +593,19 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 
 // ================= RECORD => TOP-LEVEL DISPATCH ==============
-#define GBL_API_RECORD_HANDLER(record)          \
-    GBL_STMT_START {                                        \
+#define GBL_API_RECORD_HANDLER(record)              \
+    GBL_STMT_START {                                \
             GBL_API_RECORD_LOG((record));           \
             GBL_API_RECORD_LAST_RECORD((record));   \
-        GBL_API_RECORD_ASSERT((record));        \
+        GBL_API_RECORD_ASSERT((record));            \
     } GBL_STMT_END
 
-#define GBL_API_RECORD_SET_N(file, func, line, col, result, ...)                                                                  \
-    GBL_STMT_START {                                                                                                                                \
-        GBL_API_SOURCE_LOC_PUSH(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL));                                                            \
-        GBL_CALL_RECORD_CONSTRUCT(&GBL_API_RECORD(), GBL_API_OBJECT(), result, GBL_API_SOURCE(), __VA_ARGS__);        \
-        GBL_API_RECORD_HANDLER(&GBL_API_RECORD());                                                                                      \
-        GBL_API_SOURCE_POP();                                                                                                           \
+#define GBL_API_RECORD_SET_N(file, func, line, col, result, ...)                                                    \
+    GBL_STMT_START {                                                                                                \
+        GBL_API_SOURCE_LOC_PUSH(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL));                                        \
+        GBL_CALL_RECORD_CONSTRUCT(&GBL_API_RECORD(), GBL_API_OBJECT(), result, GBL_API_SOURCE(), __VA_ARGS__);      \
+        GBL_API_RECORD_HANDLER(&GBL_API_RECORD());                                                                  \
+        GBL_API_SOURCE_POP();                                                                                       \
     } GBL_STMT_END
 
 #define GBL_API_RECORD_SET_6(file, func, line, col, result, pFmt) \

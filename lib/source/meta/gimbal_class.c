@@ -126,7 +126,7 @@ static GblClass* gblTypeClassCreate_(GblMetaClass* pMeta, GblBool floating) {
     //GBL_API_PUSH_VERBOSE("Class::create(%s)", GblType_name(GBL_TYPE_(pMeta)));
 
     if(!floating) {
-        GBL_API_VERIFY_EXPRESSION(!atomic_load(&pMeta->refCount),
+        GBL_API_VERIFY_EXPRESSION(!GBL_ATOMIC_UINT16_LOAD(pMeta->refCount),
                                   "Already have a reference to an invalid class object!");
 
         ppClass = &pMeta->pClass;
@@ -167,7 +167,7 @@ GBL_EXPORT GblClass* GblClass_refFromType(GblType type) GBL_NOEXCEPT {
 
     // Return existing reference to class data
     if(pMeta->pClass && GBL_CLASS_TYPE(pMeta->pClass) != GBL_INVALID_TYPE) {
-        GBL_API_VERIFY_EXPRESSION(atomic_load(&pMeta->refCount),
+        GBL_API_VERIFY_EXPRESSION(GBL_ATOMIC_UINT16_LOAD(pMeta->refCount),
                                   "No references to an initialized class!?");
         //GBL_API_VERBOSE("Using existing class data");
         pClass = pMeta->pClass;
@@ -179,7 +179,7 @@ GBL_EXPORT GblClass* GblClass_refFromType(GblType type) GBL_NOEXCEPT {
     }
 
     // Either way, we're returning a new reference, add refcount
-    GblRefCount oldCount = atomic_fetch_add(&pMeta->refCount, 1);
+    GblRefCount oldCount = GBL_ATOMIC_UINT16_INC(pMeta->refCount);
     GBL_API_VERBOSE("++[%s].refCount: %"GBL_SIZE_FMT, GblType_name(GBL_TYPE_(pMeta)), oldCount+1);
 
     //GBL_API_POP(1);
@@ -301,11 +301,11 @@ GBL_EXPORT GblRefCount GblClass_unref(GblClass* pSelf) GBL_NOEXCEPT {
                          GblClass_typeName(pSelf),
                          pMeta->refCount);
 
-    GBL_API_VERIFY(atomic_load(&pMeta->refCount) != 0,
+    GBL_API_VERIFY(GBL_ATOMIC_UINT16_LOAD(pMeta->refCount) != 0,
                    GBL_RESULT_ERROR_INTERNAL,
                    "The refcount for the given class was already at 0!");
 
-    refCount = atomic_fetch_sub(&pMeta->refCount, 1);
+    refCount = GBL_ATOMIC_UINT16_DEC(pMeta->refCount);
 
     if(refCount-1) {
         GBL_API_VERBOSE("--[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), refCount-1);
@@ -313,7 +313,7 @@ GBL_EXPORT GblRefCount GblClass_unref(GblClass* pSelf) GBL_NOEXCEPT {
 #ifdef GBL_TYPE_DEBUG
         {
             GblRefCount instanceRefCount = 0;
-            instanceRefCount = atomic_load(&pMeta->instanceRefCount);
+            instanceRefCount = GBL_ATOMIC_UINT16_LOAD(pMeta->instanceRefCount);
         GBL_API_VERIFY_EXPRESSION(instanceRefCount > 0,
                                   "Cannot destroy class when there are still %u instances using it!", instanceRefCount)
         }
@@ -441,7 +441,7 @@ GBL_EXPORT GblRefCount GblClass_refCountFromType(GblType type) GBL_NOEXCEPT {
     GblRefCount refCount      = 0;
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
-    if(pMeta) refCount = atomic_load(&pMeta->refCount);
+    if(pMeta) refCount = GBL_ATOMIC_UINT16_LOAD(pMeta->refCount);
     GBL_API_END_BLOCK();
     return refCount;
 }

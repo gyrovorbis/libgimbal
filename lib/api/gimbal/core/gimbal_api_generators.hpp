@@ -89,7 +89,6 @@ namespace gimbal {
         constexpr friend bool operator!=(CppType rhs, Value lhs) {    \
             return !(rhs == lhs);   \
         }
-
 }
 
 
