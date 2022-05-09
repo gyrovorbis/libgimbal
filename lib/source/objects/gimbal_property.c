@@ -204,8 +204,6 @@ GBL_EXPORT GblBool gblPropertyTableEraseAll(GblType objectType) GBL_NOEXCEPT {
             GBL_API_VERIFY_EXPRESSION(result);
         }
     }
-    //const GblBool result = gblPropertyTableErase(objectType, GBL_QUARK_INVALID);
-    //GBL_API_VERIFY_EXPRESSION(result);
     success = GBL_TRUE;
     GBL_API_END_BLOCK();
     return success;
