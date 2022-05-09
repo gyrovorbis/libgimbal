@@ -6,6 +6,7 @@
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/types/gimbal_quark.h>
 #include <stdatomic.h>
+#define __USE_UNIX98 1
 #include <pthread.h>
 
 #define GBL_CLASS_FLAGS_BIT_COUNT_                      6
