@@ -51,7 +51,7 @@ build win10-vs2022:
   variables:   
     CC: cl
     CXX: cl
-    PREFIX_PATH: C:/Qt/6.2.1/msvc2019_64
+    PREFIX_PATH: C:/Qt/6.3.0/msvc2019_64
 
 #build win10-cygwin-gcc10:
 #  extends: .build_common
