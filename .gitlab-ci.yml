@@ -62,14 +62,14 @@ build win10-vs2022:
 #    CXX: g++
 #    PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
 
-#build win10-mingw8:
-#  extends: .build_common
-#  tags:
-#    - mingw, win10
-#  variables:
-#    CC: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-gcc
-#    CXX: C:/Qt/Tools/mingw810_64/bin/x86_64-w64-mingw32-g++
-#    PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
+build win10-mingw11:
+  extends: .build_common
+  tags:
+    - mingw, win10
+  variables:
+    CC: C:/Qt/Tools/mingw1120_64/bin/gcc.exe
+    CXX: C:/Qt/Tools/mingw1120_64/bin/g++.exe
+    PREFIX_PATH: C:/Qt/6.3.0/mingw_64
 
 #build win10-clang:
 #  extends: .build_common
@@ -200,13 +200,13 @@ test ubuntu20-clang11:
 #  tags:
 #    - gcc, win10
 
-#test win10-mingw8:
-#  extends: .test_common
-#  needs: ["build win10-mingw8"]
-#  dependencies:
-#    - build win10-mingw8
-#  tags:
-#    - mingw, win10
+test win10-mingw11:
+  extends: .test_common
+  needs: ["build win10-mingw11"]
+  dependencies:
+    - build win10-mingw11
+  tags:
+    - mingw, win10
 
 #test macos-clang12:
 #  extends: .test_common
