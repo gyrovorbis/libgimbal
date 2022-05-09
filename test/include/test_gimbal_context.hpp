@@ -431,28 +431,6 @@ private slots:
         QVERIFY(test);
     }
 
-    void verifyHandle(void) {
-#if 0
-        auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_HANDLE_1_FAIL") {
-            GBL_API_VERIFY_HANDLE(NULL);
-            GBL_API_END_EMPTY();
-        };
-        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), Result::ErrorInvalidHandle, "Invalid Handle");
-
-        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_HANDLE_2_PASS") {
-            GBL_API_VERIFY_HANDLE(pCtx(), "Valid as fuck");
-            GBL_API_END_EMPTY();
-        };
-        QVERIFY(test);
-
-        test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_HANDLE_N_FAIL") {
-            GBL_API_VERIFY_HANDLE(NULL, "Assdouchery %s %d %c", "lul", -33, 'b');
-            GBL_API_END_EMPTY();
-        };
-        verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_INVALID_HANDLE, "Assdouchery lul -33 b");
-#endif
-    }
-
     void verifyPointer(void) {
         auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "VERIFY_POINTER_1_FAIL") {
             GBL_API_VERIFY_POINTER(NULL);

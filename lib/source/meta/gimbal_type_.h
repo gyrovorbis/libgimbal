@@ -5,9 +5,8 @@
 #include <gimbal/containers/gimbal_vector.h>
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/types/gimbal_quark.h>
-#include <stdatomic.h>
-#define __USE_UNIX98 1
-#include <pthread.h>
+#include <gimbal/preprocessor/gimbal_atomics.h>
+#include <tinycthread.h>
 
 #define GBL_CLASS_FLAGS_BIT_COUNT_                      6
 #define GBL_CLASS_FLAGS_BIT_MASK_                       0x3f
@@ -28,9 +27,9 @@
 
 #define GBL_TYPE_(meta)              ((GblType)meta)
 
-#define GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT 32
+#define GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT_ 32
 #define GBL_TYPE_ENSURE_INITIALIZED_()  \
-    if(!initializing_) pthread_once(&initOnce_, GblType_init_)
+    if(!initializing_) call_once(&initOnce_, GblType_init_)
 
 GBL_DECLS_BEGIN
 
@@ -43,14 +42,12 @@ GBL_DECLARE_ENUM(GBL_CLASS_FLAGS_) {
     GBL_CLASS_FLAG_EXTENDED_INFO_   = (1 << 5)
 };
 
-typedef atomic_uint_fast16_t GblRefCounter;
-
 typedef struct GblMetaClass {
     struct GblMetaClass*    pParent;
     GblQuark                name;
-    GblRefCounter           refCount;
+    GBL_ATOMIC_UINT16       refCount;
 #ifdef GBL_TYPE_DEBUG
-    GblRefCounter           instanceRefCount;
+    GBL_ATOMIC_UINT16_INIT  instanceRefCount;
 #endif
     GblTypeInfo             info;
     GblFlags                flags;
@@ -62,10 +59,10 @@ typedef struct GblMetaClass {
 
 
 extern GblContext*              pCtx_;
-extern pthread_once_t           initOnce_;
+extern once_flag                initOnce_;
 extern GblBool                  initialized;
 extern GBL_THREAD_LOCAL GblBool initializing_;
-extern pthread_mutex_t          typeRegMtx_;
+extern mtx_t                    typeRegMtx_;
 extern GblHashSet               typeRegistry_;
 extern struct TypeBuiltins_ {
     GblVector   vector;

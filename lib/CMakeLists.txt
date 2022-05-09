@@ -184,6 +184,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/objects/gimbal_context.hpp
     api/gimbal/objects/gimbal_event.h
     api/gimbal/utils/gimbal_cmdline_parser.h
+    api/gimbal/preprocessor/gimbal_atomics.h
     source/meta/gimbal_type_.h
     lib/jenkins/lookup3.h)
 
@@ -192,12 +193,13 @@ add_library(libGimbal STATIC
     ${GIMBAL_INCLUDES})
 
 add_subdirectory(lib/interface99)
+add_subdirectory(lib/tinycthread)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 
-target_link_libraries(libGimbal interface99 Threads::Threads)
+target_link_libraries(libGimbal interface99 tinycthread)
 
 #set_property(TARGET libGimbal PROPERTY C_STANDARD 11)
 #set_property(TARGET libGimbal PROPERTY C_STANDARD_REQUIRED ON)

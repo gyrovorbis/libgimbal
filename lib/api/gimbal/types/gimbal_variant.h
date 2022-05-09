@@ -77,7 +77,7 @@ typedef struct GblVariant {
 #define gblVariantSetc(...) GBL_VA_OVERLOAD_CALL(gblVariantSetc, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
 #define GBL_VARIANT_SET_TRAITS (                    \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,        \
+        GBL_META_GENERIC_MACRO_NO_DEFAULT,          \
         (                                           \
             (GblBool,           gblVariantSetb),    \
             (GblInt,            gblVariantSeti),    \
@@ -86,7 +86,7 @@ typedef struct GblVariant {
             (const GblString*,  gblVariantSets),    \
             (GblString*,        gblVariantSets),    \
             (const char*,       gblVariantSetc_2),  \
-            (char*,             gblVariantSetc_2) \
+            (char*,             gblVariantSetc_2)   \
         )                                           \
     )
 #define gblVariantSet(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_SET_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
