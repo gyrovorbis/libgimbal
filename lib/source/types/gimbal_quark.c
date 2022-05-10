@@ -1,11 +1,12 @@
 #include <gimbal/types/gimbal_quark.h>
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
-#include <pthread.h>
+#define NOGDI
+#include <tinycthread.h>
 
 #define GBL_QUARK_PAGE_SIZE_DEFAULT_            1024
 #define GBL_QUARK_REGISTRY_CAPACITY_DEFAULT_    32
-#define GBL_QUARK_ENSURE_INITIALIZED_()         if(!initialized_) pthread_once(&initOnce_, gblQuarkInit_)
+#define GBL_QUARK_ENSURE_INITIALIZED_()         if(!initialized_) call_once(&initOnce_, gblQuarkInit_)
 
 typedef struct QuarkAllocPage_ {
     struct QuarkAllocPage_*     pNext;
@@ -31,8 +32,8 @@ static struct {
 static QuarkAllocPage_* pPageCurrent_  = &pageStatic_.page;
 static GblHashSet       registry_       = { 0 };
 static GblBool          initialized_    = GBL_FALSE;
-static pthread_once_t   initOnce_       = PTHREAD_ONCE_INIT;
-static pthread_mutex_t  registryMtx_;
+static once_flag        initOnce_       = ONCE_FLAG_INIT;
+static mtx_t            registryMtx_;
 
 static GblContext*      pCtx_           = NULL;
 static GblSize          pageSize_       = GBL_QUARK_PAGE_SIZE_DEFAULT_;
@@ -55,8 +56,8 @@ static void gblQuarkInit_(void) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx_);
     GBL_API_PUSH_VERBOSE("[GblQuark]: Initializing");
     GBL_API_VERIFY_EXPRESSION(!initialized_);
-    pthread_mutex_init(&registryMtx_, NULL);
-    pthread_mutex_lock(&registryMtx_);
+    mtx_init(&registryMtx_, mtx_plain);
+    mtx_lock(&registryMtx_);
     mtxLocked = GBL_TRUE;
     GBL_API_CALL(GblHashSet_construct(&registry_,
                                       sizeof(const char*),
@@ -71,7 +72,7 @@ static void gblQuarkInit_(void) GBL_NOEXCEPT {
     initialized_            = GBL_TRUE;
     GBL_API_POP(1);
     GBL_API_END_BLOCK();
-    if(mtxLocked) pthread_mutex_unlock(&registryMtx_);
+    if(mtxLocked) mtx_unlock(&registryMtx_);
 }
 
 GBL_EXPORT GBL_RESULT GblQuark_final(void) GBL_NOEXCEPT {
@@ -79,7 +80,7 @@ GBL_EXPORT GBL_RESULT GblQuark_final(void) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx_);
     GBL_API_PUSH_VERBOSE("[GblQuark]: Finalizing");
     GBL_API_VERIFY_EXPRESSION(initialized_);
-    pthread_mutex_lock(&registryMtx_);
+    mtx_lock(&registryMtx_);
     GblHashSet_destruct(&registry_);
     for(QuarkAllocPage_* pPageIt = pageStatic_.page.pNext;
         pPageIt != NULL;
@@ -91,8 +92,8 @@ GBL_EXPORT GBL_RESULT GblQuark_final(void) GBL_NOEXCEPT {
     GBL_API_POP(1);
     GBL_API_END_BLOCK();
     if(hasMutex) {
-        pthread_mutex_unlock(&registryMtx_);
-        if(!initialized_) pthread_mutex_destroy(&registryMtx_);
+        mtx_unlock(&registryMtx_);
+        if(!initialized_) mtx_destroy(&registryMtx_);
     }
     return GBL_API_RESULT();
 }
@@ -159,10 +160,10 @@ GBL_EXPORT GblQuark GblQuark_tryString(const char* pString) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx_);
     if(initialized_ && pString) {
         GblQuark* pQuark = NULL;
-        pthread_mutex_lock(&registryMtx_);
+        mtx_lock(&registryMtx_);
         pQuark = (GblQuark*)GblHashSet_get(&registry_, &pString);
         if(pQuark) quark = *pQuark;
-        pthread_mutex_unlock(&registryMtx_);
+        mtx_unlock(&registryMtx_);
         GBL_API_END_BLOCK();
     }
     return quark;
@@ -196,12 +197,12 @@ GBL_EXPORT GblQuark quarkFromString_(const char* pString, GblBool alloc) GBL_NOE
         GBL_QUARK_ENSURE_INITIALIZED_();
         quark = GblQuark_tryString(pString);
         if(!quark) {
-            pthread_mutex_lock(&registryMtx_);
+            mtx_lock(&registryMtx_);
             if(alloc) pString = quarkStringAllocCopy_(pString);
             GBL_API_VERIFY_EXPRESSION(pString);
             GblBool inserted = GblHashSet_insert(&registry_, &pString);
             GBL_API_VERBOSE("[GblQuark] Adding: %s", pString);
-            pthread_mutex_unlock(&registryMtx_);
+            mtx_unlock(&registryMtx_);
             GBL_API_VERIFY(inserted, GBL_RESULT_ERROR_INTERNAL,
                            "[GblQuark]: Failed to add string to hash map: %s", pString);
             quark = (GblQuark)pString;

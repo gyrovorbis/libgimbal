@@ -88,7 +88,7 @@ GBL_EXPORT GblInstance* GblInstance_create_(GblType type, GblClass* pClass) {
                    "Cannot instantiate non-instantiable or abstract types!");
 
     pInstance = GBL_API_MALLOC(gblAlignedAllocSize(pMeta->info.instanceSize),
-                               GBL_ALIGNOF(max_align_t),
+                               GBL_ALIGNOF(GBL_MAX_ALIGN_T),
                                GblType_name(GBL_TYPE_(pMeta)));
 
     GBL_API_CALL(GblInstance_construct_(type, pInstance, pClass));

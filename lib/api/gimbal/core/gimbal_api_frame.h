@@ -350,7 +350,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
     GBL_API_MALLOC_4(src, size, align, NULL)
 
 #define GBL_API_MALLOC_2(src, size) \
-    GBL_API_MALLOC_3(src, gblAlignedAllocSize(size), GBL_ALIGNOF(max_align_t))
+    GBL_API_MALLOC_3(src, gblAlignedAllocSize(size), GBL_ALIGNOF(GBL_MAX_ALIGN_T))
 
 #define GBL_API_MALLOC(...)  \
     GBL_VA_OVERLOAD_SELECT(GBL_API_MALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)

@@ -133,8 +133,8 @@ GBL_INLINE GBL_API gblVectorAlloc_(GblVector* pVec, GblSize capacity) GBL_NOEXCE
         pVec->capacity = pVec->stackSize / pVec->elementSize;
     } else {
         GblSize allocSize = capacity * pVec->elementSize;
-        if(allocSize < GBL_ALIGNOF(max_align_t)) {
-            allocSize = gblPow2Next(GBL_ALIGNOF(max_align_t));
+        if(allocSize < GBL_ALIGNOF(GBL_MAX_ALIGN_T)) {
+            allocSize = gblPow2Next(GBL_ALIGNOF(GBL_MAX_ALIGN_T));
         }
         pVec->capacity = allocSize / pVec->elementSize;
         pVec->pBuffer = pVec->pCtx != GBL_NULL?

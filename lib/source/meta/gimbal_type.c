@@ -7,7 +7,7 @@
 #include <gimbal/ifaces/gimbal_ivariant.h>
 
 GblContext*              pCtx_           = NULL;
-once_flag                initOnce_       = PTHREAD_ONCE_INIT;
+once_flag                initOnce_       = ONCE_FLAG_INIT;
 GblBool                  initialized_    = GBL_FALSE;
 GBL_THREAD_LOCAL GblBool initializing_   = GBL_FALSE;
 mtx_t                    typeRegMtx_;
@@ -267,9 +267,9 @@ static GblType typeRegister_(GblType parent,
 
         memset(pMeta, 0, metaSize);
         memcpy(&pMeta->info, pInfo, sizeof(GblTypeInfo));
-        GBL_ATOMIC_UINT16_INIT(pMeta->refCount, 0);
+        GBL_ATOMIC_INT16_INIT(pMeta->refCount, 0);
 #ifdef GBL_TYPE_DEBUG
-        GBL_ATOMIC_UINT16_INIT(&pMeta->instanceRefCount, 0);
+        GBL_ATOMIC_INT16_INIT(&pMeta->instanceRefCount, 0);
 #endif
         pMeta->flags                = flags;
         pMeta->depth                = baseCount;

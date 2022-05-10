@@ -52,3 +52,7 @@ Thumbs.db
 moc_*
 ui_*
 *.qmake.stash
+
+# Visual Studio Shit
+####################
+.vs

@@ -255,7 +255,7 @@
 #   define GBL_ALIGNOF(e)               _Alignof(e)
 #endif
 
-#if defined(_MSVC_VER) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW64__)
 #       define GBL_ALIGNED_ALLOC(a, s)      _aligned_malloc(s, a)
 #       define GBL_ALIGNED_REALLOC(p, a, s) _aligned_realloc(p, s, a)
 #       define GBL_ALIGNED_FREE(p)          _aligned_free(p)
@@ -264,6 +264,7 @@
 #       define GBL_ALIGNED_REALLOC(p, a, s) __mingw_aligned_realloc(p, s, a)
 #       define GBL_ALIGNED_FREE(p)          __mingw_aligned_free(p)
 #elif defined(GBL_C_11) || defined(GBL_CPP_17)
+#       include <stdlib.h>
 #       define GBL_ALIGNED_ALLOC(a, s)      aligned_alloc(a, s)
 #       define GBL_ALIGNED_REALLOC(p, a, s) realloc(p, s)
 #       define GBL_ALIGNED_FREE(p)          free(p)
@@ -335,9 +336,12 @@
 #endif
 
 #ifdef _MSC_VER
-#   define max_align_t double
+#   define GBL_MAX_ALIGN_T double
+#else
+#   define GBL_MAX_ALIGN_T max_align_t
 #endif
-#define GBL_ALLOC_MIN_SIZE GBL_ALIGNOF(max_align_t)
+
+#define GBL_ALLOC_MIN_SIZE GBL_ALIGNOF(GBL_MAX_ALIGN_T)
 
 /* ==========================================================
  * Provide simple macro statement wrappers (adapted from Perl):

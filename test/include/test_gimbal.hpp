@@ -5,11 +5,11 @@
 #include <QDebug>
 #include <stdexcept>
 
-#pragma GBL_PRAGMA_MACRO_PUSH("GBL_ASSERT_1");
+#pragma GBL_PRAGMA_MACRO_PUSH("GBL_ASSERT_1")
 #undef GBL_ASSERT_1
 #define GBL_ASSERT_1    gimbal::test::AssertMgr::assert_
 
-#pragma GBL_PRAGMA_MACRO_PUSH("GBL_ASSERT_2");
+#pragma GBL_PRAGMA_MACRO_PUSH("GBL_ASSERT_2")
 #undef GBL_ASSERT_2
 #define GBL_ASSERT_2    gimbal::test::AssertMgr::assert_
 

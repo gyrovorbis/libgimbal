@@ -5,6 +5,7 @@
 #include <gimbal/containers/gimbal_vector.h>
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/types/gimbal_quark.h>
+#define NOGDI
 #include <gimbal/preprocessor/gimbal_atomics.h>
 #include <tinycthread.h>
 
@@ -45,9 +46,9 @@ GBL_DECLARE_ENUM(GBL_CLASS_FLAGS_) {
 typedef struct GblMetaClass {
     struct GblMetaClass*    pParent;
     GblQuark                name;
-    GBL_ATOMIC_UINT16       refCount;
+    GBL_ATOMIC_INT16       refCount;
 #ifdef GBL_TYPE_DEBUG
-    GBL_ATOMIC_UINT16_INIT  instanceRefCount;
+    GBL_ATOMIC_INT16_INIT  instanceRefCount;
 #endif
     GblTypeInfo             info;
     GblFlags                flags;
