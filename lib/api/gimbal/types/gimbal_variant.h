@@ -508,11 +508,14 @@ GBL_INLINE GBL_API gblVariantCompares(const GblVariant* pVariant, const GblStrin
 
 GBL_INLINE GBL_API gblVariantComparec(const GblVariant* pVariant, const char* pCStr, GBL_VARIANT_OP_CMP_TYPE op, GblBool* pResult) {
     GBL_ASSERT(pCStr);
+    GblSize strlength = pCStr? strlen(pCStr) : 0;
+    GBL_UNUSED(strlength);
+    GBL_ASSERT(strlength < UINT16_MAX);
     const GblString tempString = {
         .data = {
             .pCtx = GBL_NULL,
             .pBuffer = (char*)pCStr,
-            .size = pCStr? strlen(pCStr) : 0,
+            .size = (uint16_t)strlength,
             .capacity = 0,
             .elementSize = 1,
             .stackSize = 0
