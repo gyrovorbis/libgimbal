@@ -5,9 +5,11 @@
 #include "gimbal_class.h"
 
 #define GBL_INSTANCE(instance)              ((GblInstance*)instance)
-#define GBL_INSTANCE_CLASS(instance)        (GblClass_fromInstance(GBL_INSTANCE(instance)))
-#define GBL_INSTANCE_SUPER(instance)        (GblInstance_super(GBL_INSTANCE(instance)))
+#define GBL_INSTANCE_CLASS(instance)        (GblClass_peekFromInstance(GBL_INSTANCE(instance)))
+#define GBL_INSTANCE_CLASS_SUPER(instance)  (GblInstance_classSuper(GBL_INSTANCE(instance)))
+#define GBL_INSTANCE_CLASS_DEFAULT(instance)(GblInstance_classDefault(GBL_INSTANCE(instance)))
 #define GBL_INSTANCE_TYPE(instance)         (GBL_CLASS_TYPE(GBL_INSTANCE_CLASS(instance)))
+#define GBL_INSTANCE_PRIVATE(instance, type)(GblInstance_private(GBL_INSTANCE(instance), type))
 
 #define GBL_INSTANCE_CHECK(instance, toType)                \
     (GblInstance_check((GblInstance*)instance, toType))
@@ -25,12 +27,12 @@
     (GBL_INSTANCE_TRY(instance, typePrefix##_TYPE, typePrefix##_STRUCT))
 
 #define GBL_INSTANCE_CAST_CLASS(instance, toType, cType)     \
-     ((cType*)GblClass_cast(GblClass_fromInstance((GblInstance*)instance), toType))
+     ((cType*)GblClass_cast(GblClass_peekFromInstance((GblInstance*)instance), toType))
 #define GBL_INSTANCE_CAST_CLASS_PREFIX(instance, typePrefix) \
     (GBL_INSTANCE_CAST_CLASS(instance, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
 
 #define GBL_INSTANCE_TRY_CLASS(instance, toType, cType)     \
-    ((cType*)GblClass_try(GblClass_fromInstance((GblInstance*)instance), toType))
+    ((cType*)GblClass_try(GblClass_peekFromInstance((GblInstance*)instance), toType))
 #define GBL_INSTANCE_TRY_CLASS_PREFIX(instance, typePrefix) \
     (GBL_INSTANCE_TRY_CLASS(instance, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
 
@@ -61,6 +63,12 @@
     GBL_INSTANCE_VCALL_SUPER(prefix##_TYPE, prefix##_CLASS_STRUCT,                  \
                         method, __VA_ARGS__)
 
+#define GBL_INSTANCE_VCALL_DEFAULT(type, classType, method, ...)                    \
+    GBL_INSTANCE_VCALL_(GBL_CLASS_DEFAULT, type, classType,                         \
+                        method, __VA_ARGS__)
+#define GBL_INSTANCE_VCALL_DEFAULT_PREFIX(prefix, method, ...)                      \
+    GBL_INSTANCE_VCALL_DEFAULT(prefix##_TYPE, prefix##_CLASS_STRUCT,                \
+                        method, __VA_ARGS__)
 
 #define SELF    GblInstance*       pSelf
 #define CSELF   const GblInstance* pSelf
@@ -71,30 +79,45 @@ typedef struct GblInstance {
     GblClass*   pClass;
 } GblInstance;
 
+// Creates an instance on the heap with a reference to the default class for the given type
 GBL_EXPORT GblInstance* GblInstance_create              (GblType type)              GBL_NOEXCEPT;
+// Creates an instance with a floating override class
 GBL_EXPORT GblInstance* GblInstance_createWithClass     (GblClass* pClass)          GBL_NOEXCEPT;
+// Constructs an instance in-place with the default class
 GBL_EXPORT GBL_RESULT   GblInstance_construct           (SELF, GblType type)        GBL_NOEXCEPT;
+// Creates an instance on the heap with a floating override class
 GBL_EXPORT GBL_RESULT   GblInstance_constructWithClass  (SELF, GblClass* pClass)    GBL_NOEXCEPT;
 
+// Deletes an instance that was created with GblInstance_create on the heap
 GBL_EXPORT GblRefCount  GblInstance_destroy             (SELF)                      GBL_NOEXCEPT;
+// Destructs an instance created in-place with GblInstance_construct
 GBL_EXPORT GblRefCount  GblInstance_destruct            (SELF)                      GBL_NOEXCEPT;
 
+// Replaces the existing class with a type-compatible class. releasing ownership
 GBL_EXPORT GBL_RESULT   GblInstance_classSwizzle        (SELF, GblClass* pClass)    GBL_NOEXCEPT;
+// Claims ownership of the previously floating class contained by the instance
 GBL_EXPORT GBL_RESULT   GblInstance_classSink           (SELF)                      GBL_NOEXCEPT;
+// Releases ownership of the owned class contained by the instance
+GBL_EXPORT GBL_RESULT   GblInstance_classFloat          (SELF)                      GBL_NOEXCEPT;
+
+// Returns true if the given instance can be casted to an instance of toType
+GBL_EXPORT GblBool      GblInstance_check               (CSELF, GblType toType)     GBL_NOEXCEPT;
+// Attempts to cast the given instance to toType and errors out upon failure
+GBL_INLINE GblInstance* GblInstance_cast                (SELF, GblType toType)      GBL_NOEXCEPT;
+// Attempts to cast the given instance to toType but gracefully returns NULL upon failure
+GBL_INLINE GblInstance* GblInstance_try                 (SELF, GblType toType)      GBL_NOEXCEPT;
+// Returns the private data associated with the given self or base type
+GBL_EXPORT void*        GblInstance_private             (CSELF, GblType base)       GBL_NOEXCEPT;
 
 GBL_INLINE GblType      GblInstance_type                (CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE const char*  GblInstance_typeName            (CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE GblSize      GblInstance_size                (CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblSize      GblInstance_privateSize         (CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblSize      GblInstance_totalSize           (CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE GblClass*    GblInstance_class               (CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE GblClass*    GblInstance_super               (CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblClass*    GblInstance_classSuper          (CSELF)                     GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool      GblInstance_check               (CSELF, GblType toType)     GBL_NOEXCEPT;
-GBL_INLINE GblInstance* GblInstance_cast                (SELF, GblType toType)      GBL_NOEXCEPT;
-GBL_INLINE GblInstance* GblInstance_try                 (SELF, GblType toType)      GBL_NOEXCEPT;
 
-#ifdef GBL_TYPE_DEBUG
-GBL_EXPORT GblRefCount  GblInstance_refCountFromType    (GblType type)              GBL_NOEXCEPT;
-#endif
 
 // ========== IMPL ==========
 
@@ -118,8 +141,11 @@ GBL_INLINE GblSize GblInstance_size(CSELF) GBL_NOEXCEPT {
 GBL_INLINE GblClass* GblInstance_class(CSELF) GBL_NOEXCEPT {
     return pSelf? pSelf->pClass : NULL;
 }
-GBL_INLINE GblClass* GblInstance_super(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblClass* GblInstance_classSuper(CSELF) GBL_NOEXCEPT {
     return pSelf? GblClass_super(pSelf->pClass) : NULL;
+}
+GBL_INLINE GblClass* GblInstance_classDefault(CSELF) GBL_NOEXCEPT {
+    return pSelf? GblClass_default(pSelf->pClass) : NULL;
 }
 
 GBL_INLINE GblInstance* GblInstance_convert_(GblInstance* pSelf, GblType type, GblBool check) GBL_NOEXCEPT {

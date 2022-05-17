@@ -42,7 +42,7 @@ public:
     }
 
     ClassRef(GblClass* pClass):
-        pClass_(GblClass_ref(pClass)) {}
+        pClass_(GblClass_refFromClass(pClass)) {}
 
     ~ClassRef(void) {
         GblClass_unref(pClass_);

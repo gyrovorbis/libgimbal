@@ -29,7 +29,6 @@ typedef struct GblILoggerIFace {
     GBL_RESULT (*pFnPop)    (SELF, const GblStackFrame* pFrame, uint32_t count);
 } GblILoggerIFace;
 
-
 GBL_API GblILogger_write(SELF,
                          const GblStackFrame*   pFrame,
                          GBL_LOG_LEVEL          level,

@@ -5,7 +5,7 @@ static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const
     GBL_API_VERIFY_ARG(size);
     GBL_API_VERIFY_ARG(align <= size && align >= 0);
     GBL_API_VERIFY_POINTER(ppData);
-    GBL_API_DEBUG("Malloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ")", size, align);
+    //GBL_API_DEBUG("Malloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ")", size, align);
     GBL_API_ERRNO_CLEAR();
 
     *ppData = GBL_ALIGNED_ALLOC(align, size);
@@ -13,34 +13,38 @@ static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const
     GBL_API_PUSH();
     GBL_API_PERROR("Malloc Failed");
     GBL_API_VERIFY(*ppData, GBL_RESULT_ERROR_MEM_ALLOC);
+#if 0
     GBL_API_DEBUG("%-20s: %20p", "Address", *ppData);
     GBL_API_DEBUG("%-20s: %20s", "Debug Marker", pDbgStr? pDbgStr : "NULL");
     GBL_API_DEBUG("%-20s: %20s", "Function", pFrame->sourceCurrent.pFunc);
     GBL_API_DEBUG("%-20s: %20"GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
+#endif
     GBL_API_POP(1);
     GBL_API_END();
 }
 
 static GBL_RESULT GblContext_IAllocator_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData) GBL_NOEXCEPT {
     GBL_UNUSED(pFrame);
-    GBL_API_BEGIN(NULL);;
+    GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_ARG(newSize);
     GBL_API_VERIFY_ARG(newAlign <= newSize && newAlign >= 0);
     GBL_API_VERIFY_POINTER(pData);
     GBL_API_VERIFY_POINTER(ppNewData);
     const uintptr_t ptrVal = (uintptr_t)pData;
-    GBL_API_DEBUG("Realloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") %p", newSize, newAlign, ptrVal);
+    //GBL_API_DEBUG("Realloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") %p", newSize, newAlign, ptrVal);
 
     *ppNewData = GBL_ALIGNED_REALLOC(pData, newAlign, newSize);
 
     GBL_API_VERIFY(*ppNewData, GBL_RESULT_ERROR_MEM_REALLOC);
+#if 0
     GBL_API_PUSH();
     GBL_API_DEBUG("%-20s: %20p", "Address", *ppNewData);
     GBL_API_DEBUG("%-20s: %20s", "Function", pFrame->sourceCurrent.pFunc);
     GBL_API_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     GBL_API_POP(1);
+#endif
     GBL_API_END();
 }
 
@@ -51,12 +55,14 @@ static GBL_RESULT GblContext_IAllocator_free_(GblIAllocator* pIAllocator, const 
 
     GBL_ALIGNED_FREE(pData);
 
+#if 0
     GBL_API_DEBUG("Free(%p)", ptrVal);
     GBL_API_PUSH();
     GBL_API_DEBUG("%-20s: %20s", "Function", pFrame->sourceCurrent.pFunc);
     GBL_API_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
     GBL_API_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     GBL_API_POP(1);
+#endif
     GBL_API_END();
 }
 
@@ -89,26 +95,33 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
 
     //not per byte!
     if(pSelf) {
-        for(unsigned t = 0; t < pSelf->logStackDepth; ++t) {
-            tabBuff[t] = '\t';
+        for(unsigned t = 0; t < pSelf->logStackDepth*8; ++t) {
+            tabBuff[t] = ' ';
         }
-        tabBuff[pSelf->logStackDepth] = '\0';
+        tabBuff[pSelf->logStackDepth*8] = '\0';
     } else {
         tabBuff[0] = '\0';
     }
-#if 0
-    GBL_API_VERIFY((fprintf(pFile, "%s%s%s [%s:" GBL_SIZE_FMT " %s]\n",
-                            tabBuff, pPrefix, buffer,
+
+    switch(level) {
+    case GBL_LOG_LEVEL_WARNING:
+    case GBL_LOG_LEVEL_ERROR: {
+
+        GBL_API_VERIFY((fprintf(pFile, "%s%s%s\n%s        @ %s(..): %s:%" GBL_SIZE_FMT"\n",
+                            tabBuff, pPrefix, buffer, tabBuff,
+                            pFrame->sourceCurrent.pFunc,
                             pFrame->sourceCurrent.pFile,
-                            pFrame->sourceCurrent.line,
-                            pFrame->sourceCurrent.pFunc)
+                            pFrame->sourceCurrent.line)
                     >= 0), GBL_RESULT_ERROR_FILE_WRITE);
-#else
-    GBL_UNUSED(pFrame);
-    GBL_API_VERIFY((fprintf(pFile, "%s%s%s\n",
+        break;
+    }
+    default:
+        GBL_API_VERIFY((fprintf(pFile, "%s%s%s\n",
                             tabBuff, pPrefix, buffer)
                     >= 0), GBL_RESULT_ERROR_FILE_WRITE);
-#endif
+        break;
+    }
+
     GBL_API_VERIFY(fflush(pFile) == 0, GBL_RESULT_ERROR_FILE_WRITE);
     GBL_API_END();
 }
@@ -116,10 +129,10 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
 static GBL_RESULT GblContext_ILogger_pop_(GblILogger* pILogger, const GblStackFrame* pFrame, uint32_t count) GBL_NOEXCEPT {
     GBL_UNUSED(pFrame);
     GblContext* pSelf = (GblContext*)pILogger;
-    GBL_API_BEGIN(pSelf);
-    GBL_API_VERIFY(pSelf->logStackDepth >= count, GBL_RESULT_ERROR_UNDERFLOW);
+    if(pSelf->logStackDepth < count)
+        return GBL_RESULT_ERROR_UNDERFLOW;
     pSelf->logStackDepth -= count;
-    GBL_API_END();
+    return GBL_RESULT_SUCCESS;
 }
 
 static GBL_RESULT GblContext_ILogger_push_(GblILogger* pILogger, const GblStackFrame* pFrame) GBL_NOEXCEPT {
@@ -141,6 +154,11 @@ static GBL_RESULT GblContext_constructor_(GblObject* pSelf) GBL_NOEXCEPT {
 static GBL_RESULT GblContextClass_init_(GblContextClass* pClass, void* pData, GblContext* pCtx) GBL_NOEXCEPT {
     GBL_UNUSED(pData);
     GBL_API_BEGIN(pCtx);
+
+    if(!GblType_classRefCount(GBL_CONTEXT_TYPE)) {
+        GBL_PROPERTY_TABLE_REGISTER(GBL_CONTEXT, pClass);
+    }
+
     pClass->iAllocatorIFace.pFnAlloc    = GblContext_IAllocator_alloc_;
     pClass->iAllocatorIFace.pFnRealloc  = GblContext_IAllocator_realloc_;
     pClass->iAllocatorIFace.pFnFree     = GblContext_IAllocator_free_;
@@ -184,12 +202,12 @@ extern GBL_RESULT GblContext_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_CONTEXT,
       GBL_OBJECT_TYPE,
       GblQuark_internStringStatic("Context"),
-      &((const GblTypeInfo) {
+      &(const GblTypeInfo) {
           .pFnClassInit     = (GblTypeClassInitializeFn)GblContextClass_init_,
           .classSize        = sizeof(GblContextClass),
           .instanceSize     = sizeof(GblContext),
           .interfaceCount   = 2,
-          .pInterfaceMap    = ((const GblTypeInterfaceMapEntry[]) {
+          .pInterfaceMap    = (const GblTypeInterfaceMapEntry[]) {
               {
                   .interfaceType = GBL_IALLOCATOR_TYPE,
                   .classOffset   = offsetof(GblContextClass, iAllocatorIFace)
@@ -197,8 +215,8 @@ extern GBL_RESULT GblContext_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
                   .interfaceType = GBL_ILOGGER_TYPE,
                   .classOffset   = offsetof(GblContextClass, iLoggerIFace)
               }
-          })
-      }),
+          }
+      },
       GBL_TYPE_FLAGS_NONE);
     GBL_API_END();
 }

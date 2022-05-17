@@ -49,7 +49,6 @@ typedef struct GblVariant {
         GblInt          integer;
         uint64_t        uinteger64;
         GblFloat        floating;
-        void*           pVoidPtr;
         GblString       string;
     };
     GblType             type;
@@ -265,7 +264,7 @@ GBL_INLINE GBL_API gblVariantSetp(GblVariant* pVariant,    void*       pValue) {
     GBL_API_VERIFY_POINTER(pVariant);
     GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_POINTER_TYPE, pValue));
     //GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_POINTER_TYPE));
-    //pVariant->pVoidPtr = pValue;
+    //pVariant->pVoid = pValue;
     GBL_API_END();
 }
 
@@ -329,7 +328,7 @@ GBL_INLINE GBL_API gblVariantTob(const GblVariant* pVariant, GblBool* pValue) {
         if(type == GBL_BOOL_TYPE)           *pValue = pVariant->boolean;
         else if(type == GBL_INT32_TYPE)     *pValue = pVariant->i32? GBL_TRUE : GBL_FALSE;
         else if(type == GBL_FLOAT_TYPE)     *pValue = pVariant->floating != 0.0f? GBL_TRUE : GBL_FALSE;
-        else if(type == GBL_POINTER_TYPE)   *pValue = pVariant->pVoidPtr? GBL_TRUE : GBL_FALSE;
+        else if(type == GBL_POINTER_TYPE)   *pValue = pVariant->pVoid? GBL_TRUE : GBL_FALSE;
         else if(type == GBL_STRING_TYPE)    GBL_API_CALL(gblStringTob(&pVariant->string, pValue));
         else *pValue = GBL_FALSE;
     }
@@ -345,7 +344,7 @@ GBL_INLINE GBL_API gblVariantToi(const GblVariant* pVariant,    GblInt*      pVa
         if(type == GBL_BOOL_TYPE)           *pValue = pVariant->boolean? 1 : 0;
         else if(type == GBL_INT32_TYPE)     *pValue = pVariant->integer;
         else if(type == GBL_FLOAT_TYPE)     *pValue = (GblInt)pVariant->floating;
-        else if(type == GBL_POINTER_TYPE)   *pValue = (uintptr_t)pVariant->pVoidPtr;
+        else if(type == GBL_POINTER_TYPE)   *pValue = (uintptr_t)pVariant->pVoid;
         else if(type ==GBL_STRING_TYPE)     GBL_API_CALL(gblStringToi(&pVariant->string, pValue));
         else *pValue = 0;
 
@@ -376,7 +375,7 @@ GBL_INLINE GBL_API gblVariantTop(const GblVariant* pVariant,    void**       pVa
     GBL_API_VERIFY_POINTER(pValue);
     {
         const GblType type = GblVariant_type(pVariant);
-        if(type == GBL_POINTER_TYPE) *pValue = pVariant->pVoidPtr;
+        if(type == GBL_POINTER_TYPE) *pValue = pVariant->pVoid;
         else {
             *pValue = 0;
             GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_TYPE_MISMATCH, "Cannot convert type: %u to void*!", pVariant->type);
@@ -427,7 +426,7 @@ GBL_INLINE GBL_API gblVariantTos(const GblVariant* pVariant, GblString* pString)
         else if(type == GBL_FLOAT_TYPE)
             GBL_API_CALL(gblStringFromf(pString, pVariant->floating));
         else if(type == GBL_POINTER_TYPE)
-            GBL_API_CALL(gblStringFromp(pString, pVariant->pVoidPtr));
+            GBL_API_CALL(gblStringFromp(pString, pVariant->pVoid));
         else
             GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_TYPE_MISMATCH, "Attempted to convert unknown variant type %u to string!", pVariant->type);
         }

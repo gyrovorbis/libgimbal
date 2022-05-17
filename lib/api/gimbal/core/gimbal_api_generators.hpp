@@ -74,7 +74,7 @@ namespace gimbal {
         constexpr operator Value() const noexcept { return getValue(); } \
         constexpr CType getCode(void) const noexcept { return static_cast<CType>(getPrimitiveValue()); }    \
         constexpr Value getValue(void) const noexcept { return static_cast<Value>(getPrimitiveValue()); }   \
-        std::string_view toString(void) const { \
+        const char* toString(void) const { \
             const char* pStr = GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, STRINGIFIER))(getCode()); \
             if(strcmp(pStr, "") == 0) { \
                 throw std::runtime_error(std::string("Unhandled Enum Value ") + std::to_string(getCode()));    \

@@ -21,7 +21,7 @@ public:
 
 inline Thread Thread::current(void) {
     Thread thd;
-    gblThreadCurrent(&thd);
+    GblThread_current(&thd);
     return thd;
 }
 

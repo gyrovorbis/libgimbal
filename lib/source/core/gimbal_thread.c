@@ -28,28 +28,25 @@ static GBL_THREAD_LOCAL GblThread_ thread_ = {
 };
 
 
-GBL_API gblThreadCurrent(GblThread** ppThread) {
-    GBL_ASSERT(ppThread);
-    *ppThread = &thread_;
-    return GBL_RESULT_SUCCESS;
+GBL_EXPORT GblThread* GblThread_current(void) {
+    return &thread_;
 }
 
-GblContext* gblThreadContext(const GblThread* pThread) {
-    //if(!pThread) gblThreadCurrent((GblThread**)&pThread);
+GblContext* GblThread_context(const GblThread* pThread) {
+    GBL_UNUSED(pThread);
+    //if(!pThread) GblThread_current((GblThread**)&pThread);
     return GblContext_global();
 }
 
-GBL_API gblThreadCallRecordGet(const GblThread* pThread, const GblCallRecord** ppRecord) {
-    GBL_ASSERT(ppRecord);
+GBL_EXPORT const GblCallRecord* GblThread_callRecord(const GblThread* pThread) {
     if(!pThread) {
-        gblThreadCurrent((GblThread**)&pThread);
+        pThread = GblThread_current();
     }
-    *ppRecord = &pThread->callRecord;
-    return GBL_RESULT_SUCCESS;
+    return &pThread->callRecord;
 }
 
-GBL_API gblThreadCallRecordSet(GblThread* pThread, const GblCallRecord* pRecord) {
-    if(!pThread) gblThreadCurrent(&pThread);
+GBL_API GblThread_callRecordSet(GblThread* pThread, const GblCallRecord* pRecord) {
+    if(!pThread) pThread = GblThread_current();
     if(pRecord) {
         memcpy(&pThread->callRecord, pRecord, sizeof(GblCallRecord));
     } else {
@@ -59,44 +56,49 @@ GBL_API gblThreadCallRecordSet(GblThread* pThread, const GblCallRecord* pRecord)
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API gblThreadNameGet(const GblThread* pThread, const char** ppName) {
-    GBL_ASSERT(ppName);
-    if(!pThread) gblThreadCurrent((GblThread**)&pThread);
-    *ppName = pThread->pName;
-    return GBL_RESULT_SUCCESS;
+GBL_EXPORT const char* GblThread_name(const GblThread* pThread) {
+    if(!pThread) pThread = GblThread_current();
+    return pThread->pName;
 }
 
-GBL_API gblThreadNameSet(GblThread* pThread, const char* pName) {
+GBL_API GblThread_nameSet(GblThread* pThread, const char* pName) {
     GBL_ASSERT(pName);
-    if(!pThread) gblThreadCurrent(&pThread);
+    if(!pThread) pThread = GblThread_current();
     pThread->pName = pName;
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API gblThreadLogPush(GblThread* pThread) {
-    if(!pThread) gblThreadCurrent(&pThread);
+GBL_API GblThread_logPush(GblThread* pThread) {
+    if(!pThread) pThread = GblThread_current();
     ++pThread->logStackDepth;
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API gblThreadLogPop(GblThread* pThread, uint32_t count) {
-    if(!pThread) gblThreadCurrent(&pThread);
+GBL_API GblThread_logPop(GblThread* pThread, uint32_t count) {
+    if(!pThread) pThread = GblThread_current();
     GBL_ASSERT(pThread->logStackDepth >= count);
     pThread->logStackDepth -= count;
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API gblThreadStackFramePush(GblThread* pThread, GblStackFrame* pFrame) {
-    if(!pThread) gblThreadCurrent(&pThread);
+GBL_API GblThread_stackFramePush(GblThread* pThread, GblStackFrame* pFrame) {
+    if(!pThread) pThread = GblThread_current();
     if(pFrame) {
         pFrame->pPrevFrame      = pThread->pStackFrameTop;
         pFrame->pThread         = pThread;
+        if(GBL_RESULT_ERROR(pThread->callRecord.result)) {
+            GblThread_callRecordSet(pThread,NULL);
+            GBL_API_BEGIN(GblContext_global());
+            GBL_API_WARN("Pushing new stack frame from [%s] with unhandled error record!",
+                         !pFrame->sourceCurrent.pFunc? "UNKNOWN" : pFrame->sourceCurrent.pFunc);
+            GBL_API_END_BLOCK();
+        }
     }
     pThread->pStackFrameTop = pFrame;
     return GBL_RESULT_SUCCESS;
 }
-GBL_API gblThreadStackFramePop(GblThread* pThread) {
-    if(!pThread) gblThreadCurrent(&pThread);
+GBL_API GblThread_stackFramePop(GblThread* pThread) {
+    if(!pThread) pThread = GblThread_current();
     GBL_ASSERT(pThread->pStackFrameTop);
     /*if(pThread->pStackFrameTop->pPrevFrame) {
         if(GBL_RESULT_ERROR(pThread->pStackFrameTop->record.result)) {
@@ -111,9 +113,7 @@ GBL_API gblThreadStackFramePop(GblThread* pThread) {
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API gblThreadStackFrameTop(const GblThread* pThread, const GblStackFrame** ppFrame) {
-    if(!pThread) gblThreadCurrent((GblThread**)&pThread);
-    GBL_ASSERT(ppFrame);
-    *ppFrame = pThread->pStackFrameTop;
-    return GBL_RESULT_SUCCESS;
+GBL_EXPORT const GblStackFrame* GblThread_stackFrameTop(const GblThread* pThread) {
+    if(!pThread) pThread = GblThread_current();
+    return  pThread->pStackFrameTop;
 }

@@ -57,7 +57,7 @@
     GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, N, N, N, 2, 1, ##__VA_ARGS__)
 
 #define GBL_VA_OVERLOAD_SUFFIXER_3_N(...) \
-    GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, N, N, 3, 2, 1, ##__VA_ARGS__)
+    GBL_VA_OVERLOAD_SUFFIXER(N, N, N, N, N, N, N, N, 3, 2, 1, ##__VA_ARGS__)
 
 #define GBL_VA_OVERLOAD_SUFFIXER_5_N(...) \
     GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, 5, 4, 3, 2, 1, ##__VA_ARGS__)

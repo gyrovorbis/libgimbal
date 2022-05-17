@@ -76,7 +76,7 @@ GBL_API                 GblHashSet_constructMove    (SELF, GblHashSet* pRhs,
                                                      GblContext* hCtx)               GBL_NOEXCEPT;
 GBL_API                 GblHashSet_constructClone   (SELF, GblHashSet* pRhs)        GBL_NOEXCEPT;
 GBL_API                 GblHashSet_assignMove       (SELF, GblHashSet* pRhs)        GBL_NOEXCEPT;
-GBL_EXPORT void         GblHashSet_destruct         (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblHashSet_destruct         (SELF)                          GBL_NOEXCEPT;
 
 GBL_INLINE GblSize      GblHashSet_size             (CSELF)                         GBL_NOEXCEPT;
 GBL_INLINE GblSize      GblHashSet_bucketCount      (CSELF)                         GBL_NOEXCEPT;

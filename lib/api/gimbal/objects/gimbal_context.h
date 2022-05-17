@@ -25,7 +25,6 @@ typedef struct GblContextClass {
     GblILoggerIFace     iLoggerIFace;
 } GblContextClass;
 
-
 typedef struct GblContext {
     union {
         GblContextClass*    pClass;
@@ -34,6 +33,24 @@ typedef struct GblContext {
     GblCallRecord           lastIssue;
     uint32_t                logStackDepth;
 } GblContext;
+
+GBL_DECLARE_ENUM(GBL_CONTEXT_PROPERTY_ID) {
+    GBL_CONTEXT_PROPERTY_ID_FIRST               = GBL_OBJECT_PROPERTY_ID_COUNT,
+    GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_RESULT   = GBL_CONTEXT_PROPERTY_ID_FIRST,
+    GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_MESSSAGE,
+    GBL_CONTEXT_PROPERTY_ID_COUNT
+};
+
+GBL_PROPERTY_TABLE_BEGIN(GBL_CONTEXT)
+    GBL_PROPERTY(GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_RESULT,
+                 "result",
+                 GBL_UINT32_TYPE,
+                 GBL_PROPERTY_FLAGS_MASK(READ))
+    GBL_PROPERTY(GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_MESSSAGE,
+                 "message",
+                 GBL_POINTER_TYPE,
+                 GBL_PROPERTY_FLAGS_MASK(READ))
+GBL_PROPERTY_TABLE_END()
 
 
 GBL_EXPORT const GblCallRecord*
@@ -49,8 +66,8 @@ GBL_EXPORT const char*  GblContext_lastIssueMessage (CSELF)                     
 GblContext*             GblContext_global(void)                                             GBL_NOEXCEPT;
 void                    GblContext_globalSet(GblContext* pCtx)                              GBL_NOEXCEPT;
 
-
-/* Private methods, do not call directly.
+/* ========== PRIVATE ==========
+ * Private methods, do not call directly.
  *
  * Call via API frame macros like GBL_API_MALLOC(), GBL_API_FREE(), GBL_API_LOG(), GBL_API_PUSH(), etc
  * after calling GBL_API_BEGIN(GblContext* pCtx) with the context.

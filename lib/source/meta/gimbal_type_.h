@@ -5,22 +5,27 @@
 #include <gimbal/containers/gimbal_vector.h>
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/types/gimbal_quark.h>
-#define NOGDI
 #include <gimbal/preprocessor/gimbal_atomics.h>
+#ifdef _WIN32
+#   define NOGDI
+# else
+#   define __USE_UNIX98
+#endif
 #include <tinycthread.h>
 
-#define GBL_CLASS_FLAGS_BIT_COUNT_                      6
-#define GBL_CLASS_FLAGS_BIT_MASK_                       0x3f
-#define GBL_CLASS_PRIVATE_(klass)                       ((uintptr_t)((GblClass*)klass)->pPrivate_)
+#define GBL_CLASS_FLAGS_BIT_COUNT_                      5
+#define GBL_CLASS_FLAGS_BIT_MASK_                       0x1f
+#define GBL_CLASS_PRIVATE_(klass)                       ((uintptr_t)((GblClass*)klass)->private_)
 #define GBL_CLASS_FLAG_TEST_(klass, mask)               ((GblBool) (GBL_CLASS_PRIVATE_(klass) & mask))
 #define GBL_CLASS_FLAG_SET_(klass, flag)                GBL_CLASS_PRIVATE_SET_(klass, GBL_CLASS_META_CLASS_(klass), GBL_CLASS_FLAGS_(klass) | flag)
 #define GBL_CLASS_FLAG_CLEAR_(klass, flag)              GBL_CLASS_PRIVATE_SET_(klass, GBL_CLASS_META_CLASS_(klass), GBL_CLASS_FLAGS_(klass) & ~flag)
 #define GBL_CLASS_FLAGS_(klass)                         ((GblFlags)(GBL_CLASS_PRIVATE_(klass) & GBL_CLASS_FLAGS_BIT_MASK_))
 #define GBL_CLASS_META_CLASS_(klass)                    ((GblMetaClass*)(GBL_CLASS_PRIVATE_(klass) & ~GBL_CLASS_FLAGS_BIT_MASK_))
 #define GBL_CLASS_TYPE_(klass)                          ((GblType)(GBL_CLASS_META_CLASS_(klass)))
-#define GBL_CLASS_PRIVATE_SET_(klass, metaClass, flags)                             \
-    GBL_STMT_START {                                                                \
-        ((GblClass*)klass)->pPrivate_ = (void*)((uintptr_t)metaClass | flags);      \
+#define GBL_CLASS_PRIVATE_SET_(klass, meta, flags)  \
+    GBL_STMT_START {                                \
+        ((GblClass*)klass)->private_ =              \
+            ((uintptr_t)meta | flags);              \
     } GBL_STMT_END
 
 #define GBL_META_CLASS_ALIGNMENT_               (1 << (GBL_CLASS_FLAGS_BIT_COUNT_))
@@ -29,8 +34,15 @@
 #define GBL_TYPE_(meta)              ((GblType)meta)
 
 #define GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT_ 32
-#define GBL_TYPE_ENSURE_INITIALIZED_()  \
-    if(!initializing_) call_once(&initOnce_, GblType_init_)
+
+#define GBL_TYPE_ENSURE_INITIALIZED_()                  \
+    GBL_STMT_START {                                    \
+        if(!initializing_) {                            \
+            if(!inittedOnce_)                           \
+                call_once(&initOnce_, GblType_init_);   \
+            else if(!initialized_) GblType_init_();     \
+        }                                               \
+    } GBL_STMT_END
 
 GBL_DECLS_BEGIN
 
@@ -39,29 +51,29 @@ GBL_DECLARE_ENUM(GBL_CLASS_FLAGS_) {
     GBL_CLASS_FLAG_IN_PLACE_        = (1 << 1),
     GBL_CLASS_FLAG_IFACE_IMPL_      = (1 << 2),
     GBL_CLASS_FLAG_CONTEXT_         = (1 << 3),
-    GBL_CLASS_FLAG_CONTANER_        = (1 << 4), // + 16 byte header
-    GBL_CLASS_FLAG_EXTENDED_INFO_   = (1 << 5)
+    GBL_CLASS_FLAG_CONTANER_        = (1 << 4),
 };
 
 typedef struct GblMetaClass {
     struct GblMetaClass*    pParent;
     GblQuark                name;
-    GBL_ATOMIC_INT16       refCount;
-#ifdef GBL_TYPE_DEBUG
-    GBL_ATOMIC_INT16_INIT  instanceRefCount;
-#endif
+    GBL_ATOMIC_INT16        refCount;
+    GBL_ATOMIC_INT16        instanceRefCount;
     GblTypeInfo             info;
     GblFlags                flags;
     GblIPlugin*             pPlugin;
     GblClass*               pClass;
     uint8_t                 depth;
+    int16_t                 classPrivateOffset;
+    int16_t                 instancePrivateOffset;
     struct GblMetaClass**   pBases;
 } GblMetaClass;
 
 
 extern GblContext*              pCtx_;
 extern once_flag                initOnce_;
-extern GblBool                  initialized;
+extern GblBool                  inittedOnce_;
+extern GblBool                  initialized_;
 extern GBL_THREAD_LOCAL GblBool initializing_;
 extern mtx_t                    typeRegMtx_;
 extern GblHashSet               typeRegistry_;
@@ -84,6 +96,7 @@ extern GBL_RESULT GblIAllocator_typeRegister_   (GblContext* pCtx);
 extern GBL_RESULT GblILogger_typeRegister_      (GblContext* pCtx);
 extern GBL_RESULT GblContext_typeRegister_      (GblContext* pCtx);
 extern GBL_RESULT GblEvent_typeRegister_        (GblContext* pCtx);
+extern GBL_RESULT GblIPlugin_typeRegister_      (GblContext* pCtx);
 
 
 

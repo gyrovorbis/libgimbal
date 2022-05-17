@@ -41,6 +41,7 @@ class Context:
 {
 public:
 
+
     static Context* fromGblObj(GblContext* pContext) {
         return pContext ?
                     static_cast<Context*>(GblObject_userdata(GBL_OBJECT(pContext)))
@@ -49,16 +50,18 @@ public:
 
     Context(void) {
 
+        pOldClass_ = GBL_CONTEXT_CLASS(GblClass_createFloating(GBL_CONTEXT_TYPE));
         GblContextClass* pClass = GBL_CONTEXT_CLASS(GblClass_createFloating(GBL_CONTEXT_TYPE));
 
-        pClass->iAllocatorIFace.pFnAlloc = gblMemAlloc_;
-        pClass->iAllocatorIFace.pFnRealloc = gblMemRealloc_;
-        pClass->iAllocatorIFace.pFnFree = gblMemFree_;
-        pClass->iLoggerIFace.pFnWrite = gblLogWrite_;
-        pClass->iLoggerIFace.pFnPush = gblLogPush_;
-        pClass->iLoggerIFace.pFnPop = gblLogPop_;
+        pClass->iAllocatorIFace.pFnAlloc    = gblMemAlloc_;
+        pClass->iAllocatorIFace.pFnRealloc  = gblMemRealloc_;
+        pClass->iAllocatorIFace.pFnFree     = gblMemFree_;
+        pClass->iLoggerIFace.pFnWrite       = gblLogWrite_;
+        pClass->iLoggerIFace.pFnPush        = gblLogPush_;
+        pClass->iLoggerIFace.pFnPop         = gblLogPop_;
 
         Exception::checkThrow(GblInstance_constructWithClass(GBL_INSTANCE(static_cast<GblContext*>(this)), GBL_CLASS(pClass)));
+
         GblObject_userdataSet(GBL_OBJECT(static_cast<GblContext*>(this)), this);
 
     }
@@ -66,6 +69,7 @@ public:
 
     virtual ~Context(void) {
         GblInstance_destruct(GBL_INSTANCE(static_cast<GblContext*>(this)));
+        GblClass_destroyFloating(GBL_CLASS(pOldClass_));
     }
 
 
@@ -87,16 +91,50 @@ public:
 
     // ===== overriding GblContext C API user callbacks =====
 
-    virtual void    logPush(const StackFrame& frame) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); }
-    virtual void    logPop(const StackFrame& frame, uint32_t count) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); }
-    virtual void    logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); }
+    virtual void logPush(const StackFrame& frame) {
+        GBL_API_BEGIN(frame.pContext);
+        GBL_API_CALL(pOldClass_->iLoggerIFace.pFnPush((GblILogger*)static_cast<GblContext*>(this), &frame));
+        GBL_API_END_BLOCK();
+        Exception::checkThrow(GBL_API_RESULT());
+    }
+    virtual void logPop(const StackFrame& frame, uint32_t count) {
+        gimbal::Result result = pOldClass_->iLoggerIFace.pFnPop((GblILogger*)static_cast<GblContext*>(this), &frame, count);
+        Exception::checkThrow(result);
+    }
+    virtual void logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) {
+        GBL_API_BEGIN(static_cast<GblContext*>(this));
+        GBL_API_CALL(pOldClass_->iLoggerIFace.pFnWrite((GblILogger*)static_cast<GblContext*>(this), &frame, level, pFmt, varArgs));
+        GBL_API_END_BLOCK();
+        Exception::checkThrow(GBL_API_RESULT());
+    }
 
-    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr;}
-    virtual void*   memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); return nullptr; }
-    virtual void    memFree(const StackFrame& frame, void* pPtr) { Exception::throwException(GBL_RESULT_UNIMPLEMENTED); }
+    virtual void* memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) {
+        void* pPtr = nullptr;
+        GBL_API_BEGIN(static_cast<GblContext*>(this));
+        GBL_API_CALL(pOldClass_->iAllocatorIFace.pFnAlloc((GblIAllocator*)static_cast<GblContext*>(this), &frame, size, alignment, pDebugInfoStr, &pPtr));
+        GBL_API_END_BLOCK();
+        Exception::checkThrow(GBL_API_RESULT());
+        return pPtr;
+    }
+
+    virtual void* memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) {
+        void* pNewPtr = nullptr;
+        GBL_API_BEGIN(static_cast<GblContext*>(this));
+        GBL_API_CALL(pOldClass_->iAllocatorIFace.pFnRealloc((GblIAllocator*)static_cast<GblContext*>(this), &frame, pPtr, newSize, newAlign, &pNewPtr));
+        GBL_API_END_BLOCK();
+        Exception::checkThrow(GBL_API_RESULT());
+        return pNewPtr;
+    }
+
+    virtual void memFree(const StackFrame& frame, void* pPtr) {
+        GBL_API_BEGIN(static_cast<GblContext*>(this));
+        GBL_API_CALL(pOldClass_->iAllocatorIFace.pFnFree((GblIAllocator*)static_cast<GblContext*>(this), &frame, pPtr));
+        GBL_API_END_BLOCK();
+        Exception::checkThrow(GBL_API_RESULT());
+    }
 
     //===== overridden from std::pmr::memory_resource =====
-    virtual void*   do_allocate(size_t bytes, size_t align) override {
+    virtual void* do_allocate(size_t bytes, size_t align) override {
         GBL_API_BEGIN(static_cast<GblContext*>(this));
         void* pValue = nullptr;
         try {
@@ -105,7 +143,7 @@ public:
         GBL_API_END_BLOCK();
         return pValue;
     }
-    virtual void    do_deallocate(void* pPtr, size_t bytes, size_t align) override {
+    virtual void do_deallocate(void* pPtr, size_t bytes, size_t align) override {
         GBL_UNUSED(bytes); GBL_UNUSED(align);
         GBL_API_BEGIN(static_cast<GblContext*>(this));
         try {
@@ -113,44 +151,53 @@ public:
         } GBL_RESULT_CATCH(GBL_API_RESULT());
         GBL_API_END_BLOCK();
     }
-    virtual bool    do_is_equal(const std::pmr::memory_resource& other) const noexcept override {
+    virtual bool do_is_equal(const std::pmr::memory_resource& other) const noexcept override {
         return this == &other;
     }
 
 private:
 
-    static GBL_RESULT gblLogWrite_     (GblILogger* pILogger, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs) {
+    GblContextClass* pOldClass_ = nullptr;
+
+    static GBL_RESULT gblLogWrite_(GblILogger* pILogger, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs) {
         GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, Context);
-        pUd->logWrite(*static_cast<const StackFrame*>(pFrame),level, pFmt, varArgs);
+        static_cast<Context*>((GblContext*)pILogger)->logWrite(*static_cast<const StackFrame*>(pFrame),level, pFmt, varArgs);
         GBL_CONTEXT_EXT_C_TO_CPP_END();
     }
-    static GBL_RESULT gblLogPush_      (GblILogger* pILogger, const GblStackFrame* pFrame) {
+    static GBL_RESULT gblLogPush_(GblILogger* pILogger, const GblStackFrame* pFrame) {
         GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, Context)
-        pUd->logPush(*static_cast<const StackFrame*>(pFrame));
-        GBL_CONTEXT_EXT_C_TO_CPP_END();
-    }
-
-    static GBL_RESULT gblLogPop_       (GblILogger* pILogger, const GblStackFrame* pFrame, uint32_t count) {
-        GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, Context)
-        pUd->logPop(*static_cast<const StackFrame*>(pFrame), count);
+        static_cast<Context*>((GblContext*)pILogger)->logPush(*static_cast<const StackFrame*>(pFrame));
         GBL_CONTEXT_EXT_C_TO_CPP_END();
     }
 
-    static GBL_RESULT gblMemAlloc_     (GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDebugInfoStr, void** ppPtr) {
+    static GBL_RESULT gblLogPop_(GblILogger* pILogger, const GblStackFrame* pFrame, uint32_t count) {
+        gimbal::Result result;
+        try {
+            static_cast<Context*>((GblContext*)pILogger)->logPop(*static_cast<const StackFrame*>(pFrame), count);
+        } catch(const Exception& resultException) {
+            result = resultException.getResult();
+        }
+        catch(...) {
+            result = Result(Result::ErrorUnhandledException);
+        }
+        return result;
+    }
+
+    static GBL_RESULT gblMemAlloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDebugInfoStr, void** ppPtr) {
         GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, Context)
-        *ppPtr = pUd->memAlloc(*static_cast<const StackFrame*>(pFrame), size, align, pDebugInfoStr);
+        *ppPtr = static_cast<Context*>((GblContext*)pIAllocator)->memAlloc(*static_cast<const StackFrame*>(pFrame), size, align, pDebugInfoStr);
         GBL_API_VERIFY(*ppPtr, GBL_RESULT_ERROR_MEM_ALLOC);
         GBL_CONTEXT_EXT_C_TO_CPP_END();
     }
-    static GBL_RESULT gblMemRealloc_   (GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pPtr, GblSize newSize, GblSize newAlign, void** ppNewPtr) {
+    static GBL_RESULT gblMemRealloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pPtr, GblSize newSize, GblSize newAlign, void** ppNewPtr) {
         GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, Context)
-        *ppNewPtr = pUd->memRealloc(*static_cast<const StackFrame*>(pFrame), pPtr, newSize, newAlign);
+        *ppNewPtr = static_cast<Context*>((GblContext*)pIAllocator)->memRealloc(*static_cast<const StackFrame*>(pFrame), pPtr, newSize, newAlign);
         GBL_API_VERIFY(*ppNewPtr, GBL_RESULT_ERROR_MEM_ALLOC);
         GBL_CONTEXT_EXT_C_TO_CPP_END();
     }
-    static GBL_RESULT gblMemFree_      (GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pPtr) {
+    static GBL_RESULT gblMemFree_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pPtr) {
         GBL_CONTEXT_EXT_C_TO_CPP_BEGIN(pFrame, Context)
-        pUd->memFree(*static_cast<const StackFrame*>(pFrame), pPtr);
+        static_cast<Context*>((GblContext*)pIAllocator)->memFree(*static_cast<const StackFrame*>(pFrame), pPtr);
         GBL_CONTEXT_EXT_C_TO_CPP_END();
     }
 

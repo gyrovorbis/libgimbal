@@ -29,7 +29,7 @@ private slots:
 };
 
 inline void HashMap::init(void) {
-   // gblThreadStackFramePush(nullptr, nullptr);
+   // GblThread_stackFramePush(nullptr, nullptr);
 }
 
 

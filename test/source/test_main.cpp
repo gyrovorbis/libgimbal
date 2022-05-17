@@ -9,6 +9,7 @@
 #include <test_gimbal_api.hpp>
 #include <test_gimbal_hash_map.hpp>
 #include <test_gimbal_buffer.hpp>
+#include <test_gimbal_byte_array.hpp>
 #include <test_gimbal_type.hpp>
 #include <test_gimbal_object.hpp>
 
@@ -16,6 +17,9 @@ using namespace elysian;
 
 int main(int argc, char* argv[]) {
     UnitTestSuite testSuite;
+    //auto* pCtx = new gimbal::test::StandardContext;
+    //GblContext_globalSet(new gimbal::test::MonitorableContext(pCtx));
+
 
 
 qDebug() << "\n";
@@ -24,11 +28,11 @@ qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Vector());
     testSuite.enqueueTestSet(new gimbal::test::String());
  //   testSuite.enqueueTestSet(new gimbal::test::Quark());
-  //  testSuite.enqueueTestSet(new gimbal::test::MetaType());
     testSuite.enqueueTestSet(new gimbal::test::Variant());
     testSuite.enqueueTestSet(new gimbal::test::Algorithms());
     testSuite.enqueueTestSet(new gimbal::test::HashMap());
     testSuite.enqueueTestSet(new gimbal::test::Buffer());
+    //testSuite.enqueueTestSet(new gimbal::test::ByteArray());
     testSuite.enqueueTestSet(new gimbal::test::Type());
     testSuite.enqueueTestSet(new gimbal::test::CObject());
 qDebug() << "DONEZ";

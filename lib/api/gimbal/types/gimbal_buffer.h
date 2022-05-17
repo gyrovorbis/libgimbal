@@ -30,7 +30,7 @@ GBL_EXPORT GblType      GblBuffer_type      (void);
 GBL_INLINE GBL_RESULT   GblBuffer_construct_1(SELF)                                                     GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblBuffer_construct_2(SELF, GblSize bytes)                                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblBuffer_construct_3(SELF, GblSize bytes, const void* pData)                   GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT   GblBuffer_construct_4(SELF, GblSize bytes, const void* pData, GblContext* pCtx)  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblBuffer_construct_4(SELF, GblSize bytes, const void* pData, GblContext* pCtx) GBL_NOEXCEPT;
 #define GblBuffer_construct(...) \
         GBL_VA_OVERLOAD_SELECT(GblBuffer_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 

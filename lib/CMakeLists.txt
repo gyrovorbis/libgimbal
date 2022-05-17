@@ -111,13 +111,17 @@ set(GIMBAL_SOURCES
      source/objects/gimbal_event.c
      source/meta/gimbal_class.c
      source/meta/gimbal_instance.c
+     source/ifaces/gimbal_iplugin.c
+     source/objects/gimbal_module.c
      lib/jenkins/lookup3.c
 )
 
 set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_api_generators.h
     api/gimbal/types/gimbal_buffer.h
+    api/gimbal/types/gimbal_byte_array.h
     api/gimbal/types/gimbal_buffer.hpp
+    api/gimbal/types/gimbal_byte_array.hpp
     api/gimbal/types/gimbal_result.h
     api/gimbal/core/gimbal_call_stack.hpp
     api/gimbal/core/gimbal_api_generators.hpp
@@ -135,6 +139,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/ifaces/gimbal_ilogger.h
     api/gimbal/objects/gimbal_context.h
     api/gimbal/objects/gimbal_object.hpp
+    api/gimbal/objects/gimbal_module.h
     api/gimbal/types/gimbal_result.hpp
     api/gimbal/types/gimbal_typedefs.h
     api/gimbal/preprocessor/gimbal_compiler.h
@@ -144,6 +149,7 @@ set(GIMBAL_INCLUDES
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH}
     api/gimbal/preprocessor/gimbal_macro_sequences.h
     api/gimbal/core/gimbal_ext.h
+    api/gimbal/utils/gimbal_test.h
     api/gimbal/types/gimbal_variant.h
     api/gimbal/types/gimbal_quark.h
     api/gimbal/types/gimbal_quark.hpp
@@ -152,6 +158,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_hash_map.hpp
     api/gimbal/containers/gimbal_tree_set.h
     api/gimbal/containers/gimbal_table.h
+    api/gimbal/containers/gimbal_data_table.h
     api/gimbal/meta/gimbal_type.h
     api/gimbal/core/gimbal_thread.h
     api/gimbal/core/gimbal_thread.hpp
@@ -198,8 +205,9 @@ add_subdirectory(lib/tinycthread)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-target_link_libraries(libGimbal interface99 tinycthread)
+target_link_libraries(libGimbal interface99 tinycthread Threads::Threads)
 
 #set_property(TARGET libGimbal PROPERTY C_STANDARD 11)
 #set_property(TARGET libGimbal PROPERTY C_STANDARD_REQUIRED ON)

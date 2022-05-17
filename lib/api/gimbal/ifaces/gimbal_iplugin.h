@@ -1,81 +1,40 @@
 #ifndef GIMBAL_PLUGIN_H
 #define GIMBAL_PLUGIN_H
 
-#include "gimbal_interface.h"
+#include "../meta/gimbal_interface.h"
 
-GBL_DECLS_BEGIN
-
-#define GBL_IPLUGIN_TYPE (GblIPlugin_type())
-#define GBL_IPLUGIN(instance)                GBL_INSTANCE_CAST(instance, GBL_IPLUGIN_TYPE, GblIPlugin)
-#define GBL_IPLUGIN_CHECK(instance)    GBL_INSTANCE_CHECK(instance, GBL_IPLUGIN_TYPE)
-#define GBL_IPLUGIN_IFACE(klass)             GBL_CLASS_CAST(klass, GBL_IPLUGIN_TYPE, GblIPluginIFace)
-#define GBL_IPLUGIN_IFACE_CHECK(klass)  GBL_CLASS_CHECK(klass, GBL_IPLUGIN_TYPE)
-#define GBL_IPLUGIN_GET_IFACE(instance)      GBL_INSTANCE_CAST_CLASS(instance, GBL_IPLUGIN_TYPE, GblIPluginIFace)
+#define GBL_IPLUGIN_TYPE                    GBL_BUILTIN_TYPE(IPLUGIN)
+#define GBL_IPLUGIN_STRUCT                  GblIPlugin
+#define GBL_IPLUGIN_CLASS_STRUCT            GblIPluginIFace
+#define GBL_IPLUGIN(instance)               GBL_INSTANCE_CAST_PREFIX        (instance,  GBL_IPLUGIN)
+#define GBL_IPLUGIN_CHECK(instance)         GBL_INSTANCE_CHECK_PREFIX       (instance,  GBL_IPLUGIN)
+#define GBL_IPLUGIN_TRY(instance)           GBL_INSTANCE_TRY_PREFIX         (instance,  GBL_IPLUGIN)
+#define GBL_IPLUGIN_IFACE(klass)            GBL_CLASS_CAST_PREFIX           (klass,     GBL_IPLUGIN)
+#define GBL_IPLUGIN_IFACE_CHECK(klass)      GBL_CLASS_CHECK_PREFIX          (klass,     GBL_IPLUGIN)
+#define GBL_IPLUGIN_IFACE_TRY(klass)        GBL_CLASS_TRY_PREFIX            (klass,     GBL_IPLUGIN)
+#define GBL_IPLUGIN_GET_IFACE(instance)     GBL_INSTANCE_CAST_CLASS_PREFIX  (instance,  GBL_IPLUGIN)
+#define GBL_IPLUGIN_TRY_IFACE(instance)     GBL_INSTANCE_TRY_CLASS_PREFIX   (instance,  GBL_IPLUGIN)
 
 #define SELF    GblIPlugin* pSelf
 #define CSELF   const GblIPlugin* pSelf
 
+GBL_DECLS_BEGIN
 
-typedef GBL_RESULT (*GblIPluginUseFn)        (SELF);
-typedef GBL_RESULT (*GblIPluginUnuseFn)      (SELF);
-typedef GBL_RESULT (*GblIPluginTypeInfoFn)   (CSELF, GblType, GblTypeInfo*);
-
-
-typedef struct GblIPluginIface {
-    GblInterface            base;
-    GblIPluginUseFn         pFnUse;
-    GblIPluginUnuseFn       pFnUnuse;
-    GblIPluginTypeInfoFn    pFnTypeInfo;
+typedef struct GblIPluginIFace {
+    GBL_RESULT (*pFnUse)        (SELF);
+    GBL_RESULT (*pFnUnuse)      (SELF);
+    GBL_RESULT (*pFnTypeInfo)   (CSELF,
+                                 GblType        dynamicType,
+                                 GblTypeInfo*   pCompleteInfo);
 } GblIPluginIFace;
 
+GBL_EXPORT GblType    GblIPlugin_type        (void)                 GBL_NOEXCEPT;
 
-
-GBL_EXPORT GblType    GblIPlugin_type        (void);
-GBL_EXPORT GBL_RESULT GblIPlugin_use         (SELF);
-GBL_EXPORT GBL_RESULT GblIPlugin_unuse       (SELF);
-GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo    (CSELF, GblType requestedType, GblTypeInfo* pInfo);
-
-
-GBL_EXPORT GblType GblIPlugin_type(void) {
-    static GblType type = GBL_INVALID_TYPE;
-    if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GBL_INTERFACE_TYPE,
-                                     "IPlugin",
-                                     &((const GblTypeInfo) {
-                                         .classSize    = sizeof(GblIPluginIFace),
-                                         .classAlign   = GBL_ALIGNOF(GblIPluginIFace),
-                                     }),
-                                     GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED | GBL_TYPE_FLAG_ABSTRACT);
-    }
-    return type;
-}
-
-
-
-GBL_INLINE GBL_RESULT GblIPlugin_use(SELF) {
-    GBL_API_BEGIN(NULL); {
-        GblIPluginIFace* pIFace = GBL_IPLUGIN_GET_IFACE(pSelf);
-        GBL_API_VERIFY_POINTER(pIFace->pFnUse);
-        GBL_API_CALL(pIFace->pFnUse(pSelf));
-
-    } GBL_API_END();
-}
-GBL_INLINE GBL_RESULT GblIPlugin_unuse(SELF) {
-    GBL_API_BEGIN(NULL); {
-        GblIPluginIFace* pIFace = GBL_IPLUGIN_GET_IFACE(pSelf);
-        GBL_API_VERIFY_POINTER(pIFace->pFnUnuse);
-        GBL_API_CALL(pIFace->pFnUnuse(pSelf));
-
-    } GBL_API_END();
-}
-GBL_INLINE GBL_RESULT GblIPlugin_typeInfo(CSELF, GblType requestedType, GblTypeInfo* pInfo) {
-    GBL_API_BEGIN(NULL); {
-        GblIPluginIFace* pIFace = GBL_IPLUGIN_GET_IFACE(pSelf);
-        GBL_API_VERIFY_POINTER(pIFace->pFnTypeInfo);
-        GBL_API_CALL(pIFace->pFnTypeInfo(pSelf, requestedType, pInfo));
-
-    } GBL_API_END();
-}
+GBL_EXPORT GBL_RESULT GblIPlugin_use         (SELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIPlugin_unuse       (SELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo    (CSELF,
+                                              GblType       type,
+                                              GblTypeInfo*  pInfo)  GBL_NOEXCEPT;
 
 
 GBL_DECLS_END

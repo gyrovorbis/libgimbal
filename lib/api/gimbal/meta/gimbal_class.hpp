@@ -46,7 +46,7 @@ inline Type Class::getType(void) const {
     return GblType_fromClass(this);
 }
 inline RefCount Class::getRefCount(void) const {
-    return GblClass_refCountFromType(getType());
+    return GblType_classRefCount(getType());
 }
 
 

@@ -44,10 +44,10 @@ extern GBL_RESULT GblITable_typeRegister_(GblContext* pCtx) {
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_ITABLE,
                             GBL_INTERFACE_TYPE,
                            GblQuark_internStringStatic("ITable"),
-                           &((const GblTypeInfo) {
+                           &(const GblTypeInfo) {
                                .pFnClassInit = (GblTypeClassInitializeFn)GblITableIFace_init_,
                                .classSize    = sizeof(GblITableIFace)
-                           }),
+                           },
                            GBL_TYPE_FLAG_ABSTRACT);
 
     GBL_API_END();

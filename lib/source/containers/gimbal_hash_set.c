@@ -648,13 +648,13 @@ GBL_EXPORT void* GblHashSet_extract(GblHashSet *map, const void* pKey) GBL_NOEXC
 // hashmap_free frees the hash map
 // Every item is called with the element-freeing function given in hashmap_new,
 // if present, to free any data referenced in the elements of the hashmap.
-GBL_EXPORT void GblHashSet_destruct(GblHashSet *map) GBL_NOEXCEPT {
-    if (!map) return;
+GBL_EXPORT GBL_RESULT GblHashSet_destruct(GblHashSet *map) GBL_NOEXCEPT {
+    //if (!map) return
     GBL_API_BEGIN(map->pCtx);
     free_elements(map);
     GBL_API_FREE(map->pBuckets);
     GBL_API_FREE(map->pSpare);
-    GBL_API_END_BLOCK();
+    GBL_API_END();
 }
 
 // hashmap_scan iterates over all items in the hash map

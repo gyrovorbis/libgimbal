@@ -20,6 +20,11 @@ extern "C" {
 #   define GBL_DECLS_END
 #endif
 
+#define GBL_DECLARE_STRUCT_PUBLIC(S)    \
+    struct S;                           \
+    typedef struct S S;                 \
+    struct S
+
 #define GBL_FORWARD_DECLARE_STRUCT(S)  \
     struct S;                          \
     typedef struct S S

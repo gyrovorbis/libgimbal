@@ -332,9 +332,6 @@ private:
 class StandardContext: public gimbal::Context {
 protected:
 
-    virtual void*   memAlloc(const StackFrame& frame, Size size, Size alignment, const char* pDebugInfoStr) { return GBL_ALIGNED_ALLOC(alignment, size); }
-    virtual void*   memRealloc(const StackFrame& frame, void* pPtr, Size newSize, Size newAlign) { return GBL_ALIGNED_REALLOC(pPtr, newAlign, newSize); }
-    virtual void    memFree(const StackFrame& frame, void* pPtr) { GBL_ALIGNED_FREE(pPtr); }
     virtual void    logWrite(const StackFrame& frame, LogLevel level, const char* pFmt, va_list varArgs) {
         QMessageLogger logger;
 
@@ -343,8 +340,17 @@ protected:
                               frame.getSourceEntry().getLineNumber(),
                               frame.getSourceEntry().getFunctionName().data());
 #endif
+        if(level.getValue() != LogLevel::Warning ||
+           level.getValue() != LogLevel::Error) {
+            gimbal::Context::logWrite(frame, level, pFmt, varArgs);
+            return;
+        }
+       QString buffer;
 
-       QString buffer = QString::vasprintf(pFmt, varArgs);
+       for(GblSize depth = 0; depth < this->logStackDepth; ++depth)
+           buffer += "    ";
+
+        buffer += QString::vasprintf(pFmt, varArgs);
 
         switch(level.getValue()) {
         case LogLevel::Warning:
@@ -353,6 +359,9 @@ protected:
         case LogLevel::Error:
             logger.critical("%s", Q_CSTR(buffer));
             break;
+        default:
+            break;
+#if 0
         case LogLevel::Debug:
             logger.debug("%s", Q_CSTR(buffer));
             break;
@@ -370,6 +379,7 @@ protected:
                 logger.info("%s", Q_CSTR(buffer));
 #endif
         }
+#endif
             break;
         }
     }
@@ -531,8 +541,8 @@ public:
     template<typename F>
     const ApiBlock& operator=(F&& funcBlock) {
         GBL_UNUSED([&]() {
-            GBL_API_BEGIN_FRAME(stackFrame_.getSourceEntry().getFileName().data(),
-                                stackFrame_.getSourceEntry().getFunctionName().data(),
+            GBL_API_BEGIN_FRAME(stackFrame_.getSourceEntry().getFileName(),
+                                stackFrame_.getSourceEntry().getFunctionName(),
                                 stackFrame_.getSourceEntry().getLineNumber(),
                                 stackFrame_.getSourceEntry().getColumn(),
                                 pObject_,
@@ -545,7 +555,7 @@ public:
                 funcBlock(&stackFrame_);
             } catch(const gimbal::Exception& gblEx) {
                 try {
-                    //gblThreadStackFramePop(nullptr);
+                    //GblThread_stackFramePop(nullptr);
                     throw std::exception(gblEx.asStdException());
                 } catch(...) {
                     pException_ = std::current_exception();
@@ -553,7 +563,7 @@ public:
                 throw;
             } catch(...) {
                 pException_ = std::current_exception();
-                //gblThreadStackFramePop(nullptr);
+                //GblThread_stackFramePop(nullptr);
                 throw;
             }
             AssertMgr::get(&asserted_, &assertMsg_);
@@ -568,7 +578,7 @@ public:
         return getRecord().getResult().isSuccess() && !didAssert() && !didThrow();
     }
 
-    std::string_view getName(void) const { return name_; }
+    const char* getName(void) const { return name_.c_str(); }
     GblObject* getObject(void) const { return pObject_; }
     MonitorableContext* getContext(void) const {
         return dynamic_cast<MonitorableContext*>(Context::fromGblObj(GblObject_contextFind(getObject())));
@@ -584,7 +594,7 @@ public:
     decltype(auto) getLastCallRecord(void) const { return getContext()->getCallRecord(); }
 
     bool didAssert(void) const { return asserted_; }
-    std::string_view getAssertMessage(void) const { return assertMsg_; }
+    const char* getAssertMessage(void) const { return assertMsg_.c_str(); }
 
     bool didThrow(void) const { return static_cast<bool>(pException_); }
     std::exception_ptr getExceptionPtr(void) const { return pException_; }
@@ -602,29 +612,39 @@ public:
     UnitTestSet(MonitorableContext* pCtx=nullptr):
         pCtx_(pCtx? pCtx : new gimbal::test::TestContext()) {}
 
+    ~UnitTestSet(void) {}
+
     void verifyBlock(const ApiBlock& block, const ConfigOptions& config, Result result, QString message=QString()) {
         const auto resultType = static_cast<uint8_t>(result.getType());
         QCOMPARE(block.getRecord().getResult(), result);
-        if(!message.isNull()) QCOMPARE(block.getRecord().getMessage().data(), message);
+        if(!message.isNull()) QCOMPARE(block.getRecord().getMessage(), message);
 
         QCOMPARE(block.getCountersDelta().getLog(config.logLevels[resultType]), config.logEnabled[resultType]? 1 : 0);
 
         if(config.recordEnabled[resultType]) {
             QCOMPARE(block.getLastCallRecord().getResult(), result);
-            if(!message.isNull()) QCOMPARE(block.getLastCallRecord().getMessage().data(), message);
+            if(!message.isNull()) QCOMPARE(block.getLastCallRecord().getMessage(), message);
         } else {
             QVERIFY(block.getLastCallRecord().getResult().isUnknown());
-            if(!message.isNull()) QCOMPARE(block.getLastCallRecord().getMessage().data(), "");
+            if(!message.isNull()) QCOMPARE(block.getLastCallRecord().getMessage(), "");
         }
 
         if(config.assertEnabled[resultType]) {
             QVERIFY(block.didAssert());
-            if(!message.isNull()) QCOMPARE(block.getAssertMessage().data(), message);
+            if(!message.isNull()) QCOMPARE(block.getAssertMessage(), message);
         } else QVERIFY(!block.didAssert());
     }
 
+    void qVerify(bool statement, const char* pString, const char* pDescription, const char* pFile, int line) {
+        QTest::qVerify(statement, pString, pDescription, pFile, line);
+    }
+
     void verifyResult(Result result) {
-        QVERIFY(result.isSuccess());
+        qVerify(result.isSuccess(),
+                result.toString(),
+                getContext()->getCallRecord().getMessage(),
+                getContext()->getCallRecord().getSource().getFilePath(),
+                getContext()->getCallRecord().getSource().getLineNumber());
     }
 
     MonitorableContext* getContext(void) const { return pCtx(); }

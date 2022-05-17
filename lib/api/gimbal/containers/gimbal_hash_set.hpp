@@ -343,9 +343,9 @@ template<typename CRTP, typename K>
 inline auto HashSetBase<CRTP, K>::at(const key_type& key) const -> const_reference {
     const GblCallRecord* pRecord = nullptr;
     const key_type* pKey = nullptr;
-    gblThreadCallRecordSet(NULL, NULL);
+    GblThread_callRecordSet(NULL, NULL);
     pKey = reinterpret_cast<const key_type*>(GblHashSet_at(getSet(), &key));
-    gblThreadCallRecordGet(NULL, &pRecord);
+    pRecord = GblThread_callRecord(NULL);
     Exception::checkThrow(*pRecord);
     return *pKey;
 }
@@ -558,12 +558,10 @@ inline auto HashSet<K, H, P>::get(const key_type& key) noexcept -> pointer {
 
 template<typename K, typename H, typename P>
 inline auto HashSet<K, H, P>::at(const key_type& key) -> reference {
-    const GblCallRecord* pRecord = nullptr;
     key_type* pKey = nullptr;
-    gblThreadCallRecordSet(NULL, NULL);
+    GblThread_callRecordSet(NULL, NULL);
     pKey = reinterpret_cast<key_type*>(GblHashSet_at(this, &key));
-    gblThreadCallRecordGet(NULL, &pRecord);
-    Exception::checkThrow(*pRecord);
+    Exception::checkThrow(*GblThread_callRecord(NULL));
     return *pKey;
 }
 

@@ -28,11 +28,11 @@ typedef struct GblString {
 
 
 GBL_INLINE GBL_API gblStringIsEmpty(const GblString* pStr, GblBool* pResult) {
-    return gblVectorIsEmpty(&pStr->data, pResult);
+    return GblVector_empty(&pStr->data, pResult);
 }
 
 GBL_INLINE GBL_API gblStringIsStack(const GblString* pStr, GblBool* pResult) {
-    return gblVectorIsStack(&pStr->data, pResult);
+    return GblVector_stack(&pStr->data, pResult);
 }
 
 GBL_INLINE GBL_API gblStringCStr(const GblString* pStr, const char** ppStr) {
@@ -43,11 +43,11 @@ GBL_INLINE GBL_API gblStringCStr(const GblString* pStr, const char** ppStr) {
 }
 
 GBL_INLINE GBL_API gblStringDestruct(GblString* pStr) {
-    return gblVectorDestruct(&pStr->data);
+    return GblVector_destruct(&pStr->data);
 }
 
 GBL_INLINE GBL_API gblStringClear(GblString* pStr) {
-    return gblVectorClear(&pStr->data);
+    return GblVector_clear(&pStr->data);
 }
 
 GBL_INLINE GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrView) {
@@ -60,7 +60,7 @@ GBL_INLINE GBL_API gblStringAssign(GblString* pStr, const GblStringView* pStrVie
             newSize = pStrView->size? pStrView->size : strlen(pStrView->pBuffer);
         }
     }
-    GBL_API_CALL(gblVectorAssign(&pStr->data, pData, newSize));
+    GBL_API_CALL(GblVector_assign(&pStr->data, pData, newSize));
     GBL_API_END();
 }
 
@@ -75,45 +75,45 @@ GBL_INLINE GBL_API gblStringConstruct(GblString* pString, GblSize size, GblConte
         defaultView.size = strlen(pView->pBuffer);
         pView = &defaultView;
     }
-    GBL_API_CALL(gblVectorConstruct_6(&pString->data, pCtx, 1, size, pView->pBuffer, pView->size));
+    GBL_API_CALL(GblVector_construct_6(&pString->data, pCtx, 1, size, pView->pBuffer, pView->size));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringTake(GblString* pStr, char** ppStrPtr, GblSize* pCapacity) {
     GblSize size = 0;
-    return gblVectorTake(&pStr->data, (void**)ppStrPtr, &size, pCapacity);
+    return GblVector_take(&pStr->data, (void**)ppStrPtr, &size, pCapacity);
 }
 
 GBL_INLINE GBL_API gblStringGive(GblString* pStr, char* pData, GblSize capacity) {
     GBL_API_BEGIN(pStr->data.pCtx);
     if(!capacity) capacity = strlen(pData);
-    GBL_API_CALL(gblVectorGive(&pStr->data, pData, capacity, capacity));
+    GBL_API_CALL(GblVector_give(&pStr->data, pData, capacity, capacity));
     pStr->data.size = strlen((const char*)pStr->data.pBuffer);
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblStringContext(const GblString* pStr, GblContext** pCtx) {
-    return gblVectorContext(&pStr->data, pCtx);
+    return GblVector_context(&pStr->data, pCtx);
 }
 
 GBL_INLINE GBL_API gblStringStackBytes(const GblString* pStr, GblSize* pSize) {
-    return gblVectorStackBytes(&pStr->data, pSize);
+    return GblVector_stackBytes(&pStr->data, pSize);
 }
 
 GBL_INLINE GBL_API gblStringLength(const GblString* pStr, GblSize* pLength) {
-    return gblVectorSize(&pStr->data, pLength);
+    return GblVector_size(&pStr->data, pLength);
 }
 
 GBL_INLINE GBL_API gblStringCapacity(const GblString* pStr, GblSize* pCapacity) {
-    return gblVectorCapacity(&pStr->data, pCapacity);
+    return GblVector_capacity(&pStr->data, pCapacity);
 }
 
 GBL_INLINE GBL_API gblStringReserve(GblString* pStr, GblSize capacity) {
-    return gblVectorReserve(&pStr->data, capacity);
+    return GblVector_reserve(&pStr->data, capacity);
 }
 
 GBL_INLINE GBL_API gblStringResize(GblString* pStr, GblSize size) {
-    return gblVectorResize(&pStr->data, size);
+    return GblVector_resize(&pStr->data, size);
 }
 
 GBL_INLINE GBL_API gblStringCompare(const GblString* pStr1, const GblString* pStr2, GblInt* pResult) {
@@ -146,7 +146,7 @@ GBL_INLINE GBL_API gblStringInsert(GblString* pStr, GblSize index, const GblStri
         count = strlen(pView->pBuffer);
     }
     GBL_API_VERIFY_EXPRESSION(count != 0);
-    GBL_API_CALL(gblVectorInsert(&pStr->data, index, count, pView->pBuffer, NULL));
+    GBL_API_CALL(GblVector_insert(&pStr->data, index, count, pView->pBuffer, NULL));
     GBL_API_END();
 }
 
@@ -305,7 +305,7 @@ GBL_INLINE GBL_API gblStringFromp(GblString* pStr, const void* pPtr) {
 
 GBL_INLINE GBL_API gblStringConcat(GblString* pStr, const char* pOther) {
     GBL_API_BEGIN(NULL);
-    GBL_API_CALL(gblVectorConcat(&pStr->data, pOther, strlen(pOther)));
+    GBL_API_CALL(GblVector_append(&pStr->data, pOther, strlen(pOther)));
     GBL_API_END();
 }
 

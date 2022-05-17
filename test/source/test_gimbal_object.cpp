@@ -56,7 +56,7 @@ static GBL_RESULT TestObject_IEventFilter_filterEvent(GblIEventFilter* pFilter, 
 
 static GBL_RESULT TestObject_constructor(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_SUPER(pSelf));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_CLASS_SUPER(pSelf));
     pParentClass->pFnConstructor(pSelf);
     TestObject* pTest = TEST_OBJECT(pSelf);
     pTest->floater = -NAN;
@@ -66,14 +66,14 @@ static GBL_RESULT TestObject_constructor(GblObject* pSelf) {
 
 static GBL_RESULT TestObject_constructed(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_SUPER(pSelf));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_CLASS_SUPER(pSelf));
     if(pParentClass->pFnConstructed) pParentClass->pFnConstructed(pSelf);
     GBL_API_END();
 }
 
 static GBL_RESULT TestObject_destructor(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_SUPER(pSelf));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_CLASS_SUPER(pSelf));
     pParentClass->pFnDestructor(pSelf);
     GBL_API_END();
 }
@@ -196,7 +196,7 @@ void CObject::newDefault(void) {
     TestObject* pObj = TEST_OBJECT(GblObject_new(TEST_OBJECT_TYPE, NULL));
     pTestObj_ = pObj;
 
-    QCOMPARE(GblClass_refCountFromType(TEST_OBJECT_TYPE), 1);
+    QCOMPARE(GblType_classRefCount(TEST_OBJECT_TYPE), 1);
 
     // validate class
     TestObjectClass* pClass = TEST_OBJECT_GET_CLASS(pObj);
@@ -252,7 +252,7 @@ void CObject::ref(void) {
 void CObject::unref(void) {
     QCOMPARE(GblObject_unref(GBL_OBJECT(pTestObj_)), 1);
     QCOMPARE(GblObject_unref(GBL_OBJECT(pTestObj_)), 0);
-    QCOMPARE(GblClass_refCountFromType(TEST_OBJECT_TYPE), 0);
+    QCOMPARE(GblType_classRefCount(TEST_OBJECT_TYPE), 0);
 
     // K now replace what we deleted... lulz.
     pTestObj_ = nullptr;
@@ -357,8 +357,7 @@ void CObject::newInPlaceVaArgsWithClassInPlace(void) {
                                                 "userdata", (void*)0xdeadbeef,
                                                 NULL));
 
-    verifyResult(GblObject_attributeSet(GBL_OBJECT(&obj), GBL_OBJECT_ATTRIBUTE_CLASS_OWNED, GBL_TRUE));
-    verifyResult(GblObject_attributeSet(GBL_OBJECT(&obj), GBL_OBJECT_ATTRIBUTE_CLASS_CONSTRUCTED_IN_PLACE, GBL_TRUE));
+    verifyResult(GblInstance_classSink(GBL_INSTANCE(&obj)));
 
     QCOMPARE(GblObject_name(GBL_OBJECT(&obj)),              "Fuckwad");
     QCOMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);

@@ -39,10 +39,10 @@ extern GBL_RESULT GblIAllocator_typeRegister_(GblIAllocator* pCtx) GBL_NOEXCEPT 
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_IALLOCATOR,
       GBL_INTERFACE_TYPE,
       GblQuark_internStringStatic("IAllocator"),
-      &((const GblTypeInfo) {
+      &(const GblTypeInfo) {
           .pFnClassInit     = (GblTypeClassInitializeFn)GblIAllocatorIFace_init_,
           .classSize        = sizeof(GblIAllocatorIFace)
-      }),
+      },
       GBL_TYPE_FLAGS_NONE);
     GBL_API_END();
 }

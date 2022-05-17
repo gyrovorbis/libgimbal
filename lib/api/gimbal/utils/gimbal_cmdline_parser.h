@@ -66,18 +66,18 @@ GBL_INLINE GBL_API gblCmdLineParserConstruct(GblCmdLineParser* pParser, GblConte
     GBL_API_VERIFY_POINTER(pParser);
     memset(pParser, 0, sizeof(GblCmdLineParser));
     pParser->hCtx = hCtx;
-    GBL_API_CALL(gblVectorConstruct(&pParser->positionalArgs, hCtx, sizeof(GblCmdLinePositionalArg),    NULL, 0, GBL_CMDLINE_PARSER_POSITIONAL_ARG_VECTOR_INITIAL_CAPACITY));
-    GBL_API_CALL(gblVectorConstruct(&pParser->options,        hCtx, sizeof(GblCmdLineOption),           NULL, 0, GBL_CMDLINE_PARSER_OPTION_VECTOR_INITIAL_CAPACITY));
-    GBL_API_CALL(gblVectorConstruct(&pParser->unknownOptions, hCtx, sizeof(GblCmdLineOption),           NULL, 0, GBL_CMDLINE_PARSER_UNKNOWN_OPTION_VECTOR_INITIAL_CAPACITY));
+    GBL_API_CALL(GblVector_construct(&pParser->positionalArgs, hCtx, sizeof(GblCmdLinePositionalArg),    NULL, 0, GBL_CMDLINE_PARSER_POSITIONAL_ARG_VECTOR_INITIAL_CAPACITY));
+    GBL_API_CALL(GblVector_construct(&pParser->options,        hCtx, sizeof(GblCmdLineOption),           NULL, 0, GBL_CMDLINE_PARSER_OPTION_VECTOR_INITIAL_CAPACITY));
+    GBL_API_CALL(GblVector_construct(&pParser->unknownOptions, hCtx, sizeof(GblCmdLineOption),           NULL, 0, GBL_CMDLINE_PARSER_UNKNOWN_OPTION_VECTOR_INITIAL_CAPACITY));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_API gblCmdLineParserDestruct(GblCmdLineParser* pParser) {
     GBL_ASSERT(pParser);
     GBL_API_BEGIN(pParser->hCtx);
-    GBL_API_CALL(gblVectorDestruct(&pParser->positionalArgs));
-    GBL_API_CALL(gblVectorDestruct(&pParser->options));
-    GBL_API_CALL(gblVectorDestruct(&pParser->unknownOptions));
+    GBL_API_CALL(GblVector_destruct(&pParser->positionalArgs));
+    GBL_API_CALL(GblVector_destruct(&pParser->options));
+    GBL_API_CALL(GblVector_destruct(&pParser->unknownOptions));
     GBL_API_END();
 }
 
@@ -89,7 +89,7 @@ GBL_INLINE GBL_API gblCmdLineParserPositionalArgAdd(GblCmdLineParser* pParser, c
     GBL_API_BEGIN(pParser->hCtx);
     GBL_API_VERIFY_POINTER(pName);
     GBL_API_VERIFY_POINTER(pDesc);
-    GBL_API_CALL(gblVectorPushBack(&pParser->positionalArgs, &arg));
+    GBL_API_CALL(GblVector_pushBack(&pParser->positionalArgs, &arg));
     GBL_API_END();
 }
 
@@ -104,7 +104,7 @@ GBL_INLINE GBL_API gblCmdLineParserOptionAdd(GblCmdLineParser* pParser, const ch
     GBL_API_VERIFY_POINTER(pOptionShort);
     GBL_API_VERIFY_POINTER(pOptionLong);
     //GBL_API_VERIFY_POINTER(pDefaultValue);
-    GBL_API_CALL(gblVectorPushBack(&pParser->options, &option));
+    GBL_API_CALL(GblVector_pushBack(&pParser->options, &option));
     GBL_API_END();
 }
 
@@ -124,9 +124,9 @@ GBL_INLINE GBL_API gblCmdLineParserOptionValue(const GblCmdLineParser* pParser, 
     GBL_API_BEGIN(pParser->hCtx);
     GBL_API_VERIFY_POINTER(pOptionName);
     GBL_API_VERIFY_POINTER(ppValue);
-    GBL_API_CALL(gblVectorSize(&pParser->options, &size));
+    GBL_API_CALL(GblVector_size(&pParser->options, &size));
     for(GblSize o = 0; o < size; ++o) {
-        GBL_API_CALL(gblVectorAt(&pParser->options, &pOption));
+        GBL_API_CALL(GblVector_at(&pParser->options, &pOption));
         GBL_API_VERIFY_POINTER(pOption);
         if(strcmp(pOption->pName, pOptionName) == 0) {
             *ppValue = pOption->pValue? pOption->pValue : pOption->pDefaultValue;
@@ -144,9 +144,9 @@ GBL_INLINE GBL_API gblCmdLineParserPositionalArgValue(const GblCmdLineParser* pP
     GBL_ASSERT(pParser);
     GBL_API_BEGIN(pParser->hCtx);
     GBL_API_VERIFY_POINTER(ppValue);
-    GBL_API_CALL(gblVectorSize(&pParser->positionalArgs, &size));
+    GBL_API_CALL(GblVector_size(&pParser->positionalArgs, &size));
     GBL_API_VERIFY(argPos < size, GBL_RESULT_ERROR_INVALID_CMDLINE_ARG, "Index %u is out of range!", argPos);
-    GBL_API_CALL(gblVectorAt(&pParser->positionalArgs, &pArg));
+    GBL_API_CALL(GblVector_at(&pParser->positionalArgs, &pArg));
     GBL_API_VERIFY_POINTER(pArg);
     *ppValue = pArg->pValue;
     GBL_API_END();
@@ -160,9 +160,9 @@ GBL_INLINE GBL_API gblCmdLineParserUnknownOption(const GblCmdLineParser* pParser
     GBL_API_BEGIN(pParser->hCtx);
     GBL_API_VERIFY_POINTER(ppOptionName);
     *ppOptionName = NULL;
-    GBL_API_CALL(gblVectorSize(&pParser->unknownOptions));
+    GBL_API_CALL(GblVector_size(&pParser->unknownOptions));
     GBL_API_VERIFY(index < size, GBL_RESULT_ERROR_INVALID_CMDLINE_ARG, "Index %u is out of range!", index);
-    GBL_API_CALL(gblVectorAt(&pParser->unknownOptions, index));
+    GBL_API_CALL(GblVector_at(&pParser->unknownOptions, index));
     *ppOptionName = pOption->pName;
     GBL_API_END();
 }
@@ -198,10 +198,10 @@ GBL_INLINE GBL_API gblCmdLineParserParse(GblCmdLineParser* pParser, int argc, co
 
             GblSize optionSize = 0;
             GblCmdLineOption* pOption = NULL;
-            GBL_API_CALL(gblVectorSize(&pParser->options, &optionSize));
+            GBL_API_CALL(GblVector_size(&pParser->options, &optionSize));
 
             for(GblSize o = 0; o < optionSize; ++o) {
-                GBL_API_CALL(gblVectorAt(&pParser->options, &pOption));
+                GBL_API_CALL(GblVector_at(&pParser->options, &pOption));
                 GBL_API_VERIFY_POINTER(pOption);
 
                 if((!shortOption && strcmp(pOption->pOptionLong, pOptionBuff) == 0)
@@ -214,7 +214,7 @@ GBL_INLINE GBL_API gblCmdLineParserParse(GblCmdLineParser* pParser, int argc, co
 
             if(!found) {
                 GblCmdLineOption option = { pOptionBuff, NULL, pOptionBuff, pOptionBuff, NULL, ppArgv[a+1] };
-                GBL_API_CALL(gblVectorPushBack(&pParser->unknownOptions, &option));
+                GBL_API_CALL(GblVector_pushBack(&pParser->unknownOptions, &option));
                 ++unknownOptionCount;
             } else {
                 if(strcmp(pOption->pName, "help") == 0) {
@@ -228,13 +228,13 @@ GBL_INLINE GBL_API gblCmdLineParserParse(GblCmdLineParser* pParser, int argc, co
         } else { // positional arguments
             GblCmdLinePositionalArg* pArg = NULL;
             GblSize size = 0;
-            GBL_API_CALL(gblVectorSize(&pParser->positionalArgs));
+            GBL_API_CALL(GblVector_size(&pParser->positionalArgs));
             if(positionalArgCount < size) {
-                GBL_API_CALL(gblVectorAt(&pParser->positionalArgs, positionalArgCount, &pArg));
+                GBL_API_CALL(GblVector_at(&pParser->positionalArgs, positionalArgCount, &pArg));
                 pArg->pValue = pArgv;
             } else {
                 GblCmdLinePositionalArg arg = {NULL, NULL, pArgv};
-                GBL_API_CALL(gblVectorPushBack(&pParser->positionalArgs, &arg));
+                GBL_API_CALL(GblVector_pushBack(&pParser->positionalArgs, &arg));
                 ++newPositionalArgCount;
             }
             ++positionalArgCount;

@@ -6,12 +6,12 @@
 extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_IVARIANT,
-    GBL_INTERFACE_TYPE,
-    GblQuark_internStringStatic("IVariant"),
-    &((const GblTypeInfo) {
-        .classSize    = sizeof(GblIVariantIFace)
-    }),
-    GBL_TYPE_FLAG_ABSTRACT);
+                            GBL_INTERFACE_TYPE,
+                            GblQuark_internStringStatic("IVariant"),
+                            &((const GblTypeInfo) {
+                                .classSize    = sizeof(GblIVariantIFace)
+                            }),
+                            GBL_TYPE_FLAG_ABSTRACT);
     GBL_API_END();
 }
 

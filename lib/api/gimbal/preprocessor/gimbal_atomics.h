@@ -4,6 +4,13 @@
 #include "gimbal_compiler.h"
 
 
+#if 1
+#   define GBL_ATOMIC_INT16                    volatile int16_t
+#   define GBL_ATOMIC_INT16_INIT(a, v)         do { a = v; } while(0)
+#   define GBL_ATOMIC_INT16_LOAD(a)            a
+#   define GBL_ATOMIC_INT16_INC(a)             a++
+#   define GBL_ATOMIC_INT16_DEC(a)             a--
+#else
 #ifdef _WIN32
 #   define NOGDI
 #   include <windows.h>
@@ -29,6 +36,7 @@
 #       define GBL_ATOMIC_INT16_INC(a)        atomic_fetch_add(&a, 1)
 #       define GBL_ATOMIC_INT16_DEC(a)        atomic_fetch_sub(&a, 1)
 #   endif
+#endif
 #endif
 
 #endif // GIMBAL_ATOMICS_H

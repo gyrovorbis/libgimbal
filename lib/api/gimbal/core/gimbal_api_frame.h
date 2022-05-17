@@ -262,7 +262,19 @@ extern "C" {
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_TYPE, GBL_VA_OVERLOAD_SUFFIXER_3_N, src_, __VA_ARGS__)(src_, __VA_ARGS__); \
     } GBL_STMT_END
 
+//==== LAST RECORD =====
+#define GBL_API_VERIFY_LAST_RECORD()                        \
+    GBL_STMT_START {                                        \
+        const GblCallRecord* pRecord =                      \
+            GblThread_callRecord(NULL);                     \
+        if(pRecord && GBL_RESULT_ERROR(pRecord->result)) {  \
+            GBL_API_RESULT() = pRecord->result;             \
+            GBL_API_DONE();                                 \
+        }                                                   \
+    } GBL_STMT_END
 
+#define GBL_API_CLEAR_LAST_RECORD()                         \
+    GblThread_callRecordSet(NULL, NULL)
 
 #ifdef GBL_CONFIG_ERRNO_CHECKS
 #define     GBL_API_ERRNO_CLEAR()   errno = 0
@@ -382,7 +394,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
 #define GBL_API_PUSH_(srcLoc, ...) \
     GBL_STMT_START {    \
         GBL_API_SOURCE_LOC_PUSH(srcLoc);   \
-        GBL_ASSERT(GBL_RESULT_SUCCESS(gblThreadLogPush(NULL))); \
+        GBL_ASSERT(GBL_RESULT_SUCCESS(GblThread_logPush(NULL))); \
         GBL_API_EXT(LOG_PUSH);  \
         GBL_API_SOURCE_POP();  \
         ++GBL_API_FRAME()->stackDepth;   \
@@ -407,7 +419,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
     } GBL_STMT_END
 
 #define GBL_API_POP_2(srcLoc, count) \
-        GBL_ASSERT(GBL_RESULT_SUCCESS(gblThreadLogPop(NULL, count))); \
+        GBL_ASSERT(GBL_RESULT_SUCCESS(GblThread_logPop(NULL, count))); \
         GBL_API_SOURCE_SCOPED(GBL_API_EXT, srcLoc, LOG_POP, count); \
         GBL_API_FRAME()->stackDepth -= count;
 
@@ -519,8 +531,8 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         GBL_STMT_START {                                            \
             if(GBL_RESULT_##prefix(record->result)) GBL_UNLIKELY {  \
                 GBL_API_LOG(GBL_CONFIG_LOG_##prefix##_LEVEL,        \
-                            "Result: %x, Message: %s",              \
-                             record->result, record->message);      \
+                            "%s: %s",              \
+                             gblResultString(record->result), record->message);      \
             }                                                       \
         } GBL_STMT_END
 
@@ -559,9 +571,9 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_API_RECORD_LAST_RECORD_(prefix, record)                             \
     GBL_STMT_START {                                                            \
         if(GBL_RESULT_##prefix(record->result)) {                               \
-            GBL_ASSERT(gblExtCallRecordSet(GBL_API_FRAME(), record),       \
+            GBL_ASSERT(gblExtCallRecordSet(GBL_API_FRAME(), record),            \
                         "Context Last error failed!");                          \
-            GBL_ASSERT(gblThreadCallRecordSet(NULL, record),                    \
+            GBL_ASSERT(GblThread_callRecordSet(NULL, record),                    \
                 "Thread Last error failed!");                                   \
         }                                                                       \
     } GBL_STMT_END
@@ -593,11 +605,11 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 
 // ================= RECORD => TOP-LEVEL DISPATCH ==============
-#define GBL_API_RECORD_HANDLER(record)              \
-    GBL_STMT_START {                                \
-            GBL_API_RECORD_LOG((record));           \
-            GBL_API_RECORD_LAST_RECORD((record));   \
-        GBL_API_RECORD_ASSERT((record));            \
+#define GBL_API_RECORD_HANDLER(record)                \
+    GBL_STMT_START {                                  \
+            GBL_API_RECORD_LOG((record));             \
+            GBL_API_RECORD_LAST_RECORD((record));     \
+            GBL_API_RECORD_ASSERT((record));          \
     } GBL_STMT_END
 
 #define GBL_API_RECORD_SET_N(file, func, line, col, result, ...)                                                    \
@@ -623,18 +635,25 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         GBL_API_SOURCE_LOC_PUSH(src);                                           \
         GBL_MAYBE_UNUSED const GBL_RESULT localResult = (funcCall);             \
         if(!GBL_RESULT_SUCCESS(localResult)) GBL_UNLIKELY {                     \
-            GBL_API_RECORD_SET(localResult GBL_VA_ARGS(__VA_ARGS__));           \
+            GBL_API_RESULT() = localResult;                                     \
         }                                                                       \
         GBL_API_SOURCE_POP();                                                   \
     } GBL_STMT_END
 
 #define GBL_API_CALL_2(src, funcCall) \
-    GBL_API_CALL_N(src, funcCall, "Call[%s] -> Result[%s]", #funcCall, gblResultString(localResult));
+    GBL_API_CALL_N(src, funcCall, #funcCall);
 
 #define GBL_API_CALL(...) \
     GBL_STMT_START {    \
         const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
         GBL_VA_OVERLOAD_SELECT(GBL_API_CALL, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
+    } GBL_STMT_END
+
+#define GBL_API_VERIFY_CALL(...) \
+    GBL_STMT_START {    \
+        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        GBL_VA_OVERLOAD_SELECT(GBL_API_CALL, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
+        if(!GBL_RESULT_SUCCESS(GBL_API_RESULT())) goto GBL_API_END_LABEL; \
     } GBL_STMT_END
 
 
@@ -645,7 +664,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     const SrcLoc gblApiEntrySrcLoc_ = SRC_LOC(file, func, line, col); \
     GBL_API_FRAME_DECLARE = frame;   \
     GBL_API_STACK_FRAME_CONSTRUCT(GBL_API_FRAME(), (GblObject*)pObject, GBL_RESULT_SUCCESS, gblApiEntrySrcLoc_); \
-    GBL_ASSERT(GBL_RESULT_SUCCESS(gblThreadStackFramePush(NULL, GBL_API_FRAME())))
+    GBL_ASSERT(GBL_RESULT_SUCCESS(GblThread_stackFramePush(NULL, GBL_API_FRAME())))
 
 #define GBL_API_BEGIN_LOG_5(file, func, line, col, hHandle)  \
     GBL_API_BEGIN_FRAME(file, func, line, col, hHandle, ((GblStackFrame*)GBL_ALLOCA(sizeof(GblStackFrame))))
@@ -665,7 +684,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     GBL_LABEL_EMPTY(GBL_API_END_LABEL);                 \
         if(GBL_API_FRAME()->stackDepth)                 \
             GBL_API_POP(GBL_API_FRAME()->stackDepth);   \
-    GBL_ASSERT(GBL_RESULT_SUCCESS(gblThreadStackFramePop(NULL)))
+    GBL_ASSERT(GBL_RESULT_SUCCESS(GblThread_stackFramePop(NULL)))
 
 #define GBL_API_END()               \
         GBL_API_END_BLOCK();        \

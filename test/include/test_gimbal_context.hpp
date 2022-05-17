@@ -318,24 +318,25 @@ private slots:
     void recordSet(void) {
 #define RUN_TEST_SET(options)                                                           \
         [&](const ConfigOptions& options) {                                             \
-            auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "RESULT_SET_1") {                         \
+            auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "RESULT_SET_1") {               \
                 GBL_API_RECORD_SET(GBL_RESULT_UNKNOWN);                                 \
             };                                                                          \
             verifyBlock(test, options, Result::Unknown, "Unknown");                     \
                                                                                         \
-            test = GBL_TEST_CASE_API_BLOCK(pCtx_, "RESULT_SET_2") {                               \
+            test = GBL_TEST_CASE_API_BLOCK(pCtx_, "RESULT_SET_2") {                     \
                 GBL_API_RECORD_SET(GBL_RESULT_SUCCESS, "WORX!");                        \
             };                                                                          \
             verifyBlock(test, options, Result::Success, "WORX!");                       \
                                                                                         \
-            test = GBL_TEST_CASE_API_BLOCK(pCtx_, "RESULT_SET_N") {                               \
+            test = GBL_TEST_CASE_API_BLOCK(pCtx_, "RESULT_SET_N") {                     \
                 GBL_API_RECORD_SET(GBL_RESULT_TRUNCATED, "Reested to %s.", "fuck");     \
             };                                                                          \
             verifyBlock(test, options, Result::Truncated, "Reested to fuck.");          \
                                                                                         \
-            test = GBL_TEST_CASE_API_BLOCK(pCtx_, "RESULT_SET_N") {                               \
+            test = GBL_TEST_CASE_API_BLOCK(pCtx_, "RESULT_SET_N") {                     \
                 GBL_API_RECORD_SET(GBL_RESULT_ERROR_INTERNAL, "Error: %s",              \
-                                    Result(Result::ErrorInternal).toString().data());   \
+                                    Result(Result::ErrorInternal).toString());          \
+                GBL_API_CLEAR_LAST_RECORD();                                            \
             };                                                                          \
             verifyBlock(test, options, Result::ErrorInternal, "Error: Internal Error"); \
         }((options))
@@ -617,7 +618,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
             GBL_API_END();
         };
         QVERIFY(!test.didThrow());
-        QString message = test.getRecord().getMessage().data();
+        QString message = test.getRecord().getMessage();
         verifyBlock(test, GBL_CONFIG_OPTIONS_DECL(), GBL_RESULT_ERROR_OUT_OF_RANGE);
 
         auto block = GBL_API_TRY_BLOCK {
@@ -636,7 +637,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
             QFAIL("Expected Exception!");
         } catch(const gimbal::Exception& gblExcept) {
             QCOMPARE(gblExcept.getResult(), Result::ErrorOutOfRange);
-            QCOMPARE(gblExcept.getMessage().data(), message);
+            QCOMPARE(gblExcept.getMessage(), message);
         }
 
 #if 0

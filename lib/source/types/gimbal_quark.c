@@ -1,7 +1,11 @@
 #include <gimbal/types/gimbal_quark.h>
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
-#define NOGDI
+#ifdef _WIN32
+#   define NOGDI
+# else
+#   define __USE_UNIX98
+#endif
 #include <tinycthread.h>
 
 #define GBL_QUARK_PAGE_SIZE_DEFAULT_            1024
@@ -164,13 +168,13 @@ GBL_EXPORT GblQuark GblQuark_tryString(const char* pString) GBL_NOEXCEPT {
         pQuark = (GblQuark*)GblHashSet_get(&registry_, &pString);
         if(pQuark) quark = *pQuark;
         mtx_unlock(&registryMtx_);
-        GBL_API_END_BLOCK();
     }
+    GBL_API_END_BLOCK();
     return quark;
 }
 
 const char* quarkStringAllocCopy_(const char* pString) {
-    const char* pNewString = NULL;
+    char* pNewString = NULL;
     GBL_API_BEGIN(pCtx_); {
         GBL_API_VERIFY_POINTER(pString);
         GblSize size = strlen(pString) + 1;
@@ -207,8 +211,8 @@ GBL_EXPORT GblQuark quarkFromString_(const char* pString, GblBool alloc) GBL_NOE
                            "[GblQuark]: Failed to add string to hash map: %s", pString);
             quark = (GblQuark)pString;
         }
-        GBL_API_END_BLOCK();
     }
+    GBL_API_END_BLOCK();
     return quark;
 }
 

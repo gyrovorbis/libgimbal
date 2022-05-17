@@ -14,7 +14,7 @@ typedef struct GblProperty_ {
     union {
         struct {
             GblType                 valueType;
-            GBL_PROPERTY_FLAGS      flags;
+            GblFlags                flags;
             GblSize                 id;
         };
         struct {
@@ -155,7 +155,7 @@ GBL_EXPORT GblBool gblPropertyTableErase(GblType objectType, GblQuark name) GBL_
     GblProperty* pFirst = propertyRoot_(objectType);
     GBL_API_VERIFY_POINTER(pFirst);
 
-    GBL_PROPERTY_FLAGS flagsAccum = 0;
+    GblFlags flagsAccum = 0;
     GblProperty* pIt    = pFirst;
     GblProperty* pPrev  = NULL;
     GblProperty* pTarget = NULL;

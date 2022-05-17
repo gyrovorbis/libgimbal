@@ -21,11 +21,11 @@ public:
         memcpy(this, &rhs, sizeof(GblSourceLocation));
     }
 
-    std::string_view    getFilePath(void) const { return pFile; }
-    std::string_view    getFileName(void) const { return pFile; }
-    std::string_view    getFunctionName(void) const { return pFunc; }
-    GblSize             getLineNumber(void) const { return line; }
-    GblSize             getColumn(void) const { return column; }
+    const char*    getFilePath(void) const { return pFile; }
+    const char*    getFileName(void) const { return pFile; }
+    const char*    getFunctionName(void) const { return pFunc; }
+    GblSize        getLineNumber(void) const { return line; }
+    GblSize        getColumn(void) const { return column; }
 
     bool                isValid(void) const;
     std::string         toPrettyString(void) const;
@@ -59,7 +59,7 @@ public:
     }
 
 
-    std::string_view    getMessage(void) const { return message; }
+    const char*         getMessage(void) const { return message; }
     std::string         getSourceString(void) const;
 
     std::string         toString(void) const;
@@ -99,7 +99,7 @@ GBL_CHECK_C_CPP_TYPE_COMPAT(StackFrame, GblStackFrame);
 
 
 inline CallRecord::CallRecord(Result result, const char* pMessage, GblObject* pObject, SourceLocation srcLoc) noexcept {
-    GBL_CALL_RECORD_CONSTRUCT(this, pObject, result.getCode(), srcLoc, "%s", pMessage? pMessage : result.toString().data());
+    GBL_CALL_RECORD_CONSTRUCT(this, pObject, result.getCode(), srcLoc, "%s", pMessage? pMessage : result.toString());
 }
 
 

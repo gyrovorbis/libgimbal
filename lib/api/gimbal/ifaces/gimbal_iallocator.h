@@ -27,8 +27,6 @@ typedef struct GblIAllocatorIFace {
     GBL_RESULT (*pFnFree)       (SELF, const GblStackFrame* pStackFrame, void* pData);
 } GblIAllocatorIFace;
 
-
-
 GBL_RESULT GblIAllocator_alloc  (SELF,
                                  const GblStackFrame* pStackFrame,
                                  GblSize size,
@@ -44,8 +42,6 @@ GBL_RESULT GblIAllocator_realloc(SELF,
 GBL_RESULT GblIAllocator_free   (SELF,
                                  const GblStackFrame* pStackFrame,
                                  void* pData)                       GBL_NOEXCEPT;
-
-
 
 GBL_DECLS_END
 

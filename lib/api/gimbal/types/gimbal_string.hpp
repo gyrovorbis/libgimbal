@@ -345,7 +345,7 @@ public:
 
     void concat(std::string_view view) {
         //insert(cend(), view.data(), view.size());
-        Exception::checkThrow(gblVectorConcat(&this->data, view.data(), view.size()));
+        Exception::checkThrow(GblVector_append(&this->data, view.data(), view.size()));
     }
 
     String& vasprintf(const char* pFmt, va_list varArgs) {

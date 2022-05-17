@@ -26,7 +26,6 @@ typedef struct GblITableIFace {
     GBL_RESULT (*pFnNextIndex)(CSELF, const GblVariant* pKey, GblVariant* pNextKey, GblVariant* pNextValue);
 } GblITableIFace;
 
-
 GBL_EXPORT GblType  GblITable_type(void) GBL_NOEXCEPT;
 GBL_API             GblITable_index(CSELF, const GblVariant* pKey, GblVariant* pValue) GBL_NOEXCEPT;
 GBL_API             GblITable_newIndex(SELF, const GblVariant* pKey, const GblVariant* pValue) GBL_NOEXCEPT;

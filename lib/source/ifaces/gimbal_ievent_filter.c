@@ -18,9 +18,9 @@ extern GBL_RESULT GblIEventFilter_typeRegister_(GblContext* pCtx) {
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_IEVENT_FILTER,
                             GBL_INTERFACE_TYPE,
                            GblQuark_internStringStatic("IEventFilter"),
-                           &((const GblTypeInfo) {
+                           &(const GblTypeInfo) {
                                .classSize    = sizeof(GblIEventFilterIFace),
-                           }),
+                           },
                            GBL_TYPE_FLAG_ABSTRACT);
 
     GBL_API_END();

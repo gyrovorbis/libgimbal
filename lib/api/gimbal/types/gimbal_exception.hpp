@@ -6,6 +6,7 @@
 #include "../core/gimbal_call_stack.hpp"
 #include "../core/gimbal_api_generators.hpp"
 #include "../types/gimbal_result.hpp"
+#include "../core/gimbal_api_frame.h"
 
 namespace gimbal {
 
@@ -20,7 +21,7 @@ public:
         CallRecord(std::move(record)) {}
 
     virtual const char* what(void) const noexcept {
-        return getMessage().data();
+        return getMessage();
     }
 
     virtual const std::exception&   asStdException(void) const = 0;
@@ -30,6 +31,7 @@ public:
 
     static const CallRecord& checkThrow(const CallRecord& record) {
         if(record.getResult().isError()) {
+            GBL_API_CLEAR_LAST_RECORD();
             return throwException(record);
         }
         return record;
@@ -53,7 +55,7 @@ public:
         const CallRecord& getRecord(void) const { return record_; }
         Result getResult(void) const { return getRecord().getResult(); }
         const SourceLocation& getSource(void) const {return getRecord().getSource(); }
-        const char* getMessage(void) const { return getRecord().getMessage().data(); }
+        const char* getMessage(void) const { return getRecord().getMessage(); }
 
         operator bool() const { return getRecord().getResult().isSuccess(); }
     };
@@ -79,7 +81,7 @@ public:
     requires std::is_constructible_v<CallRecord,V> && std::is_constructible_v<StdType, const char*>
     StdException(V&& v) noexcept:
         Exception(std::move(v)),
-        StdType(getMessage().data()) {}
+        StdType(getMessage()) {}
 
     virtual ~StdException(void) override = default;
 

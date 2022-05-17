@@ -8,12 +8,11 @@ extern GBL_RESULT GblEvent_typeRegister_(GblEvent* pCtx) GBL_NOEXCEPT {
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_EVENT,
       GBL_INVALID_TYPE,
       GblQuark_internStringStatic("Event"),
-      &((const GblTypeInfo) {
+      &(const GblTypeInfo) {
           .classSize        = sizeof(GblEventClass),
           .instanceSize     = sizeof(GblEvent),
-      }),
+      },
       GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED         |
-      GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE    |
-      GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE);
+      GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE);
     GBL_API_END();
 }
