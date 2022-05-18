@@ -708,31 +708,6 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     GBL_VA_OVERLOAD_SELECT(GBL_API_BLOCK, GBL_VA_OVERLOAD_SUFFIXER_ARGC, SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)(SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)
 
 
-#define GBL_API_FUNCTION_7(file, func, line, col, hHandle, frame, block)    \
-    GBL_API_BEGIN_FRAME(file, func, line, col, hHandle, frame);             \
-    block;                                                                  \
-    GBL_API_END()
-
-#define GBL_API_FUNCTION_6(file, func, line, col, hHandle, block) \
-    GBL_API_FUNCTION_7(file, func, line, col, hHandle, ((GblStackFrame*)GBL_ALLOCA(sizeof(GblStackFrame))), block)
-
-#define GBL_API_FUNCTION_5(file, func, line, col, block) \
-    GBL_API_FUNCTION_6(file, func, line, col, NULL, block)
-
-#define GBL_API_FUNCTION(...) \
-    GBL_VA_OVERLOAD_SELECT(GBL_API_FUNCTION, GBL_VA_OVERLOAD_SUFFIXER_ARGC, SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)(SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)
-
-#define GBL_API_BEGIN_ONCE(...)                         \
-    static GblBool GBL_API_ONCE_NAME = GBL_FALSE;       \
-    GBL_API_BEGIN(__VA_ARGS__);            \
-    if(!GBL_API_ONCE_NAME) {
-
-#define GBL_API_END_ONCE()                              \
-        GBL_API_ONCE_NAME = GBL_TRUE;                   \
-    }                                                   \
-    GBL_API_END()
-
-
 #ifdef __cplusplus
 }
 #endif

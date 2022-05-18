@@ -305,5 +305,5 @@ GBL_API GblContext_callRecordSet_(GblContext* pSelf,
                                   const GblCallRecord* pRecord)     GBL_NOEXCEPT
 {
     GBL_UNUSED(pFrame);
-    GblContext_lastIssueSet(pSelf, pRecord);
+    return GblContext_lastIssueSet(pSelf, pRecord);
 }
