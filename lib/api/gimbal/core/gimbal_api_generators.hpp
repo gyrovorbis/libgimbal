@@ -37,9 +37,9 @@ namespace gimbal {
 
             constexpr const P* primitive_cast(void) const noexcept { return reinterpret_cast<const P*>(derived()->getPrimitiveAddress()); }
 
-            constexpr operator P() const noexcept { return reinterpret_cast<P>(derived()->getPrimitiveValue()); }
-            constexpr P* operator&(void) noexcept { return reinterpret_cast<P*>(derived()->getPrimitiveAddress()); }
-            constexpr const P* operator&(void) const noexcept { return reinterpret_cast<const P*>(derived()->getPrimitiveAddress()); }
+            constexpr operator P() const noexcept { return static_cast<P>(derived()->getPrimitiveValue()); }
+            constexpr P* operator&(void) noexcept { return static_cast<P*>(derived()->getPrimitiveAddress()); }
+            constexpr const P* operator&(void) const noexcept { return static_cast<const P*>(derived()->getPrimitiveAddress()); }
         };
 
         template<typename P>

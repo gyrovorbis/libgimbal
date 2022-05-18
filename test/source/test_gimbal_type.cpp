@@ -238,25 +238,25 @@ struct CppInstance: public CInstance {
                 {
                     .pFnClassInit = [](GblClass* pClass, const void*, GblContext* pCtx) {
                         auto* pSelf = (CppInstanceClass*)(pClass);
-                        GBL_API_FUNCTION(pCtx, ({
+                        GBL_API_BEGIN(pCtx);
                             new (&pSelf->qString) QString("QSTRING CLASS");
                             pSelf->vPrint = [](const CInstance*, int value) -> int {
                                 printf("virtual overload!!!");
                                 return 4*value;
                             };
-                        }));
+                        GBL_API_END();
                     },
                     .pFnClassFinal = [](GblClass* pClass, const void*, GblContext* pCtx) {
-                        GBL_API_FUNCTION(pCtx, ({
+                        GBL_API_BEGIN(pCtx);
                             reinterpret_cast<CppInstanceClass*>(pClass)->qString.~QString();
-                        }));
+                        GBL_API_END();
                     },
                     .classSize = sizeof(CppInstanceClass),
                     .pClassData = (void*)(uintptr_t)44,
                     .pFnInstanceInit = [](GblInstance* pInstance, GblContext* pCtx) {
-                        GBL_API_FUNCTION(pCtx, ({
+                        GBL_API_BEGIN(pCtx);
                             new (&reinterpret_cast<CppInstance*>(pInstance)->qString) QString("QSTRING INSTANCE");
-                        }));
+                       GBL_API_END();
                     },
                     .instanceSize = sizeof(CppInstance),
                 }
@@ -342,7 +342,7 @@ struct CInterface {
             {
                 .pFnClassInit = [](GblClass* pClass, const void* pUd, GblContext* pCtx) {
                     auto* pSelf = reinterpret_cast<CInterface*>(pClass);
-                    GBL_API_FUNCTION(pCtx, ({
+                    GBL_API_BEGIN(pCtx);
                         pSelf->staticInt = (int)(uintptr_t)pUd;
                         pSelf->pVClassStringer = [](void) {
                             return "CInterface::classStringer";
@@ -350,7 +350,7 @@ struct CInterface {
                         pSelf->pVInstanceStringer = [](const CInstance* pInstance) {
                             return pInstance->string;
                         };
-                    }));
+                    GBL_API_END();
                 },
                 .classSize = sizeof(CInterface),
                 .pClassData = (void*)(uintptr_t)67,
@@ -410,7 +410,7 @@ struct ICppInstance: public CppInstance {
         gimbal::TypeInfo {
             {
                 .pFnClassInit = [](GblClass* pClass, const void*, GblContext* pCtx) {
-                    GBL_API_FUNCTION(pCtx, {
+                    GBL_API_BEGIN(pCtx);
                         auto* pSelf = reinterpret_cast<ICppInstanceClass*>(pClass);
                         ICppClassPrivate* pPriv = (ICppClassPrivate*)GblClass_private(pClass, ICPPINSTANCE_TYPE);
                         strcpy(pPriv->buffer, "lookit my privates!");
@@ -421,18 +421,18 @@ struct ICppInstance: public CppInstance {
                         pSelf->cInterfaceClass.pVInstanceStringer = [](const CInstance*) {
                             return "OVERRIDDEN";
                         };
-                    });
+                    GBL_API_END();
                 },
                 .classSize = sizeof(ICppInstanceClass),
                 .classPrivateSize = sizeof(ICppClassPrivate),
                 .interfaceCount = 1,
                 .pInterfaceMap = &entry,
                 .pFnInstanceInit = [](GblInstance* pInstance, GblContext* pCtx) {
-                    GBL_API_FUNCTION(pCtx, {
+                    GBL_API_BEGIN(pCtx);
                         reinterpret_cast<ICppInstance*>(pInstance)->instanceFloat = 3.33f;
                         ICppInstancePrivate* pPriv = ICPPINSTANCE_PRIVATE(pInstance);
                         strcpy(pPriv->buffer, "FUCKWEASEL!");
-                    });
+                   GBL_API_END();
                 },
                 .instanceSize = sizeof(ICppInstance),
                 .instancePrivateSize = sizeof(ICppInstancePrivate)

@@ -67,7 +67,8 @@ class StdException: public Exception, public StdType {
 public:
 
     template<typename V>
-    requires std::is_constructible_v<CallRecord,V> && std::is_default_constructible_v<StdType>
+    requires std::is_constructible_v<CallRecord,V> && (std::is_default_constructible_v<StdType> &&
+        !std::is_constructible_v<StdType, const char*>)
     StdException(V&& v) noexcept:
         Exception(std::move(v)) {}
 

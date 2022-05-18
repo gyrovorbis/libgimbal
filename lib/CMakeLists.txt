@@ -217,6 +217,18 @@ GBL_TARGET_PROPERTY_DEFINE(GBL_BUILD_CPP_STANDARD libGimbal CXX_STANDARD)
 GBL_TARGET_PROPERTY_DEFINE(GBL_BUILD_C_EXTENSIONS libGimbal C_EXTENIONS)
 GBL_TARGET_PROPERTY_DEFINE(GBL_BUILD_CPP_EXTENSIONS libGimbal CXX_EXTENSIONS)
 
+# /Zc:__cplusplus is required to make __cplusplus accurate
+# /Zc:__cplusplus is available starting with Visual Studio 2017 version 15.7
+# (according to https://docs.microsoft.com/en-us/cpp/build/reference/zc-cplusplus)
+# That version is equivalent to _MSC_VER==1914
+# (according to https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros?view=vs-2019)
+# CMake's ${MSVC_VERSION} is equivalent to _MSC_VER
+# (according to https://cmake.org/cmake/help/latest/variable/MSVC_VERSION.html#variable:MSVC_VERSION)
+if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
+        target_compile_options(libGimbal PUBLIC "/Zc:preprocessor")
+endif()
+
+
 list(APPEND
     GBL_DEFINES
     ${GBL_CONFIGURATION_DEFINES}

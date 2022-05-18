@@ -62,7 +62,7 @@ extern "C" {
         )                                                                                                                                               \
     )
 
-GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE);
+GBL_EVAL(GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE));
 
 #define GBL_RESULT_UNKNOWN(value) \
     (value == GBL_RESULT_UNKNOWN)
