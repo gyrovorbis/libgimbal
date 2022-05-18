@@ -6,4 +6,12 @@
                                                       "Values differed")
 #define GBL_TEST_CASE_DECL(kase)    GBL_API kase(GblContext* pCtx);
 
+
+#define GBL_TEST_EXPECT_ERROR()                         \
+    GBL_API_VERIFY(!GBL_CONFIG_ASSERT_ERROR_ENABLED,    \
+                   GBL_RESULT_SKIPPED,                  \
+                    "Skipping due to assert-on-error enabled")
+
+
+
 #endif // GIMBAL_TEST_H

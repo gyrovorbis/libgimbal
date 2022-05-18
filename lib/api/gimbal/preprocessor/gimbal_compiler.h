@@ -328,11 +328,11 @@
 #endif
 
 #ifndef GBL_PRAGMA_MACRO_PUSH
-#   define GBL_PRAGMA_MACRO_PUSH(X) push_macro(X);
+#   define GBL_PRAGMA_MACRO_PUSH(X) push_macro(X)
 #endif
 
 #ifndef GBL_PRAGMA_MACRO_POP
-#   define GBL_PRAGMA_MACRO_POP(X) pop_macro(X);
+#   define GBL_PRAGMA_MACRO_POP(X) pop_macro(X)
 #endif
 
 #ifdef _MSC_VER

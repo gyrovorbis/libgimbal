@@ -128,6 +128,7 @@ GBL_API GblType_test_fundamental_blank(GblContext* pCtx) {
 
 GBL_API GblType_test_fundamental_duplicate(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
     GblType dupe = GblType_registerStatic(GBL_INVALID_TYPE,
                                         GblQuark_internStringStatic("Blank"),
                                          NULL,
@@ -139,6 +140,7 @@ GBL_API GblType_test_fundamental_duplicate(GblContext* pCtx) {
 
 GBL_API GblType_test_fundamental_derived_register_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
     GblType invalid = GblType_registerStatic(blankType_,
                                             "DerivedInvalid",
                                              NULL,
@@ -170,6 +172,7 @@ GBL_API GblType_test_fundamental_derived_register_valid(GblContext* pCtx) {
 
 GBL_API GblType_test_fundamental_deep_derived_register_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
     GblType deepDerivedInvalid = GblType_registerStatic(derived_,
                                                         "DeepDerivedInvalid",
                                                         NULL,
@@ -228,6 +231,7 @@ GBL_API GblType_test_fundamental_deep_derived_register_valid(GblContext* pCtx) {
 
 GBL_API GblType_test_fundamental_classed_register_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
     GblType invalidClassed = GblType_registerStatic(GBL_INVALID_TYPE,
                                                     "InvalidClassed",
                                                     NULL,
@@ -271,6 +275,7 @@ GBL_API GblType_test_fundamental_classed_inherit(GblContext* pCtx) {
 
 GBL_API GblType_test_fundamental_interfaced_register_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
     GblType invalidIFace = GblType_registerStatic(GBL_INVALID_TYPE,
                                                   "InvalidIFaced",
                                                   NULL,
@@ -361,6 +366,7 @@ GBL_API GblType_test_fundamental_interfaced_inherit(GblContext* pCtx) {
 
 GBL_API GblType_test_fundamental_classed_mapped_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
 
     GblTypeInterfaceMapEntry ifaceMap[] = {
         { GBL_INVALID_TYPE, 0 },
@@ -572,7 +578,7 @@ GBL_API GblType_test_fundamental_interfaced_mapped(GblContext* pCtx) {
 
 GBL_API GblType_test_fundamental_interfaced_mapped_inherit_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-
+    GBL_TEST_EXPECT_ERROR();
     GblTypeInterfaceMapEntry entries[] = {
         { ifacedIfaceMap_, sizeof(GblInterface)*3 }
     };
@@ -673,6 +679,7 @@ GBL_API GblType_test_fundamental_classed_mapped_interfaced_mapped_inherit(GblCon
 
 GBL_API GblType_test_fundamental_instantiable_register_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
     GblType invalid = GblType_registerStatic(GBL_INVALID_TYPE,
                                                      "Ininstanced",
                                                      &(const GblTypeInfo) {
@@ -716,6 +723,7 @@ GBL_API GblType_test_fundamental_instantiable_register_valid(GblContext* pCtx) {
 
 GBL_API GblType_test_fundamental_dependent_register_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
     dependentType_ = GblType_registerStatic(GBL_INVALID_TYPE,
                                             "Dependent",
                                             &(const GblTypeInfo) {
@@ -743,7 +751,7 @@ GBL_API GblType_test_fundamental_dependent_register_valid(GblContext* pCtx) {
 
 GBL_API GblType_test_fundamental_dependent_derive_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-
+    GBL_TEST_EXPECT_ERROR();
     GblType type = GblType_registerStatic(dependentType_,
                                           "InvalidDependent",
                                           &(const GblTypeInfo) {

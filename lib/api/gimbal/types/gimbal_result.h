@@ -32,6 +32,7 @@ extern "C" {
             (GBL_RESULT_UNIMPLEMENTED,                  GBL_RESULT_PARTIAL + 7, Unimplemented,              "Unimplemented"),                           \
             (GBL_RESULT_UNSUPPORTED,                    GBL_RESULT_PARTIAL + 8, Unsupported,                "Unsupported"),                             \
             (GBL_RESULT_VERSION_MISMATCH,               GBL_RESULT_PARTIAL + 9, VersionMismatch,            "Version Mismatch"),                        \
+            (GBL_RESULT_SKIPPED,                        GBL_RESULT_PARTIAL + 10,Skipped,                    "Skipped"),                                 \
             (GBL_RESULT_ERROR,                          0xbad00000,             Error,                      "Generic Error"),                           \
             (GBL_RESULT_ERROR_UNHANDLED_EXCEPTION,      GBL_RESULT_ERROR | 1,   ErrorUnhandledException,    "Unhandled Exception"),                     \
             (GBL_RESULT_ERROR_INTERNAL,                 GBL_RESULT_ERROR | 2,   ErrorInternal,              "Internal Error"),                          \

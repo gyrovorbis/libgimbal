@@ -640,7 +640,12 @@ public:
     }
 
     void verifyResult(Result result) {
-        qVerify(result.isSuccess(),
+        if(result == Result::Skipped)
+            QTest::qSkip(getContext()->getCallRecord().getMessage(),
+                         getContext()->getCallRecord().getSource().getFilePath(),
+                         getContext()->getCallRecord().getSource().getLineNumber());
+        else
+            qVerify(result.isSuccess(),
                 result.toString(),
                 getContext()->getCallRecord().getMessage(),
                 getContext()->getCallRecord().getSource().getFilePath(),
@@ -768,8 +773,8 @@ protected:
 }
 
 
-#pragma GBL_PRAGMA_MACRO_POP("GBL_ASSERT_1");
-#pragma GBL_PRAGMA_MACRO_POP("GBL_ASSERT_2");
+#pragma GBL_PRAGMA_MACRO_POP("GBL_ASSERT_1")
+#pragma GBL_PRAGMA_MACRO_POP("GBL_ASSERT_2")
 
 #endif // TEST_GIMBAL_HPP
 

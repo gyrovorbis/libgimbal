@@ -19,6 +19,3 @@
 [submodule "lib/lib/xxHash"]
 	path = lib/lib/xxHash
 	url = https://github.com/Cyan4973/xxHash.git
-[submodule "lib/lib/tinycthread"]
-	path = lib/lib/tinycthread
-	url = https://github.com/tinycthread/tinycthread.git

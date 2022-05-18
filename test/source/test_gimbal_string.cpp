@@ -113,7 +113,7 @@ void String::createStackStdPmrString(void) {
         QCOMPARE(string, "CppStr"_gstr);
         verifyStack_(string);
     };
-    test();
+    //test();
     test(pCtx());
 }
 
@@ -219,7 +219,7 @@ void String::assignHeapCCopy(void) {
         verifyString_(string, pCStr);
         verifyHeap_(string);
     };
-    test();
+    test(pCtx());
 
     auto block = GBL_TEST_API_BLOCK() {
         test(pCtx());
@@ -548,7 +548,7 @@ void String::reserve(void) {
     string.reserve(3);
     verifyString_(string, "TROLO");
     verifyStack_(string);
-    string.reserve(GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE+1);
+    string.reserve(string.getStackBytes() + 1);
     verifyString_(string, "TROLO");
     verifyHeap_(string);
     string.reserve(string.getCapacity() + 256);
