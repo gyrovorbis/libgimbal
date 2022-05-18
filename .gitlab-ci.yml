@@ -54,16 +54,7 @@ build win10-vs2022:
     PREFIX_PATH: C:/Qt/6.3.0/msvc2019_64
   after_script:
     - pwd
-    - C:/Qt/6.3.0/msvc2019_64/bin/windeployqt build/test/GimbalTests
-
-#build win10-cygwin-gcc10:
-#  extends: .build_common
-#  tags:
-#    - gcc, win10
-#  variables:
-#    CC: gcc
-#    CXX: g++
-#    PREFIX_PATH: C:/Qt/6.0.2/mingw81_64
+    - C:/Qt/6.3.0/msvc2019_64/bin/windeployqt build/test/GimbalTests.exe
 
 build win10-mingw11:
   extends: .build_common
@@ -75,7 +66,7 @@ build win10-mingw11:
     PREFIX_PATH: C:/Qt/6.3.0/mingw_64
   after_script:
     - pwd
-    - C:/Qt/6.3.0/mingw_64/bin/windeployqt build/test/GimbalTests
+    - C:/Qt/6.3.0/mingw_64/bin/windeployqt build/test/GimbalTests.exe
 
 #build win10-clang:
 #  extends: .build_common
