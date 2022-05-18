@@ -184,13 +184,13 @@ test ubuntu20-clang11:
   tags:
     - linux, clang
 
-#test win10-vs2019:
-#  extends: .test_common
-#  needs: ["build win10-vs2019"]
-#  dependencies:
-#    - build win10-vs2019
-#  tags:
-#    - win10, visual-studio
+test win10-vs2022:
+  extends: .test_common
+  needs: ["build win10-vs2022"]
+  dependencies:
+    - build win10-vs2022
+  tags:
+    - win10, visual-studio
 
 #test win10-cygwin-gcc10:
 #  extends: .test_common
