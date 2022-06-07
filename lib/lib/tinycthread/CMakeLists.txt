@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 2.8.4)
-project(TinyCThread)
+cmake_minimum_required(VERSION 3.10)
+project(TinyCThread
+        VERSION 1.0.0
+        DESCRIPTION "Fixed Copy of TinyCThread"
+        LANGUAGES C)
 enable_testing()
 
 find_package(Threads REQUIRED)
@@ -19,7 +22,7 @@ if(TINYCTHREAD_ENABLE_TESTS)
 
   add_test(NAME tinycthread
     COMMAND $<TARGET_FILE:test-tinycthread>)
-endif(NOT TINYCTHREAD_DISABLE_TESTS)
+endif(TINYCTHREAD_ENABLE_TESTS)
 
 if(TINYCTHREAD_INSTALL)
   if(CMAKE_INSTALL_LIBDIR)
