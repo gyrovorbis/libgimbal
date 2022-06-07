@@ -13,7 +13,7 @@ namespace gimbal::test {
 
 /* Different types:
 1) StringView
-2) GblString
+2) GblStringBuffer
 3) String
 
 Different axes:

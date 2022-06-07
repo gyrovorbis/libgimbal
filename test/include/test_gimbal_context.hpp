@@ -87,7 +87,7 @@ private slots:
  * 1) finish gimbal_config.h as CMake generated file for inclusion
  * 2) Implement base/default/implicit parent std C EXT back-end
  * 3) map error-handling compiler flags to CMake options
- * 4) GblString + C++ version
+ * 4) GblStringBuffer + C++ version
  * 5) GblVariant + metatypes
  * 6) Declare C enums as table structure that can be used to autogen C, C++, and stringified values
  * 7) GblContainer

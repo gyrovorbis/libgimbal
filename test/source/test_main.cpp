@@ -2,6 +2,10 @@
 #include <test_gimbal_variant.hpp>
 #include <test_gimbal_context.hpp>
 #include <test_gimbal_vector.hpp>
+#include <test_gimbal_ref.hpp>
+#include <test_gimbal_closure.hpp>
+#include <test_gimbal_string_view.hpp>
+#include <test_gimbal_string_ref.hpp>
 #include <test_gimbal_quark.hpp>
 #include <test_gimbal_string.hpp>
 //#include <test_gimbal_meta.hpp>
@@ -26,6 +30,10 @@ qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Api);
     testSuite.enqueueTestSet(new gimbal::test::Context());
     testSuite.enqueueTestSet(new gimbal::test::Vector());
+    testSuite.enqueueTestSet(new gimbal::test::Ref());
+    testSuite.enqueueTestSet(new gimbal::test::Closure());
+    testSuite.enqueueTestSet(new gimbal::test::StringView());
+    testSuite.enqueueTestSet(new gimbal::test::StringRef());
     testSuite.enqueueTestSet(new gimbal::test::String());
  //   testSuite.enqueueTestSet(new gimbal::test::Quark());
     testSuite.enqueueTestSet(new gimbal::test::Variant());

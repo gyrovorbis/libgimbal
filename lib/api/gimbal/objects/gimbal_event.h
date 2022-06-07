@@ -35,6 +35,12 @@ typedef struct GblEvent {
     GBL_EVENT_STATE     state;
 } GblEvent;
 
+/* PROPERTIES:
+ * 1) state
+ * 2) type
+ *
+ */
+
 
 GBL_INLINE GblEvent*        GblEvent_create     (GblType type)          GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblEvent_construct  (SELF, GblType type)    GBL_NOEXCEPT;
@@ -45,7 +51,7 @@ GBL_INLINE GBL_EVENT_STATE  GblEvent_state      (CSELF)                 GBL_NOEX
 GBL_INLINE GBL_RESULT       GblEvent_accept     (SELF)                  GBL_NOEXCEPT;
 
 
-// ========== INLINE IMPLS ===========
+// ========== IMPL ===========
 
 GBL_INLINE GblEvent* GblEvent_create(GblType type) GBL_NOEXCEPT {
     return GblType_check(type, GBL_EVENT_TYPE)?

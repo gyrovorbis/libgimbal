@@ -3,7 +3,7 @@
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/types/gimbal_quark.h>
 #include <gimbal/objects/gimbal_object.h>
-#include <gimbal/meta/gimbal_value_types.h>
+#include <gimbal/meta/gimbal_primitives.h>
 
 /*
  * Really should add more data like info and shit

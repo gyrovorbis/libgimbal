@@ -11,6 +11,7 @@
 #define SELF    GblDataTable** ppSelf
 #define CSELF   GblDataTable*const* ppSelf
 
+// make me also take a key
 typedef GBL_RESULT (*GblDataTableDestructFn)(void* pValue);
 
 typedef struct GblDataTableEntry {

@@ -10,7 +10,7 @@
 #include "gimbal_property.h"
 #include "../types/gimbal_quark.h"
 #include "../containers/gimbal_list.h"
-#include <gimbal/meta/gimbal_value_types.h>
+#include <gimbal/meta/gimbal_primitives.h>
 #include "../preprocessor/gimbal_atomics.h"
 #include "../containers/gimbal_data_table.h"
 

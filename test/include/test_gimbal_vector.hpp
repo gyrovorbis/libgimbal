@@ -70,7 +70,7 @@ private:
         QVERIFY(view.capacity() >= std::size(view));
         QCOMPARE(view.getContext(), pCtx);
         QCOMPARE(view.get_allocator(), pCtx);
-        QCOMPARE(view.getStackBytes(), allocSize - sizeof(GblVector) + sizeof(GblVector::stackBuffer));
+        QCOMPARE(view.getStackBytes(), allocSize - sizeof(GblVector));
     }
 
 private slots:

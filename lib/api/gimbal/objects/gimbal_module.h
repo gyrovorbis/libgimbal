@@ -3,7 +3,7 @@
 
 #include "gimbal_context.h"
 #include "../ifaces/gimbal_iplugin.h"
-#include "../types/gimbal_string.h"
+#include "../types/gimbal_string_buffer.h"
 
 #define GBL_MODULE_TYPE                 (GBL_BUILTIN_TYPE(MODULE))
 #define GBL_MODULE_PARENT_PREFIX        GBL_CONTEXT
@@ -42,9 +42,9 @@ typedef struct GblModule {
         GblContext          base;
     };
     GblVersion              version;
-    GblString               author;
-    GblString               description;
-    GblString               prefixName;
+    GblStringBuffer         author;
+    GblStringBuffer         description;
+    GblStringBuffer         prefixName;
     GblModulePrivate*       pPrivate_;
 } GblModule;
 

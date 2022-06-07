@@ -121,7 +121,7 @@ GBL_EXPORT GBL_RESULT GblQuark_init(GblContext* pCtx, GblSize pageSize, GblSize 
 }
 
 
-GblSize GblQuark_pageCount(void) GBL_NOEXCEPT {
+GBL_EXPORT GblSize GblQuark_pageCount(void) GBL_NOEXCEPT {
     GblSize count = 1;
     if(initialized_) {
         for(QuarkAllocPage_* pIt = pageStatic_.page.pNext;
@@ -134,7 +134,7 @@ GblSize GblQuark_pageCount(void) GBL_NOEXCEPT {
     return count;
 }
 
-GblSize GblQuark_bytesUsed(void) GBL_NOEXCEPT {
+GBL_EXPORT GblSize GblQuark_bytesUsed(void) GBL_NOEXCEPT {
     GblSize bytes = 0;
     if(initialized_) {
         for(QuarkAllocPage_* pIt = &pageStatic_.page;
@@ -147,7 +147,7 @@ GblSize GblQuark_bytesUsed(void) GBL_NOEXCEPT {
     return bytes;
 }
 
-GblSize GblQuark_count(void) GBL_NOEXCEPT {
+GBL_EXPORT GblSize GblQuark_count(void) GBL_NOEXCEPT {
     GblSize count = 0;
     if(initialized_) {
         count = GblHashSet_size(&registry_);
@@ -155,19 +155,38 @@ GblSize GblQuark_count(void) GBL_NOEXCEPT {
     return count;
 }
 
-GblContext* GblQuark_context(void) GBL_NOEXCEPT {
+GBL_EXPORT GblContext* GblQuark_context(void) GBL_NOEXCEPT {
     return pCtx_;
 }
 
+static inline GblQuark* GblQuark_tryString_(const char* pString) {
+    GblQuark* pQuark  = NULL;
+    mtx_lock(&registryMtx_);
+    pQuark = (GblQuark*)GblHashSet_get(&registry_, &pString);
+    mtx_unlock(&registryMtx_);
+    return pQuark;
+}
+
+GBL_EXPORT GblQuark GblQuark_tryStringSized(const char* pString, GblSize length) GBL_NOEXCEPT {
+    GblQuark quark = GBL_QUARK_INVALID;
+    GBL_API_BEGIN(pCtx_);
+    if(initialized_ && pString && length) {
+        char* pCString = GBL_ALLOCA(length + 1);
+        strncpy(pCString, pString, length);
+        pCString[length] = '\0';
+        GblQuark* pQuark = GblQuark_tryString_(pCString);
+        if(pQuark) quark = *pQuark;
+    }
+    GBL_API_END_BLOCK();
+    return quark;
+}
+
 GBL_EXPORT GblQuark GblQuark_tryString(const char* pString) GBL_NOEXCEPT {
-    GblQuark quark = 0;
+    GblQuark quark = GBL_QUARK_INVALID;
     GBL_API_BEGIN(pCtx_);
     if(initialized_ && pString) {
-        GblQuark* pQuark = NULL;
-        mtx_lock(&registryMtx_);
-        pQuark = (GblQuark*)GblHashSet_get(&registry_, &pString);
+        GblQuark* pQuark = GblQuark_tryString_(pString);
         if(pQuark) quark = *pQuark;
-        mtx_unlock(&registryMtx_);
     }
     GBL_API_END_BLOCK();
     return quark;
@@ -216,9 +235,19 @@ GBL_EXPORT GblQuark quarkFromString_(const char* pString, GblBool alloc) GBL_NOE
     return quark;
 }
 
-
 GBL_EXPORT GblQuark GblQuark_fromString(const char* pString) GBL_NOEXCEPT {
     return quarkFromString_(pString, GBL_TRUE);
+}
+
+GBL_EXPORT GblQuark GblQuark_fromStringSized(const char* pString, GblSize length) GBL_NOEXCEPT {
+    GblQuark quark = GBL_QUARK_INVALID;
+    if(pString && length) { //maybe we're interning an empty string!?
+        char* pCString = GBL_ALLOCA(length + 1);
+        strncpy(pCString, pString, length);
+        pCString[length] = '\0';
+        quark = GblQuark_fromString(pCString);
+    }
+    return quark;
 }
 
 GBL_EXPORT GblQuark GblQuark_fromStringStatic(const char* pString) GBL_NOEXCEPT {
@@ -231,6 +260,10 @@ GBL_EXPORT const char* GblQuark_toString(GblQuark quark) GBL_NOEXCEPT {
 
 GBL_EXPORT const char* GblQuark_internString(const char* pString) GBL_NOEXCEPT {
     return GblQuark_toString(GblQuark_fromString(pString));
+}
+
+GBL_EXPORT const char* GblQuark_internStringSized(const char* pString, GblSize length) GBL_NOEXCEPT {
+    return GblQuark_toString(GblQuark_fromStringSized(pString, length));
 }
 
 GBL_EXPORT const char* GblQuark_internStringStatic(const char* pString) GBL_NOEXCEPT {

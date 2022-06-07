@@ -15,6 +15,7 @@ extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
     GBL_API_END();
 }
 
+// never even being used anywhere!
 GBL_API GblIVariantIFace_validate(const GblIVariantIFace* pSelf) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf);
@@ -401,13 +402,13 @@ GBL_API GblIVariantIFace_getValueTake(const GblIVariantIFace* pSelf, const GblVa
     } GBL_API_END();
 }
 
-GBL_API GblIVariantIFace_save(const GblIVariantIFace* pSelf, const GblVariant* pVariant, GblString* pString) GBL_NOEXCEPT {
+GBL_API GblIVariantIFace_save(const GblIVariantIFace* pSelf, const GblVariant* pVariant, GblStringBuffer* pString) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf->pFnSave);
     GBL_API_CALL(pSelf->pFnSave(pVariant, pString));
     GBL_API_END();
 }
-GBL_API GblIVariantIFace_load(const GblIVariantIFace* pSelf, GblVariant* pVariant, const GblString* pString) GBL_NOEXCEPT {
+GBL_API GblIVariantIFace_load(const GblIVariantIFace* pSelf, GblVariant* pVariant, const GblStringBuffer* pString) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf->pFnLoad);
     GBL_API_CALL(pSelf->pFnLoad(pVariant, pString));

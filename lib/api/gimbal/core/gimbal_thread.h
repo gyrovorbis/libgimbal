@@ -10,7 +10,7 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT_PRIVATE(GblThread);
 
-GBL_EXPORT GblThread*   GblThread_current (void)                                GBL_NOEXCEPT;
+GBL_EXPORT GblThread*   GblThread_current        (void)                         GBL_NOEXCEPT;
 
 GBL_EXPORT GblContext*  GblThread_context        (CSELF)                        GBL_NOEXCEPT;
 

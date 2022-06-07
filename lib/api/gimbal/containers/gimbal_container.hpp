@@ -1,7 +1,3 @@
-//handles releasing previous shit
-//handles releasing previous shit
-//does nothing if already correct type#define GIMBAL_CONTAINER_HPP
-
 #ifndef GIMBAL_CONTAINER_HPP
 #define GIMBAL_CONTAINER_HPP
 

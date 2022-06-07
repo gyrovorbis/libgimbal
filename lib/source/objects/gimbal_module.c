@@ -1,7 +1,6 @@
 #include <gimbal/objects/gimbal_module.h>
-#include <gimbal/types/gimbal_string.h>
 #include <gimbal/containers/gimbal_hash_set.h>
-#include <gimbal/meta/gimbal_value_types.h>
+#include <gimbal/meta/gimbal_primitives.h>
 
 #define PROPERTY_IDX_(id)   (id - GBL_CONTEXT_PROPERTY_ID_COUNT)
 
@@ -66,9 +65,9 @@ GBL_RESULT GblModule_propertySet_(GblObject* pObject, GblSize id, const GblVaria
 GBL_RESULT GblModule_destructor_(GblObject* pObject) {
     GBL_API_BEGIN(pObject);
     GblModule* pSelf = GBL_MODULE(pObject);
-    GBL_API_CALL(gblStringDestruct(&pSelf->author));
-    GBL_API_CALL(gblStringDestruct(&pSelf->description));
-    GBL_API_CALL(gblStringDestruct(&pSelf->prefixName));
+    GBL_API_CALL(GblStringBuffer_destruct(&pSelf->author));
+    GBL_API_CALL(GblStringBuffer_destruct(&pSelf->description));
+    GBL_API_CALL(GblStringBuffer_destruct(&pSelf->prefixName));
     GBL_API_CALL(GblHashSet_destruct(&pSelf->pPrivate_->typeRegistry));
     GBL_API_FREE(pSelf->pPrivate_);
     GBL_INSTANCE_VCALL_SUPER_PREFIX(GBL_CONTEXT, base.pFnDestructor, pObject);
@@ -90,18 +89,12 @@ GBL_RESULT GblModule_unload_(GblModule* pModule) {
 GBL_RESULT GblModule_init_(GblInstance* pInstance, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblModule* pSelf = GBL_MODULE(pInstance);
-    GBL_API_CALL(gblStringConstruct(&pSelf->author,
-                                    sizeof(GblString),
-                                    GBL_CONTEXT(pSelf),
-                                    &(const GblStringView){"Anonymous", 0}));
-    GBL_API_CALL(gblStringConstruct(&pSelf->description,
-                                    sizeof(GblString),
-                                    GBL_CONTEXT(pSelf),
-                                    &(const GblStringView){"Unknown", 0}));
-    GBL_API_CALL(gblStringConstruct(&pSelf->prefixName,
-                                    sizeof(GblString),
-                                    GBL_CONTEXT(pSelf),
-                                    &(const GblStringView){"?", 0}));
+    GBL_API_CALL(GblStringBuffer_construct(&pSelf->author,
+                                           GBL_STRING_VIEW("Anonymous")));
+    GBL_API_CALL(GblStringBuffer_construct(&pSelf->description,
+                                           GBL_STRING_VIEW("Unknown")));
+    GBL_API_CALL(GblStringBuffer_construct(&pSelf->prefixName,
+                                           GBL_STRING_VIEW("?")));
 
     pSelf->pPrivate_ = GBL_API_MALLOC(sizeof(GblModulePrivate), GBL_ALIGNOF(GBL_MAX_ALIGN_T), "ModulePrivate");
     //GBL_API_CALL(GblHashSet_construct(&pSelf->pPrivate_->typeRegistry))

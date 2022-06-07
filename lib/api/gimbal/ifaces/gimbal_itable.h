@@ -32,8 +32,8 @@ GBL_API             GblITable_newIndex(SELF, const GblVariant* pKey, const GblVa
 GBL_API             GblITable_nextIndex(CSELF, const GblVariant* pKey, GblVariant* pNextKey, GblVariant* pNextValue) GBL_NOEXCEPT;
 
 //GBL_API GblITable_print(CSELF);
-//GBL_API GblITable_save(CSELF, GblString* pString);
-//GBL_API GblITable_load(SELF, const GblString* pString);
+//GBL_API GblITable_save(CSELF, GblStringBuffer* pString);
+//GBL_API GblITable_load(SELF, const GblStringBuffer* pString);
 
 #undef CSELF
 #undef SELF

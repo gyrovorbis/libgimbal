@@ -12,6 +12,8 @@
                    GBL_RESULT_SKIPPED,                  \
                     "Skipping due to assert-on-error enabled")
 
-
+#define GBL_TEST_END()                  \
+        GBL_API_VERIFY_LAST_RECORD();   \
+        GBL_API_END()
 
 #endif // GIMBAL_TEST_H

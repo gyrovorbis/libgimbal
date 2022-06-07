@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdint.h>
 
 // C Version
 #ifdef __STDC_VERSION__
@@ -47,6 +48,16 @@
 #   define GBL_NULL nullptr
 #else
 #   define GBL_NULL NULL
+#endif
+
+#if UINTPTR_MAX == 0xffff
+#   define GBL_16BIT
+#elif UINTPTR_MAX == 0xffffffff
+#   define GBL_32BIT
+#elif UINTPTR_MAX == 0xffffffffffffffff
+#   define GBL_64BIT
+#else
+    /* wtf, you're on your own, bro */
 #endif
 
 // Shared library symbol imports/exports
@@ -302,7 +313,7 @@
 // alloca()
 #ifndef GBL_ALLOCA
 #   ifndef alloca
-#       if defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__)
+#       if defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__) || defined(__EMSCRIPTEN__)
 #           include <alloca.h>     // alloca
 #       elif defined(_WIN32)
 #           include <malloc.h>     // alloca

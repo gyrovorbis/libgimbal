@@ -6,7 +6,7 @@
 
 //map this shit to Qt
 
-//maybe this will work better with variants and GblStrings and shit?!?
+//maybe this will work better with variants and GblStringBuffers and shit?!?
 
 #define GBL_CMDLINE_PARSER_POSITIONAL_ARG_VECTOR_INITIAL_CAPACITY   5
 #define GBL_CMDLINE_PARSER_OPTION_VECTOR_INITIAL_CAPACITY           5

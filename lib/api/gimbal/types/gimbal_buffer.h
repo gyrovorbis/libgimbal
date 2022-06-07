@@ -25,7 +25,7 @@ typedef struct GblBuffer {
 } GblBuffer;
 
 
-GBL_EXPORT GblType      GblBuffer_type      (void);
+//GBL_EXPORT GblType      GblBuffer_type      (void);
 
 GBL_INLINE GBL_RESULT   GblBuffer_construct_1(SELF)                                                     GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblBuffer_construct_2(SELF, GblSize bytes)                                      GBL_NOEXCEPT;
@@ -39,7 +39,7 @@ GBL_INLINE GBL_RESULT   GblBuffer_copy      (SELF, const GblBuffer* pOther)     
 GBL_INLINE GBL_RESULT   GblBuffer_move      (SELF, GblBuffer* pOther)                                   GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblBuffer_compare   (CSELF, const GblBuffer* pRhs, GblCmpResult* pResult)       GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblBuffer_convert   (CSELF, GblVariant* pVariant)                               GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT   GblBuffer_debug     (CSELF, GblString* pStr)                                    GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblBuffer_debug     (CSELF, GblStringBuffer* pStr)                                    GBL_NOEXCEPT;
 
 GBL_INLINE GblSize      GblBuffer_size      (CSELF)                                                     GBL_NOEXCEPT;
 GBL_INLINE void*        GblBuffer_data      (CSELF)                                                     GBL_NOEXCEPT;
@@ -334,7 +334,7 @@ GBL_INLINE GBL_RESULT GblBuffer_valueWrite(SELF, GblSize offset, GblSize bytes, 
 }
 
 GBL_MAYBE_UNUSED
-GBL_INLINE GBL_RESULT GblBuffer_debug(CSELF, GblString* pStr) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblBuffer_debug(CSELF, GblStringBuffer* pStr) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->pCtx);
 #if 0
     GBL_API_VERIFY_POINTER(pSelf);
@@ -353,11 +353,11 @@ GBL_INLINE GBL_RESULT GblBuffer_convert(CSELF, GblVariant* pVariant) GBL_NOEXCEP
   #if 0
     switch(gblVariantType(pVariant)) {
     case GBL_STRING_TYPE: {
-        GblString* pStr = NULL;
+        GblStringBuffer* pStr = NULL;
         GblStringView view { GblBuffer_data(pSelf), GblBuffer_size(pSelf) };
         GBL_API_CALL(gblVariantStringGet(pVariant, &pStr));
         GBL_API_VERIFY_EXPRESION(pstr);
-        GBL_API_CALL(gblStringAssign(pStr, &view));
+        GBL_API_CALL(GblStringBuffer_assign(pStr, &view));
     }
     default:
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_TYPE_MISMATCH);

@@ -93,10 +93,10 @@ concept variant_compatible =
         };
 
         template<>
-        struct VariantCompatibleTypeTraits<GblString>: public VariantCompatibleTypeTraitsDefault<GblString> {
+        struct VariantCompatibleTypeTraits<GblStringBuffer>: public VariantCompatibleTypeTraitsDefault<GblStringBuffer> {
             inline const static auto variantType  = StringType();
             struct Forwarder {
-                static const GblString* forward(const GblString& gblString) { return &gblString; }
+                static const GblStringBuffer* forward(const GblStringBuffer& gblString) { return &gblString; }
             };
         };
 
@@ -105,13 +105,13 @@ concept variant_compatible =
             inline const static auto variantType  = StringType();
 
             struct Forwarder {
-                static const GblString* forward(const gimbal::String& string) { return &string; }
+                static const GblStringBuffer* forward(const gimbal::String& string) { return &string; }
             };
         };
 
 #if 0
         template<typename S>
-        requires std::same_as<std::decay_t<S>, const GblString*>
+        requires std::same_as<std::decay_t<S>, const GblStringBuffer*>
         struct VariantCompatibleTypeTraits<S>: public VariantCompatibleTypeTraitsDefault<S> {
             constexpr static auto variantType = VariantType(VariantType::String);
         };
@@ -156,7 +156,7 @@ concept variant_compatible =
             Variant(NilType()) {}
 
         template<typename V>
-            requires (!std::is_convertible_v<V, GblVariant> && !std::is_convertible_v<V, Type> && !std::is_convertible_v<V, GblString>)
+            requires (!std::is_convertible_v<V, GblVariant> && !std::is_convertible_v<V, Type> && !std::is_convertible_v<V, GblStringBuffer>)
         constexpr Variant(V arg) { Exception::checkThrow(gblVariantConstruct(this, VariantCompatibleTypeTraits<V>::Forwarder::forward(arg))); }
 
 
@@ -176,13 +176,13 @@ concept variant_compatible =
         }
 #if 1
         template<typename V>
-            requires std::is_convertible_v<V, GblString>
+            requires std::is_convertible_v<V, GblStringBuffer>
         Variant(V&& rhs) {
             if constexpr(std::is_lvalue_reference_v<decltype(rhs)>) {
-                Exception::checkThrow(gblVariantConstruct(this, static_cast<const GblString*>(&rhs)));
+                Exception::checkThrow(gblVariantConstruct(this, static_cast<const GblStringBuffer*>(&rhs)));
             } else if constexpr(std::is_rvalue_reference_v<decltype(rhs)>) {
                 Exception::checkThrow(gblVariantConstructt(this, StringType()));
-                Exception::checkThrow(gblVariantMoves(this, static_cast<GblString*>(&rhs)));
+                Exception::checkThrow(gblVariantMoves(this, static_cast<GblStringBuffer*>(&rhs)));
             }
         }
 #endif
@@ -214,7 +214,7 @@ concept variant_compatible =
 
         // value type assignments
         template<typename V>
-            requires (!std::is_convertible_v<V, GblVariant> && !std::is_convertible_v<V, GblString>)
+            requires (!std::is_convertible_v<V, GblVariant> && !std::is_convertible_v<V, GblStringBuffer>)
         Variant& operator=(V value) {
             setValue(value);
             return *this;
@@ -222,10 +222,10 @@ concept variant_compatible =
 
 #if 1
         template<typename V>
-            requires std::is_convertible_v<V, GblString>
+            requires std::is_convertible_v<V, GblStringBuffer>
         Variant& operator=(V&& string) {
             if constexpr(std::is_lvalue_reference_v<decltype(string)>) {
-                Exception::checkThrow(gblVariantSet(this, static_cast<const GblString*>(&string)));
+                Exception::checkThrow(gblVariantSet(this, static_cast<const GblStringBuffer*>(&string)));
             } else if constexpr(std::is_rvalue_reference_v<decltype(string)>) {
                 Exception::checkThrow(gblVariantMove(this, &string));
             }

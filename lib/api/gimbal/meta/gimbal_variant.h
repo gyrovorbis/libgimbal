@@ -19,8 +19,8 @@ GBL_API             GblVariant_constructMove       (SELF,  GblVariant* pOther)  
 GBL_API             GblVariant_setCopy             (SELF,  const GblVariant* pOther)                 GBL_NOEXCEPT;
 GBL_API             GblVariant_setMove             (SELF,  GblVariant* pOther)                       GBL_NOEXCEPT;
 GBL_API             GblVariant_destruct            (SELF)                                            GBL_NOEXCEPT;
-GBL_API             GblVariant_save                (CSELF, GblString* pString)                       GBL_NOEXCEPT;
-GBL_API             GblVariant_load                (SELF, const GblString* pString)                  GBL_NOEXCEPT;
+GBL_API             GblVariant_save                (CSELF, GblStringBuffer* pString)                       GBL_NOEXCEPT;
+GBL_API             GblVariant_load                (SELF, const GblStringBuffer* pString)                  GBL_NOEXCEPT;
 
 GBL_API             GblVariant_constructDefault    (SELF,  GblType type)                             GBL_NOEXCEPT;
 
@@ -81,8 +81,8 @@ GBL_API             GblVariant_constructFloat(GblVariant* pSelf, float val);
 GBL_API             GblVariant_setFloat(GblVariant* pSelf, float val);
 GBL_EXPORT float    GblVariant_getFloat(GblVariant* pSelf, GBL_RESULT* pResult);
 
-GBL_API             GblVariant_constructStringCopy(GblVariant* pSelf, const GblString* pString)     GBL_NOEXCEPT;
-GBL_API             GblVariant_constructStringMove(GblVariant* pSelf, GblString* pString)           GBL_NOEXCEPT;
+GBL_API             GblVariant_constructStringCopy(GblVariant* pSelf, const GblStringBuffer* pString)     GBL_NOEXCEPT;
+GBL_API             GblVariant_constructStringMove(GblVariant* pSelf, GblStringBuffer* pString)           GBL_NOEXCEPT;
 
 GBL_API             GblVariant_constructCStrCopy(GblVariant* pSelf, const char* pString)            GBL_NOEXCEPT;
 GBL_API             GblVariant_constructCStrMove(GblVariant* pSelf, const char* pString)            GBL_NOEXCEPT;
@@ -92,8 +92,8 @@ GBL_API             GblVariant_setCStrMove(GblVariant* pSelf, const char* pStrin
 GBL_EXPORT const char* GblVariant_getCStrCopy(const GblVariant* pSelf, GBL_RESULT* pResult)         GBL_NOEXCEPT;
 GBL_EXPORT const char* GblVariant_getCStrMove(GblVariant* pSelf, GBL_RESULT* pResult)               GBL_NOEXCEPT;
 
-GBL_EXPORT GblString* GblVariant_getStringCopy(const GblVariant* pSelf)                     GBL_NOEXCEPT;
-GBL_EXPORT GblString* GblVariant_getStringPeek(const GblVariant* pSelf) GBL_NOEXCEPT;
+GBL_EXPORT GblStringBuffer* GblVariant_getStringCopy(const GblVariant* pSelf)                     GBL_NOEXCEPT;
+GBL_EXPORT GblStringBuffer* GblVariant_getStringPeek(const GblVariant* pSelf) GBL_NOEXCEPT;
 
 GblVariant_takeString
 #endif
@@ -161,7 +161,7 @@ GblVariant_getValue(&fVar, &floater);
 GblVariant sVar = GBL_VARIANT_INIT;
 GblVariant_constructWithValue(&sVar, GBL_STRING_TYPE, "char array", 4); //array + length
 GblVariant_setValue(&sVar, "nuther array", 21);
-GblString pStr;
+GblStringBuffer pStr;
 const char* pArray;
 GblVariant_getValue(&sVar, &charArray);
 

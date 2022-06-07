@@ -8,15 +8,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-// move random ass shit like memory allocatoin and call stack and event types the fuck out of here!!!
+GBL_DECLS_BEGIN
 
 #define GBL_INDEX_INVALID       GBL_SIZE_MAX
 
-// ======== basic types ==========
+// ======== Primitive Types ==========
 
 typedef GBL_BOOL                        GblBool;
 typedef GBL_SIZE                        GblSize;
@@ -25,24 +21,21 @@ typedef GBL_INT                         GblInt;
 typedef GBL_UINT                        GblUint;
 typedef GBL_ENUM                        GblEnum;
 typedef GBL_FLAGS                       GblFlags;
-typedef uint64_t                        GblHash;
-typedef GblHash                         GblGuid;
+typedef GBL_HASH                        GblHash;
+typedef GBL_CMP_RESULT                  GblCmpResult;
 typedef uintptr_t                       GblType;
 typedef uintptr_t                       GblQuark;
 typedef uint16_t                        GblRefCount;
-typedef GBL_CMP_RESULT                  GblCmpResult;
 typedef uint32_t                        GblVersion;
-typedef uint64_t                        GblEventType;
 typedef void                            (*GblFnPtr)();
-
 typedef union GblPtr {
-    GblFnPtr    pFunc;
-    void*       pData;
-} GblPtr;
+    GblFnPtr        pFunc;
+    void*           pData;
+}                                       GblPtr;
 
-// ====== Handle types ==========
+// ====== Struct Types ==========
 GBL_FORWARD_DECLARE_STRUCT(GblVariant);
-GBL_FORWARD_DECLARE_STRUCT(GblString);
+GBL_FORWARD_DECLARE_STRUCT(GblStringBuffer);
 GBL_FORWARD_DECLARE_STRUCT(GblStackFrame);
 GBL_FORWARD_DECLARE_STRUCT(GblCallRecord);
 GBL_FORWARD_DECLARE_STRUCT(GblMemAllocInfo);
@@ -54,16 +47,6 @@ GBL_FORWARD_DECLARE_STRUCT(GblObject);
 GBL_FORWARD_DECLARE_STRUCT(GblContext);
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
-// ======== Log Level ============
-
-
-
-
-
-
-
-#ifdef __cplusplus
-}
-#endif
+GBL_DECLS_END
 
 #endif // GIMBAL_TYPEDEFS_H

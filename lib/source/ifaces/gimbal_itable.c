@@ -1,7 +1,7 @@
 #include <gimbal/ifaces/gimbal_itable.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/meta/gimbal_variant.h>
-#include <gimbal/meta/gimbal_value_types.h>
+#include <gimbal/meta/gimbal_primitives.h>
 #include <gimbal/types/gimbal_quark.h>
 
 static GBL_RESULT GblITableIFace_index_(const GblITable* pTable, const GblVariant* pKey, GblVariant* pValue) {

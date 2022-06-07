@@ -545,9 +545,11 @@ void GblType_init_(void) {
                                       initialTypeTotalCount_,
                                       pCtx_));
     GBL_API_CALL(GblVector_construct(&typeBuiltins_.vector,
-                                    pCtx_,
                                     sizeof(GblMetaClass*),
-                                    sizeof(typeBuiltins_)));
+                                    0,
+                                    NULL,
+                                    sizeof(typeBuiltins_),
+                                    pCtx_));
     GBL_API_CALL(GblType_registerBuiltins_());
     GBL_API_POP(1);
     initialized_    = GBL_TRUE;
@@ -572,7 +574,7 @@ GblType GblType_registerBuiltin(GblSize           expectedIndex,
     GBL_API_PUSH_VERBOSE("[GblType] Registering Builtin Type: %s", pName);
     flags |= GBL_TYPE_FLAG_BUILTIN;
     type = typeRegister_(parentType, pName, pTypeInfo, flags);
-    GBL_API_CALL(GblVector_size(&typeBuiltins_.vector, &size));
+    size = GblVector_size(&typeBuiltins_.vector);
     GBL_API_VERIFY_EXPRESSION(size == expectedIndex+1,
                               "Failed to obtain expected index! "
                               "[expected: %u, actual: %u]", expectedIndex, size-1);
@@ -635,12 +637,11 @@ GBL_EXPORT GblType GblType_fromBuiltinIndex(GblUint index) {
     //GBL_API_BEGIN(pCtx_);
     {
         GblType* pType = NULL;
-        GblSize registeredCount = 0;
-        if(GBL_RESULT_SUCCESS(GblVector_size(&typeBuiltins_.vector, &registeredCount))) {
-            if(index < registeredCount) {
-                if(GBL_RESULT_SUCCESS(GblVector_at(&typeBuiltins_.vector, index, (void**)&pType)))
-                    type = *pType;
-            }
+        GblSize registeredCount = GblVector_size(&typeBuiltins_.vector);
+        if(index < registeredCount) {
+            pType = GblVector_at(&typeBuiltins_.vector, index);
+            if(pType)
+                type = *pType;
         }
     }
     //GBL_API_END_BLOCK();
@@ -687,7 +688,7 @@ GBL_EXPORT GblSize GblType_builtinCount(void) {
     GBL_API_BEGIN(pCtx_);
     GBL_TYPE_ENSURE_INITIALIZED_();
     mtx_lock(&typeRegMtx_);
-    GBL_API_CALL(GblVector_size(&typeBuiltins_.vector, &count));
+    count = GblVector_size(&typeBuiltins_.vector);
     mtx_unlock(&typeRegMtx_);
     GBL_API_END_BLOCK();
     return count;
@@ -998,12 +999,11 @@ GBL_EXPORT GBL_RESULT GblType_unregister(GblType type) {
             GBL_API_WARN("Attempting to unregister type with active class references: %u", refCount);
         }
 
-#ifdef GBL_TYPE_DEBUG
-        refCount = GblInstance_refCountFromType(type);
+        refCount = GblType_instanceRefCount(type);
         if(refCount) {
             GBL_API_WARN("Attempting to unregister type with active class references: %u", refCount);
         }
-#endif
+
         mtx_lock(&typeRegMtx_);
         const GblBool success = GblHashSet_erase(&typeRegistry_, &pMeta);
         mtx_unlock(&typeRegMtx_);

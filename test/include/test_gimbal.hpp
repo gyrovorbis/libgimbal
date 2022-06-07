@@ -5,6 +5,9 @@
 #include <QDebug>
 #include <stdexcept>
 
+#define GBL_TEST_CASE_QT_SLOT(x) \
+    inline void x(void) { verifyResult(::x(gblCtx())); }
+
 #pragma GBL_PRAGMA_MACRO_PUSH("GBL_ASSERT_1")
 #undef GBL_ASSERT_1
 #define GBL_ASSERT_1    gimbal::test::AssertMgr::assert_

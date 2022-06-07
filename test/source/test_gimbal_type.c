@@ -590,12 +590,12 @@ GBL_API GblType_test_fundamental_interfaced_mapped_inherit_invalid(GblContext* p
     };
 
     GblType invalidType = GblType_registerStatic(ifacedIfaceMap_,
-                                                      "IfaceMappedIFaceInherited",
-                                                      &info,
-                                                      0);
+                                                  "IfaceMappedIFaceInherited",
+                                                  &info,
+                                                  0);
     // Ambiguous type (inherited base is mapped)
     GBL_API_CLEAR_LAST_RECORD();
-    GBL_COMPARE(ifacedIfaceMapInherited_, GBL_INVALID_TYPE);
+    GBL_COMPARE(invalidType, GBL_INVALID_TYPE);
 
     // Ambiguous type (inherited base common with mapped base)
     invalidType = GblType_registerStatic(ifacedDerived_,
@@ -603,7 +603,7 @@ GBL_API GblType_test_fundamental_interfaced_mapped_inherit_invalid(GblContext* p
                                          &info,
                                          0);
     GBL_API_CLEAR_LAST_RECORD();
-    GBL_COMPARE(ifacedIfaceMapInherited_, GBL_INVALID_TYPE);
+    GBL_COMPARE(invalidType, GBL_INVALID_TYPE);
     GBL_API_END();
 }
 
@@ -705,12 +705,12 @@ GBL_API GblType_test_fundamental_instantiable_register_invalid(GblContext* pCtx)
 GBL_API GblType_test_fundamental_instantiable_register_valid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     instanced_ = GblType_registerStatic(GBL_INVALID_TYPE,
-                                                 "Instanced",
-                                                 &(const GblTypeInfo) {
-                                                     .instanceSize = sizeof(GblInstance),
-                                                      .classSize = sizeof(GblClass)
-                                                 },
-                                                 GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE);
+                                         "Instanced",
+                                         &(const GblTypeInfo) {
+                                             .instanceSize = sizeof(GblInstance),
+                                              .classSize = sizeof(GblClass)
+                                         },
+                                         GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_COMPARE(GblType_instanceRefCount(instanced_), 0);
     GBL_COMPARE(GblType_classRefCount(instanced_), 0);
@@ -739,7 +739,6 @@ GBL_API GblType_test_fundamental_dependent_register_invalid(GblContext* pCtx) {
     GBL_VERIFY(!GblType_depends(dependentType_, blankType_));
     GBL_VERIFY(!GblType_conforms(blankType_, dependentType_));
     GBL_API_END();
-
 }
 
 GBL_API GblType_test_fundamental_dependent_register_valid(GblContext* pCtx) {

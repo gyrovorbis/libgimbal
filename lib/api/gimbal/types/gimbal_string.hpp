@@ -1,7 +1,7 @@
 #ifndef GIMBAL_STRING_HPP
 #define GIMBAL_STRING_HPP
 
-#include <gimbal/types/gimbal_string.h>
+#include <gimbal/types/gimbal_string_buffer.h>
 #include <gimbal/containers/gimbal_vector.hpp>
 #include <iostream>
 #include <unordered_set>
@@ -50,7 +50,7 @@ protected:
 
 public:
 
-    operator const GblString*() const { return str_(); }
+    operator const GblStringBuffer*() const { return str_(); }
 
 
     const char& getElement_(size_t index) const {
@@ -72,38 +72,30 @@ public:
 // Accessor wrappers
 
     Size getStackBytes(void) const {
-        Size size = 0;
-        Exception::checkThrow(gblStringStackBytes(str_(), &size));
+        Size size = GblStringBuffer_stackBytes(str_());
         return size;
     }
 
     constexpr Size getLength(void) const {
-        Size length = 0;
-        Exception::checkThrow(gblStringLength(str_(), &length));
-        return length;
+        return GblStringBuffer_length(str_());
     }
 
     constexpr Size getCapacity(void) const {
-        Size capacity = 0;
-        Exception::checkThrow(gblStringCapacity(str_(), &capacity));
-        return capacity;
+        return GblStringBuffer_capacity(str_());
     }
 
     Context* getContext(void) const {
-        GblContext* pCtx = nullptr;
-        Exception::checkThrow(gblStringContext(str_(), &pCtx));
+        GblContext* pCtx = GblStringBuffer_context(str_());
         return pCtx == nullptr? nullptr : Context::fromGblObj(pCtx);
     }
 
     constexpr bool isEmpty(void) const {
-        GblBool empty = GBL_TRUE;
-        Exception::checkThrow(gblStringIsEmpty(str_(), &empty));
+        GblBool empty = GblStringBuffer_empty(str_());
         return empty;
     }
 
     constexpr bool isStack(void) const {
-        GblBool stack = GBL_FALSE;
-        Exception::checkThrow(gblStringIsStack(str_(), &stack));
+        GblBool stack = GblStringBuffer_stack(str_());
         return stack;
     }
 
@@ -114,13 +106,13 @@ public:
     }
 
     const char* getCString(void) const {
-        const char* pCStr = nullptr;
-        Exception::checkThrow(gblStringCStr(str_(), &pCStr));
+        const char* pCStr = GblStringBuffer_cString(str_());
         return pCStr;
     }
 
     char* getCString(void) {
-        return str_()->data.pBuffer;
+        const char* pStr = GblStringBuffer_cString(str_());
+        return const_cast<char*>(pStr);
     }
 
     std::string toStdString(void) const {
@@ -156,8 +148,7 @@ public:
         return (lhs.toStringView() <=> rhs);
     }
     friend constexpr bool operator==(const Derived& lhs, const string_base auto& rhs) {
-        gimbal::Int result = GBL_FALSE;
-        Exception::checkThrow(gblStringCompare(&lhs, &rhs, &result));
+        gimbal::Int result = GblStringBuffer_compare(&lhs, &rhs);
         return result == 0;
     }
     friend constexpr decltype(auto) operator<=>(const Derived& lhs, const string_base auto& rhs) {
@@ -172,37 +163,37 @@ public:
 
 class StringView final: public StringViewBase<StringView> {
 private:
-    const GblString* pGblStr_ = nullptr;
+    const GblStringBuffer* pGblStr_ = nullptr;
 public:
     StringView(void) = default;
 
-    StringView(const GblString& gblStr):
+    StringView(const GblStringBuffer& gblStr):
         pGblStr_(&gblStr) {}
 
     StringView(const gimbal::String& string);
 
-    StringView(const GblString* pGblString):
-        pGblStr_(pGblString) {}
+    StringView(const GblStringBuffer* pGblStringBuffer):
+        pGblStr_(pGblStringBuffer) {}
 
-    const GblString* getString_(void) const { return pGblStr_; }
+    const GblStringBuffer* getString_(void) const { return pGblStr_; }
     bool isValid(void) const { return pGblStr_; }
 };
 
 class String:
-    public GblString,
+    public GblStringBuffer,
     public StringViewBase<String>
 {
 public:
 
-    const GblString* getString_(void) const {
-        return static_cast<const GblString*>(this);
+    const GblStringBuffer* getString_(void) const {
+        return static_cast<const GblStringBuffer*>(this);
     }
 // iterator constructors!
-    GblString* getString_(void) {
-        return static_cast<GblString*>(this);
+    GblStringBuffer* getString_(void) {
+        return static_cast<GblStringBuffer*>(this);
     }
 
-    //operator const GblString*() const { return getString_(); }
+    //operator const GblStringBuffer*() const { return getString_(); }
 
     // Default Ctors
     String(std::nullptr_t, Size size=sizeof(String)):
@@ -222,11 +213,10 @@ public:
         String(pCStr? std::string_view{pCStr} : std::string_view{}, pCtx, size) {}
 
     String(const std::string_view& stringView, Context* pCtx=nullptr, Size size=sizeof(String)) {
-        GblStringView tempView = {stringView.data(), stringView.length()};
-        Exception::checkThrow(gblStringConstruct(this,
+        Exception::checkThrow(GblStringBuffer_construct(this,
+                                            GBL_STRING_VIEW(stringView.data(), stringView.length()),
                                             size,
-                                            pCtx,
-                                            &tempView));
+                                            pCtx));
     }
 
     // Copy Ctor
@@ -238,22 +228,22 @@ public:
 
     // Move Ctor
     String(String&& rhs, Context* pCtx=nullptr, Size size=sizeof(String)):
-        String(static_cast<GblString&&>(rhs), pCtx, size) {}
+        String(static_cast<GblStringBuffer&&>(rhs), pCtx, size) {}
 
-    String(GblString&& rhs, Context* pCtx=nullptr, Size size=sizeof(String)):
+    String(GblStringBuffer&& rhs, Context* pCtx=nullptr, Size size=sizeof(String)):
         String(pCtx, size)
     {
         *this = rhs;
     }
 
     ~String(void) {
-        Exception::checkThrow(gblStringDestruct(this));
+        Exception::checkThrow(GblStringBuffer_destruct(this));
     }
 
-    static std::pair<char*, Size> take(GblString* pGblStr) {
+    static std::pair<char*, Size> take(GblStringBuffer* pGblStr) {
         char* pCStr = nullptr;
         Size capacity = 0;
-        Exception::checkThrow(gblStringTake(pGblStr, &pCStr, &capacity));
+        Exception::checkThrow(GblStringBuffer_take(pGblStr, &pCStr, &capacity));
         return { pCStr, capacity };
     }
 
@@ -262,16 +252,15 @@ public:
     }
 
     void give(std::pair<char*, Size> data) {
-        Exception::checkThrow(gblStringGive(this, data.first, data.second));
+        Exception::checkThrow(GblStringBuffer_give(this, data.first, data.second));
     }
 
     void clear(void) {
-        Exception::checkThrow(gblStringClear(this));
+        Exception::checkThrow(GblStringBuffer_clear(this));
     }
 
     const String& operator=(std::string_view view) {
-        GblStringView gview = { view.data(), view.size() };
-        Exception::checkThrow(gblStringAssign(this, &gview));
+        Exception::checkThrow(GblStringBuffer_assign(this, GBL_STRING_VIEW(view.data(), view.size())));
         return *this;
     }
 
@@ -302,10 +291,10 @@ public:
     }
 
     const String& operator=(String&& rhs) {
-        return *this = static_cast<GblString&&>(rhs);
+        return *this = static_cast<GblStringBuffer&&>(rhs);
     }
 
-    const String& operator=(GblString&& rhs) {
+    const String& operator=(GblStringBuffer&& rhs) {
         StringView rhsView(rhs);
 
         if(getContext() == rhsView.getContext() && rhsView.isHeap()) {
@@ -327,19 +316,17 @@ public:
     }
 
     void reserve(Size capacity) {
-        Exception::checkThrow(gblStringReserve(this, capacity));
+        Exception::checkThrow(GblStringBuffer_reserve(this, capacity));
     }
 
     void resize(Size size) {
-        Exception::checkThrow(gblStringResize(this, size));
+        Exception::checkThrow(GblStringBuffer_resize(this, size));
     }
 
     void insert(const_iterator pos, const char* pString, GblSize count=0) {
         GBL_ASSERT(pString);
-        if(!count) count = strlen(pString);
         const auto index = std::distance(cbegin(), pos);
-        const GblStringView view{pString, count};
-        Exception::checkThrow(gblStringInsert(this, index, &view));
+        Exception::checkThrow(GblStringBuffer_insert(this, index, GBL_STRING_VIEW(pString, count)));
       //  return iterator(*this, index);
     }
 
@@ -349,7 +336,7 @@ public:
     }
 
     String& vasprintf(const char* pFmt, va_list varArgs) {
-        Exception::checkThrow(gblStringVaSprintf(this, pFmt, varArgs));
+        Exception::checkThrow(GblStringBuffer_appendVPrintf(this, pFmt, varArgs));
         return *this;
     }
 
@@ -429,7 +416,7 @@ public:
 };
 
 inline StringView::StringView(const gimbal::String& string):
-    StringView(static_cast<const GblString&>(string)) {}
+    StringView(static_cast<const GblStringBuffer&>(string)) {}
 
 }
 

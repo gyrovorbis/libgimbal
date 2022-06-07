@@ -3,6 +3,7 @@
 #include <gimbal/objects/gimbal_property.h>
 #include <gimbal/objects/gimbal_context.h>
 #include <gimbal/objects/gimbal_event.h>
+#include <gimbal/types/gimbal_string_ref.h>
 
 #define GBL_OBJECT_PROPERTY_TABLE_CAPACITY_DEFAULT_ 64
 #define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblVector) + sizeof(GblIEventFilter*)*8)
@@ -65,31 +66,31 @@ static GBL_RESULT GblObjectClass_ivariantIFace_set_(GblVariant* pSelf, GblUint a
     GBL_API_END();
 }
 
-static GBL_RESULT GblObjectClass_ivariantIFace_load_(GblVariant* pVariant, const GblString* pString) {
+static GBL_RESULT GblObjectClass_ivariantIFace_load_(GblVariant* pVariant, const GblStringBuffer* pString) {
     return GBL_RESULT_UNIMPLEMENTED;
 }
 
-static GBL_RESULT GblObjectClass_ivariantIFace_save_(const GblVariant* pVariant, GblString* pString) {
+static GBL_RESULT GblObjectClass_ivariantIFace_save_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GblVariant variant = GBL_VARIANT_INIT;
     GblBool first = GBL_TRUE;
     GBL_API_BEGIN(NULL);
-    gblStringConcat(pString, "{\n");
+    GblStringBuffer_append(pString, GBL_STRING_VIEW("{\n"));
 
     for(const GblProperty* pIt = GblObject_propertyNext(pVariant->pVoid, NULL, GBL_PROPERTY_FLAG_SAVE);
         pIt != NULL;
         pIt = GblObject_propertyNext(pVariant->pVoid, pIt, GBL_PROPERTY_FLAG_SAVE))
     {
-        if(!first) gblStringConcat(pString, ",\n");
+        if(!first) GblStringBuffer_append(pString, GBL_STRING_VIEW(",\n"));
         const char* pKey = GblProperty_nameString(pIt);
-        gblStringConcat(pString, "\t");
-        gblStringConcat(pString, pKey);
-        gblStringConcat(pString, " = ");
+        GblStringBuffer_append(pString, GBL_STRING_VIEW("\t"));
+        GblStringBuffer_append(pString, GBL_STRING_VIEW(pKey));
+        GblStringBuffer_append(pString, GBL_STRING_VIEW(" = "));
         GblObject_propertyGetString(pVariant->pVoid, pKey, &variant);
         GblVariant_save(&variant, pString);
         first = GBL_FALSE;
 
     }
-    gblStringConcat(pString, "}\n");
+    GblStringBuffer_append(pString, GBL_STRING_VIEW("}\n"));
     GBL_API_END();
 }
 
@@ -225,9 +226,11 @@ static GblVector* GblObject_ensureEventFilters_(GblObject* pSelf) GBL_NOEXCEPT {
     if(!pEventFilters) {
         pEventFilters = GBL_API_MALLOC(GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_);
         GBL_API_CALL(GblVector_construct(pEventFilters,
-                                        GblType_contextDefault(),
                                         sizeof(GblIEventFilter*),
-                                        GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_));
+                                        0,
+                                        NULL,
+                                        GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_,
+                                        GblType_contextDefault()));
         GBL_API_CALL(GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData,
                                                        objectEventFiltersQuark_,
                                                        (uintptr_t)pEventFilters,\
@@ -252,14 +255,12 @@ GBL_API GblObject_eventFilterUninstall(GblObject* pSelf, GblIEventFilter* pFilte
     GBL_API_VERIFY_POINTER(pFilter);
     pVector = GblObject_eventFilters_(pSelf);
     GBL_API_VERIFY_POINTER(pVector);
-    GblSize count = 0;
-    GBL_API_CALL(GblVector_size(pVector, &count));
+    GblSize count = GblVector_size(pVector);
     GBL_API_VERIFY(count, GBL_RESULT_ERROR_INVALID_HANDLE,
                    "Object has no event filter list to remove filter from: %x", pFilter);
     GblBool found = GBL_FALSE;
     for(GblSize f = 0; f < count; ++f) {
-        GblIEventFilter** ppFilter;
-        GBL_API_CALL(GblVector_at(pVector, f, (void**)&ppFilter));
+        GblIEventFilter** ppFilter = GblVector_at(pVector, f);
         if(*ppFilter == pFilter) {
             found = GBL_TRUE;
             GBL_API_CALL(GblVector_erase(pVector, f, 1));
@@ -275,7 +276,7 @@ GblIEventFilter* GblObject_eventFilterAt(const GblObject* pSelf, GblSize index) 
     GBL_API_BEGIN(GblType_contextDefault());
     GblVector* pFilters = GblObject_eventFilters_(pSelf);
     if(pFilters)
-        GBL_API_CALL(GblVector_at(pFilters, index, (void**)&ppFilter));
+        ppFilter = GblVector_at(pFilters, index);
     GBL_API_END_BLOCK();
     return ppFilter? *ppFilter : NULL;
 }
@@ -284,7 +285,7 @@ GblSize GblObject_eventFilterCount(const GblObject* pSelf) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblType_contextDefault());
     GblVector* pFilters = GblObject_eventFilters_(pSelf);
     if(pFilters) {
-        GBL_API_CALL(GblVector_size(pFilters, &count));
+        count = GblVector_size(pFilters);
     }
     GBL_API_END_BLOCK();
     return count;
@@ -845,20 +846,33 @@ GBL_EXPORT GblRefCount GblObject_refCount(const GblObject* pObject) GBL_NOEXCEPT
     return GBL_ATOMIC_INT16_LOAD(pObject->refCounter);
 }
 
+GBL_RESULT GblObject_nameDestruct_(void* pName) {
+    GblStringRef_release(pName);
+    return GBL_RESULT_SUCCESS;
+}
+
 GBL_EXPORT void GblObject_nameSet(GblObject* pSelf, const char* pName) GBL_NOEXCEPT {
-    GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData, objectNameQuark_, GblQuark_fromString(pName), NULL);
+
+    GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData,
+                                      objectNameQuark_,
+                                      (uintptr_t)GblStringRef_create(pName),
+                                      GblObject_nameDestruct_);
 }
 
 GBL_EXPORT const char* GblObject_name(const GblObject* pSelf) GBL_NOEXCEPT {
-    return GblQuark_toString(GblDataTable_valueFromKeyQuark(&pSelf->pExtendedData, objectNameQuark_));
+    return (const char*)GblDataTable_valueFromKeyQuark(&pSelf->pExtendedData,
+                                                       objectNameQuark_);
 }
 
 GBL_EXPORT void* GblObject_userdata(const GblObject* pSelf) GBL_NOEXCEPT {
-    return (void*)GblDataTable_valueFromKeyQuark(&pSelf->pExtendedData, objectUserdataQuark_);
+    return (void*)GblDataTable_valueFromKeyQuark(&pSelf->pExtendedData,
+                                                 objectUserdataQuark_);
 }
 
 GBL_EXPORT void GblObject_userdataSet(GblObject* pSelf, void* pUserdata) GBL_NOEXCEPT {
-    GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData, objectUserdataQuark_, (uintptr_t)pUserdata, NULL);
+    GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData,
+                                      objectUserdataQuark_,
+                                      (uintptr_t)pUserdata, NULL);
 }
 
 typedef struct GblObjectFamily_ {

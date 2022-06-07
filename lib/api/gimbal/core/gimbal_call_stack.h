@@ -80,7 +80,7 @@ typedef struct GblStackFrame {
 
 GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObject, GBL_RESULT initialResult, GblSourceLocation entryLoc);
 
-static inline GblBool GBL_API_STACK_FRAME_SOURCE_PUSH(GblStackFrame* pStackFrame, GblSourceLocation current) {
+GBL_INLINE GblBool GBL_API_STACK_FRAME_SOURCE_PUSH(GblStackFrame* pStackFrame, GblSourceLocation current) {
     if(++pStackFrame->sourceCurrentCaptureDepth == 1) { //we care about the first entry point
         pStackFrame->sourceCurrent = current;
         return GBL_TRUE;
@@ -88,7 +88,7 @@ static inline GblBool GBL_API_STACK_FRAME_SOURCE_PUSH(GblStackFrame* pStackFrame
     return GBL_FALSE;
 }
 
-static inline GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame) {
+GBL_INLINE GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame) {
     GBL_ASSERT(pStackFrame->sourceCurrentCaptureDepth);
     if(--pStackFrame->sourceCurrentCaptureDepth == 0) {
         pStackFrame->sourceCurrent = pStackFrame->sourceEntry;

@@ -1,11 +1,11 @@
 ﻿#ifndef GIMBAL_VARIANT__H
 #define GIMBAL_VARIANT__H
 
-#include "../types/gimbal_string.h"
+#include "../types/gimbal_string_buffer.h"
 #include "../ifaces/gimbal_ivariant.h"
 #include "../meta/gimbal_variant.h"
 #include "../types/gimbal_typedefs.h"
-#include "../meta/gimbal_value_types.h"
+#include "../meta/gimbal_primitives.h"
 #include <stdint.h>
 
 #define SELF    GblVariant* pSelf
@@ -49,29 +49,29 @@ typedef struct GblVariant {
         GblInt          integer;
         uint64_t        uinteger64;
         GblFloat        floating;
-        GblString       string;
+        GblStringBuffer string;
     };
     GblType             type;
 } GblVariant;
 
-#define GBL_VARIANT_CONSTRUCT_TRAITS (                      \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,                  \
-        (                                                   \
-            (GblBool,           gblVariantConstructb),      \
-            (GblInt,            gblVariantConstructi),      \
-            (GblUint,           gblVariantConstructu),      \
-            (GblFloat,          gblVariantConstructf),      \
-            (void*,             gblVariantConstructp),      \
-            (const GblString*,  gblVariantConstructs),      \
-            (GblString*,        gblVariantConstructs),      \
-            (const char*,       gblVariantConstructc),      \
-            (char*,             gblVariantConstructc),      \
-            (const GblVariant*, gblVariantConstructCopy)    \
-        )                                                   \
+#define GBL_VARIANT_CONSTRUCT_TRAITS (                           \
+        GBL_META_GENERIC_MACRO_NO_DEFAULT,                       \
+        (                                                        \
+            (GblBool,                gblVariantConstructb),      \
+            (GblInt,                 gblVariantConstructi),      \
+            (GblUint,                gblVariantConstructu),      \
+            (GblFloat,               gblVariantConstructf),      \
+            (void*,                  gblVariantConstructp),      \
+            (const GblStringBuffer*, gblVariantConstructs),      \
+            (GblStringBuffer*,       gblVariantConstructs),      \
+            (const char*,            gblVariantConstructc),      \
+            (char*,                  gblVariantConstructc),      \
+            (const GblVariant*,      gblVariantConstructCopy)    \
+        )                                                        \
     )
-#define gblVariantConstruct_N(pVariant, ...)        GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
-#define gblVariantConstruct_1(pVariant)              gblVariantConstructDefault(pVariant)
-#define gblVariantConstruct(...)                    GBL_VA_OVERLOAD_CALL(gblVariantConstruct, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
+#define gblVariantConstruct_N(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
+#define gblVariantConstruct_1(pVariant)     gblVariantConstructDefault(pVariant)
+#define gblVariantConstruct(...)            GBL_VA_OVERLOAD_CALL(gblVariantConstruct, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
 
 #define gblVariantSetc(...) GBL_VA_OVERLOAD_CALL(gblVariantSetc, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
@@ -82,8 +82,8 @@ typedef struct GblVariant {
             (GblInt,            gblVariantSeti),    \
             (GblFloat,          gblVariantSetf),    \
             (void*,             gblVariantSetp),    \
-            (const GblString*,  gblVariantSets),    \
-            (GblString*,        gblVariantSets),    \
+            (const GblStringBuffer*,  gblVariantSets),    \
+            (GblStringBuffer*,        gblVariantSets),    \
             (const char*,       gblVariantSetc_2),  \
             (char*,             gblVariantSetc_2)   \
         )                                           \
@@ -95,7 +95,7 @@ typedef struct GblVariant {
         GBL_META_GENERIC_MACRO_NO_DEFAULT,        \
         (                                           \
             (GblVariant*,       gblVariantMovev),    \
-            (GblString*,        gblVariantMoves)    \
+            (GblStringBuffer*,        gblVariantMoves)    \
         )                                           \
     )
 #define gblVariantMove(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_MOVE_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
@@ -109,7 +109,7 @@ typedef struct GblVariant {
             (GblInt*,           gblVariantGeti),    \
             (GblFloat*,         gblVariantGetf),    \
             (void**,            gblVariantGetp),    \
-            (const GblString**, gblVariantGets),    \
+            (const GblStringBuffer**, gblVariantGets),    \
             (const char**,      gblVariantGetc)     \
         )                                           \
     )
@@ -122,7 +122,7 @@ typedef struct GblVariant {
             (GblInt*,       gblVariantToi),     \
             (GblFloat*,     gblVariantTof),     \
             (void**,        gblVariantTop),     \
-            (GblString*,    gblVariantTos),     \
+            (GblStringBuffer*,    gblVariantTos),     \
             (const char**,  gblVaraintToc)      \
         )                                       \
     )
@@ -135,8 +135,8 @@ typedef struct GblVariant {
             (GblFloat,          gblVariantComparef),    \
             (const void*,       gblVariantComparep),    \
             (void*,             gblVariantComparep),    \
-            (const GblString*,  gblVariantCompares),    \
-            (GblString*,        gblVariantCompares),    \
+            (const GblStringBuffer*,  gblVariantCompares),    \
+            (GblStringBuffer*,        gblVariantCompares),    \
             (const GblVariant*, gblVariantComparev),    \
             (GblVariant*,       gblVariantComparev),    \
             (const char*,       gblVariantComparec),    \
@@ -207,7 +207,7 @@ GBL_INLINE GBL_API gblVariantGetp(const GblVariant* pVariant,    void**     pVal
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblVariantGets(const GblVariant* pVariant,  const GblString** pString) {
+GBL_INLINE GBL_API gblVariantGets(const GblVariant* pVariant,  const GblStringBuffer** pString) {
     GBL_API_BEGIN(GBL_NULL);
     GBL_API_VERIFY_POINTER(pVariant);
     GBL_API_VERIFY_POINTER(pString);
@@ -268,26 +268,24 @@ GBL_INLINE GBL_API gblVariantSetp(GblVariant* pVariant,    void*       pValue) {
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblVariantSets(GblVariant* pVariant, const GblString* pString) {
+GBL_INLINE GBL_API gblVariantSets(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_API_BEGIN(GBL_NULL);
     GBL_API_VERIFY_POINTER(pVariant);
     GBL_API_VERIFY_POINTER(pString);
-    const char* pChar;
-    GblSize     length;
-    GblContext* pCtx;
 
-    GBL_API_CALL(gblStringCStr(pString, &pChar));
-    GBL_API_CALL(gblStringLength(pString, &length));
-    GBL_API_CALL(gblStringContext(pString, &pCtx));
 
-    GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_STRING_TYPE, pChar, length, pCtx));
+    GBL_API_CALL(GblVariant_setValueCopy(pVariant,
+                                         GBL_STRING_TYPE,
+                                         GblStringBuffer_cString(pString),
+                                         GblStringBuffer_length(pString),
+                                         GblStringBuffer_context(pString)));
 #if 0
-    view.pBuffer = pString->data.pBuffer; view.size = pString->data.size;
+    view.pBuffer = pString->data.pBuffer; view.length = pString->data.size;
     if(pVariant->type != GBL_STRING_TYPE) {
         GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_STRING_TYPE));
-        GBL_API_CALL(gblStringConstruct(&pVariant->string, sizeof(GblString), pString->data.hCtx, &view));
+        GBL_API_CALL(GblStringBuffer_construct(&pVariant->string, sizeof(GblStringBuffer), pString->data.hCtx, &view));
     } else {
-        GBL_API_CALL(gblStringAssign(&pVariant->string, &view));
+        GBL_API_CALL(GblStringBuffer_assign(&pVariant->string, &view));
     }
 #endif
     GBL_API_END();
@@ -301,12 +299,12 @@ GBL_INLINE GBL_API gblVariantSetc_3(GblVariant* pVariant, const char* pString, G
 
     GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_STRING_TYPE, pString, 0, pCtx));
     /*
-    view.pBuffer = pString; view.size = 0;
+    view.pBuffer = pString; view.length = 0;
     if(pVariant->type != GBL_STRING_TYPE) {
         GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_STRING_TYPE));
-        GBL_API_CALL(gblStringConstruct(&pVariant->string, sizeof(GblString), hCtx, &view));
+        GBL_API_CALL(GblStringBuffer_construct(&pVariant->string, sizeof(GblStringBuffer), hCtx, &view));
     } else {
-        GBL_API_CALL(gblStringAssign(&pVariant->string, &view));
+        GBL_API_CALL(GblStringBuffer_assign(&pVariant->string, &view));
     }*/
     GBL_API_END();
 }
@@ -329,7 +327,7 @@ GBL_INLINE GBL_API gblVariantTob(const GblVariant* pVariant, GblBool* pValue) {
         else if(type == GBL_INT32_TYPE)     *pValue = pVariant->i32? GBL_TRUE : GBL_FALSE;
         else if(type == GBL_FLOAT_TYPE)     *pValue = pVariant->floating != 0.0f? GBL_TRUE : GBL_FALSE;
         else if(type == GBL_POINTER_TYPE)   *pValue = pVariant->pVoid? GBL_TRUE : GBL_FALSE;
-        else if(type == GBL_STRING_TYPE)    GBL_API_CALL(gblStringTob(&pVariant->string, pValue));
+        else if(type == GBL_STRING_TYPE)    *pValue = GblStringBuffer_toBool(&pVariant->string);
         else *pValue = GBL_FALSE;
     }
     GBL_API_END();
@@ -345,7 +343,7 @@ GBL_INLINE GBL_API gblVariantToi(const GblVariant* pVariant,    GblInt*      pVa
         else if(type == GBL_INT32_TYPE)     *pValue = pVariant->integer;
         else if(type == GBL_FLOAT_TYPE)     *pValue = (GblInt)pVariant->floating;
         else if(type == GBL_POINTER_TYPE)   *pValue = (uintptr_t)pVariant->pVoid;
-        else if(type ==GBL_STRING_TYPE)     GBL_API_CALL(gblStringToi(&pVariant->string, pValue));
+        else if(type ==GBL_STRING_TYPE)     *pValue = GblStringBuffer_toInt(&pVariant->string);
         else *pValue = 0;
 
     }
@@ -360,7 +358,7 @@ GBL_INLINE GBL_API gblVariantTof(const GblVariant* pVariant,    GblFloat*    pVa
         const GblType type = GblVariant_type(pVariant);
         if(type == GBL_INT32_TYPE)          *pValue = (GblFloat)pVariant->integer;
         else if(type == GBL_FLOAT_TYPE)    *pValue = pVariant->floating;
-        else if(type == GBL_STRING_TYPE)   GBL_API_CALL(gblStringTof(&pVariant->string, pValue));
+        else if(type == GBL_STRING_TYPE)   *pValue = GblStringBuffer_toFloat(&pVariant->string);
         else {
             *pValue = 0.0f;
             GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_TYPE_MISMATCH, "Cannot convert type: %u to float!", pVariant->type);
@@ -402,31 +400,31 @@ GBL_INLINE GBL_API gblVariantToc(const GblVariant* pVariant, const char** ppCStr
 
 
 // BETTER ALREADY BE CONSTRUCTED, SO THAT IT ALREADY HAS A FUCKING CONTEXT ASSOCIATED WITH IT!
-GBL_INLINE GBL_API gblVariantTos(const GblVariant* pVariant, GblString* pString) {
+GBL_INLINE GBL_API gblVariantTos(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_API_BEGIN(GBL_NULL);
     GblStringView view;
     GBL_API_VERIFY_POINTER(pVariant);
     GBL_API_VERIFY_POINTER(pString);
 
     if(pVariant->type == GBL_STRING_TYPE) {
-        view.pBuffer = pVariant->string.data.pBuffer; view.size = pVariant->string.data.size;
-        GBL_API_CALL(gblStringConstruct(pString, sizeof(GblString), GBL_NULL, &view));
+        view.pData = (char*)pVariant->string.data.pData; view.length = pVariant->string.data.size;
+        GBL_API_CALL(GblStringBuffer_construct(pString, view, sizeof(GblStringBuffer)));
     }  else {
 
-        GBL_API_CALL(gblStringConstruct(pString, sizeof(GblString), GBL_NULL, NULL));
+        GBL_API_CALL(GblStringBuffer_construct(pString));
         const GblType type = GblVariant_type(pVariant);
         if(type == GBL_NIL_TYPE)
-            GBL_API_CALL(gblStringFromNil(pString));
+            GBL_API_CALL(GblStringBuffer_appendNil(pString));
         else if(type == GBL_BOOL_TYPE)
-            GBL_API_CALL(gblStringFromb(pString, pVariant->boolean));
+            GBL_API_CALL(GblStringBuffer_appendBool(pString, pVariant->boolean));
         else if(type == GBL_INT32_TYPE)
-            GBL_API_CALL(gblStringFromi(pString, pVariant->integer));
+            GBL_API_CALL(GblStringBuffer_appendInt(pString, pVariant->integer));
         else if(type == GBL_UINT32_TYPE)
-            GBL_API_CALL(gblStringFromu(pString, pVariant->u32));
+            GBL_API_CALL(GblStringBuffer_appendUint(pString, pVariant->u32));
         else if(type == GBL_FLOAT_TYPE)
-            GBL_API_CALL(gblStringFromf(pString, pVariant->floating));
+            GBL_API_CALL(GblStringBuffer_appendFloat(pString, pVariant->floating));
         else if(type == GBL_POINTER_TYPE)
-            GBL_API_CALL(gblStringFromp(pString, pVariant->pVoid));
+            GBL_API_CALL(GblStringBuffer_appendPointer(pString, pVariant->pVoid));
         else
             GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_TYPE_MISMATCH, "Attempted to convert unknown variant type %u to string!", pVariant->type);
         }
@@ -458,9 +456,9 @@ GBL_VARIANT_COMPARE_INTEGRAL_DEFINE(i, GblInt, 0)
 GBL_VARIANT_COMPARE_INTEGRAL_DEFINE(f, GblFloat, 0.0f)
 GBL_VARIANT_COMPARE_INTEGRAL_DEFINE(p, void*, NULL)
 
-GBL_INLINE GBL_API gblVariantCompares(const GblVariant* pVariant, const GblString* pString, GBL_VARIANT_OP_CMP_TYPE op, GblBool* pResult) {
-    GblString tempString;
-    const GblString* pThisString = NULL;
+GBL_INLINE GBL_API gblVariantCompares(const GblVariant* pVariant, const GblStringBuffer* pString, GBL_VARIANT_OP_CMP_TYPE op, GblBool* pResult) {
+    GblStringBuffer tempString;
+    const GblStringBuffer* pThisString = NULL;
     GBL_API_BEGIN(GBL_NULL);
     GBL_API_VERIFY_POINTER(pVariant);
     GBL_API_VERIFY_POINTER(pString);
@@ -474,27 +472,21 @@ GBL_INLINE GBL_API gblVariantCompares(const GblVariant* pVariant, const GblStrin
     }
     switch(op) {
     case GBL_VARIANT_OP_CMP_EQUAL: {
-        GblInt result = 0;
-        GBL_API_CALL(gblStringCompare(pThisString, pString, &result));
+        GblInt result = GblStringBuffer_compare(pThisString, pString);
         *pResult = result == 0;
         break;
     }
     case GBL_VARIANT_OP_CMP_NEQUAL: {
-        GblInt result = 1;
-        GBL_API_CALL(gblStringCompare(pThisString, pString, &result));
+        GblInt result = GblStringBuffer_compare(pThisString, pString);
         *pResult = result != 0;
         break;
     }
     default: {
-        const char* pBuffer1 = NULL;
-        const char* pBuffer2 = NULL;
-        GblSize strLen1 = 0;
-        GblSize strLen2 = 0;
-        GBL_API_CALL(gblStringCStr(pThisString, &pBuffer1));
-        GBL_API_CALL(gblStringCStr(pString, &pBuffer2));
-        GBL_API_CALL(gblStringLength(pThisString, &strLen1));
-        GBL_API_CALL(gblStringLength(pString, &strLen2));
-        const int cmpValue = strncmp(pBuffer1, pBuffer2, strLen1 < strLen2? strLen1 : strLen2);
+        const char* pBuffer1 = GblStringBuffer_cString(pThisString);
+        const char* pBuffer2 = GblStringBuffer_cString(pString);
+        GblSize     strLen1 = GblStringBuffer_length(pThisString);
+        GblSize     strLen2 = GblStringBuffer_length(pString);
+        const int   cmpValue = strncmp(pBuffer1, pBuffer2, strLen1 < strLen2? strLen1 : strLen2);
         switch(op) {
         case GBL_VARIANT_OP_CMP_LESS:       *pResult = (cmpValue < 0 ); break;
         case GBL_VARIANT_OP_CMP_LEQUAL:     *pResult = (cmpValue <= 0); break;
@@ -511,10 +503,10 @@ GBL_INLINE GBL_API gblVariantComparec(const GblVariant* pVariant, const char* pC
     GblSize strlength = pCStr? strlen(pCStr) : 0;
     GBL_UNUSED(strlength);
     GBL_ASSERT(strlength < UINT16_MAX);
-    const GblString tempString = {
+    const GblStringBuffer tempString = {
         .data = {
             .pCtx = GBL_NULL,
-            .pBuffer = (char*)pCStr,
+            .pData = (uint8_t*)pCStr,
             .size = (uint16_t)strlength,
             .capacity = 0,
             .elementSize = 1,
@@ -564,12 +556,12 @@ GBL_INLINE GBL_API gblVariantComparev(const GblVariant* pLhs,
             GBL_API_CALL(gblVariantTop(pRhs, &pValue));
             GBL_API_CALL(gblVariantComparep(pLhs, pValue, op, pResult));
         } else if(type == GBL_STRING_TYPE) {
-            GblString tempStr;
-            const GblString* pRStr = NULL;
+            GblStringBuffer tempStr;
+            const GblStringBuffer* pRStr = NULL;
             if(pRhs->type == GBL_STRING_TYPE) {
                 pRStr = &pRhs->string;
             } else {
-                GBL_API_CALL(gblStringConstruct(&tempStr, sizeof(GblString), GBL_NULL, NULL));
+                GBL_API_CALL(GblStringBuffer_construct(&tempStr));
                 GBL_API_CALL(gblVariantTos(pRhs, &tempStr));
                 pRStr = &tempStr;
             }
@@ -609,16 +601,11 @@ GBL_INLINE GBL_API gblVariantConstructc(GblVariant* pVariant, const char* pStrin
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblVariantConstructs(GblVariant* pVariant, const GblString* pString) {
+GBL_INLINE GBL_API gblVariantConstructs(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_API_BEGIN(NULL);
-    const char* pChar;
-    GblSize     length;
-    GblContext* pCtx;
-
-    GBL_API_CALL(gblStringCStr(pString, &pChar));
-    GBL_API_CALL(gblStringLength(pString, &length));
-    GBL_API_CALL(gblStringContext(pString, &pCtx));
-
+    const char* pChar = GblStringBuffer_cString(pString);
+    GblSize     length = GblStringBuffer_length(pString);
+    GblContext* pCtx = GblStringBuffer_context(pString);
     GBL_API_CALL(GblVariant_constructValueCopy(pVariant, GBL_STRING_TYPE, pChar, length, pCtx));
     GBL_API_END();
 }
@@ -665,22 +652,22 @@ GBL_INLINE GBL_API gblVariantMovec(GblVariant* pVariant, char* pBuffer, GblSize 
     GBL_API_CALL(GblVariant_setValueMove(pVariant, GBL_STRING_TYPE, pBuffer, capacity));
     /*
     GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_STRING_TYPE));
-    GBL_API_CALL(gblStringGive(&pVariant->string, pBuffer, capacity));
+    GBL_API_CALL(GblStringBuffer_give(&pVariant->string, pBuffer, capacity));
     GBL_API_END();*/
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblVariantMoves(GblVariant* pVariant, GblString* pOther) {
+GBL_INLINE GBL_API gblVariantMoves(GblVariant* pVariant, GblStringBuffer* pOther) {
     GblBool stack = GBL_FALSE;
     char* pOtherBuff = NULL;
     GblSize otherCapacity = 0;
     GBL_API_BEGIN(GBL_NULL);
     GBL_API_VERIFY_POINTER(pOther);
-    GBL_API_CALL(gblStringIsStack(pOther, &stack));
+    stack = GblStringBuffer_stack(pOther);
     if(stack) {
         GBL_API_CALL(gblVariantSets(pVariant, pOther));
     } else {
-        GBL_API_CALL(gblStringTake(pOther, &pOtherBuff, &otherCapacity));
+        GBL_API_CALL(GblStringBuffer_take(pOther, &pOtherBuff, &otherCapacity));
         GBL_API_CALL(gblVariantMovec(pVariant, pOtherBuff, otherCapacity));
     }
     GBL_API_END();

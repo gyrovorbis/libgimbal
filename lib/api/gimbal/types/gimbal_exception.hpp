@@ -37,6 +37,15 @@ public:
         return record;
     }
 
+    static const CallRecord& checkThrow(std::invocable auto fn) {
+        const GblCallRecord* pRecord = nullptr;
+        GblThread_callRecordSet(NULL, NULL);
+        fn();
+        pRecord = GblThread_callRecord(NULL);
+        return Exception::checkThrow(*pRecord);
+    }
+
+
     static CallRecord tryCatchRecord(std::invocable auto fn, SourceLocation loc=SourceLocation(SRC_FILE, nullptr, SRC_LN, SRC_COL)) noexcept;
 
     class TryBlock {

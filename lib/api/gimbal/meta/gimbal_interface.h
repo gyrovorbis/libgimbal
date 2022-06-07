@@ -20,8 +20,8 @@ typedef struct GblInterface {
     int16_t     outerClassOffset;
 } GblInterface;
 
-GBL_INLINE GblInterface* GblInterface_peek              (GblClass* pClass, GblType ifaceType)  GBL_NOEXCEPT;
-GBL_INLINE GblInterface* GblInterface_try               (GblClass* pClass)                     GBL_NOEXCEPT;
+GBL_INLINE GblInterface* GblInterface_peek              (GblClass* pClass, GblType ifaceType)   GBL_NOEXCEPT;
+GBL_INLINE GblInterface* GblInterface_try               (GblClass* pClass)                      GBL_NOEXCEPT;
 
 GBL_INLINE int16_t       GblInterface_outerClassOffset  (CSELF)                                 GBL_NOEXCEPT;
 GBL_INLINE GblClass*     GblInterface_outerClass        (SELF)                                  GBL_NOEXCEPT;

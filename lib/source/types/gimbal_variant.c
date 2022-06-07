@@ -100,14 +100,14 @@ GBL_API GblVariant_destruct(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_save(const GblVariant* pSelf, GblString* pString) GBL_NOEXCEPT {
+GBL_API GblVariant_save(const GblVariant* pSelf, GblStringBuffer* pString) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, peek);
     GBL_API_CALL(GblIVariantIFace_save(pIFace, pSelf, pString));
     GBL_VARIANT_END_();
 }
 
 
-GBL_API GblVariant_load(GblVariant* pSelf, const GblString* pString) GBL_NOEXCEPT {
+GBL_API GblVariant_load(GblVariant* pSelf, const GblStringBuffer* pString) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, peek);
     GBL_API_CALL(GblIVariantIFace_load(pIFace, pSelf, pString));
     GBL_VARIANT_END_();

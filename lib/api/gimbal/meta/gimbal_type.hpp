@@ -6,7 +6,9 @@
 #include "../core/gimbal_api_generators.hpp"
 #include "../types/gimbal_result.hpp"
 #include "../objects/gimbal_context.hpp"
-#include "../meta/gimbal_value_types.h"
+#include "../meta/gimbal_primitives.h"
+#include "../meta/gimbal_enum.h"
+#include "../meta/gimbal_flags.h"
 
 #define GBL_TYPE_DECLARE_CPP(cppName, cName)    \
     class cppName final: public Type {          \

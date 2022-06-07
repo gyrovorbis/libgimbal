@@ -38,7 +38,6 @@ typedef enum GBL_IVARIANT_OP_FLAGS {
     GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE        = 0x2000
 } GBL_IVARIANT_OP_FLAGS;
 
-
 #define VARIANT     GblVariant* pVariant
 #define CVARIANT    const VARIANT
 
@@ -53,8 +52,8 @@ typedef struct GblIVariantIFace {
     GBL_RESULT (*pFnGet)      (VARIANT,  GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
     GBL_RESULT (*pFnDestruct) (VARIANT);
     GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, GblInt* pResult);
-    GBL_RESULT (*pFnSave)     (CVARIANT, GblString* pString);
-    GBL_RESULT (*pFnLoad)     (VARIANT,  const GblString* pString);
+    GBL_RESULT (*pFnSave)     (CVARIANT, GblStringBuffer* pString);
+    GBL_RESULT (*pFnLoad)     (VARIANT,  const GblStringBuffer* pString);
 } GblIVariantIFace;
 
 
@@ -77,16 +76,14 @@ GBL_API GblIVariantIFace_getValueTake        (CSELF, CVARIANT, va_list* pVarArgs
 GBL_API GblIVariantIFace_destruct            (CSELF, VARIANT)                               GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_compare             (CSELF, CVARIANT, const GblVariant* pOther,
                                               GblInt* pCmpResult)                           GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_save                (CSELF, CVARIANT, GblString* pString)          GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_load                (CSELF, VARIANT, const GblString* pString)     GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_save                (CSELF, CVARIANT, GblStringBuffer* pString)          GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_load                (CSELF, VARIANT, const GblStringBuffer* pString)     GBL_NOEXCEPT;
 
 #undef CVARIANT
 #undef VARIANT
 
 #undef CSELF
 #undef SELF
-
-
 
 GBL_DECLS_END
 

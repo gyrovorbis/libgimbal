@@ -79,7 +79,9 @@ protected:
 
     void* at_(Size index) const {
         void* pData = nullptr;
-        Exception::checkThrow(GblVector_at(vec_(), index, &pData));
+        Exception::checkThrow([&]() {
+            pData = GblVector_at(vec_(), index);
+        });
         return pData;
     }
 
@@ -107,15 +109,11 @@ public:
 
     // Accessors
     bool isEmpty(void) const {
-        Bool empty = GBL_TRUE;
-        Exception::checkThrow(GblVector_empty(vec_(), &empty));
-        return empty;
+        return GblVector_empty(vec_());
     }
 
     bool isStack(void) const {
-        Bool stack = GBL_TRUE;
-        Exception::checkThrow(GblVector_stack(vec_(), &stack));
-        return stack;
+        return GblVector_stack(vec_());
     }
 
     bool isHeap(void) const { return !isStack(); }
@@ -125,15 +123,11 @@ public:
     }
 
     Size getStackBytes(void) const {
-        Size bytes = 0;
-        Exception::checkThrow(GblVector_stackBytes(vec_(), &bytes));
-        return bytes;
+        return GblVector_stackBytes(vec_());
     }
 
     Context* getContext(void) const {
-        GblContext* pCtx = nullptr;
-        Exception::checkThrow(GblVector_context(vec_(), &pCtx));
-        return pCtx == nullptr? nullptr : Context::fromGblObj(pCtx);
+        return Context::fromGblObj(GblVector_context(vec_()));
     }
 
     allocator_type get_allocator(void) const {
@@ -141,9 +135,7 @@ public:
     }
 
     Size getSize(void) const {
-        Size size = 0;
-        Exception::checkThrow(GblVector_size(vec_(), &size));
-        return size;
+        return GblVector_size(vec_());
     }
 
     Size getSizeBytes(void) const {
@@ -155,9 +147,7 @@ public:
     }
 
     Size getCapacity(void) const {
-        Size capacity = 0;
-        Exception::checkThrow(GblVector_capacity(vec_(), &capacity));
-        return capacity;
+        return GblVector_capacity(vec_());
     }
 
     Size capacity(void) const {
@@ -165,9 +155,7 @@ public:
     }
 
     Size getElementSize(void) const {
-        Size elemSize = 0;
-        Exception::checkThrow(GblVector_elementSize(vec_(), &elemSize));
-        return elemSize;
+        return GblVector_elementSize(vec_());
     }
 
     size_type element_size(void) const { return getElementSize(); }
@@ -177,9 +165,7 @@ public:
     }
 
     const void* getData(void) const {
-        const void* pData = nullptr;
-        Exception::checkThrow(GblVector_data(vec_(), &pData));
-        return pData;
+       return GblVector_data(vec_());
     }
 
     constexpr pointer data(void) {
@@ -192,13 +178,17 @@ public:
 
     T& front(void) const {
         T* pValue = nullptr;
-        Exception::checkThrow(GblVector_front(vec_(), reinterpret_cast<void**>(&pValue)));
+        Exception::checkThrow([&]() {
+            pValue = reinterpret_cast<T*>(GblVector_front(vec_()));
+        });
         return *pValue;
     }
 
     T& back(void) const {
         T* pValue = nullptr;
-        Exception::checkThrow(GblVector_back(vec_(), reinterpret_cast<void**>(&pValue)));
+        Exception::checkThrow([&]() {
+            pValue = reinterpret_cast<T*>(GblVector_back(vec_()));
+        });
         return *pValue;
     }
 
@@ -310,14 +300,14 @@ public:
 
     // raw pointer constructor
     explicit Vector(const T* pInitialData, Size elementCount, Context* pCtx=nullptr, Size allocSize=sizeof(VectorType), Size elementSize=sizeof(T)) {
-        Exception::checkThrow(GblVector_construct(this, pCtx, elementSize, allocSize, pInitialData, elementCount));
+        Exception::checkThrow(GblVector_construct(this, elementSize, elementCount, pInitialData, allocSize, pCtx));
     }
 
     // fill constructor
     explicit Vector(Size count, const T& value=T(), Context* pCtx=nullptr, Size allocSize=sizeof(VectorType)) {
         T* pTempArray = static_cast<T*>(GBL_ALLOCA(count * sizeof(T)));
         std::fill(pTempArray, pTempArray+count, value);
-        Exception::checkThrow(GblVector_construct(this, pCtx, sizeof(T), allocSize, pTempArray, count));
+        Exception::checkThrow(GblVector_construct(this, sizeof(T), count, pTempArray, allocSize, pCtx));
     }
 
     // initializer list constructor
@@ -431,7 +421,9 @@ public:
 
     iterator insert(const_iterator position, const T* pValue, Size count) {
         const auto index = std::distance(this->cbegin(), position);
-        Exception::checkThrow(GblVector_insert(this, index, count, pValue, nullptr));
+        Exception::checkThrow([&]() {
+            GblVector_insert(this, index, count, pValue);
+        });
         return iterator(*this, index);
     }
 
@@ -470,7 +462,9 @@ public:
     iterator emplace(const_iterator position, Args&&... args) {
         const auto index = std::distance(this->cbegin(), position);
         void* pData = nullptr;
-        Exception::checkThrow(GblVector_insert(this, index, 1, nullptr, &pData));
+        Exception::checkThrow([&]() {
+            pData = GblVector_insert(this, index, 1, nullptr);
+        });
          T* pObj = new (pData) T(std::forward<Args>(args)...);
          return iterator(*this, index);
     }

@@ -1,7 +1,8 @@
-#ifndef GIMBAL_VALUE_TYPES_H
-#define GIMBAL_VALUE_TYPES_H
+#ifndef GIMBAL_PRIMITIVES_H
+#define GIMBAL_PRIMITIVES_H
 
 #include "gimbal_type.h"
+#include "../ifaces/gimbal_ivariant.h"
 
 #define GBL_NIL_TYPE                        (GBL_BUILTIN_TYPE(NIL))
 #define GBL_BOOL_TYPE                       (GBL_BUILTIN_TYPE(BOOL))
@@ -13,8 +14,6 @@
 #define GBL_UINT32_TYPE                     (GBL_BUILTIN_TYPE(UINT32))
 #define GBL_INT64_TYPE                      (GBL_BUILTIN_TYPE(INT64))
 #define GBL_UINT64_TYPE                     (GBL_BUILTIN_TYPE(UINT64))
-#define GBL_ENUM_TYPE                       (GBL_BUILTIN_TYPE(ENUM))
-#define GBL_FLAGS_TYPE                      (GBL_BUILTIN_TYPE(FLAGS))
 #define GBL_FLOAT_TYPE                      (GBL_BUILTIN_TYPE(FLOAT))
 #define GBL_DOUBLE_TYPE                     (GBL_BUILTIN_TYPE(DOUBLE))
 #define GBL_POINTER_TYPE                    (GBL_BUILTIN_TYPE(POINTER))
@@ -22,5 +21,10 @@
 #define GBL_TYPE_TYPE                       (GBL_BUILTIN_TYPE(TYPE))
 #define GBL_BOXED_TYPE                      (GBL_BUILTIN_TYPE(BOXED))
 
+typedef struct GblPrimitiveClass {
+    GblClass            base;
+    GblIVariantIFace    iVariantIFace;
+} GblPrimitiveClass;
 
-#endif // GIMBAL_VALUE_TYPES_H
+
+#endif // GIMBAL_PRIMITIVES_H

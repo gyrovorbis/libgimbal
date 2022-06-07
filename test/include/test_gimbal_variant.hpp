@@ -8,7 +8,7 @@
 namespace gimbal::test {
 
 // test converting from string to numbers and other shit
-// add that functionality to GblString
+// add that functionality to GblStringBuffer
 class Variant: public UnitTestSet {
     Q_OBJECT
     struct Cuntass {
@@ -27,14 +27,14 @@ private slots:
         {
             const auto str = gimbal::String("test", pCtx());
 
-            gimbal::Variant v(static_cast<const GblString*>(&str));
+            gimbal::Variant v(static_cast<const GblStringBuffer*>(&str));
 
             QCOMPARE(v.getType(), StringType());
 
-            gimbal::StringView strView = v.getValue<const GblString*>();
+            gimbal::StringView strView = v.getValue<const GblStringBuffer*>();
             QCOMPARE(strView.getCString(), "test");
 
-            gimbal::String string = v.toValue<GblString>();
+            gimbal::String string = v.toValue<GblStringBuffer>();
             QCOMPARE(strView.getCString(), string.getCString());
 
             gimbal::Variant v2(v);
@@ -49,7 +49,7 @@ private slots:
 
         auto stringifyTest = [&](auto&& construct, gimbal::String expected=nullptr) {
             gimbal::Variant sv(std::forward<decltype(construct)>(construct));
-            gimbal::String result = sv.toValue<GblString>();
+            gimbal::String result = sv.toValue<GblStringBuffer>();
             if(!expected.isEmpty()) QCOMPARE(result.getCString(), expected.getCString());
        };
 
@@ -57,7 +57,7 @@ private slots:
        stringifyTest(gimbal::Variant(), "nil");
        const char* pCStr = "Some heapy-ass mcHeapery String from fucking hell with all the heap allocs";
        const auto strLong = gimbal::String(pCStr, pCtx());
-       stringifyTest(static_cast<const GblString*>(&strLong), gimbal::String(pCStr));
+       stringifyTest(static_cast<const GblStringBuffer*>(&strLong), gimbal::String(pCStr));
        stringifyTest((GblBool)GBL_FALSE, "false");
        stringifyTest(128, "128");
        stringifyTest(128u, "128");
@@ -66,7 +66,7 @@ private slots:
        //gimbal::Variant v3(str3);
 
         auto testStrVariant = [&]<typename T>(gimbal::String string, T expectedVal) {
-            gimbal::Variant v(static_cast<const GblString*>(&string));
+            gimbal::Variant v(static_cast<const GblStringBuffer*>(&string));
             gimbal::Variant v2(std::forward<decltype(expectedVal)>(expectedVal));
             QCOMPARE(v, v2);
             auto blk = GBL_API_TRY_BLOCK {
@@ -81,7 +81,7 @@ private slots:
        testStrVariant("-1234", -1234);
        testStrVariant("-36", -36);
        gimbal::String nstr("nil");
-       gimbal::Variant nv(static_cast<const GblString*>(&nstr));
+       gimbal::Variant nv(static_cast<const GblStringBuffer*>(&nstr));
        QCOMPARE(nv, gimbal::Variant());
        //sketchier than all fuck!
        testStrVariant("0.000", 0.0f);
@@ -200,10 +200,10 @@ private slots:
         test(false);
         test("char array");
         test(gimbal::String("Fuck you"));
-        GblString gblStr;
-        gblStringConstruct(&gblStr, sizeof(GblString), hCtx(), gimbal::constptr_cast(GblStringView{"Lulz", 0}));
+        GblStringBuffer gblStr;
+        GblStringBuffer_construct(&gblStr, GBL_STRV("Lulaaaz"), sizeof(GblStringBuffer), hCtx());
         test(gblStr);
-        gblStringDestruct(&gblStr);
+        GblStringBuffer_destruct(&gblStr);
         gimbal::Variant g((char*)"lulzor");
         test(std::move(g));
         auto v = gimbal::Variant(reinterpret_cast<void*>(this));

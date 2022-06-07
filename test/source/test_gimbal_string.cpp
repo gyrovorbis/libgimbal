@@ -44,7 +44,7 @@ void String::verifyStack_(const gimbal::String& str, gimbal::Size stackSize) {
 void String::verifyHeap_(const gimbal::String& str) {
     QVERIFY(!str.isStack());
     QVERIFY(str.isHeap());
-    QVERIFY(str.getCString() != str.data.stackBuffer);
+    QVERIFY(str.getCString() != GblStringBuffer_stackBuffer(&str));
     QVERIFY(str.getCapacity() > str.getStackBytes());
 }
 
@@ -130,9 +130,9 @@ void String::createStackStringView(void) {
 }
 
 void String::createStackCCopy(void) {
-    const auto view = GblStringView { "CGblStr", 0 };
-    GblString gStr;
-    gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view);
+    const auto view = GBL_STRV("CGblStr");
+    GblStringBuffer gStr;
+    GblStringBuffer_construct(&gStr, view);
 
     const auto test = [&](MonitorableContext* pCtx=nullptr) {
         gimbal::String string(gStr, pCtx);
@@ -143,13 +143,13 @@ void String::createStackCCopy(void) {
     test();
     test(pCtx());
 
-    gblStringDestruct(&gStr);
+    GblStringBuffer_destruct(&gStr);
 }
 
 void String::createStackCMove(void) {
-    const auto view = GblStringView { "MovC", 0 };
-    GblString gStr;
-    GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view));
+    const auto view = GBL_STRV("MovC");
+    GblStringBuffer gStr;
+    GBL_TEST_VERIFY_RESULT(GblStringBuffer_construct(&gStr, view));
 
     const auto test = [&](MonitorableContext* pCtx=nullptr) {
     gimbal::String string(std::move(gStr), pCtx);
@@ -160,7 +160,7 @@ void String::createStackCMove(void) {
     test();
     test(pCtx());
 
-    GBL_TEST_VERIFY_RESULT(gblStringDestruct(&gStr));
+    GBL_TEST_VERIFY_RESULT(GblStringBuffer_destruct(&gStr));
 }
 
 void String::createStackCppCopy(void) {
@@ -208,10 +208,10 @@ void String::createHeapCString(void) {
 
 void String::assignHeapCCopy(void) {
     const char* pCStr = "CGblStrHeap";
-    const auto view = GblStringView { pCStr, 0 };
-    GblString gStr;
+    const auto view = GBL_STRING_VIEW(pCStr);
+    GblStringBuffer gStr;
 
-    GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), nullptr, &view));
+    GBL_TEST_VERIFY_RESULT(GblStringBuffer_construct(&gStr, view));
 
     const auto test = [&](MonitorableContext* pCtx=nullptr) {
         gimbal::String string(pCtx);
@@ -228,18 +228,18 @@ void String::assignHeapCCopy(void) {
     QCOMPARE(block.getCountersDelta().getExt(ContextCounters::ApiExtCall::MemFree), 1);
     QCOMPARE(block.getActiveAllocCount(), 0);
 
-    GBL_TEST_VERIFY_RESULT(gblStringDestruct(&gStr));
+    GBL_TEST_VERIFY_RESULT(GblStringBuffer_destruct(&gStr));
 }
 
 void String::assignHeapCMove(void) {
     const char* pCStr = "CGblStrHeap";
-    const auto view = GblStringView { pCStr, 0 };
+    const auto view =  GBL_STRV(pCStr);
 
     const auto test = [&](GblContext* pCtx1=nullptr,
                           MonitorableContext* pCtx2=nullptr)
     {
-        GblString gStr;
-        GBL_TEST_VERIFY_RESULT(gblStringConstruct(&gStr, sizeof(GblString), pCtx1, &view));
+        GblStringBuffer gStr;
+        GBL_TEST_VERIFY_RESULT(GblStringBuffer_construct(&gStr, view, sizeof(GblStringBuffer), pCtx1));
 
         gimbal::String string(pCtx2);
         string = std::move(gStr);
@@ -247,7 +247,7 @@ void String::assignHeapCMove(void) {
         verifyHeap_(string);
         StringView gblView(gStr);
         QVERIFY(gblView.getContext() == pCtx2? gblView.isStack() : gblView.isHeap());
-        GBL_TEST_VERIFY_RESULT(gblStringDestruct(&gStr));
+        GBL_TEST_VERIFY_RESULT(GblStringBuffer_destruct(&gStr));
     };
     test();
 
@@ -576,7 +576,7 @@ void String::sprintf(void) {
     str1.sprintf("Hiya %d", 3);
     verifyString_(str1, "Hiya 3");
     verifyStack_(str1);
-
+    str1.clear();
     str1.sprintf("String:%s Uint:%u Float:%.2f Char:%c", "Test", 12, -33.33f, 't');
     verifyString_(str1, "String:Test Uint:12 Float:-33.33 Char:t");
     verifyHeap_(str1);
@@ -603,9 +603,9 @@ void String::concat(void) {
 }
 
 void String::operatorAdd(void) {
-    GblString cStr{};
-    const GblStringView cView { "gblCStr" };
-    GBL_TEST_VERIFY_RESULT(gblStringConstruct(&cStr, sizeof(GblString), nullptr, &cView));
+    GblStringBuffer cStr{};
+    const GblStringView cView = GBL_STRV("gblCStr");
+    GBL_TEST_VERIFY_RESULT(GblStringBuffer_construct(&cStr, cView));
 
     gimbal::String str(pCtx());
     str =               gimbal::String()                +
@@ -620,7 +620,7 @@ void String::operatorAdd(void) {
     verifyString_(str, "cStr cppStr cppView TROLOLO gblCStr GStringLiteral");
     verifyHeap_(str);
 
-    GBL_TEST_VERIFY_RESULT(gblStringDestruct(&cStr));
+    GBL_TEST_VERIFY_RESULT(GblStringBuffer_destruct(&cStr));
 }
 
 #pragma GBL_PRAGMA_MACRO_POP("GBL_VECTOR_STACK_BUFFER_DEFAULT_SIZE");

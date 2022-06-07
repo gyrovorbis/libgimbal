@@ -18,9 +18,9 @@ typedef uint32_t                                    GblVersion;
 #define GBL_VERSION_FIELD_PATCH_BIT                 0u
 #define GBL_VERSION_FIELD_PATCH_MASK                0xff
 
-#define GBL_VERSION_MAKE(major, minor, patch)                                               \
-    (uint32_t)((major & (uint8_t)GBL_VERSION_FIELD_MAJOR_MASK) << GBL_VERSION_FIELD_MAJOR_BIT)   |   \
-    (uint32_t)((minor & (uint16_t)GBL_VERSION_FIELD_MINOR_MASK) << GBL_VERSION_FIELD_MINOR_BIT)   |   \
+#define GBL_VERSION_MAKE(major, minor, patch)                                                       \
+    (uint32_t)((major & (uint8_t)GBL_VERSION_FIELD_MAJOR_MASK) << GBL_VERSION_FIELD_MAJOR_BIT)   |  \
+    (uint32_t)((minor & (uint16_t)GBL_VERSION_FIELD_MINOR_MASK) << GBL_VERSION_FIELD_MINOR_BIT)  |  \
     (uint32_t)((patch & (uint8_t)GBL_VERSION_FIELD_PATCH_MASK) << GBL_VERSION_FIELD_PATCH_BIT)
 
 #define GBL_VERSION_EXTRACT_MAJOR(version)                                                  \
@@ -41,9 +41,9 @@ typedef uint32_t                                    GblVersion;
   //    GBL_VA_OVERLOAD_SUFFIXER_ARGC(GBL_BIT_COUNT_MASK, GBL_BIT_FIELD_MASK, __VA_ARGS__)
 
 typedef struct GblVersionInfo {
-    uint8_t major;
-    uint16_t minor;
-    uint8_t patch;
+    uint8_t     major;
+    uint16_t    minor;
+    uint8_t     patch;
 } GblVersionInfo;
 
 GBL_MAYBE_UNUSED GBL_INLINE GblVersionInfo GBL_VERSION_EXTRACT(GblVersion version) {

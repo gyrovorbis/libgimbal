@@ -29,9 +29,9 @@ GBL_INLINE GblSize      GblByteArray_size      (CSELF)                          
 GBL_INLINE GblContext*  GblByteArray_context   (CSELF)                                                      GBL_NOEXCEPT;
 GBL_INLINE GblBool      GblByteArray_isEmpty   (CSELF)                                                      GBL_NOEXCEPT;
 
-GBL_INLINE void*        GblByteArray_data      (CSELF)                                                       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT   GblByteArray_dataRead  (CSELF, GblSize offset, GblSize bytes, void* pDataOut)        GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT   GblByteArray_dataWrite (SELF, GblSize offset, GblSize bytes, const void* pDataIn)    GBL_NOEXCEPT;
+GBL_INLINE void*        GblByteArray_data      (CSELF)                                                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblByteArray_dataRead  (CSELF, GblSize offset, GblSize bytes, void* pDataOut)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblByteArray_dataWrite (SELF, GblSize offset, GblSize bytes, const void* pDataIn)   GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT   GblByteArray_clear     (SELF)                                                       GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblByteArray_acquire   (SELF, GblSize bytes, void* pData)                           GBL_NOEXCEPT;
@@ -44,7 +44,9 @@ GBL_INLINE GBL_RESULT   GblByteArray_insert    (SELF, GblSize offset, GblSize by
 GBL_INLINE GBL_RESULT   GblByteArray_append    (SELF, GblSize bytes, const void* pData)                     GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblByteArray_prepend   (SELF, GblSize bytes, const void* pData)                     GBL_NOEXCEPT;
 
-// ===== IMPL =====
+//GBL_INLINE GblHash    GblBytes_hash           (CSELF)
+
+// =========== IMPL ===========
 
 GBL_INLINE GblSize GblByteArray_size(CSELF) GBL_NOEXCEPT {
     return pSelf->size;

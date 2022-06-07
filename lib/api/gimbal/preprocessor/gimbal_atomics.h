@@ -8,6 +8,7 @@
 #   define GBL_ATOMIC_INT16                    volatile int16_t
 #   define GBL_ATOMIC_INT16_INIT(a, v)         do { a = v; } while(0)
 #   define GBL_ATOMIC_INT16_LOAD(a)            a
+#   define GBL_ATOMIC_INT16_STORE(a, v)        do { a = v; } while(0)
 #   define GBL_ATOMIC_INT16_INC(a)             a++
 #   define GBL_ATOMIC_INT16_DEC(a)             a--
 #else

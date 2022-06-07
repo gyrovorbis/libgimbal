@@ -21,6 +21,12 @@ add_subdirectory(lib/elysian-test)
 add_executable(GimbalTests
     include/test_gimbal.hpp
     include/test_gimbal_type.h
+    include/test_gimbal_ref.h
+    include/test_gimbal_string_ref.h
+    include/test_gimbal_string_view.h
+    include/test_gimbal_ref.hpp
+    include/test_gimbal_string_ref.hpp
+    include/test_gimbal_string_view.hpp
     include/test_gimbal_variant.hpp
     include/test_gimbal_string.hpp
     include/test_gimbal_vector.hpp
@@ -39,6 +45,12 @@ add_executable(GimbalTests
     source/test_gimbal_string.cpp
     source/test_gimbal_byte_array.cpp
     source/test_gimbal_type.c
+    source/test_gimbal_ref.c
+    source/test_gimbal_string_ref.c
+    source/test_gimbal_string_view.c
+    include/test_gimbal_closure.h
+    include/test_gimbal_closure.hpp
+    source/test_gimbal_closure.c
     source/test_main.cpp)
 
 

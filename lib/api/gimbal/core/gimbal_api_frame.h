@@ -130,7 +130,6 @@ extern "C" {
 
 */
 
-
 // ========== GblStackFrame ===========
     // always reference via pointer
     //initial allocation uses ALLOCA, can proxy to inline functions!!
@@ -143,6 +142,9 @@ extern "C" {
 #define GBL_API_RECORD()        GBL_API_FRAME()->record
 #define GBL_API_RESULT()        GBL_API_RECORD().result
 #define GBL_API_SOURCE()        GBL_API_FRAME()->sourceCurrent
+#define GBL_API_LAST_RECORD()   GblThread_callRecord(NULL)
+#define GBL_API_LAST_RESULT()   GblThread_callRecord(NULL)->result
+
 #define GBL_API_SOURCE_LOC_PUSH(srcLoc) \
     GBL_API_STACK_FRAME_SOURCE_PUSH(GBL_API_FRAME(), srcLoc)
 #define GBL_API_SOURCE_PUSH(FILE, FUNCTION, LINE, COLUMN)   \

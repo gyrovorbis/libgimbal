@@ -45,20 +45,20 @@ GBL_API             GblHashSet_construct_8(SELF,
                                            GblHashSetEntryDestructFn   pFnDestruct,
                                            GblSize                     capacity,
                                            GblContext*                 pCtx,
-                                           void*                       pUserdata) GBL_NOEXCEPT;
+                                           void*                       pUserdata)   GBL_NOEXCEPT;
 GBL_API             GblHashSet_construct_7(SELF,
                                            GblSize                     entrySize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
                                            GblHashSetEntryDestructFn   pFnDestruct,
                                            GblSize                     capacity,
-                                           GblContext*                 pCtx) GBL_NOEXCEPT;
+                                           GblContext*                 pCtx)        GBL_NOEXCEPT;
 GBL_API             GblHashSet_construct_6(SELF,
                                            GblSize                     entrySize,
                                            GblHashSetEntryHashFn       pFnHash,
                                            GblHashSetEntryCompareFn    pFnCompare,
                                            GblHashSetEntryDestructFn   pFnDestruct,
-                                           GblSize                     capacity) GBL_NOEXCEPT;
+                                           GblSize                     capacity)    GBL_NOEXCEPT;
 GBL_API             GblHashSet_construct_5(SELF,
                                            GblSize                     entrySize,
                                            GblHashSetEntryHashFn       pFnHash,
@@ -67,13 +67,13 @@ GBL_API             GblHashSet_construct_5(SELF,
 GBL_API             GblHashSet_construct_4(SELF,
                                            GblSize                     entrySize,
                                            GblHashSetEntryHashFn       pFnHash,
-                                           GblHashSetEntryCompareFn    pFnCompare) GBL_NOEXCEPT;
+                                           GblHashSetEntryCompareFn    pFnCompare)  GBL_NOEXCEPT;
 #define GblHashSet_construct(...) \
     GBL_VA_OVERLOAD_SELECT(GblHashSet_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 GBL_API                 GblHashSet_clone            (SELF, const GblHashSet* pRhs,
-                                                     GblContext* hCtx)               GBL_NOEXCEPT;
+                                                     GblContext* hCtx)              GBL_NOEXCEPT;
 GBL_API                 GblHashSet_constructMove    (SELF, GblHashSet* pRhs,
-                                                     GblContext* hCtx)               GBL_NOEXCEPT;
+                                                     GblContext* hCtx)              GBL_NOEXCEPT;
 GBL_API                 GblHashSet_constructClone   (SELF, GblHashSet* pRhs)        GBL_NOEXCEPT;
 GBL_API                 GblHashSet_assignMove       (SELF, GblHashSet* pRhs)        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblHashSet_destruct         (SELF)                          GBL_NOEXCEPT;
