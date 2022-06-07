@@ -744,6 +744,13 @@ GBL_API GblType_test_fundamental_dependent_register_invalid(GblContext* pCtx) {
 GBL_API GblType_test_fundamental_dependent_register_valid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
 
+    dependentType_ = GblType_registerStatic(GBL_INVALID_TYPE,
+                                            "Dependent",
+                                            &(const GblTypeInfo) {
+                                                .dependencyCount = 1,
+
+                                            })
+
 
     GBL_API_END();
 }

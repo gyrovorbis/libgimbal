@@ -28,7 +28,6 @@ GBL_EXPORT GblRefCount  GblRef_releaseWithDtor  (SELF,
 GBL_INLINE GblRefCount  GblRef_refCount         (CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE GblContext*  GblRef_context          (CSELF)                     GBL_NOEXCEPT;
 
-
 // ========== IMPL ==========
 
 typedef struct GblRef_ {
