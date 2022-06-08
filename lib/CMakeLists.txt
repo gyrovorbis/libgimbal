@@ -164,7 +164,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_hash_set.hpp
     api/gimbal/containers/gimbal_hash_map.hpp
     api/gimbal/containers/gimbal_tree_set.h
-    api/gimbal/containers/gimbal_data_table.h
     api/gimbal/containers/gimbal_array_map.h
     api/gimbal/meta/gimbal_type.h
     api/gimbal/core/gimbal_thread.h
