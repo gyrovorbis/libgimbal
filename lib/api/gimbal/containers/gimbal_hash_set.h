@@ -90,7 +90,7 @@ GBL_EXPORT void*        GblHashSet_at               (CSELF, const void* pKey)   
 GBL_EXPORT GblBool      GblHashSet_contains         (CSELF, const void* pKey)       GBL_NOEXCEPT; //true if entry exists
 GBL_EXPORT GblSize      GblHashSet_count            (CSELF, const void* pKey)       GBL_NOEXCEPT; //# of matching entries (0 or 1)
 GBL_EXPORT GblHashSetIterator
-                        GblHashSet_find(CSELF, const void* pKey) GBL_NOEXCEPT;
+                        GblHashSet_find             (CSELF, const void* pKey)       GBL_NOEXCEPT;
 
 GBL_EXPORT void*        GblHashSet_set              (SELF, const void* pEntry)      GBL_NOEXCEPT; //raw set, returns existing item w/o deleting
 GBL_EXPORT GblBool      GblHashSet_insert           (SELF, const void* pEntry)      GBL_NOEXCEPT; //throws duplicate error

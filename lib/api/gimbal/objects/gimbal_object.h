@@ -93,26 +93,26 @@ typedef enum GBL_OBJECT_PROPERTY_ID {
 
 GBL_PROPERTY_TABLE_BEGIN(GBL_OBJECT)
     GBL_PROPERTY_ENTRY("refCount",
-                      "Reference Count",
-                      "Number of remaining references to object",
-                      GBL_OBJECT_PROPERTY_ID_REFCOUNT,
-                      GBL_UINT32_TYPE,
-                      GBL_PROPERTY_FLAGS_MASK(READ))
+                       "Reference Count",
+                       "Number of remaining references to object",
+                       GBL_OBJECT_PROPERTY_ID_REFCOUNT,
+                       GBL_UINT32_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ))
     GBL_PROPERTY_ENTRY("name",
-                      "Name",
-                      "String name identifier for object",
+                       "Name",
+                       "String name identifier for object",
                        GBL_OBJECT_PROPERTY_ID_NAME,
                        GBL_POINTER_TYPE,
                        GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
     GBL_PROPERTY_ENTRY("parent",
-                      "Parent",
-                      "Parent Object to this object",
-                      GBL_OBJECT_PROPERTY_ID_PARENT,
-                      GBL_OBJECT_TYPE,
-                      GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
+                       "Parent",
+                       "Parent Object to this object",
+                       GBL_OBJECT_PROPERTY_ID_PARENT,
+                       GBL_OBJECT_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
     GBL_PROPERTY_ENTRY("userdata",
-                      "User Data",
-                      "Generic Userdata void* for miscellaneous storage",
+                       "User Data",
+                       "Generic Userdata void* for miscellaneous storage",
                        GBL_OBJECT_PROPERTY_ID_USERDATA,
                        GBL_POINTER_TYPE,
                        GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))

@@ -294,7 +294,6 @@ GBL_INLINE GblBool node_set_(GblTreeSet* pSelf, GblTreeSetNode* pNode, const voi
                      GblBool leanLeft, uint64_t* pHint, int depth)
 {
     GblBool found = GBL_FALSE;
-    GBL_API_BEGIN(pSelf->pCtx);
     int i = node_find_(pSelf, pNode, pEntry, &found, pHint, depth);
     if(found) {
         swap_item_at_(pNode, pSelf->entrySize, (GblSize)i, pEntry, pSelf->pSpares[0]);
@@ -316,7 +315,6 @@ GBL_INLINE GblBool node_set_(GblTreeSet* pSelf, GblTreeSetNode* pNode, const voi
         set_item_at_(pNode, pSelf->entrySize, (GblSize)i, pMedian);
         pNode->pChildren[i+1] = pRight;
     }
-    GBL_API_END_BLOCK();
     return GBL_FALSE;
 }
 
@@ -494,25 +492,54 @@ GBL_EXPORT GBL_RESULT GblTreeSet_destruct(GblTreeSet* pSelf) GBL_NOEXCEPT {
     GBL_API_END();
 }
 
-
 GBL_EXPORT void* GblTreeSet_set(GblTreeSet* pSelf, const void* pEntry) GBL_NOEXCEPT {
+    return GblTreeSet_setHint(pSelf, pEntry, NULL);
+}
+
+GBL_EXPORT void* GblTreeSet_setHint(GblTreeSet* pSelf, const void* pEntry, uint64_t* pHint) GBL_NOEXCEPT {
     void* pExisting = NULL;
     GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pEntry);
-    pExisting = btree_set_x_(pSelf, pEntry, GBL_FALSE, NULL);
+    pExisting = btree_set_x_(pSelf, pEntry, GBL_FALSE, pHint);
     GBL_API_END_BLOCK();
     return pExisting;
 }
 
 GBL_EXPORT void* GblTreeSet_get(const GblTreeSet* pSelf, const void* pKey) GBL_NOEXCEPT {
+    return GblTreeSet_getHint(pSelf, pKey, NULL);
+}
+
+GBL_EXPORT void* GblTreeSet_getHint(const GblTreeSet* pSelf, const void* pKey, uint64_t* pHint) GBL_NOEXCEPT {
     void* pEntry = NULL;
     GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pKey);
-    pEntry = btree_get_hint_(pSelf, pKey, NULL);
+    pEntry = btree_get_hint_(pSelf, pKey, pHint);
     GBL_API_END_BLOCK();
     return pEntry;
 }
 
+GBL_EXPORT void* GblTreeSet_at(const GblTreeSet* pSelf, const void* pKey) GBL_NOEXCEPT {
+    return GblTreeSet_atHint(pSelf, pKey, NULL);
+}
+
+GBL_EXPORT void* GblTreeSet_atHint(const GblTreeSet* pSelf, const void* pKey, uint64_t* pHint) GBL_NOEXCEPT {
+    void* pEntry = NULL;
+    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_API_VERIFY_POINTER(pKey);
+    pEntry = GblTreeSet_getHint(pSelf, pKey, pHint);
+    GBL_API_VERIFY(pEntry,
+                   GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_API_END_BLOCK();
+    return pEntry;
+}
+
+GBL_EXPORT GblBool GblTreeSet_contains(const GblTreeSet* pSelf, const void* pKey) GBL_NOEXCEPT {
+    return GblTreeSet_get(pSelf, pKey) != NULL;
+}
+
+GBL_EXPORT GblSize GblTreeSet_count(const GblTreeSet* pSelf, const void* pKey) GBL_NOEXCEPT {
+    return GblTreeSet_contains(pSelf, pKey)? 1 : 0;
+}
 
 
 enum delact {

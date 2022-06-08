@@ -4,6 +4,7 @@
 #include <test_gimbal_linked_list.hpp>
 #include <test_gimbal_array_map.hpp>
 #include <test_gimbal_vector.hpp>
+#include <test_gimbal_tree_set.hpp>
 #include <test_gimbal_ref.hpp>
 #include <test_gimbal_closure.hpp>
 #include <test_gimbal_string_view.hpp>
@@ -32,6 +33,7 @@ qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::LinkedList());
     testSuite.enqueueTestSet(new gimbal::test::ArrayMap());
     testSuite.enqueueTestSet(new gimbal::test::Vector());
+    testSuite.enqueueTestSet(new gimbal::test::TreeSet());
     testSuite.enqueueTestSet(new gimbal::test::Ref());
     testSuite.enqueueTestSet(new gimbal::test::Closure());
     testSuite.enqueueTestSet(new gimbal::test::StringView());

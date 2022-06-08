@@ -677,7 +677,7 @@ GBL_EXPORT GblBool GblHashSet_foreach(const GblHashSet *map,
 
 GBL_EXPORT GblHashSetIterator GblHashSet_next(const GblHashSet* pSelf, const GblHashSetIterator* pPrev) GBL_NOEXCEPT {
     GblHashSetIterator it = {
-        pSelf,
+        (GblHashSet*)pSelf,
         0
     };
     GBL_API_BEGIN(pSelf->pCtx);

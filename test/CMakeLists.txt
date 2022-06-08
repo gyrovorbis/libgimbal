@@ -57,6 +57,9 @@ add_executable(GimbalTests
     include/test_gimbal_array_map.h
     include/test_gimbal_array_map.hpp
     source/test_gimbal_array_map.c
+    include/test_gimbal_tree_set.h
+    include/test_gimbal_tree_set.hpp
+    source/test_gimbal_tree_set.c
     source/test_main.cpp)
 
 

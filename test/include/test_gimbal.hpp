@@ -174,10 +174,12 @@ public:
 
     void freeEvent(const StackFrame& frame, void* pPtr) {
         GBL_UNUSED(frame);
-        auto it = allocations_.find(pPtr);
-        Q_ASSERT(it != allocations_.cend());
-        if(it != allocations_.end()) {
-            allocations_.erase(it);
+        if(pPtr) {
+            auto it = allocations_.find(pPtr);
+            Q_ASSERT(it != allocations_.cend());
+            if(it != allocations_.end()) {
+                allocations_.erase(it);
+            }
         }
     }
 

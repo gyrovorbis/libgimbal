@@ -276,7 +276,7 @@ GBL_API GblContext_memFree_      (GblContext* pSelf,
                                   const GblStackFrame*  pFrame,
                                   void*                 pData)      GBL_NOEXCEPT
 {
-    return pSelf->pClass->iAllocatorIFace.pFnFree((GblIAllocator*)pSelf, pFrame, pData);
+    return !pData? GBL_RESULT_SUCCESS : pSelf->pClass->iAllocatorIFace.pFnFree((GblIAllocator*)pSelf, pFrame, pData);
 }
 
 GBL_API GblContext_logWrite_     (GblContext* pSelf,
