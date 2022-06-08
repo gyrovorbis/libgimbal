@@ -59,7 +59,7 @@ static GBL_RESULT boolSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs
 static GBL_RESULT boolGet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((GblBool*)pArgs->pVoid) = pVariant->boolean;
     GBL_API_END();
@@ -96,7 +96,7 @@ static GBL_RESULT charSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs
 static GBL_RESULT charGet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((char*)pArgs->pVoid) = pVariant->character;
     GBL_API_END();
@@ -128,7 +128,7 @@ static GBL_RESULT u8Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, 
 static GBL_RESULT u8Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((uint8_t*)pArgs->pVoid) = pVariant->u8;
     GBL_API_END();
@@ -160,7 +160,7 @@ static GBL_RESULT i16Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs,
 static GBL_RESULT i16Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((int16_t*)pArgs->pVoid) = pVariant->i16;
     GBL_API_END();
@@ -191,7 +191,7 @@ static GBL_RESULT u16Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs,
 static GBL_RESULT u16Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((uint16_t*)pArgs->pVoid) = pVariant->u16;
     GBL_API_END();
@@ -222,7 +222,7 @@ static GBL_RESULT i32Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs,
 static GBL_RESULT i32Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((int32_t*)pArgs->pVoid) = pVariant->i32;
     GBL_API_END();
@@ -253,7 +253,7 @@ static GBL_RESULT u32Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs,
 static GBL_RESULT u32Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY|GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((uint32_t*)pArgs->pVoid) = pVariant->u32;
     GBL_API_END();
@@ -285,7 +285,7 @@ static GBL_RESULT i64Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs,
 static GBL_RESULT i64Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((int64_t*)pArgs->pVoid) = pVariant->i64;
     GBL_API_END();
@@ -316,7 +316,7 @@ static GBL_RESULT u64Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs,
 static GBL_RESULT u64Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((uint64_t*)pArgs->pVoid) = pVariant->u64;
     GBL_API_END();
@@ -346,7 +346,7 @@ static GBL_RESULT f32Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs,
 static GBL_RESULT f32Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((float*)pArgs->pVoid) = pVariant->f32;
     GBL_API_END();
@@ -376,7 +376,7 @@ static GBL_RESULT f64Set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs,
 static GBL_RESULT f64Get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((double*)pArgs->pVoid) = pVariant->f64;
     GBL_API_END();
@@ -406,7 +406,7 @@ static GBL_RESULT pSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, G
 static GBL_RESULT pGet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     *((void**)pArgs->pVoid) = pVariant->pVoid;
     GBL_API_END();
@@ -583,7 +583,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     static GblIVariantIFace boolIVariantIFace = {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
             .pSetValueFmt = { "i"},
             .pGetValueFmt = { "p" },
             .pFnSet  = boolSet_,
@@ -610,7 +611,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     static const GblIVariantIFace charIVariantIFace = {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
             .pSetValueFmt = { "i"},
             .pGetValueFmt = { "p" },
             .pFnSet  = charSet_,
@@ -637,7 +639,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     static const GblIVariantIFace uint8IVariantIFace = {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
             .pSetValueFmt = { "i"},
             .pGetValueFmt = { "p" },
             .pFnSet  = u8Set_,
@@ -664,7 +667,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     static const GblIVariantIFace int16IVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
         .pSetValueFmt = { "i"},
         .pGetValueFmt = { "p" },
         .pFnSet  = i16Set_,
@@ -691,7 +695,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     static const GblIVariantIFace uint16IVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
         .pSetValueFmt = { "i"},
         .pGetValueFmt = { "p" },
         .pFnSet  = u16Set_,
@@ -718,7 +723,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     const static GblIVariantIFace int32IVariantIFace = {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
             .pSetValueFmt = { "i"},
             .pGetValueFmt = { "p" },
             .pFnSet  = i32Set_,
@@ -745,7 +751,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     const static GblIVariantIFace uint32IVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
         .pSetValueFmt = { "l"},
         .pGetValueFmt = { "p" },
         .pFnSet  = u32Set_,
@@ -772,7 +779,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     const static GblIVariantIFace int64IVariantIFace =  {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
         .pSetValueFmt = { "q"},
         .pGetValueFmt = { "p" },
         .pFnSet  = i64Set_,
@@ -799,7 +807,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     const static GblIVariantIFace uint64IVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
             .pSetValueFmt = { "q"},
             .pGetValueFmt = { "p" },
             .pFnSet  = u64Set_,
@@ -826,7 +835,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     const static GblIVariantIFace enumIVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
             .pSetValueFmt = { "q"},
             .pGetValueFmt = { "p" },
             .pFnSet  = u64Set_,
@@ -853,7 +863,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     static const GblIVariantIFace flagsIVariantIFace =  {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
         .pSetValueFmt = { "q"},
         .pGetValueFmt = { "p" },
         .pFnSet  = u64Set_,
@@ -880,7 +891,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     static const GblIVariantIFace floatIVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
         .pSetValueFmt = { "d"},
         .pGetValueFmt = { "p" },
         .pFnSet  = f32Set_,
@@ -907,7 +919,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     static const GblIVariantIFace doubleIVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
             .pSetValueFmt = { "d"},
             .pGetValueFmt = { "p" },
             .pFnSet  = f64Set_,
@@ -934,7 +947,8 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
     static const GblIVariantIFace pointerIVariantIFace =  {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY,
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
         .pSetValueFmt = { "p"},
         .pGetValueFmt = { "p" },
         .pFnSet  = pSet_,

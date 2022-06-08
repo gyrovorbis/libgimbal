@@ -2,6 +2,7 @@
 #include <test_gimbal_variant.hpp>
 #include <test_gimbal_context.hpp>
 #include <test_gimbal_linked_list.hpp>
+#include <test_gimbal_array_map.hpp>
 #include <test_gimbal_vector.hpp>
 #include <test_gimbal_ref.hpp>
 #include <test_gimbal_closure.hpp>
@@ -23,14 +24,13 @@ using namespace elysian;
 int main(int argc, char* argv[]) {
     UnitTestSuite testSuite;
     //auto* pCtx = new gimbal::test::StandardContext;
-    //GblContext_globalSet(new gimbal::test::MonitorableContext(pCtx));
-
-
+    //GblContext_globalSet(new gimbal::test::MonitorableContext(pCtx))
 
 qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Api);
     testSuite.enqueueTestSet(new gimbal::test::Context());
     testSuite.enqueueTestSet(new gimbal::test::LinkedList());
+    testSuite.enqueueTestSet(new gimbal::test::ArrayMap());
     testSuite.enqueueTestSet(new gimbal::test::Vector());
     testSuite.enqueueTestSet(new gimbal::test::Ref());
     testSuite.enqueueTestSet(new gimbal::test::Closure());

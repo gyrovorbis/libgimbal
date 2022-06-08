@@ -11,7 +11,7 @@
 #include "../types/gimbal_quark.h"
 #include <gimbal/meta/gimbal_primitives.h>
 #include "../preprocessor/gimbal_atomics.h"
-#include "../containers/gimbal_data_table.h"
+#include "../containers/gimbal_array_map.h"
 
 #define GBL_OBJECT_TYPE                     (GBL_BUILTIN_TYPE(OBJECT))
 #define GBL_OBJECT_PARENT_PREFIX            GBL_INVALID_TYPE
@@ -79,7 +79,7 @@ typedef struct GblObject {
     uint16_t                parentITableIndexFallthrough           : 1;
     uint16_t                parentITableNewIndexFallthrough        : 1;
 
-    GblDataTable*           pExtendedData;
+    GblArrayMap*            pExtendedFields;
 } GblObject;
 
 typedef enum GBL_OBJECT_PROPERTY_ID {
@@ -92,22 +92,30 @@ typedef enum GBL_OBJECT_PROPERTY_ID {
 } OBJECT_PROPERTY_ID;
 
 GBL_PROPERTY_TABLE_BEGIN(GBL_OBJECT)
-    GBL_PROPERTY(GBL_OBJECT_PROPERTY_ID_REFCOUNT,
-                 "refCount",
-                 GBL_UINT32_TYPE,
-                 GBL_PROPERTY_FLAGS_MASK(READ))
-    GBL_PROPERTY(GBL_OBJECT_PROPERTY_ID_NAME,
-                 "name",
-                 GBL_POINTER_TYPE,
-                 GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
-    GBL_PROPERTY(GBL_OBJECT_PROPERTY_ID_PARENT,
-                 "parent",
-                 GBL_OBJECT_TYPE,
-                 GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
-    GBL_PROPERTY(GBL_OBJECT_PROPERTY_ID_USERDATA,
-                 "userdata",
-                 GBL_POINTER_TYPE,
-                 GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
+    GBL_PROPERTY_ENTRY("refCount",
+                      "Reference Count",
+                      "Number of remaining references to object",
+                      GBL_OBJECT_PROPERTY_ID_REFCOUNT,
+                      GBL_UINT32_TYPE,
+                      GBL_PROPERTY_FLAGS_MASK(READ))
+    GBL_PROPERTY_ENTRY("name",
+                      "Name",
+                      "String name identifier for object",
+                       GBL_OBJECT_PROPERTY_ID_NAME,
+                       GBL_POINTER_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
+    GBL_PROPERTY_ENTRY("parent",
+                      "Parent",
+                      "Parent Object to this object",
+                      GBL_OBJECT_PROPERTY_ID_PARENT,
+                      GBL_OBJECT_TYPE,
+                      GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
+    GBL_PROPERTY_ENTRY("userdata",
+                      "User Data",
+                      "Generic Userdata void* for miscellaneous storage",
+                       GBL_OBJECT_PROPERTY_ID_USERDATA,
+                       GBL_POINTER_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
 GBL_PROPERTY_TABLE_END()
 
 

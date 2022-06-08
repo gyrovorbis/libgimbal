@@ -218,7 +218,7 @@ static GBL_RESULT GblObject_eventFiltersDestruct_(void* pData) {
 }
 
 static GblVector* GblObject_eventFilters_(const GblObject* pSelf) {
-    return (GblVector*)GblDataTable_valueFromKeyQuark(&pSelf->pExtendedData, objectEventFiltersQuark_);
+    return (GblVector*)GblArrayMap_getValue(&pSelf->pExtendedFields, objectEventFiltersQuark_);
 }
 
 static GblVector* GblObject_ensureEventFilters_(GblObject* pSelf) GBL_NOEXCEPT {
@@ -232,10 +232,10 @@ static GblVector* GblObject_ensureEventFilters_(GblObject* pSelf) GBL_NOEXCEPT {
                                         NULL,
                                         GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_,
                                         GblType_contextDefault()));
-        GBL_API_CALL(GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData,
-                                                       objectEventFiltersQuark_,
-                                                       (uintptr_t)pEventFilters,\
-                                                       GblObject_eventFiltersDestruct_));
+        GBL_API_CALL(GblArrayMap_setUserdata(&pSelf->pExtendedFields,
+                                             objectEventFiltersQuark_,
+                                             (uintptr_t)pEventFilters,
+                                             GblObject_eventFiltersDestruct_));
         pEventFilters = GblObject_eventFilters_(pSelf);
     }
     GBL_API_END_BLOCK();
@@ -309,7 +309,7 @@ static GBL_RESULT GblObjectClass_destructor_(GblObject* pSelf) {
     {
        GblObject_parentSet(pIt, NULL);
     }
-    GBL_API_CALL(GblDataTable_destroy(&pSelf->pExtendedData));
+    GBL_API_CALL(GblArrayMap_destroy(&pSelf->pExtendedFields));
     GBL_API_END();
 }
 
@@ -854,26 +854,26 @@ GBL_RESULT GblObject_nameDestruct_(void* pName) {
 
 GBL_EXPORT void GblObject_nameSet(GblObject* pSelf, const char* pName) GBL_NOEXCEPT {
 
-    GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData,
-                                      objectNameQuark_,
-                                      (uintptr_t)GblStringRef_create(pName),
-                                      GblObject_nameDestruct_);
+    GblArrayMap_setUserdata(&pSelf->pExtendedFields,
+                            objectNameQuark_,
+                            (uintptr_t)GblStringRef_create(pName),
+                            GblObject_nameDestruct_);
 }
 
 GBL_EXPORT const char* GblObject_name(const GblObject* pSelf) GBL_NOEXCEPT {
-    return (const char*)GblDataTable_valueFromKeyQuark(&pSelf->pExtendedData,
-                                                       objectNameQuark_);
+    return (const char*)GblArrayMap_getValue(&pSelf->pExtendedFields,
+                                             objectNameQuark_);
 }
 
 GBL_EXPORT void* GblObject_userdata(const GblObject* pSelf) GBL_NOEXCEPT {
-    return (void*)GblDataTable_valueFromKeyQuark(&pSelf->pExtendedData,
-                                                 objectUserdataQuark_);
+    return (void*)GblArrayMap_getValue(&pSelf->pExtendedFields,
+                                       objectUserdataQuark_);
 }
 
 GBL_EXPORT void GblObject_userdataSet(GblObject* pSelf, void* pUserdata) GBL_NOEXCEPT {
-    GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData,
-                                      objectUserdataQuark_,
-                                      (uintptr_t)pUserdata, NULL);
+    GblArrayMap_setUserdata(&pSelf->pExtendedFields,
+                            objectUserdataQuark_,
+                            (uintptr_t)pUserdata, NULL);
 }
 
 typedef struct GblObjectFamily_ {
@@ -884,8 +884,8 @@ typedef struct GblObjectFamily_ {
 } GblObjectFamily_;
 
 static GblObjectFamily_* GblObject_family_(const GblObject* pSelf) {
-    return (GblObjectFamily_*)GblDataTable_valueFromKeyQuark(&pSelf->pExtendedData,
-                                                             objectFamilyQuark_);
+    return (GblObjectFamily_*)GblArrayMap_getValue(&pSelf->pExtendedFields,
+                                                   objectFamilyQuark_);
 }
 
 static GBL_RESULT GblObject_family_destruct_(void* pValue) {
@@ -905,10 +905,10 @@ static GblObjectFamily_* GblObject_ensureFamily_(GblObject* pSelf) {
         pFamily->pSelf = pSelf;
         GblLinkedList_init(&pFamily->childList);
         GblLinkedList_init(&pFamily->childNode);
-        GBL_API_CALL(GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData,
-                                          objectFamilyQuark_,
-                                          (uintptr_t)pFamily,
-                                          GblObject_family_destruct_));
+        GBL_API_CALL(GblArrayMap_setUserdata(&pSelf->pExtendedFields,
+                                             objectFamilyQuark_,
+                                             (uintptr_t)pFamily,
+                                             GblObject_family_destruct_));
     }
     GBL_API_END_BLOCK();
     return pFamily;

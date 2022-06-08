@@ -42,14 +42,18 @@ GBL_DECLARE_ENUM(GBL_CONTEXT_PROPERTY_ID) {
 };
 
 GBL_PROPERTY_TABLE_BEGIN(GBL_CONTEXT)
-    GBL_PROPERTY(GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_RESULT,
-                 "result",
-                 GBL_UINT32_TYPE,
-                 GBL_PROPERTY_FLAGS_MASK(READ))
-    GBL_PROPERTY(GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_MESSSAGE,
-                 "message",
-                 GBL_POINTER_TYPE,
-                 GBL_PROPERTY_FLAGS_MASK(READ))
+    GBL_PROPERTY_ENTRY("result",
+                       "Result Code",
+                       "Encoded result value for last issue",
+                       GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_RESULT,
+                       GBL_UINT32_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ))
+    GBL_PROPERTY_ENTRY("message",
+                       "Message",
+                       "String message describing last issue",
+                       GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_MESSSAGE,
+                       GBL_POINTER_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ))
 GBL_PROPERTY_TABLE_END()
 
 
