@@ -4,6 +4,7 @@
 #include <gimbal/objects/gimbal_context.h>
 #include <gimbal/objects/gimbal_event.h>
 #include <gimbal/types/gimbal_string_ref.h>
+#include <gimbal/containers/gimbal_linked_list.h>
 
 #define GBL_OBJECT_PROPERTY_TABLE_CAPACITY_DEFAULT_ 64
 #define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblVector) + sizeof(GblIEventFilter*)*8)
@@ -876,10 +877,10 @@ GBL_EXPORT void GblObject_userdataSet(GblObject* pSelf, void* pUserdata) GBL_NOE
 }
 
 typedef struct GblObjectFamily_ {
-    GblObject* pSelf;
-    GblObject* pParent;
-    GblObject* pChildFirst;
-    GblObject* pSiblingNext;
+    GblObject*          pSelf;
+    GblObject*          pParent;
+    GblLinkedListNode   childList;
+    GblLinkedListNode   childNode;
 } GblObjectFamily_;
 
 static GblObjectFamily_* GblObject_family_(const GblObject* pSelf) {
@@ -888,7 +889,6 @@ static GblObjectFamily_* GblObject_family_(const GblObject* pSelf) {
 }
 
 static GBL_RESULT GblObject_family_destruct_(void* pValue) {
-    GblObjectFamily_* pSelf = (GblObjectFamily_*)pValue;
     GBL_API_BEGIN(GblType_contextDefault());
     GBL_API_FREE(pValue);
     GBL_API_END();
@@ -903,11 +903,12 @@ static GblObjectFamily_* GblObject_ensureFamily_(GblObject* pSelf) {
                                   "family");
         memset(pFamily, 0, sizeof(GblObjectFamily_));
         pFamily->pSelf = pSelf;
+        GblLinkedList_init(&pFamily->childList);
+        GblLinkedList_init(&pFamily->childNode);
         GBL_API_CALL(GblDataTable_userdataSetWithQuark(&pSelf->pExtendedData,
                                           objectFamilyQuark_,
                                           (uintptr_t)pFamily,
                                           GblObject_family_destruct_));
-        pFamily = GblObject_family_(pSelf);
     }
     GBL_API_END_BLOCK();
     return pFamily;
@@ -927,34 +928,37 @@ GBL_EXPORT void GblObject_parentSet(GblObject* pSelf, GblObject* pParent) GBL_NO
 }
 
 GBL_EXPORT GblObject* GblObject_childFirst(const GblObject* pSelf) GBL_NOEXCEPT {
+    GblObject* pChild = NULL;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
-    return pFamily? pFamily->pChildFirst : NULL;
+    if(pFamily) {
+        GblLinkedListNode* pNode = GblLinkedList_front(&pFamily->childList);
+        if(pNode) {
+            pChild = GBL_LINKED_LIST_ENTRY(pNode, GblObjectFamily_, childNode)->pSelf;
+        }
+    }
+    return pChild;
 }
 GBL_EXPORT GblObject*  GblObject_siblingNext(const GblObject* pSelf) GBL_NOEXCEPT {
+    GblObject* pSibling = NULL;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
-    return pFamily? pFamily->pSiblingNext : NULL;
+    if(pFamily && pFamily->pParent) {
+        GblObjectFamily_* pParentFamily = GblObject_family_(pFamily->pParent);
+        GblLinkedListNode* pNode = pFamily->childNode.pNext;
+        if(pNode != &pParentFamily->childList) {
+            pSibling = GBL_LINKED_LIST_ENTRY(pNode, GblObjectFamily_, childNode)->pSelf;
+        }
+    }
+    return pSibling;
 }
 
 GBL_EXPORT void GblObject_childAdd(GblObject* pSelf, GblObject* pChild) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblType_contextDefault());
     GBL_API_VERIFY_POINTER(pChild);
     {
-        GblObject* pNode = GblObject_childFirst(pSelf);
-        GblObjectFamily_* pFamily;
-        if(!pNode) {
-            pFamily = GblObject_ensureFamily_(pSelf);
-            pFamily->pChildFirst = pChild;
-        } else {
-            GblObject* pSibling = NULL;
-            while((pSibling = GblObject_siblingNext(pNode))) {
-                GBL_API_VERIFY_EXPRESSION(pSibling != pChild);
-                pNode = pSibling;
-            };
-            GblObject_family_(pNode)->pSiblingNext = pChild;
-        }
-        pFamily = GblObject_ensureFamily_(pChild);
-        pFamily->pParent = pSelf;
-        pFamily->pSiblingNext = NULL;
+        GblObjectFamily_* pParentFamily = GblObject_ensureFamily_(pSelf);
+        GblObjectFamily_* pChildFamily  = GblObject_ensureFamily_(pChild);
+        GblLinkedList_pushFront(&pParentFamily->childList, &pChildFamily->childNode);
+        pChildFamily->pParent = pSelf;
     }
     GBL_API_END_BLOCK();
 }
@@ -963,32 +967,88 @@ GBL_EXPORT GblBool GblObject_childRemove(GblObject* pSelf, GblObject* pChild) GB
     GblBool success = GBL_FALSE;
     GBL_API_BEGIN(GblType_contextDefault());
     GBL_API_VERIFY_POINTER(pChild);
-    GblObjectFamily_* pFam = GblObject_family_(pSelf);
-    GBL_API_VERIFY_POINTER(pFam && pFam->pChildFirst);
-    {
-        GblObject* pNode = GblObject_childFirst(pSelf);
-        if(pNode == pChild) {
-            pFam->pChildFirst = GblObject_siblingNext(pChild);
+    GblObjectFamily_* pParentFamily = GblObject_family_(pSelf);
+    GblObjectFamily_* pChildFamily  = GblObject_family_(pChild);
+    if(pParentFamily && pChildFamily && pChildFamily->pParent == pSelf) {
+        if(GblLinkedList_remove(&pParentFamily->childList, &pChildFamily->childNode)) {
+            pChildFamily->pParent = NULL;
             success = GBL_TRUE;
-        } else {
-            GblObject* pSiblingNext;
-            while((pSiblingNext = GblObject_siblingNext(pNode))) {
-                if(pSiblingNext == pChild) {
-                    GblObject_family_(pNode)->pSiblingNext = GblObject_family_(pChild)->pSiblingNext;
-                    success = GBL_TRUE;
-                    break;
-                }
-                pNode = GblObject_siblingNext(pNode);
-            }
-        }
-        if(success) {
-            GblObject_family_(pChild)->pSiblingNext = NULL;
-            GblObject_family_(pChild)->pParent = NULL;
         }
     }
     GBL_API_END_BLOCK();
     return success;
 }
+
+GBL_EXPORT GblObject* GblObject_childFindByType(const GblObject* pSelf, GblType childType) GBL_NOEXCEPT {
+    GblObject* pChild = NULL;
+    GBL_API_BEGIN(GblType_contextDefault()); {
+        GblObjectFamily_* pFamily = GblObject_family_(pSelf);
+        if(pFamily) {
+            for(GblLinkedListNode* pIt = pFamily->childList.pNext;
+                pIt != &pFamily->childList;
+                pIt = pIt->pNext)
+            {
+                GblObject* pChildIt = GBL_LINKED_LIST_ENTRY(pIt, GblObjectFamily_, childNode)->pSelf;
+                if(pChildIt) {
+                    if(GBL_INSTANCE_CHECK(pChildIt, childType)) {
+                        pChild = pChildIt;
+                        break;
+                    }
+                }
+            }
+        }
+    } GBL_API_END_BLOCK();
+    return pChild;
+}
+
+GBL_EXPORT GblObject* GblObject_childFindByName(const GblObject* pSelf, const char* pName) GBL_NOEXCEPT {
+    GblObject* pChild = NULL;
+    GBL_API_BEGIN(GblType_contextDefault()); {
+        GblObjectFamily_* pFamily = GblObject_family_(pSelf);
+        if(pFamily) {
+            for(GblLinkedListNode* pIt = pFamily->childList.pNext;
+                pIt != &pFamily->childList;
+                pIt = pIt->pNext)
+            {
+                GblObject* pChildIt = GBL_LINKED_LIST_ENTRY(pIt, GblObjectFamily_, childNode)->pSelf;
+                if(pChildIt) {
+                    const char* pNodeName = GblObject_name(pChildIt);
+                    if(pNodeName && strcmp(pNodeName, pName) == 0) {
+                        pChild = pChildIt;
+                        break;
+                    }
+                }
+            }
+        }
+    } GBL_API_END_BLOCK();
+    return pChild;
+}
+
+GBL_EXPORT GblObject* GblObject_childFindByIndex(const GblObject* pSelf, GblSize index) GBL_NOEXCEPT {
+    GblObject* pChild = NULL;
+    GBL_API_BEGIN(GblType_contextDefault());
+    GblObjectFamily_* pFamily = GblObject_family_(pSelf);
+    if(pFamily) {
+        GblLinkedListNode* pNode = GblLinkedList_at(&pFamily->childList, index);
+        if(pNode) {
+            pChild = GBL_LINKED_LIST_ENTRY(pNode, GblObjectFamily_, childNode)->pSelf;
+        }
+    }
+    GBL_API_END_BLOCK();
+    return pChild;
+}
+
+GBL_EXPORT GblSize GblObject_childCount(const GblObject* pSelf) GBL_NOEXCEPT {
+    GblSize count = 0;
+    GBL_API_BEGIN(GblType_contextDefault());
+    GblObjectFamily_* pFamily = GblObject_family_(pSelf);
+    if(pFamily) {
+        count = GblLinkedList_count(&pFamily->childList);
+    }
+    GBL_API_END_BLOCK();
+    return count;
+}
+
 
 GBL_EXPORT GblContext* GblObject_contextFind(GblObject* pSelf) GBL_NOEXCEPT {
     GblObject* pContext = NULL;

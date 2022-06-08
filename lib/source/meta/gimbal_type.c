@@ -229,10 +229,10 @@ static GBL_RESULT typeValidate_(GblType parent,
         for(GblSize p = 0; p < pInfo->dependencyCount; ++p) {
             if(GBL_TYPE_IS_INSTANTIABLE(pInfo->pDependencies[p]))
                 ++instantiableCount;
-            else GBL_API_VERIFY(GBL_TYPE_IS_CLASSED(pInfo->pDependencies[p]) ||
+            else GBL_API_VERIFY(GBL_TYPE_IS_INTERFACED(pInfo->pDependencies[p]) ||
                                 GBL_TYPE_IS_DEPENDENT(pInfo->pDependencies[p]),
                                 GBL_RESULT_ERROR_INVALID_TYPE,
-                                "DEPENDENCIES can only be CLASSED or DEPENDENT types!");
+                                "DEPENDENCIES can only be INTERFACED or DEPENDENT types!");
         }
         GBL_API_VERIFY(instantiableCount <= 1, GBL_RESULT_ERROR_INVALID_TYPE,
                        "Cannot have multiple INSTANTIABLE DEPENDENCY types: [%u]",

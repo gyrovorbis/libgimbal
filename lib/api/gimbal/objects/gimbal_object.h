@@ -9,7 +9,6 @@
 #include "../ifaces/gimbal_ievent_filter.h"
 #include "gimbal_property.h"
 #include "../types/gimbal_quark.h"
-#include "../containers/gimbal_list.h"
 #include <gimbal/meta/gimbal_primitives.h>
 #include "../preprocessor/gimbal_atomics.h"
 #include "../containers/gimbal_data_table.h"
@@ -198,10 +197,11 @@ GBL_EXPORT GblContext*        GblObject_contextFind         (SELF)              
 GBL_EXPORT GblObject*         GblObject_childFirst          (CSELF)                                                             GBL_NOEXCEPT;
 GBL_EXPORT void               GblObject_childAdd            (SELF, GblObject* pChild)                                           GBL_NOEXCEPT;
 GBL_EXPORT GblBool            GblObject_childRemove         (SELF, GblObject* pChild)                                           GBL_NOEXCEPT;
-GBL_INLINE GblObject*         GblObject_childFindByType     (CSELF, GblType childType)                                          GBL_NOEXCEPT;
-GBL_INLINE GblObject*         GblObject_childFindByName     (CSELF, const char* pName)                                          GBL_NOEXCEPT;
-GBL_INLINE GblObject*         GblObject_childFindByIndex    (CSELF, GblSize index)                                              GBL_NOEXCEPT;
-GBL_INLINE GblSize            GblObject_childCount          (CSELF)                                                             GBL_NOEXCEPT;
+GBL_EXPORT GblObject*         GblObject_childFindByType     (CSELF, GblType childType)                                          GBL_NOEXCEPT;
+GBL_EXPORT GblObject*         GblObject_childFindByName     (CSELF, const char* pName)                                          GBL_NOEXCEPT;
+GBL_EXPORT GblObject*         GblObject_childFindByIndex    (CSELF, GblSize index)                                              GBL_NOEXCEPT;
+GBL_EXPORT GblSize            GblObject_childCount          (CSELF)                                                             GBL_NOEXCEPT;
+//GBL_EXPORT GblBool          GblObject_childForEach        (CSELF, GblObjectChildIterFn pIterFn, void* pUserdata)              GBL_NOEXCEPT;
 
 GBL_EXPORT GblObject*         GblObject_siblingNext         (CSELF)                                                             GBL_NOEXCEPT;
 // half-assed
@@ -293,68 +293,6 @@ GBL_INLINE GblObject* GblObject_ancestorFindByName(CSELF, const char* pName) GBL
     return pAncestor;
 }
 
-GBL_INLINE GblObject* GblObject_childFindByType(CSELF, GblType childType) GBL_NOEXCEPT {
-    GblObject* pChild = NULL;
-    GBL_API_BEGIN(GblType_contextDefault()); {
-        for(GblObject* pIt = GblObject_childFirst(pSelf);
-            pIt != NULL;
-            pIt = GblObject_siblingNext(pIt))
-        {
-            if(GBL_INSTANCE_CHECK(pIt, childType)) {
-                pChild = pIt;
-                break;
-            }
-        }
-    } GBL_API_END_BLOCK();
-    return pChild;
-}
-
-GBL_INLINE GblObject* GblObject_childFindByName(CSELF, const char* pName) GBL_NOEXCEPT {
-    GblObject* pChild = NULL;
-    GBL_API_BEGIN(GblType_contextDefault()); {
-        for(GblObject* pIt = GblObject_childFirst(pSelf);
-            pIt != NULL;
-            pIt = GblObject_siblingNext(pIt))
-        {
-            const char* pNodeName = GblObject_name(pIt);
-            if(pNodeName && strcmp(pNodeName, pName) == 0) {
-                pChild = pIt;
-                break;
-            }
-        }
-    } GBL_API_END_BLOCK();
-    return pChild;
-}
-
-GBL_INLINE GblObject* GblObject_childFindByIndex(CSELF, GblSize index) GBL_NOEXCEPT {
-    GblObject* pChild = NULL;
-    GBL_API_BEGIN(GblType_contextDefault());
-    GblSize count = 0;
-    for(GblObject* pObj = GblObject_childFirst(GBL_OBJECT(pSelf));
-        pObj != NULL;
-        pObj = GblObject_siblingNext(GBL_OBJECT(pObj)))
-    {
-        if(count++ == index) {
-            pChild = pObj;
-            break;
-        }
-    }
-    GBL_API_END_BLOCK();
-    return pChild;
-}
-
-GBL_INLINE GblSize GblObject_childCount(CSELF) GBL_NOEXCEPT {
-    GblSize count = 0;
-    GBL_API_BEGIN(GblType_contextDefault());
-    for(GblObject* pObj = GblObject_childFirst(GBL_OBJECT(pSelf));
-        pObj != NULL;
-        pObj = GblObject_siblingNext(GBL_OBJECT(pObj)))
-    {
-        ++count;
-    }
-    GBL_API_END_BLOCK();
-    return count;
-}
 
 GBL_INLINE GblObject* GblObject_siblingFindByType(CSELF, GblType siblingType) GBL_NOEXCEPT {
     GblObject* pObject = NULL;

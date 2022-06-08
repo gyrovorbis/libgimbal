@@ -1,6 +1,7 @@
 #include <gimbal/types/gimbal_quark.h>
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
+#include <gimbal/containers/gimbal_linked_list.h>
 #ifdef _WIN32
 #   define NOGDI
 # else
@@ -13,7 +14,7 @@
 #define GBL_QUARK_ENSURE_INITIALIZED_()         if(!initialized_) call_once(&initOnce_, gblQuarkInit_)
 
 typedef struct QuarkAllocPage_ {
-    struct QuarkAllocPage_*     pNext;
+    GblLinkedListNode           listNode;
     GblSize                     pageSize;
     GblSize                     position;
     char                        bytes[1];
@@ -24,7 +25,7 @@ static struct {
     char            stackBytes[GBL_QUARK_PAGE_SIZE_DEFAULT_-1];
 } pageStatic_ = {
     .page = {
-        .pNext      = NULL,
+        .listNode   = { .pNext = &pageStatic_.page.listNode },
         .pageSize   = GBL_QUARK_PAGE_SIZE_DEFAULT_,
         .position   = 0,
         .bytes      = { 0 }
@@ -32,16 +33,15 @@ static struct {
     .stackBytes     = { 0 }
 };
 
+static GblLinkedListNode    pageList_       = { .pNext = &pageStatic_.page.listNode };
+static GblHashSet           registry_       = { 0 };
+static GblBool              initialized_    = GBL_FALSE;
+static once_flag            initOnce_       = ONCE_FLAG_INIT;
+static mtx_t                registryMtx_;
 
-static QuarkAllocPage_* pPageCurrent_  = &pageStatic_.page;
-static GblHashSet       registry_       = { 0 };
-static GblBool          initialized_    = GBL_FALSE;
-static once_flag        initOnce_       = ONCE_FLAG_INIT;
-static mtx_t            registryMtx_;
-
-static GblContext*      pCtx_           = NULL;
-static GblSize          pageSize_       = GBL_QUARK_PAGE_SIZE_DEFAULT_;
-static GblSize          registryCap_    = GBL_QUARK_REGISTRY_CAPACITY_DEFAULT_;
+static GblContext*          pCtx_           = NULL;
+static GblSize              pageSize_       = GBL_QUARK_PAGE_SIZE_DEFAULT_;
+static GblSize              registryCap_    = GBL_QUARK_REGISTRY_CAPACITY_DEFAULT_;
 
 static int registryComparator_(const GblHashSet* pSet, const char** pA, const char** pB) {
     GBL_UNUSED(pSet);
@@ -53,6 +53,10 @@ static int registryComparator_(const GblHashSet* pSet, const char** pA, const ch
 static GblHash registryHasher_(const GblHashSet* pSet, const char** pStr) {
     GBL_UNUSED(pSet);
     return gblHashMurmur(*pStr, strlen(*pStr));
+}
+
+GBL_INLINE QuarkAllocPage_* pageCurrent_(void) {
+    return GBL_LINKED_LIST_ENTRY(GblLinkedList_front(&pageList_), QuarkAllocPage_, listNode);
 }
 
 static void gblQuarkInit_(void) GBL_NOEXCEPT {
@@ -70,9 +74,9 @@ static void gblQuarkInit_(void) GBL_NOEXCEPT {
                                       NULL,
                                       registryCap_,
                                       pCtx_));
-    pPageCurrent_           = &pageStatic_.page;
-    pPageCurrent_->pNext    = NULL;
-    pPageCurrent_->position = 0;
+    GblLinkedList_init(&pageList_);
+    GblLinkedList_pushFront(&pageList_, &pageStatic_.page.listNode);
+    pageCurrent_()->position = 0;
     initialized_            = GBL_TRUE;
     GBL_API_POP(1);
     GBL_API_END_BLOCK();
@@ -86,11 +90,13 @@ GBL_EXPORT GBL_RESULT GblQuark_final(void) GBL_NOEXCEPT {
     GBL_API_VERIFY_EXPRESSION(initialized_);
     mtx_lock(&registryMtx_);
     GblHashSet_destruct(&registry_);
-    for(QuarkAllocPage_* pPageIt = pageStatic_.page.pNext;
-        pPageIt != NULL;
-        pPageIt = pPageIt->pNext)
+    for(GblLinkedListNode* pIt = pageList_.pNext;
+        pIt != &pageList_;
+        pIt = pIt->pNext)
     {
-        GBL_API_FREE(pPageIt);
+        QuarkAllocPage_* pPage = GBL_LINKED_LIST_ENTRY(pIt, QuarkAllocPage_, listNode);
+        if(pPage != &pageStatic_.page)
+            GBL_API_FREE(pPage);
     }
     initialized_ = GBL_FALSE;
     GBL_API_POP(1);
@@ -124,12 +130,7 @@ GBL_EXPORT GBL_RESULT GblQuark_init(GblContext* pCtx, GblSize pageSize, GblSize 
 GBL_EXPORT GblSize GblQuark_pageCount(void) GBL_NOEXCEPT {
     GblSize count = 1;
     if(initialized_) {
-        for(QuarkAllocPage_* pIt = pageStatic_.page.pNext;
-            pIt != NULL;
-            pIt = pIt->pNext)
-        {
-            ++count;
-        }
+        count = GblLinkedList_count(&pageList_);
     }
     return count;
 }
@@ -137,11 +138,11 @@ GBL_EXPORT GblSize GblQuark_pageCount(void) GBL_NOEXCEPT {
 GBL_EXPORT GblSize GblQuark_bytesUsed(void) GBL_NOEXCEPT {
     GblSize bytes = 0;
     if(initialized_) {
-        for(QuarkAllocPage_* pIt = &pageStatic_.page;
-            pIt != NULL;
+        for(GblLinkedListNode* pIt = pageList_.pNext;
+            pIt != &pageList_;
             pIt = pIt->pNext)
         {
-           bytes += pIt->position;
+            bytes += GBL_LINKED_LIST_ENTRY(pIt, QuarkAllocPage_, listNode)->position;
         }
     }
     return bytes;
@@ -200,15 +201,14 @@ const char* quarkStringAllocCopy_(const char* pString) {
         GBL_API_VERIFY(size <= pageSize_, GBL_RESULT_ERROR_OVERFLOW,
                        "Cannot allocate storage for Quark that is larger than page size! (%d vs %d)",
                        size, pageSize_);
-        if(pPageCurrent_->position + size >= pPageCurrent_->pageSize) {
+        if(pageCurrent_()->position + size >= pageCurrent_()->pageSize) {
             QuarkAllocPage_* pPage = GBL_API_MALLOC(sizeof(QuarkAllocPage_)-1 + pageSize_);
-            pPageCurrent_->pNext = pPage;
-            pPageCurrent_ = pPage;
-            pPageCurrent_->position = 0;
+            GblLinkedList_pushFront(&pageList_, &pPage->listNode);
+            pageCurrent_()->position = 0;
         }
-        pNewString = &pPageCurrent_->bytes[pPageCurrent_->position];
+        pNewString = &pageCurrent_()->bytes[pageCurrent_()->position];
         strcpy(pNewString, pString);
-        pPageCurrent_->position += size;
+        pageCurrent_()->position += size;
     } GBL_API_END_BLOCK();
     return pNewString;
 }

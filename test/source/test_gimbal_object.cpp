@@ -264,8 +264,6 @@ void CObject::extendedData(void) {
     QCOMPARE(GblObject_name(pObj),           nullptr);
     QCOMPARE(GblObject_userdata(pObj),       nullptr);
     QCOMPARE(GblObject_parent(pObj),         nullptr);
-    QCOMPARE(GblObject_childFirst(pObj),        nullptr);
-    QCOMPARE(GblObject_siblingNext(pObj),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     GblObject_nameSet(pObj, "Sing the Sorrow");
@@ -276,8 +274,6 @@ void CObject::extendedData(void) {
 
     // make sure we didn't screw up other extended data
     QCOMPARE(GblObject_parent(pObj),            nullptr);
-    QCOMPARE(GblObject_childFirst(pObj),        nullptr);
-    QCOMPARE(GblObject_siblingNext(pObj),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
@@ -292,7 +288,6 @@ void CObject::newVaArgs(void) {
 
     QCOMPARE(GblObject_name(pObj),              "Fuckwad");
     QCOMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
-    QCOMPARE(GblObject_siblingNext(pObj),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
@@ -307,7 +302,6 @@ void CObject::newInPlaceVaArgs(void) {
 
     QCOMPARE(GblObject_name(GBL_OBJECT(&obj)),              "Fuckwad");
     QCOMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
-    QCOMPARE(GblObject_siblingNext(GBL_OBJECT(&obj)),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
     QCOMPARE(GblObject_unref(GBL_OBJECT(&obj)), 0);
@@ -323,7 +317,6 @@ void CObject::newVaArgsWithClass(void) {
 
     QCOMPARE(GblObject_name(pObj),              "Fuckwad");
     QCOMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
-    QCOMPARE(GblObject_siblingNext(pObj),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
@@ -340,7 +333,6 @@ void CObject::newInPlaceVaArgsWithClass(void) {
 
     QCOMPARE(GblObject_name(GBL_OBJECT(&obj)),              "Fuckwad");
     QCOMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
-    QCOMPARE(GblObject_siblingNext(GBL_OBJECT(&obj)),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
     QCOMPARE(GblObject_unref(GBL_OBJECT(&obj)), 0);
@@ -361,7 +353,6 @@ void CObject::newInPlaceVaArgsWithClassInPlace(void) {
 
     QCOMPARE(GblObject_name(GBL_OBJECT(&obj)),              "Fuckwad");
     QCOMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
-    QCOMPARE(GblObject_siblingNext(GBL_OBJECT(&obj)),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
     QCOMPARE(GblObject_unref(GBL_OBJECT(&obj)), 0);
@@ -384,7 +375,6 @@ void CObject::newVariants(void) {
 
     QCOMPARE(GblObject_name(pObj),              "Fuckwad");
     QCOMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
-    QCOMPARE(GblObject_siblingNext(pObj),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
@@ -409,7 +399,6 @@ void CObject::newVariantsWithClass(void) {
 
     QCOMPARE(GblObject_name(pObj),              "Fuckwad");
     QCOMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
-    QCOMPARE(GblObject_siblingNext(pObj),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
@@ -437,7 +426,6 @@ void CObject::newInPlaceVariants(void) {
 
     QCOMPARE(GblObject_name(pObj),              "Fuckwad");
     QCOMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
-    QCOMPARE(GblObject_siblingNext(pObj),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
@@ -465,7 +453,6 @@ void CObject::newInPlaceVariantsWithClass(void) {
 
     QCOMPARE(GblObject_name(pObj),              "Fuckwad");
     QCOMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
-    QCOMPARE(GblObject_siblingNext(pObj),       nullptr);
     QCOMPARE(GblObject_eventFilterCount(pObj),  0);
 
     QCOMPARE(GblObject_unref(pObj), 0);
@@ -562,12 +549,12 @@ void CObject::parenting(void) {
                                     NULL);
 
     GblObject_parentSet(pChild1, pParent);
-    QCOMPARE(GblObject_childFirst(pParent), pChild1);
+    QCOMPARE(GblObject_childFindByIndex(pParent, 0), pChild1);
     QCOMPARE(GblObject_parent(pChild1), pParent);
 
     GblObject_childAdd(pParent, pChild2);
     QCOMPARE(GblObject_parent(pChild2), pParent);
-    QCOMPARE(GblObject_siblingNext(pChild1), pChild2);
+    QCOMPARE(GblObject_siblingNext(pChild2), pChild1);
 
     QCOMPARE(GblObject_parent(pChild3), pChild2);
 
@@ -578,10 +565,10 @@ void CObject::parenting(void) {
     QCOMPARE(GblObject_childFindByName(pParent, "Child1"), pChild1);
 
     GblObject_childRemove(pParent, pChild1);
-    QCOMPARE(GblObject_childFirst(pParent), pChild2);
+    QCOMPARE(GblObject_childFindByIndex(pParent, 0), pChild2);
 
     GblObject_childRemove(pChild2, pChild3);
-    QCOMPARE(GblObject_childFirst(pChild2), nullptr);
+    QCOMPARE(GblObject_childFindByIndex(pChild2, 0), nullptr);
 
     QCOMPARE(GblObject_unref(pChild3), 0);
     QCOMPARE(GblObject_unref(pChild1), 0);

@@ -51,6 +51,9 @@ add_executable(GimbalTests
     include/test_gimbal_closure.h
     include/test_gimbal_closure.hpp
     source/test_gimbal_closure.c
+    include/test_gimbal_linked_list.h
+    include/test_gimbal_linked_list.hpp
+    source/test_gimbal_linked_list.c
     source/test_main.cpp)
 
 

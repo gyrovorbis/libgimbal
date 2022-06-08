@@ -708,7 +708,7 @@ GBL_API GblType_test_fundamental_instantiable_register_valid(GblContext* pCtx) {
                                          "Instanced",
                                          &(const GblTypeInfo) {
                                              .instanceSize = sizeof(GblInstance),
-                                              .classSize = sizeof(GblClass)
+                                             .classSize = sizeof(GblClass)
                                          },
                                          GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE);
     GBL_API_VERIFY_LAST_RECORD();
@@ -738,19 +738,32 @@ GBL_API GblType_test_fundamental_dependent_register_invalid(GblContext* pCtx) {
     GBL_VERIFY(!GBL_TYPE_IS_DEPENDENT(dependentType_));
     GBL_VERIFY(!GblType_depends(dependentType_, blankType_));
     GBL_VERIFY(!GblType_conforms(blankType_, dependentType_));
+
+    dependentType_ = GblType_registerStatic(GBL_INVALID_TYPE,
+                                            "Dependent",
+                                            &(const GblTypeInfo) {
+                                                .dependencyCount = 2,
+                                                .pDependencies = (const GblType[]) {
+                                                    instanced_,
+                                                    classedDerived_
+                                                }
+                                            }, GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT);
+    //GBL_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_TYPE);
+    GBL_COMPARE(dependentType_, GBL_INVALID_TYPE);
+
     GBL_API_END();
 }
 
 GBL_API GblType_test_fundamental_dependent_register_valid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-
+#if 0
     dependentType_ = GblType_registerStatic(GBL_INVALID_TYPE,
                                             "Dependent",
                                             &(const GblTypeInfo) {
                                                 .dependencyCount = 1,
 
                                             })
-
+#endif
 
     GBL_API_END();
 }

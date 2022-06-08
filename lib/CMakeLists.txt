@@ -115,6 +115,8 @@ set(GIMBAL_SOURCES
      source/ifaces/gimbal_iplugin.c
      source/objects/gimbal_module.c
      source/types/gimbal_closure.c
+     source/containers/gimbal_linked_list.c
+     source/containers/gimbal_array_map.c
      lib/jenkins/lookup3.c
 )
 
@@ -137,7 +139,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_generics.hpp
     api/gimbal/containers/gimbal_container.hpp
     api/gimbal/core/gimbal_call_stack.h
-    api/gimbal/containers/gimbal_list.h
+    api/gimbal/containers/gimbal_linked_list.h
     api/gimbal/meta/gimbal_interface.h
     api/gimbal/objects/gimbal_object.h
     api/gimbal/ifaces/gimbal_iallocator.h

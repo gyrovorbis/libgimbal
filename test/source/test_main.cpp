@@ -1,6 +1,7 @@
 #include <elysian_qtest.hpp>
 #include <test_gimbal_variant.hpp>
 #include <test_gimbal_context.hpp>
+#include <test_gimbal_linked_list.hpp>
 #include <test_gimbal_vector.hpp>
 #include <test_gimbal_ref.hpp>
 #include <test_gimbal_closure.hpp>
@@ -29,6 +30,7 @@ int main(int argc, char* argv[]) {
 qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Api);
     testSuite.enqueueTestSet(new gimbal::test::Context());
+    testSuite.enqueueTestSet(new gimbal::test::LinkedList());
     testSuite.enqueueTestSet(new gimbal::test::Vector());
     testSuite.enqueueTestSet(new gimbal::test::Ref());
     testSuite.enqueueTestSet(new gimbal::test::Closure());

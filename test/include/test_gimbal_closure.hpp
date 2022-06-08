@@ -1,7 +1,6 @@
 #ifndef TEST_GIMBAL_CLOSURE_HPP
 #define TEST_GIMBAL_CLOSURE_HPP
 
-
 #include "test_gimbal.hpp"
 #include "test_gimbal_closure.h"
 

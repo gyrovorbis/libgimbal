@@ -6,7 +6,7 @@
 #include "gimbal_quark.h"
 #include <ctype.h>
 
-#define GBL_STRING_VIEW_NPOS                ((GblSize)-1)
+#define GBL_STRING_VIEW_NPOS                GBL_NPOS
 #define GBL_STRING_VIEW_2(data, length)     GblStringView_fromStringSized(data, length)
 #define GBL_STRING_VIEW_1(cstring)          GblStringView_fromString(cstring)
 #define GBL_STRING_VIEW(...)                GBL_VA_OVERLOAD_SELECT(GBL_STRING_VIEW, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)

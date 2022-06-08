@@ -12,8 +12,9 @@
 extern "C" {
 #endif
 
-// Warezed from the linux kernel
-#define GBL_CONTAINER_OF(p, t, m) ((t*)((char*)(p) - offsetof(t, m)))
+#define GBL_CONTAINER_OF(ptr, type, member) ((type*)((char*)(ptr) - offsetof(type, member)))
+
+#define GBL_NPOS    ((GblSize)-1)
 
 #define GBL_SWITCH_CASE_STRINGIFY(s) \
     case s: return #s
