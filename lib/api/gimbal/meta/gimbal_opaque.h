@@ -4,7 +4,7 @@
 #include "gimbal_primitives.h"
 
 #define GBL_OPAQUE(variant)
-#define
+#//define
 
 GBL_DECLS_BEGIN
 

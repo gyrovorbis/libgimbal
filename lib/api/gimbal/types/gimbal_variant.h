@@ -1,11 +1,9 @@
 ﻿#ifndef GIMBAL_VARIANT__H
 #define GIMBAL_VARIANT__H
 
-#include "../types/gimbal_string_buffer.h"
 #include "../ifaces/gimbal_ivariant.h"
 #include "../meta/gimbal_variant.h"
 #include "../types/gimbal_typedefs.h"
-#include "../meta/gimbal_primitives.h"
 #include <stdint.h>
 
 #define SELF    GblVariant* pSelf
@@ -29,30 +27,6 @@ GBL_DECLS_BEGIN
 
 GBL_ENUM_TABLE_DECLARE(GBL_META_VARIANT_OP_CMP_TYPE_TABLE);
 
-typedef struct GblVariant {
-    union {
-        GblBool         boolean;
-        char            character;
-        uint8_t         u8;
-        uint16_t        u16;
-        int16_t         i16;
-        uint32_t        u32;
-        int32_t         i32;
-        uint64_t        u64;
-        int64_t         i64;
-        GblEnum         enumeration;
-        GblFlags        flags;
-        float           f32;
-        double          f64;
-        void*           pVoid;
-
-        GblInt          integer;
-        uint64_t        uinteger64;
-        GblFloat        floating;
-        GblStringBuffer string;
-    };
-    GblType             type;
-} GblVariant;
 
 #define GBL_VARIANT_CONSTRUCT_TRAITS (                           \
         GBL_META_GENERIC_MACRO_NO_DEFAULT,                       \
@@ -246,7 +220,7 @@ GBL_INLINE GBL_API gblVariantSeti(GblVariant* pVariant,    GblInt      value) {
     GBL_API_VERIFY_POINTER(pVariant);
     GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_INT32_TYPE, value));
     //GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_INT32_TYPE));
-    //pVariant->integer = value;
+    //pVariant->i32 = value;
     GBL_API_END();
 }
 
@@ -255,7 +229,7 @@ GBL_INLINE GBL_API gblVariantSetf(GblVariant* pVariant,    GblFloat       value)
     GBL_API_VERIFY_POINTER(pVariant);
     GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_FLOAT_TYPE, value));
 //    GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_FLOAT_TYPE));
-//    pVariant->floating = value;
+//    pVariant->f32 = value;
     GBL_API_END();
 }
 
@@ -325,7 +299,7 @@ GBL_INLINE GBL_API gblVariantTob(const GblVariant* pVariant, GblBool* pValue) {
         const GblType type = GblVariant_type(pVariant);
         if(type == GBL_BOOL_TYPE)           *pValue = pVariant->boolean;
         else if(type == GBL_INT32_TYPE)     *pValue = pVariant->i32? GBL_TRUE : GBL_FALSE;
-        else if(type == GBL_FLOAT_TYPE)     *pValue = pVariant->floating != 0.0f? GBL_TRUE : GBL_FALSE;
+        else if(type == GBL_FLOAT_TYPE)     *pValue = pVariant->f32 != 0.0f? GBL_TRUE : GBL_FALSE;
         else if(type == GBL_POINTER_TYPE)   *pValue = pVariant->pVoid? GBL_TRUE : GBL_FALSE;
         else if(type == GBL_STRING_TYPE)    *pValue = GblStringBuffer_toBool(&pVariant->string);
         else *pValue = GBL_FALSE;
@@ -340,8 +314,8 @@ GBL_INLINE GBL_API gblVariantToi(const GblVariant* pVariant,    GblInt*      pVa
     {
         const GblType type = GblVariant_type(pVariant);
         if(type == GBL_BOOL_TYPE)           *pValue = pVariant->boolean? 1 : 0;
-        else if(type == GBL_INT32_TYPE)     *pValue = pVariant->integer;
-        else if(type == GBL_FLOAT_TYPE)     *pValue = (GblInt)pVariant->floating;
+        else if(type == GBL_INT32_TYPE)     *pValue = pVariant->i32;
+        else if(type == GBL_FLOAT_TYPE)     *pValue = (GblInt)pVariant->f32;
         else if(type == GBL_POINTER_TYPE)   *pValue = (uintptr_t)pVariant->pVoid;
         else if(type ==GBL_STRING_TYPE)     *pValue = GblStringBuffer_toInt(&pVariant->string);
         else *pValue = 0;
@@ -356,8 +330,8 @@ GBL_INLINE GBL_API gblVariantTof(const GblVariant* pVariant,    GblFloat*    pVa
     GBL_API_VERIFY_POINTER(pValue);
     {
         const GblType type = GblVariant_type(pVariant);
-        if(type == GBL_INT32_TYPE)          *pValue = (GblFloat)pVariant->integer;
-        else if(type == GBL_FLOAT_TYPE)    *pValue = pVariant->floating;
+        if(type == GBL_INT32_TYPE)          *pValue = (GblFloat)pVariant->i32;
+        else if(type == GBL_FLOAT_TYPE)    *pValue = pVariant->f32;
         else if(type == GBL_STRING_TYPE)   *pValue = GblStringBuffer_toFloat(&pVariant->string);
         else {
             *pValue = 0.0f;
@@ -418,11 +392,11 @@ GBL_INLINE GBL_API gblVariantTos(const GblVariant* pVariant, GblStringBuffer* pS
         else if(type == GBL_BOOL_TYPE)
             GBL_API_CALL(GblStringBuffer_appendBool(pString, pVariant->boolean));
         else if(type == GBL_INT32_TYPE)
-            GBL_API_CALL(GblStringBuffer_appendInt(pString, pVariant->integer));
+            GBL_API_CALL(GblStringBuffer_appendInt(pString, pVariant->i32));
         else if(type == GBL_UINT32_TYPE)
             GBL_API_CALL(GblStringBuffer_appendUint(pString, pVariant->u32));
         else if(type == GBL_FLOAT_TYPE)
-            GBL_API_CALL(GblStringBuffer_appendFloat(pString, pVariant->floating));
+            GBL_API_CALL(GblStringBuffer_appendFloat(pString, pVariant->f32));
         else if(type == GBL_POINTER_TYPE)
             GBL_API_CALL(GblStringBuffer_appendPointer(pString, pVariant->pVoid));
         else

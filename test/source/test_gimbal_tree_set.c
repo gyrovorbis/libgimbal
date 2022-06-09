@@ -3,8 +3,6 @@
 #include <gimbal/containers/gimbal_tree_set.h>
 
 static GblTreeSet   treeSet1_;
-static GblTreeSet   treeSet2_;
-
 static uint64_t     hint_           = 0;
 static unsigned     dtorCount_      = 0;
 static uintptr_t    lastDtorValue_  = 0;

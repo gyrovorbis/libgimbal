@@ -6,7 +6,7 @@
 #define GBL_FLAGS_TYPE                      (GBL_BUILTIN_TYPE(FLAGS))
 #define GBL_FLAGS_CLASS_STRUCT              GblFlagsClass
 #define GBL_FLAGS_TYPE_CHECK(type)          (GblType_check(type, GBL_FLAGS_TYPE))
-#define GBL_FLAGS_CHECK(variant)            (GblVariant_type(&variant) == GBL_FLAGS_TYPE)
+#define GBL_FLAGS_CHECK(variant)            (GblType_check(GblVariant_type(&variant). GBL_FLAGS_TYPE))
 #define GBL_FLAGS_CLASS(klass)              (GBL_CLASS_CAST_PREFIX(klass, GBL_FLAGS))
 #define GBL_FLAGS_CLASS_CHECK(klass)        (GBL_CLASS_CHECK_PREFIX(klass, GBL_FLAGS))
 #define GBL_FLAGS_CLASS_TRY(klass)          (GBL_CLASS_TRY_PREFIX(klass, GBL_FLAGS))

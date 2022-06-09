@@ -48,7 +48,7 @@ static GBL_RESULT GblObjectClass_ivariantIFace_get_(GblVariant* pSelf, GblUint a
     *(GblObject**)pArgs[0].pVoid = pSelf->pVoid;
     if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY) {
         GblObject_ref(GBL_OBJECT(pSelf->pVoid));
-    } else if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE) {
+    } else if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE) {
         pSelf->type = GBL_NIL_TYPE;
     }
     GBL_API_END();
@@ -387,7 +387,7 @@ static GBL_RESULT GblObjectClass_init_(GblObjectClass* pClass, void* pData, GblC
                                             GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE         |
                                             GBL_IVARIANT_OP_FLAG_SET_MOVE               |
                                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY         |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE         |
+                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE         |
                                             GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK;
     pClass->iVariantIFace.pFnConstruct =    GblObjectClass_ivariantIFace_construct_;
     pClass->iVariantIFace.pFnDestruct  =    GblObjectClass_ivariantIFace_destruct_;

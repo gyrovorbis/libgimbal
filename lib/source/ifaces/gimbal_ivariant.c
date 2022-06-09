@@ -382,15 +382,15 @@ GBL_API GblIVariantIFace_getValuePeek(const GblIVariantIFace* pSelf, const GblVa
     } GBL_API_END();
 }
 
-GBL_API GblIVariantIFace_getValueTake(const GblIVariantIFace* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_API GblIVariantIFace_getValueMove(const GblIVariantIFace* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pSelf);
         GblUint count = 0;
         GblVariant* pVariants = GBL_ALLOCA(sizeof(GblVariant)*GBL_IVARIANT_VALUE_VAR_ARG_MAX);
         GBL_API_CALL(GblIVariantIFace_valuesFromVa_(pSelf, pSelf->pGetValueFmt, pArgs, &count, pVariants));
-        if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE) {
+        if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE) {
             GBL_API_VERIFY_POINTER(pSelf->pFnGet);
-            GBL_API_CALL(pSelf->pFnGet(pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE));
+            GBL_API_CALL(pSelf->pFnGet(pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE));
         } else if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY) {
             GBL_API_VERIFY_POINTER(pSelf->pFnGet);
             GBL_API_CALL(pSelf->pFnGet(pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY));

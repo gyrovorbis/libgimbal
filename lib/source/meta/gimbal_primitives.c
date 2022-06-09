@@ -530,7 +530,7 @@ static GBL_RESULT stringGet_(GblVariant* pVariant, GblUint argc, GblVariant* pAr
     if(op & (GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK))
     {
         *((void**)pArgs->pVoid) = (void*)GblStringBuffer_cString(&pVariant->string);
-    } else if(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE) {
+    } else if(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE) {
         GblSize capacity = 0;
         GBL_API_CALL(GblStringBuffer_take(&pVariant->string, pArgs->pVoid, &capacity));
     }
@@ -985,7 +985,7 @@ extern GBL_RESULT gblValueTypesRegister_(GblContext* pCtx) {
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE         |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY         |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK         |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_TAKE,
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE,
         .pSetValueFmt   = { "p"},
         .pGetValueFmt   = { "p" },
         .pFnConstruct   = stringConstruct_,

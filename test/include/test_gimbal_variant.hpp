@@ -106,7 +106,7 @@ private slots:
     }
 
     void constructCopy(void) {
-        GblVariant g1{.floating=-33.0f, .type=GBL_FLOAT_TYPE};
+        GblVariant g1{.f32=-33.0f, .type=GBL_FLOAT_TYPE};
         gimbal::Variant v1(g1);
         QCOMPARE(v1.getType(), gimbal::FloatType());
 
@@ -116,7 +116,7 @@ private slots:
     }
 
     void constructMove(void) {
-        gimbal::Variant v1(GblVariant{.floating=-33.0f, .type=GBL_FLOAT_TYPE});
+        gimbal::Variant v1(GblVariant{.f32=-33.0f, .type=GBL_FLOAT_TYPE});
         QCOMPARE(v1.getType(), gimbal::FloatType());
 
         gimbal::Variant v2(gimbal::Variant(34));
@@ -152,7 +152,7 @@ private slots:
         test(-33.0f, -33.0f);
         test(GblBool(false), gimbal::Bool(GBL_FALSE));
         test(reinterpret_cast<void*>(this), reinterpret_cast<void*>(this));
-        auto g = GblVariant{.boolean=GBL_TRUE, .type=GBL_BOOL_TYPE};
+        auto g = GblVariant{.type=GBL_BOOL_TYPE, .boolean=GBL_TRUE};
         test(g, GblBool(GBL_TRUE));
         test(std::move(g), gimbal::Bool(true));
         auto v = gimbal::Variant(reinterpret_cast<void*>(this));

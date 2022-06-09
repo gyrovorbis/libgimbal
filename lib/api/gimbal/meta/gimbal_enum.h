@@ -5,8 +5,8 @@
 
 #define GBL_ENUM_TYPE                       (GBL_BUILTIN_TYPE(ENUM))
 #define GBL_ENUM_CLASS_STRUCT               GblEnumClass
-#define GBL_ENUM_TYPE_CHECK(other)          (GblType_derives(other, GBL_ENUM_TYPE)
-#define GBL_ENUM_CHECK(variant)             (GblVariant_type() == GBL_ENUM_TYPE)
+#define GBL_ENUM_TYPE_CHECK(other)          (GblType_check(other, GBL_ENUM_TYPE))
+#define GBL_ENUM_CHECK(variant)             (GblType_check(GblVariant_type(), GBL_ENUM_TYPE))
 #define GBL_ENUM_CLASS(klass)               (GBL_CLASS_CAST_PREFIX(klass, GBL_ENUM))
 #define GBL_ENUM_CLASS_CHECK(klass)         (GBL_CLASS_CHECK_PREFIX(klass, GBL_ENUM))
 #define GBL_ENUM_CLASS_TRY(klass)           (GBL_CLASS_TRY_PREFIX(klass, GBL_ENUM))
@@ -14,7 +14,6 @@
 #define GBL_ENUM_TRY_CLASS(variant)         (GBL_ENUM_CLASS_TRY(GblClass_peek(GblVariant_type(&variant))))
 
 #define GBL_ENUM_ENTRY(enumValue, nick)     { enumValue, GblQuark_fromStatic(#enumValue), GblQuark_fromStatic(nick) }
-
 
 #define SELF    GblEnumClass* pSelf
 #define CSELF   const SELF
