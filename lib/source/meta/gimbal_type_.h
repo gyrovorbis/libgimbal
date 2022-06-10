@@ -85,6 +85,8 @@ extern struct TypeBuiltins_ {
 
 extern void GblType_init_(void);
 
+extern GBL_RESULT GblVariant_init_              (GblContext* pCtx);
+extern GBL_RESULT GblVariant_final_             (GblContext* pCtx);
 
 extern GBL_RESULT GblIVariant_typeRegister_     (GblContext* pCtx);
 extern GBL_RESULT gblValueTypesRegister_        (GblContext* pCtx);

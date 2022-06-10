@@ -15,6 +15,8 @@
 
 GBL_DECLS_BEGIN
 
+typedef GBL_RESULT (*GblVariantConverterFn)(CSELF, GblVariant* pOther);
+
 typedef struct GblVariant {
     GblType             type;
     union {
@@ -41,7 +43,7 @@ typedef struct GblVariant {
 } GblVariant;
 
 
-GBL_EXPORT GblType      GblVariant_type                     (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE GblType      GblVariant_type                     (CSELF)                         GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblVariant_constructDefault         (SELF,  GblType type)           GBL_NOEXCEPT;
 
@@ -170,12 +172,24 @@ GBL_INLINE double       GblVariant_toDouble                 (CSELF)             
 GBL_INLINE void*        GblVariant_toPointer                (CSELF)                         GBL_NOEXCEPT;
 GBL_INLINE const char*  GblVariant_toString                 (CSELF)                         GBL_NOEXCEPT;
 
-GBL_EXPORT GblInt       GblVariant_compare                  (CSELF,
-                                                             const GblVariant* pOther)      GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT   GblVariant_registerConverter        (GblType fromType,
+                                                             GblType toType,
+                                                             GblVariantConverterFn pFnConv) GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT   GblVariant_unregisterConverter      (GblType fromType,
+                                                             GblType toType)                GBL_NOEXCEPT;
+
+GBL_EXPORT GblSize      GblVariant_converterCount           (void)                          GBL_NOEXCEPT;
+
+GBL_EXPORT GblBool      GblVariant_canConvert               (GblType fromType,
+                                                             GblType toType)                GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblVariant_convert                  (CSELF,
-                                                             GblType toType,
                                                              GblVariant* pToVariant)        GBL_NOEXCEPT;
+
+GBL_EXPORT GblInt       GblVariant_compare                  (CSELF,
+                                                             const GblVariant* pOther)      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblVariant_save                     (CSELF,
                                                              GblStringBuffer* pString)      GBL_NOEXCEPT;
@@ -184,6 +198,9 @@ GBL_EXPORT GBL_RESULT   GblVariant_load                     (SELF,
                                                              const GblStringBuffer* pStr)   GBL_NOEXCEPT;
 
 // ========== IMPL ==========
+GBL_INLINE GblType GblVariant_type(const GblVariant* pSelf) GBL_NOEXCEPT {
+    return pSelf->type;
+}
 
 GBL_INLINE GBL_RESULT GblVariant_constructNil(SELF) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);

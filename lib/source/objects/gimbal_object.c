@@ -363,12 +363,12 @@ static GBL_RESULT GblObjectClass_init_(GblObjectClass* pClass, void* pData, GblC
     // static constructor for first instance of class
     if(!GblType_classRefCount(GBL_OBJECT_TYPE)) {
         GBL_API_CALL(gblPropertyTableInitialize(pCtx, GBL_OBJECT_PROPERTY_TABLE_CAPACITY_DEFAULT_));
-        objectNameQuark_            = GblQuark_fromStringStatic("name");
-        objectUserdataQuark_        = GblQuark_fromStringStatic("userdata");
-        objectRefCountQuark_        = GblQuark_fromStringStatic("refCount");
-        objectParentQuark_          = GblQuark_fromStringStatic("parent");
-        objectFamilyQuark_          = GblQuark_fromStringStatic("family");
-        objectEventFiltersQuark_    = GblQuark_fromStringStatic("eventFilters");
+        objectNameQuark_            = GblQuark_fromStringStatic("_name");
+        objectUserdataQuark_        = GblQuark_fromStringStatic("_userdata");
+        objectRefCountQuark_        = GblQuark_fromStringStatic("_refCount");
+        objectParentQuark_          = GblQuark_fromStringStatic("_parent");
+        objectFamilyQuark_          = GblQuark_fromStringStatic("_family");
+        objectEventFiltersQuark_    = GblQuark_fromStringStatic("_eventFilters");
 
         GBL_PROPERTY_TABLE_REGISTER(GBL_OBJECT, pClass);
 

@@ -64,7 +64,7 @@ concept variant_compatible =
 
         template<>
         struct VariantCompatibleTypeTraits<gimbal::Bool>: public VariantCompatibleTypeTraitsDefault<gimbal::Bool> {
-            inline static auto variantType  = BoolType();
+            inline const static auto variantType  = BoolType();
         };
 
         template<>

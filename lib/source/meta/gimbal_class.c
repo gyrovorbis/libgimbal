@@ -291,33 +291,37 @@ static GBL_EXPORT GBL_RESULT GblClass_destruct_(GblClass* pClass) {
     GblMetaClass* pIter = pMeta;
     // walk up the destructor chain
     GBL_API_PUSH_VERBOSE("Walking class destructors.");
+
+    // iterate from derived to base class
     do {
+        // call finalizer if class provides one
         if(pIter->info.pFnClassFinal) {
             GBL_API_DEBUG("Calling class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
             GBL_API_CALL(pIter->info.pFnClassFinal(pMeta->pClass, pMeta->info.pClassData, pCtx_));
         } else {
-            GBL_API_DEBUG("No class dtor: [%s]", GblType_name(GBL_TYPE_(pMeta)));
+            GBL_API_DEBUG("No class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
         }
 
+        // iterate over all interfaces
         for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
-            GblInterface* pInterface = (GblInterface*)((const char*)pClass + pIter->info.pInterfaceMap[i].classOffset);
+            GblInterface* pInterface = (GblInterface*)((const char*)pClass +
+                                                       pIter->info.pInterfaceMap[i].classOffset);
             GblClass* pDefaultIFaceClass = GblClass_peek(GBL_CLASS_TYPE(pInterface));
-            GblClass_unref(pDefaultIFaceClass);
 
+            // destruct interface implementation
             GblClass_destruct_(GBL_CLASS(pInterface));
-            //GblClass_unref(GBL_CLASS(pInterface));
-            // unreference default interface class too!
-            //GblClass_unref(GblClass_peek(GBL_CLASS_TYPE(pInterface)));
+
+            // unreference default interface class
+            GblClass_unref(pDefaultIFaceClass);
         }
         pIter = pIter->pParent;
     } while(pIter);
     GBL_API_POP(1);
 
-    // Store parent pointer then deallocate
+    // Store parent class
     GblClass* pParentClass = pMeta->pParent? pMeta->pParent->pClass : NULL;
-   // GBL_API_FREE(pMeta->pClass);
 
-    //Release reference to parent class;
+    //Release reference to parent class
     if(pParentClass) GblClass_unref(pParentClass);
 
     // clear the type so it's not looking initialized

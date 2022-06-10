@@ -87,10 +87,6 @@ GBL_API                 GblTreeSet_construct_3  (SELF,
 #define                 GblTreeSet_construct(...)                                               \
                                                   GBL_VA_OVERLOAD_SELECT(GblTreeSet_construct,      \
                                                   GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
-//                      GblTreeSet_clone        (SELF, pOther, pCtx);
-//                      GblTreeSet_constructMove(SELF, pOther, pCtx);
-//                      GblTreeSet_constructClone(SELF, pOther);
-//                      GblTreeSet_assignMove   (SELF, pOther);
 GBL_API                 GblTreeSet_destruct     (SELF)                                  GBL_NOEXCEPT;
 
 GBL_INLINE GblSize      GblTreeSet_size         (CSELF)                                 GBL_NOEXCEPT;

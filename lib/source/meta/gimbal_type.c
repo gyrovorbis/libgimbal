@@ -550,6 +550,7 @@ void GblType_init_(void) {
                                     NULL,
                                     sizeof(typeBuiltins_),
                                     pCtx_));
+    GBL_API_CALL(GblVariant_init_(pCtx_));
     GBL_API_CALL(GblType_registerBuiltins_());
     GBL_API_POP(1);
     initialized_    = GBL_TRUE;
@@ -598,6 +599,8 @@ GBL_EXPORT GBL_RESULT GblType_final(void) {
     mtx_lock(&typeRegMtx_);
     hasMutex = GBL_TRUE;
 
+    //iterate over types and cleanup classes
+    GBL_API_CALL(GblVariant_final_(pCtx_));
     GBL_API_CALL(GblVector_clear(&typeBuiltins_.vector));
     GBL_API_CALL(GblVector_destruct(&typeBuiltins_.vector));
     GBL_API_CALL(GblHashSet_destruct(&typeRegistry_));
@@ -859,7 +862,11 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
             } else if(ifaceChecks) {
                 // recurse over interfaces checking
                 for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
-                    if(GblType_typeIsA_(pIter->info.pInterfaceMap[i].interfaceType, base, GBL_TRUE, ifaceChecks, castChecks)) {
+                    if(GblType_typeIsA_(pIter->info.pInterfaceMap[i].interfaceType,
+                                        base,
+                                        GBL_TRUE,
+                                        ifaceChecks,
+                                        castChecks)) {
                         result = GBL_TRUE;
                         GBL_API_DONE();
                     }

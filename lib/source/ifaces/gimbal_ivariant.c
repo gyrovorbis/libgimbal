@@ -9,7 +9,7 @@ extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
                             GBL_INTERFACE_TYPE,
                             GblQuark_internStringStatic("IVariant"),
                             &((const GblTypeInfo) {
-                                .classSize    = sizeof(GblIVariantIFace)
+                                .classSize      = sizeof(GblIVariantIFace)
                             }),
                             GBL_TYPE_FLAG_ABSTRACT);
     GBL_API_END();

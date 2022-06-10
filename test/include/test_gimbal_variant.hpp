@@ -4,6 +4,7 @@
 #include "test_gimbal.hpp"
 #include <gimbal/types/gimbal_variant.hpp>
 #include <gimbal/meta/gimbal_type.hpp>
+#include "test_gimbal_variant.h"
 
 namespace gimbal::test {
 
@@ -23,6 +24,9 @@ class Variant: public UnitTestSet {
 
 
 private slots:
+
+    GBL_VARIANT_TEST_SET(GBL_TEST_CASE_QT_SLOT)
+
     void testString(void) {
         {
             const auto str = gimbal::String("test", pCtx());

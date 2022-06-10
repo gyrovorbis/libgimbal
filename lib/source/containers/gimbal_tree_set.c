@@ -320,6 +320,7 @@ GBL_INLINE GblBool node_set_(GblTreeSet* pSelf, GblTreeSetNode* pNode, const voi
 
 static void* btree_set_x_(GblTreeSet* pSelf, const void* pEntry, GblBool leanLeft, uint64_t *pHint)
 {
+    void* pRetValue = NULL;
     GBL_API_BEGIN(pSelf->pCtx); {
         reset_load_fields_(pSelf);
 
@@ -332,10 +333,12 @@ static void* btree_set_x_(GblTreeSet* pSelf, const void* pEntry, GblBool leanLef
             pSelf->pRoot->entryCount = 1;
             pSelf->count++;
             pSelf->height++;
-            return NULL;
+            pRetValue = NULL;
+            GBL_API_DONE();
         }
         if (node_set_(pSelf, pSelf->pRoot, pEntry, leanLeft, pHint, 0)) {
-            return pSelf->pSpares[0];
+            pRetValue = pSelf->pSpares[0];
+            GBL_API_DONE();
         }
         ++pSelf->count;
         if ((GblSize)pSelf->pRoot->entryCount == (pSelf->maxCount-1)) {
@@ -351,7 +354,7 @@ static void* btree_set_x_(GblTreeSet* pSelf, const void* pEntry, GblBool leanLef
             ++pSelf->height;
         }
     } GBL_API_END_BLOCK();
-    return NULL;
+    return pRetValue;
 }
 
 // btree_get_hint is the same as btree_get except that an optional "hint" can
@@ -481,7 +484,7 @@ GBL_EXPORT void GblTreeSet_clear(GblTreeSet* pSelf) GBL_NOEXCEPT {
 
 GBL_EXPORT GBL_RESULT GblTreeSet_destruct(GblTreeSet* pSelf) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_FREE(pSelf->pRoot);
+    //GBL_API_FREE(pSelf->pRoot);
 
     GblTreeSet_clear(pSelf);
 

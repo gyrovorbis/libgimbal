@@ -122,7 +122,7 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_upper           (SELF)              
 GBL_INLINE GblBool          GblStringBuffer_toNil             (CSELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblStringBuffer_toBool            (CSELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GblInt           GblStringBuffer_toInt             (CSELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblUint          GblStringBuffer_toUInt            (CSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblUint          GblStringBuffer_toUint            (CSELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GblFloat         GblStringBuffer_toFloat           (CSELF)                                              GBL_NOEXCEPT;
 GBL_INLINE double           GblStringBuffer_toDouble          (CSELF)                                              GBL_NOEXCEPT;
 GBL_INLINE void*            GblStringBuffer_toPointer         (CSELF)                                              GBL_NOEXCEPT;
@@ -347,6 +347,15 @@ GBL_INLINE GBL_RESULT GblStringBuffer_appendPrintf(SELF, const char* pFmt, ...) 
     GBL_API_CALL(GblStringBuffer_appendVPrintf(pSelf, pFmt, varArgs));
     va_end(varArgs);
     GBL_API_END();
+}
+
+GBL_INLINE GblUint GblStringBuffer_toUint(CSELF) GBL_NOEXCEPT {
+    GblUint value = 0;
+    GBL_ASSERT(pSelf);
+    GBL_API_BEGIN(pSelf->data.pCtx);
+    value = strtoul(GblStringBuffer_cString(pSelf), NULL, 10);
+    GBL_API_END_BLOCK();
+    return value;
 }
 
 GBL_INLINE GblInt GblStringBuffer_toInt(CSELF) GBL_NOEXCEPT {

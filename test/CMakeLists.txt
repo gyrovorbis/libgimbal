@@ -60,6 +60,8 @@ add_executable(GimbalTests
     include/test_gimbal_tree_set.h
     include/test_gimbal_tree_set.hpp
     source/test_gimbal_tree_set.c
+    include/test_gimbal_variant.h
+    source/test_gimbal_variant.c
     source/test_main.cpp)
 
 
