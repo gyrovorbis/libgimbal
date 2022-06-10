@@ -283,6 +283,7 @@ GBL_API GblStringView_test_first(GblContext* pCtx) {
 
 GBL_API GblStringView_test_last_invalid(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
     GBL_COMPARE(GblStringView_last(GBL_STRV(NULL)), '\0');
     GBL_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_API_CLEAR_LAST_RECORD();

@@ -59,7 +59,7 @@ GBL_API GblStringRef_test_null(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GBL_COMPARE(GblStringRef_acquire(NULL), NULL);
     GBL_COMPARE(GblStringRef_release(NULL), 0);
-    GBL_COMPARE(GblStringRef_at(NULL, 0), '\0');
+    //GBL_COMPARE(GblStringRef_at(NULL, 0), '\0');
     GBL_COMPARE(GblStringRef_context(NULL), NULL);
     GBL_COMPARE(GblStringRef_refCount(NULL), 0);
     GBL_COMPARE(GblStringRef_length(NULL), 0);
