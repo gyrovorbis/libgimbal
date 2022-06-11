@@ -1,0 +1,250 @@
+#include <gimbal/meta/gimbal_enum.h>
+#include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_string_buffer.h>
+
+extern GBL_RESULT GblPrimitiveClass_init(GblPrimitiveClass* pClass, GblIVariantIFace* pIFace, GblContext* pCtx);
+
+static GBL_RESULT enumSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
+    GBL_API_BEGIN(NULL);
+    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_peek(GblVariant_type(pVariant)));
+    GBL_API_CALL(GblStringBuffer_append(pString,
+                                        GBL_STRV(GblEnumClass_nameFromValue(pEnumClass,
+                                                                            pVariant->enumeration))));
+    GBL_API_END();
+}
+
+static GBL_RESULT enumLoad_(GblVariant* pVariant, const GblStringBuffer* pString) {
+    GBL_API_BEGIN(NULL);
+    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_peek(GblVariant_type(pVariant)));
+    pVariant->enumeration = GblEnumClass_valueFromName(pEnumClass, GblStringBuffer_cString(pString));
+    GBL_API_END();
+}
+
+static GBL_RESULT enumSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_API_BEGIN(NULL);
+    GBL_UNUSED(argc);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
+    GBL_API_VERIFY_ARG(argc == 1);
+    GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_UINT32_TYPE);
+    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_peek(GblVariant_type(pVariant)));
+    GBL_API_VERIFY(GblEnumClass_valueCheck(pEnumClass, (GblEnum)pArgs->u32),
+                   GBL_RESULT_ERROR_OUT_OF_RANGE);
+    pVariant->enumeration = (GblEnum)pArgs->u32;
+    GBL_API_END();
+}
+
+static GBL_RESULT enumGet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_API_BEGIN(NULL);
+    GBL_UNUSED(argc);
+    GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
+    GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
+    *((GblEnum*)pArgs->pVoid) = pVariant->enumeration;
+    GBL_API_END();
+}
+
+
+static GBL_RESULT enumCompare_(const GblVariant* pVariant, const GblVariant* pOther, GblInt* pResult) {
+    GBL_API_BEGIN(NULL);
+    *pResult = pVariant->enumeration - pOther->enumeration;
+    GBL_API_END();
+}
+
+static GBL_RESULT enumConvert_(const GblVariant* pVariant, GblVariant* pOther) {
+    GBL_API_BEGIN(NULL);
+    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_peek(GblVariant_type(pVariant)));
+    const GblType type = GblVariant_type(pOther);
+    if(type == GBL_BOOL_TYPE)
+        GblVariant_setBool(pOther, GblEnumClass_valueCheck(pEnumClass, pVariant->enumeration));
+    else if(type == GBL_UINT8_TYPE) {
+        GBL_API_VERIFY(pVariant->enumeration <= UINT8_MAX,
+                       GBL_RESULT_ERROR_OVERFLOW);
+        GblVariant_setUint8(pOther, pVariant->enumeration);
+    } else if(type == GBL_UINT16_TYPE) {
+        GBL_API_VERIFY(pVariant->enumeration <= UINT16_MAX,
+                       GBL_RESULT_ERROR_OVERFLOW);
+        GblVariant_setUint16(pOther, pVariant->enumeration);
+    } else if(type == GBL_INT16_TYPE) {
+        GBL_API_VERIFY(pVariant->enumeration <= INT16_MAX,
+                       GBL_RESULT_ERROR_OVERFLOW);
+        GblVariant_setInt16(pOther, pVariant->enumeration);
+    } else if(type == GBL_UINT32_TYPE) {
+        GBL_API_VERIFY(pVariant->enumeration <= UINT32_MAX,
+                       GBL_RESULT_ERROR_OVERFLOW);
+        GblVariant_setUint32(pOther, pVariant->enumeration);
+    } else if(type == GBL_INT32_TYPE) {
+        GBL_API_VERIFY(pVariant->enumeration <= INT32_MAX,
+                       GBL_RESULT_ERROR_OVERFLOW);
+        GblVariant_setInt32(pOther, pVariant->enumeration);
+    } else if(type == GBL_UINT64_TYPE) {
+        GblVariant_setUint64(pOther, pVariant->enumeration);
+    } else if(type == GBL_INT64_TYPE) {
+        GblVariant_setInt64(pOther, pVariant->enumeration);
+    } else if(type == GBL_STRING_TYPE) {
+        GblVariant_setString(pOther, GblEnumClass_nameFromValue(pEnumClass, pVariant->enumeration));
+    }
+    else
+        GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
+    GBL_API_END();
+}
+
+
+GBL_INLINE GblBool GblEnumClass_valueInRange_(const GblEnumClass* pSelf, GblEnum value) {
+    return value <= pSelf->valueMax && value >= pSelf->valueMin;
+}
+
+GBL_EXPORT GblQuark GblEnumClass_nameQuarkFromValue(const GblEnumClass* pSelf, GblEnum value) {
+    GblQuark quark = GBL_QUARK_INVALID;
+    if(GblEnumClass_valueInRange_(pSelf, value)) {
+        for(uint16_t e = 0; e < pSelf->entryCount; ++e) {
+            if(GblEnumClass_valueFromIndex(pSelf, e) == value) {
+                quark = GblEnumClass_nameQuarkFromIndex(pSelf, e);
+                break;
+            }
+        }
+    }
+    return quark;
+}
+
+GBL_EXPORT GblQuark GblEnumClass_nickQuarkFromValue(const GblEnumClass* pSelf, GblEnum value) {
+    GblQuark quark = GBL_QUARK_INVALID;
+    if(GblEnumClass_valueInRange_(pSelf, value)) {
+        for(uint16_t e = 0; e < pSelf->entryCount; ++e) {
+            if(GblEnumClass_valueFromIndex(pSelf, e) == value) {
+                quark = GblEnumClass_nickQuarkFromIndex(pSelf, e);
+                break;
+            }
+        }
+    }
+    return quark;
+}
+
+
+GBL_EXPORT GblEnum GblEnumClass_valueFromNameQuark(const GblEnumClass* pSelf, GblQuark quark) {
+    GblEnum value = 0;
+    for(uint16_t e = 0; e < pSelf->entryCount; ++e) {
+        if(GblEnumClass_nameQuarkFromIndex(pSelf, e) == quark) {
+            value = GblEnumClass_valueFromIndex(pSelf, e);
+            break;
+        }
+    }
+    return value;
+}
+
+GBL_EXPORT GblEnum GblEnumClass_valueFromNickQuark(const GblEnumClass* pSelf, GblQuark quark) {
+    GblEnum value = 0;
+    for(uint16_t e = 0; e < pSelf->entryCount; ++e) {
+        if(GblEnumClass_nickQuarkFromIndex(pSelf, e) == quark) {
+            value = GblEnumClass_valueFromIndex(pSelf, e);
+            break;
+        }
+    }
+    return value;
+}
+
+GBL_EXPORT GblBool GblEnumClass_valueCheck(const GblEnumClass* pSelf, GblEnum value) {
+    GblBool result = GBL_FALSE;
+
+    if(value <= pSelf->valueMax && value >= pSelf->valueMin) {
+        for(uint16_t e = 0; e < pSelf->entryCount; ++e) {
+            if(GblEnumClass_valueFromIndex(pSelf, e) == value) {
+                result = GBL_TRUE;
+                break;
+            }
+        }
+    }
+
+    return result;
+}
+
+
+static GBL_RESULT enumClass_init_(GblClass* pClass,
+                                  const void* pUd,
+                                  GblContext* pCtx)
+{
+    GBL_API_BEGIN(pCtx);
+    GblEnumClass*       pEnumClass  = GBL_ENUM_CLASS(pClass);
+    const GblEnumEntry* pEntries    = pUd;
+
+    pEnumClass->pEntries    = pEntries;
+    pEnumClass->entryCount  = 0;
+    pEnumClass->valueMin    = UINT32_MAX;
+    pEnumClass->valueMax    = 0;
+
+    if(pEntries) {
+        const GblEnumEntry* pCurEntry = &pEntries[0];
+        while(!(pCurEntry->value    == 0 &&
+                pCurEntry->name     == GBL_QUARK_INVALID &&
+                pCurEntry->nick     == GBL_QUARK_INVALID))
+        {
+            if(pCurEntry->value < pEnumClass->valueMin)
+                pEnumClass->valueMin = pCurEntry->value;
+
+            if(pCurEntry->value > pEnumClass->valueMax)
+                pEnumClass->valueMax = pCurEntry->value;
+
+            pCurEntry = &pEntries[++pEnumClass->entryCount];
+        }
+    }
+
+    GBL_API_END();
+}
+
+GBL_RESULT  GblEnum_typeRegister_(GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    const static GblIVariantIFace enumIVariantIFace =  {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
+            .pSetValueFmt   = { "l"},
+            .pGetValueFmt   = { "p" },
+            .pFnSet         = enumSet_,
+            .pFnGet         = enumGet_,
+            .pFnCompare     = enumCompare_,
+            .pFnSave        = enumSave_,
+            .pFnLoad        = enumLoad_
+      };
+    const GblType enumType =
+            GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_ENUM,
+                  GBL_INVALID_TYPE,
+                  GblQuark_internStringStatic("enum"),
+                  &(const GblTypeInfo) {
+                      .pFnClassInit = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
+                      .classSize    = sizeof(GblEnumClass),
+                      .pClassData   = &enumIVariantIFace,
+                      .interfaceCount = 1,
+                      .pInterfaceMap = &(const GblTypeInterfaceMapEntry) {
+                           .interfaceType  = GBL_IVARIANT_TYPE,
+                           .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+                      }
+                  },
+                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED);
+
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_BOOL_TYPE, enumConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT8_TYPE, enumConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT16_TYPE, enumConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_INT16_TYPE, enumConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT32_TYPE, enumConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_INT32_TYPE, enumConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT64_TYPE, enumConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_INT64_TYPE, enumConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_STRING_TYPE, enumConvert_));
+    GBL_API_END();
+}
+
+GBL_EXPORT GblType GblEnumClass_register(const char* pName,
+                                         const GblEnumEntry* pValidEntries)
+{
+    GblType type = GBL_INVALID_TYPE;
+    GBL_API_BEGIN(NULL);
+    type = GblType_registerStatic(GBL_ENUM_TYPE,
+                                  GblQuark_internString(pName),
+                                  &(const GblTypeInfo) {
+                                      .pFnClassInit = enumClass_init_,
+                                      .classSize    = sizeof(GblEnumClass),
+                                      .pClassData   = pValidEntries,
+                                  },
+                                  GBL_TYPE_FLAGS_NONE);
+    GBL_API_END_BLOCK();
+    return type;
+}

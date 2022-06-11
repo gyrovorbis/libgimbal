@@ -425,9 +425,6 @@ static GblType typeRegister_(GblType parent,
         memcpy(&pMeta->info, pInfo, sizeof(GblTypeInfo));
         GBL_ATOMIC_INT16_INIT(pMeta->refCount, 0);
         GBL_ATOMIC_INT16_INIT(pMeta->instanceRefCount, 0);
-#ifdef GBL_TYPE_DEBUG
-        GBL_ATOMIC_INT16_INIT(&pMeta->instanceRefCount, 0);
-#endif
         pMeta->flags                = flags;
         pMeta->depth                = baseCount;
         pMeta->classPrivateOffset   = !pParent? 0 : pParent->classPrivateOffset - pInfo->classPrivateSize;
@@ -518,6 +515,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
                             GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE);
     GBL_API_CALL(GblIVariant_typeRegister_(pCtx_));
     GBL_API_CALL(gblValueTypesRegister_(pCtx_));
+    GBL_API_CALL(GblEnum_typeRegister_(pCtx));
     GBL_API_CALL(GblITable_typeRegister_(pCtx_));
     GBL_API_CALL(GblIEventHandler_typeRegister_(pCtx_));
     GBL_API_CALL(GblIEventFilter_typeRegister_(pCtx_));

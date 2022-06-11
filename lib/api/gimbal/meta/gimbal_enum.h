@@ -2,6 +2,7 @@
 #define GIMBAL_ENUM_H
 
 #include "gimbal_primitives.h"
+#include "../types/gimbal_quark.h"
 
 #define GBL_ENUM_TYPE                       (GBL_BUILTIN_TYPE(ENUM))
 #define GBL_ENUM_CLASS_STRUCT               GblEnumClass
@@ -14,6 +15,7 @@
 #define GBL_ENUM_TRY_CLASS(variant)         (GBL_ENUM_CLASS_TRY(GblClass_peek(GblVariant_type(&variant))))
 
 #define GBL_ENUM_ENTRY(enumValue, nick)     { enumValue, GblQuark_fromStatic(#enumValue), GblQuark_fromStatic(nick) }
+#define GBL_ENUM_ENTRY_LAST()               { 0, GBL_QUARK_INVALID, GBL_QUARK_INVALID }
 
 #define SELF    GblEnumClass* pSelf
 #define CSELF   const SELF
@@ -48,32 +50,80 @@ typedef struct GblEnumClass {
     GblEnum             valueMax;
     GblEnum             valueMin;
     uint16_t            entryCount; //so we can just pointer offset jump and know we're fine
-    GblEnumEntry*       pEntries;
+    const GblEnumEntry* pEntries;
 } GblEnumClass;
 
-GBL_EXPORT const GblEnumEntry*  GblEnumClass_entries            (CSELF)                             GBL_NOEXCEPT;
-GBL_EXPORT uint16_t             GblEnumClass_entryCount         (CSELF)                             GBL_NOEXCEPT;
-GBL_EXPORT const GblEnumEntry*  GblEnumClass_entryFromIndex     (CSELF, uint16_t index)             GBL_NOEXCEPT;
+GBL_INLINE const GblEnumEntry*  GblEnumClass_entries            (CSELF)                             GBL_NOEXCEPT;
+GBL_INLINE uint16_t             GblEnumClass_entryCount         (CSELF)                             GBL_NOEXCEPT;
+GBL_INLINE const GblEnumEntry*  GblEnumClass_entryFromIndex     (CSELF, uint16_t index)             GBL_NOEXCEPT;
 
-GBL_EXPORT const char*          GblEnumClass_nameFromIndex      (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_EXPORT GblQuark             GblEnumClass_nameQuarkFromIndex (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_EXPORT const char*          GblEnumClass_nameFromValue      (CSELF, GblEnum value)              GBL_NOEXCEPT;
-GBL_EXPORT GblQuark             GblEnuMClass_nameQuarkFromValue (CSELF, GblEnum value)              GBL_NOEXCEPT;
+GBL_INLINE const char*          GblEnumClass_nameFromIndex      (CSELF, uint16_t index)             GBL_NOEXCEPT;
+GBL_INLINE GblQuark             GblEnumClass_nameQuarkFromIndex (CSELF, uint16_t index)             GBL_NOEXCEPT;
+GBL_INLINE const char*          GblEnumClass_nameFromValue      (CSELF, GblEnum value)              GBL_NOEXCEPT;
+GBL_EXPORT GblQuark             GblEnumClass_nameQuarkFromValue (CSELF, GblEnum value)              GBL_NOEXCEPT;
 
-GBL_EXPORT const char*          GblEnumClass_nickFromIndex      (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_EXPORT GblQuark             GblEnumClass_nickQuarkFromIndex (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_EXPORT const char*          GblEnumClass_nickFromValue      (CSELF, GblEnum value)              GBL_NOEXCEPT;
+GBL_INLINE const char*          GblEnumClass_nickFromIndex      (CSELF, uint16_t index)             GBL_NOEXCEPT;
+GBL_INLINE GblQuark             GblEnumClass_nickQuarkFromIndex (CSELF, uint16_t index)             GBL_NOEXCEPT;
+GBL_INLINE const char*          GblEnumClass_nickFromValue      (CSELF, GblEnum value)              GBL_NOEXCEPT;
 GBL_EXPORT GblQuark             GblEnumClass_nickQuarkFromValue (CSELF, GblEnum value)              GBL_NOEXCEPT;
 
-GBL_EXPORT GblEnum              GblEnumClass_valueFromIndex     (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_EXPORT GblEnum              GblEnumClass_valueFromName      (CSELF, const char* pString)        GBL_NOEXCEPT;
+GBL_INLINE GblEnum              GblEnumClass_valueFromIndex     (CSELF, uint16_t index)             GBL_NOEXCEPT;
+GBL_INLINE GblEnum              GblEnumClass_valueFromName      (CSELF, const char* pString)        GBL_NOEXCEPT;
 GBL_EXPORT GblEnum              GblEnumClass_valueFromNameQuark (CSELF, GblQuark quark)             GBL_NOEXCEPT;
-GBL_EXPORT GblEnum              GblEnumClass_valueFromNick      (CSELF, const char* pString)        GBL_NOEXCEPT;
+GBL_INLINE GblEnum              GblEnumClass_valueFromNick      (CSELF, const char* pString)        GBL_NOEXCEPT;
 GBL_EXPORT GblEnum              GblEnumClass_valueFromNickQuark (CSELF, GblQuark quark)             GBL_NOEXCEPT;
 GBL_EXPORT GblBool              GblEnumClass_valueCheck         (CSELF, GblEnum value)              GBL_NOEXCEPT;
 
 GBL_EXPORT GblType              GblEnumClass_register           (const char*         pName,
                                                                  const GblEnumEntry* pValidEntries) GBL_NOEXCEPT;
+// ========== IMPL ==========
+
+GBL_INLINE const GblEnumEntry* GblEnumClass_entries(CSELF) GBL_NOEXCEPT {
+    return pSelf->pEntries;
+}
+GBL_INLINE uint16_t GblEnumClass_entryCount(CSELF) GBL_NOEXCEPT {
+    return pSelf->entryCount;
+}
+GBL_INLINE const GblEnumEntry*  GblEnumClass_entryFromIndex(CSELF, uint16_t index) GBL_NOEXCEPT {
+    return index < pSelf->entryCount? &pSelf->pEntries[index] : NULL;
+}
+GBL_INLINE const char* GblEnumClass_nameFromIndex(CSELF, uint16_t index) GBL_NOEXCEPT {
+    return index < pSelf->entryCount? GblQuark_toString(pSelf->pEntries[index].name) : NULL;
+}
+GBL_INLINE GblQuark GblEnumClass_nameQuarkFromIndex(CSELF, uint16_t index) GBL_NOEXCEPT {
+    return index < pSelf->entryCount? pSelf->pEntries[index].name : GBL_QUARK_INVALID;
+}
+GBL_INLINE const char* GblEnumClass_nickFromIndex(CSELF, uint16_t index) GBL_NOEXCEPT {
+    return index < pSelf->entryCount? GblQuark_toString(pSelf->pEntries[index].nick) : NULL;
+}
+GBL_INLINE GblQuark GblEnumClass_nickQuarkFromIndex(CSELF, uint16_t index) GBL_NOEXCEPT {
+    return index < pSelf->entryCount? pSelf->pEntries[index].nick : GBL_QUARK_INVALID;
+}
+GBL_INLINE GblEnum  GblEnumClass_valueFromIndex(CSELF, uint16_t index) GBL_NOEXCEPT {
+    return index < pSelf->entryCount? pSelf->pEntries[index].value : 0;
+}
+GBL_INLINE const char* GblEnumClass_nameFromValue(CSELF, GblEnum value) GBL_NOEXCEPT {
+    return GblQuark_toString(GblEnumClass_nameQuarkFromValue(pSelf, value));
+}
+GBL_INLINE const char* GblEnumClass_nickFromValue(CSELF, GblEnum value) {
+    return GblQuark_toString(GblEnumClass_nickQuarkFromValue(pSelf, value));
+}
+GBL_INLINE GblEnum GblEnumClass_valueFromName(CSELF, const char* pString) {
+    GblEnum value = 0;
+    GblQuark quark = GblQuark_tryString(pString);
+    if(quark != GBL_QUARK_INVALID) {
+        value = GblEnumClass_valueFromNameQuark(pSelf, quark);
+    }
+    return value;
+}
+GBL_INLINE GblEnum GblEnumClass_valueFromNick(CSELF, const char* pString) {
+    GblEnum value = 0;
+    GblQuark quark = GblQuark_tryString(pString);
+    if(quark != GBL_QUARK_INVALID) {
+        value = GblEnumClass_valueFromNickQuark(pSelf, quark);
+    }
+    return value;
+}
 
 /* wrapper around GBL_VARIANT
 GBL_EXPORT GblEnum              GblEnum_value(GblEnum* pEnum);

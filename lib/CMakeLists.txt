@@ -102,6 +102,7 @@ set(GIMBAL_SOURCES
      source/containers/gimbal_hash_set.c
      source/containers/gimbal_tree_set.c
      source/objects/gimbal_property.c
+     source/meta/gimbal_enum.c
      source/ifaces/gimbal_itable.c
      source/types/gimbal_quark.c
      source/ifaces/gimbal_ievent_handler.c

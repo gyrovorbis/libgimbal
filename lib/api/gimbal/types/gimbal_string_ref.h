@@ -11,7 +11,7 @@
 
 GBL_DECLS_BEGIN
 
-typedef char GblStringRef;
+typedef const char GblStringRef;
 
 GBL_INLINE GblStringRef*    GblStringRef_create                     (const char* pString)   GBL_NOEXCEPT;
 GBL_INLINE GblStringRef*    GblStringRef_createWithContext          (const char* pString,
@@ -76,21 +76,31 @@ GBL_INLINE GblStringRef* GblStringRef_createFromViewWithContext(GblStringView vi
 }
 
 GBL_INLINE GblStringRef* GblStringRef_acquire(CSELF) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
     GblStringRef* pOut = NULL;
     if(pSelf) {
         GblStringRef_* pStrHeader = GblStringRef_header_(pSelf);
         pStrHeader = (GblStringRef_*)GblRef_acquire(pStrHeader);
         pOut = pStrHeader->data;
+        GBL_API_VERBOSE("[GblStringRef]: [%s]++ = %u",
+                        pSelf,
+                        GblStringRef_refCount(pSelf));
     }
+    GBL_API_END_BLOCK();
     return pOut;
 }
 
 GBL_INLINE GblRefCount GblStringRef_release(CSELF) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
     GblRefCount count = 0;
     if(pSelf) {
         GblStringRef_* pStrHeader = GblStringRef_header_(pSelf);
+        GBL_API_VERBOSE("[GblStringRef]: [%s]-- = %u",
+                        pSelf,
+                        GblStringRef_refCount(pSelf)-1);
         count = GblRef_release(pStrHeader);
     }
+    GBL_API_END_BLOCK();
     return count;
 }
 

@@ -226,7 +226,8 @@ GBL_EXPORT GblClass* GblClass_ref(GblType type) GBL_NOEXCEPT {
 
     // Either way, we're returning a new reference, add refcount
     GblRefCount oldCount = GBL_ATOMIC_INT16_INC(pMeta->refCount);
-    GBL_API_VERBOSE("++[%s].refCount: %"GBL_SIZE_FMT, GblType_name(GBL_TYPE_(pMeta)), oldCount+1);
+    if(oldCount)
+        GBL_API_VERBOSE("++[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), oldCount+1);
 
     //GBL_API_POP(1);
     GBL_API_END_BLOCK();
@@ -374,14 +375,12 @@ GBL_EXPORT GblRefCount GblClass_unref(GblClass* pSelf) GBL_NOEXCEPT {
     if(refCount-1) {
         GBL_API_VERBOSE("--[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), refCount-1);
     } else {
-//#ifdef GBL_TYPE_DEBUG
         {
             GblRefCount instanceRefCount = 0;
             instanceRefCount = GBL_ATOMIC_INT16_LOAD(pMeta->instanceRefCount);
             if(instanceRefCount)
                 GBL_API_WARN("Destroying class with remaining instance references: %u", instanceRefCount);
         }
-//#endif
 
         GBL_API_CALL(GblClass_destruct_(pSelf));
     }

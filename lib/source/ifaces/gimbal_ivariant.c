@@ -85,14 +85,14 @@ GBL_API GblIVariantIFace_constructCopy(const GblIVariantIFace* pSelf, GblVariant
     GBL_API_VERIFY_POINTER(pOther);
     if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY) {
         GBL_API_VERIFY_POINTER(pSelf->pFnConstruct);
-        GBL_API_CALL(pSelf->pFnConstruct(pVariant, 1, pOther, GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY));
+        GBL_API_CALL(pSelf->pFnConstruct(pVariant, 1, (GblVariant*)pOther, GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY));
     } else if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_SET_COPY) {
         GBL_API_VERIFY_POINTER(pSelf->pFnSet);
         if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT) {
             GBL_API_VERIFY_POINTER(pSelf->pFnConstruct);
             GBL_API_CALL(pSelf->pFnConstruct(pVariant, 0, NULL, GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT));
         }
-        GBL_API_CALL(pSelf->pFnSet(pVariant, 1, pOther, GBL_IVARIANT_OP_FLAG_SET_COPY));
+        GBL_API_CALL(pSelf->pFnSet(pVariant, 1, (GblVariant*)pOther, GBL_IVARIANT_OP_FLAG_SET_COPY));
     } else if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_RELOCATABLE) {
         memcpy(pVariant, pOther, sizeof(GblVariant));
     } else {
@@ -154,7 +154,7 @@ GBL_API GblIVariantIFace_setCopy(const GblIVariantIFace* pSelf, GblVariant* pVar
     GBL_API_VERIFY_POINTER(pOther);
     if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_SET_COPY) {
         GBL_API_VERIFY_POINTER(pSelf->pFnSet);
-        GBL_API_CALL(pSelf->pFnSet(pVariant, 1, pOther, GBL_IVARIANT_OP_FLAG_SET_COPY));
+        GBL_API_CALL(pSelf->pFnSet(pVariant, 1, (GblVariant*)pOther, GBL_IVARIANT_OP_FLAG_SET_COPY));
     } else if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_RELOCATABLE) {
         memcpy(pVariant, pOther, sizeof(GblVariant));
     } else {
@@ -231,11 +231,12 @@ static GBL_RESULT GblIVariantIFace_valuesFromVa_(const GblIVariantIFace* pSelf, 
     while((curChar = pFmt[*pCount]) != '\0') {
         GblVariant* pCurVariant = &pVariant[*pCount];
         switch(curChar) {
-        case 'q': pCurVariant->type = GBL_INT64_TYPE;   pCurVariant->i64        = va_arg(*pArgList, int64_t);  break;
-        case 'l': pCurVariant->type = GBL_UINT32_TYPE;  pCurVariant->u32        = va_arg(*pArgList, uint32_t); break;
-        case 'i': pCurVariant->type = GBL_INT32_TYPE;   pCurVariant->i32        = va_arg(*pArgList, int32_t);  break;
-        case 'd': pCurVariant->type = GBL_DOUBLE_TYPE;  pCurVariant->f64        = va_arg(*pArgList, double);   break;
-        case 'p': pCurVariant->type = GBL_POINTER_TYPE; pCurVariant->pVoid      = va_arg(*pArgList, void*);    break;
+        case 'z': pCurVariant->type = GBL_UINT64_TYPE;  pCurVariant->u64    = va_arg(*pArgList, uint64_t); break;
+        case 'q': pCurVariant->type = GBL_INT64_TYPE;   pCurVariant->i64    = va_arg(*pArgList, int64_t);  break;
+        case 'l': pCurVariant->type = GBL_UINT32_TYPE;  pCurVariant->u32    = va_arg(*pArgList, uint32_t); break;
+        case 'i': pCurVariant->type = GBL_INT32_TYPE;   pCurVariant->i32    = va_arg(*pArgList, int32_t);  break;
+        case 'd': pCurVariant->type = GBL_DOUBLE_TYPE;  pCurVariant->f64    = va_arg(*pArgList, double);   break;
+        case 'p': pCurVariant->type = GBL_POINTER_TYPE; pCurVariant->pVoid  = va_arg(*pArgList, void*);    break;
         default: GBL_API_ERROR("[GblIVariant] Unknown va value type: %c", curChar); break;
         }
 
@@ -356,7 +357,7 @@ GBL_API GblIVariantIFace_getValueCopy(const GblIVariantIFace* pSelf, const GblVa
         GBL_API_CALL(GblIVariantIFace_valuesFromVa_(pSelf, pSelf->pGetValueFmt, pArgs, &count, pVariants));
         if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY) {
             GBL_API_VERIFY_POINTER(pSelf->pFnGet);
-            GBL_API_CALL(pSelf->pFnGet(pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY));
+            GBL_API_CALL(pSelf->pFnGet((GblVariant*)pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY));
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot get values by copy for type: %s",
@@ -373,7 +374,7 @@ GBL_API GblIVariantIFace_getValuePeek(const GblIVariantIFace* pSelf, const GblVa
         GBL_API_CALL(GblIVariantIFace_valuesFromVa_(pSelf, pSelf->pGetValueFmt, pArgs, &count, pVariants));
         if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK) {
             GBL_API_VERIFY_POINTER(pSelf->pFnGet);
-            GBL_API_CALL(pSelf->pFnGet(pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK));
+            GBL_API_CALL(pSelf->pFnGet((GblVariant*)pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK));
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot get values by peeking for type: %s",
@@ -390,10 +391,10 @@ GBL_API GblIVariantIFace_getValueMove(const GblIVariantIFace* pSelf, const GblVa
         GBL_API_CALL(GblIVariantIFace_valuesFromVa_(pSelf, pSelf->pGetValueFmt, pArgs, &count, pVariants));
         if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE) {
             GBL_API_VERIFY_POINTER(pSelf->pFnGet);
-            GBL_API_CALL(pSelf->pFnGet(pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE));
+            GBL_API_CALL(pSelf->pFnGet((GblVariant*)pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE));
         } else if(pSelf->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY) {
             GBL_API_VERIFY_POINTER(pSelf->pFnGet);
-            GBL_API_CALL(pSelf->pFnGet(pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY));
+            GBL_API_CALL(pSelf->pFnGet((GblVariant*)pVariant, count, pVariants, GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY));
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot get values by peeking for type: %s",

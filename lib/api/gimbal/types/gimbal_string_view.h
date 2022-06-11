@@ -66,6 +66,7 @@ GBL_INLINE GblQuark         GblStringView_quark             (SELF)              
 GBL_INLINE GblQuark         GblStringView_quarkTry          (SELF)                                              GBL_NOEXCEPT;
 GBL_INLINE const char*      GblStringView_intern            (SELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GblHash          GblStringView_hash              (SELF)                                              GBL_NOEXCEPT;
+GBL_INLINE char*            GblStringView_strdup            (SELF)                                              GBL_NOEXCEPT;
 GBL_INLINE char*            GblStringView_toCString         (SELF, char* pDest, GblSize destSize)               GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblStringView_toNil             (SELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblStringView_toBool            (SELF)                                              GBL_NOEXCEPT;
@@ -445,6 +446,16 @@ GBL_INLINE const char* GblStringView_intern(SELF) GBL_NOEXCEPT {
 
 GBL_INLINE GblHash GblStringView_hash(SELF) GBL_NOEXCEPT {
     return self.length? gblHashMurmur(self.pData, self.length) : 0;
+}
+
+GBL_INLINE char* GblStringView_strdup(SELF) GBL_NOEXCEPT {
+    char* pStr = NULL;
+    GBL_API_BEGIN(NULL);
+    pStr = (char*)GBL_API_MALLOC(sizeof(char) * self.length + 1);
+    if(self.length) memcpy(pStr, self.pData, self.length);
+    pStr[self.length] = '\0';
+    GBL_API_END_BLOCK();
+    return pStr;
 }
 
 GBL_INLINE char* GblStringView_toCString(SELF, char* pDst, GblSize destSize) GBL_NOEXCEPT {

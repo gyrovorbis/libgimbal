@@ -32,7 +32,6 @@ GBL_API GblType_test_testCaseInit(GblContext* pCtx) {
     GBL_API_END();
 }
 
-
 GBL_API GblType_test_testCaseFinal(GblContext* pCtx) {
     return GBL_RESULT_SUCCESS;
 }

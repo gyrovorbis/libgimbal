@@ -35,11 +35,11 @@ private slots:
 
             QCOMPARE(v.getType(), StringType());
 
-            gimbal::StringView strView = v.getValue<const GblStringBuffer*>();
-            QCOMPARE(strView.getCString(), "test");
+            //gimbal::StringView strView = v.getValue<const char*>();
+            //QCOMPARE(strView.getCString(), "test");
 
-            gimbal::String string = v.toValue<GblStringBuffer>();
-            QCOMPARE(strView.getCString(), string.getCString());
+            //gimbal::String string = v.toValue<GblStringBuffer>();
+            //QCOMPARE(strView.getCString(), string.getCString());
 
             gimbal::Variant v2(v);
 

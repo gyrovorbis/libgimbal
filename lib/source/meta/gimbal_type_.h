@@ -90,6 +90,7 @@ extern GBL_RESULT GblVariant_final_             (GblContext* pCtx);
 
 extern GBL_RESULT GblIVariant_typeRegister_     (GblContext* pCtx);
 extern GBL_RESULT gblValueTypesRegister_        (GblContext* pCtx);
+extern GBL_RESULT GblEnum_typeRegister_         (GblContext* pCtx);
 extern GBL_RESULT GblITable_typeRegister_       (GblContext* pCtx);
 extern GBL_RESULT GblIEventHandler_typeRegister_(GblContext* pCtx);
 extern GBL_RESULT GblIEventFilter_typeRegister_ (GblContext* pCtx);

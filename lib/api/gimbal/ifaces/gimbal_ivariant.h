@@ -74,10 +74,19 @@ GBL_API GblIVariantIFace_getValueCopy        (CSELF, CVARIANT, va_list* pVarArgs
 GBL_API GblIVariantIFace_getValuePeek        (CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_getValueMove        (CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
 GBL_API GblIVariantIFace_destruct            (CSELF, VARIANT)                               GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_compare             (CSELF, CVARIANT, const GblVariant* pOther,
+
+GBL_API GblIVariantIFace_compare             (CSELF,
+                                              CVARIANT,
+                                              const GblVariant* pOther,
                                               GblInt* pCmpResult)                           GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_save                (CSELF, CVARIANT, GblStringBuffer* pString)          GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_load                (CSELF, VARIANT, const GblStringBuffer* pString)     GBL_NOEXCEPT;
+
+GBL_API GblIVariantIFace_save                (CSELF,
+                                              CVARIANT,
+                                              GblStringBuffer* pString)                     GBL_NOEXCEPT;
+
+GBL_API GblIVariantIFace_load                (CSELF,
+                                              VARIANT,
+                                              const GblStringBuffer* pString)               GBL_NOEXCEPT;
 
 #undef CVARIANT
 #undef VARIANT
