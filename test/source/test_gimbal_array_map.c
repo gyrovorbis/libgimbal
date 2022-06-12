@@ -167,7 +167,9 @@ GBL_API GblArrayMap_test_validate_userdata_(GblContext* pCtx, GblArrayMap* pMap,
     GBL_COMPARE(GblArrayMap_atValue(&pMap, key), value);
     GblSize loc = GblArrayMap_find(&pMap, key);
     GBL_VERIFY(loc != GBL_ARRAY_MAP_NPOS);
-    GBL_COMPARE(GblArrayMap_probeKey(&pMap1_, loc), key);
+    const char* pKey = (const char*)GblArrayMap_probeKey(&pMap1_, loc);
+    GBL_VERIFY(pKey);
+    GBL_COMPARE(strcmp(pKey, (const char*)key), 0);
     GBL_COMPARE(GblArrayMap_probeValue(&pMap1_, loc), value);
     GBL_API_END();
 }
@@ -188,7 +190,9 @@ GBL_API GblArrayMap_test_validate_variant_(GblContext* pCtx, GblArrayMap* pMap, 
     GBL_COMPARE(GblArrayMap_atVariant(&pMap, key), pVariant);
     GblSize loc = GblArrayMap_find(&pMap, key);
     GBL_VERIFY(loc != GBL_ARRAY_MAP_NPOS);
-    GBL_COMPARE(GblArrayMap_probeKey(&pMap1_, loc), key);
+    const char* pKey = (const char*)GblArrayMap_probeKey(&pMap1_, loc);
+    GBL_VERIFY(pKey);
+    GBL_COMPARE(strcmp(pKey, (const char*)key), 0);
     GBL_COMPARE(GblArrayMap_probeValue(&pMap1_, loc), value);
     GBL_COMPARE(GblArrayMap_probeVariant(&pMap1_, loc), pVariant);
     GBL_API_END();
