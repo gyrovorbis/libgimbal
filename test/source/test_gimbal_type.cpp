@@ -281,7 +281,7 @@ struct CppInstance: public CInstance {
     QCOMPARE(GBL_CLASS_TYPE(pClass), cppInstanceType);
     QCOMPARE(pClass->qString, "QSTRING CLASS");
     QCOMPARE(pClass->floater, 12.0f);
-    QCOMPARE(*pClass->pHeapInteger, 44);
+    QCOMPARE(*pClass->pHeapInteger, 13);
     QCOMPARE(pClass->vPrint(NULL, 3), 12);
     cppInstanceType.classUnreference(pClass);
 
@@ -311,7 +311,7 @@ struct CppInstance: public CInstance {
     QCOMPARE(GBL_CLASS_TYPE(pClass), type);
     QCOMPARE(pClass->qString, "QSTRING CLASS");
     QCOMPARE(pClass->floater, 12.0f);
-    QCOMPARE(*pClass->pHeapInteger, 44);
+    QCOMPARE(*pClass->pHeapInteger, 13);
     QCOMPARE(pClass->vPrint(NULL, 3), 12);
 
     type.instanceDestruct(&cppInstance);

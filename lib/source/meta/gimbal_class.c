@@ -143,7 +143,7 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
 
         if(pIter->info.pFnClassInit) {
             //GBL_API_VERBOSE("ClassInit(%s)", GblType_name(GBL_TYPE_(pIter)));
-            GBL_API_CALL(pIter->info.pFnClassInit(pClass, pMeta->info.pClassData, pCtx_));
+            GBL_API_CALL(pIter->info.pFnClassInit(pClass, pIter->info.pClassData, pCtx_));
         } else {
             //GBL_API_VERBOSE("Ctor: NULL", GblType_name(GBL_TYPE_(pIter)));
         }
@@ -298,7 +298,7 @@ static GBL_EXPORT GBL_RESULT GblClass_destruct_(GblClass* pClass) {
         // call finalizer if class provides one
         if(pIter->info.pFnClassFinal) {
             GBL_API_DEBUG("Calling class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
-            GBL_API_CALL(pIter->info.pFnClassFinal(pMeta->pClass, pMeta->info.pClassData, pCtx_));
+            GBL_API_CALL(pIter->info.pFnClassFinal(pMeta->pClass, pIter->info.pClassData, pCtx_));
         } else {
             GBL_API_DEBUG("No class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
         }
@@ -387,7 +387,7 @@ GBL_EXPORT GblRefCount GblClass_unref(GblClass* pSelf) GBL_NOEXCEPT {
 
     GBL_API_POP(1);
     GBL_API_END_BLOCK();
-    return refCount;
+    return refCount-1;
 }
 
 

@@ -398,11 +398,14 @@ static GblType typeRegister_(GblType parent,
             pParentIt = pParentIt->pParent;
         }
 
+        const GblSize classPrivateOffset  =  ((!pParent? 0 : pParent->classPrivateOffset) - pInfo->classPrivateSize);
+        const GblSize classTotalSize        = pInfo->classSize + -(classPrivateOffset) ;
+
         GblSize metaSize = sizeof(GblMetaClass);
         const GblSize ifaceOffset   = metaSize;
         const GblSize prereqOffset  = metaSize += sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount;
         const GblSize classOffset   = metaSize += sizeof(GblType)                  * pInfo->dependencyCount;
-        const GblSize basesOffset   = metaSize += pInfo->classSize;
+        const GblSize basesOffset   = metaSize += classTotalSize;
         metaSize += baseCount * sizeof(GblMetaClass*);
 
         const GblSize alignRem = (metaSize % GBL_META_CLASS_ALIGNMENT_);
@@ -427,12 +430,12 @@ static GblType typeRegister_(GblType parent,
         GBL_ATOMIC_INT16_INIT(pMeta->instanceRefCount, 0);
         pMeta->flags                = flags;
         pMeta->depth                = baseCount;
-        pMeta->classPrivateOffset   = !pParent? 0 : pParent->classPrivateOffset - pInfo->classPrivateSize;
-        pMeta->instancePrivateOffset= !pParent? 0 : pParent->instancePrivateOffset - pInfo->instancePrivateSize;
+        pMeta->classPrivateOffset   = classPrivateOffset;
+        pMeta->instancePrivateOffset= (!pParent? 0 : pParent->instancePrivateOffset) - pInfo->instancePrivateSize;
         pMeta->pParent              = (struct GblMetaClass*)parent;
         pMeta->name                 = GblQuark_fromString(pName);
-        pMeta->pClass               = pInfo->classSize?
-                                            (GblClass*)((char*)pMeta + classOffset) : NULL;
+        pMeta->pClass               = classTotalSize?
+                                            (GblClass*)((char*)pMeta + classOffset + -(classPrivateOffset)) : NULL;
         pMeta->info.pInterfaceMap   = pInfo->interfaceCount?
                                             (GblTypeInterfaceMapEntry*)((char*)pMeta + ifaceOffset) : NULL;
         pMeta->info.pDependencies  = pInfo->dependencyCount?
@@ -515,7 +518,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
                             GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE);
     GBL_API_CALL(GblIVariant_typeRegister_(pCtx_));
     GBL_API_CALL(gblValueTypesRegister_(pCtx_));
-    GBL_API_CALL(GblEnum_typeRegister_(pCtx));
+    GBL_API_CALL(GblEnum_typeRegister_(pCtx_));
     GBL_API_CALL(GblITable_typeRegister_(pCtx_));
     GBL_API_CALL(GblIEventHandler_typeRegister_(pCtx_));
     GBL_API_CALL(GblIEventFilter_typeRegister_(pCtx_));
@@ -806,7 +809,7 @@ GBL_EXPORT GblBool GblType_flagsTest(GblType type, GblFlags mask) {
             GblFlags typeMask = (mask & GBL_TYPE_FLAGS_MASK & pMeta->flags);
             GblFlags fundamentalMask = (mask & GBL_TYPE_FUNDAMENTAL_FLAGS_MASK);
             if(fundamentalMask) {
-                GblMetaClass* pFundamental = (GblMetaClass*)GblType_fundamental(type);
+                GblMetaClass* pFundamental = GBL_META_CLASS_(GblType_fundamental(type));
                 if(pFundamental) {
                     fundamentalMask &= pFundamental->flags;
                 } else {

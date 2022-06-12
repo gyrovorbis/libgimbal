@@ -420,8 +420,9 @@ GBL_INLINE GBL_API gblVariantCompare##suffix(const GblVariant* pVariant, type rh
     case GBL_VARIANT_OP_CMP_NEQUAL:     *pResult = (val != rhs); break; \
     case GBL_VARIANT_OP_CMP_LESS:       *pResult = (val <  rhs); break; \
     case GBL_VARIANT_OP_CMP_LEQUAL:     *pResult = (val <= rhs); break; \
-    case GBL_VARIANT_OP_CMP_GREATER:    *pResult = (val >  rhs); break;\
+    case GBL_VARIANT_OP_CMP_GREATER:    *pResult = (val >  rhs); break; \
     case GBL_VARIANT_OP_CMP_GEQUAL:     *pResult = (val >= rhs); break; \
+    default: break; \
     }   \
     GBL_API_END();  \
 }
@@ -471,6 +472,7 @@ GBL_INLINE GBL_API gblVariantCompares(const GblVariant* pVariant, const GblStrin
         case GBL_VARIANT_OP_CMP_LEQUAL:     *pResult = (cmpValue <= 0); break;
         case GBL_VARIANT_OP_CMP_GREATER:    *pResult = (cmpValue > 0 ); break;
         case GBL_VARIANT_OP_CMP_GEQUAL:     *pResult = (cmpValue >= 0); break;
+        default: break;
         }
     }}
     GBL_API_END();

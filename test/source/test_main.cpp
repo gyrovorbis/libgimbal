@@ -19,6 +19,7 @@
 #include <test_gimbal_byte_array.hpp>
 #include <test_gimbal_type.hpp>
 #include <test_gimbal_object.hpp>
+#include <test_gimbal_enum.hpp>
 
 using namespace elysian;
 
@@ -40,12 +41,13 @@ qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::StringRef());
     testSuite.enqueueTestSet(new gimbal::test::String());
  //   testSuite.enqueueTestSet(new gimbal::test::Quark());
-    testSuite.enqueueTestSet(new gimbal::test::Variant());
     testSuite.enqueueTestSet(new gimbal::test::Algorithms());
     testSuite.enqueueTestSet(new gimbal::test::HashMap());
     testSuite.enqueueTestSet(new gimbal::test::Buffer());
     //testSuite.enqueueTestSet(new gimbal::test::ByteArray());
     testSuite.enqueueTestSet(new gimbal::test::Type());
+    testSuite.enqueueTestSet(new gimbal::test::Variant());
+    testSuite.enqueueTestSet(new gimbal::test::Enum());
     testSuite.enqueueTestSet(new gimbal::test::CObject());
 qDebug() << "DONEZ";
     return !testSuite.exec(argc, argv);

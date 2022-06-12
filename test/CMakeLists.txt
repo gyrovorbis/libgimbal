@@ -62,6 +62,9 @@ add_executable(GimbalTests
     source/test_gimbal_tree_set.c
     include/test_gimbal_variant.h
     source/test_gimbal_variant.c
+    include/test_gimbal_enum.h
+    include/test_gimbal_enum.hpp
+    source/test_gimbal_enum.c
     source/test_main.cpp)
 
 

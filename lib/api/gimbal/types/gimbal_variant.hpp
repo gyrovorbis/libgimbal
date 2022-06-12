@@ -74,7 +74,7 @@ concept variant_compatible =
 
         template<>
         struct VariantCompatibleTypeTraits<gimbal::UInt>: public VariantCompatibleTypeTraitsDefault<gimbal::UInt> {
-            inline const static auto variantType  = Int32Type();
+            inline const static auto variantType  = Uint32Type();
         };
 
         template<>
