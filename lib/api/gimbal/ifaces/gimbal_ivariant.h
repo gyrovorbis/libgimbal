@@ -18,7 +18,7 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT_PRIVATE(GblIVariant);
 
-typedef enum GBL_IVARIANT_OP_FLAGS {
+GBL_DECLARE_FLAGS(GBL_IVARIANT_OP_FLAGS) {
     GBL_IVARIANT_OP_FLAG_RELOCATABLE           = 0x0001,
     GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT     = 0x0002,  //without this, assume default 0 init is fine
     GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY        = 0x0004,
@@ -36,13 +36,12 @@ typedef enum GBL_IVARIANT_OP_FLAGS {
     GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE        = 0x1000,
     GBL_IVARIANT_OP_FLAG_GET_MASK              = 0x1c00,
     GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE        = 0x2000
-} GBL_IVARIANT_OP_FLAGS;
+};
 
 #define VARIANT     GblVariant* pVariant
 #define CVARIANT    const VARIANT
 
-typedef struct GblIVariantIFace {
-    GblInterface            base;
+typedef struct GblIVariantIFaceVTable {
     GBL_IVARIANT_OP_FLAGS   supportedOps;
     char                    pSetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
     char                    pGetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
@@ -54,6 +53,11 @@ typedef struct GblIVariantIFace {
     GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, GblInt* pResult);
     GBL_RESULT (*pFnSave)     (CVARIANT, GblStringBuffer* pString);
     GBL_RESULT (*pFnLoad)     (VARIANT,  const GblStringBuffer* pString);
+} GblIVariantIFaceVTable;
+
+typedef struct GblIVariantIFace {
+    GblInterface                    base;
+    const GblIVariantIFaceVTable*   pVTable;
 } GblIVariantIFace;
 
 

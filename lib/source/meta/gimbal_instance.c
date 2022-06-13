@@ -8,7 +8,7 @@ GBL_INLINE void* GblInstance_basePtr_(const GblInstance* pInstance) {
 
 GBL_EXPORT void* GblInstance_private(const GblInstance* pInstance, GblType base) {
     GblMetaClass* pMeta = GBL_META_CLASS_(base);
-    return pMeta && pMeta->info.instancePrivateSize?
+    return pMeta && pMeta->pInfo->instancePrivateSize?
                 (void*)((uint8_t*)pInstance + pMeta->instancePrivateOffset) :
                 NULL;
 }
@@ -25,7 +25,7 @@ GBL_RESULT typeInstanceConstructValidate_(GblType type, GblBool inPlace) {
     GBL_API_VERIFY(!GBL_TYPE_IS_ABSTRACT(type),
                    GBL_RESULT_ERROR_INVALID_TYPE,
                    "Cannot instantiate ABSTRACT type!");
-    GBL_API_VERIFY(pMeta->info.instanceSize,
+    GBL_API_VERIFY(pMeta->pInfo->instanceSize,
                    GBL_RESULT_ERROR_INVALID_ARG,
                    "Cannot instantiate type with instance of size 0!");
     GBL_API_VERIFY(!(inPlace && pMeta->instancePrivateOffset),
@@ -41,7 +41,7 @@ GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, Gb
     GBL_API_PUSH_VERBOSE("[GblType] Instance Init: type %s", GblType_name(type));
 
     // Zero Initialize
-    memset(pInstance, 0, pMeta->info.instanceSize);
+    memset(pInstance, 0, pMeta->pInfo->instanceSize);
 
     // Set Class
     if(!pClass) pClass = GblClass_ref(type);
@@ -54,9 +54,9 @@ GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, Gb
 
     for(uint8_t idx = 0; idx <= pMeta->depth; ++idx) {
         GblMetaClass* pIter = GBL_META_CLASS_(GblType_base((GblType)pMeta, idx));
-        if(pIter->info.pFnInstanceInit) {
+        if(pIter->pInfo->pFnInstanceInit) {
             GBL_API_VERBOSE("Calling instance initializers: [%s]", GblType_name(GBL_TYPE_(pIter)));
-            GBL_API_CALL(pIter->info.pFnInstanceInit(pInstance, pCtx_));
+            GBL_API_CALL(pIter->pInfo->pFnInstanceInit(pInstance, pCtx_));
         } else {
             GBL_API_VERBOSE("No instance initializer: [%s]", GblType_name(GBL_TYPE_(pIter)));
         }
@@ -102,9 +102,9 @@ GBL_EXPORT GblInstance* GblInstance_create_(GblType type, GblClass* pClass) {
     GBL_API_PUSH_VERBOSE("[GblType] Instance Create: type %s", GblType_name(type));
     GBL_API_CALL(typeInstanceConstructValidate_(type, GBL_FALSE));
 
-    GBL_API_DEBUG("Allocating %u bytes.", pMeta->info.instanceSize + (-pMeta->instancePrivateOffset));
+    GBL_API_DEBUG("Allocating %u bytes.", pMeta->pInfo->instanceSize + (-pMeta->instancePrivateOffset));
 
-    uint8_t* pBase = GBL_API_MALLOC(gblAlignedAllocSize(pMeta->info.instanceSize
+    uint8_t* pBase = GBL_API_MALLOC(gblAlignedAllocSize(pMeta->pInfo->instanceSize
                                                      + (-pMeta->instancePrivateOffset)),
                                GBL_ALIGNOF(GBL_MAX_ALIGN_T),
                                GblType_name(type));

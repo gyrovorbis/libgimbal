@@ -20,6 +20,8 @@
 #include <test_gimbal_type.hpp>
 #include <test_gimbal_object.hpp>
 #include <test_gimbal_enum.hpp>
+#include <test_gimbal_opaque.hpp>
+#include <test_gimbal_boxed.hpp>
 
 using namespace elysian;
 
@@ -48,6 +50,8 @@ qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Type());
     testSuite.enqueueTestSet(new gimbal::test::Variant());
     testSuite.enqueueTestSet(new gimbal::test::Enum());
+    testSuite.enqueueTestSet(new gimbal::test::Opaque());
+    testSuite.enqueueTestSet(new gimbal::test::Boxed());
     testSuite.enqueueTestSet(new gimbal::test::CObject());
 qDebug() << "DONEZ";
     return !testSuite.exec(argc, argv);

@@ -59,7 +59,7 @@ typedef struct GblMetaClass {
     GblQuark                name;
     GBL_ATOMIC_INT16        refCount;
     GBL_ATOMIC_INT16        instanceRefCount;
-    GblTypeInfo             info;
+    const GblTypeInfo*      pInfo;
     GblFlags                flags;
     GblIPlugin*             pPlugin;
     GblClass*               pClass;
@@ -83,23 +83,25 @@ extern struct TypeBuiltins_ {
 } typeBuiltins_;
 
 
-extern void GblType_init_(void);
+extern void         GblType_init_(void);
 
-extern GBL_RESULT GblVariant_init_              (GblContext* pCtx);
-extern GBL_RESULT GblVariant_final_             (GblContext* pCtx);
+extern GBL_RESULT   GblVariant_init_                  (GblContext* pCtx);
+extern GBL_RESULT   GblVariant_final_                 (GblContext* pCtx);
 
-extern GBL_RESULT GblIVariant_typeRegister_     (GblContext* pCtx);
-extern GBL_RESULT gblValueTypesRegister_        (GblContext* pCtx);
-extern GBL_RESULT GblEnum_typeRegister_         (GblContext* pCtx);
-extern GBL_RESULT GblITable_typeRegister_       (GblContext* pCtx);
-extern GBL_RESULT GblIEventHandler_typeRegister_(GblContext* pCtx);
-extern GBL_RESULT GblIEventFilter_typeRegister_ (GblContext* pCtx);
-extern GBL_RESULT GblObject_typeRegister_       (GblContext* pCtx);
-extern GBL_RESULT GblIAllocator_typeRegister_   (GblContext* pCtx);
-extern GBL_RESULT GblILogger_typeRegister_      (GblContext* pCtx);
-extern GBL_RESULT GblContext_typeRegister_      (GblContext* pCtx);
-extern GBL_RESULT GblEvent_typeRegister_        (GblContext* pCtx);
-extern GBL_RESULT GblIPlugin_typeRegister_      (GblContext* pCtx);
+extern GBL_RESULT   GblIVariant_typeRegister_         (GblContext* pCtx);
+extern GBL_RESULT   GblPrimitive_valueTypesRegister_  (GblContext* pCtx);
+extern GBL_RESULT   GblPointer_typeRegister_          (GblContext* pCtx);
+extern GBL_RESULT   GblBoxed_typeRegister_            (GblContext* pCtx);
+extern GBL_RESULT   GblEnum_typeRegister_             (GblContext* pCtx);
+extern GBL_RESULT   GblITable_typeRegister_           (GblContext* pCtx);
+extern GBL_RESULT   GblIEventHandler_typeRegister_    (GblContext* pCtx);
+extern GBL_RESULT   GblIEventFilter_typeRegister_     (GblContext* pCtx);
+extern GBL_RESULT   GblObject_typeRegister_           (GblContext* pCtx);
+extern GBL_RESULT   GblIAllocator_typeRegister_       (GblContext* pCtx);
+extern GBL_RESULT   GblILogger_typeRegister_          (GblContext* pCtx);
+extern GBL_RESULT   GblContext_typeRegister_          (GblContext* pCtx);
+extern GBL_RESULT   GblEvent_typeRegister_            (GblContext* pCtx);
+extern GBL_RESULT   GblIPlugin_typeRegister_          (GblContext* pCtx);
 
 
 

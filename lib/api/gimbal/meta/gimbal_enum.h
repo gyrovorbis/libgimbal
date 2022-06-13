@@ -36,8 +36,6 @@ typedef struct GblEnumClass {
     uint16_t            entryCount;
 } GblEnumClass;
 
-typedef GblVariant GblEnumVariant;
-
 // ========== GblEnumClass ==========
 
 GBL_INLINE const char*          GblEnumClass_nameFromIndex      (CSELF, uint16_t index)             GBL_NOEXCEPT;
@@ -167,6 +165,8 @@ GBL_INLINE GblBool GblEnum_check(GblEnum value, GblType type) GBL_NOEXCEPT {
 #if 0
 // ====== GblEnumVariant ======
 // Experimental API I'm thinking about...
+
+typedef GblVariant GblEnumVariant;
 
 #define GBL_ENUM_VARIANT(variant)           (GblEnumVariant_cast(variant))
 #define GBL_ENUM_VARIANT_CHECK(variant)     (GblEnumVariant_check(variant))

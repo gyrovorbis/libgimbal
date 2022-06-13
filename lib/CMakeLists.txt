@@ -114,10 +114,12 @@ set(GIMBAL_SOURCES
      source/meta/gimbal_class.c
      source/meta/gimbal_instance.c
      source/ifaces/gimbal_iplugin.c
+     source/meta/gimbal_pointer.c
      source/objects/gimbal_module.c
      source/types/gimbal_closure.c
      source/containers/gimbal_linked_list.c
      source/containers/gimbal_array_map.c
+     source/meta/gimbal_boxed.c
      lib/jenkins/lookup3.c
 )
 
@@ -127,7 +129,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/types/gimbal_byte_array.h
     api/gimbal/meta/gimbal_enum.h
     api/gimbal/meta/gimbal_flags.h
-    api/gimbal/meta/gimbal_opaque.h
+    api/gimbal/meta/gimbal_pointer.h
     api/gimbal/types/gimbal_buffer.hpp
     api/gimbal/types/gimbal_byte_array.hpp
     api/gimbal/types/gimbal_result.h
@@ -202,6 +204,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/objects/gimbal_event.h
     api/gimbal/utils/gimbal_cmdline_parser.h
     api/gimbal/preprocessor/gimbal_atomics.h
+    api/gimbal/meta/gimbal_boxed.h
     source/meta/gimbal_type_.h
     lib/jenkins/lookup3.h)
 

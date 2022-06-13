@@ -24,8 +24,6 @@
 #define GBL_CLASS_TRY_PREFIX(klass, typePrefix)             \
             (GBL_CLASS_TRY(klass, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
 
-#define GBL_CLASS_VCALL()
-
 #define SELF    GblClass*           pSelf
 #define CSELF   const GblClass*     pSelf
 

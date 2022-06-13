@@ -65,6 +65,12 @@ add_executable(GimbalTests
     include/test_gimbal_enum.h
     include/test_gimbal_enum.hpp
     source/test_gimbal_enum.c
+    include/test_gimbal_opaque.h
+    include/test_gimbal_opaque.hpp
+    source/test_gimbal_opaque.c
+    include/test_gimbal_boxed.h
+    include/test_gimbal_boxed.hpp
+    source/test_gimbal_boxed.c
     source/test_main.cpp)
 
 

@@ -371,31 +371,33 @@ static GBL_RESULT GblObjectClass_init_(GblObjectClass* pClass, void* pData, GblC
         objectEventFiltersQuark_    = GblQuark_fromStringStatic("_eventFilters");
 
         GBL_PROPERTY_TABLE_REGISTER(GBL_OBJECT, pClass);
-
-
     }
 
-    strcpy(pClass->iVariantIFace.pSetValueFmt, "p");
-    strcpy(pClass->iVariantIFace.pGetValueFmt, "p");
-    pClass->iVariantIFace.supportedOps =    GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
-                                            GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
-                                            GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |
-                                            GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY   |
-                                            GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE   |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY         |
-                                            GBL_IVARIANT_OP_FLAG_SET_COPY               |
-                                            GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE         |
-                                            GBL_IVARIANT_OP_FLAG_SET_MOVE               |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY         |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE         |
-                                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK;
-    pClass->iVariantIFace.pFnConstruct =    GblObjectClass_ivariantIFace_construct_;
-    pClass->iVariantIFace.pFnDestruct  =    GblObjectClass_ivariantIFace_destruct_;
-    pClass->iVariantIFace.pFnCompare   =    GblObjectClass_ivariantIFace_compare_;
-    pClass->iVariantIFace.pFnGet       =    GblObjectClass_ivariantIFace_get_;
-    pClass->iVariantIFace.pFnSet       =    GblObjectClass_ivariantIFace_set_;
-    pClass->iVariantIFace.pFnLoad      =    GblObjectClass_ivariantIFace_load_;
-    pClass->iVariantIFace.pFnSave      =    GblObjectClass_ivariantIFace_save_;
+    static const GblIVariantIFaceVTable iVariantVTable = {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY   |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE   |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY         |
+                        GBL_IVARIANT_OP_FLAG_SET_COPY               |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE         |
+                        GBL_IVARIANT_OP_FLAG_SET_MOVE               |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY         |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE         |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
+        .pGetValueFmt = "p",
+        .pSetValueFmt = "p",
+        .pFnConstruct =    GblObjectClass_ivariantIFace_construct_,
+        .pFnDestruct  =    GblObjectClass_ivariantIFace_destruct_,
+        .pFnCompare   =    GblObjectClass_ivariantIFace_compare_,
+        .pFnGet       =    GblObjectClass_ivariantIFace_get_,
+        .pFnSet       =    GblObjectClass_ivariantIFace_set_,
+        .pFnLoad      =    GblObjectClass_ivariantIFace_load_,
+        .pFnSave      =    GblObjectClass_ivariantIFace_save_,
+    };
+
+    pClass->iVariantIFace.pVTable      = &iVariantVTable;
 
     pClass->iTableIFace.pFnIndex       =    GblObjectClass_iTableIFace_index_;
     pClass->iTableIFace.pFnNewIndex    =    GblObjectClass_iTableIFace_newIndex_;
@@ -435,35 +437,48 @@ static GBL_RESULT GblObject_init_(GblInstance* pInstance, GblContext* pCtx) {
 
 extern GBL_RESULT GblObject_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
+
+    static GblTypeInterfaceMapEntry ifaceEntries[] = {
+        {
+            .interfaceType = GBL_INVALID_TYPE,
+            .classOffset   = offsetof(GblObjectClass, iVariantIFace)
+        }, {
+            .interfaceType = GBL_INVALID_TYPE,
+            .classOffset   = offsetof(GblObjectClass, iTableIFace)
+        }, {
+            .interfaceType = GBL_INVALID_TYPE,
+            .classOffset   = offsetof(GblObjectClass, iEventHandlerIFace)
+        }, {
+            .interfaceType = GBL_INVALID_TYPE,
+            .classOffset   = offsetof(GblObjectClass, iEventFilterIFace)
+        }
+    };
+
+    static GblTypeInfo typeInfo = {
+        .pFnClassInit     = (GblTypeClassInitializeFn)GblObjectClass_init_,
+        .pFnClassFinal    = (GblTypeClassFinalizeFn)GblObjectClass_final_,
+        .classSize        = sizeof(GblObjectClass),
+        .pFnInstanceInit  = (GblTypeInstanceInitializeFn)GblObject_init_,
+        .instanceSize     = sizeof(GblObject),
+        .interfaceCount   = 4,
+        .pInterfaceMap    = ifaceEntries
+    };
+
+    ifaceEntries[0].interfaceType = GBL_IVARIANT_TYPE;
+    ifaceEntries[1].interfaceType = GBL_ITABLE_TYPE;
+    ifaceEntries[2].interfaceType = GBL_IEVENT_HANDLER_TYPE;
+    ifaceEntries[3].interfaceType = GBL_IEVENT_FILTER_TYPE;
+
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_OBJECT,
-      GBL_INVALID_TYPE,
-      GblQuark_internStringStatic("Object"),
-      &(const GblTypeInfo) {
-          .pFnClassInit     = (GblTypeClassInitializeFn)GblObjectClass_init_,
-          .pFnClassFinal    = (GblTypeClassFinalizeFn)GblObjectClass_final_,
-          .classSize        = sizeof(GblObjectClass),
-          .pFnInstanceInit  = (GblTypeInstanceInitializeFn)GblObject_init_,
-          .instanceSize     = sizeof(GblObject),
-          .interfaceCount   = 4,
-          .pInterfaceMap    = (const GblTypeInterfaceMapEntry[]) {
-              {
-                  .interfaceType = GBL_IVARIANT_TYPE,
-                  .classOffset   = offsetof(GblObjectClass, iVariantIFace)
-              }, {
-                  .interfaceType = GBL_ITABLE_TYPE,
-                  .classOffset   = offsetof(GblObjectClass, iTableIFace)
-              }, {
-                  .interfaceType = GBL_IEVENT_HANDLER_TYPE,
-                  .classOffset   = offsetof(GblObjectClass, iEventHandlerIFace)
-              }, {
-                  .interfaceType = GBL_IEVENT_FILTER_TYPE,
-                  .classOffset   = offsetof(GblObjectClass, iEventFilterIFace)
-              }
-          }
-      },
-      (GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED      |
-      GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE  |
-      GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE));
+          GBL_INVALID_TYPE,
+          GblQuark_internStringStatic("Object"),
+          &typeInfo,
+          (GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED        |
+           GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE   |
+           GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE |
+           GBL_TYPE_FLAG_TYPEINFO_STATIC));
+
+    GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }
 

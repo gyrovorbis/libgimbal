@@ -148,7 +148,7 @@ GBL_EXPORT GblBool GblVariant_canConvert(GblType fromType, GblType toType) {
                        toType   != GBL_INVALID_TYPE,
                        GBL_RESULT_ERROR_INVALID_TYPE);
 
-        if(fromType == toType) {
+        if(GblType_check(fromType, toType)) {
             result = GBL_TRUE;
         } else {
 
@@ -176,7 +176,7 @@ GBL_EXPORT GBL_RESULT GblVariant_convert(const GblVariant* pSelf, GblVariant* pO
                        GBL_RESULT_ERROR_INVALID_TYPE);
 
         // Check whether we actually have to convert shit.
-        if(GblVariant_type(pSelf) == GblVariant_type(pOther)) {
+        if(GblType_check(GblVariant_type(pSelf), GblVariant_type(pOther))) {
             GBL_API_VERIFY_CALL(GblVariant_setCopy(pOther, pSelf));
 
         } else { // Okay, fine, we do.

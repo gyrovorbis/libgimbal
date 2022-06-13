@@ -56,9 +56,9 @@ GBL_EXPORT GblBool GblType_conforms_(GblType type, GblType dependent, GblBool ve
             for(GblInt a = (GblInt)GblType_depth(dependent); a >= 0; --a) {
                 GblType ancestor = GblType_ancestor(dependent, a);
                 GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
-                for(GblSize p = 0; p < pMeta->info.dependencyCount; ++p) {
-                    if(GblType_check(type, pMeta->info.pDependencies[p]) ||
-                            GblType_conforms_(type, pMeta->info.pDependencies[p], verify))
+                for(GblSize p = 0; p < pMeta->pInfo->dependencyCount; ++p) {
+                    if(GblType_check(type, pMeta->pInfo->pDependencies[p]) ||
+                            GblType_conforms_(type, pMeta->pInfo->pDependencies[p], verify))
                     {
                         continue;
                     } else if(verify) {
@@ -67,7 +67,7 @@ GBL_EXPORT GblBool GblType_conforms_(GblType type, GblType dependent, GblBool ve
                                            "due to not satisfying dependency: [%s]",
                                            GblType_name(type),
                                            GblType_name(dependent),
-                                           GblType_name(pMeta->info.pDependencies[p]));
+                                           GblType_name(pMeta->pInfo->pDependencies[p]));
                     } else GBL_API_DONE(); //if even one check fails, you're done.
                 }
             }
@@ -88,15 +88,18 @@ static GBL_RESULT typeLog_(GblType parent,
 
 
     GBL_API_PUSH_VERBOSE("flags");
-    GBL_API_VERBOSE("%-20s: %-100u", "DEPENDENT",           (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "CLASSED",             (flags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "INSTANTIABLE",        (flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "DERIVABLE",           (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "DEEP_DERIVABLE",      (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "UNMAPPABLE",          (flags & GBL_TYPE_FLAG_UNMAPPABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "BUILTIN",             (flags & GBL_TYPE_FLAG_BUILTIN)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "ABSTRACT",            (flags & GBL_TYPE_FLAG_ABSTRACT)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "FINAL",               (flags & GBL_TYPE_FLAG_FINAL)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DEPENDENT",                   (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "CLASSED",                     (flags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "INSTANTIABLE",                (flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DERIVABLE",                   (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DEEP_DERIVABLE",              (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "TYPEINFO_STATIC",             (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "CLASS_PINNED",                (flags & GBL_TYPE_FLAG_CLASS_PINNED)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "CLASS_CONSTRUCT_IMMEDIATE",   (flags & GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "UNMAPPABLE",                  (flags & GBL_TYPE_FLAG_UNMAPPABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "BUILTIN",                     (flags & GBL_TYPE_FLAG_BUILTIN)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "ABSTRACT",                    (flags & GBL_TYPE_FLAG_ABSTRACT)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "FINAL",                       (flags & GBL_TYPE_FLAG_FINAL)? 1 : 0);
     GBL_API_POP(1);
 
     GBL_API_PUSH_VERBOSE("Class Info");
@@ -147,6 +150,7 @@ static GblFlags typeFlagsWithImplied_(GblType parent,
     if(!pParentMeta && pInfo->dependencyCount)              flags |= GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT;
     if(!pParentMeta && pInfo->classSize)                    flags |= GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED;
     if(!pParentMeta && pInfo->instanceSize)                 flags |= GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE;
+    if(flags & GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE)     flags |= GBL_TYPE_FLAG_CLASS_PINNED;
     if(flags & GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED) {
                                                             flags |= GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED;
                                                             flags |= GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT;
@@ -182,6 +186,11 @@ static GBL_RESULT typeValidate_(GblType parent,
                      !(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)),
                      GBL_RESULT_ERROR_INVALID_TYPE,
                      "Cannot REDERIVE from a non DEEP DERIVABLE type!");
+
+    GBL_API_VERIFY(!(!(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED) &&
+                     (fundFlags & GBL_TYPE_FLAG_CLASS_PINNED)),
+                   GBL_RESULT_ERROR_INVALID_TYPE,
+                   "Cannot pin an NON CLASSED type!");
 
     if(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED) {
         GBL_API_VERIFY(pInfo->classSize >= sizeof(GblClass), GBL_RESULT_ERROR_INVALID_TYPE,
@@ -271,17 +280,17 @@ static GBL_RESULT typeValidate_(GblType parent,
 
             GblMetaClass* pIMeta = GBL_META_CLASS_(ifaceType);
 
-            GBL_API_VERIFY(pEntry->classOffset + pIMeta->info.classSize <= pInfo->classSize,
+            GBL_API_VERIFY(pEntry->classOffset + pIMeta->pInfo->classSize <= pInfo->classSize,
                            GBL_RESULT_ERROR_INVALID_TYPE,
                            "INTERFACE[%u: %s]: mapped BEYOND class boundary [%u > %u]!",
-                           i, GblType_name(ifaceType), pEntry->classOffset + pIMeta->info.classSize, pInfo->classSize);
+                           i, GblType_name(ifaceType), pEntry->classOffset + pIMeta->pInfo->classSize, pInfo->classSize);
 
 
             if(pParentMeta) {
-                GBL_API_VERIFY(pEntry->classOffset >= pParentMeta->info.classSize,
+                GBL_API_VERIFY(pEntry->classOffset >= pParentMeta->pInfo->classSize,
                                GBL_RESULT_ERROR_INVALID_TYPE,
                                "INTERFACE[%u: %s]: offset [%u] maps WITHIN base class [<%u]!",
-                               i, GblType_name(ifaceType), pIMeta->info.classSize, pParentMeta->info.classSize);
+                               i, GblType_name(ifaceType), pIMeta->pInfo->classSize, pParentMeta->pInfo->classSize);
             }
         }
 
@@ -302,7 +311,7 @@ static GBL_RESULT typeValidate_(GblType parent,
                                "INTERFACE[%s] forms AMBIGUOUS TYPE[%s] with INTERFACE[%s]",
                                GblType_name(ifaceType), GblType_name(common), GblType_name(otherIfaceType));
 
-                GBL_API_VERIFY(pEntry->classOffset + pIMeta->info.classSize <= pOtherEntry->classOffset,
+                GBL_API_VERIFY(pEntry->classOffset + pIMeta->pInfo->classSize <= pOtherEntry->classOffset,
                                GBL_RESULT_ERROR_INVALID_TYPE,
                                "INTERFACE[%u: %s] data OVERLAPS with INTERFACE[%u: %s]",
                                i, GblType_name(ifaceType), ii, GblType_name(otherIfaceType));
@@ -316,8 +325,8 @@ static GBL_RESULT typeValidate_(GblType parent,
             const GblType ifaceType = pEntry->interfaceType;
             GblMetaClass* pIMeta = GBL_META_CLASS_(ifaceType);
 
-            for(GblSize p = 0; p < pIMeta->info.dependencyCount; ++p) {
-                GblType prereqType = pIMeta->info.pDependencies[p];
+            for(GblSize p = 0; p < pIMeta->pInfo->dependencyCount; ++p) {
+                GblType prereqType = pIMeta->pInfo->pDependencies[p];
 
                 GblBool satisfied = GBL_FALSE;
                 if(GblType_conforms_(parent, prereqType, GBL_TRUE)) {
@@ -332,7 +341,7 @@ static GBL_RESULT typeValidate_(GblType parent,
                     }
 
                     for(GblSize pp = 0; pp < p; ++pp) {
-                        GblType prevPrereqType = pIMeta->info.pDependencies[pp];
+                        GblType prevPrereqType = pIMeta->pInfo->pDependencies[pp];
                         if(GblType_check(prevPrereqType, prereqType)) {
                             satisfied = GBL_TRUE;
                             break;
@@ -402,10 +411,11 @@ static GblType typeRegister_(GblType parent,
         const GblSize classTotalSize        = pInfo->classSize + -(classPrivateOffset) ;
 
         GblSize metaSize = sizeof(GblMetaClass);
-        const GblSize ifaceOffset   = metaSize;
-        const GblSize prereqOffset  = metaSize += sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount;
-        const GblSize classOffset   = metaSize += sizeof(GblType)                  * pInfo->dependencyCount;
-        const GblSize basesOffset   = metaSize += classTotalSize;
+        const GblSize typeInfoOffset    = metaSize;
+        const GblSize ifaceOffset       = metaSize += (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 0 : sizeof(GblTypeInfo);
+        const GblSize prereqOffset      = metaSize += (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 0 : sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount;
+        const GblSize classOffset       = metaSize += (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 0 : sizeof(GblType)                  * pInfo->dependencyCount;
+        const GblSize basesOffset       = metaSize += classTotalSize;
         metaSize += baseCount * sizeof(GblMetaClass*);
 
         const GblSize alignRem = (metaSize % GBL_META_CLASS_ALIGNMENT_);
@@ -413,19 +423,24 @@ static GblType typeRegister_(GblType parent,
             metaSize += (GBL_META_CLASS_ALIGNMENT_ - (alignRem));
 
         GBL_API_PUSH_VERBOSE("MetaClass Info");
-        GBL_API_VERBOSE("%-20s: %-100u", "size", metaSize);
-        GBL_API_VERBOSE("%-20s: %-100u", "depth", baseCount);
+        GBL_API_VERBOSE("%-20s: %-100u", "total size",      metaSize);
+        GBL_API_VERBOSE("%-20s: %-100u", "metaclass size",  sizeof(GblMetaClass));
+        GBL_API_VERBOSE("%-20s: %-100u", "typeinfo size",   prereqOffset - sizeof(GblMetaClass));
+        GBL_API_VERBOSE("%-20s: %-100u", "class size",      classTotalSize);
+        GBL_API_VERBOSE("%-20s: %-100u", "bases size",      baseCount * sizeof(GblMetaClass*));
+        GBL_API_VERBOSE("%-20s: %-100u", "align pad",       (GBL_META_CLASS_ALIGNMENT_ - (alignRem)));
+        GBL_API_VERBOSE("%-20s: %-100u", "depth",           baseCount);
         GBL_API_POP(2);
 
         GblMetaClass* pMeta = GBL_API_MALLOC(metaSize,
                                              GBL_META_CLASS_ALIGNMENT_,
                                              pName);
 
-        GBL_API_VERIFY_EXPRESSION(!((uint64_t)pMeta & GBL_CLASS_FLAGS_BIT_MASK_),
+        GBL_API_VERIFY_EXPRESSION(!((uintptr_t)pMeta & GBL_CLASS_FLAGS_BIT_MASK_),
                                   "malloc returned a misaligned pointer!");
 
         memset(pMeta, 0, metaSize);
-        memcpy(&pMeta->info, pInfo, sizeof(GblTypeInfo));
+
         GBL_ATOMIC_INT16_INIT(pMeta->refCount, 0);
         GBL_ATOMIC_INT16_INIT(pMeta->instanceRefCount, 0);
         pMeta->flags                = flags;
@@ -436,21 +451,33 @@ static GblType typeRegister_(GblType parent,
         pMeta->name                 = GblQuark_fromString(pName);
         pMeta->pClass               = classTotalSize?
                                             (GblClass*)((char*)pMeta + classOffset + -(classPrivateOffset)) : NULL;
-        pMeta->info.pInterfaceMap   = pInfo->interfaceCount?
-                                            (GblTypeInterfaceMapEntry*)((char*)pMeta + ifaceOffset) : NULL;
-        pMeta->info.pDependencies  = pInfo->dependencyCount?
-                                            (GblType*)((char*)pMeta + prereqOffset) : NULL;
-        pMeta->pBases               = baseCount?
-                                            (GblMetaClass**)((char*)pMeta + basesOffset) : NULL;
 
-        memcpy((GblTypeInterfaceMapEntry*)pMeta->info.pInterfaceMap,
-               pInfo->pInterfaceMap,
-               sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount);
-        //gblSortQuick((GblTypeInterfaceMapEntry*)pMeta->info.pInterfaceMap, pMeta->info.interfaceCount, sizeof(GblTypeInterfaceMapEntry), metaClassIFaceEntryComparator_);
+        if(flags & GBL_TYPE_FLAG_TYPEINFO_STATIC) {
+             pMeta->pInfo = pInfo;
 
-        memcpy((GblType*)pMeta->info.pDependencies,
-               pInfo->pDependencies,
-               sizeof(GblType*) * pInfo->dependencyCount);
+        } else { // Deep copy the GblTypeInfo structure
+
+            pMeta->pInfo = (const GblTypeInfo*)((char*)pMeta + typeInfoOffset);
+            memcpy((void*)pMeta->pInfo, pInfo, sizeof(GblTypeInfo));
+
+            if(pInfo->interfaceCount) {
+                ((GblTypeInfo*)pMeta->pInfo)->pInterfaceMap  =  (GblTypeInterfaceMapEntry*)((char*)pMeta + ifaceOffset);
+
+                memcpy((GblTypeInterfaceMapEntry*)pMeta->pInfo->pInterfaceMap,
+                       pInfo->pInterfaceMap,
+                       sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount);
+            }
+
+            if(pInfo->dependencyCount) {
+                ((GblTypeInfo*)pMeta->pInfo)->pDependencies  = (GblType*)((char*)pMeta + prereqOffset);
+
+                memcpy((GblType*)pMeta->pInfo->pDependencies,
+                       pInfo->pDependencies,
+                       sizeof(GblType*) * pInfo->dependencyCount);
+            }
+        }
+
+        pMeta->pBases = baseCount? (GblMetaClass**)((char*)pMeta + basesOffset) : NULL;
 
         pParentIt = pParent;
         baseCount = 0;
@@ -474,6 +501,13 @@ static GblType typeRegister_(GblType parent,
              GBL_API_CALL(GblVector_pushBack(&typeBuiltins_.vector, &newType));
         }
 
+        if(flags & GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE) {
+            GblClass* pClass = GblClass_ref(newType);
+            GBL_API_VERIFY(pClass,
+                           GBL_RESULT_ERROR_INVALID_CLASS,
+                           "Class immediate construction failed!");
+        }
+
     }
     GBL_API_END_BLOCK();
     if(hasMutex) mtx_unlock(&typeRegMtx_);
@@ -488,6 +522,8 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
                             NULL,
                             GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT |
                             GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE);
+    GBL_API_VERIFY_LAST_RECORD();
+
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_CLASS,
                             GBL_INVALID_TYPE,
                             GblQuark_internStringStatic("Class"),
@@ -496,17 +532,24 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
                             }),
                             GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED           |
                             GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE);
+    GBL_API_VERIFY_LAST_RECORD();
+
+    const static GblTypeInfo ifaceInfo = {
+        .classSize    = sizeof(GblInterface)
+    };
+
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INTERFACE,
                             GBL_INVALID_TYPE,
                             GblQuark_internStringStatic("Interface"),
-                            &((const GblTypeInfo) {
-                                .classSize    = sizeof(GblInterface)
-                            }),
+                            &ifaceInfo,
                             GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT         |
                             GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED        |
                             GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE    |
                             GBL_TYPE_FLAG_ABSTRACT                      |
-                            GBL_TYPE_FLAG_UNMAPPABLE);
+                            GBL_TYPE_FLAG_UNMAPPABLE                    |
+                            GBL_TYPE_FLAG_TYPEINFO_STATIC);
+    GBL_API_VERIFY_LAST_RECORD();
+
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INSTANCE,
                             GBL_INVALID_TYPE,
                             GblQuark_internStringStatic("Instance"),
@@ -516,9 +559,13 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
                             }),
                             GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE    |
                             GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE);
+    GBL_API_VERIFY_LAST_RECORD();
+
     GBL_API_CALL(GblIVariant_typeRegister_(pCtx_));
-    GBL_API_CALL(gblValueTypesRegister_(pCtx_));
+    GBL_API_CALL(GblPrimitive_valueTypesRegister_(pCtx_));
     GBL_API_CALL(GblEnum_typeRegister_(pCtx_));
+    GBL_API_CALL(GblPointer_typeRegister_(pCtx_));
+    GBL_API_CALL(GblBoxed_typeRegister_(pCtx_));
     GBL_API_CALL(GblITable_typeRegister_(pCtx_));
     GBL_API_CALL(GblIEventHandler_typeRegister_(pCtx_));
     GBL_API_CALL(GblIEventFilter_typeRegister_(pCtx_));
@@ -538,6 +585,7 @@ void GblType_init_(void) {
     GBL_API_VERIFY(!initialized_, GBL_RESULT_ERROR_INVALID_OPERATION, "Already initialized!");
     if(!inittedOnce_) mtx_init(&typeRegMtx_, mtx_recursive);
     mtx_lock(&typeRegMtx_);
+
     GBL_API_CALL(GblHashSet_construct(&typeRegistry_,
                                       sizeof(GblMetaClass*),
                                       metaClassHasher_,
@@ -545,12 +593,14 @@ void GblType_init_(void) {
                                       metaClassElementFree_,
                                       initialTypeTotalCount_,
                                       pCtx_));
+
     GBL_API_CALL(GblVector_construct(&typeBuiltins_.vector,
                                     sizeof(GblMetaClass*),
                                     0,
                                     NULL,
                                     sizeof(typeBuiltins_),
                                     pCtx_));
+
     GBL_API_CALL(GblVariant_init_(pCtx_));
     GBL_API_CALL(GblType_registerBuiltins_());
     GBL_API_POP(1);
@@ -826,7 +876,7 @@ GBL_EXPORT const GblTypeInfo* GblType_info(GblType type) {
     const GblTypeInfo* pInfo      = NULL;
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
-    if(pMeta) pInfo = &pMeta->info;
+    if(pMeta) pInfo = &pMeta->pInfo;
     GBL_API_END_BLOCK();
     return pInfo;
 }
@@ -862,8 +912,8 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
                 break;
             } else if(ifaceChecks) {
                 // recurse over interfaces checking
-                for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
-                    if(GblType_typeIsA_(pIter->info.pInterfaceMap[i].interfaceType,
+                for(GblSize i = 0; i < pIter->pInfo->interfaceCount; ++i) {
+                    if(GblType_typeIsA_(pIter->pInfo->pInterfaceMap[i].interfaceType,
                                         base,
                                         GBL_TRUE,
                                         ifaceChecks,
@@ -926,8 +976,8 @@ GBL_EXPORT GblType GblType_common(GblType type, GblType other) {
             else
                 return otherBase;
         } else if(!(pOtherBase->flags & GBL_TYPE_FLAG_UNMAPPABLE)){
-            for(GblSize i = 0; i < pOtherBase->info.interfaceCount; ++i) {
-                const GblType otherIface = pOtherBase->info.pInterfaceMap[i].interfaceType;
+            for(GblSize i = 0; i < pOtherBase->pInfo->interfaceCount; ++i) {
+                const GblType otherIface = pOtherBase->pInfo->pInterfaceMap[i].interfaceType;
                 const GblType common = GblType_common(type, otherIface);
                 if(common != GBL_INVALID_TYPE) {
                     return common;
@@ -947,9 +997,9 @@ GBL_EXPORT GblBool GblType_depends(GblType dependent, GblType dependency) {
             for(GblInt a = (GblInt)GblType_depth(dependent); a >= 0; --a) {
                 GblType ancestor = GblType_ancestor(dependent, a);
                 GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
-                for(GblSize p = 0; p < pMeta->info.dependencyCount; ++p) {
-                    if(pMeta->info.pDependencies[p] == dependency ||
-                            GblType_depends(pMeta->info.pDependencies[p], dependency))
+                for(GblSize p = 0; p < pMeta->pInfo->dependencyCount; ++p) {
+                    if(pMeta->pInfo->pDependencies[p] == dependency ||
+                            GblType_depends(pMeta->pInfo->pDependencies[p], dependency))
                     {
                         result = GBL_TRUE;
                         GBL_API_DONE();

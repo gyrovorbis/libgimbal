@@ -13,8 +13,6 @@ typedef struct GblEnumClass_ {
     GblEnumEntry_* pEntries;
 } GblEnumClass_;
 
-extern GBL_RESULT GblPrimitiveClass_init(GblPrimitiveClass* pClass, GblIVariantIFace* pIFace, GblContext* pCtx);
-
 static GBL_RESULT enumConstruct_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc && pArgs);
     GBL_API_BEGIN(NULL);
@@ -251,9 +249,9 @@ static GBL_RESULT enumClass_final_(GblClass* pClass,
     GBL_API_END();
 }
 
-GBL_RESULT  GblEnum_typeRegister_(GblContext* pCtx) {
+GBL_RESULT GblEnum_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-    const static GblIVariantIFace enumIVariantIFace =  {
+    const static GblIVariantIFaceVTable enumIVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE        |
                             GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT  |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY     |
@@ -268,22 +266,13 @@ GBL_RESULT  GblEnum_typeRegister_(GblContext* pCtx) {
             .pFnSave        = enumSave_,
             .pFnLoad        = enumLoad_
       };
+
     const GblType enumType =
-            GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_ENUM,
-                  GBL_INVALID_TYPE,
+        GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_ENUM,
                   GblQuark_internStringStatic("enum"),
-                  &(const GblTypeInfo) {
-                      .pFnClassInit     = (GblTypeClassInitializeFn)GblPrimitiveClass_init,
-                      .classSize        = sizeof(GblEnumClass),
-                      .classPrivateSize = sizeof(GblEnumClass_),
-                      .pClassData       = &enumIVariantIFace,
-                      .interfaceCount   = 1,
-                      .pInterfaceMap    = &(const GblTypeInterfaceMapEntry) {
-                           .interfaceType  = GBL_IVARIANT_TYPE,
-                           .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
-                      }
-                  },
-                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED |
+                  sizeof(GblEnumClass),
+                  sizeof(GblEnumClass_),
+                  &enumIVariantIFace,
                   GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE);
 
     GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_BOOL_TYPE, enumConvert_));

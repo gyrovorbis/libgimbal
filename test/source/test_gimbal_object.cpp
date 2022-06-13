@@ -209,7 +209,7 @@ void CObject::newDefault(void) {
     GblIVariantIFace* pIVariantIFace = GBL_IVARIANT_GET_IFACE(pObj);
     QCOMPARE(GblType_fromClass(GBL_CLASS(pIVariantIFace)), GBL_IVARIANT_TYPE);
     QCOMPARE(pClass, TEST_OBJECT_CLASS(pIVariantIFace));
-    QCOMPARE(QString(pIVariantIFace->pGetValueFmt), QString("p"));
+    QCOMPARE(QString(pIVariantIFace->pVTable->pGetValueFmt), QString("p"));
 
     GblITableIFace* pITableIFace = GBL_ITABLE_GET_IFACE(pObj);
     QCOMPARE(GblType_fromClass(GBL_CLASS(pITableIFace)), GBL_ITABLE_TYPE);

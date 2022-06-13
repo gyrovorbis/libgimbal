@@ -43,12 +43,18 @@ GBL_DECLARE_FLAGS(GblTypeFundamentalFlags) {
 GBL_DECLARE_FLAGS(GblTypeFlags) {
     GBL_TYPE_FLAGS_NONE                         = 0,
     GBL_TYPE_FLAG_BUILTIN                       = (1 << 6),
-    GBL_TYPE_FLAG_UNMAPPABLE                    = (1 << 7),
-    GBL_TYPE_FLAG_ABSTRACT                      = (1 << 8),
-    GBL_TYPE_FLAG_FINAL                         = (1 << 9),
-    GBL_TYPE_FLAGS_MASK                         = GBL_TYPE_FLAG_BUILTIN     |
-                                                  GBL_TYPE_FLAG_UNMAPPABLE  |
-                                                  GBL_TYPE_FLAG_ABSTRACT    |
+    GBL_TYPE_FLAG_TYPEINFO_STATIC               = (1 << 7),
+    GBL_TYPE_FLAG_CLASS_PINNED                  = (1 << 8),
+    GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE     = (1 << 9),
+    GBL_TYPE_FLAG_UNMAPPABLE                    = (1 << 10),
+    GBL_TYPE_FLAG_ABSTRACT                      = (1 << 11),
+    GBL_TYPE_FLAG_FINAL                         = (1 << 12),
+    GBL_TYPE_FLAGS_MASK                         = GBL_TYPE_FLAG_BUILTIN                     |
+                                                  GBL_TYPE_FLAG_TYPEINFO_STATIC             |
+                                                  GBL_TYPE_FLAG_CLASS_PINNED                |
+                                                  GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE   |
+                                                  GBL_TYPE_FLAG_UNMAPPABLE                  |
+                                                  GBL_TYPE_FLAG_ABSTRACT                    |
                                                   GBL_TYPE_FLAG_FINAL
 };
 
@@ -79,6 +85,7 @@ typedef struct GblTypeInfo {
 GBL_EXPORT GBL_RESULT           GblType_init            (GblContext* pDefaultCtx,
                                                          GblSize     typeBuiltinInitialCount,
                                                          GblSize     typeTotalInitialCount) GBL_NOEXCEPT;
+
 GBL_EXPORT GBL_RESULT           GblType_final           (void)                              GBL_NOEXCEPT;
 GBL_EXPORT GblContext*          GblType_contextDefault  (void)                              GBL_NOEXCEPT;
 
@@ -86,15 +93,18 @@ GBL_EXPORT GblType              GblType_registerStatic  (GblType              su
                                                          const char*          pName,
                                                          const GblTypeInfo*   pInfo,
                                                          GblFlags             flags)        GBL_NOEXCEPT;
+
 GBL_EXPORT GblType              GblType_registerDynamic (GblType              parent,
                                                          const char*          pName,
                                                          GblIPlugin*          pPlugin,
                                                          GblFlags             flags)        GBL_NOEXCEPT;
+
 GBL_EXPORT GblType              GblType_registerBuiltin (GblSize              expectedIndex,
                                                          GblType              parentType,
                                                          const char*          pName,
                                                          const GblTypeInfo*   pTypeInfo,
                                                          GblTypeFlags         flags)        GBL_NOEXCEPT;
+
 GBL_EXPORT GBL_RESULT           GblType_unregister      (GblType type)                      GBL_NOEXCEPT;
 GBL_EXPORT GblSize              GblType_registeredCount (void)                              GBL_NOEXCEPT;
 GBL_EXPORT GblSize              GblType_builtinCount    (void)                              GBL_NOEXCEPT;

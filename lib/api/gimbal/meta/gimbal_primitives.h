@@ -16,15 +16,20 @@
 #define GBL_UINT64_TYPE                     (GBL_BUILTIN_TYPE(UINT64))
 #define GBL_FLOAT_TYPE                      (GBL_BUILTIN_TYPE(FLOAT))
 #define GBL_DOUBLE_TYPE                     (GBL_BUILTIN_TYPE(DOUBLE))
-#define GBL_POINTER_TYPE                    (GBL_BUILTIN_TYPE(POINTER))
 #define GBL_STRING_TYPE                     (GBL_BUILTIN_TYPE(STRING))
 #define GBL_TYPE_TYPE                       (GBL_BUILTIN_TYPE(TYPE))
-#define GBL_BOXED_TYPE                      (GBL_BUILTIN_TYPE(BOXED))
 
 typedef struct GblPrimitiveClass {
     GblClass            base;
     GblIVariantIFace    iVariantIFace;
 } GblPrimitiveClass;
+
+GblType GblPrimitive_registerBuiltin(GblSize                        index,
+                                     const char*                    pName,
+                                     GblSize                        classSize,
+                                     GblSize                        classPrivateSize,
+                                     const GblIVariantIFaceVTable*  pIVTable,
+                                     GblFlags                       typeFlags)       GBL_NOEXCEPT;
 
 
 #endif // GIMBAL_PRIMITIVES_H

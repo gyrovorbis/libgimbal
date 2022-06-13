@@ -575,8 +575,8 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         if(GBL_RESULT_##prefix(record->result)) {                               \
             GBL_ASSERT(gblExtCallRecordSet(GBL_API_FRAME(), record),            \
                         "Context Last error failed!");                          \
-            GBL_ASSERT(GblThread_callRecordSet(NULL, record),                    \
-                "Thread Last error failed!");                                   \
+            GBL_ASSERT(GblThread_callRecordSet(NULL, record),                   \
+                        "Thread Last error failed!");                           \
         }                                                                       \
     } GBL_STMT_END
 

@@ -127,7 +127,8 @@ GBL_EXPORT GBL_RESULT         GblObject_newInPlaceWithClass (SELF, GblObjectClas
 GBL_EXPORT GblObject*         GblObject_newVaList           (GblType type, va_list* pList)                                      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVaList    (SELF, GblType type, va_list* pList)                                GBL_NOEXCEPT;
 GBL_EXPORT GblObject*         GblObject_newVaListWithClass  (GblObjectClass* pClass, va_list* pList)                            GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVaListWithClass(SELF, GblObjectClass* pClass, va_list* pList)                 GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVaListWithClass
+                                                            (SELF, GblObjectClass* pClass, va_list* pList)                  GBL_NOEXCEPT;
 
 GBL_EXPORT GblObject*         GblObject_newVariants         (GblType type,
                                                              GblUint propertyCount,
@@ -142,11 +143,12 @@ GBL_EXPORT GblObject*         GblObject_newVariantsWithClass(GblObjectClass* pCl
                                                              GblUint propertyCount,
                                                              const char* pNames[],
                                                              const GblVariant* pValues)                                         GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVariantsWithClass(SELF,
-                                                                    GblObjectClass* pClass,
-                                                                    GblUint propertyCount,
-                                                                    const char* pNames[],
-                                                                    const GblVariant* pValues)                                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVariantsWithClass
+                                                            (SELF,
+                                                             GblObjectClass* pClass,
+                                                             GblUint propertyCount,
+                                                             const char* pNames[],
+                                                             const GblVariant* pValues)                                         GBL_NOEXCEPT;
 
 GBL_EXPORT GblObject*         GblObject_ref                 (GblObject* pObject)                                                GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount        GblObject_unref               (GblObject* pObject)                                                GBL_NOEXCEPT;
@@ -320,7 +322,7 @@ GBL_INLINE GblObject* GblObject_siblingFindByName(CSELF, const char* pName) GBL_
 }
 
 GBL_INLINE GBL_RESULT GblObject_attributeSet(SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value) GBL_NOEXCEPT {
-    GBL_UNUSED(value);
+    GBL_UNUSED(value && pSelf);
     GBL_API_BEGIN(GblType_contextDefault());
     GBL_API_VERIFY_ARG(attrib < GBL_OBJECT_ATTRIBUTE_COUNT);
     switch(attrib) {

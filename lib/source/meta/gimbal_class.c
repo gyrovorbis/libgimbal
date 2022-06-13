@@ -11,17 +11,17 @@ GBL_INLINE void* GblClass_basePtr_(const GblClass* pClass) {
 
 GBL_EXPORT GblSize GblClass_totalSize(const GblClass* pClass) {
     GblMetaClass* pMeta = GBL_META_CLASS_(GBL_CLASS_TYPE(pClass));
-    return pMeta? (pMeta->info.classSize - pMeta->classPrivateOffset) : 0;
+    return pMeta? (pMeta->pInfo->classSize - pMeta->classPrivateOffset) : 0;
 }
 
 GBL_EXPORT GblSize GblClass_privateSize(const GblClass* pClass) {
     GblMetaClass* pMeta = GBL_META_CLASS_(GBL_CLASS_TYPE(pClass));
-    return pMeta? pMeta->info.classPrivateSize  : 0;
+    return pMeta? pMeta->pInfo->classPrivateSize  : 0;
 }
 
 GBL_EXPORT void* GblClass_private(const GblClass* pClass, GblType type) {
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
-    return pMeta && pMeta->info.classPrivateSize?
+    return pMeta && pMeta->pInfo->classPrivateSize?
                 (void*)((uint8_t*)pClass + pMeta->classPrivateOffset) :
                 NULL;
 }
@@ -103,7 +103,7 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
     GBL_API_VERBOSE("Type: %p", pMeta);
 
     // Zero initiailze class - NOPE OVERWRITING IFACE IF WE DO THAT!
-    //memset(pClass, 0, pMeta->info.classSize);
+    //memset(pClass, 0, pMeta->pInfo->classSize);
 
     //IMMEDIATELY initialize its type!!!
     /*
@@ -126,11 +126,11 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
         GBL_API_PUSH_VERBOSE("Class[%u]: %s", idx, GblType_name(GBL_TYPE_(pIter)));
 
         //GBL_API_PUSH_VERBOSE("Constructing Interfaces");
-        if(!pIter->info.interfaceCount) {
+        if(!pIter->pInfo->interfaceCount) {
             //GBL_API_VERBOSE("Interfaces: None");
         } else {
-            for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
-                const GblTypeInterfaceMapEntry* pIEntry = &pIter->info.pInterfaceMap[i];
+            for(GblSize i = 0; i < pIter->pInfo->interfaceCount; ++i) {
+                const GblTypeInterfaceMapEntry* pIEntry = &pIter->pInfo->pInterfaceMap[i];
                 GblMetaClass* pIMeta = (GblMetaClass*)pIEntry->interfaceType;
                 GBL_API_VERIFY_EXPRESSION(pIMeta);
                 GBL_API_PUSH_VERBOSE("Interface[%u]: %s", i, GblType_name(GBL_TYPE_(pIMeta)));
@@ -141,9 +141,9 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
         }
         //GBL_API_POP(1);
 
-        if(pIter->info.pFnClassInit) {
+        if(pIter->pInfo->pFnClassInit) {
             //GBL_API_VERBOSE("ClassInit(%s)", GblType_name(GBL_TYPE_(pIter)));
-            GBL_API_CALL(pIter->info.pFnClassInit(pClass, pIter->info.pClassData, pCtx_));
+            GBL_API_CALL(pIter->pInfo->pFnClassInit(pClass, pIter->pInfo->pClassData, pCtx_));
         } else {
             //GBL_API_VERBOSE("Ctor: NULL", GblType_name(GBL_TYPE_(pIter)));
         }
@@ -175,7 +175,7 @@ static GblClass* GblClass_create_(GblMetaClass* pMeta, GblBool floating) {
 
     if(!*ppClass) {
         GBL_API_VERBOSE("Allocating separate class structure!");
-        uint8_t* pBase = GBL_API_MALLOC(gblAlignedAllocSize(pMeta->info.classSize -
+        uint8_t* pBase = GBL_API_MALLOC(gblAlignedAllocSize(pMeta->pInfo->classSize -
                                                             pMeta->classPrivateOffset),
                                         GBL_ALIGNOF(GBL_MAX_ALIGN_T),
                                         GblType_name(GBL_TYPE_(pMeta)));
@@ -204,7 +204,7 @@ GBL_EXPORT GblClass* GblClass_ref(GblType type) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblType_contextDefault());
     GBL_API_VERIFY_ARG(type != GBL_INVALID_TYPE);
 
-    GBL_API_VERIFY(pMeta->info.classSize != 0,
+    GBL_API_VERIFY(pMeta->pInfo->classSize != 0,
                    GBL_RESULT_UNIMPLEMENTED,
                    "[GblType] Attempt to reference a class of size 0!");
 
@@ -213,8 +213,9 @@ GBL_EXPORT GblClass* GblClass_ref(GblType type) GBL_NOEXCEPT {
 
     // Return existing reference to class data
     if(pMeta->pClass && GBL_CLASS_TYPE(pMeta->pClass) != GBL_INVALID_TYPE) {
-        GBL_API_VERIFY_EXPRESSION(GBL_ATOMIC_INT16_LOAD(pMeta->refCount),
-                                  "No references to an initialized class!?");
+        GBL_API_VERIFY_EXPRESSION(GBL_ATOMIC_INT16_LOAD(pMeta->refCount) ||
+                                  (pMeta->flags & GBL_TYPE_FLAG_CLASS_PINNED),
+                                  "No references to an initialized unpinned class!?");
         //GBL_API_VERBOSE("Using existing class data");
         pClass = pMeta->pClass;
 
@@ -296,17 +297,17 @@ static GBL_EXPORT GBL_RESULT GblClass_destruct_(GblClass* pClass) {
     // iterate from derived to base class
     do {
         // call finalizer if class provides one
-        if(pIter->info.pFnClassFinal) {
+        if(pIter->pInfo->pFnClassFinal) {
             GBL_API_DEBUG("Calling class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
-            GBL_API_CALL(pIter->info.pFnClassFinal(pMeta->pClass, pIter->info.pClassData, pCtx_));
+            GBL_API_CALL(pIter->pInfo->pFnClassFinal(pMeta->pClass, pIter->pInfo->pClassData, pCtx_));
         } else {
             GBL_API_DEBUG("No class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
         }
 
         // iterate over all interfaces
-        for(GblSize i = 0; i < pIter->info.interfaceCount; ++i) {
+        for(GblSize i = 0; i < pIter->pInfo->interfaceCount; ++i) {
             GblInterface* pInterface = (GblInterface*)((const char*)pClass +
-                                                       pIter->info.pInterfaceMap[i].classOffset);
+                                                       pIter->pInfo->pInterfaceMap[i].classOffset);
             GblClass* pDefaultIFaceClass = GblClass_peek(GBL_CLASS_TYPE(pInterface));
 
             // destruct interface implementation
@@ -375,14 +376,16 @@ GBL_EXPORT GblRefCount GblClass_unref(GblClass* pSelf) GBL_NOEXCEPT {
     if(refCount-1) {
         GBL_API_VERBOSE("--[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), refCount-1);
     } else {
-        {
-            GblRefCount instanceRefCount = 0;
-            instanceRefCount = GBL_ATOMIC_INT16_LOAD(pMeta->instanceRefCount);
-            if(instanceRefCount)
-                GBL_API_WARN("Destroying class with remaining instance references: %u", instanceRefCount);
-        }
+        GblRefCount instanceRefCount = 0;
+        if((instanceRefCount = GBL_ATOMIC_INT16_LOAD(pMeta->instanceRefCount)))
+            GBL_API_WARN("0 class references with remaining instance references: %u", instanceRefCount);
 
-        GBL_API_CALL(GblClass_destruct_(pSelf));
+        if(pMeta->flags & GBL_TYPE_FLAG_CLASS_PINNED)
+            GBL_API_VERBOSE("Class::unreference(%s): 0 - Preserving pinned class",
+                            GblClass_typeName(pSelf));
+        else
+            GBL_API_VERIFY_CALL(GblClass_destruct_(pSelf));
+
     }
 
     GBL_API_POP(1);
@@ -402,10 +405,10 @@ static GblInterface* GblClass_peekInterface_(GblClass* pClass, GblType ifaceType
     {
         GblMetaClass* pMeta = GBL_META_CLASS_(GBL_CLASS_TYPE(pClass));
         while(pMeta) {
-            for(unsigned i = 0; i < pMeta->info.interfaceCount; ++i) {
-                GblInterface* pCurIClass = (GblInterface*)((uintptr_t)pClass + pMeta->info.pInterfaceMap[i].classOffset);
+            for(unsigned i = 0; i < pMeta->pInfo->interfaceCount; ++i) {
+                GblInterface* pCurIClass = (GblInterface*)((uintptr_t)pClass + pMeta->pInfo->pInterfaceMap[i].classOffset);
                 GBL_API_VERIFY_EXPRESSION(GBL_CLASS_FLAG_TEST_(GBL_CLASS(pCurIClass), GBL_CLASS_FLAG_IFACE_IMPL_));
-                GBL_API_VERIFY_EXPRESSION(GBL_META_CLASS_(pMeta->info.pInterfaceMap[i].interfaceType)
+                GBL_API_VERIFY_EXPRESSION(GBL_META_CLASS_(pMeta->pInfo->pInterfaceMap[i].interfaceType)
                                           == GBL_META_CLASS_(GBL_CLASS_TYPE(pCurIClass)));
                 GBL_API_VERIFY_EXPRESSION(GBL_CLASS_TYPE(pCurIClass) != GBL_INVALID_TYPE);
                 if(GBL_META_CLASS_(GBL_CLASS_TYPE(pCurIClass)) == pIFaceMeta) {
@@ -474,11 +477,13 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check)
     GBL_API_END_BLOCK();
     if(check && !pToClass) {
         if(toType == GBL_INVALID_TYPE) {
-            GBL_API_WARN("Attempted to cast from type %s to GBL_INVALID_TYPE!",
-                         GblClass_typeName(pClassStart));
+            GBL_API_RECORD_SET(GBL_RESULT_ERROR_TYPE_MISMATCH,
+                               "Attempted to cast from type %s to GBL_INVALID_TYPE!",
+                               GblClass_typeName(pClassStart));
         } else {
-            GBL_API_WARN("Failed to cast from type %s to %s!",
-                         GblClass_typeName(pClassStart), GblType_name(toType));
+            GBL_API_RECORD_SET(GBL_RESULT_ERROR_TYPE_MISMATCH,
+                               "Failed to cast from type %s to %s!",
+                               GblClass_typeName(pClassStart), GblType_name(toType));
         }
     }
     return pToClass;
