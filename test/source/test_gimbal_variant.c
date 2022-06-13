@@ -1993,6 +1993,45 @@ GBL_API GblVariant_test_string_conversions(GblContext* pCtx) {
     GBL_API_END();
 }
 
+GBL_API GblVariant_test_string_conversions_char(GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+
+    GBL_VARIANT(variant);
+    GBL_VARIANT(tVariant);
+    const GblRefCount refCountBegin = GblType_classRefCount(GBL_STRING_TYPE);
+
+    GBL_API_VERIFY_CALL(GblVariant_constructString(&variant, "9"));
+
+    // Length == 1
+    GBL_API_VERIFY_CALL(GblVariant_constructChar(&tVariant, '\0'));
+    GBL_VERIFY(GblVariant_canConvert(GBL_STRING_TYPE, GBL_CHAR_TYPE));
+    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_COMPARE(GblVariant_getChar(&tVariant), '9');
+    GBL_VERIFY(GblVariant_equals(&variant, &tVariant));
+
+    // Length == 0
+    GBL_API_VERIFY_CALL(GblVariant_setString(&variant, ""));
+    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_COMPARE(GblVariant_getChar(&tVariant), '\0');
+    GBL_VERIFY(GblVariant_equals(&variant, &tVariant));
+
+    // Length > 1 (Invalid)
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_API_VERIFY_CALL(GblVariant_setString(&variant, "abc"));
+    GBL_COMPARE(GblVariant_convert(&variant, &tVariant),
+                GBL_RESULT_ERROR_INVALID_CONVERSION);
+    GBL_API_CLEAR_LAST_RECORD();
+
+
+    GBL_API_VERIFY_CALL(GblVariant_destruct(&tVariant));
+    GBL_API_VERIFY_CALL(GblVariant_destruct(&variant));
+
+    // Reference leak check
+    GBL_COMPARE(refCountBegin, GblType_classRefCount(GBL_STRING_TYPE));
+
+    GBL_API_END();
+}
 
 GBL_API GblVariant_test_type(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);

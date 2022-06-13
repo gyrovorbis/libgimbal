@@ -120,6 +120,7 @@ set(GIMBAL_SOURCES
      source/containers/gimbal_linked_list.c
      source/containers/gimbal_array_map.c
      source/meta/gimbal_boxed.c
+     source/meta/gimbal_flags.c
      lib/jenkins/lookup3.c
 )
 

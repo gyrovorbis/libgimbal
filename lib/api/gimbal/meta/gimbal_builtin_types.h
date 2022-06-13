@@ -20,8 +20,8 @@
 #define GBL_TYPE_BUILTIN_INDEX_DOUBLE               16
 #define GBL_TYPE_BUILTIN_INDEX_STRING               17
 #define GBL_TYPE_BUILTIN_INDEX_TYPE                 18
-#define GBL_TYPE_BUILTIN_INDEX_FLAGS                19
-#define GBL_TYPE_BUILTIN_INDEX_ENUM                 20
+#define GBL_TYPE_BUILTIN_INDEX_ENUM                 19
+#define GBL_TYPE_BUILTIN_INDEX_FLAGS                20
 #define GBL_TYPE_BUILTIN_INDEX_POINTER              21
 #define GBL_TYPE_BUILTIN_INDEX_BOXED                22
 #define GBL_TYPE_BUILTIN_INDEX_ITABLE               23

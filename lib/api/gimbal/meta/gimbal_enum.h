@@ -39,19 +39,19 @@ typedef struct GblEnumClass {
 // ========== GblEnumClass ==========
 
 GBL_INLINE const char*          GblEnumClass_nameFromIndex      (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_EXPORT GblQuark             GblEnumClass_nameQuarkFromIndex (CSELF, uint16_t index)             GBL_NOEXCEPT;
 GBL_INLINE const char*          GblEnumClass_nameFromValue      (CSELF, GblEnum value)              GBL_NOEXCEPT;
+GBL_EXPORT GblQuark             GblEnumClass_nameQuarkFromIndex (CSELF, uint16_t index)             GBL_NOEXCEPT;
 GBL_EXPORT GblQuark             GblEnumClass_nameQuarkFromValue (CSELF, GblEnum value)              GBL_NOEXCEPT;
 
 GBL_INLINE const char*          GblEnumClass_nickFromIndex      (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_EXPORT GblQuark             GblEnumClass_nickQuarkFromIndex (CSELF, uint16_t index)             GBL_NOEXCEPT;
 GBL_INLINE const char*          GblEnumClass_nickFromValue      (CSELF, GblEnum value)              GBL_NOEXCEPT;
+GBL_EXPORT GblQuark             GblEnumClass_nickQuarkFromIndex (CSELF, uint16_t index)             GBL_NOEXCEPT;
 GBL_EXPORT GblQuark             GblEnumClass_nickQuarkFromValue (CSELF, GblEnum value)              GBL_NOEXCEPT;
 
 GBL_EXPORT GblEnum              GblEnumClass_valueFromIndex     (CSELF, uint16_t index)             GBL_NOEXCEPT;
 GBL_INLINE GblEnum              GblEnumClass_valueFromName      (CSELF, const char* pString)        GBL_NOEXCEPT;
-GBL_EXPORT GblEnum              GblEnumClass_valueFromNameQuark (CSELF, GblQuark quark)             GBL_NOEXCEPT;
 GBL_INLINE GblEnum              GblEnumClass_valueFromNick      (CSELF, const char* pString)        GBL_NOEXCEPT;
+GBL_EXPORT GblEnum              GblEnumClass_valueFromNameQuark (CSELF, GblQuark quark)             GBL_NOEXCEPT;
 GBL_EXPORT GblEnum              GblEnumClass_valueFromNickQuark (CSELF, GblQuark quark)             GBL_NOEXCEPT;
 GBL_EXPORT GblBool              GblEnumClass_valueCheck         (CSELF, GblEnum value)              GBL_NOEXCEPT;
 

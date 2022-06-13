@@ -2,7 +2,6 @@
 #include <gimbal/meta/gimbal_variant.h>
 #include <gimbal/types/gimbal_string_buffer.h>
 
-
 typedef struct GblEnumEntry_ {
     GblEnum     value;
     GblQuark    name;    // So that walking table to go from string to value is cheap
@@ -173,7 +172,7 @@ GBL_EXPORT GblEnum GblEnumClass_valueFromNickQuark(const GblEnumClass* pSelf, Gb
 GBL_EXPORT GblBool GblEnumClass_valueCheck(const GblEnumClass* pSelf, GblEnum value) {
     GblBool result = GBL_FALSE;
 
-    if(value <= pSelf->valueMax && value >= pSelf->valueMin) {
+    if(GblEnumClass_valueInRange_(pSelf, value)) {
         for(uint16_t e = 0; e < pSelf->entryCount; ++e) {
             if(GblEnumClass_valueFromIndex(pSelf, e) == value) {
                 result = GBL_TRUE;

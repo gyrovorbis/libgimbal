@@ -564,6 +564,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
     GBL_API_CALL(GblIVariant_typeRegister_(pCtx_));
     GBL_API_CALL(GblPrimitive_valueTypesRegister_(pCtx_));
     GBL_API_CALL(GblEnum_typeRegister_(pCtx_));
+    GBL_API_CALL(GblFlags_typeRegister_(pCtx_));
     GBL_API_CALL(GblPointer_typeRegister_(pCtx_));
     GBL_API_CALL(GblBoxed_typeRegister_(pCtx_));
     GBL_API_CALL(GblITable_typeRegister_(pCtx_));
