@@ -20,6 +20,7 @@
 #include <test_gimbal_type.hpp>
 #include <test_gimbal_object.hpp>
 #include <test_gimbal_enum.hpp>
+#include <test_gimbal_flags.hpp>
 #include <test_gimbal_opaque.hpp>
 #include <test_gimbal_boxed.hpp>
 
@@ -50,6 +51,7 @@ qDebug() << "\n";
     testSuite.enqueueTestSet(new gimbal::test::Type());
     testSuite.enqueueTestSet(new gimbal::test::Variant());
     testSuite.enqueueTestSet(new gimbal::test::Enum());
+    testSuite.enqueueTestSet(new gimbal::test::Flags());
     testSuite.enqueueTestSet(new gimbal::test::Opaque());
     testSuite.enqueueTestSet(new gimbal::test::Boxed());
     testSuite.enqueueTestSet(new gimbal::test::CObject());

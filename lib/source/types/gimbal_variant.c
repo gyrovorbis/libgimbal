@@ -141,6 +141,7 @@ GBL_EXPORT GBL_RESULT GblVariant_unregisterConverter(GblType fromType, GblType t
 GBL_EXPORT GblBool GblVariant_canConvert(GblType fromType, GblType toType) {
     GblBool         result          = GBL_FALSE;
     GblType         currentFromType = fromType;
+    GblType         currentToType   = toType;
     ConverterEntry_ entry           = { .toType = toType };
 
     GBL_API_BEGIN(GblTreeSet_context(&converterRegistry_)); {
@@ -151,18 +152,29 @@ GBL_EXPORT GblBool GblVariant_canConvert(GblType fromType, GblType toType) {
         if(GblType_check(fromType, toType)) {
             result = GBL_TRUE;
         } else {
+            while(!result && currentToType != GBL_INVALID_TYPE) {
+                entry.toType = currentToType;
 
-            while(!result && currentFromType != GBL_INVALID_TYPE) {
-                entry.fromType = currentFromType;
+                while(!result && currentFromType != GBL_INVALID_TYPE) {
+                    entry.fromType = currentFromType;
 
-                result = GblTreeSet_contains(&converterRegistry_,
-                                             &entry);
+                    result = GblTreeSet_contains(&converterRegistry_,
+                                                 &entry);
 
-                if(!GblType_check(currentFromType,
-                                  GblType_parent(currentFromType)))
+                    if(result) GBL_API_DONE();
+
+                    if(!GblType_check(currentFromType,
+                                      GblType_parent(currentFromType)))
+                        break;
+
+                    currentFromType = GblType_parent(currentFromType);
+                }
+
+                if(!GblType_check(currentToType,
+                                  GblType_parent(currentToType)))
                     break;
 
-                currentFromType = GblType_parent(currentFromType);
+                currentToType = GblType_parent(currentToType);
             }
         }
     } GBL_API_END_BLOCK();
@@ -183,20 +195,33 @@ GBL_EXPORT GBL_RESULT GblVariant_convert(const GblVariant* pSelf, GblVariant* pO
 
             const ConverterEntry_*  pEntry      = NULL;
             GblType                 fromType    = GblVariant_type(pSelf);
+            GblType                 toType      = GblVariant_type(pOther);
             ConverterEntry_         entry       = { .toType = GblVariant_type(pOther) };
 
-            while(!pEntry && fromType != GBL_INVALID_TYPE) {
-                entry.fromType = fromType;
+            while(!pEntry && toType != GBL_INVALID_TYPE) {
+                entry.toType = toType;
 
-                pEntry = GblTreeSet_get(&converterRegistry_,
-                                       &entry);
+                while(!pEntry && fromType != GBL_INVALID_TYPE) {
+                    entry.fromType = fromType;
 
-                if(!GblType_check(fromType, GblType_parent(fromType)))
+                    pEntry = GblTreeSet_get(&converterRegistry_,
+                                           &entry);
+
+                    if(pEntry) goto done;
+                    if(!GblType_check(fromType, GblType_parent(fromType)))
+                        break;
+
+                    fromType = GblType_parent(fromType);
+                }
+
+                if(!GblType_check(toType, GblType_parent(toType)))
                     break;
 
-                fromType = GblType_parent(fromType);
+                toType = GblType_parent(toType);
+
             }
 
+            done:
             GBL_API_VERIFY(pEntry,
                            GBL_RESULT_ERROR_INVALID_CONVERSION,
                            "[GblVariant] Conversion failed: No converter found! [%s => %s],",

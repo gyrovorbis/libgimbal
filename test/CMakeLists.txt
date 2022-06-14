@@ -71,6 +71,9 @@ add_executable(GimbalTests
     include/test_gimbal_boxed.h
     include/test_gimbal_boxed.hpp
     source/test_gimbal_boxed.c
+    include/test_gimbal_flags.h
+    include/test_gimbal_flags.hpp
+    source/test_gimbal_flags.c
     source/test_main.cpp)
 
 

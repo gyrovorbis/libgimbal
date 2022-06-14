@@ -24,11 +24,11 @@
 
 GBL_DECLS_BEGIN
 
-typedef struct GblFlagsEntry {
+typedef struct GblFlagEntry {
     GblFlags        value;
     const char*     pName;
     const char*     pNick;
-} GblFlagsEntry;
+} GblFlagEntry;
 
 typedef struct GblFlagsClass {
     GblPrimitiveClass   base;
@@ -44,7 +44,7 @@ GBL_EXPORT GblQuark     GblFlagsClass_nameQuarkFromIndex(CSELF, uint16_t index) 
 GBL_EXPORT GblQuark     GblFlagsClass_nameQuarkFromValue(CSELF, GblFlags value)             GBL_NOEXCEPT;
 
 GBL_INLINE const char*  GblFlagsClass_nickFromIndex     (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_INLINE const char*  GblFlagsClass_nickFromvalue     (CSELF, GblFlags value)             GBL_NOEXCEPT;
+GBL_INLINE const char*  GblFlagsClass_nickFromValue     (CSELF, GblFlags value)             GBL_NOEXCEPT;
 GBL_EXPORT GblQuark     GblFlagsClass_nickQuarkFromIndex(CSELF, uint16_t index)             GBL_NOEXCEPT;
 GBL_EXPORT GblQuark     GblFlagsClass_nickQuarkFromValue(CSELF, GblFlags value)             GBL_NOEXCEPT;
 
@@ -53,24 +53,35 @@ GBL_INLINE GblFlags     GblFlagsClass_valueFromName     (CSELF, const char* pNam
 GBL_INLINE GblFlags     GblFlagsClass_valueFromNick     (CSELF, const char* pNick)          GBL_NOEXCEPT;
 GBL_EXPORT GblFlags     GblFlagsClass_valueFromNameQuark(CSELF, GblQuark name)              GBL_NOEXCEPT;
 GBL_EXPORT GblFlags     GblFlagsClass_valueFromNickQuark(CSELF, GblQuark nick)              GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblFlagsClass_valueCheck        (CSELF, GblFlags flag)              GBL_NOEXCEPT;
+GBL_EXPORT GblFlags     GblFlagsClass_valueFromString   (CSELF, const char* pString)        GBL_NOEXCEPT;
 
+GBL_INLINE GblBool      GblFlagsClass_valueCheck        (CSELF, GblFlags value)             GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT   GblFlagsClass_valueAppendString (CSELF,
+                                                         GblFlags value,
+                                                         GblStringBuffer* pStr)             GBL_NOEXCEPT;
 
 // ========== GblFlags ==========
 
 GBL_EXPORT GblType      GblFlags_register               (const char*          pName,
-                                                         const GblFlagsEntry* pEntries)     GBL_NOEXCEPT;
+                                                         const GblFlagEntry*  pEntries)     GBL_NOEXCEPT;
 
 GBL_INLINE GblFlags     GblFlags_fromName               (const char* pName, GblType type)   GBL_NOEXCEPT;
 GBL_INLINE GblFlags     GblFlags_fromNameQuark          (GblQuark name, GblType type)       GBL_NOEXCEPT;
 GBL_INLINE GblFlags     GblFlags_fromNick               (const char* pNick, GblType type)   GBL_NOEXCEPT;
 GBL_INLINE GblFlags     GblFlags_fromNickQuark          (GblQuark nick, GblType type)       GBL_NOEXCEPT;
+GBL_INLINE GblFlags     GblFlags_fromString             (const char* pName, GblType type)   GBL_NOEXCEPT;
 
 GBL_INLINE const char*  GblFlags_name                   (GblFlags value, GblType type)      GBL_NOEXCEPT;
 GBL_INLINE GblQuark     GblFlags_nameQuark              (GblFlags value, GblType type)      GBL_NOEXCEPT;
 GBL_INLINE const char*  GblFlags_nick                   (GblFlags value, GblType type)      GBL_NOEXCEPT;
 GBL_INLINE GblQuark     GblFlags_nickQuark              (GblFlags value, GblType type)      GBL_NOEXCEPT;
+
 GBL_INLINE GblBool      GblFlags_check                  (GblFlags value, GblType type)      GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT   GblFlags_appendString           (GblFlags value,
+                                                         GblType type,
+                                                         GblStringBuffer* pBuffer)          GBL_NOEXCEPT;
 
 // ========== IMPL ==========
 
@@ -105,6 +116,10 @@ GBL_INLINE GblFlags GblFlagsClass_valueFromNick(CSELF, const char* pString) GBL_
     return value;
 }
 
+GBL_INLINE GblBool GblFlagsClass_valueCheck(const GblFlagsClass* pSelf, GblFlags value) GBL_NOEXCEPT {
+    return ((value | pSelf->valueMask) == pSelf->valueMask)? GBL_TRUE : GBL_FALSE;
+}
+
 // -------- GblFlags --------
 
 
@@ -129,6 +144,13 @@ GBL_INLINE GblFlags GblFlags_fromNick(const char* pNick, GblType type) GBL_NOEXC
 GBL_INLINE GblFlags GblFlags_fromNickQuark(GblQuark nick, GblType type) GBL_NOEXCEPT {
     GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
     GblFlags value = GblFlagsClass_valueFromNickQuark(pClass, nick);
+    GblClass_unref(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_INLINE GblFlags GblFlags_fromString(const char* pName, GblType type) GBL_NOEXCEPT {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlags value = GblFlagsClass_valueFromString(pClass, pName);
     GblClass_unref(GBL_CLASS(pClass));
     return value;
 }
@@ -162,6 +184,18 @@ GBL_INLINE GblBool GblFlags_check(GblFlags value, GblType type) GBL_NOEXCEPT {
     GblBool result = GblFlagsClass_valueCheck(pClass, value);
     GblClass_unref(GBL_CLASS(pClass));
     return result;
+}
+
+GBL_INLINE GBL_RESULT GblFlags_appendString(GblFlags value,
+                                            GblType type,
+                                            GblStringBuffer* pBuffer) GBL_NOEXCEPT
+{
+    GBL_API_BEGIN(NULL);
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GBL_API_CALL(GblFlagsClass_valueAppendString(pClass, value, pBuffer));
+    GblClass_unref(GBL_CLASS(pClass));
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_API_END();
 }
 
 

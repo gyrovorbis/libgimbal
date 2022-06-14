@@ -66,7 +66,7 @@ static GBL_RESULT flagsCompare_(const GblVariant* pVariant, const GblVariant* pO
     GBL_API_END();
 }
 
-static GBL_RESULT flagsConvert_(const GblVariant* pVariant, GblVariant* pOther) {
+static GBL_RESULT flagsConvertTo_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
     GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_peek(GblVariant_type(pVariant)));
     const GblType type = GblVariant_type(pOther);
@@ -97,8 +97,34 @@ static GBL_RESULT flagsConvert_(const GblVariant* pVariant, GblVariant* pOther) 
     } else if(type == GBL_INT64_TYPE) {
         GblVariant_setInt64(pOther, pVariant->flags);
     } else if(type == GBL_STRING_TYPE) {
-        GblVariant_setString(pOther, GblFlagsClass_nameFromValue(pFlagsClass, pVariant->flags));
+        struct {
+            GblStringBuffer str;
+            char extraSpace[512];
+        } buffer;
+
+        GBL_API_CALL(GblStringBuffer_construct(&buffer.str, GBL_STRV(""), sizeof(buffer)));
+        GBL_API_CALL(GblFlagsClass_valueAppendString(pFlagsClass, pVariant->flags, &buffer.str));
+
+        GBL_API_CALL(GblVariant_setString(pOther, GblStringBuffer_cString(&buffer.str)));
+
+        GBL_API_CALL(GblStringBuffer_destruct(&buffer.str));
     }
+    else
+        GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
+    GBL_API_END();
+}
+
+
+static GBL_RESULT flagsConvertFrom_(const GblVariant* pVariant, GblVariant* pOther) {
+    GBL_UNUSED(pVariant);
+    GBL_API_BEGIN(NULL);
+    const GblType type = GblVariant_type(pVariant);
+     GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_peek(GblVariant_type(pOther)));
+    if(type == GBL_STRING_TYPE)
+        GBL_API_CALL(GblVariant_setValueCopy(pOther,
+                                             GblVariant_type(pOther),
+                                             GblFlagsClass_valueFromString(pFlagsClass,
+                                                                           GblVariant_getString(pVariant))));
     else
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_API_END();
@@ -119,13 +145,9 @@ GBL_EXPORT GblFlags  GblFlagsClass_valueFromIndex(const GblFlagsClass* pSelf, ui
     return index < pSelf->entryCount? pSelf_->pEntries[index].value : 0;
 }
 
-GBL_INLINE GblBool GblFlagsClass_valueInRange_(const GblFlagsClass* pSelf, GblFlags value) {
-    return (value & pSelf->valueMask)? GBL_TRUE : GBL_FALSE;
-}
-
 GBL_EXPORT GblQuark GblFlagsClass_nameQuarkFromValue(const GblFlagsClass* pSelf, GblFlags value) {
     GblQuark quark = GBL_QUARK_INVALID;
-    if(GblFlagsClass_valueInRange_(pSelf, value)) {
+    if(GblFlagsClass_valueCheck(pSelf, value)) {
         for(uint16_t e = 0; e < pSelf->entryCount; ++e) {
             if(GblFlagsClass_valueFromIndex(pSelf, e) == value) {
                 quark = GblFlagsClass_nameQuarkFromIndex(pSelf, e);
@@ -138,7 +160,7 @@ GBL_EXPORT GblQuark GblFlagsClass_nameQuarkFromValue(const GblFlagsClass* pSelf,
 
 GBL_EXPORT GblQuark GblFlagsClass_nickQuarkFromValue(const GblFlagsClass* pSelf, GblFlags value) {
     GblQuark quark = GBL_QUARK_INVALID;
-    if(GblFlagsClass_valueInRange_(pSelf, value)) {
+    if(GblFlagsClass_valueCheck(pSelf, value)) {
         for(uint16_t e = 0; e < pSelf->entryCount; ++e) {
             if(GblFlagsClass_valueFromIndex(pSelf, e) == value) {
                 quark = GblFlagsClass_nickQuarkFromIndex(pSelf, e);
@@ -171,18 +193,42 @@ GBL_EXPORT GblFlags GblFlagsClass_valueFromNickQuark(const GblFlagsClass* pSelf,
     return value;
 }
 
-GBL_EXPORT GblBool GblFlagsClass_valueCheck(const GblFlagsClass* pSelf, GblFlags value) {
-    GblBool result = GBL_FALSE;
+GBL_EXPORT GblFlags GblFlagsClass_valueFromString(const GblFlagsClass* pClass, const char* pString) {
+    GBL_API_BEGIN(NULL);
+    GblFlags value = 0;
 
-    if(GblFlagsClass_valueInRange_(pSelf, value)) {
-        for(uint16_t e = 0; e < pSelf->entryCount; ++e) {
-            if(GblFlagsClass_valueFromIndex(pSelf, e) == value) {
-                result = GBL_TRUE;
-                break;
-            }
+    GblStringView view = GBL_STRV(pString);
+    GblFlagsClass* pSelf = GBL_FLAGS_CLASS(pClass);
+    GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pClass), GBL_FLAGS_TYPE);
+
+    for(uint16_t f = 0; f < pSelf->entryCount; ++f) {
+        if(GblStringView_contains(view, GBL_STRV(GblQuark_toString(pSelf_->pEntries[f].name)))) {
+            value |= pSelf_->pEntries[f].value;
         }
     }
-    return result;
+
+    GBL_API_END_BLOCK();
+    return value;
+}
+
+
+GBL_EXPORT GBL_RESULT GblFlagsClass_valueAppendString(const GblFlagsClass* pClass,
+                                                      GblFlags flags,
+                                                      GblStringBuffer* pStr)
+{
+    GBL_API_BEGIN(GblStringBuffer_context(pStr));
+    GblFlagsClass* pSelf = GBL_FLAGS_CLASS(pClass);
+    GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pClass), GBL_FLAGS_TYPE);
+
+    GblSize count = 0;
+    for(uint16_t f = 0; f < pSelf->entryCount; ++f) {
+        if(flags & pSelf_->pEntries[f].value) {
+            if(count++) GBL_API_CALL(GblStringBuffer_append(pStr, GBL_STRV("|")));
+            GBL_API_CALL(GblStringBuffer_append(pStr, GBL_STRV(GblQuark_toString(pSelf_->pEntries[f].name))));
+        }
+    }
+
+    GBL_API_END();
 }
 
 
@@ -193,7 +239,7 @@ static GBL_RESULT flagsClass_init_(GblClass* pClass,
     GBL_API_BEGIN(pCtx);
     GblFlagsClass*       pFlagsClass  = GBL_FLAGS_CLASS(pClass);
     GblFlagsClass_*      pFlagsClass_ = GblClass_private(pClass, GBL_FLAGS_TYPE);
-    const GblFlagsEntry* pEntries    = pUd;
+    const GblFlagEntry* pEntries    = pUd;
 
     // Initialize public/private members
     pFlagsClass->entryCount  = 0;
@@ -206,7 +252,7 @@ static GBL_RESULT flagsClass_init_(GblClass* pClass,
     } else {
 
         // Iterate over the data, determining entry count
-        const GblFlagsEntry* pCurEntry = &pEntries[0];
+        const GblFlagEntry* pCurEntry = &pEntries[0];
         while(pCurEntry->value || pCurEntry->pName || pCurEntry->pNick) {
             ++pFlagsClass->entryCount;
             ++pCurEntry;
@@ -247,7 +293,6 @@ GBL_RESULT GblFlags_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     const static GblIVariantIFaceVTable flagsIVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE        |
-                            GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT  |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY     |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY     |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
@@ -269,20 +314,23 @@ GBL_RESULT GblFlags_typeRegister_(GblContext* pCtx) {
                   &flagsIVariantIFace,
                   GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE);
 
-    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_BOOL_TYPE, flagsConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_UINT8_TYPE, flagsConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_UINT16_TYPE, flagsConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_INT16_TYPE, flagsConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_UINT32_TYPE, flagsConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_INT32_TYPE, flagsConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_UINT64_TYPE, flagsConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_INT64_TYPE, flagsConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_STRING_TYPE, flagsConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_BOOL_TYPE, flagsConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_UINT8_TYPE, flagsConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_UINT16_TYPE, flagsConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_INT16_TYPE, flagsConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_UINT32_TYPE, flagsConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_INT32_TYPE, flagsConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_UINT64_TYPE, flagsConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_INT64_TYPE, flagsConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_STRING_TYPE, flagsConvertTo_));
+
+    GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, flagsType, flagsConvertFrom_));
+
     GBL_API_END();
 }
 
 GBL_EXPORT GblType GblFlags_register(const char* pName,
-                                     const GblFlagsEntry* pValidEntries)
+                                     const GblFlagEntry* pValidEntries)
 {
     GblType type = GBL_INVALID_TYPE;
     GBL_API_BEGIN(NULL);

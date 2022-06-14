@@ -257,6 +257,13 @@ GBL_API GblEnum_test_variant_conversions(GblContext* pCtx) {
     GBL_VERIFY(GblStringView_equals(GblVariant_getStringView(&tVariant), GBL_STRV("BLUE")));
     GBL_VERIFY(GblVariant_equals(&variant, &tVariant));
 
+    // FROM String
+    GBL_API_VERIFY_CALL(GblVariant_setString(&tVariant, "BLUE"));
+    GBL_VERIFY(GblVariant_canConvert(GblVariant_type(&tVariant), GblVariant_type(&variant)));
+    GBL_API_VERIFY_CALL(GblVariant_convert(&tVariant, &variant));
+    GBL_API_VERIFY_CALL(GblVariant_equals(&tVariant, &variant));
+    GBL_COMPARE(GblVariant_getEnum(&variant), BLUE);
+
     GBL_API_VERIFY_CALL(GblVariant_destruct(&tVariant));
     GBL_API_VERIFY_CALL(GblVariant_destruct(&variant));
 

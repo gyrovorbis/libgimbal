@@ -66,7 +66,7 @@ static GBL_RESULT enumCompare_(const GblVariant* pVariant, const GblVariant* pOt
     GBL_API_END();
 }
 
-static GBL_RESULT enumConvert_(const GblVariant* pVariant, GblVariant* pOther) {
+static GBL_RESULT enumConvertTo_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
     GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_peek(GblVariant_type(pVariant)));
     const GblType type = GblVariant_type(pOther);
@@ -103,6 +103,22 @@ static GBL_RESULT enumConvert_(const GblVariant* pVariant, GblVariant* pOther) {
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_API_END();
 }
+
+static GBL_RESULT enumConvertFrom_(const GblVariant* pVariant, GblVariant* pOther) {
+    GBL_UNUSED(pVariant);
+    GBL_API_BEGIN(NULL);
+    const GblType type = GblVariant_type(pVariant);
+     GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_peek(GblVariant_type(pOther)));
+    if(type == GBL_STRING_TYPE)
+        GBL_API_CALL(GblVariant_setValueCopy(pOther,
+                                             GblVariant_type(pOther),
+                                             GblEnumClass_valueFromName(pEnumClass,
+                                                                        GblVariant_getString(pVariant))));
+    else
+        GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
+    GBL_API_END();
+}
+
 
 GBL_EXPORT GblQuark GblEnumClass_nameQuarkFromIndex(const GblEnumClass* pSelf, uint16_t index) GBL_NOEXCEPT {
     const GblEnumClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_ENUM_TYPE);
@@ -274,15 +290,18 @@ GBL_RESULT GblEnum_typeRegister_(GblContext* pCtx) {
                   &enumIVariantIFace,
                   GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE);
 
-    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_BOOL_TYPE, enumConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT8_TYPE, enumConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT16_TYPE, enumConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_INT16_TYPE, enumConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT32_TYPE, enumConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_INT32_TYPE, enumConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT64_TYPE, enumConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_INT64_TYPE, enumConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_STRING_TYPE, enumConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_BOOL_TYPE, enumConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT8_TYPE, enumConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT16_TYPE, enumConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_INT16_TYPE, enumConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT32_TYPE, enumConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_INT32_TYPE, enumConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT64_TYPE, enumConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_INT64_TYPE, enumConvertTo_));
+    GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_STRING_TYPE, enumConvertTo_));
+
+    GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, enumType, enumConvertFrom_));
+
     GBL_API_END();
 }
 
