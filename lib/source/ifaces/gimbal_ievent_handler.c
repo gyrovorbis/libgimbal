@@ -1,6 +1,6 @@
 #include <gimbal/ifaces/gimbal_ievent_handler.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/types/gimbal_quark.h>
+#include <gimbal/strings/gimbal_quark.h>
 
 GBL_API  GblIEventHandler_event(GblIEventHandler* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL); {

@@ -8,7 +8,7 @@
 #include "../ifaces/gimbal_ievent_handler.h"
 #include "../ifaces/gimbal_ievent_filter.h"
 #include "gimbal_property.h"
-#include "../types/gimbal_quark.h"
+#include "../strings/gimbal_quark.h"
 #include <gimbal/meta/gimbal_primitives.h>
 #include "../preprocessor/gimbal_atomics.h"
 #include "../containers/gimbal_array_map.h"
@@ -190,6 +190,11 @@ GBL_INLINE GBL_RESULT         GblObject_propertySetString   (SELF,  const char* 
 
 //GBL_INLINE GBL_RESULT         GblObject_propertyGetWithId   (CSELF, GblSize id, GblVariant* pValue)                             GBL_NOEXCEPT;
 //GBL_INLINE GBL_RESULT         GblObject_propertySetWithId   (SELF, GblSize id, const GblVariant* pValue)                        GBL_NOEXCEPT;
+
+//GBL_INLINE GblBool            GblObject_extFieldExists
+
+//GBL_INLINE GBL_RESULT         GblObject_extFieldSetUserdata     (CSELF, GblQuark quark, void* pUd, GblArrayMapDestructFn pDtor)     GBL_NOEXCEPT;
+//GBL_INLINE GBL_RESULT         GblObject_extFieldSetVariantCopy  (CSELF, GblQuark quark, GblVariant)
 
 GBL_EXPORT void*              GblObject_userdata            (CSELF)                                                             GBL_NOEXCEPT;
 GBL_EXPORT void               GblObject_userdataSet         (SELF, void* pUserdata)                                             GBL_NOEXCEPT;

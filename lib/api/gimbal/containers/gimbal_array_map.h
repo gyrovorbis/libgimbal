@@ -2,7 +2,7 @@
 #define GIMBAL_ARRAY_MAP_H
 
 #include "../types/gimbal_typedefs.h"
-#include "../types/gimbal_quark.h"
+#include "../strings/gimbal_quark.h"
 #include "../types/gimbal_variant.h"
 #include "../types/gimbal_result.h"
 

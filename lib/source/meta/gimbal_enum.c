@@ -1,6 +1,6 @@
 #include <gimbal/meta/gimbal_enum.h>
 #include <gimbal/meta/gimbal_variant.h>
-#include <gimbal/types/gimbal_string_buffer.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 
 typedef struct GblEnumEntry_ {
     GblEnum     value;

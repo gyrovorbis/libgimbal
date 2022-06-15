@@ -721,17 +721,6 @@ inline auto ScopeGuard<M, RAII>::end(void) -> ValueType {
 
     GBL_UNLIKELY if(delta != getExpectedDelta()) {
         Q_ASSERT(false);
-#if 0
-        this->getThread()->setCurrentCppExecutionContext(m_cppCtx);
-#if ELYSIAN_LUA_STACK_GUARD_OPTION == ELYSIAN_LUA_STACK_GUARD_LUA_ERROR
-        this->getThread()->error("INVALID STACK DELTA [Expected: %d, Actual: %d, Begin: %d, End: %d]", getExpectedDelta(), delta, this->getBeginValue(), this->getEndValue());
-#elif ELYSIAN_LUA_STACK_GUARD_OPTION == ELYSIAN_LUA_STACK_GUARD_LUA_WARNING
-        this->getThread()->warn("INVALID STACK DELTA [Expected: %d, Actual: %d, Begin: %d, End: %d]", getExpectedDelta(), delta, this->getBeginValue(), this->getEndValue());
-#elif ELYSIAN_LUA_STACK_GUARD_OPTION == ELYSIAN_LUA_STACK_GUARD_ASSERT
-    assert(false);
-#endif
-        this->getThread()->syncCppCallerContexts();
-#endif
     }
     return delta;
 }
@@ -745,22 +734,10 @@ inline auto ContextScopeGuard<M, RAII>::end(void) -> ValueType {
     GBL_UNLIKELY if(delta != this->getExpectedDelta()) {
 
         [&]() {
-            GBL_API_BEGIN(this->getContext());
+            GBL_API_BEGIN(static_cast<const GblContext*>(this->getContext()));
             GBL_API_VERIFY(delta == this->getExpectedDelta(), GBL_RESULT_ERROR_INTERNAL);
             GBL_API_END();
         }();
-
-#if 0
-        this->getThread()->setCurrentCppExecutionContext(m_cppCtx);
-#if ELYSIAN_LUA_STACK_GUARD_OPTION == ELYSIAN_LUA_STACK_GUARD_LUA_ERROR
-        this->getThread()->error("INVALID STACK DELTA [Expected: %d, Actual: %d, Begin: %d, End: %d]", getExpectedDelta(), delta, this->getBeginValue(), this->getEndValue());
-#elif ELYSIAN_LUA_STACK_GUARD_OPTION == ELYSIAN_LUA_STACK_GUARD_LUA_WARNING
-        this->getThread()->warn("INVALID STACK DELTA [Expected: %d, Actual: %d, Begin: %d, End: %d]", getExpectedDelta(), delta, this->getBeginValue(), this->getEndValue());
-#elif ELYSIAN_LUA_STACK_GUARD_OPTION == ELYSIAN_LUA_STACK_GUARD_ASSERT
-    assert(false);
-#endif
-        this->getThread()->syncCppCallerContexts();
-#endif
     }
     return delta;
 }

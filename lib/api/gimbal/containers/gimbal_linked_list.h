@@ -6,11 +6,11 @@
 #define SELF    GblLinkedListNode*  pSelf
 #define CSELF   const SELF
 
-GBL_DECLS_BEGIN
-
 #define GBL_LINKED_LIST_NPOS                            GBL_NPOS
 #define GBL_LINKED_LIST_NODE(name)                      GblLinkedListNode name = { .pNext = &name }
 #define GBL_LINKED_LIST_ENTRY(node, structure, field)   GBL_CONTAINER_OF(node, structure, field)
+
+GBL_DECLS_BEGIN
 
 typedef struct GblLinkedListNode {
     struct GblLinkedListNode* pNext;
@@ -206,14 +206,13 @@ GBL_INLINE void GblLinkedList_moveFront(SELF, GblLinkedListNode* pNode) GBL_NOEX
 
 GBL_INLINE void GblLinkedList_clear(SELF) GBL_NOEXCEPT {
     GblLinkedListNode* pPrev = pSelf;
-    for(GblLinkedListNode* pIt = pSelf->pNext;
-        pIt != pSelf;
-        pIt = pIt->pNext)
-    {
+    GblLinkedListNode* pIt = pSelf->pNext;
+
+    do {
         pPrev->pNext = pPrev;
         pPrev = pIt;
-    }
-    pSelf->pNext = pSelf;
+        pIt = pIt->pNext;
+    } while(pIt != pSelf);
 }
 
 

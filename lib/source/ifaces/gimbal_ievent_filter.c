@@ -1,6 +1,6 @@
 #include <gimbal/ifaces/gimbal_ievent_filter.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/types/gimbal_quark.h>
+#include <gimbal/strings/gimbal_quark.h>
 
 GBL_API GblIEventFilter_eventFilter(GblIEventFilter* pSelf, GblIEventHandler* pHandler, GblEvent* pEvent) {
     GBL_API_BEGIN(NULL); {

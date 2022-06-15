@@ -211,6 +211,9 @@ GBL_EXPORT GblClass* GblClass_ref(GblType type) GBL_NOEXCEPT {
     //GBL_API_PUSH_VERBOSE("Class::reference(%s)", GblType_name(GBL_TYPE_(pMeta)));
     GBL_TYPE_ENSURE_INITIALIZED_();
 
+    if(!GBL_ATOMIC_INT16_LOAD(pMeta->refCount))
+       GBL_API_VERIFY_CALL(GblType_refresh_(type));
+
     // Return existing reference to class data
     if(pMeta->pClass && GBL_CLASS_TYPE(pMeta->pClass) != GBL_INVALID_TYPE) {
         GBL_API_VERIFY_EXPRESSION(GBL_ATOMIC_INT16_LOAD(pMeta->refCount) ||
@@ -241,7 +244,10 @@ GBL_EXPORT GblClass* GblClass_peek(GblType type) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx_);
     GBL_API_VERIFY_ARG(type != GBL_INVALID_TYPE);
     GBL_API_VERIFY(pMeta->pClass, GBL_RESULT_ERROR_INVALID_OPERATION,
-                  "[GblType] gblClassPeek(%s): no class!", GblType_name(type));
+                  "[GblType] GblClass_peek(%s): no class!", GblType_name(type));
+    GBL_API_VERIFY(GBL_CLASS_TYPE_(pMeta->pClass) != GBL_INVALID_TYPE,
+                   GBL_RESULT_ERROR_INVALID_OPERATION,
+                   "Cannot peek into invalid class.");
     GBL_API_VERIFY(pMeta->refCount, GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Cannot peek into uninitialized class: %s", GblType_name(type));
     pClass = pMeta->pClass;

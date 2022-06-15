@@ -5,6 +5,7 @@
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/algorithms/gimbal_sort.h>
 #include <gimbal/ifaces/gimbal_ivariant.h>
+#include <gimbal/ifaces/gimbal_iplugin.h>
 
 GblContext*              pCtx_           = NULL;
 once_flag                initOnce_       = ONCE_FLAG_INIT;
@@ -362,6 +363,10 @@ static GBL_RESULT typeValidate_(GblType parent,
 
 }
 
+static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
+                                                   const GblTypeInfo* pInfo);
+
+
 static GblType typeRegister_(GblType parent,
                             const char* pName,
                             const GblTypeInfo* pInfo,
@@ -408,15 +413,8 @@ static GblType typeRegister_(GblType parent,
         }
 
         const GblSize classPrivateOffset  =  ((!pParent? 0 : pParent->classPrivateOffset) - pInfo->classPrivateSize);
-        const GblSize classTotalSize        = pInfo->classSize + -(classPrivateOffset) ;
 
-        GblSize metaSize = sizeof(GblMetaClass);
-        const GblSize typeInfoOffset    = metaSize;
-        const GblSize ifaceOffset       = metaSize += (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 0 : sizeof(GblTypeInfo);
-        const GblSize prereqOffset      = metaSize += (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 0 : sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount;
-        const GblSize classOffset       = metaSize += (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 0 : sizeof(GblType)                  * pInfo->dependencyCount;
-        const GblSize basesOffset       = metaSize += classTotalSize;
-        metaSize += baseCount * sizeof(GblMetaClass*);
+        GblSize metaSize = sizeof(GblMetaClass) + baseCount * sizeof(GblMetaClass*);
 
         const GblSize alignRem = (metaSize % GBL_META_CLASS_ALIGNMENT_);
         if(alignRem)
@@ -425,11 +423,6 @@ static GblType typeRegister_(GblType parent,
         GBL_API_PUSH_VERBOSE("MetaClass Info");
         GBL_API_VERBOSE("%-20s: %-100u", "total size",      metaSize);
         GBL_API_VERBOSE("%-20s: %-100u", "metaclass size",  sizeof(GblMetaClass));
-        GBL_API_VERBOSE("%-20s: %-100u", "typeinfo size",   prereqOffset - sizeof(GblMetaClass));
-        GBL_API_VERBOSE("%-20s: %-100u", "class size",      classTotalSize);
-        GBL_API_VERBOSE("%-20s: %-100u", "bases size",      baseCount * sizeof(GblMetaClass*));
-        GBL_API_VERBOSE("%-20s: %-100u", "align pad",       (GBL_META_CLASS_ALIGNMENT_ - (alignRem)));
-        GBL_API_VERBOSE("%-20s: %-100u", "depth",           baseCount);
         GBL_API_POP(2);
 
         GblMetaClass* pMeta = GBL_API_MALLOC(metaSize,
@@ -447,43 +440,22 @@ static GblType typeRegister_(GblType parent,
         pMeta->depth                = baseCount;
         pMeta->classPrivateOffset   = classPrivateOffset;
         pMeta->instancePrivateOffset= (!pParent? 0 : pParent->instancePrivateOffset) - pInfo->instancePrivateSize;
-        pMeta->pParent              = (struct GblMetaClass*)parent;
+        pMeta->pParent              = GBL_META_CLASS_(parent);
         pMeta->name                 = GblQuark_fromString(pName);
-        pMeta->pClass               = classTotalSize?
-                                            (GblClass*)((char*)pMeta + classOffset + -(classPrivateOffset)) : NULL;
-
-        if(flags & GBL_TYPE_FLAG_TYPEINFO_STATIC) {
-             pMeta->pInfo = pInfo;
-
-        } else { // Deep copy the GblTypeInfo structure
-
-            pMeta->pInfo = (const GblTypeInfo*)((char*)pMeta + typeInfoOffset);
-            memcpy((void*)pMeta->pInfo, pInfo, sizeof(GblTypeInfo));
-
-            if(pInfo->interfaceCount) {
-                ((GblTypeInfo*)pMeta->pInfo)->pInterfaceMap  =  (GblTypeInterfaceMapEntry*)((char*)pMeta + ifaceOffset);
-
-                memcpy((GblTypeInterfaceMapEntry*)pMeta->pInfo->pInterfaceMap,
-                       pInfo->pInterfaceMap,
-                       sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount);
-            }
-
-            if(pInfo->dependencyCount) {
-                ((GblTypeInfo*)pMeta->pInfo)->pDependencies  = (GblType*)((char*)pMeta + prereqOffset);
-
-                memcpy((GblType*)pMeta->pInfo->pDependencies,
-                       pInfo->pDependencies,
-                       sizeof(GblType*) * pInfo->dependencyCount);
-            }
-        }
-
-        pMeta->pBases = baseCount? (GblMetaClass**)((char*)pMeta + basesOffset) : NULL;
 
         pParentIt = pParent;
         baseCount = 0;
         while(pParentIt) {
             pMeta->pBases[pMeta->depth-(++baseCount)] = pParentIt;
             pParentIt = pParentIt->pParent;
+        }
+
+        if(flags & GBL_TYPE_FLAG_TYPEINFO_STATIC) {
+             pMeta->pInfo = pInfo;
+
+        } else {
+
+            GBL_API_VERIFY_EXPRESSION(GblType_updateTypeInfoClassChunk_(pMeta, pInfo));
         }
         GBL_API_VERIFY_EXPRESSION(baseCount == pMeta->depth);
 
@@ -512,6 +484,128 @@ static GblType typeRegister_(GblType parent,
     GBL_API_END_BLOCK();
     if(hasMutex) mtx_unlock(&typeRegMtx_);
     return newType;
+}
+
+extern GBL_RESULT GblType_refresh_(GblType type) {
+    GBL_API_BEGIN(pCtx_);
+    if(type != GBL_INVALID_TYPE) {
+        GblMetaClass* pMeta   = GBL_META_CLASS_(type);
+
+        if(!pMeta->pClass || pMeta->pPlugin) {
+
+            // not sure if needed
+            //GBL_API_VERIFY_CALL(GblType_refresh_(GBL_TYPE_(pMeta->pParent)));
+
+
+            GblTypeInfo info;
+            if(pMeta->pPlugin) {
+                GblIPluginIFace* pIPluginIFace = GBL_IPLUGIN_GET_IFACE(pMeta->pPlugin);
+                pIPluginIFace->pFnTypeInfo(pMeta->pPlugin, type, &info);
+                GBL_API_VERIFY_CALL(GblType_updateTypeInfoClassChunk_(pMeta, &info));
+            } else {
+                GblType_updateTypeInfoClassChunk_(pMeta, pMeta->pInfo);
+            }
+        }
+    }
+
+    GBL_API_END();
+}
+
+/*  DATA CHUNK LAYOUT
+ *
+ *  1) TypeInfo Struct   ----++
+ *  2) Interface Table        | TypeInfo subchunk
+ *  3) Dependency Table  -----+
+ *  4) Private class data  ---+  Class subchunk
+ *  5) Public class data   ---+
+ */
+// NOT THREAD SAFE AT ALL YET
+static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
+                                                   const GblTypeInfo* pInfo)
+{
+    GBL_API_BEGIN(pCtx_);
+
+    GBL_API_VERBOSE("[GblType] Refreshing TypeInfo/Class Data Chunk: [%s]", GblQuark_toString(pMeta->name));
+
+    // Determine where the pointer to the previous chunk is and free it.
+    if(pMeta->pInfo && !(pMeta->flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)) {
+        GBL_API_FREE((void*)pMeta->pInfo);
+        pMeta->pInfo = NULL;
+        pMeta->pClass = NULL;
+    } else if(pMeta->pClass) {
+        GBL_API_FREE((uint8_t*)pMeta->pClass + pMeta->classPrivateOffset);
+        pMeta->pClass = NULL;
+    }
+
+    // update metaclass class/instance info
+/*
+    if(!pMeta->pParent) {
+        pMeta->instancePrivateOffset    = 0;
+        pMeta->classPrivateOffset       = 0;
+    }*/
+/*else {
+        pMeta->instancePrivateOffset    = pMeta->pParent->instancePrivateOffset - pInfo->instancePrivateSize;
+        pMeta->classPrivateOffset       = pMeta->pParent->classPrivateOffset    - pInfo->classPrivateSize;
+    }
+*/
+    // Calculate sizes and offsets for chunk and subchunks contained within it
+    GblSize chunkSize               = 0;
+    GblSize ifaceOffset             = 0;
+    GblSize prereqOffset            = 0;
+
+    // Only include typeinfo within the chunk if it isn't statically allocated
+    if(!(pMeta->flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)) {
+        ifaceOffset  =  chunkSize += sizeof(GblTypeInfo);
+        prereqOffset =  chunkSize += sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount;
+                        chunkSize += sizeof(GblType)                  * pInfo->dependencyCount;
+    }
+
+    // Class subchunk is private struct data followed by public struct data
+    const GblSize classPublicOffset = chunkSize += -pMeta->classPrivateOffset;
+    const GblSize classTotalSize    = pInfo->classSize + -(pMeta->classPrivateOffset);
+    chunkSize += classTotalSize;
+
+    // Log stats so we can optimize
+    GBL_API_PUSH_VERBOSE("TypeInfoClass Chunk Info");
+    GBL_API_VERBOSE("%-20s: %-100u", "total size",      chunkSize);
+    GBL_API_VERBOSE("%-20s: %-100u", "TypeInfo size",   sizeof(GblTypeInfo));
+    GBL_API_VERBOSE("%-20s: %-100u", "Interface size",  sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount);
+    GBL_API_VERBOSE("%-20s: %-100u", "Class size",      classTotalSize);
+    GBL_API_POP(1);
+
+    // Allocate and set chunk data
+    uint8_t* pChunk = GBL_API_MALLOC(chunkSize);
+    memset(pChunk, 0, chunkSize);
+
+    // Typeinfo subchunk is only in when non-static
+    if(!(pMeta->flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)) {
+
+        // Copy outer typeinfo struct
+        pMeta->pInfo    = (const GblTypeInfo*)pChunk;
+        memcpy((void*)pMeta->pInfo, pInfo, sizeof(GblTypeInfo));
+
+        // copy interface tables
+        if(pInfo->interfaceCount) {
+            ((GblTypeInfo*)pMeta->pInfo)->pInterfaceMap  =  (GblTypeInterfaceMapEntry*)((char*)pChunk + ifaceOffset);
+
+            memcpy((GblTypeInterfaceMapEntry*)pMeta->pInfo->pInterfaceMap,
+                   pInfo->pInterfaceMap,
+                   sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount);
+        }
+
+        // copy dependency tables
+        if(pInfo->dependencyCount) {
+            ((GblTypeInfo*)pMeta->pInfo)->pDependencies  = (GblType*)((char*)pChunk + prereqOffset);
+
+            memcpy((GblType*)pMeta->pInfo->pDependencies,
+                   pInfo->pDependencies,
+                   sizeof(GblType*) * pInfo->dependencyCount);
+        }
+    }
+
+    // set metaclass's class pointer to class subchunk
+    pMeta->pClass   = classTotalSize > 0? (GblClass*)(uint8_t*)(pChunk + classPublicOffset) : NULL;
+    GBL_API_END();
 }
 
 static GBL_RESULT GblType_registerBuiltins_(void) {
@@ -877,7 +971,7 @@ GBL_EXPORT const GblTypeInfo* GblType_info(GblType type) {
     const GblTypeInfo* pInfo      = NULL;
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
-    if(pMeta) pInfo = &pMeta->pInfo;
+    if(pMeta) pInfo = pMeta->pInfo;
     GBL_API_END_BLOCK();
     return pInfo;
 }

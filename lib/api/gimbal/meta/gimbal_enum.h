@@ -2,7 +2,7 @@
 #define GIMBAL_ENUM_H
 
 #include "gimbal_primitives.h"
-#include "../types/gimbal_quark.h"
+#include "../strings/gimbal_quark.h"
 
 #define GBL_ENUM_TYPE                       (GBL_BUILTIN_TYPE(ENUM))
 #define GBL_ENUM_CLASS_STRUCT               GblEnumClass

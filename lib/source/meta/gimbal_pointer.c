@@ -1,6 +1,6 @@
 #include <gimbal/meta/gimbal_pointer.h>
 #include <gimbal/meta/gimbal_variant.h>
-#include <gimbal/types/gimbal_string_buffer.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 
 static GBL_RESULT pSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_API_BEGIN(NULL);

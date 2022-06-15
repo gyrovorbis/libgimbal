@@ -1,5 +1,5 @@
 #include <gimbal/ifaces/gimbal_iplugin.h>
-#include <gimbal/types/gimbal_quark.h>
+#include <gimbal/strings/gimbal_quark.h>
 
 GBL_RESULT GblIPlugin_typeInfo_(const GblIPlugin* pSelf, GblType type, GblTypeInfo* pInfo) {
     GBL_UNUSED(pSelf);

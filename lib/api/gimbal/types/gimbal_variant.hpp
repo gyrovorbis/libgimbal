@@ -4,7 +4,7 @@
 
 #include "gimbal_variant.h"
 #include "gimbal_typedefs.hpp"
-#include "gimbal_string.hpp"
+#include "../strings/gimbal_string.hpp"
 #include "../meta/gimbal_type.hpp"
 
 namespace gimbal {
@@ -146,10 +146,10 @@ concept variant_compatible =
         GBL_ENUM_TABLE_DECLARE_CPP(GBL_META_VARIANT_OP_CMP_TYPE_TABLE);
         using OpCmpType = VariantOpCmpType;
 
-        Variant(void) { Exception::checkThrow(gblVariantConstruct(this)); }
+        Variant(void) { Exception::checkThrow(GblVariant_construct(this)); }
 
         Variant(Type type){
-            Exception::checkThrow(gblVariantConstructt(this, type));
+            Exception::checkThrow(GblVariant_constructTypeValue(this, type));
         }
 
         Variant(std::nullptr_t):
@@ -169,9 +169,9 @@ concept variant_compatible =
             requires std::is_convertible_v<V, GblVariant>
         Variant(V&& rhs) {
             if constexpr(std::is_lvalue_reference_v<decltype(rhs)>) {
-                Exception::checkThrow(gblVariantConstruct(this, static_cast<const GblVariant*>(&rhs)));
+                Exception::checkThrow(GblVariant_constructCopy(this, static_cast<const GblVariant*>(&rhs)));
             } else if constexpr(std::is_rvalue_reference_v<decltype(rhs)>) {
-                Exception::checkThrow(gblVariantConstructMove(this, static_cast<GblVariant*>(&rhs)));
+                Exception::checkThrow(GblVariant_constructMove(this, static_cast<GblVariant*>(&rhs)));
             }
         }
 #if 1
@@ -187,7 +187,7 @@ concept variant_compatible =
         }
 #endif
 
-        ~Variant(void) { Exception::checkThrow(gblVariantDestruct(this)); }
+        ~Variant(void) { Exception::checkThrow(GblVariant_destruct(this)); }
 
          Type getType(void) const noexcept { return type; }
 

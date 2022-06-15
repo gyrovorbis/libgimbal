@@ -4,7 +4,7 @@
 #include "../meta/gimbal_type.h"
 #include "../meta/gimbal_class.h"
 #include "../meta/gimbal_instance.h"
-#include "../types/gimbal_quark.h"
+#include "../strings/gimbal_quark.h"
 #include "../containers/gimbal_linked_list.h"
 
 #define GBL_PROPERTY_TYPE                   GblProperty_type()
@@ -154,7 +154,6 @@ GBL_EXPORT GblSize            GblProperty_id                (CSELF)             
 GBL_EXPORT GblFlags           GblProperty_flags             (CSELF)                                 GBL_NOEXCEPT;
 GBL_EXPORT const char*        GblProperty_nick              (CSELF)                                 GBL_NOEXCEPT;
 GBL_EXPORT const char*        GblProperty_description       (CSELF)                                 GBL_NOEXCEPT;
-
 
 GBL_API                       gblPropertyTableInitialize    (GblContext* pCtx,
                                                              GblSize initialCapacity)               GBL_NOEXCEPT;

@@ -1,6 +1,6 @@
 #include <gimbal/objects/gimbal_event.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/types/gimbal_quark.h>
+#include <gimbal/strings/gimbal_quark.h>
 
 
 extern GBL_RESULT GblEvent_typeRegister_(GblEvent* pCtx) GBL_NOEXCEPT {

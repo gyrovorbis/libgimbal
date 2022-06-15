@@ -30,6 +30,15 @@ extern "C" {
         vsnprintf(buffer, sizeof(buffer), pFormat, argptr); \
     va_end(argptr)
 
+#define GBL_SWAP(x,y)                                       \
+    GBL_STMT_START {                                        \
+        unsigned char swap_temp[sizeof(x) == sizeof(y) ?    \
+                               (signed)sizeof(x) : -1];     \
+        memcpy(swap_temp,&y,sizeof(x));                     \
+        memcpy(&y,&x,       sizeof(x));                     \
+        memcpy(&x,swap_temp,sizeof(x));                     \
+    } GBL_STMT_END
+
 // ===== FLAGS ======
 
 /* A mask with x least-significant bits set, possibly 0 or >=32, PPC and endian-safe!

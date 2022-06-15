@@ -1,6 +1,6 @@
 #include <gimbal/ifaces/gimbal_iallocator.h>
 #include <gimbal/meta/gimbal_instance.h>
-#include <gimbal/types/gimbal_quark.h>
+#include <gimbal/strings/gimbal_quark.h>
 
 static GBL_RESULT GblIAllocatorIFace_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GBL_UNUSED(pIAllocator);

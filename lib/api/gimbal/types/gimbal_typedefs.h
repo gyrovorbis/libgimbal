@@ -22,7 +22,6 @@ typedef GBL_UINT                        GblUint;
 typedef GBL_ENUM                        GblEnum;
 typedef GBL_FLAGS                       GblFlags;
 typedef GBL_HASH                        GblHash;
-typedef GBL_CMP_RESULT                  GblCmpResult;
 typedef uintptr_t                       GblType;
 typedef uintptr_t                       GblQuark;
 typedef uint16_t                        GblRefCount;

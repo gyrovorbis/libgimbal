@@ -21,11 +21,15 @@
 GBL_DECLS_BEGIN
 
 typedef struct GblIPluginIFace {
-    GBL_RESULT (*pFnUse)        (SELF);
-    GBL_RESULT (*pFnUnuse)      (SELF);
-    GBL_RESULT (*pFnTypeInfo)   (CSELF,
-                                 GblType        dynamicType,
-                                 GblTypeInfo*   pCompleteInfo);
+    GBL_RESULT (*pFnUse)            (SELF);
+    GBL_RESULT (*pFnUnuse)          (SELF);
+    GBL_RESULT (*pFnTypeInfo)       (CSELF,
+                                     GblType        dynamicType,
+                                     GblTypeInfo*   pCompleteInfo);
+    GBL_RESULT (*pFnInterfacePeek)  (CSELF,
+                                     GblType        dynamicType,
+                                     GblType        ifaceType,
+                                     GblInterface** ppInterface);
 } GblIPluginIFace;
 
 GBL_EXPORT GblType    GblIPlugin_type        (void)                 GBL_NOEXCEPT;

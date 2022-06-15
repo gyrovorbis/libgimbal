@@ -1,6 +1,6 @@
 #include <gimbal/ifaces/gimbal_ilogger.h>
 #include <gimbal/meta/gimbal_instance.h>
-#include <gimbal/types/gimbal_quark.h>
+#include <gimbal/strings/gimbal_quark.h>
 
 
 static GBL_RESULT GblILoggerIFace_pop_(GblILogger* pILogger, const GblStackFrame* pFrame, uint32_t count) GBL_NOEXCEPT {

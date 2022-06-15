@@ -5,7 +5,7 @@
 #include "../meta/gimbal_variant.h"
 #include "../types/gimbal_typedefs.h"
 #include <stdint.h>
-#include "../types/gimbal_string_buffer.h"
+#include "../strings/gimbal_string_buffer.h"
 
 #define SELF    GblVariant* pSelf
 #define CSELF   const SELF

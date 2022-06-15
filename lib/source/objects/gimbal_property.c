@@ -1,7 +1,7 @@
 #include <gimbal/objects/gimbal_property.h>
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
-#include <gimbal/types/gimbal_quark.h>
+#include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/objects/gimbal_object.h>
 #include <gimbal/meta/gimbal_primitives.h>
 

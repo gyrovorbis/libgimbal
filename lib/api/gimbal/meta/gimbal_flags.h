@@ -2,7 +2,7 @@
 #define GIMBAL_FLAGS_H
 
 #include "gimbal_primitives.h"
-#include "../types/gimbal_quark.h"
+#include "../strings/gimbal_quark.h"
 
 #define GBL_FLAGS_TYPE                      (GBL_BUILTIN_TYPE(FLAGS))
 #define GBL_FLAGS_CLASS_STRUCT              GblFlagsClass

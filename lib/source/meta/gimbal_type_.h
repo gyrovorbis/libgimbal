@@ -4,7 +4,7 @@
 #include <gimbal/meta/gimbal_type.h>
 #include <gimbal/containers/gimbal_vector.h>
 #include <gimbal/containers/gimbal_hash_set.h>
-#include <gimbal/types/gimbal_quark.h>
+#include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/preprocessor/gimbal_atomics.h>
 #ifdef _WIN32
 #   define NOGDI
@@ -66,7 +66,7 @@ typedef struct GblMetaClass {
     uint8_t                 depth;
     int16_t                 classPrivateOffset;
     int16_t                 instancePrivateOffset;
-    struct GblMetaClass**   pBases;
+    struct GblMetaClass*    pBases[];
 } GblMetaClass;
 
 
@@ -84,6 +84,7 @@ extern struct TypeBuiltins_ {
 
 
 extern void         GblType_init_(void);
+extern GBL_RESULT   GblType_refresh_(GblType type);
 
 extern GBL_RESULT   GblVariant_init_                  (GblContext* pCtx);
 extern GBL_RESULT   GblVariant_final_                 (GblContext* pCtx);

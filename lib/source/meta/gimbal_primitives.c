@@ -2,9 +2,9 @@
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/ifaces/gimbal_ivariant.h>
 #include <gimbal/meta/gimbal_variant.h>
-#include <gimbal/types/gimbal_string_buffer.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/types/gimbal_variant.h>
-#include <gimbal/types/gimbal_quark.h>
+#include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/meta/gimbal_pointer.h>
 #include <inttypes.h>
 
