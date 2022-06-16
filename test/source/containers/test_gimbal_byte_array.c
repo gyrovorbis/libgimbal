@@ -206,7 +206,7 @@ GBL_API GblByteArray_test_acquire_release(GblContext* pCtx) {
     GBL_API_VERIFY_CALL(GblByteArray_release(pByteArray1_, &size, (void**)&pBuffer));
     GBL_COMPARE(size, strv.length+1);
     GBL_VERIFY(strcmp(pBuffer, "Megaman") == 0);
-    free(pBuffer);
+    GBL_ALIGNED_FREE(pBuffer);
 
     GBL_API_END();
 }
