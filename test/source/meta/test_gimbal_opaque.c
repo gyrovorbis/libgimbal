@@ -1,6 +1,6 @@
 #include "meta/test_gimbal_opaque.h"
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_variant.h>
 
 static GblType opaqueType_ = GBL_INVALID_TYPE;
 

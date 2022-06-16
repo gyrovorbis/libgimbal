@@ -173,7 +173,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_thread.h
     api/gimbal/core/gimbal_thread.hpp
     api/gimbal/types/gimbal_typedefs.hpp
-    api/gimbal/types/gimbal_variant.hpp
     api/gimbal/ifaces/gimbal_iplugin.h
     api/gimbal/containers/gimbal_vector.h
     api/gimbal/algorithms/gimbal_sort.h
@@ -198,7 +197,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/types/gimbal_closure.h
     api/gimbal/objects/gimbal_property.h
     api/gimbal/ifaces/gimbal_itable.h
-    api/gimbal/meta/gimbal_variant.h
     api/gimbal/types/gimbal_version.h
     api/gimbal/strings/gimbal_string.hpp
     api/gimbal/objects/gimbal_context.hpp
@@ -213,7 +211,6 @@ add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}
     ${GIMBAL_INCLUDES})
 
-add_subdirectory(lib/interface99)
 add_subdirectory(lib/tinycthread)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -221,7 +218,7 @@ find_package(Threads REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-target_link_libraries(libGimbal interface99 tinycthread Threads::Threads)
+target_link_libraries(libGimbal tinycthread Threads::Threads)
 
 #set_property(TARGET libGimbal PROPERTY C_STANDARD 11)
 #set_property(TARGET libGimbal PROPERTY C_STANDARD_REQUIRED ON)

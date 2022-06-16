@@ -1,680 +1,749 @@
-﻿#ifndef GIMBAL_VARIANT__H
-#define GIMBAL_VARIANT__H
+#ifndef GIMBAL_VARIANT_H
+#define GIMBAL_VARIANT_H
 
-#include "../ifaces/gimbal_ivariant.h"
-#include "../meta/gimbal_variant.h"
 #include "../types/gimbal_typedefs.h"
-#include <stdint.h>
-#include "../strings/gimbal_string_buffer.h"
+#include "../core/gimbal_api_frame.h"
+#include "../strings/gimbal_string_ref.h"
+#include "../meta/gimbal_primitives.h"
+#include "../meta/gimbal_enum.h"
+#include "../meta/gimbal_flags.h"
+#include "../meta/gimbal_pointer.h"
+#include "../meta/gimbal_boxed.h"
+
+#define GBL_VARIANT_INIT    { .type = GBL_INVALID_TYPE }
+#define GBL_VARIANT(name)   GblVariant name = GBL_VARIANT_INIT
 
 #define SELF    GblVariant* pSelf
 #define CSELF   const SELF
 
 GBL_DECLS_BEGIN
 
+typedef GBL_RESULT (*GblVariantConverterFn)(CSELF, GblVariant* pOther);
 
-#define GBL_META_VARIANT_OP_CMP_TYPE_TABLE (                                                        \
-        ( GBL_VARIANT_OP_CMP_TYPE, VariantOpCmpType, "Comparison operator type for Variants", gblVariantOpCmpTypeString),      \
-        (                                                                                           \
-            (GBL_VARIANT_OP_CMP_EQUAL,      0x0,    Equal,          "Equal"),                       \
-            (GBL_VARIANT_OP_CMP_NEQUAL,     0x1,    NotEqual,       "Not Equal"),                   \
-            (GBL_VARIANT_OP_CMP_LESS,       0x2,    Less,           "Less Than"),                   \
-            (GBL_VARIANT_OP_CMP_LEQUAL,     0x3,    LessOrEqual,    "Less Than Or Equal"),          \
-            (GBL_VARIANT_OP_CMP_GREATER,    0x4,    Greater,        "Greater Than"),                \
-            (GBL_VARIANT_OP_CMP_GEQUAL,     0x5,    GreaterOrEqual, "Greater Than or Equal"),       \
-            (GBL_VARIANT_OP_CMP_COUNT,      0x6,    BuiltinCount,   "Builtin comparison opCount")   \
-        )                                                                                           \
-    )
-
-GBL_ENUM_TABLE_DECLARE(GBL_META_VARIANT_OP_CMP_TYPE_TABLE);
-
-
-#define GBL_VARIANT_CONSTRUCT_TRAITS (                           \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,                       \
-        (                                                        \
-            (GblBool,                gblVariantConstructb),      \
-            (GblInt,                 gblVariantConstructi),      \
-            (GblUint,                gblVariantConstructu),      \
-            (GblFloat,               gblVariantConstructf),      \
-            (void*,                  gblVariantConstructp),      \
-            (const GblStringBuffer*, gblVariantConstructs),      \
-            (GblStringBuffer*,       gblVariantConstructs),      \
-            (const char*,            gblVariantConstructc),      \
-            (char*,                  gblVariantConstructc),      \
-            (const GblVariant*,      gblVariantConstructCopy)    \
-        )                                                        \
-    )
-#define gblVariantConstruct_N(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
-#define gblVariantConstruct_1(pVariant)     gblVariantConstructDefault(pVariant)
-#define gblVariantConstruct(...)            GBL_VA_OVERLOAD_CALL(gblVariantConstruct, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
-
-#define gblVariantSetc(...) GBL_VA_OVERLOAD_CALL(gblVariantSetc, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
-
-#define GBL_VARIANT_SET_TRAITS (                    \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,          \
-        (                                           \
-            (GblBool,           gblVariantSetb),    \
-            (GblInt,            gblVariantSeti),    \
-            (GblFloat,          gblVariantSetf),    \
-            (void*,             gblVariantSetp),    \
-            (const GblStringBuffer*,  gblVariantSets),    \
-            (GblStringBuffer*,        gblVariantSets),    \
-            (const char*,       gblVariantSetc_2),  \
-            (char*,             gblVariantSetc_2)   \
-        )                                           \
-    )
-#define gblVariantSet(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_SET_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
-
-
-#define GBL_VARIANT_MOVE_TRAITS (                    \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,        \
-        (                                           \
-            (GblVariant*,       gblVariantMovev),    \
-            (GblStringBuffer*,        gblVariantMoves)    \
-        )                                           \
-    )
-#define gblVariantMove(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_MOVE_TRAITS, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
-
-
-
-#define GBL_VARIANT_GET_TRAITS (                    \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,          \
-        (                                           \
-            (GblBool*,          gblVariantGetb),    \
-            (GblInt*,           gblVariantGeti),    \
-            (GblFloat*,         gblVariantGetf),    \
-            (void**,            gblVariantGetp),    \
-            (const GblStringBuffer**, gblVariantGets),    \
-            (const char**,      gblVariantGetc)     \
-        )                                           \
-    )
-#define gblVariantGet(pVariant, pValue) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_GET_TRAITS, pValue)(pVariant, pValue)
-
-#define GBL_VARIANT_TO_TRAITS (                 \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,      \
-        (                                       \
-            (GblBool*,      gblVariantTob),     \
-            (GblInt*,       gblVariantToi),     \
-            (GblFloat*,     gblVariantTof),     \
-            (void**,        gblVariantTop),     \
-            (GblStringBuffer*,    gblVariantTos),     \
-            (const char**,  gblVaraintToc)      \
-        )                                       \
-    )
-
-#define GBL_VARIANT_COMPARE_TRAITS (                    \
-        GBL_META_GENERIC_MACRO_NO_DEFAULT,              \
-        (                                               \
-            (GblBool,           gblVariantCompareb),    \
-            (GblInt,            gblVariantComparei),    \
-            (GblFloat,          gblVariantComparef),    \
-            (const void*,       gblVariantComparep),    \
-            (void*,             gblVariantComparep),    \
-            (const GblStringBuffer*,  gblVariantCompares),    \
-            (GblStringBuffer*,        gblVariantCompares),    \
-            (const GblVariant*, gblVariantComparev),    \
-            (GblVariant*,       gblVariantComparev),    \
-            (const char*,       gblVariantComparec),    \
-            (char*,             gblVariantComparec)     \
-        )                                               \
-    )
-
-
-
-#define gblVariantTo(pVariant, value) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_TO_TRAITS, value)(pVariant, value)
-#define gblVariantCompare(pVariant, rhs, op, result) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_COMPARE_TRAITS, rhs)(pVariant, rhs, op, result)
-
-#if 0
-GBL_INLINE GBL_API gblVariantTypeSet(GblVariant* pVariant, GblType type) {
-    GBL_API_BEGIN(GBL_NULL);
-    // FREE/RELEASE SHIT IF REFERENCE TYPE
-    if(pVariant->type && pVariant->type != type) {
-        GblVariant_destruct(pVariant);
-    }
-    pVariant->type = type;
-    GBL_API_END();
-}
-#endif
-
-// Top-level Utilities
-GBL_INLINE GBL_API gblVariantTypeGet(const GblVariant* pVariant, GblType* pType) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pType);
-    *pType = pVariant->type;
-    GBL_API_END();
-}
-
-
-// Get (Actual) Value
-GBL_INLINE GBL_API gblVariantGetb(const GblVariant* pVariant, GblBool* pValue) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pValue);
-    GBL_API_VERIFY_TYPE(pVariant->type, GBL_BOOL_TYPE);
-    GBL_API_CALL(GblVariant_getValueCopy(pVariant, pValue));
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantGeti(const GblVariant* pVariant,    GblInt*      pValue) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pValue);
-    GBL_API_VERIFY_TYPE(pVariant->type, GBL_INT32_TYPE);
-    GBL_API_CALL(GblVariant_getValueCopy(pVariant, pValue));
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantGetf(const GblVariant* pVariant,    GblFloat*    pValue) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pValue);
-    GBL_API_VERIFY_TYPE(pVariant->type, GBL_FLOAT_TYPE);
-    GBL_API_CALL(GblVariant_getValueCopy(pVariant, pValue));
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantGetp(const GblVariant* pVariant,    void**     pValue) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pValue);
-    GBL_API_VERIFY_TYPE(pVariant->type, GBL_POINTER_TYPE);
-    GBL_API_CALL(GblVariant_getValueCopy(pVariant, pValue));
-    GBL_API_END();
-}
-
-#if 0
-GBL_INLINE GBL_API gblVariantGets(const GblVariant* pVariant,  const GblStringBuffer** pString) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pString);
-    GBL_API_VERIFY_TYPE(pVariant->type, GBL_STRING_TYPE);
-    *pString = NULL//&pVariant->string;
-    GBL_API_END();
-}
-#endif
-
-GBL_INLINE GBL_API gblVariantGetc(const GblVariant* pVariant, const char** ppStr) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_TYPE(pVariant->type, GBL_STRING_TYPE);
-    GBL_API_CALL(GblVariant_getValuePeek(pVariant, ppStr));
-    GBL_API_END();
-}
-
-// Set Value
-GBL_INLINE GBL_API gblVariantSetNil(GblVariant* pVariant) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_NIL_TYPE));
-    //GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_NIL_TYPE));
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantSetb(GblVariant* pVariant,    GblBool     value) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_BOOL_TYPE, value));
-    //GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_BOOL_TYPE));
-    //pVariant->boolean = value;
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantSeti(GblVariant* pVariant,    GblInt      value) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_INT32_TYPE, value));
-    //GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_INT32_TYPE));
-    //pVariant->i32 = value;
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantSetf(GblVariant* pVariant,    GblFloat       value) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_FLOAT_TYPE, value));
-//    GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_FLOAT_TYPE));
-//    pVariant->f32 = value;
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantSetp(GblVariant* pVariant,    void*       pValue) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_POINTER_TYPE, pValue));
-    //GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_POINTER_TYPE));
-    //pVariant->pVoid = pValue;
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantSets(GblVariant* pVariant, const GblStringBuffer* pString) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pString);
-
-
-    GBL_API_CALL(GblVariant_setValueCopy(pVariant,
-                                         GBL_STRING_TYPE,
-                                         GblStringBuffer_cString(pString),
-                                         GblStringBuffer_length(pString),
-                                         GblStringBuffer_context(pString)));
-#if 0
-    view.pBuffer = pString->data.pBuffer; view.length = pString->data.size;
-    if(pVariant->type != GBL_STRING_TYPE) {
-        GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_STRING_TYPE));
-        GBL_API_CALL(GblStringBuffer_construct(&pVariant->string, sizeof(GblStringBuffer), pString->data.hCtx, &view));
-    } else {
-        GBL_API_CALL(GblStringBuffer_assign(&pVariant->string, &view));
-    }
-#endif
-    GBL_API_END();
-}
-
-
-GBL_INLINE GBL_API gblVariantSetc_3(GblVariant* pVariant, const char* pString, GblContext* pCtx) {
-    GBL_API_BEGIN(GBL_NULL);
-    GblStringView view;
-    GBL_API_VERIFY_POINTER(pVariant);
-
-    GBL_API_CALL(GblVariant_setValueCopy(pVariant, GBL_STRING_TYPE, pString, 0, pCtx));
-    /*
-    view.pBuffer = pString; view.length = 0;
-    if(pVariant->type != GBL_STRING_TYPE) {
-        GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_STRING_TYPE));
-        GBL_API_CALL(GblStringBuffer_construct(&pVariant->string, sizeof(GblStringBuffer), hCtx, &view));
-    } else {
-        GBL_API_CALL(GblStringBuffer_assign(&pVariant->string, &view));
-    }*/
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantSetc_2(GblVariant* pVariant, const char* pString) {
-    return gblVariantSetc_3(pVariant, pString, GBL_NULL);
-}
-
-
-// (MAYBE) Convert Value
-
-// Get (Actual) Value
-GBL_INLINE GBL_API gblVariantTob(const GblVariant* pVariant, GblBool* pValue) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pValue);
-    {
-        const GblType type = GblVariant_type(pVariant);
-        if(type == GBL_BOOL_TYPE)           *pValue = pVariant->boolean;
-        else if(type == GBL_INT32_TYPE)     *pValue = pVariant->i32? GBL_TRUE : GBL_FALSE;
-        else if(type == GBL_FLOAT_TYPE)     *pValue = pVariant->f32 != 0.0f? GBL_TRUE : GBL_FALSE;
-        else if(type == GBL_POINTER_TYPE)   *pValue = pVariant->pVoid? GBL_TRUE : GBL_FALSE;
-        else if(type == GBL_STRING_TYPE)    *pValue = GblStringView_toBool(GBL_STRV(pVariant->pString));
-        else *pValue = GBL_FALSE;
-    }
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantToi(const GblVariant* pVariant,    GblInt*      pValue) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pValue);
-    {
-        const GblType type = GblVariant_type(pVariant);
-        if(type == GBL_BOOL_TYPE)           *pValue = pVariant->boolean? 1 : 0;
-        else if(type == GBL_INT32_TYPE)     *pValue = pVariant->i32;
-        else if(type == GBL_FLOAT_TYPE)     *pValue = (GblInt)pVariant->f32;
-        else if(type == GBL_POINTER_TYPE)   *pValue = (uintptr_t)pVariant->pVoid;
-        else if(type ==GBL_STRING_TYPE)     *pValue = GblStringView_toInt(GBL_STRV(pVariant->pString));
-        else *pValue = 0;
-
-    }
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantTof(const GblVariant* pVariant,    GblFloat*    pValue) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pValue);
-    {
-        const GblType type = GblVariant_type(pVariant);
-        if(type == GBL_INT32_TYPE)          *pValue = (GblFloat)pVariant->i32;
-        else if(type == GBL_FLOAT_TYPE)    *pValue = pVariant->f32;
-        else if(type == GBL_STRING_TYPE)   *pValue = GblStringView_toFloat(GBL_STRV(pVariant->pString));
-        else {
-            *pValue = 0.0f;
-            GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_TYPE_MISMATCH, "Cannot convert type: %u to float!", pVariant->type);
-        }
-    }
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantTop(const GblVariant* pVariant,    void**       pValue) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pValue);
-    {
-        const GblType type = GblVariant_type(pVariant);
-        if(type == GBL_POINTER_TYPE) *pValue = pVariant->pVoid;
-        else {
-            *pValue = 0;
-            GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_TYPE_MISMATCH, "Cannot convert type: %u to void*!", pVariant->type);
-        }
-    }
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_API gblVariantToc(const GblVariant* pVariant, const char** ppCString) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(ppCString);
-    {
-        const GblType type = GblVariant_type(pVariant);
-        if(type == GBL_STRING_TYPE)
-            GBL_API_CALL(gblVariantGetc(pVariant, ppCString));
-        else {
-            *ppCString = NULL;
-            GBL_API_RECORD_SET(GBL_RESULT_ERROR_TYPE_MISMATCH, "Cannot convert type: %u to const char*!", pVariant->type);
-        }
-    }
-    GBL_API_END();
-}
-
-
-// BETTER ALREADY BE CONSTRUCTED, SO THAT IT ALREADY HAS A FUCKING CONTEXT ASSOCIATED WITH IT!
-GBL_INLINE GBL_API gblVariantTos(const GblVariant* pVariant, GblStringBuffer* pString) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pString);
-
-    if(pVariant->type == GBL_STRING_TYPE) {
-        GBL_API_CALL(GblStringBuffer_construct(pString, GBL_STRV(pVariant->pString), sizeof(GblStringBuffer)));
-    }  else {
-
-        GBL_API_CALL(GblStringBuffer_construct(pString));
-        const GblType type = GblVariant_type(pVariant);
-        if(type == GBL_NIL_TYPE)
-            GBL_API_CALL(GblStringBuffer_appendNil(pString));
-        else if(type == GBL_BOOL_TYPE)
-            GBL_API_CALL(GblStringBuffer_appendBool(pString, pVariant->boolean));
-        else if(type == GBL_INT32_TYPE)
-            GBL_API_CALL(GblStringBuffer_appendInt(pString, pVariant->i32));
-        else if(type == GBL_UINT32_TYPE)
-            GBL_API_CALL(GblStringBuffer_appendUint(pString, pVariant->u32));
-        else if(type == GBL_FLOAT_TYPE)
-            GBL_API_CALL(GblStringBuffer_appendFloat(pString, pVariant->f32));
-        else if(type == GBL_POINTER_TYPE)
-            GBL_API_CALL(GblStringBuffer_appendPointer(pString, pVariant->pVoid));
-        else
-            GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_TYPE_MISMATCH, "Attempted to convert unknown variant type %u to string!", pVariant->type);
-        }
-
-    GBL_API_END();
-}
-
-#define GBL_VARIANT_COMPARE_INTEGRAL_DEFINE(suffix, type, initialValue) \
-GBL_INLINE GBL_API gblVariantCompare##suffix(const GblVariant* pVariant, type rhs, GBL_VARIANT_OP_CMP_TYPE op, GblBool* pResult) {  \
-    type val = initialValue;    \
-    GBL_API_BEGIN(GBL_NULL);   \
-    GBL_API_VERIFY_POINTER(pVariant);   \
-    GBL_API_VERIFY_ARG(op < GBL_VARIANT_OP_CMP_COUNT);  \
-    GBL_API_VERIFY_POINTER(pResult);    \
-    GBL_API_CALL(gblVariantTo##suffix(pVariant, &val)); \
-    switch(op) {    \
-    case GBL_VARIANT_OP_CMP_EQUAL:      *pResult = (val == rhs); break; \
-    case GBL_VARIANT_OP_CMP_NEQUAL:     *pResult = (val != rhs); break; \
-    case GBL_VARIANT_OP_CMP_LESS:       *pResult = (val <  rhs); break; \
-    case GBL_VARIANT_OP_CMP_LEQUAL:     *pResult = (val <= rhs); break; \
-    case GBL_VARIANT_OP_CMP_GREATER:    *pResult = (val >  rhs); break; \
-    case GBL_VARIANT_OP_CMP_GEQUAL:     *pResult = (val >= rhs); break; \
-    default: break; \
-    }   \
-    GBL_API_END();  \
-}
-
-GBL_VARIANT_COMPARE_INTEGRAL_DEFINE(b, GblBool, GBL_FALSE)
-GBL_VARIANT_COMPARE_INTEGRAL_DEFINE(i, GblInt, 0)
-GBL_VARIANT_COMPARE_INTEGRAL_DEFINE(f, GblFloat, 0.0f)
-GBL_VARIANT_COMPARE_INTEGRAL_DEFINE(p, void*, NULL)
-
-GBL_INLINE GBL_API gblVariantCompares(const GblVariant* pVariant, const GblStringBuffer* pString, GBL_VARIANT_OP_CMP_TYPE op, GblBool* pResult) {
-    GblStringBuffer tempString;
-    const char* pThisString = NULL;
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pString);
-    GBL_API_VERIFY_ARG(op < GBL_VARIANT_OP_CMP_COUNT);
-    GBL_API_VERIFY_POINTER(pResult);
-    if(pVariant->type == GBL_STRING_TYPE) {
-        pThisString = GblVariant_getString(pVariant);;
-    } else {
-        GBL_API_CALL(gblVariantTos(pVariant, &tempString));
-        pThisString = GblStringBuffer_cString(&tempString);
-    }
-    switch(op) {
-    case GBL_VARIANT_OP_CMP_EQUAL: {
-        GblStringBuffer buffer;
-        GblStringBuffer_construct(&buffer, GBL_STRV(pThisString));
-        GblInt result = GblStringBuffer_compare(&buffer, pString);
-        *pResult = result == 0;
-        break;
-    }
-    case GBL_VARIANT_OP_CMP_NEQUAL: {
-        GblStringBuffer buffer;
-        GblStringBuffer_construct(&buffer, GBL_STRV(pThisString));
-        GblInt result = GblStringBuffer_compare(&buffer, pString);
-        *pResult = result != 0;
-        break;
-    }
-    default: {
-        const char* pBuffer1 = pThisString;
-        const char* pBuffer2 = GblStringBuffer_cString(pString);
-        GblSize     strLen1 = strlen(pThisString);
-        GblSize     strLen2 = GblStringBuffer_length(pString);
-        const int   cmpValue = strncmp(pBuffer1, pBuffer2, strLen1 < strLen2? strLen1 : strLen2);
-        switch(op) {
-        case GBL_VARIANT_OP_CMP_LESS:       *pResult = (cmpValue < 0 ); break;
-        case GBL_VARIANT_OP_CMP_LEQUAL:     *pResult = (cmpValue <= 0); break;
-        case GBL_VARIANT_OP_CMP_GREATER:    *pResult = (cmpValue > 0 ); break;
-        case GBL_VARIANT_OP_CMP_GEQUAL:     *pResult = (cmpValue >= 0); break;
-        default: break;
-        }
-    }}
-    GBL_API_END();
-}
-
-
-GBL_INLINE GBL_API gblVariantComparec(const GblVariant* pVariant, const char* pCStr, GBL_VARIANT_OP_CMP_TYPE op, GblBool* pResult) {
-    GBL_ASSERT(pCStr);
-    GblSize strlength = pCStr? strlen(pCStr) : 0;
-    GBL_UNUSED(strlength);
-    GBL_ASSERT(strlength < UINT16_MAX);
-    const GblStringBuffer tempString = {
-        .data = {
-            .pCtx = GBL_NULL,
-            .pData = (uint8_t*)pCStr,
-            .size = (uint16_t)strlength,
-            .capacity = 0,
-            .elementSize = 1,
-            .stackSize = 0
-        }
+typedef struct GblVariant {
+    GblType             type;
+    union {
+        char            character;
+        GblBool         boolean;
+        uint8_t         u8;
+        uint16_t        u16;
+        int16_t         i16;
+        uint32_t        u32;
+        int32_t         i32;
+        uint64_t        u64;
+        int64_t         i64;
+        GblEnum         enumeration;
+        GblFlags        flags;
+        float           f32;
+        double          f64;
+        void*           pVoid;
+        GblStringRef*   pString;
+        GblType         typeValue;
+        GblInstance*    pInstance;
+        GblObject*      pObject;
     };
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_CALL(gblVariantCompares(pVariant, &tempString, op, pResult));
-    GBL_API_END();
+} GblVariant;
+
+
+GBL_INLINE GblType          GblVariant_type                     (CSELF)                         GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_constructDefault         (SELF,  GblType type)           GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_constructCopy            (SELF,
+                                                                 const GblVariant* pOther)      GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_constructMove            (SELF,
+                                                                 GblVariant* pOther)            GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_constructValueCopy       (SELF,  GblType type, ...)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_constructValueCopyVaList (SELF,
+                                                                 GblType type,
+                                                                 va_list* pList)                GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_constructValueMove       (SELF,  GblType type, ...)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_constructValueMoveVaList (SELF,
+                                                                 GblType type,
+                                                                 va_list* pList)                GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_constructNil             (SELF)                          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructBool            (SELF, GblBool value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructChar            (SELF, char value)              GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructUint8           (SELF, uint8_t value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructUint16          (SELF, uint16_t value)          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructInt16           (SELF, int16_t value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructUint32          (SELF, uint32_t value)          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructInt32           (SELF, int32_t value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructUint64          (SELF, uint64_t value)          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructInt64           (SELF, int64_t value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructFloat           (SELF, float value)             GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructDouble          (SELF, double value)            GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructString          (SELF, const char* pValue)      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructStringView      (SELF, GblStringView value)     GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructTypeValue       (SELF, GblType type)            GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_constructEnum            (SELF,
+                                                                 GblType type,
+                                                                 GblEnum value)                 GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructFlags           (SELF,
+                                                                 GblType type,
+                                                                 GblFlags value)                GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_constructPointer         (SELF, void* pValue)            GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_constructOpaque          (SELF,
+                                                                 GblType ptrType,
+                                                                 void* pValue)                  GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_constructBoxedCopy       (SELF,
+                                                                 GblType boxedType,
+                                                                 void*  pValue)                 GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_constructBoxedMove       (SELF,
+                                                                 GblType boxedType,
+                                                                 void*  pValue)                 GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_constructInstance        (SELF, GblInstance* pValue)     GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructObjectCopy      (SELF, GblObject* pValue)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_constructObjectMove      (SELF, GblObject* pValue)       GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_destruct                 (SELF)                          GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_setCopy                  (SELF,
+                                                                 const GblVariant* pOther)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_setMove                  (SELF,  GblVariant* pOther)     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_setValueCopy             (SELF,  GblType type, ...)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_setValueCopyVaList       (SELF,
+                                                                 GblType  type,
+                                                                 va_list* pVarArgs)             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_setValueMove             (SELF,  GblType type, ...)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_setValueMoveVaList       (SELF,
+                                                                 GblType  type,
+                                                                 va_list* pVarArgs)             GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_invalidate               (SELF)                          GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_setNil                   (SELF)                          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setBool                  (SELF, GblBool value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setChar                  (SELF, char value)              GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setUint8                 (SELF, uint8_t value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setUint16                (SELF, uint16_t value)          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setInt16                 (SELF, int16_t value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setUint32                (SELF, uint32_t value)          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setInt32                 (SELF, int32_t value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setUint64                (SELF, uint64_t value)          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setInt64                 (SELF, int64_t value)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setFloat                 (SELF, float value)             GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setDouble                (SELF, double value)            GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setString                (SELF, const char* pValue)      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setStringView            (SELF, GblStringView value)     GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setTypeValue             (SELF, GblType value)           GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_setEnum                  (SELF,
+                                                                 GblType enumType,
+                                                                 GblEnum value)                 GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_setFlags                 (SELF,
+                                                                 GblType flagsType,
+                                                                 GblFlags value)                GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_setPointer               (SELF, void* pValue)            GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_setOpaque                (SELF,
+                                                                 GblType ptrType,
+                                                                 void* pValue)                  GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_setBoxedCopy             (SELF,
+                                                                 GblType boxedType,
+                                                                 void*  pValue)                 GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_setBoxedMove             (SELF,
+                                                                 GblType boxedType,
+                                                                 void*  pValue)                 GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblVariant_setInstance              (SELF, GblInstance* pValue)     GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setObjectCopy            (SELF, GblObject* pValue)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblVariant_setObjectMove            (SELF, GblObject* pValue)       GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_getValueCopy             (CSELF,  ...)                   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_getValueCopyVaList       (CSELF, va_list* pVarArgs)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_getValuePeek             (CSELF,  ...)                   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_getValuePeekVaList       (SELF, va_list* pVarArgs)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_getValueMove             (SELF,  ...)                    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblVariant_getValueMoveVaList       (SELF, va_list* pVarArgs)       GBL_NOEXCEPT;
+
+GBL_INLINE GblBool          GblVariant_isValid                  (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblVariant_isNil                    (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblVariant_getBool                  (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE char             GblVariant_getChar                  (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE uint8_t          GblVariant_getUint8                 (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE uint16_t         GblVariant_getUint16                (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE int16_t          GblVariant_getInt16                 (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE uint32_t         GblVariant_getUint32                (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE int32_t          GblVariant_getInt32                 (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE uint64_t         GblVariant_getUint64                (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE int64_t          GblVariant_getInt64                 (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE GblEnum          GblVariant_getEnum                  (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE GblFlags         GblVariant_getFlags                 (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE float            GblVariant_getFloat                 (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE double           GblVariant_getDouble                (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE const char*      GblVariant_getString                (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE GblStringView    GblVariant_getStringView            (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE GblType          GblVariant_getTypeValue             (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE void*            GblVariant_getPointer               (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE void*            GblVariant_getBoxedCopy             (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE void*            GblVariant_getBoxedMove             (SELF)                          GBL_NOEXCEPT;
+GBL_INLINE void*            GblVariant_getBoxedPeek             (CSELF)                         GBL_NOEXCEPT;
+
+GBL_INLINE GblInstance*     GblVariant_getInstance              (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT GblObject*       GblVariant_getObjectCopy            (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT GblObject*       GblVariant_getObjectMove            (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT GblObject*       GblVariant_getObjectPeek            (CSELF)                         GBL_NOEXCEPT;
+
+GBL_EXPORT GblBool          GblVariant_toBool                   (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT char             GblVariant_toChar                   (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT uint8_t          GblVariant_toUint8                  (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT uint16_t         GblVariant_toUint16                 (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT int16_t          GblVariant_toInt16                  (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT uint32_t         GblVariant_toUint32                 (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT int32_t          GblVariant_toInt32                  (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT uint64_t         GblVariant_toUint64                 (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT int64_t          GblVariant_toInt64                  (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT GblEnum          GblVariant_toEnum                   (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT GblFlags         GblVariant_toFlags                  (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT float            GblVariant_toFloat                  (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT double           GblVariant_toDouble                 (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT void*            GblVariant_toPointer                (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT const char*      GblVariant_toStringAppend           (CSELF, GblStringBuffer* pBuff) GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_registerConverter        (GblType fromType,
+                                                                 GblType toType,
+                                                                 GblVariantConverterFn pFnConv) GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_unregisterConverter      (GblType fromType,
+                                                                 GblType toType)                GBL_NOEXCEPT;
+
+GBL_EXPORT GblSize          GblVariant_converterCount           (void)                          GBL_NOEXCEPT;
+
+GBL_EXPORT GblBool          GblVariant_canConvert               (GblType fromType,
+                                                                 GblType toType)                GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_convert                  (CSELF,
+                                                                 GblVariant* pToVariant)        GBL_NOEXCEPT;
+
+GBL_EXPORT GblInt           GblVariant_compare                  (CSELF,
+                                                                 const GblVariant* pOther)      GBL_NOEXCEPT;
+
+GBL_INLINE GblBool          GblVariant_equals                   (CSELF,
+                                                                 const GblVariant* pOther)      GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_save                     (CSELF,
+                                                                 GblStringBuffer* pString)      GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT       GblVariant_load                     (SELF,
+                                                                 const GblStringBuffer* pStr)   GBL_NOEXCEPT;
+
+//========== MACRO OVERLOADS ==========
+
+#define GBL_VARIANT_CONSTRUCT_TABLE  (                                  \
+        GBL_META_GENERIC_MACRO_NO_DEFAULT,                              \
+        (                                                               \
+            (GblBool,                GblVariant_constructBool),         \
+            (char,                   GblVariant_constructChar),         \
+            (uint8_t,                GblVariant_constructUint8),        \
+            (uint16_t,               GblVariant_constructUint16),       \
+            (int16_t,                GblVariant_constructInt16),        \
+            (uint32_t,               GblVariant_constructUint32),       \
+            (int32_t,                GblVariant_constructInt32),        \
+            (uint64_t,               GblVariant_constructUint64),       \
+            (int64_t,                GblVariant_constructInt64),        \
+            (float,                  GblVariant_constructFloat),        \
+            (double,                 GblVariant_constructDouble),       \
+            (const char*             GblVariant_constructString),       \
+            (GblStringView           GblVariant_constructStringView),   \
+            (void*                   GblVariant_constructPointer),      \
+            (const GblVariant*       GblVariant_constructCopy),         \
+                                                                        \
+        )                                                               \
+    )
+#define GblVariant_construct_N(pVariant, ...)   GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TABLE, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
+#define GblVariant_construct_1(pVariant)        GblVariant_constructNil(pVariant)
+#define GblVariant_construct(...)               GBL_VA_OVERLOAD_CALL(GblVariant_construct, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
+
+#define GBL_VARIANT_SET_TABLE  (                                    \
+        GBL_META_GENERIC_MACRO_NO_DEFAULT,                          \
+        (                                                           \
+            (GblBool,                GblVariant_setBool),           \
+            (char,                   GblVariant_setChar),           \
+            (uint8_t,                GblVariant_setUint8),          \
+            (uint16_t,               GblVariant_setUint16),         \
+            (int16_t,                GblVariant_setInt16),          \
+            (uint32_t,               GblVariant_setUint32),         \
+            (int32_t,                GblVariant_settInt32),         \
+            (uint64_t,               GblVariant_settUint64),        \
+            (int64_t,                GblVariant_setInt64),          \
+            (float,                  GblVariant_setFloat),          \
+            (double,                 GblVariant_setDouble),         \
+            (const char*             GblVariant_setString),         \
+            (GblStringView           GblVariant_settStringView),    \
+            (void*                   GblVariant_setPointer),        \
+            (const GblVariant*       GblVariant_settCopy),          \
+                                                                    \
+        )                                                           \
+    )
+#define GblVariant_set(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_SET_TABLE, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
+
+
+
+// ========== IMPL ==========
+GBL_INLINE GblType GblVariant_type(const GblVariant* pSelf) GBL_NOEXCEPT {
+    return pSelf->type;
 }
 
-
-GBL_INLINE GBL_API gblVariantComparev(const GblVariant* pLhs,
-                          const GblVariant* pRhs,
-                          GBL_VARIANT_OP_CMP_TYPE op,
-                          GblBool* pResult)
-{
+GBL_INLINE GBL_RESULT GblVariant_constructNil(SELF) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pLhs);
-    GBL_API_VERIFY_POINTER(pRhs);
-    GBL_API_VERIFY_POINTER(pResult);
-    GBL_API_VERIFY_ARG(op <= GBL_VARIANT_OP_CMP_COUNT);
-    {
-        const GblType type = GblVariant_type(pLhs);
-        if(type == GBL_NIL_TYPE) {
-            if(pRhs->type == GBL_NIL_TYPE) {
-                if(op == GBL_VARIANT_OP_CMP_EQUAL) *pResult = GBL_TRUE;
-                else *pResult = GBL_FALSE;
-            } else {
-                if(op == GBL_VARIANT_OP_CMP_NEQUAL) *pResult = GBL_TRUE;
-                else *pResult = GBL_FALSE;
-            }
-        } else if(type ==  GBL_BOOL_TYPE) {
-            GblBool value = GBL_FALSE;
-            GBL_API_CALL(gblVariantTob(pRhs, &value));
-            GBL_API_CALL(gblVariantCompareb(pLhs, value, op, pResult));
-        } else if(type == GBL_INT32_TYPE) {
-            GblInt value = 0;
-            GBL_API_CALL(gblVariantToi(pRhs, &value));
-            GBL_API_CALL(gblVariantComparei(pLhs, value, op, pResult));
-        } else if(type == GBL_FLOAT_TYPE) {
-            GblFloat value = 0.0f;
-            GBL_API_CALL(gblVariantTof(pRhs, &value));
-            GBL_API_CALL(gblVariantComparef(pLhs, value, op, pResult));
-        } else if(type == GBL_POINTER_TYPE) {
-            void* pValue = 0;
-            GBL_API_CALL(gblVariantTop(pRhs, &pValue));
-            GBL_API_CALL(gblVariantComparep(pLhs, pValue, op, pResult));
-        } else if(type == GBL_STRING_TYPE) {
-            GblStringBuffer tempStr;
-            const char* pRStr = NULL;
-            if(pRhs->type == GBL_STRING_TYPE) {
-                pRStr = GblVariant_getString(pRhs);
-            } else {
-                GBL_API_CALL(GblStringBuffer_construct(&tempStr));
-                GBL_API_CALL(gblVariantTos(pRhs, &tempStr));
-                pRStr = GblStringBuffer_cString(&tempStr);
-            }
-            GblStringBuffer rStr;
-             GBL_API_CALL(GblStringBuffer_construct(&rStr, GBL_STRV(pRStr)));
-            GBL_API_CALL(gblVariantCompares(pLhs, &rStr, op, pResult));
-        } else {
-            GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_TYPE_MISMATCH);
-        }
-    }
+    GBL_API_VERIFY_CALL(GblVariant_constructDefault(pSelf, GBL_NIL_TYPE));
     GBL_API_END();
 }
-
-
-GBL_INLINE GBL_API gblVariantConstructDefault(GblVariant* pVariant) {
+GBL_INLINE GBL_RESULT GblVariant_constructBool(SELF, GblBool value) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_CALL(GblVariant_constructDefault(pVariant, GBL_NIL_TYPE));
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_BOOL_TYPE, value));
     GBL_API_END();
 }
-
-#define GBL_VARIANT_CONSTRUCTOR_DEFINE(suffix, argType, type)                                   \
-    GBL_INLINE GBL_API gblVariantConstruct##suffix(GblVariant* pVariant, argType value) {       \
-        GBL_API_BEGIN(GBL_NULL);                                                      \
-        GBL_API_CALL(GblVariant_constructValueCopy(pVariant, type, value));                     \
-        GBL_API_END();                                                                          \
-    }
-
-
-GBL_VARIANT_CONSTRUCTOR_DEFINE(b, GblBool,          GBL_BOOL_TYPE)
-GBL_VARIANT_CONSTRUCTOR_DEFINE(u, GblUint,          GBL_UINT32_TYPE)
-GBL_VARIANT_CONSTRUCTOR_DEFINE(i, GblInt,           GBL_INT32_TYPE)
-GBL_VARIANT_CONSTRUCTOR_DEFINE(f, GblFloat,         GBL_FLOAT_TYPE)
-GBL_VARIANT_CONSTRUCTOR_DEFINE(p, void*,            GBL_POINTER_TYPE)
-
-GBL_INLINE GBL_API gblVariantConstructc(GblVariant* pVariant, const char* pString) {
+GBL_INLINE GBL_RESULT GblVariant_constructChar(SELF, char value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_CHAR_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructUint8(SELF, uint8_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_UINT8_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructUint16(SELF, uint16_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_UINT16_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructInt16(SELF, int16_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INT16_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructUint32(SELF, uint32_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_UINT32_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructInt32(SELF, int32_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INT32_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructUint64(SELF, uint64_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_UINT64_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructInt64(SELF, int64_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INT64_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructEnum(SELF, GblType type, GblEnum value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY(GBL_ENUM_TYPE_CHECK(type),
+                   GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, type, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructFlags(SELF, GblType type, GblFlags value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY(GBL_FLAGS_TYPE_CHECK(type),
+                   GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, type, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructFloat(SELF, float value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_FLOAT_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructDouble(SELF, double value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_DOUBLE_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructPointer(SELF, void* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_POINTER_TYPE, pValue));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructOpaque(SELF, GblType ptrType, void* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    GBL_API_CALL(GblVariant_constructValueCopy(pVariant, GBL_STRING_TYPE, pString, 0, NULL));
+    GBL_API_VERIFY(GBL_POINTER_TYPE_CHECK(ptrType),
+                   GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, ptrType, pValue));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructString(SELF, const char* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_STRING_TYPE, pValue));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructBoxedCopy(SELF, GblType boxedType, void*  pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(boxedType, GBL_BOXED_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, boxedType, pValue));
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblVariantConstructs(GblVariant* pVariant, const GblStringBuffer* pString) {
+GBL_INLINE GBL_RESULT GblVariant_constructBoxedMove(SELF, GblType boxedType, void* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(boxedType, GBL_BOXED_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(pSelf, boxedType, pValue));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructStringView(SELF, GblStringView view) GBL_NOEXCEPT {
+    return GblVariant_constructString(pSelf, GBL_STRING_VIEW_CSTR(view));
+}
+GBL_INLINE GBL_RESULT GblVariant_constructTypeValue(SELF, GblType type) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_TYPE_TYPE, type));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructInstance(SELF, GblInstance* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructObjectCopy(SELF, GblObject* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_constructObjectMove(SELF, GblObject* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
+    GBL_API_END();
+}
+GBL_INLINE GblBool GblVariant_isValid(CSELF) GBL_NOEXCEPT {
+    return pSelf && GblVariant_type(pSelf) != GBL_INVALID_TYPE;
+}
+GBL_INLINE GblBool GblVariant_isNil(CSELF) GBL_NOEXCEPT {
+    return pSelf && GblVariant_type(pSelf) == GBL_NIL_TYPE;
+}
+GBL_INLINE GblBool GblVariant_getBool(CSELF) GBL_NOEXCEPT {
+    GblBool value = GBL_FALSE;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_BOOL_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE char GblVariant_getChar(CSELF) GBL_NOEXCEPT {
+    char value = '\0';;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_CHAR_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE uint8_t GblVariant_getUint8(CSELF) GBL_NOEXCEPT {
+    uint8_t value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_UINT8_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE uint16_t GblVariant_getUint16(CSELF) GBL_NOEXCEPT {
+    uint16_t value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_UINT16_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE int16_t GblVariant_getInt16(CSELF) GBL_NOEXCEPT {
+    int16_t value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_INT16_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE uint32_t GblVariant_getUint32(CSELF) GBL_NOEXCEPT {
+    uint32_t value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_UINT32_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE int32_t GblVariant_getInt32(CSELF) GBL_NOEXCEPT {
+    int32_t value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_INT32_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE uint64_t GblVariant_getUint64(CSELF) GBL_NOEXCEPT {
+    uint64_t value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_UINT64_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE int64_t GblVariant_getInt64(CSELF) GBL_NOEXCEPT {
+    int64_t value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_INT64_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE GblEnum GblVariant_getEnum(CSELF) GBL_NOEXCEPT {
+    GblEnum value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_ENUM_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE GblEnum GblVariant_getFlags(CSELF) GBL_NOEXCEPT {
+    GblFlags value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_FLAGS_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE float GblVariant_getFloat(CSELF) GBL_NOEXCEPT {
+    float value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_FLOAT_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE double GblVariant_getDouble(CSELF) GBL_NOEXCEPT {
+    double value = 0;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_DOUBLE_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE void* GblVariant_getPointer(CSELF) GBL_NOEXCEPT {
+    void* pValue = GBL_NULL;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_POINTER_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValuePeek(pSelf, &pValue));
+    GBL_API_END_BLOCK();
+    return pValue;
+}
+GBL_INLINE void* GblVariant_getBoxedCopy(CSELF) GBL_NOEXCEPT {
+    void* pValue = GBL_NULL;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_BOXED_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &pValue));
+    GBL_API_END_BLOCK();
+    return pValue;
+}
+GBL_INLINE void* GblVariant_getBoxedMove(SELF) GBL_NOEXCEPT {
+    void* pValue = GBL_NULL;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_BOXED_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValueMove(pSelf, &pValue));
+    GBL_API_END_BLOCK();
+    return pValue;
+}
+GBL_INLINE void* GblVariant_getBoxedPeek(CSELF) GBL_NOEXCEPT {
+    void* pValue = GBL_NULL;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_BOXED_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValuePeek(pSelf, &pValue));
+    GBL_API_END_BLOCK();
+    return pValue;
+}
+GBL_INLINE const char* GblVariant_getString(CSELF) GBL_NOEXCEPT {
+    const char* pValue = GBL_NULL;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_STRING_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValuePeek(pSelf, &pValue));
+    GBL_API_END_BLOCK();
+    return pValue;
+}
+GBL_INLINE GblStringView GblVariant_getStringView(CSELF) GBL_NOEXCEPT {
+    return GblStringRef_view(GblVariant_getString(pSelf));
+}
+GBL_INLINE GblType GblVariant_getTypeValue(CSELF) GBL_NOEXCEPT {
+    GblType value = GBL_INVALID_TYPE;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_TYPE_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_getValuePeek(pSelf, &value));
+    GBL_API_END_BLOCK();
+    return value;
+}
+GBL_INLINE GblInstance* GblVariant_getInstance(CSELF) GBL_NOEXCEPT {
+    GblInstance* pValue = GBL_NULL;
+    GBL_API_BEGIN(GBL_NULL);
+    GBL_API_VERIFY(GBL_TYPE_IS_INSTANTIABLE(GblVariant_type(pSelf)),
+                   GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_API_VERIFY_CALL(GblVariant_getValuePeek(pSelf, &pValue));
+    GBL_API_END_BLOCK();
+    return pValue;
+}
+GBL_INLINE GBL_RESULT GblVariant_invalidate(SELF) GBL_NOEXCEPT {
+    if(GblVariant_type(pSelf) != GBL_INVALID_TYPE)
+        GblClass_unref(GblClass_peek(GblVariant_type(pSelf)));
+    memset(pSelf, 0, sizeof(GblVariant));
+    pSelf->type = GBL_INVALID_TYPE;
+    return GBL_RESULT_SUCCESS;
+}
+
+GBL_INLINE GBL_RESULT GblVariant_setNil(SELF) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    const char* pChar = GblStringBuffer_cString(pString);
-    GblSize     length = GblStringBuffer_length(pString);
-    GblContext* pCtx = GblStringBuffer_context(pString);
-    GBL_API_CALL(GblVariant_constructValueCopy(pVariant, GBL_STRING_TYPE, pChar, length, pCtx));
+    GBL_API_VERIFY_CALL(GblVariant_destruct(pSelf));
+    GBL_API_VERIFY_CALL(GblVariant_constructDefault(pSelf, GBL_NIL_TYPE));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setBool(SELF, GblBool value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_BOOL_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setChar(SELF, char value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_CHAR_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setUint8(SELF, uint8_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_UINT8_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setUint16(SELF, uint16_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_UINT16_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setInt16(SELF, int16_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INT16_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setUint32(SELF, uint32_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_UINT32_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setInt32(SELF, int32_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INT32_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setUint64(SELF, uint64_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_UINT64_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setInt64(SELF, int64_t value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INT64_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setEnum(SELF,
+                                         GblType enumType,
+                                         GblEnum value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_TYPE(enumType, GBL_ENUM_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, enumType, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setFlags(SELF,
+                                          GblType flagsType,
+                                          GblFlags value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_TYPE(flagsType, GBL_FLAGS_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, flagsType, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setFloat(SELF, float value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_FLOAT_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setDouble(SELF, double value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_DOUBLE_TYPE, value));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setPointer(SELF, void* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_POINTER_TYPE, pValue));
+    GBL_API_END();
+}
+GBL_INLINE GBL_RESULT GblVariant_setOpaque(SELF,
+                                           GblType ptrType,
+                                           void* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_TYPE(ptrType, GBL_POINTER_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, ptrType, pValue));
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblVariantConstructt(GblVariant* pVariant, GblType type) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_CALL(GblVariant_constructDefault(pVariant, type));
+GBL_INLINE GBL_RESULT GblVariant_setBoxedCopy(SELF, GblType boxedType, void*  pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_TYPE(boxedType, GBL_BOXED_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, boxedType, pValue));
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblVariantConstructCopy(GblVariant* pVariant, const GblVariant* pOther) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pOther);
-
-    GBL_API_CALL(GblVariant_constructCopy(pVariant, pOther));
+GBL_INLINE GBL_RESULT GblVariant_setBoxedMove(SELF, GblType boxedType, void*  pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_TYPE(boxedType, GBL_BOXED_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_setValueMove(pSelf, boxedType, pValue));
     GBL_API_END();
 }
 
-GBL_INLINE GBL_API gblVariantConstructMove(GblVariant* pVariant, GblVariant* pOther) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_VERIFY_POINTER(pOther);
-    GBL_API_CALL(GblVariant_constructMove(pVariant, pOther));
+GBL_INLINE GBL_RESULT GblVariant_setString(SELF, const char* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_STRING_TYPE, pValue));
     GBL_API_END();
 }
-
-GBL_INLINE GBL_API gblVariantCopy(GblVariant* pVariant, const GblVariant* pOther) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_CALL(GblVariant_setCopy(pVariant, pOther));
+GBL_INLINE GBL_RESULT GblVariant_setStringView(SELF, GblStringView value) GBL_NOEXCEPT {
+    return GblVariant_setString(pSelf, GBL_STRING_VIEW_CSTR(value));
+}
+GBL_INLINE GBL_RESULT GblVariant_setTypeValue(SELF, GblType value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_TYPE_TYPE, value));
     GBL_API_END();
 }
-
-
-GBL_INLINE GBL_API gblVariantMovev(GblVariant* pVariant, GblVariant* pOther) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_CALL(GblVariant_setMove(pVariant, pOther));
+GBL_INLINE GBL_RESULT GblVariant_setInstance(SELF, GblInstance* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
     GBL_API_END();
 }
-
-//== MAKE ME TAKE A BUFFER INSTEAD ===
-GBL_INLINE GBL_API gblVariantMovec(GblVariant* pVariant, char* pBuffer, GblSize capacity) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_CALL(GblVariant_setValueMove(pVariant, GBL_STRING_TYPE, pBuffer, capacity));
-    /*
-    GBL_API_CALL(gblVariantTypeSet(pVariant, GBL_STRING_TYPE));
-    GBL_API_CALL(GblStringBuffer_give(&pVariant->string, pBuffer, capacity));
-    GBL_API_END();*/
+GBL_INLINE GBL_RESULT GblVariant_setObjectCopy(SELF, GblObject* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
     GBL_API_END();
 }
-
-GBL_INLINE GBL_API gblVariantMoves(GblVariant* pVariant, GblStringBuffer* pOther) {
-    GblBool stack = GBL_FALSE;
-    char* pOtherBuff = NULL;
-    GblSize otherCapacity = 0;
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pOther);
-    stack = GblStringBuffer_stack(pOther);
-    if(stack) {
-        GBL_API_CALL(gblVariantSets(pVariant, pOther));
-    } else {
-        GBL_API_CALL(GblStringBuffer_take(pOther, &pOtherBuff, &otherCapacity));
-        GBL_API_CALL(gblVariantMovec(pVariant, pOtherBuff, otherCapacity));
-    }
+GBL_INLINE GBL_RESULT GblVariant_setObjectMove(SELF, GblObject* pValue) GBL_NOEXCEPT {
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
     GBL_API_END();
 }
-
-GBL_INLINE GBL_API gblVariantDestruct(GblVariant* pVariant) {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_POINTER(pVariant);
-    GBL_API_CALL(GblVariant_destruct(pVariant));
-    GBL_API_END();
+GBL_INLINE GblBool GblVariant_equals(CSELF, const GblVariant* pOther) GBL_NOEXCEPT {
+    return GblVariant_compare(pSelf, pOther) == 0;
 }
 
+GBL_DECLS_END
 
 #undef CSELF
 #undef SELF
 
-
-GBL_DECLS_END
-
-
-
-
-
-
-
-
-#endif // GBLBAL_VARIANT__H
+#endif // GIMBAL_VARIANT_H

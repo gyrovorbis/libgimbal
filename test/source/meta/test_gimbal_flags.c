@@ -1,7 +1,7 @@
 #include "meta/test_gimbal_flags.h"
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/meta/gimbal_flags.h>
-#include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_variant.h>
 #include <gimbal/objects/gimbal_property.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 

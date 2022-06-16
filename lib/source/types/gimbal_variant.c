@@ -1,10 +1,11 @@
-#include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_variant.h>
 #include <gimbal/ifaces/gimbal_ivariant.h>
 #include <gimbal/types/gimbal_variant.h>
 #include <gimbal/meta/gimbal_type.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/objects/gimbal_object.h>
 #include <gimbal/containers/gimbal_tree_set.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 
 #define GBL_VARIANT_BEGIN_(type, classGetterSuffix)                                         \
     GBL_API_BEGIN(NULL); {                                                                  \

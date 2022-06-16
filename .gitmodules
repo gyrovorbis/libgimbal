@@ -1,21 +1,6 @@
 [submodule "test/lib/elysian-test"]
 	path = test/lib/elysian-test
 	url = ../../open-source/elysian-test.git
-[submodule "lib/lib/metalang99"]
-	path = lib/lib/metalang99
-	url = https://github.com/Hirrolot/metalang99.git
-[submodule "lib/lib/C99-Lambda"]
-	path = lib/lib/C99-Lambda
-	url = https://github.com/Leushenko/C99-Lambda.git
-[submodule "lib/lib/hashmap.c"]
-	path = lib/lib/hashmap.c
-	url = https://github.com/tidwall/hashmap.c.git
-[submodule "lib/lib/btree.c"]
-	path = lib/lib/btree.c
-	url = https://github.com/tidwall/btree.c.git
-[submodule "lib/lib/interface99"]
-	path = lib/lib/interface99
-	url = https://github.com/Hirrolot/interface99.git
 [submodule "lib/lib/xxHash"]
 	path = lib/lib/xxHash
 	url = https://github.com/Cyan4973/xxHash.git

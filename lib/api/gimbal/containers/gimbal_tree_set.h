@@ -1,7 +1,6 @@
 #ifndef GIMBAL_BTREE_H
 #define GIMBAL_BTREE_H
 
-#include <btree.c/btree.h>
 #include <time.h>
 #include "gimbal_container.h"
 #include "../types/gimbal_typedefs.h"

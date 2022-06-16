@@ -1,6 +1,6 @@
-#include "meta/test_gimbal_variant.h"
+#include "types/test_gimbal_variant.h"
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_variant.h>
 #include <string.h>
 
 GBL_API GblVariant_test_testCaseInit(GblContext* pCtx) {

@@ -1,6 +1,6 @@
 #include <gimbal/meta/gimbal_boxed.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
-#include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_variant.h>
 
 static GBL_RESULT GblBoxedClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);

@@ -27,7 +27,7 @@ add_executable(GimbalTests
     include/types/test_gimbal_ref.hpp
     include/strings/test_gimbal_string_ref.hpp
     include/strings/test_gimbal_string_view.hpp
-    include/meta/test_gimbal_variant.hpp
+    include/types/test_gimbal_variant.hpp
     include/strings/test_gimbal_string.hpp
     include/containers/test_gimbal_vector.hpp
     include/containers/test_gimbal_hash_map.hpp
@@ -56,8 +56,8 @@ add_executable(GimbalTests
     include/containers/test_gimbal_tree_set.h
     include/containers/test_gimbal_tree_set.hpp
     source/containers/test_gimbal_tree_set.c
-    include/meta/test_gimbal_variant.h
-    source/meta/test_gimbal_variant.c
+    include/types/test_gimbal_variant.h
+    source/types/test_gimbal_variant.c
     include/meta/test_gimbal_enum.h
     include/meta/test_gimbal_enum.hpp
     source/meta/test_gimbal_enum.c

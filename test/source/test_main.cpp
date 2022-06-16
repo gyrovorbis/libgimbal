@@ -1,5 +1,5 @@
 #include <elysian_qtest.hpp>
-#include <meta/test_gimbal_variant.hpp>
+#include <types/test_gimbal_variant.hpp>
 #include <objects/test_gimbal_context.hpp>
 #include <containers/test_gimbal_linked_list.hpp>
 #include <containers/test_gimbal_doubly_linked_list.hpp>

@@ -5,6 +5,7 @@
 #include <gimbal/objects/gimbal_event.h>
 #include <gimbal/strings/gimbal_string_ref.h>
 #include <gimbal/containers/gimbal_linked_list.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 
 #define GBL_OBJECT_PROPERTY_TABLE_CAPACITY_DEFAULT_ 64
 #define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblVector) + sizeof(GblIEventFilter*)*8)

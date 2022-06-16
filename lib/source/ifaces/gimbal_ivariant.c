@@ -1,6 +1,6 @@
 #include <gimbal/ifaces/gimbal_ivariant.h>
 #include <gimbal/types/gimbal_variant.h>
-#include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_variant.h>
 #include <gimbal/strings/gimbal_quark.h>
 
 extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {

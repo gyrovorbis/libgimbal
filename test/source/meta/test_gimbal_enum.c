@@ -1,7 +1,7 @@
 #include "meta/test_gimbal_enum.h"
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/meta/gimbal_enum.h>
-#include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_variant.h>
 
 typedef enum COLOR {
     RED     = 1,

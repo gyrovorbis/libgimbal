@@ -1,6 +1,6 @@
 #include <gimbal/ifaces/gimbal_itable.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/meta/gimbal_variant.h>
+#include <gimbal/types/gimbal_variant.h>
 #include <gimbal/meta/gimbal_primitives.h>
 #include <gimbal/strings/gimbal_quark.h>
 
