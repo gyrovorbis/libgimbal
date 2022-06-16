@@ -64,9 +64,9 @@ GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_1 (SELF)              
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_destruct        (SELF)                                      GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblStringBuffer_assign          (SELF, GblStringView view)                  GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_take            (SELF, char** ppStrPtr, GblSize* pCapacity) GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_give            (SELF, char* pData, GblSize capacity)       GBL_NOEXCEPT;
+// inconsistent naming with these: set/acquire/release is what GblByteArray uses
+GBL_INLINE GBL_RESULT       GblStringBuffer_acquire         (SELF, char* pData, GblSize capacity)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_release         (SELF, char** ppStrPtr, GblSize* pCapacity) GBL_NOEXCEPT;
 
 GBL_INLINE char*            GblStringBuffer_stackBuffer     (CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblStringBuffer_empty           (CSELF)                                     GBL_NOEXCEPT;
@@ -78,12 +78,14 @@ GBL_INLINE GblSize          GblStringBuffer_stackBytes      (CSELF)             
 GBL_INLINE GblSize          GblStringBuffer_length          (CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblSize          GblStringBuffer_capacity        (CSELF)                                     GBL_NOEXCEPT;
 
-GBL_INLINE char             GblStringBuffer_at              (CSELF, GblSize index)                      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_setAt           (CSELF, GblSize index, char value)          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_set             (SELF, GblStringView view)                  GBL_NOEXCEPT;
+GBL_INLINE char             GblStringBuffer_char            (CSELF, GblSize index)                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_charSet         (CSELF, GblSize index, char value)          GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_insert          (SELF,
                                                              GblSize        index,
                                                              GblStringView  view)                       GBL_NOEXCEPT;
+
 GBL_INLINE GBL_RESULT       GblStringBuffer_append          (SELF, GblStringView other)                 GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_prepend         (SELF, GblStringView other)                 GBL_NOEXCEPT;
 
@@ -103,20 +105,22 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_clear           (SELF)              
 GBL_INLINE GBL_RESULT       GblStringBuffer_overwrite       (SELF,
                                                              GblSize        index,
                                                              GblStringView  other)                      GBL_NOEXCEPT;
+
 GBL_INLINE GBL_RESULT       GblStringBuffer_replace         (SELF,
                                                              GblStringView substr,
                                                              GblStringView replacement,
                                                              GblSize       limit)                       GBL_NOEXCEPT;
+
 GBL_INLINE GBL_RESULT       GblStringBuffer_remove          (SELF, GblStringView substr)                GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_chop            (SELF)                                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_chomp           (SELF)                                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_lower           (SELF)                                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_upper           (SELF)                                      GBL_NOEXCEPT;
-//GBL_INLINE GblString*   GblString_section       (CSELF, const char* pSeparator, GblSize length, GblSize start, GblSize end)     GBL_NOEXCEPT;
-//GBL_INLINE GBL_RESULT     GblStringBuffer_padLeft         (SELF, char value, GblSize count)           GBL_NOEXCEPT;
-//GBL_INLINE GBL_RESULT       GblStringBuffer_padRight        (SELF, char value, GblSize count)           GBL_NOEXCEPT;
-//GBL_INLINE GBL_RESULT       GblStringBuffer_trimStart       (SELF, char value)                          GBL_NOEXCEPT;
-//GBL_INLINE GBL_RESULT       GblStringBuffer_trimEnd         (SELF, char value)                          GBL_NOEXCEPT;
+
+GBL_INLINE GBL_RESULT       GblStringBuffer_padLeft         (SELF, char value, GblSize count)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_padRight        (SELF, char value, GblSize count)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_trimStart       (SELF, char value)                          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_trimEnd         (SELF, char value)                          GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_reserve         (SELF, GblSize capacity)                    GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_resize          (SELF, GblSize size)                        GBL_NOEXCEPT;
@@ -171,7 +175,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_clear(SELF) GBL_NOEXCEPT {
     return GblVector_clear(&pSelf->data);
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_assign(SELF, GblStringView view) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_set(SELF, GblStringView view) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->data.pCtx);
     GBL_API_CALL(GblVector_assign(&pSelf->data, view.pData, view.length));
     GBL_API_END();
@@ -204,12 +208,43 @@ GBL_INLINE GBL_RESULT GblStringBuffer_construct_1(SELF) GBL_NOEXCEPT
     return GblStringBuffer_construct_2(pSelf, GBL_STRING_VIEW(GBL_NULL));
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_take(SELF, char** ppStrPtr, GblSize* pCapacity) GBL_NOEXCEPT {
+GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_4 (SELF,
+                                                             GblStringView  view,
+                                                             GblSize        extraStackSize,
+                                                             GblContext*    pCtx) GBL_NOEXCEPT
+{
+    GblStringBuffer_construct_4(pSelf, view, extraStackSize, pCtx);
+    return pSelf;
+}
+
+GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_3 (SELF,
+                                                             GblStringView  view,
+                                                             GblSize        extraStackSize) GBL_NOEXCEPT
+{
+    GblStringBuffer_construct_3(pSelf, view, extraStackSize);
+    return pSelf;
+}
+
+GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_2 (SELF,
+                                                             GblStringView  view) GBL_NOEXCEPT
+{
+    GblStringBuffer_construct_2(pSelf, view);
+    return pSelf;
+}
+
+GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_1 (SELF) GBL_NOEXCEPT
+{
+    GblStringBuffer_construct_1(pSelf);
+    return pSelf;
+}
+
+
+GBL_INLINE GBL_RESULT GblStringBuffer_release(SELF, char** ppStrPtr, GblSize* pCapacity) GBL_NOEXCEPT {
     GblSize size = 0;
     return GblVector_take(&pSelf->data, (void**)ppStrPtr, &size, pCapacity);
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_give(SELF, char* pData, GblSize capacity) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_acquire(SELF, char* pData, GblSize capacity) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->data.pCtx);
     if(!pData && !capacity) GBL_API_DONE();
     if(!capacity && pData) capacity = strlen(pData);
@@ -450,7 +485,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_shrinkToFit(SELF) GBL_NOEXCEPT {
     GBL_API_END();
 }
 
-GBL_INLINE char GblStringBuffer_at(CSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE char GblStringBuffer_char(CSELF, GblSize index) GBL_NOEXCEPT {
     char result = '\0';
     GBL_API_BEGIN(pSelf->data.pCtx);
     const char* pChar = (const char*)GblVector_at(&pSelf->data, index);
@@ -460,7 +495,7 @@ GBL_INLINE char GblStringBuffer_at(CSELF, GblSize index) GBL_NOEXCEPT {
     return result;
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_setAt(CSELF, GblSize index, char value) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_charSet(CSELF, GblSize index, char value) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->data.pCtx);
     GBL_API_VERIFY(index < GblStringBuffer_length(pSelf), GBL_RESULT_ERROR_OUT_OF_RANGE);
     pSelf->data.pData[index] = value;
@@ -491,7 +526,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_chomp(SELF) GBL_NOEXCEPT {
 GBL_INLINE GBL_RESULT GblStringBuffer_lower(SELF) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->data.pCtx);
     for(GblSize c = 0; c < GblStringBuffer_length(pSelf); ++c) {
-        GblStringBuffer_setAt(pSelf, c, tolower(GblStringBuffer_at(pSelf, c)));
+        GblStringBuffer_charSet(pSelf, c, tolower(GblStringBuffer_char(pSelf, c)));
     }
     GBL_API_END();
 }
@@ -499,7 +534,63 @@ GBL_INLINE GBL_RESULT GblStringBuffer_lower(SELF) GBL_NOEXCEPT {
 GBL_INLINE GBL_RESULT GblStringBuffer_upper(SELF) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->data.pCtx);
     for(GblSize c = 0; c < GblStringBuffer_length(pSelf); ++c) {
-        GblStringBuffer_setAt(pSelf, c, toupper(GblStringBuffer_at(pSelf, c)));
+        GblStringBuffer_charSet(pSelf, c, toupper(GblStringBuffer_char(pSelf, c)));
+    }
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_RESULT GblStringBuffer_padLeft(SELF, char value, GblSize count) GBL_NOEXCEPT {
+    const GblStringView view = {
+        .pData          = &value,
+        .nullTerminated = 0,
+        .length         = 1
+    };
+    GBL_API_BEGIN(pSelf->data.pCtx);
+    for(GblSize i = 0; i < count; ++i)
+        GBL_API_VERIFY_CALL(GblStringBuffer_prepend(pSelf, view));
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_RESULT GblStringBuffer_padRight(SELF, char value, GblSize count) GBL_NOEXCEPT {
+    const GblStringView view = {
+        .pData          = &value,
+        .nullTerminated = 0,
+        .length         = 1
+    };
+    GBL_API_BEGIN(pSelf->data.pCtx);
+    for(GblSize i = 0; i < count; ++i)
+        GBL_API_VERIFY_CALL(GblStringBuffer_append(pSelf, view));
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_RESULT GblStringBuffer_trimStart(SELF, char value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(pSelf->data.pCtx);
+    GblSize count = 0;
+
+    while(GblStringBuffer_length(pSelf) > count &&
+          GblStringBuffer_char(pSelf, count) == value) {
+        ++count;
+    }
+
+    if(count) {
+        GBL_API_VERIFY_CALL(GblStringBuffer_erase(pSelf, 0, count));
+    }
+    GBL_API_END();
+}
+
+GBL_INLINE GBL_RESULT GblStringBuffer_trimEnd(SELF, char value) GBL_NOEXCEPT {
+    GBL_API_BEGIN(pSelf->data.pCtx);
+    GblSize count = 0;
+
+    while(GblStringBuffer_length(pSelf) > count &&
+          GblStringBuffer_char(pSelf, GblStringBuffer_length(pSelf)-1-count) == value) {
+        ++count;
+    }
+
+    if(count) {
+        GBL_API_VERIFY_CALL(GblStringBuffer_erase(pSelf,
+                                                  GblStringBuffer_length(pSelf)-1-count,
+                                                  count));
     }
     GBL_API_END();
 }

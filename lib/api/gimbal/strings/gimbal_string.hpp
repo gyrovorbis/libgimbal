@@ -243,7 +243,7 @@ public:
     static std::pair<char*, Size> take(GblStringBuffer* pGblStr) {
         char* pCStr = nullptr;
         Size capacity = 0;
-        Exception::checkThrow(GblStringBuffer_take(pGblStr, &pCStr, &capacity));
+        Exception::checkThrow(GblStringBuffer_release(pGblStr, &pCStr, &capacity));
         return { pCStr, capacity };
     }
 
@@ -252,7 +252,7 @@ public:
     }
 
     void give(std::pair<char*, Size> data) {
-        Exception::checkThrow(GblStringBuffer_give(this, data.first, data.second));
+        Exception::checkThrow(GblStringBuffer_acquire(this, data.first, data.second));
     }
 
     void clear(void) {
@@ -260,7 +260,7 @@ public:
     }
 
     const String& operator=(std::string_view view) {
-        Exception::checkThrow(GblStringBuffer_assign(this, GBL_STRING_VIEW(view.data(), view.size())));
+        Exception::checkThrow(GblStringBuffer_set(this, GBL_STRING_VIEW(view.data(), view.size())));
         return *this;
     }
 
