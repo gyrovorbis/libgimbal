@@ -4,7 +4,7 @@
 #include "gimbal_compiler.h"
 
 #ifdef GBL_CPP_17
-#   ifdef __apple_build_version__
+#   ifdef __APPLE__
 #       include <experimental/memory_resource>
         namespace gimbal {
             namespace pmr = std::experimental::pmr;
