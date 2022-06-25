@@ -97,6 +97,7 @@ build macos-gcc11:
     EXTRA_ARGS: ""
 
 build ios-15-sim:
+  stage: build
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   artifacts:
