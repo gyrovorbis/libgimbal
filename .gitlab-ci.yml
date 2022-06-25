@@ -110,7 +110,11 @@ build ios-15-sim:
     - cd build
     - env
     - /Users/falco.girgis/Qt/6.3.1/ios/bin/qt-cmake ../ -G Xcode
-    -  /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project LibGimbal.xcodeproj build -target ALL_BUILD -parallelizeTargets -configuration Debug -hideShellScriptEnvironment
+    - /Users/falco.girgis/Qt/Tools/CMake/CMake.app/Contents/bin/cmake --build /Users/falco.girgis/Documents/dev/build-libgimbal-Qt_6_3_1_for_iOS_Simulator --target ALL_BUILD --config Debug
+   
+#    - /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project LibGimbal.xcodeproj build -target ALL_BUILD -parallelizeTargets -configuration Debug -hideShellScriptEnvironment
+
+#/Users/falco.girgis/Qt/Tools/CMake/CMake.app/Contents/bin/cmake" --build /Users/falco.girgis/Documents/dev/build-libgimbal-Qt_6_3_1_for_iOS_Simulator --target ALL_BUILD --config Debug
 
 build wasm:
   stage: build
@@ -118,6 +122,7 @@ build wasm:
     - emscriptgen
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
+    EMSDK: /home/falco/Documents/dev/emsdk
   artifacts:
     paths:
        - build/
@@ -125,8 +130,10 @@ build wasm:
     - mkdir -p build
     - cd build
     - env
-    - /home/falco/Qt/6.3.0/wasm_32/bin/qt-cmake ../ -G Ninja
-    - cmake --build ../
+    - cmake -S ../ -B ./ -DCMAKE_GENERATOR:STRING=Ninja -DCMAKE_BUILD_TYPE:STRING=Debug '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/falco/Qt/Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' -DQT_QMAKE_EXECUTABLE:FILEPATH=/home/falco/Qt/6.3.0/wasm_32/bin/qmake -DCMAKE_PREFIX_PATH:PATH=/home/falco/Qt/6.3.0/wasm_32 -DCMAKE_C_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/emcc -DCMAKE_CXX_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/em++ -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/home/falco/Qt/6.3.0/wasm_32/lib/cmake/Qt6/qt.toolchain.cmake
+    - cmake --build ../ --target all
+ #   - /home/falco/Qt/6.3.0/wasm_32/bin/qt-cmake ../ 
+ #   - cmake --build ../
 
 .clang_tidy_common:
   stage: test
