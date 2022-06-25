@@ -125,7 +125,7 @@ build wasm:
     - mkdir -p build
     - cd build
     - env
-    - /Users/falco.girgis/Qt/6.3.1/wasm_32/bin/qt-cmake ../ -G Xcode
+    - /home/falco/Qt/6.3.0/wasm_32/bin/qt-cmake ../ -G Xcode
     - cmake --build ../
 
 .clang_tidy_common:
