@@ -101,11 +101,11 @@ build ios-15-sim:
   tags:
     - ios, simulator
   variables:
-    CC: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
-    CXX: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
+    CC: clang
+    CXX: clang++
     PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/ios
     GENERATOR: Xcode
-    EXTRA_ARGS: -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DCMAKE_OSX_SYSROOT="iphoneos" -DCMAKE_TOOLCHAIN_FILE="/Users/falco.girgis/Qt/6.3.1/ios/lib/cmake/Qt6/qt.toolchain.cmake"
+    EXTRA_ARGS: -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_SYSROOT="iphonesimulator" -DCMAKE_TOOLCHAIN_FILE="/Users/falco.girgis/Qt/6.3.1/ios/lib/cmake/Qt6/qt.toolchain.cmake"
 
 build webasm:
   extends: .build_common
