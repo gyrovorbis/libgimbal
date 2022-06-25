@@ -95,13 +95,22 @@ build macos-gcc11:
     CXX: g++-11
     PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/macos
 
+  build ios-15-sim:
+  extends: .build_common
+  tags:
+    - ios, simulator
+  variables:
+    CC: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+    CXX: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
+    PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/ios
+
 build webasm:
   extends: .build_common
   tags:
     - emscriptgen
   variables:
-    CC: emcc
-    CXX: em++
+    CC: /home/falco/Documents/dev/emsdk/upstream/emscriptgen/emcc
+    CXX: /home/falco/Documents/dev/emsdk/upstream/emscriptgen/em++
     PREFIX_PATH: /home/falco/Qt/6.3.0/wasm_32
 
 .clang_tidy_common:
