@@ -127,6 +127,7 @@ build wasm:
     paths:
        - build/
   script:
+    - source ${EMSDK}/emsdk_env.sh
     - mkdir -p build
     - cd build
     - env
