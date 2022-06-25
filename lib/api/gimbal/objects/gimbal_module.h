@@ -27,7 +27,6 @@
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblModule);
-GBL_FORWARD_DECLARE_STRUCT_PRIVATE(GblModulePrivate);
 
 typedef struct GblModuleClass {
     GblContextClass      base;
@@ -42,10 +41,9 @@ typedef struct GblModule {
         GblContext          base;
     };
     GblVersion              version;
-    GblStringBuffer         author;
-    GblStringBuffer         description;
-    GblStringBuffer         prefixName;
-    GblModulePrivate*       pPrivate_;
+    GblStringRef            prefix;
+    GblStringRef            author;
+    GblStringRef            description;
 } GblModule;
 
 typedef enum GBL_MODULE_PROPERTY_ID {
@@ -58,35 +56,35 @@ typedef enum GBL_MODULE_PROPERTY_ID {
 
 GBL_PROPERTY_TABLE_BEGIN(GBL_MODULE)
     GBL_PROPERTY_ENTRY("prefix",
-                      "Prefix",
-                      "String prefix for module's namespace",
-                      GBL_MODULE_PROPERTY_ID_PREFIX,
-                      GBL_STRING_TYPE,
-                      GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
+                       "Prefix",
+                       "String prefix for module's namespace",
+                       GBL_MODULE_PROPERTY_ID_PREFIX,
+                       GBL_STRING_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
     GBL_PROPERTY_ENTRY("version",
-                      "Version",
-                      "Encoded major.minor.patch version of module",
-                      GBL_MODULE_PROPERTY_ID_VERSION,
-                      GBL_UINT32_TYPE,
-                      GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
+                       "Version",
+                       "Encoded major.minor.patch version of module",
+                       GBL_MODULE_PROPERTY_ID_VERSION,
+                       GBL_UINT32_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
     GBL_PROPERTY_ENTRY("author",
-                      "Author",
-                      "Author(s) of the module",
-                      GBL_MODULE_PROPERTY_ID_AUTHOR,
-                      GBL_STRING_TYPE,
-                      GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
+                       "Author",
+                       "Author(s) of the module",
+                       GBL_MODULE_PROPERTY_ID_AUTHOR,
+                       GBL_STRING_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
     GBL_PROPERTY_ENTRY("description",
-                      "Description",
-                      "Description of module",
-                      GBL_MODULE_PROPERTY_ID_DESCRIPTION,
-                      GBL_STRING_TYPE,
-                      GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
+                       "Description",
+                       "Description of module",
+                       GBL_MODULE_PROPERTY_ID_DESCRIPTION,
+                       GBL_STRING_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ, WRITE, LOAD, SAVE, CONSTRUCT))
     GBL_PROPERTY_ENTRY("typeCount",
-                      "Type Count",
-                      "Number of meta types registered to the module",
-                      GBL_MODULE_PROPERTY_ID_TYPE_COUNT,
-                      GBL_UINT32_TYPE,
-                      GBL_PROPERTY_FLAGS_MASK(READ))
+                       "Type Count",
+                       "Number of meta types registered to the module",
+                       GBL_MODULE_PROPERTY_ID_TYPE_COUNT,
+                       GBL_UINT32_TYPE,
+                       GBL_PROPERTY_FLAGS_MASK(READ))
 GBL_PROPERTY_TABLE_END()
 
 GblModule*  GblModule_create(const char* pName,

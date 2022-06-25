@@ -76,6 +76,8 @@ add_executable(GimbalTests
     include/containers/test_gimbal_byte_array.h
     include/containers/test_gimbal_byte_array.hpp
     source/containers/test_gimbal_byte_array.c
+    include/strings/test_gimbal_quark.h
+    source/strings/test_gimbal_quark.c
     source/test_main.cpp)
 
 
