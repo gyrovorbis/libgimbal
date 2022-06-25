@@ -295,7 +295,7 @@ private slots:
     void stlPmr(void) {
 #ifdef GBL_PMR_VECTOR
         auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "PMR_VECTOR") {
-            vector<std::string> strings{1, pCtx()};
+            std::pmr::vector<std::string> strings{1, pCtx()};
             strings.emplace_back("324324324333333333");
             strings.emplace_back("23432453453453452345234523452");
         };
@@ -305,7 +305,7 @@ private slots:
         QCOMPARE(test.getActiveAllocCount(), 0);
 
         test = GBL_TEST_CASE_API_BLOCK(pCtx(), "PMR_STRING") {
-            string str("LOLOSDFSDFSDFSDFfLOL", pCtx());
+            std::pmr::string str("LOLOSDFSDFSDFSDFfLOL", pCtx());
             str += "HEEAAAAAAAAAAAAAAAAAAAAAAP";
         };
         QVERIFY(test);

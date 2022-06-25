@@ -66,7 +66,7 @@ namespace gimbal::test {
 
 #define GBL_TEST_VERIFY_EXCEPTION_THROWN(expr, result)              \
     GBL_STMT_START {                                                \
-        QVERIFY_THROWS_EXCEPTION(gimbal::Exception, (expr));        \
+        QVERIFY_EXCEPTION_THROWN((expr), gimbal::Exception);        \
         try {                                                       \
             (expr);                                                 \
         } catch(const gimbal::Exception& except) {                  \

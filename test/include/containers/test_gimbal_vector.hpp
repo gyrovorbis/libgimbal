@@ -208,7 +208,7 @@ inline void Vector::comparison(void) {
 
     QVERIFY((gimbal::Vector{'a', 'c'}) > charArray);
 #   ifdef GBL_PMR_VECTOR
-    QVERIFY(gimbal::VectorView(gimbal::Vector<int>(vector<int>({1, 2, 3, 4, 5}, pCtx()))) <= (std::array{1, 2, 3, 4, 5}));
+    QVERIFY(gimbal::VectorView(gimbal::Vector<int>(std::pmr::vector<int>({1, 2, 3, 4, 5}, pCtx()))) <= (std::array{1, 2, 3, 4, 5}));
 #   endif
     QVERIFY(gimbal::VectorView(gimbal::Vector<int>(std::vector<int>({1, 2, 3, 4, 5}))) <= (std::array{1, 2, 3, 4, 5}));
 

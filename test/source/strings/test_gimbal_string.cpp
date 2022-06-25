@@ -108,7 +108,7 @@ void String::createStackStdString(void) {
 void String::createStackStdPmrString(void) {
 #ifdef GBL_PMR_STRING
     const auto test = [&](MonitorableContext* pCtx=nullptr) {
-        gimbal::String string(string("CppStr", pCtx), pCtx);
+        gimbal::String string(std::pmr::string("CppStr", pCtx), pCtx);
         QCOMPARE(string.getContext(), pCtx);
         verifyString_(string, "CppStr");
         QCOMPARE(string, "CppStr"_gstr);

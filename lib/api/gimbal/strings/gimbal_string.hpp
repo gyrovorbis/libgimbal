@@ -209,7 +209,7 @@ public:
         String(std::string_view{stdString.c_str()}, pCtx, size) {}
 
 #ifdef GBL_PMR_STRING
-    String(const string& stdPmrString, Context* pCtx=nullptr, Size size=sizeof(String)):
+    String(const std::pmr::string& stdPmrString, Context* pCtx=nullptr, Size size=sizeof(String)):
         String(std::string_view{stdPmrString.c_str()}, pCtx, size) {}
 #endif
 
@@ -281,7 +281,7 @@ public:
     }
 
 #ifdef GBL_PMR_STRING
-    const String& operator=(const string& stdString) {
+    const String& operator=(const std::pmr::string& stdString) {
         return *this = stdString.c_str();
     }
 #endif
