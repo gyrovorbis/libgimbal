@@ -234,7 +234,7 @@ public:
    //reverse_iterator         rbegin(void) { return {*static_cast<CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()-1 }; }
    auto         rbegin(void) { return std::make_reverse_iterator(end()); }
    auto                     rbegin(void) const { return crbegin(); }
-   iterator                 end(void) { return {*static_cast<CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()}; }
+   iterator                 end(void) { return iterator(*static_cast<CRTP*>(this), (Index)static_cast<const CRTP*>(this)->getElementCount_()); }
    auto                     end(void) const { return cend(); }
    //reverse_iterator         rend(void) { return {*static_cast<CRTP*>(this), -1}; }
    auto         rend(void) { return std::make_reverse_iterator(begin()); }
@@ -242,7 +242,7 @@ public:
    const_iterator           cbegin(void) const { return {*static_cast<const CRTP*>(this), 0}; }
    //reverse_const_iterator   crbegin(void) const { return {*static_cast<const CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()-1}; }
    auto   crbegin(void) const { return std::make_reverse_iterator(cend()); }
-   const_iterator           cend(void) const { return {*static_cast<const CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()}; }
+   const_iterator           cend(void) const { return const_iterator(*static_cast<const CRTP*>(this), (Index)static_cast<const CRTP*>(this)->getElementCount_()); }
    //reverse_const_iterator   crend(void) const { return {*static_cast<const CRTP*>(this), -1}; }
    auto crend(void) const { return std::make_reverse_iterator(cbegin()); }
 };
