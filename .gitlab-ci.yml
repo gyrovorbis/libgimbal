@@ -208,10 +208,10 @@ test win10-mingw11:
 test macos-clang13:
   extends: .test_common
   needs: ["build macos-clang13"]
-   dependencies:
-      - build macos-clang13
-    tags:
-     - macos, clang
+  dependencies:
+    - build macos-clang13
+  tags:
+    - macos, clang
 
 test macos-gcc11:
   extends: .test_common
