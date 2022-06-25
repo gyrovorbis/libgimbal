@@ -49,11 +49,15 @@ function(GBL_BUILD_TIMESTAMP_DEFINE varName)
     set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endfunction()
 
-include(TestBigEndian)
+#include(TestBigEndian)
 
 function(GBL_BUILD_BIG_ENDIAN_DEFINE varName)
-    TEST_BIG_ENDIAN(${varName})
-    GBL_BUILD_DEFINE(${varName} ${${varName}})
+#    TEST_BIG_ENDIAN(${varName})
+    if(CMAKE_C_BYTE_ORDER EQUAL BIG_ENDIAN)
+        GBL_BUILD_DEFINE(${varName} 1)
+    else()
+        GBL_BUILD_DEFINE(${varName} 0)
+    endif()
     set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endfunction()
 
