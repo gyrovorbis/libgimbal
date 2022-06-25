@@ -122,6 +122,7 @@ build wasm:
     - emscriptgen
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
+    EMSDK: /home/falco/Documents/dev/emsdk
   artifacts:
     paths:
        - build/
