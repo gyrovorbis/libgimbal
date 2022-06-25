@@ -98,6 +98,8 @@ build macos-gcc11:
 
 build ios-15-sim:
   stage: build
+  tags: 
+    - ios, simulator
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   artifacts:
