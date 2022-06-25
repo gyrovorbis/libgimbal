@@ -95,7 +95,7 @@ build macos-gcc11:
     CXX: g++-11
     PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/macos
 
-  build ios-15-sim:
+build ios-15-sim:
   extends: .build_common
   tags:
     - ios, simulator
