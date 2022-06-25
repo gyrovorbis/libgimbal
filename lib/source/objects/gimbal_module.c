@@ -172,6 +172,7 @@ GBL_RESULT GblModuleClass_final_(GblClass* pClass, const void* pData, GblContext
     if(!GblType_classRefCount(GBL_MODULE_TYPE)) {
   //      memset(pPropertyList_, 0, sizeof(pPropertyList_));
     }
+    return GBL_RESULT_UNIMPLEMENTED;
 }
 
 extern GBL_RESULT GblModule_typeRegister_(GblContext* pCtx) {
@@ -204,5 +205,6 @@ GblType GblModule_registerType(GblModule*           pSelf,
                                GblFlags             flags) GBL_NOEXCEPT {
 
     GblType newType = GblType_registerDynamic(parent, pName, GBL_IPLUGIN(pSelf), flags);
+    return newType;
 }
 

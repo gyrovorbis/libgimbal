@@ -27,7 +27,7 @@ namespace gimbal {
         const Quark& operator=(std::nullptr_t);
         const Quark& operator=(const char* pString);
         const Quark& operator=(const std::string& stdString);
-        const Quark& operator=(const std::pmr::string& stdPmrString);
+        //const Quark& operator=(const string& stdPmrString);
         const Quark& operator=(const std::string_view& stringView);
      //   const Quark& operator=(const String& gblString);
      //   const Quark& operator=(const StringView& gblStringView);

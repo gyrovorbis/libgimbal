@@ -198,13 +198,23 @@ inline void Vector::comparison(void) {
     std::array charArray = { 'a', 'b' };
     test(gimbal::Vector{'a', 'b'}, charArray);
     test(gimbal::Vector({1.2f, 1.3f, 1.4f}, pCtx()), std::vector { 1.2f, 1.3f, 1.4f });
+#ifdef GBL_PMR_VECTOR
     QCOMPARE(gimbal::VectorView(gimbal::Vector<int>(std::pmr::vector<int>({1, 2, 3, 4, 5}, pCtx()))), (std::array{1, 2, 3, 4, 5}));
+#endif
+    QCOMPARE(gimbal::VectorView(gimbal::Vector<int>(std::vector<int>({1, 2, 3, 4, 5}))), (std::array{1, 2, 3, 4, 5}));
 
+#ifdef GBL_LEX_CMP_3WAY
     QVERIFY(gimbal::Vector({1, 2, 3, 0}) < (std::initializer_list<int>{1, 2, 3, 4}));
+
     QVERIFY((gimbal::Vector{'a', 'c'}) > charArray);
-    QVERIFY(gimbal::VectorView(gimbal::Vector<int>(std::pmr::vector<int>({1, 2, 3, 4, 5}, pCtx()))) <= (std::array{1, 2, 3, 4, 5}));
+#   ifdef GBL_PMR_VECTOR
+    QVERIFY(gimbal::VectorView(gimbal::Vector<int>(vector<int>({1, 2, 3, 4, 5}, pCtx()))) <= (std::array{1, 2, 3, 4, 5}));
+#   endif
+    QVERIFY(gimbal::VectorView(gimbal::Vector<int>(std::vector<int>({1, 2, 3, 4, 5}))) <= (std::array{1, 2, 3, 4, 5}));
+
     gimbal::Vector vectrix = {1, 2};
     QVERIFY(gimbal::VectorView(vectrix) >= static_cast<GblVector&>(vectrix));
+#endif
 }
 
 inline void Vector::assignValue(void) {

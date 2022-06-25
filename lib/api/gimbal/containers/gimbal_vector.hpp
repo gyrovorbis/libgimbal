@@ -4,6 +4,7 @@
 #include "gimbal_container.hpp"
 #include "gimbal_vector.h"
 #include "../objects/gimbal_context.hpp"
+#include <algorithm>
 
 
 namespace gimbal {
@@ -117,9 +118,14 @@ public:
     }
 
     bool isHeap(void) const { return !isStack(); }
+#ifdef GBL_PMR_VECTOR
+    std::pmr::vector<value_type> toStdPmrVector(void) const {
+        gimbal::pmr::vector<value_type> stdVec(&front(), &back(), getContext());
+    }
+#endif
 
-    std::pmr::vector<value_type> toStdVector(void) const {
-        std::pmr::vector<value_type> stdVec(&front(), &back(), getContext());
+    std::vector<value_type> toStdVector(void) const {
+        std::vector<value_type> stdVec(&front(), &back());
     }
 
     Size getStackBytes(void) const {
@@ -198,7 +204,11 @@ public:
     }
 
     friend constexpr auto operator<=>(const CRTP& vec, const type_compatible_container_readable<T> auto& con) noexcept {
+#ifdef GBL_LEX_CMP_3WAY
         return std::lexicographical_compare_three_way(std::cbegin(vec), std::cend(vec), std::cbegin(con), std::cend(con));
+#else
+        return std::lexicographical_compare(std::cbegin(vec), std::cend(vec), std::cbegin(con), std::cend(con));
+#endif
     }
 
     friend bool operator==(const CRTP& vec, const VectorView<T>& rhs) {
@@ -207,7 +217,11 @@ public:
     }
 
     friend constexpr auto operator<=>(const CRTP& vec, const VectorView<T>& rhs) noexcept {
+#ifdef GBL_LEX_CMP_3WAY
         return std::lexicographical_compare_three_way(std::cbegin(vec), std::cend(vec), std::cbegin(rhs), std::cend(rhs));
+#else
+        return std::lexicographical_compare(std::cbegin(vec), std::cend(vec), std::cbegin(rhs), std::cend(rhs));
+#endif
     }
 
 };
@@ -558,13 +572,17 @@ public:
 
     const VectorType& operator=(const type_compatible_container<T> auto&& c) {
         // check for supported move semantics!
-        if constexpr(std::same_as<decltype(c), std::pmr::vector<T>&&>) {
+#ifdef GBL_PMR_VECTOR
+        if constexpr(std::same_as<decltype(c), gimbal::pmr::vector<T>&&>) {
             if(this->get_allocator() == c.get_allocator()) {
                 assign(c);
             }
         } else {
+#endif
             assign(c);
+#ifdef GBL_PMR_VECTOR
         }
+#endif
         return *this;
     }
 

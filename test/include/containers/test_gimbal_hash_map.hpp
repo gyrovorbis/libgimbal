@@ -3,6 +3,7 @@
 
 #include <gimbal/containers/gimbal_hash_map.hpp>
 #include "test_gimbal.hpp"
+#include <unordered_map>
 
 #define GBL_TEST_HASH_MAP_BENCHMARK_READ_ENTRIES    10000
 #define GBL_TEST_HASH_MAP_BENCHMARK_KEY_SIZE        30

@@ -293,8 +293,9 @@ private slots:
     }
 
     void stlPmr(void) {
+#ifdef GBL_PMR_VECTOR
         auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "PMR_VECTOR") {
-            std::pmr::vector<std::string> strings{1, pCtx()};
+            vector<std::string> strings{1, pCtx()};
             strings.emplace_back("324324324333333333");
             strings.emplace_back("23432453453453452345234523452");
         };
@@ -304,7 +305,7 @@ private slots:
         QCOMPARE(test.getActiveAllocCount(), 0);
 
         test = GBL_TEST_CASE_API_BLOCK(pCtx(), "PMR_STRING") {
-            std::pmr::string str("LOLOSDFSDFSDFSDFfLOL", pCtx());
+            string str("LOLOSDFSDFSDFSDFfLOL", pCtx());
             str += "HEEAAAAAAAAAAAAAAAAAAAAAAP";
         };
         QVERIFY(test);
@@ -313,6 +314,9 @@ private slots:
         QCOMPARE(test.getActiveAllocCount(), 0);
 
         QCOMPARE(ctx().getAllocTracker().getActiveAllocationCount(), 0);
+#else
+        QSKIP("Fucking MacOS doesn't support std::pmr::vector!");
+#endif
     }
 
     void recordSet(void) {
@@ -623,7 +627,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
 
         auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "C_TO_CPP_CALL") {
             GBL_API_TRY {
-                std::pmr::vector<int> vec(1, pCtx());
+                std::vector<int> vec(1);
                 auto val = vec.at(5);
                 GBL_UNUSED(val);
             } GBL_API_VERIFY_CATCH();

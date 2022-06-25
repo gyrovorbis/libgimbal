@@ -26,7 +26,7 @@ class String;
 
 //make this all compatible with gimbal::Vector<char>
 
-//support std::pmr::string ?
+//support string ?
 template<typename CRTP>
 class StringViewBase:
     public tags::StringBase,
@@ -135,12 +135,14 @@ public:
     friend constexpr decltype(auto) operator<=>(const Derived& lhs, const std::string& rhs) noexcept {
         return (lhs.toStdString() <=> rhs);
     }
+#ifdef GBL_PMR_STRING
     friend constexpr bool operator==(const Derived& lhs, const std::pmr::string& rhs) noexcept {
         return (lhs == rhs.c_str());
     }
     friend constexpr decltype(auto) operator<=>(const Derived& lhs, const std::pmr::string& rhs) noexcept {
         return (lhs.toStdString() <=> rhs);
     }
+#endif
     friend constexpr bool operator==(const Derived& lhs, std::string_view rhs) noexcept {
         return (lhs.toStringView() == rhs);
     }
@@ -206,8 +208,10 @@ public:
     String(const std::string& stdString, Context* pCtx=nullptr, Size size=sizeof(String)):
         String(std::string_view{stdString.c_str()}, pCtx, size) {}
 
-    String(const std::pmr::string& stdPmrString, Context* pCtx=nullptr, Size size=sizeof(String)):
+#ifdef GBL_PMR_STRING
+    String(const string& stdPmrString, Context* pCtx=nullptr, Size size=sizeof(String)):
         String(std::string_view{stdPmrString.c_str()}, pCtx, size) {}
+#endif
 
     String(const char* pCStr, Context* pCtx=nullptr, Size size=sizeof(String)):
         String(pCStr? std::string_view{pCStr} : std::string_view{}, pCtx, size) {}
@@ -276,9 +280,11 @@ public:
         return *this = stdString.c_str();
     }
 
-    const String& operator=(const std::pmr::string& stdString) {
+#ifdef GBL_PMR_STRING
+    const String& operator=(const string& stdString) {
         return *this = stdString.c_str();
     }
+#endif
 
     const String& operator=(const char* pCStr) {
         if(pCStr) return *this = std::string_view(pCStr);

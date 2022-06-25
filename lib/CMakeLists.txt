@@ -9,6 +9,7 @@ project(LibGimbal
         "elysianshadows.com"
     LANGUAGES C)
 
+#set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum OS X Deployment Version")
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -204,6 +205,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/utils/gimbal_cmdline_parser.h
     api/gimbal/preprocessor/gimbal_atomics.h
     api/gimbal/meta/gimbal_boxed.h
+    api/gimbal/preprocessor/gimbal_memory_resource.hpp
     source/meta/gimbal_type_.h
     lib/jenkins/lookup3.h)
 
@@ -238,7 +240,6 @@ GBL_TARGET_PROPERTY_DEFINE(GBL_BUILD_CPP_EXTENSIONS libGimbal CXX_EXTENSIONS)
 if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
         target_compile_options(libGimbal PUBLIC "/Zc:preprocessor")
 endif()
-
 
 list(APPEND
     GBL_DEFINES

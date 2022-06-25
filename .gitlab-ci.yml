@@ -77,23 +77,23 @@ build win10-mingw11:
 #    CXX: "C:/Program Files/LLVM/bin/clang.exe"
 #   PREFIX_PATH: "C:/Program Files/LLVM/bin"
 
-#build macos-clang12:
-#  extends: .build_common
-#  tags:
-#    - macos, clang
-#  variables:
-#    CC: clang
-#    CXX: clang++
-#    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
+build macos-clang13:
+  extends: .build_common
+  tags:
+    - macos, clang
+  variables:
+    CC: clang
+    CXX: clang++
+    PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/macos
 
-#build macos-gcc10:
-#  extends: .build_common
-#  tags:
-#    - macos, gcc
-#  variables:
-#    CC: gcc-10
-#    CXX: g++-10
-#    PREFIX_PATH: /Users/falcogirgis/Qt/6.0.2/clang_64
+build macos-gcc11:
+  extends: .build_common
+  tags:
+    - macos, gcc
+  variables:
+    CC: gcc-11
+    CXX: g++-11
+    PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/macos
 
 .clang_tidy_common:
   stage: test
@@ -205,18 +205,18 @@ test win10-mingw11:
   tags:
     - mingw, win10
 
-#test macos-clang12:
-#  extends: .test_common
-#  needs: ["build macos-clang12"]
-#  dependencies:
-#    - build macos-clang12
-#  tags:
-#    - macos, clang
+test macos-clang13:
+  extends: .test_common
+  needs: ["build macos-clang13"]
+   dependencies:
+      - build macos-clang13
+    tags:
+     - macos, clang
 
-#test macos-gcc10:
-#  extends: .test_common
-#  needs: ["build macos-gcc10"]
-#  dependencies:
-#    - build macos-gcc10
-#  tags:
-#    - macos, gcc
+test macos-gcc11:
+  extends: .test_common
+  needs: ["build macos-gcc11"]
+  dependencies:
+    - build macos-gcc11
+  tags:
+    - macos, gcc

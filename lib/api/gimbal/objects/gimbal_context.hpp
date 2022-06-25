@@ -4,10 +4,10 @@
 #include "gimbal_context.h"
 #include "../core/gimbal_api_frame.hpp"
 #include "../types/gimbal_version.hpp"
-#include "gimbal/core/gimbal_call_stack.hpp"
+#include "../core/gimbal_call_stack.hpp"
 #include "../types/gimbal_exception.hpp"
+#include "../preprocessor/gimbal_memory_resource.hpp"
 #include <iostream>
-#include <memory_resource>
 
 namespace gimbal {
 
@@ -37,7 +37,7 @@ catch(...) {    \
 
 class Context:
         public GblContext,
-        public std::pmr::memory_resource
+        public gimbal::pmr::memory_resource
 {
 public:
 
@@ -133,7 +133,7 @@ public:
         Exception::checkThrow(GBL_API_RESULT());
     }
 
-    //===== overridden from std::pmr::memory_resource =====
+    //===== overridden from memory_resource =====
     virtual void* do_allocate(size_t bytes, size_t align) override {
         GBL_API_BEGIN(static_cast<GblContext*>(this));
         void* pValue = nullptr;
@@ -151,7 +151,7 @@ public:
         } GBL_RESULT_CATCH(GBL_API_RESULT());
         GBL_API_END_BLOCK();
     }
-    virtual bool do_is_equal(const std::pmr::memory_resource& other) const noexcept override {
+    virtual bool do_is_equal(const memory_resource& other) const noexcept override {
         return this == &other;
     }
 
