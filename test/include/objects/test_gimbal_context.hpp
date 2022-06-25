@@ -294,6 +294,7 @@ private slots:
 
     void stlPmr(void) {
 #ifdef GBL_PMR_VECTOR
+        qDebug() << "PMR";
         auto test = GBL_TEST_CASE_API_BLOCK(pCtx(), "PMR_VECTOR") {
             std::pmr::vector<std::string> strings{1, pCtx()};
             strings.emplace_back("324324324333333333");
@@ -315,6 +316,7 @@ private slots:
 
         QCOMPARE(ctx().getAllocTracker().getActiveAllocationCount(), 0);
 #else
+        qDebug() << "NOT PMR";
         QSKIP("Fucking MacOS doesn't support std::pmr::vector!");
 #endif
     }
