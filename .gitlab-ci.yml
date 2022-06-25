@@ -95,6 +95,15 @@ build macos-gcc11:
     CXX: g++-11
     PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/macos
 
+build webasm:
+  extends: .build_common
+  tags:
+    - emscriptgen
+  variables:
+    CC: emcc
+    CXX: em++
+    PREFIX_PATH: /home/falco/Qt/6.3.0/wasm_32
+
 .clang_tidy_common:
   stage: test
   script:
