@@ -3,7 +3,7 @@ stages:
   - analyze
   - test
 
-
+#cmake <source-dir> -G Xcode -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DCMAKE_OSX_SYSROOT="iphoneos" -DCMAKE_TOOLCHAIN_FILE="<Qt-dir>/<version>/#ios/lib/cmake/Qt6/qt.toolchain.cmake"
 .build_common:
   stage: build
   variables:
@@ -15,13 +15,15 @@ stages:
     - mkdir -p build
     - cd build
     - env
-    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE:String=Debug -GNinja
+    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE:String=Debug -G${GENERATOR} ${EXTRA_ARGS}
     - ${ANALYZER} cmake --build . --target all
 
 .build_linux:
   extends: .build_common
   variables:
     PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
+    GENERATOR: Ninja
+    EXTRA_ARGS: 
   tags:
     - linux
 
@@ -52,6 +54,8 @@ build win10-vs2022:
     CC: cl
     CXX: cl
     PREFIX_PATH: C:/Qt/6.3.0/msvc2019_64
+    GENERATOR: Ninja
+    EXTRA_ARGS: 
   after_script:
     - pwd
     - C:/Qt/6.3.0/msvc2019_64/bin/windeployqt build/test/GimbalTests.exe
@@ -64,18 +68,11 @@ build win10-mingw11:
     CC: x86_64-w64-mingw32-gcc
     CXX: x86_64-w64-mingw32-g++
     PREFIX_PATH: C:/Qt/6.3.0/mingw_64
+    GENERATOR: Ninja
+    EXTRA_ARGS:
   after_script:
     - pwd
     - C:/Qt/6.3.0/mingw_64/bin/windeployqt build/test/GimbalTests.exe
-
-#build win10-clang:
-#  extends: .build_common
-#  tags:
-#    - clang, win10
-#  variables:
-#    CC: "C:/Program Files/LLVM/bin/clang.exe"
-#    CXX: "C:/Program Files/LLVM/bin/clang.exe"
-#   PREFIX_PATH: "C:/Program Files/LLVM/bin"
 
 build macos-clang13:
   extends: .build_common
@@ -85,6 +82,8 @@ build macos-clang13:
     CC: clang
     CXX: clang++
     PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/macos
+    GENERATOR: Ninja
+    EXTRA_ARGS: 
 
 build macos-gcc11:
   extends: .build_common
@@ -94,6 +93,8 @@ build macos-gcc11:
     CC: gcc-11
     CXX: g++-11
     PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/macos
+    GENERATOR: Ninja
+    EXTRA_ARGS:
 
 build ios-15-sim:
   extends: .build_common
@@ -103,6 +104,8 @@ build ios-15-sim:
     CC: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
     CXX: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
     PREFIX_PATH: /Users/falco.girgis/Qt/6.3.1/ios
+    GENERATOR: Xcode
+    EXTRA_ARGS: -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DCMAKE_OSX_SYSROOT="iphoneos" -DCMAKE_TOOLCHAIN_FILE="/Users/falco.girgis/Qt/6.3.1/ios/lib/cmake/Qt6/qt.toolchain.cmake"
 
 build webasm:
   extends: .build_common
