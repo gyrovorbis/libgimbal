@@ -241,6 +241,8 @@ if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
         target_compile_options(libGimbal PUBLIC "/Zc:preprocessor")
 endif()
 
+set_xcode_property(libGimbal PRODUCT_BUNDLE_IDENTIFIER "com.elysianshadows.libgimbal" All)
+
 list(APPEND
     GBL_DEFINES
     ${GBL_CONFIGURATION_DEFINES}
