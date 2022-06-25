@@ -110,7 +110,11 @@ build ios-15-sim:
     - cd build
     - env
     - /Users/falco.girgis/Qt/6.3.1/ios/bin/qt-cmake ../ -G Xcode
-    -  /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project LibGimbal.xcodeproj build -target ALL_BUILD -parallelizeTargets -configuration Debug -hideShellScriptEnvironment
+    - /Users/falco.girgis/Qt/Tools/CMake/CMake.app/Contents/bin/cmake" --build /Users/falco.girgis/Documents/dev/build-libgimbal-Qt_6_3_1_for_iOS_Simulator --target ALL_BUILD --config Debug
+   
+#    - /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project LibGimbal.xcodeproj build -target ALL_BUILD -parallelizeTargets -configuration Debug -hideShellScriptEnvironment
+
+#/Users/falco.girgis/Qt/Tools/CMake/CMake.app/Contents/bin/cmake" --build /Users/falco.girgis/Documents/dev/build-libgimbal-Qt_6_3_1_for_iOS_Simulator --target ALL_BUILD --config Debug
 
 build wasm:
   stage: build
