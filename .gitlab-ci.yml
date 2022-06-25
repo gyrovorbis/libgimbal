@@ -109,8 +109,8 @@ build webasm:
   tags:
     - emscriptgen
   variables:
-    CC: /home/falco/Documents/dev/emsdk/upstream/emscriptgen/emcc
-    CXX: /home/falco/Documents/dev/emsdk/upstream/emscriptgen/em++
+    CC: /home/falco/Documents/dev/emsdk/upstream/emscripten/emcc
+    CXX: /home/falco/Documents/dev/emsdk/upstream/emscripten/em++
     PREFIX_PATH: /home/falco/Qt/6.3.0/wasm_32
 
 .clang_tidy_common:
