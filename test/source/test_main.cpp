@@ -27,7 +27,11 @@
 
 using namespace elysian;
 
+#if defined(Q_OS_IOS)
+extern "C" int qt_main_wrapper(int argc, char** argv) {
+#else
 int main(int argc, char* argv[]) {
+#endif
     UnitTestSuite testSuite;
     //auto* pCtx = new gimbal::test::StandardContext;
     //GblContext_globalSet(new gimbal::test::MonitorableContext(pCtx))
