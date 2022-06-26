@@ -84,7 +84,11 @@ build psvita:
     paths:
        - build/
   script:
+      - mkdir -p build
+      - cd build 
+      - env
       - cmake ../ -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake
+      - cmake --build . --target all
 
 build macos-clang13:
   extends: .build_common
