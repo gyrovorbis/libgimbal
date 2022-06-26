@@ -215,9 +215,8 @@ test ios-15-sim:
     - ios, simulator
   script:
     - xcrun simctl boot A64093FF-15E7-495A-8A9B-83DC1C37D8F5
-    - xcrun simctl install A64093FF-15E7-495A-8A9B-83DC1C37D8F5 build/test/Debug-iphoneos/GimbalTests.app
+    - xcrun simctl install A64093FF-15E7-495A-8A9B-83DC1C37D8F5 build/test/Debug-iphonesimulator/GimbalTests.app
     - xcrun simctl launch --console A64093FF-15E7-495A-8A9B-83DC1C37D8F5 GimbalTests
-    - xcrun simctl shutdown A64093FF-15E7-495A-8A9B-83DC1C37D8F5
     
 test ubuntu20-gcc10:
   extends: .test_common
