@@ -21,7 +21,7 @@ stages:
 .build_linux:
   extends: .build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.3.1/gcc_64
     GENERATOR: Ninja
     EXTRA_ARGS: ""
   tags:
@@ -132,7 +132,7 @@ build wasm:
     - cd build
     - env
     - /usr/bin/cmake -S ../ -B ./ -DCMAKE_GENERATOR:STRING=Ninja -DCMAKE_BUILD_TYPE:STRING=Debug '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/falco/Qt/Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' -DQT_QMAKE_EXECUTABLE:FILEPATH=/home/falco/Qt/6.3.1/wasm_32/bin/qmake -DCMAKE_PREFIX_PATH:PATH=/home/falco/Qt/6.3.1/wasm_32 -DCMAKE_C_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/emcc -DCMAKE_CXX_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/em++ -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/home/falco/Qt/6.3.1/wasm_32/lib/cmake/Qt6/qt.toolchain.cmake
-    - /usr/bin/cmake --build ./ --target all
+    - /usr/bin/cmake --build ../ --target all
  #   - /home/falco/Qt/6.3.1/wasm_32/bin/qt-cmake ../ 
  #   - cmake --build ../
 
@@ -181,14 +181,14 @@ analyze clang-tidy:
 analyze scan-build-clang:
   extends: .scan_build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.3.1/gcc_64
     CC: clang-11
     CXX: clang++-11
 
 analyze scan-build-gcc:
   extends: .scan_build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.2.4/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.3.1/gcc_64
     CC: gcc
     CXX: g++
  
