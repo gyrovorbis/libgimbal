@@ -53,12 +53,12 @@ build win10-vs2022:
   variables:   
     CC: cl
     CXX: cl
-    PREFIX_PATH: C:/Qt/6.3.0/msvc2019_64
+    PREFIX_PATH: C:/Qt/6.3.1/msvc2019_64
     GENERATOR: Ninja
     EXTRA_ARGS: ""
   after_script:
     - pwd
-    - C:/Qt/6.3.0/msvc2019_64/bin/windeployqt build/test/GimbalTests.exe
+    - C:/Qt/6.3.1/msvc2019_64/bin/windeployqt build/test/GimbalTests.exe
 
 build win10-mingw11:
   extends: .build_common
@@ -67,12 +67,12 @@ build win10-mingw11:
   variables:
     CC: x86_64-w64-mingw32-gcc
     CXX: x86_64-w64-mingw32-g++
-    PREFIX_PATH: C:/Qt/6.3.0/mingw_64
+    PREFIX_PATH: C:/Qt/6.3.1/mingw_64
     GENERATOR: Ninja
     EXTRA_ARGS: ""
   after_script:
     - pwd
-    - C:/Qt/6.3.0/mingw_64/bin/windeployqt build/test/GimbalTests.exe
+    - C:/Qt/6.3.1/mingw_64/bin/windeployqt build/test/GimbalTests.exe
 
 build macos-clang13:
   extends: .build_common
