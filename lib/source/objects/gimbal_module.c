@@ -14,8 +14,7 @@ static GblQuark descQuark_       = GBL_QUARK_INVALID;
 static GblQuark prefixQuark_     = GBL_QUARK_INVALID;
 static GblQuark typeCountQuark_  = GBL_QUARK_INVALID;
 
-//static const GblProperty* pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_COUNT)] = { NULL };                               GBL_CONTEXT_PROPERTY_ID_COUNT] = { NULL };
-
+static const GblProperty* pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_COUNT)] = { NULL };
 
 GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
     GBL_API_BEGIN(pPlugin);
@@ -87,17 +86,8 @@ GBL_RESULT GblModule_unload_(GblModule* pModule) {
 GBL_RESULT GblModule_init_(GblInstance* pInstance, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblModule* pSelf = GBL_MODULE(pInstance);
-#if 0
-    GBL_API_CALL(GblStringBuffer_construct(&pSelf->author,
-                                           GBL_STRING_VIEW("Anonymous")));
-    GBL_API_CALL(GblStringBuffer_construct(&pSelf->description,
-                                           GBL_STRING_VIEW("Unknown")));
-    GBL_API_CALL(GblStringBuffer_construct(&pSelf->prefixName,
-                                           GBL_STRING_VIEW("?")));
 
-    pSelf->pPrivate_ = GBL_API_MALLOC(sizeof(GblModulePrivate), GBL_ALIGNOF(GBL_MAX_ALIGN_T), "ModulePrivate");
-    //GBL_API_CALL(GblHashSet_construct(&pSelf->pPrivate_->typeRegistry))
-#endif
+
     GBL_API_END();
 }
 
@@ -186,6 +176,7 @@ extern GBL_RESULT GblModule_typeRegister_(GblContext* pCtx) {
           .classSize            = sizeof(GblModuleClass),
           .pFnInstanceInit      = GblModule_init_,
           .instanceSize         = sizeof(GblModule),
+          .instancePrivateSize  = sizeof(GblModule_),
           .interfaceCount       = 1,
           .pInterfaceMap        = (const GblTypeInterfaceMapEntry[]) {
               {
@@ -194,7 +185,7 @@ extern GBL_RESULT GblModule_typeRegister_(GblContext* pCtx) {
               },
           }
       },
-      GBL_TYPE_FLAG_BUILTIN);
+      GBL_TYPE_FLAG_BUILTIN | GBL_TYPE_FLAG_ABSTRACT);
     GBL_API_END();
 }
 
