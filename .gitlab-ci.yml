@@ -15,7 +15,7 @@ stages:
     - mkdir -p build
     - cd build
     - env
-    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE:String=Debug -G${GENERATOR} ${EXTRA_ARGS}
+    - CC=${CC} CXX=${CXX} cmake ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DGBL_ENABLE_TESTS=ON -DCMAKE_BUILD_TYPE:String=Debug -G${GENERATOR} ${EXTRA_ARGS}
     - ${ANALYZER} cmake --build . --target all
 
 .build_linux:
@@ -109,7 +109,7 @@ build ios-15-sim:
     - mkdir -p build
     - cd build
     - env
-    - /Users/falco.girgis/Qt/6.3.1/ios/bin/qt-cmake ../ -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator -G Xcode
+    - /Users/falco.girgis/Qt/6.3.1/ios/bin/qt-cmake ../ -DGBL_ENABLE_TESTS=ON -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator -G Xcode
     - /Users/falco.girgis/Qt/Tools/CMake/CMake.app/Contents/bin/cmake --build . --target ALL_BUILD --config Debug
    
 #    - /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project LibGimbal.xcodeproj build -target ALL_BUILD -parallelizeTargets -configuration Debug -hideShellScriptEnvironment
@@ -131,7 +131,7 @@ build wasm:
     - mkdir -p build
     - cd build
     - env
-    - /usr/bin/cmake -S ../ -B ./ -DCMAKE_GENERATOR:STRING=Ninja -DCMAKE_BUILD_TYPE:STRING=Debug '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/falco/Qt/Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' -DQT_QMAKE_EXECUTABLE:FILEPATH=/home/falco/Qt/6.3.1/wasm_32/bin/qmake -DCMAKE_PREFIX_PATH:PATH=/home/falco/Qt/6.3.1/wasm_32 -DCMAKE_C_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/emcc -DCMAKE_CXX_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/em++ -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/home/falco/Qt/6.3.1/wasm_32/lib/cmake/Qt6/qt.toolchain.cmake
+    - /usr/bin/cmake -S ../ -B ./ -DGBL_ENABLE_TESTS=ON -DCMAKE_GENERATOR:STRING=Ninja -DCMAKE_BUILD_TYPE:STRING=Debug '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/falco/Qt/Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' -DQT_QMAKE_EXECUTABLE:FILEPATH=/home/falco/Qt/6.3.1/wasm_32/bin/qmake -DCMAKE_PREFIX_PATH:PATH=/home/falco/Qt/6.3.1/wasm_32 -DCMAKE_C_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/emcc -DCMAKE_CXX_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/em++ -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/home/falco/Qt/6.3.1/wasm_32/lib/cmake/Qt6/qt.toolchain.cmake
     - /usr/bin/cmake --build ./ --target all
 
 .clang_tidy_common:
