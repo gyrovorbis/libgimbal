@@ -252,15 +252,6 @@ target_include_directories(libGimbal
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>
         $<INSTALL_INTERFACE:api>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/api>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/metalang99/include>
-        $<INSTALL_INTERFACE:lib/metalang99/include>
-        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib/metalang99/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/C99-Lambda>
-        $<INSTALL_INTERFACE:lib/C99-Lambda>
-        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib/C99-Lambda>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib>
-        $<INSTALL_INTERFACE:lib>
-        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/api
 )

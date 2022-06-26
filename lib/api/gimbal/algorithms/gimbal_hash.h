@@ -3,8 +3,6 @@
 
 #include "../types/gimbal_typedefs.h"
 #include "../core/gimbal_api_frame.h"
-#include <jenkins/lookup3.h>
-#include <xxHash/xxhash.h>
 #include <time.h>
 
 #define GBL_SEED_COUNT                  2
@@ -24,9 +22,7 @@ GBL_INLINE GblHash  gblHash              (const void* pData, GblSize size, GblHa
 
 GBL_EXPORT GblHash  gblHashSip           (const void* pData, GblSize size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashMurmur        (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_INLINE GblHash  gblHashJenkins       (const void* pData, GblSize size) GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHashCrc           (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_INLINE GblHash  gblHashXX            (const void* pData, GblSize size) GBL_NOEXCEPT;
 
 
 
@@ -44,12 +40,6 @@ GblHash gblHash(const void* pData, GblSize size, GblHashFn pFnHash) GBL_NOEXCEPT
     GBL_ASSERT(pFnHash);
     return pFnHash(pData, size);
 }
-
-GBL_MAYBE_UNUSED GBL_INLINE
-GblHash gblHashJenkins(const void* pData, GblSize size) GBL_NOEXCEPT {
-    return hashlittle(pData, size, gblSeed(0));
-}
-
 
 GBL_MAYBE_UNUSED GBL_INLINE GblHash gblCrc32LittleEndian (const void* pData, GblSize size) GBL_NOEXCEPT {
     GblSize i;
@@ -90,7 +80,6 @@ GBL_MAYBE_UNUSED GBL_INLINE GblHash gblCrc32BigEndian(const void *pData, int siz
     return rv;
 }
 
-GBL_MAYBE_UNUSED
 GBL_INLINE GblHash  gblHashCrc(const void* pData, GblSize size) GBL_NOEXCEPT {
 #if GBL_BIG_ENDIAN == 0
     return gblCrc32LittleEndian(pData, size);
@@ -99,16 +88,10 @@ GBL_INLINE GblHash  gblHashCrc(const void* pData, GblSize size) GBL_NOEXCEPT {
 #endif
 }
 
-GBL_MAYBE_UNUSED
-GBL_INLINE GblHash gblHashXX(const void* pData, GblSize size) GBL_NOEXCEPT {
-    return XXH3_64bits_withSeed(pData, size, gblSeed(0));
-}
-
-GBL_MAYBE_UNUSED
 GBL_INLINE uint64_t gblSeed(uint8_t index) GBL_NOEXCEPT {
     static uint64_t seed[GBL_SEED_COUNT] = {0};
     static GblBool  init = GBL_FALSE;
-    if(!init) {
+    if(!init) GBL_UNLIKELY {
         seed[0] = (uint64_t)time(NULL);
         for(unsigned i = 1; i < GBL_SEED_COUNT; ++i) {
             seed[i] = gblHashCrc(&seed[i-1], sizeof(uint64_t));
@@ -118,16 +101,15 @@ GBL_INLINE uint64_t gblSeed(uint8_t index) GBL_NOEXCEPT {
     return seed[index];
 }
 
-GBL_MAYBE_UNUSED GBL_INLINE
-int gblRand(void) GBL_NOEXCEPT {
+GBL_INLINE int gblRand(void) GBL_NOEXCEPT {
     return gblRandRange(0, RAND_MAX);
 }
 
-GBL_MAYBE_UNUSED GBL_INLINE
-int gblRandRange(int min, int max) GBL_NOEXCEPT {
+
+GBL_INLINE int gblRandRange(int min, int max) GBL_NOEXCEPT {
     GBL_ASSERT(max <= RAND_MAX);
     static GblBool seeded = GBL_FALSE;
-    if(!seeded) {
+    if(!seeded) GBL_UNLIKELY {
         srand((unsigned)gblSeed(0));
         seeded = GBL_TRUE;
     }

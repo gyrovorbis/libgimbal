@@ -124,9 +124,7 @@ private slots:
     void randomRange(void);
     void hashSip(void);
     void hashMurmur(void);
-    void hashJenkins(void);
     void hashCrc(void);
-    void hashXX(void);
     void pow2Next(void);
     void gcd(void);
     void ntohl_htonl(void);
@@ -230,19 +228,9 @@ inline void Algorithms::hashMurmur(void) {
     verifyHash_(gblHashMurmur);
 }
 
-inline void Algorithms::hashJenkins(void) {
-    verifyHash_(gblHashJenkins);
-}
-
 inline void Algorithms::hashCrc(void) {
     verifyHash_(gblHashCrc);
 }
-
-inline void Algorithms::hashXX(void) {
-    QSKIP("Unimplemented.");
- //   verifyHash_(gblHashXX);
-}
-
 
 inline void Algorithms::pow2Next(void) {
     for(uint64_t b = 2; b < 63; ++b) {

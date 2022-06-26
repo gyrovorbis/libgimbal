@@ -20,6 +20,10 @@ project(LibGimbal
     DESCRIPTION "Aggregate project for libGimbal subprojects" 
     LANGUAGES C CXX)
 
+option(GBL_ENABLE_TESTS "Enable LibGimbal unit tests" OFF)
 
 add_subdirectory(lib)
-add_subdirectory(test)
+
+if(GBL_ENABLE_TESTS)
+    add_subdirectory(test)
+endif(GBL_ENABLE_TESTS)
