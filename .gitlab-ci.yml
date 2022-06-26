@@ -216,7 +216,7 @@ test ios-15-sim:
   script:
     - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app/Contents/MacOS/Simulator -CurrentDeviceUDID A64093FF-15E7-495A-8A9B-83DC1C37D8F5 &
     - xcrun simctl install A64093FF-15E7-495A-8A9B-83DC1C37D8F5 build/test/GimbalTests.app
-    - xcrun simctl launch A64093FF-15E7-495A-8A9B-83DC1C37D8F5 com.test
+    - xcrun simctl launch --console A64093FF-15E7-495A-8A9B-83DC1C37D8F5 GimbalTests
     
 test ubuntu20-gcc10:
   extends: .test_common
