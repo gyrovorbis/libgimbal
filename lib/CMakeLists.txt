@@ -123,7 +123,6 @@ set(GIMBAL_SOURCES
      source/meta/gimbal_boxed.c
      source/meta/gimbal_flags.c
      source/containers/gimbal_byte_array.c
-     lib/jenkins/lookup3.c
 )
 
 set(GIMBAL_INCLUDES
@@ -207,7 +206,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/gimbal_boxed.h
     api/gimbal/preprocessor/gimbal_memory_resource.hpp
     source/meta/gimbal_type_.h
-    lib/jenkins/lookup3.h)
+)
 
 add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}
