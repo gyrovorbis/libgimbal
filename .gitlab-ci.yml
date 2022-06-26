@@ -74,6 +74,18 @@ build win10-mingw11:
     - pwd
     - C:/Qt/6.3.1/mingw_64/bin/windeployqt build/test/GimbalTests.exe
 
+build psvita:
+  stage: build
+  tags: 
+    - psvita, vitasdk
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  artifacts:
+    paths:
+       - build/
+  script:
+      - cmake -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake ../
+
 build macos-clang13:
   extends: .build_common
   tags:
