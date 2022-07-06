@@ -180,7 +180,7 @@ static GBL_RESULT GblEnumTestSuite_variant_(GblTestSuite* pSelf, GblContext* pCt
     GBL_TEST_COMPARE(GblVariant_getEnum(&v), GREEN);
 
     // Value Get Move
-    COLOR color = 0;
+    GblEnum color = 0;
     GBL_API_VERIFY_CALL(GblVariant_getValueMove(&v, &color));
     GBL_TEST_COMPARE(color, GREEN);
 
