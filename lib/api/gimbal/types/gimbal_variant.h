@@ -261,7 +261,7 @@ GBL_EXPORT GBL_RESULT       GblVariant_load                     (SELF,
             (const char*             GblVariant_constructString),       \
             (GblStringView           GblVariant_constructStringView),   \
             (void*                   GblVariant_constructPointer),      \
-            (const GblVariant*       GblVariant_constructCopy),         \
+            (const GblVariant*       GblVariant_constructCopy)          \
                                                                         \
         )                                                               \
     )
@@ -286,7 +286,7 @@ GBL_EXPORT GBL_RESULT       GblVariant_load                     (SELF,
             (const char*             GblVariant_setString),         \
             (GblStringView           GblVariant_settStringView),    \
             (void*                   GblVariant_setPointer),        \
-            (const GblVariant*       GblVariant_settCopy),          \
+            (const GblVariant*       GblVariant_settCopy)           \
                                                                     \
         )                                                           \
     )

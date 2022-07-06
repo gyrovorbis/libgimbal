@@ -160,7 +160,7 @@ GBL_EXPORT GBL_RESULT GblArrayMap_setVariant(GblArrayMap** ppSelf, uintptr_t key
 static GBL_RESULT GblArrayMap_entrySetUserdata_(GblArrayMapEntry* pEntry, uintptr_t value, GblArrayMapDestructFn pDtor) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     if(pEntry->dtor) {
-       GBL_API_CALL(pEntry->dtor(pEntry));
+       GBL_API_CALL(pEntry->dtor(pEntry->value.pVoid));
    } else if(GblVariant_type(&pEntry->value) != GBL_INVALID_TYPE) {
        GBL_API_CALL(GblVariant_destruct(&pEntry->value));
    }

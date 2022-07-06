@@ -1,19 +1,104 @@
 #ifndef GIMBAL_TEST_H
 #define GIMBAL_TEST_H
 
-#define GBL_VERIFY(expr)    GBL_API_VERIFY_EXPRESSION(expr)
-#define GBL_COMPARE(l, r)   GBL_API_VERIFY_EXPRESSION((l == r),         \
-                                                      "Values differed")
-#define GBL_TEST_CASE_DECL(kase)    GBL_API kase(GblContext* pCtx);
+#include "../preprocessor/gimbal_macro_utils.h"
+#include <stdint.h>
 
+#define GBL_TEST_VERIFY(expr)                        GBL_API_VERIFY_EXPRESSION(expr)
+
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_DFLT_(void) { return "Values differed"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_CHAR_(void) { return "Values differed [expected: %c, actual: %c"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_INT_ (void) { return "Values differed [expected: %d, actual: %d"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_UINT_(void) { return "Values differed [expected: %u, actual: %u"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_STR_ (void) { return "Values differed [expected: %s, actual: %s"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_FLT_ (void) { return "Values differed [expected: %f, actual: %f"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_ (void) { return "Values differed [expected: %p, actual: %p"; }
+
+#define GBL_TEST_COMPARE_FMT_TABLE_  (                      \
+        GBL_TEST_COMPARE_FMT_DFLT_,                         \
+        (                                                   \
+            (char,          GBL_TEST_COMPARE_FMT_CHAR_),    \
+            (int8_t,        GBL_TEST_COMPARE_FMT_INT_),     \
+            (int16_t,       GBL_TEST_COMPARE_FMT_INT_),     \
+            (int32_t,       GBL_TEST_COMPARE_FMT_INT_),     \
+            (int64_t,       GBL_TEST_COMPARE_FMT_INT_),     \
+            (uint8_t,       GBL_TEST_COMPARE_FMT_UINT_),    \
+            (uint16_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
+            (uint32_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
+            (uint64_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
+            (const char*,   GBL_TEST_COMPARE_FMT_STR_),     \
+            (char*,         GBL_TEST_COMPARE_FMT_STR_),     \
+            (float,         GBL_TEST_COMPARE_FMT_FLT_),     \
+            (double,        GBL_TEST_COMPARE_FMT_FLT_),     \
+            (const void*,   GBL_TEST_COMPARE_FMT_PTR_)      \
+        )                                                   \
+    )
+#define GBL_TEST_COMPARE_FMT_(value) GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_FMT_TABLE_, value)()
+
+GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_PTR_   (void* pActual, void* pExpected)             { return pActual == pExpected; }
+GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_UINT64_(uint64_t actual, uint64_t expected)         { return actual == expected; }
+GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_DBL_   (double actual, double expected)             { return actual == expected; }
+GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_   (const char* pActual, const char* pExpected) { return pActual == pExpected || \
+                                                                                                     strcmp(pActual, pExpected) == 0; }
+
+#define GBL_TEST_COMPARE_CMP_TABLE_  (                      \
+        GBL_TEST_COMPARE_CMP_PTR_,                          \
+        (                                                   \
+            (char,          GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (int8_t,        GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (int16_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (int32_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (int64_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (uint8_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (uint16_t,      GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (uint32_t,      GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (uint64_t,      GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (const char*,   GBL_TEST_COMPARE_CMP_STR_),     \
+            (char*,         GBL_TEST_COMPARE_CMP_STR_),     \
+            (float,         GBL_TEST_COMPARE_CMP_DBL_),     \
+            (double,        GBL_TEST_COMPARE_CMP_DBL_),     \
+            (const void*,   GBL_TEST_COMPARE_CMP_PTR_)      \
+        )                                                   \
+    )
+#define GBL_TEST_COMPARE_CMP_(actual, expected)      GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_CMP_TABLE_, actual)(actual, expected)
+
+#define GBL_TEST_COMPARE(actual, expected)           GBL_API_VERIFY_EXPRESSION(GBL_TEST_COMPARE_CMP_(actual, expected),      \
+                                                                               GBL_TEST_COMPARE_FMT_(actual),                \
+                                                                               actual, expected)
+
+#define GBL_TEST_COMPARE_INT(actual, expected)       GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
+                                                                          "Values differed [expected: %d, actual: %d]",      \
+                                                                          actual, expected)
+
+#define GBL_TEST_COMPARE_UINT(actual, expected)      GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
+                                                                          "Values differed [expected: %u, actual: %u]",      \
+                                                                          actual, expected)
+
+#define GBL_TEST_COMPARE_STRING(actual, expected)    GBL_API_VERIFY_EXPRESSION(strcmp(actual, expected) == 0,                \
+                                                                          "Values differed [expected: %s, actual: %s]",      \
+                                                                          actual, expected)
+
+#define GBL_TEST_COMPARE_FLOAT(actual, expected)     GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
+                                                                          "Values differed [expected: %f, actual: %f]",      \
+                                                                          actual, expected)
+
+#define GBL_TEST_COMPARE_POINTER(actual, expected)   GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
+                                                                          "Values differed [exptected: %p, actual: %p]",     \
+                                                                          actual, expected)
+
+#define GBL_TEST_SKIP(reason)                        GBL_API_VERIFY(GBL_FALSE,                                               \
+                                                                    GBL_RESULT_SKIPPED,                                      \
+                                                                    reason)
+
+#define GBL_TEST_FAIL(reason)                        GBL_API_VERIFY(GBL_FALSE,                                               \
+                                                                    GBL_RESULT_ERROR,                                        \
+                                                                    reason)
 
 #define GBL_TEST_EXPECT_ERROR()                         \
     GBL_API_VERIFY(!GBL_CONFIG_ASSERT_ERROR_ENABLED,    \
                    GBL_RESULT_SKIPPED,                  \
-                    "Skipping due to assert-on-error enabled")
+                   "Skipping test case due to GBL_CONFIG_ASSERT_ERROR_ENABLED.")
 
-#define GBL_TEST_END()                  \
-        GBL_API_VERIFY_LAST_RECORD();   \
-        GBL_API_END()
+
 
 #endif // GIMBAL_TEST_H

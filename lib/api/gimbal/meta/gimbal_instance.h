@@ -151,8 +151,9 @@ GBL_INLINE GblClass* GblInstance_classDefault(CSELF) GBL_NOEXCEPT {
 GBL_INLINE GblInstance* GblInstance_convert_(GblInstance* pSelf, GblType type, GblBool check) GBL_NOEXCEPT {
     GblInstance* pOutInstance = NULL;
     GBL_API_BEGIN(GblType_contextDefault());
-    if(!(!pSelf && type == GBL_INVALID_TYPE)) {
-        GBL_API_VERIFY_POINTER(pSelf);
+    if(!pSelf) {
+        if(type == GBL_INVALID_TYPE || !check) GBL_API_DONE();
+    } else {
         if(GblInstance_check(pSelf, type)) {
             pOutInstance = pSelf;
         } else if(check) {

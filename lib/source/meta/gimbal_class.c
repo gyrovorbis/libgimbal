@@ -26,6 +26,11 @@ GBL_EXPORT void* GblClass_private(const GblClass* pClass, GblType type) {
                 NULL;
 }
 
+GBL_EXPORT const void* GblClass_data(const GblClass* pClass) {
+    GblMetaClass* pMeta = GBL_CLASS_META_CLASS_(pClass);
+    return pMeta? pMeta->pInfo->pClassData : NULL;
+}
+
 GBL_EXPORT GblClass* GblClass_peekFromInstance(const GblInstance* pInstance) {
     GblClass* pClass = NULL;
     GBL_API_BEGIN(GblType_contextDefault());

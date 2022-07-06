@@ -973,7 +973,8 @@ GBL_EXPORT void GblObject_childAdd(GblObject* pSelf, GblObject* pChild) GBL_NOEX
     {
         GblObjectFamily_* pParentFamily = GblObject_ensureFamily_(pSelf);
         GblObjectFamily_* pChildFamily  = GblObject_ensureFamily_(pChild);
-        GblLinkedList_pushFront(&pParentFamily->childList, &pChildFamily->childNode);
+        // yeah, slower than push-front, but we want to probably preserve ordering...
+        GblLinkedList_pushBack(&pParentFamily->childList, &pChildFamily->childNode);
         pChildFamily->pParent = pSelf;
     }
     GBL_API_END_BLOCK();

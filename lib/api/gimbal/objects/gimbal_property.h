@@ -6,6 +6,7 @@
 #include "../meta/gimbal_instance.h"
 #include "../strings/gimbal_quark.h"
 #include "../containers/gimbal_linked_list.h"
+#include <string.h>
 
 #define GBL_PROPERTY_TYPE                   GblProperty_type()
 #define GBL_PROPERTY_PARENT_PREFIX          GBL_INVALID_TYPE
@@ -29,12 +30,10 @@
 #define GBL_PROPERTY_TABLE_BEGIN(prefix)                    \
     GBL_INLINE void prefix##_PROPERTY_TABLE(GblSize index,  \
         GblPropertyInfo* pInfo) {                           \
-            const GblType objType = prefix##_TYPE;          \
             switch(index) {
 
 #define GBL_PROPERTY_ENTRY(name_, nick_, desc_, id_, type_, flags_) \
     case id_:                                   \
-        pInfo->objectType   = objType;          \
         pInfo->pName        = name_;            \
         pInfo->pNick        = nick_;            \
         pInfo->pDesc        = desc_;            \
@@ -57,6 +56,7 @@
         for(GblSize id = GBL_PROPERTY_ID(prefix, FIRST);                    \
             id < GBL_PROPERTY_ID(prefix, COUNT); ++id) {                    \
             GblPropertyInfo info;                                           \
+            info.objectType = prefix##_TYPE;                                \
             prefix##_PROPERTY_TABLE(id, &info);                             \
             gblPropertyTableInsert(GBL_CLASS_TYPE(klass),                   \
                                    GblQuark_fromString(info.pName),         \

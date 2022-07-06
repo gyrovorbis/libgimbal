@@ -81,7 +81,7 @@ GBL_INLINE void     GblDoublyLinkedList_clear       (SELF)                      
 // ========== IMPL ==========
 
 GBL_INLINE void GblDoublyLinkedList_init(SELF) GBL_NOEXCEPT {
-    pSelf->pNext = pSelf->pPrev = NULL;
+    pSelf->pNext = pSelf->pPrev = pSelf;
 }
 
 GBL_INLINE void GblDoublyLinkedList_pushBack(SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {

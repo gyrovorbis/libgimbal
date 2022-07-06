@@ -8,11 +8,17 @@
 #define GBL_ILOGGER_TYPE                (GBL_BUILTIN_TYPE(ILOGGER))
 #define GBL_ILOGGER_STRUCT              GblILogger
 #define GBL_ILOGGER_CLASS_STRUCT        GblILoggerIFace
+
 #define GBL_ILOGGER(inst)               (GBL_INSTANCE_CAST_PREFIX       (inst,  GBL_ILOGGER))
 #define GBL_ILOGGER_CHECK(inst)         (GBL_INSTANCE_CHECK_PREFIX      (inst,  GBL_ILOGGER))
+#define GBL_ILOGGER_TRY(inst)           (GBL_INSTANCE_TRY_PREFIX        (inst,  GBL_ILOGGER))
+
 #define GBL_ILOGGER_IFACE(klass)        (GBL_CLASS_CAST_PREFIX          (klass, GBL_ILOGGER))
 #define GBL_ILOGGER_IFACE_CHECK(klass)  (GBL_CLASS_CHECK_PREFIX         (klass, GBL_ILOGGER))
+#define GBL_ILOGGER_IFACE_TRY(klass)    (GBL_CLASS_TRY_PREFIX           (klass, GBL_ILOGGER))
+
 #define GBL_ILOGGER_GET_IFACE(inst)     (GBL_INSTANCE_CAST_CLASS_PREFIX (inst,  GBL_ILOGGER))
+#define GBL_ILOGGER_TRY_IFACE(inst)     (GBL_INSTANCE_TRY_CLASS_PREFIX  (inst,  GBL_ILOGGER))
 
 #define SELF    GblILogger* pSelf
 #define CSELF   const SELF

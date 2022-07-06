@@ -8,13 +8,13 @@ GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObje
     void* pObjectUserdata           = GBL_NULL;
     void* pContextUserdata          = GBL_NULL;
 
-    if(!pObject) {
-        pContext = GblThread_context(NULL);
-    }
-
     if(pObject) {
         pContext = GblObject_contextFind(pObject);
         pObjectUserdata = GblObject_userdata(pObject);
+    }
+
+    if(!pContext) {
+        pContext = GblThread_context(NULL);
     }
 
     if(pContext) {

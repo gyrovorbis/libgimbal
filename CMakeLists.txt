@@ -21,9 +21,14 @@ project(LibGimbal
     LANGUAGES C CXX)
 
 option(GBL_ENABLE_TESTS "Enable LibGimbal unit tests" OFF)
+option(GBL_ENABLE_TESTS_QT "Enable LibGimbal Qt unit tests" OFF)
 
 add_subdirectory(lib)
 
 if(GBL_ENABLE_TESTS)
     add_subdirectory(test)
 endif(GBL_ENABLE_TESTS)
+
+if(GBL_ENABLE_TESTS_QT)
+    add_subdirectory(testQt)
+endif()

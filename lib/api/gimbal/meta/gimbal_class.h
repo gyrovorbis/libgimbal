@@ -30,7 +30,7 @@
 GBL_DECLS_BEGIN
 
 typedef struct GblClass {
-    uintptr_t           private_;
+    uintptr_t   private_;
 } GblClass;
 
 // Returns an existing reference to the default class for the given type or lazily allocates a new one
@@ -42,7 +42,7 @@ GBL_EXPORT GBL_RESULT   GblClass_constructFloating  (SELF, GblType type)        
 
 // Returns a pointer to the default class for the given type without incrementing refCount
 GBL_EXPORT GblClass*    GblClass_peek               (GblType type)                  GBL_NOEXCEPT;
-// Retrieves an existing reference hed by an instance wthout incrementing refCount
+// Retrieves an existing reference held by an instance wthout incrementing refCount
 GBL_EXPORT GblClass*    GblClass_peekFromInstance   (const GblInstance* pInstance)  GBL_NOEXCEPT;
 // Returns a reference to an existing class
 GBL_INLINE GblClass*    GblClass_refFromClass       (SELF)                          GBL_NOEXCEPT;
@@ -62,6 +62,8 @@ GBL_EXPORT GblClass*    GblClass_cast               (SELF, GblType toType)      
 GBL_EXPORT GblClass*    GblClass_try                (SELF, GblType toType)          GBL_NOEXCEPT;
 // Retrieves the private data pointer associated with a given base type
 GBL_EXPORT void*        GblClass_private            (CSELF, GblType type)           GBL_NOEXCEPT;
+// Retrieves the void* classData associated with class upon type registry
+GBL_EXPORT const void*  GblClass_data               (CSELF)                         GBL_NOEXCEPT;
 
 GBL_INLINE GblType      GblClass_type               (CSELF)                         GBL_NOEXCEPT;
 GBL_INLINE const char*  GblClass_typeName           (CSELF)                         GBL_NOEXCEPT;

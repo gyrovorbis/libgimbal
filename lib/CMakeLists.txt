@@ -123,7 +123,9 @@ set(GIMBAL_SOURCES
      source/meta/gimbal_boxed.c
      source/meta/gimbal_flags.c
      source/containers/gimbal_byte_array.c
-)
+     source/utils/gimbal_test_suite.c
+     source/utils/gimbal_test_scenario.c
+ )
 
 set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_api_generators.h
@@ -205,6 +207,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/preprocessor/gimbal_atomics.h
     api/gimbal/meta/gimbal_boxed.h
     api/gimbal/preprocessor/gimbal_memory_resource.hpp
+    api/gimbal/utils/gimbal_test_suite.h
+    api/gimbal/utils/gimbal_test_scenario.h
     source/meta/gimbal_type_.h
 )
 

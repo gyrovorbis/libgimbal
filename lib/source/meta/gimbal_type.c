@@ -886,7 +886,7 @@ GBL_EXPORT GblType GblType_parent(GblType type) {
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
     if(pMeta) {
-        parent = (GblType)pMeta->pParent;
+        parent = GBL_TYPE_(pMeta->pParent);
     }
     GBL_API_END_BLOCK();
     return parent;
