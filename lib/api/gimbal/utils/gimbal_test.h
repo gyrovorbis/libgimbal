@@ -18,7 +18,6 @@ GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_ (void) { return "Values differe
         GBL_TEST_COMPARE_FMT_DFLT_,                         \
         (                                                   \
             (char,          GBL_TEST_COMPARE_FMT_CHAR_),    \
-            (int8_t,        GBL_TEST_COMPARE_FMT_INT_),     \
             (int16_t,       GBL_TEST_COMPARE_FMT_INT_),     \
             (int32_t,       GBL_TEST_COMPARE_FMT_INT_),     \
             (int64_t,       GBL_TEST_COMPARE_FMT_INT_),     \
@@ -45,7 +44,6 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_   (const char* pActual, const char*
         GBL_TEST_COMPARE_CMP_PTR_,                          \
         (                                                   \
             (char,          GBL_TEST_COMPARE_CMP_UINT64_),  \
-            (int8_t,        GBL_TEST_COMPARE_CMP_UINT64_),  \
             (int16_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
             (int32_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
             (int64_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
