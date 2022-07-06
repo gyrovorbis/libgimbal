@@ -87,7 +87,23 @@ build psvita:
       - mkdir -p build
       - cd build 
       - env
-      - cmake ../ -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake
+      - cmake ../ -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake
+      - cmake --build . --target all
+
+build android-sim:
+  stage: build
+  tags: 
+    - android, ndk
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  artifacts:
+    paths:
+       - build/
+  script:
+      - mkdir -p build
+      - cd build 
+      - env
+      - /home/falco/Qt/6.3.1/android_x86_64/bin/qt-cmake -DCMAKE_TOOLCHAIN_FILE=/home/falco/Documents/dev/android-ndk-r23c/build/cmake/android.toolchain.cmake -S ../ -B .
       - cmake --build . --target all
 
 build macos-clang13:
@@ -228,9 +244,10 @@ test ios-15-sim:
   tags:
     - ios, simulator
   script:
-    - xcrun simctl boot A64093FF-15E7-495A-8A9B-83DC1C37D8F5
+    - xcrun simctl boot A64093FF-15E7-495A-8A9B-83DC1C37D8F5 2>&1
     - xcrun simctl install A64093FF-15E7-495A-8A9B-83DC1C37D8F5 build/test/Debug-iphonesimulator/GimbalTests.app
     - xcrun simctl launch --console A64093FF-15E7-495A-8A9B-83DC1C37D8F5 GimbalTests
+    - xcrun simctl shutdown A64093FF-15E7-495A-8A9B-83DC1C37D8F5 2>&1
     
 test ubuntu20-gcc10:
   extends: .test_common

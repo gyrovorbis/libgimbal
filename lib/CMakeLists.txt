@@ -13,6 +13,13 @@ project(LibGimbal
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if(VITA)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVITA")
+    # This file, unfortunately, needs to be manually included.
+    # And on this lists file specifically (its not passed down from the parent/aggregate of course)
+    include("${VITASDK}/share/vita.cmake" REQUIRED)
+endif()
 
 GBL_BUILD_TIMESTAMP_DEFINE(GBL_BUILD_TIMESTAMP)
 GBL_BUILD_BIG_ENDIAN_DEFINE(GBL_BIG_ENDIAN)
