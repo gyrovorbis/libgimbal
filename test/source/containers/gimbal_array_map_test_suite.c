@@ -192,7 +192,7 @@ static GBL_RESULT GblArrayMapTestSuite_validate_variant_(GblTestSuite* pSelf, Gb
     GBL_TEST_COMPARE(GblArrayMap_getValue(&pMap, key), value);
     pVariant = GblArrayMap_getVariant(&pMap, key);
     GBL_TEST_VERIFY(pVariant);
-    uint32_t val = 0;
+    uintptr_t val = 0;
     GBL_TEST_COMPARE(GblVariant_getValuePeek(pVariant, &val), GBL_RESULT_SUCCESS);
     GBL_TEST_COMPARE(val, value);
     GBL_TEST_COMPARE(GblArrayMap_atValue(&pMap, key), value);

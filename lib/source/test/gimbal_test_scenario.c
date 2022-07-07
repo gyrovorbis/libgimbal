@@ -284,6 +284,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf);
 
+    GBL_API_DONE();
     // not properly disposing of shit anything beyond the first entry!
     for(GblObject* pIt = GblObject_childFirst(GBL_OBJECT(pSelf));
         pIt != NULL;

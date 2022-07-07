@@ -143,7 +143,7 @@ static GBL_RESULT GblQuarkTestSuite_extraPage_(GblTestSuite* pSelf, GblContext* 
     const GblSize oldBytesUsed = GblQuark_bytesUsed();
     const GblSize pageFreeBytes = GblQuark_pageSize() - oldBytesUsed - 1;
     char* pBuffer = GBL_ALLOCA(pageFreeBytes);
-    for(GblSize i = 0; i <= pageFreeBytes; ++i) pBuffer[i] = 'a';
+    for(GblSize i = 0; i < pageFreeBytes; ++i) pBuffer[i] = 'a';
     const GblQuark wasterQuark = GblQuark_fromStringSized(pBuffer, pageFreeBytes);
 
     GBL_TEST_VERIFY(wasterQuark != GBL_QUARK_INVALID);

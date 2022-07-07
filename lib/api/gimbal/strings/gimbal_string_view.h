@@ -305,7 +305,7 @@ GBL_INLINE GblSize GblStringView_rfind(SELF, GblStringView substr, GblSize end) 
     GBL_API_VERIFY(end < self.length,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
     if(self.length && substr.length) {
-        char* pCStr1 = (char*)GBL_ALLOCA(end + 1);
+        char* pCStr1 = (char*)GBL_ALLOCA(end + 2);
         char* pCStr2 = (char*)GBL_ALLOCA(substr.length + 1);
 
         for(GblSize i = end+1; i > 0; --i) {
