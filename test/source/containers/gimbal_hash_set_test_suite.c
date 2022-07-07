@@ -5,7 +5,7 @@
 #define GBL_HASH_SET_TEST_SUITE_(inst)     ((GblHashSetTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_HASH_SET_TEST_SUITE_TYPE))
 
 typedef struct GblHashSetTestSuite_ {
-
+    char dummy[1];
 } GblHashSetTestSuite_;
 
 
