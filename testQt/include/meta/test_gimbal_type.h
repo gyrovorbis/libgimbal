@@ -3,7 +3,7 @@
 
 #include <gimbal/types/gimbal_typedefs.h>
 #include <gimbal/preprocessor/gimbal_macro_utils.h>
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 
 #define GBL_TEST_CASE_DECL(kase)    GBL_API kase(GblContext* pCtx);
 

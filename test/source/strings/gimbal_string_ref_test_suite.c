@@ -1,5 +1,5 @@
 #include "strings/gimbal_string_ref_test_suite.h"
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/strings/gimbal_string_ref.h>
 

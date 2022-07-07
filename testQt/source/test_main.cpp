@@ -24,7 +24,6 @@
 #include <meta/test_gimbal_flags.hpp>
 #include <meta/test_gimbal_opaque.hpp>
 #include <meta/test_gimbal_boxed.hpp>
-#include <gimbal/utils/gimbal_test_scenario.h>
 
 using namespace elysian;
 

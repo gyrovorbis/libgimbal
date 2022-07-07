@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+SET(CMAKE_ANDROID_API 28)
+
 project(LibGimbal 
     VERSION 
         ${GIMBAL_VERSION} 
@@ -64,15 +66,12 @@ GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_EMAIL GITLAB_USER_EMAIL)
 GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/core/gimbal_config.h.in FILEPATH "Path to user API configuration file")
 
 GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ENABLED "Track most recent call record in GblHandle" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_SOURCE_TRACKING_ENABLED      "Track calling source code location" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS              "Enable C errno verification macros" ON)
 
-GBL_CONFIG_OPTION(GBL_CONFIG_LOG_SUCCESS_ENABLED           "Log all success results from API calls" OFF)
 GBL_CONFIG_OPTION(GBL_CONFIG_LOG_PARTIAL_ENABLED   "Log all partial success results from API calls" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_LOG_ERROR_ENABLED             "Log all error results from API calls" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_LOG_UNKNOWN_ENABLED             "Log all unknown results from API calls" ON)
 
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_SUCCESS_LEVEL GBL_LOG_LEVEL_DEBUG STRING "Log level for reporting success results")
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL GBL_LOG_LEVEL_WARNING STRING "Log level for reporting partial results")
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL GBL_LOG_LEVEL_ERROR STRING "Log level for reporting error results")
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL GBL_LOG_LEVEL_ERROR STRING "Log level for reporting unknown results")
@@ -81,18 +80,9 @@ GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_PARTIAL_ENABLED "Assert on all partial succe
 GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_ERROR_ENABLED          "Assert on all error results from API calls" OFF)
 GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_UNKNOWN_ENABLED          "Assert on all unknown results from API calls" OFF)
 
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_SUCCESS_ENABLED    "Update Handle's LastCallRecord on all success results from API calls" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_PARTIAL_ENABLED "Update Handle's LastCallRecord on all partial success results from API calls" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ERROR_ENABLED      "Update Handle's LastCallRecord on all error results from API calls" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_UNKNOWN_ENABLED      "Update Handle's LastCallRecord on all unknown results from API calls" ON)
-
-GBL_CONFIG_OPTION(GBL_CONFIG_EXT_CONTEXT_CALLBACKS_ENABLED    "Context supports runtime user callback EXT functions provided upon creation" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_EXT_CONTEXT_DEFAULT_ENABLED         "Context falls-back to default EXT implementation using standard C library calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_EXT_CONTEXT_PARENT_ENABLED          "Context falls-back to calling parent's EXT implementation" ON)
-
-GBL_CONFIG_OPTION(GBL_FEATURE_VARIANTS      "Enable Variants" ON)
-GBL_CONFIG_OPTION(GBL_FEATURE_STRINGS       "Enable Strings" ON)
-GBL_CONFIG_OPTION(GBL_FEATURE_CONTAINERS    "Enable Containers" ON)
 
 set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/core/gimbal_config.h")
 
@@ -130,8 +120,9 @@ set(GIMBAL_SOURCES
      source/meta/gimbal_boxed.c
      source/meta/gimbal_flags.c
      source/containers/gimbal_byte_array.c
-     source/utils/gimbal_test_suite.c
-     source/utils/gimbal_test_scenario.c
+     source/containers/gimbal_vector.c
+     source/test/gimbal_test_suite.c
+     source/test/gimbal_test_scenario.c
  )
 
 set(GIMBAL_INCLUDES
@@ -168,7 +159,7 @@ set(GIMBAL_INCLUDES
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH}
     api/gimbal/preprocessor/gimbal_macro_sequences.h
     api/gimbal/core/gimbal_ext.h
-    api/gimbal/utils/gimbal_test.h
+    api/gimbal/test/gimbal_test.h
     api/gimbal/types/gimbal_variant.h
     api/gimbal/strings/gimbal_quark.h
     api/gimbal/strings/gimbal_quark.hpp
@@ -214,8 +205,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/preprocessor/gimbal_atomics.h
     api/gimbal/meta/gimbal_boxed.h
     api/gimbal/preprocessor/gimbal_memory_resource.hpp
-    api/gimbal/utils/gimbal_test_suite.h
-    api/gimbal/utils/gimbal_test_scenario.h
+    api/gimbal/test/gimbal_test_suite.h
+    api/gimbal/test/gimbal_test_scenario.h
     source/meta/gimbal_type_.h
 )
 

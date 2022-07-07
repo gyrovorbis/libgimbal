@@ -22,8 +22,6 @@ typedef GBL_UINT                        GblUint;
 typedef GBL_ENUM                        GblEnum;
 typedef GBL_FLAGS                       GblFlags;
 typedef GBL_HASH                        GblHash;
-typedef uintptr_t                       GblType;
-typedef uintptr_t                       GblQuark;
 typedef uint16_t                        GblRefCount;
 typedef uint32_t                        GblVersion;
 typedef void                            (*GblFnPtr)();

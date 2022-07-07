@@ -1,6 +1,6 @@
 #include "containers/gimbal_tree_set_test_suite.h"
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 #include <gimbal/containers/gimbal_tree_set.h>
 
 #define GBL_TREE_SET_TEST_SUITE_(inst)  ((GblTreeSetTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_TREE_SET_TEST_SUITE_TYPE))

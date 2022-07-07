@@ -1,7 +1,7 @@
 #ifndef GIMBAL_LINKED_LIST_TEST_SUITE_H
 #define GIMBAL_LINKED_LIST_TEST_SUITE_H
 
-#include <gimbal/utils/gimbal_test_suite.h>
+#include <gimbal/test/gimbal_test_suite.h>
 
 #define GBL_LINKED_LIST_TEST_SUITE_TYPE             (GblLinkedListTestSuite_type())
 #define GBL_LINKED_LIST_TEST_SUTE_STRUCT            GblLinkedListTestSuite

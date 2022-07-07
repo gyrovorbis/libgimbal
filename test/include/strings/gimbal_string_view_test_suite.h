@@ -1,7 +1,7 @@
 #ifndef GIMBAL_STRING_VIEW_TEST_SUITE_H
 #define GIMBAL_STRING_VIEW_TEST_SUITE_H
 
-#include <gimbal/utils/gimbal_test_suite.h>
+#include <gimbal/test/gimbal_test_suite.h>
 
 #define GBL_STRING_VIEW_TEST_SUITE_TYPE             (GblStringViewTestSuite_type())
 #define GBL_STRING_VIEW_TEST_SUTE_STRUCT            GblStringViewTestSuite

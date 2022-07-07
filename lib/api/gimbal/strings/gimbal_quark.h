@@ -5,6 +5,8 @@
 
 GBL_DECLS_BEGIN
 
+typedef uintptr_t         GblQuark;
+
 #define GBL_QUARK_INVALID ((GblQuark)0)
 
 GBL_EXPORT GBL_RESULT   GblQuark_init               (GblContext* pCtx,

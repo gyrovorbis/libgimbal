@@ -1,7 +1,7 @@
 #ifndef GIMBAL_TYPE_TEST_SUITE_H
 #define GIMBAL_TYPE_TEST_SUITE_H
 
-#include <gimbal/utils/gimbal_test_suite.h>
+#include <gimbal/test/gimbal_test_suite.h>
 
 #define GBL_TYPE_TEST_SUITE_TYPE             (GblTypeTestSuite_type())
 #define GBL_TYPE_TEST_SUTE_STRUCT            GblTypeTestSuite

@@ -14,8 +14,6 @@ static GblQuark descQuark_       = GBL_QUARK_INVALID;
 static GblQuark prefixQuark_     = GBL_QUARK_INVALID;
 static GblQuark typeCountQuark_  = GBL_QUARK_INVALID;
 
-static const GblProperty* pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_COUNT)] = { NULL };
-
 GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
     GBL_API_BEGIN(pPlugin);
     GblModule* pModule = GBL_MODULE(pPlugin);

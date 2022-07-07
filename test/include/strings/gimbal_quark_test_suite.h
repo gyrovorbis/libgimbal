@@ -1,7 +1,7 @@
 #ifndef GIMBAL_QUARK_TEST_SUITE_H
 #define GIMBAL_QUARK_TEST_SUITE_H
 
-#include <gimbal/utils/gimbal_test_suite.h>
+#include <gimbal/test/gimbal_test_suite.h>
 
 #define GBL_QUARK_TEST_SUITE_TYPE             (GblQuarkTestSuite_type())
 #define GBL_QUARK_TEST_SUTE_STRUCT            GblQuarkTestSuite

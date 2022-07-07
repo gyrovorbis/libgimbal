@@ -1,7 +1,7 @@
 #ifndef GIMBAL_ARRAY_MAP_TEST_SUITE_H
 #define GIMBAL_ARRAY_MAP_TEST_SUITE_H
 
-#include <gimbal/utils/gimbal_test_suite.h>
+#include <gimbal/test/gimbal_test_suite.h>
 
 #define GBL_ARRAY_MAP_TEST_SUITE_TYPE             (GblArrayMapTestSuite_type())
 #define GBL_ARRAY_MAP_TEST_SUTE_STRUCT            GblArrayMapTestSuite

@@ -1,6 +1,6 @@
 #include "containers/gimbal_array_map_test_suite.h"
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 #include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/meta/gimbal_primitives.h>
 

@@ -1,7 +1,7 @@
 #include "containers/gimbal_doubly_linked_list_test_suite.h"
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/containers/gimbal_doubly_linked_list.h>
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 #include <string.h>
 
 #define GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(inst)    ((GblDoublyLinkedListTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_DOUBLY_LINKED_LIST_TEST_SUITE_TYPE))

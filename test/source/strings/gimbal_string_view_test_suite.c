@@ -1,6 +1,6 @@
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/strings/gimbal_string_view.h>
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 #include "strings/gimbal_string_view_test_suite.h"
 
 

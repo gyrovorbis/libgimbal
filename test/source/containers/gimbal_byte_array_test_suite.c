@@ -1,5 +1,5 @@
 #include "containers/gimbal_byte_array_test_suite.h"
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/containers/gimbal_byte_array.h>
 

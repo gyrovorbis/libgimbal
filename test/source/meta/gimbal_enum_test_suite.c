@@ -1,5 +1,5 @@
 #include "meta/gimbal_enum_test_suite.h"
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/meta/gimbal_enum.h>
 #include <gimbal/types/gimbal_variant.h>
@@ -57,44 +57,20 @@ static GBL_RESULT GblEnumTestSuite_register_(GblTestSuite* pSelf, GblContext* pC
 static GBL_RESULT GblEnumTestSuite_class_name_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblEnumTestSuite_* pSelf_ = GBL_ENUM_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(strcmp(GblEnumClass_nameFromIndex(pSelf_->pEnumClass,
-                                                  1),
-                       "GREEN"),
-                0);
-    GBL_TEST_COMPARE(strcmp(GblQuark_toString(GblEnumClass_nameQuarkFromIndex(pSelf_->pEnumClass,
-                                                                         0)),
-                       "RED"),
-                0);
-    GBL_TEST_COMPARE(strcmp(GblEnumClass_nameFromValue(pSelf_->pEnumClass,
-                                                  BLUE),
-                       "BLUE"),
-                0);
-    GBL_TEST_COMPARE(strcmp(GblQuark_toString(GblEnumClass_nameQuarkFromValue(pSelf_->pEnumClass,
-                                                                         GREEN)),
-                       "GREEN"),
-                0);
+    GBL_TEST_COMPARE(GblEnumClass_nameFromIndex(pSelf_->pEnumClass, 1),"GREEN");
+    GBL_TEST_COMPARE(GblQuark_toString(GblEnumClass_nameQuarkFromIndex(pSelf_->pEnumClass, 0)), "RED");
+    GBL_TEST_COMPARE(GblEnumClass_nameFromValue(pSelf_->pEnumClass, BLUE), "BLUE");
+    GBL_TEST_COMPARE(GblQuark_toString(GblEnumClass_nameQuarkFromValue(pSelf_->pEnumClass, GREEN)), "GREEN");
     GBL_API_END();
 }
 
 static GBL_RESULT GblEnumTestSuite_class_nick_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblEnumTestSuite_* pSelf_ = GBL_ENUM_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(strcmp(GblEnumClass_nickFromIndex(pSelf_->pEnumClass,
-                                                  1),
-                       "Green"),
-                0);
-    GBL_TEST_COMPARE(strcmp(GblQuark_toString(GblEnumClass_nickQuarkFromIndex(pSelf_->pEnumClass,
-                                                                         0)),
-                       "Red"),
-                0);
-    GBL_TEST_COMPARE(strcmp(GblEnumClass_nickFromValue(pSelf_->pEnumClass,
-                                                  BLUE),
-                       "Blue"),
-                0);
-    GBL_TEST_COMPARE(strcmp(GblQuark_toString(GblEnumClass_nickQuarkFromValue(pSelf_->pEnumClass,
-                                                                         GREEN)),
-                       "Green"),
-                0);
+    GBL_TEST_COMPARE(GblEnumClass_nickFromIndex(pSelf_->pEnumClass, 1), "Green");
+    GBL_TEST_COMPARE(GblQuark_toString(GblEnumClass_nickQuarkFromIndex(pSelf_->pEnumClass, 0)), "Red");
+    GBL_TEST_COMPARE(GblEnumClass_nickFromValue(pSelf_->pEnumClass, BLUE), "Blue");
+    GBL_TEST_COMPARE(GblQuark_toString(GblEnumClass_nickQuarkFromValue(pSelf_->pEnumClass, GREEN)), "Green");
     GBL_API_END();
 }
 
@@ -124,9 +100,9 @@ static GBL_RESULT GblEnumTestSuite_value_from_(GblTestSuite* pSelf, GblContext* 
 static GBL_RESULT GblEnumTestSuite_value_to_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblEnumTestSuite_* pSelf_ = GBL_ENUM_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(strcmp(GblEnum_name(RED, pSelf_->enumType), "RED"), 0);
+    GBL_TEST_COMPARE(GblEnum_name(RED, pSelf_->enumType), "RED");
     GBL_TEST_COMPARE(GblEnum_nameQuark(GREEN, pSelf_->enumType), GblQuark_fromString("GREEN"));
-    GBL_TEST_COMPARE(strcmp(GblEnum_nick(BLUE, pSelf_->enumType), "Blue"), 0);
+    GBL_TEST_COMPARE(GblEnum_nick(BLUE, pSelf_->enumType), "Blue");
     GBL_TEST_COMPARE(GblEnum_nickQuark(BLUE, pSelf_->enumType), GblQuark_fromString("Blue"));
     GBL_API_END();
 }

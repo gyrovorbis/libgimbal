@@ -34,8 +34,9 @@ GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_ (void) { return "Values differe
     )
 #define GBL_TEST_COMPARE_FMT_(value) GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_FMT_TABLE_, value)()
 
-GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_PTR_   (void* pActual, void* pExpected)             { return pActual == pExpected; }
+GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_PTR_   (const void* pActual, const void* pExpected) { return pActual == pExpected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_UINT64_(uint64_t actual, uint64_t expected)         { return actual == expected; }
+GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_INT64_ (int64_t actual, int64_t expected)           { return actual == expected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_DBL_   (double actual, double expected)             { return actual == expected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_   (const char* pActual, const char* pExpected) { return pActual == pExpected || \
                                                                                                      strcmp(pActual, pExpected) == 0; }
@@ -43,10 +44,10 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_   (const char* pActual, const char*
 #define GBL_TEST_COMPARE_CMP_TABLE_  (                      \
         GBL_TEST_COMPARE_CMP_PTR_,                          \
         (                                                   \
-            (char,          GBL_TEST_COMPARE_CMP_UINT64_),  \
-            (int16_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
-            (int32_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
-            (int64_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (char,          GBL_TEST_COMPARE_CMP_INT64_),   \
+            (int16_t,       GBL_TEST_COMPARE_CMP_INT64_),   \
+            (int32_t,       GBL_TEST_COMPARE_CMP_INT64_),   \
+            (int64_t,       GBL_TEST_COMPARE_CMP_INT64_),   \
             (uint8_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
             (uint16_t,      GBL_TEST_COMPARE_CMP_UINT64_),  \
             (uint32_t,      GBL_TEST_COMPARE_CMP_UINT64_),  \

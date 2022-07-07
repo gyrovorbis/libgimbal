@@ -1,7 +1,7 @@
 #include "types/gimbal_ref_test_suite.h"
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/types/gimbal_ref.h>
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 
 #define GBL_REF_TEST_SUITE_(inst)   ((GblRefTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_REF_TEST_SUITE_TYPE))
 

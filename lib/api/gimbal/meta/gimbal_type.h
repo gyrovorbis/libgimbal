@@ -1,8 +1,24 @@
+/**
+ * @file gimbal_type.h
+ * @author GyroVorbis
+ * @date 9 Sep 2012
+ * @brief File containing example of doxygen usage for quick reference.
+ *
+ * Here typically goes a more extensive explanation of what the header
+ * defines. Doxygens tags are words preceeded by either a backslash @\
+ * or by an at symbol @@.
+ * @see http://www.stack.nl/~dimitri/doxygen/docblocks.html
+ * @see http://www.stack.nl/~dimitri/doxygen/commands.html
+ */
+
 #ifndef GIMBAL_TYPE_H
 #define GIMBAL_TYPE_H
 
 #include "../types/gimbal_typedefs.h"
+#include "../strings/gimbal_quark.h"
 #include "gimbal_builtin_types.h"
+
+typedef uintptr_t                           GblType;
 
 #define GBL_INVALID_TYPE                    ((GblType)0)
 
@@ -24,7 +40,6 @@
 
 GBL_DECLS_BEGIN
 
-// ENUM types will DERIVE from enum but will not be SUBTYPES of or INHERIT
 GBL_DECLARE_FLAGS(GblTypeFundamentalFlags) {
     GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT         = (1 << 0),
     GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED           = (1 << 1),
@@ -32,11 +47,11 @@ GBL_DECLARE_FLAGS(GblTypeFundamentalFlags) {
     GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE      = (1 << 3),
     GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE         = (1 << 4),
     GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE    = (1 << 5),
-    GBL_TYPE_FUNDAMENTAL_FLAGS_MASK             = GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT               |
-                                                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED                 |
-                                                  GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE            |
-                                                  GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE               |
-                                                  GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE          |
+    GBL_TYPE_FUNDAMENTAL_FLAGS_MASK             = GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT       |
+                                                  GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED         |
+                                                  GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE    |
+                                                  GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE       |
+                                                  GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE  |
                                                   GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED
 };
 
@@ -45,14 +60,14 @@ GBL_DECLARE_FLAGS(GblTypeFlags) {
     GBL_TYPE_FLAG_BUILTIN                       = (1 << 6),
     GBL_TYPE_FLAG_TYPEINFO_STATIC               = (1 << 7),
     GBL_TYPE_FLAG_CLASS_PINNED                  = (1 << 8),
-    GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE     = (1 << 9),
+    GBL_TYPE_FLAG_CLASS_PREINIT                 = (1 << 9),
     GBL_TYPE_FLAG_UNMAPPABLE                    = (1 << 10),
     GBL_TYPE_FLAG_ABSTRACT                      = (1 << 11),
     GBL_TYPE_FLAG_FINAL                         = (1 << 12),
     GBL_TYPE_FLAGS_MASK                         = GBL_TYPE_FLAG_BUILTIN                     |
                                                   GBL_TYPE_FLAG_TYPEINFO_STATIC             |
                                                   GBL_TYPE_FLAG_CLASS_PINNED                |
-                                                  GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE   |
+                                                  GBL_TYPE_FLAG_CLASS_PREINIT               |
                                                   GBL_TYPE_FLAG_UNMAPPABLE                  |
                                                   GBL_TYPE_FLAG_ABSTRACT                    |
                                                   GBL_TYPE_FLAG_FINAL

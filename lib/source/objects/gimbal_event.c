@@ -2,7 +2,6 @@
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/strings/gimbal_quark.h>
 
-
 extern GBL_RESULT GblEvent_typeRegister_(GblEvent* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
     GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_EVENT,

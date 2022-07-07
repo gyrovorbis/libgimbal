@@ -1,5 +1,5 @@
-#include <gimbal/utils/gimbal_test_scenario.h>
-#include <gimbal/utils/gimbal_test_suite.h>
+#include <gimbal/test/gimbal_test_scenario.h>
+#include <gimbal/test/gimbal_test_suite.h>
 #include <time.h>
 
 #define GBL_TEST_SCENARIO_(inst)    ((GblTestScenario_*)GBL_INSTANCE_PRIVATE(inst, GBL_TEST_SCENARIO_TYPE))

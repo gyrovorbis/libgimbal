@@ -1126,7 +1126,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
                                  0,
                                  &nilIVariantIFace,
                                  GBL_TYPE_FLAG_CLASS_PINNED |
-                                 GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE);
+                                 GBL_TYPE_FLAG_CLASS_PREINIT);
     GBL_API_VERIFY_LAST_RECORD();
 
     // =============== BOOL ===============

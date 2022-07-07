@@ -1,5 +1,5 @@
 #include "types/gimbal_variant_test_suite.h"
-#include <gimbal/utils/gimbal_test.h>
+#include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/types/gimbal_variant.h>
 #include <string.h>

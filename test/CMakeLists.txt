@@ -48,6 +48,10 @@ add_executable(GimbalTests
     source/meta/gimbal_boxed_test_suite.c
     include/objects/gimbal_object_test_suite.h
     source/objects/gimbal_object_test_suite.c
+    include/containers/gimbal_vector_test_suite.h
+    source/containers/gimbal_vector_test_suite.c
+    include/containers/gimbal_hash_set_test_suite.h
+    source/containers/gimbal_hash_set_test_suite.c
     source/test_main.c)
 
 target_link_libraries(GimbalTests

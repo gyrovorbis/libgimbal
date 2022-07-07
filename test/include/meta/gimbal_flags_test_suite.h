@@ -1,7 +1,7 @@
 #ifndef GIMBAL_FLAGS_TEST_SUITE_H
 #define GIMBAL_FLAGS_TEST_SUITE_H
 
-#include <gimbal/utils/gimbal_test_suite.h>
+#include <gimbal/test/gimbal_test_suite.h>
 
 #define GBL_FLAGS_TEST_SUITE_TYPE             (GblFlagsTestSuite_type())
 #define GBL_FLAGS_TEST_SUTE_STRUCT            GblFlagsTestSuite

@@ -15,12 +15,7 @@ typedef struct GblSourceLocation {
     GblSize         column;
 } GblSourceLocation;
 
-static inline GblSourceLocation GBL_SOURCE_LOCATION(const char* pFile, const char* pFunc, GBL_SIZE line, GBL_SIZE column) {
-    const GblSourceLocation location = {
-        pFile, pFunc, line, column
-    };
-    return location;
-}
+#define GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE, COL) ((GblSourceLocation){FILE, FUNCTION, LINE, COL})
 
 typedef struct GblMemAllocInfo {
     GblSize     extraBytes;
@@ -80,22 +75,17 @@ typedef struct GblStackFrame {
 
 GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObject, GBL_RESULT initialResult, GblSourceLocation entryLoc);
 
-GBL_INLINE GblBool GBL_API_STACK_FRAME_SOURCE_PUSH(GblStackFrame* pStackFrame, GblSourceLocation current) {
-    if(++pStackFrame->sourceCurrentCaptureDepth == 1) { //we care about the first entry point
-        pStackFrame->sourceCurrent = current;
-        return GBL_TRUE;
-    }
-    return GBL_FALSE;
-}
 
-GBL_INLINE GblBool GBL_API_STACK_FRAME_SOURCE_POP(GblStackFrame* pStackFrame) {
-    GBL_ASSERT(pStackFrame->sourceCurrentCaptureDepth);
-    if(--pStackFrame->sourceCurrentCaptureDepth == 0) {
-        pStackFrame->sourceCurrent = pStackFrame->sourceEntry;
-        return GBL_TRUE;
-    }
-    return GBL_FALSE;
-}
+
+#define GBL_API_STACK_FRAME_SOURCE_PUSH(pStackFrame, current) \
+    if(++pStackFrame->sourceCurrentCaptureDepth == 1) pStackFrame->sourceCurrent = current;
+
+#define GBL_API_STACK_FRAME_SOURCE_POP(pStackFrame)                 \
+    GBL_STMT_START {                                                \
+        GBL_ASSERT(pStackFrame->sourceCurrentCaptureDepth);         \
+        if(--pStackFrame->sourceCurrentCaptureDepth == 0)           \
+            pStackFrame->sourceCurrent = pStackFrame->sourceEntry;  \
+    } GBL_STMT_END
 
 #ifdef __cplusplus
 }

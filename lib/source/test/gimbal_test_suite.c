@@ -1,5 +1,5 @@
-#include <gimbal/utils/gimbal_test_suite.h>
-#include <gimbal/utils/gimbal_test_scenario.h>
+#include <gimbal/test/gimbal_test_suite.h>
+#include <gimbal/test/gimbal_test_scenario.h>
 #include <gimbal/containers/gimbal_vector.h>
 
 #define GBL_TEST_SUITE_(inst)           ((GblTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_TEST_SUITE_TYPE))

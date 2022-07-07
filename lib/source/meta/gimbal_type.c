@@ -96,7 +96,7 @@ static GBL_RESULT typeLog_(GblType parent,
     GBL_API_VERBOSE("%-20s: %-100u", "DEEP_DERIVABLE",              (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)? 1 : 0);
     GBL_API_VERBOSE("%-20s: %-100u", "TYPEINFO_STATIC",             (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 1 : 0);
     GBL_API_VERBOSE("%-20s: %-100u", "CLASS_PINNED",                (flags & GBL_TYPE_FLAG_CLASS_PINNED)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "CLASS_CONSTRUCT_IMMEDIATE",   (flags & GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "CLASS_CONSTRUCT_IMMEDIATE",   (flags & GBL_TYPE_FLAG_CLASS_PREINIT)? 1 : 0);
     GBL_API_VERBOSE("%-20s: %-100u", "UNMAPPABLE",                  (flags & GBL_TYPE_FLAG_UNMAPPABLE)? 1 : 0);
     GBL_API_VERBOSE("%-20s: %-100u", "BUILTIN",                     (flags & GBL_TYPE_FLAG_BUILTIN)? 1 : 0);
     GBL_API_VERBOSE("%-20s: %-100u", "ABSTRACT",                    (flags & GBL_TYPE_FLAG_ABSTRACT)? 1 : 0);
@@ -151,7 +151,7 @@ static GblFlags typeFlagsWithImplied_(GblType parent,
     if(!pParentMeta && pInfo->dependencyCount)              flags |= GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT;
     if(!pParentMeta && pInfo->classSize)                    flags |= GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED;
     if(!pParentMeta && pInfo->instanceSize)                 flags |= GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE;
-    if(flags & GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE)     flags |= GBL_TYPE_FLAG_CLASS_PINNED;
+    if(flags & GBL_TYPE_FLAG_CLASS_PREINIT)     flags |= GBL_TYPE_FLAG_CLASS_PINNED;
     if(flags & GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED) {
                                                             flags |= GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED;
                                                             flags |= GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT;
@@ -473,7 +473,7 @@ static GblType typeRegister_(GblType parent,
              GBL_API_CALL(GblVector_pushBack(&typeBuiltins_.vector, &newType));
         }
 
-        if(flags & GBL_TYPE_FLAG_CLASS_CONSTRUCT_IMMEDIATE) {
+        if(flags & GBL_TYPE_FLAG_CLASS_PREINIT) {
             GblClass* pClass = GblClass_ref(newType);
             GBL_API_VERIFY(pClass,
                            GBL_RESULT_ERROR_INVALID_CLASS,
