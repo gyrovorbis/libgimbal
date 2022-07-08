@@ -221,15 +221,6 @@ analyze scan-build-gcc:
     PREFIX_PATH: /home/falco/Qt/6.3.1/gcc_64
     CC: gcc
     CXX: g++
- 
-
-test ubuntu20-gcc10:
-  extends: .test_common
-  needs: ["build ubuntu20-gcc10"]
-  dependencies:
-    - build ubuntu20-gcc10
-  tags:
-    - linux, gcc
     
 .test_common:
   stage: test
@@ -304,3 +295,14 @@ test macos-gcc11:
     - build macos-gcc11
   tags:
     - macos, gcc
+
+pages:
+  tags:
+  - doxygen
+  script:
+  - cd doc
+  - doxygen
+  - mv ./html ../public
+  artifacts:
+    paths:
+    - public
