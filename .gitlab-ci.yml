@@ -305,4 +305,4 @@ publish-docs:
   - cd doc
   - doxygen
   - cd html
-  - lftp -c "open libgimbal; mirror -X *. --reverse --verbose --parallel=10 ./ ./; bye"
+  - lftp -c 'open libgimbal.elysianshadows.com; login $FTP_USER $FTP_PASS; mirror -X *. --reverse --verbose --parallel=10 ./ ./; bye'
