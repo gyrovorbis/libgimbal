@@ -298,6 +298,7 @@ test macos-gcc11:
 
 pages:
   stage: deploy
+  dependencies: 
   tags:
   - doxygen
   script:
