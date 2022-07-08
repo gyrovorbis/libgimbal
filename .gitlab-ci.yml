@@ -296,7 +296,7 @@ test macos-gcc11:
   tags:
     - macos, gcc
 
-pages:
+publish-docs:
   stage: deploy
   dependencies: 
   tags:
@@ -304,7 +304,5 @@ pages:
   script:
   - cd doc
   - doxygen
-  - mv ./html ../public
-  artifacts:
-    paths:
-    - public
+  - cd html
+  - lftp -c "open libgimbal; mirror -X *. --reverse --verbose --parallel=10 ./ ./; bye"
