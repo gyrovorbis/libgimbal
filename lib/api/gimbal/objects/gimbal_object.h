@@ -13,8 +13,11 @@
 #include "../preprocessor/gimbal_atomics.h"
 #include "../containers/gimbal_array_map.h"
 
+/*! @file
+ *  @brief brief file description
+ */
+
 #define GBL_OBJECT_TYPE                     (GBL_BUILTIN_TYPE(OBJECT))
-#define GBL_OBJECT_PARENT_PREFIX            GBL_INVALID_TYPE
 #define GBL_OBJECT_STRUCT                   GblObject
 #define GBL_OBJECT_CLASS_STRUCT             GblObjectClass
 
@@ -40,9 +43,7 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblObject);
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
-GBL_FORWARD_DECLARE_STRUCT(GblSlot);
-GBL_FORWARD_DECLARE_STRUCT(GblObjectExtraData_);
-
+/// GblClass structure for a GblObject instance
 typedef struct GblObjectClass {
     GblClass                base;
 
@@ -56,16 +57,18 @@ typedef struct GblObjectClass {
     GBL_RESULT (*pFnConstructed)        (SELF);
     GBL_RESULT (*pFnPropertyGet)        (CSELF, GblSize id, GblVariant* pValue, const GblProperty* pProp);
     GBL_RESULT (*pFnPropertySet)        (SELF,  GblSize id, const GblVariant* pValue, const GblProperty* pProp);
-    GBL_RESULT (*pFnSlotCall)           (SELF,  GblSize id, GblVariant* pRet, GblUint argc, GblVariant* pArgs, const GblSlot* pSlot);
+    //GBL_RESULT (*pFnSlotCall)           (SELF,  GblSize id, GblVariant* pRet, GblUint argc, GblVariant* pArgs, const GblSlot* pSlot);
     GBL_RESULT (*pFnPropertyNotify)     (SELF,  GblProperty* pProperty);    // signal
 } GblObjectClass;
 
-GBL_DECLARE_ENUM(GBL_OBJECT_ATTRIBUTE) {
+typedef enum GBL_OBJECT_ATTRIBUTE {
     GBL_OBJECT_ATTRIBUTE_CONSTRUCTED_IN_PLACE,
     GBL_OBJECT_ATTRIBUTE_COUNT
-};
+} GBL_OBJECT_ATTRIBUTE;
 
+/// RefCounted, Property-supporting GblInstance derived type
 typedef struct GblObject {
+    /// Convenience derived class alias
     union {
         GblObjectClass*     pClass;
         GblInstance         base;
@@ -117,7 +120,6 @@ GBL_PROPERTY_TABLE_BEGIN(GBL_OBJECT)
                        GBL_POINTER_TYPE,
                        GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
 GBL_PROPERTY_TABLE_END()
-
 
 GBL_EXPORT GblObject*         GblObject_new                 (GblType type, ...)                 GBL_NULL_TERMINATED             GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT         GblObject_newInPlace          (SELF, GblType type, ...)           GBL_NULL_TERMINATED             GBL_NOEXCEPT;

@@ -13,6 +13,13 @@ GBL_EXPORT void* GblInstance_private(const GblInstance* pInstance, GblType base)
                 NULL;
 }
 
+GBL_EXPORT GblInstance* GblInstance_public(const void* pPrivate, GblType base) {
+    GblMetaClass* pMeta = GBL_META_CLASS_(base);
+    return pMeta && pMeta->pInfo->instancePrivateSize?
+                (GblInstance*)((uint8_t*)pPrivate - pMeta->instancePrivateOffset) :
+                NULL;
+}
+
 
 GBL_RESULT typeInstanceConstructValidate_(GblType type, GblBool inPlace) {
     GblMetaClass* pMeta = GBL_META_CLASS_(type);

@@ -104,9 +104,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_blank_(GblTestSuite* pSelf, GblCo
     GBL_TEST_VERIFY(!GBL_TYPE_IS_FINAL(pSelf_->blankType));
     GBL_TEST_VERIFY(GBL_TYPE_IS_FUNDAMENTAL(pSelf_->blankType));
     GBL_TEST_VERIFY(!GBL_TYPE_IS_INTERFACED(pSelf_->blankType));
-    GBL_TEST_VERIFY(GBL_TYPE_IS_ROOT(pSelf_->blankType));
     GBL_TEST_VERIFY(GBL_TYPE_IS_VALID(pSelf_->blankType));
-    GBL_TEST_VERIFY(!GBL_TYPE_IS_VALUE(pSelf_->blankType));
 
     //GBL_TEST_COMPARE(GblType_registeredCount(), GBL_TYPE_BUILTIN_COUNT+1);
     GBL_TEST_COMPARE(GblType_fromName("Blank"), pSelf_->blankType);

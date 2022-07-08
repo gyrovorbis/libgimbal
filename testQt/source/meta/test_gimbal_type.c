@@ -96,9 +96,7 @@ GBL_API GblType_test_fundamental_blank(GblContext* pCtx) {
     GBL_TEST_VERIFY(!GBL_TYPE_IS_FINAL(blankType_));
     GBL_TEST_VERIFY(GBL_TYPE_IS_FUNDAMENTAL(blankType_));
     GBL_TEST_VERIFY(!GBL_TYPE_IS_INTERFACED(blankType_));
-    GBL_TEST_VERIFY(GBL_TYPE_IS_ROOT(blankType_));
     GBL_TEST_VERIFY(GBL_TYPE_IS_VALID(blankType_));
-    GBL_TEST_VERIFY(!GBL_TYPE_IS_VALUE(blankType_));
 
     GBL_TEST_COMPARE(GblType_registeredCount(), GBL_TYPE_BUILTIN_COUNT+1);
     GBL_TEST_COMPARE(GblType_fromName("Blank"), blankType_);

@@ -65,24 +65,24 @@ GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_EMAIL GITLAB_USER_EMAIL)
 
 GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/core/gimbal_config.h.in FILEPATH "Path to user API configuration file")
 
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ENABLED "Track most recent call record in GblHandle" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS              "Enable C errno verification macros" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ENABLED   "Track most recent call record in GblHandle" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS               "Enable C errno verification macros" ON)
 
-GBL_CONFIG_OPTION(GBL_CONFIG_LOG_PARTIAL_ENABLED   "Log all partial success results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LOG_ERROR_ENABLED             "Log all error results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LOG_UNKNOWN_ENABLED             "Log all unknown results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LOG_PARTIAL_ENABLED    "Log all partial success results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LOG_ERROR_ENABLED      "Log all error results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LOG_UNKNOWN_ENABLED    "Log all unknown results from API calls" ON)
 
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL GBL_LOG_LEVEL_WARNING STRING "Log level for reporting partial results")
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL GBL_LOG_LEVEL_ERROR STRING "Log level for reporting error results")
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL GBL_LOG_LEVEL_ERROR STRING "Log level for reporting unknown results")
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL GBL_LOG_LEVEL_WARNING STRING   "Log level for reporting partial results")
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL GBL_LOG_LEVEL_ERROR STRING       "Log level for reporting error results")
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL GBL_LOG_LEVEL_ERROR STRING     "Log level for reporting unknown results")
 
-GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_PARTIAL_ENABLED "Assert on all partial success results from API calls" OFF)
-GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_ERROR_ENABLED          "Assert on all error results from API calls" OFF)
-GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_UNKNOWN_ENABLED          "Assert on all unknown results from API calls" OFF)
+GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_PARTIAL_ENABLED     "Assert on all partial success results from API calls" OFF)
+GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_ERROR_ENABLED       "Assert on all error results from API calls" OFF)
+GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_UNKNOWN_ENABLED     "Assert on all unknown results from API calls" OFF)
 
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_PARTIAL_ENABLED "Update Handle's LastCallRecord on all partial success results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ERROR_ENABLED      "Update Handle's LastCallRecord on all error results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_UNKNOWN_ENABLED      "Update Handle's LastCallRecord on all unknown results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_PARTIAL_ENABLED   "Update Handle's LastCallRecord on all partial success results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ERROR_ENABLED     "Update Handle's LastCallRecord on all error results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_UNKNOWN_ENABLED   "Update Handle's LastCallRecord on all unknown results from API calls" ON)
 
 set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/core/gimbal_config.h")
 
@@ -148,7 +148,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/ifaces/gimbal_iallocator.h
     api/gimbal/ifaces/gimbal_ilogger.h
     api/gimbal/objects/gimbal_context.h
-    api/gimbal/objects/gimbal_object.hpp
     api/gimbal/objects/gimbal_module.h
     api/gimbal/types/gimbal_result.hpp
     api/gimbal/types/gimbal_typedefs.h
@@ -184,10 +183,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/strings/gimbal_string_ref.h
     api/gimbal/types/gimbal_ref.h
     api/gimbal/meta/gimbal_type.hpp
-    api/gimbal/meta/gimbal_instance.hpp
-    api/gimbal/meta/gimbal_interface.hpp
     api/gimbal/meta/gimbal_class.h
-    api/gimbal/meta/gimbal_class.hpp
     api/gimbal/meta/gimbal_instance.h
     api/gimbal/meta/gimbal_builtin_types.h
     api/gimbal/meta/gimbal_primitives.h

@@ -5,36 +5,50 @@
 #include "../strings/gimbal_quark.h"
 #include "gimbal_builtin_types.h"
 
-typedef uintptr_t                           GblType;
+/*! @file
+ *  @brief brief file description
+ */
 
+/// UUID of an invalid type
 #define GBL_INVALID_TYPE                    ((GblType)0)
 
-#define GBL_TYPE_IS_DEPENDENT(type)         (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT))
-#define GBL_TYPE_IS_CLASSED(type)           (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED))
-#define GBL_TYPE_IS_INTERFACED(type)        (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED))
-#define GBL_TYPE_IS_INSTANTIABLE(type)      (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE))
-#define GBL_TYPE_IS_DERIVABLE(type)         (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE))
-#define GBL_TYPE_IS_DEEP_DERIVABLE(type)    (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE))
-#define GBL_TYPE_IS_BUILTIN(type)           (GblType_flagsTest(type, GBL_TYPE_FLAG_BUILTIN))
-#define GBL_TYPE_IS_ABSTRACT(type)          (GblType_flagsTest(type, GBL_TYPE_FLAG_ABSTRACT))
-#define GBL_TYPE_IS_FINAL(type)             (GblType_flagsTest(type, GBL_TYPE_FLAG_FINAL))
-#define GBL_TYPE_IS_FUNDAMENTAL(type)       (type == GblType_fundamental(type))
-#define GBL_TYPE_IS_ROOT(type)              (GblType_base(type, 0) == type)
-#define GBL_TYPE_IS_VALID(type)             (GblType_verify(type))
-#define GBL_TYPE_IS_VALUE(type)             (!GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE) \
-                                               && GblType_check(type, GBL_BUILTIN_TYPE(IVARIANT)))
-#define SELF    GblType type
+/** @name Type Flag Tests
+ *  @details Convenience macros for testing individual type flags
+ */
+///@{
+#define GBL_TYPE_IS_DEPENDENT(type)         (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT))          ///< Convenience macro checking a GblType's GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT flag
+#define GBL_TYPE_IS_CLASSED(type)           (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED))            ///< Convenience macro checking a GblType's GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED flag
+#define GBL_TYPE_IS_INTERFACED(type)        (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED))         ///< Convenience macro checking a GblType's GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED flag
+#define GBL_TYPE_IS_INSTANTIABLE(type)      (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE))       ///< Convenience macro checking a GblType's GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE flag
+#define GBL_TYPE_IS_DERIVABLE(type)         (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE))          ///< Convenience macro checking a GblType's GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE flag
+#define GBL_TYPE_IS_DEEP_DERIVABLE(type)    (GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE))     ///< Convenience macro checking a GblType's GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE flag
+#define GBL_TYPE_IS_BUILTIN(type)           (GblType_flagsTest(type, GBL_TYPE_FLAG_BUILTIN))                        ///< Convenience macro checking a GblType's GBL_TYPE_BUILTIN flag
+#define GBL_TYPE_IS_ABSTRACT(type)          (GblType_flagsTest(type, GBL_TYPE_FLAG_ABSTRACT))                       ///< Convenience macro checking a GblType's GBL_TYPE_ABSTRACT flag
+#define GBL_TYPE_IS_FINAL(type)             (GblType_flagsTest(type, GBL_TYPE_FLAG_FINAL))                          ///< Convenience macro checking a GblType's GBL_TYPE_FINAL flag
+#define GBL_TYPE_IS_FUNDAMENTAL(type)       (type == GblType_fundamental(type))                                     ///< Convenience macro for testing whether a given type is fundamental
+#define GBL_TYPE_IS_VALID(type)             (GblType_verify(type))                                                  ///< Convenience macro for testing whether a given type is valid
+#define GBL_TYPE_IS_VARIANT(type)             (!GblType_flagsTest(type, GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE) \
+                                               && GblType_check(type, GBL_BUILTIN_TYPE(IVARIANT)))                  ///< Convenience macro for testing whether a given type can be stored within a GblVariant
+///}@
+
+#define SELF    GblType self
 
 GBL_DECLS_BEGIN
 
+/** @name Type Flags
+ *  @details Flags control the behavior of a GblType. A type's flags is the combination of its
+ *  inherited GblTypeFundamentalFlags OR'd with its own GblTypeFlags.
+ */
+///@{
+/// Flags controlling behavior of fundamental or base GblTypes. These can only be set on root types and are inherited.
 GBL_DECLARE_FLAGS(GblTypeFundamentalFlags) {
-    GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT         = (1 << 0),
-    GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED           = (1 << 1),
-    GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED        = (1 << 2),
-    GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE      = (1 << 3),
-    GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE         = (1 << 4),
-    GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE    = (1 << 5),
-    GBL_TYPE_FUNDAMENTAL_FLAGS_MASK             = GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT       |
+    GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT         = (1 << 0),                                     ///< Type is dependent upon other types in dependency list
+    GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED           = (1 << 1),                                     ///< Type has an associated GblClass
+    GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED        = (1 << 2),                                     ///< Type has an associated GblInterface as its class (cannot be instantiable)
+    GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE      = (1 << 3),                                     ///< Type has an associated GblInstance
+    GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE         = (1 << 4),                                     ///< Type supports single-level inheritance
+    GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE    = (1 << 5),                                     ///< Type suppports multi-level inheritance
+    GBL_TYPE_FUNDAMENTAL_FLAGS_MASK             = GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT       |   ///< Mask of all GblFundamentalTypeFlag values
                                                   GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED         |
                                                   GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE    |
                                                   GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE       |
@@ -42,16 +56,17 @@ GBL_DECLARE_FLAGS(GblTypeFundamentalFlags) {
                                                   GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED
 };
 
+/// Flags controlling behavior of GblTypes. These can be set at any level in a type heirarchy.
 GBL_DECLARE_FLAGS(GblTypeFlags) {
     GBL_TYPE_FLAGS_NONE                         = 0,
-    GBL_TYPE_FLAG_BUILTIN                       = (1 << 6),
-    GBL_TYPE_FLAG_TYPEINFO_STATIC               = (1 << 7),
-    GBL_TYPE_FLAG_CLASS_PINNED                  = (1 << 8),
-    GBL_TYPE_FLAG_CLASS_PREINIT                 = (1 << 9),
-    GBL_TYPE_FLAG_UNMAPPABLE                    = (1 << 10),
-    GBL_TYPE_FLAG_ABSTRACT                      = (1 << 11),
-    GBL_TYPE_FLAG_FINAL                         = (1 << 12),
-    GBL_TYPE_FLAGS_MASK                         = GBL_TYPE_FLAG_BUILTIN                     |
+    GBL_TYPE_FLAG_BUILTIN                       = (1 << 6),                                     ///< Type was automatically registered as a builtin type
+    GBL_TYPE_FLAG_TYPEINFO_STATIC               = (1 << 7),                                     ///< Type's GblTypeInfo specified upon registration is static, so no internal storage has to be allocated for storing a copy
+    GBL_TYPE_FLAG_CLASS_PINNED                  = (1 << 8),                                     ///< Type's GblClass is never destroyed and remains persistent upon construction. The default behavior is to create/destroy as referenced.
+    GBL_TYPE_FLAG_CLASS_PREINIT                 = (1 << 9),                                     ///< Type's GblClass should be constructed immediately, rather than lazily upon use by default. Also implies class pinning.
+    GBL_TYPE_FLAG_UNMAPPABLE                    = (1 << 10),                                    ///< Cannot obtain Type's associated GblInterface from a GblClass it has been mapped to. Disambiguates casting with common interface base classes.
+    GBL_TYPE_FLAG_ABSTRACT                      = (1 << 11),                                    ///< Type cannot be instantiated without being derived
+    GBL_TYPE_FLAG_FINAL                         = (1 << 12),                                    ///< Type cannot be derived from
+    GBL_TYPE_FLAGS_MASK                         = GBL_TYPE_FLAG_BUILTIN                     |   ///< Mask of all GblTypeFlag values
                                                   GBL_TYPE_FLAG_TYPEINFO_STATIC             |
                                                   GBL_TYPE_FLAG_CLASS_PINNED                |
                                                   GBL_TYPE_FLAG_CLASS_PREINIT               |
@@ -59,43 +74,52 @@ GBL_DECLARE_FLAGS(GblTypeFlags) {
                                                   GBL_TYPE_FLAG_ABSTRACT                    |
                                                   GBL_TYPE_FLAG_FINAL
 };
+///@}
 
-typedef GBL_RESULT (*GblTypeClassInitializeFn)      (GblClass*, const void*, GblContext*);
-typedef GBL_RESULT (*GblTypeClassFinalizeFn)        (GblClass*, const void*, GblContext*);
-typedef GBL_RESULT (*GblTypeInstanceInitializeFn)   (GblInstance*, GblContext*);
+/// UUID type identifier
+typedef uintptr_t                                   GblType;
 
+typedef GBL_RESULT (*GblTypeClassInitializeFn)      (GblClass*, const void*, GblContext*);      ///< Function type used as a GblType's GblClass initializer
+typedef GBL_RESULT (*GblTypeClassFinalizeFn)        (GblClass*, const void*, GblContext*);      ///< Function type used as a GblType's GblClass finalizer
+typedef GBL_RESULT (*GblTypeInstanceInitializeFn)   (GblInstance*, GblContext*);                ///< Function type used as a GblType's GblInstance initializer
+
+/// Maps a GblInterface to a GblClass by using it as a member of the class at the specified offset.
 typedef struct GblTypeInterfaceMapEntry {
-    GblType      interfaceType;
-    uint16_t     classOffset;
+    GblType      interfaceType; ///< GblType of the mapped interface
+    uint16_t     classOffset;   ///< offset of GblInterface into GblClass (using offsetof())
 } GblTypeInterfaceMapEntry;
 
+/// Provides type information when registering a new GblType
 typedef struct GblTypeInfo {
-    GblTypeClassInitializeFn        pFnClassInit;
-    GblTypeClassFinalizeFn          pFnClassFinal;
-    uint16_t                        classSize;
-    uint16_t                        classPrivateSize;
-    const void*                     pClassData;
-    uint8_t                         interfaceCount;
-    const GblTypeInterfaceMapEntry* pInterfaceMap;
-    uint8_t                         dependencyCount;
-    const GblType*                  pDependencies;
-    GblTypeInstanceInitializeFn     pFnInstanceInit;
-    uint16_t                        instanceSize;
-    uint16_t                        instancePrivateSize;
+    GblTypeClassInitializeFn        pFnClassInit;           ///< Function used to initialize the values a GblType's associated GblClass
+    GblTypeClassFinalizeFn          pFnClassFinal;          ///< Function used to finalize the values of a GblType's associated GblClass
+    uint16_t                        classSize;              ///< Size of a GblType's associated GblClass structure
+    uint16_t                        classPrivateSize;       ///< Size of extra private storage to be associated with a GblType's GblClass
+    const void*                     pClassData;             ///< Size of extra private storage to be associated with a GblType's GblClass
+    uint8_t                         interfaceCount;         ///< Number of GblInterface mappings in pInterfaceMap array
+    const GblTypeInterfaceMapEntry* pInterfaceMap;          ///< Array providing mappings for each GblInterface contained within a GblType's GblClass
+    uint8_t                         dependencyCount;        ///< Number of dependent GblTypes in pDependencies array
+    const GblType*                  pDependencies;          ///< Array providing a list of type dependencies that must be implemented a GblType
+    GblTypeInstanceInitializeFn     pFnInstanceInit;        ///< Function used to initialize the values a GblType's associated GblInstance
+    uint16_t                        instanceSize;           ///< Size of a GblType's associated GblInstance structure
+    uint16_t                        instancePrivateSize;    ///< Size of extra private storage to be associated with a GblType's GblInstance.
 } GblTypeInfo;
 
+/// Initializes the type system with the given default parameters. This function is called automatically when the API is used.
 GBL_EXPORT GBL_RESULT           GblType_init            (GblContext* pDefaultCtx,
                                                          GblSize     typeBuiltinInitialCount,
                                                          GblSize     typeTotalInitialCount) GBL_NOEXCEPT;
 
+/// Finalizes the type system and frees resources, should be called upon program exit
 GBL_EXPORT GBL_RESULT           GblType_final           (void)                              GBL_NOEXCEPT;
+/// Returns the default context associated with the type system
 GBL_EXPORT GblContext*          GblType_contextDefault  (void)                              GBL_NOEXCEPT;
-
+/// Registers a new GblType with the type system whose GblTypeInfo is provided up-front
 GBL_EXPORT GblType              GblType_registerStatic  (GblType              superType,
                                                          const char*          pName,
                                                          const GblTypeInfo*   pInfo,
                                                          GblFlags             flags)        GBL_NOEXCEPT;
-
+/// Registers a new GblType with the type system whose GblTypeInfo is queried for dynamically
 GBL_EXPORT GblType              GblType_registerDynamic (GblType              parent,
                                                          const char*          pName,
                                                          GblIPlugin*          pPlugin,
@@ -141,5 +165,9 @@ GBL_EXPORT GblRefCount          GblType_instanceRefCount(SELF)                  
 GBL_DECLS_END
 
 #undef SELF
+
+/*! @file
+ *  @details DETAILED DESCRIPTION
+ */
 
 #endif // GIMBAL_TYPE_H
