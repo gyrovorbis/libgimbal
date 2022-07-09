@@ -4,6 +4,7 @@
 #include "gimbal_primitives.h"
 #include "../strings/gimbal_quark.h"
 
+/// \ingroup metaBuiltinTypes
 #define GBL_FLAGS_TYPE                      (GBL_BUILTIN_TYPE(FLAGS))
 #define GBL_FLAGS_CLASS_STRUCT              GblFlagsClass
 #define GBL_FLAGS_TYPE_CHECK(type)          (GblType_check(type, GBL_FLAGS_TYPE))

@@ -17,6 +17,7 @@
 #include "../preprocessor/gimbal_atomics.h"
 #include "../containers/gimbal_array_map.h"
 
+/// \ingroup metaBuiltinTypes
 #define GBL_OBJECT_TYPE                     (GBL_BUILTIN_TYPE(OBJECT))
 #define GBL_OBJECT_STRUCT                   GblObject
 #define GBL_OBJECT_CLASS_STRUCT             GblObjectClass
@@ -76,10 +77,10 @@ typedef enum GBL_OBJECT_ATTRIBUTE {
  *\sa GblInstance, GblObjectClass
  */
 typedef struct GblObject {
-    union {
+    GBL_ANONYMOUS_UNION_BEGIN
         GblObjectClass*     pClass;
         GblInstance         base;
-    };
+    GBL_ANONYMOUS_UNION_END
     GBL_ATOMIC_INT16        refCounter;
 
     uint16_t                contextType                            : 1;
@@ -128,6 +129,15 @@ GBL_PROPERTY_TABLE_BEGIN(GBL_OBJECT)
                        GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
 GBL_PROPERTY_TABLE_END()
 
+/*!
+* Creates a new instance of a GBL_OBJECT_TYPE compatible type, setting
+* the values of the given properties upon construction.
+* \relatesalso GblObject
+* \param type GBL_OBJECT_TYPE or derived type
+* \param ... NULL-terminated list of [key, value] pairs, where keys
+*            are of type const char* and value is the property type
+* \returns pointer to a new GblObject
+*/
 GBL_EXPORT GblObject*         GblObject_new                 (GblType type, ...)                 GBL_NULL_TERMINATED             GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT         GblObject_newInPlace          (SELF, GblType type, ...)           GBL_NULL_TERMINATED             GBL_NOEXCEPT;
 GBL_EXPORT GblObject*         GblObject_newWithClass        (GblObjectClass* pClass, ...)       GBL_NULL_TERMINATED             GBL_NOEXCEPT;

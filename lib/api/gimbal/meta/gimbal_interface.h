@@ -8,7 +8,9 @@
 #include "gimbal_class.h"
 #include "gimbal_instance.h"
 
-/// GblType ID of a GblInterface
+/*! \details GblType ID of a GblInterface
+ * \ingroup metaBuiltinTypes
+ */
 #define GBL_INTERFACE_TYPE                      GBL_BUILTIN_TYPE(INTERFACE)
 
 /*!

@@ -16,7 +16,7 @@
 
 GBL_DECLS_BEGIN
 
-/*! \brief Intrustive singly linked list structure with vector-styel API
+/*! \brief Intrustive singly linked list structure with vector-style API
  *  \ingroup containers
  */
 typedef struct GblLinkedListNode {

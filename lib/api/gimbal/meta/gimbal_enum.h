@@ -4,6 +4,7 @@
 #include "gimbal_primitives.h"
 #include "../strings/gimbal_quark.h"
 
+/// \ingroup metaBuiltinTypes
 #define GBL_ENUM_TYPE                       (GBL_BUILTIN_TYPE(ENUM))
 #define GBL_ENUM_CLASS_STRUCT               GblEnumClass
 #define GBL_ENUM_TYPE_CHECK(other)          (GblType_check(other, GBL_ENUM_TYPE))

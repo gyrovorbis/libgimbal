@@ -3,6 +3,7 @@
 
 #include "gimbal_primitives.h"
 
+/// \ingroup metaBuiltinTypes
 #define GBL_POINTER_TYPE                (GBL_BUILTIN_TYPE(POINTER))
 #define GBL_POINTER_TYPE_CHECK(type)    (GblType_check(type, GBL_POINTER_TYPE))
 #define GBL_OPAQUE_TYPE_CHECK(type)     (GblType_derives(type, GBL_POINTER_TYPE))

@@ -3,6 +3,7 @@
 
 #include "../meta/gimbal_instance.h"
 
+/// \ingroup metaBuiltinTypes
 #define GBL_EVENT_TYPE                  GBL_BUILTIN_TYPE(EVENT)
 #define GBL_EVENT_STRUCT                GblEvent
 #define GBL_EVENT_CLASS_STRUCT          GblEventClass

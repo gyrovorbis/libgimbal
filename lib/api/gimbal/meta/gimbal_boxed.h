@@ -3,6 +3,7 @@
 
 #include "gimbal_primitives.h"
 
+/// \ingroup metaBuiltinTypes
 #define GBL_BOXED_TYPE                  (GBL_BUILTIN_TYPE(BOXED))
 #define GBL_BOXED_CLASS_STRUCT          GblBoxedClass
 #define GBL_BOXED_TYPE_CHECK(type)      (GblType_check(type, GBL_BOXED_TYPE))

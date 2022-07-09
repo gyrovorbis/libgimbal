@@ -5,6 +5,7 @@
 #include "../ifaces/gimbal_iplugin.h"
 #include "../strings/gimbal_string_buffer.h"
 
+/// \ingroup metaBuiltinTypes
 #define GBL_MODULE_TYPE                 (GBL_BUILTIN_TYPE(MODULE))
 #define GBL_MODULE_PARENT_PREFIX        GBL_CONTEXT
 #define GBL_MODULE_STRUCT               GblModule

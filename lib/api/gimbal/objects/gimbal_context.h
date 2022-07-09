@@ -5,6 +5,7 @@
 #include "../ifaces/gimbal_iallocator.h"
 #include "../ifaces/gimbal_ilogger.h"
 
+/// \ingroup metaBuiltinTypes
 #define GBL_CONTEXT_TYPE                (GBL_BUILTIN_TYPE(CONTEXT))
 #define GBL_CONTEXT_STRUCT              GblContext
 #define GBL_CONTEXT_CLASS_STRUCT        GblContextClass

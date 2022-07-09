@@ -17,7 +17,7 @@
 
 GBL_DECLS_BEGIN
 
-/*! \brief Intrustive doubly linked list structure with vector-styel API
+/*! \brief Intrustive doubly linked list structure with vector-style API
  *  \ingroup containers
  */
 typedef struct GblDoublyLinkedListNode {

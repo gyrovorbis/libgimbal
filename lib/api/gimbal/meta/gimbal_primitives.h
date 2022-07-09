@@ -4,6 +4,9 @@
 #include "gimbal_type.h"
 #include "../ifaces/gimbal_ivariant.h"
 
+
+/// \addtogroup metaBuiltinTypes
+///@{
 #define GBL_NIL_TYPE                        (GBL_BUILTIN_TYPE(NIL))
 #define GBL_BOOL_TYPE                       (GBL_BUILTIN_TYPE(BOOL))
 #define GBL_CHAR_TYPE                       (GBL_BUILTIN_TYPE(CHAR))
@@ -18,7 +21,7 @@
 #define GBL_DOUBLE_TYPE                     (GBL_BUILTIN_TYPE(DOUBLE))
 #define GBL_STRING_TYPE                     (GBL_BUILTIN_TYPE(STRING))
 #define GBL_TYPE_TYPE                       (GBL_BUILTIN_TYPE(TYPE))
-
+///@}
 typedef struct GblPrimitiveClass {
     GblClass            base;
     GblIVariantIFace    iVariantIFace;

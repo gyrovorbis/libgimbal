@@ -76,6 +76,9 @@ extern "C" {
 #define GBL_UNUSED(a) \
     (void)(a)
 
+#define GBL_ANONYMOUS_UNION_BEGIN   union {
+#define GBL_ANONYMOUS_UNION_END     };
+
 
 #ifdef GBL_API_SHARED_LIB
 #   ifdef GBL_API_EXPORTS

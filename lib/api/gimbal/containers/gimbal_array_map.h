@@ -1,5 +1,5 @@
 /*! \file
- *  \brief GblArrayMap structure and related functions
+ *  \brief ::GblArrayMap structure and related functions
  */
 
 #ifndef GIMBAL_ARRAY_MAP_H

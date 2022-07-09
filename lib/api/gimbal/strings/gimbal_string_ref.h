@@ -42,6 +42,7 @@ GBL_INLINE GblStringView    GblStringRef_view                       (CSELF)     
 
 // ========== IMPL ==========
 
+/// \cond
 typedef struct GblStringRef_ {
     GblSize     length;
     char        data[1];
@@ -51,6 +52,7 @@ GBL_INLINE GblStringRef_* GblStringRef_header_(const GblStringRef* pString) GBL_
     GblStringRef_* pHeader = (GblStringRef_*)(pString - offsetof(GblStringRef_, data));
     return pHeader;
 }
+/// \endcond
 
 GBL_INLINE GblStringRef* GblStringRef_create(const char* pString) GBL_NOEXCEPT {
     return GblStringRef_createWithContext(pString, NULL);

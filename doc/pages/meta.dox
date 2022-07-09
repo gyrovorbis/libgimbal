@@ -27,8 +27,6 @@
 		-# abstract/overridable methods
 		-# default method implementations
 
-
-
 # Objects
 	Additionally the type system provides a built-in 
 
@@ -39,6 +37,11 @@
 # Registering a Type
 
 */
+
+/*! \defgroup metaBuiltinTypes Builtin Types
+	\brief Meta types that are already built into libGimbal
+ *  \ingroup meta
+*/ 
 
 /*! \page 
 *	libGimbal Meta Type System
