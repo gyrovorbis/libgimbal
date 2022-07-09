@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblVector structure and related functions
+ */
+
 #ifndef GIMBAL_VECTOR_H
 #define GIMBAL_VECTOR_H
 
@@ -9,6 +13,9 @@
 
 GBL_DECLS_BEGIN
 
+/*! \brief Contiguous array based abstract list container with C++-style STL API
+ *  \ingroup containers
+ */
 typedef struct GblVector {          // Size (32-bit / 64-bit)
     GblContext*     pCtx;           // 4/8      bytes
     uint8_t*        pData;          // 4/8      bytes

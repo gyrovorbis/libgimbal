@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblDoublyLinkedListNode structure and related functions
+ */
+
 #ifndef GIMBAL_DOUBLY_LINKED_LIST_HPP
 #define GIMBAL_DOUBLY_LINKED_LIST_HPP
 
@@ -13,6 +17,9 @@
 
 GBL_DECLS_BEGIN
 
+/*! \brief Intrustive doubly linked list structure with vector-styel API
+ *  \ingroup containers
+ */
 typedef struct GblDoublyLinkedListNode {
 
     union {

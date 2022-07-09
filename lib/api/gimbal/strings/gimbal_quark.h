@@ -1,13 +1,22 @@
+/*! \file
+ *  \brief ::GblQuark and related functions.
+ */
+
 #ifndef GIMBAL_QUARK_H
 #define GIMBAL_QUARK_H
 
 #include <gimbal/types/gimbal_typedefs.h>
 
-GBL_DECLS_BEGIN
-
-typedef uintptr_t         GblQuark;
-
 #define GBL_QUARK_INVALID ((GblQuark)0)
+
+///\cond
+GBL_DECLS_BEGIN
+///\endcond
+
+/*! \brief Uniquely identifiable interned string
+ *  \ingroup strings
+ */
+typedef uintptr_t         GblQuark;
 
 GBL_EXPORT GBL_RESULT   GblQuark_init               (GblContext* pCtx,
                                                      GblSize extraPageSize,

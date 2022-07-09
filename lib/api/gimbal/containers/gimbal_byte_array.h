@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblByteArray structure and related functions
+ */
+
 #ifndef GIMBAL_BYTE_ARRAY_H
 #define GIMBAL_BYTE_ARRAY_H
 
@@ -9,6 +13,9 @@
 
 GBL_DECLS_BEGIN
 
+/*! \brief Reference-counted resizable array of bytes
+ *  \ingroup containers
+ */
 typedef struct GblByteArray {
     GblSize             size;
     uint8_t*            pData;

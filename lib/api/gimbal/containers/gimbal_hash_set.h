@@ -1,6 +1,9 @@
+/*! \file
+ *  \brief GblHashSet structure and related functions
+ */
+
 #ifndef GIMBAL_HASHSET_H
 #define GIMBAL_HASHSET_H
-
 
 #include "../types/gimbal_typedefs.h"
 #include "../core/gimbal_api_frame.h"
@@ -17,6 +20,11 @@ typedef GblBool       (*GblHashSetEntryCompareFn) (CSELF, const void*, const voi
 typedef void          (*GblHashSetEntryDestructFn)(CSELF, void*);
 typedef GblBool       (*GblHashSetIterateFn)      (CSELF, void*, void*);
 
+/*! \brief Hash table based abstract associative container with C++-style STL API
+ *  \details
+ *      Robinhood hashing
+ *  \ingroup containers
+ */
 typedef struct GblHashSet {
     GblContext*                 pCtx;
     GblSize                     entrySize;

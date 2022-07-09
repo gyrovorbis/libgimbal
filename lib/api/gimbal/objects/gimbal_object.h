@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblObject structure and related functions
+ */
+
 #ifndef GIMBAL_OBJECT_H
 #define GIMBAL_OBJECT_H
 
@@ -12,10 +16,6 @@
 #include <gimbal/meta/gimbal_primitives.h>
 #include "../preprocessor/gimbal_atomics.h"
 #include "../containers/gimbal_array_map.h"
-
-/*! @file
- *  @brief brief file description
- */
 
 #define GBL_OBJECT_TYPE                     (GBL_BUILTIN_TYPE(OBJECT))
 #define GBL_OBJECT_STRUCT                   GblObject
@@ -66,9 +66,16 @@ typedef enum GBL_OBJECT_ATTRIBUTE {
     GBL_OBJECT_ATTRIBUTE_COUNT
 } GBL_OBJECT_ATTRIBUTE;
 
-/// RefCounted, Property-supporting GblInstance derived type
+/*! \brief GblInstance providing extended OO functionality
+ *\ingroup meta
+ *\details
+ *  A GblObject is an GblInstance type which provides support
+ *  for reference counting semantics, GblVariant interop,
+ *  event handling, parent/child relationships, arbitrary
+ *  userdata storage, and properties.
+ *\sa GblInstance, GblObjectClass
+ */
 typedef struct GblObject {
-    /// Convenience derived class alias
     union {
         GblObjectClass*     pClass;
         GblInstance         base;

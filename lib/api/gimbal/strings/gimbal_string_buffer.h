@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblStringBuffer structure and related functions
+ */
+
 #ifndef GIMBAL_STRING_BUFFER_H
 #define GIMBAL_STRING_BUFFER_H
 
@@ -31,6 +35,10 @@
 
 GBL_DECLS_BEGIN
 
+
+/*! \brief String structure optimized for construction
+ *  \ingroup strings
+ */
 typedef struct GblStringBuffer {
     GblVector data;
 } GblStringBuffer;

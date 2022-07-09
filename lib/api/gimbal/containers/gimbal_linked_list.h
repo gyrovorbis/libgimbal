@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblLinkedListNode structure and related functions
+ */
+
 #ifndef GIMBAL_LINKED_LIST_H
 #define GIMBAL_LINKED_LIST_H
 
@@ -12,6 +16,9 @@
 
 GBL_DECLS_BEGIN
 
+/*! \brief Intrustive singly linked list structure with vector-styel API
+ *  \ingroup containers
+ */
 typedef struct GblLinkedListNode {
     struct GblLinkedListNode* pNext;
 } GblLinkedListNode;

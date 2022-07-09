@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblTestSuite structure and related functions
+ */
+
 #ifndef GIMBAL_TEST_SUITE_H
 #define GIMBAL_TEST_SUITE_H
 
@@ -55,6 +59,9 @@ typedef struct GblTestSuiteClass {
     GBL_RESULT                      (*pFnCaseRun)   (SELF, GblContext* pCtx, GblSize index);
 } GblTestSuiteClass;
 
+/*! \brief GblObject representing a collection of unit test cases
+ *  \ingroup testing
+ */
 typedef struct GblTestSuite {
     union {
         GblTestSuiteClass*  pClass;

@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief ::GblStringRef type and related functions
+ */
+
+
 #ifndef GIMBAL_STRING_REF_H
 #define GIMBAL_STRING_REF_H
 
@@ -11,7 +16,10 @@
 
 GBL_DECLS_BEGIN
 
-typedef const char GblStringRef;
+/*! \brief Reference-counted string type
+ *  \ingroup strings
+ */
+typedef char GblStringRef;
 
 GBL_INLINE GblStringRef*    GblStringRef_create                     (const char* pString)   GBL_NOEXCEPT;
 GBL_INLINE GblStringRef*    GblStringRef_createWithContext          (const char* pString,

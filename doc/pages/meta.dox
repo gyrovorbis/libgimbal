@@ -1,0 +1,46 @@
+/*! \defgroup meta Meta Type Framework 
+* 	\brief Object-oriented runtime type system  
+	
+	Libgimbal is a portable type system designed to provide object-oriented functionality
+   	to the C programming language and to provide type compatibility with other 
+    languages which support interoping with C APIs.
+
+	At its core, the LibGimbal Type Framework utilizes a dynamic type system, provided
+	by the ::GblType API (within gimbal_type.h). This system provides a runtime type 
+	registry maintaining all type information provided by builtin or user-registered 
+	types. This registry provides object-oriented concepts such as classes, objects,
+	interfaces, and an inheritance model to both the C programming language, and
+	any langauge which can provide glue code to a C API. 
+
+# Core
+	The type system models OO concepts fundamentally through the following concepts:
+	- ::GblType (gimbal_type.h)
+		-# Runtime type UUIDs 
+	- GblClass (gimbal_class.h)
+		-# virtual/overridable methods
+		-# static members
+		-# private static data
+		-# interface implementations
+	- GblInstance (gimbal_instance.h)
+		-# instanced public/private members
+	- GblInterface (gimbal_interface.h)
+		-# abstract/overridable methods
+		-# default method implementations
+
+
+
+# Objects
+	Additionally the type system provides a built-in 
+
+# Variants
+
+# Builtin Types
+
+# Registering a Type
+
+*/
+
+/*! \page 
+*	libGimbal Meta Type System
+*/ 
+

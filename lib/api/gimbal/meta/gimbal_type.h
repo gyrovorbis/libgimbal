@@ -6,7 +6,7 @@
 #include "gimbal_builtin_types.h"
 
 /*! @file
- *  @brief brief file description
+ *  @brief ::GblType identifier and related functions
  */
 
 /// UUID of an invalid type
@@ -76,7 +76,12 @@ GBL_DECLARE_FLAGS(GblTypeFlags) {
 };
 ///@}
 
-/// UUID type identifier
+
+/*! \brief Type representing meta type UUIDs
+ *  \ingroup meta
+ *  \details
+ *
+ */
 typedef uintptr_t                                   GblType;
 
 typedef GBL_RESULT (*GblTypeClassInitializeFn)      (GblClass*, const void*, GblContext*);      ///< Function type used as a GblType's GblClass initializer

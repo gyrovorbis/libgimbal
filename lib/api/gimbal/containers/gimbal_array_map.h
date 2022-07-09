@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblArrayMap structure and related functions
+ */
+
 #ifndef GIMBAL_ARRAY_MAP_H
 #define GIMBAL_ARRAY_MAP_H
 
@@ -21,6 +25,9 @@ typedef struct GblArrayMapEntry {
     GblArrayMapDestructFn       dtor;
 } GblArrayMapEntry;
 
+/*! \brief GblQuark-keyed contiguous array-based associative container
+ *  \ingroup containers
+ */
 typedef struct GblArrayMap {
     GblContext*             pCtx;
     GblArrayMapCompareFn    pFnComparator;

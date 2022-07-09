@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblStringView structure and related functions
+ */
+
 #ifndef GIMBAL_STRING_VIEW_H
 #define GIMBAL_STRING_VIEW_H
 
@@ -18,6 +22,9 @@
 
 GBL_DECLS_BEGIN
 
+/*! \brief Immutable substring type
+ *  \ingroup strings
+ */
 typedef struct GblStringView {
     const char* pData;
     GblSize     nullTerminated  : 1;

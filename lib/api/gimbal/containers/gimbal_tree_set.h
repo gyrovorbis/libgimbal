@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblHashSet structure and related functions
+ */
+
 #ifndef GIMBAL_BTREE_H
 #define GIMBAL_BTREE_H
 
@@ -34,6 +38,9 @@ typedef struct GblTreeSetPool {
     GblTreeSetGroup             branches;
  } GblTreeSetPool;
 
+/*! \brief Binary tree based abstract associative container with C++-style STL API
+ *  \ingroup containers
+ */
 typedef struct GblTreeSet {
     GblContext*                 pCtx;
     GblSize                     entrySize;

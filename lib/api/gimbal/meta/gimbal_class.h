@@ -1,36 +1,49 @@
+/*! \file
+ *  \brief GblClass structure and related functions
+ *  \sa gimbal_instance.h, gimbal_type.h
+ */
+
 #ifndef GIMBAL_CLASS_H
 #define GIMBAL_CLASS_H
 
 #include "gimbal_type.h"
 
-#define GBL_CLASS(klass)                    ((GblClass*)klass)
-#define GBL_CLASS_TYPE(klass)               (GblType_fromClass(GBL_CLASS(klass)))
-#define GBL_CLASS_SUPER(klass)              (GblClass_peek(GblType_parent(GBL_CLASS_TYPE(klass))))
-#define GBL_CLASS_DEFAULT(klass)            (GblClass_peek(GBL_CLASS_TYPE(klass)))
-#define GBL_CLASS_PRIVATE(klass, type)      (GblClass_private(GBL_CLASS(klass), type))
+#define GBL_CLASS(klass)                            ((GblClass*)klass)
+#define GBL_CLASS_TYPE(klass)                       (GblType_fromClass(GBL_CLASS(klass)))
+#define GBL_CLASS_SUPER(klass)                      (GblClass_peek(GblType_parent(GBL_CLASS_TYPE(klass))))
+#define GBL_CLASS_DEFAULT(klass)                    (GblClass_peek(GBL_CLASS_TYPE(klass)))
+#define GBL_CLASS_PRIVATE(klass, type)              (GblClass_private(GBL_CLASS(klass), type))
 
-#define GBL_CLASS_CHECK(klass, toType)                      \
-            (GblClass_check((GblClass*)klass, toType))
-#define GBL_CLASS_CHECK_PREFIX(klass, typePrefix)           \
-            (GBL_CLASS_CHECK(klass, typePrefix##_TYPE))
+#define GBL_CLASS_CHECK(klass, toType)              (GblClass_check((GblClass*)klass, toType))
+#define GBL_CLASS_CHECK_PREFIX(klass, typePrefix)   (GBL_CLASS_CHECK(klass, typePrefix##_TYPE))
 
-#define GBL_CLASS_CAST(klass, toType, cType)                \
-            ((cType*)GblClass_cast((GblClass*)klass, toType))
-#define GBL_CLASS_CAST_PREFIX(klass, typePrefix)            \
-            (GBL_CLASS_CAST(klass, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
+#define GBL_CLASS_CAST(klass, toType, cType)        ((cType*)GblClass_cast((GblClass*)klass, toType))
+#define GBL_CLASS_CAST_PREFIX(klass, typePrefix)    (GBL_CLASS_CAST(klass, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
 
-#define GBL_CLASS_TRY(klass, toType, cType)                 \
-            ((cType*)GblClass_try((GblClass*)klass, toType))
-#define GBL_CLASS_TRY_PREFIX(klass, typePrefix)             \
-            (GBL_CLASS_TRY(klass, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
+#define GBL_CLASS_TRY(klass, toType, cType)         ((cType*)GblClass_try((GblClass*)klass, toType))
+#define GBL_CLASS_TRY_PREFIX(klass, typePrefix)     (GBL_CLASS_TRY(klass, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
 
 #define SELF    GblClass*           pSelf
 #define CSELF   const GblClass*     pSelf
 
 GBL_DECLS_BEGIN
 
+/*! \brief Base struct for all type classes.
+ *\ingroup meta
+ *\details
+ * A class represents a collection of data that is shared among
+ * all instances of a given type. This data is typically in the
+ * form of funtion pointers for modeling overridable methods
+ * or regular data for modeling static member variables.
+ *
+ * GblClass is the base structure which is to be inherited by all
+ * class structures within the meta type system. This means placing
+ * it or a type "inheriting" from it as the first member of a
+ * class struct, when using C.
+ *\sa GblInstace, GblType
+ */
 typedef struct GblClass {
-    uintptr_t   private_;
+    uintptr_t   private_;   ///< pointer-sized private member which is used by the back-end
 } GblClass;
 
 // Returns an existing reference to the default class for the given type or lazily allocates a new one

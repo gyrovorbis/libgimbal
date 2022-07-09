@@ -1,3 +1,6 @@
+/*! \file
+ *  \brief GblTestScenario and related functions.
+ */
 #ifndef GIMBAL_TEST_SCENARIO_H
 #define GIMBAL_TEST_SCENARIO_H
 
@@ -35,6 +38,9 @@ typedef struct GblTestScenarioClass {
     GBL_RESULT          (*pFnSuiteEnd)  (SELF, const GblTestSuite* pSuite);
 } GblTestScenarioClass;
 
+/*! \brief Top-level object representing a collection of GblTestSuite objects.
+ *  \ingroup testing
+ */
 typedef struct GblTestScenario {
     union {
         GblTestScenarioClass*   pClass;
