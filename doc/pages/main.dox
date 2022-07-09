@@ -1,7 +1,10 @@
 /*! \mainpage
 *	LibGimbal is a C/++-based, lightweight, cross-platform, general-purpose framework providing core functionality 
 	such as containers, algorithms, strings, references, error management, custom allocators, logging, and more.
-	It provides both C and C++-based APIs, and has been written with a design goal of making these APIs easily consumable from other languages that are compatible with C, such as Objective-C, Rust, and even scripting languages for interoperability. 
+	Additionally it provides a full-fledged, runtime meta type system providing object-oriented constructs to C
+	and allowing for interop of complex object models between varous C-compatible languages.
+
+	LibGimbal provides both C and C++-based APIs, and has been written with a design goal of making these APIs easily consumable from other languages that are compatible with C, such as Objective-C, Rust, and even scripting languages for interoperability. 
 
 	\tableofcontents
 
@@ -17,9 +20,8 @@
 	- Variant types for dealing with dynamically typed data
 	- Compile-time configurable macro-based API validation utilities
 	- Macro utilities for advanced preprocessor-based meta programming 
-	- Object-oriented runtime meta type system 
+	- Object-oriented runtime meta type system, providing an inheritance model, interfaces, properties, etc
 	- Unit testing framework
-
 
 ## Compiler Requirements 
 	LibGimbal has been written to build with any compiler supporting standard C17, with its builtin C++ wrappers 
@@ -63,6 +65,10 @@
 	and any contiguously indexable data type matching the given container type. This makes our containers 
 	both powerful and user-friendly, but also makes them play well with existing C++ codebases using 
 	standard containers. 
+
+	One of the biggest goals with libGimbal is to make the library as intuitive, user-friendly, and powerful
+	as it can possibly be for each language it supports, rather than simply wrapping a low-level C API to 
+	each. 
 
 ## License
 	LibGimbal is being released under the "I-dont-give-a-shit-what-you-do" license. A lot of time and energy
