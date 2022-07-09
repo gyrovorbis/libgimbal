@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblLinkedListNode structure and related functions
+ *  \ingroup containers
  */
 
 #ifndef GIMBAL_LINKED_LIST_H

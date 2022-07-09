@@ -1,5 +1,79 @@
 /*! \mainpage
-*	LibGimbal is a lightweight cross-platform framework used for creating low-overhead shared or dynamic libraries with an extensible C API.
+*	LibGimbal is a C/++-based, lightweight, cross-platform, general-purpose framework providing core functionality 
+	such as containers, algorithms, strings, references, error management, custom allocators, logging, and more.
+	It provides both C and C++-based APIs, and has been written with a design goal of making these APIs easily consumable from other languages that are compatible with C, such as Objective-C, Rust, and even scripting languages for interoperability. 
 
-LibGimbal was born of me taking a long, hard look back at my work over the years, and finally identifying and consolidating all of the disjoint, duplicated, and nonstandardized core C code that tends to be reinvented for each C API that I have written. The name "libGimbal" is a play on the name "libGyro." Just as a gimbal can be used to orient and support a gyro it is the basic foundational support library used by libGyro and the other C APIs in the Elysian Shadows software ecosystem.
+	\tableofcontents
+
+## Features
+	LibGimbal's featureset includes:
+	- Unified error logging, tracking, and propagation with source code capture
+	- Custom allocator support for all types from the ground-up
+	- Macros providing abstractions for various compiler and platform-specific features
+	- Multiple optimized string APIs for various use-cases
+	- Abstract data types and containers for resizable arrays, binary trees, hash tables, etc
+	- Algorithms for sorting, hashing, CRC, parity, ntonl/htonl, GCD, powers-of-2, etc
+	- Generic references and closures 
+	- Variant types for dealing with dynamically typed data
+	- Compile-time configurable macro-based API validation utilities
+	- Macro utilities for advanced preprocessor-based meta programming 
+	- Object-oriented runtime meta type system 
+	- Unit testing framework
+
+
+## Compiler Requirements 
+	LibGimbal has been written to build with any compiler supporting standard C17, with its builtin C++ wrappers 
+	requiring C++20. It is being explicitly tested against:
+		- Microsoft Visual Studio
+		- GCC
+		- Clang
+		- MinGW
+		- Emscriptgen
+
+	It is expected to compile with any other compiler as well, and any issues doing so will gladly be addressed.
+
+## Cross-Platform 
+	Additionally, libGimbal has been developed to be light-weight enough to run on embedded systems and retro 
+	hardware. It is being explicitly tested against:
+	- Windows
+	- MacOS
+	- Linux
+	- iOS 
+	- Android (pending)
+	- Web Assembly (pending)
+	- Playstation Vita (pending)
+	- Sega Dreamcast (pending)
+
+	We are happy to make changes required to support building for other platforms. 
+
+## Design Philosophy
+	We are well aware of the fact that trying to create a massively cross-platform, cross-language framework 
+	such as this with language standard requirements as high as C17 and C++20 may seem strange. As libGimbal 
+	is modeling so many complex concepts in a language as low-level as C, it has been decided that for the 
+	sake of providing the most intuitive API with the most powerful featureset, modern language dialects would 
+	be a hard requirement. 
+
+	For example, libGimbal's C API provides many functions which are overloaded by parameter count or type
+	variadically to provide less API clutter and annoyance of having to explictly specify a certain function
+	for argument combination. Additionally, libGimbal internally utilizes functionality from the modern C 
+	library such as aligned_alloc for cross-platform support. 
+
+	In the C++ Vector API, for example, libGimbal makes use of C++20 "concepts" to provide an API
+	that is generically compatible with the STL std::vector, std::pmr::vector, std::array, initializer_lists,
+	and any contiguously indexable data type matching the given container type. This makes our containers 
+	both powerful and user-friendly, but also makes them play well with existing C++ codebases using 
+	standard containers. 
+
+## License
+	LibGimbal is being released under the "I-dont-give-a-shit-what-you-do" license. A lot of time and energy
+	was put into creating this framework, and we'd love to see it used in cool projects or on cool hardware. 
+	We would appreciate some credit or acknowlegement, but just seeing it get some love is plenty for us. 
+
+	If you do use it, please feel free to log any bugs or feature requests or contribute back.
+
+## Credits
+	Lead Developer: Falco Girgis
+
+## Building 
+	LibGimbal is provided as a standard cmake project which can be built using its CMakeLists.
 */ 

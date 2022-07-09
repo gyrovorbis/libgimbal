@@ -1,5 +1,6 @@
 /*! \file
  *  \brief ::GblArrayMap structure and related functions
+ *  \ingroup containers
  */
 
 #ifndef GIMBAL_ARRAY_MAP_H
@@ -25,7 +26,7 @@ typedef struct GblArrayMapEntry {
     GblArrayMapDestructFn       dtor;
 } GblArrayMapEntry;
 
-/*! \brief GblQuark-keyed contiguous array-based associative container
+/*! \brief Contiguous array-based associative container with GblQuark keys
  *  \ingroup containers
  */
 typedef struct GblArrayMap {

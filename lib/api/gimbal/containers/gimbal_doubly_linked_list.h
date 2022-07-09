@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblDoublyLinkedListNode structure and related functions
+ *  \ingroup containers
  */
 
 #ifndef GIMBAL_DOUBLY_LINKED_LIST_HPP

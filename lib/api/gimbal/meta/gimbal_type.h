@@ -1,5 +1,6 @@
 /*! \file
  *  \brief ::GblType identifier and related functions
+ *  \ingroup meta
  */
 #ifndef GIMBAL_TYPE_H
 #define GIMBAL_TYPE_H

@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblByteArray structure and related functions
+ *  \ingroup containers
  */
 
 #ifndef GIMBAL_BYTE_ARRAY_H

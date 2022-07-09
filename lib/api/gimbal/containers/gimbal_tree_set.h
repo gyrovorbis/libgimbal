@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblHashSet structure and related functions
+ *  \ingroup containers
  */
 
 #ifndef GIMBAL_BTREE_H

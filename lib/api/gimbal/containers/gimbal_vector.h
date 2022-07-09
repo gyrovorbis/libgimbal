@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblVector structure and related functions
+ *  \ingroup containers
  */
 
 #ifndef GIMBAL_VECTOR_H
@@ -85,6 +86,7 @@ GBL_EXPORT GBL_RESULT   GblVector_shrinkToFit   (SELF)                          
 
 // ========== IMPL ==========
 
+/// \cond
 #define GBL_VECTOR_ALLOCA_5(elemSize, elemCount, pData, size, pCtx) \
     GblVector_createInPlace_(GBL_ALLOCA(size), elemSize, elemCount, pData, size, pCtx)
 
@@ -100,10 +102,10 @@ GBL_EXPORT GBL_RESULT   GblVector_shrinkToFit   (SELF)                          
 #define GBL_VECTOR_ALLOCA_1(elemSize) \
     GBL_VECTOR_ALLOCA_2(elemSize, 0)
 
-
 GBL_INLINE GblSize GBL_VECTOR_CAPACITY_FROM_SIZE_(GblSize size) GBL_NOEXCEPT {
     return gblPow2Next(size);
 }
+/// \endcond
 
 GBL_INLINE void* GblVector_stackBuffer(CSELF) GBL_NOEXCEPT {
     return (uint8_t*)((pSelf && pSelf->stackSize)? (pSelf + 1) : NULL);

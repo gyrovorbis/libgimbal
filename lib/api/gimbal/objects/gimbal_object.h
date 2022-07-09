@@ -68,7 +68,7 @@ typedef enum GBL_OBJECT_ATTRIBUTE {
 } GBL_OBJECT_ATTRIBUTE;
 
 /*! \brief GblInstance providing extended OO functionality
- *\ingroup meta
+ *\ingroup metaBuiltinTypes
  *\details
  *  A GblObject is an GblInstance type which provides support
  *  for reference counting semantics, GblVariant interop,
@@ -147,7 +147,7 @@ GBL_EXPORT GblObject*         GblObject_newVaList           (GblType type, va_li
 GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVaList    (SELF, GblType type, va_list* pList)                                GBL_NOEXCEPT;
 GBL_EXPORT GblObject*         GblObject_newVaListWithClass  (GblObjectClass* pClass, va_list* pList)                            GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVaListWithClass
-                                                            (SELF, GblObjectClass* pClass, va_list* pList)                  GBL_NOEXCEPT;
+                                                            (SELF, GblObjectClass* pClass, va_list* pList)                      GBL_NOEXCEPT;
 
 GBL_EXPORT GblObject*         GblObject_newVariants         (GblType type,
                                                              GblUint propertyCount,

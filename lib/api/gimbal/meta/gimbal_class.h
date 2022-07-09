@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblClass structure and related functions
+ *  \ingroup meta
  *  \sa gimbal_instance.h, gimbal_type.h
  */
 

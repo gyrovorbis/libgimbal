@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblInterface and related functions.
+ *  \ingroup meta
  */
 
 #ifndef GIMBAL_INTERFACE_H
