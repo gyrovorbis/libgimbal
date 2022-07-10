@@ -27,14 +27,14 @@
 		-# abstract/overridable methods
 		-# default method implementations
 
-# Objects
+### Objects
 	Additionally the type system provides a built-in 
 
-# Variants
+### Variants
 
-# Builtin Types
+### Builtin Types
 
-# Registering a Type
+### Registering a Type
 
 */
 
@@ -42,8 +42,3 @@
 	\brief Meta types that are already built into libGimbal
  *  \ingroup meta
 */ 
-
-/*! \page 
-*	libGimbal Meta Type System
-*/ 
-

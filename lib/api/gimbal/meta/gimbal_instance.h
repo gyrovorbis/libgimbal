@@ -13,14 +13,14 @@
 /*!
  * Function-style cast operator that casts the given instance to a GblInstance
  * \note This is not a type-safe cast.
- * \param pointer
+ * \param instance pointer to a GblInstance or derived instance
  * \returns pointer as a GblInstance
  */
 #define GBL_INSTANCE(instance)              ((GblInstance*)instance)
 
 /*!
  * Retrieves the class associated with the given GblInstance
- * \param pointer to a GblInstance or derived type
+ * \param instance pointer to a GblInstance or derived type
  * \returns pointer to a GblClass
  */
 #define GBL_INSTANCE_CLASS(instance)        (GblClass_peekFromInstance(GBL_INSTANCE(instance)))
@@ -152,6 +152,7 @@ GBL_EXPORT GblRefCount  GblInstance_destruct            (SELF)                  
 * \note The instance does not automatically assume ownersip of the new class.
 * \relatesalso GblInstance
 * \param pSelf instance
+* \param pClass replacement GblClass of compatible type
 * \returns result code
 * \sa GblInstance_classSink
 */

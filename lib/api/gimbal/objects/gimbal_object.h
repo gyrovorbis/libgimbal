@@ -17,7 +17,9 @@
 #include "../preprocessor/gimbal_atomics.h"
 #include "../containers/gimbal_array_map.h"
 
-/// \ingroup metaBuiltinTypes
+/*! \ingroup metaBuiltinTypes
+ * \details  ::GblType UUID of a GblObject
+ */
 #define GBL_OBJECT_TYPE                     (GBL_BUILTIN_TYPE(OBJECT))
 #define GBL_OBJECT_STRUCT                   GblObject
 #define GBL_OBJECT_CLASS_STRUCT             GblObjectClass
@@ -77,10 +79,10 @@ typedef enum GBL_OBJECT_ATTRIBUTE {
  *\sa GblInstance, GblObjectClass
  */
 typedef struct GblObject {
-    GBL_ANONYMOUS_UNION_BEGIN
+    union {
         GblObjectClass*     pClass;
         GblInstance         base;
-    GBL_ANONYMOUS_UNION_END
+    };
     GBL_ATOMIC_INT16        refCounter;
 
     uint16_t                contextType                            : 1;

@@ -82,7 +82,7 @@ typedef struct GblInterface {
  * Queries for the given interface type within the specified class.
  * \relatesalso GblInterface
  * \param pClass source class
- * \param type type ID of the requested interface
+ * \param ifaceType type ID of the requested interface
  * \returns GblInterface pointer to the requested interface or NULL
  *          if the interface was not present
  * \sa GblClass_try

@@ -36,7 +36,7 @@
 GBL_DECLS_BEGIN
 
 
-/*! \brief String structure optimized for construction
+/*! \brief Mutable string type optimized for building and writing
  *  \ingroup strings
  */
 typedef struct GblStringBuffer {

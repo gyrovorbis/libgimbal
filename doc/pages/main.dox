@@ -1,10 +1,10 @@
 /*! \mainpage
-*	LibGimbal is a C/++-based, lightweight, cross-platform, general-purpose framework providing core functionality 
+*	LibGimbal is a C/C++-based, lightweight, cross-platform, general-purpose framework providing core functionality 
 	such as containers, algorithms, strings, references, error management, custom allocators, logging, and more.
 	Additionally it provides a full-fledged, runtime meta type system providing object-oriented constructs to C
 	and allowing for interop of complex object models between varous C-compatible languages.
 
-	LibGimbal provides both C and C++-based APIs, and has been written with a design goal of making these APIs easily consumable from other languages that are compatible with C, such as Objective-C, Rust, and even scripting languages for interoperability. 
+	LibGimbal provides both C and C++-based APIs, and has been written with a design goal of making these APIs easily consumable from other languages which are compatible with C, such as Objective-C, Rust, and even scripting languages for interoperability. 
 
 	\tableofcontents
 
@@ -36,15 +36,15 @@
 
 ## Cross-Platform 
 	Additionally, libGimbal has been developed to be light-weight enough to run on embedded systems and retro 
-	hardware. It is being explicitly tested against:
+	hardware. It is being explicitly unit tested against:
 	- Windows
 	- MacOS
 	- Linux
 	- iOS 
-	- Android (pending)
-	- Web Assembly (pending)
-	- Playstation Vita (pending)
-	- Sega Dreamcast (pending)
+	- Android (CI integration pending)
+	- Web Assembly (CI integration pending)
+	- Playstation Vita (CI integration pending)
+	- Sega Dreamcast (build setup pending)
 
 	We are happy to make changes required to support building for other platforms. 
 
@@ -70,6 +70,9 @@
 	as it can possibly be for each language it supports, rather than simply wrapping a low-level C API to 
 	each. 
 
+## Building 
+	LibGimbal is provided as a standard cmake project which can be built using its CMakeLists.
+
 ## License
 	LibGimbal is being released under the "I-dont-give-a-shit-what-you-do" license. A lot of time and energy
 	was put into creating this framework, and we'd love to see it used in cool projects or on cool hardware. 
@@ -79,7 +82,4 @@
 
 ## Credits
 	Lead Developer: Falco Girgis
-
-## Building 
-	LibGimbal is provided as a standard cmake project which can be built using its CMakeLists.
 */ 

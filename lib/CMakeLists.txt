@@ -121,6 +121,7 @@ set(GIMBAL_SOURCES
      source/meta/gimbal_flags.c
      source/containers/gimbal_byte_array.c
      source/containers/gimbal_vector.c
+     source/strings/gimbal_string_ref.c
      source/test/gimbal_test_suite.c
      source/test/gimbal_test_scenario.c
  )
