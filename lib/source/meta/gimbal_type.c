@@ -89,18 +89,18 @@ static GBL_RESULT typeLog_(GblType parent,
 
 
     GBL_API_PUSH_VERBOSE("flags");
-    GBL_API_VERBOSE("%-20s: %-100u", "DEPENDENT",                   (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "CLASSED",                     (flags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "INSTANTIABLE",                (flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "DERIVABLE",                   (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "DEEP_DERIVABLE",              (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "TYPEINFO_STATIC",             (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "CLASS_PINNED",                (flags & GBL_TYPE_FLAG_CLASS_PINNED)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "CLASS_CONSTRUCT_IMMEDIATE",   (flags & GBL_TYPE_FLAG_CLASS_PREINIT)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "UNMAPPABLE",                  (flags & GBL_TYPE_FLAG_UNMAPPABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "BUILTIN",                     (flags & GBL_TYPE_FLAG_BUILTIN)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "ABSTRACT",                    (flags & GBL_TYPE_FLAG_ABSTRACT)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "FINAL",                       (flags & GBL_TYPE_FLAG_FINAL)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DEPENDENT",       (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "CLASSED",         (flags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "INSTANTIABLE",    (flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DERIVABLE",       (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DEEP_DERIVABLE",  (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "TYPEINFO_STATIC", (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "CLASS_PINNED",    (flags & GBL_TYPE_FLAG_CLASS_PINNED)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "CLASS_PREINIT",   (flags & GBL_TYPE_FLAG_CLASS_PREINIT)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "UNMAPPABLE",      (flags & GBL_TYPE_FLAG_UNMAPPABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "BUILTIN",         (flags & GBL_TYPE_FLAG_BUILTIN)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "ABSTRACT",        (flags & GBL_TYPE_FLAG_ABSTRACT)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "FINAL",           (flags & GBL_TYPE_FLAG_FINAL)? 1 : 0);
     GBL_API_POP(1);
 
     GBL_API_PUSH_VERBOSE("Class Info");

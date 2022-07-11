@@ -373,7 +373,7 @@ public:
     static MoveValues take(GblVector* pVec) {
         auto moveValues = MoveValues(nullptr, 0, 0);
         auto& [pData, size, capacity] = moveValues;
-        Exception::checkThrow(GblVector_take(pVec, &pData, &size, &capacity));
+        Exception::checkThrow(GblVector_release(pVec, &pData, &size, &capacity));
         return moveValues;
     }
 
@@ -383,7 +383,7 @@ public:
 
     void give(MoveValues moveValues) {
         auto& [pData, size, capacity] = moveValues;
-        Exception::checkThrow(GblVector_give(this, pData, size, capacity));
+        Exception::checkThrow(GblVector_acquire(this, pData, size, capacity));
     }
 
     ~Vector(void) {

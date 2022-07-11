@@ -1,3 +1,10 @@
+/*! \addtogroup algorithms
+ * @{
+ */
+/*! \file
+ *  \brief Random number generation, hashing, and CRC algorithms
+ */
+
 #ifndef GIMBAL_HASH_H
 #define GIMBAL_HASH_H
 
@@ -24,7 +31,7 @@ GBL_EXPORT GblHash  gblHashSip           (const void* pData, GblSize size) GBL_N
 GBL_EXPORT GblHash  gblHashMurmur        (const void* pData, GblSize size) GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHashCrc           (const void* pData, GblSize size) GBL_NOEXCEPT;
 
-
+/// @}
 
 
 

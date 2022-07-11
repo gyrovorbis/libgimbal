@@ -13,6 +13,7 @@ typedef struct GblArrayMapTestSuite_ {
 
 // god fucking damnit, static/global implicit state!
 static unsigned dtorCalls_  = 0;
+static uintptr_t dtorLastKey_ = 0;
 
 GblBool GblArrayMap_comparator_(uintptr_t key1,
                                 uintptr_t key2)
@@ -20,9 +21,10 @@ GblBool GblArrayMap_comparator_(uintptr_t key1,
     return strcmp((const char*)key1, (const char*)key2) == 0;
 }
 
-GBL_RESULT GblArrayMap_destructor_(void* pValue) {
-    GBL_UNUSED(pValue);
+GBL_RESULT GblArrayMap_destructor_(uintptr_t key, void* pData) {
+    GBL_UNUSED(pData);
     ++dtorCalls_;
+    dtorLastKey_ = key;
     return GBL_RESULT_SUCCESS;
 }
 
@@ -31,6 +33,7 @@ static GBL_RESULT GblArrayMapTestSuite_init_(GblTestSuite* pSelf, GblContext* pC
     GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblArrayMapTestSuite_));
     dtorCalls_ = 0;
+    dtorLastKey_ = 0;
     GBL_API_END();
 }
 
@@ -265,6 +268,7 @@ static GBL_RESULT GblArrayMapTestSuite_eraseUserdata_(GblTestSuite* pSelf, GblCo
     GBL_TEST_COMPARE(GblArrayMap_size(&pSelf_->pMap1), 2);
     GBL_TEST_COMPARE(GblArrayMap_find(&pSelf_->pMap1, (uintptr_t)"key1"), GBL_ARRAY_MAP_NPOS);
     GBL_TEST_COMPARE(dtorCalls_, 2);
+    GBL_TEST_COMPARE((const char*)dtorLastKey_, "key1");
     GBL_API_END();
 }
 

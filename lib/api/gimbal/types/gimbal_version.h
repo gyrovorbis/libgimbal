@@ -46,7 +46,7 @@ typedef struct GblVersionInfo {
     uint8_t     patch;
 } GblVersionInfo;
 
-GBL_MAYBE_UNUSED GBL_INLINE GblVersionInfo GBL_VERSION_EXTRACT(GblVersion version) {
+GBL_INLINE GblVersionInfo GBL_VERSION_EXTRACT(GblVersion version) {
     const GblVersionInfo info = {
         GBL_VERSION_EXTRACT_MAJOR(version),
         GBL_VERSION_EXTRACT_MINOR(version),

@@ -8,7 +8,7 @@
 #include <gimbal/strings/gimbal_string_buffer.h>
 
 #define GBL_OBJECT_PROPERTY_TABLE_CAPACITY_DEFAULT_ 64
-#define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblVector) + sizeof(GblIEventFilter*)*8)
+#define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblVector) + sizeof(GblIEventFilter*)*5)
 
 static GblQuark     objectNameQuark_            = GBL_QUARK_INVALID;
 static GblQuark     objectUserdataQuark_        = GBL_QUARK_INVALID;
@@ -214,7 +214,8 @@ GBL_API GblObject_eventNotify(GblObject* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
     GBL_API_END();
 }
 
-static GBL_RESULT GblObject_eventFiltersDestruct_(void* pData) {
+static GBL_RESULT GblObject_eventFiltersDestruct_(uintptr_t key, void* pData) {
+    GBL_UNUSED(key);
     return GblVector_destruct(pData);
 }
 
@@ -863,7 +864,8 @@ GBL_EXPORT GblRefCount GblObject_refCount(const GblObject* pObject) GBL_NOEXCEPT
     return GBL_ATOMIC_INT16_LOAD(pObject->refCounter);
 }
 
-GBL_RESULT GblObject_nameDestruct_(void* pName) {
+GBL_RESULT GblObject_nameDestruct_(uintptr_t key, void* pName) {
+    GBL_UNUSED(key);
     GblStringRef_release(pName);
     return GBL_RESULT_SUCCESS;
 }
@@ -904,7 +906,8 @@ static GblObjectFamily_* GblObject_family_(const GblObject* pSelf) {
                                                    objectFamilyQuark_);
 }
 
-static GBL_RESULT GblObject_family_destruct_(void* pValue) {
+static GBL_RESULT GblObject_family_destruct_(uintptr_t key, void* pValue) {
+    GBL_UNUSED(key);
     GBL_API_BEGIN(GblType_contextDefault());
     GBL_API_FREE(pValue);
     GBL_API_END();

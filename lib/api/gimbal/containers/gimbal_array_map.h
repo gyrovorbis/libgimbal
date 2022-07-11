@@ -17,7 +17,9 @@
 #define SELF    GblArrayMap** ppSelf
 #define CSELF   GblArrayMap*const* ppSelf
 
-typedef GBL_RESULT  (*GblArrayMapDestructFn)(void* pValue);
+GBL_FORWARD_DECLARE_STRUCT(GblArrayMapEntry);
+
+typedef GBL_RESULT  (*GblArrayMapDestructFn)(uintptr_t key, void* pEntry);
 typedef GblBool     (*GblArrayMapCompareFn) (uintptr_t key1, uintptr_t key2);
 
 typedef struct GblArrayMapEntry {
@@ -26,7 +28,7 @@ typedef struct GblArrayMapEntry {
     GblArrayMapDestructFn       dtor;
 } GblArrayMapEntry;
 
-/*! \brief Contiguous array-based associative container with GblQuark keys
+/*! \brief Contiguous array-based associative container with [K,V] pairs
  *  \ingroup containers
  */
 typedef struct GblArrayMap {
@@ -37,6 +39,7 @@ typedef struct GblArrayMap {
 
 GBL_EXPORT GblArrayMap* GblArrayMap_create          (GblArrayMapCompareFn pFnComp,
                                                      GblContext*          pCtx)     GBL_NOEXCEPT;
+
 GBL_EXPORT GBL_RESULT   GblArrayMap_destroy         (SELF)                          GBL_NOEXCEPT;
 
 GBL_INLINE GblSize      GblArrayMap_size            (CSELF)                         GBL_NOEXCEPT;
@@ -71,12 +74,15 @@ GBL_EXPORT GblSize      GblArrayMap_insertVariant   (SELF,
                                                      GblVariant* pVariant)          GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool      GblArrayMap_erase           (SELF, uintptr_t key)           GBL_NOEXCEPT;
+
 GBL_EXPORT GblBool      GblArrayMap_extractVariant  (SELF,
                                                      uintptr_t key,
                                                      GblVariant* pVariant)          GBL_NOEXCEPT;
+
 GBL_EXPORT GblBool      GblArrayMap_extractValue    (SELF,
                                                      uintptr_t key,
                                                      uintptr_t* pValue)             GBL_NOEXCEPT;
+
 GBL_EXPORT void         GblArrayMap_clear           (SELF)                          GBL_NOEXCEPT;
 
 GBL_INLINE GblSize      GblArrayMap_find            (CSELF, uintptr_t key)          GBL_NOEXCEPT;
@@ -97,14 +103,6 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_find_entry_(CSELF, uintptr_t key) GBL_N
     return (index != GBL_ARRAY_MAP_NPOS)?
                 GblArrayMap_entry_(ppSelf, index) :
                 GBL_NULL;
-}
-
-GBL_INLINE GBL_RESULT GblArrayMap_entryDestruct_(GblArrayMapEntry* pEntry) GBL_NOEXCEPT {
-    if(pEntry->dtor) {
-        return pEntry->dtor(pEntry->value.pVoid);
-    } else if(GblVariant_type(&pEntry->value) != GBL_INVALID_TYPE) {
-        return GblVariant_destruct(&pEntry->value);
-    } else return GBL_RESULT_SUCCESS;
 }
 
 GBL_INLINE uintptr_t GblArrayMap_valueFromVariant_(GblVariant* pVariant) GBL_NOEXCEPT {

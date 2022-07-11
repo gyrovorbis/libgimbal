@@ -76,7 +76,7 @@ GBL_EXPORT GBL_RESULT GblVector_construct_6(GblVector* pSelf, uint16_t elementSi
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblVector_take(GblVector* pSelf, void** ppVecPtr, GblSize* pSize, GblSize* pCapacity) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVector_release(GblVector* pSelf, void** ppVecPtr, GblSize* pSize, GblSize* pCapacity) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->pCtx);
     GblBool stack = GBL_FALSE;
     GBL_API_VERIFY_POINTER(ppVecPtr);
@@ -91,7 +91,7 @@ GBL_EXPORT GBL_RESULT GblVector_take(GblVector* pSelf, void** ppVecPtr, GblSize*
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblVector_give(GblVector* pSelf, void* pData, GblSize size, GblSize capacity) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVector_acquire(GblVector* pSelf, void* pData, GblSize size, GblSize capacity) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->pCtx);
     GBL_API_VERIFY_POINTER(pData);
     GBL_API_VERIFY_ARG(capacity);
@@ -154,30 +154,15 @@ GBL_EXPORT GBL_RESULT GblVector_shrinkToFit(GblVector* pSelf) GBL_NOEXCEPT {
 
 GBL_EXPORT GBL_RESULT GblVector_append(GblVector* pSelf, const void* pData, GblSize elementCount) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->pCtx);
-    GblSize expectedSize = 0;
-    GBL_API_VERIFY_POINTER(pData);
-    GBL_API_VERIFY_ARG(elementCount);
-    expectedSize = GblVector_size(pSelf);
-    expectedSize += elementCount;
-    GBL_API_CALL(GblVector_reserve(pSelf, expectedSize + 1));
-    memcpy(&pSelf->pData[pSelf->size * pSelf->elementSize], pData, elementCount * pSelf->elementSize);
-    pSelf->size = expectedSize;
-    pSelf->pData[pSelf->size * pSelf->elementSize] = 0;
+    GblVector_insert(pSelf, GblVector_size(pSelf), elementCount, pData);
+    GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }
 
 GBL_EXPORT GBL_RESULT GblVector_prepend(GblVector* pSelf, const void* pData, GblSize elementCount) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->pCtx);
-    GblSize expectedSize = 0;
-    GBL_API_VERIFY_POINTER(pData);
-    GBL_API_VERIFY_ARG(elementCount);
-    expectedSize = GblVector_size(pSelf);
-    expectedSize += elementCount;
-    GBL_API_CALL(GblVector_reserve(pSelf, expectedSize + 1));
-    memcpy(pSelf->pData + elementCount*pSelf->elementSize, pSelf->pData, elementCount*pSelf->elementSize);
-    memcpy(pSelf->pData, pData, elementCount*pSelf->elementSize);
-    pSelf->size = expectedSize;
-    pSelf->pData[pSelf->size * pSelf->elementSize] = 0;
+    GblVector_insert(pSelf, 0, elementCount, pData);
+    GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }
 
@@ -187,7 +172,10 @@ GBL_EXPORT void* GblVector_insert(GblVector* pSelf, GblSize index, GblSize count
     GblSize slideSize = 0;
     void* pDataOut = NULL;
     GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY_ARG(index <= pSelf->size);
+    GBL_API_VERIFY_POINTER(pData);
+    GBL_API_VERIFY_ARG(count);
+    GBL_API_VERIFY(index <= pSelf->size,
+                   GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_API_CALL(GblVector_resize(pSelf, pSelf->size + count));
     slideSize = (pSelf->size-1) - index;
     insertionPoint = (uintptr_t)pSelf->pData + index * pSelf->elementSize;
@@ -206,17 +194,34 @@ GBL_EXPORT void* GblVector_insert(GblVector* pSelf, GblSize index, GblSize count
 GBL_EXPORT GBL_RESULT GblVector_erase(GblVector* pSelf, GblSize begin, GblSize count) GBL_NOEXCEPT {
     GblSize lastIndex = 0;
     GblSize remainderCount  = 0;
+
     GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY_EXPRESSION(pSelf->size > 0);
-    GBL_API_VERIFY_ARG(begin < pSelf->size);
+    GBL_API_VERIFY(pSelf->size > 0, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_API_VERIFY(begin < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     lastIndex = begin + count - 1;
-    GBL_API_VERIFY_ARG(lastIndex < pSelf->size);
-    GBL_API_VERIFY_ARG(begin <= lastIndex);
-    GBL_API_VERIFY_EXPRESSION(count > 0 && count <= pSelf->size);
+    GBL_API_VERIFY(lastIndex < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_API_VERIFY(begin <= lastIndex, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    if(!count) GBL_API_DONE();
+    GBL_API_VERIFY(count > 0 && count <= pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     remainderCount = pSelf->size - 1 - lastIndex;
     if(remainderCount) memmove(&pSelf->pData[begin * pSelf->elementSize],
                                &pSelf->pData[(lastIndex+1) * pSelf->elementSize],
                                remainderCount * pSelf->elementSize);
     GBL_API_CALL(GblVector_resize(pSelf, pSelf->size - count));
+    GBL_API_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVector_popFront(GblVector* pSelf, void* pOut) {
+    GBL_API_BEGIN(pSelf->pCtx);
+    if(pOut) memcpy(pOut, GblVector_at(pSelf, 0), GblVector_elementSize(pSelf));
+    GBL_API_VERIFY_CALL(GblVector_erase(pSelf, 0, 1));
+    GBL_API_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVector_popBack(GblVector* pSelf, void* pOut) {
+    GBL_API_BEGIN(pSelf->pCtx);
+    const GblSize index = GblVector_size(pSelf)-1;
+    if(pOut) memcpy(pOut, GblVector_at(pSelf, index), GblVector_elementSize(pSelf));
+    GBL_API_VERIFY_CALL(GblVector_erase(pSelf, index, 1));
     GBL_API_END();
 }

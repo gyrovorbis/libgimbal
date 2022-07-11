@@ -122,6 +122,7 @@ set(GIMBAL_SOURCES
      source/containers/gimbal_byte_array.c
      source/containers/gimbal_vector.c
      source/strings/gimbal_string_ref.c
+     source/strings/gimbal_string_buffer.c
      source/test/gimbal_test_suite.c
      source/test/gimbal_test_scenario.c
  )
@@ -162,7 +163,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/test/gimbal_test.h
     api/gimbal/types/gimbal_variant.h
     api/gimbal/strings/gimbal_quark.h
-    api/gimbal/strings/gimbal_quark.hpp
     api/gimbal/containers/gimbal_hash_set.h
     api/gimbal/containers/gimbal_hash_set.hpp
     api/gimbal/containers/gimbal_hash_map.hpp

@@ -47,9 +47,9 @@ static GBL_RESULT verifyDListNode_(GblContext* pCtx, GblDoublyLinkedListNode* pL
     TestStruct_* pTest = GBL_DOUBLY_LINKED_LIST_ENTRY(pNode,
                                                       TestStruct_,
                                                       listNode);
-    GBL_TEST_COMPARE_STRING(pTest->pString, pString);
-    GBL_TEST_COMPARE_INT(GblDoublyLinkedList_find(pList, pNode), expectedIndex);
-    GBL_TEST_COMPARE_POINTER(GblDoublyLinkedList_at(pList, expectedIndex), pNode);
+    GBL_TEST_COMPARE(pTest->pString, pString);
+    GBL_TEST_COMPARE(GblDoublyLinkedList_find(pList, pNode), expectedIndex);
+    GBL_TEST_COMPARE(GblDoublyLinkedList_at(pList, expectedIndex), pNode);
     GBL_TEST_VERIFY(GblDoublyLinkedList_contains(pList, pNode));
     GBL_API_END();
 }
@@ -129,6 +129,46 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_pushFront_(GblTestSuite* pSelf, G
 
     GBL_API_END();
 }
+
+
+static GBL_RESULT GblDoublyLinkedListTestSuite_popBack_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    TestStruct_ test = {
+        .pString = "test",
+        GBL_DOUBLY_LINKED_LIST_NODE_INITIALIZER()
+    };
+
+    GblDoublyLinkedListTestSuite_* pSelf_ = GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(pSelf);
+    GblDoublyLinkedList_pushBack(&pSelf_->list1, &test.listNode);
+
+    const GblSize count = GblDoublyLinkedList_count(&pSelf_->list1);
+    GblDoublyLinkedListNode* pNode = GblDoublyLinkedList_popBack(&pSelf_->list1);
+
+    GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list1), count-1);
+    GBL_TEST_COMPARE(GBL_DOUBLY_LINKED_LIST_ENTRY(pNode, TestStruct_, listNode), &test);
+
+    GBL_API_END();
+}
+
+static GBL_RESULT GblDoublyLinkedListTestSuite_popFront_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    TestStruct_ test = {
+        .pString = "test",
+        GBL_DOUBLY_LINKED_LIST_NODE_INITIALIZER()
+    };
+
+    GblDoublyLinkedListTestSuite_* pSelf_ = GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(pSelf);
+    GblDoublyLinkedList_pushFront(&pSelf_->list1, &test.listNode);
+
+    const GblSize count = GblDoublyLinkedList_count(&pSelf_->list1);
+    GblDoublyLinkedListNode* pNode = GblDoublyLinkedList_popFront(&pSelf_->list1);
+
+    GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list1), count-1);
+    GBL_TEST_COMPARE(GBL_DOUBLY_LINKED_LIST_ENTRY(pNode, TestStruct_, listNode), &test);
+
+    GBL_API_END();
+}
+
 
 static GBL_RESULT GblDoublyLinkedListTestSuite_remove_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
@@ -358,6 +398,8 @@ GBL_EXPORT GblType GblDoublyLinkedListTestSuite_type(void) {
         { "empty",      GblDoublyLinkedListTestSuite_empty_       },
         { "pushBack",   GblDoublyLinkedListTestSuite_pushBack_    },
         { "pushFront",  GblDoublyLinkedListTestSuite_pushFront_   },
+        { "popBack",    GblDoublyLinkedListTestSuite_popBack_     },
+        { "popFront",   GblDoublyLinkedListTestSuite_popFront_    },
         { "remove",     GblDoublyLinkedListTestSuite_remove_      },
         { "moveBack",   GblDoublyLinkedListTestSuite_moveBack_    },
         { "moveFront",  GblDoublyLinkedListTestSuite_moveFront_   },

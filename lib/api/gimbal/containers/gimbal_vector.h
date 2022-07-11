@@ -53,8 +53,8 @@ GBL_INLINE GBL_RESULT   GblVector_construct_2   (SELF,
 
 GBL_EXPORT GBL_RESULT   GblVector_destruct      (SELF)                                                        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblVector_assign        (SELF, const void* pData, GblSize elementCount)               GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblVector_take          (SELF, void** ppVecPtr, GblSize* pSize, GblSize* pCapacity)   GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblVector_give          (SELF, void* pData, GblSize size, GblSize capacity)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblVector_release       (SELF, void** ppVecPtr, GblSize* pSize, GblSize* pCapacity)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblVector_acquire       (SELF, void* pData, GblSize size, GblSize capacity)           GBL_NOEXCEPT;
 
 GBL_INLINE GblContext*  GblVector_context       (CSELF)                                                       GBL_NOEXCEPT;
 GBL_INLINE uint16_t     GblVector_stackBytes    (CSELF)                                                       GBL_NOEXCEPT;
@@ -76,6 +76,9 @@ GBL_INLINE GBL_RESULT   GblVector_pushFront     (SELF, const void* pData)       
 GBL_INLINE GBL_RESULT   GblVector_pushBack      (SELF, const void* pData)                                     GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblVector_append        (SELF, const void* pData, GblSize elementCount)               GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblVector_prepend       (SELF, const void* pData, GblSize elementCount)               GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT   GblVector_popFront      (SELF, void* pOut)                                            GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblVector_popBack       (SELF, void* pOut)                                            GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblVector_erase         (SELF, GblSize begin, GblSize count)                          GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblVector_clear         (SELF)                                                        GBL_NOEXCEPT;
@@ -162,7 +165,8 @@ GBL_INLINE void* GblVector_data(CSELF) GBL_NOEXCEPT {
 GBL_INLINE void* GblVector_at(CSELF, GblSize index) GBL_NOEXCEPT {
     void* pData = NULL;
     GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY_ARG(index < pSelf->size);
+    GBL_API_VERIFY(index < pSelf->size,
+                   GBL_RESULT_ERROR_OUT_OF_RANGE);
     pData = &pSelf->pData[index * pSelf->elementSize];
     GBL_API_END_BLOCK();
     return pData;

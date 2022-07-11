@@ -7,12 +7,12 @@
 #define GBL_TEST_VERIFY(expr)                        GBL_API_VERIFY_EXPRESSION(expr)
 
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_DFLT_(void) { return "Values differed"; }
-GBL_INLINE const char* GBL_TEST_COMPARE_FMT_CHAR_(void) { return "Values differed [expected: %c, actual: %c"; }
-GBL_INLINE const char* GBL_TEST_COMPARE_FMT_INT_ (void) { return "Values differed [expected: %d, actual: %d"; }
-GBL_INLINE const char* GBL_TEST_COMPARE_FMT_UINT_(void) { return "Values differed [expected: %u, actual: %u"; }
-GBL_INLINE const char* GBL_TEST_COMPARE_FMT_STR_ (void) { return "Values differed [expected: %s, actual: %s"; }
-GBL_INLINE const char* GBL_TEST_COMPARE_FMT_FLT_ (void) { return "Values differed [expected: %f, actual: %f"; }
-GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_ (void) { return "Values differed [expected: %p, actual: %p"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_CHAR_(void) { return "Values differed [actual: %c, expected: %c]"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_INT_ (void) { return "Values differed [actual: %d, expected: %d]"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_UINT_(void) { return "Values differed [actual: %u, expected: %u]"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_STR_ (void) { return "Values differed [actual: %s, expected: %s]"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_FLT_ (void) { return "Values differed [actual: %f, expected: %f]"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_ (void) { return "Values differed [actual: %p, expected: %p]"; }
 
 #define GBL_TEST_COMPARE_FMT_TABLE_  (                      \
         GBL_TEST_COMPARE_FMT_DFLT_,                         \
@@ -65,7 +65,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_   (const char* pActual, const char*
 #define GBL_TEST_COMPARE(actual, expected)           GBL_API_VERIFY_EXPRESSION(GBL_TEST_COMPARE_CMP_(actual, expected),      \
                                                                                GBL_TEST_COMPARE_FMT_(actual),                \
                                                                                actual, expected)
-
+#if 0
 #define GBL_TEST_COMPARE_INT(actual, expected)       GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
                                                                           "Values differed [expected: %d, actual: %d]",      \
                                                                           actual, expected)
@@ -74,7 +74,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_   (const char* pActual, const char*
                                                                           "Values differed [expected: %u, actual: %u]",      \
                                                                           actual, expected)
 
-#define GBL_TEST_COMPARE_STRING(actual, expected)    GBL_API_VERIFY_EXPRESSION(strcmp(actual, expected) == 0,                \
+#define GBL_TEST_COMPARE(actual, expected)    GBL_API_VERIFY_EXPRESSION(strcmp(actual, expected) == 0,                \
                                                                           "Values differed [expected: %s, actual: %s]",      \
                                                                           actual, expected)
 
@@ -85,6 +85,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_   (const char* pActual, const char*
 #define GBL_TEST_COMPARE_POINTER(actual, expected)   GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
                                                                           "Values differed [exptected: %p, actual: %p]",     \
                                                                           actual, expected)
+#endif
 
 #define GBL_TEST_SKIP(reason)                        GBL_API_VERIFY(GBL_FALSE,                                               \
                                                                     GBL_RESULT_SKIPPED,                                      \

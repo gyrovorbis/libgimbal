@@ -52,6 +52,8 @@ add_executable(GimbalTests
     source/containers/gimbal_vector_test_suite.c
     include/containers/gimbal_hash_set_test_suite.h
     source/containers/gimbal_hash_set_test_suite.c
+    include/strings/gimbal_string_buffer_test_suite.h
+    source/strings/gimbal_string_buffer_test_suite.c
     source/test_main.c)
 
 target_link_libraries(GimbalTests

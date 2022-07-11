@@ -1,6 +1,11 @@
 #ifndef GIMBAL_NUMERIC_H
 #define GIMBAL_NUMERIC_H
 
+/*! \file
+ *  \brief General numeric computations
+ *  \ingroup algorithms
+ */
+
 #include "../types/gimbal_typedefs.h"
 #include "../preprocessor/gimbal_macro_utils.h"
 
@@ -48,7 +53,9 @@ uint64_t gblPow2Next_u64(uint64_t n) GBL_NOEXCEPT {
             (uint64_t, gblPow2Next_u64)    \
         )                                  \
     )
-
+/*! \addtogroup algorithms
+ * @{
+ */
 #define gblPow2Next(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS, X)(X);
 
 GBL_INLINE GBL_CONSTEXPR
@@ -85,8 +92,8 @@ GblInt gblParity(uint8_t n) {
     return p;
 }
 
-GBL_INLINE
-uint32_t gblntohl(uint32_t n) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR
+uint32_t gblNtohl(uint32_t n) GBL_NOEXCEPT {
     unsigned char *np = (unsigned char *)&n;
     return ((uint32_t)np[0] << 24) |
            ((uint32_t)np[1] << 16) |
@@ -94,8 +101,8 @@ uint32_t gblntohl(uint32_t n) GBL_NOEXCEPT {
             (uint32_t)np[3];
 }
 
-GBL_INLINE
-uint32_t gblhtonl(uint32_t x) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR
+uint32_t gblHtonl(uint32_t x) GBL_NOEXCEPT {
 #if GBL_BIG_ENDIAN == 0
     uint8_t *s = (uint8_t *)&x;
     return (uint32_t)(s[0] << 24 | s[1] << 16 | s[2] << 8 | s[3]);
@@ -104,6 +111,7 @@ uint32_t gblhtonl(uint32_t x) GBL_NOEXCEPT {
 #endif
 }
 
+/// @}
 
 
 GBL_DECLS_END

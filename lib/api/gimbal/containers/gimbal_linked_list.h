@@ -12,6 +12,7 @@
 #define CSELF   const SELF
 
 #define GBL_LINKED_LIST_NPOS                            GBL_NPOS
+#define GBL_LINKED_LIST_NODE_INITIALIZER()              { .pNext = NULL }
 #define GBL_LINKED_LIST_NODE(name)                      GblLinkedListNode name = { .pNext = &name }
 #define GBL_LINKED_LIST_ENTRY(node, structure, field)   GBL_CONTAINER_OF(node, structure, field)
 
@@ -31,13 +32,20 @@ GBL_INLINE void                 GblLinkedList_moveBack      (SELF, GblLinkedList
 GBL_INLINE void                 GblLinkedList_moveFront     (SELF, GblLinkedListNode* pNode)    GBL_NOEXCEPT;
 GBL_INLINE void                 GblLinkedList_joinBack      (SELF, GblLinkedListNode* pList)    GBL_NOEXCEPT;
 GBL_INLINE void                 GblLinkedList_joinFront     (SELF, GblLinkedListNode* pList)    GBL_NOEXCEPT;
+
+GBL_INLINE GblLinkedListNode*   GblLinkedList_popBack       (SELF)                              GBL_NOEXCEPT;
+GBL_INLINE GblLinkedListNode*   GblLinkedList_popFront      (SELF)                              GBL_NOEXCEPT;
+
 GBL_EXPORT GblBool              GblLinkedList_swap          (SELF,
                                                              GblLinkedListNode* pNode1,
                                                              GblLinkedListNode* pNode2)         GBL_NOEXCEPT;
+
 GBL_INLINE GblBool              GblLinkedList_remove        (SELF, GblLinkedListNode* pNode)    GBL_NOEXCEPT;
+
 GBL_EXPORT GblBool              GblLinkedList_replace       (SELF,
                                                              GblLinkedListNode* pExisting,
                                                              GblLinkedListNode* pReplacement)   GBL_NOEXCEPT;
+
 GBL_EXPORT GblBool              GblLinkedList_erase         (SELF, GblSize index)               GBL_NOEXCEPT;
 GBL_INLINE void                 GblLinkedList_clear         (SELF)                              GBL_NOEXCEPT;
 
@@ -221,6 +229,30 @@ GBL_INLINE void GblLinkedList_clear(SELF) GBL_NOEXCEPT {
         pPrev = pIt;
         pIt = pIt->pNext;
     } while(pIt != pSelf);
+}
+
+GBL_INLINE GblLinkedListNode* GblLinkedList_popFront(SELF) GBL_NOEXCEPT {
+    GblLinkedListNode* pFront = GblLinkedList_front(pSelf);
+    if(pFront) pSelf->pNext = pFront->pNext;
+    return pFront;
+}
+
+GBL_INLINE GblLinkedListNode* GblLinkedList_popBack(SELF) GBL_NOEXCEPT {
+    GblLinkedListNode* pBack = GBL_NULL;
+    GblLinkedListNode* pPrev = pSelf;
+    for(GblLinkedListNode* pIt = pSelf->pNext;
+        pIt != pSelf;
+        pIt = pIt->pNext)
+    {
+        if(pIt->pNext == pSelf) {
+            pBack = pIt;
+            pPrev->pNext = pSelf;
+            break;
+        }
+        pPrev = pIt;
+    }
+
+    return pBack;
 }
 
 

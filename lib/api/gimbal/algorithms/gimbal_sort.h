@@ -1,3 +1,10 @@
+/*! \addtogroup algorithms
+ * @{
+ */
+/*! \file
+ *  \brief Generialized array sorting algorithms
+ */
+
 #ifndef GIMBAL_SORT_H
 #define GIMBAL_SORT_H
 
@@ -16,7 +23,7 @@ GBL_INLINE void gblSortShell    (void* pArray, GblSize count, GblSize elemSize, 
 GBL_INLINE void gblSortBubble   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 
 
-
+/// @}
 
 
 

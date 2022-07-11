@@ -31,7 +31,7 @@ typedef struct GblDoublyLinkedListNode {
     struct GblDoublyLinkedListNode*     pPrev;
 } GblDoublyLinkedListNode;
 
-GBL_INLINE void     GblDoublyLinkedList_init        (SELF) GBL_NOEXCEPT;
+GBL_INLINE void     GblDoublyLinkedList_init        (SELF)                                  GBL_NOEXCEPT;
 
 GBL_INLINE void     GblDoublyLinkedList_pushBack    (SELF,
                                                      GblDoublyLinkedListNode* pNode)        GBL_NOEXCEPT;
@@ -50,6 +50,12 @@ GBL_INLINE void     GblDoublyLinkedList_joinBack    (SELF,
 
 GBL_INLINE void     GblDoublyLinkedList_joinFront   (SELF,
                                                      GblDoublyLinkedListNode* pList)        GBL_NOEXCEPT;
+
+GBL_INLINE GblDoublyLinkedListNode*
+                    GblDoublyLinkedList_popBack     (SELF)                                  GBL_NOEXCEPT;
+
+GBL_INLINE GblDoublyLinkedListNode*
+                    GblDoublyLinkedList_popFront    (SELF)                                  GBL_NOEXCEPT;
 
 GBL_INLINE GblBool  GblDoublyLinkedList_empty       (CSELF)                                 GBL_NOEXCEPT;
 
@@ -228,6 +234,26 @@ GBL_INLINE void GblDoublyLinkedList_joinFront(SELF, GblDoublyLinkedListNode* pLi
         pList->pPrev        = pList;
     }
 }
+
+
+GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_popBack(SELF) GBL_NOEXCEPT {
+    GblDoublyLinkedListNode* pBack = GblDoublyLinkedList_back(pSelf);
+    if(pBack) {
+        pBack->pPrev->pNext = pBack->pNext;
+        pBack->pNext->pPrev = pBack->pPrev;
+    }
+    return pBack;
+}
+
+GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_popFront(SELF) GBL_NOEXCEPT {
+    GblDoublyLinkedListNode* pFront = GblDoublyLinkedList_front(pSelf);
+    if(pFront) {
+        pFront->pPrev->pNext = pFront->pNext;
+        pFront->pNext->pPrev = pFront->pPrev;
+    }
+    return pFront;
+}
+
 
 
 GBL_DECLS_END

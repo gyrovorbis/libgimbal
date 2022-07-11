@@ -8,7 +8,7 @@
 
 	\tableofcontents
 
-## Features
+# Features
 	LibGimbal's featureset includes:
 	- Unified error logging, tracking, and propagation with source code capture
 	- Custom allocator support for all types from the ground-up
@@ -23,7 +23,7 @@
 	- Object-oriented runtime meta type system, providing an inheritance model, interfaces, properties, etc
 	- Unit testing framework
 
-## Compiler Requirements 
+# Compiler Requirements 
 	LibGimbal has been written to build with any compiler supporting standard C17, with its builtin C++ wrappers 
 	requiring C++20. It is being explicitly tested against:
 		- Microsoft Visual Studio
@@ -34,7 +34,7 @@
 
 	It is expected to compile with any other compiler as well, and any issues doing so will gladly be addressed.
 
-## Cross-Platform 
+# Cross-Platform 
 	Additionally, libGimbal has been developed to be light-weight enough to run on embedded systems and retro 
 	hardware. It is being explicitly unit tested against:
 	- Windows
@@ -48,7 +48,7 @@
 
 	We are happy to make changes required to support building for other platforms. 
 
-## Design Philosophy
+# Design Philosophy
 	We are well aware of the fact that trying to create a massively cross-platform, cross-language framework 
 	such as this with language standard requirements as high as C17 and C++20 may seem strange. As libGimbal 
 	is modeling so many complex concepts in a language as low-level as C, it has been decided that for the 
@@ -70,16 +70,16 @@
 	as it can possibly be for each language it supports, rather than simply wrapping a low-level C API to 
 	each. 
 
-## Building 
+# Building 
 	LibGimbal is provided as a standard cmake project which can be built using its CMakeLists.
 
-## License
+# License
 	LibGimbal is being released under the "I-dont-give-a-shit-what-you-do" license. A lot of time and energy
 	was put into creating this framework, and we'd love to see it used in cool projects or on cool hardware. 
 	We would appreciate some credit or acknowlegement, but just seeing it get some love is plenty for us. 
 
 	If you do use it, please feel free to log any bugs or feature requests or contribute back.
 
-## Credits
+# Credits
 	Lead Developer: Falco Girgis
 */ 

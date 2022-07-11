@@ -8,6 +8,7 @@ typedef struct GblTestScenario_ {
     GblTestSuite*   pCurSuite;
     const char*     pCurCase;
     clock_t         startTime;
+    double          totalTime;
 } GblTestScenario_;
 
 
@@ -26,6 +27,7 @@ static GBL_RESULT GblTestScenarioClass_begin_(GblTestScenario* pSelf) {
 
 static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_API_BEGIN(pSelf);
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
     const char* pName = GblObject_name(GBL_OBJECT(pSelf));
     GBL_API_INFO("[GblTestScenario] Ending Scenario: [%s]", pName? pName : "");
     GBL_API_PUSH();
@@ -46,9 +48,12 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_API_INFO("%-20s: %20u", "Failed",  pSelf->casesFailed);
     GBL_API_POP(1);
 
-    GBL_API_INFO("%-20s: %20s", "Result",   gblResultString(pSelf->result));
-
+    GBL_API_INFO("%-20s: %20.3fms", "Total Time",  pSelf_->totalTime);
     GBL_API_POP(1);
+
+    GBL_API_INFO("********************* %s *********************",  !GBL_RESULT_SUCCESS(pSelf->result)?
+                                            "[ FAILED ]" : "[ PASSED ]");
+
     GBL_API_END();
 }
 
@@ -69,7 +74,6 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
         pSuiteIt = GBL_TEST_SUITE_TRY(GblObject_siblingNext(GBL_OBJECT(pSuiteIt))))
     {
         pSelf_->pCurSuite = pSuiteIt;
-        pSelf->result = GBL_API_RESULT();
 
         GBL_API_VERIFY_CALL(pClass->pFnSuiteBegin(pSelf, pSuiteIt));
 
@@ -150,6 +154,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
         }
     }
 
+    pSelf->result = pSelf->casesFailed? GBL_RESULT_ERROR : GBL_RESULT_SUCCESS;
     GBL_API_CALL(pClass->pFnEnd(pSelf));
 
     GBL_API_END();
@@ -167,8 +172,11 @@ static GBL_RESULT GblTestScenarioClass_suiteBegin_(GblTestScenario* pSelf, const
 
 static GBL_RESULT GblTestScenarioClass_suiteEnd_(GblTestScenario* pSelf, const GblTestSuite* pSuite) {
     GBL_API_BEGIN(pSelf);
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
     const char* pSuiteName = GblTestSuite_name(pSuite);
-    const double msec = (double)(clock() - GBL_TEST_SCENARIO_(pSelf)->startTime) * 1000.0 / (double)CLOCKS_PER_SEC;
+    const double msec = (double)(clock() - pSelf_->startTime) * 1000.0 / (double)CLOCKS_PER_SEC;
+    pSelf_->totalTime += msec;
+
     GBL_API_INFO("Totals: %u passed, %u failed, %u skipped, %.3fms",
                  pSuite->casesPassed,
                  pSuite->casesFailed,

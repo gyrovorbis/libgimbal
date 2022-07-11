@@ -162,10 +162,10 @@ static GBL_RESULT GblQuarkTestSuite_toString_(GblTestSuite* pSelf, GblContext* p
     GBL_API_BEGIN(pCtx);
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblQuark_toString(GBL_QUARK_INVALID), NULL);
-    GBL_TEST_COMPARE_STRING(GblQuark_toString(pSelf_->staticString), "StaticString");
-    GBL_TEST_COMPARE_STRING(GblQuark_toString(pSelf_->string),       "String");
-    GBL_TEST_COMPARE_STRING(GblQuark_toString(pSelf_->sizedString),  "SizedString");
-    GBL_TEST_COMPARE_STRING(GblQuark_toString(pSelf_->pagedString),  "PagedString");
+    GBL_TEST_COMPARE(GblQuark_toString(pSelf_->staticString), "StaticString");
+    GBL_TEST_COMPARE(GblQuark_toString(pSelf_->string),       "String");
+    GBL_TEST_COMPARE(GblQuark_toString(pSelf_->sizedString),  "SizedString");
+    GBL_TEST_COMPARE(GblQuark_toString(pSelf_->pagedString),  "PagedString");
     GBL_API_END();
 }
 
@@ -173,9 +173,9 @@ static GBL_RESULT GblQuarkTestSuite_internString_(GblTestSuite* pSelf, GblContex
     GBL_API_BEGIN(pCtx);
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblQuark_internString(NULL), NULL);
-    GBL_TEST_COMPARE_STRING(GblQuark_internString("InternString"), "InternString");
+    GBL_TEST_COMPARE(GblQuark_internString("InternString"), "InternString");
     const GblQuark tryQuark = GblQuark_tryString("InternString");
-    GBL_TEST_COMPARE_STRING(GblQuark_toString(tryQuark), "InternString");
+    GBL_TEST_COMPARE(GblQuark_toString(tryQuark), "InternString");
     GBL_TEST_COMPARE(GblQuark_count(), pSelf_->quarkStartCount + 6);
     GBL_API_END();
 }
@@ -187,9 +187,9 @@ static GBL_RESULT GblQuarkTestSuite_internStringSized_(GblTestSuite* pSelf, GblC
     GBL_TEST_COMPARE(GblQuark_internStringSized("", 0), NULL);
     GBL_TEST_COMPARE(GblQuark_internStringSized(NULL, 1), NULL);
 
-    GBL_TEST_COMPARE_STRING(GblQuark_internStringSized("InternStringSizedabc", 15), "InternStringSiz");
+    GBL_TEST_COMPARE(GblQuark_internStringSized("InternStringSizedabc", 15), "InternStringSiz");
     const GblQuark tryQuark = GblQuark_tryString("InternStringSiz");
-    GBL_TEST_COMPARE_STRING(GblQuark_toString(tryQuark), "InternStringSiz");
+    GBL_TEST_COMPARE(GblQuark_toString(tryQuark), "InternStringSiz");
     GBL_TEST_COMPARE(GblQuark_count(), pSelf_->quarkStartCount + 7);
     GBL_API_END();
 }
@@ -198,7 +198,7 @@ static GBL_RESULT GblQuarkTestSuite_internStringStatic_(GblTestSuite* pSelf, Gbl
     GBL_API_BEGIN(pCtx);
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblQuark_internStringStatic(NULL), NULL);
-    GBL_TEST_COMPARE_STRING(GblQuark_internStringStatic("InternStatic"), "InternStatic");
+    GBL_TEST_COMPARE(GblQuark_internStringStatic("InternStatic"), "InternStatic");
     GBL_TEST_COMPARE(GblQuark_count(), pSelf_->quarkStartCount + 8);
     GBL_API_END();
 }

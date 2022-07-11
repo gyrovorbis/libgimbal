@@ -1,5 +1,12 @@
 #include <gimbal/containers/gimbal_array_map.h>
 
+GBL_INLINE GBL_RESULT GblArrayMap_entryDestruct_(GblArrayMapEntry* pEntry) GBL_NOEXCEPT {
+    if(pEntry->dtor) {
+        return pEntry->dtor(pEntry->key, pEntry->value.pVoid);
+    } else if(GblVariant_type(&pEntry->value) != GBL_INVALID_TYPE) {
+        return GblVariant_destruct(&pEntry->value);
+    } else return GBL_RESULT_SUCCESS;
+}
 
 GBL_EXPORT GblArrayMap* GblArrayMap_create(GblArrayMapCompareFn   pFnComparator,
                                            GblContext*            pCtx) GBL_NOEXCEPT
@@ -135,8 +142,8 @@ static GblArrayMapEntry* GblArrayMap_entryAdd_(GblArrayMap** ppSelf, uintptr_t k
 
 static GBL_RESULT GblArrayMap_entrySetVariant_(GblArrayMapEntry* pEntry, GblVariant* pVariant) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    if(pEntry->dtor && GblVariant_type(&pEntry->value) != GblVariant_type(pVariant)) {
-        GBL_API_CALL(pEntry->dtor(pVariant->pVoid));
+    if(GblVariant_type(&pEntry->value) != GblVariant_type(pVariant)) {
+        GBL_API_CALL(GblArrayMap_entryDestruct_(pEntry));
         pEntry->dtor = NULL;
         GBL_API_CALL(GblVariant_constructCopy(&pEntry->value, pVariant));
     } else {
@@ -159,15 +166,11 @@ GBL_EXPORT GBL_RESULT GblArrayMap_setVariant(GblArrayMap** ppSelf, uintptr_t key
 
 static GBL_RESULT GblArrayMap_entrySetUserdata_(GblArrayMapEntry* pEntry, uintptr_t value, GblArrayMapDestructFn pDtor) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    if(pEntry->dtor) {
-       GBL_API_CALL(pEntry->dtor(pEntry->value.pVoid));
-   } else if(GblVariant_type(&pEntry->value) != GBL_INVALID_TYPE) {
-       GBL_API_CALL(GblVariant_destruct(&pEntry->value));
-   }
-   pEntry->value.pVoid = (void*)value;
-   pEntry->value.type = GBL_INVALID_TYPE;
-   pEntry->dtor = pDtor;
-   GBL_API_END();
+    GBL_API_CALL(GblArrayMap_entryDestruct_(pEntry));
+    pEntry->value.pVoid = (void*)value;
+    pEntry->value.type = GBL_INVALID_TYPE;
+    pEntry->dtor = pDtor;
+    GBL_API_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArrayMap_setUserdata(GblArrayMap** ppSelf, uintptr_t key, uintptr_t value, GblArrayMapDestructFn pDtor) GBL_NOEXCEPT {
