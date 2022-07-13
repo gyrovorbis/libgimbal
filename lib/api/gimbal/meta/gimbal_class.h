@@ -217,13 +217,8 @@ GBL_DECLS_END
  * for derived types.
  *
  */
-#define GBL_CLASS_TRY_PREFIX(klass, typePrefix)     (GBL_CLASS_TRY(klass, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
 
-#define GBL_STATIC_CLASS_TYPE                       (GBL_BUILTIN_TYPE(STATIC_CLASS))
-#define GBL_STATIC_CLASS(klass)                     (GBL_CLASS_CAST(klass, GBL_STATIC_CLASS_TYPE, GblClass))
-#define GBL_STATIC_CLASS_CHECK(klass)               (GBL_CLASS_CHECK(klass, GBL_STATIC_CLASS_TYPE))
-#define GBL_STATIC_CLASS_TRY(klass)                 (GBL_CLASS_TRY(klass, GBL_STATIC_CLASS_TYPE, GblClass))
-*/
+
 /*!
  * \fn GblClass* GblClass_ref(GblType type)
  *  Returns a new reference to the existing internally managed default class for the given type or
@@ -558,14 +553,6 @@ GBL_DECLS_END
  *      GblInstance_classSink(GBL_INSTANCE(pObject));
  *
  *      GblInstance_destroy(GBL_INSTANCE(pObject));
- */
-
-
-
-
-
-
- *
  */
 
 #endif // GIMBAL_CLASS_H
