@@ -415,8 +415,10 @@ GBL_INLINE GBL_RESULT GblStringBuffer_prepend(SELF, GblStringView view) GBL_NOEX
 GBL_INLINE GBL_RESULT GblStringBuffer_overwrite(SELF, GblSize index, GblStringView view) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->data.pCtx);
     //GBL_API_VERIFY_ARG(index < GblStringBuffer_length(pSelf));
+    const GblBool resized = (index + view.length > GblStringBuffer_length(pSelf));
     GBL_API_CALL(GblStringBuffer_reserve(pSelf, index + view.length));
     memcpy(pSelf->data.pData+index, view.pData, view.length);
+    if(resized) pSelf->data.pData[index + view.length] = '\0';
     pSelf->data.size = strlen((const char*)pSelf->data.pData);
     GBL_API_END();
 }
@@ -430,6 +432,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_erase(SELF, GblSize index, GblSize len) GB
 GBL_INLINE GBL_RESULT GblStringBuffer_shrinkToFit(SELF) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->data.pCtx);
     GBL_API_CALL(GblVector_shrinkToFit(&pSelf->data));
+
     GBL_API_END();
 }
 

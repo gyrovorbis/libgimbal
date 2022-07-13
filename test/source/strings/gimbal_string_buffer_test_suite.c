@@ -4,7 +4,7 @@
 
 #define GBL_STRING_BUFFER_TEST_SUITE_(inst) ((GblStringBufferTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_STRING_BUFFER_TEST_SUITE_TYPE))
 
-typedef struct GblStringBufferTestSuite_ {;
+typedef struct GblStringBufferTestSuite_ {
     struct {
         GblStringBuffer buffer;
         char            ext[5];

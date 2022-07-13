@@ -610,7 +610,7 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
 static GBL_RESULT GblType_registerBuiltins_(void) {
     GBL_API_BEGIN(pCtx_);
 
-    const static GblTypeInfo protocolInfo = {};
+    const static GblTypeInfo protocolInfo = { 0 };
 
     GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_PROTOCOL,
                              GBL_INVALID_TYPE,

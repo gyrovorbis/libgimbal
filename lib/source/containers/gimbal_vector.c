@@ -142,11 +142,11 @@ GBL_EXPORT GBL_RESULT GblVector_resize(GblVector* pSelf, GblSize size) GBL_NOEXC
 GBL_EXPORT GBL_RESULT GblVector_shrinkToFit(GblVector* pSelf) GBL_NOEXCEPT {
     GBL_API_BEGIN(pSelf->pCtx);
     const GblBool stack = GblVector_stack(pSelf);
-    if(!stack && pSelf->capacity > pSelf->size) {
+    if(!stack && pSelf->capacity > pSelf->size+1) {
         pSelf->pData = pSelf->pCtx != GBL_NULL?
-                    (uint8_t*)GBL_API_REALLOC(pSelf->pData, pSelf->size * pSelf->elementSize) :
-                    (uint8_t*)realloc(pSelf->pData, pSelf->size * pSelf->elementSize);
-        pSelf->capacity = pSelf->size;
+                    (uint8_t*)GBL_API_REALLOC(pSelf->pData, pSelf->size * pSelf->elementSize + 1) :
+                    (uint8_t*)realloc(pSelf->pData, pSelf->size * pSelf->elementSize + 1);
+        pSelf->capacity = pSelf->size + 1;
     }
     GBL_API_END();
 }
