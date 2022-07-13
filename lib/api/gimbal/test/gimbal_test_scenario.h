@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblTestScenario and related functions.
+ *  \ingroup testing
  */
 #ifndef GIMBAL_TEST_SCENARIO_H
 #define GIMBAL_TEST_SCENARIO_H
@@ -18,7 +19,7 @@
 #define GBL_TEST_SCENARIO_CLASS_CHECK(klass)  (GBL_CLASS_CHECK_PREFIX(klass, GBL_TEST_SCENARIO))
 #define GBL_TEST_SCENARIO_CLASS_TRY(klass)    (GBL_CLASS_TRY_PREFIX(klass, GBL_TEST_SCENARIO))
 
-#define GBL_TEST_SCENARIO_GET_CLASS(inst)     (GBL_INSTANCE_CAST_CLASS_PREFIX(inst, GBL_TEST_SCENARIO))
+#define GBL_TEST_SCENARIO_GET_CLASS(inst)     (GBL_INSTANCE_GET_CLASS_PREFIX(inst, GBL_TEST_SCENARIO))
 #define GBL_TEST_SCENARIO_TRY_CLASS(inst)     (GBL_INSTANCE_TRY_CLASS_PREFIX(inst, GBL_TEST_SCENARIO))
 
 #define SELF    GblTestScenario* pSelf

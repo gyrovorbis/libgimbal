@@ -16,7 +16,6 @@ GBL_DECLS_BEGIN
 
 typedef GBL_BOOL                        GblBool;
 typedef GBL_SIZE                        GblSize;
-typedef GBL_FLOAT                       GblFloat;
 typedef GBL_INT                         GblInt;
 typedef GBL_UINT                        GblUint;
 typedef GBL_ENUM                        GblEnum;
@@ -35,7 +34,6 @@ GBL_FORWARD_DECLARE_STRUCT(GblVariant);
 GBL_FORWARD_DECLARE_STRUCT(GblStringBuffer);
 GBL_FORWARD_DECLARE_STRUCT(GblStackFrame);
 GBL_FORWARD_DECLARE_STRUCT(GblCallRecord);
-GBL_FORWARD_DECLARE_STRUCT(GblMemAllocInfo);
 GBL_FORWARD_DECLARE_STRUCT(GblClass);
 GBL_FORWARD_DECLARE_STRUCT(GblInstance);
 GBL_FORWARD_DECLARE_STRUCT(GblInterface);

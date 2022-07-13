@@ -1,8 +1,8 @@
 #include <gimbal/meta/gimbal_instance.h>
 #include "gimbal_type_.h"
 
-GBL_INLINE void* GblInstance_basePtr_(const GblInstance* pInstance) {
-    GblMetaClass* pMeta = GBL_META_CLASS_(GBL_INSTANCE_TYPE(pInstance));
+GBL_EXPORT void* GblInstance_basePtr_(const GblInstance* pInstance) {
+    GblMetaClass* pMeta = GBL_META_CLASS_(GBL_INSTANCE_TYPEOF(pInstance));
     return pMeta? (void*)((uint8_t*)pInstance + pMeta->instancePrivateOffset) : NULL;
 }
 
@@ -26,10 +26,10 @@ GBL_RESULT typeInstanceConstructValidate_(GblType type, GblBool inPlace) {
     GBL_API_BEGIN(pCtx_);
     GBL_API_VERIFY_ARG(type != GBL_INVALID_TYPE,
                        "[GblType] Instance Construct: Invalid type!");
-    GBL_API_VERIFY(GBL_TYPE_IS_INSTANTIABLE(type),
+    GBL_API_VERIFY(GBL_TYPE_INSTANTIABLE_CHECK(type),
                    GBL_RESULT_ERROR_INVALID_TYPE,
                    "Cannot instantiate NON INSTANTIABLE type!");
-    GBL_API_VERIFY(!GBL_TYPE_IS_ABSTRACT(type),
+    GBL_API_VERIFY(!GBL_TYPE_ABSTRACT_CHECK(type),
                    GBL_RESULT_ERROR_INVALID_TYPE,
                    "Cannot instantiate ABSTRACT type!");
     GBL_API_VERIFY(pMeta->pInfo->instanceSize,
@@ -81,7 +81,7 @@ GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, Gb
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblInstance_construct_(GblType type, GblInstance* pInstance, GblClass* pClass) {
+GBL_EXPORT GBL_RESULT GblInstance_construct_(GblType type, GblInstance* pInstance, GblClass* pClass) {
     GBL_API_BEGIN(pCtx_);
     GBL_API_CALL(typeInstanceConstructValidate_(type, GBL_TRUE));
     GBL_API_PUSH_VERBOSE("[GblType] Instance Construct: type %s", GblType_name(type));
@@ -98,7 +98,7 @@ GBL_EXPORT GBL_RESULT GblInstance_construct(GblInstance* pSelf, GblType type) {
 GBL_EXPORT GBL_RESULT GblInstance_constructWithClass(GblInstance* pSelf, GblClass* pClass) {
     GBL_API_BEGIN(pCtx_);
     GBL_API_VERIFY_POINTER(pClass);
-    GBL_API_CALL(GblInstance_construct_(GBL_CLASS_TYPE(pClass), pSelf, pClass));
+    GBL_API_CALL(GblInstance_construct_(GBL_CLASS_TYPEOF(pClass), pSelf, pClass));
     GBL_API_END();
 }
 
@@ -141,14 +141,14 @@ GBL_EXPORT GblInstance* GblInstance_create(GblType type) {
 GBL_EXPORT GblInstance* GblInstance_createWithClass(GblClass* pClass) {
     GblInstance* pInstance = NULL;
     GBL_API_BEGIN(pCtx_);
-    pInstance = GblInstance_create_(GBL_CLASS_TYPE(pClass), pClass);
+    pInstance = GblInstance_create_(GBL_CLASS_TYPEOF(pClass), pClass);
     GBL_API_END_BLOCK();
     return pInstance;
 }
 
-GBL_INLINE GBL_RESULT GblInstance_classRelease_(GblInstance* pSelf) {
+GBL_EXPORT GBL_RESULT GblInstance_classRelease_(GblInstance* pSelf) {
     GblClass*       pClass      = GBL_INSTANCE_CLASS(pSelf);
-    const GblFlags  flags       = GBL_CLASS_FLAGS_(GBL_CLASS_TYPE(pClass));
+    const GblFlags  flags       = GBL_CLASS_FLAGS_(GBL_CLASS_TYPEOF(pClass));
     GBL_API_BEGIN(pCtx_);
 
     if(flags & GBL_CLASS_FLAG_OWNED_) {
@@ -165,7 +165,7 @@ GBL_INLINE GBL_RESULT GblInstance_classRelease_(GblInstance* pSelf) {
 GBL_EXPORT GblRefCount GblInstance_destruct(GblInstance* pSelf) {
     GblRefCount     refCount    = 0;
     GBL_API_BEGIN(pCtx_);
-    GblMetaClass* pMeta     = GBL_META_CLASS_(GBL_INSTANCE_TYPE(pSelf));
+    GblMetaClass* pMeta     = GBL_META_CLASS_(GBL_INSTANCE_TYPEOF(pSelf));
     refCount = GBL_ATOMIC_INT16_DEC(pMeta->instanceRefCount);
     GBL_API_CALL(GblInstance_classRelease_(pSelf));
     GBL_API_END_BLOCK();
@@ -198,7 +198,7 @@ GBL_EXPORT GBL_RESULT GblInstance_classSwizzle(GblInstance* pSelf, GblClass* pCl
     // If we're replacing an existing class
     if(pClassOld) {
         // ensure that we're the same or a derived type
-        GBL_API_VERIFY(GblClass_check(pClass, GBL_CLASS_TYPE(pClassOld)),
+        GBL_API_VERIFY(GblClass_check(pClass, GBL_CLASS_TYPEOF(pClassOld)),
                        GBL_RESULT_ERROR_INVALID_TYPE,
                        "[GblType] Cannot swizzle from class type [%s] "
                        "to unrelated class type [%s].",
@@ -252,6 +252,59 @@ GBL_EXPORT GblBool GblInstance_check(const GblInstance* pSelf, GblType type) {
     }
     GBL_API_END_BLOCK();
     return result;
+}
+
+GBL_EXPORT GblInstance* GblInstance_convert_(GblInstance* pSelf, GblType type, GblBool check) GBL_NOEXCEPT {
+    GblInstance* pOutInstance = NULL;
+    GBL_API_BEGIN(NULL);
+    if(!pSelf) {
+        if(type == GBL_INVALID_TYPE || !check) GBL_API_DONE();
+    } else {
+        if(GblInstance_check(pSelf, type)) {
+            pOutInstance = pSelf;
+        } else if(check) {
+            GBL_API_RECORD_SET(GBL_RESULT_ERROR_TYPE_MISMATCH,
+                               "Failed to cast instance from %s to %s.",
+                                GblInstance_typeName(pSelf),
+                                GblType_name(type));
+        }
+    }
+    GBL_API_END_BLOCK();
+    return pOutInstance;
+}
+
+GBL_EXPORT GblType GblInstance_typeOf(const GblInstance* pSelf) GBL_NOEXCEPT {
+    return pSelf? GblClass_typeOf(pSelf->pClass) : GBL_INVALID_TYPE;
+}
+
+GBL_EXPORT const char* GblInstance_typeName(const GblInstance* pSelf) GBL_NOEXCEPT {
+    return pSelf? GblClass_typeName(GBL_INSTANCE_CLASS(pSelf)) : "Invalid";
+}
+
+GBL_EXPORT GblSize GblInstance_size(const GblInstance* pSelf) GBL_NOEXCEPT {
+    GblSize size = 0;
+    if(pSelf) {
+        const GblTypeInfo* pInfo = GblType_info(GBL_INSTANCE_TYPEOF(pSelf));
+        if(pInfo) size = pInfo->instanceSize;
+    }
+    return size;
+}
+GBL_EXPORT GblClass* GblInstance_class(const GblInstance* pSelf) GBL_NOEXCEPT {
+    return pSelf? pSelf->pClass : NULL;
+}
+GBL_EXPORT GblClass* GblInstance_classSuper(const GblInstance* pSelf) GBL_NOEXCEPT {
+    return pSelf? GblClass_super(pSelf->pClass) : NULL;
+}
+GBL_EXPORT GblClass* GblInstance_classDefault(const GblInstance* pSelf) GBL_NOEXCEPT {
+    return pSelf? GblClass_default(pSelf->pClass) : NULL;
+}
+
+GBL_EXPORT GblInstance* GblInstance_try(GblInstance* pSelf, GblType type) GBL_NOEXCEPT {
+    return GblInstance_convert_(pSelf, type, GBL_FALSE);
+}
+
+GBL_EXPORT  GblInstance* GblInstance_cast(GblInstance* pSelf, GblType type) GBL_NOEXCEPT {
+    return GblInstance_convert_(pSelf, type, GBL_TRUE);
 }
 
 

@@ -1,7 +1,7 @@
 #include <gimbal/ifaces/gimbal_ilogger.h>
 #include <gimbal/meta/gimbal_instance.h>
 #include <gimbal/strings/gimbal_quark.h>
-
+#include "../meta/gimbal_type_.h"
 
 static GBL_RESULT GblILoggerIFace_pop_(GblILogger* pILogger, const GblStackFrame* pFrame, uint32_t count) GBL_NOEXCEPT {
     GBL_UNUSED(pILogger && pFrame && count);
@@ -38,7 +38,7 @@ static GBL_RESULT GblILoggerIFace_init_(GblILoggerIFace* pIFace, void* pData, Gb
 
 extern GBL_RESULT GblILogger_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_ILOGGER,
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_ILOGGER,
       GBL_INTERFACE_TYPE,
       GblQuark_internStringStatic("ILogger"),
       &(const GblTypeInfo) {

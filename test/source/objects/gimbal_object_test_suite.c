@@ -20,7 +20,7 @@ typedef struct GblObjectTestSuite_ {
 #define TEST_OBJECT_CHECK(instance)         GBL_INSTANCE_CHECK_PREFIX(instance, TEST_OBJECT)
 #define TEST_OBJECT_CLASS(klass)            GBL_CLASS_CAST_PREFIX(klass, TEST_OBJECT)
 #define TEST_OBJECT_CLASS_CHECK(klass)      GBL_CLASS_CHECK_PREFIX(klass, TEST_OBJECT)
-#define TEST_OBJECT_GET_CLASS(instance)     GBL_INSTANCE_CAST_CLASS_PREFIX(instance, TEST_OBJECT)
+#define TEST_OBJECT_GET_CLASS(instance)     GBL_INSTANCE_GET_CLASS_PREFIX(instance, TEST_OBJECT)
 
 static GblType TestObject_type(void);
 
@@ -48,7 +48,7 @@ static GBL_RESULT TestObject_IEventHandler_handleEvent(GblIEventHandler* pHandle
     GBL_API_BEGIN(pHandler);
     TestObject* pTest = TEST_OBJECT(pHandler);
     pTest->eventHandlerCount++;
-    pTest->eventHandlerLastType = GblEvent_type(pEvent);
+    pTest->eventHandlerLastType = GblEvent_typeOf(pEvent);
     if(pTest->eventHandlerAccept) GblEvent_accept(pEvent);
     GBL_API_END();
 }
@@ -57,7 +57,7 @@ static GBL_RESULT TestObject_IEventFilter_filterEvent(GblIEventFilter* pFilter, 
     GBL_API_BEGIN(pFilter);
     TestObject* pTest = TEST_OBJECT(pFilter);
     pTest->eventFilterCount++;
-    pTest->eventFilterLastType = GblEvent_type(pEvent);
+    pTest->eventFilterLastType = GblEvent_typeOf(pEvent);
     pTest->eventFilterLastTarget = pTarget;
     if(pTest->eventFilterAccept) GblEvent_accept(pEvent);
     GBL_API_END();
@@ -148,23 +148,23 @@ static GBL_RESULT TestObject_propertySet(GblObject* pSelf, GblSize slot, const G
 static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     TestObjectClass* pTestClass = TEST_OBJECT_CLASS(pClass);
     GBL_API_BEGIN(pCtx);
-    if(GBL_CLASS_TYPE(pTestClass) == TEST_OBJECT_TYPE) {
-        gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
+    if(GBL_CLASS_TYPEOF(pTestClass) == TEST_OBJECT_TYPE) {
+        gblPropertyTableInsert(GBL_CLASS_TYPEOF(pTestClass),
                                GblQuark_fromStringStatic("floater"),
                                TEST_OBJECT_PROPERTY_FLOATER,
                                GBL_FLOAT_TYPE,
                                GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT);
-        gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
+        gblPropertyTableInsert(GBL_CLASS_TYPEOF(pTestClass),
                                GblQuark_fromStringStatic("stringer"),
                                TEST_OBJECT_PROPERTY_STRINGER,
                                GBL_STRING_TYPE,
                                GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT);
-        gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
+        gblPropertyTableInsert(GBL_CLASS_TYPEOF(pTestClass),
                                GblQuark_fromStringStatic("staticInt32"),
                                TEST_OBJECT_PROPERTY_STATICINT32,
                                GBL_INT32_TYPE,
                                GBL_PROPERTY_FLAG_READ);
-        gblPropertyTableInsert(GBL_CLASS_TYPE(pTestClass),
+        gblPropertyTableInsert(GBL_CLASS_TYPEOF(pTestClass),
                                GblQuark_fromStringStatic("userdata"),
                                TEST_OBJECT_PROPERTY_USERDATA,
                                GBL_POINTER_TYPE,
@@ -192,8 +192,8 @@ static GblType TestObject_type(void) {
             .instanceSize   = sizeof(TestObject)
         };
 
-        type = GblType_registerStatic(GBL_OBJECT_TYPE,
-                                      "TestObject",
+        type = GblType_registerStatic("TestObject",
+                                      GBL_OBJECT_TYPE,
                                       &info,
                                       GBL_TYPE_FLAGS_NONE);
     }

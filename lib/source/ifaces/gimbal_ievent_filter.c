@@ -1,6 +1,7 @@
 #include <gimbal/ifaces/gimbal_ievent_filter.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/strings/gimbal_quark.h>
+#include "../meta/gimbal_type_.h"
 
 GBL_API GblIEventFilter_eventFilter(GblIEventFilter* pSelf, GblIEventHandler* pHandler, GblEvent* pEvent) {
     GBL_API_BEGIN(NULL); {
@@ -15,7 +16,7 @@ GBL_API GblIEventFilter_eventFilter(GblIEventFilter* pSelf, GblIEventHandler* pH
 
 extern GBL_RESULT GblIEventFilter_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_IEVENT_FILTER,
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_IEVENT_FILTER,
                             GBL_INTERFACE_TYPE,
                            GblQuark_internStringStatic("IEventFilter"),
                            &(const GblTypeInfo) {

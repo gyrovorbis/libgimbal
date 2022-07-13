@@ -1,6 +1,7 @@
 #include <gimbal/meta/gimbal_enum.h>
 #include <gimbal/types/gimbal_variant.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
+#include "../meta/gimbal_type_.h"
 
 typedef struct GblEnumEntry_ {
     GblEnum     value;
@@ -217,7 +218,7 @@ static GBL_RESULT enumClass_init_(GblClass* pClass,
 
     if(!pEntries) {
         GBL_API_WARN("[GblEnum]: Creating class [%s] with no enum entry data!",
-                     GblType_name(GBL_CLASS_TYPE(pClass)));
+                     GblType_name(GBL_CLASS_TYPEOF(pClass)));
     } else {
 
         // Iterate over the data, determining entry count
@@ -288,7 +289,7 @@ GBL_RESULT GblEnum_typeRegister_(GblContext* pCtx) {
                   sizeof(GblEnumClass),
                   sizeof(GblEnumClass_),
                   &enumIVariantIFace,
-                  GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE);
+                  GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
 
     GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_BOOL_TYPE, enumConvertTo_));
     GBL_API_CALL(GblVariant_registerConverter(enumType, GBL_UINT8_TYPE, enumConvertTo_));
@@ -310,8 +311,8 @@ GBL_EXPORT GblType GblEnum_register(const char* pName,
 {
     GblType type = GBL_INVALID_TYPE;
     GBL_API_BEGIN(NULL);
-    type = GblType_registerStatic(GBL_ENUM_TYPE,
-                                  GblQuark_internString(pName),
+    type = GblType_registerStatic(GblQuark_internString(pName),
+                                  GBL_ENUM_TYPE,
                                   &(const GblTypeInfo) {
                                       .pFnClassInit     = enumClass_init_,
                                       .pFnClassFinal    = enumClass_final_,

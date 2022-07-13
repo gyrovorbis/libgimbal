@@ -3,6 +3,7 @@
 #include <gimbal/types/gimbal_variant.h>
 #include <gimbal/meta/gimbal_primitives.h>
 #include <gimbal/strings/gimbal_quark.h>
+#include "../meta/gimbal_type_.h"
 
 static GBL_RESULT GblITableIFace_index_(const GblITable* pTable, const GblVariant* pKey, GblVariant* pValue) {
     GBL_UNUSED(pTable); GBL_UNUSED(pKey);
@@ -41,7 +42,7 @@ static GBL_RESULT GblITableIFace_init_(GblITableIFace* pIFace, void* pClassData,
 
 extern GBL_RESULT GblITable_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_ITABLE,
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_ITABLE,
                             GBL_INTERFACE_TYPE,
                            GblQuark_internStringStatic("ITable"),
                            &(const GblTypeInfo) {

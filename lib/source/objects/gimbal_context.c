@@ -1,4 +1,5 @@
 #include <gimbal/objects/gimbal_context.h>
+#include "../meta/gimbal_type_.h"
 
 static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
@@ -199,7 +200,7 @@ GBL_EXPORT GblContext* GblContext_global(void) GBL_NOEXCEPT {
 
 extern GBL_RESULT GblContext_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_CONTEXT,
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_CONTEXT,
       GBL_OBJECT_TYPE,
       GblQuark_internStringStatic("Context"),
       &(const GblTypeInfo) {

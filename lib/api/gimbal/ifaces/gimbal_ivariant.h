@@ -10,7 +10,7 @@
 #define GBL_IVARIANT_CHECK(instance)            (GBL_INSTANCE_CHECK_PREFIX      (instance,  GBL_IVARIANT))
 #define GBL_IVARIANT_IFACE(klass)               (GBL_CLASS_CAST_PREFIX          (klass,     GBL_IVARIANT))
 #define GBL_IVARIANT_IFACE_CHECK(klass)         (GBL_CLASS_CHECK_PREFIX         (klass,     GBL_IVARIANT))
-#define GBL_IVARIANT_GET_IFACE(instance)        (GBL_INSTANCE_CAST_CLASS_PREFIX (instance,  GBL_IVARIANT))
+#define GBL_IVARIANT_GET_IFACE(instance)        (GBL_INSTANCE_GET_CLASS_PREFIX (instance,  GBL_IVARIANT))
 
 #define GBL_IVARIANT_VALUE_VAR_ARG_MAX          4
 

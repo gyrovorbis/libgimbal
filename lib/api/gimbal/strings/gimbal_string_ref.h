@@ -1,7 +1,41 @@
 /*! \file
  *  \brief ::GblStringRef type and related functions
+ *
+ *  ::GblStringRef is a read-only reference-counted string used to efficiently
+ *  store, reference, and copy strings. It is also type-compatible
+ *  with const char*, so it masquerades as a regular C-string
+ *  to conveniently support regular C string APIs and character array
+ *  accesses.
+ *
+ *  \note
+ *  ::GblStringRef also stores its length internally, so
+ *  the GblStringRef_length() function and GblStringRef_view()
+ *  functions are extremely efficient. Favor this over strlen(),
+ *  when you know you're working with a ::GblStringRef.
+ *
+ *  The following example illustrates how it may be used:
+ *
+ *      GblStringRef* pRef = GblStringRef_create("lolol");
+ *
+ *      // Look, I'm a regular C string!
+ *      assert(pRef[0] == 'l');
+ *      assert(strlen(pRef) == 5);
+ *      assert(strcmp(pRef, "lolol") == 0);
+ *
+ *      // owait, no, I'm not.
+ *      GblStringRef* pRef2 = GblStringRef_acquire(pRef);
+ *      assert(GblStringRef_refCount(pRef2) == 2);
+ *
+ *      // even stores length to save on strlen() / StringView time
+ *      assert(GblStringRef_length(pRef2) == 5);
+ *
+ *      // no strlen() happening here, fast as fuck
+ *      GblStringView view = GblStringRef_view(pRef);
+ *
+ *      GblStringRef_release(pRef);  // now refCount is 1
+ *      GblStringRef_release(pRef2); // now it's deleted
+ *  \ingroup strings
  */
-
 
 #ifndef GIMBAL_STRING_REF_H
 #define GIMBAL_STRING_REF_H
@@ -16,8 +50,14 @@
 
 GBL_DECLS_BEGIN
 
-/*! \brief Reference-counted string type
+/*! \brief Reference-counted, char*-compatible string type
+ *
+ *  GblStringRef is a const char*-compatible reference-counted,
+ *  read-only string type allowing for the sharing of a single
+ *  string allocation between two different locations.
+ *
  *  \ingroup strings
+ *  \sa gimbal_string_ref.h
  */
 typedef char GblStringRef;
 

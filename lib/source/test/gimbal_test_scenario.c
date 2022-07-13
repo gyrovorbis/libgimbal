@@ -124,6 +124,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                                      GblTestSuite_name(pSelf_->pCurSuite),
                                      pSelf_->pCurCase);
                         suiteFailed = GBL_TRUE;
+                        pSelf->casesSkipped += caseCount - idx - 1;
                         break;
                     }
 
@@ -263,8 +264,8 @@ GBL_EXPORT GblType GblTestScenario_type(void) {
     if(type == GBL_INVALID_TYPE) {
 
         GBL_API_BEGIN(NULL);
-        type = GblType_registerStatic(GBL_OBJECT_TYPE,
-                                      GblQuark_internStringStatic("TestScenario"),
+        type = GblType_registerStatic(GblQuark_internStringStatic("TestScenario"),
+                                      GBL_OBJECT_TYPE,
                                       &typeInfo,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);
 

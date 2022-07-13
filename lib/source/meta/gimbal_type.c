@@ -53,7 +53,7 @@ GBL_EXPORT GblBool GblType_conforms_(GblType type, GblType dependent, GblBool ve
     GblBool conforms = GBL_FALSE;
     GBL_API_BEGIN(pCtx_);
     if(dependent != GBL_INVALID_TYPE && type != GBL_INVALID_TYPE) {
-        if(GblType_flagsTest(dependent, GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT)) {
+        if(GblType_flagsTest(dependent, GBL_TYPE_ROOT_FLAG_DEPENDENT)) {
             for(GblInt a = (GblInt)GblType_depth(dependent); a >= 0; --a) {
                 GblType ancestor = GblType_ancestor(dependent, a);
                 GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
@@ -89,11 +89,11 @@ static GBL_RESULT typeLog_(GblType parent,
 
 
     GBL_API_PUSH_VERBOSE("flags");
-    GBL_API_VERBOSE("%-20s: %-100u", "DEPENDENT",       (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "CLASSED",         (flags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "INSTANTIABLE",    (flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "DERIVABLE",       (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE)? 1 : 0);
-    GBL_API_VERBOSE("%-20s: %-100u", "DEEP_DERIVABLE",  (flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DEPENDENT",       (flags & GBL_TYPE_ROOT_FLAG_DEPENDENT)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "CLASSED",         (flags & GBL_TYPE_ROOT_FLAG_CLASSED)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "INSTANTIABLE",    (flags & GBL_TYPE_ROOT_FLAG_INSTANTIABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DERIVABLE",       (flags & GBL_TYPE_ROOT_FLAG_DERIVABLE)? 1 : 0);
+    GBL_API_VERBOSE("%-20s: %-100u", "DEEP_DERIVABLE",  (flags & GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE)? 1 : 0);
     GBL_API_VERBOSE("%-20s: %-100u", "TYPEINFO_STATIC", (flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)? 1 : 0);
     GBL_API_VERBOSE("%-20s: %-100u", "CLASS_PINNED",    (flags & GBL_TYPE_FLAG_CLASS_PINNED)? 1 : 0);
     GBL_API_VERBOSE("%-20s: %-100u", "CLASS_PREINIT",   (flags & GBL_TYPE_FLAG_CLASS_PREINIT)? 1 : 0);
@@ -148,16 +148,16 @@ static GblFlags typeFlagsWithImplied_(GblType parent,
                                GblFlags flags)
 {
     GblMetaClass* pParentMeta = GBL_META_CLASS_(parent);
-    if(!pParentMeta && pInfo->dependencyCount)              flags |= GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT;
-    if(!pParentMeta && pInfo->classSize)                    flags |= GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED;
-    if(!pParentMeta && pInfo->instanceSize)                 flags |= GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE;
-    if(flags & GBL_TYPE_FLAG_CLASS_PREINIT)     flags |= GBL_TYPE_FLAG_CLASS_PINNED;
-    if(flags & GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED) {
-                                                            flags |= GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED;
-                                                            flags |= GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT;
+    if(!pParentMeta && pInfo->dependencyCount)              flags |= GBL_TYPE_ROOT_FLAG_DEPENDENT;
+    if(!pParentMeta && pInfo->classSize)                    flags |= GBL_TYPE_ROOT_FLAG_CLASSED;
+    if(!pParentMeta && pInfo->instanceSize)                 flags |= GBL_TYPE_ROOT_FLAG_INSTANTIABLE;
+    if(flags & GBL_TYPE_FLAG_CLASS_PREINIT)                 flags |= GBL_TYPE_FLAG_CLASS_PINNED;
+    if(flags & GBL_TYPE_ROOT_FLAG_INTERFACED) {
+                                                            flags |= GBL_TYPE_ROOT_FLAG_CLASSED;
+                                                            flags |= GBL_TYPE_ROOT_FLAG_DEPENDENT;
     }
-    if(flags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE)      flags |= GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED;
-    if(flags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)    flags |= GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE;
+    if(flags & GBL_TYPE_ROOT_FLAG_INSTANTIABLE)      flags |= GBL_TYPE_ROOT_FLAG_CLASSED;
+    if(flags & GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE)    flags |= GBL_TYPE_ROOT_FLAG_DERIVABLE;
     return flags;
 }
 
@@ -168,32 +168,32 @@ static GBL_RESULT typeValidate_(GblType parent,
     GblMetaClass* pParentMeta = GBL_META_CLASS_(parent);
     GBL_API_BEGIN(pCtx_);
 
-    GblFlags fundFlags = (flags & GBL_TYPE_FUNDAMENTAL_FLAGS_MASK);
+    GblFlags fundFlags = (flags & GBL_TYPE_ROOT_FLAGS_MASK);
     GBL_API_VERIFY(!(pParentMeta && fundFlags),
                    GBL_RESULT_ERROR_INVALID_TYPE,
                    "Cannot use FUNDAMENTAL FLAGS on DERIVED type!");
 
     if(pParentMeta) {
-        const GblType fundamentalType = GblType_fundamental(parent);
+        const GblType fundamentalType = GblType_root(parent);
         fundFlags |= GBL_META_CLASS_(fundamentalType)->flags;
     }
     fundFlags |= flags;
 
-    GBL_API_VERIFY(!(pParentMeta && !(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE)),
+    GBL_API_VERIFY(!(pParentMeta && !(fundFlags & GBL_TYPE_ROOT_FLAG_DERIVABLE)),
                    GBL_RESULT_ERROR_INVALID_TYPE,
                    "Cannot DERIVE from a NON-DERIVABLE type!");
 
     GBL_API_VERIFY(!(pParentMeta && GblType_depth(parent) > 0 &&
-                     !(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE)),
+                     !(fundFlags & GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE)),
                      GBL_RESULT_ERROR_INVALID_TYPE,
                      "Cannot REDERIVE from a non DEEP DERIVABLE type!");
 
-    GBL_API_VERIFY(!(!(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED) &&
+    GBL_API_VERIFY(!(!(fundFlags & GBL_TYPE_ROOT_FLAG_CLASSED) &&
                      (fundFlags & GBL_TYPE_FLAG_CLASS_PINNED)),
                    GBL_RESULT_ERROR_INVALID_TYPE,
                    "Cannot pin an NON CLASSED type!");
 
-    if(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED) {
+    if(fundFlags & GBL_TYPE_ROOT_FLAG_CLASSED) {
         GBL_API_VERIFY(pInfo->classSize >= sizeof(GblClass), GBL_RESULT_ERROR_INVALID_TYPE,
                        "Cannot register a CLASSED type with a class size < sizeof(GblClass): [%u]!",
                        sizeof(GblClass));
@@ -206,8 +206,8 @@ static GBL_RESULT typeValidate_(GblType parent,
                        "Cannot register a NON CLASSED type with a class size > 0!");
     }
 
-    if(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED) {
-        GBL_API_VERIFY(!(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE),
+    if(fundFlags & GBL_TYPE_ROOT_FLAG_INTERFACED) {
+        GBL_API_VERIFY(!(fundFlags & GBL_TYPE_ROOT_FLAG_INSTANTIABLE),
                        GBL_RESULT_ERROR_INVALID_TYPE,
                        "INTERFACED types cannot be INSTANTIABLE!");
 
@@ -216,11 +216,11 @@ static GBL_RESULT typeValidate_(GblType parent,
                        sizeof(GblClass));
     }
 
-    if(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE) {
+    if(fundFlags & GBL_TYPE_ROOT_FLAG_INSTANTIABLE) {
         GBL_API_VERIFY(pInfo->instanceSize >= sizeof(GblInstance), GBL_RESULT_ERROR_INVALID_TYPE,
                        "Cannot register an INSTANTIABLE type with an instance size < sizeof(GblInstance): [%u]",
                        sizeof(GblInstance));
-        GBL_API_VERIFY(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED, GBL_RESULT_ERROR_INVALID_TYPE,
+        GBL_API_VERIFY(fundFlags & GBL_TYPE_ROOT_FLAG_CLASSED, GBL_RESULT_ERROR_INVALID_TYPE,
                        "Cannot register an INSTANTIABLE type without it being CLASSED!");
     } else {
         GBL_API_VERIFY(pInfo->instanceSize == 0, GBL_RESULT_ERROR_INVALID_TYPE,
@@ -231,22 +231,21 @@ static GBL_RESULT typeValidate_(GblType parent,
                    "Cannot derive from a FINAL type!");
 
     if(pInfo->dependencyCount) {
-        GBL_API_VERIFY(fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT,
+        GBL_API_VERIFY(fundFlags & GBL_TYPE_ROOT_FLAG_DEPENDENT,
                        GBL_RESULT_ERROR_INVALID_TYPE,
                        "PREREQUESITES are only supported for DEPENDENT types!");
 
-        GblSize instantiableCount = 0;
+        GblSize primaryCount = 0;
         for(GblSize p = 0; p < pInfo->dependencyCount; ++p) {
-            if(GBL_TYPE_IS_INSTANTIABLE(pInfo->pDependencies[p]))
-                ++instantiableCount;
-            else GBL_API_VERIFY(GBL_TYPE_IS_INTERFACED(pInfo->pDependencies[p]) ||
-                                GBL_TYPE_IS_DEPENDENT(pInfo->pDependencies[p]),
+            if(!GblType_flagsTest(pInfo->pDependencies[p], GBL_TYPE_ROOT_FLAG_DEPENDENT))
+                ++primaryCount;
+            else GBL_API_VERIFY(GBL_TYPE_DEPENDENT_CHECK(pInfo->pDependencies[p]),
                                 GBL_RESULT_ERROR_INVALID_TYPE,
-                                "DEPENDENCIES can only be INTERFACED or DEPENDENT types!");
+                                "Secondary DEPENDENCIES can only be DEPENDENT types!");
         }
-        GBL_API_VERIFY(instantiableCount <= 1, GBL_RESULT_ERROR_INVALID_TYPE,
-                       "Cannot have multiple INSTANTIABLE DEPENDENCY types: [%u]",
-                       instantiableCount);
+        GBL_API_VERIFY(primaryCount <= 1, GBL_RESULT_ERROR_INVALID_TYPE,
+                       "Cannot have multiple primary NON-DEPENDENT DEPENDENCY types: [%u]",
+                       primaryCount);
     }
 
     if(pInfo->interfaceCount) {
@@ -254,7 +253,7 @@ static GBL_RESULT typeValidate_(GblType parent,
                        GBL_RESULT_ERROR_INVALID_TYPE,
                        "NULL pointer passed as interface map!");
 
-        GBL_API_VERIFY((fundFlags & GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED),
+        GBL_API_VERIFY((fundFlags & GBL_TYPE_ROOT_FLAG_CLASSED),
                        GBL_RESULT_ERROR_INVALID_TYPE,
                        "Cannot specify an INTERFACE MAP on NON-CLASSED fundamental type!");
 
@@ -268,7 +267,7 @@ static GBL_RESULT typeValidate_(GblType parent,
                            "INTERFACE[%u]: Invalid type!",
                            i);
 
-            GBL_API_VERIFY(GblType_flagsTest(ifaceType, GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED),
+            GBL_API_VERIFY(GblType_flagsTest(ifaceType, GBL_TYPE_ROOT_FLAG_INTERFACED),
                            GBL_RESULT_ERROR_INVALID_TYPE,
                            "INTERFACE[%u: %s]: Not an INTERFACED fundamental type!",
                            i, GblType_name(ifaceType));
@@ -610,49 +609,62 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
 
 static GBL_RESULT GblType_registerBuiltins_(void) {
     GBL_API_BEGIN(pCtx_);
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_PROTOCOL,
-                            GBL_INVALID_TYPE,
-                            GblQuark_internStringStatic("Protocol"),
-                            NULL,
-                            GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT |
-                            GBL_TYPE_FUNDAMENTAL_FLAG_DERIVABLE);
+
+    const static GblTypeInfo protocolInfo = {};
+
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_PROTOCOL,
+                             GBL_INVALID_TYPE,
+                             GblQuark_internStringStatic("Protocol"),
+                             &protocolInfo,
+                             GBL_TYPE_ROOT_FLAG_DEPENDENT |
+                             GBL_TYPE_ROOT_FLAG_DERIVABLE |
+                             GBL_TYPE_FLAG_TYPEINFO_STATIC);
     GBL_API_VERIFY_LAST_RECORD();
 
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_CLASS,
-                            GBL_INVALID_TYPE,
-                            GblQuark_internStringStatic("Class"),
-                            &((const GblTypeInfo) {
-                                .classSize    = sizeof(GblClass)
-                            }),
-                            GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED           |
-                            GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE);
+    const static GblTypeInfo classInfo = {
+        .classSize    = sizeof(GblClass)
+    };
+
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_STATIC_CLASS,
+                             GBL_INVALID_TYPE,
+                             GblQuark_internStringStatic("StaticClass"),
+                             &classInfo,
+                             GBL_TYPE_ROOT_FLAG_CLASSED           |
+                             GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE    |
+                             GBL_TYPE_FLAG_TYPEINFO_STATIC               |
+                             GBL_TYPE_FLAG_CLASS_PREINIT);
     GBL_API_VERIFY_LAST_RECORD();
 
     const static GblTypeInfo ifaceInfo = {
         .classSize    = sizeof(GblInterface)
     };
 
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INTERFACE,
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_INTERFACE,
                             GBL_INVALID_TYPE,
                             GblQuark_internStringStatic("Interface"),
                             &ifaceInfo,
-                            GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT         |
-                            GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED        |
-                            GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE    |
+                            GBL_TYPE_ROOT_FLAG_DEPENDENT         |
+                            GBL_TYPE_ROOT_FLAG_INTERFACED        |
+                            GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE    |
                             GBL_TYPE_FLAG_ABSTRACT                      |
                             GBL_TYPE_FLAG_UNMAPPABLE                    |
-                            GBL_TYPE_FLAG_TYPEINFO_STATIC);
+                            GBL_TYPE_FLAG_TYPEINFO_STATIC               |
+                            GBL_TYPE_FLAG_CLASS_PREINIT);
     GBL_API_VERIFY_LAST_RECORD();
 
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INSTANCE,
-                            GBL_INVALID_TYPE,
-                            GblQuark_internStringStatic("Instance"),
-                            &((const GblTypeInfo) {
-                                .classSize    = sizeof(GblClass),
-                                .instanceSize = sizeof(GblInstance)
-                            }),
-                            GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE    |
-                            GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE);
+    const static GblTypeInfo instanceInfo = {
+        .classSize    = sizeof(GblClass),
+        .instanceSize = sizeof(GblInstance)
+    };
+
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_INSTANCE,
+                             GBL_INVALID_TYPE,
+                             GblQuark_internStringStatic("Instance"),
+                             &instanceInfo,
+                             GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE    |
+                             GBL_TYPE_ROOT_FLAG_INSTANTIABLE      |
+                             GBL_TYPE_FLAG_TYPEINFO_STATIC               |
+                             GBL_TYPE_FLAG_CLASS_PREINIT);
     GBL_API_VERIFY_LAST_RECORD();
 
     GBL_API_CALL(GblIVariant_typeRegister_(pCtx_));
@@ -668,8 +680,6 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
     GBL_API_CALL(GblIAllocator_typeRegister_(pCtx_));
     GBL_API_CALL(GblILogger_typeRegister_(pCtx_));
     GBL_API_CALL(GblContext_typeRegister_(pCtx_));
-    GBL_API_CALL(GblEvent_typeRegister_(pCtx_));
-    GBL_API_CALL(GblIPlugin_typeRegister_(pCtx_));
     GBL_API_END();
 }
 
@@ -681,20 +691,20 @@ void GblType_init_(void) {
     if(!inittedOnce_) mtx_init(&typeRegMtx_, mtx_recursive);
     mtx_lock(&typeRegMtx_);
 
-    GBL_API_CALL(GblHashSet_construct(&typeRegistry_,
-                                      sizeof(GblMetaClass*),
-                                      metaClassHasher_,
-                                      metaClassComparator_,
-                                      metaClassElementFree_,
-                                      initialTypeTotalCount_,
-                                      pCtx_));
+    GBL_API_VERIFY_CALL(GblHashSet_construct(&typeRegistry_,
+                                             sizeof(GblMetaClass*),
+                                             metaClassHasher_,
+                                             metaClassComparator_,
+                                             metaClassElementFree_,
+                                            initialTypeTotalCount_,
+                                            pCtx_));
 
-    GBL_API_CALL(GblVector_construct(&typeBuiltins_.vector,
-                                    sizeof(GblMetaClass*),
-                                    0,
-                                    NULL,
-                                    sizeof(typeBuiltins_),
-                                    pCtx_));
+    GBL_API_VERIFY_CALL(GblVector_construct(&typeBuiltins_.vector,
+                                            sizeof(GblMetaClass*),
+                                            0,
+                                            NULL,
+                                            sizeof(typeBuiltins_),
+                                            pCtx_));
 
     GBL_API_CALL(GblVariant_init_(pCtx_));
     GBL_API_CALL(GblType_registerBuiltins_());
@@ -708,11 +718,11 @@ void GblType_init_(void) {
 
 // === PUBLIC API ====
 
-GblType GblType_registerBuiltin(GblSize           expectedIndex,
-                               GblType            parentType,
-                               const char*        pName,
-                               const GblTypeInfo* pTypeInfo,
-                               GblTypeFlags       flags)
+GblType GblType_registerBuiltin_(GblSize            expectedIndex,
+                                 GblType            parentType,
+                                 const char*        pName,
+                                 const GblTypeInfo* pTypeInfo,
+                                 GblTypeFlags       flags)
 {
     GblType type = GBL_INVALID_TYPE;
     GblSize size = 0;
@@ -761,6 +771,7 @@ GBL_EXPORT GBL_RESULT GblType_final(void) {
     return GBL_API_RESULT();
 }
 
+#if 0
 GBL_API GblType_init(GblContext*    pCtx,
                      GblSize        typeBuiltinInitialCount,
                      GblSize        typeTotalInitialCount) {
@@ -779,8 +790,9 @@ GBL_API GblType_init(GblContext*    pCtx,
     }
     GBL_API_END();
 }
+#endif
 
-GBL_EXPORT GblType GblType_fromBuiltinIndex(GblUint index) {
+GBL_EXPORT GblType GblType_fromBuiltinIndex(GblSize index) {
     GblType type = GBL_INVALID_TYPE;
     GBL_TYPE_ENSURE_INITIALIZED_();
     //GBL_API_BEGIN(pCtx_);
@@ -892,8 +904,8 @@ GBL_EXPORT GblType GblType_parent(GblType type) {
     return parent;
 }
 
-GBL_EXPORT GblType GblType_fundamental(GblType type) {
-    GblType base      = GBL_INVALID_TYPE;
+GBL_EXPORT GblType GblType_root(GblType type) {
+    GblType base        = GBL_INVALID_TYPE;
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
     if(pMeta) {
@@ -904,7 +916,7 @@ GBL_EXPORT GblType GblType_fundamental(GblType type) {
     return base;
 } 
 
-GBL_EXPORT GblType GblType_base(GblType type, GblUint depth) {
+GBL_EXPORT GblType GblType_base(GblType type, GblSize depth) {
     GblType base = GBL_INVALID_TYPE;
     GblMetaClass* pMeta =  GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
@@ -919,7 +931,7 @@ GBL_EXPORT GblType GblType_base(GblType type, GblUint depth) {
     return base;
 }
 
-GBL_EXPORT GblType GblType_ancestor(GblType type, GblUint level) {
+GBL_EXPORT GblType GblType_ancestor(GblType type, GblSize level) {
     GblType ancestor = GBL_INVALID_TYPE;
     GblMetaClass* pMeta =  GBL_META_CLASS_(type);
     GBL_API_BEGIN(pCtx_);
@@ -934,8 +946,8 @@ GBL_EXPORT GblType GblType_ancestor(GblType type, GblUint level) {
     return ancestor;
 }
 
-GBL_EXPORT GblUint GblType_depth(GblType type) {
-    GblUint depth = 0;
+GBL_EXPORT GblSize GblType_depth(GblType type) {
+    GblSize depth = 0;
     GBL_API_BEGIN(pCtx_);
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     if(pMeta) {
@@ -952,9 +964,9 @@ GBL_EXPORT GblBool GblType_flagsTest(GblType type, GblFlags mask) {
         GblMetaClass* pMeta = GBL_META_CLASS_(type);
         if(pMeta) {
             GblFlags typeMask = (mask & GBL_TYPE_FLAGS_MASK & pMeta->flags);
-            GblFlags fundamentalMask = (mask & GBL_TYPE_FUNDAMENTAL_FLAGS_MASK);
+            GblFlags fundamentalMask = (mask & GBL_TYPE_ROOT_FLAGS_MASK);
             if(fundamentalMask) {
-                GblMetaClass* pFundamental = GBL_META_CLASS_(GblType_fundamental(type));
+                GblMetaClass* pFundamental = GBL_META_CLASS_(GblType_root(type));
                 if(pFundamental) {
                     fundamentalMask &= pFundamental->flags;
                 } else {
@@ -980,10 +992,6 @@ GBL_EXPORT GblIPlugin* GblType_plugin(GblType type) {
     return type == GBL_INVALID_TYPE? NULL : GBL_META_CLASS_(type)->pPlugin;
 }
 
-GBL_EXPORT GblContext* GblType_contextDefault(void) {
-    return pCtx_;
-}
-
 static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChecks, GblBool ifaceChecks, GblBool castChecks) {
     GblBool         result   = GBL_FALSE;
     GblMetaClass*   pDerived = GBL_META_CLASS_(derived);
@@ -998,7 +1006,7 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
         GBL_ASSERT(GblType_verify(base));
 
         // Are we even checking for an interface type!?
-        if(!GBL_TYPE_IS_INTERFACED(base) || (pBase->flags & GBL_TYPE_FLAG_UNMAPPABLE))
+        if(!GBL_TYPE_INTERFACED_CHECK(base) || (pBase->flags & GBL_TYPE_FLAG_UNMAPPABLE))
             ifaceChecks = GBL_FALSE;
 
         while(pIter) {
@@ -1060,9 +1068,9 @@ GBL_EXPORT GblType GblType_common(GblType type, GblType other) {
     if(type == GBL_INVALID_TYPE || other == GBL_INVALID_TYPE)
         return GBL_INVALID_TYPE;
 
-    GblBool ifaced = GblType_flagsTest(other, GBL_TYPE_FUNDAMENTAL_FLAG_INTERFACED);
+    GblBool ifaced = GblType_flagsTest(other, GBL_TYPE_ROOT_FLAG_INTERFACED);
 
-    for(GblUint b = 0; b <= GblType_depth(other); ++b) {
+    for(GblSize b = 0; b <= GblType_depth(other); ++b) {
         const GblType otherBase = GblType_base(other, b);
         const GblMetaClass* pOtherBase = GBL_META_CLASS_(otherBase);
         if(GblType_implements(type, otherBase)) {
@@ -1088,7 +1096,7 @@ GBL_EXPORT GblBool GblType_depends(GblType dependent, GblType dependency) {
     GblBool result = GBL_FALSE;
     GBL_API_BEGIN(pCtx_);
     if(dependent != GBL_INVALID_TYPE && dependency != GBL_INVALID_TYPE) {
-        if(GblType_flagsTest(dependent, GBL_TYPE_FUNDAMENTAL_FLAG_DEPENDENT)) {
+        if(GblType_flagsTest(dependent, GBL_TYPE_ROOT_FLAG_DEPENDENT)) {
             for(GblInt a = (GblInt)GblType_depth(dependent); a >= 0; --a) {
                 GblType ancestor = GblType_ancestor(dependent, a);
                 GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
@@ -1113,10 +1121,10 @@ GBL_EXPORT GblBool GblType_conforms(GblType type, GblType dependent) {
 }
 
 // ==== MAKE SURE TO ITERATE OVER PARENTS AND CHECK THAT CLASS/INSTANCE SIZE IS VALID =====
-GBL_EXPORT GblType GblType_registerStatic(GblType                    parent,
-                                        const char*                  pName,
-                                        const GblTypeInfo*           pInfo,
-                                        GblFlags                     flags)
+GBL_EXPORT GblType GblType_registerStatic(const char*                  pName,
+                                          GblType                    parent,
+                                          const GblTypeInfo*           pInfo,
+                                          GblFlags                     flags)
 {
     GblType newType = GBL_INVALID_TYPE;
     GBL_API_BEGIN(pCtx_);
@@ -1170,7 +1178,7 @@ GBL_EXPORT GblType GblType_fromClass(const GblClass* pClass) {
     GblType type = GBL_INVALID_TYPE;
     //GBL_API_BEGIN(pCtx_);
     if(pClass) {
-        type = GBL_CLASS_TYPE_(pClass);
+        type = GBL_CLASS_TYPEOF_(pClass);
     }
     //GBL_API_END_BLOCK();
     return type;

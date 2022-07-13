@@ -30,6 +30,7 @@ GBL_INLINE GblContext*  GblRef_context          (CSELF)                     GBL_
 
 // ========== IMPL ==========
 
+/// \cond
 typedef struct GblRef_ {
     GblContext*         pCtx;
     GBL_ATOMIC_INT16    refCount;
@@ -38,6 +39,7 @@ typedef struct GblRef_ {
 GBL_INLINE GblRef_* GblRef_header_(const void* pData) GBL_NOEXCEPT {
     return (GblRef_*)(pData? (GblRef_*)pData - 1 : NULL);
 }
+/// \endcond
 
 GBL_INLINE void* GblRef_alloc(GblSize size) GBL_NOEXCEPT {
     return GblRef_allocWithContext(size, NULL);

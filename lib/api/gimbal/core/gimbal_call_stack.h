@@ -17,21 +17,6 @@ typedef struct GblSourceLocation {
 
 #define GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE, COL) ((GblSourceLocation){FILE, FUNCTION, LINE, COL})
 
-typedef struct GblMemAllocInfo {
-    GblSize     extraBytes;
-    GblSize     align;
-    const char* pDebugStr;
-} GblMemAllocInfo;
-
-GBL_INLINE void GBL_MEM_ALLOC_INFO_APPEND(GblMemAllocInfo* pInfo1, const GblMemAllocInfo* pInfo2) {
-    GBL_ASSERT(pInfo1);
-    if(pInfo2) {
-        pInfo1->extraBytes += pInfo2->extraBytes;
-        if(pInfo2->align > pInfo1->align) pInfo1->align = pInfo2->align;
-        if(pInfo2->pDebugStr) pInfo1->pDebugStr = pInfo2->pDebugStr;
-    }
-}
-
 typedef struct GblCallRecord {
     char                message[GBL_API_RESULT_MSG_BUFFER_SIZE];
     GblSourceLocation   srcLocation;
@@ -63,7 +48,7 @@ typedef struct GblStackFrame {
     GblCallRecord           record;
     GblCallRecord           lastFailure;
     uint32_t                sourceCurrentCaptureDepth;
-    GblObject*              pObject;
+    struct GblObject*       pObject;
     GblContext*             pContext;
     void*                   pObjectUd;
     void*                   pContextUd;
@@ -73,8 +58,7 @@ typedef struct GblStackFrame {
 } GblStackFrame;
 
 
-GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObject, GBL_RESULT initialResult, GblSourceLocation entryLoc);
-
+GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, struct GblObject* pObject, GBL_RESULT initialResult, GblSourceLocation entryLoc);
 
 
 #define GBL_API_STACK_FRAME_SOURCE_PUSH(pStackFrame, current) \

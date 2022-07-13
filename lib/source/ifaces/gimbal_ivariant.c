@@ -2,6 +2,8 @@
 #include <gimbal/types/gimbal_variant.h>
 #include <gimbal/types/gimbal_variant.h>
 #include <gimbal/strings/gimbal_quark.h>
+#include "../meta/gimbal_type_.h"
+#include "../meta/gimbal_type_.h"
 
 extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
@@ -10,7 +12,7 @@ extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
         .classSize      = sizeof(GblIVariantIFace)
     };
 
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_IVARIANT,
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_IVARIANT,
                             GBL_INTERFACE_TYPE,
                             GblQuark_internStringStatic("IVariant"),
                             &typeInfo,

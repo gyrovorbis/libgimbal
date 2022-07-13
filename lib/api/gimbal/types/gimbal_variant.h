@@ -28,6 +28,7 @@ typedef GBL_RESULT (*GblVariantConverterFn)(CSELF, GblVariant* pOther);
 /*! \brief Tagged union generalizing all value-compatible meta types
  * \ingroup meta
 */
+//need to postfix everything with '_' for private
 typedef struct GblVariant {
     GblType             type;
     union {
@@ -52,8 +53,6 @@ typedef struct GblVariant {
     };
 } GblVariant;
 
-
-GBL_INLINE GblType          GblVariant_type                     (CSELF)                         GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT       GblVariant_constructDefault         (SELF,  GblType type)           GBL_NOEXCEPT;
 
@@ -186,6 +185,9 @@ GBL_EXPORT GBL_RESULT       GblVariant_getValuePeekVaList       (SELF, va_list* 
 GBL_EXPORT GBL_RESULT       GblVariant_getValueMove             (SELF,  ...)                    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblVariant_getValueMoveVaList       (SELF, va_list* pVarArgs)       GBL_NOEXCEPT;
 
+GBL_INLINE GblType          GblVariant_type                     (CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE const char*      GblVariant_typeName                 (CSELF)                         GBL_NOEXCEPT;
+
 GBL_INLINE GblBool          GblVariant_isValid                  (CSELF)                         GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblVariant_isNil                    (CSELF)                         GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblVariant_getBool                  (CSELF)                         GBL_NOEXCEPT;
@@ -214,24 +216,23 @@ GBL_EXPORT GblObject*       GblVariant_getObjectCopy            (CSELF)         
 GBL_EXPORT GblObject*       GblVariant_getObjectMove            (SELF)                          GBL_NOEXCEPT;
 GBL_EXPORT GblObject*       GblVariant_getObjectPeek            (CSELF)                         GBL_NOEXCEPT;
 
-// IMPLEMENTED THESE WRONG, THEY SHOULD ALL CONVERT
-GBL_EXPORT GblBool          GblVariant_toBool                   (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT char             GblVariant_toChar                   (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT uint8_t          GblVariant_toUint8                  (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT uint16_t         GblVariant_toUint16                 (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT int16_t          GblVariant_toInt16                  (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT uint32_t         GblVariant_toUint32                 (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT int32_t          GblVariant_toInt32                  (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT uint64_t         GblVariant_toUint64                 (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT int64_t          GblVariant_toInt64                  (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT GblEnum          GblVariant_toEnum                   (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT GblFlags         GblVariant_toFlags                  (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT float            GblVariant_toFloat                  (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT double           GblVariant_toDouble                 (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT void*            GblVariant_toPointer                (CSELF)                         GBL_NOEXCEPT;
-GBL_EXPORT const char*      GblVariant_toStringAppend           (CSELF, GblStringBuffer* pBuff) GBL_NOEXCEPT;
-// PERFECTLY REASONABLE
-GBL_EXPORT const char*      GblVariant_toString                 (CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblVariant_toBool                   (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT char             GblVariant_toChar                   (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT uint8_t          GblVariant_toUint8                  (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT uint16_t         GblVariant_toUint16                 (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT int16_t          GblVariant_toInt16                  (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT uint32_t         GblVariant_toUint32                 (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT int32_t          GblVariant_toInt32                  (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT uint64_t         GblVariant_toUint64                 (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT int64_t          GblVariant_toInt64                  (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT GblEnum          GblVariant_toEnum                   (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT GblFlags         GblVariant_toFlags                  (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT float            GblVariant_toFloat                  (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT double           GblVariant_toDouble                 (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT void*            GblVariant_toPointer                (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT const char*      GblVariant_toString                 (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT GblStringView    GblVariant_toStringView             (SELF)                          GBL_NOEXCEPT;
+GBL_EXPORT GblType          GblVariant_toTypeValue              (SELF)                          GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT       GblVariant_registerConverter        (GblType fromType,
                                                                  GblType toType,
@@ -261,7 +262,7 @@ GBL_EXPORT GBL_RESULT       GblVariant_load                     (SELF,
                                                                  const GblStringBuffer* pStr)   GBL_NOEXCEPT;
 
 //========== MACRO OVERLOADS ==========
-
+/// \cond
 #define GBL_VARIANT_CONSTRUCT_TABLE  (                                  \
         GBL_META_GENERIC_MACRO_NO_DEFAULT,                              \
         (                                                               \
@@ -286,8 +287,10 @@ GBL_EXPORT GBL_RESULT       GblVariant_load                     (SELF,
     )
 #define GblVariant_construct_N(pVariant, ...)   GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TABLE, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
 #define GblVariant_construct_1(pVariant)        GblVariant_constructNil(pVariant)
+/// \endcond
 #define GblVariant_construct(...)               GBL_VA_OVERLOAD_CALL(GblVariant_construct, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
 
+/// \cond
 #define GBL_VARIANT_SET_TABLE  (                                    \
         GBL_META_GENERIC_MACRO_NO_DEFAULT,                          \
         (                                                           \
@@ -310,13 +313,18 @@ GBL_EXPORT GBL_RESULT       GblVariant_load                     (SELF,
             (GblVariant*,            GblVariant_setCopy)            \
         )                                                           \
     )
+/// \endcond
 #define GblVariant_set(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_SET_TABLE, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
 
 
 
 // ========== IMPL ==========
-GBL_INLINE GblType GblVariant_type(const GblVariant* pSelf) GBL_NOEXCEPT {
+GBL_INLINE GblType GblVariant_type(CSELF) GBL_NOEXCEPT {
     return pSelf->type;
+}
+
+GBL_INLINE const char* GblVariant_typeName(CSELF) GBL_NOEXCEPT {
+    return GblType_name(GblVariant_type(pSelf));
 }
 
 GBL_INLINE GBL_RESULT GblVariant_constructNil(SELF) GBL_NOEXCEPT {
@@ -453,19 +461,19 @@ GBL_INLINE GBL_RESULT GblVariant_constructTypeValue(SELF, GblType type) GBL_NOEX
 
 GBL_INLINE GBL_RESULT GblVariant_constructInstance(SELF, GblInstance* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_constructObjectCopy(SELF, GblObject* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_constructObjectMove(SELF, GblObject* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
+    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
     GBL_API_END();
 }
 
@@ -655,8 +663,7 @@ GBL_INLINE GblType GblVariant_getTypeValue(CSELF) GBL_NOEXCEPT {
 GBL_INLINE GblInstance* GblVariant_getInstance(CSELF) GBL_NOEXCEPT {
     GblInstance* pValue = GBL_NULL;
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY(GBL_TYPE_IS_INSTANTIABLE(GblVariant_type(pSelf)),
-                   GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_API_VERIFY_TYPE(GblVariant_type(pSelf), GBL_INSTANCE_TYPE);
     GBL_API_VERIFY_CALL(GblVariant_getValuePeek(pSelf, &pValue));
     GBL_API_END_BLOCK();
     return pValue;
@@ -808,19 +815,19 @@ GBL_INLINE GBL_RESULT GblVariant_setTypeValue(SELF, GblType value) GBL_NOEXCEPT 
 
 GBL_INLINE GBL_RESULT GblVariant_setInstance(SELF, GblInstance* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_setObjectCopy(SELF, GblObject* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_setObjectMove(SELF, GblObject* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_INSTANCE_TYPE(pValue), pValue));
+    GBL_API_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
     GBL_API_END();
 }
 

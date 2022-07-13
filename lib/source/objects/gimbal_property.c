@@ -4,7 +4,7 @@
 #include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/objects/gimbal_object.h>
 #include <gimbal/meta/gimbal_primitives.h>
-
+#include "../meta/gimbal_type_.h"
 
 static GblHashSet   propertyRegistry_;
 
@@ -346,15 +346,15 @@ GBL_EXPORT GblFlags GblProperty_flags(const GblProperty* pSelf)  GBL_NOEXCEPT {
 GBL_EXPORT GblType GblProperty_type(void) GBL_NOEXCEPT {
     static GblType type = GBL_INVALID_TYPE;
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GBL_INVALID_TYPE,
-                                      GblQuark_internStringStatic("Property"),
+        type = GblType_registerStatic(GblQuark_internStringStatic("Property"),
+                                      GBL_INVALID_TYPE,
                                       &(const GblTypeInfo) {
                                           .classSize            = sizeof(GblPropertyClass),
                                           .instanceSize         = sizeof(GblProperty),
                                           .instancePrivateSize  = sizeof(GblPropertyPrivate_)
                                       },
-                                      GBL_TYPE_FUNDAMENTAL_FLAG_INSTANTIABLE |
-                                      GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE);
+                                      GBL_TYPE_ROOT_FLAG_INSTANTIABLE |
+                                      GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
     }
     return type;
 }

@@ -1,6 +1,6 @@
 /*! \defgroup meta Meta Type Framework 
 * 	\brief Object-oriented, cross-language runtime type system  
-	
+
 	Libgimbal provides a portable type system designed to provide object-oriented functionality
    	to the C programming language and to provide type compatibility with other 
     languages which support interoping with C APIs.

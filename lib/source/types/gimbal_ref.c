@@ -7,7 +7,7 @@ GBL_EXPORT GBL_RESULT GblRef_reinit(void) {
     const GblRefCount refCount = GblRef_activeCount();
     if(refCount > 0) {
         GBL_API_RECORD_SET(GBL_RESULT_PARTIAL,
-                           "GblRef_final(): %u remaining references!",
+                           "GblRef_reinit(): %u remaining references!",
                            refCount);
     }
     GBL_ATOMIC_INT16_STORE(activeCount_, 0);

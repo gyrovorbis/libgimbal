@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblStringView structure and related functions
+ *  \ingroup strings
  */
 
 #ifndef GIMBAL_STRING_VIEW_H
@@ -14,7 +15,7 @@
 #define GBL_STRING_VIEW_2(data, length)     GblStringView_fromStringSized(data, length)
 #define GBL_STRING_VIEW_1(cstring)          GblStringView_fromString(cstring)
 #define GBL_STRING_VIEW(...)                GBL_VA_OVERLOAD_SELECT(GBL_STRING_VIEW, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
-#define GBL_STRV(cstring)                   GBL_STRING_VIEW(cstring)
+#define GBL_STRV(...)                       GBL_STRING_VIEW(__VA_ARGS__)
 #define GBL_STRING_VIEW_CSTR_ALLOCA(view)   GblStringView_toCString(view, (char*)GBL_ALLOCA(view.length+1), view.length+1)
 #define GBL_STRING_VIEW_CSTR(view)          (view.nullTerminated? view.pData : GBL_STRING_VIEW_CSTR_ALLOCA(view))
 
@@ -79,7 +80,7 @@ GBL_INLINE GblBool          GblStringView_toNil             (SELF)              
 GBL_INLINE GblBool          GblStringView_toBool            (SELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GblInt           GblStringView_toInt             (SELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GblUint          GblStringView_toUInt            (SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblFloat         GblStringView_toFloat           (SELF)                                              GBL_NOEXCEPT;
+GBL_INLINE float            GblStringView_toFloat           (SELF)                                              GBL_NOEXCEPT;
 GBL_INLINE double           GblStringView_toDouble          (SELF)                                              GBL_NOEXCEPT;
 GBL_INLINE void*            GblStringView_toPointer         (SELF)                                              GBL_NOEXCEPT;
 
@@ -503,7 +504,7 @@ GBL_INLINE GblUint GblStringView_toUint(SELF) GBL_NOEXCEPT {
     return strtoul(GBL_STRING_VIEW_CSTR(self), GBL_NULL, 10);
 }
 
-GBL_INLINE GblFloat GblStringView_toFloat(SELF) GBL_NOEXCEPT {
+GBL_INLINE float GblStringView_toFloat(SELF) GBL_NOEXCEPT {
     return atof(GBL_STRING_VIEW_CSTR(self));
 }
 

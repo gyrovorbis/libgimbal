@@ -39,6 +39,7 @@
  *      GBL_ASSERT(strcmp(GblQuark_toString(quark1),
  *                        GblQuark_toString(quark2) == 0);
  *
+ *  \ingroup strings
  */
 
 #ifndef GIMBAL_QUARK_H

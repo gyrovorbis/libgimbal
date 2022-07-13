@@ -21,7 +21,7 @@
 #define GBL_PROPERTY_CLASS_CHECK(klass)     GBL_CLASS_CHECK_PREFIX(klass, GBL_PROPERTY)
 #define GBL_PROPERTY_CLASS_TRY(klass)       GBL_CLASS_TRY_PREFIX(klass, GBL_PROPERTY)
 
-#define GBL_PROPERTY_GET_CLASS(instance)    GBL_INSTANCE_CAST_CLASS_PREFIX(instance, GBL_PROPERTY)
+#define GBL_PROPERTY_GET_CLASS(instance)    GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_PROPERTY)
 #define GBL_PROPERTY_TRY_CLASS(instance)    GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_PROPERTY)
 
 #define GBL_PROPERTY_ID(prefix, name) \
@@ -58,7 +58,7 @@
             GblPropertyInfo info;                                           \
             info.objectType = prefix##_TYPE;                                \
             prefix##_PROPERTY_TABLE(id, &info);                             \
-            gblPropertyTableInsert(GBL_CLASS_TYPE(klass),                   \
+            gblPropertyTableInsert(GBL_CLASS_TYPEOF(klass),                   \
                                    GblQuark_fromString(info.pName),         \
                                    id,                                      \
                                    info.valueType,                          \

@@ -6,7 +6,7 @@
 #include "../strings/gimbal_string_buffer.h"
 
 /// \ingroup metaBuiltinTypes
-#define GBL_MODULE_TYPE                 (GBL_BUILTIN_TYPE(MODULE))
+#define GBL_MODULE_TYPE                 (GblModule_type())
 #define GBL_MODULE_PARENT_PREFIX        GBL_CONTEXT
 #define GBL_MODULE_STRUCT               GblModule
 #define GBL_MODULE_CLASS_STRUCT         GblModuleClass
@@ -19,7 +19,7 @@
 #define GBL_MODULE_CLASS_CHECK(klass)   GBL_CLASS_CHECK_PREFIX(klass, GBL_MODULE)
 #define GBL_MODULE_CLASS_TRY(klass)     GBL_CLASS_TRY_PREFIX(klass, GBL_MODULE)
 
-#define GBL_MODULE_GET_CLASS(instance)  GBL_INSTANCE_CAST_CLASS_PREFIX(instance, GBL_MODULE)
+#define GBL_MODULE_GET_CLASS(instance)  GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_MODULE)
 #define GBL_MODULE_TRY_CLASS(instance)  GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_MODULE)
 
 #define SELF    GblModule* pSelf
@@ -88,6 +88,8 @@ GBL_PROPERTY_TABLE_BEGIN(GBL_MODULE)
                        GBL_UINT32_TYPE,
                        GBL_PROPERTY_FLAGS_MASK(READ))
 GBL_PROPERTY_TABLE_END()
+
+GblType     GblModule_type          (void)                      GBL_NOEXCEPT;
 
 GblModule*  GblModule_create(const char* pName,
                              GblVersion version,

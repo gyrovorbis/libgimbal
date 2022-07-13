@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblTestSuite structure and related functions
+ *  \ingroup testing
  */
 
 #ifndef GIMBAL_TEST_SUITE_H
@@ -19,7 +20,7 @@
 #define GBL_TEST_SUITE_CLASS_CHECK(klass)  (GBL_CLASS_CHECK_PREFIX(klass, GBL_TEST_SUITE))
 #define GBL_TEST_SUITE_CLASS_TRY(klass)    (GBL_CLASS_TRY_PREFIX(klass, GBL_TEST_SUITE))
 
-#define GBL_TEST_SUITE_GET_CLASS(inst)     (GBL_INSTANCE_CAST_CLASS_PREFIX(inst, GBL_TEST_SUITE))
+#define GBL_TEST_SUITE_GET_CLASS(inst)     (GBL_INSTANCE_GET_CLASS_PREFIX(inst, GBL_TEST_SUITE))
 #define GBL_TEST_SUITE_TRY_CLASS(inst)     (GBL_INSTANCE_TRY_CLASS_PREFIX(inst, GBL_TEST_SUITE))
 
 #define GBL_TEST_CASE_LAST  { GBL_NULL, GBL_NULL }

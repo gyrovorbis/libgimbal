@@ -88,7 +88,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_chomp(GblStringBuffer* pSelf) GBL_NOEXCEPT
     if(pCStr[len-1] == '\n' || pCStr[len-1] == '\r')
         ++chopCount;
     if(len >= 2) {
-        if(pCStr[len-1] == '\n' || pCStr[len-1] == '\r')
+        if(pCStr[len-2] == '\n' || pCStr[len-2] == '\r')
             ++chopCount;
     }
     GBL_API_CALL(GblStringBuffer_shrink(pSelf, chopCount));
@@ -145,7 +145,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_trimEnd(GblStringBuffer* pSelf, char value
 
     if(count) {
         GBL_API_VERIFY_CALL(GblStringBuffer_erase(pSelf,
-                                                  GblStringBuffer_length(pSelf)-1-count,
+                                                  GblStringBuffer_length(pSelf)-1-(count-1),
                                                   count));
     }
     GBL_API_END();

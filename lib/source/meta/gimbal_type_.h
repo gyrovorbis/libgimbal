@@ -21,7 +21,7 @@
 #define GBL_CLASS_FLAG_CLEAR_(klass, flag)              GBL_CLASS_PRIVATE_SET_(klass, GBL_CLASS_META_CLASS_(klass), GBL_CLASS_FLAGS_(klass) & ~flag)
 #define GBL_CLASS_FLAGS_(klass)                         ((GblFlags)(GBL_CLASS_PRIVATE_(klass) & GBL_CLASS_FLAGS_BIT_MASK_))
 #define GBL_CLASS_META_CLASS_(klass)                    ((GblMetaClass*)(GBL_CLASS_PRIVATE_(klass) & ~GBL_CLASS_FLAGS_BIT_MASK_))
-#define GBL_CLASS_TYPE_(klass)                          ((GblType)(GBL_CLASS_META_CLASS_(klass)))
+#define GBL_CLASS_TYPEOF_(klass)                          ((GblType)(GBL_CLASS_META_CLASS_(klass)))
 #define GBL_CLASS_PRIVATE_SET_(klass, meta, flags)  \
     GBL_STMT_START {                                \
         ((GblClass*)klass)->private_ =              \
@@ -54,6 +54,7 @@ GBL_DECLARE_ENUM(GBL_CLASS_FLAGS_) {
     GBL_CLASS_FLAG_CONTANER_        = (1 << 4),
 };
 
+
 typedef struct GblMetaClass {
     struct GblMetaClass*    pParent;
     GblQuark                name;
@@ -83,8 +84,14 @@ extern struct TypeBuiltins_ {
 } typeBuiltins_;
 
 
-extern void         GblType_init_(void);
-extern GBL_RESULT   GblType_refresh_(GblType type);
+extern void         GblType_init_                     (void);
+extern GBL_RESULT   GblType_refresh_                  (GblType type);
+
+extern GblType      GblType_registerBuiltin_          (GblSize              expectedIndex,
+                                                       GblType              parentType,
+                                                       const char*          pName,
+                                                       const GblTypeInfo*   pTypeInfo,
+                                                       GblTypeFlags         flags);
 
 extern GBL_RESULT   GblVariant_init_                  (GblContext* pCtx);
 extern GBL_RESULT   GblVariant_final_                 (GblContext* pCtx);
@@ -102,10 +109,6 @@ extern GBL_RESULT   GblObject_typeRegister_           (GblContext* pCtx);
 extern GBL_RESULT   GblIAllocator_typeRegister_       (GblContext* pCtx);
 extern GBL_RESULT   GblILogger_typeRegister_          (GblContext* pCtx);
 extern GBL_RESULT   GblContext_typeRegister_          (GblContext* pCtx);
-extern GBL_RESULT   GblEvent_typeRegister_            (GblContext* pCtx);
-extern GBL_RESULT   GblIPlugin_typeRegister_          (GblContext* pCtx);
-
-
 
 
 GBL_DECLS_END

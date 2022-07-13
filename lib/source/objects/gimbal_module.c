@@ -111,7 +111,7 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
         typeCountQuark_  = GblQuark_fromStringStatic("typeCount");
 #if 0
         pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_VERSION)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPE(pClass),
+            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
                                    versionQuark_,
                                    GBL_MODULE_PROPERTY_ID_VERSION,
                                    GBL_UINT32_TYPE,
@@ -119,7 +119,7 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
                                    GBL_PROPERTY_FLAG_SAVE | GBL_PROPERTY_FLAG_CONSTRUCT);
 
         pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_AUTHOR)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPE(pClass),
+            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
                                    authorQuark_,
                                    GBL_MODULE_PROPERTY_ID_AUTHOR,
                                    GBL_STRING_TYPE,
@@ -127,7 +127,7 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
                                    GBL_PROPERTY_FLAG_SAVE | GBL_PROPERTY_FLAG_CONSTRUCT);
 
         pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_DESCRIPTION)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPE(pClass),
+            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
                                    descQuark_,
                                    GBL_MODULE_PROPERTY_ID_DESCRIPTION,
                                    GBL_STRING_TYPE,
@@ -135,7 +135,7 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
                                    GBL_PROPERTY_FLAG_SAVE | GBL_PROPERTY_FLAG_CONSTRUCT);
 
         pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_PREFIX)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPE(pClass),
+            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
                                    prefixQuark_,
                                    GBL_MODULE_PROPERTY_ID_PREFIX,
                                    GBL_STRING_TYPE,
@@ -143,7 +143,7 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
                                    GBL_PROPERTY_FLAG_SAVE | GBL_PROPERTY_FLAG_CONSTRUCT);
 
         pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_TYPE_COUNT)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPE(pClass),
+            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
                                    typeCountQuark_,
                                    GBL_MODULE_PROPERTY_ID_TYPE_COUNT,
                                    GBL_UINT32_TYPE,
@@ -163,28 +163,34 @@ GBL_RESULT GblModuleClass_final_(GblClass* pClass, const void* pData, GblContext
     return GBL_RESULT_UNIMPLEMENTED;
 }
 
-extern GBL_RESULT GblModule_typeRegister_(GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin(GBL_MODULE_TYPE,
-      GBL_CONTEXT_TYPE,
-      GblQuark_internStringStatic("Module"),
-      &(const GblTypeInfo) {
-          .pFnClassInit         = GblModuleClass_init_,
-          .pFnClassFinal        = GblModuleClass_final_,
-          .classSize            = sizeof(GblModuleClass),
-          .pFnInstanceInit      = GblModule_init_,
-          .instanceSize         = sizeof(GblModule),
-          .instancePrivateSize  = sizeof(GblModule_),
-          .interfaceCount       = 1,
-          .pInterfaceMap        = (const GblTypeInterfaceMapEntry[]) {
-              {
-                  .interfaceType = GBL_IPLUGIN_TYPE,
-                  .classOffset   = offsetof(GblModuleClass, iPluginIFace)
-              },
-          }
-      },
-      GBL_TYPE_FLAG_BUILTIN | GBL_TYPE_FLAG_ABSTRACT);
-    GBL_API_END();
+GBL_EXPORT GblType GblModule_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    if(type == GBL_INVALID_TYPE) {
+        GBL_API_BEGIN(NULL);
+        type = GblType_registerStatic(GblQuark_internStringStatic("Module"),
+                                      GBL_CONTEXT_TYPE,
+                                      &(const GblTypeInfo) {
+                                          .pFnClassInit         = GblModuleClass_init_,
+                                          .pFnClassFinal        = GblModuleClass_final_,
+                                          .classSize            = sizeof(GblModuleClass),
+                                          .pFnInstanceInit      = GblModule_init_,
+                                          .instanceSize         = sizeof(GblModule),
+                                          .instancePrivateSize  = sizeof(GblModule_),
+                                          .interfaceCount       = 1,
+                                          .pInterfaceMap        = (const GblTypeInterfaceMapEntry[]) {
+                                              {
+                                                  .interfaceType = GBL_IPLUGIN_TYPE,
+                                                  .classOffset   = offsetof(GblModuleClass, iPluginIFace)
+                                              },
+                                          }
+                                      },
+                                      GBL_TYPE_FLAG_ABSTRACT);
+        GBL_API_VERIFY_LAST_RECORD();
+        GBL_API_END_BLOCK();
+    }
+
+    return type;;
 }
 
 GblType GblModule_registerType(GblModule*           pSelf,
@@ -193,7 +199,7 @@ GblType GblModule_registerType(GblModule*           pSelf,
                                const GblTypeInfo*   pInfo,
                                GblFlags             flags) GBL_NOEXCEPT {
 
-    GblType newType = GblType_registerDynamic(parent, pName, GBL_IPLUGIN(pSelf), flags);
+    GblType newType = GblType_registerDynamic(pName, parent, GBL_IPLUGIN(pSelf), flags);
     return newType;
 }
 

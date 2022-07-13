@@ -1,6 +1,7 @@
 #include <gimbal/ifaces/gimbal_iallocator.h>
 #include <gimbal/meta/gimbal_instance.h>
 #include <gimbal/strings/gimbal_quark.h>
+#include "../meta/gimbal_type_.h"
 
 static GBL_RESULT GblIAllocatorIFace_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GBL_UNUSED(pIAllocator);
@@ -34,9 +35,9 @@ static GBL_RESULT GblIAllocatorIFace_init_(GblIAllocatorIFace* pIFace, void* pDa
     GBL_API_END();
 }
 
-extern GBL_RESULT GblIAllocator_typeRegister_(GblIAllocator* pCtx) GBL_NOEXCEPT {
+extern GBL_RESULT GblIAllocator_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_IALLOCATOR,
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_IALLOCATOR,
       GBL_INTERFACE_TYPE,
       GblQuark_internStringStatic("IAllocator"),
       &(const GblTypeInfo) {

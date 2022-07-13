@@ -4,14 +4,14 @@
 #include "../meta/gimbal_instance.h"
 
 /// \ingroup metaBuiltinTypes
-#define GBL_EVENT_TYPE                  GBL_BUILTIN_TYPE(EVENT)
+#define GBL_EVENT_TYPE                  (GblEvent_type())
 #define GBL_EVENT_STRUCT                GblEvent
 #define GBL_EVENT_CLASS_STRUCT          GblEventClass
 #define GBL_EVENT(instance)             (GBL_INSTANCE_CAST_PREFIX  (instance,  GBL_EVENT))
 #define GBL_EVENT_CHECK(instance)       (GBL_INSTANCE_CHECK_PREFIX (instance,  GBL_EVENT))
 #define GBL_EVENT_CLASS(klass)          (GBL_CLASS_CAST_PREFIX     (klass,     GBL_EVENT))
 #define GBL_EVENT_CLASS_CHECK(klass)    (GBL_CLASS_CHECK_PREFIX    (klass,     GBL_EVENT))
-#define GBL_EVENT_GET_CLASS(instance)   (GBL_INSTANCE_CAST_CLASS_PREFIX (instance,  GBL_EVENT))
+#define GBL_EVENT_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS_PREFIX (instance,  GBL_EVENT))
 
 #define SELF    GblEvent* pSelf
 #define CSELF   const SELF
@@ -42,12 +42,12 @@ typedef struct GblEvent {
  *
  */
 
-
+GBL_EXPORT GblType          GblEvent_type       (void)                  GBL_NOEXCEPT;
 GBL_INLINE GblEvent*        GblEvent_create     (GblType type)          GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblEvent_construct  (SELF, GblType type)    GBL_NOEXCEPT;
 GBL_INLINE GblRefCount      GblEvent_destruct   (SELF)                  GBL_NOEXCEPT;
 GBL_INLINE GblRefCount      GblEvent_destroy    (SELF)                  GBL_NOEXCEPT;
-GBL_INLINE GblType          GblEvent_type       (CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GblType          GblEvent_typeOf     (CSELF)                 GBL_NOEXCEPT;
 GBL_INLINE GBL_EVENT_STATE  GblEvent_state      (CSELF)                 GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblEvent_accept     (SELF)                  GBL_NOEXCEPT;
 
@@ -74,8 +74,8 @@ GBL_INLINE GblRefCount GblEvent_destroy(SELF) GBL_NOEXCEPT {
     return GblInstance_destroy(GBL_INSTANCE(pSelf));
 }
 
-GBL_INLINE GblType GblEvent_type(CSELF) GBL_NOEXCEPT {
-    return GBL_INSTANCE_TYPE(pSelf);
+GBL_INLINE GblType GblEvent_typeOf(CSELF) GBL_NOEXCEPT {
+    return GBL_INSTANCE_TYPEOF(pSelf);
 }
 
 GBL_INLINE GBL_EVENT_STATE GblEvent_state(CSELF) GBL_NOEXCEPT {

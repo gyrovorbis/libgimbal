@@ -7,6 +7,7 @@
 #include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/meta/gimbal_pointer.h>
 #include <inttypes.h>
+#include "../meta/gimbal_type_.h"
 
 GBL_RESULT GblPrimitiveClass_init_(GblPrimitiveClass* pClass, GblIVariantIFaceVTable* pVTable, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
@@ -893,7 +894,6 @@ static GBL_RESULT stringLoad_(GblVariant* pVariant, const GblStringBuffer* pStri
 static GBL_RESULT stringSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
-    GBL_API_VERIFY_TYPE(pArgs->type, GBL_POINTER_TYPE);
     if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY) {
         GBL_API_VERIFY_ARG(argc == 1);
         GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
@@ -1057,7 +1057,7 @@ GblType GblPrimitive_registerBuiltin(GblSize                         index,
 
     GBL_API_VERIFY_ARG(classSize >= sizeof(GblPrimitiveClass));
 
-    type = GblType_registerBuiltin(index,
+    type = GblType_registerBuiltin_(index,
                                    GBL_INVALID_TYPE,
                                    GblQuark_internString(pName),
                                    &(const GblTypeInfo) {
@@ -1071,7 +1071,7 @@ GblType GblPrimitive_registerBuiltin(GblSize                         index,
                                            .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
                                        }
                                    },
-                                   GBL_TYPE_FUNDAMENTAL_FLAG_CLASSED | typeFlags);
+                                   GBL_TYPE_ROOT_FLAG_CLASSED | typeFlags);
 
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END_BLOCK();

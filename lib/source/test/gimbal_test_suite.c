@@ -266,8 +266,8 @@ GBL_EXPORT GblType GblTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_API_BEGIN(NULL);
-        type = GblType_registerStatic(GBL_OBJECT_TYPE,
-                                      "TestSuite",
+        type = GblType_registerStatic(GblQuark_internStringStatic("TestSuite"),
+                                      GBL_OBJECT_TYPE,
                                       &typeInfo,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);
         GBL_API_VERIFY_LAST_RECORD();
@@ -411,8 +411,8 @@ GBL_EXPORT GblType GblTestSuite_register(const char* pName,
 {
     GblType type = GBL_INVALID_TYPE;
     GBL_API_BEGIN(NULL);
-    type = GblType_registerStatic(GBL_TEST_SUITE_TYPE,
-                                  GblQuark_internString(pName),
+    type = GblType_registerStatic(GblQuark_internString(pName),
+                                  GBL_TEST_SUITE_TYPE,
                                   &(const GblTypeInfo) {
                                       .pFnClassInit         = GblTestSuiteClass_initDerived_,
                                       .classSize            = sizeof(GblTestSuiteClass),

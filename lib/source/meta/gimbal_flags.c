@@ -1,6 +1,7 @@
 #include <gimbal/meta/gimbal_flags.h>
 #include <gimbal/types/gimbal_variant.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
+#include "../meta/gimbal_type_.h"
 
 typedef struct GblFlagsEntry_ {
     GblFlags    value;
@@ -248,7 +249,7 @@ static GBL_RESULT flagsClass_init_(GblClass* pClass,
 
     if(!pEntries) {
         GBL_API_WARN("[GblFlags]: Creating class [%s] with no flags entry data!",
-                     GblType_name(GBL_CLASS_TYPE(pClass)));
+                     GblType_name(GBL_CLASS_TYPEOF(pClass)));
     } else {
 
         // Iterate over the data, determining entry count
@@ -312,7 +313,7 @@ GBL_RESULT GblFlags_typeRegister_(GblContext* pCtx) {
                   sizeof(GblFlagsClass),
                   sizeof(GblFlagsClass_),
                   &flagsIVariantIFace,
-                  GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE);
+                  GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
 
     GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_BOOL_TYPE, flagsConvertTo_));
     GBL_API_CALL(GblVariant_registerConverter(flagsType, GBL_UINT8_TYPE, flagsConvertTo_));
@@ -334,8 +335,8 @@ GBL_EXPORT GblType GblFlags_register(const char* pName,
 {
     GblType type = GBL_INVALID_TYPE;
     GBL_API_BEGIN(NULL);
-    type = GblType_registerStatic(GBL_FLAGS_TYPE,
-                                  GblQuark_internString(pName),
+    type = GblType_registerStatic(GblQuark_internString(pName),
+                                  GBL_FLAGS_TYPE,
                                   &(const GblTypeInfo) {
                                       .pFnClassInit     = flagsClass_init_,
                                       .pFnClassFinal    = flagsClass_final_,

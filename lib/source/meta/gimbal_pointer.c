@@ -1,6 +1,7 @@
 #include <gimbal/meta/gimbal_pointer.h>
 #include <gimbal/types/gimbal_variant.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
+#include "../meta/gimbal_type_.h"
 
 static GBL_RESULT pSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_API_BEGIN(NULL);
@@ -89,7 +90,7 @@ extern GBL_RESULT GblPointer_typeRegister_(GblContext* pCtx) {
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &pointerIVariantIFace,
-                                 GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE |
+                                 GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE |
                                  GBL_TYPE_FLAG_CLASS_PINNED);
     GBL_API_VERIFY_LAST_RECORD();
 
@@ -104,8 +105,8 @@ extern GBL_RESULT GblPointer_typeRegister_(GblContext* pCtx) {
 GblType GblPointer_registerOpaque(const char* pName) {
     GblType type = GBL_INVALID_TYPE;
     GBL_API_BEGIN(NULL);
-    type = GblType_registerStatic(GBL_POINTER_TYPE,
-                                  GblQuark_internString(pName),
+    type = GblType_registerStatic(GblQuark_internString(pName),
+                                  GBL_POINTER_TYPE,
                                   &(const GblTypeInfo) {
                                       .classSize        = sizeof(GblPrimitiveClass),
                                   },

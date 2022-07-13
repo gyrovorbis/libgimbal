@@ -32,7 +32,7 @@
 #define GBL_OBJECT_CLASS_CHECK(klass)       GBL_CLASS_CHECK_PREFIX(klass, GBL_OBJECT)
 #define GBL_OBJECT_CLASS_TRY(klass)         GBL_CLASS_TRY_PREFIX(klass, GBL_OBJECT)
 
-#define GBL_OBJECT_GET_CLASS(instance)      GBL_INSTANCE_CAST_CLASS_PREFIX(instance, GBL_OBJECT)
+#define GBL_OBJECT_GET_CLASS(instance)      GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_OBJECT)
 #define GBL_OBJECT_TRY_CLASS(instance)      GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_OBJECT)
 
 #define GBL_OBJECT_REF(object)              (GblObject_ref((GblObject*)object))
@@ -261,23 +261,23 @@ GblSize                       GblObject_eventFilterCount    (CSELF)             
 // ============ IMPL ===============
 
 GBL_INLINE const GblProperty* GblObject_propertyFindString(CSELF, const char* pName) GBL_NOEXCEPT {
-    return gblPropertyTableFind(GBL_INSTANCE_TYPE(pSelf), GblQuark_fromString(pName));
+    return gblPropertyTableFind(GBL_INSTANCE_TYPEOF(pSelf), GblQuark_fromString(pName));
 }
 GBL_INLINE const GblProperty* GblObject_propertyFindQuark(CSELF, GblQuark name) GBL_NOEXCEPT {
-    return gblPropertyTableFind(GBL_INSTANCE_TYPE(pSelf), name);
+    return gblPropertyTableFind(GBL_INSTANCE_TYPEOF(pSelf), name);
 }
 GBL_INLINE const GblProperty* GblObject_propertyNext(CSELF, const GblProperty* pPrev, GblFlags mask) GBL_NOEXCEPT {
-    return gblPropertyTableNext(GBL_INSTANCE_TYPE(pSelf), pPrev, mask);
+    return gblPropertyTableNext(GBL_INSTANCE_TYPEOF(pSelf), pPrev, mask);
 }
 GBL_INLINE GBL_RESULT GblObject_propertySet(SELF, const GblProperty* pProperty, const GblVariant* pValue) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblType_contextDefault());
+    GBL_API_BEGIN(NULL);
     GblClass* pClass = GblClass_peek(GblProperty_objectType(pProperty));
     GBL_API_VERIFY_EXPRESSION(pClass);
     GBL_API_CALL(GBL_OBJECT_CLASS(pClass)->pFnPropertySet(pSelf, GblProperty_id(pProperty), pValue, pProperty));
     GBL_API_END();
 }
 GBL_INLINE GBL_RESULT GblObject_propertyGet(CSELF, const GblProperty* pProperty, GblVariant* pValue) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblType_contextDefault());
+    GBL_API_BEGIN(NULL);
     GblClass* pClass = GblClass_peek(GblProperty_objectType(pProperty));
     GBL_API_VERIFY_EXPRESSION(pClass);
     GBL_API_CALL(GBL_OBJECT_CLASS(pClass)->pFnPropertyGet(pSelf, GblProperty_id(pProperty), pValue, pProperty));
@@ -298,7 +298,7 @@ GBL_INLINE GBL_RESULT GblObject_propertySetString(SELF,  const char* pName, cons
 
 GBL_INLINE GblObject* GblObject_ancestorFindByType(CSELF, GblType ancestorType) GBL_NOEXCEPT {
     GblObject* pAncestor = NULL;
-    //GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPE(pSelf))); {
+    //GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPEOF(pSelf))); {
         GblObject* pNode = GblObject_parent(pSelf);
         while(pNode) {
             if(GBL_INSTANCE_CHECK(pNode, ancestorType)) {
@@ -314,7 +314,7 @@ GBL_INLINE GblObject* GblObject_ancestorFindByType(CSELF, GblType ancestorType) 
 
 GBL_INLINE GblObject* GblObject_ancestorFindByName(CSELF, const char* pName) GBL_NOEXCEPT {
     GblObject* pAncestor = NULL;
-    GBL_API_BEGIN(GblType_contextDefault()); {
+    GBL_API_BEGIN(NULL); {
         GblObject* pNode = GblObject_parent(pSelf);
         while(pNode) {
             const char* pNodeName = GblObject_name(pNode);
@@ -349,7 +349,7 @@ GBL_INLINE GblObject* GblObject_siblingFindByName(CSELF, const char* pName) GBL_
 
 GBL_INLINE GBL_RESULT GblObject_attributeSet(SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value) GBL_NOEXCEPT {
     GBL_UNUSED(value && pSelf);
-    GBL_API_BEGIN(GblType_contextDefault());
+    GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_ARG(attrib < GBL_OBJECT_ATTRIBUTE_COUNT);
     switch(attrib) {
     default:
@@ -361,7 +361,7 @@ GBL_INLINE GBL_RESULT GblObject_attributeSet(SELF, GBL_OBJECT_ATTRIBUTE attrib, 
 
 GBL_INLINE GblBool GblObject_attribute(CSELF, GBL_OBJECT_ATTRIBUTE attrib) GBL_NOEXCEPT {
     GblBool value = GBL_FALSE;
-    GBL_API_BEGIN(GblType_contextDefault());
+    GBL_API_BEGIN(NULL);
     switch(attrib) {
     case GBL_OBJECT_ATTRIBUTE_CONSTRUCTED_IN_PLACE:
         value = pSelf->constructedInPlace;

@@ -12,7 +12,7 @@ GBL_DECLS_BEGIN
 #define GBL_ITABLE_CHECK(instance)      (GBL_INSTANCE_CHECK_PREFIX      (instance, GBL_ITABLE))
 #define GBL_ITABLE_IFACE(klass)         (GBL_CLASS_CAST_PREFIX          (klass,    GBL_ITABLE))
 #define GBL_ITABLE_IFACE_CHECK(klass)   (GBL_CLASS_CHECK_PREFIX         (klass,    GBL_ITABLE))
-#define GBL_ITABLE_GET_IFACE(instance)  (GBL_INSTANCE_CAST_CLASS_PREFIX (instance, GBL_ITABLE))
+#define GBL_ITABLE_GET_IFACE(instance)  (GBL_INSTANCE_GET_CLASS_PREFIX (instance, GBL_ITABLE))
 
 #define SELF    GblITable* pSelf
 #define CSELF   const SELF

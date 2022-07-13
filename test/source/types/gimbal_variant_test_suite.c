@@ -2142,7 +2142,7 @@ static GBL_RESULT GblVariantTestSuite_type_conversions_(GblTestSuite* pSelf, Gbl
     GBL_API_END();
 }
 
-static GBL_RESULT GblVariantTestSuite_constructGeneric_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblVariantTestSuite_construct_generic_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
     GblVariant v = GBL_VARIANT_INIT;
@@ -2226,9 +2226,9 @@ static GBL_RESULT GblVariantTestSuite_constructGeneric_(GblTestSuite* pSelf, Gbl
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // pointer
-    GBL_API_VERIFY_CALL(GblVariant_construct(&v, (const void*)0xdeadbabe));
+    GBL_API_VERIFY_CALL(GblVariant_construct(&v, (void*)0xdeadbabe));
     GBL_TEST_COMPARE(GblVariant_type(&v), GBL_POINTER_TYPE);
-    GBL_TEST_COMPARE(GblVariant_getPointer(&v), (const void*)0xdeadbabe);
+    GBL_TEST_COMPARE(GblVariant_getPointer(&v), (void*)0xdeadbabe);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // copy
@@ -2243,7 +2243,7 @@ static GBL_RESULT GblVariantTestSuite_constructGeneric_(GblTestSuite* pSelf, Gbl
     GBL_API_END();
 }
 
-static GBL_RESULT GblVariantTestSuite_setGeneric_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblVariantTestSuite_set_generic_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
     GblVariant v = GBL_VARIANT_INIT;
@@ -2309,9 +2309,9 @@ static GBL_RESULT GblVariantTestSuite_setGeneric_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(GblVariant_getString(&v), "view");
 
     // pointer
-    GBL_API_VERIFY_CALL(GblVariant_set(&v, (const void*)0xdeadbabe));
+    GBL_API_VERIFY_CALL(GblVariant_set(&v, (void*)0xdeadbabe));
     GBL_TEST_COMPARE(GblVariant_type(&v), GBL_POINTER_TYPE);
-    GBL_TEST_COMPARE(GblVariant_getPointer(&v), (const void*)0xdeadbabe);
+    GBL_TEST_COMPARE(GblVariant_getPointer(&v), (void*)0xdeadbabe);
 
     // copy
     GblVariant v2 = GBL_VARIANT_INIT;
@@ -2325,14 +2325,88 @@ static GBL_RESULT GblVariantTestSuite_setGeneric_(GblTestSuite* pSelf, GblContex
     GBL_API_END();
 }
 
-static GBL_RESULT GblVariantTestSuite_to_invalid_(GblTestSuite* pSuite, GblContext* pCtx) {
+static GBL_RESULT GblVariantTestSuite_typeName_(GblTestSuite* pSuite, GblContext* pCtx) {
+    GBL_UNUSED(pSuite);
+    GBL_API_BEGIN(pCtx);
 
+    GblVariant v = GBL_VARIANT_INIT;
 
+    //GBL_TEST_COMPARE(GblVariant_typeName(&v), "invalid");
+
+    GBL_API_VERIFY_CALL(GblVariant_set(&v, (char)'b'));
+    GBL_TEST_COMPARE(GblVariant_typeName(&v), "char");
+
+    GBL_API_VERIFY_CALL(GblVariant_set(&v, 12.0f));
+    GBL_TEST_COMPARE(GblVariant_typeName(&v), "float");
+
+    GblVariant_destruct(&v);
+
+    GBL_API_END();
 }
 
+static GBL_RESULT GblVariantTestSuite_to_invalid_(GblTestSuite* pSuite, GblContext* pCtx) {
+    GBL_UNUSED(pSuite);
+    GBL_API_BEGIN(pCtx);
+
+    GBL_TEST_EXPECT_ERROR();
+
+    GblVariant v = GBL_VARIANT_INIT;
+
+    const int integer = GblVariant_toInt32(&v);
+    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_TYPE);
+    GBL_TEST_COMPARE(integer, 0);
+    GBL_API_CLEAR_LAST_RECORD();
+
+    GBL_API_VERIFY_CALL(GblVariant_set(&v, 33.0f));
+    const GblType type = GblVariant_toTypeValue(&v);
+    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_CONVERSION);
+    GBL_TEST_COMPARE(type, GBL_INVALID_TYPE);
+    GBL_API_CLEAR_LAST_RECORD();
+
+    GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
+
+    GBL_API_END();
+}
+
+// check for class reference leakage?
 static GBL_RESULT GblVariantTestSuite_to_(GblTestSuite* pSuite, GblContext* pCtx) {
+    GBL_UNUSED(pSuite);
+    GBL_API_BEGIN(pCtx);
 
+    GblVariant v;
+    GBL_API_VERIFY_CALL(GblVariant_construct(&v, (uint8_t)7));
+    GBL_TEST_COMPARE(GblVariant_toChar(&v),      (char)7);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toUint8(&v),     (uint8_t)7);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toUint16(&v),    (uint16_t)7);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toInt16(&v),     (int16_t)7);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toUint32(&v),    (uint32_t)7);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toInt32(&v),     (int32_t)7);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toUint64(&v),    (uint64_t)7);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toInt64(&v),     (int64_t)7);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toUint64(&v),    (uint64_t)7);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toFloat(&v),     7.0f);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toDouble(&v),    7.0);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toBool(&v),      1);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_toString(&v),    "true");
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_STRING_VIEW_CSTR(GblVariant_toStringView(&v)), "true");
+    GBL_API_VERIFY_LAST_RECORD();
 
+    GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
+
+    GBL_API_END();
 }
 
 
@@ -2372,8 +2446,11 @@ GBL_EXPORT GblType GblVariantTestSuite_type(void) {
         { "stringConversionsChar",  GblVariantTestSuite_string_conversions_char_    },
         { "type",                   GblVariantTestSuite_type_                       },
         { "typeConversions",        GblVariantTestSuite_type_conversions_           },
-        { "constructGeneric",       GblVariantTestSuite_constructGeneric_           },
-        { "setGeneric",             GblVariantTestSuite_setGeneric_                 },
+        { "constructGeneric",       GblVariantTestSuite_construct_generic_          },
+        { "setGeneric",             GblVariantTestSuite_set_generic_                },
+        { "typeName",               GblVariantTestSuite_typeName_                   },
+        { "toInvalid",              GblVariantTestSuite_to_invalid_                 },
+        { "to",                     GblVariantTestSuite_to_                         },
         { NULL,                     NULL                                            }
     };
 

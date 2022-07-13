@@ -98,7 +98,6 @@ GBL_API gblExtMemFree        (const GblStackFrame* pFrame, void* pData);
 
 GBL_API gblExtCallRecordSet  (const GblStackFrame* pFrame, const GblCallRecord* pRecord) GBL_NOEXCEPT;
 
-GBL_API gblExtEventHandler  (const GblStackFrame* pFrame, const GblEvent* pEvent);
 
 #ifdef __cplusplus
 }

@@ -3,16 +3,16 @@
 
 #include "../meta/gimbal_interface.h"
 
-#define GBL_IPLUGIN_TYPE                    GBL_BUILTIN_TYPE(IPLUGIN)
+#define GBL_IPLUGIN_TYPE                    (GblIPlugin_type())
 #define GBL_IPLUGIN_STRUCT                  GblIPlugin
 #define GBL_IPLUGIN_CLASS_STRUCT            GblIPluginIFace
 #define GBL_IPLUGIN(instance)               GBL_INSTANCE_CAST_PREFIX        (instance,  GBL_IPLUGIN)
 #define GBL_IPLUGIN_CHECK(instance)         GBL_INSTANCE_CHECK_PREFIX       (instance,  GBL_IPLUGIN)
 #define GBL_IPLUGIN_TRY(instance)           GBL_INSTANCE_TRY_PREFIX         (instance,  GBL_IPLUGIN)
-#define GBL_IPLUGIN_IFACE(klass)            GBL_CLASS_CAST_PREFIX           (klass,     GBL_IPLUGIN)
-#define GBL_IPLUGIN_IFACE_CHECK(klass)      GBL_CLASS_CHECK_PREFIX          (klass,     GBL_IPLUGIN)
-#define GBL_IPLUGIN_IFACE_TRY(klass)        GBL_CLASS_TRY_PREFIX            (klass,     GBL_IPLUGIN)
-#define GBL_IPLUGIN_GET_IFACE(instance)     GBL_INSTANCE_CAST_CLASS_PREFIX  (instance,  GBL_IPLUGIN)
+#define GBL_IPLUGIN_IFACE(klass)            GBL_CLASS_CAST_PREFIX            (klass,     GBL_IPLUGIN)
+#define GBL_IPLUGIN_IFACE_CHECK(klass)      GBL_CLASS_CHECK_PREFIX           (klass,     GBL_IPLUGIN)
+#define GBL_IPLUGIN_IFACE_TRY(klass)        GBL_CLASS_TRY_PREFIX             (klass,     GBL_IPLUGIN)
+#define GBL_IPLUGIN_GET_IFACE(instance)     GBL_INSTANCE_GET_CLASS_PREFIX  (instance,  GBL_IPLUGIN)
 #define GBL_IPLUGIN_TRY_IFACE(instance)     GBL_INSTANCE_TRY_CLASS_PREFIX   (instance,  GBL_IPLUGIN)
 
 #define SELF    GblIPlugin* pSelf

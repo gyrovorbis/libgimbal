@@ -1,6 +1,7 @@
 #include <gimbal/meta/gimbal_boxed.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/types/gimbal_variant.h>
+#include "../meta/gimbal_type_.h"
 
 static GBL_RESULT GblBoxedClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
@@ -190,7 +191,7 @@ extern GBL_RESULT GblBoxed_typeRegister_(GblContext* pCtx) {
                                  sizeof(GblBoxedClass),
                                  0,
                                  &boxedIVariantIFace,
-                                 GBL_TYPE_FUNDAMENTAL_FLAG_DEEP_DERIVABLE |
+                                 GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE |
                                  GBL_TYPE_FLAG_ABSTRACT);
     GBL_API_VERIFY_LAST_RECORD();
 
@@ -210,8 +211,8 @@ GBL_EXPORT GblType GblBoxed_register(const char*                   pName,
     GblType type = GBL_INVALID_TYPE;
     GBL_API_BEGIN(NULL);
 
-    type = GblType_registerStatic(GBL_BOXED_TYPE,
-                                  GblQuark_internString(pName),
+    type = GblType_registerStatic(GblQuark_internString(pName),
+                                  GBL_BOXED_TYPE,
                                   &(const GblTypeInfo) {
                                       .pFnClassInit     = GblBoxedClass_init_,
                                       .classSize        = sizeof(GblBoxedClass),

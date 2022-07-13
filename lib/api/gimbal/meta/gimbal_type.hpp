@@ -56,7 +56,7 @@ public:
         bool            isDeepDerivable(void) const;
         bool            isAbstract(void) const;
         bool            isFinal(void) const;
-        bool            isInterface(void) const;
+        bool            isInterfaced(void) const;
         bool            isFundamental(void) const;
 
         bool            isA(Type base) const;
@@ -157,20 +157,20 @@ inline Type::Type(GblType type): PrimitiveBase(type) {}
 inline const char* Type::getName(void) const { return GblType_name(*this); }
 inline Type Type::getParentType(void) const { return GblType_parent(*this); }
 inline UInt Type::getDepth(void) const { return GblType_depth(*this); }
-inline Type Type::getFundamentalType(void) const { return GblType_fundamental(*this); }
+inline Type Type::getFundamentalType(void) const { return GblType_root(*this); }
 inline const TypeInfo* Type::getInfo(void) const { return static_cast<const TypeInfo*>(GblType_info(*this)); }
 inline bool Type::isA(Type base) const { return GblType_check(*this, base); }
 inline RefCount Type::getClassRefCount(void) const { return GblType_classRefCount(*this); }
 inline bool Type::isValid(void) const { return *this != GBL_INVALID_TYPE; }
 
-inline bool Type::isClassed(void) const { return GBL_TYPE_IS_CLASSED(*this); }
-inline bool Type::isInstantiable(void) const { return GBL_TYPE_IS_INSTANTIABLE(*this); }
-inline bool Type::isDerivable(void) const { return GBL_TYPE_IS_DERIVABLE(*this); }
-inline bool Type::isDeepDerivable(void) const { return GBL_TYPE_IS_DEEP_DERIVABLE(*this); }
-inline bool Type::isAbstract(void) const { return GBL_TYPE_IS_ABSTRACT(*this); }
-inline bool Type::isFinal(void) const { return GBL_TYPE_IS_FINAL(*this); }
-inline bool Type::isInterface(void) const  { return GBL_TYPE_IS_INTERFACED(*this); }
-inline bool Type::isFundamental(void) const { return GBL_TYPE_IS_FUNDAMENTAL(*this); }
+inline bool Type::isClassed(void) const { return GBL_TYPE_CLASSED_CHECK(*this); }
+inline bool Type::isInstantiable(void) const { return GBL_TYPE_INSTANTIABLE_CHECK(*this); }
+inline bool Type::isDerivable(void) const { return GBL_TYPE_DERIVABLE_CHECK(*this); }
+inline bool Type::isDeepDerivable(void) const { return GBL_TYPE_DEEP_DERIVABLE_CHECK(*this); }
+inline bool Type::isAbstract(void) const { return GBL_TYPE_ABSTRACT_CHECK(*this); }
+inline bool Type::isFinal(void) const { return GBL_TYPE_FINAL_CHECK(*this); }
+inline bool Type::isInterfaced(void) const  { return GBL_TYPE_INTERFACED_CHECK(*this); }
+inline bool Type::isRoot(void) const { return GBL_TYPE_ROOT_CHECK(*this); }
 
 inline void* Type::instanceCreate      (void) const { return Type::instanceCreate(*this); }
 inline void  Type::instanceConstruct   (void* pInstance) const { return Type::instanceConstruct(*this, pInstance); }
