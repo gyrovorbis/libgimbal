@@ -123,6 +123,7 @@ set(GIMBAL_SOURCES
      source/containers/gimbal_vector.c
      source/strings/gimbal_string_ref.c
      source/strings/gimbal_string_buffer.c
+     source/meta/gimbal_interface.c
      source/test/gimbal_test_suite.c
      source/test/gimbal_test_scenario.c
  )

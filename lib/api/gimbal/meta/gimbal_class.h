@@ -1,4 +1,4 @@
-/*! \file
+/*  \file
  *  \brief GblClass structure and related functions
  *  \ingroup meta
  *  \ref floatingClasses
@@ -462,7 +462,7 @@ GBL_DECLS_END
  *
  *      GblObject* pObject = GblObject_new(GBL_OBJECT_TYPE, "name",    "fuckwhisp",
  *                                                          "userdata", (void*)0xdeadbabe,
- *                                                         NULL);
+ *                                                          NULL);
  *
  *      GblObjectClass* pClass = GBL_OBJECT_GET_CLASS(pObject);
  *

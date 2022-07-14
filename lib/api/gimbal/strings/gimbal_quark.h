@@ -68,6 +68,7 @@ typedef uintptr_t       GblQuark;
 GBL_EXPORT GBL_RESULT   GblQuark_init               (GblContext* pCtx,
                                                      GblSize extraPageSize,
                                                      GblSize initialEntries)                GBL_NOEXCEPT;
+
 GBL_EXPORT GBL_RESULT   GblQuark_final              (void)                                  GBL_NOEXCEPT;
 
 GBL_EXPORT GblSize      GblQuark_pageCount          (void)                                  GBL_NOEXCEPT;
