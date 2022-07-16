@@ -7,10 +7,10 @@
 #define GIMBAL_INTERFACE_H
 
 #include "gimbal_class.h"
-#include "gimbal_instance.h"
 
 #define GBL_INTERFACE_TYPE                      GBL_BUILTIN_TYPE(INTERFACE)
-#define GBL_INTERFACE(klass)                    (GblInterface_try(GBL_CLASS(klass)))
+#define GBL_INTERFACE(klass)                    (GBL_CLASS_CAST(klass, GBL_INTERFACE_TYPE, GblInterface))
+#define GBL_INTERFACE_TRY(klass)                (GBL_CLASS_TRY(klass, GBL_INTERFACE_TYPE, GblInterface))
 #define GBL_INTERFACE_OUTER_CLASS(iface)        (GblInterface_outerClass(GBL_INTERFACE(iface)))
 #define GBL_INTERFACE_OUTER_MOST_CLASS(iface)   (GblInterface_outerMostClass(GBL_INTERFACE(iface)))
 
@@ -22,18 +22,56 @@ GBL_DECLS_BEGIN
 /// Base struct for all interfaces, inherits from GblClass
 typedef struct GblInterface {
     GblClass    base;               ///< inherited GblClass base info
-    int16_t     outerClassOffset;   ///< offset from the interface to the class containing it
+    int16_t     outerClassOffset_;  ///< offset from the interface to the class containing it (private, managed by internals)
 } GblInterface;
-
-
-GBL_EXPORT GblInterface* GblInterface_peek              (GblClass* pClass,
-                                                         GblType ifaceType) GBL_NOEXCEPT;
-
-
-GBL_EXPORT GblInterface* GblInterface_fromClass         (GblClass* pClass)  GBL_NOEXCEPT;
 
 GBL_EXPORT GblClass*     GblInterface_outerClass        (SELF)              GBL_NOEXCEPT;
 GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_NOEXCEPT;
+
+/*! \def GBL_INTERFACE_TYPE
+ *  Builtin type ID associated with GblInterface
+ *  \ingroup metaBuiltinTypes
+ *  \sa GblInterface
+ */
+
+/*! \fn GBL_INTERFACE(klass)
+ * Convenience function-style cast operator that returns the
+ * given class as a GblInterface, provided it is actually one,
+ * erroring out upon failure.
+ * \relatedalso GblInterface
+ * \param klass pointer to a GblClass or derived
+ * \returns GblInterface pointer or NULL if klass isn't one
+ * \sa GBL_INTERFACE_TRY()
+ */
+
+/*! \fn GBL_INTERFACE_TRY(klass)
+ * Convenience function-style cast operator that returns the
+ * given class as a GblInterface, provided it is actually one.
+ * \relatedalso GblInterface
+ * \param klass pointer to a GblClass or derived
+ * \returns GblInterface pointer or NULL if klass isn't one
+ * \sa GBL_INTERFACE()
+ */
+
+/*! \fn GBL_INTERFACE_OUTER_CLASS(iface)
+ * Convenience macro wrapping GblInterface_outerClass(),
+ * automatically casting the input parameter.
+ * \relatedalso GblInterface
+ * \param iface pointer to a GblInterface or derived
+ * \returns GblClass pointer or NULL if it hasn't beenm mapped
+ *          to one
+ * \sa GblInterface_outerClass
+ */
+
+/*! \fn GBL_INTERFACE_OUTER_MOST_CLASS(iface)
+ * Convenience macro wrapping GblInterface_outerMostClass(),
+ * automatically casting the input parameter.
+ * \relatedalso GblInterface
+ * \param iface pointer to a GblInterface or derived
+ * \returns GblClass pointer or NULL if it hasn't beenm mapped
+ *          to one
+ * \sa GblInterface_outerMostClass
+ */
 
 /*! \struct GblInterface
  *  \ingroup meta
@@ -73,61 +111,7 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  * the structure of a GblClass-inheriting structure. When a type
  * which implements an interface is registered, its location within
  * the class is provided to the type system via GblTypeInfo::pInterfaceMap.
- *\sa GblClass, GblInstace, GblType
- */
-
-/*! \def GBL_INTERFACE_TYPE
- *  \details GblType ID of a GblInterface
- * \ingroup metaBuiltinTypes
- */
-/*!
- * \fn GBL_INTERFACE(klass)
- * Convenience macro around GblInterface_try which automatically casts
- * the given class to a GblClass.
- * \param klass pointer to GblClass
- * \relatesalso GblInterface
- * \returns pointer to a GblInterface or NULL if not an interface
- * \sa GblInterface_try
- */
-
-/*!
- * \fn GBL_INTERFACE_OUTER_CLASS(iface)
- * Convenience macro around GblInterface_outerClass which automatically
- * casts the given interface to a GblInterface.
- * \relatesalso GblInterface
- * \param iface pointer to GblInterface or derived
- * \returns pointer to a GblClass
- * \sa GblInterface_outerClass
- */
-
-/*! \fn GBL_INTERFACE_OUTER_MOST_CLASS(iface)
- * Convenience macro around GblInterface_outerMostClass which automatically
- * casts the given interface to a GblInterface.
- * \relatesalso GblInterface
- * \param iface pointer to GblInterface or derived
- * \returns pointer to a GblClass
- * \sa GblInterface_outerMostClass
- */
-
-/*!
- * \fn GblInterface* GblInterface_peek(GblClass* pClass, GblType ifaceType)
- * Queries for the given interface type within the specified class.
- * \relatesalso GblInterface
- * \param pClass source class
- * \param ifaceType type ID of the requested interface
- * \returns GblInterface pointer to the requested interface or NULL
- *          if the interface was not present
- * \sa GblClass_try
- */
-
-/*! \fn GblInterface* GblInterface_fromClass(GblClass* pClass)
- * Casts the given class structure to an interface structure, if
- * it represents an interface.
- * \relatesalso GblInterface
- * \param pClass source class
- * \returns GblInterface pointer if the given class is actually
- *          an interface, or NULL otherwise
- * \sa GblClass_try
+ *\sa GblClass, GblInstance, GblType
  */
 
 /*!
@@ -190,7 +174,7 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *      typedef struct ISerializableIFace {
  *          GblInterface base; //inherit base class
  *
- *          // declare virtual methods for implementing save/laod
+ *          // declare virtual methods for implementing save/load
  *          GBL_RESULT  (*pFnSave)(const ISerializable* pSelf, GblStringBuffer* pBuffer);
  *          GBL_RESULT  (*pFnLoad)(ISerializable* pSelf, const GblStringBuffer* pBuffer);
  *      | GblISerializableIFace;
@@ -262,12 +246,12 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *  the entry-point becomes prettier than calling directly into a function pointer,
  *  and we are able to do type checking and error handling. We can check to see
  *  whether the given instance was even compatible with our interface or whether
- *  the class implementing the interface actually overrode the mothod or not.
+ *  the class implementing the interface actually overrode the method or not.
  *
  *  ## Registering
  *  Once we've defined our structures, created our utility macros, and created
  *  a public API around our virtual methods, it's time to register our type.
- *  To do this, we implement the ISerializable_type() functiion declared
+ *  To do this, we implement the ISerializable_type() function declared
  *  earlier to register a new meta type if we haven't already:
  *
  *      GblType ISerializable_type(void) {
@@ -291,8 +275,8 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *
  *  \note
  *  If we wish to provide a default implementation of our virtual methods, we would
- *  also set GblTypeInfo::pFnClassInit to a GblTypeClassInitializeFn function
- *  where we would initialize our class structure to some default values.
+ *  also set GblTypeInfo::pFnClassInit to a ::GblTypeClassInitializeFn function
+ *  where we would initialize our class structure with some default values.
  *
  *  ## Implementing
  *  In order to use your interface with a given type, the type must
@@ -306,30 +290,31 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *  integer.
  *
  *
- *      #define INT_SERIALIZABLE_TYPE   (IntSerializable_type())
+ *     #define INT_SERIALIZABLE_TYPE   (IntSerializable_type())
  *
- *      // Class structure
- *      typedef struct IntSerializableClass {
- *          // inherit from base class
- *          GblClass            base;
+ *     // Class structure
+ *     typedef struct IntSerializableClass {
+ *         // inherit from base class
+ *         GblClass            base;
  *
- *          // embed interface structure
- *          ISerializableIFace iSerializable;
+ *         // embed interface structure
+ *         ISerializableIFace iSerializable;
  *
- *      } IntSerializableClass;
+ *     } IntSerializableClass;
  *
- *      // Instance structure
- *      typedef struct IntSerializable {
+ *     // Instance structure
+ *     typedef struct IntSerializable {
  *
- *          // convenience union for both class and base instance
- *          union {
- *              IntSerializableClass* pClass;
- *              GblInstance           base;
- *          };
+ *         // convenience union for both class and base instance
+ *         union {
+ *             IntSerializableClass* pClass;
+ *             GblInstance           base;
+ *         };
  *
- *          int integer;
+ *         // property field we'll be serializing
+ *         int integer;
  *
- *      } IntSerializable;
+ *     } IntSerializable;
  *
  * ### Overrides
  *
@@ -370,11 +355,14 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *  this, we pass an array of interface mappings to GblType_registerStatic() via
  *  GblTypeInfo.pInterfaceMap:
  *
+ *      GblType IntSerializableType_type(void) {
+ *          static GblType type = GBL_INVALID_TYPE;
  *
- *      GblType intSerializeType =
- *          GblType_registerStatic("IntSerializable",
- *                                 GBL_INSTANCE_TYPE,
- *                                 &(const GblTypeInfo) {
+ *          if(type == GBL_INVALID_TYPE) {
+ *
+ *              type = GblType_registerStatic("IntSerializable",
+ *                                     GBL_INSTANCE_TYPE,
+ *                                     &(const GblTypeInfo) {
  *                                     .classSize       = sizeof(IntSerializableClass),
  *                                     .pFnClassInit    = IntSerializable_initializeClass,
  *                                     .instanceSize    = sizeof(IntSerializable),
@@ -386,6 +374,9 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *                                         }
  *                                 },
  *                                 GBL_TYPE_FLAGS_NONE);
+ *           }
+ *           return type;
+ *      }
  *
  *  As you can see, we provided a single entry into the interface mapping, which we used to
  *  associate our interface type with the given class offset. Now the meta type system
@@ -395,14 +386,15 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *
  *  Querying for interfaces is extremely simple. Since they're essentially a type of GblClass,
  *  you use the same set of functions you would use to cast between class types. Lets create
- *  an instance of the IntSerializable type and try to serialize it with our interface.
+ *  an instance of the IntSerializable type and try to serialize it with our interface using
+ *  the utility macros defined earlier to handle casting:
  *
  *      // create an instance
  *      IntSerializable* pIntInstance = GblInstance_create(intSerializeType);
  *
- *      // create a new string buffer to hold the saved data
+ *      // create a new string buffer to hold the data
  *      GblStringBuffer buffer;
- *      GblStringBuffer_construct(&buffer, GBL_STRV("7");
+ *      GblStringBuffer_construct(&buffer, GBL_STRV("7"));
  *
  *      // cast our type to an ISerializable and call the virtual function
  *      ISerializable_load(ISERIALIZABLE(pIntInstance), &buffer);
@@ -413,12 +405,30 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *      pIntInstance->integer = -7;
  *
  *      // we can now save a value back too!
+ *      GblStringBuffer_clear(&buffer);
  *      ISerializable_save(ISERIALIZABLE(pIntInstance), &buffer));
  *
  *      // look, it saved the new value!
  *      assert(GblStringView_toInt(GblStringBuffer_view(&buffer)) == -7);
  *
+ *      // destroy out instance when we're done
+ *      GblInstance_destroy(pIntInstance);
  *
+ *  Querying for the GblInterface structure without having defined the convenience
+ *  macros from the previous section is still possible, but it's much uglier and
+ *  more verbose.
+ *
+ *      // A, Cast to an ISerializable instance from IntSerializable
+ *      ISerializable* pSerializable = (ISerializable*)GblInstance_cast((GblInstance*)pIntInstance,
+ *                                                                      GBL_ISERIALIZABLE_TYPE);
+ *
+ *      // B. Extract the ISerializableIFace class from IntSerializable
+ *
+ *      //    1. retrieve the class from the instance
+ *      GblClass* pClass = GblInstance_class((GblInstance*)pSerializable);
+ *
+ *      //    2. retrieve the interface from the class
+ *      ISerializableIFace* pIFace = (ISerializableIFace*)GblClass_cast(pClass, GBL_ISERIALIZABLE_TYPE);
  */
 
 

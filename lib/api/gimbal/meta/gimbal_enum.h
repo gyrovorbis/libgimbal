@@ -13,8 +13,8 @@
 #define GBL_ENUM_CLASS_CHECK(klass)         (GBL_CLASS_CHECK_PREFIX(klass, GBL_ENUM))
 #define GBL_ENUM_CLASS_TRY(klass)           (GBL_CLASS_TRY_PREFIX(klass, GBL_ENUM))
 
-#define GBL_ENUM_GET_CLASS(variant)         (GBL_ENUM_CLASS(GblClass_peek(GblVariant_type(&variant))))
-#define GBL_ENUM_TRY_CLASS(variant)         (GBL_ENUM_CLASS_TRY(GblClass_peek(GblVariant_type(&variant))))
+#define GBL_ENUM_GET_CLASS(variant)         (GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_type(&variant))))
+#define GBL_ENUM_TRY_CLASS(variant)         (GBL_ENUM_CLASS_TRY(GblClass_weakRefDefault(GblVariant_type(&variant))))
 
 #define GBL_ENUM_ENTRY(enumValue, nick)     { enumValue, #enumValue, nick }
 #define GBL_ENUM_ENTRY_LAST()               { 0, NULL, NULL }
@@ -107,58 +107,58 @@ GBL_INLINE GblEnum GblEnumClass_valueFromNick(CSELF, const char* pString) GBL_NO
 // ---------- GblEnum ----------
 
 GBL_INLINE GblEnum GblEnum_fromName(const char* pName, GblType type) GBL_NOEXCEPT {
-    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_ref(type));
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
     GblEnum value = GblEnumClass_valueFromName(pClass, pName);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return value;
 }
 GBL_INLINE GblEnum GblEnum_fromNameQuark(GblQuark name, GblType type) GBL_NOEXCEPT {
-    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_ref(type));
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
     GblEnum value = GblEnumClass_valueFromNameQuark(pClass, name);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return value;
 }
 GBL_INLINE GblEnum GblEnum_fromNick(const char* pNick, GblType type) GBL_NOEXCEPT {
-    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_ref(type));
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
     GblEnum value = GblEnumClass_valueFromNick(pClass, pNick);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return value;
 }
 GBL_INLINE GblEnum GblEnum_fromNickQuark(GblQuark nick, GblType type) GBL_NOEXCEPT {
-    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_ref(type));
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
     GblEnum value = GblEnumClass_valueFromNickQuark(pClass, nick);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return value;
 }
 
 GBL_INLINE const char* GblEnum_name(GblEnum value, GblType type) GBL_NOEXCEPT {
-    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_ref(type));
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
     const char* pName = GblEnumClass_nameFromValue(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return pName;
 }
 GBL_INLINE GblQuark GblEnum_nameQuark(GblEnum value, GblType type) GBL_NOEXCEPT {
-    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_ref(type));
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
     GblQuark name = GblEnumClass_nameQuarkFromValue(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return name;
 }
 GBL_INLINE const char* GblEnum_nick(GblEnum value, GblType type) GBL_NOEXCEPT {
-    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_ref(type));
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
     const char* pNick = GblEnumClass_nickFromValue(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return pNick;
 }
 GBL_INLINE GblQuark GblEnum_nickQuark(GblEnum value, GblType type) GBL_NOEXCEPT {
-    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_ref(type));
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
     GblQuark nick = GblEnumClass_nickQuarkFromValue(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return nick;
 }
 GBL_INLINE GblBool GblEnum_check(GblEnum value, GblType type) GBL_NOEXCEPT {
-    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_ref(type));
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
     GblBool result = GblEnumClass_valueCheck(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return result;
 }
 

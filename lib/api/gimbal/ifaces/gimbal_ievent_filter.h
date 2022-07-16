@@ -2,6 +2,7 @@
 #define GIMBAL_IEVENT_FILTER_H
 
 #include "../meta/gimbal_interface.h"
+#include "../meta/gimbal_instance.h"
 
 GBL_DECLS_BEGIN
 

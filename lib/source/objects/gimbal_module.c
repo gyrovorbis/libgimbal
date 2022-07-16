@@ -199,7 +199,7 @@ GblType GblModule_registerType(GblModule*           pSelf,
                                const GblTypeInfo*   pInfo,
                                GblFlags             flags) GBL_NOEXCEPT {
 
-    GblType newType = GblType_registerDynamic(pName, parent, GBL_IPLUGIN(pSelf), flags);
+    GblType newType = GBL_INVALID_TYPE; //GblType_registerDynamic(pName, parent, GBL_IPLUGIN(pSelf), flags);
     return newType;
 }
 

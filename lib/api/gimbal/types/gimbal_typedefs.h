@@ -1,3 +1,6 @@
+/*! \file
+ *  \brief Basic primtive typedefs and forward declarations
+ */
 #ifndef GIMBAL_TYPEDEFS_H
 #define GIMBAL_TYPEDEFS_H
 

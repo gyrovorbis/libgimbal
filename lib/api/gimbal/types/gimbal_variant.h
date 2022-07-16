@@ -14,6 +14,7 @@
 #include "../meta/gimbal_flags.h"
 #include "../meta/gimbal_pointer.h"
 #include "../meta/gimbal_boxed.h"
+#include "../meta/gimbal_instance.h"
 
 #define GBL_VARIANT_INIT    { .type = GBL_INVALID_TYPE }
 #define GBL_VARIANT(name)   GblVariant name = GBL_VARIANT_INIT
@@ -671,7 +672,7 @@ GBL_INLINE GblInstance* GblVariant_getInstance(CSELF) GBL_NOEXCEPT {
 
 GBL_INLINE GBL_RESULT GblVariant_invalidate(SELF) GBL_NOEXCEPT {
     if(GblVariant_type(pSelf) != GBL_INVALID_TYPE)
-        GblClass_unref(GblClass_peek(GblVariant_type(pSelf)));
+        GblClass_unrefDefault(GblClass_weakRefDefault(GblVariant_type(pSelf)));
     memset(pSelf, 0, sizeof(GblVariant));
     pSelf->type = GBL_INVALID_TYPE;
     return GBL_RESULT_SUCCESS;

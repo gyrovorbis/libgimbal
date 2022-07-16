@@ -30,42 +30,20 @@ static GBL_RESULT GblClassTestSuite_refInvalid_(GblTestSuite* pSelf, GblContext*
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GblClass* pClass = GblClass_ref(GBL_INVALID_TYPE);
+    GblClass* pClass = GblClass_refDefault(GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_TYPE);
     GBL_TEST_COMPARE(pClass, NULL);
     GBL_API_CLEAR_LAST_RECORD();
     GBL_API_END();
 }
 
-static GBL_RESULT GblClassTestSuite_peekInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblClassTest_weakRefDefaultInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GblClass* pClass = GblClass_peek(GBL_INVALID_TYPE);
+    GblClass* pClass = GblClass_weakRefDefault(GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_TYPE);
     GBL_TEST_COMPARE(pClass, NULL);
-    GBL_API_CLEAR_LAST_RECORD();
-    GBL_API_END();
-}
-
-static GBL_RESULT GblClassTestSuite_peekFromInstanceNull_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
-    GBL_TEST_EXPECT_ERROR();
-    GblClass* pClass = GblClass_peekFromInstance(NULL);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_TEST_COMPARE(pClass, NULL);
-    GBL_API_CLEAR_LAST_RECORD();
-    GBL_API_END();
-}
-
-static GBL_RESULT GblClassTestSuite_refFromClassNull_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
-    GBL_TEST_EXPECT_ERROR();
-    GblClass* pClass = GblClass_refFromExisting(NULL);
-    GBL_TEST_COMPARE(pClass, NULL);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_POINTER);
     GBL_API_CLEAR_LAST_RECORD();
     GBL_API_END();
 }
@@ -91,10 +69,17 @@ static GBL_RESULT GblClassTestSuite_tryNullInvalid_(GblTestSuite* pSelf, GblCont
     GBL_API_END();
 }
 
-static GBL_RESULT GblClassTestSuite_privateNullInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblClassTestSuite_privateNull_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
     GBL_TEST_COMPARE(GblClass_private(NULL, GBL_INVALID_TYPE), NULL);
+    GBL_API_END();
+}
+
+static GBL_RESULT GblClassTestSuite_publicNull_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_API_BEGIN(pCtx);
+    GBL_TEST_COMPARE(GblClass_public(NULL, GBL_INVALID_TYPE), NULL);
     GBL_API_END();
 }
 
@@ -102,7 +87,6 @@ static GBL_RESULT GblClassTestSuite_propertiesNull_(GblTestSuite* pSelf, GblCont
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
     GBL_TEST_COMPARE(GblClass_typeOf(NULL), GBL_INVALID_TYPE);
-    GBL_TEST_COMPARE(GblClass_typeName(NULL), "Invalid");
     GBL_TEST_COMPARE(GblClass_size(NULL), 0);
     GBL_TEST_COMPARE(GblClass_privateSize(NULL), 0);
     GBL_TEST_COMPARE(GblClass_totalSize(NULL), 0);
@@ -125,7 +109,7 @@ static GBL_RESULT GblClassTestSuite_unrefNull_(GblTestSuite* pSelf, GblContext* 
     GBL_UNUSED(pSelf);
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblClass_unref(NULL), 0);
+    GBL_TEST_COMPARE(GblClass_unrefDefault(NULL), 0);
     GBL_API_END();
 }
 
@@ -167,35 +151,34 @@ static GBL_RESULT GblClassTestSuite_destructFloatingNull_(GblTestSuite* pSelf, G
     GBL_API_END();
 }
 
-static GBL_RESULT GblClassTestSuite_ref_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblClassTestSuite_refDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
 
-    pSelf_->pClassRef = GblClass_ref(GBL_STATIC_CLASS_TYPE);
+    pSelf_->pClassRef = GblClass_refDefault(GBL_STATIC_CLASS_TYPE);
+    GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->pClassRef);
+
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_CLASS_TYPEOF(pSelf_->pClassRef)),
                      pSelf_->initialStaticClassRefCount + 1);
 
-    GBL_API_END();
-}
+    GblClass* pClass = GblClass_refDefault(GBL_STATIC_CLASS_TYPE);
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_TEST_VERIFY(pClass);
 
-static GBL_RESULT GblClassTestSuite_peek_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
-    GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
-
-    GblClass* pClass  = GblClass_peek(GBL_STATIC_CLASS_TYPE);
     GBL_TEST_COMPARE(pClass, pSelf_->pClassRef);
-    GBL_TEST_COMPARE(GblType_classRefCount(GBL_CLASS_TYPEOF(pSelf_->pClassRef)),
-                     pSelf_->initialStaticClassRefCount + 1);
+
+    GBL_TEST_COMPARE(GblType_classRefCount(GBL_CLASS_TYPEOF(pClass)),
+                     pSelf_->initialStaticClassRefCount + 2);
 
     GBL_API_END();
 }
 
-static GBL_RESULT GblClassTestSuite_refFromClass_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblClassTest_weakRefDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
 
-    GblClass* pClass  = GblClass_refFromExisting(pSelf_->pClassRef);
+    GblClass* pClass  = GblClass_weakRefDefault(GBL_STATIC_CLASS_TYPE);
     GBL_TEST_COMPARE(pClass, pSelf_->pClassRef);
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_CLASS_TYPEOF(pSelf_->pClassRef)),
                      pSelf_->initialStaticClassRefCount + 2);
@@ -307,11 +290,20 @@ static GBL_RESULT GblClassTestSuite_privateInvalid_(GblTestSuite* pSelf, GblCont
     GBL_API_END();
 }
 
+static GBL_RESULT GblClassTestSuite_public_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
+
+    GBL_TEST_COMPARE(GblClass_public(pSelf_->pClassRef, GBL_STATIC_CLASS_TYPE),
+                     NULL);
+
+    GBL_API_END();
+}
+
 static GBL_RESULT GblClassTestSuite_properties_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblClass_typeOf            (pSelf_->pClassRef), GBL_STATIC_CLASS_TYPE);
-    GBL_TEST_COMPARE(GblClass_typeName          (pSelf_->pClassRef), "StaticClass");
     GBL_TEST_COMPARE(GblClass_size              (pSelf_->pClassRef), sizeof(GblClass));
     GBL_TEST_COMPARE(GblClass_privateSize       (pSelf_->pClassRef), 0);
     GBL_TEST_COMPARE(GblClass_totalSize         (pSelf_->pClassRef), sizeof(GblClass));
@@ -331,14 +323,14 @@ static GBL_RESULT GblClassTestSuite_properties_(GblTestSuite* pSelf, GblContext*
     GBL_API_END();
 }
 
-static GBL_RESULT GblClassTestSuite_unref_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblClassTestSuite_unrefDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
 
-    GBL_TEST_COMPARE(GblClass_unref(pSelf_->pClassRef),
+    GBL_TEST_COMPARE(GblClass_unrefDefault(pSelf_->pClassRef),
                      pSelf_->initialStaticClassRefCount + 1);
 
-    GBL_TEST_COMPARE(GblClass_unref(pSelf_->pClassRef),
+    GBL_TEST_COMPARE(GblClass_unrefDefault(pSelf_->pClassRef),
                      pSelf_->initialStaticClassRefCount);
 
     GBL_API_END();
@@ -364,29 +356,17 @@ static GBL_RESULT GblClassTestSuite_createFloating_(GblTestSuite* pSelf, GblCont
     GBL_API_END();
 }
 
-static GBL_RESULT GblClassTestSuite_refFloating_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblClassTestSuite_unrefDefaultFloating_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
 
-    pSelf_->pClassRef2 = GblClass_refFromExisting(pSelf_->pClassRef);
+    GBL_TEST_EXPECT_ERROR();
 
-    GBL_TEST_VERIFY(pSelf_->pClassRef2 != pSelf_->pClassRef);
-    GBL_TEST_COMPARE(pSelf_->pClassRef2, GBL_CLASS_DEFAULT(pSelf_->pClassRef));
-
-    GBL_TEST_VERIFY(GblClass_isDefault(pSelf_->pClassRef2));
-    GBL_TEST_VERIFY(!GblClass_isFloating(pSelf_->pClassRef2));
-
-    GBL_TEST_COMPARE(GblType_classRefCount(GBL_STATIC_CLASS_TYPE),
-                     pSelf_->initialStaticClassRefCount + 2);
-    GBL_API_END();
-}
-
-static GBL_RESULT GblClassTestSuite_unrefFloating_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
-    GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
-
-    GBL_TEST_COMPARE(GblClass_unref(pSelf_->pClassRef),
+    GBL_TEST_COMPARE(GblClass_unrefDefault(pSelf_->pClassRef),
                      pSelf_->initialStaticClassRefCount + 1);
+
+    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_OPERATION);
+    GBL_API_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pSelf_->pClassRef), GBL_STATIC_CLASS_TYPE);
     GBL_TEST_VERIFY(GblClass_isFloating(pSelf_->pClassRef));
@@ -403,6 +383,13 @@ static GBL_RESULT GblClassTestSuite_destructFloatingInvalid_(GblTestSuite* pSelf
     GBL_API_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_STATIC_CLASS_TYPE),
                      pSelf_->initialStaticClassRefCount + 1);
+
+    GblClass_destructFloating(GblClass_default(pSelf_->pClassRef));
+    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_OPERATION);
+    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblType_classRefCount(GBL_STATIC_CLASS_TYPE),
+                     pSelf_->initialStaticClassRefCount + 1);
+
     GBL_API_END();
 }
 
@@ -445,6 +432,13 @@ static GBL_RESULT GblClassTestSuite_destroyFloatingInvalid_(GblTestSuite* pSelf,
     GBL_API_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_STATIC_CLASS_TYPE),
                      pSelf_->initialStaticClassRefCount + 1);
+
+    GblClass_destroyFloating(GblClass_default(pSelf_->pClassRef));
+    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_OPERATION);
+    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblType_classRefCount(GBL_STATIC_CLASS_TYPE),
+                     pSelf_->initialStaticClassRefCount + 1);
+
     GBL_API_END();
 }
 
@@ -463,22 +457,20 @@ GBL_EXPORT GblType GblClassTestSuite_type(void) {
 
     const static GblTestCase cases[] = {
         { "refInvalid",                 GblClassTestSuite_refInvalid_               },
-        { "peekInvalid",                GblClassTestSuite_peekInvalid_              },
-        { "peekFromInstanceNull",       GblClassTestSuite_peekFromInstanceNull_     },
-        { "refFromClassNull",           GblClassTestSuite_refFromClassNull_         },
+        { "weakRefDefaultInvalid",      GblClassTest_weakRefDefaultInvalid_         },
         { "checkNullInvalid",           GblClassTestSuite_checkNullInvalid_         },
         { "castNullInvalid",            GblClassTestSuite_castNullInvalid_          },
         { "tryNullInvalid",             GblClassTestSuite_tryNullInvalid_           },
-        { "privateNullInvalid",         GblClassTestSuite_privateNullInvalid_       },
+        { "privateNull",                GblClassTestSuite_privateNull_              },
+        { "publicNull",                 GblClassTestSuite_publicNull_               },
         { "propertiesNull",             GblClassTestSuite_propertiesNull_           },
         { "unrefNull",                  GblClassTestSuite_unrefNull_                },
         { "createFloatingInvalid",      GblClassTestSuite_createFloatingInvalid_    },
         { "constructFloatingInvalid",   GblClassTestSuite_constructFloatingInvalid_ },
         { "destroyFloatingNull",        GblClassTestSuite_destroyFloatingNull_      },
         { "destructFloatingNull",       GblClassTestSuite_destructFloatingNull_     },
-        { "ref",                        GblClassTestSuite_ref_                      },
-        { "peek",                       GblClassTestSuite_peek_                     },
-        { "refFromClass",               GblClassTestSuite_refFromClass_             },
+        { "refDefault",                 GblClassTestSuite_refDefault_               },
+        { "weakRefDefault",             GblClassTest_weakRefDefault_                },
         { "check",                      GblClassTestSuite_check_                    },
         { "cast",                       GblClassTestSuite_cast_                     },
         { "castInvalid",                GblClassTestSuite_castInvalid_              },
@@ -486,11 +478,10 @@ GBL_EXPORT GblType GblClassTestSuite_type(void) {
         { "tryInvalid",                 GblClassTestSuite_tryInvalid_               },
         { "private",                    GblClassTestSuite_private_                  },
         { "privateInvalid",             GblClassTestSuite_privateInvalid_           },
-        { "unref",                      GblClassTestSuite_unref_                    },
+        { "unrefDefault",               GblClassTestSuite_unrefDefault_             },
         { "properties",                 GblClassTestSuite_properties_               },
         { "createFloating",             GblClassTestSuite_createFloating_           },
-        { "refFloating",                GblClassTestSuite_refFloating_              },
-        { "unrefFloating",              GblClassTestSuite_unrefFloating_            },
+        { "unrefDefaultFloating",       GblClassTestSuite_unrefDefaultFloating_     },
         { "destructFloatingInvalid",    GblClassTestSuite_destructFloatingInvalid_  },
         { "destroyFloating",            GblClassTestSuite_destroyFloating_          },
         { "constructFloating",          GblClassTestSuite_constructFloating_        },

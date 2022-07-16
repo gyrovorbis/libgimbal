@@ -98,12 +98,12 @@ static GBL_RESULT GblTestSuiteClass_propertyGet_(const GblObject* pSelf, GblSize
 static GBL_RESULT GblTestSuiteClass_constructed_(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
 
-    GblObjectClass* pSuper = GBL_OBJECT_CLASS(GblClass_peek(GBL_OBJECT_TYPE));
+    GblObjectClass* pSuper = GBL_OBJECT_CLASS(GblClass_weakRefDefault(GBL_OBJECT_TYPE));
     if(pSuper && pSuper->pFnConstructed) GBL_API_VERIFY_CALL(pSuper->pFnConstructed(pSelf));
 
     const char* pName = GblObject_name(pSelf);
     if(!pName) {
-        GblObject_nameSet(pSelf, GblInstance_typeName(GBL_INSTANCE(pSelf)));
+        GblObject_nameSet(pSelf, GblType_name(GblInstance_typeOf(GBL_INSTANCE(pSelf))));
     }
 
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
@@ -117,7 +117,7 @@ static GBL_RESULT GblTestSuiteClass_constructed_(GblObject* pSelf) {
 
 static GBL_RESULT GblTestSuiteClass_destructor_(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pSuper = GBL_OBJECT_CLASS(GblClass_peek(GBL_OBJECT_TYPE));
+    GblObjectClass* pSuper = GBL_OBJECT_CLASS(GblClass_weakRefDefault(GBL_OBJECT_TYPE));
     if(pSuper && pSuper->pFnDestructor) GBL_API_VERIFY_CALL(pSuper->pFnDestructor(pSelf));
 
     GBL_API_VERIFY_CALL(GblVector_destruct(&GBL_TEST_SUITE_(pSelf)->testCases));

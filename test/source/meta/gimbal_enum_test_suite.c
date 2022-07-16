@@ -27,7 +27,7 @@ static GBL_RESULT GblEnumTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) 
 static GBL_RESULT GblEnumTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblEnumTestSuite_* pSelf_ = GBL_ENUM_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(GblClass_unref(GBL_CLASS(pSelf_->pEnumClass)), 0);
+    GBL_TEST_COMPARE(GblClass_unrefDefault(GBL_CLASS(pSelf_->pEnumClass)), 0);
     GBL_API_END();
 }
 
@@ -49,7 +49,7 @@ static GBL_RESULT GblEnumTestSuite_register_(GblTestSuite* pSelf, GblContext* pC
     GBL_TEST_VERIFY(pSelf_->enumType != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_ENUM_TYPE_CHECK(pSelf_->enumType));
 
-    pSelf_->pEnumClass = (GblEnumClass*)GblClass_ref(pSelf_->enumType);
+    pSelf_->pEnumClass = (GblEnumClass*)GblClass_refDefault(pSelf_->enumType);
     GBL_TEST_VERIFY(pSelf_->pEnumClass);
     GBL_API_END();
 }

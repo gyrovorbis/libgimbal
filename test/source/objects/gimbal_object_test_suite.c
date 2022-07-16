@@ -65,7 +65,7 @@ static GBL_RESULT TestObject_IEventFilter_filterEvent(GblIEventFilter* pFilter, 
 
 static GBL_RESULT TestObject_constructor(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_CLASS_SUPER(pSelf));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_CLASS_SUPER(GBL_INSTANCE_CLASS(pSelf)));
     pParentClass->pFnConstructor(pSelf);
     TestObject* pTest = TEST_OBJECT(pSelf);
     pTest->floater = -NAN;
@@ -75,14 +75,14 @@ static GBL_RESULT TestObject_constructor(GblObject* pSelf) {
 
 static GBL_RESULT TestObject_constructed(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_CLASS_SUPER(pSelf));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_CLASS_SUPER(GBL_INSTANCE_CLASS(pSelf)));
     if(pParentClass->pFnConstructed) pParentClass->pFnConstructed(pSelf);
     GBL_API_END();
 }
 
 static GBL_RESULT TestObject_destructor(GblObject* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_INSTANCE_CLASS_SUPER(pSelf));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GBL_CLASS_SUPER(GBL_INSTANCE_CLASS(pSelf)));
     pParentClass->pFnDestructor(pSelf);
     GBL_API_END();
 }
@@ -218,27 +218,27 @@ static GBL_RESULT GblObjectTestSuite_newDefault_(GblTestSuite* pSelf, GblContext
 
     // validate class
     TestObjectClass* pClass = TEST_OBJECT_GET_CLASS(pObj);
-    GBL_TEST_COMPARE(GblType_fromClass(GBL_CLASS(pClass)), TEST_OBJECT_TYPE);
+    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pClass), TEST_OBJECT_TYPE);
     GBL_TEST_COMPARE(&pClass->base, GBL_OBJECT_CLASS(pClass));
     GBL_TEST_COMPARE(pClass->string, "Davey Havoc");
     GBL_TEST_COMPARE(pClass->staticInt32, 77);
 
     // validate interfaces
     GblIVariantIFace* pIVariantIFace = GBL_IVARIANT_GET_IFACE(pObj);
-    GBL_TEST_COMPARE(GblType_fromClass(GBL_CLASS(pIVariantIFace)), GBL_IVARIANT_TYPE);
+    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIVariantIFace), GBL_IVARIANT_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIVariantIFace));
     GBL_TEST_COMPARE(pIVariantIFace->pVTable->pGetValueFmt, "p");
 
     GblITableIFace* pITableIFace = GBL_ITABLE_GET_IFACE(pObj);
-    GBL_TEST_COMPARE(GblType_fromClass(GBL_CLASS(pITableIFace)), GBL_ITABLE_TYPE);
+    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pITableIFace), GBL_ITABLE_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pITableIFace));
 
     GblIEventHandlerIFace* pIEventHandlerIFace = GBL_IEVENT_HANDLER_TRY_IFACE(pObj);
-    GBL_TEST_COMPARE(GblType_fromClass(GBL_CLASS(pIEventHandlerIFace)), GBL_IEVENT_HANDLER_TYPE);
+    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventHandlerIFace), GBL_IEVENT_HANDLER_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventHandlerIFace));
 
     GblIEventFilterIFace* pIEventFilterIFace = GBL_IEVENT_FILTER_GET_IFACE(pObj);
-    GBL_TEST_COMPARE(GblType_fromClass(GBL_CLASS(pIEventFilterIFace)), GBL_IEVENT_FILTER_TYPE);
+    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventFilterIFace), GBL_IEVENT_FILTER_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventFilterIFace));
 
     // validate sanity of random casts
@@ -403,7 +403,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVaArgsWithClassInPlace_(GblTestSu
                                                         "userdata", (void*)0xdeadbeef,
                                                         NULL));
 
-    GBL_API_VERIFY_CALL(GblInstance_classSink(GBL_INSTANCE(&obj)));
+    GBL_API_VERIFY_CALL(GblInstance_sinkClass(GBL_INSTANCE(&obj)));
 
     GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(&obj)),       "Fuckwad");
     GBL_TEST_COMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
@@ -673,7 +673,10 @@ static GBL_RESULT GblObjectTestSuite_classSwizzle_(GblTestSuite* pSelf, GblConte
     pClass->staticInt32 = -666;
 
     // overwrite the existing class for the given object
-    GBL_API_VERIFY_CALL(GblInstance_classSwizzle(GBL_INSTANCE(pObj), GBL_CLASS(pClass)));
+    GBL_API_VERIFY_CALL(GblInstance_swizzleClass(GBL_INSTANCE(pObj), GBL_CLASS(pClass)));
+
+    // sink swizzled class for the instance to claim ownership
+    GBL_API_VERIFY_CALL(GblInstance_sinkClass(GBL_INSTANCE(pObj)));
 
     // now check the value of the static class property has changed accordingly
     GBL_API_VERIFY_CALL(GblObject_getValue(pObj, "staticInt32", &value));

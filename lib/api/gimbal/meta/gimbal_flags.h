@@ -14,8 +14,8 @@
 #define GBL_FLAGS_CLASS_CHECK(klass)        (GBL_CLASS_CHECK_PREFIX(klass, GBL_FLAGS))
 #define GBL_FLAGS_CLASS_TRY(klass)          (GBL_CLASS_TRY_PREFIX(klass, GBL_FLAGS))
 
-#define GBL_FLAGS_GET_CLASS(variant)        (GBL_FLAGS_CLASS(GblClass_peek(GblVariant_type(&variant))))
-#define GBL_FLAGS_TRY_CLASS(variant)        (GBL_FLAGS_CLASS_TRY(GblClass_peek(GblVariant_type(&variant))))
+#define GBL_FLAGS_GET_CLASS(variant)        (GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_type(&variant))))
+#define GBL_FLAGS_TRY_CLASS(variant)        (GBL_FLAGS_CLASS_TRY(GblClass_weakRefDefault(GblVariant_type(&variant))))
 
 #define GBL_FLAGS_ENTRY(flagsValue, nick)   { flagsValue, #flagsValue, nick }
 #define GBL_FLAGS_ENTRY_LAST()              { 0, NULL, NULL }
@@ -80,7 +80,7 @@ GBL_INLINE GblQuark     GblFlags_nickQuark              (GblFlags value, GblType
 
 GBL_INLINE GblBool      GblFlags_check                  (GblFlags value, GblType type)      GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT   GblFlags_appendString           (GblFlags value,
+GBL_EXPORT GBL_RESULT   GblFlags_appendString           (GblFlags value,
                                                          GblType type,
                                                          GblStringBuffer* pBuffer)          GBL_NOEXCEPT;
 
@@ -125,78 +125,66 @@ GBL_INLINE GblBool GblFlagsClass_valueCheck(const GblFlagsClass* pSelf, GblFlags
 
 
 GBL_INLINE GblFlags GblFlags_fromName(const char* pName, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     GblFlags value = GblFlagsClass_valueFromName(pClass, pName);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return value;
 }
 GBL_INLINE GblFlags GblFlags_fromNameQuark(GblQuark name, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     GblFlags value = GblFlagsClass_valueFromNameQuark(pClass, name);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return value;
 }
 GBL_INLINE GblFlags GblFlags_fromNick(const char* pNick, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     GblFlags value = GblFlagsClass_valueFromNick(pClass, pNick);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return value;
 }
 GBL_INLINE GblFlags GblFlags_fromNickQuark(GblQuark nick, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     GblFlags value = GblFlagsClass_valueFromNickQuark(pClass, nick);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return value;
 }
 
 GBL_INLINE GblFlags GblFlags_fromString(const char* pName, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     GblFlags value = GblFlagsClass_valueFromString(pClass, pName);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return value;
 }
 
 GBL_INLINE const char* GblFlags_name(GblFlags value, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     const char* pName = GblFlagsClass_nameFromValue(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return pName;
 }
 GBL_INLINE GblQuark GblFlags_nameQuark(GblFlags value, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     GblQuark name = GblFlagsClass_nameQuarkFromValue(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return name;
 }
 GBL_INLINE const char* GblFlags_nick(GblFlags value, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     const char* pNick = GblFlagsClass_nickFromValue(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return pNick;
 }
 GBL_INLINE GblQuark GblFlags_nickQuark(GblFlags value, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     GblQuark nick = GblFlagsClass_nickQuarkFromValue(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return nick;
 }
 GBL_INLINE GblBool GblFlags_check(GblFlags value, GblType type) GBL_NOEXCEPT {
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
     GblBool result = GblFlagsClass_valueCheck(pClass, value);
-    GblClass_unref(GBL_CLASS(pClass));
+    GblClass_unrefDefault(GBL_CLASS(pClass));
     return result;
-}
-
-GBL_INLINE GBL_RESULT GblFlags_appendString(GblFlags value,
-                                            GblType type,
-                                            GblStringBuffer* pBuffer) GBL_NOEXCEPT
-{
-    GBL_API_BEGIN(NULL);
-    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_ref(type));
-    GBL_API_CALL(GblFlagsClass_valueAppendString(pClass, value, pBuffer));
-    GblClass_unref(GBL_CLASS(pClass));
-    GBL_API_VERIFY_LAST_RECORD();
-    GBL_API_END();
 }
 
 

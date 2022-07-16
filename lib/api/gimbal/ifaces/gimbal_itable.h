@@ -2,6 +2,7 @@
 #define GIMBAL_ITABLE_H
 
 #include "../meta/gimbal_interface.h"
+#include "../meta/gimbal_instance.h"
 
 GBL_DECLS_BEGIN
 

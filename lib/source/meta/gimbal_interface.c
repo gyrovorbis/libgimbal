@@ -1,7 +1,7 @@
 #include <gimbal/meta/gimbal_interface.h>
 
 GBL_EXPORT GblClass* GblInterface_outerClass(GblInterface* pSelf) GBL_NOEXCEPT {
-    return pSelf? (GblClass*)((uintptr_t)pSelf + pSelf->outerClassOffset) : NULL;
+    return pSelf? (GblClass*)((uintptr_t)pSelf + pSelf->outerClassOffset_) : NULL;
 }
 
 GBL_EXPORT GblClass* GblInterface_outerMostClass(GblInterface* pSelf) GBL_NOEXCEPT {
@@ -12,7 +12,7 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass(GblInterface* pSelf) GBL_NOEXCE
     return pClass;
 }
 
-GBL_EXPORT GblInterface* GblInterface_try(GblClass* pClass) GBL_NOEXCEPT {
+GBL_EXPORT GblInterface* GblInterface_fromClass(GblClass* pClass) GBL_NOEXCEPT {
     return GblClass_isInterfaceImpl(pClass)? (GblInterface*)pClass : NULL;
 }
 

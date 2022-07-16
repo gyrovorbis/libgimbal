@@ -2,6 +2,7 @@
 #define GIMBAL_IEVENT_HANDLER_H
 
 #include "../meta/gimbal_interface.h"
+#include "../meta/gimbal_instance.h"
 
 #define GBL_IEVENT_HANDLER_TYPE                     GBL_BUILTIN_TYPE(IEVENT_HANDLER)
 #define GBL_IEVENT_HANDLER_STRUCT                   GblIEventHandler

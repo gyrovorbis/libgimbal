@@ -61,7 +61,7 @@ typedef struct GblObjectClass {
     GBL_RESULT (*pFnPropertyGet)        (CSELF, GblSize id, GblVariant* pValue, const GblProperty* pProp);
     GBL_RESULT (*pFnPropertySet)        (SELF,  GblSize id, const GblVariant* pValue, const GblProperty* pProp);
     //GBL_RESULT (*pFnSlotCall)           (SELF,  GblSize id, GblVariant* pRet, GblUint argc, GblVariant* pArgs, const GblSlot* pSlot);
-    GBL_RESULT (*pFnPropertyNotify)     (SELF,  GblProperty* pProperty);    // signal
+    //GBL_RESULT (*pFnPropertyNotify)     (SELF,  GblProperty* pProperty);    // signal
 } GblObjectClass;
 
 typedef enum GBL_OBJECT_ATTRIBUTE {
@@ -175,7 +175,7 @@ GBL_EXPORT GblObject*         GblObject_ref                 (GblObject* pObject)
 GBL_EXPORT GblRefCount        GblObject_unref               (GblObject* pObject)                                                GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount        GblObject_refCount            (const GblObject* pObject)                                          GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT         GblObject_attributeSet        (SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value)                  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT         GblObject_setAttribute        (SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value)                  GBL_NOEXCEPT;
 GBL_INLINE GblBool            GblObject_attribute           (CSELF, GBL_OBJECT_ATTRIBUTE attrib)                                GBL_NOEXCEPT;
 
 GBL_API                       GblObject_get                 (CSELF, ...) GBL_NULL_TERMINATED                                    GBL_NOEXCEPT;
@@ -208,6 +208,13 @@ GBL_INLINE GBL_RESULT         GblObject_propertySetQuark    (SELF,  GblQuark nam
 
 GBL_INLINE GBL_RESULT         GblObject_propertyGetString   (CSELF, const char* pName, GblVariant* pValue)                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT         GblObject_propertySetString   (SELF,  const char* pName, const GblVariant* pValue)                GBL_NOEXCEPT;
+
+GBL_EXPORT uintptr_t          GblObject_fieldValue          (CSELF, GblQuark name)                                              GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT         GblObject_setFieldVariantCopy (SELF, GblQuark name, const GblVariant* pVariant)                   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT         GblObject_setFieldUserdata    (SELF, GblQuark name, void* pData, GblArrayMapDestructFn* pFnDtor)  GBL_NOEXCEPT;
+GBL_EXPORT GblBool            GblObject_hasField            (CSELF, GblQuark name)                                              GBL_NOEXCEPT;
+GBL_EXPORT GblBool            GblObject_checkField          (CSELF, GblQuark name, GblType type)                                GBL_NOEXCEPT;
+
 
 //GBL_INLINE GBL_RESULT         GblObject_propertyGetWithId   (CSELF, GblSize id, GblVariant* pValue)                             GBL_NOEXCEPT;
 //GBL_INLINE GBL_RESULT         GblObject_propertySetWithId   (SELF, GblSize id, const GblVariant* pValue)                        GBL_NOEXCEPT;
@@ -271,14 +278,14 @@ GBL_INLINE const GblProperty* GblObject_propertyNext(CSELF, const GblProperty* p
 }
 GBL_INLINE GBL_RESULT GblObject_propertySet(SELF, const GblProperty* pProperty, const GblVariant* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    GblClass* pClass = GblClass_peek(GblProperty_objectType(pProperty));
+    GblClass* pClass = GblClass_weakRefDefault(GblProperty_objectType(pProperty));
     GBL_API_VERIFY_EXPRESSION(pClass);
     GBL_API_CALL(GBL_OBJECT_CLASS(pClass)->pFnPropertySet(pSelf, GblProperty_id(pProperty), pValue, pProperty));
     GBL_API_END();
 }
 GBL_INLINE GBL_RESULT GblObject_propertyGet(CSELF, const GblProperty* pProperty, GblVariant* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    GblClass* pClass = GblClass_peek(GblProperty_objectType(pProperty));
+    GblClass* pClass = GblClass_weakRefDefault(GblProperty_objectType(pProperty));
     GBL_API_VERIFY_EXPRESSION(pClass);
     GBL_API_CALL(GBL_OBJECT_CLASS(pClass)->pFnPropertyGet(pSelf, GblProperty_id(pProperty), pValue, pProperty));
     GBL_API_END();
@@ -347,7 +354,7 @@ GBL_INLINE GblObject* GblObject_siblingFindByName(CSELF, const char* pName) GBL_
     return pObject;
 }
 
-GBL_INLINE GBL_RESULT GblObject_attributeSet(SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblObject_setAttribute(SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value) GBL_NOEXCEPT {
     GBL_UNUSED(value && pSelf);
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_ARG(attrib < GBL_OBJECT_ATTRIBUTE_COUNT);

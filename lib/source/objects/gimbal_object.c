@@ -70,6 +70,7 @@ static GBL_RESULT GblObjectClass_ivariantIFace_set_(GblVariant* pSelf, GblUint a
 }
 
 static GBL_RESULT GblObjectClass_ivariantIFace_load_(GblVariant* pVariant, const GblStringBuffer* pString) {
+    GBL_UNUSED(pVariant && pString);
     return GBL_RESULT_UNIMPLEMENTED;
 }
 
@@ -419,7 +420,7 @@ static GBL_RESULT GblObjectClass_final_(GblObjectClass* pClass, void* pClassData
     GBL_API_BEGIN(pCtx);
 
     if(!GblType_classRefCount(GBL_CLASS_TYPEOF(pClass))) {
-        const GblBool result = gblPropertyTableEraseAll(GblType_fromClass(GBL_CLASS(pClass)));
+        const GblBool result = gblPropertyTableEraseAll(GBL_CLASS_TYPEOF(pClass));
         GBL_API_VERIFY_EXPRESSION(result);
     }
 
@@ -495,7 +496,6 @@ GBL_EXPORT GblObject* GblObject_new(GblType type, ...) GBL_NOEXCEPT {
 
 GBL_EXPORT GblObject* GblObject_newWithClass(GblObjectClass* pClass, ...) GBL_NOEXCEPT
 {
-    const GblType type = GBL_CLASS_TYPEOF(pClass);
     GblObject* pObject = NULL;
     va_list    varArgs;
     va_start(varArgs, pClass);
@@ -518,7 +518,6 @@ GBL_EXPORT GBL_RESULT GblObject_newInPlace(GblObject* pSelf, GblType type, ...) 
 }
 
 GBL_EXPORT GBL_RESULT GblObject_newInPlaceWithClass(GblObject* pSelf, GblObjectClass* pClass, ...) GBL_NOEXCEPT {
-    const GblType type = GBL_CLASS_TYPEOF(pClass);
     va_list    varArgs;
     va_start(varArgs, pClass);
     GBL_API_BEGIN(NULL);

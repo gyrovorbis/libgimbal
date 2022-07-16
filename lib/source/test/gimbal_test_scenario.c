@@ -77,7 +77,9 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
 
         GBL_API_VERIFY_CALL(pClass->pFnSuiteBegin(pSelf, pSuiteIt));
 
+        GBL_API_PUSH();
         GBL_API_CALL(GblTestSuite_suiteInit(pSuiteIt, pCtx));
+        GBL_API_POP(1);
 
         if(GBL_RESULT_ERROR(GBL_API_RESULT())) {
             GBL_API_ERROR("[GblTestSuite] Failed to initailize test suite[%s], skipping: %s",
@@ -106,21 +108,28 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                     suiteFailed = GBL_TRUE;
                 } else {
 
+                    GBL_API_INFO("%-12s: %s::%s", "[ RUN       ]",
+                                 GblTestSuite_name(pSelf_->pCurSuite),
+                                 pSelf_->pCurCase);
+
                     ++pSelf->casesRun;
+                    GBL_API_PUSH();
                     GBL_RESULT result = GblTestSuite_caseRun(pSuiteIt, pCtx, idx);
+                    GBL_API_POP(1);
+
                     if(result == GBL_RESULT_SKIPPED) {
                         ++pSelf->casesSkipped;
-                        GBL_API_INFO("%-12s: %s::%s", "[ SKIPPED ]",
+                        GBL_API_INFO("%-12s: %s::%s", "[  SKIPPED  ]",
                                      GblTestSuite_name(pSelf_->pCurSuite),
                                      pSelf_->pCurCase);
                     } else if(!GBL_RESULT_ERROR(result)) {
                         ++pSelf->casesPassed;
-                        GBL_API_INFO("%-12s: %s::%s", "[ PASSED ]",
+                        GBL_API_INFO("%-12s: %s::%s", "[      PASS ]",
                                      GblTestSuite_name(pSelf_->pCurSuite),
                                      pSelf_->pCurCase);
                     } else {
                         ++pSelf->casesFailed;
-                        GBL_API_INFO("%-12s: %s::%s", "[ FAILED ]",
+                        GBL_API_INFO("%-12s: %s::%s", "[      FAIL ]",
                                      GblTestSuite_name(pSelf_->pCurSuite),
                                      pSelf_->pCurCase);
                         suiteFailed = GBL_TRUE;
@@ -138,7 +147,9 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                 }
             }
 
+            GBL_API_PUSH();
             GBL_API_CALL(GblTestSuite_suiteFinal(pSuiteIt, pCtx));
+            GBL_API_POP(1);
 
             if(GBL_RESULT_ERROR(GBL_API_RESULT())) {
                 GBL_API_ERROR("[GblTestSuite] Failed to finalize test suite[%s], skipping: %s",

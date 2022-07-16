@@ -2,6 +2,7 @@
 #define GIMBAL_PLUGIN_H
 
 #include "../meta/gimbal_interface.h"
+#include "../meta/gimbal_instance.h"
 
 #define GBL_IPLUGIN_TYPE                    (GblIPlugin_type())
 #define GBL_IPLUGIN_STRUCT                  GblIPlugin

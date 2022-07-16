@@ -14,8 +14,6 @@
 
 #define GBL_INSTANCE(instance)                                  ((GblInstance*)instance)
 #define GBL_INSTANCE_CLASS(instance)                            (GblInstance_class(GBL_INSTANCE(instance)))
-#define GBL_INSTANCE_CLASS_SUPER(instance)                      (GblInstance_classSuper(GBL_INSTANCE(instance)))
-#define GBL_INSTANCE_CLASS_DEFAULT(instance)                    (GblInstance_classDefault(GBL_INSTANCE(instance)))
 #define GBL_INSTANCE_TYPEOF(instance)                           (GblInstance_typeOf(GBL_INSTANCE(instance)))
 #define GBL_INSTANCE_PRIVATE(instance, type)                    (GblInstance_private(GBL_INSTANCE(instance), type))
 #define GBL_INSTANCE_PUBLIC(instPriv, type)                     (GblInstance_public((const void*)instPriv, type))
@@ -27,9 +25,9 @@
 #define GBL_INSTANCE_TRY(instance, toType, cType)               ((cType*)GblInstance_try((GblInstance*)instance, toType))
 #define GBL_INSTANCE_TRY_PREFIX(instance, typePrefix)           (GBL_INSTANCE_TRY(instance, typePrefix##_TYPE, typePrefix##_STRUCT))
 
-#define GBL_INSTANCE_GET_CLASS(instance, toType, cType)         ((cType*)GblClass_cast(GblClass_peekFromInstance((GblInstance*)instance), toType))
+#define GBL_INSTANCE_GET_CLASS(instance, toType, cType)         ((cType*)GblClass_cast(GblInstance_class((GblInstance*)instance), toType))
 #define GBL_INSTANCE_GET_CLASS_PREFIX(instance, typePrefix)     (GBL_INSTANCE_GET_CLASS(instance, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
-#define GBL_INSTANCE_TRY_CLASS(instance, toType, cType)         ((cType*)GblClass_try(GblClass_peekFromInstance((GblInstance*)instance), toType))
+#define GBL_INSTANCE_TRY_CLASS(instance, toType, cType)         ((cType*)GblClass_try(GblInstance_class((GblInstance*)instance), toType))
 #define GBL_INSTANCE_TRY_CLASS_PREFIX(instance, typePrefix)     (GBL_INSTANCE_TRY_CLASS(instance, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
 
 #define GBL_INSTANCE_VCALL(type, classType, method, ...)        GBL_INSTANCE_VCALL_((void*), type, classType, method, __VA_ARGS__)
@@ -57,21 +55,16 @@ GBL_DECLS_BEGIN
  * \sa GblClass, GblType, GblObject
  */
 typedef struct GblInstance {
-    GblClass*   pClass; ///< Pointer to Instance's Class
+    GblClass*   pClass_; ///< Pointer to Instance's Class, do not modify directly
 } GblInstance;
 
 GBL_EXPORT GblInstance* GblInstance_create              (GblType type)              GBL_NOEXCEPT;
 GBL_EXPORT GblInstance* GblInstance_createWithClass     (GblClass* pClass)          GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblInstance_destroy             (SELF)                      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblInstance_construct           (SELF, GblType type)        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblInstance_constructWithClass  (SELF, GblClass* pClass)    GBL_NOEXCEPT;
-
-GBL_EXPORT GblRefCount  GblInstance_destroy             (SELF)                      GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount  GblInstance_destruct            (SELF)                      GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT   GblInstance_classSwizzle        (SELF, GblClass* pClass)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_classSink           (SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_classFloat          (SELF)                      GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool      GblInstance_check               (CSELF, GblType toType)     GBL_NOEXCEPT;
 GBL_EXPORT GblInstance* GblInstance_cast                (SELF, GblType toType)      GBL_NOEXCEPT;
@@ -82,13 +75,14 @@ GBL_EXPORT GblInstance* GblInstance_public              (const void* pPrivate,
                                                          GblType     base)          GBL_NOEXCEPT;
 
 GBL_EXPORT GblType      GblInstance_typeOf              (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblInstance_typeName            (CSELF)                     GBL_NOEXCEPT;
 GBL_EXPORT GblSize      GblInstance_size                (CSELF)                     GBL_NOEXCEPT;
 GBL_EXPORT GblSize      GblInstance_privateSize         (CSELF)                     GBL_NOEXCEPT;
 GBL_EXPORT GblSize      GblInstance_totalSize           (CSELF)                     GBL_NOEXCEPT;
+
 GBL_EXPORT GblClass*    GblInstance_class               (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblClass*    GblInstance_classSuper          (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblClass*    GblInstance_classDefault        (CSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_swizzleClass        (SELF, GblClass* pClass)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_sinkClass           (SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_floatClass          (SELF)                      GBL_NOEXCEPT;
 
 // ========== IMPL ==========
 
@@ -110,6 +104,12 @@ GBL_EXPORT GblClass*    GblInstance_classDefault        (CSELF)                 
     } GBL_STMT_END
 ///\endcond
 
+
+/*! \def GBL_INSTANCE_TYPE
+ *  Builtin type ID for a GblInstance type
+ *  \ingroup metaBuiltinTypes
+ */
+
 /*! \fn GblInstance* GblInstance_create(GblType type)
  * Creates an instance on the heap with a reference to the default class for the given type.
  * \note Only meta types with the GBL_TYPE_ROOT_FLAGS_INSTANTIABLE and without the
@@ -122,7 +122,7 @@ GBL_EXPORT GblClass*    GblInstance_classDefault        (CSELF)                 
 
 /*! \fn GblInstance* GblInstance_createWithClass(GblClass* pClass)
 * Creates an instance using the given floating class to override the type's default class.
-* \note The instance does not automatically assume ownership of the class. Use GblInstance_classSink
+* \note The instance does not automatically assume ownership of the class. Use GblInstance_sinkClass
 *       to bind the lifetime of a floating class to an instance.
 * \relatesalso GblInstance
 * \param pClass floating class
@@ -168,7 +168,7 @@ GBL_EXPORT GblClass*    GblInstance_classDefault        (CSELF)                 
 * \sa GblInstance_destroy
 */
 
-/*! \fn GBL_RESULT GblInstance_classSwizzle(GblInstance* pSelf, GblClass* pClass)
+/*! \fn GBL_RESULT GblInstance_swizzleClass(GblInstance* pSelf, GblClass* pClass)
 * Releases ownership of the instance's current class, replacing it with a type-compatible class.
 * This is analogous to Objective-C's "is-a swizzling."
 * \note The instance does not automatically assume ownersip of the new class.
@@ -176,25 +176,27 @@ GBL_EXPORT GblClass*    GblInstance_classDefault        (CSELF)                 
 * \param pSelf instance
 * \param pClass replacement GblClass of compatible type
 * \returns result code
-* \sa GblInstance_classSink
+* \sa GblInstance_sinkClass
 */
 
-/*! \fn GBL_RESULT GblInstance_classSink(GblInstance* pSelf)
+/*! \fn GBL_RESULT GblInstance_sinkClass(GblInstance* pSelf)
 * Claims ownership of the previously floating class contained by the instance, binding
 * the lifetime of the two, so that the class will be finalized when the instance is finalized.
+* \attention ONLY a GblClass that has been created or constructed as a floating class can be
+* sunk. Attempting to sink the default class for a given type will result in an erro!
 * \relatesalso GblInstance
 * \param pSelf instance
 * \returns result code
-* \sa GblInstance_classFloat
+* \sa GblInstance_floatClass, GblClass_isFloating(), GblClass_createFloating(), GblClass_constructFloating()
 */
 
-/*! \fn GBL_RESULT GblInstance_classFloat(GblInstance* pSelf)
+/*! \fn GBL_RESULT GblInstance_floatClass(GblInstance* pSelf)
 * Releases ownership of the owned class contained by the instance. The class will no
 * longer be finalized along with the given instance.
 * \relatesalso GblInstance
 * \param pSelf instance
 * \returns result code
-* \sa GblInstance_classSink
+* \sa GblInstance_sinkClass
 */
 
 /*! \fn GblBool GblInstance_check(const GblInstance* pSelf, GblType toType)
@@ -252,13 +254,6 @@ GBL_EXPORT GblClass*    GblInstance_classDefault        (CSELF)                 
 * \returns type ID or NULL if the instance is NULL
 */
 
-/*! \fn const char* GblInstance_typeName(const GblInstance* pSelf)
-* Returns the type name associated with the given instance.
-* \relatesalso GblInstance
-* \param pSelf instance pointer
-* \returns name or NULL if the instance is NULL
-*/
-
 /*! \fn GblSize GblInstance_size(const GblInstance* pSelf)
 * Returns the size of the public instance struct for the given instance.
 * \relatesalso GblInstance
@@ -288,19 +283,6 @@ GBL_EXPORT GblClass*    GblInstance_classDefault        (CSELF)                 
 * \returns class pointer or NULL if instance is NULL
 */
 
-/*! \fn GblClass* GblInstance_classSuper(const GblInstance* pSelf)
-* Returns the super (parent) class structure of the class associated with the given instance.
-* \relatesalso GblInstance
-* \param pSelf instance pointer
-* \returns super class pointer or NULL if instance is NULL
-*/
-
-/*! \fn GblClass* GblInstance_classDefault(const GblInstance* pSelf)
-* Returns the default class structure of the type associated with the given instance.
-* \relatesalso GblInstance
-* \param pSelf instance pointer
-* \returns default class pointer or NULL if instance is NULL
-*/
 GBL_DECLS_END
 
 #undef SELF

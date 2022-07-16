@@ -234,7 +234,7 @@ GBL_EXPORT GBL_RESULT GblBoxed_copy(void*      pBoxed,
                                     void**     ppNewBoxed)
 {
     GBL_API_BEGIN(NULL);
-    GblBoxedClass* pClass = GBL_BOXED_CLASS(GblClass_peek(type));
+    GblBoxedClass* pClass = GBL_BOXED_CLASS(GblClass_weakRefDefault(type));
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_VERIFY_CALL(pClass->pVTable->pFnCopy(pBoxed, ppNewBoxed));
     GBL_API_END();
@@ -244,7 +244,7 @@ GBL_EXPORT GBL_RESULT GblBoxed_free(void*      pBoxed,
                                     GblType    type)
 {
     GBL_API_BEGIN(NULL);
-    GblBoxedClass* pClass = GBL_BOXED_CLASS(GblClass_peek(type));
+    GblBoxedClass* pClass = GBL_BOXED_CLASS(GblClass_weakRefDefault(type));
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_VERIFY_CALL(pClass->pVTable->pFnFree(pBoxed));
     GBL_API_END();

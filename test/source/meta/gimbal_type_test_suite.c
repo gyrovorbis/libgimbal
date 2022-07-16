@@ -54,8 +54,6 @@ static GBL_RESULT GblTypeTestSuite_initDefaults_(GblTestSuite* pSelf, GblContext
                                   != GBL_INVALID_TYPE);
     }
     //GBL_TEST_COMPARE(GblType_nextRegistered(prev), GBL_INVALID_TYPE);
-
-    GBL_TEST_COMPARE(GblType_fromClass(NULL), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_fromBuiltinIndex(GBL_TYPE_BUILTIN_COUNT+1), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_fromName(NULL), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_fromName("Lolol"), GBL_INVALID_TYPE);
@@ -72,7 +70,7 @@ static GBL_RESULT GblTypeTestSuite_invalid_(GblTestSuite* pSelf, GblContext* pCt
     GBL_TEST_COMPARE(GblType_root(GBL_INVALID_TYPE), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_ancestor(GBL_INVALID_TYPE, 2), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_depth(GBL_INVALID_TYPE), 0);
-    GBL_TEST_COMPARE(GblType_flagsTest(GBL_INVALID_TYPE, 0xff), 0);
+    GBL_TEST_COMPARE(GblType_flagsCheck(GBL_INVALID_TYPE, 0xff), 0);
     GBL_TEST_COMPARE(GblType_verify(GBL_INVALID_TYPE), GBL_FALSE);
     GBL_TEST_VERIFY(GblType_check(GBL_INVALID_TYPE, GBL_INVALID_TYPE));
     GBL_TEST_VERIFY(!GblType_derives(GBL_INVALID_TYPE, GBL_INVALID_TYPE));
@@ -121,7 +119,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_blank_(GblTestSuite* pSelf, GblCo
     GBL_TEST_COMPARE(GblType_ancestor(pSelf_->blankType, 0), pSelf_->blankType);
     GBL_TEST_COMPARE(GblType_ancestor(pSelf_->blankType, 1), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_depth(pSelf_->blankType), 0);
-    GBL_TEST_VERIFY(!GblType_flagsTest(pSelf_->blankType, 0xffff));
+    GBL_TEST_VERIFY(!GblType_flagsCheck(pSelf_->blankType, 0xffff));
     GBL_TEST_VERIFY(GblType_check(pSelf_->blankType, pSelf_->blankType));
     GBL_TEST_VERIFY(!GblType_check(pSelf_->blankType, GBL_INVALID_TYPE));
     GBL_TEST_VERIFY(!GblType_derives(pSelf_->blankType, pSelf_->blankType));
@@ -207,7 +205,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_valid_(GblT
     GBL_TEST_COMPARE(GblType_depth(pSelf_->derivable), 0);
     GBL_TEST_COMPARE(GblType_base(pSelf_->derivable, 0), pSelf_->derivable);
     GBL_TEST_COMPARE(GblType_ancestor(pSelf_->derivable, 0), pSelf_->derivable);
-    GBL_TEST_VERIFY(GblType_flagsTest(pSelf_->derivable,
+    GBL_TEST_VERIFY(GblType_flagsCheck(pSelf_->derivable,
                                   GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE));
     GBL_TEST_VERIFY(GblType_verify(pSelf_->derivable));
     pSelf_->middleDerived = GblType_registerStatic("MiddleDerived",

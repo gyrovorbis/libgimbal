@@ -1,17 +1,10 @@
-/*  \file
+/*!  \file
  *  \brief GblClass structure and related functions
  *  \ingroup meta
  *  \ref floatingClasses
  *  \ref classSwizzling
  *  \sa gimbal_instance.h, gimbal_type.h
  *
- *  // Referencing semantics, getting default class
- *  // lazy class allocation
- *  // creating floating classes
- *  // check, cast, try
- *  // private data
- *  // property accessors
- *  // utility macros
  */
 #ifndef GIMBAL_CLASS_H
 #define GIMBAL_CLASS_H
@@ -23,6 +16,7 @@
 #define GBL_CLASS_SUPER(klass)                      (GblClass_super(GBL_CLASS(klass)))
 #define GBL_CLASS_DEFAULT(klass)                    (GblClass_default(GBL_CLASS(klass)))
 #define GBL_CLASS_PRIVATE(klass, type)              (GblClass_private(GBL_CLASS(klass), type))
+#define GBL_CLASS_PUBLIC(klassPrivate, type)        (GblClass_public(klassPriv, type))
 
 #define GBL_CLASS_CHECK(klass, toType)              (GblClass_check((GblClass*)klass, toType))
 #define GBL_CLASS_CHECK_PREFIX(klass, typePrefix)   (GBL_CLASS_CHECK(klass, typePrefix##_TYPE))
@@ -61,43 +55,50 @@ typedef struct GblClass {
     uintptr_t   private_;   ///< pointer-sized private member which is used by the back-end
 } GblClass;
 
-GBL_EXPORT GblClass*    GblClass_ref                (GblType type)              GBL_NOEXCEPT;
-GBL_EXPORT GblClass*    GblClass_refFromExisting    (GblClass* pClass)          GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblClass_unref              (SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_refDefault         (GblType type)          GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount GblClass_unrefDefault       (SELF)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblClass*    GblClass_peek               (GblType type)              GBL_NOEXCEPT;
-GBL_EXPORT GblClass*    GblClass_peekFromInstance   (const GblInstance* pInst)  GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_weakRefDefault     (GblType type)          GBL_NOEXCEPT;
 
-GBL_EXPORT GblClass*    GblClass_createFloating     (GblType type)              GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblClass_constructFloating  (SELF, GblType type)        GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_createFloating     (GblType type)          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblClass_destroyFloating    (SELF)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblClass_destroyFloating    (SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblClass_destructFloating   (SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblClass_constructFloating  (SELF, GblType type)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblClass_destructFloating   (SELF)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool      GblClass_check              (CSELF, GblType toType)     GBL_NOEXCEPT;
-GBL_EXPORT GblClass*    GblClass_cast               (SELF, GblType toType)      GBL_NOEXCEPT;
-GBL_EXPORT GblClass*    GblClass_try                (SELF, GblType toType)      GBL_NOEXCEPT;
-GBL_EXPORT void*        GblClass_private            (CSELF, GblType type)       GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_check              (CSELF, GblType toType) GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_cast               (SELF, GblType toType)  GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_try                (SELF, GblType toType)  GBL_NOEXCEPT;
 
-GBL_EXPORT GblType      GblClass_typeOf             (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblClass_typeName           (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblClass_size               (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblClass_privateSize        (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblClass_totalSize          (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblClass*    GblClass_super              (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblClass*    GblClass_default            (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblClass_isDefault          (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblClass_isOverridden       (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblClass_isFloating         (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblClass_isInterface        (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblClass_isInterfaceImpl    (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblClass_isOwned            (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblClass_isInPlace          (CSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT void*       GblClass_private            (CSELF, GblType type)   GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_public             (const void* pPrivate,
+                                                    GblType    base)       GBL_NOEXCEPT;
+
+GBL_EXPORT GblType     GblClass_typeOf             (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblClass_size               (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblClass_privateSize        (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblClass_totalSize          (CSELF)                 GBL_NOEXCEPT;
+
+GBL_EXPORT GblClass*   GblClass_super              (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_default            (CSELF)                 GBL_NOEXCEPT;
+
+GBL_EXPORT GblBool     GblClass_isDefault          (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isOverridden       (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isFloating         (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isInterface        (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isInterfaceImpl    (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isOwned            (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isInPlace          (CSELF)                 GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
 #undef SELF
 #undef CSELF
+
+/*! \def GBL_STATIC_CLASS_TYPE
+ *   Builtin type ID for a class-only types
+ *  \ingroup metaBuiltinTypes
+ */
 
 /*! \fn GBL_CLASS(klass)
  *  \param klass pointer to a GblClass-compatible
@@ -140,6 +141,15 @@ GBL_DECLS_END
  * Convenience wrapper around GblClass_private() which automatically casts.
  */
 
+/*! \fn GBL_CLASS_PUBLIC(klassPrivate, type)
+ *  \param klassPrivate void* pointer to private class data
+ *  \param type supertype owning the private data
+ *  \returns public GblClass* pointer or NULL if none could be found
+ *  \relatesalso GblClass
+ *  \sa GblClass_public()
+ * Convenience wrapper around GblClass_public().
+ */
+
 /*! \fn GBL_CLASS_CHECK(klass, toType)
  *  \param klass pointer to a GblClass-compatible
  *  \param toType the desired destination type
@@ -151,7 +161,7 @@ GBL_DECLS_END
  */
 /*! \fn GBL_CLASS_CHECK_PREFIX(klass, typePrefix)
  *  \param klass pointer to a GblClass-compatible
- *  \param prefix of the given type (type name macro identifier minus _TYPE postfix)
+ *  \param typePrefix prefix of the given type (type name macro identifier minus _TYPE postfix)
  *  \returns true if the given class can be casted to a calss of toType
  *  \relatesalso GblClass
  *  \sa GBL_CLASS_CHECK_PREFIX(), GblClass_check()
@@ -189,7 +199,6 @@ GBL_DECLS_END
  * for derived types.
  */
 
-
 /*! \fn GBL_CLASS_TRY(klass, toType, cType)
  *  \param klass pointer to a GblClass-compatible
  *  \param toType desination type for resulting class
@@ -218,73 +227,21 @@ GBL_DECLS_END
  *
  */
 
-
 /*!
- * \fn GblClass* GblClass_ref(GblType type)
+ * \fn GblClass* GblClass_refDefault(GblType type)
  *  Returns a new reference to the existing internally managed default class for the given type or
- *  lazily allocates a new one with a refCount of 1.
+ *  lazily allocates a new one with an initial refCount of 1.
  * \note
- *  When you're done using the reference, it must be released using GblClass_unref() in order to avoid
+ *  When you're done using the reference, it must be released using GblClass_unrefDefault() in order to avoid
  *  memory leaks!
  * \relatesalso GblClass
  * \param type classed type ID
  * \returns reference to internally managed class
- * \sa GblClass_peek, GblClass_unref
+ * \sa GblClass_weakRefDefault, GblClass_unrefDefault
  */
 
 /*!
- * \fn GblClass* GblClass_createFloating(GblType type)
- *  Creates a new, unowned class for the given type on the heap.
- * \relatesalso GblClass
- * \param type classed type ID
- * \returns dynamically allocated unowned class
- * \sa GblClass_constructFloating, GblClass_destroyFloating, floatingClasses
- */
-
-/*!
- * \fn GBL_RESULT GblClass_constructFloating(GblClass* pSelf, GblType type)
- *  Placement constructs an unowned class for the given type using an existing
- *  user-provided allocation.
- * \relatesalso GblClass
- * \param pSelf pointer to instance allocation
- * \param type type of instance to construct
- * \returns result code
- * \sa GblClass_createFloating, GblClass_destructFloating
- */
-
-/*!
- * \fn GblClass* GblClass_peek(GblType type)
- *   Returns a pointer to the default class for the given type without incrementing refCount.
- *   \note
- *   If there has not yet been a class created, or one is no longer active, this call will
- *   raise an error followed by returning NULL. Since no references are being created, only
- *   use this within contexts where you know a class reference already exists.
- * \relatesalso GblClass
- * \param type type of desired class
- * \returns pointer to a GblClss or NULL upon failure
- * \sa GblClass_ref
- */
-
-/*!
- * \fn GblClass* GblClass_peekFromInstance(const GblInstance* pInstance)
- *   Retrieves an existing reference to a class held by an instance wthout incrementing refCount.
- * \relatesalso GblClass
- * \param pInstance instance pointer
- * \returns pointer to a GblClass
- * \sa GblClass_peek
- */
-
-/*!
- * \fn GblClass* GblClass_refFromExisting(GblClass* pClass)
- *   Returns a reference to an existing class, incrementing its reference count by 1.
- *   \param pClass existing class pointer
- *   \returns same pointer passed in
- *   \relatesalso GblClass
- *   \sa GblClass_ref, GblClass_unref
-*/
-
-/*!
- * \fn GblRefCount GblClass_unref(GblClass* pSelf)
+ * \fn GblRefCount GblClass_unrefDefault(GblClass* pSelf)
  *  Release a reference to the default class associated with pSelf,
  *  destroying the class if it's reference count hits 0.
  *  \note
@@ -300,7 +257,29 @@ GBL_DECLS_END
  *  \param pSelf reference to class
  *  \returns remaining reference count
  * \relatesalso GblClass
- * \sa GblClass_ref
+ * \sa GblClass_refDefault
+ */
+
+/*!
+ * \fn GblClass* GblClass_weakRefDefault(GblType type)
+ *   Returns a pointer to the default class for the given type without incrementing refCount.
+ *   \note
+ *   If there has not yet been a class created, or one is no longer active, this call will
+ *   raise an error followed by returning NULL. Since no references are being created, only
+ *   use this within contexts where you know a class reference already exists.
+ * \relatesalso GblClass
+ * \param type type of desired class
+ * \returns pointer to a GblClss or NULL upon failure
+ * \sa GblClass_refDefault
+ */
+
+/*!
+ * \fn GblClass* GblClass_createFloating(GblType type)
+ *  Creates a new, unowned class for the given type on the heap.
+ * \relatesalso GblClass
+ * \param type classed type ID
+ * \returns dynamically allocated unowned class
+ * \sa GblClass_constructFloating, GblClass_destroyFloating, floatingClasses
  */
 
 /*!
@@ -315,9 +294,20 @@ GBL_DECLS_END
 *  Do not call this with a stack-constructed in-place floating class
 *  constructed with GblClass_constructFloating()
 *  Luckily libGyro will catch it for you and return an error.
-*  \param class pointer
+*  \param pSelf GblClass pointer
 *  \returns destructor result code or GBL_RESULT_ERROR_INVALID_OPERATION
 *  \sa GblClass_destructFloating, GblClass_createFloating
+ */
+
+/*!
+ * \fn GBL_RESULT GblClass_constructFloating(GblClass* pSelf, GblType type)
+ *  Placement constructs an unowned class for the given type using an existing
+ *  user-provided allocation.
+ * \relatesalso GblClass
+ * \param pSelf pointer to instance allocation
+ * \param type type of instance to construct
+ * \returns result code
+ * \sa GblClass_createFloating, GblClass_destructFloating
  */
 
 /*!
@@ -330,7 +320,7 @@ GBL_DECLS_END
  *  Do not call this with a heap-allocated floating class,
  *  created with GblClass_createFloating().
  *  Luckily libGyro will catch it for you and return an error.
- *  \param class pointer
+ *  \param pSelf class pointer
  *  \return destructor result code or GBL_RESULT_ERROR_INVALID_OPERATION
  * \relatesalso GblClass
  * \sa GblClass_destroyFloating, GblClass_constructFloating
@@ -380,6 +370,189 @@ GBL_DECLS_END
  * \param type type owning the private data
  * \returns pointer to private data or NULL upon failure
  * \relatesalso GblClass
+ * \sa GblClass_public()
+*/
+
+/*!
+ * \fn GblClass* GblClass_public(const void* pPrivate, GblType base)
+ * Retrieves the public GblClass corresponding to the given private data
+ * pointer for the given type or base type or NULL upon failure.
+ * \param pPrivate pointer to private data
+ * \param base type or base type that registered the private data
+ * \returns pointer to public GblClass* or NULL upon failure
+ * \relatesalso GblClass
+*/
+
+/*!
+ * \fn GblType GblClass_typeOf(const GblClass* pSelf)
+ * Returns the type associated with the given GblClass pointer,
+ * or GBL_INVALID_TYPE if the pointer is NULL.
+ * \param pSelf pointer to a GblClass
+ * \returns type ID of the class or GBL_INVALID_TYPE if NULL
+ * \relatesalso GblClass
+*/
+
+/*!
+ * \fn GblSize GblClass_size(const GblClass* pSelf)
+ * Returns the size of the public class structure for the
+ * given GblClass pointer or 0 if NULL
+ * \param pSelf pointer to a GblClass
+ * \returns size or 0 if class is NULL
+ * \relatesalso GblClass
+ * \sa GblClass_privateSize(), GblClass_totalSize()
+*/
+
+/*!
+ * \fn GblSize GblClass_privateSize(const GblClass* pSelf)
+ * Returns the TOTAL size of the private data structure
+ * associated with the type of the given class and all
+ * of its base types.
+ * \param pSelf pointer to a GblClass
+ * \returns size or 0 if class is NULL
+ * \relatesalso GblClass
+ * \sa GblClass_size(), GblClass_totalSize()
+*/
+
+/*!
+ * \fn GblSize GblClass_totalSize(const GblClass* pSelf)
+ * Returns the total combined size of the public and private
+ * class structures for the class type and all of its inherited
+ * bases.
+ * \note This is just GblClass_size() + GblClass_privateSize()
+ * \param pSelf pointer to a GblClass
+ * \returns size or 0 if class is NULL
+ * \relatesalso GblClass
+ * \sa GblClass_size(), GblClass_privateSize()
+*/
+
+/*!
+ * \fn GblClass* GblClass_super(const GblClass* pSelf)
+ * Returns the default class for the parent type of
+ * the given class type. This is typically used in the implementation of
+ * overridden methods to allow you to call into the base class's
+ * implementations.
+ * \note The returned class is a weak reference and does not impact
+ * the reference count for the parent's default class.
+ * \param pSelf pointer to a GblClass
+ * \returns pointer to parent GblClass or NULL if the given class is
+ * NULL or has no parent
+ * \relatesalso GblClass
+ * \sa GblClass_default()
+*/
+
+/*!
+ * \fn GblClass* GblClass_default(const GblClass* pSelf)
+ * Returns a weak reference to the internally-managed default class
+ * corresonding to the given class's type. This will only be different
+ * than the given argument if the class has been created either as a
+ * floating class, or if it is a pointer to the implementation of an
+ * interface. In the case of an interface, this is how you access the
+ * interface's default implementation as well.
+ * \note The returned class is a weak reference and does not impact
+ * the reference count for the default class.
+ * \param pSelf pointer to a GblClass
+ * \returns pointer to default GblClass or NULL if the given class is
+ * NULL
+ * \relatesalso GblClass
+ * \sa GblClass_isDefault()
+*/
+
+/*!
+ * \fn GblBool GblClass_isDefault(const GblClass* pSelf)
+ * Returns true if the given GblClass pointer points to the
+ * internally-managed default class for its type or false if it
+ * not the default.
+ * \note Note: The class will not be the default if it was created
+ * as separate floating class, or if it's the implementation of a
+ * GblInterface on another GblClass.
+ * \param pSelf pointer to a GblClass
+ * \returns true if default, false if not or if pSelf is NULL
+ * \relatesalso GblClass
+ * \sa GblClass_default()
+*/
+
+/*!
+ * \fn GblBool GblClass_isOverridden(const GblClass* pSelf)
+ * Inspects the internal memory of the given GblClass pointer
+ * and compares it to that of the internally managed default
+ * class, returning true if they differ or false if they are the
+ * same.
+ * \note Note: Just because a class is a floating class or an
+ * interface implementation doesn't necessarily mean it has
+ * actually been overridden to have non-default values!
+ * \param pSelf pointer to a GblClass
+ * \returns true if overridden, false if not or if pSelf is NULL
+ * \relatesalso GblClass
+*/
+
+/*!
+ * \fn GblBool GblClass_isFloating(const GblClass* pSelf)
+ * Returns true if the given GblClass is an unowned, floating
+ * class which must be manually managed, or false if it is
+ * either the default class or has been sunk by a GblInstance.
+ * \param pSelf pointer to a GblClass
+ * \returns true if floating, false if not or if pSelf is NULL
+ * \sa GblClass_createFloating(), GblClass_constructFloating(),
+ * GblInstance_sinkClass(),
+ * GblInstance_floatClass()
+ * \relatesalso GblClass
+*/
+
+/*!
+ * \fn GblBool GblClass_isFloating(const GblClass* pSelf)
+ * Returns true if the given GblClass is an unowned, floating
+ * class which must be manually managed, or false if it is
+ * either the default class or has been sunk by a GblInstance.
+ * \param pSelf pointer to a GblClass
+ * \returns true if floating, false if not or if pSelf is NULL
+ * \sa GblClass_createFloating(), GblClass_constructFloating(),
+ * GblInstance_sinkClass(),
+ * GblInstance_floatClass()
+ * \relatesalso GblClass
+*/
+
+/*!
+ * \fn GblBool GblClass_isInterface(const GblClass* pSelf)
+ * Returns true if the given GblClass is actually of or
+ * derived from GBL_INTERFACE_TYPE, false otherwise.
+ * \param pSelf pointer to a GblClass
+ * \returns true if pSelf is a GblInterface, false if not or if pSelf is NULL
+ * \sa GblClass_isInterfaceImpl
+ * \relatesalso GblClass
+*/
+
+/*!
+ * \fn GblBool GblClass_isInterfaceImpl(const GblClass* pSelf)
+ * Returns true if the given GblClass an interface *implementation*
+ * wihch has been mapped onto another GblClass, false otherwise.
+ * \param pSelf pointer to a GblClass
+ * \returns true if pSelf is a mapped GblInterface, false if not or if pSelf is NULL
+ * \sa GblClass_isInterface
+ * \relatesalso GblClass
+*/
+
+/*!
+ * \fn GblBool GblClass_isOwned(const GblClass* pSelf)
+ * Returns true if the given GblClass is a previously floating, nondefault
+ * class which has been sunk and is now owned by a GblInstance.
+ * \note This means that its lifetime has been bound to that of the instance,
+ * and it will be destructed (and deleted if necessary) with the instance.
+ * \param pSelf pointer to a GblClass
+ * \returns true if pSelf is a owned by a GblInstance, false if not or if pSelf is NULL
+ * \sa GblInstance_sinkClass(), GblInstance_floatClass()
+ * \relatesalso GblClass
+*/
+
+/*!
+ * \fn GblBool GblClass_isInPlace(const GblClass* pSelf)
+ * Returns true if the given GblClass was constructed from an existing,
+ * user-managed allocation, using GblClass_constructFloating().
+ * \note If a GblClass is both floating and in-place, it means that you are
+ * responsible for uninitializing it manually via GblClass_destructFloating()
+ * \param pSelf pointer to a GblClass
+ * \returns true if pSelf was constructed in-place, false if not or if pSelf is NULL
+ * \sa GblClass_constructFloating(), GblClass_destructFloating()
+ * \relatesalso GblClass
 */
 
 /*! \page floatingClasses Floating Classes
@@ -409,18 +582,19 @@ GBL_DECLS_END
  *
  *      // We have a brand-new, unowned class just for us!
  *      GblObjectClass* pClass = GBL_OBJECT_CLASS(GblClass_createFloating(GBL_OBJECT_TYPE));
- *      // override a virtual method on the event handler interface to do our own shit
+ *
+ *      // override a virtual method on the event handler interface to do our own thing
  *      pClass->iEventHandlerIFace.pFnEventNotify = my_event_notifier_function_;
  *
  *      // now create an instance *using our floating class* instead of the default class:
  *      GblObject* pObj = GBL_OBJECT(GblInstance_createWithClass(pClass));
  *
- *      // tell the class to assume ownership of our "floating" class by "sinking" it
- *      // if you don't sink the class, it's assumed you are maintaining its lifetime manually,
- *      // which can be useful if you want to share among multiple instances
- *      GblInstance_classSink(GBL_INSTANCE(pObj));
+ *      // Tell the class to assume ownership of our "floating" class by "sinking" it.
+ *      // If you don't sink the class, it's assumed you are maintaining its lifetime manually,
+ *      // which can be useful if you want to share among multiple instances.
+ *      GblInstance_sinkClass(GBL_INSTANCE(pObj));
  *
- *      // now it calls into our shit when the interface is used!
+ *      // now it calls into our method when the interface is used!
  *      GblIEventHandler_eventNotify(GBL_IEVENT_HANDLER(pObj), NULL);
  *
  *      // Destroys the sunk class with it
@@ -444,7 +618,7 @@ GBL_DECLS_END
  *      GblObject object;
  *      GblInstance_constructWithClass(GBL_INSTANCE(&object), &klass);
  *
- *      GblInstance_classSink(GBL_INSTANCE(&object));
+ *      GblInstance_sinkClass(GBL_INSTANCE(&object));
  *
  *      // now it calls into our shit when the interface is used!
  *      GblIEventHandler_eventNotify(GBL_IEVENT_HANDLER(&object), NULL);
@@ -491,7 +665,7 @@ GBL_DECLS_END
  *
  *      // K NOW LETS JUST SWAP THE FUCKER OUT RANDOMLY EVEN THOUGH ITS ALREADY INSTANTIATED LULUL
  *      // releases reference to default class and gets our override
- *      GblInstance_classSwizzle(GBL_INSTANCE(pObj), GBL_CLASS(pClass2));
+ *      GblInstance_swizzleClass(GBL_INSTANCE(pObj), GBL_CLASS(pClass2));
  *
  *      // tell the instance to take exclusive ownership:
  *      GblInstance_classClassSink(GBL_INSTANCE(pObj));
@@ -550,7 +724,7 @@ GBL_DECLS_END
  *      }
  *
  *      GblObject*  pObject = GBL_OBJECT(GblInstance_createWithClass(GBL_CLASS(pClass)));
- *      GblInstance_classSink(GBL_INSTANCE(pObject));
+ *      GblInstance_sinkClass(GBL_INSTANCE(pObject));
  *
  *      GblInstance_destroy(GBL_INSTANCE(pObject));
  */

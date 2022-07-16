@@ -30,7 +30,7 @@ static GBL_RESULT GblFlagsTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx)
 static GBL_RESULT GblFlagsTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(GblClass_unref(GBL_CLASS(pSelf_->pFlagsClass)), 0);
+    GBL_TEST_COMPARE(GblClass_unrefDefault(GBL_CLASS(pSelf_->pFlagsClass)), 0);
     GBL_API_END();
 }
 
@@ -50,7 +50,7 @@ static GBL_RESULT GblFlagsTestSuite_register_(GblTestSuite* pSelf, GblContext* p
     GBL_TEST_VERIFY(pSelf_->flagsType != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_FLAGS_TYPE_CHECK(pSelf_->flagsType));
 
-    pSelf_->pFlagsClass = (GblFlagsClass*)GblClass_ref(pSelf_->flagsType);
+    pSelf_->pFlagsClass = (GblFlagsClass*)GblClass_refDefault(pSelf_->flagsType);
     GBL_TEST_VERIFY(pSelf_->pFlagsClass);
     GBL_API_END();
 }

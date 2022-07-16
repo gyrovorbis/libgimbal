@@ -211,8 +211,8 @@ inline void  Type::instanceConstruct   (Type type, void* pInstance) { GblInstanc
 inline void  Type::instanceDestruct    (Type type, void* pInstance) { GblInstance_destruct(reinterpret_cast<GblInstance*>(pInstance)); }
 inline void  Type::instanceDestroy     (Type type, void* pInstance) { GblInstance_destroy(reinterpret_cast<GblInstance*>(pInstance)); }
 
-inline void* Type::classReference      (Type type) { return GblClass_ref(type); }
-inline void  Type::classUnreference    (Type type, void* pClass) { GblClass_unref(reinterpret_cast<GblClass*>(pClass)); }
+inline void* Type::classReference      (Type type) { return GblClass_refDefault(type); }
+inline void  Type::classUnreference    (Type type, void* pClass) { GblClass_unrefDefault(reinterpret_cast<GblClass*>(pClass)); }
 
 }
 
