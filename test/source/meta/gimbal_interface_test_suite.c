@@ -504,9 +504,6 @@ static GBL_RESULT checkRefCountsEnd_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_END();
 }
 
-typedef GBL_RESULT (*ClassVerifierFn)(GblClass*, GblTestSuite*, GblContext*);
-
-
 static GBL_RESULT verifyCasts_(GblClass* pClass, GblSize count, const ClassEntry_* pEntries, GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
@@ -533,7 +530,7 @@ static GBL_RESULT verifyCasts_(GblClass* pClass, GblSize count, const ClassEntry
     GBL_API_END();
 }
 
-static GBL_RESULT verifyClass_(GblEnum type, GblSize count, const ClassEntry_* pEntries,  GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT verifyClass_(GblType type, GblSize count, const ClassEntry_* pEntries,  GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
 
     GBL_API_VERIFY_CALL(checkRefCountsBegin_(pSelf, pCtx));

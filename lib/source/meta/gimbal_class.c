@@ -226,7 +226,8 @@ GBL_EXPORT GblClass* GblClass_refDefault(GblType type) GBL_NOEXCEPT {
 
     GBL_API_VERIFY(pMeta->pInfo->classSize != 0,
                    GBL_RESULT_UNIMPLEMENTED,
-                   "[GblType] Attempt to reference a class of size 0!");
+                   "[GblType] Attempt to reference class [%s] of size 0!",
+                   GblType_name(type));
 
     //GBL_API_PUSH_VERBOSE("Class::reference(%s)", GblType_name(GBL_TYPE_(pMeta)));
     GBL_TYPE_ENSURE_INITIALIZED_();
