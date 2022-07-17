@@ -126,6 +126,7 @@ set(GIMBAL_SOURCES
      source/meta/gimbal_interface.c
      source/test/gimbal_test_suite.c
      source/test/gimbal_test_scenario.c
+     source/test/gimbal_allocation_tracker.c
  )
 
 set(GIMBAL_INCLUDES
@@ -205,6 +206,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/preprocessor/gimbal_memory_resource.hpp
     api/gimbal/test/gimbal_test_suite.h
     api/gimbal/test/gimbal_test_scenario.h
+    api/gimbal/utils/gimbal_timer.h
+    api/gimbal/test/gimbal_allocation_tracker.h
     source/meta/gimbal_type_.h
 )
 

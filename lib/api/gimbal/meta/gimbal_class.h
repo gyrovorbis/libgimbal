@@ -418,7 +418,6 @@ GBL_DECLS_END
  * Returns the total combined size of the public and private
  * class structures for the class type and all of its inherited
  * bases.
- * \note This is just GblClass_size() + GblClass_privateSize()
  * \param pSelf pointer to a GblClass
  * \returns size or 0 if class is NULL
  * \relatesalso GblClass

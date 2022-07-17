@@ -84,7 +84,6 @@ static GBL_RESULT GblQuarkTestSuite_fromStringSized_(GblTestSuite* pSelf, GblCon
 
 static GBL_RESULT GblQuarkTestSuite_tryString_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
     GblQuark quark = GblQuark_tryString(NULL);
     GBL_TEST_COMPARE(quark, GBL_QUARK_INVALID);

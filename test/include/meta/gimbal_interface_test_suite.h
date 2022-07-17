@@ -1,5 +1,5 @@
-#ifndef GBIMAL_INTERFACE_TEST_SUITE_H
-#define GBIMAL_INTERFACE_TEST_SUITE_H
+#ifndef GIMBAL_INTERFACE_TEST_SUITE_H
+#define GIMBAL_INTERFACE_TEST_SUITE_H
 
 #include <gimbal/test/gimbal_test_suite.h>
 
@@ -27,4 +27,4 @@ GBL_EXPORT GblType GblInterfaceTestSuite_type(void) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
-#endif // GBIMAL_INTERFACE_TEST_SUITE_H
+#endif // GIMBAL_INTERFACE_TEST_SUITE_H

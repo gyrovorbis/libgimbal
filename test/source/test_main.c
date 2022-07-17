@@ -14,6 +14,7 @@
 #include "meta/gimbal_type_test_suite.h"
 #include "meta/gimbal_class_test_suite.h"
 #include "meta/gimbal_interface_test_suite.h"
+#include "meta/gimbal_instance_test_suite.h"
 #include "types/gimbal_variant_test_suite.h"
 #include "meta/gimbal_enum_test_suite.h"
 #include "meta/gimbal_flags_test_suite.h"
@@ -54,6 +55,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_createFromType(GBL_CLASS_TEST_SUITE_TYPE));
     GblTestScenario_suiteEnqueue(pScenario,
                                  GblTestSuite_createFromType(GBL_INTERFACE_TEST_SUITE_TYPE));
+    GblTestScenario_suiteEnqueue(pScenario,
+                                 GblTestSuite_createFromType(GBL_INSTANCE_TEST_SUITE_TYPE));
     GblTestScenario_suiteEnqueue(pScenario,
                                  GblTestSuite_createFromType(GBL_VARIANT_TEST_SUITE_TYPE));
     GblTestScenario_suiteEnqueue(pScenario,

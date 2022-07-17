@@ -703,7 +703,7 @@ GBL_EXPORT GblBool GblHashSetIterator_valid(const GblHashSetIterator* pSelf) GBL
 GBL_EXPORT void* GblHashSetIterator_value(const GblHashSetIterator* pSelf) {
     void* pKey = NULL;
     if(GblHashSetIterator_valid(pSelf)) {
-        GBL_API_BEGIN(pSelf->pSet);
+        GBL_API_BEGIN(pSelf->pSet->pCtx);
         pKey = GblHashSet_probe(pSelf->pSet, pSelf->bucketIdx);
         GBL_API_VERIFY_EXPRESSION(pKey, "No key for what should be a valid iterator!");
         GBL_API_END_BLOCK();

@@ -603,10 +603,10 @@ GBL_EXPORT GBL_RESULT GblObject_newInPlaceVaListWithClass(GblObject* pSelf, GblO
 }
 
 static GBL_RESULT GblObject_newInPlaceVariants_(GblObject* pSelf,
-                                                   GblType type,
-                                                   GblUint propertyCount,
-                                                   const char* pNames[],
-                                                   const GblVariant* pValues) GBL_NOEXCEPT
+                                                GblType type,
+                                                GblUint propertyCount,
+                                                const char* pNames[],
+                                                const GblVariant* pValues) GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
@@ -853,7 +853,7 @@ GBL_EXPORT GblRefCount GblObject_unref(GblObject* pSelf) GBL_NOEXCEPT {
         }
     }
     GBL_API_END_BLOCK();
-    return count != 0;
+    return count;
 }
 
 GBL_EXPORT GblRefCount GblObject_refCount(const GblObject* pObject) GBL_NOEXCEPT {

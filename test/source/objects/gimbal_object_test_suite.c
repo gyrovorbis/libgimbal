@@ -128,7 +128,7 @@ static GBL_RESULT TestObject_propertySet(GblObject* pSelf, GblSize slot, const G
     }
     case TEST_OBJECT_PROPERTY_STRINGER: {
         const char* pStr = NULL;
-        GBL_API_CALL(GblVariant_getValueCopy(pValue, &pStr));
+        GBL_API_CALL(GblVariant_getValuePeek(pValue, &pStr));
         if(pStr) strcpy(TEST_OBJECT(pSelf)->stringer, pStr);
         break;
     }
@@ -148,7 +148,7 @@ static GBL_RESULT TestObject_propertySet(GblObject* pSelf, GblSize slot, const G
 static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     TestObjectClass* pTestClass = TEST_OBJECT_CLASS(pClass);
     GBL_API_BEGIN(pCtx);
-    if(GBL_CLASS_TYPEOF(pTestClass) == TEST_OBJECT_TYPE) {
+    if(GBL_CLASS_TYPEOF(pTestClass) == TEST_OBJECT_TYPE && !GblType_classRefCount(TEST_OBJECT_TYPE)) {
         gblPropertyTableInsert(GBL_CLASS_TYPEOF(pTestClass),
                                GblQuark_fromStringStatic("floater"),
                                TEST_OBJECT_PROPERTY_FLOATER,
@@ -204,6 +204,12 @@ static GBL_RESULT GblObjectTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx
     GBL_API_BEGIN(pCtx);
     GblObjectTestSuite_* pSelf_ = GBL_OBJECT_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblObjectTestSuite_));
+    GBL_API_END();
+}
+
+static GBL_RESULT GblObjectTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GBL_TEST_COMPARE(GblType_classRefCount(TEST_OBJECT_TYPE), 0);
     GBL_API_END();
 }
 
@@ -883,6 +889,7 @@ GBL_EXPORT GblType GblObjectTestSuite_type(void) {
 
     const static GblTestSuiteClassVTable vTable = {
         .pFnSuiteInit   = GblObjectTestSuite_init_,
+        .pFnSuiteFinal  = GblObjectTestSuite_final_,
         .pCases         = cases
     };
 

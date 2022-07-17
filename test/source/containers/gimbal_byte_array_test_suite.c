@@ -224,7 +224,7 @@ static GBL_RESULT GblByteArrayTestSuite_acquire_release_(GblTestSuite* pSelf, Gb
     GBL_API_VERIFY_CALL(GblByteArray_release(pSelf_->pByteArray1, &size, (void**)&pBuffer));
     GBL_TEST_COMPARE(size, strv.length+1);
     GBL_TEST_COMPARE(pBuffer, "Megaman");
-    GBL_ALIGNED_FREE(pBuffer);
+    GBL_API_FREE(pBuffer);
 
     GBL_API_END();
 }

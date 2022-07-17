@@ -68,6 +68,10 @@ GBL_EXPORT GblBool      GblContext_hasError         (CSELF)                     
 GBL_EXPORT GBL_RESULT   GblContext_lastIssueResult  (CSELF)                                 GBL_NOEXCEPT;
 GBL_EXPORT const char*  GblContext_lastIssueMessage (CSELF)                                 GBL_NOEXCEPT;
 
+GBL_EXPORT GblContext*  GblContext_parentContext    (CSELF)                                 GBL_NOEXCEPT;
+
+
+
 GblContext*             GblContext_global(void)                                             GBL_NOEXCEPT;
 void                    GblContext_globalSet(GblContext* pCtx)                              GBL_NOEXCEPT;
 

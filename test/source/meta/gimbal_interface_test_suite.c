@@ -613,19 +613,23 @@ GBL_EXPORT GblType GblInterfaceTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     const static GblTestCase cases[] = {
-        { "classRefDefault",    GblInterfaceTestSuite_classRefDefault_  },
-        { "castDefault",        GblInterfaceTestSuite_castDefault_ },
-        { "tryDefault",         GblInterfaceTestSuite_tryDefault_  },
-        { "outerClassNull",  GblInterfaceTestSuite_outerClassNull_},
-        { "outerClassDefault",  GblInterfaceTestSuite_outerClassDefault_},
-        { "outerMostClassNull", GblInterfaceTestSuite_outerMostClassNull_ },
-        { "outerMostClassDefault", GblInterfaceTestSuite_outerMostClassDefault_ },
-        { "classUnrefDefault",  GblInterfaceTestSuite_classUnrefDefault_ },
-        { "classMappingInterface", GblInterfaceTestSuite_classMappingInterface_},
-        { "derivedClassMappingInterfaces", GblInterfaceTestSuite_derivedClassMappingInterfaces_ },
-        { "deepDerivedClassMappingDeepDerivedInterface", GblInterfaceTestSuite_deepDerivedClassMappingDeepDerivedInterface_ },
-        { "deepDerivedClassMappingInterfaceMappingInterface", GblInterfaceTestSuite_deepDerivedClassMappingInterfaceMappingInterface_ },
-        { "deepDerivedClassMappingDeepDerivedInterfaceMappingInterface", GblInterfaceTestSuite_deepDerivedClassMappingDeepDerivedInterfaceMappingInterface_ },
+        { "classRefDefault",        GblInterfaceTestSuite_classRefDefault_          },
+        { "castDefault",            GblInterfaceTestSuite_castDefault_              },
+        { "tryDefault",             GblInterfaceTestSuite_tryDefault_               },
+        { "outerClassNull",         GblInterfaceTestSuite_outerClassNull_           },
+        { "outerClassDefault",      GblInterfaceTestSuite_outerClassDefault_        },
+        { "outerMostClassNull",     GblInterfaceTestSuite_outerMostClassNull_       },
+        { "outerMostClassDefault",  GblInterfaceTestSuite_outerMostClassDefault_    },
+        { "classUnrefDefault",      GblInterfaceTestSuite_classUnrefDefault_        },
+        { "classMappingInterface",  GblInterfaceTestSuite_classMappingInterface_    },
+        { "derivedClassMappingInterfaces",
+                                    GblInterfaceTestSuite_derivedClassMappingInterfaces_ },
+        { "deepDerivedClassMappingDeepDerivedInterface",
+                                    GblInterfaceTestSuite_deepDerivedClassMappingDeepDerivedInterface_ },
+        { "deepDerivedClassMappingInterfaceMappingInterface",
+                                    GblInterfaceTestSuite_deepDerivedClassMappingInterfaceMappingInterface_ },
+        { "deepDerivedClassMappingDeepDerivedInterfaceMappingInterface",
+                                    GblInterfaceTestSuite_deepDerivedClassMappingDeepDerivedInterfaceMappingInterface_ },
         { NULL,     NULL    }
     };
 

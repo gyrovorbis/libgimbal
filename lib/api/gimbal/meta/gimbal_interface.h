@@ -418,7 +418,7 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *  macros from the previous section is still possible, but it's much uglier and
  *  more verbose.
  *
- *      // A, Cast to an ISerializable instance from IntSerializable
+ *      // A. Cast to an ISerializable instance from IntSerializable
  *      ISerializable* pSerializable = (ISerializable*)GblInstance_cast((GblInstance*)pIntInstance,
  *                                                                      GBL_ISERIALIZABLE_TYPE);
  *

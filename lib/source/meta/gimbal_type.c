@@ -888,11 +888,9 @@ GBL_EXPORT GblType GblType_nextRegistered(GblType prevType) {
 GBL_EXPORT GblQuark GblType_nameQuark(GblType type) {
     GblQuark name         = GBL_QUARK_INVALID;
     GblMetaClass* pMeta   = GBL_META_CLASS_(type);
-    GBL_API_BEGIN(pCtx_);
     if(pMeta) {
         name = pMeta->name;
     }
-    GBL_API_END_BLOCK();
     return name;
 }
 

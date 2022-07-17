@@ -24,6 +24,8 @@
 
 GBL_DECLS_BEGIN
 
+///////// GblVariant_isCompatible(GblType type);
+
 typedef GBL_RESULT (*GblVariantConverterFn)(CSELF, GblVariant* pOther);
 
 /*! \brief Tagged union generalizing all value-compatible meta types

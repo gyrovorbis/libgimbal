@@ -5,7 +5,7 @@
 #ifndef GIMBAL_TEST_SCENARIO_H
 #define GIMBAL_TEST_SCENARIO_H
 
-#include "../objects/gimbal_object.h"
+#include "../objects/gimbal_context.h"
 
 #define GBL_TEST_SCENARIO_TYPE                (GblTestScenario_type())
 #define GBL_TEST_SCENARIO_STRUCT              GblTestScenario
@@ -31,7 +31,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblTestScenario);
 GBL_FORWARD_DECLARE_STRUCT(GblTestSuite);
 
 typedef struct GblTestScenarioClass {
-    GblObjectClass      base;
+    GblContextClass     base;
     GBL_RESULT          (*pFnBegin)     (SELF);
     GBL_RESULT          (*pFnEnd)       (SELF);
     GBL_RESULT          (*pFnRun)       (SELF, int argc, char* argv[]);
@@ -45,7 +45,7 @@ typedef struct GblTestScenarioClass {
 typedef struct GblTestScenario {
     union {
         GblTestScenarioClass*   pClass;
-        GblObject               base;
+        GblContext              base;
     };
     GBL_RESULT                  result;
     GblSize                     suitesRun;
@@ -57,11 +57,12 @@ typedef struct GblTestScenario {
     GblSize                     casesPassed;
     GblSize                     casesFailed;
     GblSize                     casesSkipped;
+    double                      totalTime;
 } GblTestScenario;
 
 
 typedef enum GBL_TEST_SCENARIO_PROPERTY_ID {
-    GBL_TEST_SCENARIO_PROPERTY_ID_FIRST        = GBL_OBJECT_PROPERTY_ID_COUNT,
+    GBL_TEST_SCENARIO_PROPERTY_ID_FIRST        = GBL_CONTEXT_PROPERTY_ID_COUNT,
     GBL_TEST_SCENARIO_PROPERTY_ID_RESULT       = GBL_TEST_SCENARIO_PROPERTY_ID_FIRST,
     GBL_TEST_SCENARIO_PROPERTY_ID_SUITE_COUNT,
     GBL_TEST_SCENARIO_PROPERTY_ID_SUITES_RUN,
@@ -77,6 +78,7 @@ typedef enum GBL_TEST_SCENARIO_PROPERTY_ID {
 } GBL_TEST_SCENARIO_PROPERTY_ID;
 
 
+// total time property
 GBL_PROPERTY_TABLE_BEGIN(GBL_TEST_SCENARIO)
     GBL_PROPERTY_ENTRY("result",
                        "Result Code",

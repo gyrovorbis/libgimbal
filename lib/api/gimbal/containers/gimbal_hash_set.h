@@ -128,7 +128,6 @@ GBL_EXPORT GblHashSetIterator
 
 GBL_EXPORT const GblHashSet*    GblHashSetIterator_container(CSELF)                 GBL_NOEXCEPT;
 GBL_EXPORT GblBool              GblHashSetIterator_valid(CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblHash              GblHashSetIterator_hash(CSELF)                      GBL_NOEXCEPT;
 GBL_EXPORT void*                GblHashSetIterator_value(CSELF)                     GBL_NOEXCEPT;
 
 // ======== INLINE IMPL ======
