@@ -11,6 +11,7 @@ stages:
   artifacts:
     paths:
        - build/
+    expire_in: 1 week
   script:
     - mkdir -p build
     - cd build
@@ -83,6 +84,7 @@ build psvita:
   artifacts:
     paths:
        - build/
+    expire_in: 1 week
   script:
       - mkdir -p build
       - cd build 
@@ -99,6 +101,7 @@ build android-sim:
   artifacts:
     paths:
        - build/
+    expire_in: 1 week
   script:
       - mkdir -p build
       - cd build 
@@ -137,6 +140,7 @@ build ios-15-sim:
   artifacts:
     paths:
        - build/
+    expire_in: 1 week
   script:
     - mkdir -p build
     - cd build
@@ -158,6 +162,7 @@ build wasm:
   artifacts:
     paths:
        - build/
+    expire_in: 1 week
   script:
     - source ${EMSDK}/emsdk_env.sh
     - mkdir -p build
@@ -207,6 +212,7 @@ analyze clang-tidy:
   artifacts:
     paths:
       - public/
+    expire_in: 1 week
 
 analyze scan-build-clang:
   extends: .scan_build_common
