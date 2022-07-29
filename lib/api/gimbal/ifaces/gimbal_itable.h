@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief GblITable abstract table interface
+ *  \ingroup interfaces
+ */
+
+
 #ifndef GIMBAL_ITABLE_H
 #define GIMBAL_ITABLE_H
 

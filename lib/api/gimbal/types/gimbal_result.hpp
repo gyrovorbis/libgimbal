@@ -35,7 +35,7 @@ public:
     constexpr bool isType(Type type) const noexcept { return type == getType(); }
 
     constexpr operator bool() const noexcept { return isSuccess(); }
-GBL_ENUM_TABLE_DECLARE_CPP_END(GBL_META_RESULT_TABLE);
+GBL_ENUM_TABLE_DECLARE_CPP_END(GBL_META_RESULT_TABLE)
 
 }
 

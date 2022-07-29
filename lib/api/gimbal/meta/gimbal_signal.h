@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Signals, connections, and related API
+ *  \ingroup signals
+ */
+
 #ifndef GIMBAL_SIGNAL_H
 #define GIMBAL_SIGNAL_H
 

@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblThread, per-thread state and context management
+ *  \ingroup debug
+ */
+
 #ifndef GIMBAL_THREAD_H
 #define GIMBAL_THREAD_H
 

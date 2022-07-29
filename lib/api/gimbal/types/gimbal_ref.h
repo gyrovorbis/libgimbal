@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Generic reference-counted data type
+ *  \ingroup dataTypes
+ */
+
 #ifndef GIMBAL_MEMORY_REF_H
 #define GIMBAL_MEMORY_REF_H
 

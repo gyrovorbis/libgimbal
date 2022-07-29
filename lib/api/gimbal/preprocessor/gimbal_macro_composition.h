@@ -1,3 +1,10 @@
+/*! \file
+ *  \brief Macro primitives for variadic function overloads and resolution
+ *  \ingroup preprocessor
+ *  \sa gimbal_sequences.h
+ */
+
+
 #ifndef GIMBAL_MACRO_COMPOSITION_H
 #define GIMBAL_MACRO_COMPOSITION_H
 

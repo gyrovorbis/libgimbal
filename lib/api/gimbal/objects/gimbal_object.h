@@ -355,7 +355,7 @@ GBL_INLINE GblObject* GblObject_siblingFindByName(CSELF, const char* pName) GBL_
 }
 
 GBL_INLINE GBL_RESULT GblObject_setAttribute(SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value) GBL_NOEXCEPT {
-    GBL_UNUSED(value && pSelf);
+    GBL_UNUSED(value, pSelf);
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_ARG(attrib < GBL_OBJECT_ATTRIBUTE_COUNT);
     switch(attrib) {

@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblVersion type, utlities and query functions
+ *  \ingroup dataTypes
+ */
+
 #ifndef GIMBAL_VERSION_H
 #define GIMBAL_VERSION_H
 

@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblAllocationTracker, counters, and related API
+ *  \ingroup testing
+ */
+
 #ifndef GIMBAL_ALLOCATION_TRACKER_H
 #define GIMBAL_ALLOCATION_TRACKER_H
 
@@ -8,8 +13,6 @@
 #define CSELF   const SELF
 
 GBL_DECLS_BEGIN
-
-GBL_FORWARD_DECLARE_STRUCT(GblAllocationTracker);
 
 typedef struct GblAllocationCounters {
     GblSize     allocEvents;

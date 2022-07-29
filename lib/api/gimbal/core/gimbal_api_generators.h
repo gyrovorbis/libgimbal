@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief Helper defines for struct, enum, flags, handle delcarations
+ *  \ingroup preprocessor
+ *  \sa gimbal_macro_utilities.h
+ */
+
 #ifndef GIMBAL_API_GENERATORS_H
 #define GIMBAL_API_GENERATORS_H
 
@@ -67,17 +73,20 @@ extern "C" {
     typedef struct S##_* S
 
 
+#define GBL_PRIVATE(S)      struct S##_ {
+
+#define GBL_PRIVATE_END }   private;
+
 //sizeof(emptyStruct) is 1 in Cpp, 0 in C!
 #define GBL_DEFINE_EMPTY_STRUCT(S)  \
     typedef struct S {              \
         char cppCompat;             \
     } S
 
-#define GBL_UNUSED(a) \
+#define GBL_UNUSED_(a) \
     (void)(a)
 
-#define GBL_ANONYMOUS_UNION_BEGIN   union {
-#define GBL_ANONYMOUS_UNION_END     };
+#define GBL_UNUSED(...) GBL_MAP_LIST(GBL_UNUSED_, __VA_ARGS__)
 
 
 #ifdef GBL_API_SHARED_LIB

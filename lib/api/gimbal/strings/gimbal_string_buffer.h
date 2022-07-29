@@ -57,7 +57,9 @@ GBL_DECLS_BEGIN
  *  \sa GblStringRef, GblStringView, GblQuark
  */
 typedef struct GblStringBuffer {
-    GblArrayList data;
+    //GBL_PRIVATE(GblStringBuffer)
+        GblArrayList data;
+    //GBL_PRIVATE_END
 } GblStringBuffer;
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_construct_4     (SELF,

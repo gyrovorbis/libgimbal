@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief GblIVariant interface for GblVariant compatibility
+ *  \ingroup interfaces
+ */
+
+
 #ifndef GIMBAL_IVARIANT_H
 #define GIMBAL_IVARIANT_H
 

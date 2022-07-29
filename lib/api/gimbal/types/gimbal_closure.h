@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Generic and builtin closure types and API.
+ *  \ingroup signals
+ */
+
 #ifndef GIMBAL_CLOSURE_H
 #define GIMBAL_CLOSURE_H
 

@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Builtin closure marshals and generator macros
+ *  \ingroup signals
+ */
+
 #ifndef GIMBAL_MARSHAL_H
 #define GIMBAL_MARSHAL_H
 

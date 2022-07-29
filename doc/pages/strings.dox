@@ -1,4 +1,5 @@
 /*! \defgroup strings Strings 
+	\ingroup dataTypes
 * 	\brief Collection of specialized string types
 
 	LibGimbal provides a rich set of string manipulation functions with API functionality taken

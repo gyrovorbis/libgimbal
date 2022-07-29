@@ -72,7 +72,7 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
 
 
 static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, char* argv[]) {
-    GBL_UNUSED(argc && argv);
+    GBL_UNUSED(argc, argv);
     GBL_API_BEGIN(pSelf);
 
 

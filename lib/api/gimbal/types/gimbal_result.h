@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GBL_RESULT values, stringifiers, and utilities
+ *  \ingroup dataTypes
+ */
+
 #ifndef GIMBAL_RESULT_H
 #define GIMBAL_RESULT_H
 
@@ -64,7 +69,7 @@ extern "C" {
         )                                                                                                                                               \
     )
 
-GBL_EVAL(GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE));
+GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE)
 
 #define GBL_RESULT_UNKNOWN(value) \
     (value == GBL_RESULT_UNKNOWN)

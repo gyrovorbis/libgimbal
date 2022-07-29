@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief Helper Definitions for language, compiler, and platform
+ *  \ingroup preprocessor
+ *  \sa gimbal_macro_utilities.h
+ */
+
 #ifndef GIMBAL_COMPILER_H
 #define GIMBAL_COMPILER_H
 

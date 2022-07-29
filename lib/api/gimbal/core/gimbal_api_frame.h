@@ -1,4 +1,8 @@
-﻿#ifndef GIMBAL_API_FRAME_H
+﻿/*! \file
+ *  \brief GBL_API top-level debug and control-flow macros
+ *  \ingroup debug
+ */
+#ifndef GIMBAL_API_FRAME_H
 #define GIMBAL_API_FRAME_H
 
 #include "gimbal_api_generators.h"

@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief GblIEventFilter abstract event filter interface
+ *  \ingroup interfaces
+ */
+
+
 #ifndef GIMBAL_IEVENT_FILTER_H
 #define GIMBAL_IEVENT_FILTER_H
 

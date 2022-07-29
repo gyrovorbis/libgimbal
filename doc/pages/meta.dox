@@ -1,6 +1,6 @@
-/*! \defgroup meta Meta Type Framework 
-* 	\brief Object-oriented, cross-language runtime type system  
-
+/*! \defgroup meta Meta Type System
+* 	\brief Object-oriented, cross-language runtime type system
+	\details
 	Libgimbal provides a portable type system designed to provide object-oriented functionality
    	to the C programming language and to provide type compatibility with other 
     languages which support interoping with C APIs.
@@ -38,7 +38,30 @@
 
 */
 
+
+/*! \defgroup dataTypes Data Types
+	\brief Core data types built into the library
+*/ 
+
+/*! \defgroup debug Debugging
+	\brief Debugging, validation, control flow, and logging API
+*/ 
+
+
 /*! \defgroup metaBuiltinTypes Builtin Types
 	\brief Meta types that are already built into libGimbal
+ *  \ingroup meta
+*/ 
+
+
+/*! \defgroup signals Signals
+	\brief Signal emission mechanism and its related components
+ *  \ingroup meta
+*/ 
+
+
+
+/*! \defgroup interfaces Interfaces
+	\brief Built-in abstract interface types
  *  \ingroup meta
 */ 

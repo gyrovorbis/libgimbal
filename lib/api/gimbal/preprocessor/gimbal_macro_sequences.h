@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief Macro primitives for metaprogramming
+ *  \ingroup preprocessor
+ *  \sa gimbal_macro_composition.h
+ */
+
 #ifndef GIMBAL_MACRO_SEQUENCES_H
 #define GIMBAL_MACRO_SEQUENCES_H
 

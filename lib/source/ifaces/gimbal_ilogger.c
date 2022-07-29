@@ -4,12 +4,12 @@
 #include "../meta/gimbal_type_.h"
 
 static GBL_RESULT GblILoggerIFace_pop_(GblILogger* pILogger, const GblStackFrame* pFrame, uint32_t count) GBL_NOEXCEPT {
-    GBL_UNUSED(pILogger && pFrame && count);
+    GBL_UNUSED(pILogger, pFrame, count);
     return GBL_RESULT_SUCCESS;
 }
 
 static GBL_RESULT GblILoggerIFace_push_(GblILogger* pILogger, const GblStackFrame* pFrame) GBL_NOEXCEPT {
-    GBL_UNUSED(pILogger && pFrame);
+    GBL_UNUSED(pILogger,  pFrame);
     GBL_API_BEGIN(NULL);
     GBL_API_END();
 }

@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblIAllocator abstract allocator interface
+ *  \ingroup interfaces
+ */
+
 #ifndef GIMBAL_IALLOCATOR_H
 #define GIMBAL_IALLOCATOR_H
 

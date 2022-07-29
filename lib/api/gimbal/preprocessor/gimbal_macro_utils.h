@@ -1,3 +1,13 @@
+/*! \file
+ *  \brief Miscellaneous macro utilities and meta generators
+ *  \ingroup preprocessor
+ *  \sa gimbal_macro_composition.h, gimbal_macro_sequences.h
+ */
+
+/*! \defgroup preprocessor Preprocessor
+ *  \brief Platform defines, utility macros, preprocessor generators and primitives
+ *
+ */
 #ifndef GIMBAL_MACRO_UTILS_H
 #define GIMBAL_MACRO_UTILS_H
 

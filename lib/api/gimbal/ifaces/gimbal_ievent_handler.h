@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief GblIEventHandler abstract event handler interface
+ *  \ingroup interfaces
+ */
+
+
 #ifndef GIMBAL_IEVENT_HANDLER_H
 #define GIMBAL_IEVENT_HANDLER_H
 

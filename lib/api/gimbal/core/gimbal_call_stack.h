@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Stack frame, call record, source capture debug utilities
+ *  \ingroup debug
+ */
+
 #ifndef GIMBAL_CALL_STACK_H
 #define GIMBAL_CALL_STACK_H
 

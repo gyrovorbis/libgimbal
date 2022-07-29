@@ -1,6 +1,11 @@
+/*! \file
+ *  \brief GblILogger abstract logger interface
+ *  \ingroup interfaces
+ */
+
+
 #ifndef GIMBAL_ILOGGER_H
 #define GIMBAL_ILOGGER_H
-
 
 #include "../meta/gimbal_interface.h"
 #include "../core/gimbal_api_frame.h"

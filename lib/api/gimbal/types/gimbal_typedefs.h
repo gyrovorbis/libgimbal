@@ -1,5 +1,6 @@
 /*! \file
  *  \brief Basic primtive typedefs and forward declarations
+ *  \ingroup dataTypes
  */
 #ifndef GIMBAL_TYPEDEFS_H
 #define GIMBAL_TYPEDEFS_H

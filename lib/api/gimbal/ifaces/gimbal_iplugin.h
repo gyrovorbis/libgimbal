@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblIPlugin abstract plugin interface
+ *  \ingroup interfaces
+ */
+
 #ifndef GIMBAL_PLUGIN_H
 #define GIMBAL_PLUGIN_H
 
