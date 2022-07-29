@@ -1193,11 +1193,11 @@ GBL_EXPORT GBL_RESULT GblType_unregister(GblType type) {
             GBL_API_WARN("Attempting to unregister type with active class references: %u", refCount);
         }
 
+        GBL_API_VERIFY_CALL(GblType_freeTypeInfoClassChunk_(pMeta));
         mtx_lock(&typeRegMtx_);
         const GblBool success = GblHashSet_erase(&typeRegistry_, &pMeta);
         mtx_unlock(&typeRegMtx_);
         GBL_API_VERIFY(success, GBL_RESULT_ERROR_INVALID_TYPE, "Failed to remove the type from the registry HashSet!");
-        GBL_API_VERIFY_CALL(GblType_freeTypeInfoClassChunk_(pMeta));
     }
     GBL_API_POP(1);
     GBL_API_END();

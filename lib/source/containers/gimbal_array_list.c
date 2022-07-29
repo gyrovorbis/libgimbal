@@ -138,7 +138,7 @@ GBL_EXPORT GBL_RESULT GblArrayList_resize(GblArrayList* pSelf, GblSize size) GBL
     }
 
     if(pSelf->zeroTerminated)
-        pSelf->pData[size * pSelf->elementSize] = 0;
+        memset(&pSelf->pData[size * pSelf->elementSize], 0, pSelf->elementSize);
 
     pSelf->size = size;
     GBL_API_END();
@@ -186,8 +186,8 @@ GBL_EXPORT void* GblArrayList_insert(GblArrayList* pSelf, GblSize index, GblSize
     GBL_API_VERIFY_ARG(count);
     GBL_API_VERIFY(index <= pSelf->size,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
+    slideSize = pSelf->size - index;
     GBL_API_CALL(GblArrayList_resize(pSelf, pSelf->size + count));
-    slideSize = (pSelf->size-1) - index;
     insertionPoint = (uintptr_t)pSelf->pData + index * pSelf->elementSize;
     if(slideSize) memmove((uint8_t*)insertionPoint + pSelf->elementSize * count,
                           (const uint8_t*)insertionPoint,
