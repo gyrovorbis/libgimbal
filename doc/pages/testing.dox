@@ -1,7 +1,56 @@
 /*! \defgroup testing Unit Testing Framework 
-* 	\brief Object-oriented C-based unit testing framework
+* 	\brief Object-oriented, C-based unit testing framework.
 
+	\details
+	LibGimbal provides a built-in unit testing framework, which was architecturally inspired by QTest (which we had originally used for testing), with output
+	similar to a combination between QTest and GTest. Since libGimbal runs everywhere, we wanted to ensure that our tests could also run anywhere as well. 
+	The testing framework leverages the meta type system and error management back-end to implement a powerful object-oriented testing framework. 
 
+	A unit test program typically comprises a single top-level GblTestScenario object, to which GblTestSuite objects are added. A GblTestSuite represents a 
+	sequentially-executing set of test cases. 
+
+	Features
+	- Timing
+	- Memory utilization
+	- Memory leak tracing
+
+	Sample Output from a GblTestSuite:
+
+		* ********* Starting TestSuite [RefTestSuite] *********
+		* [ INIT      ]: RefTestSuite
+		* [ RUN       ]: RefTestSuite::allocEmpty
+		* [      PASS ]: RefTestSuite::allocEmpty (0.011 ms)
+		* [ RUN       ]: RefTestSuite::alloc
+		* [      PASS ]: RefTestSuite::alloc (0.016 ms)
+		* [ RUN       ]: RefTestSuite::allocWithContext
+		* [      PASS ]: RefTestSuite::allocWithContext (0.012 ms)
+		* [ RUN       ]: RefTestSuite::acquire
+		* [      PASS ]: RefTestSuite::acquire (0.010 ms)
+		* [ RUN       ]: RefTestSuite::release
+		* [      PASS ]: RefTestSuite::release (0.007 ms)
+		* [ RUN       ]: RefTestSuite::destructFail
+		* [      PASS ]: RefTestSuite::destructFail (0.016 ms)
+		* [ RUN       ]: RefTestSuite::destruct
+		* [      PASS ]: RefTestSuite::destruct (0.018 ms)
+		* [ FINAL     ]: RefTestSuite
+		* Totals: 7 passed, 0 failed, 0 skipped, 0.090ms, 0/2 leaked (0/544 bytes)
+		* ********* Finished TestSuite [RefTestSuite] *********
+
+	Sample Output from a GblTestScenario:
+
+		* [GblTestScenario] Ending Scenario: [libGimbalTests]
+		        * Test Suite Totals
+		                * Total               :                   24
+		                * Passed              :                   24
+		                * Skipped             :                    0
+		                * Failed              :                    0
+		        * Test Case Totals
+		                * Total               :                  429
+		                * Passed              :                  429
+		                * Skipped             :                    0
+		                * Failed              :                    0
+		        * Total Time          :               67.737ms
+		* ********************* [   PASS   ] *********************
 
 */
 

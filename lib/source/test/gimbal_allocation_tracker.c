@@ -91,17 +91,21 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_allocEvent(GblAllocationTracker* pSel
                    GBL_RESULT_ERROR_MEM_ALLOC,
                    "[Allocation Tracker] Attemping to allocate existing allocation: [%p]", pPtr);
 
-    pSelf_->base.activeBytes += size;
-    ++pSelf_->base.totalAllocations;
-    pSelf_->base.totalBytes += size;
-    const GblSize totalActive = pSelf_->base.totalAllocations - pSelf_->base.totalFrees;
-    if(totalActive > pSelf_->base.maxAllocations) {
-        pSelf_->base.maxAllocations = totalActive;
+    pSelf_->base.counters.bytesActive += size;
+    pSelf_->base.counters.bytesAllocated += size;
+    ++pSelf_->base.counters.allocEvents;
+    ++pSelf_->base.counters.allocsActive;
+
+    if(pSelf_->base.counters.allocsActive > pSelf_->base.maxAllocations) {
+        pSelf_->base.maxAllocations = pSelf_->base.counters.allocsActive;
     }
-    if(pSelf_->base.activeBytes > pSelf_->base.maxBytes) {
-        pSelf_->base.maxBytes = pSelf_->base.activeBytes;
+
+    if(pSelf_->base.counters.bytesActive > pSelf_->base.maxBytes) {
+        pSelf_->base.maxBytes = pSelf_->base.counters.bytesActive;
     }
-    if(size > pSelf_->base.maxAllocationSize) pSelf_->base.maxAllocationSize = size;
+
+    if(size > pSelf_->base.maxAllocationSize)
+        pSelf_->base.maxAllocationSize = size;
 
     GBL_API_END_BLOCK();
     pSelf_->recursing = GBL_FALSE;
@@ -135,20 +139,24 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_reallocEvent(GblAllocationTracker*   
                    "[Allocation Tracker] Attempt to realloc unknown pointer: [%p]", pExisting);
 
     entry.pPointer = pNew;
-    pSelf_->base.activeBytes -= pExistingEntry->size;
-    pSelf_->base.totalBytes -= pExistingEntry->size;
+    pSelf_->base.counters.bytesActive -= pExistingEntry->size;
+    pSelf_->base.counters.bytesAllocated -= pExistingEntry->size;
 
     GBL_API_VERIFY(GblHashSet_insert(&pSelf_->activeSet, &entry),
                    GBL_RESULT_ERROR_MEM_REALLOC,
                    "[Allocation Tracker] Failed to insert entry for reallocated pointer: [%p]", pNew);
 
-    pSelf_->base.activeBytes += newSize;
-    pSelf_->base.totalBytes += newSize;
-    ++pSelf_->base.totalReallocations;
-    if(pSelf_->base.activeBytes > pSelf_->base.maxBytes) {
-        pSelf_->base.maxBytes = pSelf_->base.activeBytes;
+    pSelf_->base.counters.bytesActive += newSize;
+    pSelf_->base.counters.bytesAllocated += newSize;
+    ++pSelf_->base.counters.reallocEvents;
+
+    if(pSelf_->base.counters.bytesActive > pSelf_->base.maxBytes) {
+        pSelf_->base.maxBytes = pSelf_->base.counters.bytesActive;
     }
-    if(newSize > pSelf_->base.maxAllocationSize) pSelf_->base.maxAllocationSize = newSize;
+
+    if(newSize > pSelf_->base.maxAllocationSize)
+        pSelf_->base.maxAllocationSize = newSize;
+
     GBL_API_END_BLOCK();
     pSelf_->recursing = GBL_FALSE;
     return GBL_API_RESULT();
@@ -170,29 +178,27 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_freeEvent(GblAllocationTracker* pSelf
                    GBL_RESULT_ERROR_MEM_FREE,
                    "[Allocation Tracker] Attempt to free unknown pointer: [%p]", pPtr);
 
-    pSelf_->base.activeBytes -= pExisting->size;
-    ++pSelf_->base.totalFrees;
+    pSelf_->base.counters.bytesActive -= pExisting->size;
+    pSelf_->base.counters.bytesFreed += pExisting->size;
+    ++pSelf_->base.counters.freeEvents;
+    --pSelf_->base.counters.allocsActive;
 
     GBL_API_END_BLOCK();
     pSelf_->recursing = GBL_FALSE;
     return GBL_API_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblAllocationTracker_validatePointer(const GblAllocationTracker* pSelf, const void* pPtr) {
+GBL_EXPORT GblBool GblAllocationTracker_validatePointer(const GblAllocationTracker* pSelf, const void* pPtr) {
     GblAllocationTracker_* pSelf_ = (GblAllocationTracker_*)pSelf;
     const GblAllocationEntry_ entry = {
         .pPointer   = pPtr
     };
 
-    GBL_API_BEGIN(GblHashSet_context(&pSelf_->activeSet));
     GblHashSetIterator it = GblHashSet_find(&pSelf_->activeSet, &entry);
-    GBL_API_VERIFY(GblHashSetIterator_valid(&it),
-                   GBL_RESULT_ERROR_INVALID_POINTER);
-
-    GBL_API_END();
+    return GblHashSetIterator_valid(&it);
 }
 
-GBL_EXPORT GBL_RESULT GblAllocationTracker_logActive(const GblAllocationTracker* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblAllocationTracker_logActive(const GblAllocationTracker* pSelf) {
     GblAllocationTracker_* pSelf_ = (GblAllocationTracker_*)pSelf;
     GBL_API_BEGIN(GblHashSet_context(&pSelf_->activeSet));
     GBL_API_INFO("[Allocation Tracker] Dumping Active Allocations:");
@@ -212,15 +218,36 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_logActive(const GblAllocationTracker*
         GBL_API_INFO("%-20s: %20s", "Function", pEntry->sourceLocation.pFunc);
         GBL_API_INFO("%-20s: %20u", "Line",     pEntry->sourceLocation.line);
         GBL_API_POP(1);
-
-
     }
+
     GBL_API_POP(1);
     GBL_API_END();
 
 }
 
-GBL_EXPORT GblSize GblAllocationTracker_activeCount(const GblAllocationTracker* pSelf) GBL_NOEXCEPT {
-    GblAllocationTracker_* pSelf_ = (GblAllocationTracker_*)pSelf;
-    return pSelf_? GblHashSet_size(&pSelf_->activeSet) : 0;
+void GblAllocationTracker_captureCounters(const GblAllocationTracker* pSelf,
+                                          GblAllocationCounters*      pCounters) {
+
+    memcpy(pCounters, &pSelf->counters, sizeof(GblAllocationCounters));
 }
+
+void GblAllocationTracker_diffCounters(const GblAllocationTracker*  pSelf,
+                                       const GblAllocationCounters* pSrc,
+                                       GblAllocationCounters*       pDst) {
+
+    pDst->allocEvents    = pSelf->counters.allocEvents    - pSrc->allocEvents;
+    pDst->reallocEvents  = pSelf->counters.reallocEvents  - pSrc->reallocEvents;
+    pDst->freeEvents     = pSelf->counters.freeEvents     - pSrc->freeEvents;
+
+    pDst->bytesAllocated = pSelf->counters.bytesAllocated - pSrc->bytesAllocated;
+    pDst->bytesFreed     = pSelf->counters.bytesFreed     - pSrc->bytesFreed;
+    pDst->bytesActive    = pSelf->counters.bytesActive    - pSrc->bytesActive;
+
+    pDst->allocsActive   = pSelf->counters.allocsActive   - pSrc->allocsActive;
+
+}
+
+
+
+
+

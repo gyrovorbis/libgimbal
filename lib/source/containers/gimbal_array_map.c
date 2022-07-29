@@ -3,7 +3,7 @@
 GBL_INLINE GBL_RESULT GblArrayMap_entryDestruct_(GblArrayMapEntry* pEntry) GBL_NOEXCEPT {
     if(pEntry->dtor) {
         return pEntry->dtor(pEntry->key, pEntry->value.pVoid);
-    } else if(GblVariant_type(&pEntry->value) != GBL_INVALID_TYPE) {
+    } else if(GblVariant_typeOf(&pEntry->value) != GBL_INVALID_TYPE) {
         return GblVariant_destruct(&pEntry->value);
     } else return GBL_RESULT_SUCCESS;
 }
@@ -142,7 +142,7 @@ static GblArrayMapEntry* GblArrayMap_entryAdd_(GblArrayMap** ppSelf, uintptr_t k
 
 static GBL_RESULT GblArrayMap_entrySetVariant_(GblArrayMapEntry* pEntry, GblVariant* pVariant) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    if(GblVariant_type(&pEntry->value) != GblVariant_type(pVariant)) {
+    if(GblVariant_typeOf(&pEntry->value) != GblVariant_typeOf(pVariant)) {
         GBL_API_CALL(GblArrayMap_entryDestruct_(pEntry));
         pEntry->dtor = NULL;
         GBL_API_CALL(GblVariant_constructCopy(&pEntry->value, pVariant));

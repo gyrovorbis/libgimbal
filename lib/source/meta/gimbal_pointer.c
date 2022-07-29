@@ -43,7 +43,7 @@ static GBL_RESULT pCompare_(const GblVariant* pVariant, const GblVariant* pOther
 
 static GBL_RESULT pConvert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->pVoid? GBL_TRUE : GBL_FALSE);
     else if(type == GBL_STRING_TYPE) {
@@ -57,13 +57,17 @@ static GBL_RESULT pConvert_(const GblVariant* pVariant, GblVariant* pOther) {
 }
 
 
-static GBL_RESULT pToNilConvert_(const GblVariant* pVariant, GblVariant* pOther) {
+static GBL_RESULT pConvertFrom_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_UNUSED(pVariant);
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
-    if(type == GBL_POINTER_TYPE)
-        GblVariant_setPointer(pOther, NULL);
-    else
+    const GblType dstType = GblVariant_typeOf(pOther);
+    const GblType srcType = GblVariant_typeOf(pVariant);
+    if(dstType == GBL_POINTER_TYPE) {
+        if(srcType == GBL_NIL_TYPE)
+            GblVariant_setPointer(pOther, NULL);
+        else if(srcType == GBL_STRING_TYPE)
+            GblVariant_setPointer(pOther, pVariant->pString);
+    } else
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_API_END();
 }
@@ -97,7 +101,8 @@ extern GBL_RESULT GblPointer_typeRegister_(GblContext* pCtx) {
     GBL_API_CALL(GblVariant_registerConverter(GBL_POINTER_TYPE, GBL_BOOL_TYPE, pConvert_));
     GBL_API_CALL(GblVariant_registerConverter(GBL_POINTER_TYPE, GBL_STRING_TYPE, pConvert_));
 
-    GBL_API_CALL(GblVariant_registerConverter(GBL_NIL_TYPE, GBL_POINTER_TYPE, pToNilConvert_));
+    GBL_API_CALL(GblVariant_registerConverter(GBL_NIL_TYPE, GBL_POINTER_TYPE, pConvertFrom_));
+    GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_POINTER_TYPE, pConvertFrom_));
 
     GBL_API_END();
 }

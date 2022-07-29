@@ -21,12 +21,13 @@ GBL_EXPORT const GblCallRecord*
                         GblThread_callRecord     (CSELF)                        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblThread_callRecordSet  (SELF,
                                                   const GblCallRecord* pRecord) GBL_NOEXCEPT;
-
+//private
 GBL_EXPORT GBL_RESULT   GblThread_logPush        (SELF)                         GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblThread_logPop         (SELF, uint32_t count)         GBL_NOEXCEPT;
 
 GBL_EXPORT const GblStackFrame*
                         GblThread_stackFrameTop  (CSELF)                        GBL_NOEXCEPT;
+//private
 GBL_EXPORT GBL_RESULT   GblThread_stackFramePush (SELF, GblStackFrame* pFrame)  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblThread_stackFramePop  (SELF)                         GBL_NOEXCEPT;
 

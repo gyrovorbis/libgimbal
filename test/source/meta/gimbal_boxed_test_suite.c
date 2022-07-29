@@ -32,6 +32,7 @@ static GBL_RESULT GblBoxedTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx
     GBL_API_BEGIN(pCtx);
     GblBoxedTestSuite_* pSelf_ = GBL_BOXED_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblType_classRefCount(pSelf_->boxedType), 0);
+    GblType_unregister(pSelf_->boxedType);
     GBL_API_END();
 }
 
@@ -60,7 +61,7 @@ static GBL_RESULT GblBoxedTestSuite_variant_(GblTestSuite* pSelf, GblContext* pC
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, pSelf_->boxedType));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == pSelf_->boxedType);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == pSelf_->boxedType);
     GBL_TEST_COMPARE(GblVariant_getBoxedPeek(&v), NULL);
 
     // Copy Constructor

@@ -74,20 +74,17 @@ GBL_INLINE GblBool  GblDoublyLinkedList_contains    (CSELF,
                                                      GblDoublyLinkedListNode* pNode)        GBL_NOEXCEPT;
 
 GBL_INLINE GblSize  GblDoublyLinkedList_find        (CSELF,
-                                                     GblDoublyLinkedListNode* pNode)         GBL_NOEXCEPT;
-
-GBL_INLINE GblBool  GblDoublyLinkedList_swap        (SELF,
-                                                     GblDoublyLinkedListNode* pNode1,
-                                                     GblDoublyLinkedListNode* pNode2)       GBL_NOEXCEPT;
-
-GBL_INLINE void    GblDoublyLinkedList_remove      (CSELF,
                                                      GblDoublyLinkedListNode* pNode)        GBL_NOEXCEPT;
 
-GBL_INLINE GblBool  GblDoublyLinkedList_replace     (SELF,
-                                                     GblDoublyLinkedListNode* pExisting,
+GBL_INLINE GblBool  GblDoublyLinkedList_swap        (GblDoublyLinkedListNode* pNode1,
+                                                     GblDoublyLinkedListNode* pNode2)       GBL_NOEXCEPT;
+
+GBL_INLINE void    GblDoublyLinkedList_remove       (GblDoublyLinkedListNode* pNode)        GBL_NOEXCEPT;
+
+GBL_INLINE GblBool GblDoublyLinkedList_replace      (GblDoublyLinkedListNode* pExisting,
                                                      GblDoublyLinkedListNode* pReplacement) GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool  GblDoublyLinkedList_erase       (SELF, GblSize index)                   GBL_NOEXCEPT;
+GBL_INLINE GblBool  GblDoublyLinkedList_erase       (SELF, GblSize index)                   GBL_NOEXCEPT;
 
 GBL_INLINE void     GblDoublyLinkedList_clear       (SELF)                                  GBL_NOEXCEPT;
 
@@ -141,14 +138,14 @@ GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_back(CSELF) GBL_NOEXCEPT
     return pSelf->pPrev != pSelf? pSelf->pPrev : NULL;
 }
 
-GBL_INLINE void GblDoublyLinkedList_remove(CSELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_remove(GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
     pNode->pPrev->pNext = pNode->pNext;
     pNode->pNext->pPrev = pNode->pPrev;
     pNode->pNext        = pNode;
     pNode->pPrev        = pNode;
 }
 
-GBL_EXPORT GblBool  GblDoublyLinkedList_replace(SELF, GblDoublyLinkedListNode* pExisting, GblDoublyLinkedListNode* pReplacement) GBL_NOEXCEPT {
+GBL_EXPORT GblBool  GblDoublyLinkedList_replace(GblDoublyLinkedListNode* pExisting, GblDoublyLinkedListNode* pReplacement) GBL_NOEXCEPT {
     pReplacement->pPrev->pNext  = pReplacement->pNext;
     pReplacement->pNext->pPrev  = pReplacement->pPrev;
 
@@ -163,7 +160,7 @@ GBL_EXPORT GblBool  GblDoublyLinkedList_replace(SELF, GblDoublyLinkedListNode* p
     return GBL_TRUE;
 }
 
-GBL_EXPORT GblBool GblDoublyLinkedList_swap(SELF, GblDoublyLinkedListNode* pExisting, GblDoublyLinkedListNode* pReplacement) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblDoublyLinkedList_swap(GblDoublyLinkedListNode* pExisting, GblDoublyLinkedListNode* pReplacement) GBL_NOEXCEPT {
     pExisting->pPrev->pNext     = pReplacement;
     pExisting->pNext->pPrev     = pReplacement;
     pReplacement->pNext->pPrev  = pExisting;
@@ -192,10 +189,10 @@ GBL_INLINE void GblDoublyLinkedList_moveFront(SELF, GblDoublyLinkedListNode* pNo
     GblDoublyLinkedList_pushFront(pSelf, pNode);
 }
 
-GBL_EXPORT GblBool GblDoublyLinkedList_erase(SELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblDoublyLinkedList_erase(SELF, GblSize index) GBL_NOEXCEPT {
     GblDoublyLinkedListNode* pNode = GblDoublyLinkedList_at(pSelf, index);
     if(pNode) {
-        GblDoublyLinkedList_remove(pSelf, pNode);
+        GblDoublyLinkedList_remove(pNode);
         return GBL_TRUE;
     } else return GBL_FALSE;
 }

@@ -30,7 +30,7 @@ typedef void                            (*GblFnPtr)();
 typedef union GblPtr {
     GblFnPtr        pFunc;
     void*           pData;
-}                                       GblPtr;
+} GblPtr;
 
 // ====== Struct Types ==========
 GBL_FORWARD_DECLARE_STRUCT(GblVariant);

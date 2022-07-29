@@ -17,7 +17,7 @@ GBL_RESULT GblPrimitiveClass_init_(GblPrimitiveClass* pClass, GblIVariantIFaceVT
 
 static GBL_RESULT nilSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_EXPRESSION(GblVariant_type(pVariant) == GBL_NIL_TYPE);
+    GBL_API_VERIFY_EXPRESSION(GblVariant_typeOf(pVariant) == GBL_NIL_TYPE);
     GBL_API_CALL(GblStringBuffer_appendNil(pString));
     GBL_API_END();
 }
@@ -34,7 +34,7 @@ static GBL_RESULT nilLoad_(GblVariant* pVariant, const GblStringBuffer* pString)
 static GBL_RESULT nilConvert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_UNUSED(pVariant);
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, GBL_FALSE);
     else if(type == GBL_CHAR_TYPE)
@@ -62,7 +62,7 @@ static GBL_RESULT nilConvert_(const GblVariant* pVariant, GblVariant* pOther) {
 
 static GBL_RESULT boolSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_EXPRESSION(GblVariant_type(pVariant) == GBL_NIL_TYPE);
+    GBL_API_VERIFY_EXPRESSION(GblVariant_typeOf(pVariant) == GBL_NIL_TYPE);
     GBL_API_CALL(GblStringBuffer_appendBool(pString, pVariant->boolean));
     GBL_API_END();
 }
@@ -98,7 +98,7 @@ static GBL_RESULT boolCompare_(const GblVariant* pSelf, const GblVariant* pOther
 
 static GBL_RESULT boolConvert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_CHAR_TYPE)
         GblVariant_setChar(pOther, pVariant->boolean? 1 : 0);
     else if(type == GBL_UINT8_TYPE)
@@ -167,7 +167,7 @@ static GBL_RESULT charCompare_(const GblVariant* pVariant, const GblVariant* pOt
 
 static GBL_RESULT charConvert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->character? GBL_TRUE : GBL_FALSE);
     else if(type == GBL_UINT8_TYPE)
@@ -233,7 +233,7 @@ static GBL_RESULT u8Compare_(const GblVariant* pVariant, const GblVariant* pOthe
 
 static GBL_RESULT u8Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->u8);
     else if(type == GBL_CHAR_TYPE)
@@ -304,7 +304,7 @@ static GBL_RESULT i16Compare_(const GblVariant* pVariant, const GblVariant* pOth
 
 static GBL_RESULT i16Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->i16);
     else if(type == GBL_CHAR_TYPE)
@@ -374,7 +374,7 @@ static GBL_RESULT u16Compare_(const GblVariant* pVariant, const GblVariant* pOth
 
 static GBL_RESULT u16Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->u16);
     else if(type == GBL_CHAR_TYPE)
@@ -444,7 +444,7 @@ static GBL_RESULT i32Compare_(const GblVariant* pVariant, const GblVariant* pOth
 
 static GBL_RESULT i32Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->i32);
     else if(type == GBL_CHAR_TYPE)
@@ -515,7 +515,7 @@ static GBL_RESULT u32Compare_(const GblVariant* pVariant, const GblVariant* pOth
 
 static GBL_RESULT u32Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->u32);
     else if(type == GBL_CHAR_TYPE)
@@ -587,7 +587,7 @@ static GBL_RESULT i64Compare_(const GblVariant* pVariant, const GblVariant* pOth
 
 static GBL_RESULT i64Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->i64);
     else if(type == GBL_CHAR_TYPE)
@@ -661,7 +661,7 @@ static GBL_RESULT u64Compare_(const GblVariant* pVariant, const GblVariant* pOth
 
 static GBL_RESULT u64Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->u64);
     else if(type == GBL_CHAR_TYPE)
@@ -732,7 +732,7 @@ static GBL_RESULT f32Compare_(const GblVariant* pVariant, const GblVariant* pOth
 
 static GBL_RESULT f32Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->f32 != 0.0f && pVariant->f32 != FP_NAN);
     else if(type == GBL_UINT8_TYPE)
@@ -801,7 +801,7 @@ static GBL_RESULT f64Compare_(const GblVariant* pVariant, const GblVariant* pOth
 
 static GBL_RESULT f64Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->f64 != 0.0 && pVariant->f64 != FP_NAN);
     else if(type == GBL_UINT8_TYPE)
@@ -841,13 +841,13 @@ static GBL_RESULT stringConstruct_(GblVariant* pVariant, GblUint argc, GblVarian
     // Copy constructor
     } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY) {
         GBL_API_VERIFY_ARG(argc == 1);
-        GBL_API_VERIFY_TYPE(GblVariant_type(&pArgs[0]), GBL_STRING_TYPE);
+        GBL_API_VERIFY_TYPE(GblVariant_typeOf(&pArgs[0]), GBL_STRING_TYPE);
         if(pArgs[0].pString)
             pVariant->pString = GblStringRef_acquire(pArgs[0].pString);
     // Move constructor
     } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE) {
         GBL_API_VERIFY_ARG(argc == 1);
-        GBL_API_VERIFY_TYPE(GblVariant_type(&pArgs[0]), GBL_STRING_TYPE);
+        GBL_API_VERIFY_TYPE(GblVariant_typeOf(&pArgs[0]), GBL_STRING_TYPE);
         if(pArgs[0].pString) {
             pVariant->pString   = pArgs[0].pString;
             GblVariant_invalidate(&pArgs[0]);
@@ -956,7 +956,7 @@ static GBL_RESULT stringCompare_(const GblVariant* pVariant, const GblVariant* p
 
 static GBL_RESULT stringConvert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, GblStringView_toBool(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_CHAR_TYPE) {
@@ -1034,7 +1034,7 @@ static GBL_RESULT typeCompare_(const GblVariant* pVariant, const GblVariant* pOt
 
 static GBL_RESULT typeConvert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->typeValue != GBL_INVALID_TYPE);
     else if(type == GBL_STRING_TYPE) {

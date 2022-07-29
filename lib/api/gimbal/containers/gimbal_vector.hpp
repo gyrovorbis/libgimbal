@@ -1,8 +1,8 @@
-#ifndef GIMBAL_VECTOR_HPP
-#define GIMBAL_VECTOR_HPP
+#ifndef GIMBAL_ARRAY_LIST_HPP
+#define GIMBAL_ARRAY_LIST_HPP
 
 #include "gimbal_container.hpp"
-#include "gimbal_vector.h"
+#include "gimbal_array_list.h"
 #include "../objects/gimbal_context.hpp"
 #include <algorithm>
 
@@ -81,13 +81,13 @@ protected:
     void* at_(Size index) const {
         void* pData = nullptr;
         Exception::checkThrow([&]() {
-            pData = GblVector_at(vec_(), index);
+            pData = GblArrayList_at(vec_(), index);
         });
         return pData;
     }
 
 public:
-    operator const GblVector*() const { return vec_(); }
+    operator const GblArrayList*() const { return vec_(); }
 
     // === FIXME UP ===
     const_reference getElement_(size_type index) const {
@@ -110,11 +110,11 @@ public:
 
     // Accessors
     bool isEmpty(void) const {
-        return GblVector_empty(vec_());
+        return GblArrayList_empty(vec_());
     }
 
     bool isStack(void) const {
-        return GblVector_stack(vec_());
+        return GblArrayList_stack(vec_());
     }
 
     bool isHeap(void) const { return !isStack(); }
@@ -129,11 +129,11 @@ public:
     }
 
     Size getStackBytes(void) const {
-        return GblVector_stackBytes(vec_());
+        return GblArrayList_stackBytes(vec_());
     }
 
     Context* getContext(void) const {
-        return Context::fromGblObj(GblVector_context(vec_()));
+        return Context::fromGblObj(GblArrayList_context(vec_()));
     }
 
     allocator_type get_allocator(void) const {
@@ -141,7 +141,7 @@ public:
     }
 
     Size getSize(void) const {
-        return GblVector_size(vec_());
+        return GblArrayList_size(vec_());
     }
 
     Size getSizeBytes(void) const {
@@ -153,7 +153,7 @@ public:
     }
 
     Size getCapacity(void) const {
-        return GblVector_capacity(vec_());
+        return GblArrayList_capacity(vec_());
     }
 
     Size capacity(void) const {
@@ -161,7 +161,7 @@ public:
     }
 
     Size getElementSize(void) const {
-        return GblVector_elementSize(vec_());
+        return GblArrayList_elementSize(vec_());
     }
 
     size_type element_size(void) const { return getElementSize(); }
@@ -171,7 +171,7 @@ public:
     }
 
     const void* getData(void) const {
-       return GblVector_data(vec_());
+       return GblArrayList_data(vec_());
     }
 
     constexpr pointer data(void) {
@@ -185,7 +185,7 @@ public:
     T& front(void) const {
         T* pValue = nullptr;
         Exception::checkThrow([&]() {
-            pValue = reinterpret_cast<T*>(GblVector_front(vec_()));
+            pValue = reinterpret_cast<T*>(GblArrayList_front(vec_()));
         });
         return *pValue;
     }
@@ -193,7 +193,7 @@ public:
     T& back(void) const {
         T* pValue = nullptr;
         Exception::checkThrow([&]() {
-            pValue = reinterpret_cast<T*>(GblVector_back(vec_()));
+            pValue = reinterpret_cast<T*>(GblArrayList_back(vec_()));
         });
         return *pValue;
     }
@@ -229,22 +229,22 @@ public:
 template<typename T>
 class VectorView final: public VectorViewBase<VectorView<T>, T> {
 private:
-    const GblVector* pGblVector_ = nullptr;
+    const GblArrayList* pGblArrayList_ = nullptr;
 public:
     VectorView(void) = default;
 
-    VectorView(const GblVector& gblVector):
-        pGblVector_(&gblVector) {}
+    VectorView(const GblArrayList& gblVector):
+        pGblArrayList_(&gblVector) {}
 
-    VectorView(const GblVector* pGblVector):
-        pGblVector_(pGblVector) {}
+    VectorView(const GblArrayList* pGblArrayList):
+        pGblArrayList_(pGblArrayList) {}
 
     VectorView(const Vector<T>& vector):
-        VectorView(static_cast<const GblVector*>(&vector)) {}
+        VectorView(static_cast<const GblArrayList*>(&vector)) {}
 
-    const GblVector* getVector_(void) const { return pGblVector_; }
+    const GblArrayList* getVector_(void) const { return pGblArrayList_; }
 
-    bool isValid(void) const { return pGblVector_; }
+    bool isValid(void) const { return pGblArrayList_; }
 };
 
 template<typename T>
@@ -260,19 +260,19 @@ VectorView(Vector<T> base) -> VectorView<T>;
  - 6) operator <=> (DONE, BITCH)
  - 7) C++ destructor callbacks!!1111
         Should eventually be some Vtable looking shit ideally:
-        typedef struct GblVectorTypeInfo {
+        typedef struct GblArrayListTypeInfo {
             GblMetaType* pMetaType;
             GblSize elementSize;
             void (*pDestructor)(void* pData, GblSize count);
             void (*pAssign)(void* pLhs, const void* pRhs);
             void (*pMove)(void* pLhs, void* pRhs);
             void (*pCompare)(const void* pLhs, const void* pRhs, GBL_OPERATOR_COMPARISON comp, GblBool* pResult);
-        } GblVectorTypeInfo;
+        } GblArrayListTypeInfo;
  */
 
 template<typename T>
 class Vector:
-        public GblVector,
+        public GblArrayList,
         public VectorViewBase<Vector<T>, T>
 {
 protected:
@@ -294,12 +294,12 @@ public:
     using const_iterator        = typename VectorViewBaseType::const_iterator;
     using difference_type       = typename VectorViewBaseType::difference_type;
 
-    const GblVector* getVector_(void) const {
-        return static_cast<const GblVector*>(this);
+    const GblArrayList* getVector_(void) const {
+        return static_cast<const GblArrayList*>(this);
     }
 
-    GblVector* getVector_(void) {
-        return static_cast<GblVector*>(this);
+    GblArrayList* getVector_(void) {
+        return static_cast<GblArrayList*>(this);
     }
 
     // =========== VALUE CONSTRUCTORS ==========
@@ -314,14 +314,14 @@ public:
 
     // raw pointer constructor
     explicit Vector(const T* pInitialData, Size elementCount, Context* pCtx=nullptr, Size allocSize=sizeof(VectorType), Size elementSize=sizeof(T)) {
-        Exception::checkThrow(GblVector_construct(this, elementSize, elementCount, pInitialData, allocSize, pCtx));
+        Exception::checkThrow(GblArrayList_construct(this, elementSize, elementCount, pInitialData, allocSize, pCtx));
     }
 
     // fill constructor
     explicit Vector(Size count, const T& value=T(), Context* pCtx=nullptr, Size allocSize=sizeof(VectorType)) {
         T* pTempArray = static_cast<T*>(GBL_ALLOCA(count * sizeof(T)));
         std::fill(pTempArray, pTempArray+count, value);
-        Exception::checkThrow(GblVector_construct(this, sizeof(T), count, pTempArray, allocSize, pCtx));
+        Exception::checkThrow(GblArrayList_construct(this, sizeof(T), count, pTempArray, allocSize, pCtx));
     }
 
     // initializer list constructor
@@ -361,19 +361,19 @@ public:
 
     // move constructor - regular
     Vector(VectorType&& rhs, Context* pCtx=nullptr, Size allocSize=sizeof(VectorType)):
-        Vector(static_cast<GblVector&&>(rhs), pCtx, allocSize) {}
+        Vector(static_cast<GblArrayList&&>(rhs), pCtx, allocSize) {}
 
-    // move constructor - GblVector
-    Vector(GblVector&& rhs, Context* pCtx=nullptr, Size allocSize=sizeof(VectorType)):
+    // move constructor - GblArrayList
+    Vector(GblArrayList&& rhs, Context* pCtx=nullptr, Size allocSize=sizeof(VectorType)):
         Vector(pCtx, allocSize)
     {
         *this = std::move(rhs);
     }
 
-    static MoveValues take(GblVector* pVec) {
+    static MoveValues take(GblArrayList* pVec) {
         auto moveValues = MoveValues(nullptr, 0, 0);
         auto& [pData, size, capacity] = moveValues;
-        Exception::checkThrow(GblVector_release(pVec, &pData, &size, &capacity));
+        Exception::checkThrow(GblArrayList_release(pVec, &pData, &size, &capacity));
         return moveValues;
     }
 
@@ -383,34 +383,34 @@ public:
 
     void give(MoveValues moveValues) {
         auto& [pData, size, capacity] = moveValues;
-        Exception::checkThrow(GblVector_acquire(this, pData, size, capacity));
+        Exception::checkThrow(GblArrayList_acquire(this, pData, size, capacity));
     }
 
     ~Vector(void) {
         destruct_(0, size());
-        Exception::checkThrow(GblVector_destruct(this));
+        Exception::checkThrow(GblArrayList_destruct(this));
     }
 
     using VectorViewBaseType::size;
     using VectorViewBaseType::capacity;
 
     void reserve(Size count) {
-        Exception::checkThrow(GblVector_reserve(this, count));
+        Exception::checkThrow(GblArrayList_reserve(this, count));
     }
 
     void resize(Size newSize) {
         if(newSize < size()) {
             destruct_(newSize, size() - newSize);
         }
-        Exception::checkThrow(GblVector_resize(this, newSize));
+        Exception::checkThrow(GblArrayList_resize(this, newSize));
     }
 
     void shrink_to_fit(void) {
-        Exception::checkThrow(GblVector_shrinkToFit(this));
+        Exception::checkThrow(GblArrayList_shrinkToFit(this));
     }
 
     void pushBack(T value) {
-        Exception::checkThrow(GblVector_pushBack(this, &value));
+        Exception::checkThrow(GblArrayList_pushBack(this, &value));
     }
 
     void push_back(T value) {
@@ -426,7 +426,7 @@ public:
     }
 
     void pushFront(T value) {
-        Exception::checkThrow(GblVector_pushFront(this, &value));
+        Exception::checkThrow(GblArrayList_pushFront(this, &value));
     }
 
     void push_front(T value) {
@@ -436,7 +436,7 @@ public:
     iterator insert(const_iterator position, const T* pValue, Size count) {
         const auto index = std::distance(this->cbegin(), position);
         Exception::checkThrow([&]() {
-            GblVector_insert(this, index, count, pValue);
+            GblArrayList_insert(this, index, count, pValue);
         });
         return iterator(*this, index);
     }
@@ -477,7 +477,7 @@ public:
         const auto index = std::distance(this->cbegin(), position);
         void* pData = nullptr;
         Exception::checkThrow([&]() {
-            pData = GblVector_insert(this, index, 1, nullptr);
+            pData = GblArrayList_insert(this, index, 1, nullptr);
         });
          T* pObj = new (pData) T(std::forward<Args>(args)...);
          return iterator(*this, index);
@@ -500,17 +500,17 @@ public:
         const auto index = std::distance<const_iterator>(this->begin(), first);
         const auto count = std::distance(first, last);
         destruct_(index, count);
-        Exception::checkThrow(GblVector_erase(this, index, count));
+        Exception::checkThrow(GblArrayList_erase(this, index, count));
         return iterator(*this, index+count);
     }
 
     void clear(void) {
         destruct_(0, this->getSize());
-        Exception::checkThrow(GblVector_clear(this));
+        Exception::checkThrow(GblArrayList_clear(this));
     }
 
     void assign(const T* pData, Size elementCount) {
-        Exception::checkThrow(GblVector_assign(this, pData, elementCount));
+        Exception::checkThrow(GblArrayList_assign(this, pData, elementCount));
     }
 
     void assign(gimbal::Size size, const T& value) {
@@ -526,7 +526,7 @@ public:
     void assign(const type_compatible_container_readable<T> auto& c) {
         T* pTempArray = static_cast<T*>(GBL_ALLOCA(std::size(c) * sizeof(T)));
         std::copy(begin(c), end(c), pTempArray);
-        Exception::checkThrow(GblVector_assign(this, pTempArray, std::size(c)));
+        Exception::checkThrow(GblArrayList_assign(this, pTempArray, std::size(c)));
     }
 
     void assign(const type_compatible_iterator_readable<T> auto& first, const type_compatible_iterator_readable<T> auto& last) {
@@ -547,7 +547,7 @@ public:
     }
 
     const VectorType& operator=(VectorView<T> rhs) {
-        Exception::checkThrow(GblVector_assign(this, rhs.data(), rhs.size()));
+        Exception::checkThrow(GblArrayList_assign(this, rhs.data(), rhs.size()));
         return *this;
     }
 
@@ -556,10 +556,10 @@ public:
     }
 
     const VectorType& operator=(VectorType&& rhs) {
-        return *this = static_cast<GblVector&&>(rhs);
+        return *this = static_cast<GblArrayList&&>(rhs);
     }
 
-    const VectorType& operator=(GblVector&& rhs) {
+    const VectorType& operator=(GblArrayList&& rhs) {
         VectorView<T> rhsView(rhs); //C++ wrapper "viewing" C object
 
         if(this->getContext() == rhsView.getContext() && rhsView.isHeap()) {
@@ -639,8 +639,8 @@ Vector(VectorView<T> view, Context* pCtx=nullptr, Size allocSize=sizeof(Vector<T
 template<typename T, size_t N>
 Vector(std::array<T, N> array, Context* pCtx=nullptr, Size allocSize=sizeof(Vector<T>)) -> Vector<T>;
 
-Vector(GblVector gblVec, Context* pCtx=nullptr, Size allocSize=sizeof(Vector<void*>)) -> Vector<void*>;
-Vector(const GblVector* pVec, Context* pCtx=nullptr, Size allocSize=sizeof(Vector<void*>)) -> Vector<void*>;
+Vector(GblArrayList gblVec, Context* pCtx=nullptr, Size allocSize=sizeof(Vector<void*>)) -> Vector<void*>;
+Vector(const GblArrayList* pVec, Context* pCtx=nullptr, Size allocSize=sizeof(Vector<void*>)) -> Vector<void*>;
 
 
 template<typename T>
@@ -670,4 +670,4 @@ void swap(gimbal::Vector<T>& lhs, gimbal::Vector<T>& rhs) {
 
 }
 
-#endif // GIMBAL_VECTOR_HPP
+#endif // GIMBAL_ARRAY_LIST_HPP

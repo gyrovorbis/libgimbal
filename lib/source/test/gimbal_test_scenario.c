@@ -10,11 +10,8 @@ typedef struct GblTestScenario_ {
     GblAllocationTracker*   pAllocTracker;
     GblTestSuite*           pCurSuite;
     const char*             pCurCase;
-    GblTimer                suiteTimer;
-    GblSize                 suiteAllocations;
-    GblSize                 suiteTotalAllocations;
-    GblSize                 suiteActiveBytes;
-    GblSize                 suiteTotalBytes;
+    double                  suiteMs;
+    GblAllocationCounters   suiteAllocCounters;
 } GblTestScenario_;
 
 
@@ -34,8 +31,20 @@ static GBL_RESULT GblTestScenarioClass_begin_(GblTestScenario* pSelf) {
 static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_API_BEGIN(pSelf);
     const char* pName = GblObject_name(GBL_OBJECT(pSelf));
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
     GBL_API_INFO("[GblTestScenario] Ending Scenario: [%s]", pName? pName : "");
     GBL_API_PUSH();
+
+    GBL_API_INFO("Runtime Statistics");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %20.3fms", "Total Time",               pSelf->totalTime);
+    GBL_API_INFO("%-20s: %20u",     "Max Allocations",          pSelf_->pAllocTracker->maxAllocations);
+    GBL_API_INFO("%-20s: %20u",     "Max Allocation Size",      pSelf_->pAllocTracker->maxAllocationSize);
+    GBL_API_INFO("%-20s: %20u",     "Max Allocated Bytes",      pSelf_->pAllocTracker->maxBytes);
+    GBL_API_INFO("%-20s: %20u",     "Remaining Allocs",         pSelf_->pAllocTracker->counters.allocsActive);
+    GBL_API_INFO("%-20s: %20u",     "Remaining Bytes",          pSelf_->pAllocTracker->counters.bytesActive);
+    GBL_API_INFO("%-20s: %20u",     "Seed",                     gblSeed(0));
+    GBL_API_POP(1);
 
     GBL_API_INFO("Test Suite Totals");
     GBL_API_PUSH();
@@ -53,14 +62,11 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_API_INFO("%-20s: %20u", "Failed",  pSelf->casesFailed);
     GBL_API_POP(1);
 
-    GBL_API_INFO("%-20s: %20.3fms", "Total Time",  pSelf->totalTime);
     GBL_API_POP(1);
 
-    GBL_API_INFO("********************* %s *********************",  !GBL_RESULT_SUCCESS(pSelf->result)?
-                                            "[   FAIL   ]" : "[   PASS   ]");
+    GBL_API_INFO("********************* %s *********************",
+                 !GBL_RESULT_SUCCESS(pSelf->result)? "[   FAIL   ]" : "[   PASS   ]");
 
-    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
-    //GBL_API_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
     GBL_API_END();
 }
 
@@ -119,27 +125,35 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                     ++pSelf->casesSkipped;
                     suiteFailed = GBL_TRUE;
                 } else {
-
+                    GblTimer caseTimer;
                     GBL_API_INFO("%-12s: %s::%s", "[ RUN       ]",
                                  GblTestSuite_name(pSelf_->pCurSuite),
                                  pSelf_->pCurCase);
 
                     ++pSelf->casesRun;
                     GBL_API_PUSH();
+
+                    GblTimer_start(&caseTimer);
+
                     GBL_RESULT result = GblTestSuite_caseRun(pSuiteIt, pCtx, idx);
+
+                    GblTimer_stop(&caseTimer);
+                    pSelf_->suiteMs += GblTimer_elapsedMs(&caseTimer);
+
                     GBL_API_CLEAR_LAST_RECORD();
                     GBL_API_POP(1);
 
                     if(result == GBL_RESULT_SKIPPED) {
                         ++pSelf->casesSkipped;
-                        GBL_API_INFO("%-12s: %s::%s", "[  SKIPPED  ]",
+                        GBL_API_INFO("%-12s: %s::%s", "[      SKIP ]",
                                      GblTestSuite_name(pSelf_->pCurSuite),
                                      pSelf_->pCurCase);
                     } else if(!GBL_RESULT_ERROR(result)) {
                         ++pSelf->casesPassed;
-                        GBL_API_INFO("%-12s: %s::%s", "[      PASS ]",
+                        GBL_API_INFO("%-12s: %s::%s (%.3f ms)", "[      PASS ]",
                                      GblTestSuite_name(pSelf_->pCurSuite),
-                                     pSelf_->pCurCase);
+                                     pSelf_->pCurCase,
+                                     GblTimer_elapsedMs(&caseTimer));
                     } else {
                         ++pSelf->casesFailed;
                         GBL_API_INFO("%-12s: %s::%s", "[      FAIL ]",
@@ -193,39 +207,43 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
 
 static GBL_RESULT GblTestScenarioClass_suiteBegin_(GblTestScenario* pSelf, const GblTestSuite* pSuite) {
     GBL_API_BEGIN(pSelf);
-    const char* pSuiteName = GblTestSuite_name(pSuite);
+
+    const char* pSuiteName  = GblTestSuite_name(pSuite);
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
+
+    GblAllocationTracker_captureCounters(pSelf_->pAllocTracker,
+                                         &pSelf_->suiteAllocCounters);
+
+    pSelf_->suiteMs = 0.0;
+
     GBL_API_INFO("********* Starting TestSuite [%s] *********", pSuiteName);
-    GblTestScenario_* pSelf_        = GBL_TEST_SCENARIO_(pSelf);
-    pSelf_->suiteAllocations        = GblAllocationTracker_activeCount(pSelf_->pAllocTracker);
-    pSelf_->suiteTotalAllocations   = pSelf_->pAllocTracker->totalAllocations;
-    pSelf_->suiteActiveBytes        = pSelf_->pAllocTracker->activeBytes;
-    pSelf_->suiteTotalBytes         = pSelf_->pAllocTracker->totalBytes;
-    GblTimer_start(&pSelf_->suiteTimer);
+
     GBL_API_END();
 }
 
 
 static GBL_RESULT GblTestScenarioClass_suiteEnd_(GblTestScenario* pSelf, const GblTestSuite* pSuite) {
     GBL_API_BEGIN(pSelf);
+
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
     const char* pSuiteName = GblTestSuite_name(pSuite);
-    GblTimer_stop(&pSelf_->suiteTimer);
-    const double msec = GblTimer_elapsedMs(&pSelf_->suiteTimer);
-    GblSize allocatedBytes  = pSelf_->pAllocTracker->totalBytes - pSelf_->suiteTotalBytes;
-    GblSize totalAllocs     = pSelf_->pAllocTracker->totalAllocations - pSelf_->suiteTotalAllocations;
-    GblSize leakedBytes     = pSelf_->pAllocTracker->activeBytes - pSelf_->suiteActiveBytes;
-    GblSize leaks           = GblAllocationTracker_activeCount(pSelf_->pAllocTracker) - pSelf_->suiteAllocations;
-    pSelf->totalTime += msec;
+    GblAllocationCounters  diffCounters;
 
-    GBL_API_INFO("Totals: %u passed, %u failed, %u skipped, %.3fms, %u/%u leaked (%u/%u bytes)",
+    GblAllocationTracker_diffCounters(pSelf_->pAllocTracker,
+                                      &pSelf_->suiteAllocCounters,
+                                      &diffCounters);
+
+    pSelf->totalTime += pSelf_->suiteMs;
+
+    GBL_API_INFO("Totals: %u passed, %u failed, %u skipped, %.3fms, %d/%u leaked (%d/%u bytes)",
                  pSuite->casesPassed,
                  pSuite->casesFailed,
                  pSuite->casesSkipped,
-                 msec,
-                 leaks,
-                 totalAllocs,
-                 leakedBytes,
-                 allocatedBytes);
+                 pSelf_->suiteMs,
+                 diffCounters.allocsActive,
+                 diffCounters.allocEvents,
+                 diffCounters.bytesActive,
+                 diffCounters.bytesAllocated);
     GBL_API_INFO("********* Finished TestSuite [%s] *********", pSuiteName);
     GBL_API_END();
 }
@@ -277,7 +295,7 @@ static GBL_RESULT GblTestScenarioClass_propertyGet_(const GblObject* pSelf, GblS
 
 
 static GBL_RESULT GblTestScenarioClass_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
-    GblContext* pParentCtx = GblContext_parentContext(GBL_CONTEXT(pIAllocator));
+    GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
     GBL_API_BEGIN(pParentCtx);
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
@@ -288,7 +306,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_alloc_(GblIAllocator* pIAlloca
 }
 
 static GBL_RESULT GblTestScenarioClass_IAllocator_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData) GBL_NOEXCEPT {
-    GblContext* pParentCtx = GblContext_parentContext(GBL_CONTEXT(pIAllocator));
+    GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
     GBL_API_BEGIN(pParentCtx);
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
@@ -299,7 +317,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_realloc_(GblIAllocator* pIAllo
 }
 
 static GBL_RESULT GblTestScenarioClass_IAllocator_free_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData) GBL_NOEXCEPT {
-    GblContext* pParentCtx = GblContext_parentContext(GBL_CONTEXT(pIAllocator));
+    GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
     GBL_API_BEGIN(pParentCtx);
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
@@ -320,7 +338,6 @@ static GBL_RESULT GblTestScenarioClass_constructor_(GblObject* pObject) {
     GblContext* pParentCtx      = GblContext_parentContext(GBL_CONTEXT(pObject));
     pSelf_->pAllocTracker       = GblAllocationTracker_create(pParentCtx);
 
-    GblContext* pOldGlobal = GblContext_global();
     GblContext_globalSet(GBL_CONTEXT(pSelf));
     GBL_API_END();
 }
@@ -402,18 +419,25 @@ GBL_EXPORT GblTestScenario* GblTestScenario_create(const char* pName) {
 GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf);
+    GblTestScenario_*   pSelf_  = GBL_TEST_SCENARIO_(pSelf);
 
-    GBL_API_DONE();
+    GblObject* pNext;
     // not properly disposing of shit anything beyond the first entry!
     for(GblObject* pIt = GblObject_childFirst(GBL_OBJECT(pSelf));
         pIt != NULL;
-        pIt = GblObject_siblingNext(pIt))
+        pIt = pNext)
     {
+        pNext = GblObject_siblingNext(pIt);
         if(GblObject_unref(pIt) != 0) {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblTestSuite] Destroy: Leaking unexpected existing references!");
         }
     }
+
+    //GBL_API_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
+
+    GBL_API_DONE();
+
 
     GBL_API_VERIFY(GblObject_unref(GBL_OBJECT(pSelf)) == 0,
                    GBL_RESULT_ERROR_INVALID_OPERATION,

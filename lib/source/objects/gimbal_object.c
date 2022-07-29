@@ -9,7 +9,7 @@
 #include "../meta/gimbal_type_.h"
 
 #define GBL_OBJECT_PROPERTY_TABLE_CAPACITY_DEFAULT_ 64
-#define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblVector) + sizeof(GblIEventFilter*)*5)
+#define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblArrayList) + sizeof(GblIEventFilter*)*5)
 
 static GblQuark     objectNameQuark_            = GBL_QUARK_INVALID;
 static GblQuark     objectUserdataQuark_        = GBL_QUARK_INVALID;
@@ -104,7 +104,7 @@ static GBL_RESULT GblObjectClass_iTableIFace_index_(const GblITable* pITable, co
     GBL_API_BEGIN(NULL);
     GBL_API_RESULT() = GBL_RESULT_ERROR_INVALID_PROPERTY;
     GblObject* pObject = GBL_OBJECT(pITable);
-    if(GblVariant_type(pKey) == GBL_STRING_TYPE) {
+    if(GblVariant_typeOf(pKey) == GBL_STRING_TYPE) {
         const char* pString = NULL;
         GBL_API_CALL(GblVariant_getValuePeek(pKey, &pString));
         GBL_API_RESULT() = GblObject_propertyGetString(pObject, pString, pValue);
@@ -123,7 +123,7 @@ static GBL_RESULT GblObjectClass_iTableIFace_newIndex_(GblITable* pITable, const
     GBL_API_BEGIN(NULL);
     GBL_API_RESULT() = GBL_RESULT_ERROR_INVALID_PROPERTY;
     GblObject* pObject = GBL_OBJECT(pITable);
-    if(GblVariant_type(pKey) == GBL_STRING_TYPE) {
+    if(GblVariant_typeOf(pKey) == GBL_STRING_TYPE) {
         const char* pString = NULL;
         GBL_API_CALL(GblVariant_getValuePeek(pKey, &pString));
         GBL_API_RESULT() = GblObject_propertySetString(pObject, pString, pValue);
@@ -145,14 +145,14 @@ static GBL_RESULT GblObjectClass_iTableIFace_nextIndex_(const GblITable* pITable
     GBL_API_CALL(GblVariant_setValueCopy(pNextValue, GBL_NIL_TYPE, NULL));
     GblObject* pObject = GBL_OBJECT(pITable);
     // get the first one
-    if(!pKey || GblVariant_type(pKey) == GBL_NIL_TYPE) {
+    if(!pKey || GblVariant_typeOf(pKey) == GBL_NIL_TYPE) {
         const GblProperty* pProp = GblObject_propertyNext(pObject, NULL, GBL_PROPERTY_FLAG_READ);
         if(pProp) {
             GBL_API_CALL(GblVariant_setValueCopy(pNextKey, GBL_STRING_TYPE, GblProperty_nameString(pProp)));
             GBL_API_CALL(GblObject_propertyGet(pObject, pProp, pNextValue));
             GBL_API_RESULT() = GBL_RESULT_SUCCESS;
         }
-    } else if(GblVariant_type(pKey) == GBL_STRING_TYPE) {
+    } else if(GblVariant_typeOf(pKey) == GBL_STRING_TYPE) {
         const char* pString = NULL;
         GBL_API_CALL(GblVariant_getValuePeek(pKey, &pString));
         const GblProperty* pProp = GblObject_propertyFindString(pObject, pString);
@@ -218,19 +218,19 @@ GBL_API GblObject_eventNotify(GblObject* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
 
 static GBL_RESULT GblObject_eventFiltersDestruct_(uintptr_t key, void* pData) {
     GBL_UNUSED(key);
-    return GblVector_destruct(pData);
+    return GblArrayList_destruct(pData);
 }
 
-static GblVector* GblObject_eventFilters_(const GblObject* pSelf) {
-    return (GblVector*)GblArrayMap_getValue(&pSelf->pExtendedFields, objectEventFiltersQuark_);
+static GblArrayList* GblObject_eventFilters_(const GblObject* pSelf) {
+    return (GblArrayList*)GblArrayMap_getValue(&pSelf->pExtendedFields, objectEventFiltersQuark_);
 }
 
-static GblVector* GblObject_ensureEventFilters_(GblObject* pSelf) GBL_NOEXCEPT {
+static GblArrayList* GblObject_ensureEventFilters_(GblObject* pSelf) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    GblVector* pEventFilters = GblObject_eventFilters_(pSelf);
+    GblArrayList* pEventFilters = GblObject_eventFilters_(pSelf);
     if(!pEventFilters) {
         pEventFilters = GBL_API_MALLOC(GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_);
-        GBL_API_CALL(GblVector_construct(pEventFilters,
+        GBL_API_CALL(GblArrayList_construct(pEventFilters,
                                         sizeof(GblIEventFilter*),
                                         0,
                                         NULL,
@@ -248,26 +248,26 @@ static GblVector* GblObject_ensureEventFilters_(GblObject* pSelf) GBL_NOEXCEPT {
 GBL_API GblObject_eventFilterInstall(GblObject* pSelf, GblIEventFilter* pFilter) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pFilter);
-    GblVector* pFilters = GblObject_ensureEventFilters_(pSelf);
-    GBL_API_CALL(GblVector_pushBack(pFilters, &pFilter));
+    GblArrayList* pFilters = GblObject_ensureEventFilters_(pSelf);
+    GBL_API_CALL(GblArrayList_pushBack(pFilters, &pFilter));
     GBL_API_END();
 }
 
 GBL_API GblObject_eventFilterUninstall(GblObject* pSelf, GblIEventFilter* pFilter) GBL_NOEXCEPT {
-    GblVector* pVector = NULL;
+    GblArrayList* pVector = NULL;
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pFilter);
     pVector = GblObject_eventFilters_(pSelf);
     GBL_API_VERIFY_POINTER(pVector);
-    GblSize count = GblVector_size(pVector);
+    GblSize count = GblArrayList_size(pVector);
     GBL_API_VERIFY(count, GBL_RESULT_ERROR_INVALID_HANDLE,
                    "Object has no event filter list to remove filter from: %x", pFilter);
     GblBool found = GBL_FALSE;
     for(GblSize f = 0; f < count; ++f) {
-        GblIEventFilter** ppFilter = GblVector_at(pVector, f);
+        GblIEventFilter** ppFilter = GblArrayList_at(pVector, f);
         if(*ppFilter == pFilter) {
             found = GBL_TRUE;
-            GBL_API_CALL(GblVector_erase(pVector, f, 1));
+            GBL_API_CALL(GblArrayList_erase(pVector, f, 1));
             break;
         }
     }
@@ -278,18 +278,18 @@ GBL_API GblObject_eventFilterUninstall(GblObject* pSelf, GblIEventFilter* pFilte
 GblIEventFilter* GblObject_eventFilterAt(const GblObject* pSelf, GblSize index) GBL_NOEXCEPT {
     GblIEventFilter** ppFilter = NULL;
     GBL_API_BEGIN(NULL);
-    GblVector* pFilters = GblObject_eventFilters_(pSelf);
+    GblArrayList* pFilters = GblObject_eventFilters_(pSelf);
     if(pFilters)
-        ppFilter = GblVector_at(pFilters, index);
+        ppFilter = GblArrayList_at(pFilters, index);
     GBL_API_END_BLOCK();
     return ppFilter? *ppFilter : NULL;
 }
 GblSize GblObject_eventFilterCount(const GblObject* pSelf) GBL_NOEXCEPT {
     GblSize count = 0;
     GBL_API_BEGIN(NULL);
-    GblVector* pFilters = GblObject_eventFilters_(pSelf);
+    GblArrayList* pFilters = GblObject_eventFilters_(pSelf);
     if(pFilters) {
-        count = GblVector_size(pFilters);
+        count = GblArrayList_size(pFilters);
     }
     GBL_API_END_BLOCK();
     return count;

@@ -96,6 +96,9 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
     GBL_API_VERIFY_POINTER(pFmt);
     GBL_API_VERIFY_ARG(level >= 0 /*&& level < GBL_LOG_LEVEL_COUNT*/); // or not to allow for user levels!
 
+    GblContext* pCtx = (GblContext*)pILogger;
+    if(!(pCtx->logFilter & level)) GBL_API_DONE();
+
     char buffer[GBL_VA_SNPRINTF_BUFFER_SIZE] = { '\0' };
     char tabBuff[GBL_VA_SNPRINTF_BUFFER_SIZE];// = { '\t' };
     FILE* const pFile = (level >= GBL_LOG_LEVEL_ERROR)?
@@ -170,6 +173,7 @@ static GBL_RESULT GblContext_ILogger_push_(GblILogger* pILogger, const GblStackF
 
 static GBL_RESULT GblContext_constructor_(GblObject* pSelf) GBL_NOEXCEPT {
     pSelf->contextType = 1;
+    ((GblContext*)pSelf)->logFilter = 0xffffffff;
     GBL_API_BEGIN(pSelf);
 
     GblObjectClass* pObjClass = GBL_OBJECT_CLASS(GblClass_weakRefDefault(GBL_OBJECT_TYPE));
@@ -209,7 +213,8 @@ static GblContextClass defaultClass = {
 
 static GblContext defaultCtx_ = {
     .base.pClass = (GblObjectClass*)&defaultClass,
-    .base.contextType = 1
+    .base.contextType = 1,
+    .logFilter = 0xffffffff
 };
 
 static GblContext* globalCtx_ = &defaultCtx_;
@@ -313,6 +318,11 @@ GBL_API GblContext_callRecordSet_(GblContext* pSelf,
     GBL_UNUSED(pFrame);
     return GblContext_lastIssueSet(pSelf, pRecord);
 }
+
+GBL_EXPORT void GblContext_setLogFilter(GblContext* pSelf, GblFlags mask) {
+    pSelf->logFilter = mask;
+}
+
 
 
 extern GBL_RESULT GblContext_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {

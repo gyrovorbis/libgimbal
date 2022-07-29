@@ -17,14 +17,14 @@ static GBL_RESULT flagsConstruct_(GblVariant* pVariant, GblUint argc, GblVariant
     GBL_UNUSED(argc && pArgs);
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT);
-    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
+    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     pVariant->flags = GblFlagsClass_valueFromIndex(pFlagsClass, 0);
     GBL_API_END();
 }
 
 static GBL_RESULT flagsSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_API_BEGIN(NULL);
-    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
+    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     GBL_API_CALL(GblStringBuffer_append(pString,
                                         GBL_STRV(GblFlagsClass_nameFromValue(pFlagsClass,
                                                                             pVariant->flags))));
@@ -33,7 +33,7 @@ static GBL_RESULT flagsSave_(const GblVariant* pVariant, GblStringBuffer* pStrin
 
 static GBL_RESULT flagsLoad_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_API_BEGIN(NULL);
-    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
+    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     pVariant->flags = GblFlagsClass_valueFromName(pFlagsClass, GblStringBuffer_cString(pString));
     GBL_API_END();
 }
@@ -44,7 +44,7 @@ static GBL_RESULT flagsSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArg
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
     GBL_API_VERIFY_ARG(argc == 1);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_UINT32_TYPE);
-    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
+    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     GBL_API_VERIFY(GblFlagsClass_valueCheck(pFlagsClass, (GblFlags)pArgs->u32),
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
     pVariant->flags = (GblFlags)pArgs->u32;
@@ -69,8 +69,8 @@ static GBL_RESULT flagsCompare_(const GblVariant* pVariant, const GblVariant* pO
 
 static GBL_RESULT flagsConvertTo_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
-    const GblType type = GblVariant_type(pOther);
+    GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, GblFlagsClass_valueCheck(pFlagsClass, pVariant->flags));
     else if(type == GBL_UINT8_TYPE) {
@@ -119,11 +119,11 @@ static GBL_RESULT flagsConvertTo_(const GblVariant* pVariant, GblVariant* pOther
 static GBL_RESULT flagsConvertFrom_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_UNUSED(pVariant);
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pVariant);
-     GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_type(pOther)));
+    const GblType type = GblVariant_typeOf(pVariant);
+     GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pOther)));
     if(type == GBL_STRING_TYPE)
         GBL_API_CALL(GblVariant_setValueCopy(pOther,
-                                             GblVariant_type(pOther),
+                                             GblVariant_typeOf(pOther),
                                              GblFlagsClass_valueFromString(pFlagsClass,
                                                                            GblVariant_getString(pVariant))));
     else

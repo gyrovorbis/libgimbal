@@ -120,10 +120,12 @@ set(GIMBAL_SOURCES
      source/meta/gimbal_boxed.c
      source/meta/gimbal_flags.c
      source/containers/gimbal_byte_array.c
-     source/containers/gimbal_vector.c
+     source/containers/gimbal_array_list.c
      source/strings/gimbal_string_ref.c
      source/strings/gimbal_string_buffer.c
      source/meta/gimbal_interface.c
+     source/meta/gimbal_signal.c
+     source/types/gimbal_marshal.c
      source/test/gimbal_test_suite.c
      source/test/gimbal_test_scenario.c
      source/test/gimbal_allocation_tracker.c
@@ -176,7 +178,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_thread.hpp
     api/gimbal/types/gimbal_typedefs.hpp
     api/gimbal/ifaces/gimbal_iplugin.h
-    api/gimbal/containers/gimbal_vector.h
+    api/gimbal/containers/gimbal_array_list.h
     api/gimbal/algorithms/gimbal_sort.h
     api/gimbal/algorithms/gimbal_numeric.h
     api/gimbal/algorithms/gimbal_hash.h
@@ -208,6 +210,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/test/gimbal_test_scenario.h
     api/gimbal/utils/gimbal_timer.h
     api/gimbal/test/gimbal_allocation_tracker.h
+    api/gimbal/meta/gimbal_signal.h
+    api/gimbal/types/gimbal_marshal.h
     source/meta/gimbal_type_.h
 )
 

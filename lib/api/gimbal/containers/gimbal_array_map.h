@@ -20,7 +20,7 @@
 GBL_FORWARD_DECLARE_STRUCT(GblArrayMapEntry);
 
 typedef GBL_RESULT  (*GblArrayMapDestructFn)(uintptr_t key, void* pEntry);
-typedef GblBool     (*GblArrayMapCompareFn) (uintptr_t key1, uintptr_t key2);
+typedef int         (*GblArrayMapCompareFn) (uintptr_t key1, uintptr_t key2);
 
 typedef struct GblArrayMapEntry {
     uintptr_t                   key;
@@ -34,7 +34,12 @@ typedef struct GblArrayMapEntry {
 typedef struct GblArrayMap {
     GblContext*             pCtx;
     GblArrayMapCompareFn    pFnComparator;
-    GblSize                 size;
+    GblSize                 binarySearch    : 1;    //todo
+#ifdef GBL_64BIT
+    GblSize                 size            : 63;
+#elif defined(GBL_32BIT)
+    GblSize                 size            : 31;
+#endif
 } GblArrayMap;
 
 GBL_EXPORT GblArrayMap* GblArrayMap_create          (GblArrayMapCompareFn pFnComp,
@@ -135,7 +140,7 @@ GBL_INLINE GblBool GblArrayMap_contains(CSELF, uintptr_t key) GBL_NOEXCEPT {
 GBL_INLINE GblBool GblArrayMap_containsUserdata(CSELF, uintptr_t key) GBL_NOEXCEPT {
     GblArrayMapEntry* pEntry = GblArrayMap_find_entry_(ppSelf, key);
     if(pEntry) {
-        if(GblVariant_type(&pEntry->value) == GBL_INVALID_TYPE)
+        if(GblVariant_typeOf(&pEntry->value) == GBL_INVALID_TYPE)
             return GBL_TRUE;
     }
     return GBL_FALSE;
@@ -144,7 +149,7 @@ GBL_INLINE GblBool GblArrayMap_containsUserdata(CSELF, uintptr_t key) GBL_NOEXCE
 GBL_INLINE GblBool GblArrayMap_containsVariant(CSELF, uintptr_t key) GBL_NOEXCEPT {
     GblArrayMapEntry* pEntry = GblArrayMap_find_entry_(ppSelf, key);
     if(pEntry) {
-        if(GblVariant_type(&pEntry->value) != GBL_INVALID_TYPE)
+        if(GblVariant_typeOf(&pEntry->value) != GBL_INVALID_TYPE)
             return GBL_TRUE;
     }
     return GBL_FALSE;
@@ -199,7 +204,7 @@ GBL_INLINE GblSize GblArrayMap_find(CSELF, uintptr_t key) GBL_NOEXCEPT {
         for(GblSize e = 0; e < size; ++e) {
             const GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, e);
             if((*ppSelf)->pFnComparator) {
-                if((*ppSelf)->pFnComparator(key, pEntry->key)) {
+                if((*ppSelf)->pFnComparator(key, pEntry->key) == 0) {
                     index = e;
                     break;
                 }

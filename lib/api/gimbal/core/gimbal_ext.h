@@ -10,11 +10,11 @@ extern "C" {
 #define GBL_META_LOG_LEVEL_TABLE (                                              \
         ( GBL_LOG_LEVEL, LogLevel, "Log Message Severity Level", gblLogLevelString),               \
         (                                                                       \
-            (GBL_LOG_LEVEL_DEBUG,       0x0,    Debug,      "Debug"),           \
-            (GBL_LOG_LEVEL_VERBOSE,     0x1,    Verbose,    "Verbose"),         \
-            (GBL_LOG_LEVEL_INFO,        0x2,    Info,       "Info"),            \
-            (GBL_LOG_LEVEL_WARNING,     0x3,    Warning,    "Warning"),         \
-            (GBL_LOG_LEVEL_ERROR,       0x4,    Error,      "Error"),           \
+            (GBL_LOG_LEVEL_DEBUG,       0x1,    Debug,      "Debug"),           \
+            (GBL_LOG_LEVEL_VERBOSE,     0x2,    Verbose,    "Verbose"),         \
+            (GBL_LOG_LEVEL_INFO,        0x4,    Info,       "Info"),            \
+            (GBL_LOG_LEVEL_WARNING,     0x8,    Warning,    "Warning"),         \
+            (GBL_LOG_LEVEL_ERROR,       0x10,   Error,      "Error"),           \
             (GBL_LOG_LEVEL_COUNT,       0x5,    Count,      "# of Levels")      \
         )                                                                       \
     )

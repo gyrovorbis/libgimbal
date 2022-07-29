@@ -21,14 +21,14 @@ static GBL_RESULT GblBoxed_construct_(GblVariant* pVariant, GblUint argc, GblVar
 
     // Copy constructor
     } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY) {
-        GBL_API_VERIFY_TYPE(pArgs[0].type, GblVariant_type(pVariant));
+        GBL_API_VERIFY_TYPE(pArgs[0].type, GblVariant_typeOf(pVariant));
         GBL_API_VERIFY_CALL(GblBoxed_copy(pArgs[0].pVoid,
-                                          GblVariant_type(&pArgs[0]),
+                                          GblVariant_typeOf(&pArgs[0]),
                                           &pVariant->pVoid));
 
     // Move constructor
     } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE) {
-        GBL_API_VERIFY_TYPE(pArgs[0].type, GblVariant_type(pVariant));
+        GBL_API_VERIFY_TYPE(pArgs[0].type, GblVariant_typeOf(pVariant));
         pVariant->pVoid = pArgs[0].pVoid;
         GBL_API_CALL(GblVariant_invalidate(&pArgs[0]));
 
@@ -36,7 +36,7 @@ static GBL_RESULT GblBoxed_construct_(GblVariant* pVariant, GblUint argc, GblVar
     } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY) {
         GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
         GBL_API_VERIFY_CALL(GblBoxed_copy(pArgs[0].pVoid,
-                                          GblVariant_type(pVariant),
+                                          GblVariant_typeOf(pVariant),
                                           &pVariant->pVoid));
 
     // Value moving constructor
@@ -51,7 +51,7 @@ static GBL_RESULT GblBoxed_destruct_(GblVariant* pVariant) {
     GBL_API_BEGIN(NULL);
 
     GBL_API_VERIFY_CALL(GblBoxed_free(pVariant->pVoid,
-                                      GblVariant_type(pVariant)));
+                                      GblVariant_typeOf(pVariant)));
     GBL_API_END();
 }
 
@@ -60,28 +60,28 @@ static GBL_RESULT GblBoxed_set_(GblVariant* pVariant, GblUint argc, GblVariant* 
     GBL_UNUSED(argc);
     GBL_API_VERIFY_ARG(argc == 1);
     if(op & GBL_IVARIANT_OP_FLAG_SET_COPY) {
-        GBL_API_VERIFY_TYPE(pArgs[0].type, GblVariant_type(pVariant));
-        GBL_API_VERIFY_CALL(GblBoxed_free(pVariant->pVoid, GblVariant_type(pVariant)));
+        GBL_API_VERIFY_TYPE(pArgs[0].type, GblVariant_typeOf(pVariant));
+        GBL_API_VERIFY_CALL(GblBoxed_free(pVariant->pVoid, GblVariant_typeOf(pVariant)));
         GBL_API_VERIFY_CALL(GblBoxed_copy(pArgs[0].pVoid,
-                                          GblVariant_type(&pArgs[0]),
+                                          GblVariant_typeOf(&pArgs[0]),
                                           &pVariant->pVoid));
     }
     else if(op & GBL_IVARIANT_OP_FLAG_SET_MOVE) {
-        GBL_API_VERIFY_TYPE(pArgs[0].type, GblVariant_type(pVariant));
-        GBL_API_VERIFY_CALL(GblBoxed_free(pVariant->pVoid, GblVariant_type(pVariant)));
+        GBL_API_VERIFY_TYPE(pArgs[0].type, GblVariant_typeOf(pVariant));
+        GBL_API_VERIFY_CALL(GblBoxed_free(pVariant->pVoid, GblVariant_typeOf(pVariant)));
         pVariant->pVoid = pArgs[0].pVoid;
         GBL_API_CALL(GblVariant_invalidate(&pArgs[0]));
     }
     else if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY) {
         GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
-        GBL_API_VERIFY_CALL(GblBoxed_free(pVariant->pVoid, GblVariant_type(pVariant)));
+        GBL_API_VERIFY_CALL(GblBoxed_free(pVariant->pVoid, GblVariant_typeOf(pVariant)));
         GBL_API_VERIFY_CALL(GblBoxed_copy(pArgs[0].pVoid,
-                                          GblVariant_type(pVariant),
+                                          GblVariant_typeOf(pVariant),
                                           &pVariant->pVoid));
 
     } else if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE) {
         GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
-        GBL_API_VERIFY_CALL(GblBoxed_free(pVariant->pVoid, GblVariant_type(pVariant)));
+        GBL_API_VERIFY_CALL(GblBoxed_free(pVariant->pVoid, GblVariant_typeOf(pVariant)));
         pVariant->pVoid = pArgs[0].pVoid;
     }
     GBL_API_END();
@@ -94,7 +94,7 @@ static GBL_RESULT GblBoxed_get_(GblVariant* pVariant, GblUint argc, GblVariant* 
 
     if(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY) {
         GBL_API_VERIFY_CALL(GblBoxed_copy(pVariant->pVoid,
-                                          GblVariant_type(pVariant),
+                                          GblVariant_typeOf(pVariant),
                                           pArgs[0].pVoid));
 
     } else if(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE) {
@@ -131,7 +131,7 @@ static GBL_RESULT GblBoxed_load_(GblVariant* pVariant, const GblStringBuffer* pS
 
 static GBL_RESULT GblBoxed_convertTo_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pOther);
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, pVariant->pVoid? GBL_TRUE : GBL_FALSE);
     else if(type == GBL_STRING_TYPE) {
@@ -149,11 +149,11 @@ static GBL_RESULT GblBoxed_convertTo_(const GblVariant* pVariant, GblVariant* pO
 static GBL_RESULT GblBoxed_convertFrom_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_UNUSED(pVariant);
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pVariant);
+    const GblType type = GblVariant_typeOf(pVariant);
     if(type == GBL_POINTER_TYPE)
-        GblVariant_setValueCopy(pOther, GblVariant_type(pOther), pVariant->pVoid);
+        GblVariant_setValueCopy(pOther, GblVariant_typeOf(pOther), pVariant->pVoid);
     else if(type == GBL_NIL_TYPE)
-        GblVariant_setBoxedMove(pOther, GblVariant_type(pOther), NULL);
+        GblVariant_setBoxedMove(pOther, GblVariant_typeOf(pOther), NULL);
     else
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_API_END();

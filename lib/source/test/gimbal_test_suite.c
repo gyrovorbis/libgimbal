@@ -1,11 +1,11 @@
 #include <gimbal/test/gimbal_test_suite.h>
 #include <gimbal/test/gimbal_test_scenario.h>
-#include <gimbal/containers/gimbal_vector.h>
+#include <gimbal/containers/gimbal_array_list.h>
 
 #define GBL_TEST_SUITE_(inst)           ((GblTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_TEST_SUITE_TYPE))
 
 typedef struct GblTestSuite_ {
-    GblVector       testCases;
+    GblArrayList       testCases;
 } GblTestSuite_;
 
 static GBL_RESULT GblTestSuiteClass_vTableDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
@@ -24,7 +24,7 @@ static GBL_RESULT GblTestSuiteClass_caseCount_(const GblTestSuite* pSelf, GblSiz
     GBL_API_BEGIN(pSelf);
     GBL_API_VERIFY_POINTER(pSize);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
-    *pSize = GblVector_size(&pSelf_->testCases);
+    *pSize = GblArrayList_size(&pSelf_->testCases);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }
@@ -33,7 +33,7 @@ static GBL_RESULT GblTestSuiteClass_caseName_(const GblTestSuite* pSelf, GblSize
     GBL_API_BEGIN(pSelf);
     GBL_API_VERIFY_POINTER(ppName);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
-    const GblTestCase* pCase = GblVector_at(&pSelf_->testCases, index);
+    const GblTestCase* pCase = GblArrayList_at(&pSelf_->testCases, index);
     GBL_API_VERIFY_LAST_RECORD();
     *ppName = pCase->pName;
     GBL_API_END();
@@ -42,7 +42,7 @@ static GBL_RESULT GblTestSuiteClass_caseName_(const GblTestSuite* pSelf, GblSize
 static GBL_RESULT GblTestSuiteClass_caseRun_(GblTestSuite* pSelf, GblContext* pCtx, GblSize index) {
     GBL_API_BEGIN(pCtx);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
-    const GblTestCase* pCase = GblVector_at(&pSelf_->testCases, index);
+    const GblTestCase* pCase = GblArrayList_at(&pSelf_->testCases, index);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_VERIFY_CALL(pCase->pFnRun(pSelf, pCtx));
     GBL_API_END_BLOCK();
@@ -74,7 +74,7 @@ static GBL_RESULT GblTestSuiteClass_propertyGet_(const GblObject* pSelf, GblSize
         GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pSuite->failingIssue.message);
         break;
     case GBL_TEST_SUITE_PROPERTY_ID_CASE_COUNT:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblVector_size(&pSuite_->testCases));
+        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblArrayList_size(&pSuite_->testCases));
         break;
     case GBL_TEST_SUITE_PROPERTY_ID_CASES_RUN:
         GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pSuite->casesRun);
@@ -120,7 +120,7 @@ static GBL_RESULT GblTestSuiteClass_destructor_(GblObject* pSelf) {
     GblObjectClass* pSuper = GBL_OBJECT_CLASS(GblClass_weakRefDefault(GBL_OBJECT_TYPE));
     if(pSuper && pSuper->pFnDestructor) GBL_API_VERIFY_CALL(pSuper->pFnDestructor(pSelf));
 
-    GBL_API_VERIFY_CALL(GblVector_destruct(&GBL_TEST_SUITE_(pSelf)->testCases));
+    GBL_API_VERIFY_CALL(GblArrayList_destruct(&GBL_TEST_SUITE_(pSelf)->testCases));
     GBL_API_END();
 }
 
@@ -248,7 +248,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_caseRun(GblTestSuite* pSelf,
 static GBL_RESULT GblTestSuite_init_(GblInstance* pInstance, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pInstance);
-    GBL_API_VERIFY_CALL(GblVector_construct(&pSelf_->testCases, sizeof(GblTestCase)));
+    GBL_API_VERIFY_CALL(GblArrayList_construct(&pSelf_->testCases, sizeof(GblTestCase)));
     GBL_API_END();
 }
 
@@ -333,7 +333,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_caseAdd(GblTestSuite* pSelf, const char* pNam
 
     GBL_API_VERIFY_POINTER(pName);
     GBL_API_VERIFY_POINTER(pFnRun);
-    GBL_API_VERIFY_CALL(GblVector_pushBack(&GBL_TEST_SUITE_(pSelf)->testCases, &tempCase));
+    GBL_API_VERIFY_CALL(GblArrayList_pushBack(&GBL_TEST_SUITE_(pSelf)->testCases, &tempCase));
 
     GBL_API_END();
 }
@@ -360,9 +360,9 @@ static GblSize GblTestSuite_caseIndex_(const GblTestSuite* pSelf, const char* pC
     GblSize index = GBL_NPOS;
     GBL_API_BEGIN(NULL);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
-    const GblSize caseCount = GblVector_size(&pSelf_->testCases);
+    const GblSize caseCount = GblArrayList_size(&pSelf_->testCases);
     for(GblSize i = 0; i < caseCount; ++i) {
-        const GblTestCase* pCase = GblVector_at(&pSelf_->testCases, i);
+        const GblTestCase* pCase = GblArrayList_at(&pSelf_->testCases, i);
         if(strcmp(pCase->pName, pCaseName) == 0) {
             index = i;
             break;

@@ -57,11 +57,17 @@ GblInterface* GblType_extension_(GblType type, GblType ifaceType) {
     return pExt;
 }
 
+
 static GblBool GblType_conforms_(GblType type, GblType dependent, GblBool verify) {
     GblBool conforms = GBL_FALSE;
     GBL_API_BEGIN(pCtx_);
     if(dependent != GBL_INVALID_TYPE && type != GBL_INVALID_TYPE) {
-        if(GblType_flagsCheck(dependent, GBL_TYPE_ROOT_FLAG_DEPENDENT)) {
+        GblBool classConforms   = GBL_TRUE;
+        if(GblType_flagsCheck(dependent, GBL_TYPE_ROOT_FLAG_CLASSED)) {
+            classConforms = GblType_check(type, dependent);
+        }
+
+        if(classConforms && GblType_flagsCheck(dependent, GBL_TYPE_ROOT_FLAG_DEPENDENT)) {
             for(GblInt a = (GblInt)GblType_depth(dependent); a >= 0; --a) {
                 GblType ancestor = GblType_ancestor(dependent, a);
                 GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
@@ -80,8 +86,12 @@ static GblBool GblType_conforms_(GblType type, GblType dependent, GblBool verify
                     } else GBL_API_DONE(); //if even one check fails, you're done.
                 }
             }
-            conforms = GBL_TRUE; // oh shit, you made it to the end!
         }
+
+        conforms = classConforms; // oh shit, you made it to the end!
+
+    } else if(dependent == GBL_INVALID_TYPE && type == GBL_INVALID_TYPE) {
+        conforms = GBL_TRUE;
     }
     GBL_API_END_BLOCK();
     return conforms;
@@ -164,8 +174,8 @@ static GblFlags typeFlagsWithImplied_(GblType parent,
                                                             flags |= GBL_TYPE_ROOT_FLAG_CLASSED;
                                                             flags |= GBL_TYPE_ROOT_FLAG_DEPENDENT;
     }
-    if(flags & GBL_TYPE_ROOT_FLAG_INSTANTIABLE)      flags |= GBL_TYPE_ROOT_FLAG_CLASSED;
-    if(flags & GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE)    flags |= GBL_TYPE_ROOT_FLAG_DERIVABLE;
+    if(flags & GBL_TYPE_ROOT_FLAG_INSTANTIABLE)             flags |= GBL_TYPE_ROOT_FLAG_CLASSED;
+    if(flags & GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE)           flags |= GBL_TYPE_ROOT_FLAG_DERIVABLE;
     return flags;
 }
 
@@ -245,6 +255,8 @@ static GBL_RESULT typeValidate_(GblType parent,
 
         GblSize primaryCount = 0;
         for(GblSize p = 0; p < pInfo->dependencyCount; ++p) {
+            // have to check whether other dependencies have concrete type
+            // also allowed to specify additional specificity on concrete type
             if(!GblType_flagsCheck(pInfo->pDependencies[p], GBL_TYPE_ROOT_FLAG_DEPENDENT))
                 ++primaryCount;
             else GBL_API_VERIFY(GBL_TYPE_DEPENDENT_CHECK(pInfo->pDependencies[p]),
@@ -477,7 +489,7 @@ static GblType typeRegister_(GblType parent,
 
         newType = (GblType)pMeta;
         if(flags & GBL_TYPE_FLAG_BUILTIN) {
-             GBL_API_CALL(GblVector_pushBack(&typeBuiltins_.vector, &newType));
+             GBL_API_CALL(GblArrayList_pushBack(&typeBuiltins_.vector, &newType));
         }
 
         if(flags & GBL_TYPE_FLAG_CLASS_PREINIT) {
@@ -519,6 +531,20 @@ extern GBL_RESULT GblType_refresh_(GblType type) {
     GBL_API_END();
 }
 
+static GBL_RESULT GblType_freeTypeInfoClassChunk_(GblMetaClass* pMeta) {
+    GBL_API_BEGIN(pCtx_);
+    // Determine where the pointer to the previous chunk is and free it.
+    if(pMeta->pInfo && !(pMeta->flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)) {
+        GBL_API_FREE((void*)pMeta->pInfo);
+        pMeta->pInfo = NULL;
+        pMeta->pClass = NULL;
+    } else if(pMeta->pClass) {
+        GBL_API_FREE((uint8_t*)pMeta->pClass + pMeta->classPrivateOffset);
+        pMeta->pClass = NULL;
+    }
+    GBL_API_END();
+}
+
 /*  DATA CHUNK LAYOUT
  *
  *  1) TypeInfo Struct   ----++
@@ -535,15 +561,7 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
 
     GBL_API_VERBOSE("[GblType] Refreshing TypeInfo/Class Data Chunk: [%s]", GblQuark_toString(pMeta->name));
 
-    // Determine where the pointer to the previous chunk is and free it.
-    if(pMeta->pInfo && !(pMeta->flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)) {
-        GBL_API_FREE((void*)pMeta->pInfo);
-        pMeta->pInfo = NULL;
-        pMeta->pClass = NULL;
-    } else if(pMeta->pClass) {
-        GBL_API_FREE((uint8_t*)pMeta->pClass + pMeta->classPrivateOffset);
-        pMeta->pClass = NULL;
-    }
+    GblType_freeTypeInfoClassChunk_(pMeta);
 
     // update metaclass class/instance info
 /*
@@ -689,6 +707,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
     GBL_API_CALL(GblIAllocator_typeRegister_(pCtx_));
     GBL_API_CALL(GblILogger_typeRegister_(pCtx_));
     GBL_API_CALL(GblContext_typeRegister_(pCtx_));
+
     GBL_API_END();
 }
 
@@ -708,13 +727,14 @@ void GblType_init_(void) {
                                              GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT_,
                                              pCtx_));
 
-    GBL_API_VERIFY_CALL(GblVector_construct(&typeBuiltins_.vector,
+    GBL_API_VERIFY_CALL(GblArrayList_construct(&typeBuiltins_.vector,
                                             sizeof(GblMetaClass*),
                                             0,
                                             NULL,
                                             sizeof(typeBuiltins_),
                                             pCtx_));
 
+    GBL_API_CALL(GblSignal_init_(pCtx_));
     GBL_API_CALL(GblVariant_init_(pCtx_));
     GBL_API_CALL(GblType_registerBuiltins_());
     GBL_API_POP(1);
@@ -740,7 +760,7 @@ GblType GblType_registerBuiltin_(GblSize            expectedIndex,
     GBL_API_PUSH_VERBOSE("[GblType] Registering Builtin Type: %s", pName);
     flags |= GBL_TYPE_FLAG_BUILTIN;
     type = typeRegister_(parentType, pName, pTypeInfo, flags);
-    size = GblVector_size(&typeBuiltins_.vector);
+    size = GblArrayList_size(&typeBuiltins_.vector);
     GBL_API_VERIFY_EXPRESSION(size == expectedIndex+1,
                               "Failed to obtain expected index! "
                               "[expected: %u, actual: %u]", expectedIndex, size-1);
@@ -765,9 +785,10 @@ GBL_EXPORT GBL_RESULT GblType_final(void) {
     hasMutex = GBL_TRUE;
 
     //iterate over types and cleanup classes
+    GBL_API_CALL(GblSignal_final_(pCtx_));
     GBL_API_CALL(GblVariant_final_(pCtx_));
-    GBL_API_CALL(GblVector_clear(&typeBuiltins_.vector));
-    GBL_API_CALL(GblVector_destruct(&typeBuiltins_.vector));
+    GBL_API_CALL(GblArrayList_clear(&typeBuiltins_.vector));
+    GBL_API_CALL(GblArrayList_destruct(&typeBuiltins_.vector));
     GBL_API_CALL(GblHashSet_destruct(&typeRegistry_));
 
     GBL_API_POP(1);
@@ -807,9 +828,9 @@ GBL_EXPORT GblType GblType_fromBuiltinIndex(GblSize index) {
     //GBL_API_BEGIN(pCtx_);
     {
         GblType* pType = NULL;
-        GblSize registeredCount = GblVector_size(&typeBuiltins_.vector);
+        GblSize registeredCount = GblArrayList_size(&typeBuiltins_.vector);
         if(index < registeredCount) {
-            pType = GblVector_at(&typeBuiltins_.vector, index);
+            pType = GblArrayList_at(&typeBuiltins_.vector, index);
             if(pType)
                 type = *pType;
         }
@@ -858,7 +879,7 @@ GBL_EXPORT GblSize GblType_builtinCount(void) {
     GBL_API_BEGIN(pCtx_);
     GBL_TYPE_ENSURE_INITIALIZED_();
     mtx_lock(&typeRegMtx_);
-    count = GblVector_size(&typeBuiltins_.vector);
+    count = GblArrayList_size(&typeBuiltins_.vector);
     mtx_unlock(&typeRegMtx_);
     GBL_API_END_BLOCK();
     return count;
@@ -1176,6 +1197,7 @@ GBL_EXPORT GBL_RESULT GblType_unregister(GblType type) {
         const GblBool success = GblHashSet_erase(&typeRegistry_, &pMeta);
         mtx_unlock(&typeRegMtx_);
         GBL_API_VERIFY(success, GBL_RESULT_ERROR_INVALID_TYPE, "Failed to remove the type from the registry HashSet!");
+        GBL_API_VERIFY_CALL(GblType_freeTypeInfoClassChunk_(pMeta));
     }
     GBL_API_POP(1);
     GBL_API_END();

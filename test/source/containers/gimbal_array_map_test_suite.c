@@ -15,10 +15,10 @@ typedef struct GblArrayMapTestSuite_ {
 static unsigned dtorCalls_  = 0;
 static uintptr_t dtorLastKey_ = 0;
 
-GblBool GblArrayMap_comparator_(uintptr_t key1,
+int GblArrayMap_comparator_(uintptr_t key1,
                                 uintptr_t key2)
 {
-    return strcmp((const char*)key1, (const char*)key2) == 0;
+    return strcmp((const char*)key1, (const char*)key2);
 }
 
 GBL_RESULT GblArrayMap_destructor_(uintptr_t key, void* pData) {

@@ -4,6 +4,14 @@
 #include <gimbal/types/gimbal_variant.h>
 #include <string.h>
 
+static GBL_RESULT GblVariantTestSuite_checkTypeCompatible_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GBL_TEST_VERIFY(GblVariant_checkTypeCompatible(GBL_INVALID_TYPE));
+    GBL_TEST_VERIFY(GblVariant_checkTypeCompatible(GBL_OBJECT_TYPE));
+    GBL_TEST_VERIFY(!GblVariant_checkTypeCompatible(GBL_INTERFACE_TYPE));
+    GBL_API_END();
+}
+
 static GBL_RESULT GblVariantTestSuite_nil_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
@@ -13,11 +21,11 @@ static GBL_RESULT GblVariantTestSuite_nil_(GblTestSuite* pSelf, GblContext* pCtx
     const GblRefCount nilRefCountBegin = GblType_classRefCount(GBL_NIL_TYPE);
 
     // Default initializer
-    GBL_TEST_COMPARE(GblVariant_type(&variant), GBL_INVALID_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&variant), GBL_INVALID_TYPE);
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&variant, GBL_NIL_TYPE));
-    GBL_TEST_COMPARE(GblVariant_type(&variant), GBL_NIL_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&variant), GBL_NIL_TYPE);
 
     // Get Helper
     GBL_TEST_VERIFY(GblVariant_isNil(&variant));
@@ -211,7 +219,7 @@ static GBL_RESULT GblVariantTestSuite_bool_(GblTestSuite* pSelf, GblContext* pCt
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_BOOL_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_BOOL_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_BOOL_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -343,7 +351,7 @@ static GBL_RESULT GblVariantTestSuite_char_(GblTestSuite* pSelf, GblContext* pCt
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_CHAR_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_CHAR_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_CHAR_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -475,7 +483,7 @@ static GBL_RESULT GblVariantTestSuite_u8_(GblTestSuite* pSelf, GblContext* pCtx)
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_UINT8_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_UINT8_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_UINT8_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -620,7 +628,7 @@ static GBL_RESULT GblVariantTestSuite_u16_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_UINT16_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_UINT16_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_UINT16_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -765,7 +773,7 @@ static GBL_RESULT GblVariantTestSuite_i16_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_INT16_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_INT16_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_INT16_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -910,7 +918,7 @@ static GBL_RESULT GblVariantTestSuite_u32_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_UINT32_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_UINT32_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_UINT32_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -1056,7 +1064,7 @@ static GBL_RESULT GblVariantTestSuite_i32_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_INT32_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_INT32_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_INT32_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -1201,7 +1209,7 @@ static GBL_RESULT GblVariantTestSuite_u64_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_UINT64_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_UINT64_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_UINT64_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -1346,7 +1354,7 @@ static GBL_RESULT GblVariantTestSuite_i64_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_INT64_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_INT64_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_INT64_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -1490,7 +1498,7 @@ static GBL_RESULT GblVariantTestSuite_f32_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_FLOAT_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_FLOAT_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_FLOAT_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -1630,7 +1638,7 @@ static GBL_RESULT GblVariantTestSuite_f64_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_DOUBLE_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_DOUBLE_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_DOUBLE_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -1770,7 +1778,7 @@ static GBL_RESULT GblVariantTestSuite_ptr_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_POINTER_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_POINTER_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_POINTER_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -1863,7 +1871,7 @@ static GBL_RESULT GblVariantTestSuite_string_(GblTestSuite* pSelf, GblContext* p
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_STRING_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_STRING_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_STRING_TYPE);
 
     // Copy Constructor (arguably this is actually wrong as fuck!!!!)
     // if it weren't empty, it would become invalidated!!
@@ -2001,6 +2009,13 @@ static GBL_RESULT GblVariantTestSuite_string_conversions_(GblTestSuite* pSelf, G
     GBL_TEST_COMPARE(GblVariant_getTypeValue(&tVariant), GBL_BOOL_TYPE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
+    // Pointer
+    GBL_API_VERIFY_CALL(GblVariant_setString(&variant, "pointer"));
+    GBL_API_VERIFY_CALL(GblVariant_setPointer(&tVariant, NULL));
+    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_TEST_COMPARE((const char*)GblVariant_getPointer(&tVariant), "pointer");
+    GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
+
     GBL_API_VERIFY_CALL(GblVariant_destruct(&tVariant));
     GBL_API_VERIFY_CALL(GblVariant_destruct(&variant));
 
@@ -2061,7 +2076,7 @@ static GBL_RESULT GblVariantTestSuite_type_(GblTestSuite* pSelf, GblContext* pCt
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, GBL_TYPE_TYPE));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == GBL_TYPE_TYPE);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == GBL_TYPE_TYPE);
 
     // Copy Constructor
     GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -2149,85 +2164,85 @@ static GBL_RESULT GblVariantTestSuite_construct_generic_(GblTestSuite* pSelf, Gb
 
     //nil
     GBL_API_VERIFY_CALL(GblVariant_construct(&v));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_NIL_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_NIL_TYPE);
     GBL_TEST_VERIFY(GblVariant_isNil(&v));
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     //char
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (char)'a'));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_CHAR_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_CHAR_TYPE);
     GBL_TEST_COMPARE(GblVariant_getChar(&v), 'a');
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // uint8
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (uint8_t)1));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_UINT8_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_UINT8_TYPE);
     GBL_TEST_COMPARE(GblVariant_getUint8(&v), 1);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // uint16
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (uint16_t)2));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_UINT16_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_UINT16_TYPE);
     GBL_TEST_COMPARE(GblVariant_getUint16(&v), 2);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // int16
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (int16_t)-2));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_INT16_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_INT16_TYPE);
     GBL_TEST_COMPARE(GblVariant_getInt16(&v), -2);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // uint32
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (uint32_t)3));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_UINT32_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_UINT32_TYPE);
     GBL_TEST_COMPARE(GblVariant_getUint32(&v), 3);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // int32
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (int32_t)-3));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_INT32_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_INT32_TYPE);
     GBL_TEST_COMPARE(GblVariant_getInt32(&v), -3);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // uint64
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (uint64_t)4));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_UINT64_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_UINT64_TYPE);
     GBL_TEST_COMPARE(GblVariant_getUint64(&v), 4);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // int64
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (int64_t)-4));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_INT64_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_INT64_TYPE);
     GBL_TEST_COMPARE(GblVariant_getInt64(&v), -4);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // float
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, 33.33f));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_FLOAT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_FLOAT_TYPE);
     GBL_TEST_COMPARE(GblVariant_getFloat(&v), 33.33f);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // double
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, -33.33));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_DOUBLE_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_DOUBLE_TYPE);
     GBL_TEST_COMPARE(GblVariant_getDouble(&v), -33.33);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // string
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (const char*)"literal"));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_STRING_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_STRING_TYPE);
     GBL_TEST_COMPARE(GblVariant_getString(&v), "literal");
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // string view
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, GBL_STRV("view")));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_STRING_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_STRING_TYPE);
     GBL_TEST_COMPARE(GblVariant_getString(&v), "view");
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // pointer
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, (void*)0xdeadbabe));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_POINTER_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_POINTER_TYPE);
     GBL_TEST_COMPARE(GblVariant_getPointer(&v), (void*)0xdeadbabe);
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
@@ -2235,7 +2250,7 @@ static GBL_RESULT GblVariantTestSuite_construct_generic_(GblTestSuite* pSelf, Gb
     GblVariant v2 = GBL_VARIANT_INIT;
     GBL_API_VERIFY_CALL(GblVariant_construct(&v2, GBL_STRV("copy constructor")));
     GBL_API_VERIFY_CALL(GblVariant_construct(&v, &v2));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_STRING_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_STRING_TYPE);
     GBL_TEST_COMPARE(GblVariant_getString(&v), "copy constructor");
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v2));
@@ -2250,74 +2265,74 @@ static GBL_RESULT GblVariantTestSuite_set_generic_(GblTestSuite* pSelf, GblConte
 
     //char
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (char)'a'));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_CHAR_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_CHAR_TYPE);
     GBL_TEST_COMPARE(GblVariant_getChar(&v), 'a');
 
     // uint8
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (uint8_t)1));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_UINT8_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_UINT8_TYPE);
     GBL_TEST_COMPARE(GblVariant_getUint8(&v), 1);
 
     // uint16
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (uint16_t)2));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_UINT16_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_UINT16_TYPE);
     GBL_TEST_COMPARE(GblVariant_getUint16(&v), 2);
 
     // int16
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (int16_t)-2));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_INT16_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_INT16_TYPE);
     GBL_TEST_COMPARE(GblVariant_getInt16(&v), -2);
 
     // uint32
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (uint32_t)3));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_UINT32_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_UINT32_TYPE);
     GBL_TEST_COMPARE(GblVariant_getUint32(&v), 3);
 
     // int32
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (int32_t)-3));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_INT32_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_INT32_TYPE);
     GBL_TEST_COMPARE(GblVariant_getInt32(&v), -3);
 
     // uint64
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (uint64_t)4));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_UINT64_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_UINT64_TYPE);
     GBL_TEST_COMPARE(GblVariant_getUint64(&v), 4);
 
     // int64
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (int64_t)-4));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_INT64_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_INT64_TYPE);
     GBL_TEST_COMPARE(GblVariant_getInt64(&v), -4);
 
     // float
     GBL_API_VERIFY_CALL(GblVariant_set(&v, 33.33f));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_FLOAT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_FLOAT_TYPE);
     GBL_TEST_COMPARE(GblVariant_getFloat(&v), 33.33f);
 
     // double
     GBL_API_VERIFY_CALL(GblVariant_set(&v, -33.33));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_DOUBLE_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_DOUBLE_TYPE);
     GBL_TEST_COMPARE(GblVariant_getDouble(&v), -33.33);
 
     // string
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (const char*)"literal"));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_STRING_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_STRING_TYPE);
     GBL_TEST_COMPARE(GblVariant_getString(&v), "literal");
 
     // string view
     GBL_API_VERIFY_CALL(GblVariant_set(&v, GBL_STRV("view")));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_STRING_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_STRING_TYPE);
     GBL_TEST_COMPARE(GblVariant_getString(&v), "view");
 
     // pointer
     GBL_API_VERIFY_CALL(GblVariant_set(&v, (void*)0xdeadbabe));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_POINTER_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_POINTER_TYPE);
     GBL_TEST_COMPARE(GblVariant_getPointer(&v), (void*)0xdeadbabe);
 
     // copy
     GblVariant v2 = GBL_VARIANT_INIT;
     GBL_API_VERIFY_CALL(GblVariant_construct(&v2, GBL_STRV("assignment operator")));
     GBL_API_VERIFY_CALL(GblVariant_set(&v, &v2));
-    GBL_TEST_COMPARE(GblVariant_type(&v), GBL_STRING_TYPE);
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_STRING_TYPE);
     GBL_TEST_COMPARE(GblVariant_getString(&v), "assignment operator");
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v2));
@@ -2414,6 +2429,7 @@ GBL_EXPORT GblType GblVariantTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     const static GblTestCase cases[] = {
+        { "checkTypeCompatible",    GblVariantTestSuite_checkTypeCompatible_        },
         { "nil",                    GblVariantTestSuite_nil_                        },
         { "nilInvalid",             GblVariantTestSuite_nil_invalid_                },
         { "nilConversions",         GblVariantTestSuite_nil_conversions_            },

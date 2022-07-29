@@ -82,4 +82,12 @@
 
 # Credits
 	Lead Developer: Falco Girgis
+	Hash set and Binary tree back-ends: Josh Baker (tidwall) (hashmap.c, btree.c)
+	gimbal_macro_sequences.h: William Swanson
+	MurmurHash3: Austin Appleby
+	SipHash: Jean-Philippe Amasson, Daniel J. Bernstein 
+	- (http://creativecommons.org/publicdomain/zero/1.0/)
+
+
+
 */ 

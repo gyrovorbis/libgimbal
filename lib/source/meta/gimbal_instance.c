@@ -173,6 +173,7 @@ GBL_EXPORT GblRefCount GblInstance_destruct(GblInstance* pSelf) {
     GBL_API_BEGIN(pCtx_);
     if(pSelf) {
         GblMetaClass* pMeta     = GBL_META_CLASS_(GBL_INSTANCE_TYPEOF(pSelf));
+        GBL_API_CALL(GblSignal_removeInstance_(pSelf));
         refCount = GBL_ATOMIC_INT16_DEC(pMeta->instanceRefCount) - 1;
         GBL_API_VERIFY_CALL(GblInstance_classRelease_(pSelf));
     }

@@ -175,7 +175,7 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_remove_(GblTestSuite* pSelf, GblC
     GblDoublyLinkedListTestSuite_* pSelf_ = GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(pSelf);
     //GBL_TEST_VERIFY(!GblDoublyLinkedList_remove(&pSelf_->list2, &pSelf_->testStructs[0].listNode));
     GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list2), 3);
-    GblDoublyLinkedList_remove(&pSelf_->list2, &pSelf_->testStructs[3].listNode);
+    GblDoublyLinkedList_remove(&pSelf_->testStructs[3].listNode);
     GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list2), 2);
     GBL_API_VERIFY_CALL(verifyDListNode_(pCtx,
                                         &pSelf_->list2,
@@ -347,7 +347,7 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_replace_(GblTestSuite* pSelf, Gbl
     GBL_API_BEGIN(pCtx);
     GblDoublyLinkedListTestSuite_* pSelf_ = GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(pSelf);
     GblDoublyLinkedList_pushBack(&pSelf_->list2, &pSelf_->testStructs[5].listNode);
-    GblDoublyLinkedList_replace(&pSelf_->list1, GblDoublyLinkedList_at(&pSelf_->list1, 1), &pSelf_->testStructs[5].listNode);
+    GblDoublyLinkedList_replace(GblDoublyLinkedList_at(&pSelf_->list1, 1), &pSelf_->testStructs[5].listNode);
     GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list2), 0);
     GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list1), 5);
     GBL_API_VERIFY_CALL(verifyDListNode_(pCtx,
@@ -362,7 +362,7 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_swap_(GblTestSuite* pSelf, GblCon
     GBL_API_BEGIN(pCtx);
     GblDoublyLinkedListTestSuite_* pSelf_ = GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(pSelf);
     GblDoublyLinkedList_pushBack(&pSelf_->list2, &pSelf_->testStructs[1].listNode);
-    GblDoublyLinkedList_swap(&pSelf_->list1, GblDoublyLinkedList_at(&pSelf_->list1, 1), GblDoublyLinkedList_front(&pSelf_->list2));
+    GblDoublyLinkedList_swap(GblDoublyLinkedList_at(&pSelf_->list1, 1), GblDoublyLinkedList_front(&pSelf_->list2));
     GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list2), 1);
     GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list1), 5);
     GBL_API_VERIFY_CALL(verifyDListNode_(pCtx,

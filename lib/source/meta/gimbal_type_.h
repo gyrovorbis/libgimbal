@@ -2,7 +2,7 @@
 #define GIMBAL_TYPE__H
 
 #include <gimbal/meta/gimbal_type.h>
-#include <gimbal/containers/gimbal_vector.h>
+#include <gimbal/containers/gimbal_array_list.h>
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/preprocessor/gimbal_atomics.h>
@@ -81,7 +81,7 @@ extern GBL_THREAD_LOCAL GblBool initializing_;
 extern mtx_t                    typeRegMtx_;
 extern GblHashSet               typeRegistry_;
 extern struct TypeBuiltins_ {
-    GblVector   vector;
+    GblArrayList   vector;
     uint8_t     stackBuffer[sizeof(GblType)*GBL_TYPE_BUILTIN_COUNT];
 } typeBuiltins_;
 
@@ -95,6 +95,12 @@ extern GblType          GblType_registerBuiltin_          (GblSize              
                                                            const char*          pName,
                                                            const GblTypeInfo*   pTypeInfo,
                                                            GblTypeFlags         flags);
+
+
+
+extern GBL_RESULT       GblSignal_init_                   (GblContext* pCtx);
+extern GBL_RESULT       GblSignal_final_                  (GblContext* pCtx);
+extern GBL_RESULT       GblSignal_removeInstance_         (GblInstance* pInstance);
 
 extern GBL_RESULT       GblVariant_init_                  (GblContext* pCtx);
 extern GBL_RESULT       GblVariant_final_                 (GblContext* pCtx);

@@ -167,7 +167,7 @@ GBL_API GblIVariantIFace_setCopy(const GblIVariantIFace* pSelf, GblVariant* pVar
 
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                            "[GblIVariant] Cannot copy assign type: %s",
-                           GblType_name(GblVariant_type(pVariant)));
+                           GblType_name(GblVariant_typeOf(pVariant)));
 
     }
     GBL_API_END();
@@ -195,7 +195,7 @@ GBL_API GblIVariantIFace_setMove(const GblIVariantIFace* pSelf, GblVariant* pVar
     } else {
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                            "[GblIVariant] Cannot move assign type: %s",
-                           GblType_name(GblVariant_type(pVariant)));
+                           GblType_name(GblVariant_typeOf(pVariant)));
     }
     GBL_API_END();
 }
@@ -274,7 +274,7 @@ GBL_API GblIVariantIFace_constructValueCopy(const GblIVariantIFace* pSelf, GblVa
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot copy construct values for type: %s",
-                               GblType_name(GblVariant_type(pVariant)));
+                               GblType_name(GblVariant_typeOf(pVariant)));
         }
     } GBL_API_END();
 }
@@ -313,7 +313,7 @@ GBL_API GblIVariantIFace_constructValueMove(const GblIVariantIFace* pSelf, GblVa
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot move construct values for type: %s",
-                               GblType_name(GblVariant_type(pVariant)));
+                               GblType_name(GblVariant_typeOf(pVariant)));
         }
     } GBL_API_END();
 }
@@ -330,7 +330,7 @@ GBL_API GblIVariantIFace_setValueCopy(const GblIVariantIFace* pSelf, GblVariant*
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot copy set values for type: %s",
-                               GblType_name(GblVariant_type(pVariant)));
+                               GblType_name(GblVariant_typeOf(pVariant)));
         }
     } GBL_API_END();
 }
@@ -349,7 +349,7 @@ GBL_API GblIVariantIFace_setValueMove(const GblIVariantIFace* pSelf, GblVariant*
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot move set values for type: %s",
-                               GblType_name(GblVariant_type(pVariant)));
+                               GblType_name(GblVariant_typeOf(pVariant)));
         }
     } GBL_API_END();
 }
@@ -367,7 +367,7 @@ GBL_API GblIVariantIFace_getValueCopy(const GblIVariantIFace* pSelf, const GblVa
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot get values by copy for type: %s",
-                               GblType_name(GblVariant_type(pVariant)));
+                               GblType_name(GblVariant_typeOf(pVariant)));
         }
     } GBL_API_END();
 }
@@ -384,7 +384,7 @@ GBL_API GblIVariantIFace_getValuePeek(const GblIVariantIFace* pSelf, const GblVa
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot get values by peeking for type: %s",
-                               GblType_name(GblVariant_type(pVariant)));
+                               GblType_name(GblVariant_typeOf(pVariant)));
         }
     } GBL_API_END();
 }
@@ -404,7 +404,7 @@ GBL_API GblIVariantIFace_getValueMove(const GblIVariantIFace* pSelf, const GblVa
         } else {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblIVariant] Cannot get values by peeking for type: %s",
-                               GblType_name(GblVariant_type(pVariant)));
+                               GblType_name(GblVariant_typeOf(pVariant)));
         }
     } GBL_API_END();
 }

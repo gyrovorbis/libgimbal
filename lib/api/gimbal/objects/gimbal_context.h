@@ -33,6 +33,7 @@ typedef struct GblContext {
     };
     GblCallRecord           lastIssue;
     uint32_t                logStackDepth;
+    GblFlags                logFilter;
 } GblContext;
 
 GBL_DECLARE_ENUM(GBL_CONTEXT_PROPERTY_ID) {
@@ -69,7 +70,7 @@ GBL_EXPORT GBL_RESULT   GblContext_lastIssueResult  (CSELF)                     
 GBL_EXPORT const char*  GblContext_lastIssueMessage (CSELF)                                 GBL_NOEXCEPT;
 
 GBL_EXPORT GblContext*  GblContext_parentContext    (CSELF)                                 GBL_NOEXCEPT;
-
+GBL_EXPORT void         GblContext_setLogFilter     (SELF, GblFlags mask)                   GBL_NOEXCEPT;
 
 
 GblContext*             GblContext_global(void)                                             GBL_NOEXCEPT;

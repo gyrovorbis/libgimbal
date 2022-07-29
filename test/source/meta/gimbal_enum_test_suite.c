@@ -28,6 +28,7 @@ static GBL_RESULT GblEnumTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx)
     GBL_API_BEGIN(pCtx);
     GblEnumTestSuite_* pSelf_ = GBL_ENUM_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblClass_unrefDefault(GBL_CLASS(pSelf_->pEnumClass)), 0);
+    GblType_unregister(pSelf_->enumType);
     GBL_API_END();
 }
 
@@ -124,7 +125,7 @@ static GBL_RESULT GblEnumTestSuite_variant_(GblTestSuite* pSelf, GblContext* pCt
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, pSelf_->enumType));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == pSelf_->enumType);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == pSelf_->enumType);
     GBL_TEST_COMPARE(GblVariant_getEnum(&v), RED);
 
     // Copy Constructor
@@ -248,7 +249,7 @@ static GBL_RESULT GblEnumTestSuite_variant_conversions_(GblTestSuite* pSelf, Gbl
 
     // FROM String
     GBL_API_VERIFY_CALL(GblVariant_setString(&tVariant, "BLUE"));
-    GBL_TEST_VERIFY(GblVariant_canConvert(GblVariant_type(&tVariant), GblVariant_type(&variant)));
+    GBL_TEST_VERIFY(GblVariant_canConvert(GblVariant_typeOf(&tVariant), GblVariant_typeOf(&variant)));
     GBL_API_VERIFY_CALL(GblVariant_convert(&tVariant, &variant));
     GBL_API_VERIFY_CALL(GblVariant_equals(&tVariant, &variant));
     GBL_TEST_COMPARE(GblVariant_getEnum(&variant), BLUE);

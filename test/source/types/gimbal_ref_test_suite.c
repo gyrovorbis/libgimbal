@@ -7,6 +7,7 @@
 
 typedef struct GblRefTestSuite_ {
     GblRef* pRefs[4];
+    GblSize startRefCount;
 } GblRefTestSuite_;
 
 static unsigned dtorBadCalls_ = 0;
@@ -28,9 +29,8 @@ static GBL_RESULT GblRefTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblRefTestSuite_* pSelf_ = GBL_REF_TEST_SUITE_(pSelf);
     memset(pSelf_->pRefs, 0, sizeof(pSelf_->pRefs));
     dtorBadCalls_ = dtorGoodCalls_ = 0;
-    GblRef_reinit();
+    pSelf_->startRefCount = GblRef_activeCount();
     GBL_API_CLEAR_LAST_RECORD();
-    GBL_TEST_COMPARE(GblRef_activeCount(), 0);
     GBL_API_END();
 }
 static GBL_RESULT GblRefTestSuite_allocEmpty_(GblTestSuite* pSelf, GblContext* pCtx) {
@@ -50,7 +50,7 @@ static GBL_RESULT GblRefTestSuite_alloc_(GblTestSuite* pSelf, GblContext* pCtx) 
     strncpy(pSelf_->pRefs[0], "String1", 256);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->pRefs[0]);
-    GBL_TEST_COMPARE(GblRef_activeCount(), 1);
+    GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->startRefCount + 1);
     GBL_TEST_COMPARE(GblRef_refCount(pSelf_->pRefs[0]), 1);
     GBL_TEST_COMPARE(GblRef_context(pSelf_->pRefs[0]), NULL);
     GBL_API_END();
@@ -62,7 +62,7 @@ static GBL_RESULT GblRefTestSuite_allocWithContext_(GblTestSuite* pSelf, GblCont
     strncpy(pSelf_->pRefs[1], "String2", 256);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->pRefs[1]);
-    GBL_TEST_COMPARE(GblRef_activeCount(), 2);
+    GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->startRefCount + 2);
     GBL_TEST_COMPARE(GblRef_refCount(pSelf_->pRefs[1]), 1);
     GBL_TEST_COMPARE(GblRef_context(pSelf_->pRefs[1]), pCtx);
     GBL_API_END();
@@ -75,14 +75,14 @@ static GBL_RESULT GblRefTestSuite_acquire_(GblTestSuite* pSelf, GblContext* pCtx
     GBL_TEST_COMPARE(pSelf_->pRefs[2], pSelf_->pRefs[0]);
     GBL_TEST_COMPARE(strncmp(pSelf_->pRefs[2], "String1", 256), 0);
     GBL_TEST_COMPARE(GblRef_refCount(pSelf_->pRefs[0]), 2);
-    GBL_TEST_COMPARE(GblRef_activeCount(), 2);
+    GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->startRefCount + 2);
 
     pSelf_->pRefs[3] = GblRef_acquire(pSelf_->pRefs[1]);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(pSelf_->pRefs[3], pSelf_->pRefs[1]);
     GBL_TEST_COMPARE(strncmp(pSelf_->pRefs[3], "String2", 256), 0);
     GBL_TEST_COMPARE(GblRef_refCount(pSelf_->pRefs[1]), 2);
-    GBL_TEST_COMPARE(GblRef_activeCount(), 2);
+    GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->startRefCount + 2);
 
     void* pEmpty = GblRef_acquire(NULL);
     GBL_TEST_COMPARE(pEmpty, NULL);
@@ -99,13 +99,13 @@ static GBL_RESULT GblRefTestSuite_release_(GblTestSuite* pSelf, GblContext* pCtx
     refCount = GblRef_release(pSelf_->pRefs[2]);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(refCount, 1);
-    GBL_TEST_COMPARE(GblRef_activeCount(), 2);
+    GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->startRefCount + 2);
     GBL_TEST_COMPARE(strncmp(pSelf_->pRefs[2], "String1", 256), 0);
 
     refCount = GblRef_release(pSelf_->pRefs[3]);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(refCount, 1);
-    GBL_TEST_COMPARE(GblRef_activeCount(), 2);
+    GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->startRefCount + 2);
     GBL_TEST_COMPARE(strncmp(pSelf_->pRefs[3], "String2", 256), 0);
 
     GBL_API_END();
@@ -118,7 +118,7 @@ static GBL_RESULT GblRefTestSuite_destructFail_(GblTestSuite* pSelf, GblContext*
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR);
     GBL_API_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(refCount, 1);
-    GBL_TEST_COMPARE(GblRef_activeCount(), 2);
+    GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->startRefCount + 2);
     GBL_TEST_COMPARE(dtorBadCalls_, 1);
     GBL_TEST_COMPARE(strncmp(pSelf_->pRefs[0], "String1", 256), 0);
     GBL_API_END();
@@ -131,14 +131,14 @@ static GBL_RESULT GblRefTestSuite_destruct_(GblTestSuite* pSelf, GblContext* pCt
     GBL_TEST_VERIFY(!GBL_RESULT_ERROR(GBL_API_LAST_RESULT()));
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(refCount, 0);
-    GBL_TEST_COMPARE(GblRef_activeCount(), 1);
+    GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->startRefCount + 1);
     GBL_TEST_COMPARE(dtorGoodCalls_, 1);
 
     refCount = GblRef_releaseWithDtor(pSelf_->pRefs[1], refDtorGood_);
     GBL_TEST_VERIFY(!GBL_RESULT_ERROR(GBL_API_LAST_RESULT()));
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(refCount, 0);
-    GBL_TEST_COMPARE(GblRef_activeCount(), 0);
+    GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->startRefCount +  0);
     GBL_TEST_COMPARE(dtorGoodCalls_, 2);
 
     GBL_API_END();

@@ -57,7 +57,8 @@ GBL_EXPORT GblRefCount GblRef_releaseWithDtor(void* pData,
                     GBL_API_RECORD_SET(dtorResult, "GblRef_release(): Destructor failed!");
                     GBL_API_DONE();
                 }
-            }            GBL_API_FREE(pHeader);
+            }
+            GBL_API_FREE(pHeader);
             GBL_ATOMIC_INT16_DEC(activeCount_);
         }
         GBL_API_END_BLOCK();

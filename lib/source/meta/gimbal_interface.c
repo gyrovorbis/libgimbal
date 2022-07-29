@@ -11,11 +11,3 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass(GblInterface* pSelf) GBL_NOEXCE
     }
     return pClass;
 }
-
-GBL_EXPORT GblInterface* GblInterface_fromClass(GblClass* pClass) GBL_NOEXCEPT {
-    return GblClass_isInterfaceImpl(pClass)? (GblInterface*)pClass : NULL;
-}
-
-GBL_EXPORT GblInterface* GblInterface_peek(GblClass* pClass, GblType ifaceType) GBL_NOEXCEPT {
-    return (GblInterface*)GblClass_try(pClass, ifaceType);
-}

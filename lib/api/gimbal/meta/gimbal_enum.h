@@ -13,8 +13,8 @@
 #define GBL_ENUM_CLASS_CHECK(klass)         (GBL_CLASS_CHECK_PREFIX(klass, GBL_ENUM))
 #define GBL_ENUM_CLASS_TRY(klass)           (GBL_CLASS_TRY_PREFIX(klass, GBL_ENUM))
 
-#define GBL_ENUM_GET_CLASS(variant)         (GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_type(&variant))))
-#define GBL_ENUM_TRY_CLASS(variant)         (GBL_ENUM_CLASS_TRY(GblClass_weakRefDefault(GblVariant_type(&variant))))
+#define GBL_ENUM_GET_CLASS(variant)         (GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(&variant))))
+#define GBL_ENUM_TRY_CLASS(variant)         (GBL_ENUM_CLASS_TRY(GblClass_weakRefDefault(GblVariant_typeOf(&variant))))
 
 #define GBL_ENUM_ENTRY(enumValue, nick)     { enumValue, #enumValue, nick }
 #define GBL_ENUM_ENTRY_LAST()               { 0, NULL, NULL }

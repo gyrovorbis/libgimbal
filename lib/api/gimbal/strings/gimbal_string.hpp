@@ -2,7 +2,7 @@
 #define GIMBAL_STRING_HPP
 
 #include <gimbal/strings/gimbal_string_buffer.h>
-#include <gimbal/containers/gimbal_vector.hpp>
+#include <gimbal/containers/gimbal_array_list.hpp>
 #include <iostream>
 #include <unordered_set>
 #include <compare>
@@ -338,7 +338,7 @@ public:
 
     void concat(std::string_view view) {
         //insert(cend(), view.data(), view.size());
-        Exception::checkThrow(GblVector_append(&this->data, view.data(), view.size()));
+        Exception::checkThrow(GblArrayList_append(&this->data, view.data(), view.size()));
     }
 
     String& vasprintf(const char* pFmt, va_list varArgs) {

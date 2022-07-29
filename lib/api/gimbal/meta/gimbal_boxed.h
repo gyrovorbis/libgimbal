@@ -12,8 +12,8 @@
 #define GBL_BOXED_CLASS_CHECK(klass)    (GBL_CLASS_CHECK_PREFIX(klass, GBL_BOXED))
 #define GBL_BOXED_CLASS_TRY(klass)      (GBL_CLASS_TRY_PREFIX(klass, GBL_BOXED))
 
-#define GBL_BOXED_GET_CLASS(variant)    (GBL_BOXED_CLASS(GblClass_weakRefDefault(GblVariant_type(&variant))))
-#define GBL_BOXED_TRY_CLASS(variant)    (GBL_BOXED_CLASS_TRY(GblClass_weakRefDefault(GblVariant_type(&variant))))
+#define GBL_BOXED_GET_CLASS(variant)    (GBL_BOXED_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(&variant))))
+#define GBL_BOXED_TRY_CLASS(variant)    (GBL_BOXED_CLASS_TRY(GblClass_weakRefDefault(GblVariant_typeOf(&variant))))
 
 GBL_DECLS_BEGIN
 

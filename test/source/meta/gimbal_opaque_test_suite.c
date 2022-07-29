@@ -20,6 +20,7 @@ static GBL_RESULT GblOpaqueTestSuite_final_(GblTestSuite* pSelf, GblContext* pCt
     GBL_API_BEGIN(pCtx);
     GblOpaqueTestSuite_* pSelf_ = GBL_OPAQUE_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblType_classRefCount(pSelf_->opaqueType), 0);
+    GblType_unregister(pSelf_->opaqueType);
     GBL_API_END();
 }
 
@@ -41,7 +42,7 @@ static GBL_RESULT GblOpaqueTestSuite_variant_(GblTestSuite* pSelf, GblContext* p
 
     // Default constructor
     GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, pSelf_->opaqueType));
-    GBL_TEST_VERIFY(GblVariant_type(&v) == pSelf_->opaqueType);
+    GBL_TEST_VERIFY(GblVariant_typeOf(&v) == pSelf_->opaqueType);
     GBL_TEST_COMPARE(GblVariant_getPointer(&v), NULL);
 
     // Copy Constructor

@@ -22,6 +22,8 @@ GBL_INLINE void gblSortInsertion(void* pArray, GblSize count, GblSize elemSize, 
 GBL_INLINE void gblSortShell    (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_INLINE void gblSortBubble   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 
+GBL_INLINE GblSize gblSearchBinary(void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+
 
 /// @}
 
@@ -101,7 +103,7 @@ void gblSortBubble(void* pArray, GblSize count, GblSize elemSize, GblSortCompara
 }
 
 GBL_INLINE
-GblInt gblSearchBinary(void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
+GblSize gblSearchBinary(void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     if(r >= l) {
         GblInt mid = l + (r - l) / 2;
         void* pMid = (char*)pArray + elemSize*mid;
@@ -114,7 +116,7 @@ GblInt gblSearchBinary(void* pArray, GblSize elemSize, GblInt l, GblInt r, void*
 
         return gblSearchBinary(pArray, elemSize, mid + 1, r, pTarget, pFnCmp);
     }
-    return -1;
+    return GBL_NPOS;
 }
 
 GBL_DECLS_END

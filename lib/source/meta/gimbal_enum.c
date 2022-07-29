@@ -17,14 +17,14 @@ static GBL_RESULT enumConstruct_(GblVariant* pVariant, GblUint argc, GblVariant*
     GBL_UNUSED(argc && pArgs);
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT);
-    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
+    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     pVariant->enumeration = GblEnumClass_valueFromIndex(pEnumClass, 0);
     GBL_API_END();
 }
 
 static GBL_RESULT enumSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_API_BEGIN(NULL);
-    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
+    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     GBL_API_CALL(GblStringBuffer_append(pString,
                                         GBL_STRV(GblEnumClass_nameFromValue(pEnumClass,
                                                                             pVariant->enumeration))));
@@ -33,7 +33,7 @@ static GBL_RESULT enumSave_(const GblVariant* pVariant, GblStringBuffer* pString
 
 static GBL_RESULT enumLoad_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_API_BEGIN(NULL);
-    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
+    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     pVariant->enumeration = GblEnumClass_valueFromName(pEnumClass, GblStringBuffer_cString(pString));
     GBL_API_END();
 }
@@ -44,7 +44,7 @@ static GBL_RESULT enumSet_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs
     GBL_API_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
     GBL_API_VERIFY_ARG(argc == 1);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_UINT32_TYPE);
-    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
+    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     GBL_API_VERIFY(GblEnumClass_valueCheck(pEnumClass, (GblEnum)pArgs->u32),
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
     pVariant->enumeration = (GblEnum)pArgs->u32;
@@ -69,8 +69,8 @@ static GBL_RESULT enumCompare_(const GblVariant* pVariant, const GblVariant* pOt
 
 static GBL_RESULT enumConvertTo_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_BEGIN(NULL);
-    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_type(pVariant)));
-    const GblType type = GblVariant_type(pOther);
+    GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
+    const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, GblEnumClass_valueCheck(pEnumClass, pVariant->enumeration));
     else if(type == GBL_UINT8_TYPE) {
@@ -108,11 +108,11 @@ static GBL_RESULT enumConvertTo_(const GblVariant* pVariant, GblVariant* pOther)
 static GBL_RESULT enumConvertFrom_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_UNUSED(pVariant);
     GBL_API_BEGIN(NULL);
-    const GblType type = GblVariant_type(pVariant);
-     GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_type(pOther)));
+    const GblType type = GblVariant_typeOf(pVariant);
+     GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pOther)));
     if(type == GBL_STRING_TYPE)
         GBL_API_CALL(GblVariant_setValueCopy(pOther,
-                                             GblVariant_type(pOther),
+                                             GblVariant_typeOf(pOther),
                                              GblEnumClass_valueFromName(pEnumClass,
                                                                         GblVariant_getString(pVariant))));
     else

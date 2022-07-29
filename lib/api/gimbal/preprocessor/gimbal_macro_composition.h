@@ -3,7 +3,6 @@
 
 #include "gimbal_macro_sequences.h"
 
-
 #define GBL_VA_ARGS(...) ,##__VA_ARGS__
 #define _GBL_STRINGIFY(a) #a
 #define GBL_STRINGIFY(a) _GBL_STRINGIFY(a)
@@ -72,7 +71,4 @@
 #define GBL_VA_OVERLOAD_CALL(BASE, SUFFIXER, ...) \
     GBL_VA_OVERLOAD_SELECT(BASE, SUFFIXER, ## __VA_ARGS__)(__VA_ARGS__)
 
-
-
-
-#endif // GIMBAL_MACROS_UTILS_H
+#endif // GIMBAL_MACRO_COMPOSITION_H

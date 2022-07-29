@@ -17,7 +17,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, cons
         pSelf->data.size = 0;
     } else GBL_LIKELY {
         //Make a first guess at the required size
-        newCapacity = GBL_VECTOR_CAPACITY_FROM_SIZE_(expectedSize);
+        newCapacity = gblPow2Next(expectedSize);
         GBL_API_CALL(GblStringBuffer_reserve(pSelf, newCapacity));
         GBL_API_ERRNO_CLEAR();
         va_copy(varArgsCopy, varArgs);
@@ -30,7 +30,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, cons
         GBL_API_PERROR("vsnprintf failed with code: %zu", expectedSize);
         //Multi-pass, try again with real size!
         if(expectedSize >= pSelf->data.capacity) GBL_UNLIKELY {
-            newCapacity = GBL_VECTOR_CAPACITY_FROM_SIZE_(expectedSize + 1);
+            newCapacity = gblPow2Next(expectedSize + 1);
             GBL_API_CALL(GblStringBuffer_reserve(pSelf, newCapacity));
             GBL_API_ERRNO_CLEAR();
             expectedSize = vsnprintf((char*)pSelf->data.pData+originalSize, pSelf->data.capacity-originalSize, pFmt, varArgs);

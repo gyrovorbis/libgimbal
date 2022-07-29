@@ -56,7 +56,7 @@ uint64_t gblPow2Next_u64(uint64_t n) GBL_NOEXCEPT {
 /*! \addtogroup algorithms
  * @{
  */
-#define gblPow2Next(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS, X)(X);
+#define gblPow2Next(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS, X)(X)
 
 GBL_INLINE GBL_CONSTEXPR
 GblSize gblAlignedAllocSize(GblSize bytes) GBL_NOEXCEPT {
