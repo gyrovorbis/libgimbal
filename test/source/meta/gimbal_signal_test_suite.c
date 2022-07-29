@@ -103,7 +103,7 @@ void s_IB_1_Slot_(SignalInstance_* pReceiver, const char* pArg) {
     pReceiver->pSelf_->signalReceivers[SIGNAL_I_B_1_][pReceiver->pSelf_->signalEmissions[SIGNAL_I_B_1_]]   = pReceiver->id;
     pReceiver->pSelf_->pSignalCurrentReceivers[SIGNAL_I_B_1_][pReceiver->pSelf_->signalEmissions[SIGNAL_I_B_1_]] = GblSignal_receiver();
     pReceiver->pSelf_->pSignalCurrentEmitters[SIGNAL_I_B_1_][pReceiver->pSelf_->signalEmissions[SIGNAL_I_B_1_]] =  GblSignal_emitter();
-    pReceiver->pSelf_->signalArgs     [SIGNAL_I_B_1_][pReceiver->pSelf_->signalEmissions[SIGNAL_I_B_1_]++] = (uintptr_t)pArg;
+    pReceiver->pSelf_->signalArgs     [SIGNAL_I_B_1_][pReceiver->pSelf_->signalEmissions[SIGNAL_I_B_1_]++] = (uintptr_t)GblStringView_strdup(GBL_STRV(pArg));
 }
 
 void s_IB_Base_Slot_(SignalInstance_* pReceiver, void* pArg) {
@@ -698,12 +698,14 @@ static GBL_RESULT GblSignalTestSuite_emitMulti_(GblTestSuite* pSelf, GblContext*
     GBL_TEST_COMPARE(emissionCount, 2);
 
     GBL_TEST_COMPARE((const char*)pSelf_->signalArgs[SIGNAL_I_B_1_][0], "C Marshals");
+    GBL_API_FREE(pSelf_->signalArgs[SIGNAL_I_B_1_][0]);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_I_B_1_][0], INSTANCE_1_);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_I_B_1_][0], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_I_B_1_][0], pSelf_->pInstances[INSTANCE_1_]);
 
 
     GBL_TEST_COMPARE((const char*)pSelf_->signalArgs[SIGNAL_I_B_1_][1], "C Marshals");
+    GBL_API_FREE(pSelf_->signalArgs[SIGNAL_I_B_1_][1]);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_I_B_1_][1], INSTANCE_2_);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_I_B_1_][1], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_I_B_1_][1], pSelf_->pInstances[INSTANCE_2_]);
