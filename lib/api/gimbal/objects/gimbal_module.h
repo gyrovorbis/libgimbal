@@ -1,3 +1,7 @@
+/*! \file
+ *  \brief GblModule loadable plugin instance and management API
+ *  \ingroup metaBuiltinTypes
+ */
 #ifndef GIMBAL_MODULE_H
 #define GIMBAL_MODULE_H
 

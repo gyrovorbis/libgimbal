@@ -698,14 +698,14 @@ static GBL_RESULT GblSignalTestSuite_emitMulti_(GblTestSuite* pSelf, GblContext*
     GBL_TEST_COMPARE(emissionCount, 2);
 
     GBL_TEST_COMPARE((const char*)pSelf_->signalArgs[SIGNAL_I_B_1_][0], "C Marshals");
-    GBL_API_FREE(pSelf_->signalArgs[SIGNAL_I_B_1_][0]);
+    GBL_API_FREE((void*)pSelf_->signalArgs[SIGNAL_I_B_1_][0]);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_I_B_1_][0], INSTANCE_1_);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_I_B_1_][0], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_I_B_1_][0], pSelf_->pInstances[INSTANCE_1_]);
 
 
     GBL_TEST_COMPARE((const char*)pSelf_->signalArgs[SIGNAL_I_B_1_][1], "C Marshals");
-    GBL_API_FREE(pSelf_->signalArgs[SIGNAL_I_B_1_][1]);
+    GBL_API_FREE((void*)pSelf_->signalArgs[SIGNAL_I_B_1_][1]);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_I_B_1_][1], INSTANCE_2_);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_I_B_1_][1], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_I_B_1_][1], pSelf_->pInstances[INSTANCE_2_]);

@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblEvent base type and basic API
+ *  \ingroup metaBuiltinTypes
+ */
+
 #ifndef GIMBAL_EVENT_H
 #define GIMBAL_EVENT_H
 

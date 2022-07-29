@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblFlagsClass and API for managing flag types
+ *  \ingroup metaBuiltinTypes
+ */
+
 #ifndef GIMBAL_FLAGS_H
 #define GIMBAL_FLAGS_H
 

@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblPrimitiveClass abstract primitive base plus builtin types
+ *  \ingroup metaBuiltinTypes
+ */
+
 #ifndef GIMBAL_PRIMITIVES_H
 #define GIMBAL_PRIMITIVES_H
 

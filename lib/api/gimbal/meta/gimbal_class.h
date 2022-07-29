@@ -554,9 +554,11 @@ GBL_DECLS_END
  * \relatesalso GblClass
 */
 
-/*! \page floatingClasses Floating Classes
- *  \ingroup meta
- *  \details
+/*! \page Classes Classes
+ *  \tableofcontents
+ *
+ * ## Floating Classes
+ *
  *  Typically, when you wish to override virtual methods on a class to provide
  *  custom functionality, you would need to register a new, derived static type
  *  inheriting from the existing type and overriding the desired methods within
@@ -624,9 +626,8 @@ GBL_DECLS_END
  *
  *      // Call placement destructor which doesn't deallocate
  *      GblInstance_destruct(GBL_INSTANCE(&object));
- */
-/*! \page classSwizzling Class Swizzling
- *  \ingroup meta
+ *
+ * ## Class Swizzling
  *
  *  Sometimes you would like to do something similar to the previous example,
  *  with ad-hoc virtual method overriding, but the creation of the object is
@@ -677,9 +678,7 @@ GBL_DECLS_END
  *      GblInstance_destroy(GBL_INSTANCE(pObj);
  *
  */
-/*! \page typeTemplate Template Custom Types
- * \ingroup meta
- * ## Cast Utility Macros
+/*! \page TypeTemplate Type Templates
  *  At the top of the file for most libGimbal derived types, along with the type identifier,
  *  you will find a collection of convenience utility macros implementing function-style
  *  casts for the given type.

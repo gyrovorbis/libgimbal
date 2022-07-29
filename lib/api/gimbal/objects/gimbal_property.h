@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblProprerty instance, DSL, and management API
+ *  \ingroup metaBuiltinTypes
+ */
+
 #ifndef GIMBAL_PROPERTY_H
 #define GIMBAL_PROPERTY_H
 

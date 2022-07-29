@@ -6,6 +6,7 @@
 #define GIMBAL_TYPEDEFS_H
 
 #include "../core/gimbal_api_generators.h"
+#include "../core/gimbal_config.h.in"
 #include "gimbal_result.h"
 #include "gimbal_version.h"
 #include <stdarg.h>

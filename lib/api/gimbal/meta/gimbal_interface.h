@@ -138,7 +138,7 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  * \sa GblClass_try
  */
 
-/*! \page interfaces Interfaces
+/*! \page Interfaces Interfaces
  *  \tableofcontents
  *
  *  LibGimbal's object model supports the concept of the C# or
@@ -177,7 +177,7 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
  *          // declare virtual methods for implementing save/load
  *          GBL_RESULT  (*pFnSave)(const ISerializable* pSelf, GblStringBuffer* pBuffer);
  *          GBL_RESULT  (*pFnLoad)(ISerializable* pSelf, const GblStringBuffer* pBuffer);
- *      | GblISerializableIFace;
+ *      } GblISerializableIFace;
  *
  *  Since we want to use this interface with instances, we declare a placeholder
  *  instance type which is to be used with our interface. We put it before our

@@ -10,18 +10,18 @@ static GBL_RESULT GblStringViewTestSuite_fromEmpty_(GblTestSuite* pSelf, GblCont
 
     GblStringView view = GblStringView_fromEmpty();
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
     view = GBL_STRING_VIEW(NULL);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
     view = GBL_STRV(NULL);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
     GBL_API_END();
 }
@@ -30,23 +30,23 @@ static GBL_RESULT GblStringViewTestSuite_fromString_(GblTestSuite* pSelf, GblCon
     GBL_API_BEGIN(pCtx);
 
     GblStringView view = GblStringView_fromString("lulz");
-    GBL_TEST_COMPARE(view.length, 4);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 4);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
 
     view = GBL_STRING_VIEW("lulz");
-    GBL_TEST_COMPARE(view.length, 4);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 4);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
 
     view = GBL_STRV("lulz");
-    GBL_TEST_COMPARE(view.length, 4);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 4);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
 
     view = GBL_STRV("");
-    GBL_TEST_COMPARE(view.length, 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
     GBL_TEST_COMPARE(strcmp(view.pData, ""), 0);
 
     GBL_API_END();
@@ -57,18 +57,18 @@ static GBL_RESULT GblStringViewTestSuite_fromStringSized_(GblTestSuite* pSelf, G
     GBL_API_BEGIN(pCtx);
 
     GblStringView view = GblStringView_fromStringSized("lulz", 4);
-    GBL_TEST_COMPARE(view.length, 4);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 4);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
 
     view = GblStringView_fromStringSized("lulz", 0);
-    GBL_TEST_COMPARE(view.length, 4);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 4);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
 
     view = GBL_STRING_VIEW("lulz", 2);
-    GBL_TEST_COMPARE(view.length, 2);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 2);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
 
     GBL_API_END();
@@ -80,13 +80,13 @@ static GBL_RESULT GblStringViewTestSuite_fromQuark_(GblTestSuite* pSelf, GblCont
 
     GblStringView view = GblStringView_fromQuark(GBL_QUARK_INVALID);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.length, 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
 
     view = GblStringView_fromQuark(GblQuark_fromString("lulz"));
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 4);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 4);
 
     GBL_API_END();
 }
@@ -313,15 +313,15 @@ static GBL_RESULT GblStringViewTestSuite_removePrefix_invalid_(GblTestSuite* pSe
     GblStringView view = GblStringView_removePrefix(GBL_STRV(NULL), 1);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_API_CLEAR_LAST_RECORD();
 
     view = GblStringView_removePrefix(GBL_STRV("lulz"), 5);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_API_CLEAR_LAST_RECORD();
 
     GBL_API_END();
@@ -334,26 +334,26 @@ GBL_UNUSED(pSelf);
     GblStringView view = GblStringView_removePrefix(GBL_STRV(""), 0);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(strcmp(view.pData, ""), 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
     view = GblStringView_removePrefix(GBL_STRV("lolz"), 0);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(strcmp(view.pData, "lolz"), 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 4);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 4);
 
     view = GblStringView_removePrefix(GBL_STRV("lolz"), 2);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(strcmp(view.pData, "lz"), 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 2);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 2);
 
     view = GblStringView_removePrefix(GBL_STRV("lolz"), 4);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(strcmp(view.pData, ""), 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
     GBL_API_END();
 }
@@ -367,15 +367,15 @@ static GBL_RESULT GblStringViewTestSuite_removeSuffix_invalid_(GblTestSuite* pSe
     GblStringView view = GblStringView_removeSuffix(GBL_STRV(NULL), 1);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_API_CLEAR_LAST_RECORD();
 
     view = GblStringView_removeSuffix(GBL_STRV("lulz"), 5);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_API_CLEAR_LAST_RECORD();
 
     GBL_API_END();
@@ -387,20 +387,20 @@ static GBL_RESULT GblStringViewTestSuite_removeSuffix_(GblTestSuite* pSelf, GblC
     GblStringView view = GblStringView_removeSuffix(GBL_STRV(""), 0);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(strcmp(view.pData, ""), 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
     view = GblStringView_removeSuffix(GBL_STRV("lolz"), 1);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 3);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 3);
 
     view = GblStringView_removeSuffix(GBL_STRV("lolz"), 4);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("")));
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
     GBL_API_END();
 }
@@ -428,29 +428,29 @@ static GBL_RESULT GblStringViewTestSuite_substr_invalid_(GblTestSuite* pSelf, Gb
     GblStringView view = GblStringView_substr(GBL_STRV(NULL), 0, 1);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_API_CLEAR_LAST_RECORD();
 
     GblStringView_substr(GBL_STRV(NULL), 1, 0);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_API_CLEAR_LAST_RECORD();
 
     GblStringView_substr(GBL_STRV("lulz"), 0, 5);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_API_CLEAR_LAST_RECORD();
 
     GblStringView_substr(GBL_STRV("lulz"), 1, 4);
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_API_CLEAR_LAST_RECORD();
 
     GBL_API_END();
@@ -463,39 +463,39 @@ static GBL_RESULT GblStringViewTestSuite_substr_(GblTestSuite* pSelf, GblContext
     GblStringView view = GblStringView_substr(GBL_STRV(NULL), 0, 0);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(view.pData, NULL);
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
     view = GblStringView_substr(GBL_STRV(""), 0, 0);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(strcmp(view.pData, ""), 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
     view = GblStringView_substr(GBL_STRV("lolz"), 0, 4);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(strcmp(view.pData, "lolz"), 0);
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 4);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 4);
 
     view = GblStringView_substr(GBL_STRV("lolz"), 0, 3);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
-    GBL_TEST_COMPARE(view.nullTerminated, 0);
-    GBL_TEST_COMPARE(view.length, 3);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 3);
 
     view = GblStringView_substr(GBL_STRV("lolz"), 4, 0);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("")));
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
 
 
     view = GblStringView_substr(GBL_STRV("lolz"), 3, 1);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("z")));
-    GBL_TEST_COMPARE(view.nullTerminated, 1);
-    GBL_TEST_COMPARE(view.length, 1);
+    GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
+    GBL_TEST_COMPARE_UINT(view.length, 1);
 
     GBL_API_END();
 }

@@ -21,7 +21,7 @@ static GBL_RESULT verifyEmpty_(GblContext* pCtx, GblStringRef* pRef, GblSize ref
     GBL_TEST_VERIFY(GblStringRef_valid(pRef));
     GBL_TEST_VERIFY(GblStringRef_empty(pRef));
     const GblStringView view = GblStringRef_view(pRef);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_TEST_COMPARE(view.pData, pRef);
     GBL_API_END();
 }
@@ -38,7 +38,7 @@ static GBL_RESULT verifyString_(GblContext* pCtx, GblStringRef* pRef, const char
     GBL_TEST_VERIFY(GblStringRef_valid(pRef));
     GBL_TEST_VERIFY(!GblStringRef_empty(pRef));
     const GblStringView view = GblStringRef_view(pRef);
-    GBL_TEST_COMPARE(view.length, strlen(pValue));
+    GBL_TEST_COMPARE_UINT(view.length, strlen(pValue));
     GBL_TEST_COMPARE(view.pData, pRef);
     GBL_TEST_COMPARE(GblStringRef_at(pRef, GblStringRef_length(pRef)-1), pValue[strlen(pValue)-1]);
     GBL_API_END();
@@ -70,7 +70,7 @@ static GBL_RESULT GblStringRefTestSuite_null_(GblTestSuite* pSelf, GblContext* p
     GBL_TEST_COMPARE(GblStringRef_length(NULL), 0);
     GBL_TEST_VERIFY(!GblStringRef_valid(NULL));
     const GblStringView view = GblStringRef_view(NULL);
-    GBL_TEST_COMPARE(view.length, 0);
+    GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_TEST_COMPARE(view.pData, NULL);
     GBL_TEST_EXPECT_ERROR();
     GBL_TEST_COMPARE(GblStringRef_at(pSelf_->pRefs[0], 0), '\0');

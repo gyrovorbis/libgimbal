@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Optional Compile-time polymorphic context overrides
+ *  \ingroup debug
+ */
+
 #ifndef GIMBAL_EXT_H
 #define GIMBAL_EXT_H
 

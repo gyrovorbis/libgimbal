@@ -13,6 +13,8 @@
 #include <limits.h>
 #include <gimbal/core/gimbal_config.h>
 #include "../preprocessor/gimbal_macro_utils.h"
+#include "../preprocessor/gimbal_macro_composition.h"
+#include "../preprocessor/gimbal_macro_sequences.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +60,7 @@ extern "C" {
 #endif
 
 #define GBL_FORWARD_DECLARE_ENUM(E) \
-    typedef GBL_ENUM E
+    typedef GblEnum E
 
 #define GBL_FORWARD_DECLARE_FLAGS(F) \
     typedef GBL_FLAGS F
@@ -87,7 +89,6 @@ extern "C" {
     (void)(a)
 
 #define GBL_UNUSED(...) GBL_MAP_LIST(GBL_UNUSED_, __VA_ARGS__)
-
 
 #ifdef GBL_API_SHARED_LIB
 #   ifdef GBL_API_EXPORTS
@@ -140,17 +141,17 @@ extern "C" {
 
 
 #define GBL_ENUM_TABLE_DECLARE(table) \
-    GBL_EVAL(GBL_DECLARE_ENUM(GBL_EVAL(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME)))) { \
-        GBL_EVAL(GBL_MAP_TUPLES(GBL_ENUM_TABLE_DECL_ENUM,  GBL_EVAL(GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)))) \
+    GBL_DECLARE_ENUM(GBL_META_ENUM_TYPE_PROPERTY(table, CNAME)) { \
+        GBL_MAP_TUPLES(GBL_ENUM_TABLE_DECL_ENUM,  GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)) \
     }; \
-    GBL_EVAL(GBL_ENUM_TABLE_DECLARE_STRINGIFIER(table))
+    GBL_ENUM_TABLE_DECLARE_STRINGIFIER(table)
 
 #define GBL_ENUM_TABLE_RETURN_STRING(cName, value, name, string) \
     case value: return string;
 
 #define GBL_ENUM_TABLE_TO_STRING(table, value) \
     switch(value) { \
-        GBL_EVAL(GBL_MAP_TUPLES(GBL_ENUM_TABLE_RETURN_STRING, GBL_EVAL(GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)))) \
+        GBL_MAP_TUPLES(GBL_ENUM_TABLE_RETURN_STRING, GBL_MAP_TUPLES(GBL_EVAL, GBL_META_ENUM_TUPLE_VALUE_ARRAY table)) \
     }
 
 #define GBL_ENUM_TABLE_DECLARE_STRINGIFIER(table) \

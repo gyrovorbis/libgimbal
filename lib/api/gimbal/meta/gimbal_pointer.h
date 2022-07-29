@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Pointer and opaque type registration and checking
+ *  \ingroup metaBuiltinTypes
+ */
+
 #ifndef GIMBAL_POINTER_H
 #define GIMBAL_POINTER_H
 

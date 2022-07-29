@@ -338,7 +338,6 @@ static GBL_RESULT GblTestScenarioClass_constructor_(GblObject* pObject) {
     GblContext* pParentCtx      = GblContext_parentContext(GBL_CONTEXT(pObject));
     pSelf_->pAllocTracker       = GblAllocationTracker_create(pParentCtx);
 
-    GblContext_globalSet(GBL_CONTEXT(pSelf));
     GBL_API_END();
 }
 
@@ -436,7 +435,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
 
     //GBL_API_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
 
-    GBL_API_DONE();
+    //GBL_API_DONE();
 
 
     GBL_API_VERIFY(GblObject_unref(GBL_OBJECT(pSelf)) == 0,
@@ -472,7 +471,15 @@ GBL_EXPORT const char* GblTestScenario_caseCurrent(const GblTestScenario* pSelf)
 
 GBL_EXPORT GBL_RESULT GblTestScenario_run(GblTestScenario* pSelf, int argc, char* argv[]) {
     GBL_API_BEGIN(pSelf);
+
+    GblContext* pOldGlobalCtx = GblContext_global();
+    GblContext_globalSet(GBL_CONTEXT(pSelf));
+
     GBL_INSTANCE_VCALL_PREFIX(GBL_TEST_SCENARIO, pFnRun, pSelf, argc, argv);
+
+    GblContext_setLogFilter(pOldGlobalCtx, GBL_LOG_LEVEL_WARNING|GBL_LOG_LEVEL_ERROR);
+    GblContext_globalSet(pOldGlobalCtx);
+
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }

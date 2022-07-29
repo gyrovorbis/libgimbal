@@ -6,6 +6,9 @@
 #ifndef GIMBAL_RESULT_H
 #define GIMBAL_RESULT_H
 
+#include "../preprocessor/gimbal_macro_composition.h"
+#include "../preprocessor/gimbal_macro_sequences.h"
+#include "../preprocessor/gimbal_macro_utils.h"
 #include "../core/gimbal_api_generators.h"
 
 #ifdef __cplusplus

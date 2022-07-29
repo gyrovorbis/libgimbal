@@ -72,11 +72,11 @@ GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOXED);
                                                                     GblSize     argCount,       \
                                                                     GblVariant* pArgs,          \
                                                                     GblPtr      pMarshalData)   \
-    {                                                                                           \
+    GBL_NOEXCEPT {                                                                              \
         GBL_UNUSED(pRetValue);                                                                  \
         typedef void (*CFunction)(GBL_EVAL paramList);                                          \
         GBL_ASSERT(argCount >= paramCount);                                                     \
-        GBL_ASSERT(!pRetValue || GblVariant_typeOf(pRetValue) == GBL_INVALID_TYPE);               \
+        GBL_ASSERT(!pRetValue || GblVariant_typeOf(pRetValue) == GBL_INVALID_TYPE);             \
         GblCClosure* pCClosure = (GblCClosure*)pClosure;                                        \
         CFunction pFnPtr = (CFunction)((pMarshalData.pFunc)?                                    \
                             pMarshalData.pFunc : pCClosure->pFnCCallback);                      \

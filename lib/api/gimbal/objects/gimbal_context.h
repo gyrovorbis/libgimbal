@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblContext API management instance type
+ *  \ingroup metaBuiltinTypes
+ */
+
 #ifndef GIMBAL_CONTEXT_H
 #define GIMBAL_CONTEXT_H
 

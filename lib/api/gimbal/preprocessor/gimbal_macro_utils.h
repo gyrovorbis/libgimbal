@@ -8,6 +8,10 @@
  *  \brief Platform defines, utility macros, preprocessor generators and primitives
  *
  */
+
+/*! \page Preprocessor Preprocessor
+ *  \copydoc preprocessor
+ */
 #ifndef GIMBAL_MACRO_UTILS_H
 #define GIMBAL_MACRO_UTILS_H
 

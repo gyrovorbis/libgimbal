@@ -1,7 +1,5 @@
-/*! \defgroup testing Unit Testing Framework 
-* 	\brief Object-oriented, C-based unit testing framework.
+/*! \page Testing Unit Testing Framework 
 
-	\details
 	LibGimbal provides a built-in unit testing framework, which was architecturally inspired by QTest (which we had originally used for testing), with output
 	similar to a combination between QTest and GTest. Since libGimbal runs everywhere, we wanted to ensure that our tests could also run anywhere as well. 
 	The testing framework leverages the meta type system and error management back-end to implement a powerful object-oriented testing framework. 
@@ -54,3 +52,7 @@
 
 */
 
+/*! \defgroup testing Unit Testing Framework 
+* 	\brief Object-oriented, C-based unit testing framework.
+	\copydoc Testing
+*/

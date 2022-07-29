@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblBoxedClass and API for managing boxed types
+ *  \ingroup metaBuiltinTypes
+ */
+
 #ifndef GIMBAL_BOXED_H
 #define GIMBAL_BOXED_H
 
