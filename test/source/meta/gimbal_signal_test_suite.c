@@ -77,7 +77,7 @@ typedef struct GblSignalTestSuite_ {
     GblType             types[TYPE_COUNT_];
     SignalInstance_*    pInstances[INSTANCE_COUNT_];
     GblSize             signalEmissions[SIGNAL_COUNT_];
-    INSTANCE_           signalReceivers[SIGNAL_COUNT_][INSTANCE_COUNT_];
+    uintptr_t           signalReceivers[SIGNAL_COUNT_][INSTANCE_COUNT_];
     uintptr_t           signalArgs[SIGNAL_COUNT_][INSTANCE_COUNT_];
     GblInstance*        pSignalCurrentReceivers[SIGNAL_COUNT_][INSTANCE_COUNT_];
     GblInstance*        pSignalCurrentEmitters[SIGNAL_COUNT_][INSTANCE_COUNT_];
@@ -765,7 +765,7 @@ static GBL_RESULT GblSignalTestSuite_emitVaListOtherSignal_(GblTestSuite* pSelf,
 
     const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_1_C_B_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
-    GBL_TEST_COMPARE(pSelf_->signalArgs[SIGNAL_1_C_B_][emissionIndex], 17.0f);
+    GBL_TEST_COMPARE(pSelf_->signalArgs[SIGNAL_1_C_B_][emissionIndex], (uintptr_t)17.0f);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_1_C_B_][emissionIndex], INSTANCE_2_);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_1_C_B_][emissionIndex], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_1_C_B_][emissionIndex], pSelf_->pInstances[INSTANCE_2_]);
