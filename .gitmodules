@@ -1,6 +1,3 @@
 [submodule "test/lib/elysian-test"]
 	path = test/lib/elysian-test
 	url = ../../open-source/elysian-test.git
-[submodule "doc/doxygen-dark-theme"]
-	path = doc/doxygen-dark-theme
-	url = https://github.com/MaJerle/doxygen-dark-theme.git

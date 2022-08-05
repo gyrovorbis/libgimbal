@@ -1250,8 +1250,8 @@ HTML_STYLESHEET        =
 #                         "./doxygen-dark-theme/custom_dark_theme.css"
 
 HTML_EXTRA_STYLESHEET  = "./qtify.css" \
-                         "./doxygen-dark-theme/custom.css" \
-                         "./doxygen-dark-theme/custom_dark_theme.css"                        
+                         "./custom.css" \
+                         "./custom_dark_theme.css"                        
 
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
