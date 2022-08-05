@@ -129,6 +129,7 @@ set(GIMBAL_SOURCES
      source/test/gimbal_test_suite.c
      source/test/gimbal_test_scenario.c
      source/test/gimbal_allocation_tracker.c
+     source/types/gimbal_uuid.c
  )
 
 set(GIMBAL_INCLUDES
@@ -212,6 +213,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/test/gimbal_allocation_tracker.h
     api/gimbal/meta/gimbal_signal.h
     api/gimbal/types/gimbal_marshal.h
+    api/gimbal/types/gimbal_uuid.h
+    api/gimbal/strings/gimbal_string.h
     source/meta/gimbal_type_.h
 )
 

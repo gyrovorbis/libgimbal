@@ -75,9 +75,9 @@ extern "C" {
     typedef struct S##_* S
 
 
-#define GBL_PRIVATE(S)      struct S##_ {
+#define GBL_PRIVATE(S)      struct S##Private_ {
 
-#define GBL_PRIVATE_END }   private;
+#define GBL_PRIVATE_END }   private_;
 
 //sizeof(emptyStruct) is 1 in Cpp, 0 in C!
 #define GBL_DEFINE_EMPTY_STRUCT(S)  \

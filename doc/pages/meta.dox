@@ -1,3 +1,41 @@
+
+/*! \page Meta Meta Type System
+
+	The language interop layer of libGimbal is primarily facilitated through its 
+	low-level, C-based meta type system. The type system has two primary goals,
+	one of which is to provide the C (and C++) programming language(s) with higher-level 
+	object-oriented constructs, and the other is to use these constructs to create
+	a common type system for cross-langauge interoperability.  
+
+	At its core, the LibGimbal Type Framework utilizes a dynamic type system, provided
+	by the ::GblType API (within gimbal_type.h). This system provides a runtime type 
+	registry maintaining all type information provided by builtin or user-registered 
+	types. This registry provides object-oriented concepts such as classes, objects,
+	interfaces, poperties, signals, and an inheritance model to both the C programming 
+	language, and any langauge which can provide glue code to a C API. 
+
+	The type system models OO concepts fundamentally through the following concepts:
+	- ::GblType (gimbal_type.h)
+		-# Runtime type UUIDs 
+	- GblClass (gimbal_class.h)
+		-# virtual/overridable methods
+		-# static members
+		-# private static data
+		-# interface implementations
+	- GblInstance (gimbal_instance.h)
+		-# instanced public/private members
+	- GblInterface (gimbal_interface.h)
+		-# abstract/overridable methods
+		-# default method implementations
+
+\subpage Classes
+
+\subpage Interfaces
+
+\subpage TypeTemplate
+*/
+
+
 /*! \defgroup meta Meta Type System
 * 	\brief Object-oriented, cross-language runtime type system
 	\copydoc Meta
@@ -23,7 +61,6 @@
 	\brief Signal emission mechanism and its related components
  *  \ingroup meta
 */ 
-
 
 
 /*! \defgroup interfaces Interfaces

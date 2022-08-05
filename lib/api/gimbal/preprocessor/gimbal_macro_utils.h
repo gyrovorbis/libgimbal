@@ -28,6 +28,8 @@ extern "C" {
 
 #define GBL_CONTAINER_OF(ptr, type, member) ((type*)((char*)(ptr) - offsetof(type, member)))
 
+#define GBL_ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
+
 #define GBL_NPOS    ((GblSize)-1)
 
 #define GBL_SWITCH_CASE_STRINGIFY(s) \

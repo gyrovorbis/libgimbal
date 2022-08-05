@@ -23,6 +23,7 @@
 #include "meta/gimbal_opaque_test_suite.h"
 #include "meta/gimbal_boxed_test_suite.h"
 #include "objects/gimbal_object_test_suite.h"
+#include "types/gimbal_uuid_test_suite.h"
 
 int main(int argc, char* pArgv[]) {
     GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
@@ -45,6 +46,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_createFromType(GBL_REF_TEST_SUITE_TYPE));
     GblTestScenario_suiteEnqueue(pScenario,
                                  GblTestSuite_createFromType(GBL_BYTE_ARRAY_TEST_SUITE_TYPE));
+    GblTestScenario_suiteEnqueue(pScenario,
+                                 GblTestSuite_createFromType(GBL_UUID_TEST_SUITE_TYPE));
     GblTestScenario_suiteEnqueue(pScenario,
                                  GblTestSuite_createFromType(GBL_QUARK_TEST_SUITE_TYPE));
     GblTestScenario_suiteEnqueue(pScenario,

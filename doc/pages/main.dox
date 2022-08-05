@@ -2,11 +2,28 @@
 *	LibGimbal is a C/C++-based, lightweight, cross-platform, general-purpose framework providing core functionality 
 	such as containers, algorithms, strings, references, error management, custom allocators, logging, and more.
 	Additionally it provides a full-fledged, runtime meta type system providing object-oriented constructs to C
-	and allowing for interop of complex object models between varous C-compatible languages.
+	and allowing for interop of complex object models between various C-compatible languages.
 
-	LibGimbal provides both C and C++-based APIs, and has been written with a design goal of making these APIs easily consumable from other languages which are compatible with C, such as Objective-C, Rust, and even scripting languages for interoperability. 
+	LibGimbal provides both C and C++-based APIs, and has been written with a design goal of making these APIs easily 
+	consumable from other languages which are compatible with C, such as Objective-C, Rust, Swift, Go, and even 
+	scripting languages for such as Lua, Python, and Javascript for interoperability. 
 
 	\tableofcontents
+
+# Motivation
+	LibGimbal was originally motivated by a desire to create common infrastructure between the various APIs and 
+	libraries within the Elysian Shadows codebase (Engine, Toolkit, LibGyro, ElysianVMU Emulator, ElysianLua runtime, Common Qt 
+	Widgets, etc). Many of these components were developed to be open-source 3rd party APIs in both C and C++, yet their 
+	dependencies either meant code duplication or a dependency upon the closed-source portions of the codebase. 
+
+	As development progressed, it became clear that the codebase had become essentially a monolith and that reusing components 
+	for subprojects and libraries, especially between languages was not even feasible. Additionally, some of the most powerful features 
+	implemented within the Engine and Toolkit, such as runtime reflection and debugging were tied at the hip to the Lua runtime, 
+	and as such, were beginning to consume too many resources for target platforms such as the Sega Dreamcast, as the project scaled.
+
+	LibGimbal was born as the lowest-level common core framework between these various components which were a mish-mash of C,
+	C++, and Lua scripting. It has been written from the ground-up to provide a low-level, efficient common core between C and C++
+	code and any langauges extending or interoping with the two.
 
 # Features
 	LibGimbal's featureset includes:
@@ -14,14 +31,14 @@
 	- Custom allocator support for all types from the ground-up
 	- Macros providing abstractions for various compiler and platform-specific features
 	- Multiple optimized string APIs for various use-cases
-	- Abstract data types and containers for resizable arrays, binary trees, hash tables, etc
+	- Abstract data types and containers for resizable and associative arrays, binary trees, hash tables, etc
 	- Algorithms for sorting, hashing, CRC, parity, ntonl/htonl, GCD, powers-of-2, etc
-	- Generic references and closures 
-	- Variant types for dealing with dynamically typed data
-	- Compile-time configurable macro-based API validation utilities
+	- Generic references and language-independent closure system 
+	- Extensible variant types for dealing with dynamically typed and custom data
+	- Compile-time configurable, macro-based API validation utilities
 	- Macro utilities for advanced preprocessor-based meta programming 
-	- Object-oriented runtime meta type system, providing an inheritance model, interfaces, properties, etc
-	- Unit testing framework
+	- Object-oriented runtime meta type system, providing an inheritance model, interfaces, properties, signals, etc.
+	- Platform-independent Unit testing framework
 
 # Compiler Requirements 
 	LibGimbal has been written to build with any compiler supporting standard C17, with its builtin C++ wrappers 
@@ -87,6 +104,15 @@
 	- SipHash: Jean-Philippe Amasson, Daniel J. Bernstein 
 		- (http://creativecommons.org/publicdomain/zero/1.0/)
 
+\todo
+Formatting
+	- Have Marcel go over CSS and fix any reest
+	- Qt style mini TOC doesn't have detailed documentation link
+	- make macros appear in member documentation at the end
+	- libGimbal icon padding
+	- modules table separator a little audacious
+	- types related methods/members tables have cut off open line
+
 */ 
 
 /*! \page docs Documentation
@@ -123,39 +149,4 @@
 \subsubsection dataStrings Strings
 \copydoc strings
 
-*/
-
-
-/*! \page Meta Meta Type System
-
-	Libgimbal provides a portable type system designed to provide object-oriented functionality
-   	to the C programming language and to provide type compatibility with other 
-    languages which support interoping with C APIs.
-
-	At its core, the LibGimbal Type Framework utilizes a dynamic type system, provided
-	by the ::GblType API (within gimbal_type.h). This system provides a runtime type 
-	registry maintaining all type information provided by builtin or user-registered 
-	types. This registry provides object-oriented concepts such as classes, objects,
-	interfaces, and an inheritance model to both the C programming language, and
-	any langauge which can provide glue code to a C API. 
-
-	The type system models OO concepts fundamentally through the following concepts:
-	- ::GblType (gimbal_type.h)
-		-# Runtime type UUIDs 
-	- GblClass (gimbal_class.h)
-		-# virtual/overridable methods
-		-# static members
-		-# private static data
-		-# interface implementations
-	- GblInstance (gimbal_instance.h)
-		-# instanced public/private members
-	- GblInterface (gimbal_interface.h)
-		-# abstract/overridable methods
-		-# default method implementations
-
-\subpage Classes
-
-\subpage Interfaces
-
-\subpage TypeTemplate
 */
