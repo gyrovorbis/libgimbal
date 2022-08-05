@@ -172,8 +172,8 @@ static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd, GblCo
     }
     pTestClass->staticInt32 = 77;
     strcpy(pTestClass->string, (const char*)pUd);
-    pTestClass->base.iEventHandlerIFace.pFnEvent = TestObject_IEventHandler_handleEvent;
-    pTestClass->base.iEventFilterIFace.pFnEventFilter = TestObject_IEventFilter_filterEvent;
+    pTestClass->base.GblIEventHandlerIFaceImpl.pFnEvent = TestObject_IEventHandler_handleEvent;
+    pTestClass->base.GblIEventFilterIFaceImpl.pFnEventFilter = TestObject_IEventFilter_filterEvent;
     pTestClass->base.pFnConstructor = TestObject_constructor;
     pTestClass->base.pFnDestructor  = TestObject_destructor;
     pTestClass->base.pFnConstructed = TestObject_constructed;

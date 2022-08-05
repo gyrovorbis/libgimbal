@@ -21,12 +21,81 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
-#   define GBL_DECLS_BEGIN  extern "C" {
-#   define GBL_DECLS_END  }
+#   define GBL_DECLS_BEGIN extern "C" {
+#   define GBL_DECLS_END   }
 #else
 #   define GBL_DECLS_BEGIN
 #   define GBL_DECLS_END
 #endif
+
+#define GBL_CLASS_IMPL_INTERFACE(iface) \
+    iface iface##Impl;
+
+#define GBL_CLASS_DERIVE_N(derivedKlass, baseKlass, ...) \
+    GBL_CLASS_DERIVE_2(derivedKlass, baseKlass) \
+    GBL_MAP(GBL_CLASS_IMPL_INTERFACE, __VA_ARGS__)
+
+#define GBL_CLASS_DERIVE_2(derivedKlass, baseKlass) \
+    struct derivedKlass;                            \
+    typedef struct derivedKlass derivedKlass;       \
+    struct derivedKlass {                           \
+        baseKlass   base;
+
+#define GBL_CLASS_DERIVE_1(derivedKlass) \
+    GBL_CLASS_DERIVE_2(derivedKlass, GblClass)
+
+#define GBL_CLASS_DERIVE(...)   \
+    GBL_VA_OVERLOAD_SELECT(GBL_CLASS_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_2_N, __VA_ARGS__)(__VA_ARGS__)
+
+#define GBL_CLASS_END };
+
+#define GBL_INSTANCE_DERIVE_3(derivedInstance, baseInstance, klass) \
+    struct derivedInstance;                                         \
+    typedef struct derivedInstance derivedInstance;                 \
+    struct derivedInstance {                                        \
+        union {                                                     \
+            klass*          pClass;                                 \
+            baseInstance    base;                                   \
+        };
+
+#define GBL_INSTANCE_DERIVE_2(derivedInstance, baseInstance) \
+    GBL_INSTANCE_DERIVE_3(derivedInstance, baseInstance, GblClass)
+
+#define GBL_INSTANCE_DERIVE_1(derivedInstance) \
+    GBL_INSTANCE_DERIVE_2(derivedInstance, GblInstance)
+
+#define GBL_INSTANCE_DERIVE(...) \
+    GBL_VA_OVERLOAD_SELECT(GBL_INSTANCE_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_3_N, __VA_ARGS__)(__VA_ARGS__)
+
+#define GBL_INSTANCE_END };
+
+typedef struct GblPropertyInfo_ {
+    const char* pName;
+    uintptr_t     typeId;
+    uint32_t    flags;
+} GblPropertyInfo_;
+
+#if 0
+#define GBL_PROPERTY_FLAGS__(flag) \
+    |GBL_PROPERTY_FLAG_##flag
+
+#define GBL_PROPERTY_FLAGS_(...) \
+    GBL_MAP_TUPLES(GBL_PROPERTY_FLAGS__, __VA_ARGS__)
+#endif
+
+#define GBL_PROPERTY_INFO__(name, type, flags)   \
+    { name, type, GBL_PROPERTY_FLAGS_MASK flags },
+
+#define GBL_PROPERTY_ITEM_(...) \
+    GBL_MAP_TUPLES(GBL_PROPERTY_INFO__, __VA_ARGS__)
+
+#define GBL_PROPERTIES(object) \
+   GBL_INLINE void object##_propertyInfo(GblSize size, GblPropertyInfo_*pInfoOut) {    \
+        const GblPropertyInfo_ infos[] = {   \
+            GBL_PROPERTY_ITEM_
+
+#define GBL_PROPERTIES_END }; memcpy(pInfoOut, &infos[size], sizeof(GblPropertyInfo_)); }
+
 
 #define GBL_DECLARE_STRUCT_PUBLIC(S)    \
     struct S;                           \

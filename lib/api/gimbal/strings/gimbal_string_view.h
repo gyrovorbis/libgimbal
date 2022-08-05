@@ -8,6 +8,7 @@
 
 #include "../core/gimbal_api_frame.h"
 #include "../algorithms/gimbal_hash.h"
+#include "../preprocessor/gimbal_compiler.h"
 #include "gimbal_quark.h"
 #include <ctype.h>
 

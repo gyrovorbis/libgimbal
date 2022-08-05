@@ -16,8 +16,9 @@ project(LibGimbal
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(VITA)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVITA")
+#    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVITA")
+    GBL_BUILD_DEFINE(VITA 1)
     # This file, unfortunately, needs to be manually included.
     # And on this lists file specifically (its not passed down from the parent/aggregate of course)
     include("${VITASDK}/share/vita.cmake" REQUIRED)
@@ -215,6 +216,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/types/gimbal_marshal.h
     api/gimbal/types/gimbal_uuid.h
     api/gimbal/strings/gimbal_string.h
+    api/gimbal/meta/gimbal_record.h
     source/meta/gimbal_type_.h
 )
 

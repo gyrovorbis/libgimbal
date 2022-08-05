@@ -400,13 +400,13 @@ static GBL_RESULT GblObjectClass_init_(GblObjectClass* pClass, void* pData, GblC
         .pFnSave      =    GblObjectClass_ivariantIFace_save_,
     };
 
-    pClass->iVariantIFace.pVTable      = &iVariantVTable;
+    pClass->GblIVariantIFaceImpl.pVTable      = &iVariantVTable;
 
-    pClass->iTableIFace.pFnIndex       =    GblObjectClass_iTableIFace_index_;
-    pClass->iTableIFace.pFnNewIndex    =    GblObjectClass_iTableIFace_newIndex_;
-    pClass->iTableIFace.pFnNextIndex   =    GblObjectClass_iTableIFace_nextIndex_;
+    pClass->GblITableIFaceImpl.pFnIndex       =    GblObjectClass_iTableIFace_index_;
+    pClass->GblITableIFaceImpl.pFnNewIndex    =    GblObjectClass_iTableIFace_newIndex_;
+    pClass->GblITableIFaceImpl.pFnNextIndex   =    GblObjectClass_iTableIFace_nextIndex_;
 
-    pClass->iEventHandlerIFace.pFnEvent = GblObjectClass_iEventHandlerIFace_event_;
+    pClass->GblIEventHandlerIFaceImpl.pFnEvent = GblObjectClass_iEventHandlerIFace_event_;
 
     pClass->pFnConstructor = GblObjectClass_constructor_;
     pClass->pFnDestructor  = GblObjectClass_destructor_;
@@ -444,16 +444,16 @@ extern GBL_RESULT GblObject_typeRegister_(GblContext* pCtx) {
     static GblTypeInterfaceMapEntry ifaceEntries[] = {
         {
             .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, iVariantIFace)
+            .classOffset   = offsetof(GblObjectClass, GblIVariantIFaceImpl)
         }, {
             .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, iTableIFace)
+            .classOffset   = offsetof(GblObjectClass, GblITableIFaceImpl)
         }, {
             .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, iEventHandlerIFace)
+            .classOffset   = offsetof(GblObjectClass, GblIEventHandlerIFaceImpl)
         }, {
             .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, iEventFilterIFace)
+            .classOffset   = offsetof(GblObjectClass, GblIEventFilterIFaceImpl)
         }
     };
 

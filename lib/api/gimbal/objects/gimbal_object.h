@@ -16,6 +16,7 @@
 #include <gimbal/meta/gimbal_primitives.h>
 #include "../preprocessor/gimbal_atomics.h"
 #include "../containers/gimbal_array_map.h"
+#include "../core/gimbal_api_generators.h"
 
 /*! \ingroup metaBuiltinTypes
  * \details  ::GblType UUID of a GblObject
@@ -38,8 +39,8 @@
 #define GBL_OBJECT_REF(object)              (GblObject_ref((GblObject*)object))
 #define GBL_OBJECT_UNREF(object)            (GblObject_unref((GblObject*)object))
 
-#define SELF                GblObject* pSelf
-#define CSELF               const SELF
+#define SELF GblObject* pSelf
+#define CSELF const SELF
 
 GBL_DECLS_BEGIN
 
@@ -47,13 +48,8 @@ GBL_FORWARD_DECLARE_STRUCT(GblObject);
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
 /// GblClass structure for a GblObject instance
-typedef struct GblObjectClass {
-    GblClass                base;
-
-    GblIVariantIFace        iVariantIFace;
-    GblITableIFace          iTableIFace;
-    GblIEventHandlerIFace   iEventHandlerIFace;
-    GblIEventFilterIFace    iEventFilterIFace;
+GBL_CLASS_DERIVE(GblObjectClass, GblClass,
+                 GblIVariantIFace, GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
 
     GBL_RESULT (*pFnConstructor)        (SELF);
     GBL_RESULT (*pFnDestructor)         (SELF);
@@ -62,7 +58,7 @@ typedef struct GblObjectClass {
     GBL_RESULT (*pFnPropertySet)        (SELF,  GblSize id, const GblVariant* pValue, const GblProperty* pProp);
     //GBL_RESULT (*pFnSlotCall)           (SELF,  GblSize id, GblVariant* pRet, GblUint argc, GblVariant* pArgs, const GblSlot* pSlot);
     //GBL_RESULT (*pFnPropertyNotify)     (SELF,  GblProperty* pProperty);    // signal
-} GblObjectClass;
+GBL_CLASS_END
 
 typedef enum GBL_OBJECT_ATTRIBUTE {
     GBL_OBJECT_ATTRIBUTE_CONSTRUCTED_IN_PLACE,
@@ -70,19 +66,17 @@ typedef enum GBL_OBJECT_ATTRIBUTE {
 } GBL_OBJECT_ATTRIBUTE;
 
 /*! \brief GblInstance providing extended OO functionality
- *\ingroup metaBuiltinTypes
- *\details
+ *  \ingroup metaBuiltinTypes
+ *  \details
  *  A GblObject is an GblInstance type which provides support
  *  for reference counting semantics, GblVariant interop,
  *  event handling, parent/child relationships, arbitrary
  *  userdata storage, and properties.
- *\sa GblInstance, GblObjectClass
+ *  \sa GblInstance, GblObjectClass
  */
-typedef struct GblObject {
-    union {
-        GblObjectClass*     pClass;
-        GblInstance         base;
-    };
+GBL_INSTANCE_DERIVE(GblObject, GblInstance,
+                    GblObjectClass)
+
     GBL_ATOMIC_INT16        refCounter;
 
     uint16_t                contextType                            : 1;
@@ -93,7 +87,8 @@ typedef struct GblObject {
     uint16_t                parentITableNewIndexFallthrough        : 1;
 
     GblArrayMap*            pExtendedFields;
-} GblObject;
+
+GBL_INSTANCE_END
 
 typedef enum GBL_OBJECT_PROPERTY_ID {
     GBL_OBJECT_PROPERTY_ID_FIRST,
@@ -130,7 +125,12 @@ GBL_PROPERTY_TABLE_BEGIN(GBL_OBJECT)
                        GBL_POINTER_TYPE,
                        GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
 GBL_PROPERTY_TABLE_END()
-
+#if 0
+GBL_PROPERTIES(GblObject) (
+    ("refCount", GBL_UINT32_TYPE, (READ)),
+    ("name",     GBL_STRING_TYPE, (READ, WRITE))
+) GBL_PROPERTIES_END
+#endif
 /*!
 * Creates a new instance of a GBL_OBJECT_TYPE compatible type, setting
 * the values of the given properties upon construction.
@@ -383,7 +383,6 @@ GBL_INLINE GblBool GblObject_attribute(CSELF, GBL_OBJECT_ATTRIBUTE attrib) GBL_N
 
 
 GBL_DECLS_END
-
 
 #undef CSELF
 #undef SELF
