@@ -3,6 +3,7 @@
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/containers/gimbal_tree_set.h>
 
+// Do stress test
 #define GBL_TREE_SET_TEST_SUITE_(inst)  ((GblTreeSetTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_TREE_SET_TEST_SUITE_TYPE))
 
 typedef struct GblTreeSetTestSuite_ {

@@ -4,6 +4,7 @@
 #include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/meta/gimbal_primitives.h>
 
+#define GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_ 2047
 #define GBL_ARRAY_MAP_TEST_SUITE_(inst)     ((GblArrayMapTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_MAP_TEST_SUITE_TYPE))
 
 typedef struct GblArrayMapTestSuite_ {
@@ -15,14 +16,15 @@ typedef struct GblArrayMapTestSuite_ {
 static unsigned dtorCalls_  = 0;
 static uintptr_t dtorLastKey_ = 0;
 
-int GblArrayMap_comparator_(uintptr_t key1,
-                                uintptr_t key2)
+int GblArrayMap_comparator_(const GblArrayMap* pMap, uintptr_t key1,
+                            uintptr_t key2)
 {
+    GBL_UNUSED(pMap);
     return strcmp((const char*)key1, (const char*)key2);
 }
 
-GBL_RESULT GblArrayMap_destructor_(uintptr_t key, void* pData) {
-    GBL_UNUSED(pData);
+GBL_RESULT GblArrayMap_destructor_(const GblArrayMap* pMap, uintptr_t key, void* pData) {
+    GBL_UNUSED(pData, pMap);
     ++dtorCalls_;
     dtorLastKey_ = key;
     return GBL_RESULT_SUCCESS;
@@ -87,7 +89,7 @@ static GBL_RESULT GblArrayMapTestSuite_empty_(GblTestSuite* pSelf, GblContext* p
     uintptr_t value;
     GblVariant variant;
     //GblArrayMap* pOther = NULL;
-    pSelf_->pMap1 = GblArrayMap_create(GblArrayMap_comparator_, pCtx);
+    pSelf_->pMap1 = GblArrayMap_create(GblArrayMap_comparator_, GBL_FALSE, pCtx);
     GBL_TEST_VERIFY(pSelf_->pMap1);
     GBL_TEST_COMPARE(GblArrayMap_size(&pSelf_->pMap1), 0);
     GBL_TEST_VERIFY(GblArrayMap_empty(&pSelf_->pMap1));
@@ -327,6 +329,69 @@ static GBL_RESULT GblArrayMapTestSuite_destroy_(GblTestSuite* pSelf, GblContext*
     GBL_API_END();
 }
 
+static GBL_RESULT GblArrayMapTestSuite_createBinarySearchable_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
+    pSelf_->pMap1 = GblArrayMap_create(NULL, GBL_TRUE, pCtx);
+    GBL_TEST_VERIFY(GblArrayMap_binarySearches(&pSelf_->pMap1));
+    GBL_API_END();
+}
+
+static GBL_RESULT GblArrayMapTestSuite_verifyInsertionSort_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
+
+    for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
+        uintptr_t key = gblRand();
+        GblSize prevSize = GblArrayMap_size(&pSelf_->pMap1);
+        while(GblArrayMap_size(&pSelf_->pMap1) <= prevSize) // check for collisions
+            GBL_API_VERIFY_CALL(GblArrayMap_setUserdata(&pSelf_->pMap1, key, key, NULL));
+    }
+
+    GBL_TEST_COMPARE(GblArrayMap_size(&pSelf_->pMap1), GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_);
+
+    uintptr_t prevKey = 0;
+    for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
+        const uintptr_t key = GblArrayMap_probeKey(&pSelf_->pMap1, i);
+        GBL_TEST_VERIFY(prevKey <= key);
+        prevKey = key;
+    }
+
+    GBL_API_END();
+}
+
+static GBL_RESULT GblArrayMapTestSuite_findBinarySearch_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
+
+    for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
+        const uintptr_t key = GblArrayMap_probeKey(&pSelf_->pMap1, i);
+        GBL_TEST_COMPARE(GblArrayMap_getValue(&pSelf_->pMap1, key), key);
+    }
+
+    GBL_API_END();
+}
+
+static GBL_RESULT GblArrayMapTestSuite_findLinearSearch_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
+    pSelf_->pMap1->binarySearches = GBL_FALSE;
+
+    for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
+        const uintptr_t key = GblArrayMap_probeKey(&pSelf_->pMap1, i);
+        GBL_TEST_COMPARE(GblArrayMap_getValue(&pSelf_->pMap1, key), key);
+    }
+
+    GBL_API_END();
+}
+
+static GBL_RESULT GblArrayMapTestSuite_destroyBinarySearchable_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
+    GBL_API_VERIFY_CALL(GblArrayMap_destroy(&pSelf_->pMap1));
+    GBL_API_END();
+}
+
 GBL_EXPORT GblType GblArrayMapTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
@@ -345,6 +410,11 @@ GBL_EXPORT GblType GblArrayMapTestSuite_type(void) {
         { "extractVariant",             GblArrayMapTestSuite_extractVariant_            },
         { "clear",                      GblArrayMapTestSuite_clear_                     },
         { "destroy",                    GblArrayMapTestSuite_destroy_                   },
+        { "createBinarySearchable",     GblArrayMapTestSuite_createBinarySearchable_    },
+        { "verifyInsertionSort",        GblArrayMapTestSuite_verifyInsertionSort_       },
+        { "findBinarySearch",           GblArrayMapTestSuite_findBinarySearch_          },
+        //{ "findLinearSearch",           GblArrayMapTestSuite_findLinearSearch_          },
+        { "destroyBinarySearchable",    GblArrayMapTestSuite_destroyBinarySearchable_   },
         { NULL,                         NULL                                            }
     };
 

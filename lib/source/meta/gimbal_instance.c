@@ -6,6 +6,7 @@ GBL_EXPORT void* GblInstance_basePtr_(const GblInstance* pInstance) {
     return pMeta? (void*)((uint8_t*)pInstance + pMeta->instancePrivateOffset) : NULL;
 }
 
+// not doing any type validation here...
 GBL_EXPORT void* GblInstance_private(const GblInstance* pInstance, GblType base) {
     GblMetaClass* pMeta = GBL_META_CLASS_(base);
     return pMeta && pMeta->pInfo->instancePrivateSize?
@@ -13,13 +14,13 @@ GBL_EXPORT void* GblInstance_private(const GblInstance* pInstance, GblType base)
                 NULL;
 }
 
+// not doing any type validation here...
 GBL_EXPORT GblInstance* GblInstance_public(const void* pPrivate, GblType base) {
     GblMetaClass* pMeta = GBL_META_CLASS_(base);
     return pMeta && pMeta->pInfo->instancePrivateSize?
                 (GblInstance*)((uint8_t*)pPrivate - pMeta->instancePrivateOffset) :
                 NULL;
 }
-
 
 GBL_RESULT typeInstanceConstructValidate_(GblType type, GblBool inPlace) {
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
@@ -254,34 +255,38 @@ GBL_EXPORT GBL_RESULT GblInstance_floatClass(GblInstance* pSelf) {
 
 GBL_EXPORT GblBool GblInstance_check(const GblInstance* pSelf, GblType type) {
     GblBool result = GBL_FALSE;
-    GBL_API_BEGIN(pCtx_);
     if(!(!pSelf && type == GBL_INVALID_TYPE)) {
-        GBL_API_VERIFY_POINTER(pSelf);
-        result = GblClass_check(pSelf->pClass_, type);
+        if(!pSelf) {
+            GBL_API_BEGIN(pCtx_);
+            GBL_API_VERIFY_POINTER(NULL);
+            GBL_API_END_BLOCK();
+        } else {
+            result = GblClass_check(pSelf->pClass_, type);
+        }
     } else result = GBL_TRUE;
-    GBL_API_END_BLOCK();
     return result;
 }
 
 GBL_EXPORT GblInstance* GblInstance_convert_(GblInstance* pSelf, GblType type, GblBool check) GBL_NOEXCEPT {
     GblInstance* pOutInstance = NULL;
-    GBL_API_BEGIN(NULL);
-    if(!pSelf) {
-        if(type == GBL_INVALID_TYPE || !check) GBL_API_DONE();
-        else GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_POINTER,
-                                "Failed to cast NULL instance to %s.",
-                                GblType_name(type));
-    } else {
-        if(GblInstance_check(pSelf, type)) {
-            pOutInstance = pSelf;
-        } else if(check) {
-            GBL_API_RECORD_SET(GBL_RESULT_ERROR_TYPE_MISMATCH,
-                               "Failed to cast instance from %s to %s.",
-                                GblType_name(GblInstance_typeOf(pSelf)),
-                                GblType_name(type));
-        }
+
+    const GblBool invalidPtr = (!pSelf && type != GBL_INVALID_TYPE);
+    const GblBool typeMismatch = (!invalidPtr && !(GblInstance_check(pSelf, type)));
+
+    if(check && (invalidPtr || typeMismatch)) {
+        GBL_API_BEGIN(NULL);
+        GBL_API_VERIFY_POINTER(!invalidPtr,
+                               "Failed to cast NULL instance to %s.",
+                               GblType_name(type));
+        GBL_API_VERIFY(!typeMismatch, GBL_RESULT_ERROR_TYPE_MISMATCH,
+                       "Failed to cast instance from %s to %s.",
+                       GblType_name(GblInstance_typeOf(pSelf)),
+                       GblType_name(type));
+        GBL_API_END_BLOCK();
+
+    } else if(pSelf) {
+        pOutInstance = pSelf;
     }
-    GBL_API_END_BLOCK();
     return pOutInstance;
 }
 

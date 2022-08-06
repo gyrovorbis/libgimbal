@@ -27,12 +27,19 @@ typedef struct GblArrayList {           // Size (32-bit / 64-bit)
     uint16_t        stackCapacity:  15; // 2        bytes
 } GblArrayList;                         // 20/36    bytes
 
-GBL_EXPORT GBL_RESULT   GblArrayList_construct_6   (SELF,
+GBL_EXPORT GBL_RESULT   GblArrayList_construct_7   (SELF,
                                                     uint16_t     elementSize,
                                                     GblSize      elementCount,
                                                     const void*  pInitialData,
                                                     GblSize      structSize,
+                                                    GblBool      zeroTerminated,
                                                     GblContext*  pCtx)                                           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblArrayList_construct_6   (SELF,
+                                                    uint16_t     elementSize,
+                                                    GblSize      elementCount,
+                                                    const void*  pInitialData,
+                                                    GblSize      structSize,
+                                                    GblBool      zeroTerminated)                                 GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblArrayList_construct_5    (SELF,
                                                     uint16_t     elementSize,
                                                     GblSize      elementCount,
@@ -81,8 +88,8 @@ GBL_INLINE void*        GblArrayList_emplaceFront  (SELF)                       
 GBL_INLINE GBL_RESULT   GblArrayList_pushBack      (SELF, const void* pData)                                     GBL_NOEXCEPT;
 GBL_INLINE void*        GblArrayList_emplaceBack   (SELF)                                                        GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblArrayList_append        (SELF, const void* pData, GblSize elementCount)               GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblArrayList_prepend       (SELF, const void* pData, GblSize elementCount)               GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblArrayList_append        (SELF, const void* pData, GblSize elementCount)               GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblArrayList_prepend       (SELF, const void* pData, GblSize elementCount)               GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblArrayList_popFront      (SELF, void* pOut)                                            GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblArrayList_popBack       (SELF, void* pOut)                                            GBL_NOEXCEPT;
@@ -97,11 +104,14 @@ GBL_EXPORT GBL_RESULT   GblArrayList_shrinkToFit   (SELF)                       
 // ========== IMPL ==========
 
 /// \cond
-#define GBL_ARRAY_LIST_ALLOCA_5(elemSize, elemCount, pData, size, pCtx) \
-    GblArrayList_createInPlace_(GBL_ALLOCA(size), elemSize, elemCount, pData, size, pCtx)
+#define GBL_ARRAY_LIST_ALLOCA_6(elemSize, elemCount, pData, size, zeroTerminated, pCtx) \
+    GblArrayList_createInPlace_(GBL_ALLOCA(size), elemSize, elemCount, pData, size, zeroTerminated, pCtx)
+
+#define GBL_ARRAY_LIST_ALLOCA_5(elemSize, elemCount, pData, size, zeroTerminated) \
+    GBL_ARRAY_LIST_ALLOCA_6(elemSize, elemCount, pData, size, zeroterminated, NULL)
 
 #define GBL_ARRAY_LIST_ALLOCA_4(elemSize, elemCount, pData, size) \
-    GBL_ARRAY_LIST_ALLOCA_5(elemSize, elemCount, pData, size, NULL)
+    GBL_ARRAY_LIST_ALLOCA_5(elemSize, elemCount, pData, size, GBL_FALSE)
 
 #define GBL_ARRAY_LIST_ALLOCA_3(elemSize, elemCount, pData) \
     GBL_ARRAY_LIST_ALLOCA_4(elemSize, elemCount, pData, 0)
@@ -126,8 +136,12 @@ GBL_INLINE GblBool GblArrayList_stack(CSELF) GBL_NOEXCEPT {
     return (pSelf && (pSelf->pData == GblArrayList_stackBuffer(pSelf)))? GBL_TRUE : GBL_FALSE;
 }
 
+GBL_INLINE GBL_RESULT GblArrayList_construct_6(SELF, uint16_t elementSize, GblSize elementCount, const void* pInitialData, GblSize structSize, GblBool zeroTerminated) GBL_NOEXCEPT {
+    return GblArrayList_construct_7(pSelf, elementSize, elementCount, pInitialData, structSize, zeroTerminated, NULL);
+}
+
 GBL_INLINE GBL_RESULT GblArrayList_construct_5(SELF, uint16_t elementSize, GblSize elementCount, const void* pInitialData, GblSize structSize) GBL_NOEXCEPT {
-    return GblArrayList_construct_6(pSelf, elementSize, elementCount, pInitialData, structSize, NULL);
+    return GblArrayList_construct_6(pSelf, elementSize, elementCount, pInitialData, structSize, GBL_FALSE);
 }
 
 GBL_INLINE GBL_RESULT GblArrayList_construct_4(SELF, uint16_t elementSize, GblSize elementCount, const void* pInitialData) GBL_NOEXCEPT {
@@ -168,11 +182,18 @@ GBL_INLINE void* GblArrayList_data(CSELF) GBL_NOEXCEPT {
 
 GBL_INLINE void* GblArrayList_at(CSELF, GblSize index) GBL_NOEXCEPT {
     void* pData = NULL;
-    GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY(index < pSelf->size,
-                   GBL_RESULT_ERROR_OUT_OF_RANGE);
-    pData = &pSelf->pData[index * pSelf->elementSize];
-    GBL_API_END_BLOCK();
+
+    if(!pSelf || index >= pSelf->size) GBL_UNLIKELY {
+
+        GBL_API_BEGIN(pSelf->pCtx);
+        GBL_API_VERIFY(GBL_FALSE,
+                       GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_API_END_BLOCK();
+
+    } else GBL_LIKELY {
+        pData = &pSelf->pData[index * pSelf->elementSize];
+    }
+
     return pData;
 }
 
@@ -185,10 +206,9 @@ GBL_INLINE void* GblArrayList_back(CSELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GBL_RESULT GblArrayList_pushBack(SELF, const void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
-    GblArrayList_insert(pSelf, GblArrayList_size(pSelf), 1, pData);
-    GBL_API_VERIFY_LAST_RECORD();
-    GBL_API_END();
+    return !GblArrayList_insert(pSelf, GblArrayList_size(pSelf), 1, pData)?
+                GblThread_callRecord(NULL)->result :
+                GBL_RESULT_SUCCESS;
 }
 
 GBL_INLINE void* GblArrayList_emplaceBack(SELF) GBL_NOEXCEPT {
@@ -196,14 +216,25 @@ GBL_INLINE void* GblArrayList_emplaceBack(SELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GBL_RESULT GblArrayList_pushFront(SELF, const void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
-    GblArrayList_insert(pSelf, 0, 1, pData);
-    GBL_API_VERIFY_LAST_RECORD();
-    GBL_API_END();
+    return !GblArrayList_insert(pSelf, 0, 1, pData)?
+                GblThread_callRecord(NULL)->result :
+                GBL_RESULT_SUCCESS;
 }
 
 GBL_INLINE void* GblArrayList_emplaceFront(SELF) GBL_NOEXCEPT {
     return GblArrayList_insert(pSelf, 0, 1, NULL);
+}
+
+GBL_INLINE GBL_RESULT GblArrayList_append(GblArrayList* pSelf, const void* pData, GblSize elementCount) GBL_NOEXCEPT {
+    return !GblArrayList_insert(pSelf, GblArrayList_size(pSelf), elementCount, pData)?
+                GblThread_callRecord(NULL)->result :
+                GBL_RESULT_SUCCESS;
+}
+
+GBL_INLINE GBL_RESULT GblArrayList_prepend(GblArrayList* pSelf, const void* pData, GblSize elementCount) GBL_NOEXCEPT {
+    return !GblArrayList_insert(pSelf, 0, elementCount, pData)?
+                GblThread_callRecord(NULL)->result :
+                GBL_RESULT_SUCCESS;
 }
 
 GBL_INLINE GblArrayList* GblArrayList_createInPlace (SELF,
@@ -211,11 +242,12 @@ GBL_INLINE GblArrayList* GblArrayList_createInPlace (SELF,
                                                GblSize     elementCount,
                                                const void* pInitialData,
                                                GblSize     structSize,
+                                               GblBool     zeroTerminated,
                                                GblContext* pCtx) GBL_NOEXCEPT
 {
     GblArrayList* pOut = NULL;
     GBL_API_BEGIN(pCtx);
-    GBL_API_VERIFY_CALL(GblArrayList_construct_6(pSelf, elementSize, elementCount, pInitialData, structSize, pCtx));
+    GBL_API_VERIFY_CALL(GblArrayList_construct_7(pSelf, elementSize, elementCount, pInitialData, structSize, zeroTerminated, pCtx));
     pOut = pSelf;
     GBL_API_END_BLOCK();
     return pOut;

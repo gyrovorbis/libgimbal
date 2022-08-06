@@ -21,25 +21,26 @@ GBL_EXPORT GblSize GblClass_privateSize(const GblClass* pClass) {
 
 GBL_EXPORT void* GblClass_private(const GblClass* pClass, GblType type) {
     void* pData = NULL;
-    GBL_API_BEGIN(NULL);
-    if(pClass) {
-        const GblType classType = GBL_CLASS_TYPEOF(pClass);
-        GBL_API_VERIFY(classType == type || GblType_derives(classType, type),
-                       GBL_RESULT_ERROR_TYPE_MISMATCH);
+    const GblType classType = GBL_CLASS_TYPEOF(pClass);
 
-            GblMetaClass* pMeta = GBL_META_CLASS_(type);
-            pData =  pMeta && pMeta->pInfo->classPrivateSize?
-                        (void*)((uint8_t*)pClass + pMeta->classPrivateOffset) :
-                        NULL;
+    if((!pClass && type != GBL_INVALID_TYPE) || (pClass && (type != classType && !GblType_derives(classType, type)))) {
+        GBL_API_BEGIN(NULL);
+        GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_TYPE_MISMATCH);
+        GBL_API_END_BLOCK();
+    } else if(pClass) {
 
-    } else GBL_API_VERIFY_TYPE(type, GBL_INVALID_TYPE);
-    GBL_API_END_BLOCK();
+        GblMetaClass* pMeta = GBL_META_CLASS_(type);
+        pData =  pMeta && pMeta->pInfo->classPrivateSize?
+                    (void*)((uint8_t*)pClass + pMeta->classPrivateOffset) :
+                    NULL;
+
+    }
     return pData;
 }
 
 GBL_EXPORT GblClass* GblClass_public(const void* pPrivate, GblType type) {
     GblClass* pClass = NULL;
-    GBL_API_BEGIN(NULL);
+
     if(pPrivate) {
         GblMetaClass* pMeta = GBL_META_CLASS_(type);
 
@@ -47,8 +48,11 @@ GBL_EXPORT GblClass* GblClass_public(const void* pPrivate, GblType type) {
                         (GblClass*)((uint8_t*)pPrivate - pMeta->classPrivateOffset) :
                         NULL;
 
-    } else GBL_API_VERIFY_TYPE(type, GBL_INVALID_TYPE);
-    GBL_API_END_BLOCK();
+    } else if(type != GBL_INVALID_TYPE) {
+        GBL_API_BEGIN(NULL);
+        GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_INVALID_TYPE);
+        GBL_API_END_BLOCK();
+    }
     return pClass;
 }
 
@@ -311,7 +315,6 @@ GBL_EXPORT GblClass* GblClass_createFloating(GblType type) GBL_NOEXCEPT {
     return pClass;
 }
 
-
 static GBL_EXPORT GBL_RESULT GblClass_destruct_(GblClass* pClass) {
     GblMetaClass* pMeta = GBL_META_CLASS_(GBL_CLASS_TYPEOF(pClass));
     GBL_API_BEGIN(pCtx_);
@@ -446,50 +449,10 @@ GBL_EXPORT GblRefCount GblClass_unrefDefault(GblClass* pSelf) GBL_NOEXCEPT {
     return refCount;
 }
 
-static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check, GblBool recursing);
-
-static GblInterface* GblClass_peekInterface_(GblClass* pClass, GblType ifaceType, GblBool check) {
-    GblInterface* pIClass       = NULL;
-    GblMetaClass* pIFaceMeta    = GBL_META_CLASS_(ifaceType);
-    GBL_API_BEGIN(pCtx_);
-    GBL_API_VERIFY_POINTER(pClass);
-    GBL_API_VERIFY_EXPRESSION(GBL_CLASS_TYPEOF(pClass) != GBL_INVALID_TYPE);
-    GBL_API_VERIFY_ARG(ifaceType != GBL_INVALID_TYPE);
-    GBL_API_VERIFY_ARG(GBL_TYPE_INTERFACED_CHECK(ifaceType));
-    {
-        GblMetaClass* pMeta = GBL_META_CLASS_(GBL_CLASS_TYPEOF(pClass));
-        while(pMeta) {
-            for(unsigned i = 0; i < pMeta->pInfo->interfaceCount; ++i) {
-                GblInterface* pCurIClass = (GblInterface*)((uintptr_t)pClass + pMeta->pInfo->pInterfaceMap[i].classOffset);
-                GBL_API_VERIFY_EXPRESSION(GBL_CLASS_FLAG_TEST_(GBL_CLASS(pCurIClass), GBL_CLASS_FLAG_IFACE_IMPL_));
-                GBL_API_VERIFY_EXPRESSION(GBL_META_CLASS_(pMeta->pInfo->pInterfaceMap[i].interfaceType)
-                                          == GBL_META_CLASS_(GBL_CLASS_TYPEOF(pCurIClass)));
-                GBL_API_VERIFY_EXPRESSION(GBL_CLASS_TYPEOF(pCurIClass) != GBL_INVALID_TYPE);
-
-                if(GBL_META_CLASS_(GBL_CLASS_TYPEOF(pCurIClass)) == pIFaceMeta) {
-                    pIClass = pCurIClass;
-                    break;
-                } else {
-                    pCurIClass = (GblInterface*)GblClass_cast_(GBL_CLASS(pCurIClass), ifaceType, check, GBL_TRUE);
-                    if(pCurIClass) {
-                        GBL_API_VERIFY_EXPRESSION(GBL_META_CLASS_(GBL_CLASS_TYPEOF(pCurIClass)) == pIFaceMeta);
-                        pIClass = pCurIClass;
-                        break;
-                    }
-                }
-            }
-            pMeta = pMeta->pParent;
-        }
-    }
-    GBL_API_END_BLOCK();
-    return pIClass;
-}
-
-
+// Cast a class to the given type, with optional error checking and validation (recurses for interfaces)
 static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check, GblBool recursing) {
     GblClass* pClassStart = pClass;
     GblClass* pToClass = NULL;
-    GBL_API_BEGIN(pCtx_);
 
     // Casting a NULL pointer or to an invalid type returns NULL
     if(pClass && toType != GBL_INVALID_TYPE) GBL_LIKELY {
@@ -506,12 +469,12 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
                 while(GBL_TYPE_INTERFACED_CHECK(GBL_CLASS_TYPEOF(pClass))) {
                     // Move class pointer to interface's concrete class
                     pClass = GblInterface_outerClass((GblInterface*)pClass);
-                    GBL_API_VERIFY_EXPRESSION(pClass);
+                    GBL_ASSERT(pClass);
                 }
             }
 
             GblMetaClass* pMeta = GBL_CLASS_META_CLASS_(pClass);
-            GBL_API_VERIFY_EXPRESSION(pMeta);
+            GBL_ASSERT(pMeta);
 
             // iterate from derived to base class, breadth-first searching
             do {
@@ -525,10 +488,10 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
                         GblMetaClass* pIFaceMeta    = GBL_META_CLASS_(toType);
                         GblInterface* pCurIClass = (GblInterface*)((uintptr_t)pClass + pMeta->pInfo->pInterfaceMap[i].classOffset);
 
-                        GBL_API_VERIFY_EXPRESSION(GBL_CLASS_FLAG_TEST_(GBL_CLASS(pCurIClass), GBL_CLASS_FLAG_IFACE_IMPL_));
-                        GBL_API_VERIFY_EXPRESSION(GBL_META_CLASS_(pMeta->pInfo->pInterfaceMap[i].interfaceType)
+                        GBL_ASSERT(GBL_CLASS_FLAG_TEST_(GBL_CLASS(pCurIClass), GBL_CLASS_FLAG_IFACE_IMPL_));
+                        GBL_ASSERT(GBL_META_CLASS_(pMeta->pInfo->pInterfaceMap[i].interfaceType)
                                                   == GBL_META_CLASS_(GBL_CLASS_TYPEOF(pCurIClass)));
-                        GBL_API_VERIFY_EXPRESSION(GBL_CLASS_TYPEOF(pCurIClass) != GBL_INVALID_TYPE);
+                        GBL_ASSERT(GBL_CLASS_TYPEOF(pCurIClass) != GBL_INVALID_TYPE);
 
                         if(GBL_META_CLASS_(GBL_CLASS_TYPEOF(pCurIClass)) == pIFaceMeta) {
                             pToClass = GBL_CLASS(pCurIClass);
@@ -536,7 +499,7 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
                         } else {
                             pCurIClass = (GblInterface*)GblClass_cast_(GBL_CLASS(pCurIClass), toType, GBL_FALSE, GBL_TRUE);
                             if(pCurIClass) {
-                                GBL_API_VERIFY_EXPRESSION(GblType_check(GBL_CLASS_TYPEOF(pCurIClass), toType)); //SLOOOW
+                                GBL_ASSERT(GblType_check(GBL_CLASS_TYPEOF(pCurIClass), toType)); //SLOOOW
                                 pToClass = GBL_CLASS(pCurIClass);
                                 break;
                             }
@@ -547,8 +510,8 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
             } while(!pToClass && pMeta);
         }
     }
-    GBL_API_END_BLOCK();
     if(check && !pToClass) {
+        GBL_API_BEGIN(pCtx_);
         if(toType == GBL_INVALID_TYPE) {
             if(pClass) {
                 GBL_API_RECORD_SET(GBL_RESULT_ERROR_TYPE_MISMATCH,
@@ -560,20 +523,23 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
                                "Failed to cast from type %s to %s!",
                                GblType_name(GblClass_typeOf(pClassStart)), GblType_name(toType));
         }
+        GBL_API_END_BLOCK();
     }
     return pToClass;
 }
 
 GBL_EXPORT GblBool GblClass_check(const GblClass* pSelf, GblType toType) {
     GblBool result = GBL_FALSE;
-    GBL_API_BEGIN(pCtx_);
+
     if(!pSelf && toType == GBL_INVALID_TYPE) {
         result = GBL_TRUE;
-    } else {
+    } else if(!pSelf) {
+        GBL_API_BEGIN(pCtx_);
         GBL_API_VERIFY_POINTER(pSelf);
+        GBL_API_END_BLOCK();
+    } else {
         result = GblType_check(GBL_CLASS_TYPEOF(pSelf), toType);
     }
-    GBL_API_END_BLOCK();
     return result;
 }
 

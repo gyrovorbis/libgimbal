@@ -180,11 +180,14 @@ GBL_INLINE GblBool GblStringView_blank(SELF) GBL_NOEXCEPT {
 
 GBL_INLINE char GblStringView_at(SELF, GblSize index) GBL_NOEXCEPT {
     char value = '\0';
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY(index < self.length,
-                   GBL_RESULT_ERROR_OUT_OF_RANGE);
-    value = self.pData[index];
-    GBL_API_END_BLOCK();
+    if(index >= self.length) GBL_UNLIKELY {
+        GBL_API_BEGIN(GBL_NULL);
+        GBL_API_VERIFY(GBL_FALSE,
+                       GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_API_END_BLOCK();
+    } else GBL_LIKELY {
+        value = self.pData[index];
+    }
     return value;
 }
 

@@ -23,9 +23,7 @@ extern "C" {
 #define GBL_API_FRAME_DECLARE   GblStackFrame* GBL_API_FRAME_NAME
 #define GBL_API_FRAME()         (GBL_API_FRAME_NAME)
 #define GBL_API_CONTEXT()       GBL_API_FRAME()->pContext
-#define GBL_API_CONTEXT_UD()    GBL_API_FRAME()->pContextUd
 #define GBL_API_OBJECT()        GBL_API_FRAME()->pObject
-#define GBL_API_OBJECT_UD()     GBL_API_FRAME()->pObjectUd
 #define GBL_API_RECORD()        GBL_API_FRAME()->record
 #define GBL_API_RESULT()        GBL_API_RECORD().result
 #define GBL_API_SOURCE()        GBL_API_FRAME()->sourceCurrent

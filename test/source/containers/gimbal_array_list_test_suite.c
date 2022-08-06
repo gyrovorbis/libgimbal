@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/containers/gimbal_array_list.h>
 
+#define GBL_ARRAY_LIST_TEST_SUITE_PUSH_BACK_STRESS_TEST_SIZE_ 2047
 #define GBL_ARRAY_LIST_TEST_SUITE_(inst)     ((GblArrayListTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_LIST_TEST_SUITE_TYPE))
 
 typedef struct GblArrayListTestSuite_ {
@@ -57,6 +58,7 @@ GBL_RESULT GblArrayListTestSuite_constructWithEntries_(GblTestSuite* pSelf, GblC
                                             4,
                                             initialStrings_,
                                             sizeof(pSelf_->stringList),
+                                            GBL_FALSE,
                                             pCtx));
 
     GBL_TEST_COMPARE(GblArrayList_stackBuffer(&pSelf_->stringList.vector),
@@ -523,6 +525,23 @@ GBL_RESULT GblArrayListTestSuite_shrinkToFitStack_(GblTestSuite* pSelf, GblConte
     GBL_API_END();
 }
 
+
+
+
+GBL_RESULT GblArrayListTestSuite_pushBackStressTest_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblArrayListTestSuite_* pSelf_ = GBL_ARRAY_LIST_TEST_SUITE_(pSelf);
+
+    const char* pLiteral = "LOLOL";
+
+    for(GblSize i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PUSH_BACK_STRESS_TEST_SIZE_; ++i) {
+        GblArrayList_pushBack(&pSelf_->stringList.vector, &pLiteral);
+    }
+
+    GBL_API_END();
+}
+
+
 GBL_RESULT GblArrayListTestSuite_destruct_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblArrayListTestSuite_* pSelf_ = GBL_ARRAY_LIST_TEST_SUITE_(pSelf);
@@ -564,6 +583,7 @@ GBL_EXPORT GblType GblArrayListTestSuite_type(void) {
         { "resizeLarger",           GblArrayListTestSuite_resizeSmaller_           },
         { "shrinkToFitHeap",        GblArrayListTestSuite_shrinkToFitHeap_         },
         { "shrinkToFitStack",       GblArrayListTestSuite_shrinkToFitStack_        },
+        { "pushBackStressTest",     GblArrayListTestSuite_pushBackStressTest_      },
         { "destruct",               GblArrayListTestSuite_destruct_                },
         { NULL,                     NULL  }
     };

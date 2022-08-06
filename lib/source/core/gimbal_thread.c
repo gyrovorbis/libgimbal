@@ -19,7 +19,6 @@ static GBL_THREAD_LOCAL GblThread_ thread_ = {
             .line       = 0,
             .column     = 0
         },
-        .pObject        = NULL,
         .result         = GBL_RESULT_UNKNOWN
     },
     .pName              = "Untitled",
@@ -85,7 +84,6 @@ GBL_API GblThread_stackFramePush(GblThread* pThread, GblStackFrame* pFrame) {
     if(!pThread) pThread = GblThread_current();
     if(pFrame) {
         pFrame->pPrevFrame      = pThread->pStackFrameTop;
-        pFrame->pThread         = pThread;
         if(GBL_RESULT_ERROR(pThread->callRecord.result)) {
             GblThread_callRecordSet(pThread,NULL);
             GBL_API_BEGIN(GblContext_global());

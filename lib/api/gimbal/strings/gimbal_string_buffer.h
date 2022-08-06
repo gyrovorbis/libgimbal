@@ -216,7 +216,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_construct_4(SELF,
     GBL_API_BEGIN(pCtx);
     GBL_API_VERIFY_ARG(structSize >= sizeof(GblStringBuffer));
     pSelf->data.zeroTerminated = 1;
-    GBL_API_CALL(GblArrayList_construct(&pSelf->data, 1, view.length, view.pData, structSize, pCtx));
+    GBL_API_CALL(GblArrayList_construct(&pSelf->data, 1, view.length, view.pData, structSize, GBL_TRUE, pCtx));
     GBL_API_END();
 }
 GBL_INLINE GBL_RESULT GblStringBuffer_construct_3(SELF,
@@ -305,14 +305,11 @@ GBL_INLINE GBL_RESULT GblStringBuffer_resize(SELF, GblSize size) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GBL_RESULT GblStringBuffer_grow(SELF, GblSize delta) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->data.pCtx);
-    GBL_API_CALL(GblStringBuffer_resize(pSelf, GblStringBuffer_length(pSelf) + delta));
-    GBL_API_END();
+    return GblStringBuffer_resize(pSelf, GblStringBuffer_length(pSelf) + delta);
 }
+
 GBL_INLINE GBL_RESULT GblStringBuffer_shrink(SELF, GblSize delta) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->data.pCtx);
-    GBL_API_CALL(GblStringBuffer_resize(pSelf, GblStringBuffer_length(pSelf) - delta));
-    GBL_API_END();
+    return GblStringBuffer_resize(pSelf, GblStringBuffer_length(pSelf) - delta);
 }
 
 GBL_INLINE GblInt GblStringBuffer_compare(CSELF, const GblStringBuffer* pOther) GBL_NOEXCEPT {

@@ -216,8 +216,8 @@ GBL_API GblObject_eventNotify(GblObject* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
     GBL_API_END();
 }
 
-static GBL_RESULT GblObject_eventFiltersDestruct_(uintptr_t key, void* pData) {
-    GBL_UNUSED(key);
+static GBL_RESULT GblObject_eventFiltersDestruct_(const GblArrayMap* pMap, uintptr_t key, void* pData) {
+    GBL_UNUSED(key, pMap);
     return GblArrayList_destruct(pData);
 }
 
@@ -860,8 +860,8 @@ GBL_EXPORT GblRefCount GblObject_refCount(const GblObject* pObject) GBL_NOEXCEPT
     return GBL_ATOMIC_INT16_LOAD(pObject->refCounter);
 }
 
-GBL_RESULT GblObject_nameDestruct_(uintptr_t key, void* pName) {
-    GBL_UNUSED(key);
+GBL_RESULT GblObject_nameDestruct_(const GblArrayMap* pMap, uintptr_t key, void* pName) {
+    GBL_UNUSED(key, pMap);
     GblStringRef_release(pName);
     return GBL_RESULT_SUCCESS;
 }
@@ -902,8 +902,8 @@ static GblObjectFamily_* GblObject_family_(const GblObject* pSelf) {
                                                    objectFamilyQuark_);
 }
 
-static GBL_RESULT GblObject_family_destruct_(uintptr_t key, void* pValue) {
-    GBL_UNUSED(key);
+static GBL_RESULT GblObject_family_destruct_(const GblArrayMap* pMap, uintptr_t key, void* pValue) {
+    GBL_UNUSED(key, pMap);
     GBL_API_BEGIN(NULL);
     GBL_API_FREE(pValue);
     GBL_API_END();

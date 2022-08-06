@@ -478,6 +478,7 @@ GBL_EXPORT GblType GblClassTestSuite_type(void) {
         { "tryInvalid",                 GblClassTestSuite_tryInvalid_               },
         { "private",                    GblClassTestSuite_private_                  },
         { "privateInvalid",             GblClassTestSuite_privateInvalid_           },
+        { "public",                     GblClassTestSuite_public_                   },
         { "unrefDefault",               GblClassTestSuite_unrefDefault_             },
         { "properties",                 GblClassTestSuite_properties_               },
         { "createFloating",             GblClassTestSuite_createFloating_           },

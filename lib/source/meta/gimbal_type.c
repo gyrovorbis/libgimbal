@@ -162,8 +162,8 @@ static GBL_RESULT typeLog_(GblType parent,
 }
 
 static GblFlags typeFlagsWithImplied_(GblType parent,
-                               const GblTypeInfo* pInfo,
-                               GblFlags flags)
+                                      const GblTypeInfo* pInfo,
+                                      GblFlags flags)
 {
     GblMetaClass* pParentMeta = GBL_META_CLASS_(parent);
     if(!pParentMeta && pInfo->dependencyCount)              flags |= GBL_TYPE_ROOT_FLAG_DEPENDENT;
@@ -180,8 +180,8 @@ static GblFlags typeFlagsWithImplied_(GblType parent,
 }
 
 static GBL_RESULT typeValidate_(GblType parent,
-                         const GblTypeInfo* pInfo,
-                         GblFlags flags)
+                                const GblTypeInfo* pInfo,
+                                GblFlags flags)
 {
     GblMetaClass* pParentMeta = GBL_META_CLASS_(parent);
     GBL_API_BEGIN(pCtx_);
@@ -456,6 +456,8 @@ static GblType typeRegister_(GblType parent,
         GBL_ATOMIC_INT16_INIT(pMeta->refCount, 0);
         GBL_ATOMIC_INT16_INIT(pMeta->instanceRefCount, 0);
         pMeta->flags                = flags;
+        if(parent != GBL_INVALID_TYPE)
+            pMeta->flags |= (GBL_META_CLASS_(GblType_root(parent))->flags & GBL_TYPE_ROOT_FLAGS_MASK);
         pMeta->depth                = baseCount;
         pMeta->classPrivateOffset   = classPrivateOffset;
         pMeta->instancePrivateOffset= (!pParent? 0 : pParent->instancePrivateOffset) - pInfo->instancePrivateSize;
@@ -732,6 +734,7 @@ void GblType_init_(void) {
                                             0,
                                             NULL,
                                             sizeof(typeBuiltins_),
+                                            GBL_FALSE,
                                             pCtx_));
 
     GBL_API_CALL(GblSignal_init_(pCtx_));
@@ -825,17 +828,15 @@ GBL_API GblType_init(GblContext*    pCtx,
 GBL_EXPORT GblType GblType_fromBuiltinIndex(GblSize index) {
     GblType type = GBL_INVALID_TYPE;
     GBL_TYPE_ENSURE_INITIALIZED_();
-    //GBL_API_BEGIN(pCtx_);
     {
         GblType* pType = NULL;
-        GblSize registeredCount = GblArrayList_size(&typeBuiltins_.vector);
-        if(index < registeredCount) {
-            pType = GblArrayList_at(&typeBuiltins_.vector, index);
+        // Don't want vector error checking in the critical path
+        if(index < typeBuiltins_.vector.size) {
+            pType = ((GblType*)typeBuiltins_.vector.pData) + index;
             if(pType)
                 type = *pType;
         }
     }
-    //GBL_API_END_BLOCK();
     return type;
 }
 
@@ -935,19 +936,17 @@ GBL_EXPORT GblType GblType_parent(GblType type) {
 GBL_EXPORT GblType GblType_root(GblType type) {
     GblType base        = GBL_INVALID_TYPE;
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
-    GBL_API_BEGIN(pCtx_);
     if(pMeta) {
         if(!pMeta->pParent) base = GBL_TYPE_(pMeta);
         else base = GBL_TYPE_(pMeta->pBases[0]);
     }
-    GBL_API_END_BLOCK();
     return base;
 } 
 
 GBL_EXPORT GblType GblType_base(GblType type, GblSize depth) {
     GblType base = GBL_INVALID_TYPE;
     GblMetaClass* pMeta =  GBL_META_CLASS_(type);
-    GBL_API_BEGIN(pCtx_);
+    //GBL_API_BEGIN(pCtx_);
     if(pMeta) {
         if(depth < pMeta->depth) {
             base = (GblType)pMeta->pBases[depth];
@@ -955,7 +954,7 @@ GBL_EXPORT GblType GblType_base(GblType type, GblSize depth) {
             base = (GblType)pMeta;
         }
     }
-    GBL_API_END_BLOCK();
+    //GBL_API_END_BLOCK();
     return base;
 }
 
@@ -991,7 +990,9 @@ GBL_EXPORT GblBool GblType_flagsCheck(GblType type, GblFlags mask) {
     {
         GblMetaClass* pMeta = GBL_META_CLASS_(type);
         if(pMeta) {
+#if 0
             GblFlags typeMask = (mask & GBL_TYPE_FLAGS_MASK & pMeta->flags);
+
             GblFlags fundamentalMask = (mask & GBL_TYPE_ROOT_FLAGS_MASK);
             if(fundamentalMask) {
                 GblMetaClass* pFundamental = GBL_META_CLASS_(GblType_root(type));
@@ -1002,6 +1003,9 @@ GBL_EXPORT GblBool GblType_flagsCheck(GblType type, GblFlags mask) {
                 }
             }
             result = ((typeMask | fundamentalMask) != 0);
+#else
+            result = ((pMeta->flags & mask) != 0);
+#endif
         }
     } //GBL_API_END_BLOCK();
     return result;
@@ -1020,13 +1024,14 @@ GBL_EXPORT GblIPlugin* GblType_plugin(GblType type) {
     return type == GBL_INVALID_TYPE? NULL : (GblIPlugin*)GblType_extension_(type, GBL_IPLUGIN_TYPE);
 }
 
+// If this ever needs to be optimized, make it non-recursive
 static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChecks, GblBool ifaceChecks, GblBool castChecks) {
     GblBool         result   = GBL_FALSE;
     GblMetaClass*   pDerived = GBL_META_CLASS_(derived);
     GblMetaClass*   pBase    = GBL_META_CLASS_(base);
     GblMetaClass*   pIter    = pDerived;
 
-    GBL_API_BEGIN(pCtx_);
+    //GBL_API_BEGIN(pCtx_);
     if(derived == GBL_INVALID_TYPE && base == GBL_INVALID_TYPE) {
         result = GBL_TRUE;
     } else if(derived != GBL_INVALID_TYPE && base != GBL_INVALID_TYPE) {
@@ -1050,14 +1055,15 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
                                         ifaceChecks,
                                         castChecks)) {
                         result = GBL_TRUE;
-                        GBL_API_DONE();
+                        goto done;
                     }
                 }
             }
             pIter = pIter->pParent;
         }
     }
-    GBL_API_END_BLOCK();
+    done:
+    //GBL_API_END_BLOCK();
     return result;
 }
 

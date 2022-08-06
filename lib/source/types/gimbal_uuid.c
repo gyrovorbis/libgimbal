@@ -91,27 +91,31 @@ GBL_EXPORT unsigned GblUuid_version(const GblUuid* pSelf) {
 }
 
 GBL_EXPORT int GblUuid_compare(const GblUuid* pSelf, const GblUuid* pOther) {
-#   define CHECK(f1, f2) if (f1 != f2) { result =  f1 < f2 ? -1 : 1; GBL_API_DONE(); }
+#   define CHECK(f1, f2) if (f1 != f2) { result =  f1 < f2 ? -1 : 1; goto done; }
 
     int result = -1;
-    GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_POINTER(pSelf);
-    GBL_API_VERIFY_POINTER(pOther);
+    if(!pSelf || !pOther) {
+        GBL_API_BEGIN(NULL);
+        GBL_API_VERIFY_POINTER(pSelf);
+        GBL_API_VERIFY_POINTER(pOther);
+        GBL_API_END_BLOCK();
+    } else {
 
-    CHECK(pSelf->private_.time_low,                  pOther->private_.time_low);
-    CHECK(pSelf->private_.time_mid,                  pOther->private_.time_mid);
-    CHECK(pSelf->private_.time_hi_and_version,       pOther->private_.time_hi_and_version);
-    CHECK(pSelf->private_.clock_seq_hi_and_reserved, pOther->private_.clock_seq_hi_and_reserved);
-    CHECK(pSelf->private_.clock_seq_low,             pOther->private_.clock_seq_low);
+        CHECK(pSelf->private_.time_low,                  pOther->private_.time_low);
+        CHECK(pSelf->private_.time_mid,                  pOther->private_.time_mid);
+        CHECK(pSelf->private_.time_hi_and_version,       pOther->private_.time_hi_and_version);
+        CHECK(pSelf->private_.clock_seq_hi_and_reserved, pOther->private_.clock_seq_hi_and_reserved);
+        CHECK(pSelf->private_.clock_seq_low,             pOther->private_.clock_seq_low);
 
-    for(unsigned b = 0; b < GBL_UUID_NODE_COUNT; ++b) {
-        if(pSelf->private_.node[b] < pOther->private_.node[b])
-            return -1;
-        if(pSelf->private_.node[b] > pOther->private_.node[b])
-            return 1;
+        for(unsigned b = 0; b < GBL_UUID_NODE_COUNT; ++b) {
+            if(pSelf->private_.node[b] < pOther->private_.node[b])
+                return -1;
+            if(pSelf->private_.node[b] > pOther->private_.node[b])
+                return 1;
+        }
+        result = 0;
     }
-    result = 0;
-    GBL_API_END_BLOCK();
+    done:
     return result;
 
 #   undef CHECK

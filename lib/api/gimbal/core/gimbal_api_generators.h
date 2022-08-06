@@ -12,9 +12,9 @@
 #include <stdint.h>
 #include <limits.h>
 #include <gimbal/core/gimbal_config.h>
+#include "../preprocessor/gimbal_macro_sequences.h"
 #include "../preprocessor/gimbal_macro_utils.h"
 #include "../preprocessor/gimbal_macro_composition.h"
-#include "../preprocessor/gimbal_macro_sequences.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,6 +75,7 @@ typedef struct GblPropertyInfo_ {
     uint32_t    flags;
 } GblPropertyInfo_;
 
+#if 1
 #if 0
 #define GBL_PROPERTY_FLAGS__(flag) \
     |GBL_PROPERTY_FLAG_##flag
@@ -83,19 +84,55 @@ typedef struct GblPropertyInfo_ {
     GBL_MAP_TUPLES(GBL_PROPERTY_FLAGS__, __VA_ARGS__)
 #endif
 
-#define GBL_PROPERTY_INFO__(name, type, flags)   \
-    { name, type, GBL_PROPERTY_FLAGS_MASK flags },
+
+#define GBL_PROPERTY_FLAG__(suffix)              \
+    GBL_PROPERTY_FLAG_##suffix |
+
+#define GBL_PROPERTY_FLAX_(...)              \
+    GBL_MAP(GBL_PROPERTY_FLAG__, __VA_ARGS__)
+
+#define GBL_PROPERTY_FLAGS_MASK_(...)            \
+    GBL_MAP_TUPLES(GBL_PROPERTY_FLAX_, __VA_ARGS__)0
+
+#define GBL_PROPERTY_INFO__(name, type, flgs)   \
+    { .pName = name, .typeId = type, .flags = GBL_PROPERTY_FLAGS_MASK_(flgs) },
 
 #define GBL_PROPERTY_ITEM_(...) \
-    GBL_MAP_TUPLES(GBL_PROPERTY_INFO__, __VA_ARGS__)
+   GBL_MAP_TUPLES(GBL_PROPERTY_INFO__, __VA_ARGS__)
+
+#define GBL_PROPERTIES(object, ...) \
+   GBL_INLINE void object##_propertyInfo(GblSize size, GblPropertyInfo_*pInfoOut) {    \
+        const GblPropertyInfo_ infos[] = {   \
+            GBL_PROPERTY_ITEM_(__VA_ARGS__)   \
+ }; memcpy(pInfoOut, &infos[size], sizeof(GblPropertyInfo_)); }
+
+#define GBL_PROPERTIES_END GBL_LPAREN
+#else
+#define GBL_PROPERTY_FLAGS__(flag) \
+    |GBL_PROPERTY_FLAG_##flag
+
+#define GBL_PROPERTY_FLAGS_(...) \
+    GBL_MAP_TUPLES(GBL_PROPERTY_FLAGS__, __VA_ARGS__)
+
+#define GBL_PROPERTY_INFO__(name, type, flgs)   \
+    { .pName = name, .typeId = type, .flags = flgs },
+
+#define GBL_PROPERTY_ITEM_(...) \
+    GBL_MAP(GBL_PROPERTY_INFO__, (__VA_ARGS__))
+
+#define GBL_PROPERTY_ITEM__()   \
+  GBL_PROPERTY_ITEM_
+
+#define GBL_LPAREN (
+#define GBL_RPAREN )
 
 #define GBL_PROPERTIES(object) \
    GBL_INLINE void object##_propertyInfo(GblSize size, GblPropertyInfo_*pInfoOut) {    \
         const GblPropertyInfo_ infos[] = {   \
-            GBL_PROPERTY_ITEM_
+        GBL_PROPERTY_ITEM_
 
-#define GBL_PROPERTIES_END }; memcpy(pInfoOut, &infos[size], sizeof(GblPropertyInfo_)); }
-
+#define GBL_PROPERTIES_END GBL_RPAREN) }; memcpy(pInfoOut, &infos[size], sizeof(GblPropertyInfo_)); }
+#endif
 
 #define GBL_DECLARE_STRUCT_PUBLIC(S)    \
     struct S;                           \

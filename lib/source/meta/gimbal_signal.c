@@ -231,8 +231,8 @@ GBL_INLINE InstanceConnectionTable_* InstanceConnectionTable_findOrCreate_(GblIn
 }
 
 
-static GBL_RESULT emitterSignalHandlerDtor_(uintptr_t key, void* pEntry) {
-    GBL_UNUSED(key);
+static GBL_RESULT emitterSignalHandlerDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntry) {
+    GBL_UNUSED(key, pMap);
     EmitterHandler_* pHandlers = pEntry;
     GBL_API_BEGIN(NULL);
     GBL_API_FREE(pHandlers);

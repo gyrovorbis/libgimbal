@@ -1,21 +1,16 @@
 #include <gimbal/containers/gimbal_array_map.h>
 
-GBL_INLINE GBL_RESULT GblArrayMap_entryDestruct_(GblArrayMapEntry* pEntry) GBL_NOEXCEPT {
-    if(pEntry->dtor) {
-        return pEntry->dtor(pEntry->key, pEntry->value.pVoid);
-    } else if(GblVariant_typeOf(&pEntry->value) != GBL_INVALID_TYPE) {
-        return GblVariant_destruct(&pEntry->value);
-    } else return GBL_RESULT_SUCCESS;
-}
 
-GBL_EXPORT GblArrayMap* GblArrayMap_create(GblArrayMapCompareFn   pFnComparator,
-                                           GblContext*            pCtx) GBL_NOEXCEPT
+GBL_EXPORT GblArrayMap* GblArrayMap_create(GblArrayMapCmpFn   pFnComparator,
+                                           GblBool            binarySearches,
+                                           GblContext*        pCtx) GBL_NOEXCEPT
 {
     GblArrayMap* pMap = GBL_NULL;
     GBL_API_BEGIN(pCtx);
     pMap = GBL_API_MALLOC(sizeof(GblArrayMap));
     pMap->pCtx = pCtx;
     pMap->pFnComparator = pFnComparator;
+    pMap->binarySearches = binarySearches;
     pMap->size = 0;
     GBL_API_END_BLOCK();
     return pMap;
@@ -38,7 +33,7 @@ GBL_EXPORT GBL_RESULT GblArrayMap_destroy(GblArrayMap** ppSelf) GBL_NOEXCEPT {
     GblArrayMap* pSelf = *ppSelf;
     if(pSelf) {
         for(GblSize e = 0; e < pSelf->size; ++e) {
-            GBL_API_CALL(GblArrayMap_entryDestruct_(GblArrayMap_entry_(ppSelf, e)));
+            GBL_API_CALL(GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, e)));
         }
         GBL_API_FREE(pSelf);
         *ppSelf = NULL;
@@ -53,7 +48,7 @@ static GblBool GblArrayMap_erase_(GblArrayMap** ppSelf, uintptr_t key, GblBool f
         GblSize index = GblArrayMap_find(ppSelf, key);
         if(index != GBL_ARRAY_MAP_NPOS) {
             if(free)
-                GBL_API_CALL(GblArrayMap_entryDestruct_(GblArrayMap_entry_(ppSelf, index)));
+                GBL_API_CALL(GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, index)));
             if(GblArrayMap_size(ppSelf) == 1) {
                 GblArrayMap_clear(ppSelf);
                 removed = GBL_TRUE;
@@ -109,7 +104,7 @@ GBL_EXPORT void GblArrayMap_clear(GblArrayMap** ppSelf) {
         GBL_API_BEGIN(NULL);
         const GblSize size = GblArrayMap_size(ppSelf);
         for(GblSize e = 0; e < size; ++e)
-            GblArrayMap_entryDestruct_(GblArrayMap_entry_(ppSelf, e));
+            GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, e));
 
         if((*ppSelf)->pCtx || (*ppSelf)->pFnComparator) {
             *ppSelf = GBL_API_REALLOC(*ppSelf, sizeof(GblArrayMap));
@@ -120,89 +115,4 @@ GBL_EXPORT void GblArrayMap_clear(GblArrayMap** ppSelf) {
         }
         GBL_API_END_BLOCK();
     }
-}
-
-
-static GblArrayMapEntry* GblArrayMap_entryAdd_(GblArrayMap** ppSelf, uintptr_t key) {
-    GblArrayMapEntry* pEntry = NULL;
-    GBL_API_BEGIN(NULL);
-    if(!*ppSelf) {
-        *ppSelf = GBL_API_MALLOC(GBL_ARRAY_MAP_SIZE(1));
-        memset(*ppSelf, 0, sizeof(GblArrayMap));
-    }  else {
-        *ppSelf = (GblArrayMap*)GBL_API_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(GblArrayMap_size(ppSelf) + 1));
-    }
-    ++(*ppSelf)->size;
-    pEntry = GblArrayMap_entry_(ppSelf, GblArrayMap_size(ppSelf)-1);
-    memset(pEntry, 0, sizeof(GblArrayMapEntry));
-    pEntry->key = key;
-    GBL_API_END_BLOCK();
-    return pEntry;
-}
-
-static GBL_RESULT GblArrayMap_entrySetVariant_(GblArrayMapEntry* pEntry, GblVariant* pVariant) GBL_NOEXCEPT {
-    GBL_API_BEGIN(NULL);
-    if(GblVariant_typeOf(&pEntry->value) != GblVariant_typeOf(pVariant)) {
-        GBL_API_CALL(GblArrayMap_entryDestruct_(pEntry));
-        pEntry->dtor = NULL;
-        GBL_API_CALL(GblVariant_constructCopy(&pEntry->value, pVariant));
-    } else {
-        GBL_API_CALL(GblVariant_setCopy(&pEntry->value, pVariant));
-    }
-    GBL_API_END();
-}
-
-GBL_EXPORT GBL_RESULT GblArrayMap_setVariant(GblArrayMap** ppSelf, uintptr_t key, GblVariant* pVariant) GBL_NOEXCEPT {
-    GBL_API_BEGIN(NULL);
-    GblArrayMapEntry* pEntry = GblArrayMap_find_entry_(ppSelf, key);
-    if(!pEntry) {
-        pEntry = GblArrayMap_entryAdd_(ppSelf, key);
-        GBL_API_CALL(GblVariant_constructCopy(&pEntry->value, pVariant));
-    } else {
-        GBL_API_CALL(GblArrayMap_entrySetVariant_(pEntry, pVariant));
-    }
-    GBL_API_END();
-}
-
-static GBL_RESULT GblArrayMap_entrySetUserdata_(GblArrayMapEntry* pEntry, uintptr_t value, GblArrayMapDestructFn pDtor) GBL_NOEXCEPT {
-    GBL_API_BEGIN(NULL);
-    GBL_API_CALL(GblArrayMap_entryDestruct_(pEntry));
-    pEntry->value.pVoid = (void*)value;
-    pEntry->value.type = GBL_INVALID_TYPE;
-    pEntry->dtor = pDtor;
-    GBL_API_END();
-}
-
-GBL_EXPORT GBL_RESULT GblArrayMap_setUserdata(GblArrayMap** ppSelf, uintptr_t key, uintptr_t value, GblArrayMapDestructFn pDtor) GBL_NOEXCEPT {
-    GBL_API_BEGIN(NULL);
-    GblArrayMapEntry* pEntry = GblArrayMap_find_entry_(ppSelf, key);
-    if(!pEntry) {
-        pEntry = GblArrayMap_entryAdd_(ppSelf, key);
-    }
-    GBL_API_CALL(GblArrayMap_entrySetUserdata_(pEntry, value, pDtor));
-    GBL_API_END();
-}
-
-GBL_EXPORT GblSize GblArrayMap_insertVariant(GblArrayMap** ppSelf, uintptr_t key, GblVariant* pVariant) GBL_NOEXCEPT {
-    GblSize index = GblArrayMap_find(ppSelf, key);
-    if(index == GBL_ARRAY_MAP_NPOS) {
-        GBL_API_BEGIN(NULL);
-        GblArrayMapEntry* pEntry = GblArrayMap_entryAdd_(ppSelf, key);
-        GBL_API_CALL(GblVariant_constructCopy(&pEntry->value, pVariant));
-        index = GblArrayMap_size(ppSelf)-1;
-        GBL_API_END_BLOCK();
-    }
-    return index;
-}
-
-GBL_EXPORT GblSize GblArrayMap_insertUserdata(GblArrayMap** ppSelf, uintptr_t key, uintptr_t value, GblArrayMapDestructFn pDtor) GBL_NOEXCEPT {
-    GblSize index = GblArrayMap_find(ppSelf, key);
-    if(index == GBL_ARRAY_MAP_NPOS) {
-        GBL_API_BEGIN(NULL);
-        GblArrayMapEntry* pEntry = GblArrayMap_entryAdd_(ppSelf, key);
-        GBL_API_CALL(GblArrayMap_entrySetUserdata_(pEntry, value, pDtor));
-        index = GblArrayMap_size(ppSelf)-1;
-        GBL_API_END_BLOCK();
-    }
-    return index;
 }

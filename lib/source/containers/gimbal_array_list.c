@@ -5,18 +5,22 @@ GBL_INLINE void GblArrayList_initialize_(GblArrayList* pSelf) GBL_NOEXCEPT {
     pSelf->capacity = pSelf->stackCapacity;
     pSelf->pData = (uint8_t*)GblArrayList_stackBuffer(pSelf);
     pSelf->size = 0;
-    if(pSelf->pData && pSelf->zeroTerminated) memset(&pSelf->pData[pSelf->size * pSelf->elementSize], 0, pSelf->elementSize);
+    if(pSelf->pData && pSelf->zeroTerminated)
+        GBL_UNLIKELY memset(&pSelf->pData[pSelf->size * pSelf->elementSize], 0, pSelf->elementSize);
 }
 
 
 static GBL_RESULT GblArrayList_alloc_(GblArrayList* pSelf, GblSize size) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
 
-    if(pSelf->zeroTerminated) ++size;;
+    if(!pSelf) GBL_UNLIKELY return GBL_RESULT_ERROR_INVALID_POINTER;
+
+    if(pSelf->zeroTerminated) GBL_UNLIKELY ++size;;
 
     if(pSelf->stackCapacity && size <= pSelf->stackCapacity) {
         pSelf->pData = (uint8_t*)GblArrayList_stackBuffer(pSelf);
         pSelf->capacity = pSelf->stackCapacity;
+
     } else {
 
         GblSize allocSize = size * pSelf->elementSize;
@@ -24,11 +28,16 @@ static GBL_RESULT GblArrayList_alloc_(GblArrayList* pSelf, GblSize size) GBL_NOE
             allocSize = gblPow2Next(GBL_ALIGNOF(GBL_MAX_ALIGN_T));
         }
         pSelf->capacity = allocSize / pSelf->elementSize;
+        GBL_API_BEGIN(pSelf->pCtx);
         pSelf->pData = GBL_API_MALLOC(allocSize);
+        GBL_API_END_BLOCK();
     }
-    if(pSelf->pData && pSelf->zeroTerminated) memset(&pSelf->pData[pSelf->size * pSelf->elementSize], 0, pSelf->elementSize);
+
+    if(pSelf->pData && pSelf->zeroTerminated)
+        GBL_UNLIKELY memset(&pSelf->pData[pSelf->size * pSelf->elementSize], 0, pSelf->elementSize);
+
     pSelf->size = 0;
-    GBL_API_END();
+    return result;
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_destruct(GblArrayList* pSelf) GBL_NOEXCEPT {
@@ -60,19 +69,20 @@ GBL_EXPORT GBL_RESULT GblArrayList_assign(GblArrayList* pSelf, const void* pData
     }
     pSelf->size = elementCount;
     if(pSelf->pData && pSelf->zeroTerminated)
-        memset(&pSelf->pData[pSelf->size * pSelf->elementSize], 0, pSelf->elementSize);
+        GBL_UNLIKELY memset(&pSelf->pData[pSelf->size * pSelf->elementSize], 0, pSelf->elementSize);
+
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblArrayList_construct_6(GblArrayList* pSelf, uint16_t elementSize, GblSize elementCount, const void* pInitialData, GblSize structSize, GblContext* pCtx) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblArrayList_construct_7(GblArrayList* pSelf, uint16_t elementSize, GblSize elementCount, const void* pInitialData, GblSize structSize, GblBool zeroTerminated, GblContext* pCtx) GBL_NOEXCEPT {
     GBL_API_BEGIN(pCtx);
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_ARG(structSize >= sizeof(GblArrayList));
     GBL_API_VERIFY_ARG(elementSize);
-    //memset(pSelf, 0, structSize);
     pSelf->pCtx           = pCtx;
     pSelf->stackCapacity  = (structSize - sizeof(GblArrayList)) / elementSize;
     pSelf->elementSize    = elementSize;
+    pSelf->zeroTerminated = zeroTerminated;
     GblArrayList_initialize_(pSelf);
     GBL_API_CALL(GblArrayList_assign(pSelf, pInitialData, elementCount));
     GBL_API_END();
@@ -106,50 +116,63 @@ GBL_EXPORT GBL_RESULT GblArrayList_acquire(GblArrayList* pSelf, void* pData, Gbl
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_reserve(GblArrayList* pSelf, GblSize capacity) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
 
-    if(pSelf->capacity < capacity) {
+    if(!pSelf) GBL_UNLIKELY return GBL_RESULT_ERROR_INVALID_POINTER;
+
+    if(pSelf->capacity < capacity) GBL_UNLIKELY {
         if(capacity > 2 && capacity % 2) capacity = gblPow2Next(capacity);
         const GblBool stack = GblArrayList_stack(pSelf);
         if(stack) {
             const GblSize oldSize = pSelf->size;
-            GBL_API_CALL(GblArrayList_alloc_(pSelf, capacity));
+            result = GblArrayList_alloc_(pSelf, capacity);
             memcpy(pSelf->pData, GblArrayList_stackBuffer(pSelf), oldSize * pSelf->elementSize);
             pSelf->size = oldSize;
         } else {
+            GBL_API_BEGIN(pSelf->pCtx);
             pSelf->pData = GBL_API_REALLOC(pSelf->pData,
                                            (capacity + (pSelf->zeroTerminated? 1 : 0)) * pSelf->elementSize);
+            GBL_API_END_BLOCK();
             pSelf->capacity = capacity;
         }
-        if(pSelf->zeroTerminated) memset(&pSelf->pData[pSelf->size * pSelf->elementSize], 0, pSelf->elementSize);
+        if(pSelf->zeroTerminated) GBL_UNLIKELY
+                memset(&pSelf->pData[pSelf->size * pSelf->elementSize], 0, pSelf->elementSize);
     }
-    GBL_API_END();
+
+    return result;
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_resize(GblArrayList* pSelf, GblSize size) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
-    if(size > pSelf->size) {
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
 
-        //if(size+1 > pSelf->capacity) {
-            GBL_API_CALL(GblArrayList_reserve(pSelf, size));
-        //}
+    if(!pSelf) GBL_UNLIKELY {
+        GBL_API_BEGIN(NULL);
+        GBL_API_END();
+    } else GBL_LIKELY {
 
-        //pSelf->data.pData[pSelf->data.length] = ' '; remove old nullcharacter so strlen isn't wrong!
+        if(size > pSelf->size) GBL_UNLIKELY {
+            result = GblArrayList_reserve(pSelf, size);
+        }
+
+        if(pSelf->zeroTerminated) GBL_UNLIKELY
+            memset(&pSelf->pData[size * pSelf->elementSize], 0, pSelf->elementSize);
+
+        pSelf->size = size;
     }
-
-    if(pSelf->zeroTerminated)
-        memset(&pSelf->pData[size * pSelf->elementSize], 0, pSelf->elementSize);
-
-    pSelf->size = size;
-    GBL_API_END();
+    return result;
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_shrinkToFit(GblArrayList* pSelf) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+
+    if(!pSelf) GBL_UNLIKELY return GBL_RESULT_ERROR_INVALID_POINTER;
+
     const GblBool stack = GblArrayList_stack(pSelf);
     if(!stack && pSelf->capacity > pSelf->size) {
         const GblSize fitSize = pSelf->size + ((pSelf->zeroTerminated)? 1 : 0);
         const GblSize bytes = fitSize * pSelf->elementSize;
+
+        GBL_API_BEGIN(pSelf->pCtx);
         if(fitSize <= pSelf->stackCapacity) {
             memcpy(GblArrayList_stackBuffer(pSelf), pSelf->pData, bytes);
             GBL_API_FREE(pSelf->pData);
@@ -157,46 +180,40 @@ GBL_EXPORT GBL_RESULT GblArrayList_shrinkToFit(GblArrayList* pSelf) GBL_NOEXCEPT
         } else {
             pSelf->pData = GBL_API_REALLOC(pSelf->pData, bytes);
         }
+        GBL_API_END_BLOCK();
         pSelf->capacity = pSelf->size;
     }
-    GBL_API_END();
+    return result;
 }
-
-
-GBL_EXPORT GBL_RESULT GblArrayList_append(GblArrayList* pSelf, const void* pData, GblSize elementCount) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
-    GblArrayList_insert(pSelf, GblArrayList_size(pSelf), elementCount, pData);
-    GBL_API_VERIFY_LAST_RECORD();
-    GBL_API_END();
-}
-
-GBL_EXPORT GBL_RESULT GblArrayList_prepend(GblArrayList* pSelf, const void* pData, GblSize elementCount) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
-    GblArrayList_insert(pSelf, 0, elementCount, pData);
-    GBL_API_VERIFY_LAST_RECORD();
-    GBL_API_END();
-}
-
 
 GBL_EXPORT void* GblArrayList_insert(GblArrayList* pSelf, GblSize index, GblSize count, const void* pData) GBL_NOEXCEPT {
     uintptr_t insertionPoint = 0;
     GblSize slideSize = 0;
     void* pDataOut = NULL;
-    GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY_ARG(count);
-    GBL_API_VERIFY(index <= pSelf->size,
-                   GBL_RESULT_ERROR_OUT_OF_RANGE);
-    slideSize = pSelf->size - index;
-    GBL_API_CALL(GblArrayList_resize(pSelf, pSelf->size + count));
-    insertionPoint = (uintptr_t)pSelf->pData + index * pSelf->elementSize;
-    if(slideSize) memmove((uint8_t*)insertionPoint + pSelf->elementSize * count,
-                          (const uint8_t*)insertionPoint,
-                          slideSize * pSelf->elementSize);
-    if(pData) {
-        memcpy((void*)insertionPoint, pData, pSelf->elementSize * count);
+
+    if(!pSelf || !count || index > pSelf->size) GBL_UNLIKELY {
+        GBL_API_BEGIN(pSelf->pCtx);
+        GBL_API_VERIFY_ARG(count);
+        GBL_API_VERIFY(index <= pSelf->size,
+                       GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_API_END_BLOCK();
+
+    } else GBL_LIKELY {
+        slideSize = pSelf->size - index;
+        GBL_RESULT result = GblArrayList_resize(pSelf, pSelf->size + count);
+
+        if(GBL_RESULT_SUCCESS(result)) GBL_LIKELY {
+
+            insertionPoint = (uintptr_t)pSelf->pData + index * pSelf->elementSize;
+            if(slideSize) memmove((uint8_t*)insertionPoint + pSelf->elementSize * count,
+                                  (const uint8_t*)insertionPoint,
+                                  slideSize * pSelf->elementSize);
+            if(pData) {
+                memcpy((void*)insertionPoint, pData, pSelf->elementSize * count);
+            }
+            pDataOut = (void*)insertionPoint;
+        }
     }
-    pDataOut = (void*)insertionPoint;
-    GBL_API_END_BLOCK();
     return pDataOut;
 }
 

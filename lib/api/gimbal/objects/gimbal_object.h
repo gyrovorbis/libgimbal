@@ -50,7 +50,6 @@ GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 /// GblClass structure for a GblObject instance
 GBL_CLASS_DERIVE(GblObjectClass, GblClass,
                  GblIVariantIFace, GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
-
     GBL_RESULT (*pFnConstructor)        (SELF);
     GBL_RESULT (*pFnDestructor)         (SELF);
     GBL_RESULT (*pFnConstructed)        (SELF);
@@ -125,11 +124,16 @@ GBL_PROPERTY_TABLE_BEGIN(GBL_OBJECT)
                        GBL_POINTER_TYPE,
                        GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
 GBL_PROPERTY_TABLE_END()
+#if 1
 #if 0
-GBL_PROPERTIES(GblObject) (
-    ("refCount", GBL_UINT32_TYPE, (READ)),
-    ("name",     GBL_STRING_TYPE, (READ, WRITE))
-) GBL_PROPERTIES_END
+GBL_PROPERTIES(GblObject,
+    ("refCount", GBL_UINT32_TYPE, (READ, WRITE)),
+    ("name",     GBL_STRING_TYPE, (READ)),
+    ("duder",     GBL_STRING_TYPE, (SAVE)),
+    ("duderette", GBL_STRING_TYPE, (LOAD))
+)
+#endif
+
 #endif
 /*!
 * Creates a new instance of a GBL_OBJECT_TYPE compatible type, setting
@@ -211,7 +215,7 @@ GBL_INLINE GBL_RESULT         GblObject_propertySetString   (SELF,  const char* 
 
 GBL_EXPORT uintptr_t          GblObject_fieldValue          (CSELF, GblQuark name)                                              GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT         GblObject_setFieldVariantCopy (SELF, GblQuark name, const GblVariant* pVariant)                   GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_setFieldUserdata    (SELF, GblQuark name, void* pData, GblArrayMapDestructFn* pFnDtor)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT         GblObject_setFieldUserdata    (SELF, GblQuark name, void* pData, GblArrayMapDtorFn* pFnDtor)      GBL_NOEXCEPT;
 GBL_EXPORT GblBool            GblObject_hasField            (CSELF, GblQuark name)                                              GBL_NOEXCEPT;
 GBL_EXPORT GblBool            GblObject_checkField          (CSELF, GblQuark name, GblType type)                                GBL_NOEXCEPT;
 
