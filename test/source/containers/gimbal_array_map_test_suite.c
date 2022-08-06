@@ -342,10 +342,11 @@ static GBL_RESULT GblArrayMapTestSuite_verifyInsertionSort_(GblTestSuite* pSelf,
     GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
 
     for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
-        uintptr_t key = gblRand();
         GblSize prevSize = GblArrayMap_size(&pSelf_->pMap1);
-        while(GblArrayMap_size(&pSelf_->pMap1) <= prevSize) // check for collisions
+        while(GblArrayMap_size(&pSelf_->pMap1) <= prevSize) {
+            uintptr_t key = gblRand();
             GBL_API_VERIFY_CALL(GblArrayMap_setUserdata(&pSelf_->pMap1, key, key, NULL));
+        }
     }
 
     GBL_TEST_COMPARE(GblArrayMap_size(&pSelf_->pMap1), GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_);
