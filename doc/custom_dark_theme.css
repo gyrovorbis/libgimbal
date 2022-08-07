@@ -12,7 +12,7 @@
 }
 
 body {
-	background: #282923;
+	background: black;
 	background-image: none;
 	color: #D8D8D8;
 }
@@ -23,7 +23,7 @@ div.fragment, pre.fragment {
 }
 
 a, a:link, a:visited {
-	color: #67d8ef !important;
+	color: #67d8ef;
 }
 
 .highlighted {
@@ -34,16 +34,73 @@ a.highlighted {
 	background: none !important;
 }
 
+div#titlearea {
+	background-color: #516f94;
+}
+
+.classindex dl.odd {
+	background-color: black;
+}
+
+.classindex dl.even {
+	background-color: #32363d;
+}
+
+#projectname {
+	color: #67d8ef;
+}
+
+#projectbrief {
+	color: white;
+	font-variant: small-caps !important;
+}
+
+.contents a:visited {
+	color: #AEA70E;
+}
+
+.alphachar > a {
+	color: #AEA70E;
+}
+
+dl.note dt {
+    background-color: #001d3b;
+	
+}
+
+dl.note dd {
+	border-color: black !important;
+}
+
+dl.note dd {
+	background-color: #516f94;
+	color: white;
+}
+
+dt {
+	color: white;
+}
+
+.params, dl.section, .memdoc  {
+	padding: 8px;
+}
+
+.memdoc > .fieldtable {
+	background-color: #516f94;
+}
+
 /*********************************************/
 /**              Top main menu              **/
 /*********************************************/
 #main-nav {
 	/* display: none; */
-	border-bottom: 1px solid #32363d;
+	background-color: #224466;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
 }
 
 #main-nav .sm-dox {
-	background: transparent !important;
+
 }
 
 .sm-dox a {
@@ -96,14 +153,20 @@ a.SelectItem:hover {
 /**                Main menu                **/
 /*********************************************/
 #nav-tree {
-	background: transparent;
+	background: #32363d;
 }
 
 #nav-tree .selected {
 	background-image: none;
 	background: #32363d;
+	overflow-x: hidden;
 }
 
+.ui-resizable-handle {
+	overflow-y: hidden;
+	height: Calc(100vh - 172px);
+	margin-top: -8px;
+}
 /*********************************************/
 /**               Main content              **/
 /*********************************************/
@@ -374,7 +437,8 @@ td.memItemLeft, td.memItemRight {
 /**                 Footer                  **/
 /*********************************************/
 #nav-path {
-	background: transparent;
+	background-color: #224466;
+	z-index: 9999;
 }
 
 #nav-path ul {
@@ -406,7 +470,7 @@ td.memItemLeft, td.memItemRight {
  
 /* Handle */
 ::-webkit-scrollbar-thumb {
-	background: #234567;
+	background: #224466;
 	border: none;
 }
 

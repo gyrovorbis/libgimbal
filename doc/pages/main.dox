@@ -1,4 +1,5 @@
 /*! \mainpage
+
 *	LibGimbal is a C/C++-based, lightweight, cross-platform, general-purpose framework providing core functionality 
 	such as containers, algorithms, strings, references, error management, custom allocators, logging, and more.
 	Additionally it provides a full-fledged, runtime meta type system providing object-oriented constructs to C

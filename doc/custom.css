@@ -1,6 +1,53 @@
+html {
+	background-color: black;
+	overflow-y: hidden;
+}
+
+body {
+    display: flex;
+    min-height: 100vh !important;
+    flex-direction: column !important;
+    font-weight: 300 !important;
+    height:100%;
+	display: none;
+	background-color: black;
+}
+
+#side-nav {
+    padding: 0 6px 0 0;
+    margin: 0px;
+    display: block;
+    position: absolute;
+    left: 0px;
+    width: 250px;
+    overflow-y: scroll !important;
+	overflow-x: hidden !important;
+}
+
+div.summary {
+	position: absolute;
+	right: 16px;
+}
+
+.arrow.arrow, h2.groupheader.groupheader, .memtitle.memtitle {
+	color: #bf5f82;
+}
+
+div.title {
+    color: #3ded51;
+}
+
 div.fragment, pre.fragment {
 	margin: 0;
 	padding: 4px;
+}
+
+.definition {
+	padding: 6px;
+}
+
+#main-nav > * > * > a, li > a {
+	color: white !important;
 }
 
 /*********************************************/
@@ -86,8 +133,6 @@ div.toc h3 {
 /**              H1 in textblocks           **/
 /*********************************************/
 .textblock h1 {
-    border-bottom: 1px solid #32363d;
-    border-left: 3px solid #32363d;
     margin: 40px 0px 10px 0px;
     padding-bottom: 10px;
     padding-top: 10px;
@@ -178,7 +223,8 @@ dl.warning dt {
 }
 
 dl.todo dt {
-	background-color: #82b3c9;
+	background-color: #001d3b;
+	color: white; 
 }
 
 dl.deprecated dt {
@@ -200,9 +246,14 @@ dl.warning dd {
 	border-color: #bf5f82;
 }
 
+::marker {
+	color: #bf5f82;
+}
+
 dl.todo dd {
-	background-color: #b3e5fc;
-	border-color: #82b3c9;
+	background-color: #224466;
+	border-color: black;
+	color: white;
 }
 
 dl.deprecated dd {
@@ -215,6 +266,16 @@ dl.reflist dd {
 	border-color: #cbae82;
 }
 
+.textblock h1 {
+	color: #67d8ef;
+}
+.contents a:visited {
+    color: #AEA70E !important;
+}
+
+#nav-tree .selected a {
+	color: #AEA70E !important;
+}
 /*********************************************/
 /**               Reference list            **/
 /**Similar to warning/note/todo/... messages**/
@@ -320,6 +381,10 @@ td.memItemLeft, td.memItemRight {
 
 .memItem table {
 	font-family: inherit;
+}
+
+#main-menu {
+	background-color:#224466 !important;
 }
 
 /*********************************************/
