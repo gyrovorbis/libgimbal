@@ -60,9 +60,9 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_destroy(GblAllocationTracker* pSelf) 
     GBL_API_BEGIN(GblHashSet_context(&pSelf_->activeSet));
     pSelf_->recursing = GBL_TRUE;
     GBL_API_VERIFY_CALL(GblHashSet_destruct(&pSelf_->activeSet));
+    pSelf_->recursing = GBL_FALSE;
     GBL_API_FREE(pSelf_);
     GBL_API_END_BLOCK();
-    pSelf_->recursing = GBL_FALSE;
     return GBL_API_RESULT();
 }
 
@@ -180,10 +180,11 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_freeEvent(GblAllocationTracker* pSelf
 
     pSelf_->base.counters.bytesActive -= pExisting->size;
     pSelf_->base.counters.bytesFreed += pExisting->size;
+
+    GBL_API_END_BLOCK();
     ++pSelf_->base.counters.freeEvents;
     --pSelf_->base.counters.allocsActive;
 
-    GBL_API_END_BLOCK();
     pSelf_->recursing = GBL_FALSE;
     return GBL_API_RESULT();
 }

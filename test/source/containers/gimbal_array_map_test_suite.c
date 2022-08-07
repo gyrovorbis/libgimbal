@@ -4,7 +4,7 @@
 #include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/meta/gimbal_primitives.h>
 
-#define GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_ 2047
+#define GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_ 1000
 #define GBL_ARRAY_MAP_TEST_SUITE_(inst)     ((GblArrayMapTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_MAP_TEST_SUITE_TYPE))
 
 typedef struct GblArrayMapTestSuite_ {
@@ -413,7 +413,7 @@ GBL_EXPORT GblType GblArrayMapTestSuite_type(void) {
         { "createBinarySearchable",     GblArrayMapTestSuite_createBinarySearchable_    },
         { "verifyInsertionSort",        GblArrayMapTestSuite_verifyInsertionSort_       },
         { "findBinarySearch",           GblArrayMapTestSuite_findBinarySearch_          },
-        //{ "findLinearSearch",           GblArrayMapTestSuite_findLinearSearch_          },
+        { "findLinearSearch",           GblArrayMapTestSuite_findLinearSearch_          },
         { "destroyBinarySearchable",    GblArrayMapTestSuite_destroyBinarySearchable_   },
         { NULL,                         NULL                                            }
     };

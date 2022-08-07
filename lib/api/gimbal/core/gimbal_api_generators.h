@@ -166,7 +166,7 @@ typedef struct GblPropertyInfo_ {
 #endif
 
 #define GBL_FORWARD_DECLARE_ENUM(E) \
-    typedef GblEnum E
+    typedef GBL_ENUM E
 
 #define GBL_FORWARD_DECLARE_FLAGS(F) \
     typedef GBL_FLAGS F

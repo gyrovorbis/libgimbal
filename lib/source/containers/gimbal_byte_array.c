@@ -87,7 +87,7 @@ GBL_EXPORT GBL_RESULT GblByteArray_erase(GblByteArray* pSelf, GblSize offset, Gb
 }
 
 GBL_EXPORT GblInt GblByteArray_compare(const GblByteArray* pSelf, const GblByteArray* pOther) GBL_NOEXCEPT {
-    GblInt result;
+    GblInt result = INT_MAX;
     GblInt* pResult = &result;
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY_POINTER(pSelf);

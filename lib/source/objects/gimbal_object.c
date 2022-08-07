@@ -218,7 +218,10 @@ GBL_API GblObject_eventNotify(GblObject* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
 
 static GBL_RESULT GblObject_eventFiltersDestruct_(const GblArrayMap* pMap, uintptr_t key, void* pData) {
     GBL_UNUSED(key, pMap);
-    return GblArrayList_destruct(pData);
+    GBL_API_BEGIN(NULL);
+    GBL_API_CALL(GblArrayList_destruct(pData));
+    GBL_API_FREE(pData);
+    GBL_API_END();
 }
 
 static GblArrayList* GblObject_eventFilters_(const GblObject* pSelf) {

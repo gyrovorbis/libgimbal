@@ -28,6 +28,7 @@ GBL_EXPORT GblArrayMap* GblArrayMap_clone(GblArrayMap*const* ppSelf) GBL_NOEXCEP
     return pMap;
 }
 */
+
 GBL_EXPORT GBL_RESULT GblArrayMap_destroy(GblArrayMap** ppSelf) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GblArrayMap* pSelf = *ppSelf;
@@ -84,6 +85,7 @@ GBL_EXPORT GblBool GblArrayMap_extractVariant(GblArrayMap** ppSelf, uintptr_t ke
     }
     return found;
 }
+
 
 GBL_EXPORT GblBool GblArrayMap_extractValue(GblArrayMap**ppSelf, uintptr_t key, uintptr_t* pValue) GBL_NOEXCEPT {
     GblBool found = GBL_FALSE;

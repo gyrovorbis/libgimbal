@@ -28,7 +28,3 @@ add_subdirectory(lib)
 if(GBL_ENABLE_TESTS)
     add_subdirectory(test)
 endif(GBL_ENABLE_TESTS)
-
-if(GBL_ENABLE_TESTS_QT)
-    add_subdirectory(testQt)
-endif()

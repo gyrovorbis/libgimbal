@@ -115,6 +115,8 @@ GBL_EXPORT GblBool      GblHashSet_erase            (SELF, const void* pKey)    
 GBL_EXPORT void*        GblHashSet_extract          (SELF, const void* pKey)        GBL_NOEXCEPT; //removes entry, no deletion, not found is fine
 GBL_EXPORT void         GblHashSet_clear            (SELF)                          GBL_NOEXCEPT; //deletes entries
 
+GBL_EXPORT GBL_RESULT   GblHashSet_shrinkToFit      (SELF)                          GBL_NOEXCEPT;
+
 GBL_EXPORT void*        GblHashSet_probe            (CSELF, GblSize position)       GBL_NOEXCEPT; //returns entry at slot or NULL, sparse
 GBL_EXPORT GblBool      GblHashSet_foreach          (CSELF, GblHashSetIterateFn iter,              //iterates over every non-null position
                                                      void* pUdata)                  GBL_NOEXCEPT;
