@@ -192,6 +192,22 @@ static GBL_RESULT typeValidate_(GblType parent,
                    "Cannot use FUNDAMENTAL FLAGS on DERIVED type!");
 
     if(pParentMeta) {
+#if 0
+        if(pParentMeta->instancePrivateOffset < 0)
+            GBL_API_VERIFY(pParentMeta->instancePrivateOffset - pInfo->instancePrivateSize < 0,
+                           GBL_RESULT_ERROR_OVERFLOW,
+                           "%u more private instance bytes causes an OVERFLOW!",
+                           pInfo->instancePrivateSize);
+
+
+        if(pParentMeta->classPrivateOffset < 0)
+            GBL_API_VERIFY(pParentMeta->classPrivateOffset - pInfo->classPrivateSize < 0,
+                           GBL_RESULT_ERROR_OVERFLOW,
+                           "%u more private class bytes causes an OVERFLOW!",
+                           pInfo->classPrivateSize);
+#endif
+
+
         const GblType fundamentalType = GblType_root(parent);
         fundFlags |= GBL_META_CLASS_(fundamentalType)->flags;
     }
@@ -1202,6 +1218,7 @@ GBL_EXPORT GBL_RESULT GblType_unregister(GblType type) {
         GBL_API_VERIFY_CALL(GblType_freeTypeInfoClassChunk_(pMeta));
         mtx_lock(&typeRegMtx_);
         const GblBool success = GblHashSet_erase(&typeRegistry_, &pMeta);
+        GblHashSet_shrinkToFit(&typeRegistry_);
         mtx_unlock(&typeRegMtx_);
         GBL_API_VERIFY(success, GBL_RESULT_ERROR_INVALID_TYPE, "Failed to remove the type from the registry HashSet!");
     }

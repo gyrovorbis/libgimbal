@@ -67,8 +67,8 @@ typedef struct GblMetaClass {
     GblArrayMap*            pExtensions;
     GblClass*               pClass;
     uint8_t                 depth;
-    int16_t                 classPrivateOffset;
-    int16_t                 instancePrivateOffset;
+    ptrdiff_t               classPrivateOffset;
+    ptrdiff_t               instancePrivateOffset;
     struct GblMetaClass*    pBases[];
 } GblMetaClass;
 

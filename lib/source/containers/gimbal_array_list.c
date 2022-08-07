@@ -192,7 +192,7 @@ GBL_EXPORT void* GblArrayList_insert(GblArrayList* pSelf, GblSize index, GblSize
     void* pDataOut = NULL;
 
     if(!pSelf || !count || index > pSelf->size) GBL_UNLIKELY {
-        GBL_API_BEGIN(pSelf->pCtx);
+        GBL_API_BEGIN(pSelf? (GblObject*)pSelf->pCtx : NULL);
         GBL_API_VERIFY_ARG(count);
         GBL_API_VERIFY(index <= pSelf->size,
                        GBL_RESULT_ERROR_OUT_OF_RANGE);

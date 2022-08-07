@@ -55,16 +55,16 @@ typedef struct GblTypeInterfaceMapEntry {
 typedef struct GblTypeInfo {
     GblTypeClassInitializeFn        pFnClassInit;           ///< Function used to initialize the values a GblType's associated GblClass
     GblTypeClassFinalizeFn          pFnClassFinal;          ///< Function used to finalize the values of a GblType's associated GblClass
-    uint16_t                        classSize;              ///< Size of a GblType's associated GblClass structure
-    uint16_t                        classPrivateSize;       ///< Size of extra private storage to be associated with a GblType's GblClass
+    GblSize                         classSize;              ///< Size of a GblType's associated GblClass structure
+    GblSize                         classPrivateSize;       ///< Size of extra private storage to be associated with a GblType's GblClass
     const void*                     pClassData;             ///< Size of extra private storage to be associated with a GblType's GblClass
     uint8_t                         interfaceCount;         ///< Number of GblInterface mappings in pInterfaceMap array
     const GblTypeInterfaceMapEntry* pInterfaceMap;          ///< Array providing mappings for each GblInterface contained within a GblType's GblClass
     uint8_t                         dependencyCount;        ///< Number of dependent GblTypes in pDependencies array
     const GblType*                  pDependencies;          ///< Array providing a list of type dependencies that must be implemented a GblType
     GblTypeInstanceInitializeFn     pFnInstanceInit;        ///< Function used to initialize the values a GblType's associated GblInstance
-    uint16_t                        instanceSize;           ///< Size of a GblType's associated GblInstance structure
-    uint16_t                        instancePrivateSize;    ///< Size of extra private storage to be associated with a GblType's GblInstance.
+    GblSize                         instanceSize;           ///< Size of a GblType's associated GblInstance structure
+    GblSize                        instancePrivateSize;    ///< Size of extra private storage to be associated with a GblType's GblInstance.
 } GblTypeInfo;
 
 GBL_EXPORT GblType              GblType_registerStatic  (const char*          pName,

@@ -532,7 +532,8 @@ static GblSize GblSignal_disconnect_(GblInstance*               pEmitter,
             if(signalName != GBL_QUARK_INVALID) {
                 EmitterHandler_* pHandler = (void*)GblArrayMap_getValue(&pEmitterTable->pEmitterHandlers,
                                                                         signalName);
-                disconnectedCount += disconnectFromHandler_(pHandler, pClosure);
+                if(pHandler)
+                    disconnectedCount += disconnectFromHandler_(pHandler, pClosure);
 
             } else {
                 const GblSize signalHandlerCount = GblArrayMap_size(&pEmitterTable->pEmitterHandlers);

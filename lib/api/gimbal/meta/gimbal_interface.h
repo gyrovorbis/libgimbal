@@ -76,6 +76,7 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
 /*! \struct GblInterface
  *  \ingroup meta
  * \details
+ * \extends GblClass
  *
  * An interface is a special type of GblClass which represents an
  * abstract collection of data which may be "implemented" by

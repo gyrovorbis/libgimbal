@@ -89,7 +89,7 @@ build psvita:
       - mkdir -p build
       - cd build 
       - env
-      - cmake ../ -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake 
+      - cmake ../ -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake -DGBL_ENABLE_TESTS=ON
       - cmake --build . --target all
 
 build android-sim:
@@ -304,7 +304,8 @@ test macos-gcc11:
 
 publish-docs:
   stage: deploy
-  dependencies: 
+  dependencies: []
+  needs: []
   tags:
   - doxygen
   script:

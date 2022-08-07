@@ -210,6 +210,7 @@ static GBL_RESULT GblObjectTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx
 static GBL_RESULT GblObjectTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GBL_TEST_COMPARE(GblType_classRefCount(TEST_OBJECT_TYPE), 0);
+    GblType_unregister(TestObject_type());
     GBL_API_END();
 }
 
@@ -431,7 +432,7 @@ static GBL_RESULT GblObjectTestSuite_newVariants_(GblTestSuite* pSelf, GblContex
     };
 
     GBL_API_BEGIN(pCtx);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[0], GBL_STRING_TYPE, "Fuckwad"));
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[0], GBL_POINTER_TYPE, "Fuckwad"));
     GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[1], GBL_POINTER_TYPE, (void*)0xdeadbeef));
 
     GblObject* pObj = GblObject_newVariants(TEST_OBJECT_TYPE, 2, keys, variants);
@@ -456,7 +457,7 @@ static GBL_RESULT GblObjectTestSuite_newVariantsWithClass_(GblTestSuite* pSelf, 
     };
 
     GBL_API_BEGIN(pCtx);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[0], GBL_STRING_TYPE, "Fuckwad"));
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[0], GBL_POINTER_TYPE, "Fuckwad"));
     GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[1], GBL_POINTER_TYPE, (void*)0xdeadbeef));
 
     GblObjectClass* pClass = GBL_OBJECT_CLASS(GblClass_createFloating(TEST_OBJECT_TYPE));
@@ -485,7 +486,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVariants_(GblTestSuite* pSelf, Gb
     };
 
     GBL_API_BEGIN(pCtx);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[0], GBL_STRING_TYPE, "Fuckwad"));
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[0], GBL_POINTER_TYPE, "Fuckwad"));
     GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[1], GBL_POINTER_TYPE, (void*)0xdeadbeef));
 
     TestObject obj;
@@ -513,7 +514,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVariantsWithClass_(GblTestSuite* 
     };
 
     GBL_API_BEGIN(pCtx);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[0], GBL_STRING_TYPE, "Fuckwad"));
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[0], GBL_POINTER_TYPE, "Fuckwad"));
     GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[1], GBL_POINTER_TYPE, (void*)0xdeadbeef));
 
     TestObject obj;
@@ -543,7 +544,7 @@ static GBL_RESULT GblObjectTestSuite_propertyGet_(GblTestSuite* pSelf, GblContex
                                     "userdata", (void*)0xdeadbeef,
                                     "parent",   pObj0,
                                     "floater",  -77.7,
-                                    "stringer", "Fuckin Inheritance!",
+                               //     "stringer", "Fuckin Inheritance!",
                                     NULL);
     GBL_TEST_VERIFY(pObj1);
 
@@ -552,14 +553,14 @@ static GBL_RESULT GblObjectTestSuite_propertyGet_(GblTestSuite* pSelf, GblContex
     const char* pName       = NULL;
     GblObject*  pParent     = NULL;
     float       floater     = 0.0f;
-    const char* pStringer   = NULL;
+   // const char* pStringer   = NULL;
 
     GBL_RESULT result = GblObject_get(pObj1, "userdata", &pUserdata,
                                              "refCount", &refCount,
                                              "name",     &pName,
                                              "parent",   &pParent,
                                              "floater",  &floater,
-                                             "stringer", &pStringer,
+                                     //        "stringer", &pStringer,
                                              NULL);
 
     GBL_TEST_COMPARE(result,         GBL_RESULT_SUCCESS);
@@ -568,7 +569,7 @@ static GBL_RESULT GblObjectTestSuite_propertyGet_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(pName,          "Bulbasaur");
     GBL_TEST_COMPARE(pParent,        pObj0);
     GBL_TEST_COMPARE(floater,        -77.7f);
-    //GBL_TEST_COMPARE(pStringer, "Fuckin Inheritance!");
+   // GBL_TEST_COMPARE(pStringer, "Fuckin Inheritance!");
 
     GBL_TEST_COMPARE(GblObject_unref(pObj1), 0);
     GBL_TEST_COMPARE(GblObject_unref(pObj0), 0);

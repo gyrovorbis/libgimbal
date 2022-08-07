@@ -252,8 +252,10 @@ GBL_EXPORT GblHash gblHashMurmur(const void* pData, GblSize size) GBL_NOEXCEPT {
 }
 
 struct bucket {
-    uint64_t hash:48;
-    uint64_t dib:16;
+    uint32_t hash;
+    uint16_t dib;
+    //uint64_t hash:48;
+    //uint64_t dib:16;
 };
 
 
@@ -265,8 +267,8 @@ static inline void *bucket_item(struct bucket *entry) {
     return ((char*)entry)+sizeof(struct bucket);
 }
 
-static inline uint64_t get_hash(const struct GblHashSet *map, const void *key) {
-    return map->pFnHash(map, key) << 16 >> 16;
+static inline uint32_t get_hash(const struct GblHashSet *map, const void *key) {
+    return map->pFnHash(map, key);
 }
 
 
@@ -503,6 +505,14 @@ static GblBool resize(struct GblHashSet *map, size_t new_cap) {
     return GBL_TRUE;
 }
 
+GBL_EXPORT GBL_RESULT GblHashSet_shrinkToFit(GblHashSet* pSelf) GBL_NOEXCEPT {
+    GBL_API_BEGIN(pSelf->pCtx);
+    if(pSelf->count < pSelf->bucketCount * 0.75) {
+        //GBL_API_VERIFY_EXPRESSION(resize(pSelf, pSelf->bucketCount*0.75));
+    }
+    GBL_API_END();
+}
+
 GBL_EXPORT GblBool GblHashSet_insert(GblHashSet* pSet, const void* pItem) GBL_NOEXCEPT {
     GblBool inserted = GBL_FALSE;
     GBL_API_BEGIN(pSet->pCtx);
@@ -620,7 +630,7 @@ GBL_EXPORT void* GblHashSet_get(const GblHashSet *map, const void *key) GBL_NOEX
     void* pEntry = NULL;
     GBL_API_BEGIN(map->pCtx); {
         GBL_API_VERIFY_POINTER(key);
-        const uint64_t hash = get_hash(map, key);
+        const uint32_t hash = get_hash(map, key);
         size_t i = hash & map->mask;
         for (;;) {
             struct bucket *bucket = bucket_at(map, i);
@@ -648,7 +658,7 @@ GBL_EXPORT GblHashSetIterator GblHashSet_find(const GblHashSet* map, const void*
     };
     GBL_API_BEGIN(map->pCtx); {
         GBL_API_VERIFY_POINTER(key);
-        uint64_t hash = get_hash(map, key);
+        uint32_t hash = get_hash(map, key);
         size_t i = hash & map->mask;
         for (;;) {
             struct bucket *bucket = bucket_at(map, i);
@@ -700,7 +710,7 @@ GBL_EXPORT void* GblHashSet_extract(GblHashSet *map, const void* pKey) GBL_NOEXC
     void* pEntry = NULL;
     GBL_API_BEGIN(map->pCtx); {
         GBL_API_VERIFY_POINTER(pKey);
-        uint64_t hash = get_hash(map, pKey);
+        uint32_t hash = get_hash(map, pKey);
         size_t i = hash & map->mask;
         for (;;) {
             struct bucket *bucket = bucket_at(map, i);
