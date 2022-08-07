@@ -106,7 +106,7 @@ build android-sim:
       - mkdir -p build
       - cd build 
       - env
-      - /home/falco/Qt/6.3.1/android_x86_64/bin/qt-cmake -DGBL_ENABLE_TESTS=ON -DCMAKE_TOOLCHAIN_FILE=/home/falco/Documents/dev/android-ndk-r23c/build/cmake/android.toolchain.cmake -S ../ -B .
+      - /home/falco/Qt/6.3.1/android_x86_64/bin/qt-cmake -DCMAKE_TOOLCHAIN_FILE=/home/falco/Documents/dev/android-ndk-r23c/build/cmake/android.toolchain.cmake -S ../ -B .
       - cmake --build . --target all
 
 build macos-clang13:
@@ -304,7 +304,8 @@ test macos-gcc11:
 
 publish-docs:
   stage: deploy
-  dependencies: 
+  dependencies: []
+  needs: []
   tags:
   - doxygen
   script:
