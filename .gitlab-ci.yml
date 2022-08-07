@@ -304,7 +304,8 @@ test macos-gcc11:
 
 publish-docs:
   stage: deploy
-  dependencies: 
+  dependencies: []
+  needs: []
   tags:
   - doxygen
   script:
