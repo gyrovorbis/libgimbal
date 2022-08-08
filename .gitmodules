@@ -1,9 +1,6 @@
 [submodule "test/lib/elysian-test"]
 	path = test/lib/elysian-test
 	url = ../../open-source/elysian-test.git
-[submodule "Doc/doxygenapidark"]
-	path = Doc/doxygenapidark
-	url = git@chaosrift.endofinternet.net:open-source/doxygenapidark.git
 [submodule "doc/doxygenapidark"]
 	path = doc/doxygenapidark
-	url = git@chaosrift.endofinternet.net:open-source/doxygenapidark.git
+	url = ../../open-source/doxygenapidark.git
