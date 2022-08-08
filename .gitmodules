@@ -4,3 +4,6 @@
 [submodule "Doc/doxygenapidark"]
 	path = Doc/doxygenapidark
 	url = git@chaosrift.endofinternet.net:open-source/doxygenapidark.git
+[submodule "doc/doxygenapidark"]
+	path = doc/doxygenapidark
+	url = git@chaosrift.endofinternet.net:open-source/doxygenapidark.git

@@ -228,7 +228,7 @@ public:
 template<typename C,
          typename K>
 struct HashSetIterator:
-        public GblHashSetIterator,
+        public GblHashSetIter,
         public std::iterator<std::forward_iterator_tag, K>
 {
     using                   object_type             = C;
@@ -287,9 +287,9 @@ struct HashSetIterator:
 
 
     HashSetIterator(C* pCont=nullptr, Size bucketIdx=-1):
-        GblHashSetIterator({pCont, bucketIdx}) {}
+        GblHashSetIter({pCont, bucketIdx}) {}
 
-    HashSetIterator(const GblHashSetIterator gblIt):
+    HashSetIterator(const GblHashSetIter gblIt):
         HashSetIterator(static_cast<C*>(gblIt.pSet), gblIt.bucketIdx) {}
 
     HashSetIterator(const const_iterator_type& rhs) requires is_const:
@@ -298,9 +298,9 @@ struct HashSetIterator:
     HashSetIterator(const nonconst_iterator_type& rhs):
         HashSetIterator(rhs.pSet, rhs.bucketIdx) {}
 
-    const C* getContainer(void) const { return reinterpret_cast<C*>(GblHashSetIterator_container(this)); }
-    bool     valid(void) const { return GblHashSetIterator_valid(this); }
-    K&       value(void) { return *reinterpret_cast<K*>(GblHashSetIterator_value(this)); }
+    const C* getContainer(void) const { return reinterpret_cast<C*>(GblHashSetIter_container(this)); }
+    bool     valid(void) const { return GblHashSetIter_valid(this); }
+    K&       value(void) { return *reinterpret_cast<K*>(GblHashSetIter_value(this)); }
 
 };
 

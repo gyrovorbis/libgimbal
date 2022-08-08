@@ -845,13 +845,8 @@ GBL_EXPORT GblType GblType_fromBuiltinIndex(GblSize index) {
     GblType type = GBL_INVALID_TYPE;
     GBL_TYPE_ENSURE_INITIALIZED_();
     {
-        GblType* pType = NULL;
-        // Don't want vector error checking in the critical path
-        if(index < typeBuiltins_.vector.size) {
-            pType = ((GblType*)typeBuiltins_.vector.pData) + index;
-            if(pType)
-                type = *pType;
-        }
+        GblType* pType = GblArrayList_at(&typeBuiltins_.vector, index);
+        if(pType) type = *pType;
     }
     return type;
 }

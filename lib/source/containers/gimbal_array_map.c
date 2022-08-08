@@ -8,10 +8,10 @@ GBL_EXPORT GblArrayMap* GblArrayMap_create(GblArrayMapCmpFn   pFnComparator,
     GblArrayMap* pMap = GBL_NULL;
     GBL_API_BEGIN(pCtx);
     pMap = GBL_API_MALLOC(sizeof(GblArrayMap));
-    pMap->pCtx = pCtx;
-    pMap->pFnComparator = pFnComparator;
-    pMap->binarySearches = binarySearches;
-    pMap->size = 0;
+    GBL_PRIV_REF(pMap).pCtx = pCtx;
+    GBL_PRIV_REF(pMap).pFnComparator = pFnComparator;
+    GBL_PRIV_REF(pMap).binarySearches = binarySearches;
+    GBL_PRIV_REF(pMap).size = 0;
     GBL_API_END_BLOCK();
     return pMap;
 }
@@ -33,7 +33,7 @@ GBL_EXPORT GBL_RESULT GblArrayMap_destroy(GblArrayMap** ppSelf) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GblArrayMap* pSelf = *ppSelf;
     if(pSelf) {
-        for(GblSize e = 0; e < pSelf->size; ++e) {
+        for(GblSize e = 0; e < GBL_PRIV_REF(pSelf).size; ++e) {
             GBL_API_CALL(GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, e)));
         }
         GBL_API_FREE(pSelf);
@@ -59,7 +59,7 @@ static GblBool GblArrayMap_erase_(GblArrayMap** ppSelf, uintptr_t key, GblBool f
                     memmove(GblArrayMap_entry_(ppSelf, index),
                             GblArrayMap_entry_(ppSelf, index+1), remainder * sizeof(GblArrayMapEntry));
                 *ppSelf = GBL_API_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(GblArrayMap_size(ppSelf)-1));
-                --(*ppSelf)->size;
+                --GBL_PRIV_REF(*ppSelf).size;
                 removed = GBL_TRUE;
             }
         }
@@ -108,9 +108,9 @@ GBL_EXPORT void GblArrayMap_clear(GblArrayMap** ppSelf) {
         for(GblSize e = 0; e < size; ++e)
             GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, e));
 
-        if((*ppSelf)->pCtx || (*ppSelf)->pFnComparator) {
+        if(GBL_PRIV_REF(*ppSelf).pCtx || GBL_PRIV_REF(*ppSelf).pFnComparator) {
             *ppSelf = GBL_API_REALLOC(*ppSelf, sizeof(GblArrayMap));
-            (*ppSelf)->size = 0;
+            GBL_PRIV_REF(*ppSelf).size = 0;
         } else {
             GBL_API_FREE(*ppSelf);
             *ppSelf = GBL_NULL;

@@ -376,7 +376,7 @@ static GBL_RESULT GblArrayMapTestSuite_findBinarySearch_(GblTestSuite* pSelf, Gb
 static GBL_RESULT GblArrayMapTestSuite_findLinearSearch_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
-    pSelf_->pMap1->binarySearches = GBL_FALSE;
+    GBL_PRIV_REF(pSelf_->pMap1).binarySearches = GBL_FALSE;
 
     for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
         const uintptr_t key = GblArrayMap_probeKey(&pSelf_->pMap1, i);

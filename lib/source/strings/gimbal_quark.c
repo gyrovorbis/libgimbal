@@ -74,8 +74,8 @@ static void gblQuarkInit_(void) GBL_NOEXCEPT {
     mtxLocked = GBL_TRUE;
     GBL_API_CALL(GblHashSet_construct(&registry_,
                                       sizeof(const char*),
-                                      (GblHashSetEntryHashFn)registryHasher_,
-                                      (GblHashSetEntryCompareFn)registryComparator_,
+                                      (GblHashSetHashFn)registryHasher_,
+                                      (GblHashSetCmpFn)registryComparator_,
                                       NULL,
                                       registryCap_,
                                       pCtx_));

@@ -181,9 +181,12 @@ typedef struct GblPropertyInfo_ {
     typedef struct S##_* S
 
 
-#define GBL_PRIVATE(S)      struct S##Private_ {
+#define GBL_PRIVATE()      struct {
 
 #define GBL_PRIVATE_END }   private_;
+
+#define GBL_PRIV(a)         (a).private_
+#define GBL_PRIV_REF(a)     (a)->private_
 
 //sizeof(emptyStruct) is 1 in Cpp, 0 in C!
 #define GBL_DEFINE_EMPTY_STRUCT(S)  \

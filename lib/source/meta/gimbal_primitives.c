@@ -24,7 +24,7 @@ static GBL_RESULT nilSave_(const GblVariant* pVariant, GblStringBuffer* pString)
 
 static GBL_RESULT nilLoad_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GblBool isNil = GBL_FALSE;
-    GBL_API_BEGIN(pString->data.pCtx);
+    GBL_API_BEGIN(GblStringBuffer_context(pString));
     isNil = GblStringView_toNil(GblStringBuffer_view(pString));
     GBL_API_VERIFY_EXPRESSION(isNil);
     GBL_API_VERIFY_TYPE(pVariant->type, GBL_NIL_TYPE);
@@ -68,7 +68,7 @@ static GBL_RESULT boolSave_(const GblVariant* pVariant, GblStringBuffer* pString
 }
 
 static GBL_RESULT boolLoad_(GblVariant* pVariant, const GblStringBuffer* pString) {
-    GBL_API_BEGIN(pString->data.pCtx);
+    GBL_API_BEGIN(GblStringBuffer_context(pString));
     pVariant->boolean = GblStringView_toBool(GblStringBuffer_view(pString));
     GBL_API_END();
 }

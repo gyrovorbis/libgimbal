@@ -195,8 +195,8 @@ GBL_EXPORT GblBool GblAllocationTracker_validatePointer(const GblAllocationTrack
         .pPointer   = pPtr
     };
 
-    GblHashSetIterator it = GblHashSet_find(&pSelf_->activeSet, &entry);
-    return GblHashSetIterator_valid(&it);
+    GblHashSetIter it = GblHashSet_find(&pSelf_->activeSet, &entry);
+    return GblHashSetIter_valid(&it);
 }
 
 GBL_EXPORT GBL_RESULT GblAllocationTracker_logActive(const GblAllocationTracker* pSelf) {
@@ -205,11 +205,11 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_logActive(const GblAllocationTracker*
     GBL_API_INFO("[Allocation Tracker] Dumping Active Allocations:");
     GBL_API_PUSH();
     GblSize count = 0;
-    for(GblHashSetIterator it = GblHashSet_next(&pSelf_->activeSet, NULL);
-        GblHashSetIterator_valid(&it);
+    for(GblHashSetIter it = GblHashSet_next(&pSelf_->activeSet, NULL);
+        GblHashSetIter_valid(&it);
         it = GblHashSet_next(&pSelf_->activeSet, &it), count++)
     {
-        const GblAllocationEntry_* pEntry = GblHashSetIterator_value(&it);
+        const GblAllocationEntry_* pEntry = GblHashSetIter_value(&it);
 
         GBL_API_INFO("[%u]: %p", count, pEntry->pPointer);
         GBL_API_PUSH();

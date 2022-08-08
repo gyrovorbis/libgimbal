@@ -55,9 +55,9 @@ GBL_API gblPropertyTableInitialize(GblContext* pCtx, GblSize initialCapacity) {
     GBL_API_BEGIN(pCtx);
     GblHashSet_construct(&propertyRegistry_,
                          sizeof(GblProperty*),
-                         (GblHashSetEntryHashFn)propertyHasher_,
-                         (GblHashSetEntryCompareFn)propertyComparator_,
-                         (GblHashSetEntryDestructFn)propertyDestructor_,
+                         (GblHashSetHashFn)propertyHasher_,
+                         (GblHashSetCmpFn)propertyComparator_,
+                         (GblHashSetDtorFn)propertyDestructor_,
                          initialCapacity,
                          pCtx);
     GBL_API_END();

@@ -275,9 +275,9 @@ static inline uint32_t get_hash(const struct GblHashSet *map, const void *key) {
 
 GBL_API             GblHashSet_construct_8(GblHashSet*                 pSet,
                                            GblSize                     elsize,
-                                           GblHashSetEntryHashFn       pFnHash,
-                                           GblHashSetEntryCompareFn    pFnCompare,
-                                           GblHashSetEntryDestructFn   pFnDestruct,
+                                           GblHashSetHashFn       pFnHash,
+                                           GblHashSetCmpFn    pFnCompare,
+                                           GblHashSetDtorFn   pFnDestruct,
                                            GblSize                     capacity,
                                            GblContext*                 pCtx,
                                            void*                       pUserdata) GBL_NOEXCEPT
@@ -320,9 +320,9 @@ GBL_API             GblHashSet_construct_8(GblHashSet*                 pSet,
 }
 GBL_API             GblHashSet_construct_7(GblHashSet*                 pSet,
                                            GblSize                     entrySize,
-                                           GblHashSetEntryHashFn       pFnHash,
-                                           GblHashSetEntryCompareFn    pFnCompare,
-                                           GblHashSetEntryDestructFn   pFnDestruct,
+                                           GblHashSetHashFn       pFnHash,
+                                           GblHashSetCmpFn    pFnCompare,
+                                           GblHashSetDtorFn   pFnDestruct,
                                            GblSize                     capacity,
                                            GblContext*                 pCtx) GBL_NOEXCEPT {
     return GblHashSet_construct_8(pSet, entrySize, pFnHash, pFnCompare, pFnDestruct, capacity, pCtx, NULL);
@@ -330,9 +330,9 @@ GBL_API             GblHashSet_construct_7(GblHashSet*                 pSet,
 
 GBL_API             GblHashSet_construct_6(GblHashSet*                 pSet,
                                            GblSize                     entrySize,
-                                           GblHashSetEntryHashFn       pFnHash,
-                                           GblHashSetEntryCompareFn    pFnCompare,
-                                           GblHashSetEntryDestructFn   pFnDestruct,
+                                           GblHashSetHashFn       pFnHash,
+                                           GblHashSetCmpFn    pFnCompare,
+                                           GblHashSetDtorFn   pFnDestruct,
                                            GblSize                     capacity) GBL_NOEXCEPT
 {
     return GblHashSet_construct_7(pSet, entrySize, pFnHash, pFnCompare, pFnDestruct, capacity, NULL);
@@ -340,17 +340,17 @@ GBL_API             GblHashSet_construct_6(GblHashSet*                 pSet,
 
 GBL_API             GblHashSet_construct_5(GblHashSet*                 pSet,
                                            GblSize                     entrySize,
-                                           GblHashSetEntryHashFn       pFnHash,
-                                           GblHashSetEntryCompareFn    pFnCompare,
-                                           GblHashSetEntryDestructFn   pFnDestruct) GBL_NOEXCEPT
+                                           GblHashSetHashFn       pFnHash,
+                                           GblHashSetCmpFn    pFnCompare,
+                                           GblHashSetDtorFn   pFnDestruct) GBL_NOEXCEPT
 {
     return GblHashSet_construct_6(pSet, entrySize, pFnHash, pFnCompare, pFnDestruct, 0);
 }
 
 GBL_API             GblHashSet_construct_4(GblHashSet*                 pSet,
                                            GblSize                     entrySize,
-                                           GblHashSetEntryHashFn       pFnHash,
-                                           GblHashSetEntryCompareFn    pFnCompare) GBL_NOEXCEPT {
+                                           GblHashSetHashFn       pFnHash,
+                                           GblHashSetCmpFn    pFnCompare) GBL_NOEXCEPT {
     return GblHashSet_construct_5(pSet, entrySize, pFnHash, pFnCompare, NULL);
 }
 
@@ -651,8 +651,8 @@ GBL_EXPORT void* GblHashSet_get(const GblHashSet *map, const void *key) GBL_NOEX
 
 
 
-GBL_EXPORT GblHashSetIterator GblHashSet_find(const GblHashSet* map, const void* key) GBL_NOEXCEPT {
-    GblHashSetIterator it = {
+GBL_EXPORT GblHashSetIter GblHashSet_find(const GblHashSet* map, const void* key) GBL_NOEXCEPT {
+    GblHashSetIter it = {
         (GblHashSet*)map,
         map->bucketCount
     };
@@ -764,7 +764,7 @@ GBL_EXPORT GBL_RESULT GblHashSet_destruct(GblHashSet *map) GBL_NOEXCEPT {
 // Param `iter` can return false to stop iteration early.
 // Returns false if the iteration has been stopped early.
 GBL_EXPORT GblBool GblHashSet_foreach(const GblHashSet *map,
-                  GblHashSetIterateFn iter, void* udata) GBL_NOEXCEPT
+                  GblHashSetIterFn iter, void* udata) GBL_NOEXCEPT
 {
     for (size_t i = 0; i < map->bucketCount; i++) {
         struct bucket *bucket = bucket_at(map, i);
@@ -778,8 +778,8 @@ GBL_EXPORT GblBool GblHashSet_foreach(const GblHashSet *map,
 }
 
 
-GBL_EXPORT GblHashSetIterator GblHashSet_next(const GblHashSet* pSelf, const GblHashSetIterator* pPrev) GBL_NOEXCEPT {
-    GblHashSetIterator it = {
+GBL_EXPORT GblHashSetIter GblHashSet_next(const GblHashSet* pSelf, const GblHashSetIter* pPrev) GBL_NOEXCEPT {
+    GblHashSetIter it = {
         (GblHashSet*)pSelf,
         0
     };
@@ -795,17 +795,17 @@ GBL_EXPORT GblHashSetIterator GblHashSet_next(const GblHashSet* pSelf, const Gbl
 }
 
 
-GBL_EXPORT const GblHashSet* GblHashSetIterator_container(const GblHashSetIterator* pSelf) {
+GBL_EXPORT const GblHashSet* GblHashSetIter_container(const GblHashSetIter* pSelf) {
     return pSelf->pSet;
 }
 
-GBL_EXPORT GblBool GblHashSetIterator_valid(const GblHashSetIterator* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblHashSetIter_valid(const GblHashSetIter* pSelf) GBL_NOEXCEPT {
     return pSelf && pSelf->pSet && pSelf->bucketIdx < pSelf->pSet->bucketCount;
 }
 
-GBL_EXPORT void* GblHashSetIterator_value(const GblHashSetIterator* pSelf) {
+GBL_EXPORT void* GblHashSetIter_value(const GblHashSetIter* pSelf) {
     void* pKey = NULL;
-    if(GblHashSetIterator_valid(pSelf)) {
+    if(GblHashSetIter_valid(pSelf)) {
         GBL_API_BEGIN(pSelf->pSet->pCtx);
         pKey = GblHashSet_probe(pSelf->pSet, pSelf->bucketIdx);
         GBL_API_VERIFY_EXPRESSION(pKey, "No key for what should be a valid iterator!");

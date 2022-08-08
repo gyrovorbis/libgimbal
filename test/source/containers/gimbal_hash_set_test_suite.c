@@ -81,9 +81,9 @@ static GBL_RESULT verify_(const GblHashSet* pSet, GblSize entryCount, const Hash
 
     //find
     for(GblSize e = 0; e < entryCount; ++e) {
-        GblHashSetIterator it = GblHashSet_find(pSet, &pEntries[e]);
-        GBL_TEST_VERIFY(GblHashSetIterator_valid(&it));
-        HashSetEntry_* pEntry = GblHashSetIterator_value(&it);
+        GblHashSetIter it = GblHashSet_find(pSet, &pEntries[e]);
+        GBL_TEST_VERIFY(GblHashSetIter_valid(&it));
+        HashSetEntry_* pEntry = GblHashSetIter_value(&it);
         GBL_TEST_VERIFY(pEntry);
         GBL_TEST_COMPARE(pEntry->pKey, pEntries[e].pKey);
         GBL_TEST_COMPARE(pEntry->value, pEntries[e].value);
@@ -187,9 +187,9 @@ static GBL_RESULT GblHashSetTestSuite_findInvalid_(GblTestSuite* pSelf, GblConte
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     const char* pKey = "Entry1";
 
-    GblHashSetIterator it = GblHashSet_find(&pSelf_->hashSet, &pKey);
+    GblHashSetIter it = GblHashSet_find(&pSelf_->hashSet, &pKey);
     GBL_API_VERIFY_LAST_RECORD();
-    GBL_TEST_VERIFY(!GblHashSetIterator_valid(&it));
+    GBL_TEST_VERIFY(!GblHashSetIter_valid(&it));
 
     GBL_API_END();
 }

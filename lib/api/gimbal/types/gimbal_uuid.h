@@ -36,7 +36,7 @@ GBL_DECLS_BEGIN
  */
 typedef struct GblUuid {
     union {
-        GBL_PRIVATE(GblUuid)
+        GBL_PRIVATE()
             uint32_t  time_low;
             uint16_t  time_mid;
             uint16_t  time_hi_and_version;

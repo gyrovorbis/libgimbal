@@ -52,14 +52,16 @@ typedef struct GblArrayMapEntry {
  *  \sa GblArrayMapEntry
  */
 typedef struct GblArrayMap {
-    GblContext*             pCtx;                   ///< Optional custom context
-    GblArrayMapCmpFn        pFnComparator;          ///< Optional custom comparator
-    GblSize                 binarySearches  : 1;    ///< Optionally sort values and use binary searches
+    GBL_PRIVATE()
+        GblContext*             pCtx;                   ///< Optional custom context
+        GblArrayMapCmpFn        pFnComparator;          ///< Optional custom comparator
+        GblSize                 binarySearches  : 1;    ///< Optionally sort values and use binary searches
 #ifdef GBL_64BIT
-    GblSize                 size            : 63;   ///< Number of elements within the map
+        GblSize                 size            : 63;   ///< Number of elements within the map
 #elif defined(GBL_32BIT)
-    GblSize                 size            : 31;
+        GblSize                 size            : 31;
 #endif
+    GBL_PRIVATE_END
 } GblArrayMap;
 
 /// Pre-creates a GblArrayMap with the given comparator, binary search config, and context.
@@ -159,8 +161,8 @@ GBL_INLINE uintptr_t GblArrayMap_valueFromVariant_(GblVariant* pVariant) GBL_NOE
 GBL_INLINE ptrdiff_t GblArrayMap_diffEntry_(CSELF, GblSize index, uintptr_t key) GBL_NOEXCEPT {
     ptrdiff_t diff = GBL_ARRAY_MAP_NPOS;
     const GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, index);
-    if((*ppSelf)->pFnComparator) {
-        diff = (*ppSelf)->pFnComparator(*ppSelf, pEntry->key, key);
+    if(GBL_PRIV_REF(*ppSelf).pFnComparator) {
+        diff = GBL_PRIV_REF(*ppSelf).pFnComparator(*ppSelf, pEntry->key, key);
     } else {
         diff = pEntry->key - key;
     }
@@ -219,8 +221,8 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(SELF, uintptr_t key) {
             do {
                 const GblSize mid = lower + ((upper-lower) >> 1);
                 const GblArrayMapEntry* pEntry = pEntryBegin + mid;
-                const ptrdiff_t diff = pSelf->pFnComparator?
-                                            pSelf->pFnComparator(pSelf, pEntry->key, key) :
+                const ptrdiff_t diff = GBL_PRIV_REF(pSelf).pFnComparator?
+                                            GBL_PRIV_REF(pSelf).pFnComparator(pSelf, pEntry->key, key) :
                                             pEntry->key - key;
                 if(diff > 0) {
                     upper = mid-1;
@@ -238,7 +240,7 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(SELF, uintptr_t key) {
 
         // resize array and initialize entry to point to new position
         *ppSelf = (GblArrayMap*)GBL_API_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(size+1));
-        ++(*ppSelf)->size;
+        ++GBL_PRIV_REF(*ppSelf).size;
         pEntry = GblArrayMap_entry_(ppSelf, insertionIdx);
 
         // calculate slide adjustments for the rest of the items
@@ -260,7 +262,7 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(SELF, uintptr_t key) {
         } else GBL_LIKELY {
             *ppSelf = (GblArrayMap*)GBL_API_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(size + 1));
         }
-        ++(*ppSelf)->size;
+        ++GBL_PRIV_REF(*ppSelf).size;
         pEntry = GblArrayMap_entry_(ppSelf, GblArrayMap_size(ppSelf)-1);
     }
 
@@ -290,7 +292,7 @@ GBL_INLINE GBL_RESULT GblArrayMap_entrySetUserdata_(CSELF, GblArrayMapEntry* pEn
  * \relatedalso GblArrayMap
  */
 GBL_INLINE GblSize GblArrayMap_size(CSELF) GBL_NOEXCEPT {
-    return *ppSelf? (*ppSelf)->size : 0;
+    return *ppSelf? GBL_PRIV_REF(*ppSelf).size : 0;
 }
 /*!
  * \brief GblArrayMap_context
@@ -299,7 +301,7 @@ GBL_INLINE GblSize GblArrayMap_size(CSELF) GBL_NOEXCEPT {
  * \relatedalso GblArrayMap
  */
 GBL_INLINE GblContext* GblArrayMap_context(CSELF) GBL_NOEXCEPT {
-    return *ppSelf? (*ppSelf)->pCtx : 0;
+    return *ppSelf? GBL_PRIV_REF(*ppSelf).pCtx : 0;
 }
 /*!
  * \brief GblArrayMap_empty
@@ -308,7 +310,7 @@ GBL_INLINE GblContext* GblArrayMap_context(CSELF) GBL_NOEXCEPT {
  * \relatedalso GblArrayMap
  */
 GBL_INLINE GblBool GblArrayMap_empty(CSELF) GBL_NOEXCEPT {
-    return *ppSelf && (*ppSelf)->size? GBL_FALSE : GBL_TRUE;
+    return *ppSelf && GBL_PRIV_REF(*ppSelf).size? GBL_FALSE : GBL_TRUE;
 }
 /*!
  * \brief GblArrayMap_binarySearches
@@ -317,7 +319,7 @@ GBL_INLINE GblBool GblArrayMap_empty(CSELF) GBL_NOEXCEPT {
  * \relatedalso GblArrayMap
  */
 GBL_INLINE GblBool GblArrayMap_binarySearches(CSELF) GBL_NOEXCEPT {
-    return *ppSelf && (*ppSelf)->binarySearches? GBL_TRUE : GBL_FALSE;
+    return *ppSelf && GBL_PRIV_REF(*ppSelf).binarySearches? GBL_TRUE : GBL_FALSE;
 }
 /*!
  * \brief GblArrayMap_contains
@@ -455,11 +457,11 @@ GBL_INLINE GblSize GblArrayMap_find(CSELF, uintptr_t key) GBL_NOEXCEPT {
             ptrdiff_t lower = 0;
 
             // Only run this loop if we're doing a binary search using a comparator
-            if(pSelf->pFnComparator) {
+            if(GBL_PRIV_REF(pSelf).pFnComparator) {
                 do {
                     const GblSize mid = lower + ((upper-lower) >> 1);
                     const GblArrayMapEntry* pEntry = pEntryBegin + mid;
-                    const ptrdiff_t diff = pSelf->pFnComparator(pSelf, pEntry->key, key);
+                    const ptrdiff_t diff = GBL_PRIV_REF(pSelf).pFnComparator(pSelf, pEntry->key, key);
                     if(diff > 0) {
                         upper = mid-1;
                     } else if(diff < 0) {
@@ -492,10 +494,10 @@ GBL_INLINE GblSize GblArrayMap_find(CSELF, uintptr_t key) GBL_NOEXCEPT {
         } else { // do regular-ass linear searches
 
             // Only run this loop for linear searches with a comparator
-            if(pSelf->pFnComparator) {
+            if(GBL_PRIV_REF(pSelf).pFnComparator) {
                 const GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, 0);
                 for(GblSize e = 0; e < size; ++e) {
-                    if(pSelf->pFnComparator(pSelf, pEntry->key, key) == 0) {
+                    if(GBL_PRIV_REF(pSelf).pFnComparator(pSelf, pEntry->key, key) == 0) {
                          index = e;
                          break;
                      }
