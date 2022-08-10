@@ -36,8 +36,8 @@
 #define GBL_OBJECT_GET_CLASS(instance)      GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_OBJECT)
 #define GBL_OBJECT_TRY_CLASS(instance)      GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_OBJECT)
 
-#define GBL_OBJECT_REF(object)              (GblRefCounted_ref((GblRefCounted*)object))
-#define GBL_OBJECT_UNREF(object)            (GblRefCounted_unref((GblRefCounted*)object))
+#define GBL_OBJECT_REF(object)              (GblRecord_ref((GblRecord*)object))
+#define GBL_OBJECT_UNREF(object)            (GblRecord_unref((GblRecord*)object))
 
 #define SELF GblObject* pSelf
 #define CSELF const SELF
@@ -55,7 +55,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblEvent);
  *  \implements GblIVariantIFace, GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
  */
 GBL_CLASS_DERIVE(GblObjectClass,
-                 GblRefCountedClass,
+                 GblRecordClass,
                  GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
 
     GBL_RESULT (*pFnConstructor)        (SELF);
@@ -83,7 +83,7 @@ typedef enum GBL_OBJECT_ATTRIBUTE {
  *  \extends GblInstance
  *  \implements GblIVariant, GblITable, GblIEventHandler, GblIEventFilter
  */
-GBL_INSTANCE_DERIVE(GblObject, GblRefCounted,
+GBL_INSTANCE_DERIVE(GblObject, GblRecord,
                     GblObjectClass)
 GBL_INSTANCE_END
 

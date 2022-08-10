@@ -55,7 +55,7 @@ GBL_EXPORT GblType GblClosure_type(void) {
     if(type == GBL_INVALID_TYPE) {
         GBL_API_BEGIN(NULL);
         type = GblType_registerStatic(GblQuark_internStringStatic("Closure"),
-                                      GBL_REF_COUNTED_TYPE,
+                                      GBL_RECORD_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);
         GBL_API_VERIFY_LAST_RECORD();

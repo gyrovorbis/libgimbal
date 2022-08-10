@@ -212,7 +212,7 @@ static GblContextClass defaultClass = {
 };
 
 static GblContext defaultCtx_ = {
-    .base.base.pClass = (GblRefCountedClass*)&defaultClass,
+    .base.base.pClass = (GblRecordClass*)&defaultClass,
     .base.base.private_.contextType = 1,
     .logFilter = 0xffffffff
 };

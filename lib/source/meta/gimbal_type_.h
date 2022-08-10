@@ -112,7 +112,7 @@ extern GBL_RESULT       GblFlags_typeRegister_            (GblContext* pCtx);
 extern GBL_RESULT       GblPointer_typeRegister_          (GblContext* pCtx);
 extern GBL_RESULT       GblBoxed_typeRegister_            (GblContext* pCtx);
 extern GBL_RESULT       GblITable_typeRegister_           (GblContext* pCtx);
-extern GBL_RESULT       GblRefCounted_typeRegister_           (GblContext* pCtx);
+extern GBL_RESULT       GblRecord_typeRegister_           (GblContext* pCtx);
 extern GBL_RESULT       GblIEventHandler_typeRegister_    (GblContext* pCtx);
 extern GBL_RESULT       GblIEventFilter_typeRegister_     (GblContext* pCtx);
 extern GBL_RESULT       GblObject_typeRegister_           (GblContext* pCtx);

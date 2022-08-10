@@ -5,22 +5,22 @@
 #include "../ifaces/gimbal_ivariant.h"
 #include "../containers/gimbal_array_map.h"
 
-#define GBL_REF_COUNTED_TYPE                 (GBL_BUILTIN_TYPE(RECORD))
+#define GBL_RECORD_TYPE                 (GBL_BUILTIN_TYPE(RECORD))
 
-#define GBL_REF_COUNTED(instance)            (GBL_INSTANCE_CAST(instance, GBL_REF_COUNTED_TYPE, GblRefCounted))
-#define GBL_REF_COUNTED_CLASS(klass)         (GBL_CLASS_CAST(klass, GBL_REF_COUNTED_TYPE, GblRefCountedClass))
-#define GBL_REF_COUNTED_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GBL_REF_COUNTED_TYPE, GblRefCountedClass))
+#define GBL_RECORD(instance)            (GBL_INSTANCE_CAST(instance, GBL_RECORD_TYPE, GblRecord))
+#define GBL_RECORD_CLASS(klass)         (GBL_CLASS_CAST(klass, GBL_RECORD_TYPE, GblRecordClass))
+#define GBL_RECORD_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GBL_RECORD_TYPE, GblRecordClass))
 
-#define KLASS   GblRefCountedClass* pSelf
+#define KLASS   GblRecordClass* pSelf
 #define CKLASS  const KLASS
-#define SELF    GblRefCounted* pSelf
+#define SELF    GblRecord* pSelf
 #define CSELF   const SELF
 
 GBL_DECLS_BEGIN
 
-GBL_FORWARD_DECLARE_STRUCT(GblRefCounted);
+GBL_FORWARD_DECLARE_STRUCT(GblRecord);
 
-GBL_CLASS_DERIVE(GblRefCountedClass,
+GBL_CLASS_DERIVE(GblRecordClass,
                  GblClass, GblIVariantIFace)
     GBL_PRIVATE()
         GblArrayMap* pFields;
@@ -29,7 +29,7 @@ GBL_CLASS_DERIVE(GblRefCountedClass,
     GBL_RESULT  (*pFnDestructor)(SELF);
 GBL_CLASS_END
 
-GBL_INSTANCE_DERIVE(GblRefCounted, GblInstance, GblRefCountedClass)
+GBL_INSTANCE_DERIVE(GblRecord, GblInstance, GblRecordClass)
     GBL_PRIVATE()
         GblArrayMap* pFields;
         GblRefCount  refCounter;
@@ -40,38 +40,38 @@ GBL_INSTANCE_DERIVE(GblRefCounted, GblInstance, GblRefCountedClass)
 GBL_INSTANCE_END
 
 // ===== Class =====
-GBL_EXPORT GBL_RESULT  GblRefCountedClass_setField     (KLASS,
+GBL_EXPORT GBL_RESULT  GblRecordClass_setField     (KLASS,
                                                     GblQuark          key,
                                                     uintptr_t         ud,
                                                     GblArrayMapDtorFn pFnDtor) GBL_NOEXCEPT;
 
-GBL_EXPORT uintptr_t   GblRefCountedClass_getField     (CKLASS, GblQuark key)      GBL_NOEXCEPT;
-GBL_EXPORT uintptr_t   GblRefCountedClass_takeField    (KLASS, GblQuark key)       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblRefCountedClass_clearField   (KLASS, GblQuark key)       GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblRefCountedClass_hasField     (KLASS, GblQuark key)       GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t   GblRecordClass_getField     (CKLASS, GblQuark key)      GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t   GblRecordClass_takeField    (KLASS, GblQuark key)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblRecordClass_clearField   (KLASS, GblQuark key)       GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblRecordClass_hasField     (KLASS, GblQuark key)       GBL_NOEXCEPT;
 
 // ===== Instance =====
-GBL_EXPORT GblRefCounted*  GblRefCounted_create            (GblType derivedType)       GBL_NOEXCEPT;
-GBL_EXPORT GblRefCounted*  GblRefCounted_createWithClass   (GblRefCountedClass* pClass)    GBL_NOEXCEPT;
+GBL_EXPORT GblRecord*  GblRecord_create            (GblType derivedType)       GBL_NOEXCEPT;
+GBL_EXPORT GblRecord*  GblRecord_createWithClass   (GblRecordClass* pClass)    GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblRefCounted_construct         (SELF,
+GBL_EXPORT GBL_RESULT  GblRecord_construct         (SELF,
                                                     GblType derivedType)       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblRefCounted_constructWithClass(SELF,
-                                                    GblRefCountedClass* pClass)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblRecord_constructWithClass(SELF,
+                                                    GblRecordClass* pClass)    GBL_NOEXCEPT;
 
-GBL_EXPORT GblRefCounted*  GblRefCounted_ref               (SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount GblRefCounted_unref             (SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount GblRefCounted_refCount          (CSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblRecord*  GblRecord_ref               (SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount GblRecord_unref             (SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount GblRecord_refCount          (CSELF)                     GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblRefCounted_setField          (SELF,
+GBL_EXPORT GBL_RESULT  GblRecord_setField          (SELF,
                                                     GblQuark          key,
                                                     uintptr_t         ud,
                                                     GblArrayMapDtorFn pFnDtor) GBL_NOEXCEPT;
 
-GBL_EXPORT uintptr_t   GblRefCounted_getField          (CSELF, GblQuark key)       GBL_NOEXCEPT;
-GBL_EXPORT uintptr_t   GblRefCounted_takeField         (SELF, GblQuark key)        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblRefCounted_clearField        (SELF, GblQuark key)        GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblRefCounted_hasField          (SELF, GblQuark key)        GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t   GblRecord_getField          (CSELF, GblQuark key)       GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t   GblRecord_takeField         (SELF, GblQuark key)        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblRecord_clearField        (SELF, GblQuark key)        GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblRecord_hasField          (SELF, GblQuark key)        GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

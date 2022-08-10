@@ -15,11 +15,11 @@
 
 GBL_DECLS_BEGIN
 
-GBL_CLASS_DERIVE(GblClosureClass, GblRefCountedClass)
+GBL_CLASS_DERIVE(GblClosureClass, GblRecordClass)
     GblMarshalFn    pFnMetaMarshal;
 GBL_CLASS_END
 
-GBL_INSTANCE_DERIVE(GblClosure, GblRefCounted)
+GBL_INSTANCE_DERIVE(GblClosure, GblRecord)
     GBL_PRIVATE()
         GblMarshalFn    pFnMarshal;
     GBL_PRIVATE_END

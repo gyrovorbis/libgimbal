@@ -75,6 +75,23 @@ build win10-mingw11:
     - pwd
     - C:/Qt/6.3.1/mingw_64/bin/windeployqt build/test/GimbalTests.exe
 
+build dreamcast:
+  stage: build
+  tags: 
+    - dreamcast
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  artifacts:
+    paths:
+       - build/
+    expire_in: 1 week
+  script:
+      - mkdir -p build
+      - cd build 
+      - env
+      - cmake ../ -DGBL_ENABLE_TESTS=ON -DCMAKE_TOOLCHAIN_FILE=../utils/build-environment/toolchains/dreamcast.toolchain.cmake 
+      - cmake --build . --target all
+
 build psvita:
   stage: build
   tags: 

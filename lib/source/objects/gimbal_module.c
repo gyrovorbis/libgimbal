@@ -18,8 +18,8 @@ GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
     GBL_API_BEGIN(pPlugin);
     GblModule* pModule = GBL_MODULE(pPlugin);
     GblObject* pObject = GBL_OBJECT(pModule);
-    GblRefCounted_ref(GBL_REF_COUNTED(pObject));
-    const GblRefCount refCount = GblRefCounted_refCount(GBL_REF_COUNTED(pObject));
+    GblRecord_ref(GBL_RECORD(pObject));
+    const GblRefCount refCount = GblRecord_refCount(GBL_RECORD(pObject));
     GBL_API_DEBUG("[GblModule: %s] Used: %u",
                   GblObject_name(GBL_OBJECT(pObject)),
                   refCount);
@@ -33,8 +33,8 @@ GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
     GBL_API_BEGIN(pPlugin);
     GblModule* pModule = GBL_MODULE(pPlugin);
     GblObject* pObject = GBL_OBJECT(pModule);
-    GblRefCounted_unref(GBL_REF_COUNTED(pObject));
-    const GblRefCount refCount = GblRefCounted_refCount(GBL_REF_COUNTED(pObject));
+    GblRecord_unref(GBL_RECORD(pObject));
+    const GblRefCount refCount = GblRecord_refCount(GBL_RECORD(pObject));
     GBL_API_DEBUG("[GblModule: %s] Unused: %u",
                   GblObject_name(GBL_OBJECT(pObject)),
                   refCount);
@@ -59,7 +59,7 @@ GBL_RESULT GblModule_propertySet_(GblObject* pObject, GblSize id, const GblVaria
     GBL_API_END();
 }
 
-GBL_RESULT GblModule_destructor_(GblRefCounted* pRecord) {
+GBL_RESULT GblModule_destructor_(GblRecord* pRecord) {
     GBL_API_BEGIN(pRecord);
     GblModule* pSelf = GBL_MODULE(pRecord);
     GblStringRef_release(&pSelf->author);
