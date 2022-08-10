@@ -88,6 +88,7 @@ build dreamcast:
   script:
       - mkdir -p build
       - cd build 
+      - source /opt/toolchains/dc/environ.sh
       - env
       - cmake ../ -DGBL_ENABLE_TESTS=ON -DCMAKE_TOOLCHAIN_FILE=../util/build-environment/toolchains/dreamcast.toolchain.cmake 
       - cmake --build . --target all
