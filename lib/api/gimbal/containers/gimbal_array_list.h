@@ -247,13 +247,13 @@ GBL_INLINE GBL_RESULT GblArrayList_prepend(GblArrayList* pSelf, const void* pDat
                 GBL_RESULT_SUCCESS;
 }
 
-GBL_INLINE GblArrayList* GblArrayList_createInPlace (SELF,
-                                               uint16_t    elementSize,
-                                               GblSize     elementCount,
-                                               const void* pInitialData,
-                                               GblSize     structSize,
-                                               GblBool     zeroTerminated,
-                                               GblContext* pCtx) GBL_NOEXCEPT
+GBL_INLINE GblArrayList* GblArrayList_createInPlace(SELF,
+                                                    uint16_t    elementSize,
+                                                    GblSize     elementCount,
+                                                    const void* pInitialData,
+                                                    GblSize     structSize,
+                                                    GblBool     zeroTerminated,
+                                                    GblContext* pCtx) GBL_NOEXCEPT
 {
     GblArrayList* pOut = NULL;
     GBL_API_BEGIN(pCtx);

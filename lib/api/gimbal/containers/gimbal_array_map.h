@@ -46,7 +46,7 @@ typedef struct GblArrayMapEntry {
  *
  *  \note
  *  GblArrayMap is a lazily-allocated structure, meaning it isn't actually allocated until it's
- *  needed. This is why the majority of the API takes a poiner to a pointer, so a NULL pointer
+ *  needed. This is why the majority of the API takes a pointer to a pointer, so a NULL pointer
  *  value is a valid empty map. You can optionally preconstruct the structure with GblArrayMap_create.
  *  \ingroup containers
  *  \sa GblArrayMapEntry

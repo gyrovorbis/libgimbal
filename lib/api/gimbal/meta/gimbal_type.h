@@ -23,12 +23,10 @@ GBL_DECLS_BEGIN
  */
 typedef uintptr_t                                   GblType;
 
-///\name Type Functions
-/// @{
+
 typedef GBL_RESULT (*GblTypeClassInitializeFn)      (GblClass*, const void*, GblContext*);      ///< \details Function type used as a GblType's GblClass initializer
 typedef GBL_RESULT (*GblTypeClassFinalizeFn)        (GblClass*, const void*, GblContext*);      ///< \details Function type used as a GblType's GblClass finalizer
 typedef GBL_RESULT (*GblTypeInstanceInitializeFn)   (GblInstance*, GblContext*);                ///< \details Function type used as a GblType's GblInstance initializer
-///@}
 
 /// \details Flags controlling behavior of GblTypes. These can be set at any level in a type heirarchy.
 typedef enum GblTypeFlags {
@@ -64,7 +62,7 @@ typedef struct GblTypeInfo {
     const GblType*                  pDependencies;          ///< Array providing a list of type dependencies that must be implemented a GblType
     GblTypeInstanceInitializeFn     pFnInstanceInit;        ///< Function used to initialize the values a GblType's associated GblInstance
     GblSize                         instanceSize;           ///< Size of a GblType's associated GblInstance structure
-    GblSize                        instancePrivateSize;    ///< Size of extra private storage to be associated with a GblType's GblInstance.
+    GblSize                         instancePrivateSize;    ///< Size of extra private storage to be associated with a GblType's GblInstance.
 } GblTypeInfo;
 
 GBL_EXPORT GblType              GblType_registerStatic  (const char*          pName,

@@ -73,7 +73,7 @@ GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOXED);
                                                                     GblVariant* pArgs,          \
                                                                     GblPtr      pMarshalData)   \
     GBL_NOEXCEPT {                                                                              \
-        GBL_UNUSED(pRetValue);                                                                  \
+        GBL_UNUSED(pRetValue, argCount);                                                        \
         typedef void (*CFunction)(GBL_EVAL paramList);                                          \
         GBL_ASSERT(argCount >= paramCount);                                                     \
         GBL_ASSERT(!pRetValue || GblVariant_typeOf(pRetValue) == GBL_INVALID_TYPE);             \

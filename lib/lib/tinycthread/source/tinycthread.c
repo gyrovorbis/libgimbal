@@ -23,6 +23,8 @@ freely, subject to the following restrictions:
 */
 
 #include "tinycthread.h"
+
+#ifndef _TTHREAD_CTHREADS_
 #include <stdlib.h>
 
 /* Platform specific includes */
@@ -934,4 +936,5 @@ void call_once(once_flag *flag, void (*func)(void))
 
 #ifdef __cplusplus
 }
+#endif
 #endif

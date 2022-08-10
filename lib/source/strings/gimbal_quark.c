@@ -187,7 +187,6 @@ static inline GblQuark* GblQuark_tryString_(const char* pString) {
 
 GBL_EXPORT GblQuark GblQuark_tryStringSized(const char* pString, GblSize length) GBL_NOEXCEPT {
     GblQuark quark = GBL_QUARK_INVALID;
-    GBL_API_BEGIN(pCtx_);
     if(initialized_ && pString && length) {
         char* pCString = GBL_ALLOCA(length + 1);
         strncpy(pCString, pString, length);
@@ -195,61 +194,68 @@ GBL_EXPORT GblQuark GblQuark_tryStringSized(const char* pString, GblSize length)
         GblQuark* pQuark = GblQuark_tryString_(pCString);
         if(pQuark) quark = *pQuark;
     }
-    GBL_API_END_BLOCK();
     return quark;
 }
 
 GBL_EXPORT GblQuark GblQuark_tryString(const char* pString) GBL_NOEXCEPT {
     GblQuark quark = GBL_QUARK_INVALID;
-    GBL_API_BEGIN(pCtx_);
     if(initialized_ && pString) {
         GblQuark* pQuark = GblQuark_tryString_(pString);
         if(pQuark) quark = *pQuark;
     }
-    GBL_API_END_BLOCK();
     return quark;
 }
 
 const char* quarkStringAllocCopy_(const char* pString) {
     char* pNewString = NULL;
-    GBL_API_BEGIN(pCtx_); {
-        GBL_API_VERIFY_POINTER(pString);
-        const GblSize size = strlen(pString) + 1;
+    GBL_ASSERT(pString);
+
+    const GblSize size = strlen(pString) + 1;
+    GBL_ASSERT(size <= GblQuark_pageSize());
+    #if 0
+    {
+        GBL_API_BEGIN(pCtx_);
         GBL_API_VERIFY(size <= GblQuark_pageSize(), GBL_RESULT_ERROR_OVERFLOW,
                        "Cannot allocate storage for Quark that is larger than page size! (%u vs %u)",
                        size, GblQuark_pageSize());
-        if(pageCurrent_()->position + size > GblQuark_pageSize()) {
-            QuarkAllocPage_* pPage = GBL_API_MALLOC(sizeof(QuarkAllocPage_)-1 + pageSize_);
-            memset(pPage, 0, sizeof(QuarkAllocPage_)-1 + pageSize_);
-            GblLinkedList_pushFront(&pageList_, &pPage->listNode);
-            pageCurrent_()->pageSize = pageSize_;
-        }
-        pNewString = &pageCurrent_()->bytes[pageCurrent_()->position];
-        strcpy(pNewString, pString);
-        pageCurrent_()->position += size;
-    } GBL_API_END_BLOCK();
+    }
+    #endif
+    if(pageCurrent_()->position + size > GblQuark_pageSize()) {
+        GBL_API_BEGIN(pCtx_);
+        QuarkAllocPage_* pPage = GBL_API_MALLOC(sizeof(QuarkAllocPage_)-1 + pageSize_);
+        memset(pPage, 0, sizeof(QuarkAllocPage_)-1 + pageSize_);
+        GblLinkedList_pushFront(&pageList_, &pPage->listNode);
+        pageCurrent_()->pageSize = pageSize_;
+        GBL_API_END_BLOCK();
+    }
+    pNewString = &pageCurrent_()->bytes[pageCurrent_()->position];
+    strcpy(pNewString, pString);
+    pageCurrent_()->position += size;
+
     return pNewString;
 }
 
 GBL_EXPORT GblQuark quarkFromString_(const char* pString, GblBool alloc) GBL_NOEXCEPT {
     GblQuark quark = 0;
-    GBL_API_BEGIN(pCtx_);
     if(pString) {
         GBL_QUARK_ENSURE_INITIALIZED_();
         quark = GblQuark_tryString(pString);
         if(!quark) {
             mtx_lock(&registryMtx_);
             if(alloc) pString = quarkStringAllocCopy_(pString);
-            GBL_API_VERIFY_POINTER(pString);
-            GblBool inserted = GblHashSet_insert(&registry_, &pString);
-            GBL_API_VERBOSE("[GblQuark] Adding: %s", pString);
-            mtx_unlock(&registryMtx_);
-            GBL_API_VERIFY(inserted, GBL_RESULT_ERROR_INTERNAL,
-                           "[GblQuark]: Failed to add string to hash map: %s", pString);
+            GBL_ASSERT(pString);
+            if(pString) {
+                GblBool inserted = GblHashSet_insert(&registry_, &pString);
+                //GBL_API_VERBOSE("[GblQuark] Adding: %s", pString);
+                mtx_unlock(&registryMtx_);
+                GBL_UNUSED(inserted);
+                GBL_ASSERT(inserted);
+                //GBL_API_VERIFY(inserted, GBL_RESULT_ERROR_INTERNAL,
+                //               "[GblQuark]: Failed to add string to hash map: %s", pString);
+            }
             quark = (GblQuark)pString;
         }
     }
-    GBL_API_END_BLOCK();
     return quark;
 }
 

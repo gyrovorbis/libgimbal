@@ -52,6 +52,11 @@ extern "C" {
 * tinycthread.h.
 */
 
+#if __STDC_VERSION__ == 201710L && !(__STDC_NO_THREADS__)
+#define _TTHREAD_CTHREADS_
+#include <threads.h>
+#else
+
 /* Which platform are we on? */
 #if !defined(_TTHREAD_PLATFORM_DEFINED_)
   #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
@@ -475,5 +480,5 @@ int tss_set(tss_t key, void *val);
 #ifdef __cplusplus
 }
 #endif
-
+#endif
 #endif /* _TINYTHREAD_H_ */

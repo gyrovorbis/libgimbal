@@ -23,7 +23,7 @@ static GblBool propertyComparator_(const GblHashSet* pSet, const GblProperty** p
 }
 
 static void propertyDestructor_(const GblHashSet* pSet, GblProperty** pProperty) {
-    GBL_API_BEGIN(pSet->pCtx);
+    GBL_API_BEGIN(GblHashSet_context(pSet));
     GBL_API_FREE(*pProperty);
     GBL_API_END_BLOCK();
 }

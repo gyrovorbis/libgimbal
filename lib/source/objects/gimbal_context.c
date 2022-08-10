@@ -172,7 +172,7 @@ static GBL_RESULT GblContext_ILogger_push_(GblILogger* pILogger, const GblStackF
 }
 
 static GBL_RESULT GblContext_constructor_(GblObject* pSelf) GBL_NOEXCEPT {
-    pSelf->contextType = 1;
+    GBL_PRIV(pSelf->base).contextType = 1;
     ((GblContext*)pSelf)->logFilter = 0xffffffff;
     GBL_API_BEGIN(pSelf);
 
@@ -212,8 +212,8 @@ static GblContextClass defaultClass = {
 };
 
 static GblContext defaultCtx_ = {
-    .base.pClass = (GblObjectClass*)&defaultClass,
-    .base.contextType = 1,
+    .base.base.pClass = (GblRefCountedClass*)&defaultClass,
+    .base.base.private_.contextType = 1,
     .logFilter = 0xffffffff
 };
 

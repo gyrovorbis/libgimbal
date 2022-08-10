@@ -115,10 +115,10 @@ static GBL_RESULT GblTestSuiteClass_constructed_(GblObject* pSelf) {
     GBL_API_END();
 }
 
-static GBL_RESULT GblTestSuiteClass_destructor_(GblObject* pSelf) {
+static GBL_RESULT GblTestSuiteClass_destructor_(GblRefCounted* pSelf) {
     GBL_API_BEGIN(pSelf);
     GblObjectClass* pSuper = GBL_OBJECT_CLASS(GblClass_weakRefDefault(GBL_OBJECT_TYPE));
-    if(pSuper && pSuper->pFnDestructor) GBL_API_VERIFY_CALL(pSuper->pFnDestructor(pSelf));
+    if(pSuper && pSuper->base.pFnDestructor) GBL_API_VERIFY_CALL(pSuper->base.pFnDestructor(pSelf));
 
     GBL_API_VERIFY_CALL(GblArrayList_destruct(&GBL_TEST_SUITE_(pSelf)->testCases));
     GBL_API_END();
@@ -149,7 +149,7 @@ static GBL_RESULT GblTestSuiteClass_init_(GblClass* pClass, const void* pUd, Gbl
     pSelf->pFnCaseName              = GblTestSuiteClass_caseName_;
 
     pSelf->base.pFnConstructed      = GblTestSuiteClass_constructed_;
-    pSelf->base.pFnDestructor       = GblTestSuiteClass_destructor_;
+    pSelf->base.base.pFnDestructor  = GblTestSuiteClass_destructor_;
     pSelf->base.pFnPropertyGet      = GblTestSuiteClass_propertyGet_;
 
     GBL_API_END();
@@ -317,7 +317,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_destroy(GblTestSuite* pSelf) {
     GBL_API_VERIFY(GblTestSuite_scenario(pSelf) == NULL,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Tried to destroy a GblTestSuite owned by a scenario!");
-    GBL_API_VERIFY(GblObject_unref(GBL_OBJECT(pSelf)) == 0,
+    GBL_API_VERIFY(GblRefCounted_unref(GBL_REF_COUNTED(pSelf)) == 0,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Tried to destroy GblTestSuite, has other references!");
     GBL_API_END();

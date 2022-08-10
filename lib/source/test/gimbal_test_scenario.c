@@ -343,16 +343,16 @@ static GBL_RESULT GblTestScenarioClass_constructor_(GblObject* pObject) {
     GBL_API_END();
 }
 
-static GBL_RESULT GblTestScenarioClass_destructor_(GblObject* pObject) {
-    GBL_API_BEGIN(pObject);
+static GBL_RESULT GblTestScenarioClass_destructor_(GblRefCounted* pRecord) {
+    GBL_API_BEGIN(pRecord);
 
-    GblTestScenario*    pSelf   = GBL_TEST_SCENARIO(pObject);
+    GblTestScenario*    pSelf   = GBL_TEST_SCENARIO(pRecord);
     GblTestScenario_*   pSelf_  = GBL_TEST_SCENARIO_(pSelf);
 
     GBL_API_VERIFY_CALL(GblAllocationTracker_destroy(pSelf_->pAllocTracker));
 
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
-    GBL_API_VERIFY_CALL(pCtxClass->base.pFnDestructor(pObject));
+    GBL_API_VERIFY_CALL(pCtxClass->base.base.pFnDestructor(pRecord));
     GBL_API_END();
 }
 
@@ -371,7 +371,7 @@ static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd, 
     pSelfClass->pFnSuiteBegin                   = GblTestScenarioClass_suiteBegin_;
     pSelfClass->pFnSuiteEnd                     = GblTestScenarioClass_suiteEnd_;
     pSelfClass->base.base.pFnConstructor        = GblTestScenarioClass_constructor_;
-    pSelfClass->base.base.pFnDestructor         = GblTestScenarioClass_destructor_;
+    pSelfClass->base.base.base.pFnDestructor    = GblTestScenarioClass_destructor_;
     pSelfClass->base.base.pFnPropertyGet        = GblTestScenarioClass_propertyGet_;
     pSelfClass->base.iAllocatorIFace.pFnAlloc   = GblTestScenarioClass_IAllocator_alloc_;
     pSelfClass->base.iAllocatorIFace.pFnRealloc = GblTestScenarioClass_IAllocator_realloc_;
@@ -429,7 +429,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
         pIt = pNext)
     {
         pNext = GblObject_siblingNext(pIt);
-        if(GblObject_unref(pIt) != 0) {
+        if(GblRefCounted_unref(GBL_REF_COUNTED(pIt)) != 0) {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblTestSuite] Destroy: Leaking unexpected existing references!");
         }
@@ -440,7 +440,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
     //GBL_API_DONE();
 
 
-    GBL_API_VERIFY(GblObject_unref(GBL_OBJECT(pSelf)) == 0,
+    GBL_API_VERIFY(GblRefCounted_unref(GBL_REF_COUNTED(pSelf)) == 0,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "[GblTestScenario] Destroy: Leaking unexpected existing references!");
     GBL_API_END();

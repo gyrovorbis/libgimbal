@@ -130,6 +130,11 @@ set(GIMBAL_SOURCES
      source/test/gimbal_test_suite.c
      source/test/gimbal_test_scenario.c
      source/test/gimbal_allocation_tracker.c
+     source/meta/gimbal_record.c
+     source/meta/gimbal_closure.c
+     source/meta/gimbal_c_closure.c
+     source/meta/gimbal_class_closure.c
+     source/meta/gimbal_signal_closure.c
      source/types/gimbal_uuid.c
  )
 
@@ -217,6 +222,10 @@ set(GIMBAL_INCLUDES
     api/gimbal/types/gimbal_uuid.h
     api/gimbal/strings/gimbal_string.h
     api/gimbal/meta/gimbal_record.h
+    api/gimbal/meta/gimbal_closure.h
+    api/gimbal/meta/gimbal_c_closure.h
+    api/gimbal/meta/gimbal_class_closure.h
+    api/gimbal/meta/gimbal_signal_closure.h
     source/meta/gimbal_type_.h
 )
 
@@ -226,12 +235,24 @@ add_library(libGimbal STATIC
 
 add_subdirectory(lib/tinycthread)
 
+list(APPEND
+     GBL_TARGET_LINK_LIBS
+     tinycthread)
+
+if (NOT DEFINED PLATFORM_DREAMCAST)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-target_link_libraries(libGimbal tinycthread Threads::Threads)
+list(APPEND
+     GBL_TARGET_LINK_LIBS
+     Threads::Threads)
+
+endif()
+
+target_link_libraries(libGimbal ${GBL_TARGET_LINK_LIBS})
 
 #set_property(TARGET libGimbal PROPERTY C_STANDARD 11)
 #set_property(TARGET libGimbal PROPERTY C_STANDARD_REQUIRED ON)

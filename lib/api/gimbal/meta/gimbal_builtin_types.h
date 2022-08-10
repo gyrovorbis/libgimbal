@@ -25,14 +25,15 @@
 #define GBL_TYPE_BUILTIN_INDEX_POINTER              21
 #define GBL_TYPE_BUILTIN_INDEX_BOXED                22  //lazy
 #define GBL_TYPE_BUILTIN_INDEX_ITABLE               23
-#define GBL_TYPE_BUILTIN_INDEX_IEVENT_HANDLER       24  //combine?
-#define GBL_TYPE_BUILTIN_INDEX_IEVENT_FILTER        25  //combine? IEventSink?
-#define GBL_TYPE_BUILTIN_INDEX_OBJECT               26
-#define GBL_TYPE_BUILTIN_INDEX_IALLOCATOR           27
-#define GBL_TYPE_BUILTIN_INDEX_ILOGGER              28
-#define GBL_TYPE_BUILTIN_INDEX_CONTEXT              29
+#define GBL_TYPE_BUILTIN_INDEX_RECORD               24
+#define GBL_TYPE_BUILTIN_INDEX_IEVENT_HANDLER       25  //combine?
+#define GBL_TYPE_BUILTIN_INDEX_IEVENT_FILTER        26  //combine? IEventSink?
+#define GBL_TYPE_BUILTIN_INDEX_OBJECT               27
+#define GBL_TYPE_BUILTIN_INDEX_IALLOCATOR           28
+#define GBL_TYPE_BUILTIN_INDEX_ILOGGER              29
+#define GBL_TYPE_BUILTIN_INDEX_CONTEXT              30
 
-#define GBL_TYPE_BUILTIN_COUNT                      30
+#define GBL_TYPE_BUILTIN_COUNT                      31
 
 #define GBL_BUILTIN_TYPE(prefix) \
     (GblType_fromBuiltinIndex(GBL_TYPE_BUILTIN_INDEX_##prefix))

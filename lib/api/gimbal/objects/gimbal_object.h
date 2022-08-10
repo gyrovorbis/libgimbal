@@ -6,7 +6,7 @@
 #define GIMBAL_OBJECT_H
 
 #include "../core/gimbal_api_frame.h"
-#include "../meta/gimbal_instance.h"
+#include "../meta/gimbal_record.h"
 #include "../ifaces/gimbal_ivariant.h"
 #include "../ifaces/gimbal_itable.h"
 #include "../ifaces/gimbal_ievent_handler.h"
@@ -36,8 +36,8 @@
 #define GBL_OBJECT_GET_CLASS(instance)      GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_OBJECT)
 #define GBL_OBJECT_TRY_CLASS(instance)      GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_OBJECT)
 
-#define GBL_OBJECT_REF(object)              (GblObject_ref((GblObject*)object))
-#define GBL_OBJECT_UNREF(object)            (GblObject_unref((GblObject*)object))
+#define GBL_OBJECT_REF(object)              (GblRefCounted_ref((GblRefCounted*)object))
+#define GBL_OBJECT_UNREF(object)            (GblRefCounted_unref((GblRefCounted*)object))
 
 #define SELF GblObject* pSelf
 #define CSELF const SELF
@@ -54,10 +54,11 @@ GBL_FORWARD_DECLARE_STRUCT(GblEvent);
  *  \extends GblClass
  *  \implements GblIVariantIFace, GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
  */
-GBL_CLASS_DERIVE(GblObjectClass, GblClass,
-                 GblIVariantIFace, GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
+GBL_CLASS_DERIVE(GblObjectClass,
+                 GblRefCountedClass,
+                 GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
+
     GBL_RESULT (*pFnConstructor)        (SELF);
-    GBL_RESULT (*pFnDestructor)         (SELF);
     GBL_RESULT (*pFnConstructed)        (SELF);
     GBL_RESULT (*pFnPropertyGet)        (CSELF, GblSize id, GblVariant* pValue, const GblProperty* pProp);
     GBL_RESULT (*pFnPropertySet)        (SELF,  GblSize id, const GblVariant* pValue, const GblProperty* pProp);
@@ -82,20 +83,8 @@ typedef enum GBL_OBJECT_ATTRIBUTE {
  *  \extends GblInstance
  *  \implements GblIVariant, GblITable, GblIEventHandler, GblIEventFilter
  */
-GBL_INSTANCE_DERIVE(GblObject, GblInstance,
+GBL_INSTANCE_DERIVE(GblObject, GblRefCounted,
                     GblObjectClass)
-
-    GBL_ATOMIC_INT16        refCounter;
-
-    uint16_t                contextType                            : 1;
-    uint16_t                constructedInPlace                     : 1;
-    uint16_t                childEventsSend                        : 1;
-    uint16_t                childEventsReceive                     : 1;
-    uint16_t                parentITableIndexFallthrough           : 1;
-    uint16_t                parentITableNewIndexFallthrough        : 1;
-
-    GblArrayMap*            pExtendedFields;
-
 GBL_INSTANCE_END
 
 typedef enum GBL_OBJECT_PROPERTY_ID {
@@ -184,10 +173,6 @@ GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVariantsWithClass
                                                              const char* pNames[],
                                                              const GblVariant* pValues)                                         GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*         GblObject_ref                 (GblObject* pObject)                                                GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount        GblObject_unref               (GblObject* pObject)                                                GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount        GblObject_refCount            (const GblObject* pObject)                                          GBL_NOEXCEPT;
-
 GBL_INLINE GBL_RESULT         GblObject_setAttribute        (SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value)                  GBL_NOEXCEPT;
 GBL_INLINE GblBool            GblObject_attribute           (CSELF, GBL_OBJECT_ATTRIBUTE attrib)                                GBL_NOEXCEPT;
 
@@ -221,13 +206,6 @@ GBL_INLINE GBL_RESULT         GblObject_propertySetQuark    (SELF,  GblQuark nam
 
 GBL_INLINE GBL_RESULT         GblObject_propertyGetString   (CSELF, const char* pName, GblVariant* pValue)                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT         GblObject_propertySetString   (SELF,  const char* pName, const GblVariant* pValue)                GBL_NOEXCEPT;
-
-GBL_EXPORT uintptr_t          GblObject_fieldValue          (CSELF, GblQuark name)                                              GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_setFieldVariantCopy (SELF, GblQuark name, const GblVariant* pVariant)                   GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_setFieldUserdata    (SELF, GblQuark name, void* pData, GblArrayMapDtorFn* pFnDtor)      GBL_NOEXCEPT;
-GBL_EXPORT GblBool            GblObject_hasField            (CSELF, GblQuark name)                                              GBL_NOEXCEPT;
-GBL_EXPORT GblBool            GblObject_checkField          (CSELF, GblQuark name, GblType type)                                GBL_NOEXCEPT;
-
 
 //GBL_INLINE GBL_RESULT         GblObject_propertyGetWithId   (CSELF, GblSize id, GblVariant* pValue)                             GBL_NOEXCEPT;
 //GBL_INLINE GBL_RESULT         GblObject_propertySetWithId   (SELF, GblSize id, const GblVariant* pValue)                        GBL_NOEXCEPT;
@@ -384,7 +362,7 @@ GBL_INLINE GblBool GblObject_attribute(CSELF, GBL_OBJECT_ATTRIBUTE attrib) GBL_N
     GBL_API_BEGIN(NULL);
     switch(attrib) {
     case GBL_OBJECT_ATTRIBUTE_CONSTRUCTED_IN_PLACE:
-        value = pSelf->constructedInPlace;
+        value = GBL_PRIV(pSelf->base).constructedInPlace;
         break;
     default:
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_ARG, "[GblObject]: Failed to get invalid attribute: %u", attrib);

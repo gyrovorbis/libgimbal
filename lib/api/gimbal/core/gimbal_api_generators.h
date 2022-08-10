@@ -49,6 +49,30 @@ extern "C" {
 
 #define GBL_CLASS_END };
 
+#define GBL_INTERFACE_DERIVE_N(instance, klass, baseClass, ...) \
+    GBL_INTERFACE_DERIVE_3(instance, klass, baseClass)          \
+    GBL_MAP(GBL_CLASS_IMPL_INTERFACE, __VA_ARGS__)
+
+#define GBL_INTERFACE_DERIVE_3(instance, klass, baseClass)  \
+    struct instance;                                        \
+    typedef struct instance instance;                       \
+    struct klass;                                           \
+    typedef struct klass;                                   \
+    struct klass {                                          \
+        baseClass base;
+
+#define GBL_INTERFACE_DERIVE_2(instance, klass) \
+    GBL_INTERFACE_DERIVE_3(instance, klass, GblInterface)
+
+#define GBL_INTERFACE_DERIVE_1(instance)    \
+    GBL_INTERFACE_DERIVE_2(instance, instance##IFace)
+
+#define GBL_INTERFACE_DERIVE(...)   \
+    GBL_VA_OVERLOAD_SELECT(GBL_INTERFACE_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_3_N, __VA_ARGS__)(__VA_ARGS__)
+
+#define GBL_INTERFACE_END };
+
+
 #define GBL_INSTANCE_DERIVE_3(derivedInstance, baseInstance, klass) \
     struct derivedInstance;                                         \
     typedef struct derivedInstance derivedInstance;                 \
@@ -59,10 +83,10 @@ extern "C" {
         };
 
 #define GBL_INSTANCE_DERIVE_2(derivedInstance, baseInstance) \
-    GBL_INSTANCE_DERIVE_3(derivedInstance, baseInstance, GblClass)
+    GBL_INSTANCE_DERIVE_3(derivedInstance, baseInstance, derivedInstance##Class)
 
 #define GBL_INSTANCE_DERIVE_1(derivedInstance) \
-    GBL_INSTANCE_DERIVE_2(derivedInstance, GblInstance)
+    GBL_INSTANCE_DERIVE_2(derivedInstance, GblInstance, GblClass)
 
 #define GBL_INSTANCE_DERIVE(...) \
     GBL_VA_OVERLOAD_SELECT(GBL_INSTANCE_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_3_N, __VA_ARGS__)(__VA_ARGS__)

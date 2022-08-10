@@ -4,3 +4,6 @@
 [submodule "doc/doxygenapidark"]
 	path = doc/doxygenapidark
 	url = ../../open-source/doxygenapidark.git
+[submodule "util/-f"]
+	path = util/-f
+	url = git@chaosrift.endofinternet.net:open-source/build-environment.git

@@ -5,10 +5,15 @@ project(TinyCThread
         LANGUAGES C)
 enable_testing()
 
-find_package(Threads REQUIRED)
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
 add_library(tinycthread STATIC source/tinycthread.c)
+if(NOT DEFINED PLATFORM_DREAMCAST)
+find_package(Threads REQUIRED)
 target_link_libraries(tinycthread ${CMAKE_THREAD_LIBS_INIT})
+endif()
 set_property(TARGET tinycthread APPEND PROPERTY INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set_property(TARGET tinycthread APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set_property(TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE True)

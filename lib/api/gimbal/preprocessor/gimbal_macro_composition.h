@@ -63,7 +63,10 @@
     GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, N, N, N, 2, 1, ##__VA_ARGS__)
 
 #define GBL_VA_OVERLOAD_SUFFIXER_3_N(...) \
-    GBL_VA_OVERLOAD_SUFFIXER(N, N, N, N, N, N, N, N, 3, 2, 1, ##__VA_ARGS__)
+    GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, N, N, 3, 2, 1, ##__VA_ARGS__)
+
+#define GBL_VA_OVERLOAD_SUFFIXER_4_N(...) \
+    GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, N, 4, 3, 2, 1, ##__VA_ARGS__)
 
 #define GBL_VA_OVERLOAD_SUFFIXER_5_N(...) \
     GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, N, 5, 4, 3, 2, 1, ##__VA_ARGS__)
@@ -71,6 +74,14 @@
 #define GBL_VA_OVERLOAD_SUFFIXER_6_N(...) \
     GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, N, 6, 5, 4, 3, 2, 1, ##__VA_ARGS__)
 
+#define GBL_VA_OVERLOAD_SUFFIXER_7_N(...) \
+    GBL_VA_OVERLOAD_SUFFIXER(0, N, N, N, 7, 6, 5, 4, 3, 2, 1, ##__VA_ARGS__)
+
+#define GBL_VA_OVERLOAD_SUFFIXER_8_N(...) \
+    GBL_VA_OVERLOAD_SUFFIXER(0, N, N, 8, 7, 6, 5, 4, 3, 2, 1, ##__VA_ARGS__)
+
+#define GBL_VA_OVERLOAD_SUFFIXER_9_N(...) \
+    GBL_VA_OVERLOAD_SUFFIXER(0, N, 9, 8, 7, 6, 5, 4, 3, 2, 1, ##__VA_ARGS__)
 
 #define GBL_VA_OVERLOAD_SELECT(BASE, SUFFIXER, ...) \
     GBL_APPEND_SUFFIX(BASE, SUFFIXER(__VA_ARGS__))

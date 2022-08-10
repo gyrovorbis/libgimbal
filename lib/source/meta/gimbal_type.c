@@ -719,6 +719,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
     GBL_API_CALL(GblPointer_typeRegister_(pCtx_));
     GBL_API_CALL(GblBoxed_typeRegister_(pCtx_));
     GBL_API_CALL(GblITable_typeRegister_(pCtx_));
+    GBL_API_CALL(GblRefCounted_typeRegister_(pCtx_));
     GBL_API_CALL(GblIEventHandler_typeRegister_(pCtx_));
     GBL_API_CALL(GblIEventFilter_typeRegister_(pCtx_));
     GBL_API_CALL(GblObject_typeRegister_(pCtx_));

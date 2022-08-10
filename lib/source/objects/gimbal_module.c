@@ -18,8 +18,8 @@ GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
     GBL_API_BEGIN(pPlugin);
     GblModule* pModule = GBL_MODULE(pPlugin);
     GblObject* pObject = GBL_OBJECT(pModule);
-    GblObject_ref(pObject);
-    const GblRefCount refCount = GblObject_refCount(pObject);
+    GblRefCounted_ref(GBL_REF_COUNTED(pObject));
+    const GblRefCount refCount = GblRefCounted_refCount(GBL_REF_COUNTED(pObject));
     GBL_API_DEBUG("[GblModule: %s] Used: %u",
                   GblObject_name(GBL_OBJECT(pObject)),
                   refCount);
@@ -33,8 +33,8 @@ GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
     GBL_API_BEGIN(pPlugin);
     GblModule* pModule = GBL_MODULE(pPlugin);
     GblObject* pObject = GBL_OBJECT(pModule);
-    GblObject_unref(pObject);
-    const GblRefCount refCount = GblObject_refCount(pObject);
+    GblRefCounted_unref(GBL_REF_COUNTED(pObject));
+    const GblRefCount refCount = GblRefCounted_refCount(GBL_REF_COUNTED(pObject));
     GBL_API_DEBUG("[GblModule: %s] Unused: %u",
                   GblObject_name(GBL_OBJECT(pObject)),
                   refCount);
@@ -59,13 +59,13 @@ GBL_RESULT GblModule_propertySet_(GblObject* pObject, GblSize id, const GblVaria
     GBL_API_END();
 }
 
-GBL_RESULT GblModule_destructor_(GblObject* pObject) {
-    GBL_API_BEGIN(pObject);
-    GblModule* pSelf = GBL_MODULE(pObject);
+GBL_RESULT GblModule_destructor_(GblRefCounted* pRecord) {
+    GBL_API_BEGIN(pRecord);
+    GblModule* pSelf = GBL_MODULE(pRecord);
     GblStringRef_release(&pSelf->author);
     GblStringRef_release(&pSelf->prefix);
     GblStringRef_release(&pSelf->description);
-    GBL_INSTANCE_VCALL_SUPER_PREFIX(GBL_CONTEXT, base.pFnDestructor, pObject);
+    GBL_INSTANCE_VCALL_SUPER_PREFIX(GBL_CONTEXT, base.base.pFnDestructor, pRecord);
     GBL_API_END();
 }
 
@@ -93,14 +93,14 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
     GBL_UNUSED(pData);
     GBL_API_BEGIN(pCtx);
     GblModuleClass* pSelf = GBL_MODULE_CLASS(pClass);
-    pSelf->pFnLoad                  = GblModule_load_;
-    pSelf->pFnUnload                = GblModule_unload_;
-    pSelf->base.base.pFnDestructor  = GblModule_destructor_;
-    pSelf->base.base.pFnPropertyGet = GblModule_propertyGet_;
-    pSelf->base.base.pFnPropertySet = GblModule_propertySet_;
-    pSelf->iPluginIFace.pFnUse      = GblModule_IPlugin_use_;
-    pSelf->iPluginIFace.pFnUnuse    = GblModule_IPlugin_unuse_;
-    pSelf->iPluginIFace.pFnTypeInfo = GblModule_IPlugin_typeInfo_;
+    pSelf->pFnLoad                       = GblModule_load_;
+    pSelf->pFnUnload                     = GblModule_unload_;
+    pSelf->base.base.base.pFnDestructor  = GblModule_destructor_;
+    pSelf->base.base.pFnPropertyGet      = GblModule_propertyGet_;
+    pSelf->base.base.pFnPropertySet      = GblModule_propertySet_;
+    pSelf->iPluginIFace.pFnUse           = GblModule_IPlugin_use_;
+    pSelf->iPluginIFace.pFnUnuse         = GblModule_IPlugin_unuse_;
+    pSelf->iPluginIFace.pFnTypeInfo      = GblModule_IPlugin_typeInfo_;
 
     if(!GblType_classRefCount(GBL_MODULE_TYPE)) {
 
