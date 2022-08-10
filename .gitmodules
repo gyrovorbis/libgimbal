@@ -6,4 +6,4 @@
 	url = ../../open-source/doxygenapidark.git
 [submodule "util/build-environment"]
 	path = util/build-environment
-	url = git@chaosrift.endofinternet.net:open-source/build-environment.git
+	url = ../../open-source/build-environment.git
