@@ -125,12 +125,12 @@ GBL_INLINE int gblRandRange(int min, int max) GBL_NOEXCEPT {
 
 
 #ifdef __GNUC__
-#define FORCE_INLINE __attribute__((always_inline)) inline
+#define FORCE_INLINE static __attribute__((always_inline)) inline
 #else
 #define FORCE_INLINE GBL_INLINE
 #endif
 
-static FORCE_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
+FORCE_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
   h ^= h >> 16;
   h *= 0x85ebca6b;
   h ^= h >> 13;

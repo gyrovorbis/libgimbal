@@ -4,6 +4,7 @@
 
 static GBL_THREAD_LOCAL GblClosure* pCurrentClosure_ = NULL;
 
+#if 0
 GBL_EXPORT GblClosure* GblClosure_current(void) {
     return pCurrentClosure_;
 }
@@ -43,7 +44,7 @@ GBL_EXPORT GBL_RESULT GblClosure_invoke(GblClosure*     pSelf,
 
     GBL_API_END();
 }
-
+#endif
 GBL_EXPORT GblType GblClosure_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
