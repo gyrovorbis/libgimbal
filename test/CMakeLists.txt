@@ -71,6 +71,22 @@ add_executable(GimbalTests
 target_link_libraries(GimbalTests
     libGimbal)
 
+if(VITA)
+    add_compile_definitions(GimbalTests PUBLIC VITA=1)
+    include("${VITASDK}/share/vita.cmake" REQUIRED)
+
+    target_link_libraries(GimbalTests
+        debugNet
+    )
+
+    vita_create_self(eboot.bin GimbalTests UNSAFE)
+
+    vita_create_vpk("GimbalTests_v${GIMBAL_VERSION}.vpk" GBLTESTS0 eboot.bin
+        VERSION "01.00"
+        NAME "Gimbal Tests v${GIMBAL_VERSION}"
+    )
+endif()
+
 target_include_directories(GimbalTests
     PRIVATE include)
 
