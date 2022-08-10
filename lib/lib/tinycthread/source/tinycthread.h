@@ -57,7 +57,7 @@ extern "C" {
 #if !defined(_TTHREAD_PLATFORM_DEFINED_)
   #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
     #define _TTHREAD_WIN32_
-  #elif __STDC_VERSION__ == 201710L && !(__STDC_NO_THREADS__)
+  #elif __STDC_VERSION__ == 201710L && !(__STDC_NO_THREADS__) && __DREAMCAST__
     #define _TTHREAD_CTHREADS_
     #include <threads.h>
   #else
