@@ -52,20 +52,21 @@ extern "C" {
 * tinycthread.h.
 */
 
-#if __STDC_VERSION__ == 201710L && !(__STDC_NO_THREADS__)
-#define _TTHREAD_CTHREADS_
-#include <threads.h>
-#else
 
 /* Which platform are we on? */
 #if !defined(_TTHREAD_PLATFORM_DEFINED_)
   #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
     #define _TTHREAD_WIN32_
+  #elif __STDC_VERSION__ == 201710L && !(__STDC_NO_THREADS__) && __DREAMCAST__
+    #define _TTHREAD_CTHREADS_
+    #include <threads.h>
   #else
     #define _TTHREAD_POSIX_
   #endif
   #define _TTHREAD_PLATFORM_DEFINED_
 #endif
+
+#ifndef _TTHREAD_CTHREADS_
 
 /* Activate some POSIX functionality (e.g. clock_gettime and recursive mutexes) */
 #if defined(_TTHREAD_POSIX_)
