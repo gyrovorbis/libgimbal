@@ -288,13 +288,19 @@
 #endif
 
 #ifdef __cplusplus
-#   define GBL_INLINE GBL_MAYBE_UNUSED inline
+#   define GBL_INLINE_ inline
 #else
-#   define GBL_INLINE GBL_MAYBE_UNUSED static inline
+#   define GBL_INLINE_ static inline
+#endif
+
+#ifdef __cplusplus
+#   define GBL_INLINE GBL_MAYBE_UNUSED GBL_INLINE_
+#else
+#   define GBL_INLINE GBL_MAYBE_UNUSED GBL_INLINE_
 #endif
 
 #ifdef __GNUC__
-#   define GBL_FORCE_INLINE __attribute__((always_inline)) GBL_INLINE
+#   define GBL_FORCE_INLINE __attribute__((always_inline)) GBL_INLINE_
 #elif defined(_MSC_VER)
 #   define GBL_FORCE_INLINE __forceinline
 #else
