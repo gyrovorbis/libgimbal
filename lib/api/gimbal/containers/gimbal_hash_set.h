@@ -6,7 +6,7 @@
 #ifndef GIMBAL_HASHSET_H
 #define GIMBAL_HASHSET_H
 
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 #include "../core/gimbal_api_frame.h"
 
 #define SELF    GblHashSet*         pSelf

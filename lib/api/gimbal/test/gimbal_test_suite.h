@@ -6,7 +6,7 @@
 #ifndef GIMBAL_TEST_SUITE_H
 #define GIMBAL_TEST_SUITE_H
 
-#include "../objects/gimbal_object.h"
+#include "../meta/instances/gimbal_object.h"
 
 #define GBL_TEST_SUITE_TYPE                (GblTestSuite_type())
 #define GBL_TEST_SUITE_STRUCT              GblTestSuite

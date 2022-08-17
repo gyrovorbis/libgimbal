@@ -2,7 +2,7 @@
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/containers/gimbal_array_map.h>
-#include <gimbal/meta/gimbal_primitives.h>
+#include <gimbal/meta/classes/gimbal_primitives.h>
 
 #define GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_ 1000
 #define GBL_ARRAY_MAP_TEST_SUITE_(inst)     ((GblArrayMapTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_MAP_TEST_SUITE_TYPE))

@@ -6,10 +6,10 @@
 #ifndef GIMBAL_ARRAY_MAP_H
 #define GIMBAL_ARRAY_MAP_H
 
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 #include "../strings/gimbal_quark.h"
-#include "../types/gimbal_variant.h"
-#include "../types/gimbal_result.h"
+#include "../meta/types/gimbal_variant.h"
+#include "../core/gimbal_result.h"
 
 #define GBL_ARRAY_MAP_NPOS                      GBL_NPOS                                                        ///< Invalid index identifier returned when an entry couldn't be found
 #define GBL_ARRAY_MAP_SIZE(elements)            (sizeof(GblArrayMap) + (sizeof(GblArrayMapEntry)*(elements)))   ///< Calculates total size of the GblArrayMap structure with elements

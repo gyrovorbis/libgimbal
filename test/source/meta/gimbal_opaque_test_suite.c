@@ -1,7 +1,7 @@
 #include "meta/gimbal_opaque_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/types/gimbal_variant.h>
+#include <gimbal/meta/types/gimbal_variant.h>
 
 #define GBL_OPAQUE_TEST_SUITE_(inst)    ((GblOpaqueTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_OPAQUE_TEST_SUITE_TYPE))
 

@@ -87,147 +87,145 @@ GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_UNKNOWN_ENABLED   "Update Handle's
 
 set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/core/gimbal_config.h")
 
-set(GIMBAL_SOURCES
-     source/types/gimbal_version.c
-     source/objects/gimbal_context.c
-     source/core/gimbal_thread.c
-     source/ifaces/gimbal_ivariant.c
-     source/types/gimbal_variant.c
-     source/types/gimbal_ref.c
-     source/objects/gimbal_object.c
-     source/core/gimbal_ext.c
-     source/meta/gimbal_type.c
-     source/meta/gimbal_primitives.c
-     source/containers/gimbal_hash_set.c
-     source/containers/gimbal_tree_set.c
-     source/objects/gimbal_property.c
-     source/meta/gimbal_enum.c
-     source/ifaces/gimbal_itable.c
-     source/strings/gimbal_quark.c
-     source/ifaces/gimbal_ievent_handler.c
-     source/ifaces/gimbal_ievent_filter.c
-     source/core/gimbal_call_stack.c
-     source/ifaces/gimbal_iallocator.c
-     source/ifaces/gimbal_ilogger.c
-     source/objects/gimbal_event.c
-     source/meta/gimbal_class.c
-     source/meta/gimbal_instance.c
-     source/ifaces/gimbal_iplugin.c
-     source/meta/gimbal_pointer.c
-     source/objects/gimbal_module.c
-     source/types/gimbal_closure.c
-     source/containers/gimbal_linked_list.c
-     source/containers/gimbal_array_map.c
-     source/meta/gimbal_boxed.c
-     source/meta/gimbal_flags.c
-     source/containers/gimbal_byte_array.c
-     source/containers/gimbal_array_list.c
-     source/strings/gimbal_string_ref.c
-     source/strings/gimbal_string_buffer.c
-     source/meta/gimbal_interface.c
-     source/meta/gimbal_signal.c
-     source/types/gimbal_marshal.c
-     source/test/gimbal_test_suite.c
-     source/test/gimbal_test_scenario.c
-     source/test/gimbal_allocation_tracker.c
-     source/meta/gimbal_record.c
-     source/meta/gimbal_closure.c
-     source/meta/gimbal_c_closure.c
-     source/meta/gimbal_class_closure.c
-     source/meta/gimbal_signal_closure.c
-     source/types/gimbal_uuid.c
- )
-
 set(GIMBAL_INCLUDES
-    api/gimbal/core/gimbal_api_generators.h
-    api/gimbal/containers/gimbal_byte_array.h
-    api/gimbal/meta/gimbal_enum.h
-    api/gimbal/meta/gimbal_flags.h
-    api/gimbal/meta/gimbal_pointer.h
-    api/gimbal/containers/gimbal_byte_array.hpp
-    api/gimbal/types/gimbal_result.h
-    api/gimbal/core/gimbal_call_stack.hpp
-    api/gimbal/core/gimbal_api_generators.hpp
-    api/gimbal/types/gimbal_version.hpp
-    api/gimbal/types/gimbal_exception.hpp
-    api/gimbal/core/gimbal_api_frame.h
-    api/gimbal/core/gimbal_api_frame.hpp
-    api/gimbal/containers/gimbal_generics.hpp
-    api/gimbal/containers/gimbal_container.hpp
-    api/gimbal/core/gimbal_call_stack.h
-    api/gimbal/containers/gimbal_linked_list.h
-    api/gimbal/meta/gimbal_interface.h
-    api/gimbal/objects/gimbal_object.h
-    api/gimbal/ifaces/gimbal_iallocator.h
-    api/gimbal/ifaces/gimbal_ilogger.h
-    api/gimbal/objects/gimbal_context.h
-    api/gimbal/objects/gimbal_module.h
-    api/gimbal/types/gimbal_result.hpp
-    api/gimbal/types/gimbal_typedefs.h
-    api/gimbal/preprocessor/gimbal_compiler.h
-    api/gimbal/preprocessor/gimbal_macro_composition.h
-    api/gimbal/preprocessor/gimbal_macro_utils.h
     ${GBL_CONFIGURATION_INPUT_PATH}
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH}
-    api/gimbal/preprocessor/gimbal_macro_sequences.h
-    api/gimbal/core/gimbal_ext.h
-    api/gimbal/test/gimbal_test.h
-    api/gimbal/types/gimbal_variant.h
-    api/gimbal/strings/gimbal_quark.h
+    api/gimbal/algorithms/gimbal_sort.h
+    api/gimbal/algorithms/gimbal_numeric.h
+    api/gimbal/algorithms/gimbal_hash.h
+    api/gimbal/containers/gimbal_byte_array.h
+    api/gimbal/containers/gimbal_byte_array.hpp
+    api/gimbal/containers/gimbal_generics.hpp
+    api/gimbal/containers/gimbal_container.hpp
+    api/gimbal/containers/gimbal_linked_list.h
     api/gimbal/containers/gimbal_hash_set.h
     api/gimbal/containers/gimbal_hash_set.hpp
     api/gimbal/containers/gimbal_hash_map.hpp
     api/gimbal/containers/gimbal_tree_set.h
     api/gimbal/containers/gimbal_array_map.h
     api/gimbal/containers/gimbal_doubly_linked_list.h
-    api/gimbal/meta/gimbal_type.h
+    api/gimbal/containers/gimbal_array_list.h
+    api/gimbal/containers/gimbal_vector.hpp
+    api/gimbal/core/gimbal_api_generators.h
+    api/gimbal/core/gimbal_call_stack.hpp
+    api/gimbal/core/gimbal_api_generators.hpp
+    api/gimbal/core/gimbal_api_frame.h
+    api/gimbal/core/gimbal_api_frame.hpp
+    api/gimbal/core/gimbal_call_stack.h
+    api/gimbal/core/gimbal_ext.h
+    api/gimbal/core/gimbal_result.h
+    api/gimbal/core/gimbal_result.hpp
+    api/gimbal/core/gimbal_typedefs.h
+    api/gimbal/core/gimbal_typedefs.hpp
+    api/gimbal/core/gimbal_version.h
+    api/gimbal/core/gimbal_version.hpp
+    api/gimbal/core/gimbal_exception.hpp
     api/gimbal/core/gimbal_thread.h
     api/gimbal/core/gimbal_thread.hpp
-    api/gimbal/types/gimbal_typedefs.hpp
-    api/gimbal/ifaces/gimbal_iplugin.h
-    api/gimbal/containers/gimbal_array_list.h
-    api/gimbal/algorithms/gimbal_sort.h
-    api/gimbal/algorithms/gimbal_numeric.h
-    api/gimbal/algorithms/gimbal_hash.h
-    api/gimbal/containers/gimbal_vector.hpp
+    api/gimbal/core/gimbal_ref.h
+    api/gimbal/meta/classes/gimbal_class.h
+    api/gimbal/meta/classes/gimbal_boxed.h
+    api/gimbal/meta/classes/gimbal_enum.h
+    api/gimbal/meta/classes/gimbal_flags.h
+    api/gimbal/meta/classes/gimbal_primitives.h
+    api/gimbal/meta/ifaces/gimbal_ivariant.h
+    api/gimbal/meta/ifaces/gimbal_ievent_handler.h
+    api/gimbal/meta/ifaces/gimbal_ievent_filter.h
+    api/gimbal/meta/ifaces/gimbal_itable.h
+    api/gimbal/meta/ifaces/gimbal_iplugin.h
+    api/gimbal/meta/ifaces/gimbal_iallocator.h
+    api/gimbal/meta/ifaces/gimbal_ilogger.h
+    api/gimbal/meta/ifaces/gimbal_interface.h
+    api/gimbal/meta/instances/gimbal_context.h
+    api/gimbal/meta/instances/gimbal_context.hpp
+    api/gimbal/meta/instances/gimbal_event.h
+    api/gimbal/meta/instances/gimbal_instance.h
+    api/gimbal/meta/instances/gimbal_module.h
+    api/gimbal/meta/instances/gimbal_object.h
+    api/gimbal/meta/instances/gimbal_box.h
+    api/gimbal/meta/properties/gimbal_property.h
+    api/gimbal/meta/signals/gimbal_signal.h
+    api/gimbal/meta/signals/gimbal_marshal.h
+    api/gimbal/meta/signals/gimbal_closure.h
+    api/gimbal/meta/signals/gimbal_c_closure.h
+    api/gimbal/meta/signals/gimbal_class_closure.h
+    api/gimbal/meta/signals/gimbal_signal_closure.h
+    api/gimbal/meta/types/gimbal_type.h
+    api/gimbal/meta/types/gimbal_type.hpp
+    api/gimbal/meta/types/gimbal_pointer.h
+    api/gimbal/meta/types/gimbal_variant.h
+    api/gimbal/meta/types/gimbal_builtin_types.h
+    source/meta/types/gimbal_type_.h
+    api/gimbal/preprocessor/gimbal_compiler.h
+    api/gimbal/preprocessor/gimbal_macro_composition.h
+    api/gimbal/preprocessor/gimbal_macro_utils.h
+    api/gimbal/preprocessor/gimbal_macro_sequences.h
+    api/gimbal/preprocessor/gimbal_atomics.h
+    api/gimbal/preprocessor/gimbal_memory_resource.hpp
+    api/gimbal/strings/gimbal_quark.h
     api/gimbal/strings/gimbal_string_buffer.h
     api/gimbal/strings/gimbal_string_view.h
     api/gimbal/strings/gimbal_string_ref.h
-    api/gimbal/types/gimbal_ref.h
-    api/gimbal/meta/gimbal_type.hpp
-    api/gimbal/meta/gimbal_class.h
-    api/gimbal/meta/gimbal_instance.h
-    api/gimbal/meta/gimbal_builtin_types.h
-    api/gimbal/meta/gimbal_primitives.h
-    api/gimbal/ifaces/gimbal_ivariant.h
-    api/gimbal/ifaces/gimbal_ievent_handler.h
-    api/gimbal/ifaces/gimbal_ievent_filter.h
-    api/gimbal/types/gimbal_closure.h
-    api/gimbal/objects/gimbal_property.h
-    api/gimbal/ifaces/gimbal_itable.h
-    api/gimbal/types/gimbal_version.h
+    api/gimbal/strings/gimbal_string.h
     api/gimbal/strings/gimbal_string.hpp
-    api/gimbal/objects/gimbal_context.hpp
-    api/gimbal/objects/gimbal_event.h
-    api/gimbal/utils/gimbal_cmdline_parser.h
-    api/gimbal/preprocessor/gimbal_atomics.h
-    api/gimbal/meta/gimbal_boxed.h
-    api/gimbal/preprocessor/gimbal_memory_resource.hpp
+    api/gimbal/test/gimbal_test.h
     api/gimbal/test/gimbal_test_suite.h
     api/gimbal/test/gimbal_test_scenario.h
-    api/gimbal/utils/gimbal_timer.h
     api/gimbal/test/gimbal_allocation_tracker.h
-    api/gimbal/meta/gimbal_signal.h
-    api/gimbal/types/gimbal_marshal.h
-    api/gimbal/types/gimbal_uuid.h
-    api/gimbal/strings/gimbal_string.h
-    api/gimbal/meta/gimbal_record.h
-    api/gimbal/meta/gimbal_closure.h
-    api/gimbal/meta/gimbal_c_closure.h
-    api/gimbal/meta/gimbal_class_closure.h
-    api/gimbal/meta/gimbal_signal_closure.h
-    source/meta/gimbal_type_.h
+    api/gimbal/utils/gimbal_timer.h
+    api/gimbal/utils/gimbal_uuid.h
 )
+
+
+set(GIMBAL_SOURCES
+    source/containers/gimbal_hash_set.c
+    source/containers/gimbal_tree_set.c
+    source/containers/gimbal_linked_list.c
+    source/containers/gimbal_array_map.c
+    source/containers/gimbal_byte_array.c
+    source/containers/gimbal_array_list.c
+    source/core/gimbal_thread.c
+    source/core/gimbal_version.c
+    source/core/gimbal_ref.c
+    source/core/gimbal_call_stack.c
+    source/core/gimbal_ext.c
+    source/meta/classes/gimbal_class.c
+    source/meta/classes/gimbal_boxed.c
+    source/meta/classes/gimbal_flags.c
+    source/meta/classes/gimbal_enum.c
+    source/meta/classes/gimbal_primitives.c
+    source/meta/ifaces/gimbal_itable.c
+    source/meta/ifaces/gimbal_ievent_handler.c
+    source/meta/ifaces/gimbal_ievent_filter.c
+    source/meta/ifaces/gimbal_iallocator.c
+    source/meta/ifaces/gimbal_ilogger.c
+    source/meta/ifaces/gimbal_iplugin.c
+    source/meta/ifaces/gimbal_interface.c
+    source/meta/ifaces/gimbal_ivariant.c
+    source/meta/instances/gimbal_context.c
+    source/meta/instances/gimbal_object.c
+    source/meta/instances/gimbal_event.c
+    source/meta/instances/gimbal_instance.c
+    source/meta/instances/gimbal_module.c
+    source/meta/instances/gimbal_box.c
+    source/meta/properties/gimbal_property.c
+    source/meta/signals/gimbal_signal.c
+    source/meta/signals/gimbal_marshal.c
+    source/meta/signals/gimbal_closure.c
+    source/meta/signals/gimbal_c_closure.c
+    source/meta/signals/gimbal_class_closure.c
+    source/meta/signals/gimbal_signal_closure.c
+    source/meta/types/gimbal_variant.c
+    source/meta/types/gimbal_type.c
+    source/meta/types/gimbal_pointer.c
+    source/strings/gimbal_quark.c
+    source/strings/gimbal_string_ref.c
+    source/strings/gimbal_string_buffer.c
+    source/test/gimbal_test_suite.c
+    source/test/gimbal_test_scenario.c
+    source/test/gimbal_allocation_tracker.c
+    source/utils/gimbal_uuid.c
+ )
 
 add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}

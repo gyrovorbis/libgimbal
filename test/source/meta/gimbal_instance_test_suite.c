@@ -1,6 +1,6 @@
 #include "meta/gimbal_instance_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
-#include <gimbal/meta/gimbal_instance.h>
+#include <gimbal/meta/instances/gimbal_instance.h>
 
 #define GBL_INSTANCE_TEST_SUITE_(inst)      ((GblInstanceTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_INSTANCE_TEST_SUITE_TYPE))
 

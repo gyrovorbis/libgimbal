@@ -1,7 +1,7 @@
 #include "types/gimbal_variant_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/types/gimbal_variant.h>
+#include <gimbal/meta/types/gimbal_variant.h>
 #include <string.h>
 
 static GBL_RESULT GblVariantTestSuite_checkTypeCompatible_(GblTestSuite* pSelf, GblContext* pCtx) {

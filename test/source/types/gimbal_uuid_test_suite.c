@@ -1,7 +1,7 @@
 #include "types/gimbal_uuid_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/types/gimbal_uuid.h>
+#include <gimbal/utils/gimbal_uuid.h>
 
 #define GBL_UUID_TEST_SUITE__V4_COUNT    256
 

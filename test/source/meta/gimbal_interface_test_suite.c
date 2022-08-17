@@ -1,7 +1,7 @@
 #include "meta/gimbal_interface_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/meta/gimbal_interface.h>
+#include <gimbal/meta/ifaces/gimbal_interface.h>
 
 #define GBL_INTERFACE_TEST_SUITE_(inst)     (GBL_INSTANCE_PRIVATE(inst, GBL_INTERFACE_TEST_SUITE_TYPE))
 

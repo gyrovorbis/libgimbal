@@ -8,7 +8,7 @@
 #ifndef GIMBAL_SORT_H
 #define GIMBAL_SORT_H
 
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 
 GBL_DECLS_BEGIN
 

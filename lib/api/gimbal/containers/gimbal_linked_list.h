@@ -6,7 +6,7 @@
 #ifndef GIMBAL_LINKED_LIST_H
 #define GIMBAL_LINKED_LIST_H
 
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 
 #define SELF    GblLinkedListNode*  pSelf
 #define CSELF   const SELF

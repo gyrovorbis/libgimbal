@@ -1,5 +1,5 @@
 #include <gimbal/core/gimbal_ext.h>
-#include <gimbal/objects/gimbal_context.h>
+#include <gimbal/meta/instances/gimbal_context.h>
 #include <gimbal/core/gimbal_api_frame.h>
 
 #define GBL_EXT_FN_DEFINE_(extName, contextName, ...) \

@@ -49,6 +49,10 @@ extern "C" {
 
 #define GBL_CLASS_END };
 
+#define GBL_CLASS_DERIVE_EMPTY(...) \
+    GBL_CLASS_DERIVE(__VA_ARGS__)   \
+    GBL_CLASS_END
+
 #define GBL_INTERFACE_DERIVE_N(instance, klass, baseClass, ...) \
     GBL_INTERFACE_DERIVE_3(instance, klass, baseClass)          \
     GBL_MAP(GBL_CLASS_IMPL_INTERFACE, __VA_ARGS__)
@@ -92,6 +96,10 @@ extern "C" {
     GBL_VA_OVERLOAD_SELECT(GBL_INSTANCE_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_3_N, __VA_ARGS__)(__VA_ARGS__)
 
 #define GBL_INSTANCE_END };
+
+#define GBL_INSTANCE_DERIVE_EMPTY(...) \
+    GBL_INSTANCE_DERIVE(__VA_ARGS__)   \
+    GBL_INSTANCE_END
 
 typedef struct GblPropertyInfo_ {
     const char* pName;

@@ -2,7 +2,7 @@
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/containers/gimbal_linked_list.h>
-#include <gimbal/meta/gimbal_instance.h>
+#include <gimbal/meta/instances/gimbal_instance.h>
 
 #define GBL_LINKED_LIST_TEST_SUITE_(inst)   ((GblLinkedListTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_LINKED_LIST_TEST_SUITE_TYPE))
 

@@ -6,7 +6,7 @@
 #ifndef GIMBAL_EXT_H
 #define GIMBAL_EXT_H
 
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 
 #ifdef __cplusplus
 extern "C" {

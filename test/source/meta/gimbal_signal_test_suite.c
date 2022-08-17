@@ -1,14 +1,10 @@
 #include "meta/gimbal_signal_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
-#include <gimbal/meta/gimbal_signal.h>
-#include <gimbal/types/gimbal_closure.h>
+#include <gimbal/meta/signals/gimbal_signal.h>
+#include <gimbal/meta/signals/gimbal_closure.h>
+#include <gimbal/meta/signals/gimbal_c_closure.h>
 
 #define GBL_SIGNAL_TEST_SUITE_(inst)    ((GblSignalTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_SIGNAL_TEST_SUITE_TYPE))
-
-/*ISSUES: BLOCKING A SIGNAL THAT DOESN'T EXIST YET
- * same with blockAll
- *
- */
 
 typedef enum TYPE_ {
     TYPE_I_A_,
@@ -125,7 +121,7 @@ void s_2_CB_Slot_(SignalInstance_* pReceiver, double arg) {
     pReceiver->pSelf_->pSignalCurrentReceivers[SIGNAL_2_C_B_][pReceiver->pSelf_->signalEmissions[SIGNAL_2_C_B_]] = GblSignal_receiver();
     pReceiver->pSelf_->pSignalCurrentEmitters[SIGNAL_2_C_B_][pReceiver->pSelf_->signalEmissions[SIGNAL_2_C_B_]] =  GblSignal_emitter();
     pReceiver->pSelf_->signalArgs     [SIGNAL_2_C_B_][pReceiver->pSelf_->signalEmissions[SIGNAL_2_C_B_]++] = (uintptr_t)arg;
-    pReceiver->pSelf_->pClosureUserdata = GblClosure_current()->pUserdata;
+    pReceiver->pSelf_->pClosureUserdata = GblBox_userdata(GBL_BOX(GblClosure_current()));
 }
 
 static GBL_RESULT classInit_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
@@ -612,9 +608,8 @@ static GBL_RESULT GblSignalTestSuite_connectClosure_(GblTestSuite* pSelf, GblCon
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
-    GblClosure* pClosure = GblCClosure_createWithContext(GBL_CALLBACK(s_2_CB_Slot_),
-                                                         (void*)0xdeadbeef,
-                                                         pCtx);
+    GblClosure* pClosure = GBL_CLOSURE(GblCClosure_create(GBL_CALLBACK(s_2_CB_Slot_),
+                                                          (void*)0xdeadbeef));
 
     pSelf_->pClosure = pClosure;
 

@@ -1,5 +1,5 @@
 #include <gimbal/core/gimbal_thread.h>
-#include <gimbal/objects/gimbal_context.h>
+#include <gimbal/meta/instances/gimbal_context.h>
 #include <gimbal/core/gimbal_call_stack.h>
 
 typedef struct GblThread_ {

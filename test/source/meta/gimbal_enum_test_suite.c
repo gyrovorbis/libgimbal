@@ -1,8 +1,8 @@
 #include "meta/gimbal_enum_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/meta/gimbal_enum.h>
-#include <gimbal/types/gimbal_variant.h>
+#include <gimbal/meta/classes/gimbal_enum.h>
+#include <gimbal/meta/types/gimbal_variant.h>
 
 #define GBL_ENUM_TEST_SUITE_(inst)  ((GblEnumTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ENUM_TEST_SUITE_TYPE))
 

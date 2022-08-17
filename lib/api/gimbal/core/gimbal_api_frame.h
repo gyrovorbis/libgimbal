@@ -230,6 +230,10 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
 
 GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, const char* pDebugStr) {
     GBL_API_INLINE_BEGIN(GBL_NULL);
+    if(align == 0) {
+        align = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
+        size = gblAlignedAllocSize(size);
+    }
     GBL_ASSERT(size % align == 0);
     GBL_API_EXT(MALLOC, size, align, pDebugStr, &GBL_API_INLINE_RETVAL());
     GBL_API_INLINE_END();

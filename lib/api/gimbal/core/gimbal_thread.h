@@ -6,7 +6,7 @@
 #ifndef GIMBAL_THREAD_H
 #define GIMBAL_THREAD_H
 
-#include <gimbal/types/gimbal_typedefs.h>
+#include <gimbal/core/gimbal_typedefs.h>
 
 #define SELF    GblThread* pSelf
 #define CSELF   const SELF

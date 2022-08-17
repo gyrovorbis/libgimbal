@@ -5,7 +5,7 @@
 #ifndef GIMBAL_TEST_SCENARIO_H
 #define GIMBAL_TEST_SCENARIO_H
 
-#include "../objects/gimbal_context.h"
+#include "../meta/instances/gimbal_context.h"
 
 #define GBL_TEST_SCENARIO_TYPE                (GblTestScenario_type())
 #define GBL_TEST_SCENARIO_STRUCT              GblTestScenario

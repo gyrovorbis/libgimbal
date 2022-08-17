@@ -265,11 +265,11 @@
 #endif
 
 #if defined(GBL_CPP_11)
-#   define GBL_ALIGNAS(e)               alignas(e)
-#   define GBL_ALIGNOF(e)               alignof(e)
+#   define GBL_ALIGNAS(e) alignas(e)
+#   define GBL_ALIGNOF(e) alignof(e)
 #elif defined(GBL_C_11)
-#   define GBL_ALIGNAS(e)               _Alignas(e)
-#   define GBL_ALIGNOF(e)               _Alignof(e)
+#   define GBL_ALIGNAS(e) _Alignas(e)
+#   define GBL_ALIGNOF(e) _Alignof(e)
 #endif
 
 #if defined(_MSC_VER) || defined(__MINGW64__)
@@ -288,9 +288,17 @@
 #endif
 
 #ifdef __cplusplus
-#   define GBL_INLINE   GBL_MAYBE_UNUSED inline
+#   define GBL_INLINE GBL_MAYBE_UNUSED inline
 #else
-#   define GBL_INLINE   GBL_MAYBE_UNUSED static inline
+#   define GBL_INLINE GBL_MAYBE_UNUSED static inline
+#endif
+
+#ifdef __GNUC__
+#   define GBL_FORCE_INLINE __attribute__((always_inline)) GBL_INLINE
+#elif defined(_MSC_VER)
+#   define GBL_FORCE_INLINE __forceinline
+#else
+#   define GBL_FORCE_INLINE GBL_INLINE
 #endif
 
 // ====== NONSTANDARD COMPILER-SPECIFIC C FUNCTIONS ==========

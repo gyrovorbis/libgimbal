@@ -6,7 +6,7 @@
 #ifndef GIMBAL_TIMER_H
 #define GIMBAL_TIMER_H
 
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 #include <time.h>
 
 #define GBL_TIMER_INIT      { 0, 0, 0 }

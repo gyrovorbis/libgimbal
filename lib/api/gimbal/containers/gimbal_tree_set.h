@@ -8,7 +8,7 @@
 
 #include <time.h>
 #include "gimbal_container.h"
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 
 #define SELF    GblTreeSet* pSelf
 #define CSELF   const SELF

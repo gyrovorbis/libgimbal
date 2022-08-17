@@ -6,7 +6,7 @@
 #ifndef GIMBAL_CALL_STACK_H
 #define GIMBAL_CALL_STACK_H
 
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 #include "gimbal_thread.h"
 
 #ifdef __cplusplus

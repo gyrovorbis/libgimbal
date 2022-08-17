@@ -6,7 +6,7 @@
 #ifndef GIMBAL_ALLOCATION_TRACKER_H
 #define GIMBAL_ALLOCATION_TRACKER_H
 
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 #include "gimbal/core/gimbal_call_stack.h"
 
 #define SELF    GblAllocationTracker* pSelf

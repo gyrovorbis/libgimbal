@@ -67,7 +67,7 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_API_INFO("********************* %s *********************",
                  !GBL_RESULT_SUCCESS(pSelf->result)? "[   FAIL   ]" : "[   PASS   ]");
 
-    //GBL_API_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
+    GBL_API_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
 
     GBL_API_END();
 }
@@ -343,7 +343,7 @@ static GBL_RESULT GblTestScenarioClass_constructor_(GblObject* pObject) {
     GBL_API_END();
 }
 
-static GBL_RESULT GblTestScenarioClass_destructor_(GblRecord* pRecord) {
+static GBL_RESULT GblTestScenarioClass_destructor_(GblBox* pRecord) {
     GBL_API_BEGIN(pRecord);
 
     GblTestScenario*    pSelf   = GBL_TEST_SCENARIO(pRecord);
@@ -429,7 +429,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
         pIt = pNext)
     {
         pNext = GblObject_siblingNext(pIt);
-        if(GblRecord_unref(GBL_RECORD(pIt)) != 0) {
+        if(GblBox_unref(GBL_BOX(pIt)) != 0) {
             GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION,
                                "[GblTestSuite] Destroy: Leaking unexpected existing references!");
         }
@@ -440,7 +440,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
     //GBL_API_DONE();
 
 
-    GBL_API_VERIFY(GblRecord_unref(GBL_RECORD(pSelf)) == 0,
+    GBL_API_VERIFY(GblBox_unref(GBL_BOX(pSelf)) == 0,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "[GblTestScenario] Destroy: Leaking unexpected existing references!");
     GBL_API_END();

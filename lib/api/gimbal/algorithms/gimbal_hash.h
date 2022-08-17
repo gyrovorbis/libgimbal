@@ -8,7 +8,7 @@
 #ifndef GIMBAL_HASH_H
 #define GIMBAL_HASH_H
 
-#include "../types/gimbal_typedefs.h"
+#include "../core/gimbal_typedefs.h"
 #include "../core/gimbal_api_frame.h"
 #include <time.h>
 
@@ -123,14 +123,7 @@ GBL_INLINE int gblRandRange(int min, int max) GBL_NOEXCEPT {
     return (rand() % (max - min + 1)) + min;
 }
 
-
-#ifdef __GNUC__
-#define FORCE_INLINE __attribute__((always_inline)) inline
-#else
-#define FORCE_INLINE GBL_INLINE
-#endif
-
-static FORCE_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
+GBL_FORCE_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
   h ^= h >> 16;
   h *= 0x85ebca6b;
   h ^= h >> 13;

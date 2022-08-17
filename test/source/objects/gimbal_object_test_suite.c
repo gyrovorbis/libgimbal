@@ -1,7 +1,7 @@
 #include "objects/gimbal_object_test_suite.h"
-#include <gimbal/objects/gimbal_object.h>
-#include <gimbal/objects/gimbal_event.h>
-#include <gimbal/types/gimbal_variant.h>
+#include <gimbal/meta/instances/gimbal_object.h>
+#include <gimbal/meta/instances/gimbal_event.h>
+#include <gimbal/meta/types/gimbal_variant.h>
 #include <gimbal/test/gimbal_test.h>
 #include <math.h>
 
@@ -80,10 +80,10 @@ static GBL_RESULT TestObject_constructed(GblObject* pSelf) {
     GBL_API_END();
 }
 
-static GBL_RESULT TestObject_destructor(GblRecord* pSelf) {
+static GBL_RESULT TestObject_destructor(GblBox* pSelf) {
     GBL_API_BEGIN(pSelf);
-    GblRecordClass* pParentClass = GBL_RECORD_CLASS(GBL_CLASS_SUPER(GBL_INSTANCE_CLASS(pSelf)));
-    pParentClass->pFnDestructor(GBL_RECORD(pSelf));
+    GblBoxClass* pParentClass = GBL_BOX_CLASS(GBL_CLASS_SUPER(GBL_INSTANCE_CLASS(pSelf)));
+    pParentClass->pFnDestructor(GBL_BOX(pSelf));
     GBL_API_END();
 }
 
@@ -284,18 +284,18 @@ static GBL_RESULT GblObjectTestSuite_name_(GblTestSuite* pSelf, GblContext* pCtx
 static GBL_RESULT GblObjectTestSuite_ref_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblObjectTestSuite_* pSelf_ = GBL_OBJECT_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(GblRecord_refCount(GBL_RECORD(pSelf_->pTestObj)), 1);
-    GblObject* pObj = GBL_OBJECT(GblRecord_ref(GBL_RECORD(pSelf_->pTestObj)));
+    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pSelf_->pTestObj)), 1);
+    GblObject* pObj = GBL_OBJECT(GblBox_ref(GBL_BOX(pSelf_->pTestObj)));
     GBL_TEST_COMPARE(GBL_OBJECT(pSelf_->pTestObj), pObj);
-    GBL_TEST_COMPARE(GblRecord_refCount(GBL_RECORD(pObj)), 2);
+    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pObj)), 2);
     GBL_API_END();
 }
 
 static GBL_RESULT GblObjectTestSuite_unref_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblObjectTestSuite_* pSelf_ = GBL_OBJECT_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pSelf_->pTestObj)), 1);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pSelf_->pTestObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pSelf_->pTestObj)), 1);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pSelf_->pTestObj)), 0);
     GBL_TEST_COMPARE(GblType_classRefCount(TEST_OBJECT_TYPE), 0);
 
     // K now replace what we deleted... lulz.
@@ -323,7 +323,7 @@ static GBL_RESULT GblObjectTestSuite_extendedData_(GblTestSuite* pSelf, GblConte
     GBL_TEST_COMPARE(GblObject_parent(pObj),            NULL);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_END();
 }
 
@@ -339,7 +339,7 @@ static GBL_RESULT GblObjectTestSuite_newVaArgs_(GblTestSuite* pSelf, GblContext*
     GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_END();
 }
 
@@ -356,7 +356,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVaArgs_(GblTestSuite* pSelf, GblC
     GBL_TEST_COMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(&obj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(&obj)), 0);
     GBL_API_END();
 }
 
@@ -374,7 +374,7 @@ static GBL_RESULT GblObjectTestSuite_newVaArgsWithClass_(GblTestSuite* pSelf, Gb
     GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_VERIFY_CALL(GblClass_destroyFloating(GBL_CLASS(pClass)));
     GBL_API_END();
 }
@@ -393,7 +393,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVaArgsWithClass_(GblTestSuite* pS
     GBL_TEST_COMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(&obj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(&obj)), 0);
     GBL_API_VERIFY_CALL(GblClass_destroyFloating(GBL_CLASS(pClass)));
     GBL_API_END();
 }
@@ -416,7 +416,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVaArgsWithClassInPlace_(GblTestSu
     GBL_TEST_COMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(&obj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(&obj)), 0);
     GBL_API_END();
 }
 
@@ -441,7 +441,7 @@ static GBL_RESULT GblObjectTestSuite_newVariants_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_END();
 }
 
@@ -468,7 +468,7 @@ static GBL_RESULT GblObjectTestSuite_newVariantsWithClass_(GblTestSuite* pSelf, 
     GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_VERIFY_CALL(GblClass_destroyFloating(GBL_CLASS(pClass)));
     GBL_API_END();
 }
@@ -498,7 +498,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVariants_(GblTestSuite* pSelf, Gb
     GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_END();
 }
 
@@ -528,7 +528,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVariantsWithClass_(GblTestSuite* 
     GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_VERIFY_CALL(GblClass_destroyFloating(GBL_CLASS(pClass)));
     GBL_API_END();
 }
@@ -571,8 +571,8 @@ static GBL_RESULT GblObjectTestSuite_propertyGet_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(floater,        -77.7f);
    // GBL_TEST_COMPARE(pStringer, "Fuckin Inheritance!");
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj1)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj0)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj1)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj0)), 0);
     GBL_API_END();
 }
 
@@ -609,7 +609,7 @@ static GBL_RESULT GblObjectTestSuite_propertySet_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(pUd, (void*)0x12345);
     GBL_TEST_COMPARE(floater, 33.33f);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_END();
 }
 
@@ -652,10 +652,10 @@ static GBL_RESULT GblObjectTestSuite_parenting_(GblTestSuite* pSelf, GblContext*
     GblObject_childRemove(pChild2, pChild3);
     GBL_TEST_COMPARE(GblObject_childFindByIndex(pChild2, 0), NULL);
 
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pChild3)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pChild1)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pParent)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pChild2)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild3)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild1)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild2)), 0);
 
     GBL_API_END();
 }
@@ -690,7 +690,7 @@ static GBL_RESULT GblObjectTestSuite_classSwizzle_(GblTestSuite* pSelf, GblConte
     GBL_TEST_COMPARE(value, -666);
 
     // clean up our shit
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_END();
 }
 
@@ -722,7 +722,7 @@ static GBL_RESULT GblObjectTestSuite_eventNotify_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(GblEvent_state(&event), GBL_EVENT_STATE_ACCEPTED);
 
     GblEvent_destruct(&event);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pObj)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_END();
 }
 
@@ -760,9 +760,9 @@ static GBL_RESULT GblObjectTestSuite_eventNotifyAncestors_(GblTestSuite* pSelf, 
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 1);
 
     GblEvent_destruct(&event);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pChild)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pParent)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pGrand)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);
     GBL_API_END();
 }
 
@@ -799,9 +799,9 @@ static GBL_RESULT GblObjectTestSuite_eventSendAncestors_(GblTestSuite* pSelf, Gb
     GBL_TEST_COMPARE(GblEvent_state(&event), GBL_EVENT_STATE_ACCEPTED);
 
     GblEvent_destruct(&event);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pChild)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pParent)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pGrand)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);
     GBL_API_END();
 }
 
@@ -853,9 +853,9 @@ static GBL_RESULT GblObjectTestSuite_eventFilters_(GblTestSuite* pSelf, GblConte
     GBL_TEST_COMPARE(pChild->eventFilterCount, 2);
 
     GblEvent_destruct(&event);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pChild)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pParent)), 0);
-    GBL_TEST_COMPARE(GblRecord_unref(GBL_RECORD(pGrand)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);
     GBL_API_END();
 }
 

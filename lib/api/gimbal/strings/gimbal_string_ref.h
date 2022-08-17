@@ -41,8 +41,8 @@
 #define GIMBAL_STRING_REF_H
 
 #include "../core/gimbal_api_frame.h"
-#include "../types/gimbal_typedefs.h"
-#include "../types/gimbal_ref.h"
+#include "../core/gimbal_typedefs.h"
+#include "../core/gimbal_ref.h"
 #include "gimbal_string_view.h"
 
 #define SELF    GblStringRef* pSelf
