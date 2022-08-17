@@ -1,5 +1,6 @@
 /*! \file
  *  \brief GblObject structure and related functions
+ *  \ingroup metaBuiltinTypes
  */
 
 #ifndef GIMBAL_OBJECT_H
@@ -47,8 +48,8 @@ GBL_FORWARD_DECLARE_STRUCT(GblEvent);
  *  \brief GblClass providing extended OO functionality
  * \ingroup metaBuiltinTypes
  *  \sa GblClass, GblObject
- *  \extends GblClass
- *  \implements GblIVariantIFace, GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
+ *  \extends GblBoxClass
+ *  \implements GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace
  */
 GBL_CLASS_DERIVE(GblObjectClass,
                  GblBoxClass,
@@ -76,8 +77,8 @@ typedef enum GBL_OBJECT_ATTRIBUTE {
  *  event handling, parent/child relationships, arbitrary
  *  userdata storage, and properties.
  *  \sa GblInstance, GblObjectClass
- *  \extends GblInstance
- *  \implements GblIVariant, GblITable, GblIEventHandler, GblIEventFilter
+ *  \extends GblBox
+ *  \implements GblITable, GblIEventHandler, GblIEventFilter
  */
 GBL_INSTANCE_DERIVE_EMPTY(GblObject, GblBox,
                     GblObjectClass)

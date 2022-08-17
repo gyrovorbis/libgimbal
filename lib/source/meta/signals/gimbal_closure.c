@@ -17,7 +17,7 @@ GBL_EXPORT GblClosure* GblClosure_create(GblType           derivedType,
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(derivedType, GBL_CLOSURE_TYPE);
     GBL_API_VERIFY_ARG(size >= sizeof(GblClosure));
-    pClosure = GBL_CLOSURE(GblBox_createExt(derivedType, size, pUserdata, pFnDtor, NULL));
+    pClosure = GBL_CLOSURE(GblBox_createExt(derivedType, size, pUserdata, pFnDtor));
     GBL_API_END_BLOCK();
     return pClosure;
 }

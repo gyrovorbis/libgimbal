@@ -59,10 +59,10 @@
 	- MacOS
 	- Linux
 	- iOS 
-	- Android (CI integration pending)
-	- Web Assembly (CI integration pending)
-	- Playstation Vita (CI integration pending)
-	- Sega Dreamcast (build setup pending)
+	- Android 
+	- Web Assembly 
+	- Playstation Vita 
+	- Sega Dreamcast 
 
 	We are happy to make changes required to support building for other platforms. 
 

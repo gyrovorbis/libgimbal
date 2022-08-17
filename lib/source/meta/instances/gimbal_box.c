@@ -7,6 +7,44 @@
 GblQuark fieldKeyDtor_  = GBL_QUARK_INVALID;
 GblQuark fieldKeyUd_    = GBL_QUARK_INVALID;
 
+GBL_EXPORT GBL_RESULT GblBox_setUserDestructor(GblBox* pSelf, GblArrayMapDtorFn pFnDtor) {
+    if(pFnDtor) {
+        return GblArrayMap_setUserdata(&GBL_PRIV_REF(pSelf).pFields,
+                                       fieldKeyDtor_,
+                                       (uintptr_t)pSelf,
+                                       pFnDtor);
+    } else {
+        return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields,
+                                 fieldKeyDtor_);
+    }
+}
+
+GBL_EXPORT uintptr_t GblBox_getField(const GblBox* pSelf, GblQuark key) {
+    return GblArrayMap_getValue(&GBL_PRIV_REF(pSelf).pFields, key);
+}
+
+GBL_EXPORT uintptr_t GblBox_takeField(GblBox* pSelf, GblQuark key) {
+    uintptr_t value = 0;
+    GblArrayMap_extractValue(&GBL_PRIV_REF(pSelf).pFields, key, &value);
+    return value;
+}
+
+GBL_EXPORT GblBool GblBox_clearField(GblBox* pSelf, GblQuark key) {
+    return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields, key);
+}
+
+GBL_EXPORT GblBool GblBox_hasField(const GblBox* pSelf, GblQuark key) {
+    return GblArrayMap_contains(&GBL_PRIV_REF(pSelf).pFields, key);
+}
+
+GBL_EXPORT GBL_RESULT GblBox_setField(GblBox*           pSelf,
+                                      GblQuark          key,
+                                      uintptr_t         ud,
+                                      GblArrayMapDtorFn pFnDtor)
+{
+    return GblArrayMap_setUserdata(&GBL_PRIV_REF(pSelf).pFields, key, ud, pFnDtor);
+}
+
 GBL_EXPORT void* GblBox_userdata(const GblBox* pSelf) {
     return (void*)GblArrayMap_getValue(&GBL_PRIV_REF(pSelf).pFields, fieldKeyUd_);
 }
@@ -20,18 +58,6 @@ GBL_EXPORT GBL_RESULT GblBox_setUserdata(GblBox* pSelf, void* pUserdata) {
     } else {
         return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields,
                                  fieldKeyUd_);
-    }
-}
-
-GBL_EXPORT GBL_RESULT GblBox_setUserDestructor_(GblBox* pSelf, GblArrayMapDtorFn pFnDtor) {
-    if(pFnDtor) {
-        return GblArrayMap_setUserdata(&GBL_PRIV_REF(pSelf).pFields,
-                                       fieldKeyDtor_,
-                                       (uintptr_t)pSelf,
-                                       pFnDtor);
-    } else {
-        return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields,
-                                 fieldKeyDtor_);
     }
 }
 
@@ -77,20 +103,61 @@ GBL_EXPORT GBL_RESULT GblBox_constructWithClass(GblBox* pSelf,
 GBL_EXPORT GblBox* GblBox_createExt(GblType           derivedType,
                                     GblSize           totalSize,
                                     void*             pUserdata,
-                                    GblArrayMapDtorFn pFnDtor,
-                                    ...)
+                                    GblArrayMapDtorFn pFnUdDtor)
 {
     GblBox* pBox = NULL;
     GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
     GBL_API_VERIFY_ARG(totalSize >= sizeof(GblBox));
     pBox = GBL_API_MALLOC(totalSize, 0, GblType_name(derivedType));
-    GBL_API_VERIFY_CALL(GblInstance_construct((GblInstance*)pBox, derivedType));
-    if(pFnDtor) GBL_API_VERIFY_CALL(GblBox_setUserDestructor_(pBox, pFnDtor));
-    if(pUserdata) GBL_API_VERIFY_CALL(GblBox_setUserdata(pBox, pUserdata));
-
+    GBL_API_CALL(GblBox_constructExt(pBox, derivedType, pUserdata, pFnUdDtor));
+    GBL_PRIV_REF(pBox).constructedInPlace = 0;
     GBL_API_END_BLOCK();
     return pBox;
+}
+
+GBL_EXPORT GBL_RESULT GblBox_constructExt(GblBox*           pSelf,
+                                          GblType           derivedType,
+                                          void*             pUserdata,
+                                          GblArrayMapDtorFn pFnUdDtor)
+{
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_POINTER(pSelf);
+    GBL_API_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
+    GBL_API_VERIFY_CALL(GblInstance_construct((GblInstance*)pSelf, derivedType));
+    if(pFnUdDtor) GBL_API_VERIFY_CALL(GblBox_setUserDestructor(pSelf, pFnUdDtor));
+    if(pUserdata) GBL_API_VERIFY_CALL(GblBox_setUserdata(pSelf, pUserdata));
+    GBL_PRIV_REF(pSelf).constructedInPlace = 1;
+    GBL_API_END();
+}
+
+GBL_EXPORT GblBox* GblBox_createExtWithClass(GblBoxClass*      pClass,
+                                             GblSize           totalSize,
+                                             void*             pUserdata,
+                                             GblArrayMapDtorFn pFnUdDtor)
+{
+    GblBox* pBox = NULL;
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_ARG(totalSize >= sizeof(GblBox));
+    pBox = GBL_API_MALLOC(totalSize, 0, GblType_name(GBL_CLASS_TYPEOF(pClass)));
+    GBL_API_CALL(GblBox_constructExtWithClass(pBox, pClass, pUserdata, pFnUdDtor));
+    GBL_PRIV_REF(pBox).constructedInPlace = 0;
+    GBL_API_END_BLOCK();
+    return pBox;
+}
+
+GBL_EXPORT GBL_RESULT GblBox_constructExtWithClass(GblBox*           pSelf,
+                                                   GblBoxClass*      pClass,
+                                                   void*             pUserdata,
+                                                   GblArrayMapDtorFn pFnUdDtor)
+{
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_POINTER(pSelf && pClass);
+    GBL_API_VERIFY_TYPE(GBL_CLASS_TYPEOF(pClass), GBL_BOX_TYPE);
+    GBL_API_VERIFY_CALL(GblInstance_constructWithClass(GBL_INSTANCE(pSelf), GBL_CLASS(pClass)));
+    if(pFnUdDtor) GBL_API_VERIFY_CALL(GblBox_setUserDestructor(pSelf, pFnUdDtor));
+    if(pUserdata) GBL_API_VERIFY_CALL(GblBox_setUserdata(pSelf, pUserdata));
+    GBL_PRIV_REF(pSelf).constructedInPlace = 1;
+    GBL_API_END();
 }
 
 
@@ -136,6 +203,89 @@ static GBL_RESULT GblBox_init_(GblInstance* pInstance, GblContext* pCtx) {
 static GBL_RESULT GblBox_destructor_(GblBox* pSelf) {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_CALL(GblArrayMap_destroy(&GBL_PRIV_REF(pSelf).pFields));
+    GBL_API_END();
+}
+
+GBL_EXPORT void* GblBoxClass_userdata(const GblBoxClass* pSelf) {
+    return (void*)GblArrayMap_getValue(&GBL_PRIV_REF(pSelf).pFields, fieldKeyUd_);
+}
+
+GBL_EXPORT GBL_RESULT GblBoxClass_setUserDestructor(GblBoxClass* pSelf, GblArrayMapDtorFn pFnDtor) {
+    if(pFnDtor) {
+        return GblArrayMap_setUserdata(&GBL_PRIV_REF(pSelf).pFields,
+                                       fieldKeyDtor_,
+                                       (uintptr_t)pSelf,
+                                       pFnDtor);
+    } else {
+        return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields,
+                                 fieldKeyDtor_);
+    }
+}
+
+GBL_EXPORT GBL_RESULT GblBoxClass_setUserdata(GblBoxClass* pSelf, void* pUserdata) {
+    if(pUserdata) {
+        return GblArrayMap_setUserdata(&GBL_PRIV_REF(pSelf).pFields,
+                                       fieldKeyUd_,
+                                       (uintptr_t)pUserdata,
+                                       NULL);
+    } else {
+        return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields,
+                                 fieldKeyUd_);
+    }
+}
+
+GBL_EXPORT uintptr_t GblBoxClass_getField(const GblBoxClass* pSelf, GblQuark key) {
+    return GblArrayMap_getValue(&GBL_PRIV_REF(pSelf).pFields, key);
+}
+
+GBL_EXPORT uintptr_t GblBoxClass_takeField(GblBoxClass* pSelf, GblQuark key) {
+    uintptr_t value = 0;
+    GblArrayMap_extractValue(&GBL_PRIV_REF(pSelf).pFields, key, &value);
+    return value;
+}
+
+GBL_EXPORT GblBool GblBoxClass_clearField(GblBoxClass* pSelf, GblQuark key) {
+    return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields, key);
+}
+
+GBL_EXPORT GblBool GblBoxClass_hasField(const GblBoxClass* pSelf, GblQuark key) {
+    return GblArrayMap_contains(&GBL_PRIV_REF(pSelf).pFields, key);
+}
+
+GBL_EXPORT GBL_RESULT GblBoxClass_setField(GblBoxClass*      pSelf,
+                                           GblQuark          key,
+                                           uintptr_t         ud,
+                                           GblArrayMapDtorFn pFnDtor)
+{
+    return GblArrayMap_setUserdata(&GBL_PRIV_REF(pSelf).pFields, key, ud, pFnDtor);
+}
+
+
+GBL_EXPORT GblBoxClass* GblBoxClass_createFloatingExt(GblType           derivedType,
+                                                      GblSize           totalSize,
+                                                      void*             pUserdata,
+                                                      GblArrayMapDtorFn pFnUdDtor)
+{
+    GblBoxClass* pClass = NULL;
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
+    GBL_API_VERIFY_ARG(totalSize >= sizeof(GblBoxClass));
+    pClass = GBL_API_MALLOC(totalSize, 0, GblType_name(derivedType));
+    GBL_API_CALL(GblBoxClass_constructFloatingExt(pClass, derivedType, pUserdata, pFnUdDtor));
+    GBL_CLASS_FLAG_CLEAR_(GBL_CLASS(pClass), GBL_CLASS_FLAG_IN_PLACE_);
+    GBL_API_END_BLOCK();
+    return pClass;
+}
+
+GBL_EXPORT GBL_RESULT GblBoxClass_constructFloatingExt(GblBoxClass*      pSelf,
+                                                       GblType           derivedType,
+                                                       void*             pUserdata,
+                                                       GblArrayMapDtorFn pFnUdDtor)
+{
+    GBL_API_BEGIN(NULL);
+    GblClass_constructFloating(GBL_CLASS(pSelf), derivedType);
+    if(pUserdata) GBL_API_VERIFY_CALL(GblBoxClass_setUserdata(pSelf, pUserdata));
+    if(pFnUdDtor) GBL_API_VERIFY_CALL(GblBoxClass_setUserDestructor(pSelf, pFnUdDtor));
     GBL_API_END();
 }
 

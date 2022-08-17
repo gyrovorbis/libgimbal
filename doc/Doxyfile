@@ -1026,6 +1026,8 @@ EXCLUDE_PATTERNS       =
 
 EXCLUDE_SYMBOLS        = SELF \
                          CSELF \
+                         KLASS \
+                         CKLASS \
                          GBL_DECLS_BEGIN \
                          GBL_DECLS_END
 
