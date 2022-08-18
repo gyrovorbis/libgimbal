@@ -92,12 +92,13 @@ static GBL_RESULT GblContext_IAllocator_free_(GblIAllocator* pIAllocator, const 
 
 static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs) GBL_NOEXCEPT {
     GblContext* pSelf = (GblContext*)(pILogger);
+    GblContext* pCtx = (GblContext*)pILogger;
+
+    if(!(pCtx->logFilter & level)) return GBL_RESULT_SUCCESS;
+
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pFmt);
     GBL_API_VERIFY_ARG(level >= 0 /*&& level < GBL_LOG_LEVEL_COUNT*/); // or not to allow for user levels!
-
-    GblContext* pCtx = (GblContext*)pILogger;
-    if(!(pCtx->logFilter & level)) GBL_API_DONE();
 
     char buffer[GBL_VA_SNPRINTF_BUFFER_SIZE] = { '\0' };
     char tabBuff[GBL_VA_SNPRINTF_BUFFER_SIZE];// = { '\t' };

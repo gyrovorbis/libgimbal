@@ -1228,7 +1228,8 @@ static GBL_RESULT GblVariantTestSuite_u64_(GblTestSuite* pSelf, GblContext* pCtx
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // Value Move Constructor
-    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(&v, GBL_UINT64_TYPE, 18));
+    uint64_t value = 18;
+    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(&v, GBL_UINT64_TYPE, (uint64_t)18));
     GBL_TEST_COMPARE(GblVariant_getUint64(&v), 18);
 
     // Utility / Value Set Copy
@@ -1236,7 +1237,8 @@ static GBL_RESULT GblVariantTestSuite_u64_(GblTestSuite* pSelf, GblContext* pCtx
     GBL_TEST_COMPARE(GblVariant_getUint64(&v), 19);
 
     // Value Set Move
-    GBL_API_VERIFY_CALL(GblVariant_setValueMove(&v, GBL_UINT64_TYPE, 20));
+    value = 20;
+    GBL_API_VERIFY_CALL(GblVariant_setValueMove(&v, GBL_UINT64_TYPE, value));
     GBL_TEST_COMPARE(GblVariant_getUint64(&v), 20);
 
     // Value Get Move
@@ -1373,7 +1375,7 @@ static GBL_RESULT GblVariantTestSuite_i64_(GblTestSuite* pSelf, GblContext* pCtx
     GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
 
     // Value Move Constructor
-    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(&v, GBL_INT64_TYPE, 18));
+    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(&v, GBL_INT64_TYPE, (int64_t)18));
     GBL_TEST_COMPARE(GblVariant_getInt64(&v), 18);
 
     // Utility / Value Set Copy
@@ -1381,7 +1383,7 @@ static GBL_RESULT GblVariantTestSuite_i64_(GblTestSuite* pSelf, GblContext* pCtx
     GBL_TEST_COMPARE(GblVariant_getInt64(&v), 19);
 
     // Value Set Move
-    GBL_API_VERIFY_CALL(GblVariant_setValueMove(&v, GBL_INT64_TYPE, 20));
+    GBL_API_VERIFY_CALL(GblVariant_setValueMove(&v, GBL_INT64_TYPE, (int64_t)20));
     GBL_TEST_COMPARE(GblVariant_getInt64(&v), 20);
 
     // Value Get Move

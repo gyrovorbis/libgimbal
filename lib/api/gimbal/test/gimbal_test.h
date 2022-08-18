@@ -44,23 +44,33 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_UINTPTR_(uintptr_t actual, uintptr_t exp
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_PTR_    (const void* pActual, const void* pExpected) { return pActual == pExpected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_UINT32_ (uint32_t actual, uint32_t expected)         { return actual == expected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_UINT64_ (uint64_t actual, uint64_t expected)         { return actual == expected; }
+GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_INT32_  (int32_t actual, int32_t expected)           { return actual == expected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_INT64_  (int64_t actual, int64_t expected)           { return actual == expected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_DBL_    (double actual, double expected)             { return actual == expected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char* pExpected) { return pActual == pExpected ||
                                                                                                      (pActual && pExpected && \
                                                                                                      strcmp(pActual, pExpected) == 0); }
 
+#ifdef __DREAMCAST__
+#   define GBL_TEST_CMP_PLATFORM_ENTRIES()       \
+        (GblSize, GBL_TEST_COMPARE_CMP_UINT32_), \
+        (int,     GBL_TEST_COMPARE_CMP_INT32_),
+# else
+#   define GBL_TEST_CMP_PLATFORM_ENTRIES()
+#endif
+
 #define GBL_TEST_COMPARE_CMP_TABLE_  (                      \
         GBL_TEST_COMPARE_CMP_PTR_,                          \
         (                                                   \
-            (char,          GBL_TEST_COMPARE_CMP_INT64_),   \
-            (int16_t,       GBL_TEST_COMPARE_CMP_INT64_),   \
-            (int32_t,       GBL_TEST_COMPARE_CMP_INT64_),   \
+            (char,          GBL_TEST_COMPARE_CMP_INT32_),   \
+            (int16_t,       GBL_TEST_COMPARE_CMP_INT32_),   \
+            (int32_t,       GBL_TEST_COMPARE_CMP_INT32_),   \
             (int64_t,       GBL_TEST_COMPARE_CMP_INT64_),   \
-            (uint8_t,       GBL_TEST_COMPARE_CMP_UINT64_),  \
-            (uint16_t,      GBL_TEST_COMPARE_CMP_UINT64_),  \
+            (uint8_t,       GBL_TEST_COMPARE_CMP_UINT32_),  \
+            (uint16_t,      GBL_TEST_COMPARE_CMP_UINT32_),  \
             (uint32_t,      GBL_TEST_COMPARE_CMP_UINT32_),  \
             (uint64_t,      GBL_TEST_COMPARE_CMP_UINT64_),  \
+            GBL_TEST_CMP_PLATFORM_ENTRIES()                 \
             (const char*,   GBL_TEST_COMPARE_CMP_STR_),     \
             (char*,         GBL_TEST_COMPARE_CMP_STR_),     \
             (float,         GBL_TEST_COMPARE_CMP_DBL_),     \

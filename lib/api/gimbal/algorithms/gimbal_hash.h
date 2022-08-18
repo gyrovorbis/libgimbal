@@ -123,7 +123,7 @@ GBL_INLINE int gblRandRange(int min, int max) GBL_NOEXCEPT {
     return (rand() % (max - min + 1)) + min;
 }
 
-GBL_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
+GBL_FORCE_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
   h ^= h >> 16;
   h *= 0x85ebca6b;
   h ^= h >> 13;
@@ -200,14 +200,7 @@ GBL_INLINE void MurmurHash3_x86_32 ( const void * key, int len,
 
 GBL_INLINE GblHash gblHashMurmur(const void* pData, GblSize size) GBL_NOEXCEPT {
     uint32_t out;
-    GBL_API_BEGIN(NULL);
-    GBL_API_VERBOSE("Hashing: %u, %p", size, pData);
-#if 1
     MurmurHash3_x86_32(pData, size, gblSeed(0), &out);
-#else
-    out = gblHashSip(pData, size);
-#endif
-    GBL_API_END_BLOCK();
     return out;
 }
 
