@@ -123,7 +123,7 @@ GBL_INLINE int gblRandRange(int min, int max) GBL_NOEXCEPT {
     return (rand() % (max - min + 1)) + min;
 }
 
-GBL_FORCE_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
+GBL_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
   h ^= h >> 16;
   h *= 0x85ebca6b;
   h ^= h >> 13;
@@ -136,9 +136,11 @@ GBL_FORCE_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
 //-----------------------------------------------------------------------------
 // Block read - if your platform needs to do endian-swapping or can only
 // handle aligned reads, do the conversion here
-
-#define getblock(p, i) (p[i])
-
+#ifndef __DREAMCAST__
+#   define getblock(k, p, i) (k = p[i])
+#else
+#   define getblock(k, p, i) memcpy(&k, p + i, sizeof(uint32_t))
+#endif
 GBL_INLINE void MurmurHash3_x86_32 ( const void * key, int len,
                           uint32_t seed, void * out ) GBL_NOEXCEPT {
 #define	ROTL32(x, r) ((x << r) | (x >> (32 - r)))
@@ -159,7 +161,8 @@ GBL_INLINE void MurmurHash3_x86_32 ( const void * key, int len,
 
     for(i = -nblocks; i; i++)
     {
-      uint32_t k1 = getblock(blocks,i);
+      uint32_t k1;
+      getblock(k1, blocks, i);
 
       k1 *= c1;
       k1 = ROTL32(k1,15);
@@ -197,7 +200,14 @@ GBL_INLINE void MurmurHash3_x86_32 ( const void * key, int len,
 
 GBL_INLINE GblHash gblHashMurmur(const void* pData, GblSize size) GBL_NOEXCEPT {
     uint32_t out;
+    GBL_API_BEGIN(NULL);
+    GBL_API_VERBOSE("Hashing: %u, %p", size, pData);
+#if 1
     MurmurHash3_x86_32(pData, size, gblSeed(0), &out);
+#else
+    out = gblHashSip(pData, size);
+#endif
+    GBL_API_END_BLOCK();
     return out;
 }
 
