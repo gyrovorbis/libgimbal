@@ -391,6 +391,38 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_clear_(GblTestSuite* pSelf, GblCo
 }
 
 
+static GBL_RESULT GblDoublyLinkedListTestSuite_reverse_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblDoublyLinkedListTestSuite_* pSelf_ = GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(pSelf);
+
+    GblDoublyLinkedList_pushBack(&pSelf_->list1, &pSelf_->testStructs[0].listNode);
+    GblDoublyLinkedList_pushBack(&pSelf_->list1, &pSelf_->testStructs[1].listNode);
+    GblDoublyLinkedList_pushBack(&pSelf_->list1, &pSelf_->testStructs[2].listNode);
+
+    GblDoublyLinkedList_reverse(&pSelf_->list1);
+
+
+    GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list1), 3);
+    GBL_API_VERIFY_CALL(verifyDListNode_(pCtx,
+                                         &pSelf_->list1,
+                                         &pSelf_->testStructs[2].listNode,
+                                         0,
+                                         "node2"));
+    GBL_API_VERIFY_CALL(verifyDListNode_(pCtx,
+                                         &pSelf_->list1,
+                                         &pSelf_->testStructs[1].listNode,
+                                         1,
+                                         "node1"));
+    GBL_API_VERIFY_CALL(verifyDListNode_(pCtx,
+                                         &pSelf_->list1,
+                                         &pSelf_->testStructs[0].listNode,
+                                         2,
+                                         "node0"));
+
+    GBL_API_END();
+}
+
+
 GBL_EXPORT GblType GblDoublyLinkedListTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
@@ -409,6 +441,7 @@ GBL_EXPORT GblType GblDoublyLinkedListTestSuite_type(void) {
         { "replace",    GblDoublyLinkedListTestSuite_replace_     },
         { "swap",       GblDoublyLinkedListTestSuite_swap_        },
         { "clear",      GblDoublyLinkedListTestSuite_clear_       },
+        { "reverse",    GblDoublyLinkedListTestSuite_reverse_     },
         { NULL,         NULL                                      }
     };
 

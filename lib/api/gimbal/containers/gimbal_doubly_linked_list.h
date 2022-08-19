@@ -88,6 +88,8 @@ GBL_INLINE GblBool  GblDoublyLinkedList_erase       (SELF, GblSize index)       
 
 GBL_INLINE void     GblDoublyLinkedList_clear       (SELF)                                  GBL_NOEXCEPT;
 
+GBL_INLINE void     GblDoublyLinkedList_reverse     (SELF)                                  GBL_NOEXCEPT;
+
 
 // ========== IMPL ==========
 
@@ -251,6 +253,15 @@ GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_popFront(SELF) GBL_NOEXC
     return pFront;
 }
 
+GBL_INLINE void GblDoublyLinkedList_reverse(SELF) GBL_NOEXCEPT {
+    GblDoublyLinkedListNode* pIt = pSelf;
+    do {
+        GblDoublyLinkedListNode* pTemp = pIt->pNext;
+        pIt->pNext = pIt->pPrev;
+        pIt->pPrev = pTemp;
+        pIt = pTemp;
+    } while(pIt != pSelf);
+}
 
 
 GBL_DECLS_END

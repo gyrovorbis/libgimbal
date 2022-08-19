@@ -57,6 +57,8 @@ GBL_INLINE GblLinkedListNode*   GblLinkedList_back          (CSELF)             
 GBL_INLINE GblBool              GblLinkedList_contains      (CSELF, GblLinkedListNode* pNode)   GBL_NOEXCEPT;
 GBL_INLINE GblSize              GblLinkedList_find          (CSELF, GblLinkedListNode* PNode)   GBL_NOEXCEPT;
 
+GBL_INLINE void                 GblLinkedList_reverse       (SELF)                              GBL_NOEXCEPT;
+
 // ========== IMPL ==========
 
 GBL_INLINE void GblLinkedList_init(SELF) GBL_NOEXCEPT {
@@ -253,6 +255,20 @@ GBL_INLINE GblLinkedListNode* GblLinkedList_popBack(SELF) GBL_NOEXCEPT {
     }
 
     return pBack;
+}
+
+GBL_INLINE void GblLinkedList_reverse(SELF) GBL_NOEXCEPT {
+    GblLinkedListNode* pPrev = pSelf;
+    GblLinkedListNode* pNext = pSelf;
+    for(GblLinkedListNode* pIt = pSelf->pNext;
+        pIt != pSelf;
+        pIt = pNext)
+    {
+        pNext = pIt->pNext;
+        pIt->pNext = pPrev;
+        pPrev = pIt;
+    }
+    pSelf->pNext = pPrev;
 }
 
 

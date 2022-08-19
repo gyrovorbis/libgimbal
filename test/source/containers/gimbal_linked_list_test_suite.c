@@ -402,6 +402,37 @@ static GBL_RESULT GblLinkedListTestSuite_clear_(GblTestSuite* pSelf, GblContext*
     GBL_API_END();
 }
 
+static GBL_RESULT GblLinkedListTestSuite_reverse_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblLinkedListTestSuite_* pSelf_ = GBL_LINKED_LIST_TEST_SUITE_(pSelf);
+
+    GblLinkedList_pushBack(&pSelf_->list1, &pSelf_->testStructs[0].listNode);
+    GblLinkedList_pushBack(&pSelf_->list1, &pSelf_->testStructs[1].listNode);
+    GblLinkedList_pushBack(&pSelf_->list1, &pSelf_->testStructs[2].listNode);
+
+    GblLinkedList_reverse(&pSelf_->list1);
+
+
+    GBL_TEST_COMPARE(GblLinkedList_count(&pSelf_->list1), 3);
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[2].listNode,
+                                        0,
+                                        "node2"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[1].listNode,
+                                        1,
+                                        "node1"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[0].listNode,
+                                        2,
+                                        "node0"));
+
+    GBL_API_END();
+}
+
 GBL_EXPORT GblType GblLinkedListTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
@@ -420,7 +451,8 @@ GBL_EXPORT GblType GblLinkedListTestSuite_type(void) {
         { "replace",    GblLinkedListTestSuite_replace_     },
         { "swap",       GblLinkedListTestSuite_swap_        },
         { "clear",      GblLinkedListTestSuite_clear_       },
-        { NULL,         NULL                                }
+        { "reverse",    GblLinkedListTestSuite_reverse_     },
+        { NULL,         NULL                                },
     };
 
     const static GblTestSuiteClassVTable vTable = {
