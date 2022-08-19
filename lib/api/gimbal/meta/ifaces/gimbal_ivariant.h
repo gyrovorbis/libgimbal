@@ -22,8 +22,6 @@
 
 GBL_DECLS_BEGIN
 
-GBL_FORWARD_DECLARE_STRUCT_PRIVATE(GblIVariant);
-
 GBL_DECLARE_FLAGS(GBL_IVARIANT_OP_FLAGS) {
     GBL_IVARIANT_OP_FLAG_RELOCATABLE           = 0x0001,
     GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT     = 0x0002,  //without this, assume default 0 init is fine
@@ -61,11 +59,9 @@ typedef struct GblIVariantIFaceVTable {
     GBL_RESULT (*pFnLoad)     (VARIANT,  const GblStringBuffer* pString);
 } GblIVariantIFaceVTable;
 
-typedef struct GblIVariantIFace {
-    GblInterface                    base;
+GBL_INTERFACE_DERIVE(GblIVariant)
     const GblIVariantIFaceVTable*   pVTable;
-} GblIVariantIFace;
-
+GBL_INTERFACE_END
 
 #define SELF    GblIVariantIFace* pSelf
 #define CSELF   const SELF

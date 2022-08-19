@@ -57,13 +57,13 @@ extern "C" {
     GBL_INTERFACE_DERIVE_3(instance, klass, baseClass)          \
     GBL_MAP(GBL_CLASS_IMPL_INTERFACE, __VA_ARGS__)
 
-#define GBL_INTERFACE_DERIVE_3(instance, klass, baseClass)  \
+#define GBL_INTERFACE_DERIVE_3(instance, klass, baseKlass)  \
     struct instance;                                        \
     typedef struct instance instance;                       \
     struct klass;                                           \
-    typedef struct klass;                                   \
+    typedef struct klass klass;                             \
     struct klass {                                          \
-        baseClass base;
+        baseKlass base;
 
 #define GBL_INTERFACE_DERIVE_2(instance, klass) \
     GBL_INTERFACE_DERIVE_3(instance, klass, GblInterface)

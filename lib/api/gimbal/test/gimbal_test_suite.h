@@ -49,33 +49,25 @@ typedef struct GblTestSuiteClassVTable {
     const GblTestCase*  pCases;
 } GblTestSuiteClassVTable;
 
-typedef struct GblTestSuiteClass {
-    GblObjectClass                  base;
-
+GBL_CLASS_DERIVE(GblTestSuiteClass, GblObjectClass)
     const GblTestSuiteClassVTable*  pVTable;
 
     GBL_RESULT                      (*pFnSuiteName) (CSELF, const char** ppName);
     GBL_RESULT                      (*pFnCaseCount) (CSELF, GblSize* pSize);
     GBL_RESULT                      (*pFnCaseName)  (CSELF, GblSize index, const char** ppName);
     GBL_RESULT                      (*pFnCaseRun)   (SELF, GblContext* pCtx, GblSize index);
-} GblTestSuiteClass;
+GBL_CLASS_END
 
 /*! \brief GblObject representing a collection of unit test cases
  *  \ingroup testing
  */
-typedef struct GblTestSuite {
-    union {
-        GblTestSuiteClass*  pClass;
-        GblObject           base;
-    };
-
-    GblCallRecord           failingIssue;
-
-    GblSize                 casesRun;
-    GblSize                 casesPassed;
-    GblSize                 casesFailed;
-    GblSize                 casesSkipped;
-} GblTestSuite;
+GBL_INSTANCE_DERIVE(GblTestSuite, GblObject, GblTestSuiteClass)
+    GblCallRecord   failingIssue;
+    GblSize         casesRun;
+    GblSize         casesPassed;
+    GblSize         casesFailed;
+    GblSize         casesSkipped;
+GBL_INSTANCE_END
 
 typedef enum GBL_TEST_SUITE_PROPERTY_ID {
     GBL_TEST_SUITE_PROPERTY_ID_FIRST        = GBL_OBJECT_PROPERTY_ID_COUNT,

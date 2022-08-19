@@ -30,15 +30,11 @@
 
 GBL_DECLS_BEGIN
 
-GBL_FORWARD_DECLARE_STRUCT(GblILogger);
-
-
-typedef struct GblILoggerIFace {
-    GblInterface base;
+GBL_INTERFACE_DERIVE(GblILogger)
     GBL_RESULT (*pFnWrite)  (SELF, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
     GBL_RESULT (*pFnPush)   (SELF, const GblStackFrame* pFrame);
     GBL_RESULT (*pFnPop)    (SELF, const GblStackFrame* pFrame, uint32_t count);
-} GblILoggerIFace;
+GBL_INTERFACE_END
 
 GBL_API GblILogger_write(SELF,
                          const GblStackFrame*   pFrame,

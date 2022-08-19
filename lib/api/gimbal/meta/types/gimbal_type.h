@@ -23,7 +23,6 @@ GBL_DECLS_BEGIN
  */
 typedef uintptr_t                                   GblType;
 
-
 typedef GBL_RESULT (*GblTypeClassInitializeFn)      (GblClass*, const void*, GblContext*);      ///< \details Function type used as a GblType's GblClass initializer
 typedef GBL_RESULT (*GblTypeClassFinalizeFn)        (GblClass*, const void*, GblContext*);      ///< \details Function type used as a GblType's GblClass finalizer
 typedef GBL_RESULT (*GblTypeInstanceInitializeFn)   (GblInstance*, GblContext*);                ///< \details Function type used as a GblType's GblInstance initializer

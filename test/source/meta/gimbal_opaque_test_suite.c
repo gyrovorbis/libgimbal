@@ -27,7 +27,7 @@ static GBL_RESULT GblOpaqueTestSuite_final_(GblTestSuite* pSelf, GblContext* pCt
 static GBL_RESULT GblOpaqueTestSuite_register_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblOpaqueTestSuite_* pSelf_ = GBL_OPAQUE_TEST_SUITE_(pSelf);
-    pSelf_->opaqueType = GblPointer_registerOpaque("CString");
+    pSelf_->opaqueType = GblPointer_register("CString");
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }

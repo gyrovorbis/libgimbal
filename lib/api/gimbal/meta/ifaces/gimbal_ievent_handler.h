@@ -26,12 +26,10 @@
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
-GBL_FORWARD_DECLARE_STRUCT(GblIEventHandler);
 
-typedef struct GblIEventHandlerIFace {
-    GblInterface    base;
+GBL_INTERFACE_DERIVE(GblIEventHandler)
     GBL_RESULT      (*pFnEvent)(SELF, GblEvent* pEvent);   //handle all events
-} GblIEventHandlerIFace;
+GBL_INTERFACE_END
 
 GBL_API GblIEventHandler_event(SELF, GblEvent* pEvent) GBL_NOEXCEPT;
 

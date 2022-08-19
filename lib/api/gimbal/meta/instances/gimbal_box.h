@@ -10,7 +10,6 @@
 #include "../ifaces/gimbal_ivariant.h"
 #include "../../containers/gimbal_array_map.h"
 
-
 #define GBL_BOX_TYPE                 (GBL_BUILTIN_TYPE(BOX))    ///< GblType UUID of a GblBox
 
 #define GBL_BOX(instance)            (GBL_INSTANCE_CAST(instance, GBL_BOX_TYPE, GblBox))

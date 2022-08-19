@@ -26,7 +26,7 @@
 
 GBL_DECLS_BEGIN
 
-typedef struct GblIPluginIFace {
+GBL_INTERFACE_DERIVE(GblIPlugin)
     GBL_RESULT (*pFnUse)            (SELF);
     GBL_RESULT (*pFnUnuse)          (SELF);
     GBL_RESULT (*pFnTypeInfo)       (CSELF,
@@ -36,7 +36,7 @@ typedef struct GblIPluginIFace {
                                      GblType        dynamicType,
                                      GblType        ifaceType,
                                      GblInterface** ppInterface);
-} GblIPluginIFace;
+GBL_INTERFACE_END
 
 GBL_EXPORT GblType    GblIPlugin_type        (void)                 GBL_NOEXCEPT;
 

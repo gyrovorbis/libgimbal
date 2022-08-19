@@ -29,17 +29,11 @@ GBL_DECLARE_ENUM(GBL_EVENT_STATE) {
     GBL_EVENT_STATE_IGNORED
 };
 
-typedef struct GblEventClass {
-    GblClass    base;
-} GblEventClass;
+GBL_CLASS_DERIVE_EMPTY(GblEventClass)
 
-typedef struct GblEvent {
-    union {
-        GblEventClass*  pClass;
-        GblInstance     base;
-    };
+GBL_INSTANCE_DERIVE(GblEvent, GblInstance, GblEventClass)
     GBL_EVENT_STATE     state;
-} GblEvent;
+GBL_INSTANCE_END
 
 /* PROPERTIES:
  * 1) state

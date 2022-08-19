@@ -6,10 +6,7 @@
 #ifndef GIMBAL_PROPERTY_H
 #define GIMBAL_PROPERTY_H
 
-#include "../types/gimbal_type.h"
-#include "../classes/gimbal_class.h"
-#include "../instances/gimbal_instance.h"
-#include "../../strings/gimbal_quark.h"
+#include "../instances/gimbal_box.h"
 #include "../../containers/gimbal_linked_list.h"
 #include <string.h>
 
@@ -101,21 +98,16 @@ typedef enum GBL_PROPERTY_FLAG {
 
 GBL_FORWARD_DECLARE_STRUCT(GblProperty);
 
-typedef struct GblPropertyClass {
-    GblClass        base;
-    GblType         valueType;
-    GBL_RESULT      (*pFnDestruct)       (GblProperty*);
-    GBL_RESULT      (*pFnVariantDefault) (const GblProperty*, GblVariant*);
-    GBL_RESULT      (*pFnVariantValidate)(const GblProperty*, GblVariant*);
-    GBL_RESULT      (*pFnVariantCompare) (const GblProperty*, const GblVariant*, const GblVariant*, GblInt*);
-    GBL_RESULT      (*pFnVariantCheck)   (const GblProperty*, const GblVariant*);
-} GblPropertyClass;
+GBL_CLASS_DERIVE(GblPropertyClass, GblBoxClass)
+    GblType     valueType;
+    GBL_RESULT  (*pFnDestruct)       (GblProperty*);
+    GBL_RESULT  (*pFnVariantDefault) (const GblProperty*, GblVariant*);
+    GBL_RESULT  (*pFnVariantValidate)(const GblProperty*, GblVariant*);
+    GBL_RESULT  (*pFnVariantCompare) (const GblProperty*, const GblVariant*, const GblVariant*, GblInt*);
+    GBL_RESULT  (*pFnVariantCheck)   (const GblProperty*, const GblVariant*);
+GBL_CLASS_END
 
-typedef struct GblProperty {
-    union {
-        GblPropertyClass*   pClass;
-        GblInstance         base;
-    };
+GBL_INSTANCE_DERIVE(GblProperty, GblBox, GblPropertyClass)
     GblType                 objectType;
     GblQuark                name;
     GblType                 valueType;
@@ -132,8 +124,7 @@ typedef struct GblProperty {
         };
     };
     GblProperty*            pNext_;
-} GblProperty;
-
+GBL_INSTANCE_END
 
 GBL_EXPORT GblType            GblProperty_type              (void)                                  GBL_NOEXCEPT;
 

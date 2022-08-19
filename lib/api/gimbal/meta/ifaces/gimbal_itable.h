@@ -24,14 +24,11 @@ GBL_DECLS_BEGIN
 #define SELF    GblITable* pSelf
 #define CSELF   const SELF
 
-GBL_FORWARD_DECLARE_STRUCT(GblITable);
-
-typedef struct GblITableIFace {
-    GblInterface base;
+GBL_INTERFACE_DERIVE(GblITable)
     GBL_RESULT (*pFnIndex)    (CSELF, const GblVariant* pKey, GblVariant* pValue);
     GBL_RESULT (*pFnNewIndex) (SELF, const GblVariant* pKey, const GblVariant* pValue);
     GBL_RESULT (*pFnNextIndex)(CSELF, const GblVariant* pKey, GblVariant* pNextKey, GblVariant* pNextValue);
-} GblITableIFace;
+GBL_INTERFACE_END
 
 GBL_EXPORT GblType  GblITable_type(void) GBL_NOEXCEPT;
 GBL_API             GblITable_index(CSELF, const GblVariant* pKey, GblVariant* pValue) GBL_NOEXCEPT;

@@ -24,14 +24,12 @@ GBL_DECLS_BEGIN
 #define SELF    GblIEventFilter* pSelf
 #define CSELF   const SELF
 
-GBL_FORWARD_DECLARE_STRUCT(GblIEventFilter);
 GBL_FORWARD_DECLARE_STRUCT(GblIEventHandler);
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
-typedef struct GblIEventFilterIFace {
-    GblInterface    base;
+GBL_INTERFACE_DERIVE(GblIEventFilter)
     GBL_RESULT      (*pFnEventFilter)(SELF, GblIEventHandler* pHandler, GblEvent* pEvent);
-} GblIEventFilterIFace;
+GBL_INTERFACE_END
 
 GBL_API GblIEventFilter_eventFilter(SELF, GblIEventHandler* pHandler, GblEvent* pEvent) GBL_NOEXCEPT;
 

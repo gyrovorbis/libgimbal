@@ -11,7 +11,6 @@
 
 GBL_DECLS_BEGIN
 
-
 GBL_INLINE GBL_CONSTEXPR
 uint8_t gblPow2Next_u8(uint8_t n) GBL_NOEXCEPT {
     GBL_ASSERT(n >= 2);

@@ -23,14 +23,11 @@
 
 GBL_DECLS_BEGIN
 
-GBL_FORWARD_DECLARE_STRUCT(GblIAllocator);
-
-typedef struct GblIAllocatorIFace {
-    GblInterface base;
+GBL_INTERFACE_DERIVE(GblIAllocator)
     GBL_RESULT (*pFnAlloc)      (SELF, const GblStackFrame* pStackFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData);
     GBL_RESULT (*pFnRealloc)    (SELF, const GblStackFrame* pStackFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
     GBL_RESULT (*pFnFree)       (SELF, const GblStackFrame* pStackFrame, void* pData);
-} GblIAllocatorIFace;
+GBL_INTERFACE_END
 
 GBL_RESULT GblIAllocator_alloc  (SELF,
                                  const GblStackFrame* pStackFrame,

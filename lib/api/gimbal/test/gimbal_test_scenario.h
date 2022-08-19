@@ -30,36 +30,30 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblTestScenario);
 GBL_FORWARD_DECLARE_STRUCT(GblTestSuite);
 
-typedef struct GblTestScenarioClass {
-    GblContextClass     base;
-    GBL_RESULT          (*pFnBegin)     (SELF);
-    GBL_RESULT          (*pFnEnd)       (SELF);
-    GBL_RESULT          (*pFnRun)       (SELF, int argc, char* argv[]);
-    GBL_RESULT          (*pFnSuiteBegin)(SELF, const GblTestSuite* pSuite);
-    GBL_RESULT          (*pFnSuiteEnd)  (SELF, const GblTestSuite* pSuite);
-} GblTestScenarioClass;
+GBL_CLASS_DERIVE(GblTestScenarioClass, GblContextClass)
+    GBL_RESULT  (*pFnBegin)     (SELF);
+    GBL_RESULT  (*pFnEnd)       (SELF);
+    GBL_RESULT  (*pFnRun)       (SELF, int argc, char* argv[]);
+    GBL_RESULT  (*pFnSuiteBegin)(SELF, const GblTestSuite* pSuite);
+    GBL_RESULT  (*pFnSuiteEnd)  (SELF, const GblTestSuite* pSuite);
+GBL_CLASS_END
 
 /*! \brief Top-level object representing a collection of GblTestSuite objects.
  *  \ingroup testing
  */
-typedef struct GblTestScenario {
-    union {
-        GblTestScenarioClass*   pClass;
-        GblContext              base;
-    };
-    GBL_RESULT                  result;
-    GblSize                     suitesRun;
-    GblSize                     suitesPassed;
-    GblSize                     suitesFailed;
-    GblSize                     suitesSkipped;
-    GblSize                     caseCount;
-    GblSize                     casesRun;
-    GblSize                     casesPassed;
-    GblSize                     casesFailed;
-    GblSize                     casesSkipped;
-    double                      totalTime;
-} GblTestScenario;
-
+GBL_INSTANCE_DERIVE(GblTestScenario, GblContext, GblTestScenarioClass)
+    GBL_RESULT  result;
+    GblSize     suitesRun;
+    GblSize     suitesPassed;
+    GblSize     suitesFailed;
+    GblSize     suitesSkipped;
+    GblSize     caseCount;
+    GblSize     casesRun;
+    GblSize     casesPassed;
+    GblSize     casesFailed;
+    GblSize     casesSkipped;
+    double      totalTime;
+GBL_INSTANCE_END
 
 typedef enum GBL_TEST_SCENARIO_PROPERTY_ID {
     GBL_TEST_SCENARIO_PROPERTY_ID_FIRST        = GBL_CONTEXT_PROPERTY_ID_COUNT,

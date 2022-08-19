@@ -36,11 +36,10 @@ typedef struct GblFlagEntry {
     const char*     pNick;
 } GblFlagEntry;
 
-typedef struct GblFlagsClass {
-    GblPrimitiveClass   base;
+GBL_CLASS_DERIVE(GblFlagsClass, GblPrimitiveClass)
     GblFlags            valueMask;
     uint16_t            entryCount;
-} GblFlagsClass;
+GBL_CLASS_END
 
 // ========== GblFlagsClass ==========
 

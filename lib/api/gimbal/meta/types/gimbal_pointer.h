@@ -15,9 +15,8 @@
 
 GBL_DECLS_BEGIN
 
-GblType GblPointer_registerOpaque(const char* pName) GBL_NOEXCEPT;
+GblType GblPointer_register(const char* pName) GBL_NOEXCEPT;
 
 GBL_DECLS_END
-
 
 #endif // GIMBAL_POINTER_H

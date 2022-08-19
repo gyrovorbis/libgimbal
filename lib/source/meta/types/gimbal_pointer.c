@@ -107,7 +107,7 @@ extern GBL_RESULT GblPointer_typeRegister_(GblContext* pCtx) {
     GBL_API_END();
 }
 
-GblType GblPointer_registerOpaque(const char* pName) {
+GblType GblPointer_register(const char* pName) {
     GblType type = GBL_INVALID_TYPE;
     GBL_API_BEGIN(NULL);
     type = GblType_registerStatic(GblQuark_internString(pName),

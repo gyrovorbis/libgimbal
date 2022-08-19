@@ -33,23 +33,18 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblModule);
 
-typedef struct GblModuleClass {
-    GblContextClass      base;
+GBL_CLASS_DERIVE(GblModuleClass, GblContextClass)
     GblIPluginIFace     iPluginIFace;
     GBL_RESULT          (*pFnLoad)  (SELF);
     GBL_RESULT          (*pFnUnload)(SELF);
-} GblModuleClass;
+GBL_CLASS_END
 
-typedef struct GblModule {
-    union {
-        GblModuleClass*     pClass;
-        GblContext          base;
-    };
-    GblVersion              version;
-    GblStringRef            prefix;
-    GblStringRef            author;
-    GblStringRef            description;
-} GblModule;
+GBL_INSTANCE_DERIVE(GblModule, GblContext, GblModuleClass)
+    GblVersion      version;
+    GblStringRef    prefix;
+    GblStringRef    author;
+    GblStringRef    description;
+GBL_INSTANCE_END
 
 typedef enum GBL_MODULE_PROPERTY_ID {
     GBL_MODULE_PROPERTY_ID_PREFIX = GBL_CONTEXT_PROPERTY_ID_COUNT,
