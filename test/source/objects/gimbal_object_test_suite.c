@@ -108,7 +108,7 @@ static GBL_RESULT TestObject_propertyGet(const GblObject* pSelf, GblSize slot, G
         GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), TEST_OBJECT_GET_CLASS(pSelf)->staticInt32);
         break;
     case TEST_OBJECT_PROPERTY_USERDATA:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblObject_userdata(GBL_OBJECT(pSelf)));
+        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblBox_userdata(GBL_BOX(pSelf)));
         break;
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Attempt to get unregistered property: %s",
@@ -135,7 +135,7 @@ static GBL_RESULT TestObject_propertySet(GblObject* pSelf, GblSize slot, const G
     case TEST_OBJECT_PROPERTY_USERDATA: {
         void* pUserdata = NULL;
         GBL_API_CALL(GblVariant_getValueCopy(pValue, &pUserdata));
-        GblObject_userdataSet(pSelf, pUserdata);
+        GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
         break;
     }
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -218,7 +218,7 @@ static GBL_RESULT GblObjectTestSuite_newDefault_(GblTestSuite* pSelf, GblContext
     GBL_API_BEGIN(pCtx);
     GblObjectTestSuite_* pSelf_ = GBL_OBJECT_TEST_SUITE_(pSelf);
 
-    TestObject* pObj = TEST_OBJECT(GblObject_new(TEST_OBJECT_TYPE, NULL));
+    TestObject* pObj = TEST_OBJECT(GblObject_create(TEST_OBJECT_TYPE, NULL));
     pSelf_->pTestObj = pObj;
 
     GBL_TEST_COMPARE(GblType_classRefCount(TEST_OBJECT_TYPE), 1);
@@ -273,9 +273,9 @@ static GBL_RESULT GblObjectTestSuite_name_(GblTestSuite* pSelf, GblContext* pCtx
     GBL_API_BEGIN(pCtx);
     GblObjectTestSuite_* pSelf_ = GBL_OBJECT_TEST_SUITE_(pSelf);
 
-    GblObject_nameSet(GBL_OBJECT(pSelf_->pTestObj), "TestName");
+    GblObject_setName(GBL_OBJECT(pSelf_->pTestObj), "TestName");
     GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(pSelf_->pTestObj)), "TestName");
-    GblObject_nameSet(GBL_OBJECT(pSelf_->pTestObj), "TestName2");
+    GblObject_setName(GBL_OBJECT(pSelf_->pTestObj), "TestName2");
     GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(pSelf_->pTestObj)), "TestName2");
 
     GBL_API_END();
@@ -306,18 +306,18 @@ static GBL_RESULT GblObjectTestSuite_unref_(GblTestSuite* pSelf, GblContext* pCt
 static GBL_RESULT GblObjectTestSuite_extendedData_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    GblObject* pObj = GblObject_new(TEST_OBJECT_TYPE, NULL);
+    GblObject* pObj = GblObject_create(TEST_OBJECT_TYPE, NULL);
 
     GBL_TEST_COMPARE(GblObject_name(pObj),           NULL);
-    GBL_TEST_COMPARE(GblObject_userdata(pObj),       NULL);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)),       NULL);
     GBL_TEST_COMPARE(GblObject_parent(pObj),         NULL);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
-    GblObject_nameSet(pObj, "Sing the Sorrow");
+    GblObject_setName(pObj, "Sing the Sorrow");
     GBL_TEST_COMPARE(GblObject_name(pObj), "Sing the Sorrow");
 
-    GblObject_userdataSet(pObj, (void*)0xbadbeef);
-    GBL_TEST_COMPARE(GblObject_userdata(pObj), (void*)0xbadbeef);
+    GblBox_setUserdata(GBL_BOX(pObj), (void*)0xbadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)), (void*)0xbadbeef);
 
     // make sure we didn't screw up other extended data
     GBL_TEST_COMPARE(GblObject_parent(pObj),            NULL);
@@ -330,13 +330,13 @@ static GBL_RESULT GblObjectTestSuite_extendedData_(GblTestSuite* pSelf, GblConte
 static GBL_RESULT GblObjectTestSuite_newVaArgs_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    GblObject* pObj = GblObject_new(TEST_OBJECT_TYPE,
+    GblObject* pObj = GblObject_create(TEST_OBJECT_TYPE,
                                     "name",     "Fuckwad",
                                     "userdata", (void*)0xdeadbeef,
                                     NULL);
 
     GBL_TEST_COMPARE(GblObject_name(pObj),       "Fuckwad");
-    GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
@@ -347,13 +347,13 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVaArgs_(GblTestSuite* pSelf, GblC
     TestObject obj;
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    GBL_API_VERIFY_CALL(GblObject_newInPlace((GblObject*)&obj, TEST_OBJECT_TYPE,
+    GBL_API_VERIFY_CALL(GblObject_construct((GblObject*)&obj, TEST_OBJECT_TYPE,
                                             "name",     "Fuckwad",
                                             "userdata", (void*)0xdeadbeef,
                                             NULL));
 
     GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(&obj)),        "Fuckwad");
-    GBL_TEST_COMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(&obj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(&obj)), 0);
@@ -365,13 +365,13 @@ static GBL_RESULT GblObjectTestSuite_newVaArgsWithClass_(GblTestSuite* pSelf, Gb
     GBL_API_BEGIN(pCtx);
     GblObjectClass* pClass = GBL_OBJECT_CLASS(GblClass_createFloating(TEST_OBJECT_TYPE));
 
-    GblObject* pObj = GblObject_newWithClass(pClass,
+    GblObject* pObj = GblObject_createWithClass(pClass,
                                     "name",     "Fuckwad",
                                     "userdata", (void*)0xdeadbeef,
                                     NULL);
 
     GBL_TEST_COMPARE(GblObject_name(pObj),       "Fuckwad");
-    GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
@@ -384,13 +384,13 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVaArgsWithClass_(GblTestSuite* pS
     GBL_API_BEGIN(pCtx);
     GblObjectClass* pClass = GBL_OBJECT_CLASS(GblClass_createFloating(TEST_OBJECT_TYPE));
     TestObject obj;
-    GBL_API_VERIFY_CALL(GblObject_newInPlaceWithClass((GblObject*)&obj, pClass,
+    GBL_API_VERIFY_CALL(GblObject_constructWithClass((GblObject*)&obj, pClass,
                                                         "name",     "Fuckwad",
                                                         "userdata", (void*)0xdeadbeef,
                                                         NULL));
 
     GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(&obj)),        "Fuckwad");
-    GBL_TEST_COMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(&obj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(&obj)), 0);
@@ -405,7 +405,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVaArgsWithClassInPlace_(GblTestSu
     GBL_API_VERIFY_CALL(GblClass_constructFloating(GBL_CLASS(&klass), TEST_OBJECT_TYPE));
 
     TestObject obj;
-    GBL_API_VERIFY_CALL(GblObject_newInPlaceWithClass((GblObject*)&obj, GBL_OBJECT_CLASS(&klass),
+    GBL_API_VERIFY_CALL(GblObject_constructWithClass((GblObject*)&obj, GBL_OBJECT_CLASS(&klass),
                                                         "name",     "Fuckwad",
                                                         "userdata", (void*)0xdeadbeef,
                                                         NULL));
@@ -413,7 +413,7 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVaArgsWithClassInPlace_(GblTestSu
     GBL_API_VERIFY_CALL(GblInstance_sinkClass(GBL_INSTANCE(&obj)));
 
     GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(&obj)),       "Fuckwad");
-    GBL_TEST_COMPARE(GblObject_userdata(GBL_OBJECT(&obj)),          (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(&obj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(GBL_OBJECT(&obj)),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(&obj)), 0);
@@ -435,10 +435,10 @@ static GBL_RESULT GblObjectTestSuite_newVariants_(GblTestSuite* pSelf, GblContex
     GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[0], GBL_POINTER_TYPE, "Fuckwad"));
     GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variants[1], GBL_POINTER_TYPE, (void*)0xdeadbeef));
 
-    GblObject* pObj = GblObject_newVariants(TEST_OBJECT_TYPE, 2, keys, variants);
+    GblObject* pObj = GblObject_createVariants(TEST_OBJECT_TYPE, 2, keys, variants);
 
     GBL_TEST_COMPARE(GblObject_name(pObj),       "Fuckwad");
-    GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
@@ -462,10 +462,10 @@ static GBL_RESULT GblObjectTestSuite_newVariantsWithClass_(GblTestSuite* pSelf, 
 
     GblObjectClass* pClass = GBL_OBJECT_CLASS(GblClass_createFloating(TEST_OBJECT_TYPE));
 
-    GblObject* pObj = GblObject_newVariantsWithClass(pClass, 2, keys, variants);
+    GblObject* pObj = GblObject_createVariantsWithClass(pClass, 2, keys, variants);
 
     GBL_TEST_COMPARE(GblObject_name(pObj),       "Fuckwad");
-    GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
@@ -492,10 +492,10 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVariants_(GblTestSuite* pSelf, Gb
     TestObject obj;
     GblObject* pObj = &obj.base;
 
-    GBL_API_VERIFY_CALL((GblObject_newInPlaceVariants(pObj, TEST_OBJECT_TYPE, 2, keys, variants)));
+    GBL_API_VERIFY_CALL((GblObject_constructVariants(pObj, TEST_OBJECT_TYPE, 2, keys, variants)));
 
     GBL_TEST_COMPARE(GblObject_name(pObj),       "Fuckwad");
-    GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
@@ -522,10 +522,10 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVariantsWithClass_(GblTestSuite* 
 
     GblObjectClass* pClass = GBL_OBJECT_CLASS(GblClass_createFloating(TEST_OBJECT_TYPE));
 
-    GBL_API_VERIFY_CALL(GblObject_newInPlaceVariantsWithClass(pObj, pClass, 2, keys, variants));
+    GBL_API_VERIFY_CALL(GblObject_constructVariantsWithClass(pObj, pClass, 2, keys, variants));
 
     GBL_TEST_COMPARE(GblObject_name(pObj),       "Fuckwad");
-    GBL_TEST_COMPARE(GblObject_userdata(pObj),          (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)),          (void*)0xdeadbeef);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
@@ -536,10 +536,10 @@ static GBL_RESULT GblObjectTestSuite_newInPlaceVariantsWithClass_(GblTestSuite* 
 static GBL_RESULT GblObjectTestSuite_propertyGet_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    GblObject* pObj0 = GblObject_new(GBL_OBJECT_TYPE, NULL);
+    GblObject* pObj0 = GblObject_create(GBL_OBJECT_TYPE, NULL);
     GBL_TEST_VERIFY(pObj0);
 
-    GblObject* pObj1 = GblObject_new(TEST_OBJECT_TYPE,
+    GblObject* pObj1 = GblObject_create(TEST_OBJECT_TYPE,
                                     "name",     "Bulbasaur",
                                     "userdata", (void*)0xdeadbeef,
                                     "parent",   pObj0,
@@ -579,7 +579,7 @@ static GBL_RESULT GblObjectTestSuite_propertyGet_(GblTestSuite* pSelf, GblContex
 static GBL_RESULT GblObjectTestSuite_propertySet_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    GblObject* pObj = GblObject_new(TEST_OBJECT_TYPE,
+    GblObject* pObj = GblObject_create(TEST_OBJECT_TYPE,
                                     "name",     "Bulbasaur",
                                     "userdata", (void*)0xdeadbeef,
                                     "parent",   NULL,
@@ -616,41 +616,41 @@ static GBL_RESULT GblObjectTestSuite_propertySet_(GblTestSuite* pSelf, GblContex
 static GBL_RESULT GblObjectTestSuite_parenting_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    GblObject* pChild1 = GblObject_new(GBL_OBJECT_TYPE,
+    GblObject* pChild1 = GblObject_create(GBL_OBJECT_TYPE,
                                     "name",     "Child1",
                                     NULL);
-    GblObject* pChild2 = GblObject_new(GBL_OBJECT_TYPE,
+    GblObject* pChild2 = GblObject_create(GBL_OBJECT_TYPE,
                                     "name",     "Child2",
                                     NULL);
-    GblObject* pChild3 = GblObject_new(GBL_OBJECT_TYPE,
+    GblObject* pChild3 = GblObject_create(GBL_OBJECT_TYPE,
                                     "name",     "Child3",
                                     "parent",   pChild2,
                                     NULL);
-    GblObject* pParent = GblObject_new(TEST_OBJECT_TYPE,
+    GblObject* pParent = GblObject_create(TEST_OBJECT_TYPE,
                                     "name",     "Parent",
                                     NULL);
 
-    GblObject_parentSet(pChild1, pParent);
-    GBL_TEST_COMPARE(GblObject_childFindByIndex(pParent, 0), pChild1);
+    GblObject_setParent(pChild1, pParent);
+    GBL_TEST_COMPARE(GblObject_findChildByIndex(pParent, 0), pChild1);
     GBL_TEST_COMPARE(GblObject_parent(pChild1), pParent);
 
-    GblObject_childAdd(pParent, pChild2);
+    GblObject_addChild(pParent, pChild2);
     GBL_TEST_COMPARE(GblObject_parent(pChild2), pParent);
     GBL_TEST_COMPARE(GblObject_siblingNext(pChild1), pChild2);
 
     GBL_TEST_COMPARE(GblObject_parent(pChild3), pChild2);
 
-    GBL_TEST_COMPARE(GblObject_ancestorFindByType(pChild3, TEST_OBJECT_TYPE), pParent);
-    GBL_TEST_COMPARE(GblObject_ancestorFindByName(pChild2, "Parent"), pParent);
-    GBL_TEST_COMPARE(GblObject_childFindByType(pChild2, GBL_OBJECT_TYPE), pChild3);
-    GBL_TEST_COMPARE(GblObject_siblingFindByName(pChild1, "Child2"), pChild2);
-    GBL_TEST_COMPARE(GblObject_childFindByName(pParent, "Child1"), pChild1);
+    GBL_TEST_COMPARE(GblObject_findAncestorByType(pChild3, TEST_OBJECT_TYPE), pParent);
+    GBL_TEST_COMPARE(GblObject_findAncestorByName(pChild2, "Parent"), pParent);
+    GBL_TEST_COMPARE(GblObject_findChildByType(pChild2, GBL_OBJECT_TYPE), pChild3);
+    GBL_TEST_COMPARE(GblObject_findSiblingByName(pChild1, "Child2"), pChild2);
+    GBL_TEST_COMPARE(GblObject_findChildByName(pParent, "Child1"), pChild1);
 
-    GblObject_childRemove(pParent, pChild1);
-    GBL_TEST_COMPARE(GblObject_childFindByIndex(pParent, 0), pChild2);
+    GblObject_removeChild(pParent, pChild1);
+    GBL_TEST_COMPARE(GblObject_findChildByIndex(pParent, 0), pChild2);
 
-    GblObject_childRemove(pChild2, pChild3);
-    GBL_TEST_COMPARE(GblObject_childFindByIndex(pChild2, 0), NULL);
+    GblObject_removeChild(pChild2, pChild3);
+    GBL_TEST_COMPARE(GblObject_findChildByIndex(pChild2, 0), NULL);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild3)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild1)), 0);
@@ -664,7 +664,7 @@ static GBL_RESULT GblObjectTestSuite_classSwizzle_(GblTestSuite* pSelf, GblConte
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
     // Create new object with name
-    GblObject* pObj = GblObject_new(TEST_OBJECT_TYPE,
+    GblObject* pObj = GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "DickWhisp",
                                     NULL);
 
@@ -697,7 +697,7 @@ static GBL_RESULT GblObjectTestSuite_classSwizzle_(GblTestSuite* pSelf, GblConte
 static GBL_RESULT GblObjectTestSuite_eventNotify_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    TestObject* pObj = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pObj = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "DickWhisp",
                                     NULL);
     GblEvent event;
@@ -707,7 +707,7 @@ static GBL_RESULT GblObjectTestSuite_eventNotify_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(pObj->eventHandlerLastType, GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblEvent_state(&event), GBL_EVENT_STATE_PENDING);
 
-    GBL_API_VERIFY_CALL(GblObject_eventNotify(GBL_OBJECT(pObj), &event));
+    GBL_API_VERIFY_CALL(GblObject_notifyEvent(GBL_OBJECT(pObj), &event));
 
     GBL_TEST_COMPARE(pObj->eventHandlerCount, 1);
     GBL_TEST_COMPARE(pObj->eventHandlerLastType, GBL_EVENT_TYPE);
@@ -715,7 +715,7 @@ static GBL_RESULT GblObjectTestSuite_eventNotify_(GblTestSuite* pSelf, GblContex
 
     pObj->eventHandlerAccept = GBL_TRUE;
 
-    GBL_API_VERIFY_CALL(GblObject_eventNotify(GBL_OBJECT(pObj), &event));
+    GBL_API_VERIFY_CALL(GblObject_notifyEvent(GBL_OBJECT(pObj), &event));
 
     GBL_TEST_COMPARE(pObj->eventHandlerCount, 2);
     GBL_TEST_COMPARE(pObj->eventHandlerLastType, GBL_EVENT_TYPE);
@@ -730,14 +730,14 @@ static GBL_RESULT GblObjectTestSuite_eventNotify_(GblTestSuite* pSelf, GblContex
 static GBL_RESULT GblObjectTestSuite_eventNotifyAncestors_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    TestObject* pGrand = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pGrand = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "Grandparent",
                                     NULL);
-    TestObject* pParent = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pParent = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "Parent",
                                     "parent", pGrand,
                                     NULL);
-    TestObject* pChild = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pChild = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "Child",
                                     "parent", pParent,
                                     NULL);
@@ -745,7 +745,7 @@ static GBL_RESULT GblObjectTestSuite_eventNotifyAncestors_(GblTestSuite* pSelf, 
     GblEvent event;
     GBL_API_VERIFY_CALL(GblEvent_construct(&event, GBL_EVENT_TYPE));
 
-    GBL_API_VERIFY_CALL(GblObject_eventNotify(GBL_OBJECT(pChild), &event));
+    GBL_API_VERIFY_CALL(GblObject_notifyEvent(GBL_OBJECT(pChild), &event));
 
     GBL_TEST_COMPARE(pChild->eventHandlerCount, 1);
     GBL_TEST_COMPARE(pParent->eventHandlerCount, 1);
@@ -753,7 +753,7 @@ static GBL_RESULT GblObjectTestSuite_eventNotifyAncestors_(GblTestSuite* pSelf, 
 
     pParent->eventHandlerAccept = GBL_TRUE;
 
-    GBL_API_VERIFY_CALL(GblObject_eventNotify(GBL_OBJECT(pChild), &event));
+    GBL_API_VERIFY_CALL(GblObject_notifyEvent(GBL_OBJECT(pChild), &event));
 
     GBL_TEST_COMPARE(pChild->eventHandlerCount, 2);
     GBL_TEST_COMPARE(pParent->eventHandlerCount, 2);
@@ -775,14 +775,14 @@ static GBL_RESULT GblObjectTestSuite_eventSendAncestorsEmit(TestObject* pObj, Gb
 static GBL_RESULT GblObjectTestSuite_eventSendAncestors_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    TestObject* pGrand = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pGrand = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "Grandparent",
                                     NULL);
-    TestObject* pParent = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pParent = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "Parent",
                                     "parent", pGrand,
                                     NULL);
-    TestObject* pChild = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pChild = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "Child",
                                     "parent", pParent,
                                     NULL);
@@ -809,24 +809,24 @@ static GBL_RESULT GblObjectTestSuite_eventSendAncestors_(GblTestSuite* pSelf, Gb
 static GBL_RESULT GblObjectTestSuite_eventFilters_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_API_BEGIN(pCtx);
-    TestObject* pGrand = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pGrand = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "Grandparent",
                                     NULL);
-    TestObject* pParent = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pParent = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "Parent",
                                     "parent", pGrand,
                                     NULL);
-    TestObject* pChild = (TestObject*)GblObject_new(TEST_OBJECT_TYPE,
+    TestObject* pChild = (TestObject*)GblObject_create(TEST_OBJECT_TYPE,
                                     "name", "Child",
                                     "parent", pParent,
                                     NULL);
 
-    GBL_API_VERIFY_CALL(GblObject_eventFilterInstall(GBL_OBJECT(pParent), GBL_IEVENT_FILTER(pChild)));
+    GBL_API_VERIFY_CALL(GblObject_installEventFilter(GBL_OBJECT(pParent), GBL_IEVENT_FILTER(pChild)));
 
     GblEvent event;
     GBL_API_VERIFY_CALL(GblEvent_construct(&event, GBL_EVENT_TYPE));
 
-    GBL_API_VERIFY_CALL(GblObject_eventNotify(GBL_OBJECT(pChild), &event));
+    GBL_API_VERIFY_CALL(GblObject_notifyEvent(GBL_OBJECT(pChild), &event));
 
     GBL_TEST_COMPARE(pChild->eventHandlerCount, 1);
     GBL_TEST_COMPARE(pParent->eventHandlerCount, 1);
@@ -837,16 +837,16 @@ static GBL_RESULT GblObjectTestSuite_eventFilters_(GblTestSuite* pSelf, GblConte
 
     pChild->eventFilterAccept = GBL_TRUE;
 
-    GBL_API_VERIFY_CALL(GblObject_eventNotify(GBL_OBJECT(pChild), &event));
+    GBL_API_VERIFY_CALL(GblObject_notifyEvent(GBL_OBJECT(pChild), &event));
     GBL_TEST_COMPARE(pChild->eventHandlerCount, 2);
     GBL_TEST_COMPARE(pParent->eventHandlerCount, 1);
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 1);
     GBL_TEST_COMPARE(pChild->eventFilterCount, 2);
 
-    GBL_API_VERIFY_CALL(GblObject_eventFilterUninstall(GBL_OBJECT(pParent), GBL_IEVENT_FILTER(pChild)));
+    GBL_API_VERIFY_CALL(GblObject_uninstallEventFilter(GBL_OBJECT(pParent), GBL_IEVENT_FILTER(pChild)));
 
     event.state = GBL_EVENT_STATE_PENDING;
-    GBL_API_VERIFY_CALL(GblObject_eventNotify(GBL_OBJECT(pChild), &event));
+    GBL_API_VERIFY_CALL(GblObject_notifyEvent(GBL_OBJECT(pChild), &event));
     GBL_TEST_COMPARE(pChild->eventHandlerCount, 3);
     GBL_TEST_COMPARE(pParent->eventHandlerCount, 2);
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 2);

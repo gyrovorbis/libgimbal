@@ -177,17 +177,17 @@ static GBL_RESULT GblObjectClass_iEventHandlerIFace_event_(GblIEventHandler* pHa
 }
 
 
-GBL_API GblObject_eventSend(GblObject* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
+GBL_API GblObject_sendEvent(GblObject* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GblObject* pParent = GblObject_parent(pSelf);
     if(pParent) {
-        GBL_API_CALL(GblObject_eventNotify(pParent, pEvent));
+        GBL_API_CALL(GblObject_notifyEvent(pParent, pEvent));
     }
     GBL_API_END();
 }
 
 
-GBL_API GblObject_eventNotify(GblObject* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
+GBL_API GblObject_notifyEvent(GblObject* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GblObject* pObject = GBL_OBJECT(pSelf);
 
@@ -210,7 +210,7 @@ GBL_API GblObject_eventNotify(GblObject* pSelf, GblEvent* pEvent) GBL_NOEXCEPT {
     }
 
     // Propagate up to parent
-    GBL_API_CALL(GblObject_eventSend(pSelf, pEvent));
+    GBL_API_CALL(GblObject_sendEvent(pSelf, pEvent));
 
     GBL_API_END();
 }
@@ -247,7 +247,7 @@ static GblArrayList* GblObject_ensureEventFilters_(GblObject* pSelf) GBL_NOEXCEP
     return pEventFilters;
 }
 
-GBL_API GblObject_eventFilterInstall(GblObject* pSelf, GblIEventFilter* pFilter) GBL_NOEXCEPT {
+GBL_API GblObject_installEventFilter(GblObject* pSelf, GblIEventFilter* pFilter) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pFilter);
     GblArrayList* pFilters = GblObject_ensureEventFilters_(pSelf);
@@ -255,7 +255,7 @@ GBL_API GblObject_eventFilterInstall(GblObject* pSelf, GblIEventFilter* pFilter)
     GBL_API_END();
 }
 
-GBL_API GblObject_eventFilterUninstall(GblObject* pSelf, GblIEventFilter* pFilter) GBL_NOEXCEPT {
+GBL_API GblObject_uninstallEventFilter(GblObject* pSelf, GblIEventFilter* pFilter) GBL_NOEXCEPT {
     GblArrayList* pVector = NULL;
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pFilter);
@@ -277,7 +277,8 @@ GBL_API GblObject_eventFilterUninstall(GblObject* pSelf, GblIEventFilter* pFilte
                    "EventFilter wasn't found on Object: %x", pFilter);
     GBL_API_END();
 }
-GblIEventFilter* GblObject_eventFilterAt(const GblObject* pSelf, GblSize index) GBL_NOEXCEPT {
+
+GBL_EXPORT GblIEventFilter* GblObject_eventFilterAt(const GblObject* pSelf, GblSize index) GBL_NOEXCEPT {
     GblIEventFilter** ppFilter = NULL;
     GBL_API_BEGIN(NULL);
     GblArrayList* pFilters = GblObject_eventFilters_(pSelf);
@@ -286,7 +287,8 @@ GblIEventFilter* GblObject_eventFilterAt(const GblObject* pSelf, GblSize index) 
     GBL_API_END_BLOCK();
     return ppFilter? *ppFilter : NULL;
 }
-GblSize GblObject_eventFilterCount(const GblObject* pSelf) GBL_NOEXCEPT {
+
+GBL_EXPORT GblSize GblObject_eventFilterCount(const GblObject* pSelf) GBL_NOEXCEPT {
     GblSize count = 0;
     GBL_API_BEGIN(NULL);
     GblArrayList* pFilters = GblObject_eventFilters_(pSelf);
@@ -307,12 +309,12 @@ static GBL_RESULT GblObjectClass_constructor_(GblObject* pSelf) {
 static GBL_RESULT GblObjectClass_destructor_(GblBox* pRecord) {
     GBL_API_BEGIN(NULL);
     GblObject* pSelf = (GblObject*)pRecord;
-    GblObject_parentSet(pSelf, NULL);
+    GblObject_setParent(pSelf, NULL);
     for(GblObject* pIt = GblObject_childFirst(pSelf);
         pIt != NULL;
         pIt = GblObject_siblingNext(pSelf))
     {
-       GblObject_parentSet(pIt, NULL);
+       GblObject_setParent(pIt, NULL);
     }
 
     GblBoxClass* pRecordClass = GBL_BOX_CLASS(GblClass_weakRefDefault(GBL_BOX_TYPE));
@@ -327,7 +329,7 @@ static GBL_RESULT GblObjectClass_propertyGet_(const GblObject* pSelf, GblSize sl
     case GBL_OBJECT_PROPERTY_ID_NAME:      GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblObject_name(pSelf));     break;
     case GBL_OBJECT_PROPERTY_ID_PARENT:    GblVariant_setValueMove(pValue, GblProperty_valueType(pProp), GblObject_parent(pSelf));   break;
     case GBL_OBJECT_PROPERTY_ID_REFCOUNT:  GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblBox_refCount(GBL_BOX(pSelf))); break;
-    case GBL_OBJECT_PROPERTY_ID_USERDATA:  GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblObject_userdata(pSelf)); break;
+    case GBL_OBJECT_PROPERTY_ID_USERDATA:  GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblBox_userdata(GBL_BOX(pSelf))); break;
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY, "Reading unhandled property: %s", GblProperty_nameString(pProp));
     }
     GBL_API_END();
@@ -340,19 +342,19 @@ static GBL_RESULT GblObjectClass_propertySet_(GblObject* pSelf, GblSize slot, co
     case GBL_OBJECT_PROPERTY_ID_NAME: {
         const char* pName = NULL;
         GBL_API_CALL(GblVariant_getValueCopy(pValue, &pName));
-        GblObject_nameSet(pSelf, pName);
+        GblObject_setName(pSelf, pName);
         break;
     }
     case GBL_OBJECT_PROPERTY_ID_PARENT: {
         GblObject* pParent = NULL;
         GBL_API_CALL(GblVariant_getValuePeek(pValue, &pParent));
-        GblObject_parentSet(pSelf, pParent);
+        GblObject_setParent(pSelf, pParent);
         break;
     }
     case GBL_OBJECT_PROPERTY_ID_USERDATA: {
         void* pUserdata = NULL;
         GBL_API_CALL(GblVariant_getValueCopy(pValue, &pUserdata));
-        GblObject_userdataSet(pSelf, pUserdata);
+        GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
         break;
     }
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -482,51 +484,51 @@ extern GBL_RESULT GblObject_typeRegister_(GblContext* pCtx) {
 }
 
 
-GBL_EXPORT GblObject* GblObject_new(GblType type, ...) GBL_NOEXCEPT {
+GBL_EXPORT GblObject* GblObject_create(GblType type, ...) GBL_NOEXCEPT {
     GblObject* pObject = NULL;
     va_list    varArgs;
     va_start(varArgs, type);
     GBL_API_BEGIN(NULL);
-    pObject = GblObject_newVaList(type, &varArgs);
+    pObject = GblObject_createVaList(type, &varArgs);
     GBL_API_END_BLOCK();
     va_end(varArgs);
     return pObject;
 }
 
-GBL_EXPORT GblObject* GblObject_newWithClass(GblObjectClass* pClass, ...) GBL_NOEXCEPT
+GBL_EXPORT GblObject* GblObject_createWithClass(GblObjectClass* pClass, ...) GBL_NOEXCEPT
 {
     GblObject* pObject = NULL;
     va_list    varArgs;
     va_start(varArgs, pClass);
     GBL_API_BEGIN(NULL);
-    pObject = GblObject_newVaListWithClass(pClass, &varArgs);
+    pObject = GblObject_createVaListWithClass(pClass, &varArgs);
     GBL_API_END_BLOCK();
     va_end(varArgs);
     return pObject;
 
 }
 
-GBL_EXPORT GBL_RESULT GblObject_newInPlace(GblObject* pSelf, GblType type, ...) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblObject_construct(GblObject* pSelf, GblType type, ...) GBL_NOEXCEPT {
     va_list varArgs;
     va_start(varArgs, type);
     GBL_API_BEGIN(NULL);
-    GBL_API_CALL(GblObject_newInPlaceVaList(pSelf, type, &varArgs));
+    GBL_API_CALL(GblObject_constructVaList(pSelf, type, &varArgs));
     GBL_API_END_BLOCK();
     va_end(varArgs);
     return GBL_API_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_newInPlaceWithClass(GblObject* pSelf, GblObjectClass* pClass, ...) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblObject_constructWithClass(GblObject* pSelf, GblObjectClass* pClass, ...) GBL_NOEXCEPT {
     va_list    varArgs;
     va_start(varArgs, pClass);
     GBL_API_BEGIN(NULL);
-    GBL_API_CALL(GblObject_newInPlaceVaListWithClass(pSelf, pClass, &varArgs));
+    GBL_API_CALL(GblObject_constructVaListWithClass(pSelf, pClass, &varArgs));
     GBL_API_END_BLOCK();
     va_end(varArgs);
     return GBL_API_RESULT();
 }
 
-static  GBL_RESULT GblObject_newInPlaceVaList_(GblObject* pSelf, GblType type, va_list* pVarArgs) GBL_NOEXCEPT {
+static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va_list* pVarArgs) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     GBL_API_VERIFY_POINTER(pSelf);
@@ -561,45 +563,45 @@ static  GBL_RESULT GblObject_newInPlaceVaList_(GblObject* pSelf, GblType type, v
     GBL_API_END();
 }
 
-GBL_EXPORT GblObject* GblObject_newVaList(GblType type, va_list* pVarArgs) GBL_NOEXCEPT {
+GBL_EXPORT GblObject* GblObject_createVaList(GblType type, va_list* pVarArgs) GBL_NOEXCEPT {
     GblObject* pObject = NULL;
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     pObject = GBL_OBJECT(GblBox_create(type));
-    GBL_API_CALL(GblObject_newInPlaceVaList_(pObject, type, pVarArgs));
+    GBL_API_CALL(GblObject_constructVaList_(pObject, type, pVarArgs));
     GBL_API_END_BLOCK();
     return pObject;
 }
 
-GBL_EXPORT GblObject* GblObject_newVaListWithClass(GblObjectClass* pClass, va_list* pVarArgs) GBL_NOEXCEPT {
+GBL_EXPORT GblObject* GblObject_createVaListWithClass(GblObjectClass* pClass, va_list* pVarArgs) GBL_NOEXCEPT {
     GblObject* pObject = NULL;
     const GblType type = GBL_CLASS_TYPEOF(pClass);
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     pObject = GBL_OBJECT(GblBox_createWithClass(GBL_BOX_CLASS(pClass)));
-    GBL_API_CALL(GblObject_newInPlaceVaList_(pObject, type, pVarArgs));
+    GBL_API_CALL(GblObject_constructVaList_(pObject, type, pVarArgs));
     GBL_API_END_BLOCK();
     return pObject;
 }
 
-GBL_EXPORT GBL_RESULT GblObject_newInPlaceVaList(GblObject* pSelf, GblType type, va_list* pVarArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblObject_constructVaList(GblObject* pSelf, GblType type, va_list* pVarArgs) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     GBL_API_CALL(GblBox_construct((GblBox*)pSelf, type));
-    GBL_API_CALL(GblObject_newInPlaceVaList_(pSelf, type, pVarArgs));
+    GBL_API_CALL(GblObject_constructVaList_(pSelf, type, pVarArgs));
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_newInPlaceVaListWithClass(GblObject* pSelf, GblObjectClass* pClass, va_list* pVarArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblObject_constructVaListWithClass(GblObject* pSelf, GblObjectClass* pClass, va_list* pVarArgs) GBL_NOEXCEPT {
     const GblType type = GBL_CLASS_TYPEOF(pClass);
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     GBL_API_CALL(GblBox_constructWithClass((GblBox*)pSelf, GBL_BOX_CLASS(pClass)));
-    GBL_API_CALL(GblObject_newInPlaceVaList_(pSelf, type, pVarArgs));
+    GBL_API_CALL(GblObject_constructVaList_(pSelf, type, pVarArgs));
     GBL_API_END();
 }
 
-static GBL_RESULT GblObject_newInPlaceVariants_(GblObject* pSelf,
+static GBL_RESULT GblObject_constructVariants_(GblObject* pSelf,
                                                 GblType type,
                                                 GblUint propertyCount,
                                                 const char* pNames[],
@@ -632,17 +634,17 @@ static GBL_RESULT GblObject_newInPlaceVariants_(GblObject* pSelf,
     GBL_API_END();
 }
 
-GBL_EXPORT GblObject* GblObject_newVariants(GblType type, GblUint propertyCount, const char* pNames[], const GblVariant* pValues) GBL_NOEXCEPT {
+GBL_EXPORT GblObject* GblObject_createVariants(GblType type, GblUint propertyCount, const char* pNames[], const GblVariant* pValues) GBL_NOEXCEPT {
     GblObject* pObject = NULL;
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     pObject = GBL_OBJECT(GblBox_create(type));
-    GBL_API_CALL(GblObject_newInPlaceVariants_(pObject, type, propertyCount, pNames, pValues));
+    GBL_API_CALL(GblObject_constructVariants_(pObject, type, propertyCount, pNames, pValues));
     GBL_API_END_BLOCK();
     return pObject;
 }
 
-GBL_EXPORT GblObject* GblObject_newVariantsWithClass(GblObjectClass* pClass,
+GBL_EXPORT GblObject* GblObject_createVariantsWithClass(GblObjectClass* pClass,
                                                      GblUint propertyCount,
                                                      const char* pNames[],
                                                      const GblVariant* pValues) GBL_NOEXCEPT
@@ -652,12 +654,12 @@ GBL_EXPORT GblObject* GblObject_newVariantsWithClass(GblObjectClass* pClass,
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     pObject = GBL_OBJECT(GblBox_createWithClass(GBL_BOX_CLASS(pClass)));
-    GBL_API_CALL(GblObject_newInPlaceVariants_(pObject, type, propertyCount, pNames, pValues));
+    GBL_API_CALL(GblObject_constructVariants_(pObject, type, propertyCount, pNames, pValues));
     GBL_API_END_BLOCK();
     return pObject;
 }
 
-GBL_EXPORT GBL_RESULT GblObject_newInPlaceVariants(GblObject* pSelf,
+GBL_EXPORT GBL_RESULT GblObject_constructVariants(GblObject* pSelf,
                                                    GblType type,
                                                    GblUint propertyCount,
                                                    const char* pNames[],
@@ -666,11 +668,11 @@ GBL_EXPORT GBL_RESULT GblObject_newInPlaceVariants(GblObject* pSelf,
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     GBL_API_CALL(GblBox_construct((GblBox*)pSelf, type));
-    GBL_API_CALL(GblObject_newInPlaceVariants_(pSelf, type, propertyCount, pNames, pValues));
+    GBL_API_CALL(GblObject_constructVariants_(pSelf, type, propertyCount, pNames, pValues));
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_newInPlaceVariantsWithClass(GblObject* pSelf,
+GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass(GblObject* pSelf,
                                                             GblObjectClass* pClass,
                                                             GblUint propertyCount,
                                                             const char* pNames[],
@@ -680,7 +682,7 @@ GBL_EXPORT GBL_RESULT GblObject_newInPlaceVariantsWithClass(GblObject* pSelf,
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     GBL_API_CALL(GblBox_constructWithClass((GblBox*)pSelf, GBL_BOX_CLASS(pClass)));
-    GBL_API_CALL(GblObject_newInPlaceVariants_(pSelf, type, propertyCount, pNames, pValues));
+    GBL_API_CALL(GblObject_constructVariants_(pSelf, type, propertyCount, pNames, pValues));
     GBL_API_END();
 }
 
@@ -830,7 +832,7 @@ GBL_RESULT GblObject_nameDestruct_(const GblArrayMap* pMap, uintptr_t key, void*
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_EXPORT void GblObject_nameSet(GblObject* pSelf, const char* pName) {
+GBL_EXPORT void GblObject_setName(GblObject* pSelf, const char* pName) {
 
     GblArrayMap_setUserdata(&GBL_PRIV(pSelf->base).pFields,
                             objectNameQuark_,
@@ -841,14 +843,6 @@ GBL_EXPORT void GblObject_nameSet(GblObject* pSelf, const char* pName) {
 GBL_EXPORT const char* GblObject_name(const GblObject* pSelf) {
     return (const char*)GblArrayMap_getValue(&GBL_PRIV(pSelf->base).pFields,
                                              objectNameQuark_);
-}
-
-GBL_EXPORT void* GblObject_userdata(const GblObject* pSelf) {
-    return GblBox_userdata(GBL_BOX(pSelf));
-}
-
-GBL_EXPORT void GblObject_userdataSet(GblObject* pSelf, void* pUserdata) {
-    GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
 }
 
 typedef struct GblObjectFamily_ {
@@ -895,12 +889,12 @@ GBL_EXPORT GblObject* GblObject_parent(const GblObject* pSelf) GBL_NOEXCEPT {
     return pFamily? pFamily->pParent : NULL;
 }
 
-GBL_EXPORT void GblObject_parentSet(GblObject* pSelf, GblObject* pParent) GBL_NOEXCEPT {
+GBL_EXPORT void GblObject_setParent(GblObject* pSelf, GblObject* pParent) GBL_NOEXCEPT {
     GblObject* pOldParent = GblObject_parent(pSelf);
     if(pOldParent) {
-        GblObject_childRemove(pOldParent, pSelf);
+        GblObject_removeChild(pOldParent, pSelf);
     }
-    if(pParent) GblObject_childAdd(pParent, pSelf);
+    if(pParent) GblObject_addChild(pParent, pSelf);
 }
 
 GBL_EXPORT GblObject* GblObject_childFirst(const GblObject* pSelf) GBL_NOEXCEPT {
@@ -927,7 +921,7 @@ GBL_EXPORT GblObject*  GblObject_siblingNext(const GblObject* pSelf) GBL_NOEXCEP
     return pSibling;
 }
 
-GBL_EXPORT void GblObject_childAdd(GblObject* pSelf, GblObject* pChild) GBL_NOEXCEPT {
+GBL_EXPORT void GblObject_addChild(GblObject* pSelf, GblObject* pChild) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pChild);
     {
@@ -940,7 +934,7 @@ GBL_EXPORT void GblObject_childAdd(GblObject* pSelf, GblObject* pChild) GBL_NOEX
     GBL_API_END_BLOCK();
 }
 
-GBL_EXPORT GblBool GblObject_childRemove(GblObject* pSelf, GblObject* pChild) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblObject_removeChild(GblObject* pSelf, GblObject* pChild) GBL_NOEXCEPT {
     GblBool success = GBL_FALSE;
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pChild);
@@ -956,7 +950,7 @@ GBL_EXPORT GblBool GblObject_childRemove(GblObject* pSelf, GblObject* pChild) GB
     return success;
 }
 
-GBL_EXPORT GblObject* GblObject_childFindByType(const GblObject* pSelf, GblType childType) GBL_NOEXCEPT {
+GBL_EXPORT GblObject* GblObject_findChildByType(const GblObject* pSelf, GblType childType) GBL_NOEXCEPT {
     GblObject* pChild = NULL;
     GBL_API_BEGIN(NULL); {
         GblObjectFamily_* pFamily = GblObject_family_(pSelf);
@@ -978,7 +972,7 @@ GBL_EXPORT GblObject* GblObject_childFindByType(const GblObject* pSelf, GblType 
     return pChild;
 }
 
-GBL_EXPORT GblObject* GblObject_childFindByName(const GblObject* pSelf, const char* pName) GBL_NOEXCEPT {
+GBL_EXPORT GblObject* GblObject_findChildByName(const GblObject* pSelf, const char* pName) GBL_NOEXCEPT {
     GblObject* pChild = NULL;
     GBL_API_BEGIN(NULL); {
         GblObjectFamily_* pFamily = GblObject_family_(pSelf);
@@ -1001,7 +995,7 @@ GBL_EXPORT GblObject* GblObject_childFindByName(const GblObject* pSelf, const ch
     return pChild;
 }
 
-GBL_EXPORT GblObject* GblObject_childFindByIndex(const GblObject* pSelf, GblSize index) GBL_NOEXCEPT {
+GBL_EXPORT GblObject* GblObject_findChildByIndex(const GblObject* pSelf, GblSize index) GBL_NOEXCEPT {
     GblObject* pChild = NULL;
     GBL_API_BEGIN(NULL);
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
@@ -1026,7 +1020,7 @@ GBL_EXPORT GblSize GblObject_childCount(const GblObject* pSelf) GBL_NOEXCEPT {
     return count;
 }
 
-GBL_EXPORT GblContext* GblObject_contextFind(GblObject* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblContext* GblObject_findContext(GblObject* pSelf) GBL_NOEXCEPT {
     GblObject* pContext = NULL;
     GblObject* pIt = pSelf;
     while(pIt) {

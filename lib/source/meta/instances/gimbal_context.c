@@ -230,7 +230,7 @@ GBL_EXPORT GblContext* GblContext_global(void) GBL_NOEXCEPT {
 }
 
 GBL_EXPORT GblContext* GblContext_parentContext(const GblContext* pSelf) GBL_NOEXCEPT {
-    return GblObject_contextFind(GblObject_parent((GblObject*)pSelf));
+    return GblObject_findContext(GblObject_parent((GblObject*)pSelf));
 }
 
 GBL_EXPORT const GblCallRecord* GblContext_lastIssue(const GblContext* pSelf) GBL_NOEXCEPT {

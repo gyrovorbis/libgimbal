@@ -369,7 +369,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     GBL_STMT_START { \
         const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
         GBL_UNUSED(src_);                                                \
-       GblObject_eventSend(GBL_API_OBJECT(), (GblEvent*)event);          \
+       GblObject_sendEvent(GBL_API_OBJECT(), (GblEvent*)event);          \
     } GBL_STMT_END
 
 

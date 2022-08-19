@@ -60,7 +60,7 @@ typedef struct GblStackFrame {
     GblStackFrame*          pPrevFrame;
 } GblStackFrame;
 
-GBL_EXPORT GblContext* GblObject_contextFind(GblObject* pSelf) GBL_NOEXCEPT;
+GBL_EXPORT GblContext* GblObject_findContext(GblObject* pSelf) GBL_NOEXCEPT;
 
 // I think this can all become a tiny macro
 GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObject, GBL_RESULT initialResult, GblSourceLocation entryLoc) GBL_NOEXCEPT {
@@ -72,7 +72,7 @@ GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblOb
         if(pPrev && pPrev->pObject == pObject) GBL_LIKELY {
             pContext = pPrev->pContext;
         } else GBL_UNLIKELY {
-            pContext = GblObject_contextFind(pObject);
+            pContext = GblObject_findContext(pObject);
         }
     }
 

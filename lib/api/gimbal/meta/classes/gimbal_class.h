@@ -635,7 +635,7 @@ GBL_DECLS_END
  *  not actually under your control. This is a time for libGimbal's class
  *  swizzling, inspired by Objective-C's "is-a" swizzling:
  *
- *      GblObject* pObject = GblObject_new(GBL_OBJECT_TYPE, "name",    "fuckwhisp",
+ *      GblObject* pObject = GblObject_create(GBL_OBJECT_TYPE, "name",    "fuckwhisp",
  *                                                          "userdata", (void*)0xdeadbabe,
  *                                                          NULL);
  *

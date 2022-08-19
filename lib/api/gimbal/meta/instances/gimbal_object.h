@@ -18,23 +18,18 @@
 /*! \ingroup metaBuiltinTypes
  * \details  ::GblType UUID of a GblObject
  */
-#define GBL_OBJECT_TYPE                     (GBL_BUILTIN_TYPE(OBJECT))
-#define GBL_OBJECT_STRUCT                   GblObject
-#define GBL_OBJECT_CLASS_STRUCT             GblObjectClass
+#define GBL_OBJECT_TYPE                 (GBL_BUILTIN_TYPE(OBJECT))
 
-#define GBL_OBJECT(instance)                GBL_INSTANCE_CAST_PREFIX(instance, GBL_OBJECT)
-#define GBL_OBJECT_CHECK(instance)          GBL_INSTANCE_CHECK_PREFIX(instance, GBL_OBJECT)
-#define GBL_OBJECT_TRY(instance)            GBL_INSTANCE_TRY_PREFIX(instance, GBL_OBJECT)
+#define GBL_OBJECT(instance)            (GBL_INSTANCE_CAST(instance, GBL_OBJECT_TYPE, GblObject))
+#define GBL_OBJECT_CHECK(instance)      (GBL_INSTANCE_CHECK(instance, GBL_OBJECT_TYPE))
+#define GBL_OBJECT_TRY(instance)        (GBL_INSTANCE_TRY(instance, GBL_OBJECT_TYPE, GblObject))
 
-#define GBL_OBJECT_CLASS(klass)             GBL_CLASS_CAST_PREFIX(klass, GBL_OBJECT)
-#define GBL_OBJECT_CLASS_CHECK(klass)       GBL_CLASS_CHECK_PREFIX(klass, GBL_OBJECT)
-#define GBL_OBJECT_CLASS_TRY(klass)         GBL_CLASS_TRY_PREFIX(klass, GBL_OBJECT)
+#define GBL_OBJECT_CLASS(klass)         (GBL_CLASS_CAST(klass, GBL_OBJECT_TYPE, GblObjectClass))
+#define GBL_OBJECT_CLASS_CHECK(klass)   (GBL_CLASS_CHECK(klass, GBL_OBJECT_TYPE))
+#define GBL_OBJECT_CLASS_TRY(klass)     (GBL_CLASS_TRY(klass, GBL_OBJECT_TYPE, GblObjectClass))
 
-#define GBL_OBJECT_GET_CLASS(instance)      GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_OBJECT)
-#define GBL_OBJECT_TRY_CLASS(instance)      GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_OBJECT)
-
-#define GBL_OBJECT_REF(object)              (GblBox_ref((GblBox*)object))
-#define GBL_OBJECT_UNREF(object)            (GblBox_unref((GblBox*)object))
+#define GBL_OBJECT_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GBL_OBJECT_TYPE, GblObjectClass))
+#define GBL_OBJECT_TRY_CLASS(instance)  (GBL_INSTANCE_TRY_CLASS(instance, GBL_OBJECT_TYPE, GblObjectClass))
 
 #define SELF GblObject* pSelf
 #define CSELF const SELF
@@ -55,18 +50,13 @@ GBL_CLASS_DERIVE(GblObjectClass,
                  GblBoxClass,
                  GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
 
-    GBL_RESULT (*pFnConstructor)        (SELF);
-    GBL_RESULT (*pFnConstructed)        (SELF);
-    GBL_RESULT (*pFnPropertyGet)        (CSELF, GblSize id, GblVariant* pValue, const GblProperty* pProp);
-    GBL_RESULT (*pFnPropertySet)        (SELF,  GblSize id, const GblVariant* pValue, const GblProperty* pProp);
+    GBL_RESULT (*pFnConstructor)(SELF);
+    GBL_RESULT (*pFnConstructed)(SELF);
+    GBL_RESULT (*pFnPropertyGet)(CSELF, GblSize id, GblVariant* pValue, const GblProperty* pProp);
+    GBL_RESULT (*pFnPropertySet)(SELF,  GblSize id, const GblVariant* pValue, const GblProperty* pProp);
     //GBL_RESULT (*pFnSlotCall)           (SELF,  GblSize id, GblVariant* pRet, GblUint argc, GblVariant* pArgs, const GblSlot* pSlot);
     //GBL_RESULT (*pFnPropertyNotify)     (SELF,  GblProperty* pProperty);    // signal
 GBL_CLASS_END
-
-typedef enum GBL_OBJECT_ATTRIBUTE {
-    GBL_OBJECT_ATTRIBUTE_CONSTRUCTED_IN_PLACE,
-    GBL_OBJECT_ATTRIBUTE_COUNT
-} GBL_OBJECT_ATTRIBUTE;
 
 /*! \class GblObject
  *  \brief GblInstance providing extended OO functionality
@@ -118,17 +108,7 @@ GBL_PROPERTY_TABLE_BEGIN(GBL_OBJECT)
                        GBL_POINTER_TYPE,
                        GBL_PROPERTY_FLAGS_MASK(READ, WRITE, CONSTRUCT))
 GBL_PROPERTY_TABLE_END()
-#if 1
-#if 0
-GBL_PROPERTIES(GblObject,
-    ("refCount", GBL_UINT32_TYPE, (READ, WRITE)),
-    ("name",     GBL_STRING_TYPE, (READ)),
-    ("duder",     GBL_STRING_TYPE, (SAVE)),
-    ("duderette", GBL_STRING_TYPE, (LOAD))
-)
-#endif
 
-#endif
 /*!
 * Creates a new instance of a GBL_OBJECT_TYPE compatible type, setting
 * the values of the given properties upon construction.
@@ -138,39 +118,97 @@ GBL_PROPERTIES(GblObject,
 *            are of type const char* and value is the property type
 * \returns pointer to a new GblObject
 */
-GBL_EXPORT GblObject*         GblObject_new                 (GblType type, ...)                 GBL_NULL_TERMINATED             GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_newInPlace          (SELF, GblType type, ...)           GBL_NULL_TERMINATED             GBL_NOEXCEPT;
-GBL_EXPORT GblObject*         GblObject_newWithClass        (GblObjectClass* pClass, ...)       GBL_NULL_TERMINATED             GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_newInPlaceWithClass (SELF, GblObjectClass* pClass, ...) GBL_NULL_TERMINATED             GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_create              (GblType type, ...)                 GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_construct           (SELF, GblType type, ...)           GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_createWithClass     (GblObjectClass* pClass, ...)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_constructWithClass  (SELF, GblObjectClass* pClass, ...) GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_createVaList        (GblType type, va_list* pList)      GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*         GblObject_newVaList           (GblType type, va_list* pList)                                      GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVaList    (SELF, GblType type, va_list* pList)                                GBL_NOEXCEPT;
-GBL_EXPORT GblObject*         GblObject_newVaListWithClass  (GblObjectClass* pClass, va_list* pList)                            GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVaListWithClass
-                                                            (SELF, GblObjectClass* pClass, va_list* pList)                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_constructVaList     (SELF,
+                                                      GblType           type,
+                                                      va_list*          pList)           GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*         GblObject_newVariants         (GblType type,
-                                                             GblUint propertyCount,
-                                                             const char* pNames[],
-                                                             const GblVariant* pValues)                                         GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVariants  (SELF,
-                                                             GblType type,
-                                                             GblUint propertyCount,
-                                                             const char* pNames[],
-                                                             const GblVariant* pValues)                                         GBL_NOEXCEPT;
-GBL_EXPORT GblObject*         GblObject_newVariantsWithClass(GblObjectClass* pClass,
-                                                             GblUint propertyCount,
-                                                             const char* pNames[],
-                                                             const GblVariant* pValues)                                         GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblObject_newInPlaceVariantsWithClass
-                                                            (SELF,
-                                                             GblObjectClass* pClass,
-                                                             GblUint propertyCount,
-                                                             const char* pNames[],
-                                                             const GblVariant* pValues)                                         GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_createVaListWithClass
+                                                     (GblObjectClass*   pClass,
+                                                      va_list*          pList)           GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT         GblObject_setAttribute        (SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value)                  GBL_NOEXCEPT;
-GBL_INLINE GblBool            GblObject_attribute           (CSELF, GBL_OBJECT_ATTRIBUTE attrib)                                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_constructVaListWithClass
+                                                     (SELF,
+                                                      GblObjectClass*   pClass,
+                                                      va_list*          pList)           GBL_NOEXCEPT;
+
+GBL_EXPORT GblObject*  GblObject_createVariants      (GblType           type,
+                                                      GblUint           propertyCount,
+                                                      const char*       pNames[],
+                                                      const GblVariant* pValues)         GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT  GblObject_constructVariants   (SELF,
+                                                      GblType           type,
+                                                      GblUint           propertyCount,
+                                                      const char*       pNames[],
+                                                      const GblVariant* pValues)         GBL_NOEXCEPT;
+
+GBL_EXPORT GblObject*  GblObject_createVariantsWithClass
+                                                     (GblObjectClass*   pClass,
+                                                      GblUint           propertyCount,
+                                                      const char*       pNames[],
+                                                      const GblVariant* pValues)         GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT  GblObject_constructVariantsWithClass
+                                                     (SELF,
+                                                      GblObjectClass*   pClass,
+                                                      GblUint           propertyCount,
+                                                      const char*       pNames[],
+                                                      const GblVariant* pValues)        GBL_NOEXCEPT;
+
+GBL_EXPORT const char* GblObject_name                (CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT void        GblObject_setName             (SELF, const char* pName)          GBL_NOEXCEPT;
+
+GBL_EXPORT GblObject*  GblObject_parent              (CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT void        GblObject_setParent           (SELF, GblObject* pParent)         GBL_NOEXCEPT;
+
+GBL_EXPORT GblObject*  GblObject_childFirst          (CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblObject_childCount          (CSELF)                            GBL_NOEXCEPT;
+
+GBL_EXPORT GblObject*  GblObject_siblingNext         (CSELF)                            GBL_NOEXCEPT;
+
+GBL_EXPORT void        GblObject_addChild            (SELF, GblObject* pChild)          GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblObject_removeChild         (SELF, GblObject* pChild)          GBL_NOEXCEPT;
+
+GBL_INLINE GblObject*  GblObject_findAncestorByType  (CSELF, GblType ancestorType)      GBL_NOEXCEPT;
+GBL_INLINE GblObject*  GblObject_findAncestorByName  (CSELF, const char* pName)         GBL_NOEXCEPT;
+GBL_EXPORT GblContext* GblObject_findContext         (SELF)                             GBL_NOEXCEPT;
+
+GBL_EXPORT GblObject*  GblObject_findChildByType     (CSELF, GblType childType)         GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_findChildByName     (CSELF, const char* pName)         GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_findChildByIndex    (CSELF, GblSize index)             GBL_NOEXCEPT;
+
+GBL_INLINE GblObject*  GblObject_findSiblingByType   (CSELF, GblType siblingType)       GBL_NOEXCEPT;
+GBL_INLINE GblObject*  GblObject_findSiblingByName   (CSELF, const char* pName)         GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT  GblObject_sendEvent           (SELF, GblEvent* pEvent)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_notifyEvent         (SELF, GblEvent* pEvent)           GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT  GblObject_installEventFilter  (SELF, GblIEventFilter* pFilter)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_uninstallEventFilter(SELF, GblIEventFilter* pFilter)   GBL_NOEXCEPT;
+
+GBL_EXPORT GblSize     GblObject_eventFilterCount    (CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GblIEventFilter*
+                       GblObject_eventFilterAt       (CSELF, GblSize index)             GBL_NOEXCEPT;
+
+//==============
+
+GBL_EXPORT GBL_RESULT  GblObject_readProperty        (CSELF,
+                                                      const char* pName,
+                                                      GblVariant* pValue)               GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT  GblObject_writeProperty       (SELF,
+                                                      const char* pName,
+                                                      GblVariant* pValue)               GBL_NOEXCEPT;
+
+//================
+
+
 
 GBL_API                       GblObject_get                 (CSELF, ...) GBL_NULL_TERMINATED                                    GBL_NOEXCEPT;
 GBL_API                       GblObject_set                 (SELF, ...) GBL_NULL_TERMINATED                                     GBL_NOEXCEPT;
@@ -211,46 +249,7 @@ GBL_INLINE GBL_RESULT         GblObject_propertySetString   (SELF,  const char* 
 //GBL_INLINE GBL_RESULT         GblObject_extFieldSetUserdata     (CSELF, GblQuark quark, void* pUd, GblArrayMapDestructFn pDtor)     GBL_NOEXCEPT;
 //GBL_INLINE GBL_RESULT         GblObject_extFieldSetVariantCopy  (CSELF, GblQuark quark, GblVariant)
 //remove me
-GBL_EXPORT void*              GblObject_userdata            (CSELF)                                                             GBL_NOEXCEPT;
-GBL_EXPORT void               GblObject_userdataSet         (SELF, void* pUserdata)                                             GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*         GblObject_parent              (CSELF)                                                             GBL_NOEXCEPT;
-GBL_EXPORT void               GblObject_parentSet           (SELF, GblObject* pParent)                                          GBL_NOEXCEPT;
-
-GBL_EXPORT const char*        GblObject_name                (CSELF) GBL_NOEXCEPT;
-GBL_EXPORT void               GblObject_nameSet             (SELF, const char* pName)                                           GBL_NOEXCEPT;
-
-GBL_INLINE GblObject*         GblObject_ancestorFindByType  (CSELF, GblType ancestorType)                                       GBL_NOEXCEPT;
-GBL_INLINE GblObject*         GblObject_ancestorFindByName  (CSELF, const char* pName)                                          GBL_NOEXCEPT;
-GBL_EXPORT GblContext*        GblObject_contextFind         (SELF)                                                              GBL_NOEXCEPT;
-
-GBL_EXPORT GblObject*         GblObject_childFirst          (CSELF)                                                             GBL_NOEXCEPT;
-GBL_EXPORT void               GblObject_childAdd            (SELF, GblObject* pChild)                                           GBL_NOEXCEPT;
-GBL_EXPORT GblBool            GblObject_childRemove         (SELF, GblObject* pChild)                                           GBL_NOEXCEPT;
-GBL_EXPORT GblObject*         GblObject_childFindByType     (CSELF, GblType childType)                                          GBL_NOEXCEPT;
-GBL_EXPORT GblObject*         GblObject_childFindByName     (CSELF, const char* pName)                                          GBL_NOEXCEPT;
-GBL_EXPORT GblObject*         GblObject_childFindByIndex    (CSELF, GblSize index)                                              GBL_NOEXCEPT;
-GBL_EXPORT GblSize            GblObject_childCount          (CSELF)                                                             GBL_NOEXCEPT;
-//GBL_EXPORT GblBool          GblObject_childForEach        (CSELF, GblObjectChildIterFn pIterFn, void* pUserdata)              GBL_NOEXCEPT;
-
-GBL_EXPORT GblObject*         GblObject_siblingNext         (CSELF)                                                             GBL_NOEXCEPT;
-// half-assed
-GBL_INLINE GblObject*         GblObject_siblingFindByType   (CSELF, GblType siblingType)                                        GBL_NOEXCEPT;
-GBL_INLINE GblObject*         GblObject_siblingFindByName   (CSELF, const char* pName)                                          GBL_NOEXCEPT;
-//GBL_INLINE GblObject*         GblObject_siblingFindByIndex  (CSELF, GblSize index) GBL_NOEXCEPT;
-//GBL_INLINE Gblobject*         GblObject_siblingCount()
-
-GBL_API                       GblObject_eventSend           (SELF, GblEvent* pEvent) GBL_NOEXCEPT;
-GBL_API                       GblObject_eventNotify         (SELF, GblEvent* pEvent) GBL_NOEXCEPT;
-
-GBL_API                       GblObject_eventFilterInstall  (SELF, GblIEventFilter* pFilter)                                    GBL_NOEXCEPT;
-GBL_API                       GblObject_eventFilterUninstall(SELF, GblIEventFilter* pFilter)                                    GBL_NOEXCEPT;
-GblIEventFilter*              GblObject_eventFilterAt       (CSELF, GblSize index)                                              GBL_NOEXCEPT;
-GblSize                       GblObject_eventFilterCount    (CSELF)                                                             GBL_NOEXCEPT;
-
-
-//GBL_API                 GblObject_load(SELF, GblIStructuredReader* pReader) GBL_NOEXCEPT;
-//GBL_API                 GblObject_save(SELF, GblIStructuredWriter* pWriter) GBL_NOEXCEPT;
 
 // ============ IMPL ===============
 
@@ -290,7 +289,7 @@ GBL_INLINE GBL_RESULT GblObject_propertySetString(SELF,  const char* pName, cons
         return GblObject_propertySetQuark(pSelf, GblQuark_fromString(pName), pValue);
 }
 
-GBL_INLINE GblObject* GblObject_ancestorFindByType(CSELF, GblType ancestorType) GBL_NOEXCEPT {
+GBL_INLINE GblObject* GblObject_findAncestorByType(CSELF, GblType ancestorType) GBL_NOEXCEPT {
     GblObject* pAncestor = NULL;
     //GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPEOF(pSelf))); {
         GblObject* pNode = GblObject_parent(pSelf);
@@ -306,7 +305,7 @@ GBL_INLINE GblObject* GblObject_ancestorFindByType(CSELF, GblType ancestorType) 
     return pAncestor;
 }
 
-GBL_INLINE GblObject* GblObject_ancestorFindByName(CSELF, const char* pName) GBL_NOEXCEPT {
+GBL_INLINE GblObject* GblObject_findAncestorByName(CSELF, const char* pName) GBL_NOEXCEPT {
     GblObject* pAncestor = NULL;
     GBL_API_BEGIN(NULL); {
         GblObject* pNode = GblObject_parent(pSelf);
@@ -324,48 +323,21 @@ GBL_INLINE GblObject* GblObject_ancestorFindByName(CSELF, const char* pName) GBL
 }
 
 
-GBL_INLINE GblObject* GblObject_siblingFindByType(CSELF, GblType siblingType) GBL_NOEXCEPT {
+GBL_INLINE GblObject* GblObject_findSiblingByType(CSELF, GblType siblingType) GBL_NOEXCEPT {
     GblObject* pObject = NULL;
     if(GblObject_parent(pSelf)) {
-        GblObject_childFindByType(GblObject_parent(pSelf), siblingType);
+        GblObject_findChildByType(GblObject_parent(pSelf), siblingType);
     }
     return pObject;
 }
 
-GBL_INLINE GblObject* GblObject_siblingFindByName(CSELF, const char* pName) GBL_NOEXCEPT {
+GBL_INLINE GblObject* GblObject_findSiblingByName(CSELF, const char* pName) GBL_NOEXCEPT {
     GblObject* pObject = NULL;
     GblObject* pParent = GblObject_parent(pSelf);
     if(pParent) {
-        pObject = GblObject_childFindByName(pParent, pName);
+        pObject = GblObject_findChildByName(pParent, pName);
     }
     return pObject;
-}
-
-GBL_INLINE GBL_RESULT GblObject_setAttribute(SELF, GBL_OBJECT_ATTRIBUTE attrib, GblBool value) GBL_NOEXCEPT {
-    GBL_UNUSED(value, pSelf);
-    GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_ARG(attrib < GBL_OBJECT_ATTRIBUTE_COUNT);
-    switch(attrib) {
-    default:
-        GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_ARG, "[GblObject]: Failed to set invalid attribute: %u", attrib);
-        break;
-    }
-    GBL_API_END();
-}
-
-GBL_INLINE GblBool GblObject_attribute(CSELF, GBL_OBJECT_ATTRIBUTE attrib) GBL_NOEXCEPT {
-    GblBool value = GBL_FALSE;
-    GBL_API_BEGIN(NULL);
-    switch(attrib) {
-    case GBL_OBJECT_ATTRIBUTE_CONSTRUCTED_IN_PLACE:
-        value = GBL_PRIV(pSelf->base).constructedInPlace;
-        break;
-    default:
-        GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_ARG, "[GblObject]: Failed to get invalid attribute: %u", attrib);
-        break;
-    }
-    GBL_API_END_BLOCK();
-    return value;
 }
 
 

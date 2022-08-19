@@ -103,7 +103,7 @@ static GBL_RESULT GblTestSuiteClass_constructed_(GblObject* pSelf) {
 
     const char* pName = GblObject_name(pSelf);
     if(!pName) {
-        GblObject_nameSet(pSelf, GblType_name(GblInstance_typeOf(GBL_INSTANCE(pSelf))));
+        GblObject_setName(pSelf, GblType_name(GblInstance_typeOf(GBL_INSTANCE(pSelf))));
     }
 
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
@@ -280,7 +280,7 @@ GBL_EXPORT GblTestSuite* GblTestSuite_create(const char* pName) {
     GblTestSuite* pSuite = NULL;
 
     GBL_API_BEGIN(NULL);
-    pSuite = GBL_TEST_SUITE(GblObject_new(GBL_TEST_SUITE_TYPE, "name", pName,
+    pSuite = GBL_TEST_SUITE(GblObject_create(GBL_TEST_SUITE_TYPE, "name", pName,
                                                                NULL));
 
     GBL_API_VERIFY_LAST_RECORD();
@@ -295,7 +295,7 @@ GBL_EXPORT GblTestSuite* GblTestSuite_createWithVTable(const char* pName, const 
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_CLASS(GblClass_createFloating(GBL_TEST_SUITE_TYPE));
     pClass->pVTable = pVTable;
 
-    pSuite = GBL_TEST_SUITE(GblObject_newWithClass(GBL_OBJECT_CLASS(pClass), "name", pName,
+    pSuite = GBL_TEST_SUITE(GblObject_createWithClass(GBL_OBJECT_CLASS(pClass), "name", pName,
                                                                              NULL));
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END_BLOCK();
@@ -307,7 +307,7 @@ GBL_EXPORT GblTestSuite* GblTestSuite_createFromType(GblType type) {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY(GblType_check(type, GBL_TEST_SUITE_TYPE),
                    GBL_RESULT_ERROR_TYPE_MISMATCH);
-    pSuite = GBL_TEST_SUITE(GblObject_new(type, NULL));
+    pSuite = GBL_TEST_SUITE(GblObject_create(type, NULL));
     GBL_API_END_BLOCK();
     return pSuite;
 }
@@ -399,7 +399,7 @@ GBL_EXPORT GblBool GblTestSuite_casePassed(const GblTestSuite* pSelf, const char
 }
 
 GBL_EXPORT GblTestScenario* GblTestSuite_scenario(const GblTestSuite* pSelf) {
-    return pSelf? GBL_TEST_SCENARIO(GblObject_ancestorFindByType(GBL_OBJECT(pSelf), GBL_TEST_SCENARIO_TYPE)) : NULL;
+    return pSelf? GBL_TEST_SCENARIO(GblObject_findAncestorByType(GBL_OBJECT(pSelf), GBL_TEST_SCENARIO_TYPE)) : NULL;
 }
 
 
