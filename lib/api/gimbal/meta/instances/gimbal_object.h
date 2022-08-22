@@ -39,7 +39,6 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblObject);
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
-
 GBL_CLASS_DERIVE(GblObjectClass, GblBoxClass,
                  GblITableIFace, GblIEventHandlerIFace, GblIEventFilterIFace)
     GBL_RESULT (*pFnConstructor)(GBL_SELF);
@@ -57,106 +56,106 @@ GBL_PROPERTIES(GblObject,
     (refCount, GBL_GENERIC,  (READ),                    GBL_UINT16_TYPE)
 )
 
-GBL_EXPORT GblType     GblObject_type                (void)                              GBL_NOEXCEPT;
+GBL_EXPORT GblType     GblObject_type                (void)                                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*  GblObject_create              (GblType type, ...)                 GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_create              (GblType type, ...)                     GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblObject_construct           (GBL_SELF, GblType type, ...)           GBL_NOEXCEPT;
-GBL_EXPORT GblObject*  GblObject_createWithClass     (GblObjectClass* pClass, ...)       GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_createWithClass     (GblObjectClass* pClass, ...)           GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblObject_constructWithClass  (GBL_SELF, GblObjectClass* pClass, ...) GBL_NOEXCEPT;
-GBL_EXPORT GblObject*  GblObject_createVaList        (GblType type, va_list* pList)      GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_createVaList        (GblType type, va_list* pList)          GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_constructVaList     (GBL_SELF,
                                                       GblType           type,
-                                                      va_list*          pList)           GBL_NOEXCEPT;
+                                                      va_list*          pList)               GBL_NOEXCEPT;
 
 GBL_EXPORT GblObject*  GblObject_createVaListWithClass
                                                      (GblObjectClass*   pClass,
-                                                      va_list*          pList)           GBL_NOEXCEPT;
+                                                      va_list*          pList)               GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_constructVaListWithClass
                                                      (GBL_SELF,
                                                       GblObjectClass*   pClass,
-                                                      va_list*          pList)           GBL_NOEXCEPT;
+                                                      va_list*          pList)               GBL_NOEXCEPT;
 
 GBL_EXPORT GblObject*  GblObject_createVariants      (GblType           type,
                                                       GblUint           propertyCount,
                                                       const char*       pNames[],
-                                                      const GblVariant* pValues)         GBL_NOEXCEPT;
+                                                      const GblVariant* pValues)             GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_constructVariants   (GBL_SELF,
                                                       GblType           type,
                                                       GblUint           propertyCount,
                                                       const char*       pNames[],
-                                                      const GblVariant* pValues)         GBL_NOEXCEPT;
+                                                      const GblVariant* pValues)             GBL_NOEXCEPT;
 
 GBL_EXPORT GblObject*  GblObject_createVariantsWithClass
                                                      (GblObjectClass*   pClass,
                                                       GblUint           propertyCount,
                                                       const char*       pNames[],
-                                                      const GblVariant* pValues)         GBL_NOEXCEPT;
+                                                      const GblVariant* pValues)             GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_constructVariantsWithClass
                                                      (GBL_SELF,
                                                       GblObjectClass*   pClass,
                                                       GblUint           propertyCount,
                                                       const char*       pNames[],
-                                                      const GblVariant* pValues)        GBL_NOEXCEPT;
+                                                      const GblVariant* pValues)             GBL_NOEXCEPT;
 
-GBL_EXPORT const char* GblObject_name                (GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT void        GblObject_setName             (GBL_SELF, const char* pName)          GBL_NOEXCEPT;
+GBL_EXPORT const char* GblObject_name                (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT void        GblObject_setName             (GBL_SELF, const char* pName)           GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*  GblObject_parent              (GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT void        GblObject_setParent           (GBL_SELF, GblObject* pParent)         GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_parent              (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT void        GblObject_setParent           (GBL_SELF, GblObject* pParent)          GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*  GblObject_childFirst          (GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblObject_childCount          (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_childFirst          (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblObject_childCount          (GBL_CSELF)                             GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*  GblObject_siblingNext         (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_siblingNext         (GBL_CSELF)                             GBL_NOEXCEPT;
 
-GBL_EXPORT void        GblObject_addChild            (GBL_SELF, GblObject* pChild)          GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblObject_removeChild         (GBL_SELF, GblObject* pChild)          GBL_NOEXCEPT;
+GBL_EXPORT void        GblObject_addChild            (GBL_SELF, GblObject* pChild)           GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblObject_removeChild         (GBL_SELF, GblObject* pChild)           GBL_NOEXCEPT;
 
-GBL_INLINE GblObject*  GblObject_findAncestorByType  (GBL_CSELF, GblType ancestorType)      GBL_NOEXCEPT;
-GBL_INLINE GblObject*  GblObject_findAncestorByName  (GBL_CSELF, const char* pName)         GBL_NOEXCEPT;
-GBL_EXPORT GblContext* GblObject_findContext         (GBL_SELF)                             GBL_NOEXCEPT;
+GBL_INLINE GblObject*  GblObject_findAncestorByType  (GBL_CSELF, GblType ancestorType)       GBL_NOEXCEPT;
+GBL_INLINE GblObject*  GblObject_findAncestorByName  (GBL_CSELF, const char* pName)          GBL_NOEXCEPT;
+GBL_EXPORT GblContext* GblObject_findContext         (GBL_SELF)                              GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*  GblObject_findChildByType     (GBL_CSELF, GblType childType)         GBL_NOEXCEPT;
-GBL_EXPORT GblObject*  GblObject_findChildByName     (GBL_CSELF, const char* pName)         GBL_NOEXCEPT;
-GBL_EXPORT GblObject*  GblObject_findChildByIndex    (GBL_CSELF, GblSize index)             GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_findChildByType     (GBL_CSELF, GblType childType)          GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_findChildByName     (GBL_CSELF, const char* pName)          GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_findChildByIndex    (GBL_CSELF, GblSize index)              GBL_NOEXCEPT;
 
-GBL_INLINE GblObject*  GblObject_findSiblingByType   (GBL_CSELF, GblType siblingType)       GBL_NOEXCEPT;
-GBL_INLINE GblObject*  GblObject_findSiblingByName   (GBL_CSELF, const char* pName)         GBL_NOEXCEPT;
+GBL_INLINE GblObject*  GblObject_findSiblingByType   (GBL_CSELF, GblType siblingType)        GBL_NOEXCEPT;
+GBL_INLINE GblObject*  GblObject_findSiblingByName   (GBL_CSELF, const char* pName)          GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblObject_sendEvent           (GBL_SELF, GblEvent* pEvent)           GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblObject_notifyEvent         (GBL_SELF, GblEvent* pEvent)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_sendEvent           (GBL_SELF, GblEvent* pEvent)            GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_notifyEvent         (GBL_SELF, GblEvent* pEvent)            GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblObject_installEventFilter  (GBL_SELF, GblIEventFilter* pFilter)   GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblObject_uninstallEventFilter(GBL_SELF, GblIEventFilter* pFilter)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_installEventFilter  (GBL_SELF, GblIEventFilter* pFilter)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_uninstallEventFilter(GBL_SELF, GblIEventFilter* pFilter)    GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize     GblObject_eventFilterCount    (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblObject_eventFilterCount    (GBL_CSELF)                             GBL_NOEXCEPT;
 GBL_EXPORT GblIEventFilter*
-                       GblObject_eventFilterAt       (GBL_CSELF, GblSize index)             GBL_NOEXCEPT;
+                       GblObject_eventFilterAt       (GBL_CSELF, GblSize index)              GBL_NOEXCEPT;
 
 //==============
 
-GBL_EXPORT GBL_RESULT  GblObject_readProperty        (GBL_CSELF, const char* pName, ...)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblObject_writeProperty       (GBL_SELF, const char* pName, ...)     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_readProperty        (GBL_CSELF, const char* pName, ...)     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblObject_writeProperty       (GBL_SELF, const char* pName, ...)      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_readPropertyVaList  (GBL_CSELF,
                                                       const char* pName,
-                                                      va_list*    pVaList)              GBL_NOEXCEPT;
+                                                      va_list*    pVaList)                   GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_writePropertyVaList (GBL_SELF,
                                                       const char* pName,
-                                                      va_list     pVaList)              GBL_NOEXCEPT;
+                                                      va_list     pVaList)                   GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_readPropertyVariant (GBL_CSELF,
                                                       const char* pName,
-                                                      GblVariant* pValue)               GBL_NOEXCEPT;
+                                                      GblVariant* pValue)                    GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_writePropertyVariant(GBL_SELF,
                                                       const char* pName,
-                                                      GblVariant* pValue)               GBL_NOEXCEPT;
+                                                      GblVariant* pValue)                    GBL_NOEXCEPT;
 
 //================
 

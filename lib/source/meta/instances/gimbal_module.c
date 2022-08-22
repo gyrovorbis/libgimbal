@@ -93,14 +93,14 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
     GBL_UNUSED(pData);
     GBL_API_BEGIN(pCtx);
     GblModuleClass* pSelf = GBL_MODULE_CLASS(pClass);
-    pSelf->pFnLoad                       = GblModule_load_;
-    pSelf->pFnUnload                     = GblModule_unload_;
-    pSelf->base.base.base.pFnDestructor  = GblModule_destructor_;
-    pSelf->base.base.pFnPropertyGet      = GblModule_propertyGet_;
-    pSelf->base.base.pFnPropertySet      = GblModule_propertySet_;
-    pSelf->iPluginIFace.pFnUse           = GblModule_IPlugin_use_;
-    pSelf->iPluginIFace.pFnUnuse         = GblModule_IPlugin_unuse_;
-    pSelf->iPluginIFace.pFnTypeInfo      = GblModule_IPlugin_typeInfo_;
+    pSelf->pFnLoad                              = GblModule_load_;
+    pSelf->pFnUnload                            = GblModule_unload_;
+    pSelf->base.base.base.pFnDestructor         = GblModule_destructor_;
+    pSelf->base.base.pFnPropertyGet             = GblModule_propertyGet_;
+    pSelf->base.base.pFnPropertySet             = GblModule_propertySet_;
+    pSelf->GblIPluginIFaceImpl.pFnUse           = GblModule_IPlugin_use_;
+    pSelf->GblIPluginIFaceImpl.pFnUnuse         = GblModule_IPlugin_unuse_;
+    pSelf->GblIPluginIFaceImpl.pFnTypeInfo      = GblModule_IPlugin_typeInfo_;
 
     if(!GblType_classRefCount(GBL_MODULE_TYPE)) {
 
@@ -109,46 +109,8 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
         descQuark_       = GblQuark_fromStringStatic("description");
         prefixQuark_     = GblQuark_fromStringStatic("prefix");
         typeCountQuark_  = GblQuark_fromStringStatic("typeCount");
-#if 0
-        pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_VERSION)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
-                                   versionQuark_,
-                                   GBL_MODULE_PROPERTY_ID_VERSION,
-                                   GBL_UINT32_TYPE,
-                                   GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE |
-                                   GBL_PROPERTY_FLAG_SAVE | GBL_PROPERTY_FLAG_CONSTRUCT);
 
-        pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_AUTHOR)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
-                                   authorQuark_,
-                                   GBL_MODULE_PROPERTY_ID_AUTHOR,
-                                   GBL_STRING_TYPE,
-                                   GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE |
-                                   GBL_PROPERTY_FLAG_SAVE | GBL_PROPERTY_FLAG_CONSTRUCT);
-
-        pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_DESCRIPTION)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
-                                   descQuark_,
-                                   GBL_MODULE_PROPERTY_ID_DESCRIPTION,
-                                   GBL_STRING_TYPE,
-                                   GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE |
-                                   GBL_PROPERTY_FLAG_SAVE | GBL_PROPERTY_FLAG_CONSTRUCT);
-
-        pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_PREFIX)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
-                                   prefixQuark_,
-                                   GBL_MODULE_PROPERTY_ID_PREFIX,
-                                   GBL_STRING_TYPE,
-                                   GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE |
-                                   GBL_PROPERTY_FLAG_SAVE | GBL_PROPERTY_FLAG_CONSTRUCT);
-
-        pPropertyList_[PROPERTY_IDX_(GBL_MODULE_PROPERTY_ID_TYPE_COUNT)] =
-            gblPropertyTableInsert(GBL_CLASS_TYPEOF(pClass),
-                                   typeCountQuark_,
-                                   GBL_MODULE_PROPERTY_ID_TYPE_COUNT,
-                                   GBL_UINT32_TYPE,
-                                   GBL_PROPERTY_FLAG_READ);
-#endif
+        GBL_PROPERTIES_REGISTER(GblModule);
     }
 
     GBL_API_END();
@@ -181,7 +143,7 @@ GBL_EXPORT GblType GblModule_type(void) {
                                           .pInterfaceMap        = (const GblTypeInterfaceMapEntry[]) {
                                               {
                                                   .interfaceType = GBL_IPLUGIN_TYPE,
-                                                  .classOffset   = offsetof(GblModuleClass, iPluginIFace)
+                                                  .classOffset   = offsetof(GblModuleClass, GblIPluginIFaceImpl)
                                               },
                                           }
                                       },

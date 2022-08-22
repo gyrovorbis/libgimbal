@@ -254,37 +254,37 @@ static GBL_RESULT GblTestScenarioClass_propertyGet_(const GblObject* pSelf, GblS
     GBL_API_BEGIN(pSelf);
     GblTestScenario* pScenario = GBL_TEST_SCENARIO(pSelf);
     switch(id) {
-    case GBL_TEST_SCENARIO_PROPERTY_ID_RESULT:
+    case GblTestScenario_Property_Id_testResult:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->result);
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_SUITE_COUNT:
+    case GblTestScenario_Property_Id_suiteCount:
         GblVariant_setValueCopy(pValue, pProp->valueType, GblTestScenario_suiteCount_(pScenario));
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_SUITES_RUN:
+    case GblTestScenario_Property_Id_suitesRun:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->suitesRun);
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_SUITES_PASSED:
+    case GblTestScenario_Property_Id_suitesPassed:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->suitesPassed);
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_SUITES_FAILED:
+    case GblTestScenario_Property_Id_suitesFailed:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->suitesFailed);
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_SUITES_SKIPPED:
+    case GblTestScenario_Property_Id_suitesSkipped:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->suitesSkipped);
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_CASE_COUNT:
+    case GblTestScenario_Property_Id_caseCount:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->caseCount);
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_CASES_RUN:
+    case GblTestScenario_Property_Id_casesRun:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->casesRun);
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_CASES_PASSED:
+    case GblTestScenario_Property_Id_casesPassed:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->casesPassed);
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_CASES_FAILED:
+    case GblTestScenario_Property_Id_casesFailed:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->casesFailed);
         break;
-    case GBL_TEST_SCENARIO_PROPERTY_ID_CASES_SKIPPED:
+    case GblTestScenario_Property_Id_casesSkipped:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->casesSkipped);
         break;
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -302,7 +302,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_alloc_(GblIAllocator* pIAlloca
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
-    GBL_API_VERIFY_CALL(pCtxClass->iAllocatorIFace.pFnAlloc(pIAllocator, pFrame, size, align, pDbgStr, ppData));
+    GBL_API_VERIFY_CALL(pCtxClass->GblIAllocatorIFaceImpl.pFnAlloc(pIAllocator, pFrame, size, align, pDbgStr, ppData));
     GBL_API_VERIFY_CALL(GblAllocationTracker_allocEvent(pSelf_->pAllocTracker, *ppData, size, align, pDbgStr, pFrame->sourceEntry));
     GBL_API_END();
 }
@@ -313,7 +313,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_realloc_(GblIAllocator* pIAllo
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
-    GBL_API_VERIFY_CALL(pCtxClass->iAllocatorIFace.pFnRealloc(pIAllocator, pFrame, pData, newSize, newAlign, ppNewData));
+    GBL_API_VERIFY_CALL(pCtxClass->GblIAllocatorIFaceImpl.pFnRealloc(pIAllocator, pFrame, pData, newSize, newAlign, ppNewData));
     GBL_API_VERIFY_CALL(GblAllocationTracker_reallocEvent(pSelf_->pAllocTracker, pData, *ppNewData, newSize, newAlign, pFrame->sourceEntry));
     GBL_API_END();
 }
@@ -324,7 +324,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_free_(GblIAllocator* pIAllocat
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
-    GBL_API_VERIFY_CALL(pCtxClass->iAllocatorIFace.pFnFree(pIAllocator, pFrame, pData));
+    GBL_API_VERIFY_CALL(pCtxClass->GblIAllocatorIFaceImpl.pFnFree(pIAllocator, pFrame, pData));
     GBL_API_VERIFY_CALL(GblAllocationTracker_freeEvent(pSelf_->pAllocTracker, pData, pFrame->sourceEntry));
     GBL_API_END();
 }
@@ -361,21 +361,21 @@ static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd, 
     GBL_API_BEGIN(pCtx);
 
     if(!GblType_classRefCount(GBL_TEST_SCENARIO_TYPE)) {
-        GBL_PROPERTY_TABLE_REGISTER(GBL_TEST_SCENARIO, pClass);
+        GBL_PROPERTIES_REGISTER(GblTestScenario);
     }
 
     GblTestScenarioClass* pSelfClass = GBL_TEST_SCENARIO_CLASS(pClass);
-    pSelfClass->pFnBegin                        = GblTestScenarioClass_begin_;
-    pSelfClass->pFnEnd                          = GblTestScenarioClass_end_;
-    pSelfClass->pFnRun                          = GblTestScenarioClass_run_;
-    pSelfClass->pFnSuiteBegin                   = GblTestScenarioClass_suiteBegin_;
-    pSelfClass->pFnSuiteEnd                     = GblTestScenarioClass_suiteEnd_;
-    pSelfClass->base.base.pFnConstructor        = GblTestScenarioClass_constructor_;
-    pSelfClass->base.base.base.pFnDestructor    = GblTestScenarioClass_destructor_;
-    pSelfClass->base.base.pFnPropertyGet        = GblTestScenarioClass_propertyGet_;
-    pSelfClass->base.iAllocatorIFace.pFnAlloc   = GblTestScenarioClass_IAllocator_alloc_;
-    pSelfClass->base.iAllocatorIFace.pFnRealloc = GblTestScenarioClass_IAllocator_realloc_;
-    pSelfClass->base.iAllocatorIFace.pFnFree    = GblTestScenarioClass_IAllocator_free_;
+    pSelfClass->pFnBegin                               = GblTestScenarioClass_begin_;
+    pSelfClass->pFnEnd                                 = GblTestScenarioClass_end_;
+    pSelfClass->pFnRun                                 = GblTestScenarioClass_run_;
+    pSelfClass->pFnSuiteBegin                          = GblTestScenarioClass_suiteBegin_;
+    pSelfClass->pFnSuiteEnd                            = GblTestScenarioClass_suiteEnd_;
+    pSelfClass->base.base.pFnConstructor               = GblTestScenarioClass_constructor_;
+    pSelfClass->base.base.base.pFnDestructor           = GblTestScenarioClass_destructor_;
+    pSelfClass->base.base.pFnPropertyGet               = GblTestScenarioClass_propertyGet_;
+    pSelfClass->base.GblIAllocatorIFaceImpl.pFnAlloc   = GblTestScenarioClass_IAllocator_alloc_;
+    pSelfClass->base.GblIAllocatorIFaceImpl.pFnRealloc = GblTestScenarioClass_IAllocator_realloc_;
+    pSelfClass->base.GblIAllocatorIFaceImpl.pFnFree    = GblTestScenarioClass_IAllocator_free_;
     GBL_API_END();
 }
 
@@ -477,7 +477,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_run(GblTestScenario* pSelf, int argc, char
     GblContext* pOldGlobalCtx = GblContext_global();
     GblContext_globalSet(GBL_CONTEXT(pSelf));
 
-    GBL_INSTANCE_VCALL_PREFIX(GBL_TEST_SCENARIO, pFnRun, pSelf, argc, argv);
+    GBL_INSTANCE_VCALL(GBL_TEST_SCENARIO_TYPE, GblTestScenarioClass, pFnRun, pSelf, argc, argv);
 
     GblContext_setLogFilter(pOldGlobalCtx, GBL_LOG_LEVEL_WARNING|GBL_LOG_LEVEL_ERROR);
     GblContext_globalSet(pOldGlobalCtx);

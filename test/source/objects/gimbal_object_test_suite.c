@@ -22,7 +22,7 @@ typedef struct GblObjectTestSuite_ {
 #define TEST_OBJECT_CLASS_CHECK(klass)      GBL_CLASS_CHECK_PREFIX(klass, TEST_OBJECT)
 #define TEST_OBJECT_GET_CLASS(instance)     GBL_INSTANCE_GET_CLASS_PREFIX(instance, TEST_OBJECT)
 
-static GblType TestObject_type(void);
+GBL_EXPORT GblType TestObject_type(void);
 
 typedef struct TestObjectClass {
     GblObjectClass  base;
@@ -87,27 +87,26 @@ static GBL_RESULT TestObject_destructor(GblBox* pSelf) {
     GBL_API_END();
 }
 
-enum TEST_OBJECT_PROPERTIES {
-    TEST_OBJECT_PROPERTY_FLOATER,
-    TEST_OBJECT_PROPERTY_STRINGER,
-    TEST_OBJECT_PROPERTY_STATICINT32,
-    TEST_OBJECT_PROPERTY_USERDATA,
-    TEST_OBJECT_PROPERTY_COUNT
-};
+GBL_PROPERTIES(TestObject,
+    (floater,     GBL_GENERIC, (READ, WRITE, CONSTRUCT),   GBL_FLOAT_TYPE),
+    (stringer,    GBL_GENERIC, (READ, WRITE, CONSTRUCT),   GBL_STRING_TYPE),
+    (staticInt32, GBL_GENERIC, (READ),                     GBL_INT32_TYPE),
+    (userdata,    GBL_GENERIC, (ALL, CONSTRUCT, OVERRIDE), GBL_POINTER_TYPE)
+)
 
 static GBL_RESULT TestObject_propertyGet(const GblObject* pSelf, GblSize slot, GblVariant* pValue, const GblProperty* pProp) {
     GBL_API_BEGIN(pSelf);
     switch(slot) {
-    case TEST_OBJECT_PROPERTY_FLOATER:
+    case TestObject_Property_Id_floater:
         GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT(pSelf)->floater);
         break;
-    case TEST_OBJECT_PROPERTY_STRINGER:
+    case TestObject_Property_Id_stringer:
         GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT(pSelf)->stringer);
         break;
-    case TEST_OBJECT_PROPERTY_STATICINT32:
+    case TestObject_Property_Id_staticInt32:
         GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT_GET_CLASS(pSelf)->staticInt32);
         break;
-    case TEST_OBJECT_PROPERTY_USERDATA:
+    case TestObject_Property_Id_userdata:
         GblVariant_setValueCopy(pValue, pProp->valueType, GblBox_userdata(GBL_BOX(pSelf)));
         break;
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -120,19 +119,19 @@ static GBL_RESULT TestObject_propertyGet(const GblObject* pSelf, GblSize slot, G
 static GBL_RESULT TestObject_propertySet(GblObject* pSelf, GblSize slot, const GblVariant* pValue, const GblProperty* pProp) {
     GBL_API_BEGIN(pSelf);
     switch(slot) {
-    case TEST_OBJECT_PROPERTY_FLOATER: {
+    case TestObject_Property_Id_floater: {
         float value = NAN;
         GBL_API_CALL(GblVariant_getValueCopy(pValue, &value));
         TEST_OBJECT(pSelf)->floater = value;
         break;
     }
-    case TEST_OBJECT_PROPERTY_STRINGER: {
+    case TestObject_Property_Id_stringer: {
         const char* pStr = NULL;
         GBL_API_CALL(GblVariant_getValuePeek(pValue, &pStr));
         if(pStr) strcpy(TEST_OBJECT(pSelf)->stringer, pStr);
         break;
     }
-    case TEST_OBJECT_PROPERTY_USERDATA: {
+    case TestObject_Property_Id_userdata: {
         void* pUserdata = NULL;
         GBL_API_CALL(GblVariant_getValueCopy(pValue, &pUserdata));
         GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
@@ -149,26 +148,7 @@ static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd, GblCo
     TestObjectClass* pTestClass = TEST_OBJECT_CLASS(pClass);
     GBL_API_BEGIN(pCtx);
     if(GBL_CLASS_TYPEOF(pTestClass) == TEST_OBJECT_TYPE && !GblType_classRefCount(TEST_OBJECT_TYPE)) {
-        gblPropertyTableInsert(GBL_CLASS_TYPEOF(pTestClass),
-                               GblQuark_fromStringStatic("floater"),
-                               TEST_OBJECT_PROPERTY_FLOATER,
-                               GBL_FLOAT_TYPE,
-                               GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT);
-        gblPropertyTableInsert(GBL_CLASS_TYPEOF(pTestClass),
-                               GblQuark_fromStringStatic("stringer"),
-                               TEST_OBJECT_PROPERTY_STRINGER,
-                               GBL_STRING_TYPE,
-                               GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT);
-        gblPropertyTableInsert(GBL_CLASS_TYPEOF(pTestClass),
-                               GblQuark_fromStringStatic("staticInt32"),
-                               TEST_OBJECT_PROPERTY_STATICINT32,
-                               GBL_INT32_TYPE,
-                               GBL_PROPERTY_FLAG_READ);
-        gblPropertyTableInsert(GBL_CLASS_TYPEOF(pTestClass),
-                               GblQuark_fromStringStatic("userdata"),
-                               TEST_OBJECT_PROPERTY_USERDATA,
-                               GBL_POINTER_TYPE,
-                               GBL_PROPERTY_FLAG_CONSTRUCT | GBL_PROPERTY_FLAG_READ | GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_OVERRIDE);
+        GBL_PROPERTIES_REGISTER(TestObject);
     }
     pTestClass->staticInt32 = 77;
     strcpy(pTestClass->string, (const char*)pUd);
@@ -182,7 +162,7 @@ static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd, GblCo
     GBL_API_END();
 }
 
-static GblType TestObject_type(void) {
+GBL_EXPORT GblType TestObject_type(void) {
     static GblType type = GBL_INVALID_TYPE;
     if(type == GBL_INVALID_TYPE) {
         const GblTypeInfo info = {

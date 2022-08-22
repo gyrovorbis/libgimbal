@@ -412,29 +412,6 @@ GBL_EXPORT GBL_RESULT GblProperty_construct(GblProperty* pSelf,
     return result;
 }
 
-GBL_EXPORT const GblProperty* gblPropertyTableInsert(GblType             objectType,
-                                                     GblQuark            name,
-                                                     GblSize             id,
-                                                     GblType             valueType,
-                                                     GblFlags            flags)
-{
-    GblProperty* pProp = NULL;
-
-    GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_));
-
-    pProp = GblProperty_create(GBL_PROPERTY_TYPE,
-                               GblQuark_toString(name),
-                               id,
-                               flags,
-                               1,
-                               valueType);
-
-    GBL_API_VERIFY_CALL(GblProperty_install(objectType, pProp));
-    GBL_API_END_BLOCK();
-    return pProp;
-}
-
-
 static GBL_RESULT GblProperty_initOptionalArgs_(GblProperty* pProp, GblSize argCount, va_list* pList) {
     GBL_UNUSED(pProp, argCount, pList);
     if(!argCount)

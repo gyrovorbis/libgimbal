@@ -50,12 +50,11 @@ typedef struct GblTestSuiteClassVTable {
 } GblTestSuiteClassVTable;
 
 GBL_CLASS_DERIVE(GblTestSuiteClass, GblObjectClass)
-    const GblTestSuiteClassVTable*  pVTable;
-
-    GBL_RESULT                      (*pFnSuiteName) (GBL_CSELF, const char** ppName);
-    GBL_RESULT                      (*pFnCaseCount) (GBL_CSELF, GblSize* pSize);
-    GBL_RESULT                      (*pFnCaseName)  (GBL_CSELF, GblSize index, const char** ppName);
-    GBL_RESULT                      (*pFnCaseRun)   (GBL_SELF, GblContext* pCtx, GblSize index);
+    const GblTestSuiteClassVTable* pVTable;
+    GBL_RESULT  (*pFnSuiteName) (GBL_CSELF, const char** ppName);
+    GBL_RESULT  (*pFnCaseCount) (GBL_CSELF, GblSize* pSize);
+    GBL_RESULT  (*pFnCaseName)  (GBL_CSELF, GblSize index, const char** ppName);
+    GBL_RESULT  (*pFnCaseRun)   (GBL_SELF, GblContext* pCtx, GblSize index);
 GBL_CLASS_END
 
 /*! \brief GblObject representing a collection of unit test cases
@@ -69,63 +68,15 @@ GBL_INSTANCE_DERIVE(GblTestSuite, GblObject, GblTestSuiteClass)
     GblSize         casesSkipped;
 GBL_INSTANCE_END
 
-typedef enum GBL_TEST_SUITE_PROPERTY_ID {
-    GBL_TEST_SUITE_PROPERTY_ID_FIRST        = GblObject_Property_Id_count,
-    GBL_TEST_SUITE_PROPERTY_ID_RESULT       = GBL_TEST_SUITE_PROPERTY_ID_FIRST,
-    GBL_TEST_SUITE_PROPERTY_ID_FAILURE_MSG,
-    GBL_TEST_SUITE_PROPERTY_ID_CASE_COUNT,
-    GBL_TEST_SUITE_PROPERTY_ID_CASES_RUN,
-    GBL_TEST_SUITE_PROPERTY_ID_CASES_PASSED,
-    GBL_TEST_SUITE_PROPERTY_ID_CASES_FAILED,
-    GBL_TEST_SUITE_PROPERTY_ID_CASES_SKIPPED,
-    GBL_TEST_SUITE_PROPERTY_ID_COUNT
-} GBL_TEST_SUITE_PROPERTY_ID;
-
-GBL_PROPERTY_TABLE_BEGIN(GBL_TEST_SUITE)
-    GBL_PROPERTY_ENTRY("result",
-                       "Result Code",
-                       "Result code returned from test suite run",
-                       GBL_TEST_SUITE_PROPERTY_ID_RESULT,
-                       GBL_UINT32_TYPE,
-                       GBL_PROPERTY_FLAGS_MASK(READ, SAVE))
-    GBL_PROPERTY_ENTRY("failureMessage",
-                       "Failure Message",
-                       "Error message returned from failing test cases (if any)",
-                       GBL_TEST_SUITE_PROPERTY_ID_FAILURE_MSG,
-                       GBL_STRING_TYPE,
-                       GBL_PROPERTY_FLAGS_MASK(READ, SAVE))
-    GBL_PROPERTY_ENTRY("caseCount",
-                       "Case Count",
-                       "Number of test cases included within suite",
-                       GBL_TEST_SUITE_PROPERTY_ID_CASE_COUNT,
-                       GBL_UINT32_TYPE,
-                       GBL_PROPERTY_FLAGS_MASK(READ, SAVE))
-    GBL_PROPERTY_ENTRY("casesRun",
-                       "Cases Run",
-                       "Total number of cases that have run",
-                       GBL_TEST_SUITE_PROPERTY_ID_CASES_RUN,
-                       GBL_UINT32_TYPE,
-                       GBL_PROPERTY_FLAGS_MASK(READ, SAVE))
-    GBL_PROPERTY_ENTRY("casesPassed",
-                       "Cases Passed",
-                       "Number of test cases that passed",
-                       GBL_TEST_SUITE_PROPERTY_ID_CASES_PASSED,
-                       GBL_UINT32_TYPE,
-                       GBL_PROPERTY_FLAGS_MASK(READ, SAVE))
-    GBL_PROPERTY_ENTRY("casesFailed",
-                       "Cases Failed",
-                       "Number of test cases that failed",
-                       GBL_TEST_SUITE_PROPERTY_ID_CASES_FAILED,
-                       GBL_UINT32_TYPE,
-                       GBL_PROPERTY_FLAGS_MASK(READ, SAVE))
-    GBL_PROPERTY_ENTRY("casesSkipped",
-                       "Cases Skipped",
-                       "Number of test cases that were skipped",
-                       GBL_TEST_SUITE_PROPERTY_ID_CASES_SKIPPED,
-                       GBL_UINT32_TYPE,
-                       GBL_PROPERTY_FLAGS_MASK(READ, SAVE))
-GBL_PROPERTY_TABLE_END()
-
+GBL_PROPERTIES(GblTestSuite,
+    (runResult,      GBL_GENERIC, (READ, SAVE), GBL_UINT32_TYPE),
+    (failureMessage, GBL_GENERIC, (READ, SAVE), GBL_STRING_TYPE),
+    (caseCount,      GBL_GENERIC, (READ, SAVE), GBL_UINT32_TYPE),
+    (casesRun,       GBL_GENERIC, (READ, SAVE), GBL_UINT32_TYPE),
+    (casesPassed,    GBL_GENERIC, (READ, SAVE), GBL_UINT32_TYPE),
+    (casesFailed,    GBL_GENERIC, (READ, SAVE), GBL_UINT32_TYPE),
+    (casesSkipped,   GBL_GENERIC, (READ, SAVE), GBL_UINT32_TYPE)
+)
 
 GBL_EXPORT GblType          GblTestSuite_type               (void)                                      GBL_NOEXCEPT;
 

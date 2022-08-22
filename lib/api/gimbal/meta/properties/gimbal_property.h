@@ -117,6 +117,16 @@ GBL_EXPORT GBL_RESULT   GblProperty_defaultValue (GBL_CSELF, GblVariant* pValue)
 GBL_EXPORT GblBool      GblProperty_checkValue   (GBL_CSELF, const GblVariant* pValue) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblProperty_validateValue(GBL_CSELF, GblVariant* pValue)       GBL_NOEXCEPT;
 
+
+
+
+
+
+
+
+
+
+
 // ===== IMPL =====
 
 GBL_INLINE const char* GblProperty_nameString(GBL_CSELF) GBL_NOEXCEPT {
@@ -126,6 +136,8 @@ GBL_INLINE const char* GblProperty_nameString(GBL_CSELF) GBL_NOEXCEPT {
 GBL_INLINE GblType GblProperty_objectType(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf? GBL_PRIV_REF(pSelf).objectType : GBL_INVALID_TYPE;
 }
+
+/// \cond
 
 #define GBL_PROPERTIES_(object, ...)                        \
     GBL_PROPERTIES_IDS_(object, __VA_ARGS__)                \
@@ -238,85 +250,6 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
         return pProp? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR_INVALID_POINTER;
     }
 }
-
-
-
-#if 0
-#define GBL_STRING_PROPERTY_TYPE GBL_PROPERTY_TYPE
-#define GBL_UINT_PROPERTY_TYPE GBL_PROPERTY_TYPE
-GBL_PROPERTIES(GblProperty,
-    (prefix,      GBL_STRING, (READ, WRITE, LOAD, SAVE, CONSTRUCT)),
-    (version,     GBL_UINT,   (READ, WRITE, LOAD, SAVE, CONSTRUCT)),
-    (author,      GBL_STRING, (READ, WRITE, LOAD, SAVE), "Unknown"),
-    (description, GBL_STRING, (READ, WRITE, LOAD, SAVE), "None"),
-    (typeCount,   GBL_UINT,   (READ), GBL_UINT16_TYPE)
-)
-#endif
-
-
-/// \cond
-
-#define GBL_PROPERTY_IDGEN(prefix, name) \
-    prefix##_PROPERTY_ID_##name
-
-#define GBL_PROPERTY_TABLE_BEGIN(prefix)                    \
-    GBL_INLINE void prefix##_PROPERTY_TABLE(GblSize index,  \
-        GblPropertyInfo* pInfo) {                           \
-            switch(index) {
-
-#define GBL_PROPERTY_ENTRY(name_, nick_, desc_, id_, type_, flags_) \
-    case id_:                                   \
-        pInfo->pName        = name_;            \
-        pInfo->pNick        = nick_;            \
-        pInfo->pDesc        = desc_;            \
-        pInfo->id           = id_;              \
-        pInfo->valueType    = type_;            \
-        pInfo->flags        = flags_;           \
-    break;
-
-#define GBL_PROPERTY_FLAGY_(suffix)              \
-    GBL_PROPERTY_FLAG_##suffix |
-
-#define GBL_PROPERTY_FLAGS_MASK(...)            \
-    GBL_MAP(GBL_PROPERTY_FLAGY_, __VA_ARGS__)0
-
-#define GBL_PROPERTY_TABLE_END()                \
-    default: memset(pInfo, 0, sizeof(GblPropertyInfo)); }}
-
-#define GBL_PROPERTY_TABLE_REGISTER(prefix, klass)                          \
-    GBL_STMT_START {                                                        \
-        for(GblSize id = GBL_PROPERTY_IDGEN(prefix, FIRST);                   \
-            id < GBL_PROPERTY_IDGEN(prefix, COUNT); ++id) {                   \
-            GblPropertyInfo info;                                           \
-            info.objectType = prefix##_TYPE;                                \
-            prefix##_PROPERTY_TABLE(id, &info);                             \
-            gblPropertyTableInsert(GBL_CLASS_TYPEOF(klass),                 \
-                                   GblQuark_fromString(info.pName),         \
-                                   id,                                      \
-                                   info.valueType,                          \
-                                   info.flags);                             \
-        }                                                                   \
-    } GBL_STMT_END
-
-
-typedef struct GblPropertyInfo {
-    GblType     objectType;
-    const char* pName;
-    const char* pNick;
-    const char* pDesc;
-    GblType     valueType;
-    GblSize     id;
-    GblFlags    flags;
-} GblPropertyInfo;
-
-
-
-GBL_EXPORT const GblProperty* gblPropertyTableInsert        (GblType             objectType,
-                                                             GblQuark            pName,
-                                                             GblSize             id,
-                                                             GblType             valueType,
-                                                             GblFlags            flags)             GBL_NOEXCEPT;
-
 
 /// \endcond
 

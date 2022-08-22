@@ -25,44 +25,22 @@
 
 GBL_DECLS_BEGIN
 
-typedef struct GblContextClass {
-    GblObjectClass      base;
-    GblIAllocatorIFace  iAllocatorIFace;
-    GblILoggerIFace     iLoggerIFace;
-} GblContextClass;
+GBL_CLASS_DERIVE_EMPTY(GblContextClass,
+                       GblObjectClass, GblIAllocatorIFace, GblILoggerIFace);
 
-typedef struct GblContext {
-    union {
-        GblContextClass*    pClass;
-        GblObject           base;
-    };
+GBL_INSTANCE_DERIVE(GblContext, GblObject)
     GblCallRecord           lastIssue;
     uint32_t                logStackDepth;
     GblFlags                logFilter;
-} GblContext;
+GBL_INSTANCE_END
 
-GBL_DECLARE_ENUM(GBL_CONTEXT_PROPERTY_ID) {
-    GBL_CONTEXT_PROPERTY_ID_FIRST               = GblObject_Property_Id_count,
-    GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_RESULT   = GBL_CONTEXT_PROPERTY_ID_FIRST,
-    GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_MESSSAGE,
-    GBL_CONTEXT_PROPERTY_ID_COUNT
-};
 
-GBL_PROPERTY_TABLE_BEGIN(GBL_CONTEXT)
-    GBL_PROPERTY_ENTRY("result",
-                       "Result Code",
-                       "Encoded result value for last issue",
-                       GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_RESULT,
-                       GBL_UINT32_TYPE,
-                       GBL_PROPERTY_FLAGS_MASK(READ))
-    GBL_PROPERTY_ENTRY("message",
-                       "Message",
-                       "String message describing last issue",
-                       GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_MESSSAGE,
-                       GBL_POINTER_TYPE,
-                       GBL_PROPERTY_FLAGS_MASK(READ))
-GBL_PROPERTY_TABLE_END()
+GBL_PROPERTIES(GblContext,
+    (result,  GBL_GENERIC, (READ), GBL_UINT32_TYPE),
+    (message, GBL_GENERIC, (READ), GBL_POINTER_TYPE)
+)
 
+GBL_EXPORT GblType      GblContext_type             (void)                                      GBL_NOEXCEPT;
 
 GBL_EXPORT const GblCallRecord*
                         GblContext_lastIssue        (GBL_CSELF)                                 GBL_NOEXCEPT;
