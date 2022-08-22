@@ -91,7 +91,7 @@ build dreamcast:
       - source /opt/toolchains/dc/environ.sh
       - env
       - cmake ../ -DGBL_ENABLE_TESTS=ON -DCMAKE_TOOLCHAIN_FILE=../util/build-environment/toolchains/dreamcast.toolchain.cmake 
-      - cmake --build . --target all
+      - cmake --build . --target all -- -j8
 
 build psvita:
   stage: build
@@ -108,7 +108,7 @@ build psvita:
       - cd build 
       - env
       - cmake ../ -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake 
-      - cmake --build . --target all
+      - cmake --build . --target all -- -j8
 
 build android-sim:
   stage: build
@@ -125,7 +125,7 @@ build android-sim:
       - cd build 
       - env
       - /home/falco/Qt/6.3.1/android_x86_64/bin/qt-cmake -DCMAKE_TOOLCHAIN_FILE=/home/falco/Documents/dev/android-ndk-r23c/build/cmake/android.toolchain.cmake -S ../ -B .
-      - cmake --build . --target all
+      - cmake --build . --target all -- -j8
 
 build macos-clang13:
   extends: .build_common
@@ -197,6 +197,7 @@ build wasm:
 
 analyze clang-tidy:
   stage: analyze
+  when: manual
   extends: .clang_tidy_common
   needs: ["build ubuntu20-clang11"]
   dependencies:
@@ -206,6 +207,7 @@ analyze clang-tidy:
 
 
 .scan_build_common:
+  when: manual
   extends: .build_linux_clang
   stage: analyze
   dependencies: []
