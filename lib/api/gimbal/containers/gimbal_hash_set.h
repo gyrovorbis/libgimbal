@@ -9,17 +9,17 @@
 #include "../core/gimbal_typedefs.h"
 #include "../core/gimbal_api_frame.h"
 
-#define SELF    GblHashSet*         pSelf
-#define CSELF   const GblHashSet*   pSelf
+#define GBL_SELF    GblHashSet*         pSelf
+#define GBL_CSELF   const GblHashSet*   pSelf
 
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblHashSet);
 
-typedef GblHash       (*GblHashSetHashFn)(CSELF, const void*);              ///< User-defined hasher function, hashing two entries
-typedef GblBool       (*GblHashSetCmpFn) (CSELF, const void*, const void*); ///< User-defined comparator function, comparing two entries
-typedef void          (*GblHashSetDtorFn)(CSELF, void*);                    ///< User-defined destructor function, destroying an entry
-typedef GblBool       (*GblHashSetIterFn)(CSELF, void*, void*);             ///< User-defined iterator function for traversal
+typedef GblHash       (*GblHashSetHashFn)(GBL_CSELF, const void*);              ///< User-defined hasher function, hashing two entries
+typedef GblBool       (*GblHashSetCmpFn) (GBL_CSELF, const void*, const void*); ///< User-defined comparator function, comparing two entries
+typedef void          (*GblHashSetDtorFn)(GBL_CSELF, void*);                    ///< User-defined destructor function, destroying an entry
+typedef GblBool       (*GblHashSetIterFn)(GBL_CSELF, void*, void*);             ///< User-defined iterator function for traversal
 
 /*! \brief Hash-table based abstract associative container with C++-style STL std::unoredered_set API
  *  \details
@@ -62,7 +62,7 @@ typedef struct GblHashSetIter {
     GBL_PRIVATE_END
 } GblHashSetIter;
 
-GBL_EXPORT GBL_RESULT        GblHashSet_construct_8   (SELF,
+GBL_EXPORT GBL_RESULT        GblHashSet_construct_8   (GBL_SELF,
                                                        GblSize            entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare,
@@ -70,71 +70,71 @@ GBL_EXPORT GBL_RESULT        GblHashSet_construct_8   (SELF,
                                                        GblSize            capacity,
                                                        GblContext*        pCtx,
                                                        void*              pUserdata)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT        GblHashSet_construct_7   (SELF,
+GBL_EXPORT GBL_RESULT        GblHashSet_construct_7   (GBL_SELF,
                                                        GblSize            entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare,
                                                        GblHashSetDtorFn   pFnDestruct,
                                                        GblSize            capacity,
                                                        GblContext*        pCtx)         GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT        GblHashSet_construct_6   (SELF,
+GBL_EXPORT GBL_RESULT        GblHashSet_construct_6   (GBL_SELF,
                                                        GblSize            entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare,
                                                        GblHashSetDtorFn   pFnDestruct,
                                                        GblSize            capacity)     GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT        GblHashSet_construct_5   (SELF,
+GBL_EXPORT GBL_RESULT        GblHashSet_construct_5   (GBL_SELF,
                                                        GblSize            entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare,
                                                        GblHashSetDtorFn   pFnDestruct)  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT        GblHashSet_construct_4   (SELF,
+GBL_EXPORT GBL_RESULT        GblHashSet_construct_4   (GBL_SELF,
                                                        GblSize            entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare)   GBL_NOEXCEPT;
 #define                      GblHashSet_construct(...) \
       GBL_VA_OVERLOAD_SELECT(GblHashSet_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 
-GBL_EXPORT GBL_RESULT        GblHashSet_clone         (SELF, const GblHashSet* pRhs,
+GBL_EXPORT GBL_RESULT        GblHashSet_clone         (GBL_SELF, const GblHashSet* pRhs,
                                                        GblContext* hCtx)                GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblHashSet_constructMove (SELF, GblHashSet* pRhs,
+GBL_EXPORT GBL_RESULT        GblHashSet_constructMove (GBL_SELF, GblHashSet* pRhs,
                                                        GblContext* hCtx)                GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblHashSet_constructClone(SELF, GblHashSet* pRhs)          GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT        GblHashSet_assignMove    (SELF, GblHashSet* pRhs)          GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT        GblHashSet_destruct      (SELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT        GblHashSet_constructClone(GBL_SELF, GblHashSet* pRhs)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT        GblHashSet_assignMove    (GBL_SELF, GblHashSet* pRhs)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT        GblHashSet_destruct      (GBL_SELF)                        GBL_NOEXCEPT;
 
-GBL_INLINE GblSize           GblHashSet_size          (CSELF)                           GBL_NOEXCEPT;
-GBL_INLINE GblSize           GblHashSet_bucketCount   (CSELF)                           GBL_NOEXCEPT;
-GBL_INLINE GblSize           GblHashSet_bucketSize    (CSELF)                           GBL_NOEXCEPT;
-GBL_INLINE GblContext*       GblHashSet_context       (CSELF)                           GBL_NOEXCEPT;
-GBL_INLINE GblBool           GblHashSet_empty         (CSELF)                           GBL_NOEXCEPT;
-GBL_INLINE void*             GblHashSet_userdata      (CSELF)                           GBL_NOEXCEPT;
+GBL_INLINE GblSize           GblHashSet_size          (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_INLINE GblSize           GblHashSet_bucketCount   (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_INLINE GblSize           GblHashSet_bucketSize    (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_INLINE GblContext*       GblHashSet_context       (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_INLINE GblBool           GblHashSet_empty         (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_INLINE void*             GblHashSet_userdata      (GBL_CSELF)                       GBL_NOEXCEPT;
 
-GBL_INLINE void*             GblHashSet_get           (CSELF, const void* pKey)         GBL_NOEXCEPT; //raw get, no error
-GBL_INLINE void*             GblHashSet_at            (CSELF, const void* pKey)         GBL_NOEXCEPT; //throws range error
-GBL_INLINE GblBool           GblHashSet_contains      (CSELF, const void* pKey)         GBL_NOEXCEPT; //true if entry exists
-GBL_INLINE GblSize           GblHashSet_count         (CSELF, const void* pKey)         GBL_NOEXCEPT; //# of matching entries (0 or 1)
-GBL_INLINE GblHashSetIter    GblHashSet_find          (CSELF, const void* pKey)         GBL_NOEXCEPT;
+GBL_INLINE void*             GblHashSet_get           (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT; //raw get, no error
+GBL_INLINE void*             GblHashSet_at            (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT; //throws range error
+GBL_INLINE GblBool           GblHashSet_contains      (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT; //true if entry exists
+GBL_INLINE GblSize           GblHashSet_count         (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT; //# of matching entries (0 or 1)
+GBL_INLINE GblHashSetIter    GblHashSet_find          (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT;
 
-GBL_EXPORT void*             GblHashSet_set           (SELF, const void* pEntry)        GBL_NOEXCEPT; //raw set, returns existing item w/o deleting
-GBL_INLINE GblBool           GblHashSet_insert        (SELF, const void* pEntry)        GBL_NOEXCEPT; //throws duplicate error
-GBL_INLINE void              GblHashSet_insertOrAssign(SELF, const void* pEntry)        GBL_NOEXCEPT; //deletes any overwritten value
-GBL_EXPORT void*             GblHashSet_emplace       (SELF, const void* pKey)          GBL_NOEXCEPT; //throws duplicate error
-GBL_INLINE void*             GblHashSet_tryEmplace    (SELF, const void* pKey)          GBL_NOEXCEPT; //gracefully returns NULL if already exists
+GBL_EXPORT void*             GblHashSet_set           (GBL_SELF, const void* pEntry)    GBL_NOEXCEPT; //raw set, returns existing item w/o deleting
+GBL_INLINE GblBool           GblHashSet_insert        (GBL_SELF, const void* pEntry)    GBL_NOEXCEPT; //throws duplicate error
+GBL_INLINE void              GblHashSet_insertOrAssign(GBL_SELF, const void* pEntry)    GBL_NOEXCEPT; //deletes any overwritten value
+GBL_EXPORT void*             GblHashSet_emplace       (GBL_SELF, const void* pKey)      GBL_NOEXCEPT; //throws duplicate error
+GBL_INLINE void*             GblHashSet_tryEmplace    (GBL_SELF, const void* pKey)      GBL_NOEXCEPT; //gracefully returns NULL if already exists
 
-GBL_EXPORT GblBool           GblHashSet_erase         (SELF, const void* pKey)          GBL_NOEXCEPT; //deletes entry, not found is fine
-GBL_EXPORT void*             GblHashSet_extract       (SELF, const void* pKey)          GBL_NOEXCEPT; //removes entry, no deletion, not found is fine
-GBL_EXPORT void              GblHashSet_clear         (SELF)                            GBL_NOEXCEPT; //deletes entries
+GBL_EXPORT GblBool           GblHashSet_erase         (GBL_SELF, const void* pKey)      GBL_NOEXCEPT; //deletes entry, not found is fine
+GBL_EXPORT void*             GblHashSet_extract       (GBL_SELF, const void* pKey)      GBL_NOEXCEPT; //removes entry, no deletion, not found is fine
+GBL_EXPORT void              GblHashSet_clear         (GBL_SELF)                        GBL_NOEXCEPT; //deletes entries
 
-GBL_EXPORT GBL_RESULT        GblHashSet_shrinkToFit   (SELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT        GblHashSet_shrinkToFit   (GBL_SELF)                        GBL_NOEXCEPT;
 
-GBL_EXPORT void*             GblHashSet_probe         (CSELF, GblSize position)         GBL_NOEXCEPT; //returns entry at slot or NULL, sparse
-GBL_EXPORT GblBool           GblHashSet_foreach       (CSELF, GblHashSetIterFn iter,              //iterates over every non-null position
+GBL_EXPORT void*             GblHashSet_probe         (GBL_CSELF, GblSize position)     GBL_NOEXCEPT; //returns entry at slot or NULL, sparse
+GBL_EXPORT GblBool           GblHashSet_foreach       (GBL_CSELF, GblHashSetIterFn iter,              //iterates over every non-null position
                                                        void* pUdata)                    GBL_NOEXCEPT;
 
-GBL_EXPORT GblHashSetIter    GblHashSet_next          (CSELF,
+GBL_EXPORT GblHashSetIter    GblHashSet_next          (GBL_CSELF,
                                                        const GblHashSetIter* pPrev)     GBL_NOEXCEPT; //[Lua-style] Returns iterator after given
 GBL_EXPORT const GblHashSet* GblHashSetIter_container (const GblHashSetIter* pSelf)     GBL_NOEXCEPT;
 GBL_EXPORT GblBool           GblHashSetIter_valid     (const GblHashSetIter* pSelf)     GBL_NOEXCEPT;
@@ -307,7 +307,7 @@ GBL_INLINE void* GblHashSet_tryEmplace(GblHashSet* pSet, const void* pKey) GBL_N
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_HASHSET_H

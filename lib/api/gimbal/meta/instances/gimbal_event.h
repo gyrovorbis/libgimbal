@@ -18,8 +18,8 @@
 #define GBL_EVENT_CLASS_CHECK(klass)    (GBL_CLASS_CHECK_PREFIX    (klass,     GBL_EVENT))
 #define GBL_EVENT_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS_PREFIX (instance,  GBL_EVENT))
 
-#define SELF    GblEvent* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblEvent* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -41,14 +41,14 @@ GBL_INSTANCE_END
  *
  */
 
-GBL_EXPORT GblType          GblEvent_type       (void)                  GBL_NOEXCEPT;
-GBL_INLINE GblEvent*        GblEvent_create     (GblType type)          GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblEvent_construct  (SELF, GblType type)    GBL_NOEXCEPT;
-GBL_INLINE GblRefCount      GblEvent_destruct   (SELF)                  GBL_NOEXCEPT;
-GBL_INLINE GblRefCount      GblEvent_destroy    (SELF)                  GBL_NOEXCEPT;
-GBL_INLINE GblType          GblEvent_typeOf     (CSELF)                 GBL_NOEXCEPT;
-GBL_INLINE GBL_EVENT_STATE  GblEvent_state      (CSELF)                 GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblEvent_accept     (SELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblType          GblEvent_type       (void)                      GBL_NOEXCEPT;
+GBL_INLINE GblEvent*        GblEvent_create     (GblType type)              GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblEvent_construct  (GBL_SELF, GblType type)    GBL_NOEXCEPT;
+GBL_INLINE GblRefCount      GblEvent_destruct   (GBL_SELF)                  GBL_NOEXCEPT;
+GBL_INLINE GblRefCount      GblEvent_destroy    (GBL_SELF)                  GBL_NOEXCEPT;
+GBL_INLINE GblType          GblEvent_typeOf     (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GBL_EVENT_STATE  GblEvent_state      (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblEvent_accept     (GBL_SELF)                  GBL_NOEXCEPT;
 
 
 // ========== IMPL ===========
@@ -59,29 +59,29 @@ GBL_INLINE GblEvent* GblEvent_create(GblType type) GBL_NOEXCEPT {
                 NULL;
 }
 
-GBL_INLINE GBL_RESULT GblEvent_construct(SELF, GblType type) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblEvent_construct(GBL_SELF, GblType type) GBL_NOEXCEPT {
     return GblType_check(type, GBL_EVENT_TYPE)?
                 GblInstance_construct(GBL_INSTANCE(pSelf), type) :
                 GBL_RESULT_ERROR_INVALID_TYPE;
 }
 
-GBL_INLINE GblRefCount GblEvent_destruct(SELF) GBL_NOEXCEPT {
+GBL_INLINE GblRefCount GblEvent_destruct(GBL_SELF) GBL_NOEXCEPT {
     return GblInstance_destruct(GBL_INSTANCE(pSelf));
 }
 
-GBL_INLINE GblRefCount GblEvent_destroy(SELF) GBL_NOEXCEPT {
+GBL_INLINE GblRefCount GblEvent_destroy(GBL_SELF) GBL_NOEXCEPT {
     return GblInstance_destroy(GBL_INSTANCE(pSelf));
 }
 
-GBL_INLINE GblType GblEvent_typeOf(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblType GblEvent_typeOf(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_INSTANCE_TYPEOF(pSelf);
 }
 
-GBL_INLINE GBL_EVENT_STATE GblEvent_state(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GBL_EVENT_STATE GblEvent_state(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->state;
 }
 
-GBL_INLINE GBL_RESULT GblEvent_accept(SELF) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblEvent_accept(GBL_SELF) GBL_NOEXCEPT {
     if(pSelf->state != GBL_EVENT_STATE_PENDING) {
         return GBL_RESULT_ERROR_INVALID_ARG;
     }
@@ -91,8 +91,8 @@ GBL_INLINE GBL_RESULT GblEvent_accept(SELF) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 
 #endif // GIMBAL_EVENT_H

@@ -14,8 +14,8 @@
 #define GBL_INTERFACE_OUTER_CLASS(iface)        (GblInterface_outerClass(GBL_INTERFACE(iface)))
 #define GBL_INTERFACE_OUTER_MOST_CLASS(iface)   (GblInterface_outerMostClass(GBL_INTERFACE(iface)))
 
-#define SELF    GblInterface* pSelf
-#define CSELF   const GblInterface* pSelf
+#define GBL_SELF    GblInterface* pSelf
+#define GBL_CSELF   const GblInterface* pSelf
 
 GBL_DECLS_BEGIN
 
@@ -25,8 +25,8 @@ typedef struct GblInterface {
     int16_t     outerClassOffset_;  ///< offset from the interface to the class containing it (private, managed by internals)
 } GblInterface;
 
-GBL_EXPORT GblClass*     GblInterface_outerClass        (SELF)              GBL_NOEXCEPT;
-GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_NOEXCEPT;
+GBL_EXPORT GblClass*     GblInterface_outerClass        (GBL_SELF)  GBL_NOEXCEPT;
+GBL_EXPORT GblClass*     GblInterface_outerMostClass    (GBL_SELF)  GBL_NOEXCEPT;
 
 /*! \def GBL_INTERFACE_TYPE
  *  Builtin type ID associated with GblInterface
@@ -435,7 +435,7 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (SELF)              GBL_
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_INTERFACE_H

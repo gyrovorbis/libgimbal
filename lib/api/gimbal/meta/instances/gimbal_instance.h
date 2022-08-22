@@ -37,8 +37,8 @@
 #define GBL_INSTANCE_VCALL_DEFAULT(type, classType, method, ...)GBL_INSTANCE_VCALL_(GBL_CLASS_DEFAULT, type, classType, method, __VA_ARGS__)
 #define GBL_INSTANCE_VCALL_DEFAULT_PREFIX(prefix, method, ...)  GBL_INSTANCE_VCALL_DEFAULT(prefix##_TYPE, prefix##_CLASS_STRUCT, method, __VA_ARGS__)
 
-#define SELF    GblInstance*       pSelf
-#define CSELF   const GblInstance* pSelf
+#define GBL_SELF    GblInstance*       pSelf
+#define GBL_CSELF   const GblInstance* pSelf
 
 GBL_DECLS_BEGIN
 
@@ -58,31 +58,31 @@ typedef struct GblInstance {
     GblClass*   pClass_; ///< Pointer to Instance's Class, do not modify directly
 } GblInstance;
 
-GBL_EXPORT GblInstance* GblInstance_create              (GblType type)              GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_createWithClass     (GblClass* pClass)          GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblInstance_destroy             (SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblInstance* GblInstance_create              (GblType type)               GBL_NOEXCEPT;
+GBL_EXPORT GblInstance* GblInstance_createWithClass     (GblClass* pClass)           GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblInstance_destroy             (GBL_SELF)                   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblInstance_construct           (SELF, GblType type)        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_constructWithClass  (SELF, GblClass* pClass)    GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblInstance_destruct            (SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_construct           (GBL_SELF, GblType type)     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_constructWithClass  (GBL_SELF, GblClass* pClass) GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblInstance_destruct            (GBL_SELF)                   GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool      GblInstance_check               (CSELF, GblType toType)     GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_cast                (SELF, GblType toType)      GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_try                 (SELF, GblType toType)      GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblInstance_check               (GBL_CSELF, GblType toType)  GBL_NOEXCEPT;
+GBL_EXPORT GblInstance* GblInstance_cast                (GBL_SELF, GblType toType)   GBL_NOEXCEPT;
+GBL_EXPORT GblInstance* GblInstance_try                 (GBL_SELF, GblType toType)   GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblInstance_private             (CSELF, GblType base)       GBL_NOEXCEPT;
+GBL_EXPORT void*        GblInstance_private             (GBL_CSELF, GblType base)    GBL_NOEXCEPT;
 GBL_EXPORT GblInstance* GblInstance_public              (const void* pPrivate,
-                                                         GblType     base)          GBL_NOEXCEPT;
+                                                         GblType     base)           GBL_NOEXCEPT;
 
-GBL_EXPORT GblType      GblInstance_typeOf              (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblInstance_size                (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblInstance_privateSize         (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblInstance_totalSize           (CSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblType      GblInstance_typeOf              (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblInstance_size                (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblInstance_privateSize         (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblInstance_totalSize           (GBL_CSELF)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblClass*    GblInstance_class               (CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_swizzleClass        (SELF, GblClass* pClass)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_sinkClass           (SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_floatClass          (SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblClass*    GblInstance_class               (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_swizzleClass        (GBL_SELF, GblClass* pClass) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_sinkClass           (GBL_SELF)                   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_floatClass          (GBL_SELF)                   GBL_NOEXCEPT;
 
 // ========== IMPL ==========
 
@@ -285,8 +285,8 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass          (SELF)                  
 
 GBL_DECLS_END
 
-#undef SELF
-#undef CSELF
+#undef GBL_SELF
+#undef GBL_CSELF
 
 
 #endif // GIMBAL_INSTANCE_H

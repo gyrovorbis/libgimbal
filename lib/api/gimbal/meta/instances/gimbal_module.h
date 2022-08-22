@@ -26,8 +26,8 @@
 #define GBL_MODULE_GET_CLASS(instance)  GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_MODULE)
 #define GBL_MODULE_TRY_CLASS(instance)  GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_MODULE)
 
-#define SELF    GblModule* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblModule* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -35,8 +35,8 @@ GBL_FORWARD_DECLARE_STRUCT(GblModule);
 
 GBL_CLASS_DERIVE(GblModuleClass, GblContextClass)
     GblIPluginIFace     iPluginIFace;
-    GBL_RESULT          (*pFnLoad)  (SELF);
-    GBL_RESULT          (*pFnUnload)(SELF);
+    GBL_RESULT          (*pFnLoad)  (GBL_SELF);
+    GBL_RESULT          (*pFnUnload)(GBL_SELF);
 GBL_CLASS_END
 
 GBL_INSTANCE_DERIVE(GblModule, GblContext, GblModuleClass)
@@ -88,35 +88,35 @@ GBL_PROPERTY_TABLE_BEGIN(GBL_MODULE)
                        GBL_PROPERTY_FLAGS_MASK(READ))
 GBL_PROPERTY_TABLE_END()
 
-GblType     GblModule_type          (void)                      GBL_NOEXCEPT;
+GblType     GblModule_type          (void)                          GBL_NOEXCEPT;
 
 GblModule*  GblModule_create(const char* pName,
                              GblVersion version,
                              const char* pDescription,
-                             const char* pPrefix)               GBL_NOEXCEPT;
+                             const char* pPrefix)                   GBL_NOEXCEPT;
 
 
-GblType     GblModule_registerType(SELF,
+GblType     GblModule_registerType(GBL_SELF,
                                    GblType              parent,
                                    const char*          pName,
                                    const GblTypeInfo*   pInfo,
-                                   GblFlags             flags)  GBL_NOEXCEPT;
+                                   GblFlags             flags)      GBL_NOEXCEPT;
 
-GblType     GblModule_typeFromName  (CSELF, const char* pName)  GBL_NOEXCEPT;
-GblType     GblModule_typeFromIndex (CSELF, GblSize     index)  GBL_NOEXCEPT;
-GblSize     GblModule_typeCount     (CSELF)                     GBL_NOEXCEPT;
+GblType     GblModule_typeFromName  (GBL_CSELF, const char* pName)  GBL_NOEXCEPT;
+GblType     GblModule_typeFromIndex (GBL_CSELF, GblSize     index)  GBL_NOEXCEPT;
+GblSize     GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT;
 
-GblBool     GblModule_isLoaded      (CSELF)                     GBL_NOEXCEPT;
+GblBool     GblModule_isLoaded      (GBL_CSELF)                     GBL_NOEXCEPT;
 
-GBL_RESULT  GblModule_use           (SELF)                      GBL_NOEXCEPT;
-GBL_RESULT  GblModule_unuse         (SELF)                      GBL_NOEXCEPT;
-GblSize     GblModule_useCount      (CSELF)                     GBL_NOEXCEPT;
+GBL_RESULT  GblModule_use           (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_RESULT  GblModule_unuse         (GBL_SELF)                      GBL_NOEXCEPT;
+GblSize     GblModule_useCount      (GBL_CSELF)                     GBL_NOEXCEPT;
 
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 
 

@@ -21,18 +21,18 @@
 #define GBL_IPLUGIN_GET_IFACE(instance)     GBL_INSTANCE_GET_CLASS_PREFIX  (instance,  GBL_IPLUGIN)
 #define GBL_IPLUGIN_TRY_IFACE(instance)     GBL_INSTANCE_TRY_CLASS_PREFIX   (instance,  GBL_IPLUGIN)
 
-#define SELF    GblIPlugin* pSelf
-#define CSELF   const GblIPlugin* pSelf
+#define GBL_SELF    GblIPlugin* pSelf
+#define GBL_CSELF   const GblIPlugin* pSelf
 
 GBL_DECLS_BEGIN
 
 GBL_INTERFACE_DERIVE(GblIPlugin)
-    GBL_RESULT (*pFnUse)            (SELF);
-    GBL_RESULT (*pFnUnuse)          (SELF);
-    GBL_RESULT (*pFnTypeInfo)       (CSELF,
+    GBL_RESULT (*pFnUse)            (GBL_SELF);
+    GBL_RESULT (*pFnUnuse)          (GBL_SELF);
+    GBL_RESULT (*pFnTypeInfo)       (GBL_CSELF,
                                      GblType        dynamicType,
                                      GblTypeInfo*   pCompleteInfo);
-    GBL_RESULT (*pFnInterfacePeek)  (CSELF,
+    GBL_RESULT (*pFnInterfacePeek)  (GBL_CSELF,
                                      GblType        dynamicType,
                                      GblType        ifaceType,
                                      GblInterface** ppInterface);
@@ -40,17 +40,17 @@ GBL_INTERFACE_END
 
 GBL_EXPORT GblType    GblIPlugin_type        (void)                 GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT GblIPlugin_use         (SELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT GblIPlugin_unuse       (SELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo    (CSELF,
+GBL_EXPORT GBL_RESULT GblIPlugin_use         (GBL_SELF)             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIPlugin_unuse       (GBL_SELF)             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo    (GBL_CSELF,
                                               GblType       type,
                                               GblTypeInfo*  pInfo)  GBL_NOEXCEPT;
 
 
 GBL_DECLS_END
 
-#undef SELF
-#undef CSELF
+#undef GBL_SELF
+#undef GBL_CSELF
 
 
 #endif // GIMBAL_PLUGIN_H

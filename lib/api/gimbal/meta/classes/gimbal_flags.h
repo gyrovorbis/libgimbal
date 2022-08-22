@@ -25,8 +25,8 @@
 #define GBL_FLAGS_ENTRY(flagsValue, nick)   { flagsValue, #flagsValue, nick }
 #define GBL_FLAGS_ENTRY_LAST()              { 0, NULL, NULL }
 
-#define SELF    GblFlagsClass* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblFlagsClass* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -43,26 +43,26 @@ GBL_CLASS_END
 
 // ========== GblFlagsClass ==========
 
-GBL_INLINE const char*  GblFlagsClass_nameFromIndex     (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_INLINE const char*  GblFlagsClass_nameFromValue     (CSELF, GblFlags value)             GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblFlagsClass_nameQuarkFromIndex(CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblFlagsClass_nameQuarkFromValue(CSELF, GblFlags value)             GBL_NOEXCEPT;
+GBL_INLINE const char*  GblFlagsClass_nameFromIndex     (GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
+GBL_INLINE const char*  GblFlagsClass_nameFromValue     (GBL_CSELF, GblFlags value)         GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblFlagsClass_nameQuarkFromIndex(GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblFlagsClass_nameQuarkFromValue(GBL_CSELF, GblFlags value)         GBL_NOEXCEPT;
 
-GBL_INLINE const char*  GblFlagsClass_nickFromIndex     (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_INLINE const char*  GblFlagsClass_nickFromValue     (CSELF, GblFlags value)             GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblFlagsClass_nickQuarkFromIndex(CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblFlagsClass_nickQuarkFromValue(CSELF, GblFlags value)             GBL_NOEXCEPT;
+GBL_INLINE const char*  GblFlagsClass_nickFromIndex     (GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
+GBL_INLINE const char*  GblFlagsClass_nickFromValue     (GBL_CSELF, GblFlags value)         GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblFlagsClass_nickQuarkFromIndex(GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblFlagsClass_nickQuarkFromValue(GBL_CSELF, GblFlags value)         GBL_NOEXCEPT;
 
-GBL_EXPORT GblFlags     GblFlagsClass_valueFromIndex    (CSELF, uint16_t index)             GBL_NOEXCEPT;
-GBL_INLINE GblFlags     GblFlagsClass_valueFromName     (CSELF, const char* pName)          GBL_NOEXCEPT;
-GBL_INLINE GblFlags     GblFlagsClass_valueFromNick     (CSELF, const char* pNick)          GBL_NOEXCEPT;
-GBL_EXPORT GblFlags     GblFlagsClass_valueFromNameQuark(CSELF, GblQuark name)              GBL_NOEXCEPT;
-GBL_EXPORT GblFlags     GblFlagsClass_valueFromNickQuark(CSELF, GblQuark nick)              GBL_NOEXCEPT;
-GBL_EXPORT GblFlags     GblFlagsClass_valueFromString   (CSELF, const char* pString)        GBL_NOEXCEPT;
+GBL_EXPORT GblFlags     GblFlagsClass_valueFromIndex    (GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
+GBL_INLINE GblFlags     GblFlagsClass_valueFromName     (GBL_CSELF, const char* pName)      GBL_NOEXCEPT;
+GBL_INLINE GblFlags     GblFlagsClass_valueFromNick     (GBL_CSELF, const char* pNick)      GBL_NOEXCEPT;
+GBL_EXPORT GblFlags     GblFlagsClass_valueFromNameQuark(GBL_CSELF, GblQuark name)          GBL_NOEXCEPT;
+GBL_EXPORT GblFlags     GblFlagsClass_valueFromNickQuark(GBL_CSELF, GblQuark nick)          GBL_NOEXCEPT;
+GBL_EXPORT GblFlags     GblFlagsClass_valueFromString   (GBL_CSELF, const char* pString)    GBL_NOEXCEPT;
 
-GBL_INLINE GblBool      GblFlagsClass_valueCheck        (CSELF, GblFlags value)             GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblFlagsClass_valueCheck        (GBL_CSELF, GblFlags value)         GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblFlagsClass_valueAppendString (CSELF,
+GBL_EXPORT GBL_RESULT   GblFlagsClass_valueAppendString (GBL_CSELF,
                                                          GblFlags value,
                                                          GblStringBuffer* pStr)             GBL_NOEXCEPT;
 
@@ -92,19 +92,19 @@ GBL_EXPORT GBL_RESULT   GblFlags_appendString           (GblFlags value,
 
 // ------ GblFlagsClass ------
 
-GBL_INLINE const char* GblFlagsClass_nameFromIndex(CSELF, uint16_t index) GBL_NOEXCEPT {
+GBL_INLINE const char* GblFlagsClass_nameFromIndex(GBL_CSELF, uint16_t index) GBL_NOEXCEPT {
     return GblQuark_toString(GblFlagsClass_nameQuarkFromIndex(pSelf, index));
 }
-GBL_INLINE const char* GblFlagsClass_nickFromIndex(CSELF, uint16_t index) GBL_NOEXCEPT {
+GBL_INLINE const char* GblFlagsClass_nickFromIndex(GBL_CSELF, uint16_t index) GBL_NOEXCEPT {
     return GblQuark_toString(GblFlagsClass_nickQuarkFromIndex(pSelf, index));
 }
-GBL_INLINE const char* GblFlagsClass_nameFromValue(CSELF, GblFlags value) GBL_NOEXCEPT {
+GBL_INLINE const char* GblFlagsClass_nameFromValue(GBL_CSELF, GblFlags value) GBL_NOEXCEPT {
     return GblQuark_toString(GblFlagsClass_nameQuarkFromValue(pSelf, value));
 }
-GBL_INLINE const char* GblFlagsClass_nickFromValue(CSELF, GblFlags value) GBL_NOEXCEPT {
+GBL_INLINE const char* GblFlagsClass_nickFromValue(GBL_CSELF, GblFlags value) GBL_NOEXCEPT {
     return GblQuark_toString(GblFlagsClass_nickQuarkFromValue(pSelf, value));
 }
-GBL_INLINE GblFlags GblFlagsClass_valueFromName(CSELF, const char* pString) GBL_NOEXCEPT {
+GBL_INLINE GblFlags GblFlagsClass_valueFromName(GBL_CSELF, const char* pString) GBL_NOEXCEPT {
     GblFlags value = 0;
     GblQuark quark = GblQuark_tryString(pString);
     if(quark != GBL_QUARK_INVALID) {
@@ -112,7 +112,7 @@ GBL_INLINE GblFlags GblFlagsClass_valueFromName(CSELF, const char* pString) GBL_
     }
     return value;
 }
-GBL_INLINE GblFlags GblFlagsClass_valueFromNick(CSELF, const char* pString) GBL_NOEXCEPT {
+GBL_INLINE GblFlags GblFlagsClass_valueFromNick(GBL_CSELF, const char* pString) GBL_NOEXCEPT {
     GblFlags value = 0;
     GblQuark quark = GblQuark_tryString(pString);
     if(quark != GBL_QUARK_INVALID) {
@@ -194,7 +194,7 @@ GBL_INLINE GblBool GblFlags_check(GblFlags value, GblType type) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_FLAGS_H

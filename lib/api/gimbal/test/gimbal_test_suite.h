@@ -25,8 +25,8 @@
 
 #define GBL_TEST_CASE_LAST  { GBL_NULL, GBL_NULL }
 
-#define SELF    GblTestSuite* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblTestSuite* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -34,7 +34,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblContext);
 GBL_FORWARD_DECLARE_STRUCT(GblTestSuite);
 GBL_FORWARD_DECLARE_STRUCT(GblTestScenario);
 
-typedef GBL_RESULT (*GblTestCaseRunFn)(SELF, GblContext* pCtx);
+typedef GBL_RESULT (*GblTestCaseRunFn)(GBL_SELF, GblContext* pCtx);
 
 typedef struct GblTestCase {
     const char*      pName;
@@ -42,20 +42,20 @@ typedef struct GblTestCase {
 } GblTestCase;
 
 typedef struct GblTestSuiteClassVTable {
-    GBL_RESULT          (*pFnSuiteInit) (SELF, GblContext* pCtx);
-    GBL_RESULT          (*pFnSuiteFinal)(SELF, GblContext* pCtx);
-    GBL_RESULT          (*pFnCaseInit)  (SELF, GblContext* pCtx);
-    GBL_RESULT          (*pFnCaseFinal) (SELF, GblContext* pCtx);
+    GBL_RESULT          (*pFnSuiteInit) (GBL_SELF, GblContext* pCtx);
+    GBL_RESULT          (*pFnSuiteFinal)(GBL_SELF, GblContext* pCtx);
+    GBL_RESULT          (*pFnCaseInit)  (GBL_SELF, GblContext* pCtx);
+    GBL_RESULT          (*pFnCaseFinal) (GBL_SELF, GblContext* pCtx);
     const GblTestCase*  pCases;
 } GblTestSuiteClassVTable;
 
 GBL_CLASS_DERIVE(GblTestSuiteClass, GblObjectClass)
     const GblTestSuiteClassVTable*  pVTable;
 
-    GBL_RESULT                      (*pFnSuiteName) (CSELF, const char** ppName);
-    GBL_RESULT                      (*pFnCaseCount) (CSELF, GblSize* pSize);
-    GBL_RESULT                      (*pFnCaseName)  (CSELF, GblSize index, const char** ppName);
-    GBL_RESULT                      (*pFnCaseRun)   (SELF, GblContext* pCtx, GblSize index);
+    GBL_RESULT                      (*pFnSuiteName) (GBL_CSELF, const char** ppName);
+    GBL_RESULT                      (*pFnCaseCount) (GBL_CSELF, GblSize* pSize);
+    GBL_RESULT                      (*pFnCaseName)  (GBL_CSELF, GblSize index, const char** ppName);
+    GBL_RESULT                      (*pFnCaseRun)   (GBL_SELF, GblContext* pCtx, GblSize index);
 GBL_CLASS_END
 
 /*! \brief GblObject representing a collection of unit test cases
@@ -70,7 +70,7 @@ GBL_INSTANCE_DERIVE(GblTestSuite, GblObject, GblTestSuiteClass)
 GBL_INSTANCE_END
 
 typedef enum GBL_TEST_SUITE_PROPERTY_ID {
-    GBL_TEST_SUITE_PROPERTY_ID_FIRST        = GBL_OBJECT_PROPERTY_ID_COUNT,
+    GBL_TEST_SUITE_PROPERTY_ID_FIRST        = GblObject_Property_Id_count,
     GBL_TEST_SUITE_PROPERTY_ID_RESULT       = GBL_TEST_SUITE_PROPERTY_ID_FIRST,
     GBL_TEST_SUITE_PROPERTY_ID_FAILURE_MSG,
     GBL_TEST_SUITE_PROPERTY_ID_CASE_COUNT,
@@ -142,41 +142,41 @@ GBL_EXPORT GblTestSuite*    GblTestSuite_createWithVTable   (const char* pName,
 
 GBL_EXPORT GblTestSuite*    GblTestSuite_createFromType     (GblType type)                              GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblTestSuite_destroy            (SELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestSuite_destroy            (GBL_SELF)                                  GBL_NOEXCEPT;
 
 
-GBL_EXPORT const char*      GblTestSuite_name               (CSELF)                                     GBL_NOEXCEPT;
+GBL_EXPORT const char*      GblTestSuite_name               (GBL_CSELF)                                 GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool          GblTestSuite_ran                (CSELF)                                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblTestSuite_passed             (CSELF)                                     GBL_NOEXCEPT;
-GBL_EXPORT GblTestScenario* GblTestSuite_scenario           (CSELF)                                     GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblTestSuite_ran                (GBL_CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblTestSuite_passed             (GBL_CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT GblTestScenario* GblTestSuite_scenario           (GBL_CSELF)                                 GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblTestSuite_caseAdd            (SELF,
+GBL_EXPORT GBL_RESULT       GblTestSuite_caseAdd            (GBL_SELF,
                                                              const char* pName,
                                                              GblTestCaseRunFn pFnTest)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblTestSuite_casesAdd           (SELF,
+GBL_EXPORT GBL_RESULT       GblTestSuite_casesAdd           (GBL_SELF,
                                                              const GblTestCase* pCases)                 GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool          GblTestSuite_caseRan            (CSELF, const char* pCaseName)              GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblTestSuite_casePassed         (CSELF, const char* pCaseName)              GBL_NOEXCEPT;
-GBL_EXPORT GblSize          GblTestSuite_caseCount          (CSELF)                                     GBL_NOEXCEPT;
-GBL_EXPORT const char*      GblTestSuite_caseName           (CSELF, GblSize index)                      GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblTestSuite_caseRan            (GBL_CSELF, const char* pCaseName)          GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblTestSuite_casePassed         (GBL_CSELF, const char* pCaseName)          GBL_NOEXCEPT;
+GBL_EXPORT GblSize          GblTestSuite_caseCount          (GBL_CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT const char*      GblTestSuite_caseName           (GBL_CSELF, GblSize index)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblTestSuite_caseInit           (SELF, GblContext* pCtx)                    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblTestSuite_caseFinal          (SELF, GblContext* pCtx)                    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestSuite_caseInit           (GBL_SELF, GblContext* pCtx)                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestSuite_caseFinal          (GBL_SELF, GblContext* pCtx)                GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblTestSuite_caseRun            (SELF,
+GBL_EXPORT GBL_RESULT       GblTestSuite_caseRun            (GBL_SELF,
                                                              GblContext* pCtx,
                                                              GblSize index)                             GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblTestSuite_suiteInit          (SELF, GblContext* pCtx)                    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblTestSuite_suiteFinal         (SELF, GblContext* pCtx)                    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestSuite_suiteInit          (GBL_SELF, GblContext* pCtx)                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestSuite_suiteFinal         (GBL_SELF, GblContext* pCtx)                GBL_NOEXCEPT;
 
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_TEST_SUITE_H

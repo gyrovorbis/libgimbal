@@ -45,19 +45,25 @@ GBL_EXPORT GBL_RESULT GblArrayMap_destroy(GblArrayMap** ppSelf) GBL_NOEXCEPT {
 static GblBool GblArrayMap_erase_(GblArrayMap** ppSelf, uintptr_t key, GblBool free) GBL_NOEXCEPT {
     GblBool removed = GBL_FALSE;
     GBL_API_BEGIN(NULL);
+
     if(*ppSelf) {
         GblSize index = GblArrayMap_find(ppSelf, key);
+
         if(index != GBL_ARRAY_MAP_NPOS) {
             if(free)
                 GBL_API_CALL(GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, index)));
+
             if(GblArrayMap_size(ppSelf) == 1) {
                 GblArrayMap_clear(ppSelf);
                 removed = GBL_TRUE;
+
             } else {
                 GblSize remainder = GblArrayMap_size(ppSelf)-1 - index;
+
                 if(remainder)
                     memmove(GblArrayMap_entry_(ppSelf, index),
                             GblArrayMap_entry_(ppSelf, index+1), remainder * sizeof(GblArrayMapEntry));
+
                 *ppSelf = GBL_API_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(GblArrayMap_size(ppSelf)-1));
                 --GBL_PRIV_REF(*ppSelf).size;
                 removed = GBL_TRUE;

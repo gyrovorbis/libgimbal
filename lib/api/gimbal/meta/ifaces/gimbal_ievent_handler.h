@@ -20,22 +20,22 @@
 #define GBL_IEVENT_HANDLER_GET_IFACE(instance)      GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_IEVENT_HANDLER)
 #define GBL_IEVENT_HANDLER_TRY_IFACE(instance)      GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_IEVENT_HANDLER)
 
-#define SELF    GblIEventHandler* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblIEventHandler* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
 GBL_INTERFACE_DERIVE(GblIEventHandler)
-    GBL_RESULT      (*pFnEvent)(SELF, GblEvent* pEvent);   //handle all events
+    GBL_RESULT      (*pFnEvent)(GBL_SELF, GblEvent* pEvent);   //handle all events
 GBL_INTERFACE_END
 
-GBL_API GblIEventHandler_event(SELF, GblEvent* pEvent) GBL_NOEXCEPT;
+GBL_API GblIEventHandler_event(GBL_SELF, GblEvent* pEvent) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_IEVENT_HANDLER_H

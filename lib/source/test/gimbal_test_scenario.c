@@ -255,37 +255,37 @@ static GBL_RESULT GblTestScenarioClass_propertyGet_(const GblObject* pSelf, GblS
     GblTestScenario* pScenario = GBL_TEST_SCENARIO(pSelf);
     switch(id) {
     case GBL_TEST_SCENARIO_PROPERTY_ID_RESULT:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->result);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->result);
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_SUITE_COUNT:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblTestScenario_suiteCount_(pScenario));
+        GblVariant_setValueCopy(pValue, pProp->valueType, GblTestScenario_suiteCount_(pScenario));
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_SUITES_RUN:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->suitesRun);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->suitesRun);
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_SUITES_PASSED:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->suitesPassed);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->suitesPassed);
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_SUITES_FAILED:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->suitesFailed);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->suitesFailed);
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_SUITES_SKIPPED:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->suitesSkipped);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->suitesSkipped);
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_CASE_COUNT:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->caseCount);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->caseCount);
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_CASES_RUN:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->casesRun);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->casesRun);
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_CASES_PASSED:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->casesPassed);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->casesPassed);
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_CASES_FAILED:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->casesFailed);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->casesFailed);
         break;
     case GBL_TEST_SCENARIO_PROPERTY_ID_CASES_SKIPPED:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pScenario->casesSkipped);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->casesSkipped);
         break;
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "[GblTestScenario] Reading unhandled property: %s",

@@ -32,8 +32,8 @@
 #define GBL_STATIC_CLASS_CHECK(klass)               (GBL_CLASS_CHECK(klass, GBL_STATIC_CLASS_TYPE))
 #define GBL_STATIC_CLASS_TRY(klass)                 (GBL_CLASS_TRY(klass, GBL_STATIC_CLASS_TYPE, GblClass))
 
-#define SELF    GblClass*           pSelf
-#define CSELF   const GblClass*     pSelf
+#define GBL_SELF    GblClass*           pSelf
+#define GBL_CSELF   const GblClass*     pSelf
 
 GBL_DECLS_BEGIN
 
@@ -55,46 +55,46 @@ typedef struct GblClass {
     uintptr_t   private_;   ///< pointer-sized private member which is used by the back-end
 } GblClass;
 
-GBL_EXPORT GblClass*   GblClass_refDefault         (GblType type)          GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount GblClass_unrefDefault       (SELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_refDefault         (GblType type)              GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount GblClass_unrefDefault       (GBL_SELF)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblClass*   GblClass_weakRefDefault     (GblType type)          GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_weakRefDefault     (GblType type)              GBL_NOEXCEPT;
 
-GBL_EXPORT GblClass*   GblClass_createFloating     (GblType type)          GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_createFloating     (GblType type)              GBL_NOEXCEPT;
 //GBL_EXPORT GblClass*   GblClass_createFloatingExt  (GblType type, GblSize size) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblClass_destroyFloating    (SELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblClass_destroyFloating    (GBL_SELF)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblClass_constructFloating  (SELF, GblType type)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblClass_destructFloating   (SELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblClass_constructFloating  (GBL_SELF, GblType type)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblClass_destructFloating   (GBL_SELF)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool     GblClass_check              (CSELF, GblType toType) GBL_NOEXCEPT;
-GBL_EXPORT GblClass*   GblClass_cast               (SELF, GblType toType)  GBL_NOEXCEPT;
-GBL_EXPORT GblClass*   GblClass_try                (SELF, GblType toType)  GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_check              (GBL_CSELF, GblType toType) GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_cast               (GBL_SELF, GblType toType)  GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_try                (GBL_SELF, GblType toType)  GBL_NOEXCEPT;
 
-GBL_EXPORT void*       GblClass_private            (CSELF, GblType type)   GBL_NOEXCEPT;
+GBL_EXPORT void*       GblClass_private            (GBL_CSELF, GblType type)   GBL_NOEXCEPT;
 GBL_EXPORT GblClass*   GblClass_public             (const void* pPrivate,
-                                                    GblType    base)       GBL_NOEXCEPT;
+                                                    GblType    base)           GBL_NOEXCEPT;
 
-GBL_EXPORT GblType     GblClass_typeOf             (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblClass_size               (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblClass_privateSize        (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblClass_totalSize          (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblType     GblClass_typeOf             (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblClass_size               (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblClass_privateSize        (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblClass_totalSize          (GBL_CSELF)                 GBL_NOEXCEPT;
 
-GBL_EXPORT GblClass*   GblClass_super              (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblClass*   GblClass_default            (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_super              (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblClass_default            (GBL_CSELF)                 GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool     GblClass_isDefault          (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isOverridden       (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isFloating         (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isInterface        (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isInterfaceImpl    (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isOwned            (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isInPlace          (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isDefault          (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isOverridden       (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isFloating         (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isInterface        (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isInterfaceImpl    (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isOwned            (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblClass_isInPlace          (GBL_CSELF)                 GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
-#undef SELF
-#undef CSELF
+#undef GBL_SELF
+#undef GBL_CSELF
 
 /*! \def GBL_STATIC_CLASS_TYPE
  *   Builtin type ID for a class-only types

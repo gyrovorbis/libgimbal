@@ -106,7 +106,7 @@ typedef struct GblPropertyInfo_ {
     uintptr_t     typeId;
     uint32_t    flags;
 } GblPropertyInfo_;
-
+#if 0
 #if 1
 #if 0
 #define GBL_PROPERTY_FLAGS__(flag) \
@@ -164,6 +164,7 @@ typedef struct GblPropertyInfo_ {
         GBL_PROPERTY_ITEM_
 
 #define GBL_PROPERTIES_END GBL_RPAREN) }; memcpy(pInfoOut, &infos[size], sizeof(GblPropertyInfo_)); }
+#endif
 #endif
 
 #define GBL_DECLARE_STRUCT_PUBLIC(S)    \

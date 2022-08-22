@@ -12,8 +12,8 @@
 
 #define GBL_CALLBACK(fn)                    ((GblFnPtr)fn)
 
-#define SELF    GblClosure* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblClosure* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -35,37 +35,37 @@ GBL_EXPORT GblClosure* GblClosure_create        (GblType           derivedType,
                                                  void*             pUserdata,
                                                  GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
 
-GBL_INLINE void        GblClosure_setMarshal    (SELF,
+GBL_INLINE void        GblClosure_setMarshal    (GBL_SELF,
                                                  GblMarshalFn pFnMarshal)       GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblClosure_setMetaMarshal(SELF,
+GBL_EXPORT GBL_RESULT  GblClosure_setMetaMarshal(GBL_SELF,
                                                  GblMarshalFn pFnMeta)          GBL_NOEXCEPT;
 
-GBL_INLINE GblBool     GblClosure_hasMarshal    (CSELF)                         GBL_NOEXCEPT;
-GBL_INLINE GblBool     GblClosure_hasMetaMarshal(CSELF)                         GBL_NOEXCEPT;
+GBL_INLINE GblBool     GblClosure_hasMarshal    (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblBool     GblClosure_hasMetaMarshal(GBL_CSELF)                     GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblClosure_invoke        (SELF,
+GBL_EXPORT GBL_RESULT  GblClosure_invoke        (GBL_SELF,
                                                  GblVariant* pRetValue,
                                                  GblSize     argCount,
                                                  GblVariant* pArgValues)        GBL_NOEXCEPT;
 
 // ===== IMPL =====
 
-GBL_INLINE GblBool GblClosure_hasMarshal(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblClosure_hasMarshal(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_PRIV_REF(pSelf).pFnMarshal? GBL_TRUE : GBL_FALSE;
 }
 
-GBL_INLINE GblBool GblClosure_hasMetaMarshal(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblClosure_hasMetaMarshal(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_CLOSURE_GET_CLASS(pSelf)->pFnMetaMarshal? GBL_TRUE : GBL_FALSE;
 }
 
-GBL_INLINE void GblClosure_setMarshal(SELF, GblMarshalFn pFnMarshal) GBL_NOEXCEPT {
+GBL_INLINE void GblClosure_setMarshal(GBL_SELF, GblMarshalFn pFnMarshal) GBL_NOEXCEPT {
     GBL_PRIV_REF(pSelf).pFnMarshal = pFnMarshal;
 }
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_CLOSURE_H

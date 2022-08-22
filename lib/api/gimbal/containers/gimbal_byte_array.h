@@ -9,8 +9,8 @@
 #include "../core/gimbal_ref.h"
 #include "../strings/gimbal_string_view.h"
 
-#define SELF                GblByteArray*          pSelf
-#define CSELF               const GblByteArray*    pSelf
+#define GBL_SELF    GblByteArray*          pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -22,51 +22,51 @@ typedef struct GblByteArray {
     uint8_t*            pData;
 } GblByteArray;
 
-GBL_INLINE GblByteArray*   GblByteArray_create_0   (void)                                                       GBL_NOEXCEPT;
-GBL_INLINE GblByteArray*   GblByteArray_create_1   (GblSize bytes)                                              GBL_NOEXCEPT;
-GBL_INLINE GblByteArray*   GblByteArray_create_2   (GblSize bytes, const void* pData)                           GBL_NOEXCEPT;
-GBL_EXPORT GblByteArray*   GblByteArray_create_3   (GblSize bytes, const void* pData, GblContext* pCtx)         GBL_NOEXCEPT;
+GBL_INLINE GblByteArray*   GblByteArray_create_0   (void)                                                           GBL_NOEXCEPT;
+GBL_INLINE GblByteArray*   GblByteArray_create_1   (GblSize bytes)                                                  GBL_NOEXCEPT;
+GBL_INLINE GblByteArray*   GblByteArray_create_2   (GblSize bytes, const void* pData)                               GBL_NOEXCEPT;
+GBL_EXPORT GblByteArray*   GblByteArray_create_3   (GblSize bytes, const void* pData, GblContext* pCtx)             GBL_NOEXCEPT;
 #define GblByteArray_create(...) \
         GBL_VA_OVERLOAD_SELECT(GblByteArray_create, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 
-GBL_INLINE GblByteArray*    GblByteArray_ref       (SELF)                                                       GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount      GblByteArray_unref     (SELF)                                                       GBL_NOEXCEPT;
+GBL_INLINE GblByteArray*    GblByteArray_ref       (GBL_SELF)                                                       GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount      GblByteArray_unref     (GBL_SELF)                                                       GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblByteArray_copy      (SELF, const GblByteArray* pOther)                           GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_move      (SELF, GblByteArray* pOther)                                 GBL_NOEXCEPT;
-GBL_EXPORT GblInt           GblByteArray_compare   (CSELF, const GblByteArray* pRhs)                            GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblByteArray_equals    (CSELF, const GblByteArray* pRhs)                            GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_copy      (GBL_SELF, const GblByteArray* pOther)                           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_move      (GBL_SELF, GblByteArray* pOther)                                 GBL_NOEXCEPT;
+GBL_EXPORT GblInt           GblByteArray_compare   (GBL_CSELF, const GblByteArray* pRhs)                            GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblByteArray_equals    (GBL_CSELF, const GblByteArray* pRhs)                            GBL_NOEXCEPT;
 
-GBL_INLINE GblRefCount      GblByteArray_refCount  (CSELF)                                                      GBL_NOEXCEPT;
-GBL_INLINE GblContext*      GblByteArray_context   (CSELF)                                                      GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblByteArray_size      (CSELF)                                                      GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblByteArray_empty     (CSELF)                                                      GBL_NOEXCEPT;
+GBL_INLINE GblRefCount      GblByteArray_refCount  (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_INLINE GblContext*      GblByteArray_context   (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_INLINE GblSize          GblByteArray_size      (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblByteArray_empty     (GBL_CSELF)                                                      GBL_NOEXCEPT;
 
-GBL_INLINE uint8_t          GblByteArray_at        (CSELF, GblSize index)                                       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_set       (SELF, GblSize bytes, const void* pData)                     GBL_NOEXCEPT;
+GBL_INLINE uint8_t          GblByteArray_at        (GBL_CSELF, GblSize index)                                       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_set       (GBL_SELF, GblSize bytes, const void* pData)                     GBL_NOEXCEPT;
 
-GBL_INLINE void*            GblByteArray_data      (CSELF)                                                      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_read      (CSELF, GblSize offset, GblSize bytes, void* pDataOut)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_write     (SELF, GblSize offset, GblSize bytes, const void* pDataIn)   GBL_NOEXCEPT;
+GBL_INLINE void*            GblByteArray_data      (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_read      (GBL_CSELF, GblSize offset, GblSize bytes, void* pDataOut)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_write     (GBL_SELF, GblSize offset, GblSize bytes, const void* pDataIn)   GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblByteArray_clear     (SELF)                                                       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_acquire   (SELF, GblSize bytes, void* pData)                           GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_release   (SELF, GblSize* pSize, void** ppData)                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblByteArray_resize    (SELF, GblSize bytes)                                        GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_grow      (SELF, GblSize bytes)                                        GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_shrink    (SELF, GblSize bytes)                                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblByteArray_erase     (SELF, GblSize offset, GblSize bytes)                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblByteArray_insert    (SELF, GblSize offset, GblSize bytes, const void* pDataIn)   GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_append    (SELF, GblSize bytes, const void* pData)                     GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblByteArray_prepend   (SELF, GblSize bytes, const void* pData)                     GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_clear     (GBL_SELF)                                                       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_acquire   (GBL_SELF, GblSize bytes, void* pData)                           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_release   (GBL_SELF, GblSize* pSize, void** ppData)                        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblByteArray_resize    (GBL_SELF, GblSize bytes)                                        GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_grow      (GBL_SELF, GblSize bytes)                                        GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_shrink    (GBL_SELF, GblSize bytes)                                        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblByteArray_erase     (GBL_SELF, GblSize offset, GblSize bytes)                        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblByteArray_insert    (GBL_SELF, GblSize offset, GblSize bytes, const void* pDataIn)   GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_append    (GBL_SELF, GblSize bytes, const void* pData)                     GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblByteArray_prepend   (GBL_SELF, GblSize bytes, const void* pData)                     GBL_NOEXCEPT;
 
-GBL_EXPORT GblHash          GblByteArray_hash       (CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE const char*      GblByteArray_cString    (CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE GblStringView    GblByteArray_stringView (CSELF)                                                     GBL_NOEXCEPT;
+GBL_EXPORT GblHash          GblByteArray_hash       (GBL_CSELF)                                                     GBL_NOEXCEPT;
+GBL_INLINE const char*      GblByteArray_cString    (GBL_CSELF)                                                     GBL_NOEXCEPT;
+GBL_INLINE GblStringView    GblByteArray_stringView (GBL_CSELF)                                                     GBL_NOEXCEPT;
 
 // =========== IMPL ===========
 
-GBL_INLINE GblBool GblByteArray_empty(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblByteArray_empty(GBL_CSELF) GBL_NOEXCEPT {
     if(!pSelf)
         return GBL_TRUE;
     if(!pSelf->pData || ! pSelf->size)
@@ -87,27 +87,27 @@ GBL_INLINE GblByteArray* GblByteArray_create_2(GblSize bytes, const void* pData)
     return GblByteArray_create_3(bytes, pData, NULL);
 }
 
-GBL_INLINE GblByteArray* GblByteArray_ref(SELF) GBL_NOEXCEPT {
+GBL_INLINE GblByteArray* GblByteArray_ref(GBL_SELF) GBL_NOEXCEPT {
     return (GblByteArray*)GblRef_acquire(pSelf);
 }
 
-GBL_INLINE GblRefCount GblByteArray_refCount(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblRefCount GblByteArray_refCount(GBL_CSELF) GBL_NOEXCEPT {
     return GblRef_refCount(pSelf);
 }
 
-GBL_INLINE GblContext* GblByteArray_context(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblContext* GblByteArray_context(GBL_CSELF) GBL_NOEXCEPT {
     return GblRef_context(pSelf);
 }
 
-GBL_INLINE GblSize GblByteArray_size(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblByteArray_size(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->size;
 }
 
-GBL_INLINE void* GblByteArray_data(CSELF) GBL_NOEXCEPT {
+GBL_INLINE void* GblByteArray_data(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->pData;
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_set(SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_set(GBL_SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_CALL(GblByteArray_resize(pSelf, bytes));
@@ -115,7 +115,7 @@ GBL_INLINE GBL_RESULT GblByteArray_set(SELF, GblSize bytes, const void* pData) G
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_copy(SELF, const GblByteArray* pOther) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_copy(GBL_SELF, const GblByteArray* pOther) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_POINTER(pOther);
@@ -123,7 +123,7 @@ GBL_INLINE GBL_RESULT GblByteArray_copy(SELF, const GblByteArray* pOther) GBL_NO
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_move(SELF, GblByteArray* pOther) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_move(GBL_SELF, GblByteArray* pOther) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_POINTER(pOther);
@@ -136,11 +136,11 @@ GBL_INLINE GBL_RESULT GblByteArray_move(SELF, GblByteArray* pOther) GBL_NOEXCEPT
     GBL_API_END();
 }
 
-GBL_INLINE GblBool GblByteArray_equals(CSELF, const GblByteArray* pRhs) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblByteArray_equals(GBL_CSELF, const GblByteArray* pRhs) GBL_NOEXCEPT {
     return GblByteArray_compare(pSelf, pRhs) == 0;
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_clear(SELF) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_clear(GBL_SELF) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY_POINTER(pSelf);
     if(pSelf->pData) GBL_API_FREE(pSelf->pData);
@@ -150,7 +150,7 @@ GBL_INLINE GBL_RESULT GblByteArray_clear(SELF) GBL_NOEXCEPT {
 }
 
 
-GBL_INLINE GBL_RESULT GblByteArray_acquire(SELF, GblSize bytes, void* pData) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_acquire(GBL_SELF, GblSize bytes, void* pData) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY_ARG(bytes > 0);
     GBL_API_VERIFY_POINTER(pData);
@@ -160,7 +160,7 @@ GBL_INLINE GBL_RESULT GblByteArray_acquire(SELF, GblSize bytes, void* pData) GBL
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_release(SELF, GblSize* pSize, void** ppData) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_release(GBL_SELF, GblSize* pSize, void** ppData) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY_POINTER(pSize);
     GBL_API_VERIFY_POINTER(ppData);
@@ -171,19 +171,19 @@ GBL_INLINE GBL_RESULT GblByteArray_release(SELF, GblSize* pSize, void** ppData) 
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_grow(SELF, GblSize bytes) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_grow(GBL_SELF, GblSize bytes) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GblByteArray_resize(pSelf, GblByteArray_size(pSelf) + bytes);
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_shrink(SELF, GblSize bytes) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_shrink(GBL_SELF, GblSize bytes) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_CALL(GblByteArray_resize(pSelf, GblByteArray_size(pSelf) - bytes));
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_append(SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_append(GBL_SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_ARG(bytes > 0);
@@ -196,13 +196,13 @@ GBL_INLINE GBL_RESULT GblByteArray_append(SELF, GblSize bytes, const void* pData
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_prepend(SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_prepend(GBL_SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GblByteArray_insert(pSelf, 0, bytes, pData);
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_read(CSELF, GblSize offset, GblSize bytes, void* pDataOut) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_read(GBL_CSELF, GblSize offset, GblSize bytes, void* pDataOut) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY(offset < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_API_VERIFY(offset + bytes <= pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
@@ -211,7 +211,7 @@ GBL_INLINE GBL_RESULT GblByteArray_read(CSELF, GblSize offset, GblSize bytes, vo
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_write(SELF, GblSize offset, GblSize bytes, const void* pDataIn) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_write(GBL_SELF, GblSize offset, GblSize bytes, const void* pDataIn) GBL_NOEXCEPT {
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY(offset < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_API_VERIFY(offset + bytes <= pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
@@ -220,14 +220,14 @@ GBL_INLINE GBL_RESULT GblByteArray_write(SELF, GblSize offset, GblSize bytes, co
     GBL_API_END();
 }
 
-GBL_INLINE GblStringView GblByteArray_stringView(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblByteArray_stringView(GBL_CSELF) GBL_NOEXCEPT {
     return GblStringView_fromStringSized((const char*)pSelf->pData, pSelf->size);
 }
 
-GBL_INLINE const char* GblByteArray_cString(CSELF) GBL_NOEXCEPT {
+GBL_INLINE const char* GblByteArray_cString(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->pData[pSelf->size-1] == '\0'? (const char*)pSelf->pData : GBL_NULL;
 }
-GBL_INLINE uint8_t GblByteArray_at(CSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE uint8_t GblByteArray_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
     uint8_t byte = 0;
     GBL_API_BEGIN(GblByteArray_context(pSelf));
     GBL_API_VERIFY(index < pSelf->size,
@@ -238,8 +238,8 @@ GBL_INLINE uint8_t GblByteArray_at(CSELF, GblSize index) GBL_NOEXCEPT {
 }
 
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 GBL_DECLS_END
 

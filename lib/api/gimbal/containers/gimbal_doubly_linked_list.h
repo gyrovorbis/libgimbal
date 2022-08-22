@@ -8,8 +8,8 @@
 
 #include "gimbal_linked_list.h"
 
-#define SELF    GblDoublyLinkedListNode* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblDoublyLinkedListNode* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 #define GBL_DOUBLY_LINKED_LIST_NPOS                             GBL_NPOS
 #define GBL_DOUBLY_LINKED_LIST_NODE_INITIALIZER()               { .pNext = NULL, .pPrev = NULL }
@@ -31,49 +31,49 @@ typedef struct GblDoublyLinkedListNode {
     struct GblDoublyLinkedListNode*     pPrev;
 } GblDoublyLinkedListNode;
 
-GBL_INLINE void     GblDoublyLinkedList_init        (SELF)                                  GBL_NOEXCEPT;
+GBL_INLINE void     GblDoublyLinkedList_init        (GBL_SELF)                              GBL_NOEXCEPT;
 
-GBL_INLINE void     GblDoublyLinkedList_pushBack    (SELF,
+GBL_INLINE void     GblDoublyLinkedList_pushBack    (GBL_SELF,
                                                      GblDoublyLinkedListNode* pNode)        GBL_NOEXCEPT;
 
-GBL_INLINE void     GblDoublyLinkedList_pushFront   (SELF,
+GBL_INLINE void     GblDoublyLinkedList_pushFront   (GBL_SELF,
                                                      GblDoublyLinkedListNode* pNode)        GBL_NOEXCEPT;
 
-GBL_INLINE void     GblDoublyLinkedList_moveBack    (SELF,
+GBL_INLINE void     GblDoublyLinkedList_moveBack    (GBL_SELF,
                                                      GblDoublyLinkedListNode* pnode)        GBL_NOEXCEPT;
 
-GBL_INLINE void     GblDoublyLinkedList_moveFront   (SELF,
+GBL_INLINE void     GblDoublyLinkedList_moveFront   (GBL_SELF,
                                                      GblDoublyLinkedListNode* pNode)        GBL_NOEXCEPT;
 
-GBL_INLINE void     GblDoublyLinkedList_joinBack    (SELF,
+GBL_INLINE void     GblDoublyLinkedList_joinBack    (GBL_SELF,
                                                      GblDoublyLinkedListNode* pList)        GBL_NOEXCEPT;
 
-GBL_INLINE void     GblDoublyLinkedList_joinFront   (SELF,
+GBL_INLINE void     GblDoublyLinkedList_joinFront   (GBL_SELF,
                                                      GblDoublyLinkedListNode* pList)        GBL_NOEXCEPT;
 
 GBL_INLINE GblDoublyLinkedListNode*
-                    GblDoublyLinkedList_popBack     (SELF)                                  GBL_NOEXCEPT;
+                    GblDoublyLinkedList_popBack     (GBL_SELF)                              GBL_NOEXCEPT;
 
 GBL_INLINE GblDoublyLinkedListNode*
-                    GblDoublyLinkedList_popFront    (SELF)                                  GBL_NOEXCEPT;
+                    GblDoublyLinkedList_popFront    (GBL_SELF)                              GBL_NOEXCEPT;
 
-GBL_INLINE GblBool  GblDoublyLinkedList_empty       (CSELF)                                 GBL_NOEXCEPT;
+GBL_INLINE GblBool  GblDoublyLinkedList_empty       (GBL_CSELF)                             GBL_NOEXCEPT;
 
-GBL_INLINE GblSize  GblDoublyLinkedList_count       (CSELF)                                 GBL_NOEXCEPT;
-
-GBL_INLINE GblDoublyLinkedListNode*
-                    GblDoublyLinkedList_at          (CSELF, GblSize index)                  GBL_NOEXCEPT;
+GBL_INLINE GblSize  GblDoublyLinkedList_count       (GBL_CSELF)                             GBL_NOEXCEPT;
 
 GBL_INLINE GblDoublyLinkedListNode*
-                    GblDoublyLinkedList_front       (CSELF)                                 GBL_NOEXCEPT;
+                    GblDoublyLinkedList_at          (GBL_CSELF, GblSize index)              GBL_NOEXCEPT;
 
 GBL_INLINE GblDoublyLinkedListNode*
-                    GblDoublyLinkedList_back        (CSELF)                                 GBL_NOEXCEPT;
+                    GblDoublyLinkedList_front       (GBL_CSELF)                             GBL_NOEXCEPT;
 
-GBL_INLINE GblBool  GblDoublyLinkedList_contains    (CSELF,
+GBL_INLINE GblDoublyLinkedListNode*
+                    GblDoublyLinkedList_back        (GBL_CSELF)                             GBL_NOEXCEPT;
+
+GBL_INLINE GblBool  GblDoublyLinkedList_contains    (GBL_CSELF,
                                                      GblDoublyLinkedListNode* pNode)        GBL_NOEXCEPT;
 
-GBL_INLINE GblSize  GblDoublyLinkedList_find        (CSELF,
+GBL_INLINE GblSize  GblDoublyLinkedList_find        (GBL_CSELF,
                                                      GblDoublyLinkedListNode* pNode)        GBL_NOEXCEPT;
 
 GBL_INLINE GblBool  GblDoublyLinkedList_swap        (GblDoublyLinkedListNode* pNode1,
@@ -84,20 +84,20 @@ GBL_INLINE void    GblDoublyLinkedList_remove       (GblDoublyLinkedListNode* pN
 GBL_INLINE GblBool GblDoublyLinkedList_replace      (GblDoublyLinkedListNode* pExisting,
                                                      GblDoublyLinkedListNode* pReplacement) GBL_NOEXCEPT;
 
-GBL_INLINE GblBool  GblDoublyLinkedList_erase       (SELF, GblSize index)                   GBL_NOEXCEPT;
+GBL_INLINE GblBool  GblDoublyLinkedList_erase       (GBL_SELF, GblSize index)               GBL_NOEXCEPT;
 
-GBL_INLINE void     GblDoublyLinkedList_clear       (SELF)                                  GBL_NOEXCEPT;
+GBL_INLINE void     GblDoublyLinkedList_clear       (GBL_SELF)                              GBL_NOEXCEPT;
 
-GBL_INLINE void     GblDoublyLinkedList_reverse     (SELF)                                  GBL_NOEXCEPT;
+GBL_INLINE void     GblDoublyLinkedList_reverse     (GBL_SELF)                              GBL_NOEXCEPT;
 
 
 // ========== IMPL ==========
 
-GBL_INLINE void GblDoublyLinkedList_init(SELF) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_init(GBL_SELF) GBL_NOEXCEPT {
     pSelf->pNext = pSelf->pPrev = pSelf;
 }
 
-GBL_INLINE void GblDoublyLinkedList_pushBack(SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_pushBack(GBL_SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
     GblDoublyLinkedListNode* pLast = pSelf->pPrev;
     pLast->pNext = pNode;
     pNode->pPrev = pLast;
@@ -105,38 +105,38 @@ GBL_INLINE void GblDoublyLinkedList_pushBack(SELF, GblDoublyLinkedListNode* pNod
     pSelf->pPrev = pNode;
 }
 
-GBL_INLINE void GblDoublyLinkedList_pushFront(SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_pushFront(GBL_SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
     pNode->pNext = pSelf->pNext;
     pSelf->pNext->pPrev = pNode;
     pNode->pPrev = pSelf;
     pSelf->pNext = pNode;
 }
 
-GBL_INLINE GblSize GblDoublyLinkedList_find(CSELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblDoublyLinkedList_find(GBL_CSELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
     return GblLinkedList_find(&pSelf->singleNode, &pNode->singleNode);
 }
 
-GBL_INLINE GblBool GblDoublyLinkedList_contains(CSELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblDoublyLinkedList_contains(GBL_CSELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
     return GblLinkedList_contains(&pSelf->singleNode, &pNode->singleNode);
 }
 
-GBL_INLINE GblBool GblDoublyLinkedList_empty(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblDoublyLinkedList_empty(GBL_CSELF) GBL_NOEXCEPT {
     return GblLinkedList_empty(&pSelf->singleNode) && (pSelf->pPrev == pSelf || pSelf->pPrev == NULL);
 }
 
-GBL_INLINE GblSize GblDoublyLinkedList_count(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblDoublyLinkedList_count(GBL_CSELF) GBL_NOEXCEPT {
     return GblLinkedList_count(&pSelf->singleNode);
 }
 
-GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_at(CSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
     return (GblDoublyLinkedListNode*)GblLinkedList_at(&pSelf->singleNode, index);
 }
 
-GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_front(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_front(GBL_CSELF) GBL_NOEXCEPT {
     return (GblDoublyLinkedListNode*)GblLinkedList_front(&pSelf->singleNode);
 }
 
-GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_back(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_back(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->pPrev != pSelf? pSelf->pPrev : NULL;
 }
 
@@ -177,21 +177,21 @@ GBL_EXPORT GblBool GblDoublyLinkedList_swap(GblDoublyLinkedListNode* pExisting, 
     return GBL_TRUE;
 }
 
-GBL_INLINE void GblDoublyLinkedList_moveBack(SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_moveBack(GBL_SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
     pNode->pPrev->pNext = pNode->pNext;
     pNode->pNext->pPrev = pNode->pPrev;
 
     GblDoublyLinkedList_pushBack(pSelf, pNode);
 }
 
-GBL_INLINE void GblDoublyLinkedList_moveFront(SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_moveFront(GBL_SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
     pNode->pPrev->pNext = pNode->pNext;
     pNode->pNext->pPrev = pNode->pPrev;
 
     GblDoublyLinkedList_pushFront(pSelf, pNode);
 }
 
-GBL_INLINE GblBool GblDoublyLinkedList_erase(SELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblDoublyLinkedList_erase(GBL_SELF, GblSize index) GBL_NOEXCEPT {
     GblDoublyLinkedListNode* pNode = GblDoublyLinkedList_at(pSelf, index);
     if(pNode) {
         GblDoublyLinkedList_remove(pNode);
@@ -199,7 +199,7 @@ GBL_INLINE GblBool GblDoublyLinkedList_erase(SELF, GblSize index) GBL_NOEXCEPT {
     } else return GBL_FALSE;
 }
 
-GBL_INLINE void GblDoublyLinkedList_clear(SELF) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_clear(GBL_SELF) GBL_NOEXCEPT {
     GblDoublyLinkedListNode* pPrev = pSelf;
     GblDoublyLinkedListNode* pIt = pSelf->pNext;
 
@@ -212,7 +212,7 @@ GBL_INLINE void GblDoublyLinkedList_clear(SELF) GBL_NOEXCEPT {
     } while(pIt != pSelf);
 }
 
-GBL_INLINE void GblDoublyLinkedList_joinBack(SELF, GblDoublyLinkedListNode* pList) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_joinBack(GBL_SELF, GblDoublyLinkedListNode* pList) GBL_NOEXCEPT {
     if(!GblDoublyLinkedList_empty(pList)) {
         pSelf->pPrev->pNext = pList->pNext;
         pList->pNext->pPrev = pSelf->pPrev;
@@ -223,7 +223,7 @@ GBL_INLINE void GblDoublyLinkedList_joinBack(SELF, GblDoublyLinkedListNode* pLis
     }
 }
 
-GBL_INLINE void GblDoublyLinkedList_joinFront(SELF, GblDoublyLinkedListNode* pList) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_joinFront(GBL_SELF, GblDoublyLinkedListNode* pList) GBL_NOEXCEPT {
     if(!GblDoublyLinkedList_empty(pList)) {
         pSelf->pNext->pPrev = pList->pPrev;
         pList->pPrev->pNext = pSelf->pNext;
@@ -235,7 +235,7 @@ GBL_INLINE void GblDoublyLinkedList_joinFront(SELF, GblDoublyLinkedListNode* pLi
 }
 
 
-GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_popBack(SELF) GBL_NOEXCEPT {
+GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_popBack(GBL_SELF) GBL_NOEXCEPT {
     GblDoublyLinkedListNode* pBack = GblDoublyLinkedList_back(pSelf);
     if(pBack) {
         pBack->pPrev->pNext = pBack->pNext;
@@ -244,7 +244,7 @@ GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_popBack(SELF) GBL_NOEXCE
     return pBack;
 }
 
-GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_popFront(SELF) GBL_NOEXCEPT {
+GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_popFront(GBL_SELF) GBL_NOEXCEPT {
     GblDoublyLinkedListNode* pFront = GblDoublyLinkedList_front(pSelf);
     if(pFront) {
         pFront->pPrev->pNext = pFront->pNext;
@@ -253,7 +253,7 @@ GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_popFront(SELF) GBL_NOEXC
     return pFront;
 }
 
-GBL_INLINE void GblDoublyLinkedList_reverse(SELF) GBL_NOEXCEPT {
+GBL_INLINE void GblDoublyLinkedList_reverse(GBL_SELF) GBL_NOEXCEPT {
     GblDoublyLinkedListNode* pIt = pSelf;
     do {
         GblDoublyLinkedListNode* pTemp = pIt->pNext;
@@ -266,7 +266,7 @@ GBL_INLINE void GblDoublyLinkedList_reverse(SELF) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_DOUBLY_LINKED_LIST_HPP

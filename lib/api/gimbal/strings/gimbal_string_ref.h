@@ -45,8 +45,8 @@
 #include "../core/gimbal_ref.h"
 #include "gimbal_string_view.h"
 
-#define SELF    GblStringRef* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblStringRef* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -61,24 +61,24 @@ GBL_DECLS_BEGIN
  */
 typedef char GblStringRef;
 
-GBL_INLINE GblStringRef*    GblStringRef_create                     (const char* pString)   GBL_NOEXCEPT;
+GBL_INLINE GblStringRef*    GblStringRef_create                     (const char* pString)       GBL_NOEXCEPT;
 GBL_INLINE GblStringRef*    GblStringRef_createWithContext          (const char* pString,
-                                                                     GblContext* pCtx)      GBL_NOEXCEPT;
-GBL_INLINE GblStringRef*    GblStringRef_createFromView             (GblStringView view)    GBL_NOEXCEPT;
+                                                                     GblContext* pCtx)          GBL_NOEXCEPT;
+GBL_INLINE GblStringRef*    GblStringRef_createFromView             (GblStringView view)        GBL_NOEXCEPT;
 GBL_EXPORT GblStringRef*    GblStringRef_createFromViewWithContext  (GblStringView view,
-                                                                     GblContext*   pCtx)    GBL_NOEXCEPT;
+                                                                     GblContext*   pCtx)        GBL_NOEXCEPT;
 
-GBL_EXPORT GblStringRef*    GblStringRef_acquire                    (CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount      GblStringRef_release                    (CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*    GblStringRef_acquire                    (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount      GblStringRef_release                    (GBL_CSELF)                 GBL_NOEXCEPT;
 
-GBL_EXPORT char             GblStringRef_at                         (CSELF, GblSize index)  GBL_NOEXCEPT;
+GBL_EXPORT char             GblStringRef_at                         (GBL_CSELF, GblSize index)  GBL_NOEXCEPT;
 
-GBL_INLINE GblContext*      GblStringRef_context                    (CSELF)                 GBL_NOEXCEPT;
-GBL_INLINE GblRefCount      GblStringRef_refCount                   (CSELF)                 GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringRef_length                     (CSELF)                 GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringRef_empty                      (CSELF)                 GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringRef_valid                      (CSELF)                 GBL_NOEXCEPT;
-GBL_INLINE GblStringView    GblStringRef_view                       (CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GblContext*      GblStringRef_context                    (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GblRefCount      GblStringRef_refCount                   (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GblSize          GblStringRef_length                     (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringRef_empty                      (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringRef_valid                      (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GblStringView    GblStringRef_view                       (GBL_CSELF)                 GBL_NOEXCEPT;
 
 // ========== IMPL ==========
 
@@ -106,7 +106,7 @@ GBL_INLINE GblStringRef* GblStringRef_createFromView(GblStringView view) GBL_NOE
     return GblStringRef_createFromViewWithContext(view, NULL);
 }
 
-GBL_INLINE GblContext* GblStringRef_context(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblContext* GblStringRef_context(GBL_CSELF) GBL_NOEXCEPT {
     GblContext* pCtx = NULL;
     if(pSelf) {
         GblStringRef_* pStrHeader = GblStringRef_header_(pSelf);
@@ -115,7 +115,7 @@ GBL_INLINE GblContext* GblStringRef_context(CSELF) GBL_NOEXCEPT {
     return pCtx;
 }
 
-GBL_INLINE GblRefCount GblStringRef_refCount(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblRefCount GblStringRef_refCount(GBL_CSELF) GBL_NOEXCEPT {
     GblRefCount refCount = 0;
     if(pSelf) {
         GblStringRef_* pStrHeader = GblStringRef_header_(pSelf);
@@ -124,7 +124,7 @@ GBL_INLINE GblRefCount GblStringRef_refCount(CSELF) GBL_NOEXCEPT {
     return refCount;
 }
 
-GBL_INLINE GblSize GblStringRef_length(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblStringRef_length(GBL_CSELF) GBL_NOEXCEPT {
     GblSize length = 0;
     if(pSelf) {
         GblStringRef_* pStrHeader = GblStringRef_header_(pSelf);
@@ -133,22 +133,22 @@ GBL_INLINE GblSize GblStringRef_length(CSELF) GBL_NOEXCEPT {
     return length;
 }
 
-GBL_INLINE GblBool GblStringRef_empty(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringRef_empty(GBL_CSELF) GBL_NOEXCEPT {
     return GblStringRef_length(pSelf) == 0;
 }
 
-GBL_INLINE GblBool GblStringRef_valid(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringRef_valid(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf? GBL_TRUE : GBL_FALSE;
 }
 
-GBL_INLINE GblStringView GblStringRef_view(CSELF) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringRef_view(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_STRING_VIEW(pSelf, GblStringRef_length(pSelf));
 }
 
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_STRING_REF_H

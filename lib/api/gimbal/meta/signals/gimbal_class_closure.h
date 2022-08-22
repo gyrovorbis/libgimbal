@@ -9,8 +9,8 @@
 #define GBL_CLASS_CLOkSURE_CLASS(klass)          (GBL_CLASS_CAST(klass, GBL_CLASS_CLOSURE_TYPE, GblClassClosureClass))
 #define GBL_CLASS_CLOSURE_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS(instance), GBL_CLASS_CLOSURE_TYPE, GblClassClosureClass)
 
-#define SELF    GblClassClosure* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblClassClosure* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -31,29 +31,29 @@ GBL_EXPORT GblClassClosure* GblClassClosure_create     (GblType      classType,
                                                         GblInstance* pInstance,
                                                         void*        pUserdata) GBL_NOEXCEPT;
 
-GBL_INLINE void             GblClassClosure_setMethod  (SELF,
+GBL_INLINE void             GblClassClosure_setMethod  (GBL_SELF,
                                                         GblType classType,
                                                         GblSize offset)         GBL_NOEXCEPT;
 
-GBL_INLINE void             GblClassClosure_setInstance(SELF,
+GBL_INLINE void             GblClassClosure_setInstance(GBL_SELF,
                                                         GblInstance* pInstance) GBL_NOEXCEPT;
 
 // ===== IMPL ======
 
 
-GBL_INLINE void GblClassClosure_setMethod(SELF, GblType classType, GblSize offset) GBL_NOEXCEPT {
+GBL_INLINE void GblClassClosure_setMethod(GBL_SELF, GblType classType, GblSize offset) GBL_NOEXCEPT {
     GBL_PRIV_REF(pSelf).classType = classType;
     GBL_PRIV_REF(pSelf).offset = offset;
 }
 
-GBL_INLINE void GblClassClosure_setInstance(SELF, GblInstance* pInstance) GBL_NOEXCEPT {
+GBL_INLINE void GblClassClosure_setInstance(GBL_SELF, GblInstance* pInstance) GBL_NOEXCEPT {
     GBL_PRIV_REF(pSelf).pInstance = pInstance;
 }
 
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_CLASS_CLOSURE_H

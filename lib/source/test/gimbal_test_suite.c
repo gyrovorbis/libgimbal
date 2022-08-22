@@ -68,25 +68,25 @@ static GBL_RESULT GblTestSuiteClass_propertyGet_(const GblObject* pSelf, GblSize
     GblTestSuite_* pSuite_ = GBL_TEST_SUITE_(pSelf);
     switch(id) {
     case GBL_TEST_SUITE_PROPERTY_ID_RESULT:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pSuite->failingIssue.result);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pSuite->failingIssue.result);
         break;
     case GBL_TEST_SUITE_PROPERTY_ID_FAILURE_MSG:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pSuite->failingIssue.message);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pSuite->failingIssue.message);
         break;
     case GBL_TEST_SUITE_PROPERTY_ID_CASE_COUNT:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblArrayList_size(&pSuite_->testCases));
+        GblVariant_setValueCopy(pValue, pProp->valueType, GblArrayList_size(&pSuite_->testCases));
         break;
     case GBL_TEST_SUITE_PROPERTY_ID_CASES_RUN:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pSuite->casesRun);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pSuite->casesRun);
         break;
     case GBL_TEST_SUITE_PROPERTY_ID_CASES_PASSED:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pSuite->casesPassed);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pSuite->casesPassed);
         break;
     case GBL_TEST_SUITE_PROPERTY_ID_CASES_FAILED:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pSuite->casesFailed);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pSuite->casesFailed);
         break;
     case GBL_TEST_SUITE_PROPERTY_ID_CASES_SKIPPED:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), pSuite->casesSkipped);
+        GblVariant_setValueCopy(pValue, pProp->valueType, pSuite->casesSkipped);
         break;
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "[GblTestSuite] Reading unhandled property: %s",

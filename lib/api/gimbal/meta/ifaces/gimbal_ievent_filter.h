@@ -21,20 +21,20 @@ GBL_DECLS_BEGIN
 #define GBL_IEVENT_FILTER_IFACE_CHECK(klass)        GBL_CLASS_CHECK_PREFIX(klass, GBL_IEVENT_FILTER)
 #define GBL_IEVENT_FILTER_GET_IFACE(instance)       GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_IEVENT_FILTER)
 
-#define SELF    GblIEventFilter* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblIEventFilter* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_FORWARD_DECLARE_STRUCT(GblIEventHandler);
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
 GBL_INTERFACE_DERIVE(GblIEventFilter)
-    GBL_RESULT      (*pFnEventFilter)(SELF, GblIEventHandler* pHandler, GblEvent* pEvent);
+    GBL_RESULT      (*pFnEventFilter)(GBL_SELF, GblIEventHandler* pHandler, GblEvent* pEvent);
 GBL_INTERFACE_END
 
-GBL_API GblIEventFilter_eventFilter(SELF, GblIEventHandler* pHandler, GblEvent* pEvent) GBL_NOEXCEPT;
+GBL_API GblIEventFilter_eventFilter(GBL_SELF, GblIEventHandler* pHandler, GblEvent* pEvent) GBL_NOEXCEPT;
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 GBL_DECLS_END
 

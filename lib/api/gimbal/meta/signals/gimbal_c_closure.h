@@ -9,8 +9,8 @@
 #define GBL_C_CLOSURE_CLASS(klass)          (GBL_CLASS_CAST(klass, GBL_C_CLOSURE_TYPE, GblCClosureClass))
 #define GBL_C_CLOSURE_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS(instance, GBL_C_CLOSURE_TYPE, GblCClosureClass))
 
-#define SELF    GblCClosure* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblCClosure* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -27,18 +27,18 @@ GBL_EXPORT GblType      GblCClosure_type       (void)                 GBL_NOEXCE
 GBL_EXPORT GblCClosure* GblCClosure_create     (GblFnPtr pFnCallback,
                                                 void*    pUserdata)   GBL_NOEXCEPT;
 
-GBL_INLINE void         GblCClosure_setCallback(SELF,
+GBL_INLINE void         GblCClosure_setCallback(GBL_SELF,
                                                 GblFnPtr pFnCallback) GBL_NOEXCEPT;
 
 // ===== IMPL =====
 
-GBL_INLINE void GblCClosure_setCallback(SELF, GblFnPtr pFnCallback) GBL_NOEXCEPT {
+GBL_INLINE void GblCClosure_setCallback(GBL_SELF, GblFnPtr pFnCallback) GBL_NOEXCEPT {
     GBL_PRIV_REF(pSelf).pFnCallback = pFnCallback;
 }
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_C_CLOSURE_H

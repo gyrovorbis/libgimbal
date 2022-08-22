@@ -44,6 +44,7 @@ static GBL_RESULT GblBoxed_construct_(GblVariant* pVariant, GblUint argc, GblVar
         GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
         pVariant->pVoid = pArgs[0].pVoid;
     }
+
     GBL_API_END();
 }
 

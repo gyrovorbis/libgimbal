@@ -17,7 +17,6 @@ static GblQuark     objectParentQuark_          = GBL_QUARK_INVALID;
 static GblQuark     objectFamilyQuark_          = GBL_QUARK_INVALID;
 static GblQuark     objectEventFiltersQuark_    = GBL_QUARK_INVALID;
 
-
 static GBL_RESULT GblObjectClass_ivariantIFace_construct_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
     GBL_API_BEGIN(NULL);
@@ -326,10 +325,10 @@ static GBL_RESULT GblObjectClass_destructor_(GblBox* pRecord) {
 static GBL_RESULT GblObjectClass_propertyGet_(const GblObject* pSelf, GblSize slot, GblVariant* pValue, const GblProperty* pProp)  {
     GBL_API_BEGIN(NULL);
     switch(slot) {
-    case GBL_OBJECT_PROPERTY_ID_NAME:      GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblObject_name(pSelf));     break;
-    case GBL_OBJECT_PROPERTY_ID_PARENT:    GblVariant_setValueMove(pValue, GblProperty_valueType(pProp), GblObject_parent(pSelf));   break;
-    case GBL_OBJECT_PROPERTY_ID_REFCOUNT:  GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblBox_refCount(GBL_BOX(pSelf))); break;
-    case GBL_OBJECT_PROPERTY_ID_USERDATA:  GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblBox_userdata(GBL_BOX(pSelf))); break;
+    case GblObject_Property_Id_name:      GblVariant_setValueCopy(pValue, pProp->valueType, GblObject_name(pSelf));     break;
+    case GblObject_Property_Id_parent:    GblVariant_setValueMove(pValue, pProp->valueType, GblObject_parent(pSelf));   break;
+    case GblObject_Property_Id_refCount:  GblVariant_setValueCopy(pValue, pProp->valueType, GblBox_refCount(GBL_BOX(pSelf))); break;
+    case GblObject_Property_Id_userdata:  GblVariant_setValueCopy(pValue, pProp->valueType, GblBox_userdata(GBL_BOX(pSelf))); break;
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY, "Reading unhandled property: %s", GblProperty_nameString(pProp));
     }
     GBL_API_END();
@@ -339,19 +338,19 @@ static GBL_RESULT GblObjectClass_propertySet_(GblObject* pSelf, GblSize slot, co
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(pProp);
     switch(slot) {
-    case GBL_OBJECT_PROPERTY_ID_NAME: {
+    case GblObject_Property_Id_name: {
         const char* pName = NULL;
         GBL_API_CALL(GblVariant_getValueCopy(pValue, &pName));
         GblObject_setName(pSelf, pName);
         break;
     }
-    case GBL_OBJECT_PROPERTY_ID_PARENT: {
+    case GblObject_Property_Id_parent: {
         GblObject* pParent = NULL;
         GBL_API_CALL(GblVariant_getValuePeek(pValue, &pParent));
         GblObject_setParent(pSelf, pParent);
         break;
     }
-    case GBL_OBJECT_PROPERTY_ID_USERDATA: {
+    case GblObject_Property_Id_userdata: {
         void* pUserdata = NULL;
         GBL_API_CALL(GblVariant_getValueCopy(pValue, &pUserdata));
         GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
@@ -371,14 +370,17 @@ static GBL_RESULT GblObjectClass_init_(GblObjectClass* pClass, void* pData, GblC
 
     // static constructor for first instance of class
     if(!GblType_classRefCount(GBL_OBJECT_TYPE)) {
-        GBL_API_CALL(gblPropertyTableInitialize(pCtx, GBL_OBJECT_PROPERTY_TABLE_CAPACITY_DEFAULT_));
         objectNameQuark_            = GblQuark_fromStringStatic("_name");
         objectRefCountQuark_        = GblQuark_fromStringStatic("_refCount");
         objectParentQuark_          = GblQuark_fromStringStatic("_parent");
         objectFamilyQuark_          = GblQuark_fromStringStatic("_family");
         objectEventFiltersQuark_    = GblQuark_fromStringStatic("_eventFilters");
 
+#if 0
         GBL_PROPERTY_TABLE_REGISTER(GBL_OBJECT, pClass);
+#else
+        GBL_PROPERTIES_REGISTER(GblObject);
+#endif
     }
 
     static const GblIVariantIFaceVTable iVariantVTable = {
@@ -425,14 +427,10 @@ static GBL_RESULT GblObjectClass_final_(GblObjectClass* pClass, void* pClassData
     GBL_API_BEGIN(pCtx);
 
     if(!GblType_classRefCount(GBL_CLASS_TYPEOF(pClass))) {
-        const GblBool result = gblPropertyTableEraseAll(GBL_CLASS_TYPEOF(pClass));
+        const GblBool result = GblProperty_uninstallAll(GBL_CLASS_TYPEOF(pClass));
         GBL_API_VERIFY_EXPRESSION(result);
     }
 
-    // static destructor for last instance of class
-    if(!GblType_classRefCount(GBL_OBJECT_TYPE)) {
-        GBL_API_CALL(gblPropertyTableFinalize());
-    }
     GBL_API_END();
 }
 
@@ -542,8 +540,8 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
         GblVariant variant = GBL_VARIANT_INIT;
         const GblProperty* pProp = GblObject_propertyFindString(pSelf, pKey);
         if(pProp) {
-            GBL_API_CALL(GblVariant_constructValueCopyVaList(&variant, GblProperty_valueType(pProp), pVarArgs));
-            if(GblProperty_flags(pProp) & GBL_PROPERTY_FLAG_CONSTRUCT) {
+            GBL_API_CALL(GblVariant_constructValueCopyVaList(&variant, pProp->valueType, pVarArgs));
+            if(pProp->flags & GBL_PROPERTY_FLAG_CONSTRUCT) {
                 GBL_API_CALL(GblObject_propertySet(pSelf, pProp, &variant));
             } else {
                 GBL_API_WARN("[GblObject] Failed to construct with non-constructible property: %s[%s]",
@@ -615,7 +613,7 @@ static GBL_RESULT GblObject_constructVariants_(GblObject* pSelf,
         const GblProperty* pProp = GblObject_propertyFindString(pSelf, pNames[p]);
 
         if(pProp) {
-            if(GblProperty_flags(pProp) & GBL_PROPERTY_FLAG_CONSTRUCT) {
+            if(pProp->flags & GBL_PROPERTY_FLAG_CONSTRUCT) {
                 GBL_API_CALL(GblObject_propertySet(pSelf, pProp, &pValues[p]));
             } else {
                 GBL_API_WARN("[GblObject]: Failed to construct with non-constructible property: %s[%s]",
@@ -712,7 +710,7 @@ GBL_API GblObject_getValue(const GblObject* pSelf, const char* pName, ...) GBL_N
     GBL_API_BEGIN(NULL);
     GblVariant variant;
     const GblProperty* pProp = GblObject_propertyFindString(pSelf, pName);
-    GBL_API_VERIFY(GblProperty_flags(pProp) & GBL_PROPERTY_FLAG_READ,
+    GBL_API_VERIFY(pProp->flags & GBL_PROPERTY_FLAG_READ,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unreadable property: [%s]", pName);
     GBL_API_CALL(GblVariant_constructDefault(&variant, GBL_NIL_TYPE));
@@ -737,7 +735,7 @@ GBL_API GblObject_getVaList(const GblObject* pSelf, va_list* pVarArgs) GBL_NOEXC
             GBL_API_CALL(GblVariant_constructDefault(&variant, GBL_NIL_TYPE));
             GBL_API_CALL(GblObject_propertyGetString(pSelf, pKey, &variant));
             GBL_API_CALL(GblVariant_getValueCopyVaList(&variant, pVarArgs));
-            if(GblProperty_flags(pProp) & GBL_PROPERTY_FLAG_READ) {
+            if(pProp->flags & GBL_PROPERTY_FLAG_READ) {
                 ;
             } else {
                 GBL_API_WARN("[GblObject]: Failed to get non-readable property: %s[%s]",
@@ -760,10 +758,10 @@ GBL_API GblObject_setValue(GblObject* pSelf, const char* pName, ...) GBL_NOEXCEP
     GBL_API_BEGIN(NULL);
     GblVariant variant;
     const GblProperty* pProp = GblObject_propertyFindString(pSelf, pName);
-    GBL_API_VERIFY(GblProperty_flags(pProp) & GBL_PROPERTY_FLAG_WRITE,
+    GBL_API_VERIFY(pProp->flags & GBL_PROPERTY_FLAG_WRITE,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unwritable property: [%s]", pName);
-    GBL_API_CALL(GblVariant_constructValueCopyVaList(&variant, GblProperty_valueType(pProp), &varArgs));
+    GBL_API_CALL(GblVariant_constructValueCopyVaList(&variant, pProp->valueType, &varArgs));
     GBL_API_CALL(GblObject_setVariants(pSelf, 1, &pName, &variant));
     GBL_API_CALL(GblVariant_destruct(&variant));
     GBL_API_END_BLOCK();
@@ -777,7 +775,7 @@ GBL_API GblObject_setVaList(GblObject* pSelf, va_list* pVarArgs) GBL_NOEXCEPT {
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_POINTER(pVarArgs);
 
-    GblSize count = gblPropertyTableCount(GBL_INSTANCE_TYPEOF(pSelf));
+    GblSize count = GblProperty_count(GBL_INSTANCE_TYPEOF(pSelf));
     GblVariant*  pVariants  = GBL_ALLOCA(sizeof(GblVariant) * count);
     const char** pKeys      = GBL_ALLOCA(sizeof(const char*) * count);
 
@@ -787,8 +785,8 @@ GBL_API GblObject_setVaList(GblObject* pSelf, va_list* pVarArgs) GBL_NOEXCEPT {
         pKeys[p] = pKey;
         const GblProperty* pProp = GblObject_propertyFindString(pSelf, pKey);
         if(pProp) {
-            GBL_API_CALL(GblVariant_constructValueCopyVaList(&pVariants[p], GblProperty_valueType(pProp), pVarArgs));
-            if(GblProperty_flags(pProp) & GBL_PROPERTY_FLAG_WRITE) {
+            GBL_API_CALL(GblVariant_constructValueCopyVaList(&pVariants[p], pProp->valueType, pVarArgs));
+            if(pProp->flags & GBL_PROPERTY_FLAG_WRITE) {
                 ++p;
             } else {
                 GBL_API_WARN("[GblObject]: Failed to set non-writable property: %s[%s]",
@@ -1032,3 +1030,5 @@ GBL_EXPORT GblContext* GblObject_findContext(GblObject* pSelf) GBL_NOEXCEPT {
     }
     return (GblContext*)pContext;
 }
+
+GBL_EXPORT GblType GblObject_type(void) { return GBL_OBJECT_TYPE; }

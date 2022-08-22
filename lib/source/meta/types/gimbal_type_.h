@@ -96,7 +96,8 @@ extern GblType          GblType_registerBuiltin_          (GblSize              
                                                            const GblTypeInfo*   pTypeInfo,
                                                            GblTypeFlags         flags);
 
-
+extern GBL_RESULT       GblProperty_init_                 (GblContext* pCtx);
+extern GBL_RESULT       GblProperty_final_                (GblContext* pCtx);
 
 extern GBL_RESULT       GblSignal_init_                   (GblContext* pCtx);
 extern GBL_RESULT       GblSignal_final_                  (GblContext* pCtx);
@@ -112,7 +113,7 @@ extern GBL_RESULT       GblFlags_typeRegister_            (GblContext* pCtx);
 extern GBL_RESULT       GblPointer_typeRegister_          (GblContext* pCtx);
 extern GBL_RESULT       GblBoxed_typeRegister_            (GblContext* pCtx);
 extern GBL_RESULT       GblITable_typeRegister_           (GblContext* pCtx);
-extern GBL_RESULT       GblBox_typeRegister_           (GblContext* pCtx);
+extern GBL_RESULT       GblBox_typeRegister_              (GblContext* pCtx);
 extern GBL_RESULT       GblIEventHandler_typeRegister_    (GblContext* pCtx);
 extern GBL_RESULT       GblIEventFilter_typeRegister_     (GblContext* pCtx);
 extern GBL_RESULT       GblObject_typeRegister_           (GblContext* pCtx);

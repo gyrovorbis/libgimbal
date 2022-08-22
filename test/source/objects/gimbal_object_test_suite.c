@@ -99,16 +99,16 @@ static GBL_RESULT TestObject_propertyGet(const GblObject* pSelf, GblSize slot, G
     GBL_API_BEGIN(pSelf);
     switch(slot) {
     case TEST_OBJECT_PROPERTY_FLOATER:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), TEST_OBJECT(pSelf)->floater);
+        GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT(pSelf)->floater);
         break;
     case TEST_OBJECT_PROPERTY_STRINGER:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), TEST_OBJECT(pSelf)->stringer);
+        GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT(pSelf)->stringer);
         break;
     case TEST_OBJECT_PROPERTY_STATICINT32:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), TEST_OBJECT_GET_CLASS(pSelf)->staticInt32);
+        GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT_GET_CLASS(pSelf)->staticInt32);
         break;
     case TEST_OBJECT_PROPERTY_USERDATA:
-        GblVariant_setValueCopy(pValue, GblProperty_valueType(pProp), GblBox_userdata(GBL_BOX(pSelf)));
+        GblVariant_setValueCopy(pValue, pProp->valueType, GblBox_userdata(GBL_BOX(pSelf)));
         break;
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Attempt to get unregistered property: %s",

@@ -55,18 +55,6 @@ extern "C" {
 #   define GBL_BOOL                             uint8_t
 #endif
 
-#ifndef GBL_FLOAT
-#   define GBL_FLOAT                            float
-#endif
-
-#ifndef GBL_INT
-#   define GBL_INT                              int32_t
-#endif
-
-#ifndef GBL_UINT
-#   define GBL_UINT                             uint32_t
-#endif
-
 #ifndef GBL_ENUM
 #   define GBL_ENUM                             uint32_t
 #endif

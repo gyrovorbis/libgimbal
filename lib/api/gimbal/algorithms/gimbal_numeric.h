@@ -69,8 +69,8 @@ GblSize gblAlignedAllocSize(GblSize bytes) GBL_NOEXCEPT {
 
 // GCD using Euclid's algorithm, only >0 values
 GBL_INLINE GBL_CONSTEXPR
-GblInt gblGcd(GblInt u, GblInt v) GBL_NOEXCEPT {
-    GblInt R;
+int gblGcd(int u, int v) GBL_NOEXCEPT {
+    int R;
     //if(!u) return v;
     //if(!v) return u;
     while ((u % v) > 0) GBL_LIKELY {
@@ -82,7 +82,7 @@ GblInt gblGcd(GblInt u, GblInt v) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GBL_CONSTEXPR
-GblInt gblParity(uint8_t n) {
+int gblParity(uint8_t n) {
     int p = 0;
     while(n) GBL_LIKELY {
         p = !p;

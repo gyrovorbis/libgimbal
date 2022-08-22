@@ -754,6 +754,7 @@ void GblType_init_(void) {
                                             GBL_FALSE,
                                             pCtx_));
 
+    GBL_API_CALL(GblProperty_init_(pCtx_));
     GBL_API_CALL(GblSignal_init_(pCtx_));
     GBL_API_CALL(GblVariant_init_(pCtx_));
     GBL_API_CALL(GblType_registerBuiltins_());
@@ -806,6 +807,7 @@ GBL_EXPORT GBL_RESULT GblType_final(void) {
 
     //iterate over types and cleanup classes
     GBL_API_CALL(GblSignal_final_(pCtx_));
+    GBL_API_CALL(GblProperty_final_(pCtx_));
     GBL_API_CALL(GblVariant_final_(pCtx_));
     GBL_API_CALL(GblArrayList_clear(&typeBuiltins_.vector));
     GBL_API_CALL(GblArrayList_destruct(&typeBuiltins_.vector));

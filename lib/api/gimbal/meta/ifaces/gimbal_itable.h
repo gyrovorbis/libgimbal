@@ -21,26 +21,26 @@ GBL_DECLS_BEGIN
 #define GBL_ITABLE_IFACE_CHECK(klass)   (GBL_CLASS_CHECK_PREFIX         (klass,    GBL_ITABLE))
 #define GBL_ITABLE_GET_IFACE(instance)  (GBL_INSTANCE_GET_CLASS_PREFIX  (instance, GBL_ITABLE))
 
-#define SELF    GblITable* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblITable* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_INTERFACE_DERIVE(GblITable)
-    GBL_RESULT (*pFnIndex)    (CSELF, const GblVariant* pKey, GblVariant* pValue);
-    GBL_RESULT (*pFnNewIndex) (SELF, const GblVariant* pKey, const GblVariant* pValue);
-    GBL_RESULT (*pFnNextIndex)(CSELF, const GblVariant* pKey, GblVariant* pNextKey, GblVariant* pNextValue);
+    GBL_RESULT (*pFnIndex)    (GBL_CSELF, const GblVariant* pKey, GblVariant* pValue);
+    GBL_RESULT (*pFnNewIndex) (GBL_SELF, const GblVariant* pKey, const GblVariant* pValue);
+    GBL_RESULT (*pFnNextIndex)(GBL_CSELF, const GblVariant* pKey, GblVariant* pNextKey, GblVariant* pNextValue);
 GBL_INTERFACE_END
 
 GBL_EXPORT GblType  GblITable_type(void) GBL_NOEXCEPT;
-GBL_API             GblITable_index(CSELF, const GblVariant* pKey, GblVariant* pValue) GBL_NOEXCEPT;
-GBL_API             GblITable_newIndex(SELF, const GblVariant* pKey, const GblVariant* pValue) GBL_NOEXCEPT;
-GBL_API             GblITable_nextIndex(CSELF, const GblVariant* pKey, GblVariant* pNextKey, GblVariant* pNextValue) GBL_NOEXCEPT;
+GBL_API             GblITable_index(GBL_CSELF, const GblVariant* pKey, GblVariant* pValue) GBL_NOEXCEPT;
+GBL_API             GblITable_newIndex(GBL_SELF, const GblVariant* pKey, const GblVariant* pValue) GBL_NOEXCEPT;
+GBL_API             GblITable_nextIndex(GBL_CSELF, const GblVariant* pKey, GblVariant* pNextKey, GblVariant* pNextValue) GBL_NOEXCEPT;
 
-//GBL_API GblITable_print(CSELF);
-//GBL_API GblITable_save(CSELF, GblStringBuffer* pString);
-//GBL_API GblITable_load(SELF, const GblStringBuffer* pString);
+//GBL_API GblITable_print(GBL_CSELF);
+//GBL_API GblITable_save(GBL_CSELF, GblStringBuffer* pString);
+//GBL_API GblITable_load(GBL_SELF, const GblStringBuffer* pString);
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 GBL_DECLS_END
 

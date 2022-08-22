@@ -10,6 +10,8 @@
 
 #include "gimbal_macro_sequences.h"
 
+#define GBL_VA_REQUIRE(...) ...
+
 #define GBL_VA_ARGS(...) ,##__VA_ARGS__
 #define _GBL_STRINGIFY(a) #a
 #define GBL_STRINGIFY(a) _GBL_STRINGIFY(a)

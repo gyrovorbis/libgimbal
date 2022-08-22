@@ -20,8 +20,8 @@
 #define GBL_CONTEXT_CLASS_CHECK(klass)  GBL_CLASS_CHECK_PREFIX   (klass, GBL_CONTEXT)
 #define GBL_CONTEXT_GET_CLASS(inst)     GBL_INSTANCE_GET_CLASS_PREFIX(inst,  GBL_CONTEXT)
 
-#define SELF    GblContext* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblContext* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -42,7 +42,7 @@ typedef struct GblContext {
 } GblContext;
 
 GBL_DECLARE_ENUM(GBL_CONTEXT_PROPERTY_ID) {
-    GBL_CONTEXT_PROPERTY_ID_FIRST               = GBL_OBJECT_PROPERTY_ID_COUNT,
+    GBL_CONTEXT_PROPERTY_ID_FIRST               = GblObject_Property_Id_count,
     GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_RESULT   = GBL_CONTEXT_PROPERTY_ID_FIRST,
     GBL_CONTEXT_PROPERTY_ID_LAST_ISSUE_MESSSAGE,
     GBL_CONTEXT_PROPERTY_ID_COUNT
@@ -65,21 +65,21 @@ GBL_PROPERTY_TABLE_END()
 
 
 GBL_EXPORT const GblCallRecord*
-                        GblContext_lastIssue        (CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblContext_lastIssueSet     (SELF, const GblCallRecord* pRecord)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblContext_lastIssueClear   (SELF)                                  GBL_NOEXCEPT;
+                        GblContext_lastIssue        (GBL_CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblContext_lastIssueSet     (GBL_SELF, const GblCallRecord* pRecord)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblContext_lastIssueClear   (GBL_SELF)                                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool      GblContext_hasIssue         (CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblContext_hasError         (CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblContext_lastIssueResult  (CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblContext_lastIssueMessage (CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblContext_hasIssue         (GBL_CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblContext_hasError         (GBL_CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblContext_lastIssueResult  (GBL_CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblContext_lastIssueMessage (GBL_CSELF)                                 GBL_NOEXCEPT;
 
-GBL_EXPORT GblContext*  GblContext_parentContext    (CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT void         GblContext_setLogFilter     (SELF, GblFlags mask)                   GBL_NOEXCEPT;
+GBL_EXPORT GblContext*  GblContext_parentContext    (GBL_CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT void         GblContext_setLogFilter     (GBL_SELF, GblFlags mask)                   GBL_NOEXCEPT;
 
 
-GblContext*             GblContext_global(void)                                             GBL_NOEXCEPT;
-void                    GblContext_globalSet(GblContext* pCtx)                              GBL_NOEXCEPT;
+GblContext*             GblContext_global(void)                                                 GBL_NOEXCEPT;
+void                    GblContext_globalSet(GblContext* pCtx)                                  GBL_NOEXCEPT;
 
 /* ========== PRIVATE ==========
  * Private methods, do not call directly.
@@ -87,34 +87,34 @@ void                    GblContext_globalSet(GblContext* pCtx)                  
  * Call via API frame macros like GBL_API_MALLOC(), GBL_API_FREE(), GBL_API_LOG(), GBL_API_PUSH(), etc
  * after calling GBL_API_BEGIN(GblContext* pCtx) with the context.
  */
-GBL_API GblContext_memAlloc_     (SELF,
+GBL_API GblContext_memAlloc_     (GBL_SELF,
                                   const GblStackFrame*  pFrame,
                                   GblSize               size,
                                   GblSize               align,
                                   const char*           pDbgStr,
                                   void**                ppData)     GBL_NOEXCEPT;
-GBL_API GblContext_memRealloc_   (SELF,
+GBL_API GblContext_memRealloc_   (GBL_SELF,
                                   const GblStackFrame*  pFrame,
                                   void*                 pData,
                                   GblSize               newSize,
                                   GblSize               newAlign,
                                   void**                ppNewData)  GBL_NOEXCEPT;
-GBL_API GblContext_memFree_      (SELF,
+GBL_API GblContext_memFree_      (GBL_SELF,
                                   const GblStackFrame*  pFrame,
                                   void*                 pData)      GBL_NOEXCEPT;
 
-GBL_API GblContext_logWrite_     (SELF,
+GBL_API GblContext_logWrite_     (GBL_SELF,
                                   const GblStackFrame*  pFrame,
                                   GBL_LOG_LEVEL         level,
                                   const char*           pFmt,
                                   va_list               varArgs)    GBL_NOEXCEPT;
-GBL_API GblContext_logPush_      (SELF,
+GBL_API GblContext_logPush_      (GBL_SELF,
                                   const GblStackFrame*  pFrame)     GBL_NOEXCEPT;
-GBL_API GblContext_logPop_       (SELF,
+GBL_API GblContext_logPop_       (GBL_SELF,
                                   const GblStackFrame*  pFrame,
                                   uint32_t              count)      GBL_NOEXCEPT;
 
-GBL_API GblContext_callRecordSet_(SELF,
+GBL_API GblContext_callRecordSet_(GBL_SELF,
                                   const GblStackFrame* pFrame,
                                   const GblCallRecord* pRecord)     GBL_NOEXCEPT;
 
@@ -124,8 +124,8 @@ GBL_EXPORT
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 
 #endif // GIMBAL_CONTEXT_H

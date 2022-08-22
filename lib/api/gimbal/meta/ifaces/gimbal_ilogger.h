@@ -25,27 +25,27 @@
 #define GBL_ILOGGER_GET_IFACE(inst)     (GBL_INSTANCE_GET_CLASS_PREFIX (inst,  GBL_ILOGGER))
 #define GBL_ILOGGER_TRY_IFACE(inst)     (GBL_INSTANCE_TRY_CLASS_PREFIX  (inst,  GBL_ILOGGER))
 
-#define SELF    GblILogger* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblILogger* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
 GBL_INTERFACE_DERIVE(GblILogger)
-    GBL_RESULT (*pFnWrite)  (SELF, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
-    GBL_RESULT (*pFnPush)   (SELF, const GblStackFrame* pFrame);
-    GBL_RESULT (*pFnPop)    (SELF, const GblStackFrame* pFrame, uint32_t count);
+    GBL_RESULT (*pFnWrite)  (GBL_SELF, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
+    GBL_RESULT (*pFnPush)   (GBL_SELF, const GblStackFrame* pFrame);
+    GBL_RESULT (*pFnPop)    (GBL_SELF, const GblStackFrame* pFrame, uint32_t count);
 GBL_INTERFACE_END
 
-GBL_API GblILogger_write(SELF,
+GBL_API GblILogger_write(GBL_SELF,
                          const GblStackFrame*   pFrame,
                          GBL_LOG_LEVEL          level,
                          const char*            pFmt,
                          va_list                varArgs)    GBL_NOEXCEPT;
 
-GBL_API GblILogger_push (SELF,
+GBL_API GblILogger_push (GBL_SELF,
                          const GblStackFrame* pFrame)       GBL_NOEXCEPT;
 
-GBL_API GblILogger_pop  (SELF,
+GBL_API GblILogger_pop  (GBL_SELF,
                          const GblStackFrame* pFrame,
                           uint32_t            count)        GBL_NOEXCEPT;
 
@@ -53,8 +53,8 @@ GBL_API GblILogger_pop  (SELF,
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 
 

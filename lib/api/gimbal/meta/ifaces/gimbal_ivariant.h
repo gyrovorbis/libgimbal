@@ -63,42 +63,42 @@ GBL_INTERFACE_DERIVE(GblIVariant)
     const GblIVariantIFaceVTable*   pVTable;
 GBL_INTERFACE_END
 
-#define SELF    GblIVariantIFace* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblIVariantIFace* pSelf
+#define GBL_CSELF   const GBL_SELF
 
-GBL_API GblIVariantIFace_validate            (CSELF)                                        GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_constructDefault    (CSELF, VARIANT)                               GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_constructCopy       (CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_constructMove       (CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_constructValueCopy  (CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_constructValueMove  (CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_setCopy             (CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_setMove             (CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_setValueCopy        (CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_setValueMove        (CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_getValueCopy        (CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_getValuePeek        (CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_getValueMove        (CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantIFace_destruct            (CSELF, VARIANT)                               GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_validate            (GBL_CSELF)                                        GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructDefault    (GBL_CSELF, VARIANT)                               GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructCopy       (GBL_CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructMove       (GBL_CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructValueCopy  (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_constructValueMove  (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setCopy             (GBL_CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setMove             (GBL_CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setValueCopy        (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_setValueMove        (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_getValueCopy        (GBL_CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_getValuePeek        (GBL_CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_getValueMove        (GBL_CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_API GblIVariantIFace_destruct            (GBL_CSELF, VARIANT)                               GBL_NOEXCEPT;
 
-GBL_API GblIVariantIFace_compare             (CSELF,
+GBL_API GblIVariantIFace_compare             (GBL_CSELF,
                                               CVARIANT,
                                               const GblVariant* pOther,
-                                              GblInt* pCmpResult)                           GBL_NOEXCEPT;
+                                              GblInt* pCmpResult)                               GBL_NOEXCEPT;
 
-GBL_API GblIVariantIFace_save                (CSELF,
+GBL_API GblIVariantIFace_save                (GBL_CSELF,
                                               CVARIANT,
-                                              GblStringBuffer* pString)                     GBL_NOEXCEPT;
+                                              GblStringBuffer* pString)                         GBL_NOEXCEPT;
 
-GBL_API GblIVariantIFace_load                (CSELF,
+GBL_API GblIVariantIFace_load                (GBL_CSELF,
                                               VARIANT,
-                                              const GblStringBuffer* pString)               GBL_NOEXCEPT;
+                                              const GblStringBuffer* pString)                   GBL_NOEXCEPT;
 
 #undef CVARIANT
 #undef VARIANT
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 GBL_DECLS_END
 

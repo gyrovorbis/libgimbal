@@ -9,8 +9,8 @@
 #include "../core/gimbal_typedefs.h"
 #include "gimbal/core/gimbal_call_stack.h"
 
-#define SELF    GblAllocationTracker* pSelf
-#define CSELF   const SELF
+#define GBL_SELF    GblAllocationTracker* pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 
@@ -33,40 +33,40 @@ typedef struct GblAllocationTracker {
 
 GBL_EXPORT GblAllocationTracker*
                         GblAllocationTracker_create         (GblContext* pCtx)                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblAllocationTracker_destroy        (SELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblAllocationTracker_destroy        (GBL_SELF)                          GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblAllocationTracker_allocEvent     (SELF,
+GBL_EXPORT GBL_RESULT   GblAllocationTracker_allocEvent     (GBL_SELF,
                                                              const void*        pPtr,
                                                              GblSize            size,
                                                              GblSize            align,
                                                              const char*        pDbg,
                                                              GblSourceLocation  srcLoc)         GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblAllocationTracker_reallocEvent   (SELF,
+GBL_EXPORT GBL_RESULT   GblAllocationTracker_reallocEvent   (GBL_SELF,
                                                              const void*        pExisting,
                                                              const void*        pNew,
                                                              GblSize            newSize,
                                                              GblSize            newAlign,
                                                              GblSourceLocation  srcLoc)         GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblAllocationTracker_freeEvent      (SELF,
+GBL_EXPORT GBL_RESULT   GblAllocationTracker_freeEvent      (GBL_SELF,
                                                              const void* pPtr,
                                                              GblSourceLocation  srcLoc)         GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool      GblAllocationTracker_validatePointer(CSELF, const void* pPtr)           GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblAllocationTracker_validatePointer(GBL_CSELF, const void* pPtr)       GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblAllocationTracker_logActive      (CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblAllocationTracker_logActive      (GBL_CSELF)                         GBL_NOEXCEPT;
 
-GBL_EXPORT void         GblAllocationTracker_captureCounters(CSELF,
+GBL_EXPORT void         GblAllocationTracker_captureCounters(GBL_CSELF,
                                                              GblAllocationCounters* pCount)     GBL_NOEXCEPT;
 
-GBL_EXPORT void         GblAllocationTracker_diffCounters   (CSELF,
+GBL_EXPORT void         GblAllocationTracker_diffCounters   (GBL_CSELF,
                                                              const GblAllocationCounters* pSrc,
                                                              GblAllocationCounters*       pDst) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
-#undef CSELF
-#undef SELF
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_ALLOCATION_TRACKER_H
