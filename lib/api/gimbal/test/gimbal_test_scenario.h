@@ -21,7 +21,7 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblTestScenario);
 GBL_FORWARD_DECLARE_STRUCT(GblTestSuite);
 
-GBL_CLASS_DERIVE(GblTestScenarioClass, GblContextClass)
+GBL_CLASS_DERIVE(GblTestScenario, GblContext)
     GBL_RESULT  (*pFnBegin)     (GBL_SELF);
     GBL_RESULT  (*pFnEnd)       (GBL_SELF);
     GBL_RESULT  (*pFnRun)       (GBL_SELF, int argc, char* argv[]);

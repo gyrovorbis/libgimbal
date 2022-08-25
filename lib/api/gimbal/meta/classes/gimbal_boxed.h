@@ -30,7 +30,7 @@ typedef struct GblBoxedClassVTable {
     GblBoxedFreeFn      pFnFree;
 } GblBoxedClassVTable;
 
-GBL_CLASS_DERIVE(GblBoxedClass, GblPrimitiveClass)
+GBL_CLASS_DERIVE(GblBoxed, GblPrimitive)
     const GblBoxedClassVTable*      pVTable;
 GBL_CLASS_END
 

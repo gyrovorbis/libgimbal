@@ -25,15 +25,14 @@
 
 GBL_DECLS_BEGIN
 
-GBL_CLASS_DERIVE_EMPTY(GblContextClass,
-                       GblObjectClass, GblIAllocatorIFace, GblILoggerIFace);
+GBL_CLASS_DERIVE_EMPTY(GblContext,
+                       GblObject, GblIAllocator, GblILogger)
 
 GBL_INSTANCE_DERIVE(GblContext, GblObject)
-    GblCallRecord           lastIssue;
-    uint32_t                logStackDepth;
-    GblFlags                logFilter;
+    GblCallRecord   lastIssue;
+    uint32_t        logStackDepth;
+    GblFlags        logFilter;
 GBL_INSTANCE_END
-
 
 GBL_PROPERTIES(GblContext,
     (result,  GBL_GENERIC, (READ), GBL_UINT32_TYPE),
@@ -71,12 +70,14 @@ GBL_API GblContext_memAlloc_     (GBL_SELF,
                                   GblSize               align,
                                   const char*           pDbgStr,
                                   void**                ppData)     GBL_NOEXCEPT;
+
 GBL_API GblContext_memRealloc_   (GBL_SELF,
                                   const GblStackFrame*  pFrame,
                                   void*                 pData,
                                   GblSize               newSize,
                                   GblSize               newAlign,
                                   void**                ppNewData)  GBL_NOEXCEPT;
+
 GBL_API GblContext_memFree_      (GBL_SELF,
                                   const GblStackFrame*  pFrame,
                                   void*                 pData)      GBL_NOEXCEPT;
@@ -86,8 +87,10 @@ GBL_API GblContext_logWrite_     (GBL_SELF,
                                   GBL_LOG_LEVEL         level,
                                   const char*           pFmt,
                                   va_list               varArgs)    GBL_NOEXCEPT;
+
 GBL_API GblContext_logPush_      (GBL_SELF,
                                   const GblStackFrame*  pFrame)     GBL_NOEXCEPT;
+
 GBL_API GblContext_logPop_       (GBL_SELF,
                                   const GblStackFrame*  pFrame,
                                   uint32_t              count)      GBL_NOEXCEPT;

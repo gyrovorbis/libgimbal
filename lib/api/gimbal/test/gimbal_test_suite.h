@@ -49,7 +49,7 @@ typedef struct GblTestSuiteClassVTable {
     const GblTestCase*  pCases;
 } GblTestSuiteClassVTable;
 
-GBL_CLASS_DERIVE(GblTestSuiteClass, GblObjectClass)
+GBL_CLASS_DERIVE(GblTestSuite, GblObject)
     const GblTestSuiteClassVTable* pVTable;
     GBL_RESULT  (*pFnSuiteName) (GBL_CSELF, const char** ppName);
     GBL_RESULT  (*pFnCaseCount) (GBL_CSELF, GblSize* pSize);
@@ -60,7 +60,7 @@ GBL_CLASS_END
 /*! \brief GblObject representing a collection of unit test cases
  *  \ingroup testing
  */
-GBL_INSTANCE_DERIVE(GblTestSuite, GblObject, GblTestSuiteClass)
+GBL_INSTANCE_DERIVE(GblTestSuite, GblObject)
     GblCallRecord   failingIssue;
     GblSize         casesRun;
     GblSize         casesPassed;

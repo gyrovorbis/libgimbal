@@ -14,7 +14,7 @@
 
 GBL_DECLS_BEGIN
 
-GBL_CLASS_DERIVE_EMPTY(GblSignalClosureClass, GblClosureClass)
+GBL_CLASS_DERIVE_EMPTY(GblSignalClosure, GblClosure)
 
 GBL_INSTANCE_DERIVE(GblSignalClosure, GblClosure)
     GBL_PRIVATE()

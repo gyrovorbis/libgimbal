@@ -250,10 +250,10 @@ static GBL_RESULT GblTestScenarioClass_suiteEnd_(GblTestScenario* pSelf, const G
     GBL_API_END();
 }
 
-static GBL_RESULT GblTestScenarioClass_propertyGet_(const GblObject* pSelf, GblSize id, GblVariant* pValue, const GblProperty* pProp) {
+static GBL_RESULT GblTestScenarioClass_property_(const GblObject* pSelf, const GblProperty* pProp, GblVariant* pValue) {
     GBL_API_BEGIN(pSelf);
     GblTestScenario* pScenario = GBL_TEST_SCENARIO(pSelf);
-    switch(id) {
+    switch(pProp->id) {
     case GblTestScenario_Property_Id_testResult:
         GblVariant_setValueCopy(pValue, pProp->valueType, pScenario->result);
         break;
@@ -372,7 +372,7 @@ static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd, 
     pSelfClass->pFnSuiteEnd                            = GblTestScenarioClass_suiteEnd_;
     pSelfClass->base.base.pFnConstructor               = GblTestScenarioClass_constructor_;
     pSelfClass->base.base.base.pFnDestructor           = GblTestScenarioClass_destructor_;
-    pSelfClass->base.base.pFnPropertyGet               = GblTestScenarioClass_propertyGet_;
+    pSelfClass->base.base.pFnProperty                  = GblTestScenarioClass_property_;
     pSelfClass->base.GblIAllocatorIFaceImpl.pFnAlloc   = GblTestScenarioClass_IAllocator_alloc_;
     pSelfClass->base.GblIAllocatorIFaceImpl.pFnRealloc = GblTestScenarioClass_IAllocator_realloc_;
     pSelfClass->base.GblIAllocatorIFaceImpl.pFnFree    = GblTestScenarioClass_IAllocator_free_;

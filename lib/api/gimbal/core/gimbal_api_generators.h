@@ -29,23 +29,36 @@ extern "C" {
 #endif
 
 #define GBL_CLASS_IMPL_INTERFACE(iface) \
-    iface iface##Impl;
+    iface##IFace iface##IFace##Impl;
 
-#define GBL_CLASS_DERIVE_N(derivedKlass, baseKlass, ...) \
-    GBL_CLASS_DERIVE_2(derivedKlass, baseKlass) \
+#define GBL_CLASS_DERIVE_N(instance, baseKlass, ...) \
+    GBL_CLASS_DERIVE_2(instance, baseKlass) \
     GBL_MAP(GBL_CLASS_IMPL_INTERFACE, __VA_ARGS__)
 
-#define GBL_CLASS_DERIVE_2(derivedKlass, baseKlass) \
-    struct derivedKlass;                            \
-    typedef struct derivedKlass derivedKlass;       \
-    struct derivedKlass {                           \
-        baseKlass   base;
+#define GBL_CLASS_DERIVE_2(instance, baseInstance)  \
+    struct instance##Class;                         \
+    typedef struct instance##Class instance##Class; \
+    struct instance##Class {                        \
+        baseInstance##Class   base;
 
-#define GBL_CLASS_DERIVE_1(derivedKlass) \
-    GBL_CLASS_DERIVE_2(derivedKlass, GblClass)
+#define GBL_CLASS_DERIVE_1(instance) \
+    GBL_CLASS_DERIVE_2(instance, Gbl)
 
 #define GBL_CLASS_DERIVE(...)   \
-    GBL_VA_OVERLOAD_SELECT(GBL_CLASS_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_2_N, __VA_ARGS__)(__VA_ARGS__)
+    GBL_VA_OVERLOAD_CALL(GBL_CLASS_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_2_N, __VA_ARGS__)
+
+#define GBL_CLASS_BASE_N(instance, ...)             \
+    GBL_CLASS_DERIVE_N(instance, Gbl, __VA_ARGS__)
+
+#define GBL_CLASS_BASE_1(instance) \
+    GBL_CLASS_DERIVE_2(instance, Gbl)
+
+#define GBL_CLASS_BASE(...) \
+    GBL_VA_OVERLOAD_CALL(GBL_CLASS_BASE, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
+
+#define GBL_CLASS_BASE_EMPTY(...) \
+    GBL_CLASS_BASE(__VA_ARGS__)   \
+    GBL_CLASS_END
 
 #define GBL_CLASS_END };
 
@@ -72,33 +85,36 @@ extern "C" {
     GBL_INTERFACE_DERIVE_2(instance, instance##IFace)
 
 #define GBL_INTERFACE_DERIVE(...)   \
-    GBL_VA_OVERLOAD_SELECT(GBL_INTERFACE_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_3_N, __VA_ARGS__)(__VA_ARGS__)
+    GBL_VA_OVERLOAD_CALL(GBL_INTERFACE_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_3_N, __VA_ARGS__)
 
 #define GBL_INTERFACE_END };
 
-
-#define GBL_INSTANCE_DERIVE_3(derivedInstance, baseInstance, klass) \
+#define GBL_INSTANCE_DERIVE(derivedInstance, baseInstance)          \
     struct derivedInstance;                                         \
     typedef struct derivedInstance derivedInstance;                 \
     struct derivedInstance {                                        \
         union {                                                     \
-            klass*          pClass;                                 \
+            derivedInstance##Class*          pClass;                \
             baseInstance    base;                                   \
         };
 
-#define GBL_INSTANCE_DERIVE_2(derivedInstance, baseInstance) \
-    GBL_INSTANCE_DERIVE_3(derivedInstance, baseInstance, derivedInstance##Class)
+#define GBL_INSTANCE_BASE(instance)     \
+    struct instance;                    \
+    typedef struct instance instance;   \
+    struct instance {                   \
+        union {                         \
+            instance##Class* pClass;    \
+            GblInstance      base;      \
+        };
 
-#define GBL_INSTANCE_DERIVE_1(derivedInstance) \
-    GBL_INSTANCE_DERIVE_2(derivedInstance, GblInstance, GblClass)
-
-#define GBL_INSTANCE_DERIVE(...) \
-    GBL_VA_OVERLOAD_SELECT(GBL_INSTANCE_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_3_N, __VA_ARGS__)(__VA_ARGS__)
+#define GBL_INSTANCE_BASE_EMPTY(instance)   \
+    GBL_INSTANCE_BASE(instance)             \
+    GBL_INSTANCE_END
 
 #define GBL_INSTANCE_END };
 
-#define GBL_INSTANCE_DERIVE_EMPTY(...) \
-    GBL_INSTANCE_DERIVE(__VA_ARGS__)   \
+#define GBL_INSTANCE_DERIVE_EMPTY(derived, base) \
+    GBL_INSTANCE_DERIVE(derived, base)   \
     GBL_INSTANCE_END
 
 typedef struct GblPropertyInfo_ {
@@ -106,66 +122,6 @@ typedef struct GblPropertyInfo_ {
     uintptr_t     typeId;
     uint32_t    flags;
 } GblPropertyInfo_;
-#if 0
-#if 1
-#if 0
-#define GBL_PROPERTY_FLAGS__(flag) \
-    |GBL_PROPERTY_FLAG_##flag
-
-#define GBL_PROPERTY_FLAGS_(...) \
-    GBL_MAP_TUPLES(GBL_PROPERTY_FLAGS__, __VA_ARGS__)
-#endif
-
-
-#define GBL_PROPERTY_FLAG__(suffix)              \
-    GBL_PROPERTY_FLAG_##suffix |
-
-#define GBL_PROPERTY_FLAX_(...)              \
-    GBL_MAP(GBL_PROPERTY_FLAG__, __VA_ARGS__)
-
-#define GBL_PROPERTY_FLAGS_MASK_(...)            \
-    GBL_MAP_TUPLES(GBL_PROPERTY_FLAX_, __VA_ARGS__)0
-
-#define GBL_PROPERTY_INFO__(name, type, flgs)   \
-    { .pName = name, .typeId = type, .flags = GBL_PROPERTY_FLAGS_MASK_(flgs) },
-
-#define GBL_PROPERTY_ITEM_(...) \
-   GBL_MAP_TUPLES(GBL_PROPERTY_INFO__, __VA_ARGS__)
-
-#define GBL_PROPERTIES(object, ...) \
-   GBL_INLINE void object##_propertyInfo(GblSize size, GblPropertyInfo_*pInfoOut) {    \
-        const GblPropertyInfo_ infos[] = {   \
-            GBL_PROPERTY_ITEM_(__VA_ARGS__)   \
- }; memcpy(pInfoOut, &infos[size], sizeof(GblPropertyInfo_)); }
-
-#define GBL_PROPERTIES_END GBL_LPAREN
-#else
-#define GBL_PROPERTY_FLAGS__(flag) \
-    |GBL_PROPERTY_FLAG_##flag
-
-#define GBL_PROPERTY_FLAGS_(...) \
-    GBL_MAP_TUPLES(GBL_PROPERTY_FLAGS__, __VA_ARGS__)
-
-#define GBL_PROPERTY_INFO__(name, type, flgs)   \
-    { .pName = name, .typeId = type, .flags = flgs },
-
-#define GBL_PROPERTY_ITEM_(...) \
-    GBL_MAP(GBL_PROPERTY_INFO__, (__VA_ARGS__))
-
-#define GBL_PROPERTY_ITEM__()   \
-  GBL_PROPERTY_ITEM_
-
-#define GBL_LPAREN (
-#define GBL_RPAREN )
-
-#define GBL_PROPERTIES(object) \
-   GBL_INLINE void object##_propertyInfo(GblSize size, GblPropertyInfo_*pInfoOut) {    \
-        const GblPropertyInfo_ infos[] = {   \
-        GBL_PROPERTY_ITEM_
-
-#define GBL_PROPERTIES_END GBL_RPAREN) }; memcpy(pInfoOut, &infos[size], sizeof(GblPropertyInfo_)); }
-#endif
-#endif
 
 #define GBL_DECLARE_STRUCT_PUBLIC(S)    \
     struct S;                           \

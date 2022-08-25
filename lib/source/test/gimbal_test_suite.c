@@ -62,11 +62,11 @@ static GBL_RESULT GblTestSuiteClass_caseRun_(GblTestSuite* pSelf, GblContext* pC
     return GBL_API_RESULT();
 }
 
-static GBL_RESULT GblTestSuiteClass_propertyGet_(const GblObject* pSelf, GblSize id, GblVariant* pValue, const GblProperty* pProp) {
+static GBL_RESULT GblTestSuiteClass_property_(const GblObject* pSelf, const GblProperty* pProp, GblVariant* pValue) {
     GBL_API_BEGIN(pSelf);
     GblTestSuite* pSuite = GBL_TEST_SUITE(pSelf);
     GblTestSuite_* pSuite_ = GBL_TEST_SUITE_(pSelf);
-    switch(id) {
+    switch(pProp->id) {
     case GblTestSuite_Property_Id_runResult:
         GblVariant_setValueCopy(pValue, pProp->valueType, pSuite->failingIssue.result);
         break;
@@ -150,7 +150,7 @@ static GBL_RESULT GblTestSuiteClass_init_(GblClass* pClass, const void* pUd, Gbl
 
     pSelf->base.pFnConstructed      = GblTestSuiteClass_constructed_;
     pSelf->base.base.pFnDestructor  = GblTestSuiteClass_destructor_;
-    pSelf->base.pFnPropertyGet      = GblTestSuiteClass_propertyGet_;
+    pSelf->base.pFnProperty         = GblTestSuiteClass_property_;
 
     GBL_API_END();
 }

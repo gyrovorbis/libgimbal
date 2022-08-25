@@ -2,7 +2,7 @@
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/containers/gimbal_array_list.h>
 
-#define GBL_ARRAY_LIST_TEST_SUITE_PUSH_BACK_STRESS_TEST_SIZE_ 2047
+#define GBL_ARRAY_LIST_TEST_SUITE_PUSH_BACK_STRESS_TEST_SIZE_ 512
 #define GBL_ARRAY_LIST_TEST_SUITE_(inst)     ((GblArrayListTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_LIST_TEST_SUITE_TYPE))
 
 typedef struct GblArrayListTestSuite_ {

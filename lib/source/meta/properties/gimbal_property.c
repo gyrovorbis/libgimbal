@@ -115,9 +115,11 @@ GBL_INLINE const GblProperty* propertyFirstNextBase_(GblType objectType, GblType
     return pRoot;
 }
 
-GBL_EXPORT const GblProperty* GblProperty_find(GblType objectType, GblQuark name) GBL_NOEXCEPT {
+GBL_EXPORT const GblProperty* GblProperty_findQuark(GblType objectType, GblQuark name) {
     const GblProperty* pProperty = NULL;
     GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_)); {
+        GBL_API_VERIFY(name != GBL_QUARK_INVALID,
+                       GBL_RESULT_ERROR_INVALID_PROPERTY);
         GblProperty* pKey             = GBL_ALLOCA(sizeof(GblProperty));
         pKey->name                    = name;
         GBL_PRIV_REF(pKey).objectType = objectType;
@@ -135,7 +137,11 @@ GBL_EXPORT const GblProperty* GblProperty_find(GblType objectType, GblQuark name
     return pProperty;
 }
 
-GBL_EXPORT const GblProperty* GblProperty_next(GblType objectType, const GblProperty* pPrev, GblFlags mask) GBL_NOEXCEPT {
+GBL_EXPORT const GblProperty* GblProperty_find(GblType objectType, const char* pName) {
+    return GblProperty_findQuark(objectType, GblQuark_tryString(pName));
+}
+
+GBL_EXPORT const GblProperty* GblProperty_next(GblType objectType, const GblProperty* pPrev, GblFlags mask) {
     const GblProperty* pNext = NULL;
     GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_));
     const GblProperty* pIt = NULL;
@@ -153,7 +159,7 @@ GBL_EXPORT const GblProperty* GblProperty_next(GblType objectType, const GblProp
 
         // regular next node
         if(GBL_PRIV_REF(pIt).pNext) {
-            pIt = GblProperty_find(objectType, GBL_PRIV_REF(pIt).pNext->name);
+            pIt = GblProperty_findQuark(objectType, GBL_PRIV_REF(pIt).pNext->name);
         //beginning of new type
         } else {
             pIt = propertyFirstNextBase_(objectType, GBL_PRIV_REF(pIt).objectType);
@@ -209,9 +215,11 @@ GBL_EXPORT GBL_RESULT GblProperty_install(GblType objectType, GblProperty* pProp
 }
 
 
-GBL_EXPORT GblBool GblProperty_uninstall(GblType objectType, GblQuark name) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblProperty_uninstallQuark(GblType objectType, GblQuark name) GBL_NOEXCEPT {
     GblBool success = GBL_FALSE;
     GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_));
+    GBL_API_VERIFY(name != GBL_QUARK_INVALID,
+                   GBL_RESULT_ERROR_INVALID_PROPERTY);
     GBL_API_VERIFY_ARG(objectType != GBL_INVALID_TYPE);
     GBL_API_PUSH_VERBOSE("[GblObject] Uninstalling property: %s[%s]",
                          GblType_name(objectType), GblQuark_toString(name));
@@ -257,7 +265,11 @@ GBL_EXPORT GblBool GblProperty_uninstall(GblType objectType, GblQuark name) GBL_
     return success;
 }
 
-GBL_EXPORT GblBool GblProperty_uninstallAll(GblType objectType) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblProperty_uninstall(GblType objectType, const char* pName) {
+    return GblProperty_uninstallQuark(objectType, GblQuark_tryString(pName));
+}
+
+GBL_EXPORT GblBool GblProperty_uninstallAll(GblType objectType) {
     GblBool success = GBL_FALSE;
     GBL_API_BEGIN(GblHashSet_context(&propertyRegistry_));
     const GblPropertyRoot_* pRoot = propertyRoot_(objectType);
@@ -265,7 +277,7 @@ GBL_EXPORT GblBool GblProperty_uninstallAll(GblType objectType) GBL_NOEXCEPT {
         const unsigned propertyCount = pRoot->count;
         for(unsigned p = 0; p < propertyCount; ++p) { // last property removed will remove root!
             GBL_API_VERIFY_EXPRESSION(pRoot->pLast);
-            const GblBool result = GblProperty_uninstall(objectType, pRoot->pLast->name);
+            const GblBool result = GblProperty_uninstallQuark(objectType, pRoot->pLast->name);
             GBL_API_VERIFY_EXPRESSION(result);
         }
     }
@@ -284,13 +296,22 @@ GBL_EXPORT GBL_RESULT GblProperty_defaultValue(const GblProperty* pSelf, GblVari
 GBL_EXPORT GblBool GblProperty_checkValue(const GblProperty* pSelf, const GblVariant* pValue) {
     GBL_API_BEGIN(NULL);
     GBL_INSTANCE_VCALL(GBL_PROPERTY_TYPE, GblPropertyClass, pFnCheckValue, pSelf, pValue);
-    GBL_API_END();
+    GBL_API_END_BLOCK();
+    return GBL_RESULT_SUCCESS(GBL_API_RESULT());
 }
 
 GBL_EXPORT GBL_RESULT GblProperty_validateValue(const GblProperty* pSelf, GblVariant* pValue) {
     GBL_API_BEGIN(NULL);
     GBL_INSTANCE_VCALL(GBL_PROPERTY_TYPE, GblPropertyClass, pFnValidateValue, pSelf, pValue);
     GBL_API_END();
+}
+
+GBL_EXPORT int GblProperty_compareValues(const GblProperty* pSelf, const GblVariant* pV1, const GblVariant* pV2) {
+    int result = 0;
+    GBL_API_BEGIN(NULL);
+    GBL_INSTANCE_VCALL(GBL_PROPERTY_TYPE, GblPropertyClass, pFnCompareValues, pSelf, pV1, pV2, &result);
+    GBL_API_END_BLOCK();
+    return result;
 }
 
 GBL_EXPORT GblSize GblProperty_count(GblType objectType) {
@@ -442,6 +463,12 @@ static GBL_RESULT GblProperty_validateValue_(const GblProperty* pProp, GblVarian
     return GBL_RESULT_UNIMPLEMENTED;
 }
 
+static GBL_RESULT GblProperty_compareValues_(const GblProperty* pProp, const GblVariant* pV1, const GblVariant* pV2, int* pResult) {
+    GBL_UNUSED(pProp);
+    *pResult = GblVariant_compare(pV1, pV2);
+    return GBL_RESULT_SUCCESS;
+}
+
 static GBL_RESULT GblPropertyClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     GBL_UNUSED(pUd);
     GBL_API_BEGIN(pCtx);
@@ -451,7 +478,7 @@ static GBL_RESULT GblPropertyClass_init_(GblClass* pClass, const void* pUd, GblC
     pSelf->pFnDefaultValue      = GblProperty_defaultValue_;
     pSelf->pFnCheckValue        = GblProperty_checkValue_;
     pSelf->pFnValidateValue     = GblProperty_validateValue_;
-
+    pSelf->pFnCompareValues     = GblProperty_compareValues_;
     GBL_API_END();
 }
 

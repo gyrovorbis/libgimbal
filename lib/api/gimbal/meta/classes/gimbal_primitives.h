@@ -27,9 +27,9 @@
 #define GBL_STRING_TYPE                     (GBL_BUILTIN_TYPE(STRING))  ///< \details Builtin ID for string GblVariant type
 #define GBL_TYPE_TYPE                       (GBL_BUILTIN_TYPE(TYPE))    ///< \details Builtin ID for ::GblType GblVariant type
 ///@}
-GBL_CLASS_DERIVE(GblPrimitiveClass)
-    GblIVariantIFace    iVariantIFace;
-GBL_CLASS_END
+
+
+GBL_CLASS_BASE_EMPTY(GblPrimitive, GblIVariant)
 
 GblType GblPrimitive_registerBuiltin(GblSize                        index,
                                      const char*                    pName,

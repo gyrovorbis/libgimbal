@@ -104,6 +104,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_array_map.h
     api/gimbal/containers/gimbal_doubly_linked_list.h
     api/gimbal/containers/gimbal_array_list.h
+    api/gimbal/containers/gimbal_nary_tree.h
     api/gimbal/containers/gimbal_vector.hpp
     api/gimbal/core/gimbal_api_generators.h
     api/gimbal/core/gimbal_call_stack.hpp

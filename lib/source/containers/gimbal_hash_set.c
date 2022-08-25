@@ -551,7 +551,6 @@ GBL_EXPORT GblBool GblHashSet_foreach(const GblHashSet *map,
     return GBL_TRUE;
 }
 
-
 GBL_EXPORT GblHashSetIter GblHashSet_next(const GblHashSet* pSelf, const GblHashSetIter* pPrev) GBL_NOEXCEPT {
     GblHashSetIter it = {
         (GblHashSet*)pSelf,

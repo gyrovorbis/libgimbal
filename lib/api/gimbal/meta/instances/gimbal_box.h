@@ -35,13 +35,12 @@ GBL_FORWARD_DECLARE_STRUCT(GblBox);
  *  \extends GblClass
  *  \implements GblIVariantIFace
  */
-GBL_CLASS_DERIVE(GblBoxClass,
-                 GblClass, GblIVariantIFace)
+GBL_CLASS_BASE(GblBox, GblIVariant)
     GBL_PRIVATE()
         GblArrayMap* pFields;
     GBL_PRIVATE_END
 
-    GBL_RESULT  (*pFnDestructor)(GBL_SELF);
+    GBL_RESULT (*pFnDestructor)(GBL_SELF);
 GBL_CLASS_END
 
 /*! \class GblBox
@@ -51,7 +50,7 @@ GBL_CLASS_END
  *  \extends GblInstance
  *  \implements GblIVariant
  */
-GBL_INSTANCE_DERIVE(GblBox, GblInstance, GblBoxClass)
+GBL_INSTANCE_BASE(GblBox)
     GBL_PRIVATE()
         GblArrayMap* pFields;
         GblRefCount  refCounter;

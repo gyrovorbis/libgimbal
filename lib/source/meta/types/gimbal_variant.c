@@ -300,12 +300,13 @@ GBL_API GblVariant_setCopy(GblVariant* pSelf, const GblVariant* pOther) GBL_NOEX
 
 GBL_API GblVariant_setMove(GblVariant* pSelf, GblVariant* pOther) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
-    if(pSelf->type != pOther->type) {
+    /* you still have to destruct, what if it's another ref you're oving over!? */
+    //if(pSelf->type != pOther->type) {
         GBL_API_CALL(GblVariant_destruct(pSelf));
         GBL_API_CALL(GblVariant_constructMove(pSelf, pOther));
-    } else {
-        GBL_API_CALL(GblIVariantIFace_setMove(pIFace, pSelf, pOther));
-    }
+    //} else {
+    //   GBL_API_CALL(GblIVariantIFace_setMove(pIFace, pSelf, pOther));
+    //}
     GBL_VARIANT_END_();
 }
 /*

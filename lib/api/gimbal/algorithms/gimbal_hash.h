@@ -200,7 +200,17 @@ GBL_INLINE void MurmurHash3_x86_32 ( const void * key, int len,
 
 GBL_INLINE GblHash gblHashMurmur(const void* pData, GblSize size) GBL_NOEXCEPT {
     uint32_t out;
+#if 0
     MurmurHash3_x86_32(pData, size, gblSeed(0), &out);
+#else
+    uint32_t prime = 0x01000193;
+    uint32_t hash = 0x811C9DC5;
+    const unsigned char* p = (const unsigned char*)pData;
+    for (size_t i = 0; i < size; ++i) {
+        hash = (hash * prime) ^ *p++;
+    }
+    return hash;
+#endif
     return out;
 }
 

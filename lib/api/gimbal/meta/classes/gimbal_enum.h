@@ -35,7 +35,7 @@ typedef struct GblEnumEntry {
     const char*     pNick;
 } GblEnumEntry;
 
-GBL_CLASS_DERIVE(GblEnumClass, GblPrimitiveClass)
+GBL_CLASS_DERIVE(GblEnum, GblPrimitive)
     GblEnum             valueMax;
     GblEnum             valueMin;
     uint16_t            entryCount;

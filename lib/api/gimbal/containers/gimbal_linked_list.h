@@ -8,13 +8,13 @@
 
 #include "../core/gimbal_typedefs.h"
 
-#define GBL_SELF    GblLinkedListNode*  pSelf
-#define GBL_CSELF   const GBL_SELF
-
 #define GBL_LINKED_LIST_NPOS                            GBL_NPOS
 #define GBL_LINKED_LIST_NODE_INITIALIZER()              { .pNext = NULL }
 #define GBL_LINKED_LIST_NODE(name)                      GblLinkedListNode name = { .pNext = &name }
 #define GBL_LINKED_LIST_ENTRY(node, structure, field)   GBL_CONTAINER_OF(node, structure, field)
+
+#define GBL_SELF    GblLinkedListNode*  pSelf
+#define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
 

@@ -66,6 +66,8 @@ add_executable(GimbalTests
     source/types/gimbal_closure_test_suite.c
     include/types/gimbal_uuid_test_suite.h
     source/types/gimbal_uuid_test_suite.c
+    include/containers/gimbal_nary_tree_test_suite.h
+    source/containers/gimbal_nary_tree_test_suite.c
     source/test_main.c)
 
 target_link_libraries(GimbalTests

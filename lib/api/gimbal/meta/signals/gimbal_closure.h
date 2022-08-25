@@ -17,7 +17,7 @@
 
 GBL_DECLS_BEGIN
 
-GBL_CLASS_DERIVE(GblClosureClass, GblBoxClass)
+GBL_CLASS_DERIVE(GblClosure, GblBox)
     GblMarshalFn    pFnMetaMarshal;
 GBL_CLASS_END
 

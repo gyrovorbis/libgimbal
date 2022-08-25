@@ -49,12 +49,12 @@ GBL_RESULT GblModule_IPlugin_typeInfo_(const GblIPlugin* pPlugin, GblType type, 
     GBL_API_END();
 }
 
-GBL_RESULT GblModule_propertyGet_(const GblObject* pObject, GblSize id, GblVariant* pValue, const GblProperty* pProperty) {
+GBL_RESULT GblModule_property_(const GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
     GBL_API_BEGIN(pObject);
     GBL_API_END();
 }
 
-GBL_RESULT GblModule_propertySet_(GblObject* pObject, GblSize id, const GblVariant* pValue, const GblProperty* pProperty) {
+GBL_RESULT GblModule_setProperty_(GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
     GBL_API_BEGIN(pObject);
     GBL_API_END();
 }
@@ -96,8 +96,8 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
     pSelf->pFnLoad                              = GblModule_load_;
     pSelf->pFnUnload                            = GblModule_unload_;
     pSelf->base.base.base.pFnDestructor         = GblModule_destructor_;
-    pSelf->base.base.pFnPropertyGet             = GblModule_propertyGet_;
-    pSelf->base.base.pFnPropertySet             = GblModule_propertySet_;
+    pSelf->base.base.pFnProperty                = GblModule_property_;
+    pSelf->base.base.pFnSetProperty             = GblModule_setProperty_;
     pSelf->GblIPluginIFaceImpl.pFnUse           = GblModule_IPlugin_use_;
     pSelf->GblIPluginIFaceImpl.pFnUnuse         = GblModule_IPlugin_unuse_;
     pSelf->GblIPluginIFaceImpl.pFnTypeInfo      = GblModule_IPlugin_typeInfo_;

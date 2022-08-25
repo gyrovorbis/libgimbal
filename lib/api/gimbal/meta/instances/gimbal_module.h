@@ -33,13 +33,12 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblModule);
 
-GBL_CLASS_DERIVE(GblModuleClass, GblContextClass,
-                 GblIPluginIFace)
+GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
     GBL_RESULT  (*pFnLoad)  (GBL_SELF);
     GBL_RESULT  (*pFnUnload)(GBL_SELF);
 GBL_CLASS_END
 
-GBL_INSTANCE_DERIVE(GblModule, GblContext, GblModuleClass)
+GBL_INSTANCE_DERIVE(GblModule, GblContext)
     GblVersion      version;
     GblStringRef    prefix;
     GblStringRef    author;

@@ -235,7 +235,7 @@ const char* quarkStringAllocCopy_(const char* pString) {
     return pNewString;
 }
 
-GBL_EXPORT GblQuark quarkFromString_(const char* pString, GblBool alloc) GBL_NOEXCEPT {
+GBL_EXPORT GblQuark quarkFromString_(const char* pString, GblBool alloc) {
     GblQuark quark = 0;
     if(pString) {
         GBL_QUARK_ENSURE_INITIALIZED_();

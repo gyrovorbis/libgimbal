@@ -10,7 +10,7 @@
 
 GBL_RESULT GblPrimitiveClass_init_(GblPrimitiveClass* pClass, GblIVariantIFaceVTable* pVTable, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
-    pClass->iVariantIFace.pVTable = pVTable;
+    pClass->GblIVariantIFaceImpl.pVTable = pVTable;
     GBL_API_END();
 }
 
@@ -1067,7 +1067,7 @@ GblType GblPrimitive_registerBuiltin(GblSize                         index,
                                        .interfaceCount      = 1,
                                        .pInterfaceMap = &(const GblTypeInterfaceMapEntry) {
                                            .interfaceType  = GBL_IVARIANT_TYPE,
-                                           .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
+                                           .classOffset    = offsetof(GblPrimitiveClass, GblIVariantIFaceImpl)
                                        }
                                    },
                                    GBL_TYPE_ROOT_FLAG_CLASSED | typeFlags);

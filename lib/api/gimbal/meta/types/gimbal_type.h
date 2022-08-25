@@ -14,7 +14,7 @@
  */
 #define GBL_INVALID_TYPE    ((GblType)0)
 
-#define GBL_SELF                GblType self
+#define GBL_SELF            GblType self
 
 GBL_DECLS_BEGIN
 

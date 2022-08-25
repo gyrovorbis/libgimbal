@@ -14,10 +14,9 @@
 
 GBL_DECLS_BEGIN
 
-GBL_CLASS_DERIVE_EMPTY(GblBoolPropertyClass, GblPropertyClass)
+GBL_CLASS_DERIVE_EMPTY(GblBoolProperty, GblProperty)
 
-GBL_INSTANCE_DERIVE(GblBoolProperty, GblProperty,
-                    GblBoolPropertyClass)
+GBL_INSTANCE_DERIVE(GblBoolProperty, GblProperty)
     GblBool defaultValue;
 GBL_INSTANCE_END
 
