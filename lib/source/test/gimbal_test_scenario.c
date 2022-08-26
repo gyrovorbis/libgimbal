@@ -85,9 +85,13 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
     pSelf->result = GBL_RESULT_SUCCESS;
     GBL_API_VERIFY_CALL(pClass->pFnBegin(pSelf));
 
-    for(GblTestSuite* pSuiteIt = GBL_TEST_SUITE_TRY(GblObject_childFirst(GBL_OBJECT(pSelf)));
+    for(GblTestSuite* pSuiteIt = GBL_INSTANCE_TRY(GblObject_childFirst(GBL_OBJECT(pSelf)),
+                                                  GBL_TEST_SUITE_TYPE,
+                                                  GblTestSuite);
         pSuiteIt != NULL;
-        pSuiteIt = GBL_TEST_SUITE_TRY(GblObject_siblingNext(GBL_OBJECT(pSuiteIt))))
+        pSuiteIt = GBL_INSTANCE_TRY(GblObject_siblingNext(GBL_OBJECT(pSuiteIt)),
+                                    GBL_TEST_SUITE_TYPE,
+                                    GblTestSuite))
     {
         pSelf_->pCurSuite = pSuiteIt;
 
@@ -458,7 +462,9 @@ GBL_EXPORT GblTestSuite* GblTestScenario_suiteFind(const GblTestScenario* pSelf,
     GblTestSuite* pSuite = NULL;
     GBL_API_BEGIN(pSelf);
     GBL_API_VERIFY_POINTER(pName);
-    pSuite = GBL_TEST_SUITE_TRY(GblObject_findChildByName(GBL_OBJECT(pSelf), pName));
+    pSuite = GBL_INSTANCE_TRY(GblObject_findChildByName(GBL_OBJECT(pSelf), pName),
+                              GBL_TEST_SUITE_TYPE,
+                              GblTestSuite);
     GBL_API_END_BLOCK();
     return pSuite;
 }
@@ -475,12 +481,12 @@ GBL_EXPORT GBL_RESULT GblTestScenario_run(GblTestScenario* pSelf, int argc, char
     GBL_API_BEGIN(pSelf);
 
     GblContext* pOldGlobalCtx = GblContext_global();
-    GblContext_globalSet(GBL_CONTEXT(pSelf));
+    GblContext_setGlobal(GBL_CONTEXT(pSelf));
 
     GBL_INSTANCE_VCALL(GBL_TEST_SCENARIO_TYPE, GblTestScenarioClass, pFnRun, pSelf, argc, argv);
 
     GblContext_setLogFilter(pOldGlobalCtx, GBL_LOG_LEVEL_WARNING|GBL_LOG_LEVEL_ERROR);
-    GblContext_globalSet(pOldGlobalCtx);
+    GblContext_setGlobal(pOldGlobalCtx);
 
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();

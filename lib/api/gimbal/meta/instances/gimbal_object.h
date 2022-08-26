@@ -41,9 +41,9 @@ GBL_CLASS_END
 GBL_INSTANCE_DERIVE_EMPTY(GblObject, GblBox)
 
 GBL_PROPERTIES(GblObject,
-    (name,     GBL_GENERIC,  (ALL, CONSTRUCT),          GBL_POINTER_TYPE),
-    (parent,   GBL_GENERIC,  (READ, WRITE, CONSTRUCT),  GBL_OBJECT_TYPE),
-    (userdata, GBL_GENERIC,  (READ, WRITE, CONSTRUCT),  GBL_POINTER_TYPE),
+    (name,     GBL_GENERIC,  (READ, WRITE, LOAD, SAVE), GBL_POINTER_TYPE),
+    (parent,   GBL_GENERIC,  (READ, WRITE),             GBL_OBJECT_TYPE),
+    (userdata, GBL_GENERIC,  (READ, WRITE),             GBL_POINTER_TYPE),
     (refCount, GBL_GENERIC,  (READ),                    GBL_UINT16_TYPE)
 )
 
@@ -79,7 +79,7 @@ GBL_EXPORT GblObject*  GblObject_createVariantsWithClass   (GblObjectClass*   pC
 
 GBL_EXPORT GBL_RESULT  GblObject_constructVariantsWithClass(GBL_SELF,
                                                             GblObjectClass*   pClass,
-                                                            GblUint           propertyCount,
+                                                            GblSize           propertyCount,
                                                             const char*       pNames[],
                                                             const GblVariant* pValues)                        GBL_NOEXCEPT;
 

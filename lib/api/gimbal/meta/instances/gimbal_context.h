@@ -39,24 +39,24 @@ GBL_PROPERTIES(GblContext,
     (message, GBL_GENERIC, (READ), GBL_POINTER_TYPE)
 )
 
-GBL_EXPORT GblType      GblContext_type             (void)                                      GBL_NOEXCEPT;
+GBL_EXPORT GblType      GblContext_type            (void)                                  GBL_NOEXCEPT;
+GBL_EXPORT GblContext*  GblContext_global          (void)                                  GBL_NOEXCEPT;
+GBL_EXPORT void         GblContext_setGlobal       (GblContext* pCtx)                      GBL_NOEXCEPT;
 
 GBL_EXPORT const GblCallRecord*
-                        GblContext_lastIssue        (GBL_CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblContext_lastIssueSet     (GBL_SELF, const GblCallRecord* pRecord)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblContext_lastIssueClear   (GBL_SELF)                                  GBL_NOEXCEPT;
+                        GblContext_lastIssue       (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblContext_setLastIssue    (GBL_SELF, const GblCallRecord* pIssue) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblContext_clearLastIssue  (GBL_SELF)                              GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool      GblContext_hasIssue         (GBL_CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblContext_hasError         (GBL_CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblContext_lastIssueResult  (GBL_CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblContext_lastIssueMessage (GBL_CSELF)                                 GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblContext_hasIssue        (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblContext_hasError        (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblContext_lastIssueResult (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblContext_lastIssueMessage(GBL_CSELF)                             GBL_NOEXCEPT;
 
-GBL_EXPORT GblContext*  GblContext_parentContext    (GBL_CSELF)                                 GBL_NOEXCEPT;
-GBL_EXPORT void         GblContext_setLogFilter     (GBL_SELF, GblFlags mask)                   GBL_NOEXCEPT;
+GBL_EXPORT GblContext*  GblContext_parentContext   (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT void         GblContext_setLogFilter    (GBL_SELF, GblFlags mask)               GBL_NOEXCEPT;
 
 
-GblContext*             GblContext_global(void)                                                 GBL_NOEXCEPT;
-void                    GblContext_globalSet(GblContext* pCtx)                                  GBL_NOEXCEPT;
 
 /* ========== PRIVATE ==========
  * Private methods, do not call directly.
@@ -64,6 +64,7 @@ void                    GblContext_globalSet(GblContext* pCtx)                  
  * Call via API frame macros like GBL_API_MALLOC(), GBL_API_FREE(), GBL_API_LOG(), GBL_API_PUSH(), etc
  * after calling GBL_API_BEGIN(GblContext* pCtx) with the context.
  */
+/// \cond
 GBL_API GblContext_memAlloc_     (GBL_SELF,
                                   const GblStackFrame*  pFrame,
                                   GblSize               size,
@@ -99,10 +100,8 @@ GBL_API GblContext_callRecordSet_(GBL_SELF,
                                   const GblStackFrame* pFrame,
                                   const GblCallRecord* pRecord)     GBL_NOEXCEPT;
 
-
-GBL_EXPORT
-
-
+/// \endcond
+///
 GBL_DECLS_END
 
 #undef GBL_CSELF

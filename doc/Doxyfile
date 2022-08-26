@@ -1024,10 +1024,10 @@ EXCLUDE_PATTERNS       =
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = SELF \
-                         CSELF \
-                         KLASS \
-                         CKLASS \
+EXCLUDE_SYMBOLS        = GBL_SELF \
+                         GBL_CSELF \
+                         GBL_KLASS \
+                         GBL_CKLASS \
                          GBL_DECLS_BEGIN \
                          GBL_DECLS_END
 

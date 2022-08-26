@@ -222,7 +222,7 @@ static GblContext defaultCtx_ = {
 static GblContext* globalCtx_ = &defaultCtx_;
 
 
-void GblContext_globalSet(GblContext* pCtx) GBL_NOEXCEPT {
+void GblContext_setGlobal(GblContext* pCtx) GBL_NOEXCEPT {
     globalCtx_ = pCtx;
 }
 
@@ -238,7 +238,7 @@ GBL_EXPORT const GblCallRecord* GblContext_lastIssue(const GblContext* pSelf) GB
     return pSelf? &pSelf->lastIssue : NULL;
 }
 
-GBL_API GblContext_lastIssueSet(GblContext* pSelf, const GblCallRecord* pRecord) GBL_NOEXCEPT {
+GBL_API GblContext_setLastIssue(GblContext* pSelf, const GblCallRecord* pRecord) GBL_NOEXCEPT {
     //GBL_API_BEGIN(pSelf);
     if(pRecord) memcpy(&pSelf->lastIssue, pRecord, sizeof(GblCallRecord));
     else memset(&pSelf->lastIssue, 0, sizeof(GblCallRecord));
@@ -246,8 +246,8 @@ GBL_API GblContext_lastIssueSet(GblContext* pSelf, const GblCallRecord* pRecord)
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API GblContext_lastIssueClear(GblContext* pSelf) GBL_NOEXCEPT {
-    return GblContext_lastIssueSet(pSelf, NULL);
+GBL_API GblContext_clearLastIssue(GblContext* pSelf) GBL_NOEXCEPT {
+    return GblContext_setLastIssue(pSelf, NULL);
 }
 
 GBL_EXPORT GblBool GblContext_hasIssue(const GblContext* pSelf) GBL_NOEXCEPT {
@@ -318,7 +318,7 @@ GBL_API GblContext_callRecordSet_(GblContext* pSelf,
                                   const GblCallRecord* pRecord)     GBL_NOEXCEPT
 {
     GBL_UNUSED(pFrame);
-    return GblContext_lastIssueSet(pSelf, pRecord);
+    return GblContext_setLastIssue(pSelf, pRecord);
 }
 
 GBL_EXPORT void GblContext_setLogFilter(GblContext* pSelf, GblFlags mask) {

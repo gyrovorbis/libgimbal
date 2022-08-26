@@ -13,14 +13,14 @@
 #define GBL_BOX_TYPE                 (GBL_BUILTIN_TYPE(BOX))    ///< GblType UUID of a GblBox
 
 #define GBL_BOX(instance)            (GBL_INSTANCE_CAST(instance, GBL_BOX_TYPE, GblBox))
-#define GBL_BOX_CLASS(GBL_KLASS)         (GBL_CLASS_CAST(GBL_KLASS, GBL_BOX_TYPE, GblBoxClass))
+#define GBL_BOX_CLASS(GBL_KLASS)     (GBL_CLASS_CAST(GBL_KLASS, GBL_BOX_TYPE, GblBoxClass))
 #define GBL_BOX_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GBL_BOX_TYPE, GblBoxClass))
 
 #define GBL_BOX_REF(instance)        (GblBox_ref(GBL_BOX(instance)))
 #define GBL_BOX_UNREF(instance)      (GblBox_unref(GBL_BOX(instance)))
 
 #define GBL_KLASS   GblBoxClass* pSelf
-#define GBL_CGBL_KLASS  const GBL_KLASS
+#define GBL_CKLASS  const GBL_KLASS
 #define GBL_SELF    GblBox* pSelf
 #define GBL_CSELF   const GBL_SELF
 
@@ -71,16 +71,17 @@ GBL_EXPORT GBL_RESULT   GblBoxClass_constructFloatingExt(GBL_KLASS,
                                                          void*             pUserdata,
                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblBoxClass_userdata            (GBL_CGBL_KLASS)                GBL_NOEXCEPT;
+GBL_EXPORT void*        GblBoxClass_userdata            (GBL_CKLASS)                    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblBoxClass_setUserdata         (GBL_KLASS, void* pUserdata)    GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblBoxClass_setUserDestructor   (GBL_KLASS,
                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT uintptr_t    GblBoxClass_getField            (GBL_CGBL_KLASS, GblQuark key)  GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t    GblBoxClass_getField            (GBL_CKLASS, GblQuark key)      GBL_NOEXCEPT;
 GBL_EXPORT uintptr_t    GblBoxClass_takeField           (GBL_KLASS, GblQuark key)       GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblBoxClass_clearField          (GBL_KLASS, GblQuark key)       GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblBoxClass_hasField            (GBL_CGBL_KLASS, GblQuark key)  GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblBoxClass_hasField            (GBL_CKLASS, GblQuark key)      GBL_NOEXCEPT;
+
 GBL_EXPORT GBL_RESULT   GblBoxClass_setField            (GBL_KLASS,
                                                          GblQuark          key,
                                                          uintptr_t         ud,
@@ -127,6 +128,7 @@ GBL_EXPORT uintptr_t    GblBox_getField                 (GBL_CSELF, GblQuark key
 GBL_EXPORT uintptr_t    GblBox_takeField                (GBL_SELF, GblQuark key)        GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblBox_clearField               (GBL_SELF, GblQuark key)        GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblBox_hasField                 (GBL_CSELF, GblQuark key)       GBL_NOEXCEPT;
+
 GBL_EXPORT GBL_RESULT   GblBox_setField                 (GBL_SELF,
                                                          GblQuark          key,
                                                          uintptr_t         ud,
@@ -136,7 +138,7 @@ GBL_DECLS_END
 
 #undef GBL_CSELF
 #undef GBL_SELF
-#undef GBL_CGBL_KLASS
+#undef GBL_CKLASS
 #undef GBL_KLASS
 
 #endif // GIMBAL_BOX_H

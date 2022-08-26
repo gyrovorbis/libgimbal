@@ -43,6 +43,13 @@ typedef struct TestObject {
     GblIEventHandler*   eventFilterLastTarget;
 } TestObject;
 
+GBL_PROPERTIES(TestObject,
+    (floater,     GBL_GENERIC, (READ, WRITE), GBL_FLOAT_TYPE),
+    (stringer,    GBL_GENERIC, (READ, WRITE), GBL_STRING_TYPE),
+    (staticInt32, GBL_GENERIC, (READ),        GBL_INT32_TYPE)
+)
+
+//    (userdata,    GBL_GENERIC, (READ, WRITE),  GBL_POINTER_TYPE)
 
 static GBL_RESULT TestObject_IEventHandler_handleEvent(GblIEventHandler* pHandler, GblEvent* pEvent) {
     GBL_API_BEGIN(pHandler);
@@ -87,13 +94,6 @@ static GBL_RESULT TestObject_destructor(GblBox* pSelf) {
     GBL_API_END();
 }
 
-GBL_PROPERTIES(TestObject,
-    (floater,     GBL_GENERIC, (READ, WRITE, CONSTRUCT),   GBL_FLOAT_TYPE),
-    (stringer,    GBL_GENERIC, (READ, WRITE, CONSTRUCT),   GBL_STRING_TYPE),
-    (staticInt32, GBL_GENERIC, (READ),                     GBL_INT32_TYPE),
-    (userdata,    GBL_GENERIC, (ALL, CONSTRUCT, OVERRIDE), GBL_POINTER_TYPE)
-)
-
 static GBL_RESULT TestObject_property_(const GblObject* pSelf, const GblProperty* pProp, GblVariant* pValue) {
     GBL_API_BEGIN(pSelf);
     switch(pProp->id) {
@@ -106,9 +106,9 @@ static GBL_RESULT TestObject_property_(const GblObject* pSelf, const GblProperty
     case TestObject_Property_Id_staticInt32:
         GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT_GET_CLASS(pSelf)->staticInt32);
         break;
-    case TestObject_Property_Id_userdata:
+/*    case TestObject_Property_Id_userdata:
         GblVariant_setValueCopy(pValue, pProp->valueType, GblBox_userdata(GBL_BOX(pSelf)));
-        break;
+        break;*/
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Attempt to get unregistered property: %s",
                                 GblProperty_nameString(pProp));
@@ -131,12 +131,12 @@ static GBL_RESULT TestObject_setProperty_(GblObject* pSelf, const GblProperty* p
         if(pStr) strcpy(TEST_OBJECT(pSelf)->stringer, pStr);
         break;
     }
-    case TestObject_Property_Id_userdata: {
+/*    case TestObject_Property_Id_userdata: {
         void* pUserdata = NULL;
         GBL_API_CALL(GblVariant_getValueCopy(pValue, &pUserdata));
         GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
         break;
-    }
+    }*/
     default: GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Attempt to set unregistered property: %s",
                                 GblProperty_nameString(pProp));
@@ -148,8 +148,18 @@ static GBL_RESULT TestObject_setProperty_(GblObject* pSelf, const GblProperty* p
 static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     TestObjectClass* pTestClass = TEST_OBJECT_CLASS(pClass);
     GBL_API_BEGIN(pCtx);
-    if(GBL_CLASS_TYPEOF(pTestClass) == TEST_OBJECT_TYPE && !GblType_classRefCount(TEST_OBJECT_TYPE)) {
+    if(!GblType_classRefCount(TEST_OBJECT_TYPE)) {
         GBL_PROPERTIES_REGISTER(TestObject);
+#if 0
+        GblSize p = 0;
+        const GblProperty* pProp = NULL;
+        while((pProp = GblProperty_next(TEST_OBJECT_TYPE, pProp, 0xfffff))) {
+            GBL_API_INFO("Property[%u] = %s[%s]",
+                         p++,
+                         GblType_name(GblProperty_objectType(pProp)),
+                         GblProperty_nameString(pProp));
+        }
+#endif
     }
     pTestClass->staticInt32 = 77;
     strcpy(pTestClass->string, (const char*)pUd);
