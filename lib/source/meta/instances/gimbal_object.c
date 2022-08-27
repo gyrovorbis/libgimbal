@@ -784,7 +784,7 @@ GBL_API GblObject_setPropertiesVaList(GblObject* pSelf, va_list* pVarArgs) {
         }
     }
 
-    GBL_API_CALL(GblObject_setPropertiesVariant(pSelf, p, pKeys, pVariants));
+    GBL_API_CALL(GblObject_setPropertiesVariants(pSelf, p, pKeys, pVariants));
 
     for(GblSize v = 0; v < p; ++v) {
        GBL_API_CALL(GblVariant_destruct(&pVariants[v]));
@@ -801,7 +801,7 @@ GBL_API GblObject_propertiesVariant(const GblObject* pSelf, GblSize propertyCoun
     GBL_API_END();
 }
 
-GBL_API GblObject_setPropertiesVariant(GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
+GBL_API GblObject_setPropertiesVariants(GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
     GBL_API_BEGIN(NULL);
     for(GblUint p = 0; p < propertyCount; ++p) {
         GBL_API_CALL(GblObject_setPropertyVariant(pSelf, pNames[p], &pValues[p]));
@@ -1014,7 +1014,7 @@ static GBL_RESULT GblObject_constructVariants_(GblObject*  pSelf,
     GBL_API_END();
 }
 
-GBL_EXPORT GblObject* GblObject_createVariants(GblType type, GblSize propertyCount, const char* pNames[], const GblVariant* pValues) {
+GBL_EXPORT GblObject* GblObject_createVariants(GblType type, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
     GblObject* pObject = NULL;
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
@@ -1025,9 +1025,9 @@ GBL_EXPORT GblObject* GblObject_createVariants(GblType type, GblSize propertyCou
 }
 
 GBL_EXPORT GblObject* GblObject_createVariantsWithClass(GblObjectClass* pClass,
-                                                        GblSize propertyCount,
-                                                        const char* pNames[],
-                                                        const GblVariant* pValues)
+                                                        GblSize         propertyCount,
+                                                        const char*     pNames[],
+                                                        GblVariant*     pValues)
 {
     const GblType type = GBL_CLASS_TYPEOF(pClass);
     GblObject* pObject = NULL;
@@ -1039,11 +1039,11 @@ GBL_EXPORT GblObject* GblObject_createVariantsWithClass(GblObjectClass* pClass,
     return pObject;
 }
 
-GBL_EXPORT GBL_RESULT GblObject_constructVariants(GblObject* pSelf,
-                                                  GblType type,
-                                                  GblSize propertyCount,
+GBL_EXPORT GBL_RESULT GblObject_constructVariants(GblObject*  pSelf,
+                                                  GblType     type,
+                                                  GblSize     propertyCount,
                                                   const char* pNames[],
-                                                  const GblVariant* pValues)
+                                                  GblVariant* pValues)
 {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
@@ -1052,11 +1052,11 @@ GBL_EXPORT GBL_RESULT GblObject_constructVariants(GblObject* pSelf,
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass(GblObject* pSelf,
+GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass(GblObject*      pSelf,
                                                            GblObjectClass* pClass,
-                                                           GblSize propertyCount,
-                                                           const char* pNames[],
-                                                           const GblVariant* pValues)
+                                                           GblSize         propertyCount,
+                                                           const char*     pNames[],
+                                                           GblVariant*     pValues)
 {
     const GblType type = GBL_CLASS_TYPEOF(pClass);
     GBL_API_BEGIN(NULL);

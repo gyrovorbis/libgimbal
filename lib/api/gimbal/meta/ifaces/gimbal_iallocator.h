@@ -24,9 +24,9 @@
 GBL_DECLS_BEGIN
 
 GBL_INTERFACE_DERIVE(GblIAllocator)
-    GBL_RESULT (*pFnAlloc)      (GBL_SELF, const GblStackFrame* pStackFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData);
-    GBL_RESULT (*pFnRealloc)    (GBL_SELF, const GblStackFrame* pStackFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
-    GBL_RESULT (*pFnFree)       (GBL_SELF, const GblStackFrame* pStackFrame, void* pData);
+    GBL_RESULT (*pFnAlloc)  (GBL_SELF, const GblStackFrame* pStackFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData);
+    GBL_RESULT (*pFnRealloc)(GBL_SELF, const GblStackFrame* pStackFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
+    GBL_RESULT (*pFnFree)   (GBL_SELF, const GblStackFrame* pStackFrame, void* pData);
 GBL_INTERFACE_END
 
 GBL_RESULT GblIAllocator_alloc  (GBL_SELF,

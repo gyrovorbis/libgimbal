@@ -64,24 +64,24 @@ GBL_EXPORT GBL_RESULT  GblObject_constructVaListWithClass  (GBL_SELF,
 GBL_EXPORT GblObject*  GblObject_createVariants            (GblType           type,
                                                             GblSize           propertyCount,
                                                             const char*       pNames[],
-                                                            const GblVariant* pValues)                        GBL_NOEXCEPT;
+                                                            GblVariant*      pValues)                         GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_constructVariants         (GBL_SELF,
-                                                            GblType           type,
-                                                            GblSize           propertyCount,
-                                                            const char*       pNames[],
-                                                            const GblVariant* pValues)                        GBL_NOEXCEPT;
+                                                            GblType         type,
+                                                            GblSize         propertyCount,
+                                                            const char*     pNames[],
+                                                            GblVariant*     pValues)                          GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*  GblObject_createVariantsWithClass   (GblObjectClass*   pClass,
-                                                            GblSize           propertyCount,
-                                                            const char*       pNames[],
-                                                            const GblVariant* pValues)                        GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_createVariantsWithClass   (GblObjectClass* pClass,
+                                                            GblSize         propertyCount,
+                                                            const char*     pNames[],
+                                                            GblVariant*     pValues)                          GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_constructVariantsWithClass(GBL_SELF,
-                                                            GblObjectClass*   pClass,
-                                                            GblSize           propertyCount,
-                                                            const char*       pNames[],
-                                                            const GblVariant* pValues)                        GBL_NOEXCEPT;
+                                                            GblObjectClass* pClass,
+                                                            GblSize         propertyCount,
+                                                            const char*     pNames[],
+                                                            GblVariant*     pValues)                          GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_property                  (GBL_CSELF, const char* pName, ...)                GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblObject_propertyByQuark           (GBL_CSELF, GblQuark name, ...)                    GBL_NOEXCEPT;
@@ -92,7 +92,7 @@ GBL_EXPORT GBL_RESULT  GblObject_propertiesVaList          (GBL_CSELF, va_list* 
 GBL_EXPORT GBL_RESULT  GblObject_propertyVariant           (GBL_CSELF, const char* pName, GblVariant* pValue) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblObject_propertyVariantByQuark    (GBL_CSELF, GblQuark name, GblVariant* pValue)     GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblObject_propertiesVariant         (GBL_CSELF,
+GBL_EXPORT GBL_RESULT  GblObject_propertiesVariants        (GBL_CSELF,
                                                             GblSize     propertyCount,
                                                             const char* pNames[],
                                                             GblVariant* pValue)                               GBL_NOEXCEPT;
@@ -106,7 +106,7 @@ GBL_EXPORT GBL_RESULT  GblObject_setPropertiesVaList       (GBL_SELF, va_list* p
 GBL_EXPORT GBL_RESULT  GblObject_setPropertyVariant        (GBL_SELF, const char* pName, GblVariant* pValue)  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblObject_setPropertyVariantByQuark (GBL_SELF, GblQuark name, GblVariant* pValue)      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblObject_setPropertiesVariant      (GBL_SELF,
+GBL_EXPORT GBL_RESULT  GblObject_setPropertiesVariants     (GBL_SELF,
                                                             GblSize     propertyCount,
                                                             const char* pNames[],
                                                             GblVariant* pValue)                               GBL_NOEXCEPT;

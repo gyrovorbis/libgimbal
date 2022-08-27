@@ -28,7 +28,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblIEventHandler);
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
 GBL_INTERFACE_DERIVE(GblIEventFilter)
-    GBL_RESULT      (*pFnEventFilter)(GBL_SELF, GblIEventHandler* pHandler, GblEvent* pEvent);
+    GBL_RESULT (*pFnEventFilter)(GBL_SELF, GblIEventHandler* pHandler, GblEvent* pEvent);
 GBL_INTERFACE_END
 
 GBL_API GblIEventFilter_eventFilter(GBL_SELF, GblIEventHandler* pHandler, GblEvent* pEvent) GBL_NOEXCEPT;

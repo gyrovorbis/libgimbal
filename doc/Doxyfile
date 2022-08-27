@@ -1029,7 +1029,8 @@ EXCLUDE_SYMBOLS        = GBL_SELF \
                          GBL_KLASS \
                          GBL_CKLASS \
                          GBL_DECLS_BEGIN \
-                         GBL_DECLS_END
+                         GBL_DECLS_END \
+                         GBL_PROPERTIES()
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include
