@@ -108,7 +108,7 @@ static GBL_RESULT GblTestSuiteClass_constructed_(GblObject* pSelf) {
 
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(pClass->pVTable && pClass->pVTable->pCases) {
-        GBL_API_VERIFY_CALL(GblTestSuite_casesAdd(GBL_TEST_SUITE(pSelf),
+        GBL_API_VERIFY_CALL(GblTestSuite_addCases(GBL_TEST_SUITE(pSelf),
                                                   pClass->pVTable->pCases));
     }
 
@@ -177,7 +177,7 @@ GBL_EXPORT const char* GblTestSuite_name(const GblTestSuite* pSelf) {
     return pName;
 }
 
-GBL_EXPORT GBL_RESULT GblTestSuite_suiteInit(GblTestSuite* pSelf, GblContext* pCtx) {
+GBL_EXPORT GBL_RESULT GblTestSuite_initSuite(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnSuiteInit)
@@ -187,7 +187,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_suiteInit(GblTestSuite* pSelf, GblContext* pC
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblTestSuite_suiteFinal(GblTestSuite* pSelf, GblContext* pCtx) {
+GBL_EXPORT GBL_RESULT GblTestSuite_finalSuite(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnSuiteFinal)
@@ -197,7 +197,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_suiteFinal(GblTestSuite* pSelf, GblContext* p
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblTestSuite_caseInit(GblTestSuite* pSelf, GblContext* pCtx) {
+GBL_EXPORT GBL_RESULT GblTestSuite_initCase(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnCaseInit)
@@ -207,7 +207,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_caseInit(GblTestSuite* pSelf, GblContext* pCt
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblTestSuite_caseFinal(GblTestSuite* pSelf, GblContext* pCtx) {
+GBL_EXPORT GBL_RESULT GblTestSuite_finalCase(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnCaseFinal)
@@ -235,7 +235,7 @@ GBL_EXPORT const char* GblTestSuite_caseName(const GblTestSuite* pSelf, GblSize 
     return pName;
 }
 
-GBL_EXPORT GBL_RESULT GblTestSuite_caseRun(GblTestSuite* pSelf,
+GBL_EXPORT GBL_RESULT GblTestSuite_runCase(GblTestSuite* pSelf,
                                            GblContext* pCtx,
                                            GblSize index)
 {
@@ -323,7 +323,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_destroy(GblTestSuite* pSelf) {
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblTestSuite_caseAdd(GblTestSuite* pSelf, const char* pName, GblTestCaseRunFn pFnRun) {
+GBL_EXPORT GBL_RESULT GblTestSuite_addCase(GblTestSuite* pSelf, const char* pName, GblTestCaseRunFn pFnRun) {
     GBL_API_BEGIN(pSelf);
 
     const GblTestCase tempCase = {
@@ -338,11 +338,11 @@ GBL_EXPORT GBL_RESULT GblTestSuite_caseAdd(GblTestSuite* pSelf, const char* pNam
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblTestSuite_casesAdd(GblTestSuite* pSelf, const GblTestCase* pCases) {
+GBL_EXPORT GBL_RESULT GblTestSuite_addCases(GblTestSuite* pSelf, const GblTestCase* pCases) {
     const GblTestCase* pIt = pCases;
     GBL_API_BEGIN(pSelf);
     while(pIt && pIt->pName && pIt->pFnRun) {
-        GBL_API_VERIFY_CALL(GblTestSuite_caseAdd(pSelf, pIt->pName, pIt->pFnRun));
+        GBL_API_VERIFY_CALL(GblTestSuite_addCase(pSelf, pIt->pName, pIt->pFnRun));
         ++pIt;
     }
     GBL_API_END();

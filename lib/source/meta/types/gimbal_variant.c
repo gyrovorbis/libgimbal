@@ -155,6 +155,7 @@ GBL_EXPORT GblBool GblVariant_canConvert(GblType fromType, GblType toType) {
         } else {
             while(!result && currentToType != GBL_INVALID_TYPE) {
                 entry.toType = currentToType;
+                currentFromType = fromType;
 
                 while(!result && currentFromType != GBL_INVALID_TYPE) {
                     entry.fromType = currentFromType;
@@ -201,6 +202,7 @@ GBL_EXPORT GBL_RESULT GblVariant_convert(const GblVariant* pSelf, GblVariant* pO
 
             while(!pEntry && toType != GBL_INVALID_TYPE) {
                 entry.toType = toType;
+                fromType = GblVariant_typeOf(pSelf);
 
                 while(!pEntry && fromType != GBL_INVALID_TYPE) {
                     entry.fromType = fromType;
@@ -730,7 +732,7 @@ GBL_EXPORT void* GblVariant_toPointer(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_POINTER_TYPE) {
         GBL_VARIANT(v);
-        GBL_API_VERIFY_CALL(GblVariant_constructPointer(&v, NULL));
+        GBL_API_VERIFY_CALL(GblVariant_constructPointer(&v, GBL_POINTER_TYPE, NULL));
         GBL_API_VERIFY_CALL(GblVariant_convert(pSelf, &v));
         GBL_API_VERIFY_CALL(GblVariant_setMove(pSelf, &v));
         GBL_API_VERIFY_CALL(GblVariant_destruct(&v));

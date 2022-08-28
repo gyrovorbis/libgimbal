@@ -1,4 +1,4 @@
-#include "types/gimbal_ref_test_suite.h"
+#include "core/gimbal_ref_test_suite.h"
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/core/gimbal_ref.h>
 #include <gimbal/test/gimbal_test.h>

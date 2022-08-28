@@ -65,9 +65,9 @@ GBL_INLINE GBL_RESULT   GblArrayList_construct_3 (GBL_SELF,
 GBL_INLINE GBL_RESULT   GblArrayList_construct_2 (GBL_SELF,
                                                   uint16_t     elementSize)                                      GBL_NOEXCEPT;
 #define                 GblArrayList_construct(...) \
-                            GBL_VA_OVERLOAD_SELECT(GblArrayList_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
+                            GBL_VA_OVERLOAD_CALL(GblArrayList_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 #define                 GblArrayList_alloca(...) \
-                            GBL_VA_OVERLOAD_SELECT(GBL_ARRAY_LIST_ALLOCA, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
+                            GBL_VA_OVERLOAD_CALL(GBL_ARRAY_LIST_ALLOCA, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
 GBL_EXPORT GBL_RESULT   GblArrayList_destruct    (GBL_SELF)                                                      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblArrayList_assign      (GBL_SELF, const void* pData, GblSize elementCount)             GBL_NOEXCEPT;

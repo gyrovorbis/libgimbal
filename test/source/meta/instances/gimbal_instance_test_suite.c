@@ -1,4 +1,4 @@
-#include "meta/gimbal_instance_test_suite.h"
+#include "meta/instances/gimbal_instance_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/meta/instances/gimbal_instance.h>
 

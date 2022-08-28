@@ -663,7 +663,7 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
                 GblVariant*     pArgValues  = GBL_ALLOCA(sizeof(GblVariant) * argCount);
 
                 // initialize argument values
-                GBL_API_VERIFY_CALL(GblVariant_constructPointer(&pArgValues[0], pConnection->pReceiver));
+                GBL_API_VERIFY_CALL(GblVariant_constructPointer(&pArgValues[0], GBL_POINTER_TYPE, pConnection->pReceiver));
                 if(pVarArgs) {
                     for(GblSize a = 1; a < argCount; ++a) {
                         GBL_API_VERIFY_CALL(GblVariant_constructValueCopyVaList(&pArgValues[a],
@@ -684,7 +684,7 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
 
                     // update arg[0]: receiver (already set for first connection, though)
                     if(!firstConnection)
-                        GBL_API_VERIFY_CALL(GblVariant_setPointer(&pArgValues[0], pConnection->pReceiver));
+                        GBL_API_VERIFY_CALL(GblVariant_setPointer(&pArgValues[0], GBL_POINTER_TYPE, pConnection->pReceiver));
                     else
                         firstConnection = GBL_FALSE;
 

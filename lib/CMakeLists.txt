@@ -6,9 +6,9 @@ project(LibGimbal
     VERSION 
         ${GIMBAL_VERSION} 
     DESCRIPTION 
-        "Lightweight cross-platform framework for creating static/dynamic libraries with a run-time extensible C API"
+        "Lightweight langauge independent cross-platform framework for creating static/dynamic libraries with a run-time extensible C API"
     HOMEPAGE_URL
-        "elysianshadows.com"
+        "libgimbal.elysianshadows.com"
     LANGUAGES C)
 
 #set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum OS X Deployment Version")
@@ -93,38 +93,24 @@ set(GIMBAL_INCLUDES
     api/gimbal/algorithms/gimbal_numeric.h
     api/gimbal/algorithms/gimbal_hash.h
     api/gimbal/containers/gimbal_byte_array.h
-    api/gimbal/containers/gimbal_byte_array.hpp
-    api/gimbal/containers/gimbal_generics.hpp
-    api/gimbal/containers/gimbal_container.hpp
     api/gimbal/containers/gimbal_linked_list.h
     api/gimbal/containers/gimbal_hash_set.h
-    api/gimbal/containers/gimbal_hash_set.hpp
-    api/gimbal/containers/gimbal_hash_map.hpp
     api/gimbal/containers/gimbal_tree_set.h
     api/gimbal/containers/gimbal_array_map.h
     api/gimbal/containers/gimbal_doubly_linked_list.h
     api/gimbal/containers/gimbal_array_list.h
     api/gimbal/containers/gimbal_nary_tree.h
-    api/gimbal/containers/gimbal_vector.hpp
     api/gimbal/core/gimbal_api_generators.h
-    api/gimbal/core/gimbal_call_stack.hpp
-    api/gimbal/core/gimbal_api_generators.hpp
     api/gimbal/core/gimbal_api_frame.h
-    api/gimbal/core/gimbal_api_frame.hpp
     api/gimbal/core/gimbal_call_stack.h
     api/gimbal/core/gimbal_ext.h
     api/gimbal/core/gimbal_result.h
-    api/gimbal/core/gimbal_result.hpp
     api/gimbal/core/gimbal_typedefs.h
-    api/gimbal/core/gimbal_typedefs.hpp
     api/gimbal/core/gimbal_version.h
-    api/gimbal/core/gimbal_version.hpp
-    api/gimbal/core/gimbal_exception.hpp
     api/gimbal/core/gimbal_thread.h
-    api/gimbal/core/gimbal_thread.hpp
     api/gimbal/core/gimbal_ref.h
     api/gimbal/meta/classes/gimbal_class.h
-    api/gimbal/meta/classes/gimbal_boxed.h
+    api/gimbal/meta/classes/gimbal_opaque.h
     api/gimbal/meta/classes/gimbal_enum.h
     api/gimbal/meta/classes/gimbal_flags.h
     api/gimbal/meta/classes/gimbal_primitives.h
@@ -137,7 +123,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/ifaces/gimbal_ilogger.h
     api/gimbal/meta/ifaces/gimbal_interface.h
     api/gimbal/meta/instances/gimbal_context.h
-    api/gimbal/meta/instances/gimbal_context.hpp
     api/gimbal/meta/instances/gimbal_event.h
     api/gimbal/meta/instances/gimbal_instance.h
     api/gimbal/meta/instances/gimbal_module.h
@@ -152,7 +137,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/signals/gimbal_class_closure.h
     api/gimbal/meta/signals/gimbal_signal_closure.h
     api/gimbal/meta/types/gimbal_type.h
-    api/gimbal/meta/types/gimbal_type.hpp
     api/gimbal/meta/types/gimbal_pointer.h
     api/gimbal/meta/types/gimbal_variant.h
     api/gimbal/meta/types/gimbal_builtin_types.h
@@ -162,13 +146,11 @@ set(GIMBAL_INCLUDES
     api/gimbal/preprocessor/gimbal_macro_utils.h
     api/gimbal/preprocessor/gimbal_macro_sequences.h
     api/gimbal/preprocessor/gimbal_atomics.h
-    api/gimbal/preprocessor/gimbal_memory_resource.hpp
     api/gimbal/strings/gimbal_quark.h
     api/gimbal/strings/gimbal_string_buffer.h
     api/gimbal/strings/gimbal_string_view.h
     api/gimbal/strings/gimbal_string_ref.h
     api/gimbal/strings/gimbal_string.h
-    api/gimbal/strings/gimbal_string.hpp
     api/gimbal/test/gimbal_test.h
     api/gimbal/test/gimbal_test_suite.h
     api/gimbal/test/gimbal_test_scenario.h
@@ -191,7 +173,7 @@ set(GIMBAL_SOURCES
     source/core/gimbal_call_stack.c
     source/core/gimbal_ext.c
     source/meta/classes/gimbal_class.c
-    source/meta/classes/gimbal_boxed.c
+    source/meta/classes/gimbal_opaque.c
     source/meta/classes/gimbal_flags.c
     source/meta/classes/gimbal_enum.c
     source/meta/classes/gimbal_primitives.c

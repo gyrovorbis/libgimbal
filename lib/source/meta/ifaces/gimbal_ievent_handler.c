@@ -14,15 +14,21 @@ GBL_API  GblIEventHandler_event(GblIEventHandler* pSelf, GblEvent* pEvent) GBL_N
     } GBL_API_END();
 }
 
-extern GBL_RESULT GblIEventHandler_typeRegister_(GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_IEVENT_HANDLER,
-                            GBL_INTERFACE_TYPE,
-                           GblQuark_internStringStatic("IEventHandler"),
-                           &(const GblTypeInfo) {
-                               .classSize    = sizeof(GblIEventHandlerIFace)
-                           },
-                           GBL_TYPE_FLAG_ABSTRACT);
-    GBL_API_END();
+GBL_EXPORT GblType GblIEventHandler_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
 
+    static const GblTypeInfo info = {
+        .classSize = sizeof(GblIEventHandlerIFace)
+    };
+
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+        GBL_API_BEGIN(NULL);
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblIEventHandler"),
+                                      GBL_INTERFACE_TYPE,
+                                      &info,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+        GBL_API_VERIFY_LAST_RECORD();
+        GBL_API_END_BLOCK();
+    }
+    return type;
 }

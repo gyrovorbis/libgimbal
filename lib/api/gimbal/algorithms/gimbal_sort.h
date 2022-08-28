@@ -34,8 +34,7 @@ GBL_INLINE GblSize gblSearchBinary(void* pArray, GblSize elemSize, GblInt l, Gbl
 // ======== INLINE IMPLEMENTATION ========
 
 
-GBL_INLINE
-void gblSortSelection(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
+GBL_INLINE void gblSortSelection(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     void* pTemp = GBL_ALLOCA(elemSize);
     for(GblSize i = 0; i < count; ++i) {
         GblSize min = i;
@@ -49,13 +48,11 @@ void gblSortSelection(void* pArray, GblSize count, GblSize elemSize, GblSortComp
     }
 }
 
-GBL_INLINE
-void gblSortQuick(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
+GBL_INLINE void gblSortQuick(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     qsort(pArray, count, elemSize, pFnCmp);
 }
 
-GBL_INLINE
-void gblSortInsertion(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
+GBL_INLINE void gblSortInsertion(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     void* pTemp = GBL_ALLOCA(elemSize);
     for(GblSize i = 0; i < count; ++i) {
         memcpy(pTemp, (char*)pArray + i*elemSize, elemSize);
@@ -68,8 +65,7 @@ void gblSortInsertion(void* pArray, GblSize count, GblSize elemSize, GblSortComp
     }
 }
 
-GBL_INLINE
-void gblSortShell(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
+GBL_INLINE void gblSortShell(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     void* pTemp     = GBL_ALLOCA(elemSize);
     char* pItems    = (char*)pArray;
     for (int i = (int)count / 2; i > 0; i = i / 2) {
@@ -87,8 +83,7 @@ void gblSortShell(void* pArray, GblSize count, GblSize elemSize, GblSortComparat
    }
 }
 
-GBL_INLINE
-void gblSortBubble(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
+GBL_INLINE void gblSortBubble(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     void* pTemp     = GBL_ALLOCA(elemSize);
     char* pItems    = (char*)pArray;
     for(GblSize i = count; i >= 1; --i) {
@@ -102,8 +97,7 @@ void gblSortBubble(void* pArray, GblSize count, GblSize elemSize, GblSortCompara
     }
 }
 
-GBL_INLINE
-GblSize gblSearchBinary(void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
+GBL_INLINE GblSize gblSearchBinary(void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     if(r >= l) {
         GblInt mid = l + (r - l) / 2;
         void* pMid = (char*)pArray + elemSize*mid;

@@ -35,20 +35,6 @@ static GBL_RESULT GblIAllocatorIFace_init_(GblIAllocatorIFace* pIFace, void* pDa
     GBL_API_END();
 }
 
-extern GBL_RESULT GblIAllocator_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_IALLOCATOR,
-      GBL_INTERFACE_TYPE,
-      GblQuark_internStringStatic("IAllocator"),
-      &(const GblTypeInfo) {
-          .pFnClassInit     = (GblTypeClassInitializeFn)GblIAllocatorIFace_init_,
-          .classSize        = sizeof(GblIAllocatorIFace)
-      },
-      GBL_TYPE_FLAGS_NONE);
-    GBL_API_END();
-}
-
-
 GBL_RESULT GblIAllocator_alloc  (GblIAllocator* pSelf,
                                  const GblStackFrame* pStackFrame,
                                  GblSize size,
@@ -83,4 +69,24 @@ GBL_RESULT GblIAllocator_free   (GblIAllocator* pSelf,
     GBL_INSTANCE_VCALL_PREFIX(GBL_IALLOCATOR, pFnFree,
                               pSelf, pStackFrame, pData);
     GBL_API_END();
+}
+
+GBL_EXPORT GblType GblIAllocator_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    static const GblTypeInfo info = {
+        .pFnClassInit = (GblTypeClassInitializeFn)GblIAllocatorIFace_init_,
+        .classSize = sizeof(GblIAllocatorIFace)
+    };
+
+    if(type == GBL_INVALID_TYPE) {
+        GBL_API_BEGIN(NULL);
+        type = GblType_registerStatic(GblQuark_internStringStatic("IAllocator"),
+                                      GBL_INTERFACE_TYPE,
+                                      &info,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+        GBL_API_VERIFY_LAST_RECORD();
+        GBL_API_END_BLOCK();
+    }
+    return type;
 }

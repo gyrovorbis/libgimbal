@@ -12,7 +12,7 @@
 
 GBL_DECLS_BEGIN
 
-#define GBL_IEVENT_FILTER_TYPE                      GBL_BUILTIN_TYPE(IEVENT_FILTER)
+#define GBL_IEVENT_FILTER_TYPE                      (GblIEventFilter_type())
 #define GBL_IEVENT_FILTER_STRUCT                    GblIEventFilter
 #define GBL_IEVENT_FILTER_CLASS_STRUCT              GblIEventFilterIFace
 #define GBL_IEVENT_FILTER(instance)                 GBL_INSTANCE_CAST_PREFIX(instance, GBL_IEVENT_FILTER)
@@ -31,7 +31,11 @@ GBL_INTERFACE_DERIVE(GblIEventFilter)
     GBL_RESULT (*pFnEventFilter)(GBL_SELF, GblIEventHandler* pHandler, GblEvent* pEvent);
 GBL_INTERFACE_END
 
-GBL_API GblIEventFilter_eventFilter(GBL_SELF, GblIEventHandler* pHandler, GblEvent* pEvent) GBL_NOEXCEPT;
+GBL_EXPORT GblType    GblIEventFilter_type        (void)                        GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT GblIEventFilter_eventFilter (GBL_SELF,
+                                                   GblIEventHandler* pHandler,
+                                                   GblEvent* pEvent)             GBL_NOEXCEPT;
 
 #undef GBL_CSELF
 #undef GBL_SELF

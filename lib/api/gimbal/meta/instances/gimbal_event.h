@@ -6,7 +6,7 @@
 #ifndef GIMBAL_EVENT_H
 #define GIMBAL_EVENT_H
 
-#include "gimbal_instance.h"
+#include "gimbal_box.h"
 
 /// \ingroup metaBuiltinTypes
 #define GBL_EVENT_TYPE                  (GblEvent_type())
@@ -29,9 +29,9 @@ GBL_DECLARE_ENUM(GBL_EVENT_STATE) {
     GBL_EVENT_STATE_IGNORED
 };
 
-GBL_CLASS_DERIVE_EMPTY(GblEvent)
+GBL_CLASS_DERIVE_EMPTY(GblEvent, GblBox)
 
-GBL_INSTANCE_DERIVE(GblEvent, GblInstance)
+GBL_INSTANCE_DERIVE(GblEvent, GblBox)
     GBL_EVENT_STATE     state;
 GBL_INSTANCE_END
 

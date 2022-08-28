@@ -1044,6 +1044,39 @@ static GBL_RESULT typeConvert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_API_END();
 }
 
+
+GblType GblPrimitive_register(const char*                     pName,
+                              GblSize                         classSize,
+                              GblSize                         classPrivateSize,
+                              const GblIVariantIFaceVTable*   pVTable,
+                              GblFlags                        typeFlags)
+{
+    GblType type = GBL_INVALID_TYPE;
+    GBL_API_BEGIN(NULL);
+
+    GBL_API_VERIFY_ARG(classSize >= sizeof(GblPrimitiveClass));
+
+    type = GblType_registerStatic(GblQuark_internString(pName),
+                                   GBL_STATIC_CLASS_TYPE,
+                                   &(const GblTypeInfo) {
+                                       .pFnClassInit        = (GblTypeClassInitializeFn)GblPrimitiveClass_init_,
+                                       .classSize           = classSize,
+                                       .classPrivateSize    = classPrivateSize,
+                                       .pClassData          = pVTable,
+                                       .interfaceCount      = 1,
+                                       .pInterfaceMap = &(const GblTypeInterfaceMapEntry) {
+                                           .interfaceType  = GBL_IVARIANT_TYPE,
+                                           .classOffset    = offsetof(GblPrimitiveClass, GblIVariantIFaceImpl)
+                                       }
+                                   },
+                                   typeFlags);
+
+    GBL_API_VERIFY_LAST_RECORD();
+    GBL_API_END_BLOCK();
+    return type;
+}
+
+
 GblType GblPrimitive_registerBuiltin(GblSize                         index,
                                      const char*                     pName,
                                      GblSize                         classSize,
@@ -1057,7 +1090,7 @@ GblType GblPrimitive_registerBuiltin(GblSize                         index,
     GBL_API_VERIFY_ARG(classSize >= sizeof(GblPrimitiveClass));
 
     type = GblType_registerBuiltin_(index,
-                                   GBL_INVALID_TYPE,
+                                   GBL_STATIC_CLASS_TYPE,
                                    GblQuark_internString(pName),
                                    &(const GblTypeInfo) {
                                        .pFnClassInit        = (GblTypeClassInitializeFn)GblPrimitiveClass_init_,
@@ -1070,7 +1103,7 @@ GblType GblPrimitive_registerBuiltin(GblSize                         index,
                                            .classOffset    = offsetof(GblPrimitiveClass, GblIVariantIFaceImpl)
                                        }
                                    },
-                                   GBL_TYPE_ROOT_FLAG_CLASSED | typeFlags);
+                                   typeFlags);
 
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END_BLOCK();
@@ -1102,13 +1135,6 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
 
     GBL_API_BEGIN(pCtx);
     GBL_API_PUSH_VERBOSE("[GblType] Registering Builtin Types");
-/*
-    static GblTypeInterfaceMapEntry iVariantMapEntry = {
-        .interfaceType = GBL_INVALID_TYPE,
-        .classOffset    = offsetof(GblPrimitiveClass, iVariantIFace)
-    };
-*/
-
 
     // =============== NIL ===============
     static const GblIVariantIFaceVTable nilIVariantIFace = {
@@ -1414,28 +1440,6 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
                                  GBL_TYPE_FLAGS_NONE);
     GBL_API_VERIFY_LAST_RECORD();
 
-    // =============== TYPE ===============
-    const static GblIVariantIFaceVTable typeIVariantIFace =  {
-            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
-                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
-            .pSetValueFmt   = { "p"},
-            .pGetValueFmt   = { "p" },
-            .pFnSet         = typeSet_,
-            .pFnGet         = typeGet_,
-            .pFnCompare     = typeCompare_,
-            .pFnSave        = typeSave_,
-            .pFnLoad        = typeLoad_
-      };
-
-    GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_TYPE,
-                                 GblQuark_internStringStatic("type"),
-                                 sizeof(GblPrimitiveClass),
-                                 0,
-                                 &typeIVariantIFace,
-                                 GBL_TYPE_FLAGS_NONE);
-    GBL_API_VERIFY_LAST_RECORD();
 
     GBL_API_CALL(GblPrimitive_valueTypesRegisterConverters_(pCtx));
 
@@ -1608,12 +1612,48 @@ static GBL_RESULT GblPrimitive_valueTypesRegisterConverters_(GblContext* pCtx) {
     GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_INT64_TYPE, stringConvert_));
     GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_FLOAT_TYPE, stringConvert_));
     GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_DOUBLE_TYPE, stringConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_TYPE_TYPE, stringConvert_));
-
-    // =============== TYPE ===============
-    GBL_API_CALL(GblVariant_registerConverter(GBL_TYPE_TYPE, GBL_BOOL_TYPE, typeConvert_));
-    GBL_API_CALL(GblVariant_registerConverter(GBL_TYPE_TYPE, GBL_STRING_TYPE, typeConvert_));
 
     GBL_API_POP(1);
     GBL_API_END();
+}
+
+GBL_EXPORT GblType GblType_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    // =============== TYPE ===============
+    const static GblIVariantIFaceVTable typeIVariantIFace =  {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
+            .pSetValueFmt   = { "p"},
+            .pGetValueFmt   = { "p" },
+            .pFnSet         = typeSet_,
+            .pFnGet         = typeGet_,
+            .pFnCompare     = typeCompare_,
+            .pFnSave        = typeSave_,
+            .pFnLoad        = typeLoad_
+      };
+
+    if(type == GBL_INVALID_TYPE) {
+        GBL_API_BEGIN(NULL);
+        type = GblPrimitive_register(GblQuark_internStringStatic("type"),
+                                     sizeof(GblPrimitiveClass),
+                                     0,
+                                     &typeIVariantIFace,
+                                     GBL_TYPE_FLAGS_NONE);
+        GBL_API_VERIFY_LAST_RECORD();
+
+        // =============== TYPE ===============
+        GBL_API_CALL(GblVariant_registerConverter(type, GBL_BOOL_TYPE, typeConvert_));
+        GBL_API_CALL(GblVariant_registerConverter(type, GBL_STRING_TYPE, typeConvert_));
+
+
+        GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, type, stringConvert_));
+
+
+        GBL_API_END_BLOCK();
+    }
+
+    return type;
 }

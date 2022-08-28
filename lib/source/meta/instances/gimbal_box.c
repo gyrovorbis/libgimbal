@@ -308,8 +308,8 @@ static GBL_RESULT GblBoxClass_final_(GblClass* pClass, const void* pUd, GblConte
 
 }
 
-GBL_EXPORT GBL_RESULT GblBox_typeRegister_(GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+GBL_EXPORT GblType GblBox_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
 
     static GblTypeInterfaceMapEntry ifaceMap[] = {
         {
@@ -328,15 +328,18 @@ GBL_EXPORT GBL_RESULT GblBox_typeRegister_(GblContext* pCtx) {
         .pInterfaceMap      = ifaceMap
     };
 
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+        GBL_API_BEGIN(NULL);
 
-    ifaceMap[0].interfaceType = GBL_IVARIANT_TYPE;
+        ifaceMap[0].interfaceType = GBL_IVARIANT_TYPE;
 
-    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_BOX,
-                             GBL_INSTANCE_TYPE,
-                             GblQuark_internStringStatic("GblBox"),
-                             &typeInfo,
-                             GBL_TYPE_FLAG_TYPEINFO_STATIC);
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblBox"),
+                                      GBL_INSTANCE_TYPE,
+                                      &typeInfo,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
 
-    GBL_API_VERIFY_LAST_RECORD();
-    GBL_API_END();
+        GBL_API_VERIFY_LAST_RECORD();
+        GBL_API_END_BLOCK();
+    }
+    return type;
 }

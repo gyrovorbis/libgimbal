@@ -36,20 +36,6 @@ static GBL_RESULT GblILoggerIFace_init_(GblILoggerIFace* pIFace, void* pData, Gb
     GBL_API_END();
 }
 
-extern GBL_RESULT GblILogger_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_ILOGGER,
-      GBL_INTERFACE_TYPE,
-      GblQuark_internStringStatic("ILogger"),
-      &(const GblTypeInfo) {
-          .pFnClassInit     = (GblTypeClassInitializeFn)GblILoggerIFace_init_,
-          .classSize        = sizeof(GblILoggerIFace)
-      },
-      GBL_TYPE_FLAGS_NONE);
-    GBL_API_END();
-}
-
-
 GBL_API GblILogger_write(GblILogger* pSelf,
                          const GblStackFrame*   pFrame,
                          GBL_LOG_LEVEL          level,
@@ -79,6 +65,26 @@ GBL_API GblILogger_pop(GblILogger* pSelf,
     GBL_INSTANCE_VCALL_PREFIX(GBL_ILOGGER, pFnPop,
                               pSelf, pFrame, count);
     GBL_API_END();
+}
+
+GBL_EXPORT GblType GblILogger_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    static const GblTypeInfo info =  {
+        .pFnClassInit     = (GblTypeClassInitializeFn)GblILoggerIFace_init_,
+        .classSize        = sizeof(GblILoggerIFace)
+    };
+
+    if(type == GBL_INVALID_TYPE) {
+        GBL_API_BEGIN(NULL);
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblILogger"),
+                                      GBL_INTERFACE_TYPE,
+                                      &info,
+                                     GBL_TYPE_FLAG_TYPEINFO_STATIC);
+        GBL_API_VERIFY_LAST_RECORD();
+        GBL_API_END_BLOCK();
+    }
+    return type;
 }
 
 

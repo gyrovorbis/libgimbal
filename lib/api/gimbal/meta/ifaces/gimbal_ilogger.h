@@ -10,7 +10,7 @@
 #include "gimbal_interface.h"
 #include "../../core/gimbal_api_frame.h"
 
-#define GBL_ILOGGER_TYPE                (GBL_BUILTIN_TYPE(ILOGGER))
+#define GBL_ILOGGER_TYPE                (GblILogger_type())
 #define GBL_ILOGGER_STRUCT              GblILogger
 #define GBL_ILOGGER_CLASS_STRUCT        GblILoggerIFace
 
@@ -35,6 +35,8 @@ GBL_INTERFACE_DERIVE(GblILogger)
     GBL_RESULT (*pFnPush)   (GBL_SELF, const GblStackFrame* pFrame);
     GBL_RESULT (*pFnPop)    (GBL_SELF, const GblStackFrame* pFrame, uint32_t count);
 GBL_INTERFACE_END
+
+GBL_EXPORT GblType GblILogger_type(void)                    GBL_NOEXCEPT;
 
 GBL_API GblILogger_write(GBL_SELF,
                          const GblStackFrame*   pFrame,

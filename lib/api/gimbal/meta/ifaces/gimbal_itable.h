@@ -12,7 +12,7 @@
 
 GBL_DECLS_BEGIN
 
-#define GBL_ITABLE_TYPE                 (GBL_BUILTIN_TYPE(ITABLE))
+#define GBL_ITABLE_TYPE                 (GblITable_type())
 #define GBL_ITABLE_STRUCT               GblITable
 #define GBL_ITABLE_CLASS_STRUCT         GblITableIFace
 #define GBL_ITABLE(instance)            (GBL_INSTANCE_CAST_PREFIX       (instance, GBL_ITABLE))

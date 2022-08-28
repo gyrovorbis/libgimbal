@@ -11,7 +11,7 @@
 #include "../ifaces/gimbal_ilogger.h"
 
 /// \ingroup metaBuiltinTypes
-#define GBL_CONTEXT_TYPE                (GBL_BUILTIN_TYPE(CONTEXT))
+#define GBL_CONTEXT_TYPE                (GblContext_type())
 #define GBL_CONTEXT_STRUCT              GblContext
 #define GBL_CONTEXT_CLASS_STRUCT        GblContextClass
 #define GBL_CONTEXT(inst)               GBL_INSTANCE_CAST_PREFIX (inst,  GBL_CONTEXT)
@@ -55,6 +55,7 @@ GBL_EXPORT const char*  GblContext_lastIssueMessage(GBL_CSELF)                  
 
 GBL_EXPORT GblContext*  GblContext_parentContext   (GBL_CSELF)                             GBL_NOEXCEPT;
 GBL_EXPORT void         GblContext_setLogFilter    (GBL_SELF, GblFlags mask)               GBL_NOEXCEPT;
+GBL_EXPORT void         GblContext_logBuildInfo    (GBL_CSELF)                             GBL_NOEXCEPT;
 
 
 

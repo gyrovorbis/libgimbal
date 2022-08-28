@@ -1,4 +1,4 @@
-#include "meta/gimbal_flags_test_suite.h"
+#include "meta/classes/gimbal_flags_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/meta/classes/gimbal_flags.h>
@@ -49,7 +49,7 @@ static GBL_RESULT GblFlagsTestSuite_register_(GblTestSuite* pSelf, GblContext* p
     GBL_API_VERIFY_LAST_RECORD();
 
     GBL_TEST_VERIFY(pSelf_->flagsType != GBL_INVALID_TYPE);
-    GBL_TEST_VERIFY(GBL_FLAGS_TYPE_CHECK(pSelf_->flagsType));
+    GBL_API_VERIFY_TYPE(pSelf_->flagsType, GBL_FLAGS_TYPE);
 
     pSelf_->pFlagsClass = (GblFlagsClass*)GblClass_refDefault(pSelf_->flagsType);
     GBL_TEST_VERIFY(pSelf_->pFlagsClass);

@@ -64,9 +64,9 @@ static GBL_RESULT pConvertFrom_(const GblVariant* pVariant, GblVariant* pOther) 
     const GblType srcType = GblVariant_typeOf(pVariant);
     if(dstType == GBL_POINTER_TYPE) {
         if(srcType == GBL_NIL_TYPE)
-            GblVariant_setPointer(pOther, NULL);
+            GblVariant_setPointer(pOther, GBL_POINTER_TYPE, NULL);
         else if(srcType == GBL_STRING_TYPE)
-            GblVariant_setPointer(pOther, pVariant->pString);
+            GblVariant_setPointer(pOther, GBL_POINTER_TYPE, pVariant->pString);
     } else
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_API_END();
@@ -94,15 +94,14 @@ extern GBL_RESULT GblPointer_typeRegister_(GblContext* pCtx) {
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &pointerIVariantIFace,
-                                 GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE |
                                  GBL_TYPE_FLAG_CLASS_PINNED);
     GBL_API_VERIFY_LAST_RECORD();
 
     GBL_API_CALL(GblVariant_registerConverter(GBL_POINTER_TYPE, GBL_BOOL_TYPE, pConvert_));
     GBL_API_CALL(GblVariant_registerConverter(GBL_POINTER_TYPE, GBL_STRING_TYPE, pConvert_));
 
-    GBL_API_CALL(GblVariant_registerConverter(GBL_NIL_TYPE, GBL_POINTER_TYPE, pConvertFrom_));
-    GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_POINTER_TYPE, pConvertFrom_));
+    GBL_API_CALL(GblVariant_registerConverter(GBL_NIL_TYPE,     GBL_POINTER_TYPE, pConvertFrom_));
+    GBL_API_CALL(GblVariant_registerConverter(GBL_STRING_TYPE,  GBL_POINTER_TYPE, pConvertFrom_));
 
     GBL_API_END();
 }

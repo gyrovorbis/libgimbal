@@ -484,6 +484,22 @@ static GBL_RESULT GblNaryTreeTestSuite_siblingIndex_(GblTestSuite* pSelf, GblCon
     GBL_API_END();
 }
 
+static GBL_RESULT GblNaryTreeTestSuite_disconnect_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTree_disconnect(NARY_OBJECT_NODE_(pSelf, 0));
+
+    GBL_TEST_VERIFY(!GblNaryTree_isConnected(NARY_OBJECT_NODE_(pSelf_, 0)));
+    GBL_TEST_VERIFY(!GblNaryTree_isChild(NARY_OBJECT_NODE_(pSelf_, 0), NARY_OBJECT_NODE_(pSelf_, 4)));
+    GBL_TEST_VERIFY(!GblNaryTree_isSibling(NARY_OBJECT_NODE_(pSelf_, 3), NARY_OBJECT_NODE_(pSelf_, 2)));
+    GBL_TEST_VERIFY(!GblNaryTree_isAncestor(NARY_OBJECT_NODE_(pSelf, 0), NARY_OBJECT_NODE_(pSelf, 9)));
+    GBL_TEST_VERIFY(!GblNaryTree_isAncestor(NARY_OBJECT_NODE_(pSelf, 0), NARY_OBJECT_NODE_(pSelf, 10)));
+
+    GBL_API_END();
+}
+
 GBL_EXPORT GblType GblNaryTreeTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
@@ -516,6 +532,7 @@ GBL_EXPORT GblType GblNaryTreeTestSuite_type(void) {
         { "siblingFirst",     GblNaryTreeTestSuite_siblingFirst_     },
         { "siblingAt",        GblNaryTreeTestSuite_siblingAt_        },
         { "siblingIndex",     GblNaryTreeTestSuite_siblingIndex_     },
+        { "disconnect",       GblNaryTreeTestSuite_disconnect_       },
         { NULL,               NULL                                   }
     };
 

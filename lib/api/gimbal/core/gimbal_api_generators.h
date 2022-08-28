@@ -117,12 +117,6 @@ extern "C" {
     GBL_INSTANCE_DERIVE(derived, base)   \
     GBL_INSTANCE_END
 
-typedef struct GblPropertyInfo_ {
-    const char* pName;
-    uintptr_t     typeId;
-    uint32_t    flags;
-} GblPropertyInfo_;
-
 #define GBL_DECLARE_STRUCT_PUBLIC(S)    \
     struct S;                           \
     typedef struct S S;                 \

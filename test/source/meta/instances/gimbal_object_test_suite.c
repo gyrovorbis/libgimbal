@@ -1,4 +1,4 @@
-#include "objects/gimbal_object_test_suite.h"
+#include "meta/instances/gimbal_object_test_suite.h"
 #include <gimbal/meta/instances/gimbal_object.h>
 #include <gimbal/meta/instances/gimbal_event.h>
 #include <gimbal/meta/types/gimbal_variant.h>

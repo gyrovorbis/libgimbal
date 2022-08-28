@@ -1,4 +1,4 @@
-#include "meta/gimbal_enum_test_suite.h"
+#include "meta/classes/gimbal_enum_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/meta/classes/gimbal_enum.h>
@@ -48,7 +48,7 @@ static GBL_RESULT GblEnumTestSuite_register_(GblTestSuite* pSelf, GblContext* pC
     GBL_API_VERIFY_LAST_RECORD();
 
     GBL_TEST_VERIFY(pSelf_->enumType != GBL_INVALID_TYPE);
-    GBL_TEST_VERIFY(GBL_ENUM_TYPE_CHECK(pSelf_->enumType));
+    GBL_API_VERIFY_TYPE(pSelf_->enumType, GBL_ENUM_TYPE);
 
     pSelf_->pEnumClass = (GblEnumClass*)GblClass_refDefault(pSelf_->enumType);
     GBL_TEST_VERIFY(pSelf_->pEnumClass);

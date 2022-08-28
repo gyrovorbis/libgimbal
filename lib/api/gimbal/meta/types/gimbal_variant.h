@@ -13,7 +13,7 @@
 #include "../classes/gimbal_primitives.h"
 #include "../classes/gimbal_enum.h"
 #include "../classes/gimbal_flags.h"
-#include "../classes/gimbal_boxed.h"
+#include "../classes/gimbal_opaque.h"
 #include "../instances/gimbal_instance.h"
 
 #define GBL_VARIANT_INIT    { .type = GBL_INVALID_TYPE }
@@ -23,8 +23,6 @@
 #define GBL_CSELF   const GBL_SELF
 
 GBL_DECLS_BEGIN
-
-///////// GblVariant_isCompatible(GblType type);
 
 typedef GBL_RESULT (*GblVariantConverterFn)(GBL_CSELF, GblVariant* pOther);
 
@@ -103,18 +101,16 @@ GBL_INLINE GBL_RESULT       GblVariant_constructFlags           (GBL_SELF,
                                                                  GblType type,
                                                                  GblFlags value)                GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructPointer         (GBL_SELF, void* pValue)        GBL_NOEXCEPT;
-
-GBL_INLINE GBL_RESULT       GblVariant_constructOpaque          (GBL_SELF,
+GBL_INLINE GBL_RESULT       GblVariant_constructPointer         (GBL_SELF,
                                                                  GblType ptrType,
                                                                  void* pValue)                  GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructBoxedCopy       (GBL_SELF,
-                                                                 GblType boxedType,
+GBL_INLINE GBL_RESULT       GblVariant_constructOpaqueCopy      (GBL_SELF,
+                                                                 GblType opaqueType,
                                                                  void*  pValue)                 GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructBoxedMove       (GBL_SELF,
-                                                                 GblType boxedType,
+GBL_INLINE GBL_RESULT       GblVariant_constructOpaqueMove      (GBL_SELF,
+                                                                 GblType opaqueType,
                                                                  void*  pValue)                 GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT       GblVariant_constructInstance        (GBL_SELF, GblInstance* pValue) GBL_NOEXCEPT;
@@ -165,18 +161,16 @@ GBL_INLINE GBL_RESULT       GblVariant_setFlags                 (GBL_SELF,
                                                                  GblType flagsType,
                                                                  GblFlags value)                GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setPointer               (GBL_SELF, void* pValue)        GBL_NOEXCEPT;
-
-GBL_INLINE GBL_RESULT       GblVariant_setOpaque                (GBL_SELF,
+GBL_INLINE GBL_RESULT       GblVariant_setPointer               (GBL_SELF,
                                                                  GblType ptrType,
                                                                  void* pValue)                  GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setBoxedCopy             (GBL_SELF,
-                                                                 GblType boxedType,
+GBL_INLINE GBL_RESULT       GblVariant_setOpaqueCopy            (GBL_SELF,
+                                                                 GblType opaqueType,
                                                                  void*  pValue)                 GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setBoxedMove             (GBL_SELF,
-                                                                 GblType boxedType,
+GBL_INLINE GBL_RESULT       GblVariant_setOpaqueMove            (GBL_SELF,
+                                                                 GblType opaqueType,
                                                                  void*  pValue)                 GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT       GblVariant_setInstance              (GBL_SELF, GblInstance* pValue) GBL_NOEXCEPT;
@@ -212,9 +206,9 @@ GBL_INLINE const char*      GblVariant_getString                (GBL_CSELF)     
 GBL_INLINE GblStringView    GblVariant_getStringView            (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE GblType          GblVariant_getTypeValue             (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE void*            GblVariant_getPointer               (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE void*            GblVariant_getBoxedCopy             (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE void*            GblVariant_getBoxedMove             (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_INLINE void*            GblVariant_getBoxedPeek             (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE void*            GblVariant_getOpaqueCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE void*            GblVariant_getOpaqueMove            (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_INLINE void*            GblVariant_getOpaquePeek            (GBL_CSELF)                     GBL_NOEXCEPT;
 
 GBL_INLINE GblInstance*     GblVariant_getInstance              (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_EXPORT GblObject*       GblVariant_getObjectCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
@@ -290,7 +284,7 @@ GBL_EXPORT GBL_RESULT       GblVariant_load                     (GBL_SELF,
             (GblVariant*,            GblVariant_constructCopy)          \
         )                                                               \
     )
-#define GblVariant_construct_N(pVariant, ...)   GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TABLE, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
+#define GblVariant_construct_N(pVariant, ...)   GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_CONSTRUCT_TABLE, GBL_TUPLE_FIRST (__VA_ARGS__))(pVariant, __VA_ARGS__)
 #define GblVariant_construct_1(pVariant)        GblVariant_constructNil(pVariant)
 /// \endcond
 #define GblVariant_construct(...)               GBL_VA_OVERLOAD_CALL(GblVariant_construct, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
@@ -319,7 +313,7 @@ GBL_EXPORT GBL_RESULT       GblVariant_load                     (GBL_SELF,
         )                                                           \
     )
 /// \endcond
-#define GblVariant_set(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_SET_TABLE, GBL_ARG_1(__VA_ARGS__))(pVariant, __VA_ARGS__)
+#define GblVariant_set(pVariant, ...) GBL_META_GENERIC_MACRO_GENERATE(GBL_VARIANT_SET_TABLE, GBL_TUPLE_FIRST(__VA_ARGS__))(pVariant, __VA_ARGS__)
 
 
 
@@ -398,16 +392,14 @@ GBL_INLINE GBL_RESULT GblVariant_constructInt64(GBL_SELF, int64_t value) GBL_NOE
 
 GBL_INLINE GBL_RESULT GblVariant_constructEnum(GBL_SELF, GblType type, GblEnum value) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY(GBL_ENUM_TYPE_CHECK(type),
-                   GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_API_VERIFY_TYPE(type, GBL_ENUM_TYPE);
     GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, type, value));
     GBL_API_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_constructFlags(GBL_SELF, GblType type, GblFlags value) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY(GBL_FLAGS_TYPE_CHECK(type),
-                   GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_API_VERIFY_TYPE(type, GBL_FLAGS_TYPE);
     GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, type, value));
     GBL_API_END();
 }
@@ -424,13 +416,7 @@ GBL_INLINE GBL_RESULT GblVariant_constructDouble(GBL_SELF, double value) GBL_NOE
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblVariant_constructPointer(GBL_SELF, void* pValue) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_POINTER_TYPE, pValue));
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_RESULT GblVariant_constructOpaque(GBL_SELF, GblType ptrType, void* pValue) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblVariant_constructPointer(GBL_SELF, GblType ptrType, void* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY(GBL_POINTER_TYPE_CHECK(ptrType),
                    GBL_RESULT_ERROR_TYPE_MISMATCH);
@@ -444,17 +430,17 @@ GBL_INLINE GBL_RESULT GblVariant_constructString(GBL_SELF, const char* pValue) G
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblVariant_constructBoxedCopy(GBL_SELF, GblType boxedType, void*  pValue) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblVariant_constructOpaqueCopy(GBL_SELF, GblType opaqueType, void*  pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_TYPE(boxedType, GBL_BOXED_TYPE);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, boxedType, pValue));
+    GBL_API_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, opaqueType, pValue));
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblVariant_constructBoxedMove(GBL_SELF, GblType boxedType, void* pValue) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblVariant_constructOpaqueMove(GBL_SELF, GblType opaqueType, void* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_TYPE(boxedType, GBL_BOXED_TYPE);
-    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(pSelf, boxedType, pValue));
+    GBL_API_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(pSelf, opaqueType, pValue));
     GBL_API_END();
 }
 
@@ -620,28 +606,28 @@ GBL_INLINE void* GblVariant_getPointer(GBL_CSELF) GBL_NOEXCEPT {
     return pValue;
 }
 
-GBL_INLINE void* GblVariant_getBoxedCopy(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE void* GblVariant_getOpaqueCopy(GBL_CSELF) GBL_NOEXCEPT {
     void* pValue = GBL_NULL;
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOXED_TYPE);
+    GBL_API_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OPAQUE_TYPE);
     GBL_API_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &pValue));
     GBL_API_END_BLOCK();
     return pValue;
 }
 
-GBL_INLINE void* GblVariant_getBoxedMove(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE void* GblVariant_getOpaqueMove(GBL_SELF) GBL_NOEXCEPT {
     void* pValue = GBL_NULL;
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOXED_TYPE);
+    GBL_API_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OPAQUE_TYPE);
     GBL_API_VERIFY_CALL(GblVariant_getValueMove(pSelf, &pValue));
     GBL_API_END_BLOCK();
     return pValue;
 }
 
-GBL_INLINE void* GblVariant_getBoxedPeek(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE void* GblVariant_getOpaquePeek(GBL_CSELF) GBL_NOEXCEPT {
     void* pValue = GBL_NULL;
     GBL_API_BEGIN(GBL_NULL);
-    GBL_API_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOXED_TYPE);
+    GBL_API_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OPAQUE_TYPE);
     GBL_API_VERIFY_CALL(GblVariant_getValuePeek(pSelf, &pValue));
     GBL_API_END_BLOCK();
     return pValue;
@@ -777,32 +763,26 @@ GBL_INLINE GBL_RESULT GblVariant_setDouble(GBL_SELF, double value) GBL_NOEXCEPT 
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblVariant_setPointer(GBL_SELF, void* pValue) GBL_NOEXCEPT {
-    GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_POINTER_TYPE, pValue));
-    GBL_API_END();
-}
-
-GBL_INLINE GBL_RESULT GblVariant_setOpaque(GBL_SELF,
-                                           GblType ptrType,
-                                           void* pValue) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblVariant_setPointer(GBL_SELF,
+                                            GblType ptrType,
+                                            void* pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_TYPE(ptrType, GBL_POINTER_TYPE);
     GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, ptrType, pValue));
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblVariant_setBoxedCopy(GBL_SELF, GblType boxedType, void*  pValue) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblVariant_setOpaqueCopy(GBL_SELF, GblType opaqueType, void*  pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_TYPE(boxedType, GBL_BOXED_TYPE);
-    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, boxedType, pValue));
+    GBL_API_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_setValueCopy(pSelf, opaqueType, pValue));
     GBL_API_END();
 }
 
-GBL_INLINE GBL_RESULT GblVariant_setBoxedMove(GBL_SELF, GblType boxedType, void*  pValue) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblVariant_setOpaqueMove(GBL_SELF, GblType opaqueType, void*  pValue) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_TYPE(boxedType, GBL_BOXED_TYPE);
-    GBL_API_VERIFY_CALL(GblVariant_setValueMove(pSelf, boxedType, pValue));
+    GBL_API_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
+    GBL_API_VERIFY_CALL(GblVariant_setValueMove(pSelf, opaqueType, pValue));
     GBL_API_END();
 }
 

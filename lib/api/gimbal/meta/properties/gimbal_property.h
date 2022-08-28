@@ -133,8 +133,6 @@ GBL_INLINE GblType GblProperty_objectType(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf? GBL_PRIV_REF(pSelf).objectType : GBL_INVALID_TYPE;
 }
 
-/// \cond
-
 GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
                                                      GblType       derivedType,
                                                      const char*   pName,
@@ -170,7 +168,7 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
     GBL_PROPERTIES_REGISTER_DEFINE_(object, __VA_ARGS__)
 
 #define GBL_PROPERTIES_REGISTER_(...) \
-    GBL_VA_OVERLOAD_SELECT(GBL_PROPERTIES_REGISTER, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
+    GBL_VA_OVERLOAD_CALL(GBL_PROPERTIES_REGISTER, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
 #define GBL_PROPERTIES_REGISTER_1(object) \
     GBL_PROPERTIES_REGISTER_2(object, NULL)
@@ -179,18 +177,18 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
     GBL_STMT_START {                                                \
         for(GblSize p = 0; p < object##_Property_Id_count; ++p) {   \
             object##_registerProperty_(p,                           \
-                                       list? &list[p] : NULL);      \
+                                       list? &list[p] : GBL_NULL);  \
         }                                                           \
     } GBL_STMT_END
 
-#define GBL_PROPERTIES_IDS_(object, ...)                        \
-    typedef enum object##_Property_Id_ {                        \
-        FOREACH(GBL_PROPERTY_ID_, object, (__VA_ARGS__))        \
-        object##_Property_Id_count                              \
+#define GBL_PROPERTIES_IDS_(object, ...)                            \
+    typedef enum object##_Property_Id_ {                            \
+        GBL_TUPLE_FOREACH(GBL_PROPERTY_ID_, object, (__VA_ARGS__))  \
+        object##_Property_Id_count                                  \
     } object##_Property_Id_;
 
 #define GBL_PROPERTY_ID_(object, property)  \
-    GBL_PROPERTY_ID__(object, EXPAND property)
+    GBL_PROPERTY_ID__(object, GBL_EVAL property)
 
 #define GBL_PROPERTY_ID__(...) \
     GBL_PROPERTY_ID___(__VA_ARGS__)
@@ -198,26 +196,26 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
 #define GBL_PROPERTY_ID___(object, name, type, flags, ...) \
     object##_Property_Id_##name,
 
-#define GBL_PROPERTIES_REGISTER_DEFINE_(object, ...)                                          \
-    GBL_EXPORT GblType object##_type(void) GBL_NOEXCEPT;    \
+#define GBL_PROPERTIES_REGISTER_DEFINE_(object, ...)                                    \
+    GBL_EXPORT GblType object##_type(void) GBL_NOEXCEPT;                                \
     GBL_INLINE GBL_RESULT object##_registerProperty_(GblEnum id,                        \
                                                      GblProperty** ppProp) GBL_NOEXCEPT \
-    {                                                                                  \
-        GBL_API_BEGIN(NULL);                                                           \
-        GblProperty* pProp = ppProp? *ppProp : GBL_NULL;                               \
-        switch(id) {                                                                   \
-            FOREACH(GBL_PROPERTY_REGISTER_, object, (__VA_ARGS__))                     \
-            default: GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_INVALID_PROPERTY);     \
-        }                                                                              \
-        if(pProp) {                                                                    \
-            GBL_API_CALL(GblProperty_install(object##_type(), pProp));                 \
-            if(ppProp) *ppProp = pProp;                                                \
-        }                                                                              \
-        GBL_API_END();                                                                 \
+    {                                                                                   \
+        GBL_API_BEGIN(NULL);                                                            \
+        GblProperty* pProp = ppProp? *ppProp : GBL_NULL;                                \
+        switch(id) {                                                                    \
+            GBL_TUPLE_FOREACH(GBL_PROPERTY_REGISTER_, object, (__VA_ARGS__))            \
+            default: GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_INVALID_PROPERTY);      \
+        }                                                                               \
+        if(pProp) {                                                                     \
+            GBL_API_CALL(GblProperty_install(object##_type(), pProp));                  \
+            if(ppProp) *ppProp = pProp;                                                 \
+        }                                                                               \
+        GBL_API_END();                                                                  \
     }
 
 #define GBL_PROPERTY_REGISTER_(object, property) \
-    GBL_PROPERTY_REGISTER__(object, EXPAND property)
+    GBL_PROPERTY_REGISTER__(object, GBL_EVAL property)
 
 #define GBL_PROPERTY_REGISTER__(...) \
     GBL_PROPERTY_REGISTER___(__VA_ARGS__)
@@ -228,7 +226,7 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
                 type##_PROPERTY_TYPE,                                  \
                 GblQuark_internStringStatic(GBL_STRINGIFY(name)),      \
                 id,                                                    \
-                GBL_PROPERTY_FLAGS_MASK_ FIRST(__VA_ARGS__),           \
+                GBL_PROPERTY_FLAGS_MASK_ GBL_TUPLE_FIRST(__VA_ARGS__), \
                 GBL_PROPERTY_VARARGS_((__VA_ARGS__))));                \
         break;
 
@@ -239,15 +237,13 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
     0
 
 #define GBL_PROPERTY_VARARGS__N(...) \
-    PP_NARG __VA_ARGS__ - 1, REST __VA_ARGS__
+    GBL_NARG __VA_ARGS__ - 1, GBL_TUPLE_REST __VA_ARGS__
 
 #define GBL_PROPERTY_FLAGS_MASK_(...) \
     GBL_MAP(GBL_PROPERTY_FLAGS_MASK__, __VA_ARGS__)0
 
 #define GBL_PROPERTY_FLAGS_MASK__(suffix)  \
     GBL_PROPERTY_FLAG_##suffix |
-
-/// \endcond
 
 GBL_DECLS_END
 

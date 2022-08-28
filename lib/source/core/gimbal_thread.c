@@ -44,7 +44,7 @@ GBL_EXPORT const GblCallRecord* GblThread_callRecord(const GblThread* pThread) {
     return &pThread->callRecord;
 }
 
-GBL_API GblThread_callRecordSet(GblThread* pThread, const GblCallRecord* pRecord) {
+GBL_API GblThread_setCallRecord(GblThread* pThread, const GblCallRecord* pRecord) {
     if(!pThread) pThread = GblThread_current();
     if(pRecord) {
         memcpy(&pThread->callRecord, pRecord, sizeof(GblCallRecord));
@@ -60,7 +60,7 @@ GBL_EXPORT const char* GblThread_name(const GblThread* pThread) {
     return pThread->pName;
 }
 
-GBL_API GblThread_nameSet(GblThread* pThread, const char* pName) {
+GBL_API GblThread_setName(GblThread* pThread, const char* pName) {
     GBL_ASSERT(pName);
     if(!pThread) pThread = GblThread_current();
     pThread->pName = pName;
@@ -85,7 +85,7 @@ GBL_API GblThread_stackFramePush(GblThread* pThread, GblStackFrame* pFrame) {
     if(pFrame) {
         pFrame->pPrevFrame      = pThread->pStackFrameTop;
         if(GBL_RESULT_ERROR(pThread->callRecord.result)) {
-            GblThread_callRecordSet(pThread,NULL);
+            GblThread_setCallRecord(pThread,NULL);
             GBL_API_BEGIN(GblContext_global());
             GBL_API_WARN("Pushing new stack frame from [%s] with unhandled error record!",
                          !pFrame->sourceCurrent.pFunc? "UNKNOWN" : pFrame->sourceCurrent.pFunc);

@@ -20,11 +20,11 @@ GBL_EXPORT GblThread*   GblThread_current        (void)                         
 GBL_EXPORT GblContext*  GblThread_context        (GBL_CSELF)                        GBL_NOEXCEPT;
 
 GBL_EXPORT const char*  GblThread_name           (GBL_CSELF)                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblThread_nameSet        (GBL_SELF, const char* pName)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblThread_setName        (GBL_SELF, const char* pName)      GBL_NOEXCEPT;
 
 GBL_EXPORT const GblCallRecord*
                         GblThread_callRecord     (GBL_CSELF)                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblThread_callRecordSet  (GBL_SELF,
+GBL_EXPORT GBL_RESULT   GblThread_setCallRecord  (GBL_SELF,
                                                   const GblCallRecord* pRecord)     GBL_NOEXCEPT;
 //private
 GBL_EXPORT GBL_RESULT   GblThread_logPush        (GBL_SELF)                         GBL_NOEXCEPT;

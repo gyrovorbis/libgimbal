@@ -24,6 +24,7 @@ static GBL_RESULT GblTestScenarioClass_begin_(GblTestScenario* pSelf) {
     const char* pName = GblObject_name(GBL_OBJECT(pSelf));
     GBL_API_INFO("[GblTestScenario] Beginning Scenario: [%s]", pName? pName : "");
     GBL_API_PUSH();
+    GblContext_logBuildInfo(GBL_CONTEXT(pSelf));
     GBL_API_END();
 }
 
@@ -101,7 +102,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                      GblTestSuite_name(pSelf_->pCurSuite));
 
         GBL_API_PUSH();
-        GBL_API_CALL(GblTestSuite_suiteInit(pSuiteIt, pCtx));
+        GBL_API_CALL(GblTestSuite_initSuite(pSuiteIt, pCtx));
         GBL_API_CLEAR_LAST_RECORD();
         GBL_API_POP(1);
 
@@ -122,7 +123,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                 pSelf_->pCurCase = GblTestSuite_caseName(pSuiteIt, idx);
 
 
-                GBL_API_CALL(GblTestSuite_caseInit(pSuiteIt, pCtx));
+                GBL_API_CALL(GblTestSuite_initCase(pSuiteIt, pCtx));
                 GBL_API_CLEAR_LAST_RECORD();
 
                 if(GBL_RESULT_ERROR(GBL_API_RESULT())) {
@@ -141,7 +142,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
 
                     GblTimer_start(&caseTimer);
 
-                    GBL_RESULT result = GblTestSuite_caseRun(pSuiteIt, pCtx, idx);
+                    GBL_RESULT result = GblTestSuite_runCase(pSuiteIt, pCtx, idx);
 
                     GblTimer_stop(&caseTimer);
                     pSelf_->suiteMs += GblTimer_elapsedMs(&caseTimer);
@@ -171,7 +172,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                         break;
                     }
 
-                    GBL_API_CALL(GblTestSuite_caseFinal(pSuiteIt, pCtx));
+                    GBL_API_CALL(GblTestSuite_finalCase(pSuiteIt, pCtx));
                     GBL_API_CLEAR_LAST_RECORD();
                     if(GBL_RESULT_ERROR(GBL_API_RESULT())) {
                         GBL_API_ERROR("[GblTestSuite] Failed to finalize test case: [%s]",
@@ -185,7 +186,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                          GblTestSuite_name(pSelf_->pCurSuite),
                          pSelf_->pCurCase);
             GBL_API_PUSH();
-            GBL_API_CALL(GblTestSuite_suiteFinal(pSuiteIt, pCtx));
+            GBL_API_CALL(GblTestSuite_finalSuite(pSuiteIt, pCtx));
             GBL_API_CLEAR_LAST_RECORD();
             GBL_API_POP(1);
 
@@ -450,7 +451,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
     GBL_API_END();
 }
 
-GBL_EXPORT GBL_RESULT GblTestScenario_suiteEnqueue(GblTestScenario* pSelf, const GblTestSuite* pSuite) {
+GBL_EXPORT GBL_RESULT GblTestScenario_enqueueSuite(GblTestScenario* pSelf, const GblTestSuite* pSuite) {
     GBL_API_BEGIN(pSelf);
     GblObject_addChild(GBL_OBJECT(pSelf), GBL_OBJECT(pSuite));
     pSelf->caseCount += GblTestSuite_caseCount(pSuite);
@@ -458,7 +459,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_suiteEnqueue(GblTestScenario* pSelf, const
     GBL_API_END();
 }
 
-GBL_EXPORT GblTestSuite* GblTestScenario_suiteFind(const GblTestScenario* pSelf, const char* pName) {
+GBL_EXPORT GblTestSuite* GblTestScenario_findSuite(const GblTestScenario* pSelf, const char* pName) {
     GblTestSuite* pSuite = NULL;
     GBL_API_BEGIN(pSelf);
     GBL_API_VERIFY_POINTER(pName);
@@ -469,11 +470,11 @@ GBL_EXPORT GblTestSuite* GblTestScenario_suiteFind(const GblTestScenario* pSelf,
     return pSuite;
 }
 
-GBL_EXPORT GblTestSuite* GblTestScenario_suiteCurrent(const GblTestScenario* pSelf) {
+GBL_EXPORT GblTestSuite* GblTestScenario_currentSuite(const GblTestScenario* pSelf) {
     return pSelf? GBL_TEST_SCENARIO_(pSelf)->pCurSuite : NULL;
 }
 
-GBL_EXPORT const char* GblTestScenario_caseCurrent(const GblTestScenario* pSelf) {
+GBL_EXPORT const char* GblTestScenario_currentCase(const GblTestScenario* pSelf) {
     return pSelf? GBL_TEST_SCENARIO_(pSelf)->pCurCase : NULL;
 }
 

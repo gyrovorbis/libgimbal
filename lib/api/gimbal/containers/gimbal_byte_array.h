@@ -27,7 +27,7 @@ GBL_INLINE GblByteArray*   GblByteArray_create_1   (GblSize bytes)              
 GBL_INLINE GblByteArray*   GblByteArray_create_2   (GblSize bytes, const void* pData)                               GBL_NOEXCEPT;
 GBL_EXPORT GblByteArray*   GblByteArray_create_3   (GblSize bytes, const void* pData, GblContext* pCtx)             GBL_NOEXCEPT;
 #define GblByteArray_create(...) \
-        GBL_VA_OVERLOAD_SELECT(GblByteArray_create, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
+        GBL_VA_OVERLOAD_CALL(GblByteArray_create, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
 GBL_INLINE GblByteArray*    GblByteArray_ref       (GBL_SELF)                                                       GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount      GblByteArray_unref     (GBL_SELF)                                                       GBL_NOEXCEPT;

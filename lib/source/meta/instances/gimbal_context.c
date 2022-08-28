@@ -325,30 +325,152 @@ GBL_EXPORT void GblContext_setLogFilter(GblContext* pSelf, GblFlags mask) {
     pSelf->logFilter = mask;
 }
 
+GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
+    GBL_API_BEGIN(pSelf);
+
+    GBL_API_INFO("Build Info");
+    GBL_API_PUSH();
+
+    GBL_API_INFO("Project Info");
+    GBL_API_INFO("%-20s: %-100.100s", "Name", GBL_PROJECT_NAME);
+    GBL_API_INFO("%-20s: %-100.100s", "Version", GBL_PROJECT_VERSION);
+    GBL_API_INFO("%-20s: %-100.100s", "URL", GBL_PROJECT_URL);
+    GBL_API_INFO("%-20s: %-100.100s", "Description", GBL_PROJECT_DESCRIPTION);
+    GBL_API_POP(1);
+
+    GBL_API_INFO("Build Info");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "Timestamp", GBL_BUILD_TIMESTAMP);
+    GBL_API_INFO("%-20s: %-100.100s", "Type", GBL_BUILD_TYPE);
+    GBL_API_INFO("%-20s: %-100.100s", "Config", GBL_BUILD_CONFIG);
+    GBL_API_POP(1);
+
+    GBL_API_INFO("CI Info");
+    GBL_API_PUSH();
+    #if GBL_BUILD_CI
+    GBL_API_INFO("%-20s: %-100.100s", "Project", GBL_BUILD_CI_PROJECT_TITLE);
+
+    GBL_API_INFO("Source Control Commit Info");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "Title", GBL_BUILD_CI_COMMIT_TITLE);
+    GBL_API_INFO("%-20s: %-100.100s", "Timestamp", GBL_BUILD_CI_COMMIT_TIMESTAMP);
+    GBL_API_INFO("%-20s: %-100.100s", "SHA", GBL_BUILD_CI_COMMIT_SHA);
+    GBL_API_INFO("%-20s: %-100.100s", "Tag", GBL_BUILD_CI_COMMIT_TAG);
+    GBL_API_INFO("%-20s: %-100.100s", "Ref", GBL_BUILD_CI_COMMIT_BRANCH);
+    GBL_API_POP(1);
+
+    GBL_API_INFO("Job Info");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "ID", GBL_BUILD_CI_JOB_ID);
+    GBL_API_INFO("%-20s: %-100.100s", "Name", GBL_BUILD_CI_JOB_NAME);
+    GBL_API_INFO("%-20s: %-100.100s", "Stage", GBL_BUILD_CI_JOB_STAGE);
+    GBL_API_POP(1);
+
+    GBL_API_INFO("User Info");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "Login", GBL_BUILD_CI_USER_LOGIN);
+    GBL_API_INFO("%-20s: %-100.100s", "Name", GBL_BUILD_CI_USER_NAME);
+    GBL_API_INFO("%-20s: %-100.100s", "Email Address", GBL_BUILD_CI_USER_EMAIL);
+    GBL_API_POP(1);
+
+    GBL_API_INFO("Build Node Info");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "Description", GBL_BUILD_CI_RUNNER_DESCRIPTION);
+    GBL_API_INFO("%-20s: %-100.100s", "Tags", GBL_BUILD_CI_RUNNER_TAGS);
+    GBL_API_INFO("%-20s: %-100.100s", "Architecture", GBL_BUILD_CI_RUNNER_ARCH);
+    GBL_API_POP(1);
+    #else
+    GBL_API_WARN("UNOFFICIAL LOCAL BUILD !");
+    #endif
+    GBL_API_POP(1);
+
+    GBL_API_INFO("Compiler Info");
+    GBL_API_PUSH();
+    GBL_API_INFO("C");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "ID", GBL_BUILD_C_COMPILER_ID);
+    GBL_API_INFO("%-20s: %-100.100s", "Version", GBL_BUILD_C_COMPILER_VERSION);
+    GBL_API_INFO("%-20s: %-100.100s", "Target", GBL_BUILD_C_COMPILER_TARGET);
+    GBL_API_INFO("%-20s: %-100.100s", "Toolchain", GBL_BUILD_C_COMPILER_TOOLCHAIN);
+    GBL_API_INFO("%-20s: %-100.100s", "Language Standard", GBL_BUILD_C_STANDARD);
+    GBL_API_INFO("%-20s: %-100.100s", "Language Extensions", GBL_BUILD_C_EXTENSIONS);
+    GBL_API_POP(1);
+
+    GBL_API_INFO("C++");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "ID", GBL_BUILD_CPP_COMPILER_ID);
+    GBL_API_INFO("%-20s: %-100.100s", "Version", GBL_BUILD_CPP_COMPILER_VERSION);
+    GBL_API_INFO("%-20s: %-100.100s", "Target", GBL_BUILD_CPP_COMPILER_TARGET);
+    GBL_API_INFO("%-20s: %-100.100s", "Toolchain", GBL_BUILD_CPP_COMPILER_TOOLCHAIN);
+    GBL_API_INFO("%-20s: %-100.100s", "Language Standard", GBL_BUILD_CPP_STANDARD);
+    GBL_API_INFO("%-20s: %-100.100s", "Language Extensions", GBL_BUILD_CPP_EXTENSIONS);
+    GBL_API_POP(1);
+    GBL_API_POP(1);
+
+    GBL_API_INFO("Environment Info");
+    GBL_API_PUSH();
+    GBL_API_INFO("Host");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "Host Name", GBL_BUILD_HOST_NAME);
+    //GBL_API_VERBOSE("%-20s: %-100.100s", "Domain Name", GBL_BUILD_HOST_DOMAIN_NAME);
+    GBL_API_INFO("%-20s: %-100.100s", "Operating System", GBL_BUILD_HOST_OS);
+    GBL_API_INFO("%-20s: %-100.100s", "Architecture", GBL_BUILD_HOST_ARCH);
+    GBL_API_INFO("Processor");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "Family", GBL_BUILD_HOST_PROCESSOR_NAME);
+    GBL_API_INFO("%-20s: %-100.100s", "Description", GBL_BUILD_HOST_PROCESSOR_DESCRIPTION);
+    GBL_API_INFO("%-20s: %-100.u", "Physical Cores", GBL_BUILD_HOST_PROCESSOR_CORES_PHYSICAL);
+    GBL_API_INFO("%-20s: %-100.u", "Logical Cores", GBL_BUILD_HOST_PROCESSOR_CORES_LOGICAL);
+    GBL_API_POP(1);
+    GBL_API_INFO("Physical Memory");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100u", "Total (MB)", GBL_BUILD_HOST_MEMORY_PHYSICAL_TOTAL);
+    GBL_API_INFO("%-20s: %-100u", "Available (MB)", GBL_BUILD_HOST_MEMORY_PHYSICAL_AVAILABLE);
+    GBL_API_POP(1);
+    GBL_API_POP(1);
+    GBL_API_INFO("Target");
+    GBL_API_PUSH();
+    GBL_API_INFO("%-20s: %-100.100s", "Operating System", GBL_BUILD_TARGET_OS);
+    GBL_API_INFO("%-20s: %-100.100s", "Architecture", GBL_BUILD_TARGET_ARCH);
+    GBL_API_INFO("%-20s: %-100u", "Word Size", GBL_PTR_SIZE * 8);
+    GBL_API_INFO("%-20s: %-100.100s", "Endianness", GBL_BIG_ENDIAN? "Big" : "Little");
+    GBL_API_POP(2);
+
+    GBL_API_END_BLOCK();
+}
+GBL_EXPORT GblType GblContext_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    static GblTypeInterfaceMapEntry ifaceEntries[2] = {
+        {
+            .classOffset   = offsetof(GblContextClass, GblIAllocatorIFaceImpl)
+        }, {
+            .classOffset   = offsetof(GblContextClass, GblILoggerIFaceImpl)
+        }
+    };
+
+    static GblTypeInfo info = {
+        .pFnClassInit     = (GblTypeClassInitializeFn)GblContextClass_init_,
+        .classSize        = sizeof(GblContextClass),
+        .instanceSize     = sizeof(GblContext),
+        .interfaceCount   = 2,
+        .pInterfaceMap    = ifaceEntries
+    };
 
 
-extern GBL_RESULT GblContext_typeRegister_(GblContext* pCtx) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_CONTEXT,
-      GBL_OBJECT_TYPE,
-      GblQuark_internStringStatic("Context"),
-      &(const GblTypeInfo) {
-          .pFnClassInit     = (GblTypeClassInitializeFn)GblContextClass_init_,
-          .classSize        = sizeof(GblContextClass),
-          .instanceSize     = sizeof(GblContext),
-          .interfaceCount   = 2,
-          .pInterfaceMap    = (const GblTypeInterfaceMapEntry[]) {
-              {
-                  .interfaceType = GBL_IALLOCATOR_TYPE,
-                  .classOffset   = offsetof(GblContextClass, GblIAllocatorIFaceImpl)
-              }, {
-                  .interfaceType = GBL_ILOGGER_TYPE,
-                  .classOffset   = offsetof(GblContextClass, GblILoggerIFaceImpl)
-              }
-          }
-      },
-      GBL_TYPE_FLAGS_NONE);
-    GBL_API_END();
+    if(type == GBL_INVALID_TYPE) {
+        GBL_API_BEGIN(NULL);
+
+        ifaceEntries[0].interfaceType = GBL_IALLOCATOR_TYPE;
+        ifaceEntries[1].interfaceType = GBL_ILOGGER_TYPE;
+
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblContext"),
+                                      GBL_OBJECT_TYPE,
+                                      &info,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+        GBL_API_VERIFY_LAST_RECORD();
+        GBL_API_END_BLOCK();
+    }
+    return type;
 }
 
-GBL_EXPORT GblType GblContext_type(void) { return GBL_CONTEXT_TYPE; }

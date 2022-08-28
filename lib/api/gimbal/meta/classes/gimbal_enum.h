@@ -10,16 +10,10 @@
 #include "../../strings/gimbal_quark.h"
 
 /// \ingroup metaBuiltinTypes
-#define GBL_ENUM_TYPE                       (GBL_BUILTIN_TYPE(ENUM))
-#define GBL_ENUM_CLASS_STRUCT               GblEnumClass
-#define GBL_ENUM_TYPE_CHECK(other)          (GblType_check(other, GBL_ENUM_TYPE))
+#define GBL_ENUM_TYPE                       (GblEnum_type())
 
-#define GBL_ENUM_CLASS(klass)               (GBL_CLASS_CAST_PREFIX(klass, GBL_ENUM))
-#define GBL_ENUM_CLASS_CHECK(klass)         (GBL_CLASS_CHECK_PREFIX(klass, GBL_ENUM))
-#define GBL_ENUM_CLASS_TRY(klass)           (GBL_CLASS_TRY_PREFIX(klass, GBL_ENUM))
-
+#define GBL_ENUM_CLASS(klass)               (GBL_CLASS_CAST(klass, GBL_ENUM_TYPE, GblEnumClass))
 #define GBL_ENUM_GET_CLASS(variant)         (GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(&variant))))
-#define GBL_ENUM_TRY_CLASS(variant)         (GBL_ENUM_CLASS_TRY(GblClass_weakRefDefault(GblVariant_typeOf(&variant))))
 
 #define GBL_ENUM_ENTRY(enumValue, nick)     { enumValue, #enumValue, nick }
 #define GBL_ENUM_ENTRY_LAST()               { 0, NULL, NULL }
@@ -61,6 +55,8 @@ GBL_EXPORT GblEnum      GblEnumClass_valueFromNickQuark (GBL_CSELF, GblQuark qua
 GBL_EXPORT GblBool      GblEnumClass_valueCheck         (GBL_CSELF, GblEnum value)          GBL_NOEXCEPT;
 
 // ========== GblEnum ==========
+
+GBL_EXPORT GblType      GblEnum_type                    (void)                              GBL_NOEXCEPT;
 
 GBL_EXPORT GblType      GblEnum_register                (const char*         pName,
                                                          const GblEnumEntry* pValidEntries) GBL_NOEXCEPT;
@@ -167,85 +163,6 @@ GBL_INLINE GblBool GblEnum_check(GblEnum value, GblType type) GBL_NOEXCEPT {
 }
 
 
-#if 0
-// ====== GblEnumVariant ======
-// Experimental API I'm thinking about...
-
-typedef GblVariant GblEnumVariant;
-
-#define GBL_ENUM_VARIANT(variant)           (GblEnumVariant_cast(variant))
-#define GBL_ENUM_VARIANT_CHECK(variant)     (GblEnumVariant_check(variant))
-#define GBL_ENUM_VARIANT_TRY(variant)       (GblEnumVariant_try(variant))
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_construct        (GblEnumVariant* pVariant,
-                                                                 GblType type,
-                                                                 GblEnum value)                     GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_constructFromName(GblEnumVariant* pVariant,
-                                                                 GblType type,
-                                                                 const char* pName)                 GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_constructFromNameQuark
-                                                                (GblEnumVariant* pVariant,
-                                                                 GblType type,
-                                                                 GblQuark quark)                    GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_constructFromNick(GblEnumVariant* pVariant,
-                                                                 GblType type,
-                                                                 const char* pName)                 GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_constructFromNickQuark
-                                                                (GblEnumVariant* pVariant,
-                                                                 GblType type,
-                                                                 GblQuark quark)                    GBL_NOEXCEPT;
-
-
-GBL_EXPORT const char*          GblEnumVariant_name             (const GblVariant* pVariant)        GBL_NOEXCEPT;
-GBL_EXPORT GblQuark             GblEnumVariant_nameQuark        (const GblVariant* pVariant)        GBL_NOEXCEPT;
-GBL_EXPORT const char*          GblEnumVariant_nick             (const GblVariant* pVariant)        GBL_NOEXCEPT;
-GBL_EXPORT GblQuark             GblEnumVariant_nickQuark        (const GblVariant* pVariant)        GBL_NOEXCEPT;
-GBL_EXPORT GblEnum              GblEnumVariant_value            (const GblVariant* pVariant)        GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_valueSet         (GblVariant* pVariant,
-                                                                 GblEnum value)                     GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_valueSetFromName (GblVariant* pVariant,
-                                                                 const char* pName)                 GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_valueSetFromNameQuark
-                                                                (GblVariant* pVariant,
-                                                                 GblQuark quark)                    GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_valueSetFromNick (GblVariant* pVariant,
-                                                                 const char* pName)                 GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT           GblEnumVariant_valuaSetFromNickQuark
-                                                                (GblVariant* pVariant,
-                                                                 GblQuark quark)                    GBL_NOEXCEPT;
-
-GBL_EXPORT GblBool              GblEnumVariant_valueCheck       (const GblVariant* pVariant)        GBL_NOEXCEPT;
-
-GBL_EXPORT GblBool              GblEnumVariant_check            (const GblVariant* pVariant)        GBL_NOEXCEPT;
-GBL_EXPORT GblEnumVariant*      GblEnumVariant_cast             (GblVariant* pVariant)              GBL_NOEXCEPT;
-GBL_EXPORT GblEnumVariant*      GblEnumVariant_try              (GblVariant* pVariant)              GBL_NOEXCEPT;
-
-/*
- * #define GBL_LOG_LEVEL_ENUM_TABLE (                                       \
- *      ( GBL_LOG_LEVEL, LogLevel, "Level of Loggery", gblLogLevelString ), \
- *      (                                                                   \
- *          (GBL_LOG_LEVEL_VERBOSE, 0x1, Verbose,   "Verbose Shit"),        \
- *          (GBL_LOG_LEVEL_WARNING, 0x2, Warning,   "Warning Shit"),        \
- *          (GBL_LOG_LEVEL_ERROR,   0x3, Error,     "Error   Shit")         \
- *      )                                                                   \
- *  )
- *  // automatically shit out C enum definition
- *  GBL_ENUM_TABLE_DECLARE(GBL_LOG_LEVEL_ENUM_TABLE);
- *  // automatically shit out C++ enum definition
- *  GBL_ENUM_TABLE_DECLARE_CPP(GBL_LOG_LEVEL_ENUM_TABLE);
- *  // automatically shit out GblType registration code
- *  GBL_ENUM_REGISTER_TABLE(GBL_LOG_LEVEL_ENUM_TABLE);
- */
-#endif
 GBL_DECLS_END
 
 #undef GBL_CSELF

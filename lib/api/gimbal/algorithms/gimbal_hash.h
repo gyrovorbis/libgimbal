@@ -29,6 +29,7 @@ GBL_INLINE GblHash  gblHash              (const void* pData, GblSize size, GblHa
 
 GBL_EXPORT GblHash  gblHashSip           (const void* pData, GblSize size) GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHashMurmur        (const void* pData, GblSize size) GBL_NOEXCEPT;
+GBL_INLINE GblHash  gblHashFnv1          (const void* pData, GblSize size) GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHashCrc           (const void* pData, GblSize size) GBL_NOEXCEPT;
 
 /// @}
@@ -136,7 +137,7 @@ GBL_FORCE_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
 //-----------------------------------------------------------------------------
 // Block read - if your platform needs to do endian-swapping or can only
 // handle aligned reads, do the conversion here
-#ifndef __DREAMCAST__
+#if !defined(__DREAMCAST__) && !defined(__VITA__)
 #   define getblock(k, p, i) (k = p[i])
 #else
 #   define getblock(k, p, i) memcpy(&k, p + i, sizeof(uint32_t))
@@ -203,6 +204,12 @@ GBL_INLINE GblHash gblHashMurmur(const void* pData, GblSize size) GBL_NOEXCEPT {
 #if 0
     MurmurHash3_x86_32(pData, size, gblSeed(0), &out);
 #else
+    return gblHashFnv1(pData, size);
+#endif
+    return out;
+}
+
+GBL_INLINE GblHash gblHashFnv1(const void* pData, GblSize size) GBL_NOEXCEPT {
     uint32_t prime = 0x01000193;
     uint32_t hash = 0x811C9DC5;
     const unsigned char* p = (const unsigned char*)pData;
@@ -210,8 +217,6 @@ GBL_INLINE GblHash gblHashMurmur(const void* pData, GblSize size) GBL_NOEXCEPT {
         hash = (hash * prime) ^ *p++;
     }
     return hash;
-#endif
-    return out;
 }
 
 

@@ -40,18 +40,23 @@ static GBL_RESULT GblITableIFace_init_(GblITableIFace* pIFace, void* pClassData,
 }
 
 
-extern GBL_RESULT GblITable_typeRegister_(GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
-    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_ITABLE,
-                            GBL_INTERFACE_TYPE,
-                           GblQuark_internStringStatic("ITable"),
-                           &(const GblTypeInfo) {
-                               .pFnClassInit = (GblTypeClassInitializeFn)GblITableIFace_init_,
-                               .classSize    = sizeof(GblITableIFace)
-                           },
-                           GBL_TYPE_FLAG_ABSTRACT);
+GBL_EXPORT GblType GblITable_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
 
-    GBL_API_END();
+    const static GblTypeInfo info = {
+        .pFnClassInit = (GblTypeClassInitializeFn)GblITableIFace_init_,
+        .classSize = sizeof(GblITableIFace)
+    };
+
+    if(type == GBL_INVALID_TYPE) {
+        GBL_API_BEGIN(NULL);
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblITable"),
+                                      GBL_INTERFACE_TYPE,
+                                      &info,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+        GBL_API_END_BLOCK();
+    }
+    return type;
 }
 
 GBL_API GblITable_index(const GblITable* pSelf, const GblVariant* pKey, GblVariant* pValue) GBL_NOEXCEPT {

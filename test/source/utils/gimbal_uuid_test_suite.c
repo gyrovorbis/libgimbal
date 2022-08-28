@@ -1,4 +1,4 @@
-#include "types/gimbal_uuid_test_suite.h"
+#include "utils/gimbal_uuid_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/utils/gimbal_uuid.h>

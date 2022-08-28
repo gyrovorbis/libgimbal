@@ -10,7 +10,7 @@
 #include "../ifaces/gimbal_ivariant.h"
 #include "../../containers/gimbal_array_map.h"
 
-#define GBL_BOX_TYPE                 (GBL_BUILTIN_TYPE(BOX))    ///< GblType UUID of a GblBox
+#define GBL_BOX_TYPE                 (GblBox_type())    ///< GblType UUID of a GblBox
 
 #define GBL_BOX(instance)            (GBL_INSTANCE_CAST(instance, GBL_BOX_TYPE, GblBox))
 #define GBL_BOX_CLASS(GBL_KLASS)     (GBL_CLASS_CAST(GBL_KLASS, GBL_BOX_TYPE, GblBoxClass))
@@ -88,6 +88,7 @@ GBL_EXPORT GBL_RESULT   GblBoxClass_setField            (GBL_KLASS,
                                                          GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
 
 // ===== Instance =====
+GBL_EXPORT GblType      GblBox_type                     (void)                          GBL_NOEXCEPT;
 GBL_EXPORT GblBox*      GblBox_create                   (GblType derivedType)           GBL_NOEXCEPT;
 GBL_EXPORT GblBox*      GblBox_createWithClass          (GblBoxClass* pClass)           GBL_NOEXCEPT;
 

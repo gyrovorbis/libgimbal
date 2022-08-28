@@ -4,6 +4,7 @@
 #include <gimbal/meta/types/gimbal_type.h>
 #include <gimbal/containers/gimbal_array_list.h>
 #include <gimbal/containers/gimbal_hash_set.h>
+#include <gimbal/containers/gimbal_nary_tree.h>
 #include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/preprocessor/gimbal_atomics.h>
 #ifdef _WIN32
@@ -58,18 +59,21 @@ GBL_FORWARD_DECLARE_STRUCT(GblArrayMap);
 GBL_FORWARD_DECLARE_STRUCT(GblInterface);
 
 typedef struct GblMetaClass {
-    struct GblMetaClass*    pParent;
-    GblQuark                name;
-    GBL_ATOMIC_INT16        refCount;
-    GBL_ATOMIC_INT16        instanceRefCount;
-    const GblTypeInfo*      pInfo;
-    GblFlags                flags;
-    GblArrayMap*            pExtensions;
-    GblClass*               pClass;
-    uint8_t                 depth;
-    ptrdiff_t               classPrivateOffset;
-    ptrdiff_t               instancePrivateOffset;
-    struct GblMetaClass*    pBases[];
+    union {
+        struct GblMetaClass*    pParent;
+        GblNaryTreeNode         treeNode;
+    };
+    GblQuark                    name;
+    GBL_ATOMIC_INT16            refCount;
+    GBL_ATOMIC_INT16            instanceRefCount;
+    const GblTypeInfo*          pInfo;
+    GblFlags                    flags;
+    GblArrayMap*                pExtensions;
+    GblClass*                   pClass;
+    uint8_t                     depth;
+    ptrdiff_t                   classPrivateOffset;
+    ptrdiff_t                   instancePrivateOffset;
+    struct GblMetaClass*        pBases[];
 } GblMetaClass;
 
 
@@ -82,7 +86,7 @@ extern mtx_t                    typeRegMtx_;
 extern GblHashSet               typeRegistry_;
 extern struct TypeBuiltins_ {
     GblArrayList   vector;
-    uint8_t     stackBuffer[sizeof(GblType)*GBL_TYPE_BUILTIN_COUNT];
+    uint8_t        stackBuffer[sizeof(GblType)*GBL_TYPE_BUILTIN_COUNT];
 } typeBuiltins_;
 
 
@@ -108,18 +112,7 @@ extern GBL_RESULT       GblVariant_final_                 (GblContext* pCtx);
 
 extern GBL_RESULT       GblIVariant_typeRegister_         (GblContext* pCtx);
 extern GBL_RESULT       GblPrimitive_valueTypesRegister_  (GblContext* pCtx);
-extern GBL_RESULT       GblEnum_typeRegister_             (GblContext* pCtx);
-extern GBL_RESULT       GblFlags_typeRegister_            (GblContext* pCtx);
 extern GBL_RESULT       GblPointer_typeRegister_          (GblContext* pCtx);
-extern GBL_RESULT       GblBoxed_typeRegister_            (GblContext* pCtx);
-extern GBL_RESULT       GblITable_typeRegister_           (GblContext* pCtx);
-extern GBL_RESULT       GblBox_typeRegister_              (GblContext* pCtx);
-extern GBL_RESULT       GblIEventHandler_typeRegister_    (GblContext* pCtx);
-extern GBL_RESULT       GblIEventFilter_typeRegister_     (GblContext* pCtx);
-extern GBL_RESULT       GblObject_typeRegister_           (GblContext* pCtx);
-extern GBL_RESULT       GblIAllocator_typeRegister_       (GblContext* pCtx);
-extern GBL_RESULT       GblILogger_typeRegister_          (GblContext* pCtx);
-extern GBL_RESULT       GblContext_typeRegister_          (GblContext* pCtx);
 
 
 GBL_DECLS_END

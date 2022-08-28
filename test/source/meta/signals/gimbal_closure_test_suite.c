@@ -1,4 +1,4 @@
-#include "types/gimbal_closure_test_suite.h"
+#include "meta/signals/gimbal_closure_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/meta/signals/gimbal_closure.h>
 #include <gimbal/meta/signals/gimbal_c_closure.h>
@@ -147,7 +147,7 @@ static GBL_RESULT GblClosureTestSuite_closureInvokeMetaMarshal_(GblTestSuite* pS
     GblVariant_constructString(&ret, "Secret of Mana");
     GblVariant_constructBool(&args[0], GBL_FALSE);
     GblVariant_constructFloat(&args[1], 17.777f);
-    GblVariant_constructPointer(&args[2], (void*)0xdeadcafe);
+    GblVariant_constructPointer(&args[2], GBL_POINTER_TYPE, (void*)0xdeadcafe);
 
 
     GBL_API_VERIFY_CALL(GblClosure_invoke(&pSelf_->pTestClosure->base,
@@ -216,8 +216,8 @@ static GBL_RESULT GblClosureTestSuite_cClosure_(GblTestSuite* pSelf, GblContext*
     GblClosure_setMarshal(GBL_CLOSURE(pCClosure), cClosureMarshal_);
 
     GblVariant args[2];
-    GblVariant_constructPointer(&args[0], pSelf_);
-    GblVariant_constructPointer(&args[1], "Dragon Quest");
+    GblVariant_constructPointer(&args[0], GBL_POINTER_TYPE, pSelf_);
+    GblVariant_constructPointer(&args[1], GBL_POINTER_TYPE, "Dragon Quest");
 
     GblClosure_invoke(GBL_CLOSURE(pCClosure), NULL, 2, args);
 
@@ -255,8 +255,8 @@ static GBL_RESULT GblClosureTestSuite_classClosure_(GblTestSuite* pSelf, GblCont
     GblClosure_setMarshal(pClosure, cClosureMarshal_);
 
     GblVariant args[2];
-    GblVariant_constructPointer(&args[0], pSelf_);
-    GblVariant_constructPointer(&args[1], "Phantasy Star");
+    GblVariant_constructPointer(&args[0], GBL_POINTER_TYPE, pSelf_);
+    GblVariant_constructPointer(&args[1], GBL_POINTER_TYPE, "Phantasy Star");
 
     GBL_API_VERIFY_CALL(GblClosure_invoke(pClosure, NULL, 2, args));
 
@@ -296,7 +296,7 @@ static GBL_RESULT GblClosureTestSuite_capture_(GblTestSuite* pSelf, GblContext* 
     GblClosure_setMarshal(pClosure, cClosureMarshal_);
 
     GblVariant args[2];
-    GblVariant_constructPointer(&args[0], pSelf_);
+    GblVariant_constructPointer(&args[0], GBL_POINTER_TYPE, pSelf_);
     GblVariant_constructDefault(&args[1], GBL_POINTER_TYPE);
 
     GblClosure_invoke(pClosure, NULL, 2, args);
@@ -320,7 +320,7 @@ static void cClosureCaptureClosureFunction_(GblClosureTestSuite_* pSelf_, const 
     GBL_API_BEGIN(NULL);
 
     GblVariant args[2];
-    GblVariant_constructPointer(&args[0], pSelf_);
+    GblVariant_constructPointer(&args[0], GBL_POINTER_TYPE, pSelf_);
     GblVariant_constructDefault(&args[1], GBL_POINTER_TYPE);
 
     GblClosure_invoke(pInnerClosure, NULL, 2, args);
@@ -347,7 +347,7 @@ static GBL_RESULT GblClosureTestSuite_captureCapture_(GblTestSuite* pSelf, GblCo
     GblClosure_setMarshal(pClosureOuter, cClosureMarshal_);
 
     GblVariant args[2];
-    GblVariant_constructPointer(&args[0], pSelf_);
+    GblVariant_constructPointer(&args[0], GBL_POINTER_TYPE, pSelf_);
     GblVariant_constructDefault(&args[1], GBL_POINTER_TYPE);
 
     GblClosure_invoke(pClosureOuter, NULL, 2, args);

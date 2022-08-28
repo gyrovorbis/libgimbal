@@ -6,6 +6,7 @@
 #include <gimbal/strings/gimbal_string_ref.h>
 #include <gimbal/containers/gimbal_linked_list.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
+#include <gimbal/containers/gimbal_nary_tree.h>
 #include "../types/gimbal_type_.h"
 
 #define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblArrayList))
@@ -440,46 +441,6 @@ static GBL_RESULT GblObject_init_(GblInstance* pInstance, GblContext* pCtx) {
         GblObjectClass* pClass = GBL_OBJECT_GET_CLASS(pInstance);
         GBL_API_CALL(pClass->pFnConstructor(GBL_OBJECT(pInstance)));
     } GBL_API_END();
-}
-
-extern GBL_RESULT GblObject_typeRegister_(GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
-
-    static GblTypeInterfaceMapEntry ifaceEntries[] = {
-        {
-            .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, GblITableIFaceImpl)
-        }, {
-            .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, GblIEventHandlerIFaceImpl)
-        }, {
-            .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, GblIEventFilterIFaceImpl)
-        }
-    };
-
-    static GblTypeInfo typeInfo = {
-        .pFnClassInit     = (GblTypeClassInitializeFn)GblObjectClass_init_,
-        .pFnClassFinal    = (GblTypeClassFinalizeFn)GblObjectClass_final_,
-        .classSize        = sizeof(GblObjectClass),
-        .pFnInstanceInit  = (GblTypeInstanceInitializeFn)GblObject_init_,
-        .instanceSize     = sizeof(GblObject),
-        .interfaceCount   = 3,
-        .pInterfaceMap    = ifaceEntries
-    };
-
-    ifaceEntries[0].interfaceType = GBL_ITABLE_TYPE;
-    ifaceEntries[1].interfaceType = GBL_IEVENT_HANDLER_TYPE;
-    ifaceEntries[2].interfaceType = GBL_IEVENT_FILTER_TYPE;
-
-    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_OBJECT,
-                             GBL_BOX_TYPE,
-                             GblQuark_internStringStatic("GblObject"),
-                             &typeInfo,
-                             GBL_TYPE_FLAG_TYPEINFO_STATIC);
-
-    GBL_API_VERIFY_LAST_RECORD();
-    GBL_API_END();
 }
 
 GBL_INLINE GBL_RESULT GblObject_property_(const GblObject* pSelf,
@@ -1086,11 +1047,11 @@ GBL_EXPORT const char* GblObject_name(const GblObject* pSelf) {
                                              objectNameQuark_);
 }
 
+#define GBL_OBJECT_FAMILY_ENTRY_(node) (!node? GBL_NULL : GBL_NARY_TREE_ENTRY(node, GblObjectFamily_, treeNode)->pSelf)
+
 typedef struct GblObjectFamily_ {
+    GblNaryTreeNode     treeNode;
     GblObject*          pSelf;
-    GblObject*          pParent;
-    GblLinkedListNode   childList;
-    GblLinkedListNode   childNode;
 } GblObjectFamily_;
 
 static GblObjectFamily_* GblObject_family_(const GblObject* pSelf) {
@@ -1114,8 +1075,6 @@ static GblObjectFamily_* GblObject_ensureFamily_(GblObject* pSelf) {
                                   "family");
         memset(pFamily, 0, sizeof(GblObjectFamily_));
         pFamily->pSelf = pSelf;
-        GblLinkedList_init(&pFamily->childList);
-        GblLinkedList_init(&pFamily->childNode);
         GBL_API_CALL(GblArrayMap_setUserdata(&GBL_PRIV(pSelf->base).pFields,
                                              objectFamilyQuark_,
                                              (uintptr_t)pFamily,
@@ -1127,7 +1086,7 @@ static GblObjectFamily_* GblObject_ensureFamily_(GblObject* pSelf) {
 
 GBL_EXPORT GblObject* GblObject_parent(const GblObject* pSelf) {
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
-    return pFamily? pFamily->pParent : NULL;
+    return pFamily? GBL_OBJECT_FAMILY_ENTRY_(pFamily->treeNode.pParent): NULL;
 }
 
 GBL_EXPORT void GblObject_setParent(GblObject* pSelf, GblObject* pParent) {
@@ -1142,22 +1101,15 @@ GBL_EXPORT GblObject* GblObject_childFirst(const GblObject* pSelf) {
     GblObject* pChild = NULL;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
     if(pFamily) {
-        GblLinkedListNode* pNode = GblLinkedList_front(&pFamily->childList);
-        if(pNode) {
-            pChild = GBL_LINKED_LIST_ENTRY(pNode, GblObjectFamily_, childNode)->pSelf;
-        }
+        pChild = GBL_OBJECT_FAMILY_ENTRY_(pFamily->treeNode.pChildFirst);
     }
     return pChild;
 }
 GBL_EXPORT GblObject* GblObject_siblingNext(const GblObject* pSelf) {
     GblObject* pSibling = NULL;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
-    if(pFamily && pFamily->pParent) {
-        GblObjectFamily_* pParentFamily = GblObject_family_(pFamily->pParent);
-        GblLinkedListNode* pNode = pFamily->childNode.pNext;
-        if(pNode != &pParentFamily->childList) {
-            pSibling = GBL_LINKED_LIST_ENTRY(pNode, GblObjectFamily_, childNode)->pSelf;
-        }
+    if(pFamily && pFamily->treeNode.pParent) {
+        pSibling = GBL_OBJECT_FAMILY_ENTRY_(pFamily->treeNode.pSiblingNext);
     }
     return pSibling;
 }
@@ -1169,8 +1121,8 @@ GBL_EXPORT void GblObject_addChild(GblObject* pSelf, GblObject* pChild) {
         GblObjectFamily_* pParentFamily = GblObject_ensureFamily_(pSelf);
         GblObjectFamily_* pChildFamily  = GblObject_ensureFamily_(pChild);
         // yeah, slower than push-front, but we want to probably preserve ordering...
-        GblLinkedList_pushBack(&pParentFamily->childList, &pChildFamily->childNode);
-        pChildFamily->pParent = pSelf;
+        GblNaryTree_addChildBack(&pParentFamily->treeNode,
+                                 &pChildFamily->treeNode);
     }
     GBL_API_END_BLOCK();
 }
@@ -1181,11 +1133,10 @@ GBL_EXPORT GblBool GblObject_removeChild(GblObject* pSelf, GblObject* pChild) {
     GBL_API_VERIFY_POINTER(pChild);
     GblObjectFamily_* pParentFamily = GblObject_family_(pSelf);
     GblObjectFamily_* pChildFamily  = GblObject_family_(pChild);
-    if(pParentFamily && pChildFamily && pChildFamily->pParent == pSelf) {
-        if(GblLinkedList_remove(&pParentFamily->childList, &pChildFamily->childNode)) {
-            pChildFamily->pParent = NULL;
-            success = GBL_TRUE;
-        }
+    if(pParentFamily && pChildFamily && pChildFamily->treeNode.pParent == &pParentFamily->treeNode) {
+        GblNaryTree_removeChild(&pParentFamily->treeNode,
+                                &pChildFamily->treeNode);
+        success = GBL_TRUE;
     }
     GBL_API_END_BLOCK();
     return success;
@@ -1196,11 +1147,11 @@ GBL_EXPORT GblObject* GblObject_findChildByType(const GblObject* pSelf, GblType 
     GBL_API_BEGIN(NULL); {
         GblObjectFamily_* pFamily = GblObject_family_(pSelf);
         if(pFamily) {
-            for(GblLinkedListNode* pIt = pFamily->childList.pNext;
-                pIt != &pFamily->childList;
-                pIt = pIt->pNext)
+            for(GblNaryTreeNode* pIt = pFamily->treeNode.pChildFirst;
+                pIt;
+                pIt = pIt->pSiblingNext)
             {
-                GblObject* pChildIt = GBL_LINKED_LIST_ENTRY(pIt, GblObjectFamily_, childNode)->pSelf;
+                GblObject* pChildIt = GBL_OBJECT_FAMILY_ENTRY_(pIt);
                 if(pChildIt) {
                     if(GBL_INSTANCE_CHECK(pChildIt, childType)) {
                         pChild = pChildIt;
@@ -1218,11 +1169,11 @@ GBL_EXPORT GblObject* GblObject_findChildByName(const GblObject* pSelf, const ch
     GBL_API_BEGIN(NULL); {
         GblObjectFamily_* pFamily = GblObject_family_(pSelf);
         if(pFamily) {
-            for(GblLinkedListNode* pIt = pFamily->childList.pNext;
-                pIt != &pFamily->childList;
-                pIt = pIt->pNext)
+            for(GblNaryTreeNode* pIt = pFamily->treeNode.pChildFirst;
+                pIt;
+                pIt = pIt->pSiblingNext)
             {
-                GblObject* pChildIt = GBL_LINKED_LIST_ENTRY(pIt, GblObjectFamily_, childNode)->pSelf;
+                GblObject* pChildIt = GBL_OBJECT_FAMILY_ENTRY_(pIt);
                 if(pChildIt) {
                     const char* pNodeName = GblObject_name(pChildIt);
                     if(pNodeName && strcmp(pNodeName, pName) == 0) {
@@ -1241,10 +1192,7 @@ GBL_EXPORT GblObject* GblObject_findChildByIndex(const GblObject* pSelf, GblSize
     GBL_API_BEGIN(NULL);
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
     if(pFamily) {
-        GblLinkedListNode* pNode = GblLinkedList_at(&pFamily->childList, index);
-        if(pNode) {
-            pChild = GBL_LINKED_LIST_ENTRY(pNode, GblObjectFamily_, childNode)->pSelf;
-        }
+        pChild = GBL_OBJECT_FAMILY_ENTRY_(GblNaryTree_childAt(&pFamily->treeNode, index));
     }
     GBL_API_END_BLOCK();
     return pChild;
@@ -1255,10 +1203,19 @@ GBL_EXPORT GblSize GblObject_childCount(const GblObject* pSelf) {
     GBL_API_BEGIN(NULL);
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
     if(pFamily) {
-        count = GblLinkedList_count(&pFamily->childList);
+        count = GblNaryTree_childCount(&pFamily->treeNode);
     }
     GBL_API_END_BLOCK();
     return count;
+}
+
+GBL_EXPORT GblSize GblObject_depth(const GblObject* pSelf) {
+    GblSize depth = 0;
+    GblObjectFamily_* pFamily = GblObject_family_(pSelf);
+    if(pFamily) {
+        depth = GblNaryTree_depth(&pFamily->treeNode);
+    }
+    return depth;
 }
 
 GBL_EXPORT GblContext* GblObject_findContext(GblObject* pSelf) {
@@ -1307,6 +1264,25 @@ GBL_EXPORT GblObject* GblObject_findAncestorByName(const GblObject* pSelf, const
     return pAncestor;
 }
 
+GBL_EXPORT GblObject* GblObject_findAncestorByHeight(const GblObject* pSelf, GblSize height) {
+    GblObject* pAncestor = NULL;
+    GblObjectFamily_* pFamily = GblObject_family_(pSelf);
+    if(pFamily) {
+        pAncestor = GBL_OBJECT_FAMILY_ENTRY_(GblNaryTree_ancestor(&pFamily->treeNode, height));
+    }
+    return pAncestor;
+}
+
+
+GBL_EXPORT GblObject* GblObject_findAncestorBaseByDepth(const GblObject* pSelf, GblSize depth) {
+    GblObject* pBase = NULL;
+    GblObjectFamily_* pFamily = GblObject_family_(pSelf);
+    if(pFamily) {
+        pBase = GBL_OBJECT_FAMILY_ENTRY_(GblNaryTree_base(&pFamily->treeNode, depth));
+    }
+    return pBase;
+}
+
 
 GBL_EXPORT GblObject* GblObject_findSiblingByType(const GblObject* pSelf, GblType siblingType) {
     GblObject* pObject = NULL;
@@ -1325,6 +1301,56 @@ GBL_EXPORT GblObject* GblObject_findSiblingByName(const GblObject* pSelf, const 
     return pObject;
 }
 
+GBL_EXPORT GblObject* GblObject_findSiblingByIndex(const GblObject* pSelf, GblSize index) {
+    GblObject* pAncestor = NULL;
+    GblObjectFamily_* pFamily = GblObject_family_(pSelf);
+    if(pFamily) {
+        pAncestor = GBL_OBJECT_FAMILY_ENTRY_(GblNaryTree_siblingAt(&pFamily->treeNode, index));
+    }
+    return pAncestor;
+}
 
-GBL_EXPORT GblType GblObject_type(void) { return GBL_OBJECT_TYPE; }
 
+GBL_EXPORT GblType GblObject_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    static GblTypeInterfaceMapEntry ifaceEntries[] = {
+        {
+            .interfaceType = GBL_INVALID_TYPE,
+            .classOffset   = offsetof(GblObjectClass, GblITableIFaceImpl)
+        }, {
+            .interfaceType = GBL_INVALID_TYPE,
+            .classOffset   = offsetof(GblObjectClass, GblIEventHandlerIFaceImpl)
+        }, {
+            .interfaceType = GBL_INVALID_TYPE,
+            .classOffset   = offsetof(GblObjectClass, GblIEventFilterIFaceImpl)
+        }
+    };
+
+    static GblTypeInfo typeInfo = {
+        .pFnClassInit     = (GblTypeClassInitializeFn)GblObjectClass_init_,
+        .pFnClassFinal    = (GblTypeClassFinalizeFn)GblObjectClass_final_,
+        .classSize        = sizeof(GblObjectClass),
+        .pFnInstanceInit  = (GblTypeInstanceInitializeFn)GblObject_init_,
+        .instanceSize     = sizeof(GblObject),
+        .interfaceCount   = 3,
+        .pInterfaceMap    = ifaceEntries
+    };
+
+
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+        GBL_API_BEGIN(NULL);
+        ifaceEntries[0].interfaceType = GBL_ITABLE_TYPE;
+        ifaceEntries[1].interfaceType = GBL_IEVENT_HANDLER_TYPE;
+        ifaceEntries[2].interfaceType = GBL_IEVENT_FILTER_TYPE;
+
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblObject"),
+                                      GBL_BOX_TYPE,
+                                      &typeInfo,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+
+        GBL_API_VERIFY_LAST_RECORD();
+        GBL_API_END_BLOCK();
+    }
+    return type;
+}

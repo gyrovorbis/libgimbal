@@ -1,4 +1,4 @@
-#include "meta/gimbal_type_test_suite.h"
+#include "meta/types/gimbal_type_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/core/gimbal_api_frame.h>
 #include <gimbal/meta/types/gimbal_type.h>

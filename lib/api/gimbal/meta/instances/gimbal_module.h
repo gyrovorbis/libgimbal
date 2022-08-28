@@ -55,17 +55,16 @@ GBL_PROPERTIES(GblModule,
 
 GblType     GblModule_type          (void)                          GBL_NOEXCEPT;
 
-GblModule*  GblModule_create(const char* pName,
-                             GblVersion version,
-                             const char* pDescription,
-                             const char* pPrefix)                   GBL_NOEXCEPT;
+GblModule*  GblModule_create        (const char* pName,
+                                     GblVersion  version,
+                                     const char* pDescription,
+                                     const char* pPrefix)           GBL_NOEXCEPT;
 
-
-GblType     GblModule_registerType(GBL_SELF,
-                                   GblType              parent,
-                                   const char*          pName,
-                                   const GblTypeInfo*   pInfo,
-                                   GblFlags             flags)      GBL_NOEXCEPT;
+GblType     GblModule_registerType  (GBL_SELF,
+                                     GblType            parent,
+                                     const char*        pName,
+                                     const GblTypeInfo* pInfo,
+                                     GblFlags           flags)      GBL_NOEXCEPT;
 
 GblType     GblModule_typeFromName  (GBL_CSELF, const char* pName)  GBL_NOEXCEPT;
 GblType     GblModule_typeFromIndex (GBL_CSELF, GblSize     index)  GBL_NOEXCEPT;

@@ -482,10 +482,15 @@ static GblType typeRegister_(GblType parent,
 
         pParentIt = pParent;
         baseCount = 0;
-        while(pParentIt) {
-            pMeta->pBases[pMeta->depth-(++baseCount)] = pParentIt;
-            pParentIt = pParentIt->pParent;
+        if(pParent) {
+            GblNaryTree_addChildFront(&pParent->treeNode, &pMeta->treeNode);
+
+            while(pParentIt) {
+                pMeta->pBases[pMeta->depth-(++baseCount)] = pParentIt;
+                pParentIt = pParentIt->pParent;
+            }
         }
+        GBL_API_VERIFY_EXPRESSION(baseCount == pMeta->depth);
 
         if(flags & GBL_TYPE_FLAG_TYPEINFO_STATIC) {
              pMeta->pInfo = pInfo;
@@ -494,7 +499,6 @@ static GblType typeRegister_(GblType parent,
 
             GBL_API_VERIFY_EXPRESSION(GblType_updateTypeInfoClassChunk_(pMeta, pInfo));
         }
-        GBL_API_VERIFY_EXPRESSION(baseCount == pMeta->depth);
 
         mtx_lock(&typeRegMtx_);
         hasMutex = GBL_TRUE;
@@ -714,18 +718,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
 
     GBL_API_CALL(GblIVariant_typeRegister_(pCtx_));
     GBL_API_CALL(GblPrimitive_valueTypesRegister_(pCtx_));
-    GBL_API_CALL(GblEnum_typeRegister_(pCtx_));
-    GBL_API_CALL(GblFlags_typeRegister_(pCtx_));
     GBL_API_CALL(GblPointer_typeRegister_(pCtx_));
-    GBL_API_CALL(GblBoxed_typeRegister_(pCtx_));
-    GBL_API_CALL(GblITable_typeRegister_(pCtx_));
-    GBL_API_CALL(GblBox_typeRegister_(pCtx_));
-    GBL_API_CALL(GblIEventHandler_typeRegister_(pCtx_));
-    GBL_API_CALL(GblIEventFilter_typeRegister_(pCtx_));
-    GBL_API_CALL(GblObject_typeRegister_(pCtx_));
-    GBL_API_CALL(GblIAllocator_typeRegister_(pCtx_));
-    GBL_API_CALL(GblILogger_typeRegister_(pCtx_));
-    GBL_API_CALL(GblContext_typeRegister_(pCtx_));
 
     GBL_API_END();
 }
@@ -822,27 +815,6 @@ GBL_EXPORT GBL_RESULT GblType_final(void) {
     }
     return GBL_API_RESULT();
 }
-
-#if 0
-GBL_API GblType_init(GblContext*    pCtx,
-                     GblSize        typeBuiltinInitialCount,
-                     GblSize        typeTotalInitialCount) {
-    if(typeBuiltinInitialCount) initialTypeBuiltinCount_    = typeBuiltinInitialCount;
-    if(typeTotalInitialCount)   initialTypeTotalCount_      = typeTotalInitialCount;
-    GBL_API_BEGIN(NULL);
-    if(!initialized_) {
-       // GBL_API_PUSH_VERBOSE("[GblType]: Inititalizing.");
-        pCtx_ = pCtx;
-        GBL_TYPE_ENSURE_INITIALIZED_();
-    } else {
-        GBL_API_PUSH_VERBOSE("[GblType]: ReInititalizing.");
-        GBL_API_CALL(GblType_final());
-        pCtx_ = pCtx;
-        GblType_init_();
-    }
-    GBL_API_END();
-}
-#endif
 
 GBL_EXPORT GblType GblType_fromBuiltinIndex(GblSize index) {
     GblType type = GBL_INVALID_TYPE;
@@ -1000,28 +972,12 @@ GBL_EXPORT GblSize GblType_depth(GblType type) {
 
 GBL_EXPORT GblBool GblType_flagsCheck(GblType type, GblFlags mask) {
     GblBool result = GBL_FALSE;
-    //GBL_API_BEGIN(pCtx_);
     {
         GblMetaClass* pMeta = GBL_META_CLASS_(type);
         if(pMeta) {
-#if 0
-            GblFlags typeMask = (mask & GBL_TYPE_FLAGS_MASK & pMeta->flags);
-
-            GblFlags fundamentalMask = (mask & GBL_TYPE_ROOT_FLAGS_MASK);
-            if(fundamentalMask) {
-                GblMetaClass* pFundamental = GBL_META_CLASS_(GblType_root(type));
-                if(pFundamental) {
-                    fundamentalMask &= pFundamental->flags;
-                } else {
-                    fundamentalMask = 0; // FLAGS FOR INVALID TYPE
-                }
-            }
-            result = ((typeMask | fundamentalMask) != 0);
-#else
             result = ((pMeta->flags & mask) != 0);
-#endif
         }
-    } //GBL_API_END_BLOCK();
+    }
     return result;
 }
 
@@ -1045,7 +1001,6 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
     GblMetaClass*   pBase    = GBL_META_CLASS_(base);
     GblMetaClass*   pIter    = pDerived;
 
-    //GBL_API_BEGIN(pCtx_);
     if(derived == GBL_INVALID_TYPE && base == GBL_INVALID_TYPE) {
         result = GBL_TRUE;
     } else if(derived != GBL_INVALID_TYPE && base != GBL_INVALID_TYPE) {
@@ -1077,7 +1032,6 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
         }
     }
     done:
-    //GBL_API_END_BLOCK();
     return result;
 }
 
@@ -1170,7 +1124,7 @@ GBL_EXPORT GblBool GblType_conforms(GblType type, GblType dependent) {
 
 // ==== MAKE SURE TO ITERATE OVER PARENTS AND CHECK THAT CLASS/INSTANCE SIZE IS VALID =====
 GBL_EXPORT GblType GblType_registerStatic(const char*                  pName,
-                                          GblType                    parent,
+                                          GblType                      parent,
                                           const GblTypeInfo*           pInfo,
                                           GblFlags                     flags)
 {
@@ -1213,10 +1167,13 @@ GBL_EXPORT GBL_RESULT GblType_unregister(GblType type) {
             GBL_API_WARN("Attempting to unregister type with active class references: %u", refCount);
         }
 
+        GblNaryTree_disconnect(&pMeta->treeNode);
+
         GBL_API_VERIFY_CALL(GblType_freeTypeInfoClassChunk_(pMeta));
         mtx_lock(&typeRegMtx_);
+
         const GblBool success = GblHashSet_erase(&typeRegistry_, &pMeta);
-        GblHashSet_shrinkToFit(&typeRegistry_);
+        //GblHashSet_shrinkToFit(&typeRegistry_);
         mtx_unlock(&typeRegMtx_);
         GBL_API_VERIFY(success, GBL_RESULT_ERROR_INVALID_TYPE, "Failed to remove the type from the registry HashSet!");
     }

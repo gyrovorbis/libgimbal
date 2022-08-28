@@ -15,7 +15,7 @@
 /*! \ingroup metaBuiltinTypes
  * \details  ::GblType UUID of a GblObject
  */
-#define GBL_OBJECT_TYPE                 (GBL_BUILTIN_TYPE(OBJECT))
+#define GBL_OBJECT_TYPE                 (GblObject_type())
 
 #define GBL_OBJECT(instance)            (GBL_INSTANCE_CAST(instance, GBL_OBJECT_TYPE, GblObject))
 #define GBL_OBJECT_CLASS(klass)         (GBL_CLASS_CAST(klass, GBL_OBJECT_TYPE, GblObjectClass))
@@ -28,7 +28,6 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblObject);
 GBL_FORWARD_DECLARE_STRUCT(GblProperty);
-GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
 GBL_CLASS_DERIVE(GblObject, GblBox,
                  GblITable, GblIEventHandler, GblIEventFilter)
@@ -48,7 +47,6 @@ GBL_PROPERTIES(GblObject,
 )
 
 GBL_EXPORT GblType     GblObject_type                      (void)                                             GBL_NOEXCEPT;
-
 GBL_EXPORT GblObject*  GblObject_create                    (GblType type, ...)                                GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblObject_construct                 (GBL_SELF, GblType type, ...)                      GBL_NOEXCEPT;
 GBL_EXPORT GblObject*  GblObject_createWithClass           (GblObjectClass* pClass, ...)                      GBL_NOEXCEPT;
@@ -114,6 +112,8 @@ GBL_EXPORT GBL_RESULT  GblObject_setPropertiesVariants     (GBL_SELF,
 GBL_EXPORT const char* GblObject_name                      (GBL_CSELF)                                        GBL_NOEXCEPT;
 GBL_EXPORT void        GblObject_setName                   (GBL_SELF, const char* pName)                      GBL_NOEXCEPT;
 
+GBL_EXPORT GblSize     GblObject_depth                     (GBL_CSELF)                                        GBL_NOEXCEPT;
+
 GBL_EXPORT GblObject*  GblObject_parent                    (GBL_CSELF)                                        GBL_NOEXCEPT;
 GBL_EXPORT void        GblObject_setParent                 (GBL_SELF, GblObject* pParent)                     GBL_NOEXCEPT;
 
@@ -127,6 +127,9 @@ GBL_EXPORT GblBool     GblObject_removeChild               (GBL_SELF, GblObject*
 
 GBL_EXPORT GblObject*  GblObject_findAncestorByType        (GBL_CSELF, GblType ancestorType)                  GBL_NOEXCEPT;
 GBL_EXPORT GblObject*  GblObject_findAncestorByName        (GBL_CSELF, const char* pName)                     GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_findAncestorByHeight      (GBL_CSELF, GblSize height)                        GBL_NOEXCEPT;
+
+GBL_EXPORT GblObject*  GblObject_findBaseByDepth           (GBL_CSELF, GblSize depth)                         GBL_NOEXCEPT;
 GBL_EXPORT GblContext* GblObject_findContext               (GBL_SELF)                                         GBL_NOEXCEPT;
 
 GBL_EXPORT GblObject*  GblObject_findChildByType           (GBL_CSELF, GblType childType)                     GBL_NOEXCEPT;
@@ -135,6 +138,7 @@ GBL_EXPORT GblObject*  GblObject_findChildByIndex          (GBL_CSELF, GblSize i
 
 GBL_EXPORT GblObject*  GblObject_findSiblingByType         (GBL_CSELF, GblType siblingType)                   GBL_NOEXCEPT;
 GBL_EXPORT GblObject*  GblObject_findSiblingByName         (GBL_CSELF, const char* pName)                     GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_findSiblingByIndex        (GBL_CSELF, GblSize index)                         GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_sendEvent                 (GBL_SELF, GblEvent* pEvent)                       GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblObject_notifyEvent               (GBL_SELF, GblEvent* pEvent)                       GBL_NOEXCEPT;

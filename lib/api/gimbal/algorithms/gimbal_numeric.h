@@ -11,32 +11,28 @@
 
 GBL_DECLS_BEGIN
 
-GBL_INLINE GBL_CONSTEXPR
-uint8_t gblPow2Next_u8(uint8_t n) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR uint8_t gblPow2Next_u8(uint8_t n) GBL_NOEXCEPT {
     GBL_ASSERT(n >= 2);
     --n;
     n |= n >> 1; n |= n >> 2; n |= n >> 4;
     return n + 1;
 }
 
-GBL_INLINE GBL_CONSTEXPR
-uint16_t gblPow2Next_u16(uint16_t n) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR uint16_t gblPow2Next_u16(uint16_t n) GBL_NOEXCEPT {
     GBL_ASSERT(n >= 2);
     --n;
     n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8;
     return n + 1;
 }
 
-GBL_INLINE GBL_CONSTEXPR
-uint32_t gblPow2Next_u32(uint32_t n) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR uint32_t gblPow2Next_u32(uint32_t n) GBL_NOEXCEPT {
     GBL_ASSERT(n >= 2);
     --n;
     n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16;
     return n + 1;
 }
 
-GBL_INLINE GBL_CONSTEXPR
-uint64_t gblPow2Next_u64(uint64_t n) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR uint64_t gblPow2Next_u64(uint64_t n) GBL_NOEXCEPT {
     GBL_ASSERT(n >= 2);
     --n;
     n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16; n |= n >> 32;
@@ -57,8 +53,7 @@ uint64_t gblPow2Next_u64(uint64_t n) GBL_NOEXCEPT {
  */
 #define gblPow2Next(X) GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS, X)(X)
 
-GBL_INLINE GBL_CONSTEXPR
-GblSize gblAlignedAllocSize(GblSize bytes) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR GblSize gblAlignedAllocSize(GblSize bytes) GBL_NOEXCEPT {
     const GblSize remainder = bytes % GBL_ALLOC_MIN_SIZE;
     GblSize newSize = bytes;
     if(remainder) {
@@ -68,8 +63,7 @@ GblSize gblAlignedAllocSize(GblSize bytes) GBL_NOEXCEPT {
 }
 
 // GCD using Euclid's algorithm, only >0 values
-GBL_INLINE GBL_CONSTEXPR
-int gblGcd(int u, int v) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR int gblGcd(int u, int v) GBL_NOEXCEPT {
     int R;
     //if(!u) return v;
     //if(!v) return u;
@@ -81,8 +75,7 @@ int gblGcd(int u, int v) GBL_NOEXCEPT {
     return v;
 }
 
-GBL_INLINE GBL_CONSTEXPR
-int gblParity(uint8_t n) {
+GBL_INLINE GBL_CONSTEXPR int gblParity(uint8_t n) {
     int p = 0;
     while(n) GBL_LIKELY {
         p = !p;
@@ -91,8 +84,7 @@ int gblParity(uint8_t n) {
     return p;
 }
 
-GBL_INLINE GBL_CONSTEXPR
-uint32_t gblNtohl(uint32_t n) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR uint32_t gblNtohl(uint32_t n) GBL_NOEXCEPT {
     unsigned char *np = (unsigned char *)&n;
     return ((uint32_t)np[0] << 24) |
            ((uint32_t)np[1] << 16) |
@@ -100,8 +92,7 @@ uint32_t gblNtohl(uint32_t n) GBL_NOEXCEPT {
             (uint32_t)np[3];
 }
 
-GBL_INLINE GBL_CONSTEXPR
-uint32_t gblHtonl(uint32_t x) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR uint32_t gblHtonl(uint32_t x) GBL_NOEXCEPT {
 #if GBL_BIG_ENDIAN == 0
     uint8_t *s = (uint8_t *)&x;
     return (uint32_t)(s[0] << 24 | s[1] << 16 | s[2] << 8 | s[3]);

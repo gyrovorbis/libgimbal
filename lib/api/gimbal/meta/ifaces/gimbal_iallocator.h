@@ -9,7 +9,7 @@
 #include "gimbal_interface.h"
 #include "../../core/gimbal_api_frame.h"
 
-#define GBL_IALLOCATOR_TYPE                 GBL_BUILTIN_TYPE(IALLOCATOR)
+#define GBL_IALLOCATOR_TYPE                 (GblIAllocator_type())
 #define GBL_IALLOCATOR_STRUCT               GblIAllocator
 #define GBL_IALLOCATOR_CLASS_STRUCT         GblIAllocatorIFace
 #define GBL_IALLOCATOR(inst)                (GBL_INSTANCE_CAST_PREFIX  (inst,  GBL_IALLOCATOR))
@@ -28,6 +28,8 @@ GBL_INTERFACE_DERIVE(GblIAllocator)
     GBL_RESULT (*pFnRealloc)(GBL_SELF, const GblStackFrame* pStackFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
     GBL_RESULT (*pFnFree)   (GBL_SELF, const GblStackFrame* pStackFrame, void* pData);
 GBL_INTERFACE_END
+
+GBL_EXPORT GblType  GblIAllocator_type(void)    GBL_NOEXCEPT;
 
 GBL_RESULT GblIAllocator_alloc  (GBL_SELF,
                                  const GblStackFrame* pStackFrame,

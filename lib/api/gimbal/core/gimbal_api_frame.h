@@ -154,7 +154,7 @@ extern "C" {
     } GBL_STMT_END
 
 #define GBL_API_CLEAR_LAST_RECORD()                         \
-    GblThread_callRecordSet(NULL, NULL)
+    GblThread_setCallRecord(NULL, NULL)
 
 //===== C STD ERRNO =====
 
@@ -451,7 +451,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     GBL_STMT_START {                                                            \
         if(GBL_RESULT_##prefix(record->result)) {                               \
             gblExtCallRecordSet(GBL_API_FRAME(), record);                       \
-            GblThread_callRecordSet(NULL, record);                              \
+            GblThread_setCallRecord(NULL, record);                              \
         }                                                                       \
     } GBL_STMT_END
 

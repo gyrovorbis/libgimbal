@@ -45,7 +45,7 @@ typedef enum GblTypeFlags {
 /// \details Maps a GblInterface to a GblClass by using it as a member of the class at the specified offset.
 typedef struct GblTypeInterfaceMapEntry {
     GblType      interfaceType; ///< GblType of the mapped interface
-    uint16_t     classOffset;   ///< offset of GblInterface into GblClass (using offsetof())
+    GblSize      classOffset;   ///< offset of GblInterface into GblClass (using offsetof())
 } GblTypeInterfaceMapEntry;
 
 /// \details Provides type information when registering a new GblType

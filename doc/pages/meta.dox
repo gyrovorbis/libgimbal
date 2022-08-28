@@ -7,6 +7,95 @@
 	object-oriented constructs, and the other is to use these constructs to create
 	a common type system for cross-langauge interoperability.  
 
+\tableofcontents
+
+# Taking C to the Next Level
+	One of the things libGimabl's type system aims to do is endow C programmers with a powerful 
+	set of tools and constructs from higher-level object-oriented languages. Constructs such as 
+	inheritance, private member variables, virtual functions, interfaces, and even signals and 
+	properties become accessible to C programs. The following is an actual header from libGimbal
+	using its own type system to implement the module system:
+
+	\code{.c}
+		#ifndef GIMBAL_MODULE_H
+		#define GIMBAL_MODULE_H
+
+		#include "gimbal_context.h"
+		#include "../ifaces/gimbal_iplugin.h"
+
+		// Type UUID
+		#define GBL_MODULE_TYPE                 (GBL_TYPE(GblModule))
+
+		// Function-style utility cast operators
+		#define GBL_MODULE(instance)            (GBL_INSTANCE_CAST(instance, GblModule))
+		#define GBL_MODULE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblModule))
+		#define GBL_MODULE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblModule))
+
+		// OO API local defines to simulate "this" pointer
+		#define GBL_SELF    GblModule* pSelf
+		#define GBL_CSELF   const GBL_SELF
+
+		// Declares our header extern C
+		GBL_DECLS_BEGIN
+
+		// Defines a table of class virtual methods and static members,
+		// inheriting from GblContext, plus implementing the GblIPlugin interface
+		GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
+		    GBL_RESULT  (*pFnLoad)  (GBL_SELF);
+		    GBL_RESULT  (*pFnUnload)(GBL_SELF);
+		GBL_CLASS_END
+
+		// Declares the structure for public instanced members,
+		// inheriting from GblModule
+		GBL_INSTANCE_DERIVE(GblModule, GblContext)
+		    GblVersion      version;
+		    GblStringRef    prefix;
+		    GblStringRef    author;
+		    GblStringRef    description;
+		GBL_INSTANCE_END
+
+		// Defines a list of properties for our type
+		GBL_PROPERTIES(GblModule,
+		    (prefix,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
+		    (version,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_UINT32_TYPE),
+		    (author,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
+		    (description, GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
+		    (typeCount,   GBL_GENERIC, (READ),                    GBL_UINT32_TYPE)
+		)
+
+		// Regular public function declrations
+		GblType     GblModule_type          (void)                          GBL_NOEXCEPT;
+
+		GblModule*  GblModule_create        (const char* pName,
+		                                     GblVersion  version,
+		                                     const char* pDescription,
+		                                     const char* pPrefix)           GBL_NOEXCEPT;
+
+		GblType     GblModule_registerType  (GBL_SELF,
+		                                     GblType            parent,
+		                                     const char*        pName,
+		                                     const GblTypeInfo* pInfo,
+		                                     GblFlags           flags)      GBL_NOEXCEPT;
+
+		GblType     GblModule_typeFromName  (GBL_CSELF, const char* pName)  GBL_NOEXCEPT;
+		GblType     GblModule_typeFromIndex (GBL_CSELF, GblSize     index)  GBL_NOEXCEPT;
+		GblSize     GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT;
+
+		GblBool     GblModule_isLoaded      (GBL_CSELF)                     GBL_NOEXCEPT;
+
+		GBL_RESULT  GblModule_use           (GBL_SELF)                      GBL_NOEXCEPT;
+		GBL_RESULT  GblModule_unuse         (GBL_SELF)                      GBL_NOEXCEPT;
+		GblSize     GblModule_useCount      (GBL_CSELF)                     GBL_NOEXCEPT;
+
+
+		GBL_DECLS_END
+
+		#undef GBL_CSELF
+		#undef GBL_SELF
+
+		#endif // GIMBAL_MODULE_H
+	\endcode
+
 	At its core, the LibGimbal Type Framework utilizes a dynamic type system, provided
 	by the ::GblType API (within gimbal_type.h). This system provides a runtime type 
 	registry maintaining all type information provided by builtin or user-registered 

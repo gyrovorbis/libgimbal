@@ -10,7 +10,7 @@
 #include "gimbal_interface.h"
 #include "../instances/gimbal_instance.h"
 
-#define GBL_IEVENT_HANDLER_TYPE                     GBL_BUILTIN_TYPE(IEVENT_HANDLER)
+#define GBL_IEVENT_HANDLER_TYPE                     (GblIEventHandler_type())
 #define GBL_IEVENT_HANDLER_STRUCT                   GblIEventHandler
 #define GBL_IEVENT_HANDLER_CLASS_STRUCT             GblIEventHandlerIFace
 #define GBL_IEVENT_HANDLER(instance)                GBL_INSTANCE_CAST_PREFIX(instance, GBL_IEVENT_HANDLER)
@@ -31,7 +31,9 @@ GBL_INTERFACE_DERIVE(GblIEventHandler)
     GBL_RESULT (*pFnEvent)(GBL_SELF, GblEvent* pEvent);
 GBL_INTERFACE_END
 
-GBL_API GblIEventHandler_event(GBL_SELF, GblEvent* pEvent) GBL_NOEXCEPT;
+GBL_EXPORT GblType     GblIEventHandler_type    (void)                       GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT  GblIEventHandler_event   (GBL_SELF, GblEvent* pEvent) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

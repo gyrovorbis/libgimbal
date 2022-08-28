@@ -1,4 +1,4 @@
-#include "meta/gimbal_signal_test_suite.h"
+#include "meta/signals/gimbal_signal_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/meta/signals/gimbal_signal.h>
 #include <gimbal/meta/signals/gimbal_closure.h>

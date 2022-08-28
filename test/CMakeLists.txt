@@ -24,50 +24,51 @@ add_executable(GimbalTests
     source/containers/gimbal_array_map_test_suite.c
     include/containers/gimbal_tree_set_test_suite.h
     source/containers/gimbal_tree_set_test_suite.c
-    include/types/gimbal_ref_test_suite.h
-    source/types/gimbal_ref_test_suite.c
     include/containers/gimbal_byte_array_test_suite.h
     source/containers/gimbal_byte_array_test_suite.c
+    include/containers/gimbal_array_list_test_suite.h
+    source/containers/gimbal_array_list_test_suite.c
+    include/containers/gimbal_hash_set_test_suite.h
+    source/containers/gimbal_hash_set_test_suite.c
+    include/containers/gimbal_nary_tree_test_suite.h
+    source/containers/gimbal_nary_tree_test_suite.c
+    include/core/gimbal_ref_test_suite.h
+    source/core/gimbal_ref_test_suite.c
+    include/meta/classes/gimbal_enum_test_suite.h
+    source/meta/classes/gimbal_enum_test_suite.c
+    include/meta/classes/gimbal_flags_test_suite.h
+    source/meta/classes/gimbal_flags_test_suite.c
+    include/meta/classes/gimbal_opaque_test_suite.h
+    source/meta/classes/gimbal_opaque_test_suite.c
+    include/meta/classes/gimbal_class_test_suite.h
+    source/meta/classes/gimbal_class_test_suite.c
+    include/meta/ifaces/gimbal_interface_test_suite.h
+    source/meta/ifaces/gimbal_interface_test_suite.c
+    include/meta/instances/gimbal_instance_test_suite.h
+    source/meta/instances/gimbal_instance_test_suite.c
+    include/meta/instances/gimbal_object_test_suite.h
+    source/meta/instances/gimbal_object_test_suite.c
+    include/meta/signals/gimbal_signal_test_suite.h
+    source/meta/signals/gimbal_signal_test_suite.c
+    include/meta/signals/gimbal_closure_test_suite.h
+    source/meta/signals/gimbal_closure_test_suite.c
+    include/meta/types/gimbal_type_test_suite.h
+    source/meta/types/gimbal_type_test_suite.c
+    include/meta/types/gimbal_variant_test_suite.h
+    source/meta/types/gimbal_variant_test_suite.c
+    include/meta/types/gimbal_pointer_test_suite.h
+    source/meta/types/gimbal_pointer_test_suite.c
     include/strings/gimbal_quark_test_suite.h
     source/strings/gimbal_quark_test_suite.c
     include/strings/gimbal_string_view_test_suite.h
     source/strings/gimbal_string_view_test_suite.c
     include/strings/gimbal_string_ref_test_suite.h
     source/strings/gimbal_string_ref_test_suite.c
-    include/meta/gimbal_type_test_suite.h
-    source/meta/gimbal_type_test_suite.c
-    include/types/gimbal_variant_test_suite.h
-    source/types/gimbal_variant_test_suite.c
-    include/meta/gimbal_enum_test_suite.h
-    source/meta/gimbal_enum_test_suite.c
-    include/meta/gimbal_flags_test_suite.h
-    source/meta/gimbal_flags_test_suite.c
-    include/meta/gimbal_opaque_test_suite.h
-    source/meta/gimbal_opaque_test_suite.c
-    include/meta/gimbal_boxed_test_suite.h
-    source/meta/gimbal_boxed_test_suite.c
-    include/objects/gimbal_object_test_suite.h
-    source/objects/gimbal_object_test_suite.c
-    include/containers/gimbal_array_list_test_suite.h
-    source/containers/gimbal_array_list_test_suite.c
-    include/containers/gimbal_hash_set_test_suite.h
-    source/containers/gimbal_hash_set_test_suite.c
     include/strings/gimbal_string_buffer_test_suite.h
     source/strings/gimbal_string_buffer_test_suite.c
-    include/meta/gimbal_class_test_suite.h
-    source/meta/gimbal_class_test_suite.c
-    include/meta/gimbal_interface_test_suite.h
-    source/meta/gimbal_interface_test_suite.c
-    include/meta/gimbal_instance_test_suite.h
-    source/meta/gimbal_instance_test_suite.c
-    include/meta/gimbal_signal_test_suite.h
-    source/meta/gimbal_signal_test_suite.c
-    include/types/gimbal_closure_test_suite.h
-    source/types/gimbal_closure_test_suite.c
-    include/types/gimbal_uuid_test_suite.h
-    source/types/gimbal_uuid_test_suite.c
-    include/containers/gimbal_nary_tree_test_suite.h
-    source/containers/gimbal_nary_tree_test_suite.c
+    include/utils/gimbal_uuid_test_suite.h
+    source/utils/gimbal_uuid_test_suite.c
+
     source/test_main.c)
 
 target_link_libraries(GimbalTests

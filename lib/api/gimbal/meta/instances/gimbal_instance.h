@@ -96,7 +96,7 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass          (GBL_SELF)              
 
 #define GBL_INSTANCE_VCALL_(op, type, classType, method, ...)                                   \
     GBL_STMT_START {                                                                            \
-        classType* pClass = GBL_INSTANCE_GET_CLASS(GBL_ARG_1(__VA_ARGS__), type, classType);   \
+        classType* pClass = GBL_INSTANCE_GET_CLASS(GBL_TUPLE_FIRST (__VA_ARGS__, 1), type, classType);   \
         pClass = (classType*)op(pClass);                                                        \
         GBL_API_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                          \
         GBL_API_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                  \

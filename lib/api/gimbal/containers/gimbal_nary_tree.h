@@ -103,6 +103,8 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingFirst        (GBL_CSELF)         
 GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingAt           (GBL_CSELF, GblSize index)                                     GBL_NOEXCEPT;
 GBL_INLINE GblSize          GblNaryTree_siblingIndex        (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 
+GBL_INLINE void             GblNaryTree_disconnect          (GBL_SELF)                                                     GBL_NOEXCEPT;
+
 //GBL_INLINE GblNaryTreeNode* GblNaryTree_lowestCommonAncestor(GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 //GBL_INLINE GblSize          GblNaryTree_distance            (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 //GBL_INLINE GblBool          GblNaryTree_traverse            (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIt, void* pUd) GBL_NOEXCEPT;
@@ -260,7 +262,6 @@ GBL_INLINE void GblNaryTree_addChildAfter(GBL_SELF, GblNaryTreeNode* pAfter, Gbl
     pChild->pParent = pSelf;
 }
 
-// ===== DO BETTER =====
 GBL_INLINE void GblNaryTree_moveChildFront(GBL_SELF, GblNaryTreeNode* pChild) GBL_NOEXCEPT {
     GblNaryTree_removeChild(pSelf, pChild);
     GblNaryTree_addChildFront(pSelf, pChild);
@@ -272,7 +273,7 @@ GBL_INLINE void GblNaryTree_moveChildBack(GBL_SELF, GblNaryTreeNode* pChild) GBL
 }
 
 GBL_INLINE void GblNaryTree_moveChildTo(GBL_SELF, GblSize index, GblNaryTreeNode* pChild) GBL_NOEXCEPT {
-    GblNaryTreeNode* pPrev = index? GblNaryTree_childAt(pSelf, index-1) : NULL;
+    GblNaryTreeNode* pPrev = index? GblNaryTree_childAt(pSelf, index-1) : GBL_NULL;
 
     GblNaryTree_removeChild(pSelf, pChild);
     if(pPrev)
@@ -340,7 +341,7 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_removeChildAt(GBL_SELF, GblSize index) G
 }
 
 GBL_INLINE void GblNaryTree_replaceChild(GBL_SELF, GblNaryTreeNode* pOld, GblNaryTreeNode* pNew) GBL_NOEXCEPT {
-    GblNaryTreeNode* pPrev = NULL;
+    GblNaryTreeNode* pPrev = GBL_NULL;
     GblNaryTreeNode* pNode = pSelf->pChildFirst;
     while(pNode) {
         if(pNode == pOld) {
@@ -360,11 +361,11 @@ GBL_INLINE void GblNaryTree_replaceChildAt(GBL_SELF, GblSize index, GblNaryTreeN
     GblSize i = 0;
     GblNaryTreeNode* pNode = pSelf->pChildFirst;
     if(!index) {
-        pNewChild->pSiblingNext = pSelf->pChildFirst? pSelf->pChildFirst->pSiblingNext: NULL;
+        pNewChild->pSiblingNext = pSelf->pChildFirst? pSelf->pChildFirst->pSiblingNext: GBL_NULL;
         pSelf->pChildFirst = pNewChild;
         pNewChild->pParent = pSelf;
     } else {
-        GblNaryTreeNode* pPrev = NULL;
+        GblNaryTreeNode* pPrev = GBL_NULL;
         while(pNode) {
             if(i++ == index) {
                 pPrev->pSiblingNext = pNewChild;
@@ -411,7 +412,7 @@ GBL_INLINE void GblNaryTree_swapChildrenAt(GBL_SELF, GblSize index1, GblSize ind
 
 GBL_INLINE void GblNaryTree_reverseChildren(GBL_SELF) GBL_NOEXCEPT {
     GblNaryTreeNode* pPrev = GBL_NULL;
-    GblNaryTreeNode* pNext = NULL;
+    GblNaryTreeNode* pNext = GBL_NULL;
     GblNaryTreeNode* pNode = pSelf->pChildFirst;
 
     while(pNode) {
@@ -502,7 +503,7 @@ GBL_INLINE GblSize GblNaryTree_siblingCount(GBL_CSELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingLast(GBL_CSELF) GBL_NOEXCEPT {
-    GblNaryTreeNode* pLast = NULL;
+    GblNaryTreeNode* pLast = GBL_NULL;
     GblNaryTreeNode* pNode = pSelf->pSiblingNext;
     if(pSelf->pSiblingNext) {
         while(pNode) {
@@ -523,7 +524,7 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingBefore(GBL_CSELF) GBL_NOEXCEPT {
            pNode = pNode->pSiblingNext;
         }
     }
-    return NULL;
+    return GBL_NULL;
 }
 
 GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingFirst(GBL_CSELF) GBL_NOEXCEPT {
@@ -533,21 +534,30 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingFirst(GBL_CSELF) GBL_NOEXCEPT {
         else
             return pSelf->pSiblingNext;
     }
-    return NULL;
+    return GBL_NULL;
 }
 
+
+GBL_INLINE void GblNaryTree_disconnect(GBL_SELF) GBL_NOEXCEPT {
+    if(pSelf->pParent) {
+        GblNaryTree_removeChild(pSelf->pParent, pSelf);
+    }
+
+    while(pSelf->pChildFirst) {
+        GblNaryTree_removeChildFront(pSelf);
+    }
+}
 
 GBL_INLINE GblBool GblNaryTree_traverse(GBL_CSELF,
                                         GblEnum order,
                                         GblNaryTreeIterFn pFnIter,
                                         void* pUserdata) GBL_NOEXCEPT {
-    return GBL_FALSE;
+    return GBL_FALSE; //lulznope
 }
 
-
-// ===== / DO BETTER =====
-
-
 GBL_DECLS_END
+
+#undef GBL_CSELF
+#undef GBL_SELF
 
 #endif // GIMBAL_NARY_TREE_H
