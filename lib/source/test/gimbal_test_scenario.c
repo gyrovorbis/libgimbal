@@ -307,7 +307,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_alloc_(GblIAllocator* pIAlloca
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
-    GBL_API_VERIFY_CALL(pCtxClass->GblIAllocatorIFaceImpl.pFnAlloc(pIAllocator, pFrame, size, align, pDbgStr, ppData));
+    GBL_API_VERIFY_CALL(pCtxClass->GblIAllocatorImpl.pFnAlloc(pIAllocator, pFrame, size, align, pDbgStr, ppData));
     GBL_API_VERIFY_CALL(GblAllocationTracker_allocEvent(pSelf_->pAllocTracker, *ppData, size, align, pDbgStr, pFrame->sourceEntry));
     GBL_API_END();
 }
@@ -318,7 +318,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_realloc_(GblIAllocator* pIAllo
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
-    GBL_API_VERIFY_CALL(pCtxClass->GblIAllocatorIFaceImpl.pFnRealloc(pIAllocator, pFrame, pData, newSize, newAlign, ppNewData));
+    GBL_API_VERIFY_CALL(pCtxClass->GblIAllocatorImpl.pFnRealloc(pIAllocator, pFrame, pData, newSize, newAlign, ppNewData));
     GBL_API_VERIFY_CALL(GblAllocationTracker_reallocEvent(pSelf_->pAllocTracker, pData, *ppNewData, newSize, newAlign, pFrame->sourceEntry));
     GBL_API_END();
 }
@@ -329,7 +329,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_free_(GblIAllocator* pIAllocat
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
-    GBL_API_VERIFY_CALL(pCtxClass->GblIAllocatorIFaceImpl.pFnFree(pIAllocator, pFrame, pData));
+    GBL_API_VERIFY_CALL(pCtxClass->GblIAllocatorImpl.pFnFree(pIAllocator, pFrame, pData));
     GBL_API_VERIFY_CALL(GblAllocationTracker_freeEvent(pSelf_->pAllocTracker, pData, pFrame->sourceEntry));
     GBL_API_END();
 }
@@ -378,9 +378,9 @@ static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd, 
     pSelfClass->base.base.pFnConstructor               = GblTestScenarioClass_constructor_;
     pSelfClass->base.base.base.pFnDestructor           = GblTestScenarioClass_destructor_;
     pSelfClass->base.base.pFnProperty                  = GblTestScenarioClass_property_;
-    pSelfClass->base.GblIAllocatorIFaceImpl.pFnAlloc   = GblTestScenarioClass_IAllocator_alloc_;
-    pSelfClass->base.GblIAllocatorIFaceImpl.pFnRealloc = GblTestScenarioClass_IAllocator_realloc_;
-    pSelfClass->base.GblIAllocatorIFaceImpl.pFnFree    = GblTestScenarioClass_IAllocator_free_;
+    pSelfClass->base.GblIAllocatorImpl.pFnAlloc   = GblTestScenarioClass_IAllocator_alloc_;
+    pSelfClass->base.GblIAllocatorImpl.pFnRealloc = GblTestScenarioClass_IAllocator_realloc_;
+    pSelfClass->base.GblIAllocatorImpl.pFnFree    = GblTestScenarioClass_IAllocator_free_;
     GBL_API_END();
 }
 

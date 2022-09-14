@@ -8,7 +8,7 @@ GBL_API GblIEventFilter_eventFilter(GblIEventFilter* pSelf, GblIEventHandler* pH
         GBL_API_VERIFY_POINTER(pSelf);
         GBL_API_VERIFY_POINTER(pHandler);
         GBL_API_VERIFY_POINTER(pEvent);
-        GblIEventFilterIFace* pIFace = GBL_IEVENT_FILTER_GET_IFACE(pSelf);
+        GblIEventFilterClass* pIFace = GBL_IEVENT_FILTER_GET_IFACE(pSelf);
         GBL_API_VERIFY_EXPRESSION(pIFace && pIFace->pFnEventFilter);
         GBL_API_CALL(pIFace->pFnEventFilter(pSelf, pHandler, pEvent));
     } GBL_API_END();
@@ -18,7 +18,7 @@ GBL_EXPORT GblType GblIEventFilter_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     static const GblTypeInfo info = {
-        .classSize = sizeof(GblIEventFilterIFace)
+        .classSize = sizeof(GblIEventFilterClass)
     };
 
     if(type == GBL_INVALID_TYPE) {

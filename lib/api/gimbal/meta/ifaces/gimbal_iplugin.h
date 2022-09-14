@@ -11,7 +11,7 @@
 
 #define GBL_IPLUGIN_TYPE                    (GblIPlugin_type())
 #define GBL_IPLUGIN_STRUCT                  GblIPlugin
-#define GBL_IPLUGIN_CLASS_STRUCT            GblIPluginIFace
+#define GBL_IPLUGIN_CLASS_STRUCT            GblIPluginClass
 #define GBL_IPLUGIN(instance)               GBL_INSTANCE_CAST_PREFIX        (instance,  GBL_IPLUGIN)
 #define GBL_IPLUGIN_CHECK(instance)         GBL_INSTANCE_CHECK_PREFIX       (instance,  GBL_IPLUGIN)
 #define GBL_IPLUGIN_TRY(instance)           GBL_INSTANCE_TRY_PREFIX         (instance,  GBL_IPLUGIN)

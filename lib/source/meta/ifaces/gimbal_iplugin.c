@@ -11,10 +11,10 @@ GBL_RESULT GblIPlugin_typeInfo_(const GblIPlugin* pSelf, GblType type, GblTypeIn
     GBL_API_END();
 }
 
-static GBL_RESULT GblIPluginIFace_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
+static GBL_RESULT GblIPluginClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
     GBL_UNUSED(pData);
     GBL_API_BEGIN(pCtx);
-    GblIPluginIFace* pSelf = (GblIPluginIFace*)pClass;
+    GblIPluginClass* pSelf = (GblIPluginClass*)pClass;
     pSelf->pFnTypeInfo = GblIPlugin_typeInfo_;
     GBL_API_END();
 }
@@ -42,11 +42,11 @@ GBL_EXPORT GblType GblIPlugin_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_API_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("IPlugin"),
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblIPlugin"),
                                       GBL_INTERFACE_TYPE,
                                       &(const GblTypeInfo) {
-                                          .pFnClassInit     = GblIPluginIFace_init_,
-                                          .classSize        = sizeof(GblIPluginIFace)
+                                          .pFnClassInit     = GblIPluginClass_init_,
+                                          .classSize        = sizeof(GblIPluginClass)
                                       },
                                       GBL_TYPE_FLAG_ABSTRACT);
         GBL_API_VERIFY_LAST_RECORD();

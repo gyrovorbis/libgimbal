@@ -12,7 +12,7 @@
 
 #define GBL_ILOGGER_TYPE                (GblILogger_type())
 #define GBL_ILOGGER_STRUCT              GblILogger
-#define GBL_ILOGGER_CLASS_STRUCT        GblILoggerIFace
+#define GBL_ILOGGER_CLASS_STRUCT        GblILoggerClass
 
 #define GBL_ILOGGER(inst)               (GBL_INSTANCE_CAST_PREFIX       (inst,  GBL_ILOGGER))
 #define GBL_ILOGGER_CHECK(inst)         (GBL_INSTANCE_CHECK_PREFIX      (inst,  GBL_ILOGGER))

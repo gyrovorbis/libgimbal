@@ -55,7 +55,7 @@ GBL_DECLS_BEGIN
  * \sa GblClass, GblType, GblObject
  */
 typedef struct GblInstance {
-    GblClass*   pClass_; ///< Pointer to Instance's Class, do not modify directly
+    GblClass*   pClass; ///< READ-ONLY Pointer to Instance's Class, do not modify directly
 } GblInstance;
 
 GBL_EXPORT GblInstance* GblInstance_create              (GblType type)               GBL_NOEXCEPT;

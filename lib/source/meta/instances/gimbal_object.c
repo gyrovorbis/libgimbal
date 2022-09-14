@@ -17,7 +17,7 @@ static GblQuark     objectParentQuark_          = GBL_QUARK_INVALID;
 static GblQuark     objectFamilyQuark_          = GBL_QUARK_INVALID;
 static GblQuark     objectEventFiltersQuark_    = GBL_QUARK_INVALID;
 
-static GBL_RESULT GblObjectClass_ivariantIFace_construct_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblObjectClass_ivariantIFace_construct_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
     GBL_API_BEGIN(NULL);
     if(op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT) {
@@ -42,7 +42,7 @@ static GBL_RESULT GblObjectClass_ivariantIFace_compare_(const GblVariant* pVaria
     GBL_API_END();
 }
 
-static GBL_RESULT GblObjectClass_ivariantIFace_get_(GblVariant* pSelf, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblObjectClass_ivariantIFace_get_(GblVariant* pSelf, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
     GBL_API_BEGIN(NULL);
     *(GblObject**)pArgs[0].pVoid = pSelf->pVoid;
@@ -55,7 +55,7 @@ static GBL_RESULT GblObjectClass_ivariantIFace_get_(GblVariant* pSelf, GblUint a
 }
 
 
-static GBL_RESULT GblObjectClass_ivariantIFace_set_(GblVariant* pSelf, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblObjectClass_ivariantIFace_set_(GblVariant* pSelf, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
     GBL_API_BEGIN(NULL);
     pSelf->pVoid = pArgs[0].pVoid;
@@ -383,7 +383,7 @@ static GBL_RESULT GblObjectClass_init_(GblObjectClass* pClass, void* pData, GblC
         GBL_PROPERTIES_REGISTER(GblObject);
     }
 
-    static const GblIVariantIFaceVTable iVariantVTable = {
+    static const GblIVariantClassVTable iVariantVTable = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
                         GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
                         GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |
@@ -407,13 +407,13 @@ static GBL_RESULT GblObjectClass_init_(GblObjectClass* pClass, void* pData, GblC
         .pFnSave      =    GblObjectClass_ivariantIFace_save_,
     };
 
-    pClass->base.GblIVariantIFaceImpl.pVTable = &iVariantVTable;
+    pClass->base.GblIVariantImpl.pVTable = &iVariantVTable;
 
-    pClass->GblITableIFaceImpl.pFnIndex       =    GblObjectClass_iTableIFace_index_;
-    pClass->GblITableIFaceImpl.pFnNewIndex    =    GblObjectClass_iTableIFace_newIndex_;
-    pClass->GblITableIFaceImpl.pFnNextIndex   =    GblObjectClass_iTableIFace_nextIndex_;
+    pClass->GblITableImpl.pFnIndex       =    GblObjectClass_iTableIFace_index_;
+    pClass->GblITableImpl.pFnNewIndex    =    GblObjectClass_iTableIFace_newIndex_;
+    pClass->GblITableImpl.pFnNextIndex   =    GblObjectClass_iTableIFace_nextIndex_;
 
-    pClass->GblIEventHandlerIFaceImpl.pFnEvent = GblObjectClass_iEventHandlerIFace_event_;
+    pClass->GblIEventHandlerImpl.pFnEvent = GblObjectClass_iEventHandlerIFace_event_;
 
     pClass->pFnConstructor      = GblObjectClass_constructor_;
     pClass->pFnConstructed      = GblObjectClass_constructed_;
@@ -726,7 +726,7 @@ GBL_API GblObject_setPropertiesVaList(GblObject* pSelf, va_list* pVarArgs) {
     GblVariant*  pVariants  = GBL_ALLOCA(sizeof(GblVariant) * count);
     const char** pKeys      = GBL_ALLOCA(sizeof(const char*) * count);
 
-    GblUint p = 0;
+    GblSize p = 0;
     const char* pKey = NULL;
     while((pKey = va_arg(*pVarArgs, const char*))) {
         pKeys[p] = pKey;
@@ -756,7 +756,7 @@ GBL_API GblObject_setPropertiesVaList(GblObject* pSelf, va_list* pVarArgs) {
 
 GBL_API GblObject_propertiesVariant(const GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
     GBL_API_BEGIN(NULL);
-    for(GblUint p = 0; p < propertyCount; ++p) {
+    for(GblSize p = 0; p < propertyCount; ++p) {
         GBL_API_CALL(GblObject_propertyVariant(pSelf, pNames[p], &pValues[p]));
     }
     GBL_API_END();
@@ -764,7 +764,7 @@ GBL_API GblObject_propertiesVariant(const GblObject* pSelf, GblSize propertyCoun
 
 GBL_API GblObject_setPropertiesVariants(GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
     GBL_API_BEGIN(NULL);
-    for(GblUint p = 0; p < propertyCount; ++p) {
+    for(GblSize p = 0; p < propertyCount; ++p) {
         GBL_API_CALL(GblObject_setPropertyVariant(pSelf, pNames[p], &pValues[p]));
     }
     GBL_API_END();
@@ -961,7 +961,7 @@ static GBL_RESULT GblObject_constructVariants_(GblObject*  pSelf,
 
     const GblProperty** pProps = GBL_ALLOCA(sizeof(GblProperty*) * propertyCount);
 
-    for(GblUint p = 0; p < propertyCount; ++p) {
+    for(GblSize p = 0; p < propertyCount; ++p) {
         pProps[p] = GblProperty_find(GBL_INSTANCE_TYPEOF(pSelf), pNames[p]);
 
         if(!pProps[p]) {
@@ -1317,13 +1317,13 @@ GBL_EXPORT GblType GblObject_type(void) {
     static GblTypeInterfaceMapEntry ifaceEntries[] = {
         {
             .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, GblITableIFaceImpl)
+            .classOffset   = offsetof(GblObjectClass, GblITableImpl)
         }, {
             .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, GblIEventHandlerIFaceImpl)
+            .classOffset   = offsetof(GblObjectClass, GblIEventHandlerImpl)
         }, {
             .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, GblIEventFilterIFaceImpl)
+            .classOffset   = offsetof(GblObjectClass, GblIEventFilterImpl)
         }
     };
 

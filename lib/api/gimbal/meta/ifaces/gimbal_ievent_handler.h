@@ -12,7 +12,7 @@
 
 #define GBL_IEVENT_HANDLER_TYPE                     (GblIEventHandler_type())
 #define GBL_IEVENT_HANDLER_STRUCT                   GblIEventHandler
-#define GBL_IEVENT_HANDLER_CLASS_STRUCT             GblIEventHandlerIFace
+#define GBL_IEVENT_HANDLER_CLASS_STRUCT             GblIEventHandlerClass
 #define GBL_IEVENT_HANDLER(instance)                GBL_INSTANCE_CAST_PREFIX(instance, GBL_IEVENT_HANDLER)
 #define GBL_IEVENT_HANDLER_CHECK(instance)          GBL_INSTANCE_CHECK_PREFIX(instance, GBL_IEVENT_HANDLER)
 #define GBL_IEVENT_HANDLER_IFACE(klass)             GBL_CLASS_CAST_PREFIX(klass, GBL_IEVENT_HANDLER)

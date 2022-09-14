@@ -163,7 +163,7 @@ GBL_EXPORT GblType GblOpaqueTestSuite_type(void) {
         { "register",       GblOpaqueTestSuite_register_        },
         { "variant",        GblOpaqueTestSuite_variant_         },
         { "conversions",    GblOpaqueTestSuite_conversions_     },
-        { NULL,             NULL                               }
+        { NULL,             NULL                                }
     };
 
     const static GblTestSuiteClassVTable vTable = {

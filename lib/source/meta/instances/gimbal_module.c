@@ -98,9 +98,9 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
     pSelf->base.base.base.pFnDestructor         = GblModule_destructor_;
     pSelf->base.base.pFnProperty                = GblModule_property_;
     pSelf->base.base.pFnSetProperty             = GblModule_setProperty_;
-    pSelf->GblIPluginIFaceImpl.pFnUse           = GblModule_IPlugin_use_;
-    pSelf->GblIPluginIFaceImpl.pFnUnuse         = GblModule_IPlugin_unuse_;
-    pSelf->GblIPluginIFaceImpl.pFnTypeInfo      = GblModule_IPlugin_typeInfo_;
+    pSelf->GblIPluginImpl.pFnUse           = GblModule_IPlugin_use_;
+    pSelf->GblIPluginImpl.pFnUnuse         = GblModule_IPlugin_unuse_;
+    pSelf->GblIPluginImpl.pFnTypeInfo      = GblModule_IPlugin_typeInfo_;
 
     if(!GblType_classRefCount(GBL_MODULE_TYPE)) {
 
@@ -128,26 +128,31 @@ GBL_RESULT GblModuleClass_final_(GblClass* pClass, const void* pData, GblContext
 GBL_EXPORT GblType GblModule_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    if(type == GBL_INVALID_TYPE) {
+    static GblTypeInterfaceMapEntry iface = {
+        .classOffset = offsetof(GblModuleClass, GblIPluginImpl)
+    };
+
+    static GblTypeInfo info = {
+        .pFnClassInit         = GblModuleClass_init_,
+        .pFnClassFinal        = GblModuleClass_final_,
+        .classSize            = sizeof(GblModuleClass),
+        .pFnInstanceInit      = GblModule_init_,
+        .instanceSize         = sizeof(GblModule),
+        .instancePrivateSize  = sizeof(GblModule_),
+        .interfaceCount       = 1,
+        .pInterfaceMap        = &iface
+    };
+
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         GBL_API_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("Module"),
+
+        iface.interfaceType = GBL_IPLUGIN_TYPE;
+
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblModule"),
                                       GBL_CONTEXT_TYPE,
-                                      &(const GblTypeInfo) {
-                                          .pFnClassInit         = GblModuleClass_init_,
-                                          .pFnClassFinal        = GblModuleClass_final_,
-                                          .classSize            = sizeof(GblModuleClass),
-                                          .pFnInstanceInit      = GblModule_init_,
-                                          .instanceSize         = sizeof(GblModule),
-                                          .instancePrivateSize  = sizeof(GblModule_),
-                                          .interfaceCount       = 1,
-                                          .pInterfaceMap        = (const GblTypeInterfaceMapEntry[]) {
-                                              {
-                                                  .interfaceType = GBL_IPLUGIN_TYPE,
-                                                  .classOffset   = offsetof(GblModuleClass, GblIPluginIFaceImpl)
-                                              },
-                                          }
-                                      },
-                                      GBL_TYPE_FLAG_ABSTRACT);
+                                      &info,
+                                      GBL_TYPE_FLAG_ABSTRACT |
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
         GBL_API_VERIFY_LAST_RECORD();
         GBL_API_END_BLOCK();
     }

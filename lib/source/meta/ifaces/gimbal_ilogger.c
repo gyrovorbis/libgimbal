@@ -27,7 +27,7 @@ static GBL_RESULT GblILoggerIFace_write_(GblILogger* pILogger, const GblStackFra
 }
 
 
-static GBL_RESULT GblILoggerIFace_init_(GblILoggerIFace* pIFace, void* pData, GblContext* pCtx) GBL_NOEXCEPT {
+static GBL_RESULT GblILoggerIFace_init_(GblILoggerClass* pIFace, void* pData, GblContext* pCtx) GBL_NOEXCEPT {
     GBL_UNUSED(pData);
     GBL_API_BEGIN(pCtx);
     pIFace->pFnWrite    = GblILoggerIFace_write_;
@@ -72,7 +72,7 @@ GBL_EXPORT GblType GblILogger_type(void) {
 
     static const GblTypeInfo info =  {
         .pFnClassInit     = (GblTypeClassInitializeFn)GblILoggerIFace_init_,
-        .classSize        = sizeof(GblILoggerIFace)
+        .classSize        = sizeof(GblILoggerClass)
     };
 
     if(type == GBL_INVALID_TYPE) {

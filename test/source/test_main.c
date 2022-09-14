@@ -3,6 +3,7 @@
 #include "containers/gimbal_doubly_linked_list_test_suite.h"
 #include "containers/gimbal_nary_tree_test_suite.h"
 #include "containers/gimbal_array_list_test_suite.h"
+#include "containers/gimbal_ring_buffer_test_suite.h"
 #include "containers/gimbal_array_map_test_suite.h"
 #include "containers/gimbal_tree_set_test_suite.h"
 #include "containers/gimbal_hash_set_test_suite.h"
@@ -34,7 +35,7 @@ int main(int argc, char* pArgv[]) {
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
     gdb_init();
 #endif
-   GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
+   GblTestScenario* pScenario = GblTestScenario_create("LibGimbalTests");
 
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO | GBL_LOG_LEVEL_WARNING | GBL_LOG_LEVEL_ERROR );
 
@@ -46,6 +47,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_createFromType(GBL_NARY_TREE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_ARRAY_LIST_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_createFromType(GBL_RING_BUFFER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_ARRAY_MAP_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,

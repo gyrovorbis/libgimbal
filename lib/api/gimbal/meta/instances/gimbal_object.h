@@ -56,13 +56,13 @@ GBL_EXPORT GBL_RESULT  GblObject_constructVaList           (GBL_SELF, GblType  t
 GBL_EXPORT GblObject*  GblObject_createVaListWithClass     (GblObjectClass* pClass, va_list* pList)           GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_constructVaListWithClass  (GBL_SELF,
-                                                            GblObjectClass*   pClass,
-                                                            va_list*          pList)                          GBL_NOEXCEPT;
+                                                            GblObjectClass*  pClass,
+                                                            va_list*         pList)                           GBL_NOEXCEPT;
 
-GBL_EXPORT GblObject*  GblObject_createVariants            (GblType           type,
-                                                            GblSize           propertyCount,
-                                                            const char*       pNames[],
-                                                            GblVariant*      pValues)                         GBL_NOEXCEPT;
+GBL_EXPORT GblObject*  GblObject_createVariants            (GblType         type,
+                                                            GblSize         propertyCount,
+                                                            const char*     pNames[],
+                                                            GblVariant*     pValues)                          GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblObject_constructVariants         (GBL_SELF,
                                                             GblType         type,

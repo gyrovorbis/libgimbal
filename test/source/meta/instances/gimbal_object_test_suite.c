@@ -163,8 +163,8 @@ static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd, GblCo
     }
     pTestClass->staticInt32 = 77;
     strcpy(pTestClass->string, (const char*)pUd);
-    pTestClass->base.GblIEventHandlerIFaceImpl.pFnEvent = TestObject_IEventHandler_handleEvent;
-    pTestClass->base.GblIEventFilterIFaceImpl.pFnEventFilter = TestObject_IEventFilter_filterEvent;
+    pTestClass->base.GblIEventHandlerImpl.pFnEvent = TestObject_IEventHandler_handleEvent;
+    pTestClass->base.GblIEventFilterImpl.pFnEventFilter = TestObject_IEventFilter_filterEvent;
     pTestClass->base.pFnConstructor      = TestObject_constructor;
     pTestClass->base.base.pFnDestructor  = TestObject_destructor;
     pTestClass->base.pFnConstructed      = TestObject_constructed;
@@ -222,20 +222,20 @@ static GBL_RESULT GblObjectTestSuite_newDefault_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(pClass->staticInt32, 77);
 
     // validate interfaces
-    GblIVariantIFace* pIVariantIFace = GBL_IVARIANT_GET_IFACE(pObj);
+    GblIVariantClass* pIVariantIFace = GBL_IVARIANT_GET_IFACE(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIVariantIFace), GBL_IVARIANT_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIVariantIFace));
     GBL_TEST_COMPARE(pIVariantIFace->pVTable->pGetValueFmt, "p");
 
-    GblITableIFace* pITableIFace = GBL_ITABLE_GET_IFACE(pObj);
+    GblITableClass* pITableIFace = GBL_ITABLE_GET_IFACE(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pITableIFace), GBL_ITABLE_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pITableIFace));
 
-    GblIEventHandlerIFace* pIEventHandlerIFace = GBL_IEVENT_HANDLER_TRY_IFACE(pObj);
+    GblIEventHandlerClass* pIEventHandlerIFace = GBL_IEVENT_HANDLER_TRY_IFACE(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventHandlerIFace), GBL_IEVENT_HANDLER_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventHandlerIFace));
 
-    GblIEventFilterIFace* pIEventFilterIFace = GBL_IEVENT_FILTER_GET_IFACE(pObj);
+    GblIEventFilterClass* pIEventFilterIFace = GBL_IEVENT_FILTER_GET_IFACE(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventFilterIFace), GBL_IEVENT_FILTER_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventFilterIFace));
 

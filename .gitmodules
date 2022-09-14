@@ -7,3 +7,6 @@
 [submodule "util/build-environment"]
 	path = util/build-environment
 	url = ../../open-source/build-environment.git
+[submodule "lib/lib/tinycthread"]
+	path = lib/lib/tinycthread
+	url = ../../open-source/tinycthread.git

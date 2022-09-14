@@ -31,14 +31,14 @@ GblType GblType_type                 (void)                                     
 GblType GblPrimitive_register        (const char*                    pName,
                                       GblSize                        classSize,
                                       GblSize                        classPrivateSize,
-                                      const GblIVariantIFaceVTable*  pIVTable,
+                                      const GblIVariantClassVTable*  pIVTable,
                                       GblFlags                       typeFlags)      GBL_NOEXCEPT;
 
 GblType GblPrimitive_registerBuiltin (GblSize                        index,
                                       const char*                    pName,
                                       GblSize                        classSize,
                                       GblSize                        classPrivateSize,
-                                      const GblIVariantIFaceVTable*  pIVTable,
+                                      const GblIVariantClassVTable*  pIVTable,
                                       GblFlags                       typeFlags)       GBL_NOEXCEPT;
 
 

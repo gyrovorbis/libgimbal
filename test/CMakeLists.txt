@@ -32,6 +32,8 @@ add_executable(GimbalTests
     source/containers/gimbal_hash_set_test_suite.c
     include/containers/gimbal_nary_tree_test_suite.h
     source/containers/gimbal_nary_tree_test_suite.c
+    include/containers/gimbal_ring_buffer_test_suite.h
+    source/containers/gimbal_ring_buffer_test_suite.c
     include/core/gimbal_ref_test_suite.h
     source/core/gimbal_ref_test_suite.c
     include/meta/classes/gimbal_enum_test_suite.h

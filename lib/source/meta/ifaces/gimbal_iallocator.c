@@ -3,7 +3,7 @@
 #include <gimbal/strings/gimbal_quark.h>
 #include "../types/gimbal_type_.h"
 
-static GBL_RESULT GblIAllocatorIFace_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
+static GBL_RESULT GblIAllocatorClass_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GBL_UNUSED(pIAllocator);
     GBL_UNUSED(pFrame);
     GBL_UNUSED(pDbgStr);
@@ -12,26 +12,26 @@ static GBL_RESULT GblIAllocatorIFace_alloc_(GblIAllocator* pIAllocator, const Gb
     GBL_API_END();
 }
 
-static GBL_RESULT GblIAllocatorIFace_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData) GBL_NOEXCEPT {
+static GBL_RESULT GblIAllocatorClass_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData) GBL_NOEXCEPT {
     GBL_UNUSED(pFrame && pIAllocator && newAlign);
     GBL_API_BEGIN(NULL);
     *ppNewData = GBL_ALIGNED_REALLOC(pData, newAlign, newSize);
     GBL_API_END();
 }
 
-static GBL_RESULT GblIAllocatorIFace_free_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData) GBL_NOEXCEPT {
+static GBL_RESULT GblIAllocatorClass_free_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData) GBL_NOEXCEPT {
     GBL_UNUSED(pFrame && pIAllocator);
     GBL_API_BEGIN(NULL);
     GBL_ALIGNED_FREE(pData);
     GBL_API_END();
 }
 
-static GBL_RESULT GblIAllocatorIFace_init_(GblIAllocatorIFace* pIFace, void* pData, GblContext* pCtx) GBL_NOEXCEPT {
+static GBL_RESULT GblIAllocatorClass_init_(GblIAllocatorClass* pIFace, void* pData, GblContext* pCtx) GBL_NOEXCEPT {
     GBL_UNUSED(pData);
     GBL_API_BEGIN(pCtx);
-    pIFace->pFnAlloc    = GblIAllocatorIFace_alloc_;
-    pIFace->pFnRealloc  = GblIAllocatorIFace_realloc_;
-    pIFace->pFnFree     = GblIAllocatorIFace_free_;
+    pIFace->pFnAlloc    = GblIAllocatorClass_alloc_;
+    pIFace->pFnRealloc  = GblIAllocatorClass_realloc_;
+    pIFace->pFnFree     = GblIAllocatorClass_free_;
     GBL_API_END();
 }
 
@@ -75,13 +75,13 @@ GBL_EXPORT GblType GblIAllocator_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     static const GblTypeInfo info = {
-        .pFnClassInit = (GblTypeClassInitializeFn)GblIAllocatorIFace_init_,
-        .classSize = sizeof(GblIAllocatorIFace)
+        .pFnClassInit = (GblTypeClassInitializeFn)GblIAllocatorClass_init_,
+        .classSize = sizeof(GblIAllocatorClass)
     };
 
     if(type == GBL_INVALID_TYPE) {
         GBL_API_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("IAllocator"),
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblIAllocator"),
                                       GBL_INTERFACE_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

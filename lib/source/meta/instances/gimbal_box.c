@@ -314,7 +314,7 @@ GBL_EXPORT GblType GblBox_type(void) {
     static GblTypeInterfaceMapEntry ifaceMap[] = {
         {
             GBL_INVALID_TYPE,
-            offsetof(GblBoxClass, GblIVariantIFaceImpl)
+            offsetof(GblBoxClass, GblIVariantImpl)
         }
     };
 

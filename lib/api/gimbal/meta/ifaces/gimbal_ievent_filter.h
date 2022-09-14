@@ -14,7 +14,7 @@ GBL_DECLS_BEGIN
 
 #define GBL_IEVENT_FILTER_TYPE                      (GblIEventFilter_type())
 #define GBL_IEVENT_FILTER_STRUCT                    GblIEventFilter
-#define GBL_IEVENT_FILTER_CLASS_STRUCT              GblIEventFilterIFace
+#define GBL_IEVENT_FILTER_CLASS_STRUCT              GblIEventFilterClass
 #define GBL_IEVENT_FILTER(instance)                 GBL_INSTANCE_CAST_PREFIX(instance, GBL_IEVENT_FILTER)
 #define GBL_IEVENT_FILTER_CHECK(instance)           GBL_INSTANCE_CHECK_PREFIX(instance, GBL_IEVENT_FILTER)
 #define GBL_IEVENT_FILTER_IFACE(klass)              GBL_CLASS_CAST_PREFIX(klass, GBL_IEVENT_FILTER)

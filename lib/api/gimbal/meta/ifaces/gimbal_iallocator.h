@@ -11,7 +11,7 @@
 
 #define GBL_IALLOCATOR_TYPE                 (GblIAllocator_type())
 #define GBL_IALLOCATOR_STRUCT               GblIAllocator
-#define GBL_IALLOCATOR_CLASS_STRUCT         GblIAllocatorIFace
+#define GBL_IALLOCATOR_CLASS_STRUCT         GblIAllocatorClass
 #define GBL_IALLOCATOR(inst)                (GBL_INSTANCE_CAST_PREFIX  (inst,  GBL_IALLOCATOR))
 #define GBL_IALLOCATOR_CHECK(inst)          (GBL_INSTANCE_CHECK_PREFIX (insta, GBL_IALLOCATOR))
 #define GBL_IALLOCATOR_IFACE(klass)         (GBL_CLASS_CAST_PREFIX     (klass, GBL_IALLOCATOR))

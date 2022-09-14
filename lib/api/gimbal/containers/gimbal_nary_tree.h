@@ -35,6 +35,21 @@ typedef enum GBL_NARY_TREE_TRAVERSAL_ORDER {
     GBL_NARY_TREE_TRAVERSAL_ORDER_LEVEL
 } GBL_NARY_TREE_TRAVERSAL_ORDER;
 
+/*! \brief Represents a single intrusive node within an N-Ary tree structure
+ *
+ *  GblNaryTreeNode is a single node which is to be embedded within another
+ *  structure, providing heirarchial relationships between its instances. As
+ *  relationships are established between these instances, they become nodes
+ *  comprising an aggregate tree structure.
+ *
+ *  A single node contains only a pointer to its parent node plus a linked list of
+ *  its child nodes, resulting in a minimal memory footprint. The API attempts to
+ *  present psuedo list-style semantics for accessing ancestors, bases, siblings,
+ *  and children by index; however, these are linked structures and such operations
+ *  are of O(N) time complexity, requiring traversals for random access.
+ *
+ *  \ingroup containers
+ */
 typedef struct GblNaryTreeNode {
     struct GblNaryTreeNode* pParent;        ///< Node's parent
     struct GblNaryTreeNode* pChildFirst;    ///< Node's first child (beginning of child linked list)

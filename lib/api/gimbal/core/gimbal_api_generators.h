@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 #define GBL_CLASS_IMPL_INTERFACE(iface) \
-    iface##IFace iface##IFace##Impl;
+    iface##Class iface##Impl;
 
 #define GBL_CLASS_DERIVE_N(instance, baseKlass, ...) \
     GBL_CLASS_DERIVE_2(instance, baseKlass) \
@@ -82,20 +82,20 @@ extern "C" {
     GBL_INTERFACE_DERIVE_3(instance, klass, GblInterface)
 
 #define GBL_INTERFACE_DERIVE_1(instance)    \
-    GBL_INTERFACE_DERIVE_2(instance, instance##IFace)
+    GBL_INTERFACE_DERIVE_2(instance, instance##Class)
 
 #define GBL_INTERFACE_DERIVE(...)   \
     GBL_VA_OVERLOAD_CALL(GBL_INTERFACE_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_3_N, __VA_ARGS__)
 
 #define GBL_INTERFACE_END };
 
-#define GBL_INSTANCE_DERIVE(derivedInstance, baseInstance)          \
-    struct derivedInstance;                                         \
-    typedef struct derivedInstance derivedInstance;                 \
-    struct derivedInstance {                                        \
-        union {                                                     \
-            derivedInstance##Class*          pClass;                \
-            baseInstance    base;                                   \
+#define GBL_INSTANCE_DERIVE(derivedInstance, baseInstance)  \
+    struct derivedInstance;                                 \
+    typedef struct derivedInstance derivedInstance;         \
+    struct derivedInstance {                                \
+        union {                                             \
+            derivedInstance##Class* pClass;                 \
+            baseInstance            base;                   \
         };
 
 #define GBL_INSTANCE_BASE(instance)     \

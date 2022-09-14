@@ -54,7 +54,7 @@ GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, Gb
     if(!pClass) pClass = GblClass_refDefault(type);
     else GblClass_refDefault(type);
     GBL_API_VERIFY_EXPRESSION(pClass, "Failed to retrieve class reference!");
-    pInstance->pClass_ = pClass;
+    pInstance->pClass = pClass;
 
     GBL_API_VERBOSE("Calling initializer chain.");
     GBL_API_PUSH();
@@ -220,7 +220,7 @@ GBL_EXPORT GBL_RESULT GblInstance_swizzleClass(GblInstance* pSelf, GblClass* pCl
     }
 
     // set new class
-    pSelf->pClass_ = pClass;
+    pSelf->pClass = pClass;
 
     GBL_API_END();
 }
@@ -261,7 +261,7 @@ GBL_EXPORT GblBool GblInstance_check(const GblInstance* pSelf, GblType type) {
             GBL_API_VERIFY_POINTER(NULL);
             GBL_API_END_BLOCK();
         } else {
-            result = GblClass_check(pSelf->pClass_, type);
+            result = GblClass_check(pSelf->pClass, type);
         }
     } else result = GBL_TRUE;
     return result;
@@ -291,7 +291,7 @@ GBL_EXPORT GblInstance* GblInstance_convert_(GblInstance* pSelf, GblType type, G
 }
 
 GBL_EXPORT GblType GblInstance_typeOf(const GblInstance* pSelf) GBL_NOEXCEPT {
-    return pSelf? GblClass_typeOf(pSelf->pClass_) : GBL_INVALID_TYPE;
+    return pSelf? GblClass_typeOf(pSelf->pClass) : GBL_INVALID_TYPE;
 }
 
 GBL_EXPORT GblSize GblInstance_size(const GblInstance* pSelf) GBL_NOEXCEPT {
@@ -319,7 +319,7 @@ GBL_EXPORT GblSize GblInstance_totalSize(const GblInstance* pSelf) GBL_NOEXCEPT 
 }
 
 GBL_EXPORT GblClass* GblInstance_class(const GblInstance* pSelf) GBL_NOEXCEPT {
-    return pSelf? pSelf->pClass_ : NULL;
+    return pSelf? pSelf->pClass : NULL;
 }
 
 GBL_EXPORT GblInstance* GblInstance_try(GblInstance* pSelf, GblType type) GBL_NOEXCEPT {

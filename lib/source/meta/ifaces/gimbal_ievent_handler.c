@@ -7,7 +7,7 @@ GBL_API  GblIEventHandler_event(GblIEventHandler* pSelf, GblEvent* pEvent) GBL_N
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pEvent);
         GBL_API_VERIFY_POINTER(pSelf);
-        GblIEventHandlerIFace* pIFace = GBL_IEVENT_HANDLER_GET_IFACE(pSelf);
+        GblIEventHandlerClass* pIFace = GBL_IEVENT_HANDLER_GET_IFACE(pSelf);
         if(pIFace && pIFace->pFnEvent) {
             GBL_API_CALL(pIFace->pFnEvent(pSelf, pEvent));
         }
@@ -18,7 +18,7 @@ GBL_EXPORT GblType GblIEventHandler_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     static const GblTypeInfo info = {
-        .classSize = sizeof(GblIEventHandlerIFace)
+        .classSize = sizeof(GblIEventHandlerClass)
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {

@@ -16,25 +16,24 @@
 
 #define GBL_CLASS_FLAGS_BIT_COUNT_                      5
 #define GBL_CLASS_FLAGS_BIT_MASK_                       0x1f
-#define GBL_CLASS_PRIVATE_(klass)                       ((uintptr_t)((GblClass*)klass)->private_)
+#define GBL_CLASS_PRIVATE_(klass)                       ((uintptr_t)GBL_PRIV_REF(((GblClass*)klass)).metaClassInfo)
 #define GBL_CLASS_FLAG_TEST_(klass, mask)               ((GblBool) (GBL_CLASS_PRIVATE_(klass) & mask))
 #define GBL_CLASS_FLAG_SET_(klass, flag)                GBL_CLASS_PRIVATE_SET_(klass, GBL_CLASS_META_CLASS_(klass), GBL_CLASS_FLAGS_(klass) | flag)
 #define GBL_CLASS_FLAG_CLEAR_(klass, flag)              GBL_CLASS_PRIVATE_SET_(klass, GBL_CLASS_META_CLASS_(klass), GBL_CLASS_FLAGS_(klass) & ~flag)
 #define GBL_CLASS_FLAGS_(klass)                         ((GblFlags)(GBL_CLASS_PRIVATE_(klass) & GBL_CLASS_FLAGS_BIT_MASK_))
 #define GBL_CLASS_META_CLASS_(klass)                    ((GblMetaClass*)(GBL_CLASS_PRIVATE_(klass) & ~GBL_CLASS_FLAGS_BIT_MASK_))
 #define GBL_CLASS_TYPEOF_(klass)                          ((GblType)(GBL_CLASS_META_CLASS_(klass)))
-#define GBL_CLASS_PRIVATE_SET_(klass, meta, flags)  \
-    GBL_STMT_START {                                \
-        ((GblClass*)klass)->private_ =              \
-            ((uintptr_t)meta | flags);              \
+#define GBL_CLASS_PRIVATE_SET_(klass, meta, flags)          \
+    GBL_STMT_START {                                        \
+        GBL_PRIV_REF(((GblClass*)klass)).metaClassInfo =    \
+            ((uintptr_t)meta | flags);                      \
     } GBL_STMT_END
 
-#define GBL_META_CLASS_ALIGNMENT_               (1 << (GBL_CLASS_FLAGS_BIT_COUNT_))
-#define GBL_META_CLASS_(type)                   ((GblMetaClass*)type)
+#define GBL_META_CLASS_ALIGNMENT_                       (1 << (GBL_CLASS_FLAGS_BIT_COUNT_))
+#define GBL_META_CLASS_(type)                           ((GblMetaClass*)type)
+#define GBL_TYPE_(meta)                                 ((GblType)meta)
 
-#define GBL_TYPE_(meta)              ((GblType)meta)
-
-#define GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT_ 32
+#define GBL_TYPE_REGISTRY_HASH_MAP_CAPACITY_DEFAULT_    32
 
 #define GBL_TYPE_ENSURE_INITIALIZED_()                  \
     GBL_STMT_START {                                    \

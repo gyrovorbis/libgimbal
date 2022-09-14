@@ -10,7 +10,7 @@ static GBL_RESULT GblOpaqueClass_init_(GblClass* pClass, const void* pData, GblC
     GBL_API_END();
 }
 
-static GBL_RESULT GblOpaque_construct_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblOpaque_construct_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_ARG(argc == 1 || (op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT));
 
@@ -56,7 +56,7 @@ static GBL_RESULT GblOpaque_destruct_(GblVariant* pVariant) {
     GBL_API_END();
 }
 
-static GBL_RESULT GblOpaque_set_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblOpaque_set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_API_VERIFY_ARG(argc == 1);
@@ -88,7 +88,7 @@ static GBL_RESULT GblOpaque_set_(GblVariant* pVariant, GblUint argc, GblVariant*
     GBL_API_END();
 }
 
-static GBL_RESULT GblOpaque_get_(GblVariant* pVariant, GblUint argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblOpaque_get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_ARG(argc == 1);
     GBL_API_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
@@ -163,7 +163,7 @@ static GBL_RESULT GblOpaque_convertFrom_(const GblVariant* pVariant, GblVariant*
 GBL_EXPORT GblType GblOpaque_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    static const GblIVariantIFaceVTable opaqueIVariantIFace =  {
+    static const GblIVariantClassVTable opaqueIVariantIFace =  {
         .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
                         GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
                         GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |

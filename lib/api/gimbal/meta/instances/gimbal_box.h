@@ -33,7 +33,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblBox);
  *  \ingroup metaBuiltinTypes
  *  \sa GblClass, GblBox
  *  \extends GblClass
- *  \implements GblIVariantIFace
+ *  \implements GblIVariantClass
  */
 GBL_CLASS_BASE(GblBox, GblIVariant)
     GBL_PRIVATE()

@@ -52,7 +52,9 @@ GBL_DECLS_BEGIN
  *\sa GblInstace, GblType
  */
 typedef struct GblClass {
-    uintptr_t   private_;   ///< pointer-sized private member which is used by the back-end
+    GBL_PRIVATE()
+        uintptr_t   metaClassInfo;   ///< pointer-sized private member which is used by the back-end
+    GBL_PRIVATE_END
 } GblClass;
 
 GBL_EXPORT GblClass*   GblClass_refDefault         (GblType type)              GBL_NOEXCEPT;
@@ -61,7 +63,6 @@ GBL_EXPORT GblRefCount GblClass_unrefDefault       (GBL_SELF)                  G
 GBL_EXPORT GblClass*   GblClass_weakRefDefault     (GblType type)              GBL_NOEXCEPT;
 
 GBL_EXPORT GblClass*   GblClass_createFloating     (GblType type)              GBL_NOEXCEPT;
-//GBL_EXPORT GblClass*   GblClass_createFloatingExt  (GblType type, GblSize size) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblClass_destroyFloating    (GBL_SELF)                  GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblClass_constructFloating  (GBL_SELF, GblType type)    GBL_NOEXCEPT;
