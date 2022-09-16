@@ -11,29 +11,23 @@
 
 #include "../types/gimbal_type.h"
 
-#define GBL_CLASS(klass)                            ((GblClass*)klass)
-#define GBL_CLASS_TYPEOF(klass)                     (GblClass_typeOf(GBL_CLASS(klass)))
-#define GBL_CLASS_SUPER(klass)                      (GblClass_super(GBL_CLASS(klass)))
-#define GBL_CLASS_DEFAULT(klass)                    (GblClass_default(GBL_CLASS(klass)))
-#define GBL_CLASS_PRIVATE(klass, type)              (GblClass_private(GBL_CLASS(klass), type))
-#define GBL_CLASS_PUBLIC(klassPrivate, type)        (GblClass_public(klassPriv, type))
+#define GBL_CLASS(klass)                     ((GblClass*)klass)
+#define GBL_CLASS_TYPEOF(klass)              (GblClass_typeOf(GBL_CLASS(klass)))
+#define GBL_CLASS_SUPER(klass)               (GblClass_super(GBL_CLASS(klass)))
+#define GBL_CLASS_DEFAULT(klass)             (GblClass_default(GBL_CLASS(klass)))
+#define GBL_CLASS_PRIVATE(klass, type)       (GblClass_private(GBL_CLASS(klass), type))
+#define GBL_CLASS_PUBLIC(klassPrivate, type) (GblClass_public(klassPriv, type))
 
-#define GBL_CLASS_CHECK(klass, toType)              (GblClass_check((GblClass*)klass, toType))
-#define GBL_CLASS_CHECK_PREFIX(klass, typePrefix)   (GBL_CLASS_CHECK(klass, typePrefix##_TYPE))
+#define GBL_CLASS_CHECK(klass, toType)       (GblClass_check((GblClass*)klass, GBL_TYPEOF(toType)))
+#define GBL_CLASS_CAST(klass, cType)         ((GBL_CLASSOF(cType)*)GblClass_cast((GblClass*)klass, GBL_TYPEOF(cType)))
+#define GBL_CLASS_TRY(klass, cType)          ((GBL_CLASSOF(cType)*)GblClass_try((GblClass*)klass, GBL_TYPEOF(cType)))
 
-#define GBL_CLASS_CAST(klass, toType, cType)        ((cType*)GblClass_cast((GblClass*)klass, toType))
-#define GBL_CLASS_CAST_PREFIX(klass, typePrefix)    (GBL_CLASS_CAST(klass, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
+#define GBL_CLASSOF(cType)                   cType##Class
 
-#define GBL_CLASS_TRY(klass, toType, cType)         ((cType*)GblClass_try((GblClass*)klass, toType))
-#define GBL_CLASS_TRY_PREFIX(klass, typePrefix)     (GBL_CLASS_TRY(klass, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
+#define GBL_STATIC_CLASS_TYPE                (GBL_BUILTIN_TYPE(STATIC_CLASS))
+#define GBL_STATIC_CLASS(klass)              (GblClass_cast((GblClass*)klass, GBL_STATIC_CLASS_TYPE))
 
-#define GBL_STATIC_CLASS_TYPE                       (GBL_BUILTIN_TYPE(STATIC_CLASS))
-#define GBL_STATIC_CLASS(klass)                     (GBL_CLASS_CAST(klass, GBL_STATIC_CLASS_TYPE, GblClass))
-#define GBL_STATIC_CLASS_CHECK(klass)               (GBL_CLASS_CHECK(klass, GBL_STATIC_CLASS_TYPE))
-#define GBL_STATIC_CLASS_TRY(klass)                 (GBL_CLASS_TRY(klass, GBL_STATIC_CLASS_TYPE, GblClass))
-
-#define GBL_SELF    GblClass*           pSelf
-#define GBL_CSELF   const GblClass*     pSelf
+#define GBL_SELF_TYPE GblClass
 
 GBL_DECLS_BEGIN
 
@@ -74,7 +68,7 @@ GBL_EXPORT GblClass*   GblClass_try                (GBL_SELF, GblType toType)  G
 
 GBL_EXPORT void*       GblClass_private            (GBL_CSELF, GblType type)   GBL_NOEXCEPT;
 GBL_EXPORT GblClass*   GblClass_public             (const void* pPrivate,
-                                                    GblType    base)           GBL_NOEXCEPT;
+                                                    GblType     base)          GBL_NOEXCEPT;
 
 GBL_EXPORT GblType     GblClass_typeOf             (GBL_CSELF)                 GBL_NOEXCEPT;
 GBL_EXPORT GblSize     GblClass_size               (GBL_CSELF)                 GBL_NOEXCEPT;
@@ -94,8 +88,7 @@ GBL_EXPORT GblBool     GblClass_isInPlace          (GBL_CSELF)                 G
 
 GBL_DECLS_END
 
-#undef GBL_SELF
-#undef GBL_CSELF
+#undef GBL_SELF_TYPE
 
 /*! \def GBL_STATIC_CLASS_TYPE
  *   Builtin type ID for a class-only types

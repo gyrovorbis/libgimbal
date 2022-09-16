@@ -24,8 +24,7 @@
 #define GBL_UUID_STRING_SIZE    37  ///< Byte size of a string needed to represent a UUID, including NULL terminator.
 #define GBL_UUID_STRING_LENGTH  36  ///< Length of string needed to represent a UUID, excluding NULL terminator.
 
-#define GBL_SELF    GblUuid* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblUuid
 
 GBL_DECLS_BEGIN
 
@@ -68,8 +67,7 @@ GBL_EXPORT GblBool    GblUuid_isNil         (GBL_CSELF)                        G
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_UUID_H
 

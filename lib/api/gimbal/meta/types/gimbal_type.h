@@ -12,9 +12,8 @@
 /*! UUID of an invalid type
  * \ingroup metaBuiltinTypes
  */
-#define GBL_INVALID_TYPE    ((GblType)0)
-
-#define GBL_SELF            GblType self
+#define GBL_INVALID_TYPE ((GblType)0)
+#define GBL_SELF_TYPE    GblType
 
 GBL_DECLS_BEGIN
 
@@ -86,31 +85,31 @@ GBL_EXPORT GblType              GblType_fromName        (const char* pName)     
 GBL_EXPORT GblType              GblType_fromNameQuark   (GblQuark quark)                GBL_NOEXCEPT;
 GBL_EXPORT GblType              GblType_fromBuiltinIndex(GblSize index)                 GBL_NOEXCEPT;
 
-GBL_EXPORT const char*          GblType_name            (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblQuark             GblType_nameQuark       (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_parent          (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_root            (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_base            (GBL_SELF, GblSize depth)       GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_ancestor        (GBL_SELF, GblSize level)       GBL_NOEXCEPT;
-GBL_EXPORT GblSize              GblType_depth           (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_flagsCheck      (GBL_SELF, GblFlags mask)       GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_verify          (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_check           (GBL_SELF, GblType other)       GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_depends         (GBL_SELF, GblType dependency)  GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_derives         (GBL_SELF, GblType superType)   GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_implements      (GBL_SELF, GblType superType)   GBL_NOEXCEPT;
-GBL_EXPORT GblType              GblType_common          (GBL_SELF, GblType other)       GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_maps            (GBL_SELF, GblType iface)       GBL_NOEXCEPT;
-GBL_EXPORT GblBool              GblType_conforms        (GBL_SELF, GblType dependent)   GBL_NOEXCEPT;
-GBL_EXPORT const GblTypeInfo*   GblType_info            (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblIPlugin*          GblType_plugin          (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblInterface*        GblType_extension       (GBL_SELF, GblType iface)       GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount          GblType_classRefCount   (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount          GblType_instanceRefCount(GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT const char*          GblType_name            (GBL_VSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblQuark             GblType_nameQuark       (GBL_VSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_parent          (GBL_VSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_root            (GBL_VSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_base            (GBL_VSELF, GblSize depth)      GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_ancestor        (GBL_VSELF, GblSize level)      GBL_NOEXCEPT;
+GBL_EXPORT GblSize              GblType_depth           (GBL_VSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_flagsCheck      (GBL_VSELF, GblFlags mask)      GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_verify          (GBL_VSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_check           (GBL_VSELF, GblType other)      GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_depends         (GBL_VSELF, GblType dependency) GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_derives         (GBL_VSELF, GblType superType)  GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_implements      (GBL_VSELF, GblType superType)  GBL_NOEXCEPT;
+GBL_EXPORT GblType              GblType_common          (GBL_VSELF, GblType other)      GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_maps            (GBL_VSELF, GblType iface)      GBL_NOEXCEPT;
+GBL_EXPORT GblBool              GblType_conforms        (GBL_VSELF, GblType dependent)  GBL_NOEXCEPT;
+GBL_EXPORT const GblTypeInfo*   GblType_info            (GBL_VSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblIPlugin*          GblType_plugin          (GBL_VSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblInterface*        GblType_extension       (GBL_VSELF, GblType iface)      GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount          GblType_classRefCount   (GBL_VSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount          GblType_instanceRefCount(GBL_VSELF)                     GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 
 #endif // GIMBAL_TYPE_H

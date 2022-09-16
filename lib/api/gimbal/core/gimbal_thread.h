@@ -8,8 +8,7 @@
 
 #include <gimbal/core/gimbal_typedefs.h>
 
-#define GBL_SELF    GblThread* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblThread
 
 GBL_DECLS_BEGIN
 
@@ -38,7 +37,6 @@ GBL_EXPORT GBL_RESULT   GblThread_stackFramePop  (GBL_SELF)                     
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_THREAD_H

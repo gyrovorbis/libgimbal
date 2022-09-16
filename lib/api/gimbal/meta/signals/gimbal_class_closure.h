@@ -3,14 +3,13 @@
 
 #include "gimbal_closure.h"
 
-#define GBL_CLASS_CLOSURE_TYPE                  (GblClassClosure_type())
+#define GBL_CLASS_CLOSURE_TYPE                  (GBL_TYPEOF(GblClassClosure))
 
-#define GBL_CLASS_CLOSURE(instance)             (GBL_INSTANCE_CAST(instance, GBL_CLASS_CLOSURE_TYPE, GblClassClosure))
-#define GBL_CLASS_CLOkSURE_CLASS(klass)          (GBL_CLASS_CAST(klass, GBL_CLASS_CLOSURE_TYPE, GblClassClosureClass))
-#define GBL_CLASS_CLOSURE_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS(instance), GBL_CLASS_CLOSURE_TYPE, GblClassClosureClass)
+#define GBL_CLASS_CLOSURE(instance)             (GBL_INSTANCE_CAST(instance, GblClassClosure))
+#define GBL_CLASS_CLOSURE_CLASS(klass)          (GBL_CLASS_CAST(klass, GblClassClosure))
+#define GBL_CLASS_CLOSURE_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS(instance, GblClassClosure))
 
-#define GBL_SELF    GblClassClosure* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblClassClosure
 
 GBL_DECLS_BEGIN
 
@@ -53,7 +52,6 @@ GBL_INLINE void GblClassClosure_setInstance(GBL_SELF, GblInstance* pInstance) GB
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_CLASS_CLOSURE_H

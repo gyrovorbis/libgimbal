@@ -13,14 +13,12 @@ typedef struct GblObjectTestSuite_ {
     TestObject*     pTestObj;
 } GblObjectTestSuite_;
 
-#define TEST_OBJECT_TYPE                    (TestObject_type())
-#define TEST_OBJECT_STRUCT                  TestObject
-#define TEST_OBJECT_CLASS_STRUCT            TestObjectClass
-#define TEST_OBJECT(instance)               GBL_INSTANCE_CAST_PREFIX(instance, TEST_OBJECT)
-#define TEST_OBJECT_CHECK(instance)         GBL_INSTANCE_CHECK_PREFIX(instance, TEST_OBJECT)
-#define TEST_OBJECT_CLASS(klass)            GBL_CLASS_CAST_PREFIX(klass, TEST_OBJECT)
-#define TEST_OBJECT_CLASS_CHECK(klass)      GBL_CLASS_CHECK_PREFIX(klass, TEST_OBJECT)
-#define TEST_OBJECT_GET_CLASS(instance)     GBL_INSTANCE_GET_CLASS_PREFIX(instance, TEST_OBJECT)
+#define TEST_OBJECT_TYPE                    (GBL_TYPEOF(TestObject))
+#define TEST_OBJECT(instance)               (GBL_INSTANCE_CAST(instance, TestObject))
+#define TEST_OBJECT_CHECK(instance)         (GBL_INSTANCE_CHECK(instance, TestObject))
+#define TEST_OBJECT_CLASS(klass)            (GBL_CLASS_CAST(klass, TestObject))
+#define TEST_OBJECT_CLASS_CHECK(klass)      (GBL_CLASS_CHECK(klass, TestObject))
+#define TEST_OBJECT_GET_CLASS(instance)     (GBL_INSTANCE_GET_CLASS(instance, TestObject))
 
 GBL_EXPORT GblType TestObject_type(void);
 
@@ -55,7 +53,7 @@ static GBL_RESULT TestObject_IEventHandler_handleEvent(GblIEventHandler* pHandle
     GBL_API_BEGIN(pHandler);
     TestObject* pTest = TEST_OBJECT(pHandler);
     pTest->eventHandlerCount++;
-    pTest->eventHandlerLastType = GblEvent_typeOf(pEvent);
+    pTest->eventHandlerLastType = GBL_INSTANCE_TYPEOF(pEvent);
     if(pTest->eventHandlerAccept) GblEvent_accept(pEvent);
     GBL_API_END();
 }
@@ -64,7 +62,7 @@ static GBL_RESULT TestObject_IEventFilter_filterEvent(GblIEventFilter* pFilter, 
     GBL_API_BEGIN(pFilter);
     TestObject* pTest = TEST_OBJECT(pFilter);
     pTest->eventFilterCount++;
-    pTest->eventFilterLastType = GblEvent_typeOf(pEvent);
+    pTest->eventFilterLastType = GBL_INSTANCE_TYPEOF(pEvent);
     pTest->eventFilterLastTarget = pTarget;
     if(pTest->eventFilterAccept) GblEvent_accept(pEvent);
     GBL_API_END();
@@ -199,6 +197,8 @@ static GBL_RESULT GblObjectTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx
 }
 
 static GBL_RESULT GblObjectTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+
     GBL_API_BEGIN(pCtx);
     GBL_TEST_COMPARE(GblType_classRefCount(TEST_OBJECT_TYPE), 0);
     GblType_unregister(TestObject_type());
@@ -222,39 +222,39 @@ static GBL_RESULT GblObjectTestSuite_newDefault_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(pClass->staticInt32, 77);
 
     // validate interfaces
-    GblIVariantClass* pIVariantIFace = GBL_IVARIANT_GET_IFACE(pObj);
+    GblIVariantClass* pIVariantIFace = GBL_IVARIANT_GET_CLASS(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIVariantIFace), GBL_IVARIANT_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIVariantIFace));
     GBL_TEST_COMPARE(pIVariantIFace->pVTable->pGetValueFmt, "p");
 
-    GblITableClass* pITableIFace = GBL_ITABLE_GET_IFACE(pObj);
+    GblITableClass* pITableIFace = GBL_ITABLE_GET_CLASS(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pITableIFace), GBL_ITABLE_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pITableIFace));
 
-    GblIEventHandlerClass* pIEventHandlerIFace = GBL_IEVENT_HANDLER_TRY_IFACE(pObj);
+    GblIEventHandlerClass* pIEventHandlerIFace = GBL_IEVENT_HANDLER_GET_CLASS(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventHandlerIFace), GBL_IEVENT_HANDLER_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventHandlerIFace));
 
-    GblIEventFilterClass* pIEventFilterIFace = GBL_IEVENT_FILTER_GET_IFACE(pObj);
+    GblIEventFilterClass* pIEventFilterIFace = GBL_IEVENT_FILTER_GET_CLASS(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventFilterIFace), GBL_IEVENT_FILTER_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventFilterIFace));
 
     // validate sanity of random casts
-    GBL_TEST_COMPARE(pITableIFace, GBL_ITABLE_IFACE(pIEventHandlerIFace));
-    GBL_TEST_COMPARE(pIVariantIFace, GBL_IVARIANT_IFACE(pIEventFilterIFace));
+    GBL_TEST_COMPARE(pITableIFace, GBL_ITABLE_CLASS(pIEventHandlerIFace));
+    GBL_TEST_COMPARE(pIVariantIFace, GBL_IVARIANT_CLASS(pIEventFilterIFace));
 
     //validate some of the compatible checks
-    GBL_TEST_VERIFY(GBL_IVARIANT_IFACE_CHECK(pClass));
+    //GBL_TEST_VERIFY(GBL_IVARIANT_IFACE_CHECK(pClass));
     GBL_TEST_VERIFY(!TEST_OBJECT_CLASS_CHECK(pIVariantIFace));
     //GBL_TEST_VERIFY(GBL_OBJECT_CLASS_CHECK(pClass));
-    GBL_TEST_VERIFY(GBL_ITABLE_IFACE_CHECK(GBL_OBJECT_CLASS(pITableIFace)));
+    //GBL_TEST_VERIFY(GBL_ITABLE_IFACE_CHECK(GBL_OBJECT_CLASS(pITableIFace)));
 
     //validate insanity
-    GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(GBL_ITABLE_IFACE(GBL_OBJECT_CLASS(GBL_IEVENT_FILTER_IFACE(TEST_OBJECT_GET_CLASS(pObj))))));
+    GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(GBL_ITABLE_CLASS(GBL_OBJECT_CLASS(GBL_IEVENT_FILTER_CLASS(TEST_OBJECT_GET_CLASS(pObj))))));
 
     // validate instance checks and casts
-    GBL_TEST_VERIFY(GBL_IVARIANT_CHECK(pObj));
-    GBL_TEST_VERIFY(GBL_IEVENT_FILTER_CHECK(GBL_OBJECT(GBL_IEVENT_FILTER(pObj))));
+    //GBL_TEST_VERIFY(GBL_IVARIANT_CHECK(pObj));
+    //GBL_TEST_VERIFY(GBL_IEVENT_FILTER_CHECK(GBL_OBJECT(GBL_IEVENT_FILTER(pObj))));
     GBL_TEST_COMPARE(pObj, TEST_OBJECT(GBL_IVARIANT(GBL_OBJECT(GBL_IEVENT_FILTER(TEST_OBJECT(pObj))))));
 
     GBL_API_END();
@@ -712,7 +712,7 @@ static GBL_RESULT GblObjectTestSuite_eventNotify_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(pObj->eventHandlerLastType, GBL_EVENT_TYPE);
     GBL_TEST_COMPARE(GblEvent_state(&event), GBL_EVENT_STATE_ACCEPTED);
 
-    GblEvent_destruct(&event);
+    GBL_BOX_UNREF(&event);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_API_END();
 }
@@ -750,7 +750,7 @@ static GBL_RESULT GblObjectTestSuite_eventNotifyAncestors_(GblTestSuite* pSelf, 
     GBL_TEST_COMPARE(pParent->eventHandlerCount, 2);
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 1);
 
-    GblEvent_destruct(&event);
+    GBL_BOX_UNREF(&event);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);
@@ -789,7 +789,7 @@ static GBL_RESULT GblObjectTestSuite_eventSendAncestors_(GblTestSuite* pSelf, Gb
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 1);
     GBL_TEST_COMPARE(GblEvent_state(&event), GBL_EVENT_STATE_ACCEPTED);
 
-    GblEvent_destruct(&event);
+    GBL_BOX_UNREF(&event);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);
@@ -836,14 +836,14 @@ static GBL_RESULT GblObjectTestSuite_eventFilters_(GblTestSuite* pSelf, GblConte
 
     GBL_API_VERIFY_CALL(GblObject_uninstallEventFilter(GBL_OBJECT(pParent), GBL_IEVENT_FILTER(pChild)));
 
-    event.state = GBL_EVENT_STATE_PENDING;
+    GblEvent_reset(&event);
     GBL_API_VERIFY_CALL(GblObject_notifyEvent(GBL_OBJECT(pChild), &event));
     GBL_TEST_COMPARE(pChild->eventHandlerCount, 3);
     GBL_TEST_COMPARE(pParent->eventHandlerCount, 2);
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 2);
     GBL_TEST_COMPARE(pChild->eventFilterCount, 2);
 
-    GblEvent_destruct(&event);
+    GBL_BOX_UNREF(&event);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);

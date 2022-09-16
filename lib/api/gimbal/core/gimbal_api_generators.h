@@ -114,7 +114,7 @@ extern "C" {
 #define GBL_INSTANCE_END };
 
 #define GBL_INSTANCE_DERIVE_EMPTY(derived, base) \
-    GBL_INSTANCE_DERIVE(derived, base)   \
+    GBL_INSTANCE_DERIVE(derived, base)           \
     GBL_INSTANCE_END
 
 #define GBL_DECLARE_STRUCT_PUBLIC(S)    \
@@ -163,13 +163,22 @@ extern "C" {
     struct S##_;                \
     typedef struct S##_* S
 
-
 #define GBL_PRIVATE()      struct {
 
 #define GBL_PRIVATE_END }   private_;
 
 #define GBL_PRIV(a)         (a).private_
 #define GBL_PRIV_REF(a)     (a)->private_
+
+#define GBL_VSELF   GBL_SELF_TYPE self
+
+#define GBL_KLASS   GBL_GLUE(GBL_SELF_TYPE, Class)* pSelf
+#define GBL_CKLASS  const GBL_KLASS
+
+#define GBL_SELF    GBL_SELF_TYPE* pSelf
+#define GBL_CSELF   const GBL_SELF
+
+#define GBL_TYPEOF(instanceStruct)  (instanceStruct##_type())
 
 //sizeof(emptyStruct) is 1 in Cpp, 0 in C!
 #define GBL_DEFINE_EMPTY_STRUCT(S)  \
@@ -191,8 +200,6 @@ extern "C" {
 #else
 #   define GBL_EXPORT
 #endif
-
-#define GBL_API GBL_RESULT GBL_EXPORT
 
 #define GBL_API_INLINE_HELPER(retType, suffix, args, apiCall)                                                   \
     GBL_MAYBE_UNUSED GBL_API_INLINE(suffix, GBL_EVAL(GBL_MAP_TUPLES(GBL_DECL_VAR_TYPE, retType)_, GBL_EVAL args) {        \

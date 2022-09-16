@@ -1,5 +1,5 @@
 ﻿/*! \file
- *  \brief GBL_API top-level debug and control-flow macros
+ *  \brief GBL_EXPORT GBL_RESULT top-level debug and control-flow macros
  *  \ingroup debug
  */
 #ifndef GIMBAL_API_FRAME_H
@@ -180,7 +180,7 @@ extern "C" {
 #   define GBL_API_PERROR(...)
 #endif
 
-GBL_MAYBE_UNUSED GBL_INLINE GBL_API GBL_ERRNO_RESULT(int ernum) {
+GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_ERRNO_RESULT(int ernum) {
     switch(ernum) {
     case 0:     return GBL_RESULT_SUCCESS;
     default:    return GBL_RESULT_ERROR;

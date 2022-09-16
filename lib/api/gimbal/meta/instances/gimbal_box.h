@@ -10,19 +10,16 @@
 #include "../ifaces/gimbal_ivariant.h"
 #include "../../containers/gimbal_array_map.h"
 
-#define GBL_BOX_TYPE                 (GblBox_type())    ///< GblType UUID of a GblBox
+#define GBL_BOX_TYPE                 (GBL_TYPEOF(GblBox))    ///< GblType UUID of a GblBox
 
-#define GBL_BOX(instance)            (GBL_INSTANCE_CAST(instance, GBL_BOX_TYPE, GblBox))
-#define GBL_BOX_CLASS(GBL_KLASS)     (GBL_CLASS_CAST(GBL_KLASS, GBL_BOX_TYPE, GblBoxClass))
-#define GBL_BOX_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GBL_BOX_TYPE, GblBoxClass))
+#define GBL_BOX(instance)            (GBL_INSTANCE_CAST(instance, GblBox))
+#define GBL_BOX_CLASS(klass)         (GBL_CLASS_CAST(klass, GblBox))
+#define GBL_BOX_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblBox))
 
 #define GBL_BOX_REF(instance)        (GblBox_ref(GBL_BOX(instance)))
 #define GBL_BOX_UNREF(instance)      (GblBox_unref(GBL_BOX(instance)))
 
-#define GBL_KLASS   GblBoxClass* pSelf
-#define GBL_CKLASS  const GBL_KLASS
-#define GBL_SELF    GblBox* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblBox
 
 GBL_DECLS_BEGIN
 
@@ -134,12 +131,8 @@ GBL_EXPORT GBL_RESULT   GblBox_setField                 (GBL_SELF,
                                                          GblQuark          key,
                                                          uintptr_t         ud,
                                                          GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
-
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
-#undef GBL_CKLASS
-#undef GBL_KLASS
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_BOX_H

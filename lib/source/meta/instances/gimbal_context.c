@@ -237,7 +237,7 @@ GBL_EXPORT const GblCallRecord* GblContext_lastIssue(const GblContext* pSelf) GB
     return pSelf? &pSelf->lastIssue : NULL;
 }
 
-GBL_API GblContext_setLastIssue(GblContext* pSelf, const GblCallRecord* pRecord) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblContext_setLastIssue(GblContext* pSelf, const GblCallRecord* pRecord) GBL_NOEXCEPT {
     //GBL_API_BEGIN(pSelf);
     if(pRecord) memcpy(&pSelf->lastIssue, pRecord, sizeof(GblCallRecord));
     else memset(&pSelf->lastIssue, 0, sizeof(GblCallRecord));
@@ -245,7 +245,7 @@ GBL_API GblContext_setLastIssue(GblContext* pSelf, const GblCallRecord* pRecord)
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API GblContext_clearLastIssue(GblContext* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblContext_clearLastIssue(GblContext* pSelf) GBL_NOEXCEPT {
     return GblContext_setLastIssue(pSelf, NULL);
 }
 
@@ -266,7 +266,7 @@ GBL_EXPORT const char*  GblContext_lastIssueMessage (const GblContext* pSelf) GB
 }
 
 
-GBL_API GblContext_memAlloc_     (GblContext* pSelf,
+GBL_EXPORT GBL_RESULT GblContext_memAlloc_     (GblContext* pSelf,
                                   const GblStackFrame*  pFrame,
                                   GblSize               size,
                                   GblSize               align,
@@ -275,7 +275,7 @@ GBL_API GblContext_memAlloc_     (GblContext* pSelf,
 {
     return pSelf->pClass->GblIAllocatorImpl.pFnAlloc((GblIAllocator*)pSelf, pFrame, size, align, pDbgStr, ppData);
 }
-GBL_API GblContext_memRealloc_   (GblContext* pSelf,
+GBL_EXPORT GBL_RESULT GblContext_memRealloc_   (GblContext* pSelf,
                                   const GblStackFrame*  pFrame,
                                   void*                 pData,
                                   GblSize               newSize,
@@ -284,14 +284,14 @@ GBL_API GblContext_memRealloc_   (GblContext* pSelf,
 {
     return pSelf->pClass->GblIAllocatorImpl.pFnRealloc((GblIAllocator*)pSelf, pFrame, pData, newSize, newAlign, ppNewData);
 }
-GBL_API GblContext_memFree_      (GblContext* pSelf,
+GBL_EXPORT GBL_RESULT GblContext_memFree_      (GblContext* pSelf,
                                   const GblStackFrame*  pFrame,
                                   void*                 pData)      GBL_NOEXCEPT
 {
     return !pData? GBL_RESULT_SUCCESS : pSelf->pClass->GblIAllocatorImpl.pFnFree((GblIAllocator*)pSelf, pFrame, pData);
 }
 
-GBL_API GblContext_logWrite_     (GblContext* pSelf,
+GBL_EXPORT GBL_RESULT GblContext_logWrite_     (GblContext* pSelf,
                                   const GblStackFrame*  pFrame,
                                   GBL_LOG_LEVEL         level,
                                   const char*           pFmt,
@@ -301,18 +301,18 @@ GBL_API GblContext_logWrite_     (GblContext* pSelf,
     return pSelf->pClass->GblILoggerImpl.pFnWrite((GblILogger*)pSelf, pFrame, level, pFmt, varArgs);
     //GBL_API_END();
 }
-GBL_API GblContext_logPush_      (GblContext* pSelf,
+GBL_EXPORT GBL_RESULT GblContext_logPush_      (GblContext* pSelf,
                                   const GblStackFrame*  pFrame)     GBL_NOEXCEPT
 {
     return pSelf->pClass->GblILoggerImpl.pFnPush((GblILogger*)pSelf, pFrame);
 }
-GBL_API GblContext_logPop_       (GblContext* pSelf,
+GBL_EXPORT GBL_RESULT GblContext_logPop_       (GblContext* pSelf,
                                   const GblStackFrame*  pFrame,
                                   uint32_t              count)      GBL_NOEXCEPT
 {
     return pSelf->pClass->GblILoggerImpl.pFnPop((GblILogger*)pSelf, pFrame, count);
 }
-GBL_API GblContext_callRecordSet_(GblContext* pSelf,
+GBL_EXPORT GBL_RESULT GblContext_callRecordSet_(GblContext* pSelf,
                                   const GblStackFrame* pFrame,
                                   const GblCallRecord* pRecord)     GBL_NOEXCEPT
 {

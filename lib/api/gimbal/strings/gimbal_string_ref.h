@@ -45,8 +45,7 @@
 #include "../core/gimbal_ref.h"
 #include "gimbal_string_view.h"
 
-#define GBL_SELF    GblStringRef* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblStringRef
 
 GBL_DECLS_BEGIN
 
@@ -148,7 +147,6 @@ GBL_INLINE GblStringView GblStringRef_view(GBL_CSELF) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_STRING_REF_H

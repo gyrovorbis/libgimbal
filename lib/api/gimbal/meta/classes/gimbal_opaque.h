@@ -9,10 +9,8 @@
 #include "gimbal_primitives.h"
 
 /// \ingroup metaBuiltinTypes
-#define GBL_OPAQUE_TYPE                  (GblOpaque_type())
-
-#define GBL_OPAQUE_CLASS(klass)          (GBL_CLASS_CAST(klass, GBL_OPAQUE_TYPE, GblOpaqueClass))
-#define GBL_OPAQUE_GET_CLASS(variant)    (GBL_OPAQUE_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(&variant))))
+#define GBL_OPAQUE_TYPE                  (GBL_TYPEOF(GblOpaque))
+#define GBL_OPAQUE_CLASS(klass)          (GBL_CLASS_CAST(klass, GblOpaque))
 
 GBL_DECLS_BEGIN
 

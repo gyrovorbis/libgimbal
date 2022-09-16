@@ -7,14 +7,13 @@
 
 #include "../meta/instances/gimbal_context.h"
 
-#define GBL_TEST_SCENARIO_TYPE                (GblTestScenario_type())
+#define GBL_TEST_SCENARIO_TYPE                (GBL_TYPEOF(GblTestScenario))
 
-#define GBL_TEST_SCENARIO(instance)           (GBL_INSTANCE_CAST(instance, GBL_TEST_SCENARIO_TYPE, GblTestScenario))
-#define GBL_TEST_SCENARIO_CLASS(klass)        (GBL_CLASS_CAST(klass, GBL_TEST_SCENARIO_TYPE, GblTestScenarioClass))
-#define GBL_TEST_SCENARIO_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GBL_TEST_SCENARIO_TYPE, GblTestScenarioClass))
+#define GBL_TEST_SCENARIO(instance)           (GBL_INSTANCE_CAST(instance, GblTestScenario))
+#define GBL_TEST_SCENARIO_CLASS(klass)        (GBL_CLASS_CAST(klass, GblTestScenario))
+#define GBL_TEST_SCENARIO_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblTestScenario))
 
-#define GBL_SELF    GblTestScenario* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblTestScenario
 
 GBL_DECLS_BEGIN
 
@@ -33,17 +32,17 @@ GBL_CLASS_END
  *  \ingroup testing
  */
 GBL_INSTANCE_DERIVE(GblTestScenario, GblContext)
-    GBL_RESULT  result;
-    GblSize     suitesRun;
-    GblSize     suitesPassed;
-    GblSize     suitesFailed;
-    GblSize     suitesSkipped;
-    GblSize     caseCount;
-    GblSize     casesRun;
-    GblSize     casesPassed;
-    GblSize     casesFailed;
-    GblSize     casesSkipped;
-    double      totalTime;
+    GBL_RESULT result;
+    GblSize    suitesRun;
+    GblSize    suitesPassed;
+    GblSize    suitesFailed;
+    GblSize    suitesSkipped;
+    GblSize    caseCount;
+    GblSize    casesRun;
+    GblSize    casesPassed;
+    GblSize    casesFailed;
+    GblSize    casesSkipped;
+    double     totalTime;
 GBL_INSTANCE_END
 
 GBL_PROPERTIES(GblTestScenario,
@@ -60,21 +59,20 @@ GBL_PROPERTIES(GblTestScenario,
     (casesSkipped,  GBL_GENERIC, (READ, SAVE), GBL_UINT32_TYPE)
 )
 
-GBL_EXPORT GblType          GblTestScenario_type        (void)                                 GBL_NOEXCEPT;
-GBL_EXPORT GblTestScenario* GblTestScenario_create      (const char* pName)                    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblTestScenario_destroy     (GBL_SELF)                             GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblTestScenario_enqueueSuite(GBL_SELF, const GblTestSuite* pSuite) GBL_NOEXCEPT;
-GBL_EXPORT GblTestSuite*    GblTestScenario_currentSuite(GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT GblTestSuite*    GblTestScenario_findSuite   (GBL_CSELF, const char* pName)         GBL_NOEXCEPT;
-GBL_EXPORT const char*      GblTestScenario_currentCase (GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblTestScenario_run         (GBL_SELF, int argc, char* argv[])     GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblTestScenario_ran         (GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblTestScenario_passed      (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GblType          GblTestScenario_type         (void)                                 GBL_NOEXCEPT;
+GBL_EXPORT GblTestScenario* GblTestScenario_create       (const char* pName)                    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestScenario_destroy      (GBL_SELF)                             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestScenario_enqueueSuite (GBL_SELF, const GblTestSuite* pSuite) GBL_NOEXCEPT;
+GBL_EXPORT GblTestSuite*    GblTestScenario_currentSuite (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GblTestSuite*    GblTestScenario_findSuite    (GBL_CSELF, const char* pName)         GBL_NOEXCEPT;
+GBL_EXPORT const char*      GblTestScenario_currentCase  (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestScenario_run          (GBL_SELF, int argc, char* argv[])     GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblTestScenario_ran          (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblTestScenario_passed       (GBL_CSELF)                            GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 
 #endif // GIMBAL_TEST_SCENARIO_H

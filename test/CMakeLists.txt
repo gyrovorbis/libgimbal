@@ -6,7 +6,7 @@ set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
 set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "Falco Girgis")
 set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
 
-project(GimbalTest VERSION ${GIMBAL_VERSION} DESCRIPTION "Gimbal Tests" LANGUAGES C)
+project(GimbalTest VERSION ${GIMBAL_VERSION} DESCRIPTION "LibGimbal Tests" LANGUAGES C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 17)
@@ -70,8 +70,7 @@ add_executable(GimbalTests
     source/strings/gimbal_string_buffer_test_suite.c
     include/utils/gimbal_uuid_test_suite.h
     source/utils/gimbal_uuid_test_suite.c
-
-    source/test_main.c)
+    source/gimbal_test_main.c)
 
 target_link_libraries(GimbalTests
     libGimbal)

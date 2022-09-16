@@ -17,7 +17,7 @@
         GblClass* pClass_ = GblClass_##classGetterSuffix##Default(type_);                   \
         GBL_API_VERIFY_POINTER(pClass_, "Failed to retrieve class for type: %s",            \
                                GblType_name(type_));                                        \
-        const GblIVariantClass* pIFace = GBL_IVARIANT_IFACE(pClass_);                       \
+        const GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(pClass_);                       \
         GBL_API_VERIFY_EXPRESSION(pIFace,                                                   \
             "Failed to retrieve GblIVariant Interface for type: %s",                        \
                 GblType_name(type_))
@@ -250,7 +250,7 @@ GBL_EXPORT GblInt GblVariant_compare(const GblVariant* pSelf, const GblVariant* 
         if(GblVariant_canConvert(GblVariant_typeOf(pSelf), GblVariant_typeOf(pOther))) {
             GBL_VARIANT(temp);
             const GblClass*         pOtherClass = GblClass_weakRefDefault(GblVariant_typeOf(pOther));
-            const GblIVariantClass* pOtherIFace = GBL_IVARIANT_IFACE(pOtherClass);
+            const GblIVariantClass* pOtherIFace = GBL_IVARIANT_CLASS(pOtherClass);
             GBL_API_VERIFY_EXPRESSION(pOtherIFace);
             GBL_API_VERIFY_CALL(GblVariant_constructDefault(&temp, GblVariant_typeOf(pOther)));
             GBL_API_VERIFY_CALL(GblVariant_convert(pSelf, &temp));
@@ -268,28 +268,28 @@ GBL_EXPORT GblInt GblVariant_compare(const GblVariant* pSelf, const GblVariant* 
     return result;
 }
 
-GBL_API GblVariant_constructDefault(GblVariant* pSelf, GblType type) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_constructDefault(GblVariant* pSelf, GblType type) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(type, ref);
     GBL_API_CALL(GblVariant_initDefault_(pSelf, type));
     GBL_API_CALL(GblIVariantClass_constructDefault(pIFace, pSelf));
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_constructCopy(GblVariant* pSelf,  const GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_constructCopy(GblVariant* pSelf,  const GblVariant* pOther) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pOther->type, ref);
     GBL_API_CALL(GblVariant_initDefault_(pSelf, pOther->type));
     GBL_API_CALL(GblIVariantClass_constructCopy(pIFace, pSelf, pOther));
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_constructMove(GblVariant* pSelf, GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_constructMove(GblVariant* pSelf, GblVariant* pOther) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pOther->type, ref); //still has to copy class reference
     GBL_API_CALL(GblVariant_initDefault_(pSelf, pOther->type));
     GBL_API_CALL(GblIVariantClass_constructMove(pIFace, pSelf, pOther));
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_setCopy(GblVariant* pSelf, const GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_setCopy(GblVariant* pSelf, const GblVariant* pOther) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     if(pSelf->type != pOther->type) {
         GBL_API_CALL(GblVariant_destruct(pSelf));
@@ -300,7 +300,7 @@ GBL_API GblVariant_setCopy(GblVariant* pSelf, const GblVariant* pOther) GBL_NOEX
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_setMove(GblVariant* pSelf, GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_setMove(GblVariant* pSelf, GblVariant* pOther) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     /* you still have to destruct, what if it's another ref you're oving over!? */
     //if(pSelf->type != pOther->type) {
@@ -317,7 +317,7 @@ GBL_API GblVariant_setMove(GblVariant* pSelf, GblVariant* pOther) GBL_NOEXCEPT {
  * and invalidating the variant, or because of a failed construction, assignment,
  * or conversion. This is analogous to free(NULL) being valid.
  */
-GBL_API GblVariant_destruct(GblVariant* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_destruct(GblVariant* pSelf) GBL_NOEXCEPT {
     if(GblVariant_typeOf(pSelf) != GBL_INVALID_TYPE) {
         GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
         GBL_API_CALL(GblIVariantClass_destruct(pIFace, pSelf));
@@ -327,19 +327,19 @@ GBL_API GblVariant_destruct(GblVariant* pSelf) GBL_NOEXCEPT {
     } else return GBL_RESULT_SUCCESS;
 }
 
-GBL_API GblVariant_save(const GblVariant* pSelf, GblStringBuffer* pString) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_save(const GblVariant* pSelf, GblStringBuffer* pString) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_API_CALL(GblIVariantClass_save(pIFace, pSelf, pString));
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_load(GblVariant* pSelf, const GblStringBuffer* pString) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_load(GblVariant* pSelf, const GblStringBuffer* pString) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_API_CALL(GblIVariantClass_load(pIFace, pSelf, pString));
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_constructValueCopyVaList(GblVariant* pSelf, GblType type, va_list* pList) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_constructValueCopyVaList(GblVariant* pSelf, GblType type, va_list* pList) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(type, ref);
     GBL_API_CALL(GblVariant_initDefault_(pSelf, type));
     GBL_API_CALL(GblIVariantClass_constructValueCopy(pIFace, pSelf, pList));
@@ -351,7 +351,7 @@ GBL_API GblVariant_constructValueCopyVaList(GblVariant* pSelf, GblType type, va_
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_constructValueMoveVaList(GblVariant* pSelf, GblType type, va_list* pList) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_constructValueMoveVaList(GblVariant* pSelf, GblType type, va_list* pList) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(type, ref);
     GBL_API_CALL(GblVariant_initDefault_(pSelf, type));
     GBL_API_CALL(GblIVariantClass_constructValueMove(pIFace, pSelf, pList));
@@ -363,7 +363,7 @@ GBL_API GblVariant_constructValueMoveVaList(GblVariant* pSelf, GblType type, va_
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_constructValueCopy(GblVariant* pSelf, GblType type, ...) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_constructValueCopy(GblVariant* pSelf, GblType type, ...) GBL_NOEXCEPT {
     va_list list;
     va_start(list, type);
     GBL_API_BEGIN(NULL);
@@ -373,7 +373,7 @@ GBL_API GblVariant_constructValueCopy(GblVariant* pSelf, GblType type, ...) GBL_
     return GBL_API_RESULT();
 }
 
-GBL_API GblVariant_constructValueMove(GblVariant* pSelf, GblType type, ...) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_constructValueMove(GblVariant* pSelf, GblType type, ...) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     va_list varArgs;
     va_start(varArgs, type);
@@ -383,7 +383,7 @@ GBL_API GblVariant_constructValueMove(GblVariant* pSelf, GblType type, ...) GBL_
     return GBL_API_RESULT();
 }
 
-GBL_API GblVariant_setValueCopy(GblVariant* pSelf, GblType type, ...) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_setValueCopy(GblVariant* pSelf, GblType type, ...) GBL_NOEXCEPT {
     va_list varArgs;
     va_start(varArgs, type);
     GBL_API_BEGIN(NULL);
@@ -393,7 +393,7 @@ GBL_API GblVariant_setValueCopy(GblVariant* pSelf, GblType type, ...) GBL_NOEXCE
     return GBL_API_RESULT();
 }
 
-GBL_API GblVariant_setValueMove(GblVariant* pSelf, GblType type, ...) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_setValueMove(GblVariant* pSelf, GblType type, ...) GBL_NOEXCEPT {
     va_list varArgs;
     va_start(varArgs, type);
     GBL_API_BEGIN(NULL);
@@ -410,7 +410,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueCopyVaList(GblVariant* pSelf,
     GBL_API_BEGIN(NULL);
     if(type != pSelf->type) {
         GBL_API_VERIFY_TYPE(type, GBL_IVARIANT_TYPE);
-        GblIVariantClass* pIFace = GBL_IVARIANT_IFACE(GblClass_refDefault(type));
+        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_refDefault(type));
         GBL_API_CALL(GblVariant_destruct(pSelf));
         GBL_API_CALL(GblVariant_initDefault_(pSelf, type));
         GBL_API_CALL(GblIVariantClass_constructValueCopy(pIFace, pSelf, pVarArgs));
@@ -420,7 +420,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueCopyVaList(GblVariant* pSelf,
             GBL_API_CALL(GblVariant_initDefault_(pSelf, GBL_INVALID_TYPE));
         }
     } else {
-        GblIVariantClass* pIFace = GBL_IVARIANT_IFACE(GblClass_weakRefDefault(type));
+        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_weakRefDefault(type));
         GBL_API_CALL(GblIVariantClass_setValueCopy(pIFace, pSelf, pVarArgs));
         if(GBL_RESULT_ERROR(GBL_API_LAST_RESULT())) {
             GBL_API_CLEAR_LAST_RECORD();
@@ -438,7 +438,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueMoveVaList(GblVariant* pSelf,
     GBL_API_BEGIN(NULL);
     if(type != pSelf->type) {
         GBL_API_VERIFY_TYPE(type, GBL_IVARIANT_TYPE);
-        GblIVariantClass* pIFace = GBL_IVARIANT_IFACE(GblClass_refDefault(type));
+        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_refDefault(type));
         GBL_API_CALL(GblVariant_destruct(pSelf));
         GBL_API_CALL(GblVariant_initDefault_(pSelf, type));
         GBL_API_CALL(GblIVariantClass_constructValueMove(pIFace, pSelf, pVarArgs));
@@ -448,7 +448,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueMoveVaList(GblVariant* pSelf,
             GBL_API_CALL(GblVariant_initDefault_(pSelf, GBL_INVALID_TYPE));
         }
     } else {
-        GblIVariantClass* pIFace = GBL_IVARIANT_IFACE(GblClass_weakRefDefault(type));
+        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_weakRefDefault(type));
         GBL_API_CALL(GblIVariantClass_setValueMove(pIFace, pSelf, pVarArgs));
         if(GBL_RESULT_ERROR(GBL_API_LAST_RESULT())) {
             GBL_API_CLEAR_LAST_RECORD();
@@ -459,7 +459,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueMoveVaList(GblVariant* pSelf,
     GBL_API_END();
 }
 
-GBL_API GblVariant_getValueCopy(const GblVariant* pSelf, ...) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_getValueCopy(const GblVariant* pSelf, ...) GBL_NOEXCEPT {
     va_list varArgs;
     va_start(varArgs, pSelf);
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
@@ -469,7 +469,7 @@ GBL_API GblVariant_getValueCopy(const GblVariant* pSelf, ...) GBL_NOEXCEPT {
     return GBL_API_RESULT();
 }
 
-GBL_API GblVariant_getValuePeek(const GblVariant* pSelf, ...) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_getValuePeek(const GblVariant* pSelf, ...) GBL_NOEXCEPT {
     va_list varArgs;
     va_start(varArgs, pSelf);
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
@@ -479,7 +479,7 @@ GBL_API GblVariant_getValuePeek(const GblVariant* pSelf, ...) GBL_NOEXCEPT {
     return GBL_API_RESULT();
 }
 
-GBL_API GblVariant_getValueMove(GblVariant* pSelf,  ...) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_getValueMove(GblVariant* pSelf,  ...) GBL_NOEXCEPT {
     va_list varArgs;
     va_start(varArgs, pSelf);
     GBL_API_BEGIN(NULL);
@@ -489,19 +489,19 @@ GBL_API GblVariant_getValueMove(GblVariant* pSelf,  ...) GBL_NOEXCEPT {
     return GBL_API_RESULT();
 }
 
-GBL_API GblVariant_getValueMoveVaList(GblVariant* pSelf, va_list* pVarArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_getValueMoveVaList(GblVariant* pSelf, va_list* pVarArgs) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_API_CALL(GblIVariantClass_getValueMove(pIFace, pSelf, pVarArgs));
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_getValuePeekVaList(GblVariant* pSelf, va_list* pVarArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_getValuePeekVaList(GblVariant* pSelf, va_list* pVarArgs) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_API_CALL(GblIVariantClass_getValuePeek(pIFace, pSelf, pVarArgs));
     GBL_VARIANT_END_();
 }
 
-GBL_API GblVariant_getValueCopyVaList(const GblVariant* pSelf, va_list* pVarArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblVariant_getValueCopyVaList(const GblVariant* pSelf, va_list* pVarArgs) GBL_NOEXCEPT {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_API_CALL(GblIVariantClass_getValueCopy(pIFace, pSelf, pVarArgs));
     GBL_VARIANT_END_();

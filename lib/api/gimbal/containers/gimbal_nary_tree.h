@@ -13,8 +13,7 @@
 #define GBL_NARY_TREE_ENTRY(node, structure, field)  GBL_CONTAINER_OF(node, structure, field)
 #define GBL_NARY_TREE_TRAVERSAL_MASK(order, flags)   ((order << 0x2) && flags)
 
-#define GBL_SELF  GblNaryTreeNode* pSelf
-#define GBL_CSELF const GBL_SELF
+#define GBL_SELF_TYPE GblNaryTreeNode
 
 GBL_DECLS_BEGIN
 
@@ -572,7 +571,6 @@ GBL_INLINE GblBool GblNaryTree_traverse(GBL_CSELF,
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_NARY_TREE_H

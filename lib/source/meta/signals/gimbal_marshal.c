@@ -104,9 +104,9 @@ GBL_EXPORT GBL_RESULT GblMarshal_ClassClosureMeta(GblClosure*        pClosure,
                    "Attempt to meta marshal class [%s] closure with no instance pointer!",
                    GblType_name(GBL_PRIV_REF(pClassClosure).classType));
 
-    uint8_t* pClass = GBL_INSTANCE_GET_CLASS(GBL_PRIV_REF(pClassClosure).pInstance,
-                                             GBL_PRIV_REF(pClassClosure).classType,
-                                             uint8_t);
+    uint8_t* pClass = (uint8_t*)GblClass_cast(GblInstance_class(GBL_PRIV_REF(pClassClosure).pInstance),
+                                              GBL_PRIV_REF(pClassClosure).classType);
+
     pMarshalData.pFunc = *(GblFnPtr*)(uint8_t*)(pClass + GBL_PRIV_REF(pClassClosure).offset);
 
     GBL_API_VERIFY_CALL(GBL_PRIV_REF(pClosure).pFnMarshal(pClosure, pRetValue, argCount, pArgs, pMarshalData));

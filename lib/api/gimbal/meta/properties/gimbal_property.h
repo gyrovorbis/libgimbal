@@ -8,15 +8,14 @@
 
 #include "../instances/gimbal_box.h"
 
-#define GBL_PROPERTY_TYPE               (GblProperty_type())
+#define GBL_PROPERTY_TYPE               (GBL_TYPEOF(GblProperty))
 #define GBL_GENERIC_PROPERTY_TYPE       GBL_PROPERTY_TYPE
 
-#define GBL_PROPERTY(instance)          (GBL_INSTANCE_CAST(instance, GBL_PROPERTY_TYPE, GblProperty))
-#define GBL_PROPERTY_CLASS(klass)       (GBL_CLASS_CAST(klass, GBL_PROPERTY_TYPE, GblPropertyClass))
-#define GBL_PROPERTY_GET_CLASS(instance)(GBL_INSTANCE_GET_CLASS(instance, GBL_PROPERTY_TYPE, GblPropertyClass))
+#define GBL_PROPERTY(instance)          (GBL_INSTANCE_CAST(instance, GblProperty))
+#define GBL_PROPERTY_CLASS(klass)       (GBL_CLASS_CAST(klass, GblPropertyClass))
+#define GBL_PROPERTY_GET_CLASS(instance)(GBL_INSTANCE_GET_CLASS(instance, GblProperty))
 
-#define GBL_SELF    GblProperty* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblProperty
 
 GBL_DECLS_BEGIN
 
@@ -247,7 +246,6 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_PROPERTY_H

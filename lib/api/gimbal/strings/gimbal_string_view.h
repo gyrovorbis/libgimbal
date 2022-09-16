@@ -20,7 +20,7 @@
 #define GBL_STRING_VIEW_CSTR_ALLOCA(view)   GblStringView_toCString(view, (char*)GBL_ALLOCA(view.length+1), view.length+1)
 #define GBL_STRING_VIEW_CSTR(view)          (view.nullTerminated? view.pData : GBL_STRING_VIEW_CSTR_ALLOCA(view))
 
-#define GBL_SELF    GblStringView self
+#define GBL_SELF_TYPE GblStringView
 
 GBL_DECLS_BEGIN
 
@@ -41,49 +41,49 @@ GBL_INLINE GblStringView    GblStringView_fromEmpty         (void)              
 GBL_INLINE GblStringView    GblStringView_fromString        (const char* pString)                                   GBL_NOEXCEPT;
 GBL_INLINE GblStringView    GblStringView_fromStringSized   (const char* pData, GblSize length)                     GBL_NOEXCEPT;
 GBL_INLINE GblStringView    GblStringView_fromQuark         (GblQuark quark)                                        GBL_NOEXCEPT;
-GBL_INLINE GblInt           GblStringView_compare           (GBL_SELF, GblStringView other)                         GBL_NOEXCEPT;
-GBL_INLINE GblInt           GblStringView_compareIgnoreCase (GBL_SELF, GblStringView other)                         GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringView_equals            (GBL_SELF, GblStringView other)                         GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringView_equalsIgnoreCase  (GBL_SELF, GblStringView other)                         GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringView_copy              (GBL_SELF, void* pDst, GblSize offset, GblSize bytes)   GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringView_empty             (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringView_blank             (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE char             GblStringView_at                (GBL_SELF, GblSize index)                               GBL_NOEXCEPT;
-GBL_INLINE char             GblStringView_first             (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE char             GblStringView_last              (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblStringView    GblStringView_removePrefix      (GBL_SELF, GblSize length)                              GBL_NOEXCEPT;
-GBL_INLINE GblStringView    GblStringView_removeSuffix      (GBL_SELF, GblSize length)                              GBL_NOEXCEPT;
-GBL_INLINE GblStringView    GblStringView_chomp             (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblStringView    GblStringView_substr            (GBL_SELF, GblSize offset, GblSize length)              GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringView_contains          (GBL_SELF, GblStringView subStr)                        GBL_NOEXCEPT;
-//GBL_INLINE GblBool          GblStringView_containsIgnoreCase(GBL_SELF, GblStringView substr)                        GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringView_count             (GBL_SELF, GblStringView substr)                        GBL_NOEXCEPT;
-//GBL_INLINE GblSize          GblStringView_countIgnoreCase   (GBL_SELF, GblStringView substr)                        GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringView_find              (GBL_SELF, GblStringView substr, GblSize offset)        GBL_NOEXCEPT;
-//GBL_INILNE GblSize          GblStringView_findIgnoreCase    (GBL_SELF, GblStringView substr, GblSize offset)        GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringView_rfind             (GBL_SELF, GblStringView substr, GblSize offset)        GBL_NOEXCEPT;
-//GBL_INLINE GblSize          GblStringView_rfindIgnoreCase   (GBL_SELF, GblStringView substr, GblSize offset)        GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringView_startsWith        (GBL_SELF, GblStringView substr)                        GBL_NOEXCEPT;
-//GBL_INLINE GblBool        GblStringView_startsWithIgnoreCase(GBL_SELF, GblStringView substr)                       GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringView_endsWith          (GBL_SELF, GblStringView substr)                        GBL_NOEXCEPT;
-//GBL_INLINE GblBool        GblStringView_endsWithIgnoreCase(GBL_SELF, GblStringView substr)                         GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringView_findFirstOf       (GBL_SELF, GblStringView chars, GblSize offset)         GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringView_findLastOf        (GBL_SELF, GblStringView chars, GblSize end)            GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringView_findFirstNotOf    (GBL_SELF, GblStringView chars, GblSize offset)         GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringView_findLastNotOf     (GBL_SELF, GblStringView chars, GblSize end)            GBL_NOEXCEPT;
-GBL_INLINE GblQuark         GblStringView_quark             (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblQuark         GblStringView_quarkTry          (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE const char*      GblStringView_intern            (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblHash          GblStringView_hash              (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE char*            GblStringView_strdup            (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE char*            GblStringView_toCString         (GBL_SELF, char* pDest, GblSize destSize)               GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringView_toNil             (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringView_toBool            (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblInt           GblStringView_toInt             (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblUint          GblStringView_toUInt            (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE float            GblStringView_toFloat           (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE double           GblStringView_toDouble          (GBL_SELF)                                              GBL_NOEXCEPT;
-GBL_INLINE void*            GblStringView_toPointer         (GBL_SELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblInt           GblStringView_compare           (GBL_VSELF, GblStringView other)                         GBL_NOEXCEPT;
+GBL_INLINE GblInt           GblStringView_compareIgnoreCase (GBL_VSELF, GblStringView other)                         GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringView_equals            (GBL_VSELF, GblStringView other)                         GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringView_equalsIgnoreCase  (GBL_VSELF, GblStringView other)                         GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringView_copy              (GBL_VSELF, void* pDst, GblSize offset, GblSize bytes)   GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringView_empty             (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringView_blank             (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE char             GblStringView_at                (GBL_VSELF, GblSize index)                               GBL_NOEXCEPT;
+GBL_INLINE char             GblStringView_first             (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE char             GblStringView_last              (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblStringView    GblStringView_removePrefix      (GBL_VSELF, GblSize length)                              GBL_NOEXCEPT;
+GBL_INLINE GblStringView    GblStringView_removeSuffix      (GBL_VSELF, GblSize length)                              GBL_NOEXCEPT;
+GBL_INLINE GblStringView    GblStringView_chomp             (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblStringView    GblStringView_substr            (GBL_VSELF, GblSize offset, GblSize length)              GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringView_contains          (GBL_VSELF, GblStringView subStr)                        GBL_NOEXCEPT;
+//GBL_INLINE GblBool          GblStringView_containsIgnoreCase(GBL_VSELF, GblStringView substr)                        GBL_NOEXCEPT;
+GBL_INLINE GblSize          GblStringView_count             (GBL_VSELF, GblStringView substr)                        GBL_NOEXCEPT;
+//GBL_INLINE GblSize          GblStringView_countIgnoreCase   (GBL_VSELF, GblStringView substr)                        GBL_NOEXCEPT;
+GBL_INLINE GblSize          GblStringView_find              (GBL_VSELF, GblStringView substr, GblSize offset)        GBL_NOEXCEPT;
+//GBL_INILNE GblSize          GblStringView_findIgnoreCase    (GBL_VSELF, GblStringView substr, GblSize offset)        GBL_NOEXCEPT;
+GBL_INLINE GblSize          GblStringView_rfind             (GBL_VSELF, GblStringView substr, GblSize offset)        GBL_NOEXCEPT;
+//GBL_INLINE GblSize          GblStringView_rfindIgnoreCase   (GBL_VSELF, GblStringView substr, GblSize offset)        GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringView_startsWith        (GBL_VSELF, GblStringView substr)                        GBL_NOEXCEPT;
+//GBL_INLINE GblBool        GblStringView_startsWithIgnoreCase(GBL_VSELF, GblStringView substr)                       GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringView_endsWith          (GBL_VSELF, GblStringView substr)                        GBL_NOEXCEPT;
+//GBL_INLINE GblBool        GblStringView_endsWithIgnoreCase(GBL_VSELF, GblStringView substr)                         GBL_NOEXCEPT;
+GBL_INLINE GblSize          GblStringView_findFirstOf       (GBL_VSELF, GblStringView chars, GblSize offset)         GBL_NOEXCEPT;
+GBL_INLINE GblSize          GblStringView_findLastOf        (GBL_VSELF, GblStringView chars, GblSize end)            GBL_NOEXCEPT;
+GBL_INLINE GblSize          GblStringView_findFirstNotOf    (GBL_VSELF, GblStringView chars, GblSize offset)         GBL_NOEXCEPT;
+GBL_INLINE GblSize          GblStringView_findLastNotOf     (GBL_VSELF, GblStringView chars, GblSize end)            GBL_NOEXCEPT;
+GBL_INLINE GblQuark         GblStringView_quark             (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblQuark         GblStringView_quarkTry          (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE const char*      GblStringView_intern            (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblHash          GblStringView_hash              (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE char*            GblStringView_strdup            (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE char*            GblStringView_toCString         (GBL_VSELF, char* pDest, GblSize destSize)               GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringView_toNil             (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblStringView_toBool            (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblInt           GblStringView_toInt             (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE GblUint          GblStringView_toUInt            (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE float            GblStringView_toFloat           (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE double           GblStringView_toDouble          (GBL_VSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE void*            GblStringView_toPointer         (GBL_VSELF)                                              GBL_NOEXCEPT;
 
 
 //========== IMPL ==========
@@ -124,7 +124,7 @@ GBL_INLINE GblStringView GblStringView_fromQuark(GblQuark quark) GBL_NOEXCEPT {
     return GblStringView_fromString(GblQuark_toString(quark));
 }
 
-GBL_INLINE GblInt GblStringView_compare(GBL_SELF, GblStringView other) GBL_NOEXCEPT {
+GBL_INLINE GblInt GblStringView_compare(GBL_VSELF, GblStringView other) GBL_NOEXCEPT {
     if(!self.length && !other.length)   return 0;
     else if(self.length > other.length) return INT_MAX;
     else if(self.length < other.length) return INT_MIN;
@@ -133,7 +133,7 @@ GBL_INLINE GblInt GblStringView_compare(GBL_SELF, GblStringView other) GBL_NOEXC
     }
 }
 
-GBL_INLINE GblInt GblStringView_compareIgnoreCase(GBL_SELF, GblStringView other) GBL_NOEXCEPT {
+GBL_INLINE GblInt GblStringView_compareIgnoreCase(GBL_VSELF, GblStringView other) GBL_NOEXCEPT {
     if(!self.length && other.length) return INT_MIN;
     else if(self.length && !other.length) return INT_MAX;
     else if(!self.length && !other.length) return 0;
@@ -150,15 +150,15 @@ GBL_INLINE GblInt GblStringView_compareIgnoreCase(GBL_SELF, GblStringView other)
     }
 }
 
-GBL_INLINE GblBool GblStringView_equals(GBL_SELF, GblStringView other) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringView_equals(GBL_VSELF, GblStringView other) GBL_NOEXCEPT {
     return GblStringView_compare(self, other) == 0;
 }
 
-GBL_INLINE GblBool GblStringView_equalsIgnoreCase(GBL_SELF, GblStringView other) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringView_equalsIgnoreCase(GBL_VSELF, GblStringView other) GBL_NOEXCEPT {
     return GblStringView_compareIgnoreCase(self, other) == 0;
 }
 
-GBL_INLINE GBL_RESULT GblStringView_copy(GBL_SELF, void* pDst, GblSize offset, GblSize bytes) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringView_copy(GBL_VSELF, void* pDst, GblSize offset, GblSize bytes) GBL_NOEXCEPT {
     GBL_API_BEGIN(GBL_NULL);
     GBL_API_VERIFY_POINTER(pDst);
     GBL_API_VERIFY(offset + bytes < self.length,
@@ -169,16 +169,16 @@ GBL_INLINE GBL_RESULT GblStringView_copy(GBL_SELF, void* pDst, GblSize offset, G
     GBL_API_END();
 }
 
-GBL_INLINE GblBool GblStringView_empty(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringView_empty(GBL_VSELF) GBL_NOEXCEPT {
     return self.length == 0;
 }
 
-GBL_INLINE GblBool GblStringView_blank(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringView_blank(GBL_VSELF) GBL_NOEXCEPT {
     if(GblStringView_empty(self)) return GBL_TRUE;
     else return GblStringView_findFirstNotOf(self, GBL_STRING_VIEW(" \t\n\r"), 0) == GBL_STRING_VIEW_NPOS;
 }
 
-GBL_INLINE char GblStringView_at(GBL_SELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE char GblStringView_at(GBL_VSELF, GblSize index) GBL_NOEXCEPT {
     char value = '\0';
     if(index >= self.length) GBL_UNLIKELY {
         GBL_API_BEGIN(GBL_NULL);
@@ -191,7 +191,7 @@ GBL_INLINE char GblStringView_at(GBL_SELF, GblSize index) GBL_NOEXCEPT {
     return value;
 }
 
-GBL_INLINE char GblStringView_first(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE char GblStringView_first(GBL_VSELF) GBL_NOEXCEPT {
     char value = '\0';
     GBL_API_BEGIN(GBL_NULL);
     GBL_API_VERIFY(self.length,
@@ -201,7 +201,7 @@ GBL_INLINE char GblStringView_first(GBL_SELF) GBL_NOEXCEPT {
     return value;
 }
 
-GBL_INLINE char GblStringView_last(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE char GblStringView_last(GBL_VSELF) GBL_NOEXCEPT {
     char value = '\0';
     GBL_API_BEGIN(GBL_NULL);
     GBL_API_VERIFY(self.length,
@@ -211,7 +211,7 @@ GBL_INLINE char GblStringView_last(GBL_SELF) GBL_NOEXCEPT {
     return value;
 }
 
-GBL_INLINE GblStringView GblStringView_removePrefix(GBL_SELF, GblSize length) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringView_removePrefix(GBL_VSELF, GblSize length) GBL_NOEXCEPT {
     GblStringView view = {
         .pData          = GBL_NULL,
         .nullTerminated = 0,
@@ -228,7 +228,7 @@ GBL_INLINE GblStringView GblStringView_removePrefix(GBL_SELF, GblSize length) GB
     return view;
 }
 
-GBL_INLINE GblStringView GblStringView_removeSuffix(GBL_SELF, GblSize length) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringView_removeSuffix(GBL_VSELF, GblSize length) GBL_NOEXCEPT {
     GblStringView view = {
         .pData          = GBL_NULL,
         .nullTerminated = 0,
@@ -244,14 +244,14 @@ GBL_INLINE GblStringView GblStringView_removeSuffix(GBL_SELF, GblSize length) GB
     return view;
 }
 
-GBL_INLINE GblStringView GblStringView_chomp(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringView_chomp(GBL_VSELF) GBL_NOEXCEPT {
     GblSize subStrLen = self.length;
     if(self.length && self.pData[self.length-1] == '\n') --subStrLen;
     if(self.length >= 2 && self.pData[self.length-2] == '\r') --subStrLen;
     return GblStringView_substr(self, 0, subStrLen);
 }
 
-GBL_INLINE GblStringView GblStringView_substr(GBL_SELF, GblSize offset, GblSize length) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringView_substr(GBL_VSELF, GblSize offset, GblSize length) GBL_NOEXCEPT {
     GblStringView view = {
         .pData          = GBL_NULL,
         .nullTerminated = 0,
@@ -267,7 +267,7 @@ GBL_INLINE GblStringView GblStringView_substr(GBL_SELF, GblSize offset, GblSize 
     return view;
 }
 
-GBL_INLINE GblBool GblStringView_contains(GBL_SELF, GblStringView substr) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringView_contains(GBL_VSELF, GblStringView substr) GBL_NOEXCEPT {
     GblBool result = GBL_FALSE;
     if(!self.length && !substr.length) {
         result = GBL_TRUE;
@@ -279,7 +279,7 @@ GBL_INLINE GblBool GblStringView_contains(GBL_SELF, GblStringView substr) GBL_NO
     return result;
 }
 
-GBL_INLINE GblSize GblStringView_count(GBL_SELF, GblStringView substr) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblStringView_count(GBL_VSELF, GblStringView substr) GBL_NOEXCEPT {
     GblSize count = 0;
     GblSize offset = 0;
     while((offset = GblStringView_find(self, substr, offset)) != GBL_STRING_VIEW_NPOS) {
@@ -290,7 +290,7 @@ GBL_INLINE GblSize GblStringView_count(GBL_SELF, GblStringView substr) GBL_NOEXC
     return count;
 }
 
-GBL_INLINE GblSize GblStringView_find(GBL_SELF, GblStringView substr, GblSize offset) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblStringView_find(GBL_VSELF, GblStringView substr, GblSize offset) GBL_NOEXCEPT {
     GblSize pos = GBL_STRING_VIEW_NPOS;
     GBL_API_BEGIN(NULL);
     if(!self.length && !offset) GBL_API_DONE();
@@ -308,7 +308,7 @@ GBL_INLINE GblSize GblStringView_find(GBL_SELF, GblStringView substr, GblSize of
     return pos;
 }
 
-GBL_INLINE GblSize GblStringView_rfind(GBL_SELF, GblStringView substr, GblSize end) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblStringView_rfind(GBL_VSELF, GblStringView substr, GblSize end) GBL_NOEXCEPT {
     GblSize pos = GBL_STRING_VIEW_NPOS;
     GBL_API_BEGIN(NULL);
     if(!self.length && end == GBL_STRING_VIEW_NPOS)
@@ -339,7 +339,7 @@ GBL_INLINE GblSize GblStringView_rfind(GBL_SELF, GblStringView substr, GblSize e
     return pos;
 }
 
-GBL_INLINE GblBool GblStringView_startsWith(GBL_SELF, GblStringView substr) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringView_startsWith(GBL_VSELF, GblStringView substr) GBL_NOEXCEPT {
     if(substr.length > self.length)
         return GBL_FALSE;
     for(GblSize i = 0; i < substr.length; ++i) {
@@ -349,7 +349,7 @@ GBL_INLINE GblBool GblStringView_startsWith(GBL_SELF, GblStringView substr) GBL_
     return GBL_TRUE;
 }
 
-GBL_INLINE GblBool GblStringView_endsWith(GBL_SELF, GblStringView substr) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringView_endsWith(GBL_VSELF, GblStringView substr) GBL_NOEXCEPT {
     if(substr.length > self.length)
         return GBL_FALSE;
     for(GblSize i = 0; i < substr.length; ++i) {
@@ -359,7 +359,7 @@ GBL_INLINE GblBool GblStringView_endsWith(GBL_SELF, GblStringView substr) GBL_NO
     return GBL_TRUE;
 }
 
-GBL_INLINE GblSize GblStringView_findFirstOf(GBL_SELF, GblStringView chars, GblSize offset) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblStringView_findFirstOf(GBL_VSELF, GblStringView chars, GblSize offset) GBL_NOEXCEPT {
     GblSize pos = GBL_STRING_VIEW_NPOS;
     GBL_API_BEGIN(GBL_NULL);
     GBL_API_VERIFY(offset < self.length || (!self.length && !offset),
@@ -376,7 +376,7 @@ GBL_INLINE GblSize GblStringView_findFirstOf(GBL_SELF, GblStringView chars, GblS
     return pos;
 }
 
-GBL_INLINE GblSize GblStringView_findLastOf(GBL_SELF, GblStringView chars, GblSize end) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblStringView_findLastOf(GBL_VSELF, GblStringView chars, GblSize end) GBL_NOEXCEPT {
     GblSize pos = GBL_STRING_VIEW_NPOS;
     GBL_API_BEGIN(GBL_NULL);
     if(!self.length && (!end || end == GBL_STRING_VIEW_NPOS)) {
@@ -397,7 +397,7 @@ GBL_INLINE GblSize GblStringView_findLastOf(GBL_SELF, GblStringView chars, GblSi
     return pos;
 }
 
-GBL_INLINE GblSize GblStringView_findFirstNotOf(GBL_SELF, GblStringView chars, GblSize offset) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblStringView_findFirstNotOf(GBL_VSELF, GblStringView chars, GblSize offset) GBL_NOEXCEPT {
     GblSize pos = GBL_STRING_VIEW_NPOS;
     GBL_API_BEGIN(GBL_NULL);
     GBL_API_VERIFY(offset < self.length || (!self.length && !offset),
@@ -423,7 +423,7 @@ GBL_INLINE GblSize GblStringView_findFirstNotOf(GBL_SELF, GblStringView chars, G
     return pos;
 }
 
-GBL_INLINE GblSize GblStringView_findLastNotOf(GBL_SELF, GblStringView chars, GblSize end) GBL_NOEXCEPT {
+GBL_INLINE GblSize GblStringView_findLastNotOf(GBL_VSELF, GblStringView chars, GblSize end) GBL_NOEXCEPT {
     GblSize pos = GBL_STRING_VIEW_NPOS;
     GBL_API_BEGIN(GBL_NULL);
     if(!self.length && (!end || end == GBL_STRING_VIEW_NPOS)) {
@@ -449,23 +449,23 @@ GBL_INLINE GblSize GblStringView_findLastNotOf(GBL_SELF, GblStringView chars, Gb
     return pos;
 }
 
-GBL_INLINE GblQuark GblStringView_quark(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE GblQuark GblStringView_quark(GBL_VSELF) GBL_NOEXCEPT {
     return GblQuark_fromString(GBL_STRING_VIEW_CSTR(self));
 }
 
-GBL_INLINE GblQuark GblStringView_quarkTry(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE GblQuark GblStringView_quarkTry(GBL_VSELF) GBL_NOEXCEPT {
     return GblQuark_tryString(GBL_STRING_VIEW_CSTR(self));
 }
 
-GBL_INLINE const char* GblStringView_intern(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE const char* GblStringView_intern(GBL_VSELF) GBL_NOEXCEPT {
     return GblQuark_internString(GBL_STRING_VIEW_CSTR(self));
 }
 
-GBL_INLINE GblHash GblStringView_hash(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE GblHash GblStringView_hash(GBL_VSELF) GBL_NOEXCEPT {
     return self.length? gblHashMurmur(self.pData, self.length) : 0;
 }
 
-GBL_INLINE char* GblStringView_strdup(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE char* GblStringView_strdup(GBL_VSELF) GBL_NOEXCEPT {
     char* pStr = NULL;
     GBL_API_BEGIN(NULL);
     pStr = (char*)GBL_API_MALLOC(sizeof(char) * self.length + 1);
@@ -475,7 +475,7 @@ GBL_INLINE char* GblStringView_strdup(GBL_SELF) GBL_NOEXCEPT {
     return pStr;
 }
 
-GBL_INLINE char* GblStringView_toCString(GBL_SELF, char* pDst, GblSize destSize) GBL_NOEXCEPT {
+GBL_INLINE char* GblStringView_toCString(GBL_VSELF, char* pDst, GblSize destSize) GBL_NOEXCEPT {
     if(!destSize) return GBL_NULL;
     GblSize length = destSize-1 < self.length? destSize-1 : self.length;
     memcpy(pDst, self.pData, length);
@@ -483,7 +483,7 @@ GBL_INLINE char* GblStringView_toCString(GBL_SELF, char* pDst, GblSize destSize)
     return pDst;
 }
 
-GBL_INLINE GblBool GblStringView_toNil(GBL_SELF) GBL_NOEXCEPT  {
+GBL_INLINE GblBool GblStringView_toNil(GBL_VSELF) GBL_NOEXCEPT  {
     const char* pCStr = GBL_STRING_VIEW_CSTR(self);
     if(!self.length || strncmp(pCStr, "nil", sizeof("nil")) == 0) {
         return GBL_TRUE;
@@ -491,7 +491,7 @@ GBL_INLINE GblBool GblStringView_toNil(GBL_SELF) GBL_NOEXCEPT  {
     return GBL_FALSE;
 }
 
-GBL_INLINE GblBool GblStringView_toBool(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE GblBool GblStringView_toBool(GBL_VSELF) GBL_NOEXCEPT {
     const char* pCStr = GBL_STRING_VIEW_CSTR(self);
     if(strncmp(pCStr, "true", sizeof("true")) == 0) {
         return GBL_TRUE;
@@ -500,23 +500,23 @@ GBL_INLINE GblBool GblStringView_toBool(GBL_SELF) GBL_NOEXCEPT {
     }
 }
 
-GBL_INLINE GblInt GblStringView_toInt(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE GblInt GblStringView_toInt(GBL_VSELF) GBL_NOEXCEPT {
     return atoi(GBL_STRING_VIEW_CSTR(self));
 }
 
-GBL_INLINE GblUint GblStringView_toUint(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE GblUint GblStringView_toUint(GBL_VSELF) GBL_NOEXCEPT {
     return strtoul(GBL_STRING_VIEW_CSTR(self), GBL_NULL, 10);
 }
 
-GBL_INLINE float GblStringView_toFloat(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE float GblStringView_toFloat(GBL_VSELF) GBL_NOEXCEPT {
     return atof(GBL_STRING_VIEW_CSTR(self));
 }
 
-GBL_INLINE double GblStringView_toDouble(GBL_SELF) GBL_NOEXCEPT  {
+GBL_INLINE double GblStringView_toDouble(GBL_VSELF) GBL_NOEXCEPT  {
     return atof(GBL_STRING_VIEW_CSTR(self));
 }
 
-GBL_INLINE void* GblStringView_toPointer(GBL_SELF) GBL_NOEXCEPT {
+GBL_INLINE void* GblStringView_toPointer(GBL_VSELF) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     const char* pCStr = GBL_STRING_VIEW_CSTR(self);
     unsigned int tempUint = 0;
@@ -528,6 +528,6 @@ GBL_INLINE void* GblStringView_toPointer(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_STRING_VIEW_H

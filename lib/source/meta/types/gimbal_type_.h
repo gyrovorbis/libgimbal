@@ -22,7 +22,7 @@
 #define GBL_CLASS_FLAG_CLEAR_(klass, flag)              GBL_CLASS_PRIVATE_SET_(klass, GBL_CLASS_META_CLASS_(klass), GBL_CLASS_FLAGS_(klass) & ~flag)
 #define GBL_CLASS_FLAGS_(klass)                         ((GblFlags)(GBL_CLASS_PRIVATE_(klass) & GBL_CLASS_FLAGS_BIT_MASK_))
 #define GBL_CLASS_META_CLASS_(klass)                    ((GblMetaClass*)(GBL_CLASS_PRIVATE_(klass) & ~GBL_CLASS_FLAGS_BIT_MASK_))
-#define GBL_CLASS_TYPEOF_(klass)                          ((GblType)(GBL_CLASS_META_CLASS_(klass)))
+#define GBL_CLASS_TYPEOF_(klass)                        ((GblType)(GBL_CLASS_META_CLASS_(klass)))
 #define GBL_CLASS_PRIVATE_SET_(klass, meta, flags)          \
     GBL_STMT_START {                                        \
         GBL_PRIV_REF(((GblClass*)klass)).metaClassInfo =    \

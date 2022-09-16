@@ -9,8 +9,7 @@
 #include "../core/gimbal_typedefs.h"
 #include "gimbal/core/gimbal_call_stack.h"
 
-#define GBL_SELF    GblAllocationTracker* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblAllocationTracker
 
 GBL_DECLS_BEGIN
 
@@ -66,7 +65,6 @@ GBL_EXPORT void         GblAllocationTracker_diffCounters   (GBL_CSELF,
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_ALLOCATION_TRACKER_H

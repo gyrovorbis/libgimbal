@@ -176,7 +176,7 @@ static GBL_RESULT GblObjectClass_iEventHandlerIFace_event_(GblIEventHandler* pHa
 }
 
 
-GBL_API GblObject_sendEvent(GblObject* pSelf, GblEvent* pEvent) {
+GBL_EXPORT GBL_RESULT GblObject_sendEvent(GblObject* pSelf, GblEvent* pEvent) {
     GBL_API_BEGIN(NULL);
     GblObject* pParent = GblObject_parent(pSelf);
     if(pParent) {
@@ -186,7 +186,7 @@ GBL_API GblObject_sendEvent(GblObject* pSelf, GblEvent* pEvent) {
 }
 
 
-GBL_API GblObject_notifyEvent(GblObject* pSelf, GblEvent* pEvent) {
+GBL_EXPORT GBL_RESULT GblObject_notifyEvent(GblObject* pSelf, GblEvent* pEvent) {
     GBL_API_BEGIN(NULL);
     GblObject* pObject = GBL_OBJECT(pSelf);
 
@@ -246,7 +246,7 @@ static GblArrayList* GblObject_ensureEventFilters_(GblObject* pSelf) {
     return pEventFilters;
 }
 
-GBL_API GblObject_installEventFilter(GblObject* pSelf, GblIEventFilter* pFilter) {
+GBL_EXPORT GBL_RESULT GblObject_installEventFilter(GblObject* pSelf, GblIEventFilter* pFilter) {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pFilter);
     GblArrayList* pFilters = GblObject_ensureEventFilters_(pSelf);
@@ -254,7 +254,7 @@ GBL_API GblObject_installEventFilter(GblObject* pSelf, GblIEventFilter* pFilter)
     GBL_API_END();
 }
 
-GBL_API GblObject_uninstallEventFilter(GblObject* pSelf, GblIEventFilter* pFilter) {
+GBL_EXPORT GBL_RESULT GblObject_uninstallEventFilter(GblObject* pSelf, GblIEventFilter* pFilter) {
     GblArrayList* pVector = NULL;
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pFilter);
@@ -717,7 +717,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertiesVaList(const GblObject* pSelf, va_list
     GBL_API_END();
 }
 
-GBL_API GblObject_setPropertiesVaList(GblObject* pSelf, va_list* pVarArgs) {
+GBL_EXPORT GBL_RESULT GblObject_setPropertiesVaList(GblObject* pSelf, va_list* pVarArgs) {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf);
     GBL_API_VERIFY_POINTER(pVarArgs);
@@ -754,7 +754,7 @@ GBL_API GblObject_setPropertiesVaList(GblObject* pSelf, va_list* pVarArgs) {
     GBL_API_END();
 }
 
-GBL_API GblObject_propertiesVariant(const GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
+GBL_EXPORT GBL_RESULT GblObject_propertiesVariant(const GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
     GBL_API_BEGIN(NULL);
     for(GblSize p = 0; p < propertyCount; ++p) {
         GBL_API_CALL(GblObject_propertyVariant(pSelf, pNames[p], &pValues[p]));
@@ -762,7 +762,7 @@ GBL_API GblObject_propertiesVariant(const GblObject* pSelf, GblSize propertyCoun
     GBL_API_END();
 }
 
-GBL_API GblObject_setPropertiesVariants(GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
+GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants(GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
     GBL_API_BEGIN(NULL);
     for(GblSize p = 0; p < propertyCount; ++p) {
         GBL_API_CALL(GblObject_setPropertyVariant(pSelf, pNames[p], &pValues[p]));
@@ -1153,7 +1153,7 @@ GBL_EXPORT GblObject* GblObject_findChildByType(const GblObject* pSelf, GblType 
             {
                 GblObject* pChildIt = GBL_OBJECT_FAMILY_ENTRY_(pIt);
                 if(pChildIt) {
-                    if(GBL_INSTANCE_CHECK(pChildIt, childType)) {
+                    if(GblInstance_check(GBL_INSTANCE(pChildIt), childType)) {
                         pChild = pChildIt;
                         break;
                     }
@@ -1236,7 +1236,7 @@ GBL_EXPORT GblObject* GblObject_findAncestorByType(const GblObject* pSelf, GblTy
     //GBL_API_BEGIN(GblType_context(GBL_INSTANCE_TYPEOF(pSelf))); {
         GblObject* pNode = GblObject_parent(pSelf);
         while(pNode) {
-            if(GBL_INSTANCE_CHECK(pNode, ancestorType)) {
+            if(GblInstance_check(GBL_INSTANCE(pNode), ancestorType)) {
                 pAncestor = pNode;
                 break;
             }

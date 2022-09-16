@@ -8,8 +8,7 @@
 
 #include "gimbal_linked_list.h"
 
-#define GBL_SELF    GblDoublyLinkedListNode* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblDoublyLinkedListNode
 
 #define GBL_DOUBLY_LINKED_LIST_NPOS                             GBL_NPOS
 #define GBL_DOUBLY_LINKED_LIST_NODE_INITIALIZER()               { .pNext = NULL, .pPrev = NULL }
@@ -266,7 +265,6 @@ GBL_INLINE void GblDoublyLinkedList_reverse(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_DOUBLY_LINKED_LIST_HPP

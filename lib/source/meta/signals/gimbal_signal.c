@@ -410,7 +410,7 @@ GBL_EXPORT GBL_RESULT GblSignal_connectClass(GblInstance* pEmitter,
 {
     GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
-    GBL_API_VERIFY(GBL_INSTANCE_CHECK(pReceiver, classType),
+    GBL_API_VERIFY(GblInstance_check(pReceiver, classType),
                    GBL_RESULT_ERROR_TYPE_MISMATCH);
     GBL_API_VERIFY_ARG(methodOffset >= sizeof(GblClass));
 

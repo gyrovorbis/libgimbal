@@ -10,8 +10,7 @@
 #include "../core/gimbal_api_frame.h"
 #include "gimbal_typedefs.h"
 
-#define GBL_SELF    GblRef* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblRef
 
 GBL_DECLS_BEGIN
 
@@ -85,7 +84,6 @@ GBL_INLINE GblContext* GblRef_context(GBL_CSELF) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_MEMORY_REF_H

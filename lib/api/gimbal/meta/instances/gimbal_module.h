@@ -10,24 +10,11 @@
 #include "../../strings/gimbal_string_buffer.h"
 
 /// \ingroup metaBuiltinTypes
-#define GBL_MODULE_TYPE                 (GblModule_type())
-#define GBL_MODULE_PARENT_PREFIX        GBL_CONTEXT
-#define GBL_MODULE_STRUCT               GblModule
-#define GBL_MODULE_CLASS_STRUCT         GblModuleClass
-
-#define GBL_MODULE(instance)            GBL_INSTANCE_CAST_PREFIX(instance,  GBL_MODULE)
-#define GBL_MODULE_CHECK(instance)      GBL_INSTANCE_CHECK_PREFIX(instance, GBL_MODULE)
-#define GBL_MODULE_TRY(instance)        GBL_INSTANCE_TRY_PREFIX(instance, GBL_MODULE)
-
-#define GBL_MODULE_CLASS(klass)         GBL_CLASS_CAST_PREFIX(klass, GBL_MODULE)
-#define GBL_MODULE_CLASS_CHECK(klass)   GBL_CLASS_CHECK_PREFIX(klass, GBL_MODULE)
-#define GBL_MODULE_CLASS_TRY(klass)     GBL_CLASS_TRY_PREFIX(klass, GBL_MODULE)
-
-#define GBL_MODULE_GET_CLASS(instance)  GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_MODULE)
-#define GBL_MODULE_TRY_CLASS(instance)  GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_MODULE)
-
-#define GBL_SELF    GblModule* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_MODULE_TYPE                 (GBL_TYPEOF(GblModule))
+#define GBL_MODULE(instance)            (GBL_INSTANCE_CAST(instance,  GblModule))
+#define GBL_MODULE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblModule))
+#define GBL_MODULE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblModule))
+#define GBL_SELF_TYPE                   GblModule
 
 GBL_DECLS_BEGIN
 
@@ -79,8 +66,7 @@ GblSize     GblModule_useCount      (GBL_CSELF)                     GBL_NOEXCEPT
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 
 

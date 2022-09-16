@@ -9,17 +9,16 @@
 #include "../core/gimbal_typedefs.h"
 #include "../core/gimbal_api_frame.h"
 
-#define GBL_SELF    GblHashSet*         pSelf
-#define GBL_CSELF   const GblHashSet*   pSelf
+#define GBL_SELF_TYPE GblHashSet
 
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblHashSet);
 
-typedef GblHash       (*GblHashSetHashFn)(GBL_CSELF, const void*);              ///< User-defined hasher function, hashing two entries
-typedef GblBool       (*GblHashSetCmpFn) (GBL_CSELF, const void*, const void*); ///< User-defined comparator function, comparing two entries
-typedef void          (*GblHashSetDtorFn)(GBL_CSELF, void*);                    ///< User-defined destructor function, destroying an entry
-typedef GblBool       (*GblHashSetIterFn)(GBL_CSELF, void*, void*);             ///< User-defined iterator function for traversal
+typedef GblHash (*GblHashSetHashFn)(GBL_CSELF, const void*);              ///< User-defined hasher function, hashing two entries
+typedef GblBool (*GblHashSetCmpFn) (GBL_CSELF, const void*, const void*); ///< User-defined comparator function, comparing two entries
+typedef void    (*GblHashSetDtorFn)(GBL_CSELF, void*);                    ///< User-defined destructor function, destroying an entry
+typedef GblBool (*GblHashSetIterFn)(GBL_CSELF, void*, void*);             ///< User-defined iterator function for traversal
 
 /*! \brief Hash-table based abstract associative container with C++-style STL std::unoredered_set API
  *  \details
@@ -307,7 +306,6 @@ GBL_INLINE void* GblHashSet_tryEmplace(GblHashSet* pSet, const void* pKey) GBL_N
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_HASHSET_H

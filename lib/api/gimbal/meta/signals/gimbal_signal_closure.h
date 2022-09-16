@@ -3,14 +3,13 @@
 
 #include "gimbal_closure.h"
 
-#define GBL_SIGNAL_CLOSURE_TYPE                 (GblSignalClosure_type())
+#define GBL_SIGNAL_CLOSURE_TYPE                 (GBL_TYPEOF(GblSignalClosure))
 
-#define GBL_SIGNAL_CLOSURE(instance)            (GBL_INSTANCE_CAST(instance, GBL_SIGNAL_CLOSURE_TYPE, GblSignalClosure))
-#define GBL_SIGNAL_CLOSURE_CLASS(klass)         (GBL_CLASS_CAST(klass, GBL_SIGNAL_CLOSURE_TYPE, GblSignalClosureClass))
-#define GBL_SIGNAL_CLOSURE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GBL_SIGNAL_CLOSURE_TYPE, GblSignalClosureClass))
+#define GBL_SIGNAL_CLOSURE(instance)            (GBL_INSTANCE_CAST(instance, GblSignalClosure))
+#define GBL_SIGNAL_CLOSURE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblSignalClosure))
+#define GBL_SIGNAL_CLOSURE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblSignalClosure))
 
-#define GBL_SELF    GblSignalClosure* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblSignalClosure
 
 GBL_DECLS_BEGIN
 
@@ -31,7 +30,6 @@ GBL_EXPORT GBL_RESULT        GblSignalClosure_setSignal(GBL_SELF,
                                                         const char*  pSignalName) GBL_NOEXCEPT;
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_SIGNAL_CLOSURE_H

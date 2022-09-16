@@ -13,8 +13,7 @@
 #define GBL_LINKED_LIST_NODE(name)                      GblLinkedListNode name = { .pNext = &name }
 #define GBL_LINKED_LIST_ENTRY(node, structure, field)   GBL_CONTAINER_OF(node, structure, field)
 
-#define GBL_SELF    GblLinkedListNode*  pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblLinkedListNode
 
 GBL_DECLS_BEGIN
 
@@ -274,7 +273,6 @@ GBL_INLINE void GblLinkedList_reverse(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_LINKED_LIST_H

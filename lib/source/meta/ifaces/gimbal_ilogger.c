@@ -36,34 +36,34 @@ static GBL_RESULT GblILoggerIFace_init_(GblILoggerClass* pIFace, void* pData, Gb
     GBL_API_END();
 }
 
-GBL_API GblILogger_write(GblILogger* pSelf,
+GBL_EXPORT GBL_RESULT GblILogger_write(GblILogger* pSelf,
                          const GblStackFrame*   pFrame,
                          GBL_LOG_LEVEL          level,
                          const char*            pFmt,
                          va_list                varArgs) GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL_PREFIX(GBL_ILOGGER, pFnWrite,
-                              pSelf, pFrame, level, pFmt, varArgs);
+    GBL_INSTANCE_VCALL(GblILogger, pFnWrite,
+                       pSelf, pFrame, level, pFmt, varArgs);
     GBL_API_END();
 }
 
-GBL_API GblILogger_push(GblILogger* pSelf,
+GBL_EXPORT GBL_RESULT GblILogger_push(GblILogger* pSelf,
                         const GblStackFrame* pFrame) GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL_PREFIX(GBL_ILOGGER, pFnPush,
-                              pSelf, pFrame);
+    GBL_INSTANCE_VCALL(GblILogger, pFnPush,
+                       pSelf, pFrame);
     GBL_API_END();
 }
 
-GBL_API GblILogger_pop(GblILogger* pSelf,
+GBL_EXPORT GBL_RESULT GblILogger_pop(GblILogger* pSelf,
                        const GblStackFrame* pFrame,
                        uint32_t             count) GBL_NOEXCEPT
 {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL_PREFIX(GBL_ILOGGER, pFnPop,
-                              pSelf, pFrame, count);
+    GBL_INSTANCE_VCALL(GblILogger, pFnPop,
+                       pSelf, pFrame, count);
     GBL_API_END();
 }
 

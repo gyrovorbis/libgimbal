@@ -15,14 +15,12 @@
 /*! \ingroup metaBuiltinTypes
  * \details  ::GblType UUID of a GblObject
  */
-#define GBL_OBJECT_TYPE                 (GblObject_type())
+#define GBL_OBJECT_TYPE                 (GBL_TYPEOF(GblObject))
+#define GBL_OBJECT(instance)            (GBL_INSTANCE_CAST(instance, GblObject))
+#define GBL_OBJECT_CLASS(klass)         (GBL_CLASS_CAST(klass, GblObject))
+#define GBL_OBJECT_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblObject))
 
-#define GBL_OBJECT(instance)            (GBL_INSTANCE_CAST(instance, GBL_OBJECT_TYPE, GblObject))
-#define GBL_OBJECT_CLASS(klass)         (GBL_CLASS_CAST(klass, GBL_OBJECT_TYPE, GblObjectClass))
-#define GBL_OBJECT_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GBL_OBJECT_TYPE, GblObjectClass))
-
-#define GBL_SELF    GblObject* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblObject
 
 GBL_DECLS_BEGIN
 
@@ -152,7 +150,6 @@ GBL_EXPORT GblIEventFilter*
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_OBJECT_H

@@ -159,7 +159,7 @@ GBL_EXPORT GblHash gblHashSip(const void* pData, GblSize size) GBL_NOEXCEPT {
     return SIP64((uint8_t*)pData, size, gblSeed(0), gblSeed(1));
 }
 
-GBL_API             GblHashSet_construct_8(GblHashSet*                 pSet,
+GBL_EXPORT GBL_RESULT             GblHashSet_construct_8(GblHashSet*                 pSet,
                                            GblSize                     elsize,
                                            GblHashSetHashFn       pFnHash,
                                            GblHashSetCmpFn    pFnCompare,
@@ -204,7 +204,7 @@ GBL_API             GblHashSet_construct_8(GblHashSet*                 pSet,
     GBL_API_END();
 
 }
-GBL_API             GblHashSet_construct_7(GblHashSet*                 pSet,
+GBL_EXPORT GBL_RESULT             GblHashSet_construct_7(GblHashSet*                 pSet,
                                            GblSize                     entrySize,
                                            GblHashSetHashFn       pFnHash,
                                            GblHashSetCmpFn    pFnCompare,
@@ -214,7 +214,7 @@ GBL_API             GblHashSet_construct_7(GblHashSet*                 pSet,
     return GblHashSet_construct_8(pSet, entrySize, pFnHash, pFnCompare, pFnDestruct, capacity, pCtx, NULL);
 }
 
-GBL_API             GblHashSet_construct_6(GblHashSet*                 pSet,
+GBL_EXPORT GBL_RESULT             GblHashSet_construct_6(GblHashSet*                 pSet,
                                            GblSize                     entrySize,
                                            GblHashSetHashFn       pFnHash,
                                            GblHashSetCmpFn    pFnCompare,
@@ -224,7 +224,7 @@ GBL_API             GblHashSet_construct_6(GblHashSet*                 pSet,
     return GblHashSet_construct_7(pSet, entrySize, pFnHash, pFnCompare, pFnDestruct, capacity, NULL);
 }
 
-GBL_API             GblHashSet_construct_5(GblHashSet*                 pSet,
+GBL_EXPORT GBL_RESULT             GblHashSet_construct_5(GblHashSet*                 pSet,
                                            GblSize                     entrySize,
                                            GblHashSetHashFn       pFnHash,
                                            GblHashSetCmpFn    pFnCompare,
@@ -233,7 +233,7 @@ GBL_API             GblHashSet_construct_5(GblHashSet*                 pSet,
     return GblHashSet_construct_6(pSet, entrySize, pFnHash, pFnCompare, pFnDestruct, 0);
 }
 
-GBL_API             GblHashSet_construct_4(GblHashSet*                 pSet,
+GBL_EXPORT GBL_RESULT             GblHashSet_construct_4(GblHashSet*                 pSet,
                                            GblSize                     entrySize,
                                            GblHashSetHashFn       pFnHash,
                                            GblHashSetCmpFn    pFnCompare) GBL_NOEXCEPT {
@@ -241,7 +241,7 @@ GBL_API             GblHashSet_construct_4(GblHashSet*                 pSet,
 }
 
 
-GBL_API  GblHashSet_clone(GblHashSet* pSelf, const GblHashSet* pRhs, GblContext* pCtx) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT  GblHashSet_clone(GblHashSet* pSelf, const GblHashSet* pRhs, GblContext* pCtx) GBL_NOEXCEPT {
     if(!pCtx) pCtx = GBL_PRIV_REF(pRhs).pCtx;
     GBL_API_BEGIN(pCtx);
     GBL_API_CALL(GblHashSet_construct_8(pSelf,
@@ -263,14 +263,14 @@ GBL_API  GblHashSet_clone(GblHashSet* pSelf, const GblHashSet* pRhs, GblContext*
     GBL_API_END();
 }
 
-GBL_API GblHashSet_constructClone(GblHashSet* pSelf, GblHashSet* pRhs) {
+GBL_EXPORT GBL_RESULT GblHashSet_constructClone(GblHashSet* pSelf, GblHashSet* pRhs) {
     GBL_API_BEGIN(GBL_PRIV_REF(pRhs).pCtx);
     GblHashSet_destruct(pSelf);
     GBL_API_CALL(GblHashSet_clone(pSelf, pRhs, NULL));
     GBL_API_END();
 }
 
-GBL_API GblHashSet_constructMove(GblHashSet* pSelf, GblHashSet* pRhs, GblContext* pCtx) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblHashSet_constructMove(GblHashSet* pSelf, GblHashSet* pRhs, GblContext* pCtx) GBL_NOEXCEPT {
     if(pCtx != GBL_PRIV_REF(pRhs).pCtx && pCtx != NULL) {
         return GblHashSet_clone(pSelf, pRhs, pCtx);
     } else {
@@ -280,7 +280,7 @@ GBL_API GblHashSet_constructMove(GblHashSet* pSelf, GblHashSet* pRhs, GblContext
     }
 }
 
-GBL_API GblHashSet_assignMove(GblHashSet* pLhs, GblHashSet* pRhs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblHashSet_assignMove(GblHashSet* pLhs, GblHashSet* pRhs) GBL_NOEXCEPT {
     GblHashSet_destruct(pLhs);
     return GblHashSet_constructMove(pLhs, pRhs, NULL);
 }

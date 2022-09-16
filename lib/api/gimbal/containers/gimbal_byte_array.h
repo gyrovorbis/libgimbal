@@ -9,8 +9,7 @@
 #include "../core/gimbal_ref.h"
 #include "../strings/gimbal_string_view.h"
 
-#define GBL_SELF    GblByteArray*          pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblByteArray
 
 GBL_DECLS_BEGIN
 
@@ -238,11 +237,8 @@ GBL_INLINE uint8_t GblByteArray_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
     return byte;
 }
 
-
-#undef GBL_CSELF
-#undef GBL_SELF
-
 GBL_DECLS_END
 
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_BUFFER_H

@@ -62,7 +62,7 @@ GBL_INLINE GblVersionInfo GBL_VERSION_EXTRACT(GblVersion version) {
 
 
 #define GBL_VERSION_STRING_SIZE_MAX     (3 * 3 + 2 + 1) // 3 chars * 3 subTypes + 2 dots + 1 null char
-GBL_API gblVersionInfoString(const GblVersionInfo* pInfo, char* pBuffer, size_t size);
+GBL_EXPORT GBL_RESULT gblVersionInfoString(const GblVersionInfo* pInfo, char* pBuffer, size_t size);
 
 
 

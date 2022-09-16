@@ -19,5 +19,6 @@ GBL_EXPORT GblType GblEvent_type(void) {
         GBL_API_VERIFY_LAST_RECORD();
         GBL_API_END_BLOCK();
     }
+
     return type;
 }

@@ -9,13 +9,13 @@
 #include "../classes/gimbal_class.h"
 
 #define GBL_INTERFACE_TYPE                      GBL_BUILTIN_TYPE(INTERFACE)
-#define GBL_INTERFACE(klass)                    (GBL_CLASS_CAST(klass, GBL_INTERFACE_TYPE, GblInterface))
-#define GBL_INTERFACE_TRY(klass)                (GBL_CLASS_TRY(klass, GBL_INTERFACE_TYPE, GblInterface))
+
+#define GBL_INTERFACE(klass)                    ((GblInterface*)GblClass_cast(GBL_CLASS(klass), GBL_INTERFACE_TYPE))
+#define GBL_INTERFACE_TRY(klass)                ((GblInterface*)GblClass_try(GBL_CLASS(klass), GBL_INTERFACE_TYPE))
 #define GBL_INTERFACE_OUTER_CLASS(iface)        (GblInterface_outerClass(GBL_INTERFACE(iface)))
 #define GBL_INTERFACE_OUTER_MOST_CLASS(iface)   (GblInterface_outerMostClass(GBL_INTERFACE(iface)))
 
-#define GBL_SELF    GblInterface* pSelf
-#define GBL_CSELF   const GblInterface* pSelf
+#define GBL_SELF_TYPE GblInterface
 
 GBL_DECLS_BEGIN
 
@@ -435,7 +435,6 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (GBL_SELF)  GBL_NOEXCEPT
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_INTERFACE_H

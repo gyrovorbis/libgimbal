@@ -289,27 +289,27 @@ GBL_EXPORT GblBool GblProperty_uninstallAll(GblType objectType) {
 
 GBL_EXPORT GBL_RESULT GblProperty_defaultValue(const GblProperty* pSelf, GblVariant* pValue) {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GBL_PROPERTY_TYPE, GblPropertyClass, pFnDefaultValue, pSelf, pValue);
+    GBL_INSTANCE_VCALL(GblProperty, pFnDefaultValue, pSelf, pValue);
     GBL_API_END();
 }
 
 GBL_EXPORT GblBool GblProperty_checkValue(const GblProperty* pSelf, const GblVariant* pValue) {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GBL_PROPERTY_TYPE, GblPropertyClass, pFnCheckValue, pSelf, pValue);
+    GBL_INSTANCE_VCALL(GblProperty, pFnCheckValue, pSelf, pValue);
     GBL_API_END_BLOCK();
     return GBL_RESULT_SUCCESS(GBL_API_RESULT());
 }
 
 GBL_EXPORT GBL_RESULT GblProperty_validateValue(const GblProperty* pSelf, GblVariant* pValue) {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GBL_PROPERTY_TYPE, GblPropertyClass, pFnValidateValue, pSelf, pValue);
+    GBL_INSTANCE_VCALL(GblProperty, pFnValidateValue, pSelf, pValue);
     GBL_API_END();
 }
 
 GBL_EXPORT int GblProperty_compareValues(const GblProperty* pSelf, const GblVariant* pV1, const GblVariant* pV2) {
     int result = 0;
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GBL_PROPERTY_TYPE, GblPropertyClass, pFnCompareValues, pSelf, pV1, pV2, &result);
+    GBL_INSTANCE_VCALL(GblProperty, pFnCompareValues, pSelf, pV1, pV2, &result);
     GBL_API_END_BLOCK();
     return result;
 }
@@ -347,8 +347,7 @@ static GBL_RESULT GblProperty_initVaList_(GblProperty* pSelf,
     pSelf->flags                   = flags;
 
     if(optionalArgCount) {
-        GBL_INSTANCE_VCALL(GBL_PROPERTY_TYPE, GblPropertyClass,
-                           pFnInitOptionalArgs, pSelf, optionalArgCount, pList);
+        GBL_INSTANCE_VCALL(GblProperty, pFnInitOptionalArgs, pSelf, optionalArgCount, pList);
     }
 
     GBL_API_END();

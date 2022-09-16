@@ -9,20 +9,12 @@
 #include "gimbal_interface.h"
 #include "../instances/gimbal_instance.h"
 
-#define GBL_IPLUGIN_TYPE                    (GblIPlugin_type())
-#define GBL_IPLUGIN_STRUCT                  GblIPlugin
-#define GBL_IPLUGIN_CLASS_STRUCT            GblIPluginClass
-#define GBL_IPLUGIN(instance)               GBL_INSTANCE_CAST_PREFIX        (instance,  GBL_IPLUGIN)
-#define GBL_IPLUGIN_CHECK(instance)         GBL_INSTANCE_CHECK_PREFIX       (instance,  GBL_IPLUGIN)
-#define GBL_IPLUGIN_TRY(instance)           GBL_INSTANCE_TRY_PREFIX         (instance,  GBL_IPLUGIN)
-#define GBL_IPLUGIN_IFACE(klass)            GBL_CLASS_CAST_PREFIX            (klass,     GBL_IPLUGIN)
-#define GBL_IPLUGIN_IFACE_CHECK(klass)      GBL_CLASS_CHECK_PREFIX           (klass,     GBL_IPLUGIN)
-#define GBL_IPLUGIN_IFACE_TRY(klass)        GBL_CLASS_TRY_PREFIX             (klass,     GBL_IPLUGIN)
-#define GBL_IPLUGIN_GET_IFACE(instance)     GBL_INSTANCE_GET_CLASS_PREFIX  (instance,  GBL_IPLUGIN)
-#define GBL_IPLUGIN_TRY_IFACE(instance)     GBL_INSTANCE_TRY_CLASS_PREFIX   (instance,  GBL_IPLUGIN)
+#define GBL_IPLUGIN_TYPE                (GBL_TYPEOF(GblIPlugin))
+#define GBL_IPLUGIN(instance)           (GBL_INSTANCE_CAST(instance, GblIPlugin))
+#define GBL_PLUGIN_CLASS(klass)         (GBL_CLASS_CAST(klass, GblIPlugin))
+#define GBL_IPLUGIN_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblIPlugin))
 
-#define GBL_SELF    GblIPlugin* pSelf
-#define GBL_CSELF   const GblIPlugin* pSelf
+#define GBL_SELF_TYPE GblIPlugin
 
 GBL_DECLS_BEGIN
 
@@ -38,19 +30,19 @@ GBL_INTERFACE_DERIVE(GblIPlugin)
                                      GblInterface** ppInterface);
 GBL_INTERFACE_END
 
-GBL_EXPORT GblType    GblIPlugin_type        (void)                 GBL_NOEXCEPT;
+GBL_EXPORT GblType    GblIPlugin_type     (void)                 GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT GblIPlugin_use         (GBL_SELF)             GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT GblIPlugin_unuse       (GBL_SELF)             GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo    (GBL_CSELF,
-                                              GblType       type,
-                                              GblTypeInfo*  pInfo)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIPlugin_use      (GBL_SELF)             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIPlugin_unuse    (GBL_SELF)             GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo (GBL_CSELF,
+                                           GblType       type,
+                                           GblTypeInfo*  pInfo)  GBL_NOEXCEPT;
 
 
 GBL_DECLS_END
 
-#undef GBL_SELF
-#undef GBL_CSELF
+#undef GBL_SELF_TYPE
 
 
 #endif // GIMBAL_PLUGIN_H

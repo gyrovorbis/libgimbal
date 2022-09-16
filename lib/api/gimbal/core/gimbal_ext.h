@@ -93,15 +93,15 @@ GBL_EXT_EVENT_HANDLER
 #endif
 
 
-GBL_API gblExtLogWrite       (const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
-GBL_API gblExtLogPush        (const GblStackFrame* pFrame);
-GBL_API gblExtLogPop         (const GblStackFrame* pFrame, uint32_t count);
+GBL_EXPORT GBL_RESULT gblExtLogWrite       (const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
+GBL_EXPORT GBL_RESULT gblExtLogPush        (const GblStackFrame* pFrame);
+GBL_EXPORT GBL_RESULT gblExtLogPop         (const GblStackFrame* pFrame, uint32_t count);
 
-GBL_API gblExtMemAlloc       (const GblStackFrame* pFrame, GblSize size, GblSize alignment, const char* pDebugInfoString, void** ppData);
-GBL_API gblExtMemRealloc     (const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
-GBL_API gblExtMemFree        (const GblStackFrame* pFrame, void* pData);
+GBL_EXPORT GBL_RESULT gblExtMemAlloc       (const GblStackFrame* pFrame, GblSize size, GblSize alignment, const char* pDebugInfoString, void** ppData);
+GBL_EXPORT GBL_RESULT gblExtMemRealloc     (const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
+GBL_EXPORT GBL_RESULT gblExtMemFree        (const GblStackFrame* pFrame, void* pData);
 
-GBL_API gblExtCallRecordSet  (const GblStackFrame* pFrame, const GblCallRecord* pRecord) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT gblExtCallRecordSet  (const GblStackFrame* pFrame, const GblCallRecord* pRecord) GBL_NOEXCEPT;
 
 
 #ifdef __cplusplus

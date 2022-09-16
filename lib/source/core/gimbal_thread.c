@@ -44,7 +44,7 @@ GBL_EXPORT const GblCallRecord* GblThread_callRecord(const GblThread* pThread) {
     return &pThread->callRecord;
 }
 
-GBL_API GblThread_setCallRecord(GblThread* pThread, const GblCallRecord* pRecord) {
+GBL_EXPORT GBL_RESULT GblThread_setCallRecord(GblThread* pThread, const GblCallRecord* pRecord) {
     if(!pThread) pThread = GblThread_current();
     if(pRecord) {
         memcpy(&pThread->callRecord, pRecord, sizeof(GblCallRecord));
@@ -60,27 +60,27 @@ GBL_EXPORT const char* GblThread_name(const GblThread* pThread) {
     return pThread->pName;
 }
 
-GBL_API GblThread_setName(GblThread* pThread, const char* pName) {
+GBL_EXPORT GBL_RESULT GblThread_setName(GblThread* pThread, const char* pName) {
     GBL_ASSERT(pName);
     if(!pThread) pThread = GblThread_current();
     pThread->pName = pName;
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API GblThread_logPush(GblThread* pThread) {
+GBL_EXPORT GBL_RESULT GblThread_logPush(GblThread* pThread) {
     if(!pThread) pThread = GblThread_current();
     ++pThread->logStackDepth;
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API GblThread_logPop(GblThread* pThread, uint32_t count) {
+GBL_EXPORT GBL_RESULT GblThread_logPop(GblThread* pThread, uint32_t count) {
     if(!pThread) pThread = GblThread_current();
     GBL_ASSERT(pThread->logStackDepth >= count);
     pThread->logStackDepth -= count;
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_API GblThread_stackFramePush(GblThread* pThread, GblStackFrame* pFrame) {
+GBL_EXPORT GBL_RESULT GblThread_stackFramePush(GblThread* pThread, GblStackFrame* pFrame) {
     if(!pThread) pThread = GblThread_current();
     if(pFrame) {
         pFrame->pPrevFrame      = pThread->pStackFrameTop;
@@ -95,7 +95,7 @@ GBL_API GblThread_stackFramePush(GblThread* pThread, GblStackFrame* pFrame) {
     pThread->pStackFrameTop = pFrame;
     return GBL_RESULT_SUCCESS;
 }
-GBL_API GblThread_stackFramePop(GblThread* pThread) {
+GBL_EXPORT GBL_RESULT GblThread_stackFramePop(GblThread* pThread) {
     if(!pThread) pThread = GblThread_current();
     GBL_ASSERT(pThread->pStackFrameTop);
     /*if(pThread->pStackFrameTop->pPrevFrame) {

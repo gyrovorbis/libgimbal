@@ -11,15 +11,12 @@
 
 /// \ingroup metaBuiltinTypes
 #define GBL_FLAGS_TYPE                      (GblFlags_type())
-
-#define GBL_FLAGS_CLASS(klass)              (GBL_CLASS_CAST(klass, GBL_FLAGS_TYPE, GblFlagsClass))
-#define GBL_FLAGS_GET_CLASS(variant)        (GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(&variant))))
+#define GBL_FLAGS_CLASS(klass)              (GBL_CLASS_CAST(klass, GblFlags))
 
 #define GBL_FLAGS_ENTRY(flagsValue, nick)   { flagsValue, #flagsValue, nick }
 #define GBL_FLAGS_ENTRY_LAST()              { 0, NULL, NULL }
 
-#define GBL_SELF    GblFlagsClass* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblFlagsClass
 
 GBL_DECLS_BEGIN
 
@@ -189,7 +186,6 @@ GBL_INLINE GblBool GblFlags_check(GblFlags value, GblType type) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_FLAGS_H

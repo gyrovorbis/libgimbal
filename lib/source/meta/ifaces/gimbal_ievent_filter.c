@@ -3,12 +3,12 @@
 #include <gimbal/strings/gimbal_quark.h>
 #include "../types/gimbal_type_.h"
 
-GBL_API GblIEventFilter_eventFilter(GblIEventFilter* pSelf, GblIEventHandler* pHandler, GblEvent* pEvent) {
+GBL_EXPORT GBL_RESULT GblIEventFilter_eventFilter(GblIEventFilter* pSelf, GblIEventHandler* pHandler, GblEvent* pEvent) {
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pSelf);
         GBL_API_VERIFY_POINTER(pHandler);
         GBL_API_VERIFY_POINTER(pEvent);
-        GblIEventFilterClass* pIFace = GBL_IEVENT_FILTER_GET_IFACE(pSelf);
+        GblIEventFilterClass* pIFace = GBL_IEVENT_FILTER_GET_CLASS(pSelf);
         GBL_API_VERIFY_EXPRESSION(pIFace && pIFace->pFnEventFilter);
         GBL_API_CALL(pIFace->pFnEventFilter(pSelf, pHandler, pEvent));
     } GBL_API_END();

@@ -541,7 +541,7 @@ extern GBL_RESULT GblType_refresh_(GblType type) {
 
             GblTypeInfo info;
             if(pPlugin) {
-                GblIPluginClass* pIPluginIFace = GBL_IPLUGIN_GET_IFACE(pPlugin);
+                GblIPluginClass* pIPluginIFace = GBL_IPLUGIN_GET_CLASS(pPlugin);
                 pIPluginIFace->pFnTypeInfo(pPlugin, type, &info);
                 GBL_API_VERIFY_CALL(GblType_updateTypeInfoClassChunk_(pMeta, &info));
             } else {

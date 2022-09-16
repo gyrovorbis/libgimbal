@@ -11,15 +11,12 @@
 
 /// \ingroup metaBuiltinTypes
 #define GBL_ENUM_TYPE                       (GblEnum_type())
-
-#define GBL_ENUM_CLASS(klass)               (GBL_CLASS_CAST(klass, GBL_ENUM_TYPE, GblEnumClass))
-#define GBL_ENUM_GET_CLASS(variant)         (GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(&variant))))
+#define GBL_ENUM_CLASS(klass)               (GBL_CLASS_CAST(klass, GblEnum))
 
 #define GBL_ENUM_ENTRY(enumValue, nick)     { enumValue, #enumValue, nick }
 #define GBL_ENUM_ENTRY_LAST()               { 0, NULL, NULL }
 
-#define GBL_SELF    GblEnumClass* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblEnumClass
 
 GBL_DECLS_BEGIN
 
@@ -165,7 +162,6 @@ GBL_INLINE GblBool GblEnum_check(GblEnum value, GblType type) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_ENUM_H

@@ -170,7 +170,7 @@ static GBL_RESULT GblTestSuiteClass_initDerived_(GblClass* pClass, const void* p
 GBL_EXPORT const char* GblTestSuite_name(const GblTestSuite* pSelf) {
     const char* pName = "";
     GBL_API_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL(GBL_TEST_SUITE_TYPE, GblTestSuiteClass, pFnSuiteName, pSelf, &pName);
+    GBL_INSTANCE_VCALL(GblTestSuite, pFnSuiteName, pSelf, &pName);
     GBL_API_VERIFY_LAST_RECORD();
     if(!pName) pName = "";
     GBL_API_END_BLOCK();
@@ -182,7 +182,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_initSuite(GblTestSuite* pSelf, GblContext* pC
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnSuiteInit)
         GBL_API_DONE();
-    GBL_INSTANCE_VCALL(GBL_TEST_SUITE_TYPE, GblTestSuiteClass, pVTable->pFnSuiteInit, pSelf, pCtx);
+    GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnSuiteInit, pSelf, pCtx);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }
@@ -192,7 +192,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_finalSuite(GblTestSuite* pSelf, GblContext* p
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnSuiteFinal)
         GBL_API_DONE();
-    GBL_INSTANCE_VCALL(GBL_TEST_SUITE_TYPE, GblTestSuiteClass, pVTable->pFnSuiteFinal, pSelf, pCtx);
+    GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnSuiteFinal, pSelf, pCtx);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }
@@ -202,7 +202,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_initCase(GblTestSuite* pSelf, GblContext* pCt
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnCaseInit)
         GBL_API_DONE();
-    GBL_INSTANCE_VCALL(GBL_TEST_SUITE_TYPE, GblTestSuiteClass, pVTable->pFnCaseInit, pSelf, pCtx);
+    GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnCaseInit, pSelf, pCtx);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }
@@ -212,7 +212,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_finalCase(GblTestSuite* pSelf, GblContext* pC
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnCaseFinal)
         GBL_API_DONE();
-    GBL_INSTANCE_VCALL(GBL_TEST_SUITE_TYPE, GblTestSuiteClass, pVTable->pFnCaseFinal, pSelf, pCtx);
+    GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnCaseFinal, pSelf, pCtx);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }
@@ -220,7 +220,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_finalCase(GblTestSuite* pSelf, GblContext* pC
 GBL_EXPORT GblSize GblTestSuite_caseCount(const GblTestSuite* pSelf) {
     GblSize count = 0;
     GBL_API_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL(GBL_TEST_SUITE_TYPE, GblTestSuiteClass, pFnCaseCount, pSelf, &count);
+    GBL_INSTANCE_VCALL(GblTestSuite, pFnCaseCount, pSelf, &count);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END_BLOCK();
     return count;
@@ -229,7 +229,7 @@ GBL_EXPORT GblSize GblTestSuite_caseCount(const GblTestSuite* pSelf) {
 GBL_EXPORT const char* GblTestSuite_caseName(const GblTestSuite* pSelf, GblSize index) {
     const char* pName = NULL;
     GBL_API_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL(GBL_TEST_SUITE_TYPE, GblTestSuiteClass, pFnCaseName, pSelf, index, &pName);
+    GBL_INSTANCE_VCALL(GblTestSuite, pFnCaseName, pSelf, index, &pName);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END_BLOCK();
     return pName;
@@ -240,7 +240,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_runCase(GblTestSuite* pSelf,
                                            GblSize index)
 {
     GBL_API_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL(GBL_TEST_SUITE_TYPE, GblTestSuiteClass, pFnCaseRun, pSelf, pCtx, index);
+    GBL_INSTANCE_VCALL(GblTestSuite, pFnCaseRun, pSelf, pCtx, index);
     GBL_API_VERIFY_LAST_RECORD();
     GBL_API_END();
 }
@@ -266,7 +266,7 @@ GBL_EXPORT GblType GblTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_API_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("TestSuite"),
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblTestSuite"),
                                       GBL_OBJECT_TYPE,
                                       &typeInfo,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

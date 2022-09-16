@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_api_frame.h>
 
 #define GBL_EXT_FN_DEFINE_(extName, contextName, ...) \
-    GBL_API gblExt##extName (GBL_MAP_LIST(GBL_DECL_VAR_PAIR, __VA_ARGS__)) { \
+    GBL_EXPORT GBL_RESULT gblExt##extName (GBL_MAP_LIST(GBL_DECL_VAR_PAIR, __VA_ARGS__)) { \
         GBL_ASSERT(pFrame); \
         if(!pFrame->pContext) return GBL_RESULT_UNIMPLEMENTED; \
         return GblContext_##contextName##_ (pFrame->pContext, GBL_MAP_LIST(GBL_DECL_VAR_PAIR_NAME, __VA_ARGS__)); \
@@ -21,7 +21,7 @@ GBL_EXT_FN_DEFINE_(MemFree, memFree,        (const GblStackFrame*, pFrame), (voi
 GBL_EXT_FN_DEFINE_(CallRecordSet, callRecordSet,  (const GblStackFrame*, pFrame), (const GblCallRecord*, pRecord));
 
 #if 0
-GBL_API gblExtApiEvent(const GblStackFrame* pFrame, GBL_EVENT_TYPE type, const void* pData, GblSize size) {
+GBL_EXPORT GBL_RESULT gblExtApiEvent(const GblStackFrame* pFrame, GBL_EVENT_TYPE type, const void* pData, GblSize size) {
     return gblObjectEvent(pFrame->hHandle, pFrame, type, pData, size);
 }
 #endif

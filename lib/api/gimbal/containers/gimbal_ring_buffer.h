@@ -10,8 +10,7 @@
 #include "../core/gimbal_api_frame.h"
 #include <stdlib.h>
 
-#define GBL_SELF    GblRingBuffer* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblRingBuffer
 
 GBL_DECLS_BEGIN
 
@@ -98,6 +97,7 @@ GBL_EXPORT GBL_RESULT  GblRingBuffer_shrinkToFit (GBL_SELF)                     
 
 // ===== IMPL =====
 
+/// \cond
 GBL_INLINE void GblRingBuffer_advance_(GBL_SELF) GBL_NOEXCEPT {
     ++GBL_PRIV_REF(pSelf).backPos;
     GBL_PRIV_REF(pSelf).backPos %= GBL_PRIV_REF(pSelf).capacity;
@@ -106,6 +106,7 @@ GBL_INLINE void GblRingBuffer_advance_(GBL_SELF) GBL_NOEXCEPT {
         GBL_PRIV_REF(pSelf).frontPos %= GBL_PRIV_REF(pSelf).capacity;
     }
 }
+/// \endcond
 
 GBL_INLINE GBL_RESULT GblRingBuffer_construct_5(GBL_SELF,
                                                 uint16_t    elementSize,
@@ -140,7 +141,7 @@ GBL_INLINE GblSize GblRingBuffer_capacity(GBL_CSELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GblSize GblRingBuffer_size(GBL_CSELF) GBL_NOEXCEPT {
-    return GBL_PRIV_REF(pSelf).capacity - (GBL_PRIV_REF(pSelf).capacity - imaxabs((intmax_t)(GBL_PRIV_REF(pSelf).backPos - GBL_PRIV_REF(pSelf).frontPos)));
+    return GBL_PRIV_REF(pSelf).capacity - (GBL_PRIV_REF(pSelf).capacity - llabs((ptrdiff_t)(GBL_PRIV_REF(pSelf).backPos - GBL_PRIV_REF(pSelf).frontPos)));
 }
 
 GBL_INLINE GblSize GblRingBuffer_elementSize(GBL_CSELF) GBL_NOEXCEPT {
@@ -221,13 +222,8 @@ GBL_INLINE void GblRingBuffer_clear(GBL_SELF) GBL_NOEXCEPT {
     GBL_PRIV_REF(pSelf).frontPos = GBL_PRIV_REF(pSelf).backPos = 0;
 }
 
-
-
-
-#undef GBL_CSELF
-#undef GBL_SELF
-
 GBL_DECLS_END
 
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_RING_BUFFER_H

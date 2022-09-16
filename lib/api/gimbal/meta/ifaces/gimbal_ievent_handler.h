@@ -10,18 +10,12 @@
 #include "gimbal_interface.h"
 #include "../instances/gimbal_instance.h"
 
-#define GBL_IEVENT_HANDLER_TYPE                     (GblIEventHandler_type())
-#define GBL_IEVENT_HANDLER_STRUCT                   GblIEventHandler
-#define GBL_IEVENT_HANDLER_CLASS_STRUCT             GblIEventHandlerClass
-#define GBL_IEVENT_HANDLER(instance)                GBL_INSTANCE_CAST_PREFIX(instance, GBL_IEVENT_HANDLER)
-#define GBL_IEVENT_HANDLER_CHECK(instance)          GBL_INSTANCE_CHECK_PREFIX(instance, GBL_IEVENT_HANDLER)
-#define GBL_IEVENT_HANDLER_IFACE(klass)             GBL_CLASS_CAST_PREFIX(klass, GBL_IEVENT_HANDLER)
-#define GBL_IEVENT_HANDLER_IFACE_CHECK(klass)       GBL_CLASS_CHECK_PREFIX(klass, GBL_IEVENT_HANDLER)
-#define GBL_IEVENT_HANDLER_GET_IFACE(instance)      GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_IEVENT_HANDLER)
-#define GBL_IEVENT_HANDLER_TRY_IFACE(instance)      GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_IEVENT_HANDLER)
+#define GBL_IEVENT_HANDLER_TYPE                 (GBL_TYPEOF(GblIEventHandler))
+#define GBL_IEVENT_HANDLER(instance)            (GBL_INSTANCE_CAST(instance, GblIEventHandler))
+#define GBL_IEVENT_HANDLER_CLASS(klass)         (GBL_CLASS_CAST(klass, GblIEventHandler))
+#define GBL_IEVENT_HANDLER_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblIEventHandler))
 
-#define GBL_SELF    GblIEventHandler* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblIEventHandler
 
 GBL_DECLS_BEGIN
 
@@ -31,13 +25,12 @@ GBL_INTERFACE_DERIVE(GblIEventHandler)
     GBL_RESULT (*pFnEvent)(GBL_SELF, GblEvent* pEvent);
 GBL_INTERFACE_END
 
-GBL_EXPORT GblType     GblIEventHandler_type    (void)                       GBL_NOEXCEPT;
+GBL_EXPORT GblType     GblIEventHandler_type  (void)                       GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblIEventHandler_event   (GBL_SELF, GblEvent* pEvent) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblIEventHandler_event (GBL_SELF, GblEvent* pEvent) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_IEVENT_HANDLER_H

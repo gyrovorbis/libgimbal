@@ -10,19 +10,14 @@
 #include "gimbal_interface.h"
 #include "../instances/gimbal_instance.h"
 
+#define GBL_IEVENT_FILTER_TYPE                      (GBL_TYPEOF(GblIEventFilter))
+#define GBL_IEVENT_FILTER(instance)                 (GBL_INSTANCE_CAST(instance, GblIEventFilter))
+#define GBL_IEVENT_FILTER_CLASS(klass)              (GBL_CLASS_CAST(klass, GblIEventFilter))
+#define GBL_IEVENT_FILTER_GET_CLASS(instance)       (GBL_INSTANCE_GET_CLASS(instance, GblIEventFilter))
+
+#define GBL_SELF_TYPE                               GblIEventFilter
+
 GBL_DECLS_BEGIN
-
-#define GBL_IEVENT_FILTER_TYPE                      (GblIEventFilter_type())
-#define GBL_IEVENT_FILTER_STRUCT                    GblIEventFilter
-#define GBL_IEVENT_FILTER_CLASS_STRUCT              GblIEventFilterClass
-#define GBL_IEVENT_FILTER(instance)                 GBL_INSTANCE_CAST_PREFIX(instance, GBL_IEVENT_FILTER)
-#define GBL_IEVENT_FILTER_CHECK(instance)           GBL_INSTANCE_CHECK_PREFIX(instance, GBL_IEVENT_FILTER)
-#define GBL_IEVENT_FILTER_IFACE(klass)              GBL_CLASS_CAST_PREFIX(klass, GBL_IEVENT_FILTER)
-#define GBL_IEVENT_FILTER_IFACE_CHECK(klass)        GBL_CLASS_CHECK_PREFIX(klass, GBL_IEVENT_FILTER)
-#define GBL_IEVENT_FILTER_GET_IFACE(instance)       GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_IEVENT_FILTER)
-
-#define GBL_SELF    GblIEventFilter* pSelf
-#define GBL_CSELF   const GBL_SELF
 
 GBL_FORWARD_DECLARE_STRUCT(GblIEventHandler);
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
@@ -35,12 +30,11 @@ GBL_EXPORT GblType    GblIEventFilter_type        (void)                        
 
 GBL_EXPORT GBL_RESULT GblIEventFilter_eventFilter (GBL_SELF,
                                                    GblIEventHandler* pHandler,
-                                                   GblEvent* pEvent)             GBL_NOEXCEPT;
-
-#undef GBL_CSELF
-#undef GBL_SELF
+                                                   GblEvent* pEvent)            GBL_NOEXCEPT;
 
 GBL_DECLS_END
+
+#undef GBL_SELF_TYPE
 
 
 #endif // GIMBAL_IEVENT_FILTER_H

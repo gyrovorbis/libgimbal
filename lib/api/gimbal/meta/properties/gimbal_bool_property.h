@@ -9,8 +9,7 @@
 #define GBL_BOOL_PROPERTY_CLASS(klass)          (GBL_CLASS_CAST(klass, GBL_BOOL_PROPERTY_TYPE, GblBoolPropertyClass))
 #define GBL_BOOL_PROPERTY_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS(instance, GBL_BOOL_PROPERTY_TYPE, GblBoolPropertyClass))
 
-#define GBL_SELF    GblBoolProperty* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblBoolProperty
 
 GBL_DECLS_BEGIN
 
@@ -35,7 +34,6 @@ GBL_EXPORT GBL_RESULT       GblBoolProperty_construct(GBL_SELF,
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_BOOL_PROPERTY_H

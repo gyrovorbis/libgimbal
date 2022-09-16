@@ -9,8 +9,7 @@
 #include "../core/gimbal_api_frame.h"
 #include "../algorithms/gimbal_numeric.h"
 
-#define GBL_SELF    GblArrayList* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblArrayList
 
 GBL_DECLS_BEGIN
 
@@ -267,8 +266,7 @@ GBL_INLINE void* GblArrayList_emplace(GBL_SELF, GblSize index) GBL_NOEXCEPT {
     return GblArrayList_insert(pSelf, index, 1, NULL);
 }
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 GBL_DECLS_END
 

@@ -87,11 +87,9 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
     GBL_API_VERIFY_CALL(pClass->pFnBegin(pSelf));
 
     for(GblTestSuite* pSuiteIt = GBL_INSTANCE_TRY(GblObject_childFirst(GBL_OBJECT(pSelf)),
-                                                  GBL_TEST_SUITE_TYPE,
                                                   GblTestSuite);
         pSuiteIt != NULL;
         pSuiteIt = GBL_INSTANCE_TRY(GblObject_siblingNext(GBL_OBJECT(pSuiteIt)),
-                                    GBL_TEST_SUITE_TYPE,
                                     GblTestSuite))
     {
         pSelf_->pCurSuite = pSuiteIt;
@@ -397,7 +395,7 @@ GBL_EXPORT GblType GblTestScenario_type(void) {
     if(type == GBL_INVALID_TYPE) {
 
         GBL_API_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("TestScenario"),
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblTestScenario"),
                                       GBL_CONTEXT_TYPE,
                                       &typeInfo,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);
@@ -464,7 +462,6 @@ GBL_EXPORT GblTestSuite* GblTestScenario_findSuite(const GblTestScenario* pSelf,
     GBL_API_BEGIN(pSelf);
     GBL_API_VERIFY_POINTER(pName);
     pSuite = GBL_INSTANCE_TRY(GblObject_findChildByName(GBL_OBJECT(pSelf), pName),
-                              GBL_TEST_SUITE_TYPE,
                               GblTestSuite);
     GBL_API_END_BLOCK();
     return pSuite;
@@ -484,7 +481,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_run(GblTestScenario* pSelf, int argc, char
     GblContext* pOldGlobalCtx = GblContext_global();
     GblContext_setGlobal(GBL_CONTEXT(pSelf));
 
-    GBL_INSTANCE_VCALL(GBL_TEST_SCENARIO_TYPE, GblTestScenarioClass, pFnRun, pSelf, argc, argv);
+    GBL_INSTANCE_VCALL(GblTestScenario, pFnRun, pSelf, argc, argv);
 
     GblContext_setLogFilter(pOldGlobalCtx, GBL_LOG_LEVEL_WARNING|GBL_LOG_LEVEL_ERROR);
     GblContext_setGlobal(pOldGlobalCtx);

@@ -12,8 +12,7 @@
 #define GBL_TIMER_INIT      { 0, 0, 0 }
 #define GBL_TIMER(name)     name = GBL_TIMER_INIT
 
-#define GBL_SELF    GblTimer* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblTimer
 
 GBL_DECLS_BEGIN
 
@@ -55,8 +54,7 @@ GBL_INLINE double GblTimer_elapsedMs(GBL_CSELF) GBL_NOEXCEPT {
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 
 #endif // GIMBAL_TIMER_H

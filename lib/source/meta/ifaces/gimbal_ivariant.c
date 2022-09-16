@@ -21,7 +21,7 @@ extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
 }
 
 // never even being used anywhere!
-GBL_API GblIVariantClass_validate(const GblIVariantClass* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_validate(const GblIVariantClass* pSelf) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
 
@@ -66,7 +66,7 @@ GBL_API GblIVariantClass_validate(const GblIVariantClass* pSelf) GBL_NOEXCEPT {
 }
 
 
-GBL_API GblIVariantClass_constructDefault(const GblIVariantClass* pSelf, GblVariant* pVariant) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructDefault(const GblIVariantClass* pSelf, GblVariant* pVariant) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_API_VERIFY_POINTER(pVariant);
@@ -83,7 +83,7 @@ GBL_API GblIVariantClass_constructDefault(const GblIVariantClass* pSelf, GblVari
  * 2) Try default constructor + copy assignment
  * 3) Shit pants
  */
-GBL_API GblIVariantClass_constructCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblVariant* pOther) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_API_VERIFY_POINTER(pVariant);
@@ -117,7 +117,7 @@ GBL_API GblIVariantClass_constructCopy(const GblIVariantClass* pSelf, GblVariant
  * 5) Try memcpy
  * 6) Shit pants
  */
-GBL_API GblIVariantClass_constructMove(const GblIVariantClass* pSelf, GblVariant* pVariant, GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructMove(const GblIVariantClass* pSelf, GblVariant* pVariant, GblVariant* pOther) GBL_NOEXCEPT {
    GBL_API_BEGIN(NULL);
    GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
    GBL_API_VERIFY_POINTER(pVariant);
@@ -152,7 +152,7 @@ GBL_API GblIVariantClass_constructMove(const GblIVariantClass* pSelf, GblVariant
    GBL_API_END();
 }
 
-GBL_API GblIVariantClass_setCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_setCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblVariant* pOther) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_API_VERIFY_POINTER(pVariant);
@@ -178,7 +178,7 @@ GBL_API GblIVariantClass_setCopy(const GblIVariantClass* pSelf, GblVariant* pVar
  * 3) Try memcpy
  * 4) Shit pants
  */
-GBL_API GblIVariantClass_setMove(const GblIVariantClass* pSelf, GblVariant* pVariant, GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_setMove(const GblIVariantClass* pSelf, GblVariant* pVariant, GblVariant* pOther) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_API_VERIFY_POINTER(pVariant);
@@ -200,7 +200,7 @@ GBL_API GblIVariantClass_setMove(const GblIVariantClass* pSelf, GblVariant* pVar
 }
 
 
-GBL_API GblIVariantClass_destruct(const GblIVariantClass* pSelf, GblVariant* pVariant) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_destruct(const GblIVariantClass* pSelf, GblVariant* pVariant) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_API_VERIFY_POINTER(pVariant);
@@ -210,7 +210,7 @@ GBL_API GblIVariantClass_destruct(const GblIVariantClass* pSelf, GblVariant* pVa
     GBL_API_END();
 }
 
-GBL_API GblIVariantClass_compare(const GblIVariantClass* pSelf, const GblVariant* pVariant, const GblVariant* pOther, GblInt* pCmpResult) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_compare(const GblIVariantClass* pSelf, const GblVariant* pVariant, const GblVariant* pOther, GblInt* pCmpResult) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_API_VERIFY_POINTER(pVariant);
@@ -254,7 +254,7 @@ static GBL_RESULT GblIVariantClass_valuesFromVa_(const GblIVariantClass* pSelf, 
  * 2) Try set value copy (and maybe constructor)
  * 3) shit pants
  */
-GBL_API GblIVariantClass_constructValueCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) {
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructValueCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) {
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
         GblSize count = 0;
@@ -283,7 +283,7 @@ GBL_API GblIVariantClass_constructValueCopy(const GblIVariantClass* pSelf, GblVa
  * 4) Try default constructor + construct value copy
  * 5) Shit pants
  */
-GBL_API GblIVariantClass_constructValueMove(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) {
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructValueMove(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) {
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
         GblSize count = 0;
@@ -317,7 +317,7 @@ GBL_API GblIVariantClass_constructValueMove(const GblIVariantClass* pSelf, GblVa
     } GBL_API_END();
 }
 
-GBL_API GblIVariantClass_setValueCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_setValueCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
         GblSize count = 0;
@@ -333,7 +333,7 @@ GBL_API GblIVariantClass_setValueCopy(const GblIVariantClass* pSelf, GblVariant*
         }
     } GBL_API_END();
 }
-GBL_API GblIVariantClass_setValueMove(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_setValueMove(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
         GblSize count = 0;
@@ -354,7 +354,7 @@ GBL_API GblIVariantClass_setValueMove(const GblIVariantClass* pSelf, GblVariant*
 }
 
 
-GBL_API GblIVariantClass_getValueCopy(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_getValueCopy(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
         GblSize count = 0;
@@ -371,7 +371,7 @@ GBL_API GblIVariantClass_getValueCopy(const GblIVariantClass* pSelf, const GblVa
     } GBL_API_END();
 }
 
-GBL_API GblIVariantClass_getValuePeek(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_getValuePeek(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
         GblSize count = 0;
@@ -388,7 +388,7 @@ GBL_API GblIVariantClass_getValuePeek(const GblIVariantClass* pSelf, const GblVa
     } GBL_API_END();
 }
 
-GBL_API GblIVariantClass_getValueMove(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_getValueMove(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL); {
         GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
         GblSize count = 0;
@@ -408,14 +408,14 @@ GBL_API GblIVariantClass_getValueMove(const GblIVariantClass* pSelf, const GblVa
     } GBL_API_END();
 }
 
-GBL_API GblIVariantClass_save(const GblIVariantClass* pSelf, const GblVariant* pVariant, GblStringBuffer* pString) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_save(const GblIVariantClass* pSelf, const GblVariant* pVariant, GblStringBuffer* pString) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_API_VERIFY_POINTER(pSelf->pVTable->pFnSave);
     GBL_API_CALL(pSelf->pVTable->pFnSave(pVariant, pString));
     GBL_API_END();
 }
-GBL_API GblIVariantClass_load(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblStringBuffer* pString) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_load(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblStringBuffer* pString) GBL_NOEXCEPT {
     GBL_API_BEGIN(NULL);
     GBL_API_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_API_VERIFY_POINTER(pSelf->pVTable->pFnLoad);

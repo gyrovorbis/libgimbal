@@ -19,8 +19,7 @@
 #define GBL_VARIANT_INIT    { .type = GBL_INVALID_TYPE }
 #define GBL_VARIANT(name)   GblVariant name = GBL_VARIANT_INIT
 
-#define GBL_SELF    GblVariant* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblVariant
 
 GBL_DECLS_BEGIN
 
@@ -826,7 +825,6 @@ GBL_INLINE GblBool GblVariant_equals(GBL_CSELF, const GblVariant* pOther) GBL_NO
 
 GBL_DECLS_END
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_VARIANT_H

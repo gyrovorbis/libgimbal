@@ -10,35 +10,25 @@
 #include "../../core/gimbal_api_frame.h"
 #include "../classes/gimbal_class.h"
 
-#define GBL_INSTANCE_TYPE                                       (GBL_BUILTIN_TYPE(INSTANCE))
+#define GBL_INSTANCE_TYPE                              (GBL_BUILTIN_TYPE(INSTANCE))
 
-#define GBL_INSTANCE(instance)                                  ((GblInstance*)instance)
-#define GBL_INSTANCE_CLASS(instance)                            (GblInstance_class(GBL_INSTANCE(instance)))
-#define GBL_INSTANCE_TYPEOF(instance)                           (GblInstance_typeOf(GBL_INSTANCE(instance)))
-#define GBL_INSTANCE_PRIVATE(instance, type)                    (GblInstance_private(GBL_INSTANCE(instance), type))
-#define GBL_INSTANCE_PUBLIC(instPriv, type)                     (GblInstance_public((const void*)instPriv, type))
+#define GBL_INSTANCE(instance)                         ((GblInstance*)instance)
+#define GBL_INSTANCE_CLASS(instance)                   (GblInstance_class(GBL_INSTANCE(instance)))
+#define GBL_INSTANCE_TYPEOF(instance)                  (GblInstance_typeOf(GBL_INSTANCE(instance)))
+#define GBL_INSTANCE_PRIVATE(instance, type)           (GblInstance_private(GBL_INSTANCE(instance), type))
+#define GBL_INSTANCE_PUBLIC(instPriv, type)            (GblInstance_public((const void*)instPriv, type))
 
-#define GBL_INSTANCE_CHECK(instance, toType)                    (GblInstance_check((GblInstance*)instance, toType))
-#define GBL_INSTANCE_CHECK_PREFIX(instance, typePrefix)         (GBL_INSTANCE_CHECK(instance, typePrefix##_TYPE))
-#define GBL_INSTANCE_CAST(instance, toType, cType)              ((cType*)GblInstance_cast((GblInstance*)instance, toType))
-#define GBL_INSTANCE_CAST_PREFIX(instance, typePrefix)          (GBL_INSTANCE_CAST(instance, typePrefix##_TYPE, typePrefix##_STRUCT))
-#define GBL_INSTANCE_TRY(instance, toType, cType)               ((cType*)GblInstance_try((GblInstance*)instance, toType))
-#define GBL_INSTANCE_TRY_PREFIX(instance, typePrefix)           (GBL_INSTANCE_TRY(instance, typePrefix##_TYPE, typePrefix##_STRUCT))
+#define GBL_INSTANCE_CHECK(instance, cType)            (GblInstance_check((GblInstance*)instance, GBL_TYPEOF(cType)))
+#define GBL_INSTANCE_CAST(instance, cType)             ((cType*)GblInstance_cast((GblInstance*)instance, GBL_TYPEOF(cType)))
+#define GBL_INSTANCE_TRY(instance, cType)              ((cType*)GblInstance_try((GblInstance*)instance, GBL_TYPEOF(cType)))
 
-#define GBL_INSTANCE_GET_CLASS(instance, toType, cType)         ((cType*)GblClass_cast(GblInstance_class((GblInstance*)instance), toType))
-#define GBL_INSTANCE_GET_CLASS_PREFIX(instance, typePrefix)     (GBL_INSTANCE_GET_CLASS(instance, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
-#define GBL_INSTANCE_TRY_CLASS(instance, toType, cType)         ((cType*)GblClass_try(GblInstance_class((GblInstance*)instance), toType))
-#define GBL_INSTANCE_TRY_CLASS_PREFIX(instance, typePrefix)     (GBL_INSTANCE_TRY_CLASS(instance, typePrefix##_TYPE, typePrefix##_CLASS_STRUCT))
+#define GBL_INSTANCE_GET_CLASS(instance, cType)        ((GBL_CLASSOF(cType)*)GblClass_cast(GblInstance_class((GblInstance*)instance), GBL_TYPEOF(cType)))
+#define GBL_INSTANCE_TRY_CLASS(instance, cType)        ((GBL_CLASSOF(cType)*)GblClass_try(GblInstance_class((GblInstance*)instance), GBL_TYPEOF(cType)))
 
-#define GBL_INSTANCE_VCALL(type, classType, method, ...)        GBL_INSTANCE_VCALL_((void*), type, classType, method, __VA_ARGS__)
-#define GBL_INSTANCE_VCALL_PREFIX(prefix, method, ...)          GBL_INSTANCE_VCALL(prefix##_TYPE, prefix##_CLASS_STRUCT, method, __VA_ARGS__)
-#define GBL_INSTANCE_VCALL_SUPER(type, classType, method, ...)  GBL_INSTANCE_VCALL_(GBL_CLASS_SUPER, type, classType, method, __VA_ARGS__)
-#define GBL_INSTANCE_VCALL_SUPER_PREFIX(prefix, method, ...)    GBL_INSTANCE_VCALL_SUPER(prefix##_TYPE, prefix##_CLASS_STRUCT, method, __VA_ARGS__)
-#define GBL_INSTANCE_VCALL_DEFAULT(type, classType, method, ...)GBL_INSTANCE_VCALL_(GBL_CLASS_DEFAULT, type, classType, method, __VA_ARGS__)
-#define GBL_INSTANCE_VCALL_DEFAULT_PREFIX(prefix, method, ...)  GBL_INSTANCE_VCALL_DEFAULT(prefix##_TYPE, prefix##_CLASS_STRUCT, method, __VA_ARGS__)
+#define GBL_INSTANCE_VCALL(cType, method, ...)         GBL_INSTANCE_VCALL_(cType, method, __VA_ARGS__)
+#define GBL_INSTANCE_VCALL_DEFAULT(cType, method, ...) GBL_INSTANCE_VCALL_DEFAULT_(cType, method, __VA_ARGS__)
 
-#define GBL_SELF    GblInstance*       pSelf
-#define GBL_CSELF   const GblInstance* pSelf
+#define GBL_SELF_TYPE GblInstance
 
 GBL_DECLS_BEGIN
 
@@ -58,49 +48,49 @@ typedef struct GblInstance {
     GblClass*   pClass; ///< READ-ONLY Pointer to Instance's Class, do not modify directly
 } GblInstance;
 
-GBL_EXPORT GblInstance* GblInstance_create              (GblType type)               GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_createWithClass     (GblClass* pClass)           GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblInstance_destroy             (GBL_SELF)                   GBL_NOEXCEPT;
+GBL_EXPORT GblInstance* GblInstance_create             (GblType type)               GBL_NOEXCEPT;
+GBL_EXPORT GblInstance* GblInstance_createWithClass    (GblClass* pClass)           GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblInstance_destroy            (GBL_SELF)                   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblInstance_construct           (GBL_SELF, GblType type)     GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_constructWithClass  (GBL_SELF, GblClass* pClass) GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblInstance_destruct            (GBL_SELF)                   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_construct          (GBL_SELF, GblType type)     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_constructWithClass (GBL_SELF, GblClass* pClass) GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblInstance_destruct           (GBL_SELF)                   GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool      GblInstance_check               (GBL_CSELF, GblType toType)  GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_cast                (GBL_SELF, GblType toType)   GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_try                 (GBL_SELF, GblType toType)   GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblInstance_check              (GBL_CSELF, GblType toType)  GBL_NOEXCEPT;
+GBL_EXPORT GblInstance* GblInstance_cast               (GBL_SELF, GblType toType)   GBL_NOEXCEPT;
+GBL_EXPORT GblInstance* GblInstance_try                (GBL_SELF, GblType toType)   GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblInstance_private             (GBL_CSELF, GblType base)    GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_public              (const void* pPrivate,
-                                                         GblType     base)           GBL_NOEXCEPT;
+GBL_EXPORT void*        GblInstance_private            (GBL_CSELF, GblType base)    GBL_NOEXCEPT;
+GBL_EXPORT GblInstance* GblInstance_public             (const void* pPrivate,
+                                                        GblType     base)           GBL_NOEXCEPT;
 
-GBL_EXPORT GblType      GblInstance_typeOf              (GBL_CSELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblInstance_size                (GBL_CSELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblInstance_privateSize         (GBL_CSELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblInstance_totalSize           (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblType      GblInstance_typeOf             (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblInstance_size               (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblInstance_privateSize        (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblInstance_totalSize          (GBL_CSELF)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblClass*    GblInstance_class               (GBL_CSELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_swizzleClass        (GBL_SELF, GblClass* pClass) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_sinkClass           (GBL_SELF)                   GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_floatClass          (GBL_SELF)                   GBL_NOEXCEPT;
+GBL_EXPORT GblClass*    GblInstance_class              (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_swizzleClass       (GBL_SELF, GblClass* pClass) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_sinkClass          (GBL_SELF)                   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblInstance_floatClass         (GBL_SELF)                   GBL_NOEXCEPT;
 
 // ========== IMPL ==========
 
 ///\cond
-#define GBL_INSTANCE_VCALL__N(method, ...)  GBL_API_CALL(pClass->method(__VA_ARGS__))
+#define GBL_INSTANCE_VCALL_(cType, method, ...)                                                       \
+    GBL_STMT_START {                                                                                  \
+        GBL_CLASSOF(cType)* pClass = GBL_INSTANCE_GET_CLASS(GBL_TUPLE_FIRST (__VA_ARGS__, 1), cType); \
+        GBL_API_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                                \
+        GBL_API_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                        \
+        GBL_API_CALL(pClass->method(__VA_ARGS__));                                                    \
+    } GBL_STMT_END
 
-#define GBL_INSTANCE_VCALL__2(method, inst) GBL_API_VCALL__N(method, inst)
-
-#define GBL_INSTANCE_VCALL__(...)               \
-    GBL_VA_OVERLOAD_SELECT(GBL_INSTANCE_VCALL_, GBL_VA_OVERLOAD_SUFFIXER_2_N, __VA_ARGS__)(__VA_ARGS__);
-
-#define GBL_INSTANCE_VCALL_(op, type, classType, method, ...)                                   \
-    GBL_STMT_START {                                                                            \
-        classType* pClass = GBL_INSTANCE_GET_CLASS(GBL_TUPLE_FIRST (__VA_ARGS__, 1), type, classType);   \
-        pClass = (classType*)op(pClass);                                                        \
-        GBL_API_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                          \
-        GBL_API_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                  \
-        GBL_API_CALL(pClass->method(__VA_ARGS__));                                              \
+#define GBL_INSTANCE_VCALL_DEFAULT_(cType, method, ...)                                               \
+    GBL_STMT_START {                                                                                  \
+        GBL_CLASSOF(cType)* pClass = (GBL_CLASSOF(cType)*)GblClass_weakRefDefault(GBL_TYPEOF(cType)); \
+        GBL_API_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                                \
+        GBL_API_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                        \
+        GBL_API_CALL(pClass->method(__VA_ARGS__));                                                    \
     } GBL_STMT_END
 ///\endcond
 
@@ -285,8 +275,7 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass          (GBL_SELF)              
 
 GBL_DECLS_END
 
-#undef GBL_SELF
-#undef GBL_CSELF
+#undef GBL_SELF_TYPE
 
 
 #endif // GIMBAL_INSTANCE_H

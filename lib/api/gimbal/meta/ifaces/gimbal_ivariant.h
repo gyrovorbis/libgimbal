@@ -9,14 +9,10 @@
 
 #include "gimbal_interface.h"
 
-#define GBL_IVARIANT_TYPE                       (GBL_BUILTIN_TYPE(IVARIANT))
-#define GBL_IVARIANT_STRUCT                     GblIVariant
-#define GBL_IVARIANT_CLASS_STRUCT               GblIVariantClass
-#define GBL_IVARIANT(instance)                  (GBL_INSTANCE_CAST_PREFIX       (instance,  GBL_IVARIANT))
-#define GBL_IVARIANT_CHECK(instance)            (GBL_INSTANCE_CHECK_PREFIX      (instance,  GBL_IVARIANT))
-#define GBL_IVARIANT_IFACE(klass)               (GBL_CLASS_CAST_PREFIX          (klass,     GBL_IVARIANT))
-#define GBL_IVARIANT_IFACE_CHECK(klass)         (GBL_CLASS_CHECK_PREFIX         (klass,     GBL_IVARIANT))
-#define GBL_IVARIANT_GET_IFACE(instance)        (GBL_INSTANCE_GET_CLASS_PREFIX (instance,  GBL_IVARIANT))
+#define GBL_IVARIANT_TYPE                   (GBL_BUILTIN_TYPE(IVARIANT))
+#define GBL_IVARIANT(instance)              ((GblIVariant*)GblInstance_cast(GBL_INSTANCE(instance), GBL_IVARIANT_TYPE))
+#define GBL_IVARIANT_CLASS(klass)           ((GblIVariantClass*)GblClass_cast(GBL_CLASS(klass), GBL_IVARIANT_TYPE))
+#define GBL_IVARIANT_GET_CLASS(instance)    (GBL_IVARIANT_CLASS(GblInstance_class(GBL_INSTANCE(instance))))
 
 #define GBL_IVARIANT_VALUE_VAR_ARG_MAX          4
 
@@ -70,42 +66,40 @@ GBL_INTERFACE_DERIVE(GblIVariant)
     const GblIVariantClassVTable*   pVTable;
 GBL_INTERFACE_END
 
-#define GBL_SELF    GblIVariantClass* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF_TYPE GblIVariantClass
 
-GBL_API GblIVariantClass_validate            (GBL_CSELF)                                        GBL_NOEXCEPT;
-GBL_API GblIVariantClass_constructDefault    (GBL_CSELF, VARIANT)                               GBL_NOEXCEPT;
-GBL_API GblIVariantClass_constructCopy       (GBL_CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
-GBL_API GblIVariantClass_constructMove       (GBL_CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
-GBL_API GblIVariantClass_constructValueCopy  (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantClass_constructValueMove  (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantClass_setCopy             (GBL_CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
-GBL_API GblIVariantClass_setMove             (GBL_CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
-GBL_API GblIVariantClass_setValueCopy        (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantClass_setValueMove        (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantClass_getValueCopy        (GBL_CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantClass_getValuePeek        (GBL_CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantClass_getValueMove        (GBL_CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
-GBL_API GblIVariantClass_destruct            (GBL_CSELF, VARIANT)                               GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_validate           (GBL_CSELF)                                        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructDefault   (GBL_CSELF, VARIANT)                               GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructCopy      (GBL_CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructMove      (GBL_CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructValueCopy (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructValueMove (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_setCopy            (GBL_CSELF, VARIANT,  const GblVariant* pOther)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_setMove            (GBL_CSELF, VARIANT,  GblVariant* pOther)          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_setValueCopy       (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_setValueMove       (GBL_CSELF, VARIANT,  va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_getValueCopy       (GBL_CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_getValuePeek       (GBL_CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_getValueMove       (GBL_CSELF, CVARIANT, va_list* pVarArgs)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_destruct           (GBL_CSELF, VARIANT)                               GBL_NOEXCEPT;
 
-GBL_API GblIVariantClass_compare             (GBL_CSELF,
-                                              CVARIANT,
-                                              const GblVariant* pOther,
-                                              GblInt* pCmpResult)                               GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_compare            (GBL_CSELF,
+                                                           CVARIANT,
+                                                           const GblVariant* pOther,
+                                                           GblInt* pCmpResult)                               GBL_NOEXCEPT;
 
-GBL_API GblIVariantClass_save                (GBL_CSELF,
-                                              CVARIANT,
-                                              GblStringBuffer* pString)                         GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_save               (GBL_CSELF,
+                                                           CVARIANT,
+                                                           GblStringBuffer* pString)                         GBL_NOEXCEPT;
 
-GBL_API GblIVariantClass_load                (GBL_CSELF,
-                                              VARIANT,
-                                              const GblStringBuffer* pString)                   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblIVariantClass_load               (GBL_CSELF,
+                                                           VARIANT,
+                                                           const GblStringBuffer* pString)                   GBL_NOEXCEPT;
 
 #undef CVARIANT
 #undef VARIANT
 
-#undef GBL_CSELF
-#undef GBL_SELF
+#undef GBL_SELF_TYPE
 
 GBL_DECLS_END
 

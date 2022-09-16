@@ -192,8 +192,6 @@ static GBL_RESULT GblClassTestSuite_check_(GblTestSuite* pSelf, GblContext* pCtx
 
     GBL_TEST_VERIFY(GblClass_check(pSelf_->pClassRef, GBL_STATIC_CLASS_TYPE));
     GBL_TEST_VERIFY(!GblClass_check(pSelf_->pClassRef, GBL_INTERFACE_TYPE));
-    GBL_TEST_VERIFY(GBL_CLASS_CHECK(pSelf_->pClassRef, GBL_STATIC_CLASS_TYPE));
-    GBL_TEST_VERIFY(!GBL_CLASS_CHECK(pSelf_->pClassRef, GBL_INTERFACE_TYPE));
 
     GBL_API_END();
 }
@@ -205,11 +203,6 @@ static GBL_RESULT GblClassTestSuite_cast_(GblTestSuite* pSelf, GblContext* pCtx)
 
     GBL_TEST_COMPARE(GblClass_cast(pSelf_->pClassRef, GBL_STATIC_CLASS_TYPE),
                      pSelf_->pClassRef);
-
-
-    GBL_TEST_COMPARE(GBL_CLASS_CAST(pSelf_->pClassRef,
-                                   GBL_STATIC_CLASS_TYPE,
-                                   GblClass), pSelf_->pClassRef);
 
     GBL_API_END();
 }
@@ -225,12 +218,6 @@ static GBL_RESULT GblClassTestSuite_castInvalid_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
     GBL_API_CLEAR_LAST_RECORD();
 
-    GBL_TEST_COMPARE(GBL_CLASS_CAST(pSelf_->pClassRef, GBL_INTERFACE_TYPE, GblInterface),
-                     NULL);
-
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
-    GBL_API_CLEAR_LAST_RECORD();
-
     GBL_API_END();
 }
 
@@ -241,10 +228,6 @@ static GBL_RESULT GblClassTestSuite_try_(GblTestSuite* pSelf, GblContext* pCtx) 
     GBL_TEST_COMPARE(GblClass_try(pSelf_->pClassRef, GBL_STATIC_CLASS_TYPE),
                      pSelf_->pClassRef);
 
-    GBL_TEST_COMPARE(GBL_CLASS_TRY(pSelf_->pClassRef,
-                                   GBL_STATIC_CLASS_TYPE,
-                                   GblClass), pSelf_->pClassRef);
-
     GBL_API_END();
 }
 
@@ -253,9 +236,6 @@ static GBL_RESULT GblClassTestSuite_tryInvalid_(GblTestSuite* pSelf, GblContext*
     GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GblClass_try(pSelf_->pClassRef, GBL_INTERFACE_TYPE),
-                     NULL);
-
-    GBL_TEST_COMPARE(GBL_CLASS_TRY(pSelf_->pClassRef, GBL_INTERFACE_TYPE, GblInterface),
                      NULL);
 
     GBL_API_END();

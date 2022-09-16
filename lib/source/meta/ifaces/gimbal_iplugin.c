@@ -21,19 +21,19 @@ static GBL_RESULT GblIPluginClass_init_(GblClass* pClass, const void* pData, Gbl
 
 GBL_EXPORT GBL_RESULT GblIPlugin_use(GblIPlugin* pSelf) {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL_PREFIX(GBL_IPLUGIN, pFnUse, pSelf);
+    GBL_INSTANCE_VCALL(GblIPlugin, pFnUse, pSelf);
     GBL_API_END();
 }
 
 GBL_EXPORT GBL_RESULT GblIPlugin_unuse(GblIPlugin* pSelf) {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL_PREFIX(GBL_IPLUGIN, pFnUnuse, pSelf);
+    GBL_INSTANCE_VCALL(GblIPlugin, pFnUnuse, pSelf);
     GBL_API_END();
 }
 
 GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo(const GblIPlugin* pSelf, GblType requestedType, GblTypeInfo* pInfo) {
     GBL_API_BEGIN(NULL);
-    GBL_INSTANCE_VCALL_PREFIX(GBL_IPLUGIN, pFnTypeInfo, pSelf, requestedType, pInfo);
+    GBL_INSTANCE_VCALL(GblIPlugin, pFnTypeInfo, pSelf, requestedType, pInfo);
     GBL_API_END();
 }
 
@@ -48,7 +48,7 @@ GBL_EXPORT GblType GblIPlugin_type(void) {
                                           .pFnClassInit     = GblIPluginClass_init_,
                                           .classSize        = sizeof(GblIPluginClass)
                                       },
-                                      GBL_TYPE_FLAG_ABSTRACT);
+                                      GBL_TYPE_FLAGS_NONE);
         GBL_API_VERIFY_LAST_RECORD();
         GBL_API_END_BLOCK();
     }
