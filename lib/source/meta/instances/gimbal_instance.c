@@ -273,20 +273,23 @@ GBL_EXPORT GblInstance* GblInstance_convert_(GblInstance* pSelf, GblType type, G
     const GblBool invalidPtr = (!pSelf && type != GBL_INVALID_TYPE);
     const GblBool typeMismatch = (!invalidPtr && !(GblInstance_check(pSelf, type)));
 
-    if(check && (invalidPtr || typeMismatch)) {
-        GBL_API_BEGIN(NULL);
-        GBL_API_VERIFY_POINTER(!invalidPtr,
-                               "Failed to cast NULL instance to %s.",
-                               GblType_name(type));
-        GBL_API_VERIFY(!typeMismatch, GBL_RESULT_ERROR_TYPE_MISMATCH,
-                       "Failed to cast instance from %s to %s.",
-                       GblType_name(GblInstance_typeOf(pSelf)),
-                       GblType_name(type));
-        GBL_API_END_BLOCK();
+    if(invalidPtr || typeMismatch) {
+        if(check) {
+            GBL_API_BEGIN(NULL);
+            GBL_API_VERIFY_POINTER(!invalidPtr,
+                                   "Failed to cast NULL instance to %s.",
+                                   GblType_name(type));
+            GBL_API_VERIFY(!typeMismatch, GBL_RESULT_ERROR_TYPE_MISMATCH,
+                           "Failed to cast instance from %s to %s.",
+                           GblType_name(GblInstance_typeOf(pSelf)),
+                           GblType_name(type));
+            GBL_API_END_BLOCK();
 
+        }
     } else if(pSelf) {
         pOutInstance = pSelf;
     }
+
     return pOutInstance;
 }
 
