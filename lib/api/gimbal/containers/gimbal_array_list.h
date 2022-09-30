@@ -42,73 +42,73 @@ GBL_EXPORT GBL_RESULT   GblArrayList_construct_7 (GBL_SELF,
                                                   const void*  pInitialData,
                                                   GblSize      structSize,
                                                   GblBool      zeroTerminated,
-                                                  GblContext*  pCtx)                                             GBL_NOEXCEPT;
+                                                  GblContext*  pCtx)                                           GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblArrayList_construct_6 (GBL_SELF,
                                                   uint16_t     elementSize,
                                                   GblSize      elementCount,
                                                   const void*  pInitialData,
                                                   GblSize      structSize,
-                                                  GblBool      zeroTerminated)                                   GBL_NOEXCEPT;
+                                                  GblBool      zeroTerminated)                                 GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblArrayList_construct_5 (GBL_SELF,
                                                   uint16_t     elementSize,
                                                   GblSize      elementCount,
                                                   const void*  pInitialData,
-                                                  GblSize      structSize)                                       GBL_NOEXCEPT;
+                                                  GblSize      structSize)                                     GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblArrayList_construct_4 (GBL_SELF,
                                                   uint16_t     elementSize,
                                                   GblSize      elementCount,
-                                                  const void*  pInitialData)                                     GBL_NOEXCEPT;
+                                                  const void*  pInitialData)                                   GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblArrayList_construct_3 (GBL_SELF,
                                                   uint16_t     elementSize,
-                                                  GblSize      elementCount)                                     GBL_NOEXCEPT;
+                                                  GblSize      elementCount)                                   GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT   GblArrayList_construct_2 (GBL_SELF,
-                                                  uint16_t     elementSize)                                      GBL_NOEXCEPT;
+                                                  uint16_t     elementSize)                                    GBL_NOEXCEPT;
 #define                 GblArrayList_construct(...) \
                             GBL_VA_OVERLOAD_CALL(GblArrayList_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 #define                 GblArrayList_alloca(...) \
                             GBL_VA_OVERLOAD_CALL(GBL_ARRAY_LIST_ALLOCA, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
-GBL_EXPORT GBL_RESULT   GblArrayList_destruct    (GBL_SELF)                                                      GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblArrayList_assign      (GBL_SELF, const void* pData, GblSize elementCount)             GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblArrayList_release     (GBL_SELF, void** ppVecPtr, GblSize* pSize, GblSize* pCapacity) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblArrayList_acquire     (GBL_SELF, void* pData, GblSize size, GblSize capacity)         GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_destruct    (GBL_SELF)                                                    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_assign      (GBL_SELF, const void* pData, GblSize elementCount)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_release     (GBL_SELF, void** ppData, GblSize* pSize, GblSize* pCapacity) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_acquire     (GBL_SELF, void* pData, GblSize size, GblSize capacity)       GBL_NOEXCEPT;
 
-GBL_INLINE GblContext*  GblArrayList_context     (GBL_CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE uint16_t     GblArrayList_stackBytes  (GBL_CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE void*        GblArrayList_stackBuffer (GBL_CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE GblSize      GblArrayList_size        (GBL_CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE GblSize      GblArrayList_capacity    (GBL_CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE uint16_t     GblArrayList_elementSize (GBL_CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE void*        GblArrayList_data        (GBL_CSELF)                                                     GBL_NOEXCEPT;
+GBL_INLINE GblContext*  GblArrayList_context     (GBL_CSELF)                                                   GBL_NOEXCEPT;
+GBL_INLINE uint16_t     GblArrayList_stackBytes  (GBL_CSELF)                                                   GBL_NOEXCEPT;
+GBL_INLINE void*        GblArrayList_stackBuffer (GBL_CSELF)                                                   GBL_NOEXCEPT;
+GBL_INLINE GblSize      GblArrayList_size        (GBL_CSELF)                                                   GBL_NOEXCEPT;
+GBL_INLINE GblSize      GblArrayList_capacity    (GBL_CSELF)                                                   GBL_NOEXCEPT;
+GBL_INLINE uint16_t     GblArrayList_elementSize (GBL_CSELF)                                                   GBL_NOEXCEPT;
+GBL_INLINE void*        GblArrayList_data        (GBL_CSELF)                                                   GBL_NOEXCEPT;
 
-GBL_INLINE GblBool      GblArrayList_empty       (GBL_CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE GblBool      GblArrayList_stack       (GBL_CSELF)                                                     GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblArrayList_empty       (GBL_CSELF)                                                   GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblArrayList_stack       (GBL_CSELF)                                                   GBL_NOEXCEPT;
 
-GBL_INLINE void*        GblArrayList_at          (GBL_CSELF, GblSize index)                                      GBL_NOEXCEPT;
-GBL_INLINE void*        GblArrayList_front       (GBL_CSELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE void*        GblArrayList_back        (GBL_CSELF)                                                     GBL_NOEXCEPT;
+GBL_INLINE void*        GblArrayList_at          (GBL_CSELF, GblSize index)                                    GBL_NOEXCEPT;
+GBL_INLINE void*        GblArrayList_front       (GBL_CSELF)                                                   GBL_NOEXCEPT;
+GBL_INLINE void*        GblArrayList_back        (GBL_CSELF)                                                   GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblArrayList_insert      (GBL_SELF, GblSize index, GblSize count, const void* pData)     GBL_NOEXCEPT;
-GBL_INLINE void*        GblArrayList_emplace     (GBL_SELF, GblSize index)                                       GBL_NOEXCEPT;
+GBL_EXPORT void*        GblArrayList_insert      (GBL_SELF, GblSize index, GblSize count, const void* pData)   GBL_NOEXCEPT;
+GBL_INLINE void*        GblArrayList_emplace     (GBL_SELF, GblSize index)                                     GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT   GblArrayList_pushFront   (GBL_SELF, const void* pData)                                   GBL_NOEXCEPT;
-GBL_INLINE void*        GblArrayList_emplaceFront(GBL_SELF)                                                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblArrayList_pushFront   (GBL_SELF, const void* pData)                                 GBL_NOEXCEPT;
+GBL_INLINE void*        GblArrayList_emplaceFront(GBL_SELF)                                                    GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT   GblArrayList_pushBack    (GBL_SELF, const void* pData)                                   GBL_NOEXCEPT;
-GBL_INLINE void*        GblArrayList_emplaceBack (GBL_SELF)                                                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblArrayList_pushBack    (GBL_SELF, const void* pData)                                 GBL_NOEXCEPT;
+GBL_INLINE void*        GblArrayList_emplaceBack (GBL_SELF)                                                    GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT   GblArrayList_append      (GBL_SELF, const void* pData, GblSize elementCount)             GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT   GblArrayList_prepend     (GBL_SELF, const void* pData, GblSize elementCount)             GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblArrayList_append      (GBL_SELF, const void* pData, GblSize elementCount)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT   GblArrayList_prepend     (GBL_SELF, const void* pData, GblSize elementCount)           GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblArrayList_popFront    (GBL_SELF, void* pOut)                                          GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblArrayList_popBack     (GBL_SELF, void* pOut)                                          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_popFront    (GBL_SELF, void* pOut)                                        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_popBack     (GBL_SELF, void* pOut)                                        GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblArrayList_erase       (GBL_SELF, GblSize begin, GblSize count)                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblArrayList_clear       (GBL_SELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_erase       (GBL_SELF, GblSize begin, GblSize count)                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_clear       (GBL_SELF)                                                    GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblArrayList_reserve     (GBL_SELF, GblSize capacity)                                    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblArrayList_resize      (GBL_SELF, GblSize size)                                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblArrayList_shrinkToFit (GBL_SELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_reserve     (GBL_SELF, GblSize capacity)                                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_resize      (GBL_SELF, GblSize size)                                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblArrayList_shrinkToFit (GBL_SELF)                                                    GBL_NOEXCEPT;
 
 // ========== IMPL ==========
 

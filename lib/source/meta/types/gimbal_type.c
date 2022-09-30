@@ -451,9 +451,7 @@ static GblType typeRegister_(GblType parent,
 
         GblSize metaSize = sizeof(GblMetaClass) + baseCount * sizeof(GblMetaClass*);
 
-        const GblSize alignRem = (metaSize % GBL_META_CLASS_ALIGNMENT_);
-        if(alignRem)
-            metaSize += (GBL_META_CLASS_ALIGNMENT_ - (alignRem));
+        metaSize = gblAlignedAllocSize(metaSize, GBL_META_CLASS_ALIGNMENT_);
 
         GBL_API_PUSH_VERBOSE("MetaClass Info");
         GBL_API_VERBOSE("%-20s: %-100u", "total size",      metaSize);

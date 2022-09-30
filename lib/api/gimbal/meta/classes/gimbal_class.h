@@ -1,8 +1,7 @@
-/*!  \file
+/*! \file
  *  \brief GblClass structure and related functions
  *  \ingroup meta
- *  \ref floatingClasses
- *  \ref classSwizzling
+ *  \copydoc GblClass
  *  \sa gimbal_instance.h, gimbal_type.h
  *
  */
@@ -36,14 +35,14 @@ GBL_DECLS_BEGIN
  *\details
  * A class represents a collection of data that is shared among
  * all instances of a given type. This data is typically in the
- * form of funtion pointers for modeling overridable methods
+ * form of function pointers for modeling overridable methods
  * or regular data for modeling static member variables.
  *
  * GblClass is the base structure which is to be inherited by all
  * class structures within the meta type system. This means placing
  * it or a type "inheriting" from it as the first member of a
  * class struct, when using C.
- *\sa GblInstace, GblType
+ *\sa GblInstance, GblType
  */
 typedef struct GblClass {
     GBL_PRIVATE()
@@ -552,6 +551,9 @@ GBL_DECLS_END
 /*! \page Classes Classes
  *  \tableofcontents
  *
+ * ## GblClass
+ *  \copydoc GblClass
+ *
  * ## Floating Classes
  *
  *  Typically, when you wish to override virtual methods on a class to provide
@@ -567,15 +569,16 @@ GBL_DECLS_END
  *  This is where libGimbal's floating classes come into play. Lets say you
  *  wish to quickly create a new GblObject with a custom event handler:
  *
+ *  \code{.c}
  *      GblObject* pMyObj = GblInstance_create(GBL_OBJECT_TYPE);
  *      GblIEventHandler* pHandler = GBL_EVENT_HANDLER(pMyObj);
  *
  *      // I want to override this, but don't want to register a new type!
  *      GblIEventHandler_eventNotify(pHandler, NULL);
- *
+ *  \endcode
  *  By creating a separate "floating" class, we are able to perform ad-hoc
  *  method overriding for a single instance:
- *
+ *  \code{.c}
  *      // We have a brand-new, unowned class just for us!
  *      GblObjectClass* pClass = GBL_OBJECT_CLASS(GblClass_createFloating(GBL_OBJECT_TYPE));
  *
@@ -595,7 +598,7 @@ GBL_DECLS_END
  *
  *      // Destroys the sunk class with it
  *      GblInstance_destroy(GBL_INSTANCE(pObj));
- *
+ *  \endcode
  *  \note
  *  If we do not "sink" the floating class, then we have to destory it manually,
  *  because its lifetime will not yet be bound to the instance. This can actually
@@ -603,7 +606,7 @@ GBL_DECLS_END
  *  shared among multiple instances.
  *
  *  For extra credit, we can do the same trick with stack-allocated types as well:
- *
+ *  \code{.c}
  *      // call placement constructor on existing memory
  *      GblObjectClass klass;
  *      GblClass_constructFloating(GBL_CLASS(&klass), GBL_OBJECT_TYPE);
@@ -621,17 +624,18 @@ GBL_DECLS_END
  *
  *      // Call placement destructor which doesn't deallocate
  *      GblInstance_destruct(GBL_INSTANCE(&object));
- *
+ *  \endcode
  * ## Class Swizzling
  *
  *  Sometimes you would like to do something similar to the previous example,
  *  with ad-hoc virtual method overriding, but the creation of the object is
  *  not actually under your control. This is a time for libGimbal's class
  *  swizzling, inspired by Objective-C's "is-a" swizzling:
- *
- *      GblObject* pObject = GblObject_create(GBL_OBJECT_TYPE, "name",    "fuckwhisp",
- *                                                          "userdata", (void*)0xdeadbabe,
- *                                                          NULL);
+ *  \code{.c}
+ *      GblObject* pObject = GblObject_create(GBL_OBJECT_TYPE,
+ *                                            "name",    "MyObject",
+ *                                            "userdata", (void*)0xdeadbabe,
+ *                                            NULL);
  *
  *      GblObjectClass* pClass = GBL_OBJECT_GET_CLASS(pObject);
  *
@@ -671,55 +675,63 @@ GBL_DECLS_END
  *
  *      // K clean up our fuckery
  *      GblInstance_destroy(GBL_INSTANCE(pObj);
- *
+ *  \endcode
  */
 /*! \page TypeTemplate Type Templates
  *  At the top of the file for most libGimbal derived types, along with the type identifier,
  *  you will find a collection of convenience utility macros implementing function-style
  *  casts for the given type.
+ *  \code{.c}
+ *      // type UUID macro (expands to GblObject_type() registration function)
+ *      #define GBL_OBJECT_TYPE                     (GBL_TYPEOF(GblObject))
  *
- *      // type info macros
- *      #define GBL_OBJECT_TYPE                     (GBL_BUILTIN_TYPE(OBJECT))
- *      #define GBL_OBJECT_STRUCT                   GblObject
- *      #define GBL_OBJECT_CLASS_STRUCT             GblObjectClass
+ *      // instance function-style cast macro
+ *      #define GBL_OBJECT(instance)                (GBL_INSTANCE_CAST(instance, GblObject))
  *
- *      // instance cast and validation macros
- *      #define GBL_OBJECT(instance)                GBL_INSTANCE_CAST_PREFIX(instance, GBL_OBJECT)
- *      #define GBL_OBJECT_CHECK(instance)          GBL_INSTANCE_CHECK_PREFIX(instance, GBL_OBJECT)
- *      #define GBL_OBJECT_TRY(instance)            GBL_INSTANCE_TRY_PREFIX(instance, GBL_OBJECT)
+ *      // class cast function-style cast macro
+ *      #define GBL_OBJECT_CLASS(klass)             (GBL_CLASS_CAST(klass, GblObject))
  *
- *      // class cast and validation macros
- *      #define GBL_OBJECT_CLASS(klass)             GBL_CLASS_CAST_PREFIX(klass, GBL_OBJECT)
- *      #define GBL_OBJECT_CLASS_CHECK(klass)       GBL_CLASS_CHECK_PREFIX(klass, GBL_OBJECT)
- *      #define GBL_OBJECT_CLASS_TRY(klass)         GBL_CLASS_TRY_PREFIX(klass, GBL_OBJECT)
- *
- *      // instance-to-class cast and validation macros
- *      #define GBL_OBJECT_GET_CLASS(instance)      GBL_INSTANCE_GET_CLASS_PREFIX(instance, GBL_OBJECT)
- *      #define GBL_OBJECT_TRY_CLASS(instance)      GBL_INSTANCE_TRY_CLASS_PREFIX(instance, GBL_OBJECT)
- *
+ *      // instance-to-class cast macro
+ *      #define GBL_OBJECT_GET_CLASS(instance)      (GBL_INSTANCE_GET_CLASS(instance, GblObject))
+ *  \endcode
  *  While these macros are obviously optional, they do add a lot to the codebase in terms of readability
  *  and convenience as well as uniform styling. With these sorts of macros defined, we then gain access to
  *  lots of convenience:
- *
+ *  \code{.c}
+ *      // create a floating object class
+ *      //    - easy cast to particular class
  *      GblObjectClass* pClass  = GBL_OBJECT_CLASS(GblClass_createFloating(GBL_OBJECT_TYPE));
  *
- *      GblIEventHandlerIFace* pIEvent = GBL_IEVENT_HANDLER_IFACE(pClass);
+ *      // lets override just its implementation of the GblIEventHandlerClass interface
+ *      //    - easy cast to particular interface
+ *      GblIEventHandlerClass* pIEvent = GBL_IEVENT_HANDLER_CLASS(pClass);
+ *      // override virtual method
  *      pIEvent->pFnEvent = [&](GblIEventHandler* pSelf, GblEvent* pEvent) {
+ *           // easy cast to particular instance type
  *           GblObject* pSelfObj = GBL_OBJECT(pSelf);
  *
- *           if(MY_CUSTOM_EVENT_CHECK(pEvent)) {
+ *           printf("%s received an Event!", GblObject_name(pSelfObj));
+ *
+ *
+ *           if(GBL_INSTANCE_CHECK(pEvent, MyEventType)) {
+ *               // easy cast to particular event instance
  *               MyCustomEvent* pEvent = MY_CUSTOM_EVENT(pEvent);
+ *
  *               // do something
- *           } else if(SOME_OTHER_EVENT_CHECK(pEvent)) {
+ *           } else if(GBL_INSTANCE_CHECK(pEvent, MyOtherEventType)) {
+ *               // easy cast to particular event instance
  *               SomeOtherEvent* pEvent = SOME_OTHER_EVENT(pEvent);
+ *
  *               // do something
  *           }
  *      }
  *
- *      GblObject*  pObject = GBL_OBJECT(GblInstance_createWithClass(GBL_CLASS(pClass)));
+ *      GblObject* pObject = GblObject_createWithClass(pClass);
+ *      // easy cast from object to GblInstance base
  *      GblInstance_sinkClass(GBL_INSTANCE(pObject));
- *
- *      GblInstance_destroy(GBL_INSTANCE(pObject));
+ *      // easy cast from object to GblBox base
+ *      GblBox_unref(GBL_BOX(pObject));
+ *  \endcode
  */
 
 #endif // GIMBAL_CLASS_H

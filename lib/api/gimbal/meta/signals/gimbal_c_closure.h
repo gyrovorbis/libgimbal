@@ -1,3 +1,10 @@
+/*! \file
+ *  \brief GblCClosure base instance and API
+ *  \copydoc GblCClosure
+ *  \ingroup signals
+ */
+
+
 #ifndef GIMBAL_C_CLOSURE_H
 #define GIMBAL_C_CLOSURE_H
 

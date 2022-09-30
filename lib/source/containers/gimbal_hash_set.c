@@ -159,14 +159,14 @@ GBL_EXPORT GblHash gblHashSip(const void* pData, GblSize size) GBL_NOEXCEPT {
     return SIP64((uint8_t*)pData, size, gblSeed(0), gblSeed(1));
 }
 
-GBL_EXPORT GBL_RESULT             GblHashSet_construct_8(GblHashSet*                 pSet,
-                                           GblSize                     elsize,
-                                           GblHashSetHashFn       pFnHash,
-                                           GblHashSetCmpFn    pFnCompare,
-                                           GblHashSetDtorFn   pFnDestruct,
-                                           GblSize                     capacity,
-                                           GblContext*                 pCtx,
-                                           void*                       pUserdata) GBL_NOEXCEPT
+GBL_EXPORT GBL_RESULT GblHashSet_construct_8(GblHashSet*      pSet,
+                                             GblSize          elsize,
+                                             GblHashSetHashFn pFnHash,
+                                             GblHashSetCmpFn  pFnCompare,
+                                             GblHashSetDtorFn pFnDestruct,
+                                             GblSize          capacity,
+                                             GblContext*      pCtx,
+                                             void*            pUserdata)
 {
 
     GBL_API_BEGIN(pCtx);
@@ -198,7 +198,7 @@ GBL_EXPORT GBL_RESULT             GblHashSet_construct_8(GblHashSet*            
         GBL_PRIV_REF(pSet).capacity       = capacity;
         GBL_PRIV_REF(pSet).bucketCount    = capacity;
         GBL_PRIV_REF(pSet).mask           = GBL_PRIV_REF(pSet).bucketCount-1;
-        GBL_PRIV_REF(pSet).pBuckets        = GBL_API_MALLOC(GBL_PRIV_REF(pSet).bucketSize*GBL_PRIV_REF(pSet).bucketCount);
+        GBL_PRIV_REF(pSet).pBuckets       = GBL_API_MALLOC(GBL_PRIV_REF(pSet).bucketSize*GBL_PRIV_REF(pSet).bucketCount);
         memset(GBL_PRIV_REF(pSet).pBuckets, 0, GBL_PRIV_REF(pSet).bucketSize*GBL_PRIV_REF(pSet).bucketCount);
     }
     GBL_API_END();

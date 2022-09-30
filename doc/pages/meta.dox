@@ -31,9 +31,8 @@
 		#define GBL_MODULE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblModule))
 		#define GBL_MODULE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblModule))
 
-		// OO API local defines to simulate "this" pointer
-		#define GBL_SELF    GblModule* pSelf
-		#define GBL_CSELF   const GBL_SELF
+		// Type of the "self" pointer for the current file scope
+		#define GBL_SELF_TYPE GblModule
 
 		// Declares our header extern C
 		GBL_DECLS_BEGIN
@@ -90,8 +89,7 @@
 
 		GBL_DECLS_END
 
-		#undef GBL_CSELF
-		#undef GBL_SELF
+		#undef GBL_SELF_TYPE
 
 		#endif // GIMBAL_MODULE_H
 	\endcode

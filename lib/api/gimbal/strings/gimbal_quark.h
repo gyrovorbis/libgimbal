@@ -67,28 +67,33 @@ typedef uintptr_t       GblQuark;
 
 GBL_EXPORT GBL_RESULT   GblQuark_init               (GblContext* pCtx,
                                                      GblSize extraPageSize,
-                                                     GblSize initialEntries)                GBL_NOEXCEPT;
+                                                     GblSize initialEntries)              GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblQuark_final              (void)                                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblQuark_final              (void)                                GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblQuark_pageCount          (void)                                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblQuark_pageSize           (void)                                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblQuark_bytesUsed          (void)                                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblQuark_count              (void)                                  GBL_NOEXCEPT;
-GBL_EXPORT GblContext*  GblQuark_context            (void)                                  GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblQuark_pageCount          (void)                                GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblQuark_pageSize           (void)                                GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblQuark_bytesUsed          (void)                                GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblQuark_bytesAvailable     (void)                                GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblQuark_totalCapacity      (void)                                GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblQuark_fragmentedBytes    (void)                                GBL_NOEXCEPT;
+GBL_EXPORT float        GblQuark_utilization        (void)                                GBL_NOEXCEPT;
 
-GBL_EXPORT GblQuark     GblQuark_fromString         (const char* pString)                   GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblQuark_fromStringSized    (const char* pString, GblSize length)   GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblQuark_fromStringStatic   (const char* pSstring)                  GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblQuark_count              (void)                                GBL_NOEXCEPT;
+GBL_EXPORT GblContext*  GblQuark_context            (void)                                GBL_NOEXCEPT;
 
-GBL_EXPORT GblQuark     GblQuark_tryString          (const char* pString)                   GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblQuark_tryStringSized     (const char* pString, GblSize length)   GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_fromString         (const char* pString)                 GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_fromStringSized    (const char* pString, GblSize length) GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_fromStringStatic   (const char* pSstring)                GBL_NOEXCEPT;
 
-GBL_EXPORT const char*  GblQuark_toString           (GblQuark quark)                        GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_tryString          (const char* pString)                 GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_tryStringSized     (const char* pString, GblSize length) GBL_NOEXCEPT;
 
-GBL_EXPORT const char*  GblQuark_internString       (const char* pString)                   GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblQuark_internStringSized  (const char* pString, GblSize length)   GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblQuark_internStringStatic (const char* pString)                   GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblQuark_toString           (GblQuark quark)                      GBL_NOEXCEPT;
+
+GBL_EXPORT const char*  GblQuark_internString       (const char* pString)                 GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblQuark_internStringSized  (const char* pString, GblSize length) GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblQuark_internStringStatic (const char* pString)                 GBL_NOEXCEPT;
 
 /// \cond
 GBL_DECLS_END
@@ -137,6 +142,26 @@ GBL_DECLS_END
     \returns total number of bytes used on all pages by interned strings
 */
 
+/*!
+    \fn GblQuark_bytesAvailable(void)
+    \returns total number of bytes available on the current page
+*/
+
+/*!
+    \fn GblQuark_totalCapacity(void)
+    \returns total combined byte size of all active pages
+*/
+
+/*!
+    \fn GblQuark_fragmentedBytes(void)
+    \returns total number of leftover/wasted bytes at the end of a page that were too small to fill
+*/
+
+/*!
+    \fn GblQuark_utilization(void)
+    \returns Ratio of GblQuark_bytesUsed() over GblQuark_totalCapacity(),
+            representing what percentage of available resources is being utilized
+*/
 /*!
     \fn GblQuark_count(void)
     \returns total number of GblQuarks which have been created internally

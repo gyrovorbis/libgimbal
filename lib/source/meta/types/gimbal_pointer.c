@@ -112,7 +112,7 @@ GblType GblPointer_register(const char* pName) {
     type = GblType_registerStatic(GblQuark_internString(pName),
                                   GBL_POINTER_TYPE,
                                   &(const GblTypeInfo) {
-                                      .classSize        = sizeof(GblPrimitiveClass),
+                                      .classSize = sizeof(GblPrimitiveClass),
                                   },
                                   GBL_TYPE_FLAGS_NONE);
     GBL_API_VERIFY_LAST_RECORD();

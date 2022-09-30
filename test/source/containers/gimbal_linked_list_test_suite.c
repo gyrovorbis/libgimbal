@@ -14,7 +14,7 @@ typedef struct TestStruct_ {
 typedef struct GblLinkedListTestSuite_ {
     GblLinkedListNode   list1;
     GblLinkedListNode   list2;
-    TestStruct_         testStructs[6];
+    TestStruct_         testStructs[7];
 } GblLinkedListTestSuite_;
 
 static GBL_RESULT GblLinkedListTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
@@ -34,6 +34,8 @@ static GBL_RESULT GblLinkedListTestSuite_init_(GblTestSuite* pSelf, GblContext* 
     pSelf_->testStructs[4].listNode.pNext = NULL;
     pSelf_->testStructs[5].pString = "node5";
     pSelf_->testStructs[5].listNode.pNext = NULL;
+    pSelf_->testStructs[6].pString = "node6";
+    pSelf_->testStructs[6].listNode.pNext = NULL;
     GBL_API_END();
 }
 
@@ -433,26 +435,192 @@ static GBL_RESULT GblLinkedListTestSuite_reverse_(GblTestSuite* pSelf, GblContex
     GBL_API_END();
 }
 
+static GBL_RESULT GblLinkedListTestSuite_insertAfter_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblLinkedListTestSuite_* pSelf_ = GBL_LINKED_LIST_TEST_SUITE_(pSelf);
+
+    GblLinkedList_insertAfter(&pSelf_->testStructs[2].listNode,
+                              &pSelf_->testStructs[3].listNode);
+
+
+    GBL_TEST_COMPARE(GblLinkedList_count(&pSelf_->list1), 4);
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[2].listNode,
+                                        0,
+                                        "node2"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[3].listNode,
+                                        1,
+                                        "node3"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[1].listNode,
+                                        2,
+                                        "node1"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[0].listNode,
+                                        3,
+                                        "node0"));
+
+    GBL_API_END();
+}
+
+static GBL_RESULT GblLinkedListTestSuite_insertFront_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblLinkedListTestSuite_* pSelf_ = GBL_LINKED_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_VERIFY(GblLinkedList_insert(&pSelf_->list1, &pSelf_->testStructs[4].listNode, 0));
+
+
+    GBL_TEST_COMPARE(GblLinkedList_count(&pSelf_->list1), 5);
+
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[4].listNode,
+                                        0,
+                                        "node4"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[2].listNode,
+                                        1,
+                                        "node2"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[3].listNode,
+                                        2,
+                                        "node3"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[1].listNode,
+                                        3,
+                                        "node1"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[0].listNode,
+                                        4,
+                                        "node0"));
+
+    GBL_API_END();
+}
+
+static GBL_RESULT GblLinkedListTestSuite_insertBack_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblLinkedListTestSuite_* pSelf_ = GBL_LINKED_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_VERIFY(GblLinkedList_insert(&pSelf_->list1, &pSelf_->testStructs[5].listNode, 5));
+
+
+    GBL_TEST_COMPARE(GblLinkedList_count(&pSelf_->list1), 6);
+
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[4].listNode,
+                                        0,
+                                        "node4"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[2].listNode,
+                                        1,
+                                        "node2"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[3].listNode,
+                                        2,
+                                        "node3"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[1].listNode,
+                                        3,
+                                        "node1"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[0].listNode,
+                                        4,
+                                        "node0"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[5].listNode,
+                                        5,
+                                        "node5"));
+
+    GBL_API_END();
+}
+
+static GBL_RESULT GblLinkedListTestSuite_insertMiddle_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblLinkedListTestSuite_* pSelf_ = GBL_LINKED_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_VERIFY(GblLinkedList_insert(&pSelf_->list1, &pSelf_->testStructs[6].listNode, 3));
+
+
+    GBL_TEST_COMPARE(GblLinkedList_count(&pSelf_->list1), 7);
+
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[4].listNode,
+                                        0,
+                                        "node4"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[2].listNode,
+                                        1,
+                                        "node2"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[3].listNode,
+                                        2,
+                                        "node3"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[6].listNode,
+                                        3,
+                                        "node6"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[1].listNode,
+                                        4,
+                                        "node1"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[0].listNode,
+                                        5,
+                                        "node0"));
+    GBL_API_VERIFY_CALL(verifyListNode_(pCtx,
+                                        &pSelf_->list1,
+                                        &pSelf_->testStructs[5].listNode,
+                                        6,
+                                        "node5"));
+
+    GBL_API_END();
+}
+
 GBL_EXPORT GblType GblLinkedListTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     const static GblTestCase cases[] = {
-        { "empty",      GblLinkedListTestSuite_empty_       },
-        { "pushBack",   GblLinkedListTestSuite_pushBack_    },
-        { "pushFront",  GblLinkedListTestSuite_pushFront_   },
-        { "popBack",    GblLinkedListTestSuite_popBack_     },
-        { "popFront",   GblLinkedListTestSuite_popFront_    },
-        { "remove",     GblLinkedListTestSuite_remove_      },
-        { "moveBack",   GblLinkedListTestSuite_moveBack_    },
-        { "moveFront",  GblLinkedListTestSuite_moveFront_   },
-        { "joinBack",   GblLinkedListTestSuite_joinBack_    },
-        { "joinFront",  GblLinkedListTestSuite_joinFront_   },
-        { "erase",      GblLinkedListTestSuite_erase_       },
-        { "replace",    GblLinkedListTestSuite_replace_     },
-        { "swap",       GblLinkedListTestSuite_swap_        },
-        { "clear",      GblLinkedListTestSuite_clear_       },
-        { "reverse",    GblLinkedListTestSuite_reverse_     },
-        { NULL,         NULL                                },
+        { "empty",          GblLinkedListTestSuite_empty_           },
+        { "pushBack",       GblLinkedListTestSuite_pushBack_        },
+        { "pushFront",      GblLinkedListTestSuite_pushFront_       },
+        { "popBack",        GblLinkedListTestSuite_popBack_         },
+        { "popFront",       GblLinkedListTestSuite_popFront_        },
+        { "remove",         GblLinkedListTestSuite_remove_          },
+        { "moveBack",       GblLinkedListTestSuite_moveBack_        },
+        { "moveFront",      GblLinkedListTestSuite_moveFront_       },
+        { "joinBack",       GblLinkedListTestSuite_joinBack_        },
+        { "joinFront",      GblLinkedListTestSuite_joinFront_       },
+        { "erase",          GblLinkedListTestSuite_erase_           },
+        { "replace",        GblLinkedListTestSuite_replace_         },
+        { "swap",           GblLinkedListTestSuite_swap_            },
+        { "clear",          GblLinkedListTestSuite_clear_           },
+        { "reverse",        GblLinkedListTestSuite_reverse_         },
+        { "insertAfter",    GblLinkedListTestSuite_insertAfter_     },
+        { "insertFront",    GblLinkedListTestSuite_insertFront_     },
+        { "insertBack",     GblLinkedListTestSuite_insertBack_      },
+        { "insertMiddle",   GblLinkedListTestSuite_insertMiddle_    },
+        { NULL,             NULL                                    },
     };
 
     const static GblTestSuiteClassVTable vTable = {
@@ -462,7 +630,7 @@ GBL_EXPORT GblType GblLinkedListTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_API_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("LinkedListTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStringStatic("GblLinkedListTestSuite"),
                                      &vTable,
                                      sizeof(GblLinkedListTestSuite),
                                      sizeof(GblLinkedListTestSuite_),

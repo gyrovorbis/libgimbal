@@ -54,210 +54,210 @@ typedef struct GblVariant {
     };
 } GblVariant;
 
-GBL_INLINE GblBool          GblVariant_checkTypeCompatible      (GblType type)                  GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblVariant_checkTypeCompatible      (GblType type)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_constructDefault         (GBL_SELF,  GblType type)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_constructDefault         (GBL_SELF,  GblType type)       GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_constructCopy            (GBL_SELF,
-                                                                 const GblVariant* pOther)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_constructCopy            (GBL_SELF,
+                                                              const GblVariant* pOther)      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_constructMove            (GBL_SELF,
-                                                                 GblVariant* pOther)            GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_constructMove            (GBL_SELF,
+                                                              GblVariant* pOther)            GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_constructValueCopy       (GBL_SELF,  GblType type, ...)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_constructValueCopy       (GBL_SELF,  GblType type, ...)  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_constructValueCopyVaList (GBL_SELF,
-                                                                 GblType type,
-                                                                 va_list* pList)                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_constructValueCopyVaList (GBL_SELF,
+                                                              GblType type,
+                                                              va_list* pList)                GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_constructValueMove       (GBL_SELF,  GblType type, ...)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_constructValueMove       (GBL_SELF,  GblType type, ...)  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_constructValueMoveVaList (GBL_SELF,
-                                                                 GblType type,
-                                                                 va_list* pList)                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_constructValueMoveVaList (GBL_SELF,
+                                                              GblType type,
+                                                              va_list* pList)                GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructNil             (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructBool            (GBL_SELF, GblBool value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructChar            (GBL_SELF, char value)          GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructUint8           (GBL_SELF, uint8_t value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructUint16          (GBL_SELF, uint16_t value)      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructInt16           (GBL_SELF, int16_t value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructUint32          (GBL_SELF, uint32_t value)      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructInt32           (GBL_SELF, int32_t value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructUint64          (GBL_SELF, uint64_t value)      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructInt64           (GBL_SELF, int64_t value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructFloat           (GBL_SELF, float value)         GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructDouble          (GBL_SELF, double value)        GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructString          (GBL_SELF, const char* pValue)  GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructStringView      (GBL_SELF, GblStringView value) GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructTypeValue       (GBL_SELF, GblType type)        GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructNil             (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructBool            (GBL_SELF, GblBool value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructChar            (GBL_SELF, char value)          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructUint8           (GBL_SELF, uint8_t value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructUint16          (GBL_SELF, uint16_t value)      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructInt16           (GBL_SELF, int16_t value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructUint32          (GBL_SELF, uint32_t value)      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructInt32           (GBL_SELF, int32_t value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructUint64          (GBL_SELF, uint64_t value)      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructInt64           (GBL_SELF, int64_t value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructFloat           (GBL_SELF, float value)         GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructDouble          (GBL_SELF, double value)        GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructString          (GBL_SELF, const char* pValue)  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructStringView      (GBL_SELF, GblStringView value) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructTypeValue       (GBL_SELF, GblType type)        GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructEnum            (GBL_SELF,
-                                                                 GblType type,
-                                                                 GblEnum value)                 GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructEnum            (GBL_SELF,
+                                                              GblType type,
+                                                              GblEnum value)                 GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructFlags           (GBL_SELF,
-                                                                 GblType type,
-                                                                 GblFlags value)                GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructFlags           (GBL_SELF,
+                                                              GblType type,
+                                                              GblFlags value)                GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructPointer         (GBL_SELF,
-                                                                 GblType ptrType,
-                                                                 void* pValue)                  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructPointer         (GBL_SELF,
+                                                              GblType ptrType,
+                                                              void* pValue)                  GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructOpaqueCopy      (GBL_SELF,
-                                                                 GblType opaqueType,
-                                                                 void*  pValue)                 GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructOpaqueCopy      (GBL_SELF,
+                                                              GblType opaqueType,
+                                                              void*  pValue)                 GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructOpaqueMove      (GBL_SELF,
-                                                                 GblType opaqueType,
-                                                                 void*  pValue)                 GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructOpaqueMove      (GBL_SELF,
+                                                              GblType opaqueType,
+                                                              void*  pValue)                 GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_constructInstance        (GBL_SELF, GblInstance* pValue) GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructObjectCopy      (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_constructObjectMove      (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructInstance        (GBL_SELF, GblInstance* pValue) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructObjectCopy      (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_constructObjectMove      (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_destruct                 (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_destruct                 (GBL_SELF)                      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_setCopy                  (GBL_SELF,
-                                                                 const GblVariant* pOther)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_setCopy                  (GBL_SELF,
+                                                              const GblVariant* pOther)      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_setMove                  (GBL_SELF,  GblVariant* pOther) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblVariant_setValueCopy             (GBL_SELF,  GblType type, ...)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_setMove                  (GBL_SELF,  GblVariant* pOther) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_setValueCopy             (GBL_SELF,  GblType type, ...)  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_setValueCopyVaList       (GBL_SELF,
-                                                                 GblType  type,
-                                                                 va_list* pVarArgs)             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_setValueCopyVaList       (GBL_SELF,
+                                                              GblType  type,
+                                                              va_list* pVarArgs)             GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_setValueMove             (GBL_SELF,  GblType type, ...)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_setValueMove             (GBL_SELF,  GblType type, ...)  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_setValueMoveVaList       (GBL_SELF,
-                                                                 GblType  type,
-                                                                 va_list* pVarArgs)             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_setValueMoveVaList       (GBL_SELF,
+                                                              GblType  type,
+                                                              va_list* pVarArgs)             GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_invalidate               (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_invalidate               (GBL_SELF)                      GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setNil                   (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setBool                  (GBL_SELF, GblBool value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setChar                  (GBL_SELF, char value)          GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setUint8                 (GBL_SELF, uint8_t value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setUint16                (GBL_SELF, uint16_t value)      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setInt16                 (GBL_SELF, int16_t value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setUint32                (GBL_SELF, uint32_t value)      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setInt32                 (GBL_SELF, int32_t value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setUint64                (GBL_SELF, uint64_t value)      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setInt64                 (GBL_SELF, int64_t value)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setFloat                 (GBL_SELF, float value)         GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setDouble                (GBL_SELF, double value)        GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setString                (GBL_SELF, const char* pValue)  GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setStringView            (GBL_SELF, GblStringView value) GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setTypeValue             (GBL_SELF, GblType value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setNil                   (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setBool                  (GBL_SELF, GblBool value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setChar                  (GBL_SELF, char value)          GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setUint8                 (GBL_SELF, uint8_t value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setUint16                (GBL_SELF, uint16_t value)      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setInt16                 (GBL_SELF, int16_t value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setUint32                (GBL_SELF, uint32_t value)      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setInt32                 (GBL_SELF, int32_t value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setUint64                (GBL_SELF, uint64_t value)      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setInt64                 (GBL_SELF, int64_t value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setFloat                 (GBL_SELF, float value)         GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setDouble                (GBL_SELF, double value)        GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setString                (GBL_SELF, const char* pValue)  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setStringView            (GBL_SELF, GblStringView value) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setTypeValue             (GBL_SELF, GblType value)       GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setEnum                  (GBL_SELF,
-                                                                 GblType enumType,
-                                                                 GblEnum value)                 GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setEnum                  (GBL_SELF,
+                                                              GblType enumType,
+                                                              GblEnum value)                 GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setFlags                 (GBL_SELF,
-                                                                 GblType flagsType,
-                                                                 GblFlags value)                GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setFlags                 (GBL_SELF,
+                                                              GblType flagsType,
+                                                              GblFlags value)                GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setPointer               (GBL_SELF,
-                                                                 GblType ptrType,
-                                                                 void* pValue)                  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setPointer               (GBL_SELF,
+                                                              GblType ptrType,
+                                                              void* pValue)                  GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setOpaqueCopy            (GBL_SELF,
-                                                                 GblType opaqueType,
-                                                                 void*  pValue)                 GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setOpaqueCopy            (GBL_SELF,
+                                                              GblType opaqueType,
+                                                              void*  pValue)                 GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setOpaqueMove            (GBL_SELF,
-                                                                 GblType opaqueType,
-                                                                 void*  pValue)                 GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setOpaqueMove            (GBL_SELF,
+                                                              GblType opaqueType,
+                                                              void*  pValue)                 GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblVariant_setInstance              (GBL_SELF, GblInstance* pValue) GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setObjectCopy            (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblVariant_setObjectMove            (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setInstance              (GBL_SELF, GblInstance* pValue) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setObjectCopy            (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setObjectMove            (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_getValueCopy             (GBL_CSELF,  ...)               GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblVariant_getValueCopyVaList       (GBL_CSELF, va_list* pVarArgs)  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblVariant_getValuePeek             (GBL_CSELF,  ...)               GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblVariant_getValuePeekVaList       (GBL_SELF, va_list* pVarArgs)   GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblVariant_getValueMove             (GBL_SELF,  ...)                GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblVariant_getValueMoveVaList       (GBL_SELF, va_list* pVarArgs)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_getValueCopy             (GBL_CSELF,  ...)               GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_getValueCopyVaList       (GBL_CSELF, va_list* pVarArgs)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_getValuePeek             (GBL_CSELF,  ...)               GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_getValuePeekVaList       (GBL_SELF, va_list* pVarArgs)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_getValueMove             (GBL_SELF,  ...)                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_getValueMoveVaList       (GBL_SELF, va_list* pVarArgs)   GBL_NOEXCEPT;
 
-GBL_INLINE GblType          GblVariant_typeOf                   (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE const char*      GblVariant_typeName                 (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblType       GblVariant_typeOf                   (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE const char*   GblVariant_typeName                 (GBL_CSELF)                     GBL_NOEXCEPT;
 
-GBL_INLINE GblBool          GblVariant_isValid                  (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblVariant_isNil                    (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblVariant_getBool                  (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE char             GblVariant_getChar                  (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE uint8_t          GblVariant_getUint8                 (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE uint16_t         GblVariant_getUint16                (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE int16_t          GblVariant_getInt16                 (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE uint32_t         GblVariant_getUint32                (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE int32_t          GblVariant_getInt32                 (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE uint64_t         GblVariant_getUint64                (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE int64_t          GblVariant_getInt64                 (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE GblEnum          GblVariant_getEnum                  (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE GblFlags         GblVariant_getFlags                 (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE float            GblVariant_getFloat                 (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE double           GblVariant_getDouble                (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE const char*      GblVariant_getString                (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE GblStringView    GblVariant_getStringView            (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE GblType          GblVariant_getTypeValue             (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE void*            GblVariant_getPointer               (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE void*            GblVariant_getOpaqueCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE void*            GblVariant_getOpaqueMove            (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_INLINE void*            GblVariant_getOpaquePeek            (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblVariant_isValid                  (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblVariant_isNil                    (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblVariant_getBool                  (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE char          GblVariant_getChar                  (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE uint8_t       GblVariant_getUint8                 (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE uint16_t      GblVariant_getUint16                (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE int16_t       GblVariant_getInt16                 (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE uint32_t      GblVariant_getUint32                (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE int32_t       GblVariant_getInt32                 (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE uint64_t      GblVariant_getUint64                (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE int64_t       GblVariant_getInt64                 (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblEnum       GblVariant_getEnum                  (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblFlags      GblVariant_getFlags                 (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE float         GblVariant_getFloat                 (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE double        GblVariant_getDouble                (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE const char*   GblVariant_getString                (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblVariant_getStringView            (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblType       GblVariant_getTypeValue             (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE void*         GblVariant_getPointer               (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE void*         GblVariant_getOpaqueCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE void*         GblVariant_getOpaqueMove            (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_INLINE void*         GblVariant_getOpaquePeek            (GBL_CSELF)                     GBL_NOEXCEPT;
 
-GBL_INLINE GblInstance*     GblVariant_getInstance              (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblObject*       GblVariant_getObjectCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GblObject*       GblVariant_getObjectMove            (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblObject*       GblVariant_getObjectPeek            (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblInstance*  GblVariant_getInstance              (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblObject*    GblVariant_getObjectCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblObject*    GblVariant_getObjectMove            (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblObject*    GblVariant_getObjectPeek            (GBL_CSELF)                     GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool          GblVariant_toBool                   (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT char             GblVariant_toChar                   (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT uint8_t          GblVariant_toUint8                  (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT uint16_t         GblVariant_toUint16                 (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT int16_t          GblVariant_toInt16                  (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT uint32_t         GblVariant_toUint32                 (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT int32_t          GblVariant_toInt32                  (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT uint64_t         GblVariant_toUint64                 (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT int64_t          GblVariant_toInt64                  (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblEnum          GblVariant_toEnum                   (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblFlags         GblVariant_toFlags                  (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT float            GblVariant_toFloat                  (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT double           GblVariant_toDouble                 (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT void*            GblVariant_toPointer                (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT const char*      GblVariant_toString                 (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblStringView    GblVariant_toStringView             (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblType          GblVariant_toTypeValue              (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblBool       GblVariant_toBool                   (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT char          GblVariant_toChar                   (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT uint8_t       GblVariant_toUint8                  (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT uint16_t      GblVariant_toUint16                 (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT int16_t       GblVariant_toInt16                  (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT uint32_t      GblVariant_toUint32                 (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT int32_t       GblVariant_toInt32                  (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT uint64_t      GblVariant_toUint64                 (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT int64_t       GblVariant_toInt64                  (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblEnum       GblVariant_toEnum                   (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblFlags      GblVariant_toFlags                  (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT float         GblVariant_toFloat                  (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT double        GblVariant_toDouble                 (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT void*         GblVariant_toPointer                (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT const char*   GblVariant_toString                 (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblStringView GblVariant_toStringView             (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblType       GblVariant_toTypeValue              (GBL_SELF)                      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_registerConverter        (GblType fromType,
-                                                                 GblType toType,
-                                                                 GblVariantConverterFn pFnConv) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_registerConverter        (GblType fromType,
+                                                              GblType toType,
+                                                              GblVariantConverterFn pFnConv) GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_unregisterConverter      (GblType fromType,
-                                                                 GblType toType)                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_unregisterConverter      (GblType fromType,
+                                                              GblType toType)                GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize          GblVariant_converterCount           (void)                          GBL_NOEXCEPT;
+GBL_EXPORT GblSize       GblVariant_converterCount           (void)                          GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool          GblVariant_canConvert               (GblType fromType,
-                                                                 GblType toType)                GBL_NOEXCEPT;
+GBL_EXPORT GblBool       GblVariant_canConvert               (GblType fromType,
+                                                              GblType toType)                GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_convert                  (GBL_CSELF,
-                                                                 GblVariant* pToVariant)        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_convert                  (GBL_CSELF,
+                                                              GblVariant* pToVariant)        GBL_NOEXCEPT;
 
-GBL_EXPORT GblInt           GblVariant_compare                  (GBL_CSELF,
-                                                                 const GblVariant* pOther)      GBL_NOEXCEPT;
+GBL_EXPORT GblInt        GblVariant_compare                  (GBL_CSELF,
+                                                              const GblVariant* pOther)      GBL_NOEXCEPT;
 
-GBL_INLINE GblBool          GblVariant_equals                   (GBL_CSELF,
-                                                                 const GblVariant* pOther)      GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblVariant_equals                   (GBL_CSELF,
+                                                              const GblVariant* pOther)      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_save                     (GBL_CSELF,
-                                                                 GblStringBuffer* pString)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_save                     (GBL_CSELF,
+                                                              GblStringBuffer* pString)      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblVariant_load                     (GBL_SELF,
-                                                                 const GblStringBuffer* pStr)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_load                     (GBL_SELF,
+                                                              const GblStringBuffer* pStr)   GBL_NOEXCEPT;
 
 //========== MACRO OVERLOADS ==========
 /// \cond

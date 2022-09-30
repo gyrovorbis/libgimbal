@@ -68,23 +68,3 @@ GBL_EXPORT GblBool GblLinkedList_swap(GblLinkedListNode* pSelf,
     }
     return found;
 }
-
-GBL_EXPORT GblBool GblLinkedList_erase(GblLinkedListNode* pSelf, GblSize index) GBL_NOEXCEPT {
-    GblBool erased = GBL_FALSE;
-    GblLinkedListNode* pPrevIt = pSelf;
-    GblSize count = 0;
-    for(GblLinkedListNode* pIt = pSelf->pNext;
-        pIt != pSelf;
-        pIt = pIt->pNext)
-    {
-        if(count++ == index) {
-            pPrevIt->pNext  = pIt->pNext;
-            pIt->pNext      = pIt;
-            erased          = GBL_TRUE;
-            break;
-        }
-
-        pPrevIt = pIt;
-    }
-    return erased;
-}

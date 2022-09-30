@@ -8,12 +8,12 @@
 
 #include "../instances/gimbal_box.h"
 
-#define GBL_PROPERTY_TYPE               (GBL_TYPEOF(GblProperty))
-#define GBL_GENERIC_PROPERTY_TYPE       GBL_PROPERTY_TYPE
+#define GBL_PROPERTY_TYPE                       (GBL_TYPEOF(GblProperty))
+#define GBL_GENERIC_PROPERTY_TYPE                GBL_PROPERTY_TYPE
 
-#define GBL_PROPERTY(instance)          (GBL_INSTANCE_CAST(instance, GblProperty))
-#define GBL_PROPERTY_CLASS(klass)       (GBL_CLASS_CAST(klass, GblPropertyClass))
-#define GBL_PROPERTY_GET_CLASS(instance)(GBL_INSTANCE_GET_CLASS(instance, GblProperty))
+#define GBL_PROPERTY(instance)                  (GBL_INSTANCE_CAST(instance, GblProperty))
+#define GBL_PROPERTY_CLASS(klass)               (GBL_CLASS_CAST(klass, GblPropertyClass))
+#define GBL_PROPERTY_GET_CLASS(instance)        (GBL_INSTANCE_GET_CLASS(instance, GblProperty))
 
 #define GBL_SELF_TYPE GblProperty
 

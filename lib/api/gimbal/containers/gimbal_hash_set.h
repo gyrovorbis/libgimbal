@@ -92,12 +92,14 @@ GBL_EXPORT GBL_RESULT        GblHashSet_construct_4   (GBL_SELF,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare)   GBL_NOEXCEPT;
 #define                      GblHashSet_construct(...) \
-      GBL_VA_OVERLOAD_SELECT(GblHashSet_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
+        GBL_VA_OVERLOAD_CALL(GblHashSet_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
-GBL_EXPORT GBL_RESULT        GblHashSet_clone         (GBL_SELF, const GblHashSet* pRhs,
-                                                       GblContext* hCtx)                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT        GblHashSet_clone         (GBL_SELF,
+                                                       const GblHashSet* pRhs,
+                                                       GblContext*       hCtx)          GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblHashSet_constructMove (GBL_SELF, GblHashSet* pRhs,
+GBL_EXPORT GBL_RESULT        GblHashSet_constructMove (GBL_SELF,
+                                                       GblHashSet* pRhs,
                                                        GblContext* hCtx)                GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT        GblHashSet_constructClone(GBL_SELF, GblHashSet* pRhs)      GBL_NOEXCEPT;
@@ -130,8 +132,10 @@ GBL_EXPORT void              GblHashSet_clear         (GBL_SELF)                
 GBL_EXPORT GBL_RESULT        GblHashSet_shrinkToFit   (GBL_SELF)                        GBL_NOEXCEPT;
 
 GBL_EXPORT void*             GblHashSet_probe         (GBL_CSELF, GblSize position)     GBL_NOEXCEPT; //returns entry at slot or NULL, sparse
-GBL_EXPORT GblBool           GblHashSet_foreach       (GBL_CSELF, GblHashSetIterFn iter,              //iterates over every non-null position
-                                                       void* pUdata)                    GBL_NOEXCEPT;
+
+GBL_EXPORT GblBool           GblHashSet_foreach       (GBL_CSELF,
+                                                       GblHashSetIterFn iter,
+                                                       void*            pUdata)         GBL_NOEXCEPT; //iterates over every non-null position
 
 GBL_EXPORT GblHashSetIter    GblHashSet_next          (GBL_CSELF,
                                                        const GblHashSetIter* pPrev)     GBL_NOEXCEPT; //[Lua-style] Returns iterator after given

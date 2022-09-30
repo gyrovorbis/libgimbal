@@ -34,6 +34,8 @@ add_executable(GimbalTests
     source/containers/gimbal_nary_tree_test_suite.c
     include/containers/gimbal_ring_buffer_test_suite.h
     source/containers/gimbal_ring_buffer_test_suite.c
+    include/containers/gimbal_ring_list_test_suite.h
+    source/containers/gimbal_ring_list_test_suite.c
     include/core/gimbal_ref_test_suite.h
     source/core/gimbal_ref_test_suite.c
     include/meta/classes/gimbal_enum_test_suite.h
@@ -70,6 +72,8 @@ add_executable(GimbalTests
     source/strings/gimbal_string_buffer_test_suite.c
     include/utils/gimbal_uuid_test_suite.h
     source/utils/gimbal_uuid_test_suite.c
+    include/utils/gimbal_arena_allocator_test_suite.h
+    source/utils/gimbal_arena_allocator_test_suite.c
     source/gimbal_test_main.c)
 
 target_link_libraries(GimbalTests

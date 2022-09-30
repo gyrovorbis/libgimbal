@@ -135,7 +135,7 @@ extern "C" {
         typedef GBL_ENUM E;        \
         enum E
 #else
-#   define GBL_DECLARE_ENUM(E)      \
+#   define GBL_DECLARE_ENUM(E)     \
         enum E : GBL_ENUM
 #endif
 
@@ -163,20 +163,20 @@ extern "C" {
     struct S##_;                \
     typedef struct S##_* S
 
-#define GBL_PRIVATE()      struct {
+#define GBL_PRIVATE()       struct {
 
 #define GBL_PRIVATE_END }   private_;
 
 #define GBL_PRIV(a)         (a).private_
 #define GBL_PRIV_REF(a)     (a)->private_
 
-#define GBL_VSELF   GBL_SELF_TYPE self
+#define GBL_VSELF           GBL_SELF_TYPE self
 
-#define GBL_KLASS   GBL_GLUE(GBL_SELF_TYPE, Class)* pSelf
-#define GBL_CKLASS  const GBL_KLASS
+#define GBL_KLASS           GBL_GLUE(GBL_SELF_TYPE, Class)* pSelf
+#define GBL_CKLASS          const GBL_KLASS
 
-#define GBL_SELF    GBL_SELF_TYPE* pSelf
-#define GBL_CSELF   const GBL_SELF
+#define GBL_SELF            GBL_SELF_TYPE* pSelf
+#define GBL_CSELF           const GBL_SELF
 
 #define GBL_TYPEOF(instanceStruct)  (instanceStruct##_type())
 

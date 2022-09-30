@@ -26,6 +26,9 @@
 extern "C" {
 #endif
 
+#define GBL_MIN(a,b) (((a)<(b))?(a):(b))
+#define GBL_MAX(a,b) (((a)>(b))?(a):(b))
+
 #define GBL_CONTAINER_OF(ptr, type, member) ((type*)((char*)(ptr) - offsetof(type, member)))
 
 #define GBL_ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))

@@ -101,6 +101,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_array_list.h
     api/gimbal/containers/gimbal_nary_tree.h
     api/gimbal/containers/gimbal_ring_buffer.h
+    api/gimbal/containers/gimbal_ring_list.h
     api/gimbal/core/gimbal_api_generators.h
     api/gimbal/core/gimbal_api_frame.h
     api/gimbal/core/gimbal_call_stack.h
@@ -158,10 +159,12 @@ set(GIMBAL_INCLUDES
     api/gimbal/test/gimbal_allocation_tracker.h
     api/gimbal/utils/gimbal_timer.h
     api/gimbal/utils/gimbal_uuid.h
+    api/gimbal/utils/gimbal_arena_allocator.h
 )
 
 
 set(GIMBAL_SOURCES
+    source/algorithms/gimbal_numeric.c
     source/containers/gimbal_hash_set.c
     source/containers/gimbal_tree_set.c
     source/containers/gimbal_linked_list.c
@@ -169,6 +172,7 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_byte_array.c
     source/containers/gimbal_array_list.c
     source/containers/gimbal_ring_buffer.c
+    source/containers/gimbal_ring_list.c
     source/core/gimbal_thread.c
     source/core/gimbal_version.c
     source/core/gimbal_ref.c
@@ -211,6 +215,7 @@ set(GIMBAL_SOURCES
     source/test/gimbal_test_scenario.c
     source/test/gimbal_allocation_tracker.c
     source/utils/gimbal_uuid.c
+    source/utils/gimbal_arena_allocator.c
  )
 
 add_library(libGimbal STATIC

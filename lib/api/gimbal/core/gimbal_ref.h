@@ -1,5 +1,5 @@
 /*! \file
- *  \brief Generic reference-counted data type
+ *  \brief Generic, atomic reference-counted data types
  *  \ingroup dataTypes
  */
 
@@ -17,20 +17,18 @@ GBL_DECLS_BEGIN
 typedef void            GblRef;
 typedef GBL_RESULT      (*GblRefDestructFn)     (GBL_SELF);
 
-GBL_EXPORT GBL_RESULT   GblRef_reinit           (void)                      GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblRef_activeCount      (void)                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRef_reinit           (void)                               GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblRef_activeCount      (void)                               GBL_NOEXCEPT;
 
-GBL_INLINE void*        GblRef_alloc            (GblSize size)              GBL_NOEXCEPT;
-GBL_EXPORT void*        GblRef_allocWithContext (GblSize size,
-                                                 GblContext* pCtx)          GBL_NOEXCEPT;
+GBL_INLINE void*        GblRef_alloc            (GblSize size)                       GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRef_allocWithContext (GblSize size, GblContext* pCtx)     GBL_NOEXCEPT;
 
-GBL_INLINE void*        GblRef_acquire          (GBL_SELF)                  GBL_NOEXCEPT;
-GBL_INLINE GblRefCount  GblRef_release          (GBL_SELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblRef_releaseWithDtor  (GBL_SELF,
-                                                 GblRefDestructFn pFnDtor)  GBL_NOEXCEPT;
+GBL_INLINE void*        GblRef_acquire          (GBL_SELF)                           GBL_NOEXCEPT;
+GBL_INLINE GblRefCount  GblRef_release          (GBL_SELF)                           GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblRef_releaseWithDtor  (GBL_SELF, GblRefDestructFn pFnDtor) GBL_NOEXCEPT;
 
-GBL_INLINE GblRefCount  GblRef_refCount         (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_INLINE GblContext*  GblRef_context          (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_INLINE GblRefCount  GblRef_refCount         (GBL_CSELF)                          GBL_NOEXCEPT;
+GBL_INLINE GblContext*  GblRef_context          (GBL_CSELF)                          GBL_NOEXCEPT;
 
 // ========== IMPL ==========
 

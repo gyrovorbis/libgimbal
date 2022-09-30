@@ -1,3 +1,10 @@
+/*! \file
+ *  \brief GblClassClosure base instance and API
+ *  \copydoc GblClassClosure
+ *  \ingroup signals
+ */
+
+
 #ifndef GIMBAL_CLASS_CLOSURE_H
 #define GIMBAL_CLASS_CLOSURE_H
 
@@ -23,19 +30,19 @@ GBL_INSTANCE_DERIVE(GblClassClosure, GblClosure)
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 
-GBL_EXPORT GblType          GblClassClosure_type       (void)                   GBL_NOEXCEPT;
+GBL_EXPORT GblType          GblClassClosure_type        (void)                   GBL_NOEXCEPT;
 
-GBL_EXPORT GblClassClosure* GblClassClosure_create     (GblType      classType,
-                                                        GblSize      offset,
-                                                        GblInstance* pInstance,
-                                                        void*        pUserdata) GBL_NOEXCEPT;
+GBL_EXPORT GblClassClosure* GblClassClosure_create      (GblType      classType,
+                                                         GblSize      offset,
+                                                         GblInstance* pInstance,
+                                                         void*        pUserdata) GBL_NOEXCEPT;
 
-GBL_INLINE void             GblClassClosure_setMethod  (GBL_SELF,
-                                                        GblType classType,
-                                                        GblSize offset)         GBL_NOEXCEPT;
+GBL_INLINE void             GblClassClosure_setMethod   (GBL_SELF,
+                                                         GblType classType,
+                                                         GblSize offset)         GBL_NOEXCEPT;
 
-GBL_INLINE void             GblClassClosure_setInstance(GBL_SELF,
-                                                        GblInstance* pInstance) GBL_NOEXCEPT;
+GBL_INLINE void             GblClassClosure_setInstance (GBL_SELF,
+                                                         GblInstance* pInstance) GBL_NOEXCEPT;
 
 // ===== IMPL ======
 

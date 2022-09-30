@@ -438,7 +438,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
         }
     }
 
-    //GBL_API_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
+    GBL_API_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
 
     //GBL_API_DONE();
 

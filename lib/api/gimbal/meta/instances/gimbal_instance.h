@@ -25,6 +25,9 @@
 #define GBL_INSTANCE_GET_CLASS(instance, cType)        ((GBL_CLASSOF(cType)*)GblClass_cast(GblInstance_class((GblInstance*)instance), GBL_TYPEOF(cType)))
 #define GBL_INSTANCE_TRY_CLASS(instance, cType)        ((GBL_CLASSOF(cType)*)GblClass_try(GblInstance_class((GblInstance*)instance), GBL_TYPEOF(cType)))
 
+#define GBL_INSTANCE_CREATE(cType)                     ((cType*)GblInstance_create(GBL_TYPEOF(cType)))
+#define GBL_INSTANCE_CONSTRUCT(cType, instance)        (GblInstance_construct(instance, GBL_TYPEOF(cType)))
+
 #define GBL_INSTANCE_VCALL(cType, method, ...)         GBL_INSTANCE_VCALL_(cType, method, __VA_ARGS__)
 #define GBL_INSTANCE_VCALL_DEFAULT(cType, method, ...) GBL_INSTANCE_VCALL_DEFAULT_(cType, method, __VA_ARGS__)
 
@@ -33,7 +36,7 @@
 GBL_DECLS_BEGIN
 
 /*! \brief Base struct for all instantiable meta types.
- *  \ingroup meta
+ *\ingroup meta
  *\details
  * An Instance simply represents an object that can be created from a given
  * GblType which shares some data with other instances of the same type,

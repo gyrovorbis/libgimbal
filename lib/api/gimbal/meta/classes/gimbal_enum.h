@@ -34,40 +34,40 @@ GBL_CLASS_END
 
 // ========== GblEnumClass ==========
 
-GBL_INLINE const char*  GblEnumClass_nameFromIndex      (GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
-GBL_INLINE const char*  GblEnumClass_nameFromValue      (GBL_CSELF, GblEnum value)          GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblEnumClass_nameQuarkFromIndex (GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblEnumClass_nameQuarkFromValue (GBL_CSELF, GblEnum value)          GBL_NOEXCEPT;
+GBL_INLINE const char* GblEnumClass_nameFromIndex      (GBL_CSELF, uint16_t index)       GBL_NOEXCEPT;
+GBL_INLINE const char* GblEnumClass_nameFromValue      (GBL_CSELF, GblEnum value)        GBL_NOEXCEPT;
+GBL_EXPORT GblQuark    GblEnumClass_nameQuarkFromIndex (GBL_CSELF, uint16_t index)       GBL_NOEXCEPT;
+GBL_EXPORT GblQuark    GblEnumClass_nameQuarkFromValue (GBL_CSELF, GblEnum value)        GBL_NOEXCEPT;
 
-GBL_INLINE const char*  GblEnumClass_nickFromIndex      (GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
-GBL_INLINE const char*  GblEnumClass_nickFromValue      (GBL_CSELF, GblEnum value)          GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblEnumClass_nickQuarkFromIndex (GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblEnumClass_nickQuarkFromValue (GBL_CSELF, GblEnum value)          GBL_NOEXCEPT;
+GBL_INLINE const char* GblEnumClass_nickFromIndex      (GBL_CSELF, uint16_t index)       GBL_NOEXCEPT;
+GBL_INLINE const char* GblEnumClass_nickFromValue      (GBL_CSELF, GblEnum value)        GBL_NOEXCEPT;
+GBL_EXPORT GblQuark    GblEnumClass_nickQuarkFromIndex (GBL_CSELF, uint16_t index)       GBL_NOEXCEPT;
+GBL_EXPORT GblQuark    GblEnumClass_nickQuarkFromValue (GBL_CSELF, GblEnum value)        GBL_NOEXCEPT;
 
-GBL_EXPORT GblEnum      GblEnumClass_valueFromIndex     (GBL_CSELF, uint16_t index)         GBL_NOEXCEPT;
-GBL_INLINE GblEnum      GblEnumClass_valueFromName      (GBL_CSELF, const char* pString)    GBL_NOEXCEPT;
-GBL_INLINE GblEnum      GblEnumClass_valueFromNick      (GBL_CSELF, const char* pString)    GBL_NOEXCEPT;
-GBL_EXPORT GblEnum      GblEnumClass_valueFromNameQuark (GBL_CSELF, GblQuark quark)         GBL_NOEXCEPT;
-GBL_EXPORT GblEnum      GblEnumClass_valueFromNickQuark (GBL_CSELF, GblQuark quark)         GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblEnumClass_valueCheck         (GBL_CSELF, GblEnum value)          GBL_NOEXCEPT;
+GBL_EXPORT GblEnum     GblEnumClass_valueFromIndex     (GBL_CSELF, uint16_t index)       GBL_NOEXCEPT;
+GBL_INLINE GblEnum     GblEnumClass_valueFromName      (GBL_CSELF, const char* pString)  GBL_NOEXCEPT;
+GBL_INLINE GblEnum     GblEnumClass_valueFromNick      (GBL_CSELF, const char* pString)  GBL_NOEXCEPT;
+GBL_EXPORT GblEnum     GblEnumClass_valueFromNameQuark (GBL_CSELF, GblQuark quark)       GBL_NOEXCEPT;
+GBL_EXPORT GblEnum     GblEnumClass_valueFromNickQuark (GBL_CSELF, GblQuark quark)       GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblEnumClass_valueCheck         (GBL_CSELF, GblEnum value)        GBL_NOEXCEPT;
 
 // ========== GblEnum ==========
 
-GBL_EXPORT GblType      GblEnum_type                    (void)                              GBL_NOEXCEPT;
+GBL_EXPORT GblType     GblEnum_type                    (void)                            GBL_NOEXCEPT;
 
-GBL_EXPORT GblType      GblEnum_register                (const char*         pName,
-                                                         const GblEnumEntry* pValidEntries) GBL_NOEXCEPT;
+GBL_EXPORT GblType     GblEnum_register                (const char*         pName,
+                                                        const GblEnumEntry* pEntries)    GBL_NOEXCEPT;
 
-GBL_INLINE GblEnum      GblEnum_fromName                (const char* pName, GblType type)   GBL_NOEXCEPT;
-GBL_INLINE GblEnum      GblEnum_fromNameQuark           (GblQuark name, GblType type)       GBL_NOEXCEPT;
-GBL_INLINE GblEnum      GblEnum_fromNick                (const char* pNick, GblType type)   GBL_NOEXCEPT;
-GBL_INLINE GblEnum      GblEnum_fromNickQuark           (GblQuark nick, GblType type)       GBL_NOEXCEPT;
+GBL_INLINE GblEnum     GblEnum_fromName                (const char* pName, GblType type) GBL_NOEXCEPT;
+GBL_INLINE GblEnum     GblEnum_fromNameQuark           (GblQuark name, GblType type)     GBL_NOEXCEPT;
+GBL_INLINE GblEnum     GblEnum_fromNick                (const char* pNick, GblType type) GBL_NOEXCEPT;
+GBL_INLINE GblEnum     GblEnum_fromNickQuark           (GblQuark nick, GblType type)     GBL_NOEXCEPT;
 
-GBL_INLINE const char*  GblEnum_name                    (GblEnum value, GblType type)       GBL_NOEXCEPT;
-GBL_INLINE GblQuark     GblEnum_nameQuark               (GblEnum value, GblType type)       GBL_NOEXCEPT;
-GBL_INLINE const char*  GblEnum_nick                    (GblEnum value, GblType type)       GBL_NOEXCEPT;
-GBL_INLINE GblQuark     GblEnum_nickQuark               (GblEnum value, GblType type)       GBL_NOEXCEPT;
-GBL_INLINE GblBool      GblEnum_check                   (GblEnum value, GblType type)       GBL_NOEXCEPT;
+GBL_INLINE const char* GblEnum_name                    (GblEnum value, GblType type)     GBL_NOEXCEPT;
+GBL_INLINE GblQuark    GblEnum_nameQuark               (GblEnum value, GblType type)     GBL_NOEXCEPT;
+GBL_INLINE const char* GblEnum_nick                    (GblEnum value, GblType type)     GBL_NOEXCEPT;
+GBL_INLINE GblQuark    GblEnum_nickQuark               (GblEnum value, GblType type)     GBL_NOEXCEPT;
+GBL_INLINE GblBool     GblEnum_check                   (GblEnum value, GblType type)     GBL_NOEXCEPT;
 
 // =============== IMPL ================
 

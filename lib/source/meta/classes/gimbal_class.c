@@ -199,7 +199,7 @@ static GblClass* GblClass_create_(GblMetaClass* pMeta, GblBool floating) {
 
     if(!*ppClass) {
         GBL_API_VERBOSE("Allocating separate class structure!");
-        uint8_t* pBase = GBL_API_MALLOC(gblAlignedAllocSize(pMeta->pInfo->classSize -
+        uint8_t* pBase = GBL_API_MALLOC(gblAlignedAllocSizeDefault(pMeta->pInfo->classSize -
                                                             pMeta->classPrivateOffset),
                                         GBL_ALIGNOF(GBL_MAX_ALIGN_T),
                                         GblType_name(GBL_TYPE_(pMeta)));

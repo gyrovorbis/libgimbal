@@ -58,79 +58,80 @@ GBL_INSTANCE_BASE(GblBox)
 GBL_INSTANCE_END
 
 // ===== Class =====
-GBL_EXPORT GblBoxClass* GblBoxClass_createFloatingExt   (GblType           derivedType,
-                                                         GblSize           totalSize,
-                                                         void*             pUserdata,
-                                                         GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
+GBL_EXPORT GblBoxClass* GblBoxClass_createFloatingExt    (GblType           derivedType,
+                                                          GblSize           totalSize,
+                                                          void*             pUserdata,
+                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblBoxClass_constructFloatingExt(GBL_KLASS,
-                                                         GblType           derivedType,
-                                                         void*             pUserdata,
-                                                         GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBoxClass_constructFloatingExt (GBL_KLASS,
+                                                          GblType           derivedType,
+                                                          void*             pUserdata,
+                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblBoxClass_userdata            (GBL_CKLASS)                    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblBoxClass_setUserdata         (GBL_KLASS, void* pUserdata)    GBL_NOEXCEPT;
+GBL_EXPORT void*        GblBoxClass_userdata             (GBL_CKLASS)                    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBoxClass_setUserdata          (GBL_KLASS, void* pUserdata)    GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblBoxClass_setUserDestructor   (GBL_KLASS,
-                                                         GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBoxClass_setUserDestructor    (GBL_KLASS,
+                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT uintptr_t    GblBoxClass_getField            (GBL_CKLASS, GblQuark key)      GBL_NOEXCEPT;
-GBL_EXPORT uintptr_t    GblBoxClass_takeField           (GBL_KLASS, GblQuark key)       GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblBoxClass_clearField          (GBL_KLASS, GblQuark key)       GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblBoxClass_hasField            (GBL_CKLASS, GblQuark key)      GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t    GblBoxClass_getField             (GBL_CKLASS, GblQuark key)      GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t    GblBoxClass_takeField            (GBL_KLASS, GblQuark key)       GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblBoxClass_clearField           (GBL_KLASS, GblQuark key)       GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblBoxClass_hasField             (GBL_CKLASS, GblQuark key)      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblBoxClass_setField            (GBL_KLASS,
-                                                         GblQuark          key,
-                                                         uintptr_t         ud,
-                                                         GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBoxClass_setField             (GBL_KLASS,
+                                                          GblQuark          key,
+                                                          uintptr_t         ud,
+                                                          GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
 
 // ===== Instance =====
-GBL_EXPORT GblType      GblBox_type                     (void)                          GBL_NOEXCEPT;
-GBL_EXPORT GblBox*      GblBox_create                   (GblType derivedType)           GBL_NOEXCEPT;
-GBL_EXPORT GblBox*      GblBox_createWithClass          (GblBoxClass* pClass)           GBL_NOEXCEPT;
+GBL_EXPORT GblType      GblBox_type                      (void)                          GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblBox_construct                (GBL_SELF, GblType derivedType) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblBox_constructWithClass       (GBL_SELF, GblBoxClass* pClass) GBL_NOEXCEPT;
+GBL_EXPORT GblBox*      GblBox_create                    (GblType derivedType)           GBL_NOEXCEPT;
+GBL_EXPORT GblBox*      GblBox_createWithClass           (GblBoxClass* pClass)           GBL_NOEXCEPT;
 
-GBL_EXPORT GblBox*      GblBox_createExt                (GblType           derivedType,
-                                                         GblSize           totalSize,
-                                                         void*             pUserdata,
-                                                         GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBox_construct                 (GBL_SELF, GblType derivedType) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBox_constructWithClass        (GBL_SELF, GblBoxClass* pClass) GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblBox_constructExt             (GBL_SELF,
-                                                         GblType           derivedType,
-                                                         void*             pUserdata,
-                                                         GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
+GBL_EXPORT GblBox*      GblBox_createExt                 (GblType           derivedType,
+                                                          GblSize           totalSize,
+                                                          void*             pUserdata,
+                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT GblBox*      GblBox_createExtWithClass       (GblBoxClass*      pClass,
-                                                         GblSize           totalSize,
-                                                         void*             pUserdata,
-                                                         GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBox_constructExt              (GBL_SELF,
+                                                          GblType           derivedType,
+                                                          void*             pUserdata,
+                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblBox_constructExtWithClass    (GBL_SELF,
-                                                         GblBoxClass*      pClass,
-                                                         void*             pUserdata,
-                                                         GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
+GBL_EXPORT GblBox*      GblBox_createExtWithClass        (GblBoxClass*      pClass,
+                                                          GblSize           totalSize,
+                                                          void*             pUserdata,
+                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT GblBox*      GblBox_ref                      (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblBox_unref                    (GBL_SELF)                      GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblBox_refCount                 (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBox_constructExtWithClass     (GBL_SELF,
+                                                          GblBoxClass*      pClass,
+                                                          void*             pUserdata,
+                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblBox_userdata                 (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblBox_setUserdata              (GBL_SELF, void* pUserdata)     GBL_NOEXCEPT;
+GBL_EXPORT GblBox*      GblBox_ref                       (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblBox_unref                     (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblBox_refCount                  (GBL_CSELF)                     GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblBox_setUserDestructor        (GBL_SELF,
-                                                         GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
+GBL_EXPORT void*        GblBox_userdata                  (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBox_setUserdata               (GBL_SELF, void* pUserdata)     GBL_NOEXCEPT;
 
-GBL_EXPORT uintptr_t    GblBox_getField                 (GBL_CSELF, GblQuark key)       GBL_NOEXCEPT;
-GBL_EXPORT uintptr_t    GblBox_takeField                (GBL_SELF, GblQuark key)        GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblBox_clearField               (GBL_SELF, GblQuark key)        GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblBox_hasField                 (GBL_CSELF, GblQuark key)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblBox_setUserDestructor         (GBL_SELF,
+                                                          GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblBox_setField                 (GBL_SELF,
-                                                         GblQuark          key,
-                                                         uintptr_t         ud,
-                                                         GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t    GblBox_getField                  (GBL_CSELF, GblQuark key)       GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t    GblBox_takeField                 (GBL_SELF, GblQuark key)        GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblBox_clearField                (GBL_SELF, GblQuark key)        GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblBox_hasField                  (GBL_CSELF, GblQuark key)       GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT   GblBox_setField                  (GBL_SELF,
+                                                          GblQuark          key,
+                                                          uintptr_t         ud,
+                                                          GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

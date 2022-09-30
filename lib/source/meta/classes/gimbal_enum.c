@@ -274,14 +274,14 @@ GBL_EXPORT GblType GblEnum_type(void) {
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY     |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY     |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
-            .pSetValueFmt   = { "l"},
-            .pGetValueFmt   = { "p" },
-            .pFnConstruct   = enumConstruct_,
-            .pFnSet         = enumSet_,
-            .pFnGet         = enumGet_,
-            .pFnCompare     = enumCompare_,
-            .pFnSave        = enumSave_,
-            .pFnLoad        = enumLoad_
+            .pSetValueFmt = { "l"},
+            .pGetValueFmt = { "p" },
+            .pFnConstruct = enumConstruct_,
+            .pFnSet       = enumSet_,
+            .pFnGet       = enumGet_,
+            .pFnCompare   = enumCompare_,
+            .pFnSave      = enumSave_,
+            .pFnLoad      = enumLoad_
       };
 
     if(enumType == GBL_INVALID_TYPE) {

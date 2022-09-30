@@ -19,16 +19,16 @@ GBL_DECLS_BEGIN
 
 // ======== Primitive Types ==========
 
-typedef GBL_BOOL                        GblBool;
-typedef GBL_SIZE                        GblSize;
-typedef int32_t                         GblInt;
-typedef uint32_t                        GblUint;
-typedef GBL_ENUM                        GblEnum;
-typedef GBL_FLAGS                       GblFlags;
-typedef GBL_HASH                        GblHash;
-typedef uint16_t                        GblRefCount;
-typedef uint32_t                        GblVersion;
-typedef void                            (*GblFnPtr)();
+typedef GBL_BOOL    GblBool;
+typedef GBL_SIZE    GblSize;
+typedef int32_t     GblInt;
+typedef uint32_t    GblUint;
+typedef GBL_ENUM    GblEnum;
+typedef GBL_FLAGS   GblFlags;
+typedef GBL_HASH    GblHash;
+typedef uint16_t    GblRefCount;
+typedef uint32_t    GblVersion;
+typedef void        (*GblFnPtr)();
 typedef union GblPtr {
     GblFnPtr        pFunc;
     void*           pData;

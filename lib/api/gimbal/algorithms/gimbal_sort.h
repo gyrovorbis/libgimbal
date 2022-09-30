@@ -3,6 +3,7 @@
  */
 /*! \file
  *  \brief Generialized array sorting algorithms
+ *  \todo gblSortRadix()
  */
 
 #ifndef GIMBAL_SORT_H
@@ -16,13 +17,13 @@ GBL_DECLS_BEGIN
 typedef GblInt  (*GblSortComparatorFn)  (const void*, const void*);
 typedef void    (*GblSortFn)            (void*, GblSize, GblSize, GblSortComparatorFn);
 
-GBL_INLINE void gblSortSelection(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-GBL_INLINE void gblSortQuick    (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-GBL_INLINE void gblSortInsertion(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-GBL_INLINE void gblSortShell    (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-GBL_INLINE void gblSortBubble   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE void gblSortSelection   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE void gblSortQuick       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE void gblSortInsertion   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE void gblSortShell       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE void gblSortBubble      (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 
-GBL_INLINE GblSize gblSearchBinary(void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE GblSize gblSearchBinary (void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 
 
 /// @}

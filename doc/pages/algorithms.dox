@@ -1,5 +1,7 @@
 /*! \defgroup algorithms Algorithms 
 * 	\brief Collection of common algorithms
+
+	LibGimbal provides a set of built-in numeric, sorting, and general utility algorithms which tend to be commonly used within applications and core frameworks.
 */
 
 /*! \page Algorithms Algorithms 

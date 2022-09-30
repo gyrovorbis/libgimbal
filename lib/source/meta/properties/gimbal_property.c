@@ -12,7 +12,7 @@ typedef struct GblPropertyRoot_ {
     GblProperty*    pLast;
 } GblPropertyRoot_;
 
-static GblHashSet   propertyRegistry_;
+static GblHashSet propertyRegistry_;
 
 // ========== PROPERTY SYSTEM PRIVATE ==========
 

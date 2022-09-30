@@ -232,7 +232,7 @@ void GblAllocationTracker_captureCounters(const GblAllocationTracker* pSelf,
     memcpy(pCounters, &pSelf->counters, sizeof(GblAllocationCounters));
 }
 
-void GblAllocationTracker_diffCounters(const GblAllocationTracker*  pSelf,
+void GblAllocationTracker_diffCounters(const GblAllocationTracker* pSelf,
                                        const GblAllocationCounters* pSrc,
                                        GblAllocationCounters*       pDst) {
 

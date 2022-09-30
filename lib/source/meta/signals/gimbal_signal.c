@@ -83,7 +83,7 @@ GBL_EXPORT GBL_RESULT GblSignal_install(GblType        ownerType,
 
     const GblSize allocSize = sizeof(Signal_) + sizeof(GblType)*argCount;
 
-    pSignal = GBL_API_MALLOC(gblAlignedAllocSize(allocSize),
+    pSignal = GBL_API_MALLOC(gblAlignedAllocSizeDefault(allocSize),
                              GBL_ALIGNOF(GBL_MAX_ALIGN_T),
                              pName);
 

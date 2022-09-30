@@ -26,13 +26,13 @@
 
 GBL_CLASS_BASE_EMPTY(GblPrimitive, GblIVariant)
 
-GblType GblType_type                 (void)                                         GBL_NOEXCEPT;
+GblType GblType_type                 (void)                                           GBL_NOEXCEPT;
 
 GblType GblPrimitive_register        (const char*                    pName,
                                       GblSize                        classSize,
                                       GblSize                        classPrivateSize,
                                       const GblIVariantClassVTable*  pIVTable,
-                                      GblFlags                       typeFlags)      GBL_NOEXCEPT;
+                                      GblFlags                       typeFlags)       GBL_NOEXCEPT;
 
 GblType GblPrimitive_registerBuiltin (GblSize                        index,
                                       const char*                    pName,

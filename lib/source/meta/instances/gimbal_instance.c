@@ -112,7 +112,7 @@ GBL_EXPORT GblInstance* GblInstance_create_(GblType type, GblClass* pClass) {
 
     GBL_API_DEBUG("Allocating %u bytes.", pMeta->pInfo->instanceSize + (-pMeta->instancePrivateOffset));
 
-    uint8_t* pBase = GBL_API_MALLOC(gblAlignedAllocSize(pMeta->pInfo->instanceSize
+    uint8_t* pBase = GBL_API_MALLOC(gblAlignedAllocSizeDefault(pMeta->pInfo->instanceSize
                                                      + (-pMeta->instancePrivateOffset)),
                                GBL_ALIGNOF(GBL_MAX_ALIGN_T),
                                GblType_name(type));

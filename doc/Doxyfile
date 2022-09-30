@@ -41,7 +41,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = LibGimbal
+PROJECT_NAME           = libGimbal
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -53,7 +53,7 @@ PROJECT_NUMBER         = 0.0.0 (PRERELEASE)
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Ultimate C17/C++20 Cross-Language Runtime Framework and Meta Type System"
+PROJECT_BRIEF          = "Ultimate C17/C++20 Core Utility Library and Cross-Language Runtime Framework"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -484,7 +484,7 @@ LOOKUP_CACHE_SIZE      = 0
 # DOT_NUM_THREADS setting.
 # Minimum value: 0, maximum value: 32, default value: 1.
 
-NUM_PROC_THREADS       = 1
+NUM_PROC_THREADS       = 0
 
 #---------------------------------------------------------------------------
 # Build related configuration options
@@ -894,7 +894,7 @@ WARN_LINE_FORMAT       = "at line $line of file $file"
 # specified the warning and error messages are written to standard output
 # (stdout).
 
-WARN_LOGFILE           =
+WARN_LOGFILE           = doxygen_warnings.txt
 
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
@@ -1024,7 +1024,8 @@ EXCLUDE_PATTERNS       =
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = GBL_SELF \
+EXCLUDE_SYMBOLS        = GBL_SELF_TYPE \
+                         GBL_SELF \
                          GBL_CSELF \
                          GBL_KLASS \
                          GBL_CKLASS \

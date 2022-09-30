@@ -31,12 +31,12 @@ GBL_INSTANCE_DERIVE(GblEvent, GblBox)
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 
-GBL_EXPORT GblType         GblEvent_type       (void)                   GBL_NOEXCEPT;
-GBL_INLINE GblEvent*       GblEvent_create     (GblType type)           GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT      GblEvent_construct  (GBL_SELF, GblType type) GBL_NOEXCEPT;
-GBL_INLINE GBL_EVENT_STATE GblEvent_state      (GBL_CSELF)              GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT      GblEvent_accept     (GBL_SELF)               GBL_NOEXCEPT;
-GBL_INLINE void            GblEvent_reset      (GBL_SELF)               GBL_NOEXCEPT;
+GBL_EXPORT GblType         GblEvent_type      (void)                   GBL_NOEXCEPT;
+GBL_INLINE GblEvent*       GblEvent_create    (GblType type)           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT      GblEvent_construct (GBL_SELF, GblType type) GBL_NOEXCEPT;
+GBL_INLINE GBL_EVENT_STATE GblEvent_state     (GBL_CSELF)              GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT      GblEvent_accept    (GBL_SELF)               GBL_NOEXCEPT;
+GBL_INLINE void            GblEvent_reset     (GBL_SELF)               GBL_NOEXCEPT;
 
 // ========== IMPL ===========
 

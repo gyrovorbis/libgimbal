@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief GblSignalClosure base instance and API
+ *  \copydoc GblSignalClosure
+ *  \ingroup signals
+ */
+
 #ifndef GIMBAL_SIGNAL_CLOSURE_H
 #define GIMBAL_SIGNAL_CLOSURE_H
 
@@ -21,13 +27,13 @@ GBL_INSTANCE_DERIVE(GblSignalClosure, GblClosure)
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 
-GBL_EXPORT GblType           GblSignalClosure_type     (void)                     GBL_NOEXCEPT;
+GBL_EXPORT GblType           GblSignalClosure_type      (void)                     GBL_NOEXCEPT;
 
-GBL_EXPORT GblSignalClosure* GblSignalClosure_create   (const char*  pSignalName,
-                                                        void*        pUserdata)   GBL_NOEXCEPT;
+GBL_EXPORT GblSignalClosure* GblSignalClosure_create    (const char*  pSignalName,
+                                                         void*        pUserdata)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblSignalClosure_setSignal(GBL_SELF,
-                                                        const char*  pSignalName) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT        GblSignalClosure_setSignal (GBL_SELF,
+                                                         const char*  pSignalName) GBL_NOEXCEPT;
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

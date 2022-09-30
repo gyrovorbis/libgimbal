@@ -1070,7 +1070,7 @@ static GblObjectFamily_* GblObject_ensureFamily_(GblObject* pSelf) {
     GBL_API_BEGIN(NULL);
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
     if(!pFamily) {
-        pFamily = GBL_API_MALLOC(gblAlignedAllocSize(sizeof(GblObjectFamily_)),
+        pFamily = GBL_API_MALLOC(gblAlignedAllocSizeDefault(sizeof(GblObjectFamily_)),
                                  GBL_ALIGNOF(GBL_MAX_ALIGN_T),
                                   "family");
         memset(pFamily, 0, sizeof(GblObjectFamily_));

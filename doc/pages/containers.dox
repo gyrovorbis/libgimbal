@@ -9,6 +9,7 @@ LibGimbal containers have been created with the goal of interoping directly with
 from either the C or C++ API. To facilitate this interop, and because we like the overall API design, the C APIs tend to mirror C++'s
 STL APIs fairly closely and should be fairly intuitive to work with for any C++ developer.
 
+
 ## Choosing the Right Container
     The following table can be referenced when deciding which container type to use:
    
@@ -23,6 +24,7 @@ STL APIs fairly closely and should be fairly intuitive to work with for any C++ 
 	GblArrayMap		       |Resizable array-based, [K,V] container with optional binary searchability  | gimbal_array_map.h
 	GblByteArray		   |Reference-counted resizable byte array buffer with generic read/write API  | gimbal_byte_array.h
 	GblRingBuffer          |Circular queue/Ring Buffer backed by a contiguous array with list semantics| gimbal_ring_buffer.h
+	GblRingList            |Non-intrusive circular doubly-linked list with high-level, convenience API | gimbal_ring_list.h
 
 
 

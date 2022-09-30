@@ -232,7 +232,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
     GBL_API_INLINE_BEGIN(GBL_NULL);
     if(align == 0) {
         align = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
-        size = gblAlignedAllocSize(size);
+        size = gblAlignedAllocSizeDefault(size);
     }
     GBL_ASSERT(size % align == 0);
     GBL_API_EXT(MALLOC, size, align, pDebugStr, &GBL_API_INLINE_RETVAL());
@@ -245,13 +245,25 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
     GBL_API_INLINE_CALL_(MALLOC, src, size, align, dbgStr)
 
 #define GBL_API_MALLOC_3(src, size, align) \
-    GBL_API_MALLOC_4(src, size, align, NULL)
+    GBL_API_MALLOC_4(src, size, align, GBL_NULL)
 
 #define GBL_API_MALLOC_2(src, size) \
-    GBL_API_MALLOC_3(src, gblAlignedAllocSize(size), GBL_ALIGNOF(GBL_MAX_ALIGN_T))
+    GBL_API_MALLOC_3(src, gblAlignedAllocSizeDefault(size), GBL_ALIGNOF(GBL_MAX_ALIGN_T))
 
 #define GBL_API_MALLOC(...)  \
     GBL_VA_OVERLOAD_SELECT(GBL_API_MALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
+
+#define GBL_API_NEW_4(src, type, count, dbgStr) \
+    (type*)GBL_API_INLINE_CALL_(MALLOC, src, gblAlignedAllocSizeDefault(sizeof(type)*count), 0, dbgStr)
+
+#define GBL_API_NEW_3(src, type, count) \
+    GBL_API_NEW_4(src, type, count, GBL_NULL)
+
+#define GBL_API_NEW_2(src, type) \
+    GBL_API_NEW_3(src, type, 1)
+
+#define GBL_API_NEW(...) \
+    GBL_VA_OVERLOAD_SELECT(GBL_API_NEW, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
 
 GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, GblSize newAlign) {
     GBL_API_INLINE_BEGIN(NULL);
@@ -269,6 +281,18 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
     GBL_API_REALLOC_4(src, pData, newSize, 1)
 
 #define GBL_API_REALLOC(...)  \
+     GBL_VA_OVERLOAD_SELECT(GBL_API_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
+
+#define GBL_API_RENEW_5(src, ptr, type, count, dbgStr) \
+    GBL_API_INLINE_CALL(REALLOC, src, ptr, sizeof(type)*count, dbgStr)
+
+#define GBL_API_RENEW_4(src, ptr, type, count) \
+    GBL_API_RENEW_5(src, ptr, type, count, GBL_NULL)
+
+#define GBL_API_RENEW_3(src, ptr, type) \
+    GBL_API_RENEW_4(src, ptr, type, 1)
+
+#define GBL_API_RENEW(...) \
      GBL_VA_OVERLOAD_SELECT(GBL_API_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
 
 #define GBL_API_FREE(pData) \
