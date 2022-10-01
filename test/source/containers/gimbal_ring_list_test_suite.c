@@ -679,6 +679,20 @@ static GBL_RESULT GblRingListTestSuite_destroyDeep_(GblTestSuite* pSelf, GblCont
     GBL_API_END();
 }
 
+static GBL_RESULT GblRingListTestSuite_stressTest_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+
+    GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
+
+    for(GblSize i = 0; i < 2000; ++i) {
+        GblRingList* pList = GblRingList_create("a", "b", "c", "d", "e", "f", "g");
+        GblRingList_remove(pList, 0, 3);
+        GblRingList_destroy(pList);
+    }
+
+    GBL_API_END();
+}
+
 GBL_EXPORT GblType GblRingListTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
@@ -724,6 +738,7 @@ GBL_EXPORT GblType GblRingListTestSuite_type(void) {
         { "find",                       GblRingListTestSuite_find_                      },
         { "destroyShallow",             GblRingListTestSuite_destroyShallow_            },
         { "destroyDeep",                GblRingListTestSuite_destroyDeep_               },
+        { "stressTest",                 GblRingListTestSuite_stressTest_                },
         { NULL,                         NULL                                            }
     };
 

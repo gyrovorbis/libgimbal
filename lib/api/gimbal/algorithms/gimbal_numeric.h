@@ -145,6 +145,7 @@ GBL_INLINE GBL_CONSTEXPR GblSize gblAlignedAllocSizeDefault(GblSize bytes) GBL_N
 }
 
 GBL_INLINE GBL_CONSTEXPR GblSize gblAlignedAllocSize(GblSize size, GblSize align) GBL_NOEXCEPT {
+    if(!align) align = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
     const GblSize alignRem = size % align;
     GblSize newSize = size;
     if(alignRem) {

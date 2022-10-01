@@ -24,6 +24,14 @@ GBL_DECLS_BEGIN
  *  allocated, intrusive linked list structures with the list nodes
  *  embedded within their containing structures.
  *
+ *  Operation                         |Time Complexity
+ *  ----------------------------------|------------------
+ *  iteration                         | O(N)
+ *  insertion/removal (middle)        | O(N)
+ *  insertion/removal (front or back) | O(1)
+ *  access (front or back)            | O(1)
+ *  random access (middle)            | O(N)
+ *
  *  \note For more a more user-friendly, high-level, abstract,
  *  non-intrusive circularly linked list structure which can be
  *  filled with arbitrary data and whose allocations are managed

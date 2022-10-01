@@ -160,6 +160,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/utils/gimbal_timer.h
     api/gimbal/utils/gimbal_uuid.h
     api/gimbal/utils/gimbal_arena_allocator.h
+    api/gimbal/utils/gimbal_pool_allocator.h
 )
 
 
@@ -216,6 +217,7 @@ set(GIMBAL_SOURCES
     source/test/gimbal_allocation_tracker.c
     source/utils/gimbal_uuid.c
     source/utils/gimbal_arena_allocator.c
+    source/utils/gimbal_pool_allocator.c
  )
 
 add_library(libGimbal STATIC

@@ -32,7 +32,7 @@ GBL_CLASS_DERIVE(GblEnum, GblPrimitive)
     uint16_t            entryCount;
 GBL_CLASS_END
 
-// ========== GblEnumClass ==========
+// ========== GblEnumClass ==========#
 
 GBL_INLINE const char* GblEnumClass_nameFromIndex      (GBL_CSELF, uint16_t index)       GBL_NOEXCEPT;
 GBL_INLINE const char* GblEnumClass_nameFromValue      (GBL_CSELF, GblEnum value)        GBL_NOEXCEPT;

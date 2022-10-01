@@ -14,12 +14,15 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_construct_6(GblRingBuffer* pSelf,
 
     memset(pSelf, 0, sizeof(GblRingBuffer));
 
-    GBL_PRIV_REF(pSelf).pCtx = pCtx;
+    GBL_PRIV_REF(pSelf).pCtx        = pCtx;
     GBL_PRIV_REF(pSelf).elementSize = elementSize;
+    GBL_PRIV_REF(pSelf).capacity    = capacity;
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_reserve(pSelf, capacity));
-    if(initialSize) GBL_API_VERIFY_CALL(GblRingBuffer_append(pSelf, pInitialData, initialSize));
+    GBL_PRIV_REF(pSelf).pData       = GBL_API_MALLOC(capacity * elementSize, 0, "GblRingBuffer");
 
+    for(GblSize i = 0; i < initialSize; ++i) {
+        GBL_API_VERIFY_CALL(GblRingBuffer_pushBack(pSelf, pInitialData + (elementSize * i)));
+    }
     GBL_API_END();
 }
 
@@ -49,6 +52,8 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_copy(GblRingBuffer* pSelf,
            GBL_PRIV_REF(pOther).pData,
            GBL_PRIV_REF(pSelf).elementSize * GBL_PRIV_REF(pSelf).capacity);
 
+    GBL_PRIV_REF(pSelf).size = GBL_PRIV_REF(pOther).size;
+
     GBL_API_END();
 }
 
@@ -63,7 +68,7 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_move(GblRingBuffer* pSelf,
 
     GBL_API_END();
 }
-
+#if 0
 GBL_EXPORT GBL_RESULT GblRingBuffer_reserve(GblRingBuffer* pSelf,
                                             GblSize        capacity)
 {
@@ -121,6 +126,7 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_resize(GblRingBuffer* pSelf, GblSize size) {
                 GblRingBuffer_advance_(pSelf);
 
         } else if(size < oldSize) {
+            GBL_PRIV_REF(pSelf).size -= (oldSize - size);
             GBL_PRIV_REF(pSelf).frontPos += (oldSize - size);
             GBL_PRIV_REF(pSelf).frontPos %= GBL_PRIV_REF(pSelf).capacity;
         }
@@ -141,4 +147,4 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_shrinkToFit(GblRingBuffer* pSelf) {
 
     } else return GBL_RESULT_SUCCESS;
 }
-
+#endif

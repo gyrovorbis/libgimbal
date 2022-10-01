@@ -9,6 +9,7 @@
 #include "containers/gimbal_tree_set_test_suite.h"
 #include "containers/gimbal_hash_set_test_suite.h"
 #include "utils/gimbal_arena_allocator_test_suite.h"
+#include "utils/gimbal_pool_allocator_test_suite.h"
 #include "core/gimbal_ref_test_suite.h"
 #include "containers/gimbal_byte_array_test_suite.h"
 #include "strings/gimbal_quark_test_suite.h"
@@ -61,6 +62,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_createFromType(GBL_HASH_SET_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_ARENA_ALLOCATOR_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_createFromType(GBL_POOL_ALLOCATOR_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_REF_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,

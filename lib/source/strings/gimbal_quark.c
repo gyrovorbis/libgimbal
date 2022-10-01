@@ -79,6 +79,7 @@ static void gblQuarkInit_(void) {
 
     GBL_API_CALL(GblArenaAllocator_construct(&arena_,
                                              pageSize_,
+                                             0,
                                              &pageStatic_.page,
                                              pCtx_));
     initialized_            = GBL_TRUE;

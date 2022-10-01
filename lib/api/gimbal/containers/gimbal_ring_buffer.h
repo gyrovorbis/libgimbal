@@ -1,6 +1,7 @@
 /*! \file
  *  \brief GblRingBuffer container and related functions
  *  \ingroup containers
+ *  \copydoc GblRingBuffer
  */
 
 #ifndef GIMBAL_RING_BUFFER_H
@@ -14,12 +15,24 @@
 
 GBL_DECLS_BEGIN
 
-/*! \brief Contiguous, array-based circular/ring buffer with a list API
+/*! \brief Contiguous, array-based circular/ring buffer with queue semantics
  *
- *  GblRingBuffer is an abstract list-style container of fixed capacity,
+ *  GblRingBuffer is a generic container of fixed capacity,
  *  to which elements may be enqueued or dequeued without requiring any
  *  shuffling around in memory. Rather than resizing when the capacity is
  *  reached, any new values simply overrwrite the oldest values.
+ *  Insertions and removals are performed semantically like a queue:
+ *  pushing to the back and popping from the front; however, since the
+ *  container is implemented as a contiguous array, it is also randomly
+ *  accessible.
+ *
+ *  Operation                         |Time Complexity
+ *  ----------------------------------|------------------
+ *  iteration                         | O(N)
+ *  insertion (back)                  | O(1)
+ *  removal (front)                   | O(1)
+ *  access (front or back)            | O(1)
+ *  random access (middle)            | O(1)
  *
  *  These properties make this structure well-suited for FIFO or queue
  *  style structures of fixed sizes as well as for representing stream
@@ -32,6 +45,7 @@ typedef struct GblRingBuffer {
     GBL_PRIVATE()
         GblContext* pCtx;
         uint8_t*    pData;
+        GblSize     size;
         GblSize     capacity;
         GblSize     backPos;
         GblSize     frontPos;
@@ -73,7 +87,6 @@ GBL_INLINE GblContext* GblRingBuffer_context     (GBL_CSELF)                    
 GBL_INLINE GblSize     GblRingBuffer_capacity    (GBL_CSELF)                                  GBL_NOEXCEPT;
 GBL_INLINE GblSize     GblRingBuffer_size        (GBL_CSELF)                                  GBL_NOEXCEPT;
 GBL_INLINE GblSize     GblRingBuffer_elementSize (GBL_CSELF)                                  GBL_NOEXCEPT;
-GBL_INLINE void*       GblRingBuffer_data        (GBL_SELF)                                   GBL_NOEXCEPT;
 
 GBL_INLINE GblBool     GblRingBuffer_empty       (GBL_CSELF)                                  GBL_NOEXCEPT;
 GBL_INLINE GblBool     GblRingBuffer_full        (GBL_CSELF)                                  GBL_NOEXCEPT;
@@ -86,14 +99,7 @@ GBL_INLINE GBL_RESULT  GblRingBuffer_pushBack    (GBL_SELF, const void* pData)  
 GBL_INLINE void*       GblRingBuffer_emplaceBack (GBL_SELF)                                   GBL_NOEXCEPT;
 
 GBL_INLINE void*       GblRingBuffer_popFront    (GBL_SELF)                                   GBL_NOEXCEPT;
-
-GBL_INLINE GBL_RESULT  GblRingBuffer_append      (GBL_SELF, const void* pData, GblSize count) GBL_NOEXCEPT;
-
 GBL_INLINE void        GblRingBuffer_clear       (GBL_SELF)                                   GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT  GblRingBuffer_reserve     (GBL_SELF, GblSize capacity)                 GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblRingBuffer_resize      (GBL_SELF, GblSize size)                     GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblRingBuffer_shrinkToFit (GBL_SELF)                                   GBL_NOEXCEPT;
 
 // ===== IMPL =====
 
@@ -101,9 +107,11 @@ GBL_EXPORT GBL_RESULT  GblRingBuffer_shrinkToFit (GBL_SELF)                     
 GBL_INLINE void GblRingBuffer_advance_(GBL_SELF) GBL_NOEXCEPT {
     ++GBL_PRIV_REF(pSelf).backPos;
     GBL_PRIV_REF(pSelf).backPos %= GBL_PRIV_REF(pSelf).capacity;
-    if(GBL_PRIV_REF(pSelf).backPos == GBL_PRIV_REF(pSelf).frontPos) {
+    if(GblRingBuffer_full(pSelf)) {
         ++GBL_PRIV_REF(pSelf).frontPos;
         GBL_PRIV_REF(pSelf).frontPos %= GBL_PRIV_REF(pSelf).capacity;
+    } else {
+        ++GBL_PRIV_REF(pSelf).size;
     }
 }
 /// \endcond
@@ -141,15 +149,11 @@ GBL_INLINE GblSize GblRingBuffer_capacity(GBL_CSELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GblSize GblRingBuffer_size(GBL_CSELF) GBL_NOEXCEPT {
-    return GBL_PRIV_REF(pSelf).capacity - (GBL_PRIV_REF(pSelf).capacity - llabs((ptrdiff_t)(GBL_PRIV_REF(pSelf).backPos - GBL_PRIV_REF(pSelf).frontPos)));
+    return GBL_PRIV_REF(pSelf).size;
 }
 
 GBL_INLINE GblSize GblRingBuffer_elementSize(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_PRIV_REF(pSelf).elementSize;
-}
-
-GBL_INLINE void* GblRingBuffer_data(GBL_SELF) GBL_NOEXCEPT {
-    return GBL_PRIV_REF(pSelf).pData;
 }
 
 GBL_INLINE GblBool GblRingBuffer_empty(GBL_CSELF) GBL_NOEXCEPT {
@@ -181,8 +185,7 @@ GBL_INLINE void* GblRingBuffer_front(GBL_CSELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE void* GblRingBuffer_back(GBL_CSELF) GBL_NOEXCEPT {
-    return GblRingBuffer_at(pSelf, GBL_PRIV_REF(pSelf).backPos == 0?
-                                GblRingBuffer_size(pSelf) - 1 : GBL_PRIV_REF(pSelf).backPos - 1);
+    return GblRingBuffer_at(pSelf, GBL_PRIV_REF(pSelf).size-1);
 }
 
 
@@ -202,24 +205,21 @@ GBL_INLINE GBL_RESULT GblRingBuffer_pushBack(GBL_SELF, const void* pData) GBL_NO
 GBL_INLINE void* GblRingBuffer_popFront(GBL_SELF) GBL_NOEXCEPT {
     void* pFront = GblRingBuffer_front(pSelf);
     if(pFront) {
+        --GBL_PRIV_REF(pSelf).size;
         ++GBL_PRIV_REF(pSelf).frontPos;
         GBL_PRIV_REF(pSelf).frontPos %= GBL_PRIV_REF(pSelf).capacity;
+    } else {
+        GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+        GBL_API_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_API_END_BLOCK();
     }
     return pFront;
 }
 
-/// \todo Batch/Bulk optimize me
-GBL_INLINE GBL_RESULT GblRingBuffer_append(GBL_SELF, const void* pData, GblSize count) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-    for(GblSize i = 0; i < count; ++i) {
-        const GblSize offset = (i * GBL_PRIV_REF(pSelf).elementSize);
-        GBL_API_VERIFY_CALL(GblRingBuffer_pushBack(pSelf, ((uint8_t*)pData) + offset));
-    }
-    GBL_API_END();
-}
-
 GBL_INLINE void GblRingBuffer_clear(GBL_SELF) GBL_NOEXCEPT {
-    GBL_PRIV_REF(pSelf).frontPos = GBL_PRIV_REF(pSelf).backPos = 0;
+    GBL_PRIV_REF(pSelf).frontPos = 0;
+    GBL_PRIV_REF(pSelf).backPos  = 0;
+    GBL_PRIV_REF(pSelf).size     = 0;
 }
 
 GBL_DECLS_END

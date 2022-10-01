@@ -3,17 +3,20 @@
 
 #define GBL_ARENA_PAGE_(node)  GBL_LINKED_LIST_ENTRY(node, GblArenaAllocatorPage, listNode)
 
-GBL_EXPORT GBL_RESULT GblArenaAllocator_construct(GblArenaAllocator*     pSelf,
-                                                  GblSize                pageSize,
-                                                  GblArenaAllocatorPage* pInitialPage,
-                                                  GblContext*            pCtx)
+GBL_EXPORT GBL_RESULT (GblArenaAllocator_construct)(GblArenaAllocator*     pSelf,
+                                                    GblSize                pageSize,
+                                                    GblSize                pageAlign,
+                                                    GblArenaAllocatorPage* pInitialPage,
+                                                    GblContext*            pCtx)
 {
     GBL_API_BEGIN(pCtx);
     memset(pSelf, 0, sizeof(GblArenaAllocator));
     pSelf->pCtx = pCtx;
     GblLinkedList_init(&pSelf->listNode);
-    GblLinkedList_pushFront(&pSelf->listNode, &pInitialPage->listNode);
+    if(pInitialPage)
+        GblLinkedList_pushFront(&pSelf->listNode, &pInitialPage->listNode);
     pSelf->pageSize = pageSize;
+    pSelf->pageAlign = pageAlign < GBL_ALIGNOF(GBL_MAX_ALIGN_T)? GBL_ALIGNOF(GBL_MAX_ALIGN_T) : pageAlign;
     GBL_API_END();
 }
 
@@ -21,10 +24,10 @@ GBL_EXPORT GBL_RESULT GblArenaAllocator_destruct(GblArenaAllocator* pSelf) {
     return GblArenaAllocator_freeAll(pSelf);
 }
 
-static GblArenaAllocatorPage* GblArenaAllocator_allocPage_(GblContext* pCtx, GblSize size) {
+static GblArenaAllocatorPage* GblArenaAllocator_allocPage_(GblContext* pCtx, GblSize size, GblSize align) {
     GblArenaAllocatorPage* pPage = NULL;
     GBL_API_BEGIN(pCtx);
-    pPage = GBL_API_MALLOC(sizeof(GblArenaAllocatorPage) + size-1);
+    pPage = GBL_API_MALLOC(gblAlignedAllocSize(sizeof(GblArenaAllocatorPage) + size-1, align), align);
     GblLinkedList_init(&pPage->listNode);
     pPage->capacity = size;
     pPage->used = 0;
@@ -41,14 +44,16 @@ GBL_EXPORT void* GblArenaAllocator_allocAligned(GblArenaAllocator* pSelf, GblSiz
     void* pData = NULL;
     if(size) {
 
-        GblArenaAllocatorPage* pPage = pSelf->pActivePage;
+        GblArenaAllocatorPage* pPage = GBL_ARENA_PAGE_(GblLinkedList_front(&pSelf->listNode));
 
         if(alignment == 0) alignment = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
         const GblSize actualSize = gblAlignedAllocSize(size, alignment);
 
         if(!pPage || (pPage->capacity - pPage->used < actualSize)) {
             if(actualSize <= pSelf->pageSize) {
-                GblArenaAllocatorPage* pNewPage = GblArenaAllocator_allocPage_(pSelf->pCtx, pSelf->pageSize);
+                GblArenaAllocatorPage* pNewPage = GblArenaAllocator_allocPage_(pSelf->pCtx,
+                                                                               pSelf->pageSize,
+                                                                               pSelf->pageAlign);
                 GblLinkedList_pushFront(&pSelf->listNode, &pNewPage->listNode);
             } else {
                 GBL_API_BEGIN(pSelf->pCtx);
@@ -163,3 +168,19 @@ GBL_EXPORT GblSize GblArenaAllocator_bytesAvailable(const GblArenaAllocator* pSe
     }
     return bytes;
 }
+
+GBL_EXPORT void GblArenaAllocator_saveState(const GblArenaAllocator* pSelf, GblArenaAllocatorState* pState) {
+    pState->pActivePage = pSelf->pActivePage;
+    pState->bytesUsed   = pSelf->pActivePage->used;
+}
+
+GBL_EXPORT GBL_RESULT GblArenaAllocator_loadState(GblArenaAllocator* pSelf, const GblArenaAllocatorState* pState) {
+    GBL_API_BEGIN(pSelf->pCtx);
+    while(pSelf->pActivePage != pState->pActivePage) {
+        GblArenaAllocatorPage* pPage = GBL_ARENA_PAGE_(GblLinkedList_popFront(&pSelf->listNode));
+        GBL_API_FREE(pPage);
+    }
+    pSelf->pActivePage->used = pState->bytesUsed;
+    GBL_API_END();
+}
+

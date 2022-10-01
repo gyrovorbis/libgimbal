@@ -3,7 +3,6 @@
  *  \ingroup containers
  *  \todo
  *    GblRingList_sort()
- *    Back allocations with pool/chunk allocator
  */
 
 #ifndef GIMBAL_RING_LIST_H
@@ -27,7 +26,8 @@ typedef GBL_RESULT (*GblRingListDtorFn)(void* pValue, void* pClosure);
  *
  *  GblRingList is a non-intrusive circular doubly-linked
  *  list with an API mirroring C++'s std::vector, or that of
- *  an abstract List from other languges.
+ *  an abstract List from other languges. All values are stored
+ *  in the form of void* pointers.
  *
  *  Each entry within the list is maintained as a simple
  *  GblDoublyLinkedListNode connecting it to the prevous and next
@@ -61,7 +61,7 @@ typedef GBL_RESULT (*GblRingListDtorFn)(void* pValue, void* pClosure);
  *  each node from contiguous blocks of data, also
  *  maintaining a free list to reuse nodes as they become
  *  available.
- *
+ *  \sa GblDoublyLinkedListNode
  *  \ingroup containers
  */
 typedef struct GblRingList {

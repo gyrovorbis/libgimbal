@@ -74,6 +74,8 @@ add_executable(GimbalTests
     source/utils/gimbal_uuid_test_suite.c
     include/utils/gimbal_arena_allocator_test_suite.h
     source/utils/gimbal_arena_allocator_test_suite.c
+    include/utils/gimbal_pool_allocator_test_suite.h
+    source/utils/gimbal_pool_allocator_test_suite.c
     source/gimbal_test_main.c)
 
 target_link_libraries(GimbalTests

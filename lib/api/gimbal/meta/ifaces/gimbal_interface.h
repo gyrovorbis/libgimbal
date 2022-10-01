@@ -217,17 +217,17 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (GBL_SELF)  GBL_NOEXCEPT
  *          GBL_API_BEGIN(NULL);
  *
  *          // exttract our interface from the given instance
- *          ISerializableIFace* pIFace = ISERIALIZABLE_GET_IFACE(pSelf);
+ *          ISerializableClass* pClass = ISERIALIZABLE_GET_CLASS(pSelf);
  *
  *          // check whether we managed to find the interface
- *          if(pIFace) {
+ *          if(pClass) {
  *
  *              // check whether the virtual method has been implemented
- *              if(pIFace->pFnSave) {
+ *              if(pClass->pFnSave) {
  *
  *                  // call virtual method implementation,
  *                  // propagating any error code returned
- *                  GBL_API_VERIFY_CALL(pIFace->pFnSave(pSelf, pBuffer);
+ *                  GBL_API_VERIFY_CALL(pClass->pFnSave(pSelf, pBuffer);
  *              }
  *          }
  *          GBL_API_END();

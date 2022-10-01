@@ -1,8 +1,21 @@
 #include <gimbal/containers/gimbal_ring_list.h>
 #include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/utils/gimbal_pool_allocator.h>
 #include <stdarg.h>
 
 #define GBL_RING_LIST_(node) GBL_DOUBLY_LINKED_LIST_ENTRY(node, GblRingList, listNode)
+
+#define GBL_RING_LIST_POOL_ALLOCATOR
+
+#ifdef GBL_RING_LIST_POOL_ALLOCATOR
+#  define GBL_RING_LIST_NEW_()           (GblPoolAllocator_new(&allocPool_))
+#  define GBL_RING_LIST_DELETE_(ptr)     (GblPoolAllocator_delete(&allocPool_, ptr))
+#else
+#  define GBL_RING_LIST_NEW_()           GBL_API_NEW(GblRingList)
+#  define GBL_RING_LIST_DELETE_(ptr)     GBL_API_FREE(ptr)
+#endif
+
+static GblPoolAllocator allocPool_;
 
 static GBL_RESULT GblRingList_pushBackVaList_(GblRingList* pSelf, va_list* pList) {
     GBL_API_BEGIN(NULL);
@@ -10,7 +23,7 @@ static GBL_RESULT GblRingList_pushBackVaList_(GblRingList* pSelf, va_list* pList
 
     GblRingList* pEntry = NULL;
     while((pArg = va_arg(*pList, void*))) {
-        pEntry = GBL_API_NEW(GblRingList);
+        pEntry = GBL_RING_LIST_NEW_();
         pEntry->pData = pArg;
         GblDoublyLinkedList_pushBack(&pSelf->listNode,
                                      &pEntry->listNode);
@@ -26,7 +39,7 @@ static GBL_RESULT GblRingList_pushFrontVaList_(GblRingList* pSelf, va_list* pLis
 
     GblSize idx = 0;
     while((pArg = va_arg(*pList, void*))) {
-        GblRingList* pEntry = GBL_API_NEW(GblRingList);
+        GblRingList* pEntry = GBL_RING_LIST_NEW_();
         pEntry->pData = pArg;
         GblDoublyLinkedList_insert(&pSelf->listNode,
                                    idx++,
@@ -55,7 +68,7 @@ static GBL_RESULT GblRingList_insertVaList_(GblRingList* pSelf, intptr_t index, 
                        GBL_RESULT_ERROR_OUT_OF_RANGE);
         if(index > 0) {
             while((pArg = va_arg(*pList, void*))) {
-                GblRingList* pNewEntry = GBL_API_NEW(GblRingList);
+                GblRingList* pNewEntry = GBL_RING_LIST_NEW_();
                 GblDoublyLinkedList_init(&pNewEntry->listNode);
                 GblDoublyLinkedList_insertBefore(&pEntry->listNode, &pNewEntry->listNode);
                 pNewEntry->pData = pArg;
@@ -64,7 +77,7 @@ static GBL_RESULT GblRingList_insertVaList_(GblRingList* pSelf, intptr_t index, 
 
         } else {
             while((pArg = va_arg(*pList, void*))) {
-                GblRingList* pNewEntry = GBL_API_NEW(GblRingList);
+                GblRingList* pNewEntry = GBL_RING_LIST_NEW_();
                 GblDoublyLinkedList_init(&pNewEntry->listNode);
                 GblDoublyLinkedList_insertAfter(&pEntry->listNode, &pNewEntry->listNode);
                 pNewEntry->pData = pArg;
@@ -79,8 +92,17 @@ static GBL_RESULT GblRingList_insertVaList_(GblRingList* pSelf, intptr_t index, 
 
 GBL_EXPORT GblRingList* GblRingList_createEmpty(void) {
     GBL_API_BEGIN(NULL);
-    GblRingList* pList = GBL_API_NEW(GblRingList);
+
+    // top-level entry point, ensure pool is created!
+    if(!allocPool_.entrySize) {
+        GBL_API_VERIFY_CALL(GblPoolAllocator_construct(&allocPool_,
+                                                       sizeof(GblRingList),
+                                                       20));
+    }
+
+    GblRingList* pList = GBL_RING_LIST_NEW_();
     GblDoublyLinkedList_init(&pList->listNode);
+    pList->size = 0;
     GBL_API_END_BLOCK();
     return pList;
 }
@@ -144,10 +166,10 @@ GBL_EXPORT GBL_RESULT (GblRingList_destroy)(GblRingList*      pSelf,
     {
         pNext = pIt->ringNode.pNext;
         if(pFnDtor) GBL_API_VERIFY_CALL(pFnDtor(pIt->pData, pCapture));
-        GBL_API_FREE(pIt);
+        GBL_RING_LIST_DELETE_(pIt);
     }
 
-    GBL_API_FREE(pSelf);
+    GBL_RING_LIST_DELETE_(pSelf);
 
     GBL_API_END();
 }
@@ -218,7 +240,7 @@ GBL_EXPORT void* GblRingList_replace(GblRingList* pSelf, intptr_t index, void* p
 
 GBL_EXPORT GBL_RESULT GblRingList_insertSorted(GblRingList* pSelf, void* pData, GblRingListCmpFn pFnCmp, void* pCl) {
     GBL_API_BEGIN(NULL);
-    GblRingList* pEntry = GBL_API_NEW(GblRingList);
+    GblRingList* pEntry = GBL_RING_LIST_NEW_();
     pEntry->pData = pData;
 
     if(!pFnCmp) {
@@ -266,7 +288,7 @@ GBL_EXPORT void* (GblRingList_popBack)(GblRingList* pSelf, GblSize count) {
     for(GblSize i = 0; i < count; ++i) {
         GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_popBack(&pSelf->listNode));
         if(pEntry) pData = pEntry->pData;
-        GBL_API_FREE(pEntry);
+        GBL_RING_LIST_DELETE_(pEntry);
         --pSelf->size;
     }
     GBL_API_END_BLOCK();
@@ -279,7 +301,7 @@ GBL_EXPORT void* (GblRingList_popFront)(GblRingList* pSelf, GblSize count) {
     for(GblSize i = 0; i < count; ++i) {
         GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_popFront(&pSelf->listNode));
         if(pEntry) pData = pEntry->pData;
-        GBL_API_FREE(pEntry);
+        GBL_RING_LIST_DELETE_(pEntry);
         --pSelf->size;
     }
     GBL_API_END_BLOCK();
@@ -303,7 +325,7 @@ GBL_EXPORT void* (GblRingList_remove)(GblRingList* pSelf, intptr_t index, GblSiz
         pData = pNode->pData;
         pNext = (index >= 0)? pNode->ringNode.pNext : pNode->ringNode.pPrev;
         GblDoublyLinkedList_remove(&pNode->listNode);
-        GBL_API_FREE(pNode);
+        GBL_RING_LIST_DELETE_(pNode);
         --count;
         --pSelf->size;
         pNode = pNext;
@@ -323,7 +345,7 @@ GBL_EXPORT GBL_RESULT GblRingList_clear(GblRingList* pSelf) {
         pIt = pNext)
     {
         pNext = pIt->ringNode.pNext;
-        GBL_API_FREE(pIt);
+        GBL_RING_LIST_DELETE_(pIt);
     }
 
     GblDoublyLinkedList_init(&pSelf->listNode);

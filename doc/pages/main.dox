@@ -43,6 +43,7 @@
 	- Platform-independent unit testing framework
 
 # Code Examples
+Miscellaneous code fragments demonstrating a bit of what libGimbal has to offer.
 ##String References
  <table>
  <tr><td>C</td><td>C++</td></tr>
@@ -113,6 +114,7 @@ aka std::vector with a better name:
 </table>
 
 ##Variants
+<table><tr><td>
  \code{.c}
 GblVariant v = GBL_VARIANT_INIT;
 
@@ -132,6 +134,7 @@ GblFlags       gValue  = GblVariant_toFlags(&v);      // if the type is a generi
 
 GblVariant_destruct(&v);
 \endcode 
+</td></tr></table>
 
 ##Flags Meta Types
 <table><tr><td>
@@ -187,6 +190,7 @@ assert(strcmp(GblVariant_getString(&sVar), "LOAD|SAVE") == 0);
 
 ##Object-Oriented C
 Defining an Object:
+<table><tr><td>
 \code{.c}
 /* Create a vtable structure for GblObject which inherits from the GblBox base
    class and implements the GblITable, GblIEventHandler, and GblIEventFilter interface vtables. */	
@@ -212,26 +216,17 @@ GBL_PROPERTIES(GblObject,
     (refCount, GBL_GENERIC,  (READ),                    GBL_UINT16_TYPE)
 )
 \endcode
+</td></tr></table>
+
 Creating an Object
+<table><tr><td>
 \code{.c}
 GblObject* pObject = GBL_OBJECT_CREATE(GblObject,
                                        "name",     "childObject",
                                        "userdata", (void*)0xdeadbabe);
 
 \endcode
-
-Quarks/StringBuffer
-Hash Tables
-Context Control Flow, Logging, Errors
-Object with Properties
-Signals/Slots example
-GblFlags example
-Object with Events
-Function overloading in C
-C/++ generic selection
-
-
-
+</td></tr></table>
 
 # Compiler Requirements 
 	LibGimbal has been written to build with any compiler supporting standard C17, with its builtin C++ wrappers 
@@ -318,6 +313,7 @@ C/++ generic selection
 	DSLs, fuckery--call it what you will--but we do so unapologetically. This is a very advanced C codebase, and such macros are often literally 
 	necessary (try to capture source context without one), and are often times far, far more convenient than duplicationg code paths.
 
+	<table><tr><td>
 	\code{.c}
 		// You wanna type all this every time you want to make a simple hash set?!
 		GBL_EXPORT GBL_RESULT        GblHashSet_construct_8   (GBL_SELF,
@@ -338,11 +334,13 @@ C/++ generic selection
 		        GBL_VA_OVERLOAD_CALL(GblHashSet_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
    \endcode
+   </td></tr></table>
 
 	We provide all sorts of convenience overloads for our C APIs, which are by both argument count and type, closer to what you would expect in C++ thanks to macros. Not
 	only that, but we provide the primitive macro utility and meta programming constructs through which you can leverage this stuff in your own 
 	codebase, should you also wish to dabble in the dark arts (see gimbal_macro_composition.h and gimbal_macro_sequences.h).
 
+	<table><tr><td>
 	\code{.c}
 	/* So you want me to give you a malloc function which captures source code location, optionally takes alignment, and optionally takes a debug string for 
 	   tracing allocations and memory leaks? K. Hullo, macros! */
@@ -362,6 +360,7 @@ C/++ generic selection
     						 SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), \
     						 __VA_ARGS__)
     \endcode
+    </td></tr></table>
 
 	Yes, they can be a pain in the ass. We know. But it is our opinion that properly used macros enrich the codebase and make it more modern. 
 	The only place where someone using the codebase is really expected to be writing their own macros is for the meta type system's macro-based DSL, 
@@ -423,17 +422,7 @@ C/++ generic selection
 		  C was a painful, humbling experience. I actually almost gave up on this project and being a C programmer altogether. However,
 		  this book inspired me to see beyond the language limitations and opened my mind to what could truly be accomplished
 		  in C without the ++.
-
-\todo
-	- Have Marcel go over CSS and fix any reest
-	- Qt style mini TOC doesn't have detailed documentation link
-	- make macros appear in member documentation at the end
-	- libGimbal icon padding
-	- modules table separator a little audacious
-	- types related methods/members tables have cut off open line
-	- clicking on a link in a ToC fucks up botton navigator pane
-	- header files with only macros have a fucked up ToC and no listing
-*/ 
+*/
 
 /*! \page docs Documentation
 
@@ -487,6 +476,16 @@ LibGimbal's features are conceptually split into the following high-level compon
 - automatic timing and performance measurements
 - memory utilization and leak detection
 - support for dynamic/run-time test plan construction
+
+\todo
+	- Have Marcel go over CSS and fix any reest
+	- Qt style mini TOC doesn't have detailed documentation link
+	- make macros appear in member documentation at the end
+	- libGimbal icon padding
+	- modules table separator a little audacious
+	- types related methods/members tables have cut off open line
+	- clicking on a link in a ToC fucks up botton navigator pane
+	- header files with only macros have a fucked up ToC and no listing
 
 */
 

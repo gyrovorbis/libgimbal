@@ -8,7 +8,7 @@ typedef struct GblArenaAllocatorTestSuite_ {
     GblArenaAllocator arena;
     struct {
         GblArenaAllocatorPage page;
-        char                  bytes[63];
+        char                  bytes[127];
     };
 } GblArenaAllocatorTestSuite_;
 
@@ -26,7 +26,7 @@ static GBL_RESULT GblArenaAllocatorTestSuite_init_(GblTestSuite* pSelf, GblConte
 static GBL_RESULT GblArenaAllocatorTestSuite_construct_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
-    GBL_API_VERIFY_CALL(GblArenaAllocator_construct(&pSelf_->arena, 128, &pSelf_->page, pCtx));
+    GBL_API_VERIFY_CALL(GblArenaAllocator_construct(&pSelf_->arena, 128, 1, &pSelf_->page, pCtx));
 
     GBL_TEST_COMPARE(GblArenaAllocator_pageCount(&pSelf_->arena), 1);
     GBL_TEST_COMPARE(GblArenaAllocator_bytesUsed(&pSelf_->arena), 0);
@@ -95,6 +95,31 @@ static GBL_RESULT GblArenaAllocatorTestSuite_allocFail_(GblTestSuite* pSelf, Gbl
     GBL_API_END();
 }
 
+static GBL_RESULT GblArenaAllocatorTestSuite_saveLoadState_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
+
+    char* pTestString = GblArenaAllocator_allocAligned(&pSelf_->arena, 20, 1);
+    strcpy(pTestString, "Restoration Point");
+
+    const GblSize bytesUsed = GblArenaAllocator_bytesUsed(&pSelf_->arena);
+    const GblSize pageCount = GblArenaAllocator_pageCount(&pSelf_->arena);
+
+    GblArenaAllocatorState state;
+    GblArenaAllocator_saveState(&pSelf_->arena, &state);
+
+    for(GblSize i = 0; i < 5; ++i)
+        GblArenaAllocator_alloc(&pSelf_->arena, 100);
+
+    GBL_API_VERIFY_CALL(GblArenaAllocator_loadState(&pSelf_->arena, &state));
+
+    GBL_TEST_COMPARE(pTestString, "Restoration Point");
+    GBL_TEST_COMPARE(GblArenaAllocator_bytesUsed(&pSelf_->arena), bytesUsed);
+    GBL_TEST_COMPARE(GblArenaAllocator_pageCount(&pSelf_->arena), pageCount);
+
+    GBL_API_END();
+}
+
 static GBL_RESULT GblArenaAllocatorTestSuite_freeAll_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
@@ -127,6 +152,7 @@ GBL_EXPORT GblType GblArenaAllocatorTestSuite_type(void) {
         { "allocNewPage",   GblArenaAllocatorTestSuite_allocNewPage_ },
         { "allocAligned",   GblArenaAllocatorTestSuite_allocAligned_ },
         { "allocFail",      GblArenaAllocatorTestSuite_allocFail_    },
+        { "saveLoadState",  GblArenaAllocatorTestSuite_saveLoadState_},
         { "freeAll",        GblArenaAllocatorTestSuite_freeAll_      },
         { "destruct",       GblArenaAllocatorTestSuite_destruct_     },
         { NULL,             NULL                                     }
