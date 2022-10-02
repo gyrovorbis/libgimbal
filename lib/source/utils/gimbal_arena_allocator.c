@@ -27,7 +27,8 @@ GBL_EXPORT GBL_RESULT GblArenaAllocator_destruct(GblArenaAllocator* pSelf) {
 static GblArenaAllocatorPage* GblArenaAllocator_allocPage_(GblContext* pCtx, GblSize size, GblSize align) {
     GblArenaAllocatorPage* pPage = NULL;
     GBL_API_BEGIN(pCtx);
-    pPage = GBL_API_MALLOC(gblAlignedAllocSize(sizeof(GblArenaAllocatorPage) + size-1, align), align);
+    const GblSize actualSize = gblAlignedAllocSize(sizeof(GblArenaAllocatorPage) + size-1, align);
+    pPage = GBL_API_MALLOC(actualSize, align);
     GblLinkedList_init(&pPage->listNode);
     pPage->capacity = size;
     pPage->used = 0;

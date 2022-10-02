@@ -45,9 +45,9 @@ static GBL_RESULT GblArenaAllocatorTestSuite_alloc_(GblTestSuite* pSelf, GblCont
     strcpy(pStr, "1234567890");
 
     GBL_TEST_COMPARE(GblArenaAllocator_pageCount(&pSelf_->arena), 1);
-    GBL_TEST_VERIFY(GblArenaAllocator_bytesUsed(&pSelf_->arena) > 12);
+    GBL_TEST_VERIFY(GblArenaAllocator_bytesUsed(&pSelf_->arena) >= 12);
     GBL_TEST_COMPARE(GblArenaAllocator_totalCapacity(&pSelf_->arena), 128);
-    GBL_TEST_VERIFY(GblArenaAllocator_utilization(&pSelf_->arena) > 12.0f / 128.0f);
+    GBL_TEST_VERIFY(GblArenaAllocator_utilization(&pSelf_->arena) >= 12.0f / 128.0f);
 
     GBL_API_END();
 }
@@ -57,7 +57,7 @@ static GBL_RESULT GblArenaAllocatorTestSuite_allocNewPage_(GblTestSuite* pSelf, 
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
 
     GblSize bytesAvail = GblArenaAllocator_bytesAvailable(&pSelf_->arena);
-    GBL_TEST_VERIFY(bytesAvail < 128 - 12);
+    GBL_TEST_VERIFY(bytesAvail <= 128 - 12);
 
     char* pStr = GblArenaAllocator_alloc(&pSelf_->arena, bytesAvail+1);
     GBL_TEST_VERIFY(pStr);
