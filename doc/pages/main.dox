@@ -31,6 +31,7 @@
 	LibGimbal's featureset includes:
 	- Unified error logging, tracking, and propagation with source code capture
 	- Custom allocator support for all types from the ground-up
+	- Specialized, context-specific allocators
 	- Macros providing abstractions for various compiler and platform-specific features
 	- Multiple optimized string APIs for various use-cases (including string interning)
 	- Replacement STL containers with both C++20 and C17-compatible APIs, with C++ polymorphic allocator support

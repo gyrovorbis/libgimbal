@@ -21,7 +21,7 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_construct_6(GblRingBuffer* pSelf,
     GBL_PRIV_REF(pSelf).pData       = GBL_API_MALLOC(capacity * elementSize, 0, "GblRingBuffer");
 
     for(GblSize i = 0; i < initialSize; ++i) {
-        GBL_API_VERIFY_CALL(GblRingBuffer_pushBack(pSelf, pInitialData + (elementSize * i)));
+        GBL_API_VERIFY_CALL(GblRingBuffer_pushBack(pSelf, (void*)((uintptr_t)pInitialData + (elementSize * i))));
     }
     GBL_API_END();
 }

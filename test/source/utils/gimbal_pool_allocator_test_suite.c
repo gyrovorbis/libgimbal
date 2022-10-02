@@ -25,8 +25,8 @@ typedef struct GblVariantList_ {
 typedef struct GblPoolAllocatorTestSuite_ {
     GblPoolAllocator pool;
     struct {
-        GblArenaAllocatorPage  page;
-        char                   bytes[63];
+    GBL_ALIGNAS(64)    GblArenaAllocatorPage  page;
+        char           bytes[63];
     };
     GblVariantListNode_ variantList;
 } GblPoolAllocatorTestSuite_;

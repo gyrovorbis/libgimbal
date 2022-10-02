@@ -10,6 +10,7 @@
 #define GIMBAL_SORT_H
 
 #include "../core/gimbal_typedefs.h"
+#include "../containers/gimbal_linked_list.h"
 
 GBL_DECLS_BEGIN
 
@@ -23,9 +24,25 @@ GBL_INLINE void gblSortInsertion   (void* pArray, GblSize count, GblSize elemSiz
 GBL_INLINE void gblSortShell       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_INLINE void gblSortBubble      (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 
+#if 0
+GBL_INLINE void gblSortMerge       (void* pArray,
+                                    const void* pSrc1, GblSize src1Count,
+                                    const void* pSrc2, GblSize src2count,
+                                    GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+
 GBL_INLINE GblSize gblSearchBinary (void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 
 
+GBL_INLINE void gblMergeSortList   (GblLinkedListNode* pList,
+                                    int pFnSortComparator(const GblLinkedListNode* pNode1,
+                                                          const GblLinkedListNode* pNode2)) GBL_NOEXCEPT
+{
+
+    if(!GblLinkedList_empty(pList)) {
+
+    }
+}
+#endif
 /// @}
 
 
