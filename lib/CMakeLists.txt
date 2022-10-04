@@ -102,6 +102,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_nary_tree.h
     api/gimbal/containers/gimbal_ring_buffer.h
     api/gimbal/containers/gimbal_ring_list.h
+    api/gimbal/containers/gimbal_array_deque.h
     api/gimbal/core/gimbal_api_generators.h
     api/gimbal/core/gimbal_api_frame.h
     api/gimbal/core/gimbal_call_stack.h
@@ -174,6 +175,7 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_array_list.c
     source/containers/gimbal_ring_buffer.c
     source/containers/gimbal_ring_list.c
+    source/containers/gimbal_array_deque.c
     source/core/gimbal_thread.c
     source/core/gimbal_version.c
     source/core/gimbal_ref.c

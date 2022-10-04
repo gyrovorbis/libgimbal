@@ -1,5 +1,5 @@
 ﻿/*! \file
- *  \brief GBL_EXPORT GBL_RESULT top-level debug and control-flow macros
+ *  \brief GblContext top-level debug and control-flow macros
  *  \ingroup debug
  */
 #ifndef GIMBAL_API_FRAME_H
@@ -32,8 +32,29 @@ extern "C" {
 
 // ====== SOURCE LOCATION PROPAGATION UTILITIES =====
 
+#define GBL_SRC_FILE    GBL_SOURCE_FILE
+#define GBL_SRC_FN      GBL_SOURCE_FUNCTION
+#define GBL_SRC_LN      GBL_SOURCE_LINE
+#define GBL_SRC_COL     GBL_SOURCE_COLUMN
+#define GBL_SRC_LOC     GBL_SOURCE_LOCATION
+#define GblSrcLoc       GblSourceLocation
+
+#define GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE, COL) ((GblSourceLocation){FILE, FUNCTION, LINE, COL})
+
+#define GBL_API_STACK_FRAME_SOURCE_PUSH(pStackFrame, current) \
+    if(++pStackFrame->sourceCurrentCaptureDepth == 1) pStackFrame->sourceCurrent = current;
+
+#define GBL_API_STACK_FRAME_SOURCE_POP(pStackFrame)                 \
+    GBL_STMT_START {                                                \
+        GBL_ASSERT(pStackFrame->sourceCurrentCaptureDepth);         \
+        if(--pStackFrame->sourceCurrentCaptureDepth == 0)           \
+            pStackFrame->sourceCurrent = pStackFrame->sourceEntry;  \
+    } GBL_STMT_END
+
+
 #define GBL_API_SOURCE_LOC_PUSH(srcLoc)                     \
     GBL_API_STACK_FRAME_SOURCE_PUSH(GBL_API_FRAME(), srcLoc)
+
 #define GBL_API_SOURCE_PUSH(FILE, FUNCTION, LINE, COLUMN)   \
     GBL_API_SOURCE_LOC_PUSH(GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE, COLUMN))
 
@@ -62,7 +83,7 @@ extern "C" {
     } GBL_STMT_END
 
 #define GBL_API_RECORD_SET_JMP_CND(expr, result, label, ...) \
-    GBL_API_RECORD_SET_JMP_CND_(expr, result, goto label, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__);
+    GBL_API_RECORD_SET_JMP_CND_(expr, result, goto label, GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__);
 
 //====== VERIFY =========
 
@@ -82,7 +103,7 @@ extern "C" {
 
 #define GBL_API_VERIFY(...)                                                                                         \
     GBL_STMT_START {                                                                                                \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                                             \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                             \
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY, GBL_VA_OVERLOAD_SUFFIXER_3_N, src_, __VA_ARGS__)(src_, __VA_ARGS__); \
     } GBL_STMT_END
 
@@ -96,7 +117,7 @@ extern "C" {
 
 #define GBL_API_VERIFY_EXPRESSION(...)                                                                                          \
     GBL_STMT_START {                                                                                                            \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                                                         \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                                         \
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_EXPRESSION, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);  \
     } GBL_STMT_END
 
@@ -109,7 +130,7 @@ extern "C" {
 
 #define GBL_API_VERIFY_POINTER(...)                                                                                             \
     GBL_STMT_START {                                                                                                            \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                                                         \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                                         \
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_POINTER, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);     \
     } GBL_STMT_END
 
@@ -122,7 +143,7 @@ extern "C" {
 
 #define GBL_API_VERIFY_ARG(...)                                                                                             \
     GBL_STMT_START {                                                                                                        \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                                                     \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                                     \
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_ARG, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);     \
     } GBL_STMT_END
 
@@ -138,7 +159,7 @@ extern "C" {
 
 #define GBL_API_VERIFY_TYPE(...)                                                                                            \
     GBL_STMT_START {                                                                                                        \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                                                     \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                                     \
         GBL_VA_OVERLOAD_SELECT(GBL_API_VERIFY_TYPE, GBL_VA_OVERLOAD_SUFFIXER_3_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);    \
     } GBL_STMT_END
 
@@ -191,7 +212,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_ERRNO_RESULT(int ernum) {
 #define GBL_API_INLINE_RETVAL() GBL_API_INLINE_RETURN_VALUE_NAME
 
 #define GBL_API_INLINE(MethodPrefix, ReturnType, ...)                                                               \
-    GBL_INLINE ReturnType GBL_API_INLINE_##MethodPrefix##_(GBL_API_FRAME_DECLARE, SrcLoc srcLoc, ##__VA_ARGS__) {   \
+    GBL_INLINE ReturnType GBL_API_INLINE_##MethodPrefix##_(GBL_API_FRAME_DECLARE, GblSrcLoc srcLoc, ##__VA_ARGS__) {   \
         ReturnType GBL_API_INLINE_RETURN_VALUE_NAME;
 
 #define GBL_API_INLINE_BEGIN(InitialRetValue)       \
@@ -213,13 +234,13 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_ERRNO_RESULT(int ernum) {
     GBL_API_INLINE_##MethodPrefix##_(GBL_API_FRAME(), srcLoc GBL_VA_ARGS(__VA_ARGS__))
 
 #define GBL_API_INLINE_CALL(MethodPrefix, ...) \
-    GBL_API_INLINE_CALL_(MethodPrefix, SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL) GBL_VA_ARG)
+    GBL_API_INLINE_CALL_(MethodPrefix, GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL) GBL_VA_ARG)
 
 // ============== GBL EXT USERMETHODS ==========
 
 #define GBL_API_EXT(prefix, ...)                                                                                        \
     GBL_STMT_START {                                                                                                    \
-        GBL_API_SOURCE_PUSH(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                                                         \
+        GBL_API_SOURCE_PUSH(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                                         \
         GBL_MAYBE_UNUSED const GBL_RESULT localResult = GBL_EXT_##prefix(GBL_API_FRAME(), ##__VA_ARGS__);               \
         GBL_ASSERT(!(GBL_CONFIG_ASSERT_ERROR_ENABLED && GBL_RESULT_ERROR(localResult)), "Ext["#prefix"]: ERROR");       \
         GBL_ASSERT(!(GBL_CONFIG_ASSERT_PARTIAL_ENABLED && GBL_RESULT_PARTIAL(localResult)), "Ext["#prefix"]: ERROR");   \
@@ -251,7 +272,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
     GBL_API_MALLOC_3(src, gblAlignedAllocSizeDefault(size), GBL_ALIGNOF(GBL_MAX_ALIGN_T))
 
 #define GBL_API_MALLOC(...)  \
-    GBL_VA_OVERLOAD_SELECT(GBL_API_MALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
+    GBL_VA_OVERLOAD_SELECT(GBL_API_MALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__)
 
 #define GBL_API_NEW_4(src, type, count, dbgStr) \
     (type*)GBL_API_INLINE_CALL_(MALLOC, src, gblAlignedAllocSizeDefault(sizeof(type)*count), 0, dbgStr)
@@ -263,7 +284,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
     GBL_API_NEW_3(src, type, 1)
 
 #define GBL_API_NEW(...) \
-    GBL_VA_OVERLOAD_SELECT(GBL_API_NEW, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
+    GBL_VA_OVERLOAD_SELECT(GBL_API_NEW, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__)
 
 GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, GblSize newAlign) {
     GBL_API_INLINE_BEGIN(NULL);
@@ -281,7 +302,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
     GBL_API_REALLOC_4(src, pData, newSize, 1)
 
 #define GBL_API_REALLOC(...)  \
-     GBL_VA_OVERLOAD_SELECT(GBL_API_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
+     GBL_VA_OVERLOAD_SELECT(GBL_API_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__)
 
 #define GBL_API_RENEW_5(src, ptr, type, count, dbgStr) \
     GBL_API_INLINE_CALL(REALLOC, src, ptr, sizeof(type)*count, dbgStr)
@@ -293,10 +314,10 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
     GBL_API_RENEW_4(src, ptr, type, 1)
 
 #define GBL_API_RENEW(...) \
-     GBL_VA_OVERLOAD_SELECT(GBL_API_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), __VA_ARGS__)
+     GBL_VA_OVERLOAD_SELECT(GBL_API_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__)
 
 #define GBL_API_FREE(pData) \
-    GBL_API_SOURCE_SCOPED(GBL_API_EXT, (SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL)), FREE, pData)
+    GBL_API_SOURCE_SCOPED(GBL_API_EXT, (GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL)), FREE, pData)
 
 #define GBL_API_PUSH_(srcLoc, ...)                                  \
     GBL_STMT_START {                                                \
@@ -309,7 +330,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
 
 #define GBL_API_PUSH()                                                  \
     GBL_STMT_START {                                                    \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL); \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL); \
         GBL_API_PUSH_(src_);                                            \
     } GBL_STMT_END
 
@@ -321,7 +342,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
 
 #define GBL_API_PUSH_VERBOSE(...)                                                                                               \
     GBL_STMT_START {                                                                                                            \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                                                         \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                                         \
         GBL_VA_OVERLOAD_SELECT(GBL_API_PUSH_VERBOSE, GBL_VA_OVERLOAD_SUFFIXER_1_N, src_, ##__VA_ARGS__)(src_, ##__VA_ARGS__);   \
     } GBL_STMT_END
 
@@ -335,7 +356,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
 
 #define GBL_API_POP(...)                                                                    \
     GBL_STMT_START {                                                                        \
-        const SrcLoc loc = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                      \
+        const GblSrcLoc loc = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                      \
         GBL_VA_OVERLOAD_CALL(GBL_API_POP, GBL_VA_OVERLOAD_SUFFIXER_ARGC, loc, __VA_ARGS__); \
     } GBL_STMT_END
 
@@ -353,35 +374,35 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_API_LOG_(src, level, pFmt, ...) \
     GBL_API_INLINE_CALL_(LOG, src, level, pFmt, ##__VA_ARGS__);
 #define GBL_API_LOG(level, pFmt, ...)       \
-   GBL_API_LOG_(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL), level, pFmt, ##__VA_ARGS__)
+   GBL_API_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), level, pFmt, ##__VA_ARGS__)
 
 #define GBL_API_DEBUG(pFmt, ...)                                        \
     GBL_STMT_START {                                                    \
-        const SrcLoc src = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        const GblSrcLoc src = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);  \
         GBL_API_LOG_(src, GBL_LOG_LEVEL_DEBUG, pFmt, ##__VA_ARGS__);    \
     } GBL_STMT_END
 
 #define GBL_API_VERBOSE(pFmt, ...)                                      \
     GBL_STMT_START {                                                    \
-        const SrcLoc src = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        const GblSrcLoc src = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);  \
         GBL_API_LOG_(src, GBL_LOG_LEVEL_VERBOSE, pFmt, ##__VA_ARGS__);  \
     } GBL_STMT_END
 
 #define GBL_API_INFO(pFmt, ...)                                         \
     GBL_STMT_START {                                                    \
-        const SrcLoc src = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        const GblSrcLoc src = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);  \
         GBL_API_LOG_(src, GBL_LOG_LEVEL_INFO, pFmt, ##__VA_ARGS__);     \
     } GBL_STMT_END
 
 #define GBL_API_WARN(pFmt, ...)                                         \
     GBL_STMT_START {                                                    \
-        const SrcLoc src = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        const GblSrcLoc src = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);  \
         GBL_API_LOG_(src, GBL_LOG_LEVEL_WARNING, pFmt, ##__VA_ARGS__);  \
     } GBL_STMT_END
 
 #define GBL_API_ERROR(pFmt, ...)                                        \
     GBL_STMT_START {                                                    \
-        const SrcLoc src = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        const GblSrcLoc src = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);  \
         GBL_API_LOG_(src, GBL_LOG_LEVEL_ERROR, pFmt, ##__VA_ARGS__);    \
     } GBL_STMT_END
 
@@ -391,7 +412,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 #define GBL_API_EVENT(event) \
     GBL_STMT_START { \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);  \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);  \
         GBL_UNUSED(src_);                                                \
        GblObject_sendEvent(GBL_API_OBJECT(), (GblEvent*)event);          \
     } GBL_STMT_END
@@ -511,7 +532,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 #define GBL_API_RECORD_SET_N(file, func, line, col, result, ...)                                                    \
     GBL_STMT_START {                                                                                                \
-        GBL_API_SOURCE_LOC_PUSH(SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL));                                        \
+        GBL_API_SOURCE_LOC_PUSH(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL));                                        \
         GBL_CALL_RECORD_CONSTRUCT(&GBL_API_RECORD(), GBL_API_OBJECT(), result, GBL_API_SOURCE(), __VA_ARGS__);      \
         GBL_API_RECORD_HANDLER(&GBL_API_RECORD());                                                                  \
         GBL_API_SOURCE_POP();                                                                                       \
@@ -524,7 +545,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     GBL_API_RECORD_SET_6(file, func, line, col, result, gblResultString(result))
 
 #define GBL_API_RECORD_SET(...)  \
-    GBL_VA_OVERLOAD_CALL(GBL_API_RECORD_SET, GBL_VA_OVERLOAD_SUFFIXER_6_N, SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)
+    GBL_VA_OVERLOAD_CALL(GBL_API_RECORD_SET, GBL_VA_OVERLOAD_SUFFIXER_6_N, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL, __VA_ARGS__)
 
 
 #define GBL_API_CALL_N(src, funcCall, ...)                                      \
@@ -542,13 +563,13 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 #define GBL_API_CALL(...)                                                                                           \
     GBL_STMT_START {                                                                                                \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                                             \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                             \
         GBL_VA_OVERLOAD_SELECT(GBL_API_CALL, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
     } GBL_STMT_END
 
 #define GBL_API_VERIFY_CALL(...) \
     GBL_STMT_START {    \
-        const SrcLoc src_ = SRC_LOC(SRC_FILE, SRC_FN, SRC_LN, SRC_COL);                                             \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                             \
         GBL_VA_OVERLOAD_SELECT(GBL_API_CALL, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
         if(!GBL_RESULT_SUCCESS(GBL_API_RESULT())) goto GBL_API_END_LABEL;                                           \
     } GBL_STMT_END
@@ -557,7 +578,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 // ================= TOP-LEVEL API UTILITIES ==============
 
 #define GBL_API_BEGIN_FRAME(file, func, line, col, pObject, frame)                                                  \
-    const SrcLoc gblApiEntrySrcLoc_ = SRC_LOC(file, func, line, col);                                               \
+    const GblSrcLoc gblApiEntrySrcLoc_ = GBL_SRC_LOC(file, func, line, col);                                               \
     GBL_API_FRAME_DECLARE = frame;                                                                                  \
     GBL_API_STACK_FRAME_CONSTRUCT(GBL_API_FRAME(), (GblObject*)pObject, GBL_RESULT_SUCCESS, gblApiEntrySrcLoc_);    \
     GBL_RESULT_SUCCESS(GblThread_stackFramePush(NULL, GBL_API_FRAME()))
@@ -570,7 +591,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     GBL_API_PUSH_VERBOSE(__VA_ARGS__);
 
 #define GBL_API_BEGIN(...) \
-        GBL_VA_OVERLOAD_CALL(GBL_API_BEGIN_LOG, GBL_VA_OVERLOAD_SUFFIXER_5_N, SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)
+        GBL_VA_OVERLOAD_CALL(GBL_API_BEGIN_LOG, GBL_VA_OVERLOAD_SUFFIXER_5_N, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL, __VA_ARGS__)
 
 #define GBL_API_DONE()  \
     goto GBL_API_END_LABEL
@@ -601,7 +622,7 @@ GBL_MAYBE_UNUSED GBL_API_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     GBL_API_BLOCK_6(file, func, line, col, NULL, block)
 
 #define GBL_API_BLOCK(...) \
-    GBL_VA_OVERLOAD_SELECT(GBL_API_BLOCK, GBL_VA_OVERLOAD_SUFFIXER_ARGC, SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)(SRC_FILE, SRC_FN, SRC_LN, SRC_COL, __VA_ARGS__)
+    GBL_VA_OVERLOAD_SELECT(GBL_API_BLOCK, GBL_VA_OVERLOAD_SUFFIXER_ARGC, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL, __VA_ARGS__)(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL, __VA_ARGS__)
 
 
 #ifdef __cplusplus

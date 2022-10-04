@@ -20,8 +20,6 @@ typedef struct GblSourceLocation {
     GblSize         column;
 } GblSourceLocation;
 
-#define GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE, COL) ((GblSourceLocation){FILE, FUNCTION, LINE, COL})
-
 typedef struct GblCallRecord {
     GBL_ALIGNAS(128)
     char                message[GBL_API_RESULT_MSG_BUFFER_SIZE];
@@ -40,13 +38,6 @@ GBL_INLINE void GBL_CALL_RECORD_CONSTRUCT(GblCallRecord* pRecord, struct GblObje
     pRecord->srcLocation    = source;
     pRecord->result         = resultCode;
 }
-
-#define SRC_FILE    GBL_SOURCE_FILE
-#define SRC_FN      GBL_SOURCE_FUNCTION
-#define SRC_LN      GBL_SOURCE_LINE
-#define SRC_COL     GBL_SOURCE_COLUMN
-#define SRC_LOC     GBL_SOURCE_LOCATION
-#define SrcLoc      GblSourceLocation
 
 typedef struct GblStackFrame {
     GBL_ALIGNAS(256)
@@ -91,16 +82,6 @@ GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblOb
     pFrame->pPrevFrame                  = NULL;
     return result;
 }
-
-#define GBL_API_STACK_FRAME_SOURCE_PUSH(pStackFrame, current) \
-    if(++pStackFrame->sourceCurrentCaptureDepth == 1) pStackFrame->sourceCurrent = current;
-
-#define GBL_API_STACK_FRAME_SOURCE_POP(pStackFrame)                 \
-    GBL_STMT_START {                                                \
-        GBL_ASSERT(pStackFrame->sourceCurrentCaptureDepth);         \
-        if(--pStackFrame->sourceCurrentCaptureDepth == 0)           \
-            pStackFrame->sourceCurrent = pStackFrame->sourceEntry;  \
-    } GBL_STMT_END
 
 #ifdef __cplusplus
 }

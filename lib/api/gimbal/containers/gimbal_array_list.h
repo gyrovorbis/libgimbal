@@ -23,6 +23,7 @@ GBL_DECLS_BEGIN
  *  - Optional zero termination
  *
  *  \ingroup containers
+ *  \sa GblRingBuffer, GblArrayDeque
  */
 typedef struct GblArrayList {               // Size (32-bit / 64-bit)
     GBL_PRIVATE()

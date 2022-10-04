@@ -2,7 +2,7 @@
 #include <gimbal/test/gimbal_test.h>
 #include <gimbal/containers/gimbal_array_list.h>
 
-#define GBL_ARRAY_LIST_TEST_SUITE_PUSH_BACK_STRESS_TEST_SIZE_ 512
+#define GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_ 1024
 #define GBL_ARRAY_LIST_TEST_SUITE_(inst)     ((GblArrayListTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_LIST_TEST_SUITE_TYPE))
 
 typedef struct GblArrayListTestSuite_ {
@@ -525,22 +525,53 @@ GBL_RESULT GblArrayListTestSuite_shrinkToFitStack_(GblTestSuite* pSelf, GblConte
     GBL_API_END();
 }
 
-
-
-
-GBL_RESULT GblArrayListTestSuite_pushBackStressTest_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+static GBL_RESULT GblArrayListTestSuite_atProfile_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayListTestSuite_* pSelf_ = GBL_ARRAY_LIST_TEST_SUITE_(pSelf);
+    GBL_API_BEGIN(pCtx);
 
     const char* pLiteral = "LOLOL";
 
-    for(GblSize i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PUSH_BACK_STRESS_TEST_SIZE_; ++i) {
+    GblArrayList_clear(&pSelf_->stringList.vector);
+    GblArrayList_pushBack(&pSelf_->stringList.vector, &pLiteral);
+
+
+    for(GblSize i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
+        pLiteral = GblArrayList_at(&pSelf_->stringList.vector, 0);
+    }
+
+    GBL_API_END();
+}
+
+
+GBL_RESULT GblArrayListTestSuite_pushBackProfile_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblArrayListTestSuite_* pSelf_ = GBL_ARRAY_LIST_TEST_SUITE_(pSelf);
+
+    GblArrayList_clear(&pSelf_->stringList.vector);
+
+    const char* pLiteral = "LOLOL";
+
+    for(GblSize i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
         GblArrayList_pushBack(&pSelf_->stringList.vector, &pLiteral);
     }
 
     GBL_API_END();
 }
 
+GBL_RESULT GblArrayListTestSuite_pushFrontProfile_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_API_BEGIN(pCtx);
+    GblArrayListTestSuite_* pSelf_ = GBL_ARRAY_LIST_TEST_SUITE_(pSelf);
+
+    const char* pLiteral = "LOLOL";
+
+    GblArrayList_clear(&pSelf_->stringList.vector);
+
+    for(GblSize i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
+        GblArrayList_pushFront(&pSelf_->stringList.vector, &pLiteral);
+    }
+
+    GBL_API_END();
+}
 
 GBL_RESULT GblArrayListTestSuite_destruct_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_API_BEGIN(pCtx);
@@ -583,7 +614,9 @@ GBL_EXPORT GblType GblArrayListTestSuite_type(void) {
         { "resizeLarger",           GblArrayListTestSuite_resizeSmaller_           },
         { "shrinkToFitHeap",        GblArrayListTestSuite_shrinkToFitHeap_         },
         { "shrinkToFitStack",       GblArrayListTestSuite_shrinkToFitStack_        },
-        { "pushBackStressTest",     GblArrayListTestSuite_pushBackStressTest_      },
+        { "atProfile",              GblArrayListTestSuite_atProfile_               },
+        { "pushBackProfile",        GblArrayListTestSuite_pushBackProfile_         },
+        { "pushFrontProfile",       GblArrayListTestSuite_pushFrontProfile_        },
         { "destruct",               GblArrayListTestSuite_destruct_                },
         { NULL,                     NULL  }
     };

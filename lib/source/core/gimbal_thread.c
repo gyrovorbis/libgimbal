@@ -47,6 +47,9 @@ GBL_EXPORT const GblCallRecord* GblThread_callRecord(const GblThread* pThread) {
 GBL_EXPORT GBL_RESULT GblThread_setCallRecord(GblThread* pThread, const GblCallRecord* pRecord) {
     if(!pThread) pThread = GblThread_current();
     if(pRecord) {
+        //pThread->callRecord.result = pRecord->result;
+        //strcpy(pThread->callRecord.message, pRecord->message);
+        //memcpy(&pThread->callRecord.srcLocation, &pRecord->srcLocation, sizeof(GblSourceLocation));
         memcpy(&pThread->callRecord, pRecord, sizeof(GblCallRecord));
     } else {
         //memset(&pThread->callRecord, 0, sizeof(GblCallRecord));

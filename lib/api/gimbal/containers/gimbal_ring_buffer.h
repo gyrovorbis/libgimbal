@@ -40,18 +40,18 @@ GBL_DECLS_BEGIN
  *  consumer pops them.
  *
  *  \ingroup containers
+ *  \sa GblDeque, GblArrayList
  */
-typedef struct GblRingBuffer {
+typedef struct GblRingBuffer {      // Size (32/64-bit)
     GBL_PRIVATE()
-        GblContext* pCtx;
-        uint8_t*    pData;
-        GblSize     size;
-        GblSize     capacity;
-        GblSize     backPos;
-        GblSize     frontPos;
-        uint16_t    elementSize;
+        GblContext* pCtx;           // 4/8      bytes
+        uint8_t*    pData;          // 4/8      bytes
+        GblSize     size;           // 4/8      bytes
+        GblSize     capacity;       // 4/8      bytes
+        GblSize     frontPos;       // 4/8      bytes
+        uint16_t    elementSize;    // 2        bytes
     GBL_PRIVATE_END
-} GblRingBuffer;
+} GblRingBuffer;                    // 22/42    total
 
 GBL_EXPORT GBL_RESULT  GblRingBuffer_construct_6(GBL_SELF,
                                                  uint16_t    elementSize,
@@ -104,9 +104,12 @@ GBL_INLINE void        GblRingBuffer_clear       (GBL_SELF)                     
 // ===== IMPL =====
 
 /// \cond
+
+GBL_INLINE GblSize GblRingBuffer_mappedIndex_(GBL_CSELF, GblSize index) {
+    return (GBL_PRIV_REF(pSelf).frontPos + index) % GBL_PRIV_REF(pSelf).capacity;
+}
+
 GBL_INLINE void GblRingBuffer_advance_(GBL_SELF) GBL_NOEXCEPT {
-    ++GBL_PRIV_REF(pSelf).backPos;
-    GBL_PRIV_REF(pSelf).backPos %= GBL_PRIV_REF(pSelf).capacity;
     if(GblRingBuffer_full(pSelf)) {
         ++GBL_PRIV_REF(pSelf).frontPos;
         GBL_PRIV_REF(pSelf).frontPos %= GBL_PRIV_REF(pSelf).capacity;
@@ -173,8 +176,8 @@ GBL_INLINE void* GblRingBuffer_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
         GBL_API_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
         GBL_API_END_BLOCK();
     } else GBL_LIKELY {
-        const GblSize pos = (GBL_PRIV_REF(pSelf).frontPos + index) % GBL_PRIV_REF(pSelf).capacity;
-        pData = &GBL_PRIV_REF(pSelf).pData[pos * GBL_PRIV_REF(pSelf).elementSize];
+        pData = &GBL_PRIV_REF(pSelf).pData[GblRingBuffer_mappedIndex_(pSelf, index) *
+                                           GBL_PRIV_REF(pSelf).elementSize];
     }
 
     return pData;
@@ -218,7 +221,6 @@ GBL_INLINE void* GblRingBuffer_popFront(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_INLINE void GblRingBuffer_clear(GBL_SELF) GBL_NOEXCEPT {
     GBL_PRIV_REF(pSelf).frontPos = 0;
-    GBL_PRIV_REF(pSelf).backPos  = 0;
     GBL_PRIV_REF(pSelf).size     = 0;
 }
 

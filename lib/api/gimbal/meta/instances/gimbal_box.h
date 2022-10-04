@@ -47,15 +47,15 @@ GBL_CLASS_END
  *  \extends GblInstance
  *  \implements GblIVariant
  */
-GBL_INSTANCE_BASE(GblBox)
-    GBL_PRIVATE()
-        GblArrayMap* pFields;
-        GblRefCount  refCounter;
-        uint16_t     contextType         : 1;
+GBL_INSTANCE_BASE(GblBox)                       // Size (32-64 bit)
+    GBL_PRIVATE()                               // 4/8  bytes (inherited)
+        GblArrayMap* pFields;                   // 4/8  bytes
+        GblRefCount  refCounter;                // 2    bytes
+        uint16_t     contextType         : 1;   // 2    bytes
         uint16_t     constructedInPlace  : 1;
         uint16_t     derivedFlags        : 14;
     GBL_PRIVATE_END
-GBL_INSTANCE_END
+GBL_INSTANCE_END                                // 12/20 total
 
 // ===== Class =====
 GBL_EXPORT GblBoxClass* GblBoxClass_createFloatingExt    (GblType           derivedType,

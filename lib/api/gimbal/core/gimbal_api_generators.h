@@ -201,15 +201,6 @@ extern "C" {
 #   define GBL_EXPORT
 #endif
 
-#define GBL_API_INLINE_HELPER(retType, suffix, args, apiCall)                                                   \
-    GBL_MAYBE_UNUSED GBL_API_INLINE(suffix, GBL_EVAL(GBL_MAP_TUPLES(GBL_DECL_VAR_TYPE, retType)_, GBL_EVAL args) {        \
-        GBL_API_INLINE_BEGIN(GBL_EVAL(GBL_MAP_TUPLES(GBL_DECL_VAR_NAME, retType));                                       \
-        GBL_STMT_START apiCall                                                                                  \
-        GBL_STMT_END;                                                                                           \
-        GBL_API_INLINE_END();                                                                                   \
-        GBL_API_INLINE_RETURN();                                                                                \
-    }
-
 //========== CLEAN THIS ENUM SHIT UP AND MAKE IT IN THE FORM OF ==============
 
 //GBL_API_ENUM_GENERATE()

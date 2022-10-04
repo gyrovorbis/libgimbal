@@ -20,6 +20,7 @@ STL APIs fairly closely and should be fairly intuitive to work with for any C++ 
 	GblNaryTreeNode		   |Instrusive generic tree structure with parent + linked list of children         | gimbal_nary_tree.h
 	GblArrayList    	   |Dynamically resizable array, O(1) lookup, equivalent to C++ std::vector	        | gimbal_array_list.h
 	GblRingList            |Non-intrusive circular doubly-linked list with high-level, convenience API      | gimbal_ring_list.h
+	GblArrayDeque		   |Dynamically resizable array with good performance when resizing from either end | gimbal_array_deque.h
 	GblTreeSet             |Binary tree-based associative set structure, analogous to std::set		        | gimbal_tree_set.h
 	GblHashSet	           |Hash table-based associative set structure, analogous to std::unordered_set     | gimbal_hash_set.h
 	GblArrayMap		       |Resizable array-based, [K,V] container with optional binary searchability       | gimbal_array_map.h

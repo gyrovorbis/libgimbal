@@ -254,6 +254,11 @@ GblObject* pObject = GBL_OBJECT_CREATE(GblObject,
 
 	We are happy to make changes required to accomodate other platforms. Yes, your toaster included.
 
+# Validation
+Pretty big library with pretty lofty goals... Don't worry, we have like 600+ unit test cases which 
+are included within the repo, using our own unit testing framework, which you can run on your target
+of choice. We go through a lot of effort to test throroughly and verify correctness in CI. 
+
 # Design Philosophy
 	We are well aware of the fact that trying to create a massively cross-platform, cross-language framework 
 	such as this with language standard requirements as high as C17 and C++20 may seem strange. As libGimbal 
