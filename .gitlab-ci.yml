@@ -274,7 +274,9 @@ test dreamcast:
   tags:
     - dreamcast
   script:
+    - (ll 2>&1) | tee build/results.txt
     - lxdream -H -d build/test/GimbalTests
+    - test -f build/results.txt && grep -L "********************* [   FAIL   ] *********************" build/results.txt
 
 test ubuntu20-gcc10:
   extends: .test_common
