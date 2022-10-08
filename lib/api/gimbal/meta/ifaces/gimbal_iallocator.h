@@ -7,7 +7,7 @@
 #define GIMBAL_IALLOCATOR_H
 
 #include "gimbal_interface.h"
-#include "../../core/gimbal_api_frame.h"
+#include "../../core/gimbal_ctx.h"
 
 #define GBL_IALLOCATOR_TYPE                 (GBL_TYPEOF(GblIAllocator))
 #define GBL_IALLOCATOR(instance)            (GBL_INSTANCE_CAST(instance,  GblIAllocator))

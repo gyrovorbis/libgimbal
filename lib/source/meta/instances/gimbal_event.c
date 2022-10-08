@@ -1,5 +1,5 @@
 #include <gimbal/meta/instances/gimbal_event.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/strings/gimbal_quark.h>
 
 GBL_EXPORT GblType GblEvent_type(void) {
@@ -11,13 +11,13 @@ GBL_EXPORT GblType GblEvent_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblType_registerStatic(GblQuark_internStringStatic("GblEvent"),
                                       GBL_BOX_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
 
     return type;

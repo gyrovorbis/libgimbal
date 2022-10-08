@@ -15,34 +15,19 @@
 GBL_DECLS_BEGIN
 
 
-typedef GblInt  (*GblSortComparatorFn)  (const void*, const void*);
+typedef int  (*GblSortComparatorFn)  (const void*, const void*);
 typedef void    (*GblSortFn)            (void*, GblSize, GblSize, GblSortComparatorFn);
 
 GBL_INLINE void gblSortSelection   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_INLINE void gblSortQuick       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_INLINE void gblSortInsertion   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_INLINE void gblSortShell       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE void gblSortMerge       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_INLINE void gblSortBubble      (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 
-#if 0
-GBL_INLINE void gblSortMerge       (void* pArray,
-                                    const void* pSrc1, GblSize src1Count,
-                                    const void* pSrc2, GblSize src2count,
-                                    GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-
-GBL_INLINE GblSize gblSearchBinary (void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE GblSize gblSearchBinary (void* pArray, GblSize elemSize, int l, int r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 
 
-GBL_INLINE void gblMergeSortList   (GblLinkedListNode* pList,
-                                    int pFnSortComparator(const GblLinkedListNode* pNode1,
-                                                          const GblLinkedListNode* pNode2)) GBL_NOEXCEPT
-{
-
-    if(!GblLinkedList_empty(pList)) {
-
-    }
-}
-#endif
 /// @}
 
 
@@ -50,6 +35,55 @@ GBL_INLINE void gblMergeSortList   (GblLinkedListNode* pList,
 
 
 // ======== INLINE IMPLEMENTATION ========
+
+GBL_INLINE void gblSortMerge(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
+    uint8_t* pFirstHalf;
+    uint8_t* pEofFirstHalf;
+    uint8_t* pSecondHalf;
+    uint8_t* pEofSecondHalf;
+    uint8_t* pResultBuffer, *pResult;
+    GblSize halfSize;
+
+    if(count < 1) return;
+
+    halfSize = count / 2;
+    pFirstHalf = (uint8_t*)pArray;
+    pSecondHalf = (uint8_t*)pArray + (halfSize * elemSize);
+
+    gblSortMerge(pFirstHalf, halfSize, elemSize, pFnCmp);
+    gblSortMerge(pSecondHalf, count-halfSize, elemSize, pFnCmp);
+
+    pEofFirstHalf = pSecondHalf;
+    pEofSecondHalf = (uint8_t*)pArray + (count * elemSize);
+    pResultBuffer = (uint8_t*)GBL_ALLOCA(count * elemSize);
+    pResult = pResultBuffer;
+
+    while(pFirstHalf < pEofFirstHalf && pSecondHalf < pEofSecondHalf) {
+        if((*pFnCmp)(pFirstHalf, pSecondHalf) < 0) {
+            memcpy(pResult, pFirstHalf, elemSize);
+            pFirstHalf += elemSize;
+        } else {
+            memcpy(pResult, pSecondHalf, elemSize);
+            pSecondHalf += elemSize;
+        }
+        pResult += elemSize;
+    }
+
+    while(pFirstHalf < pEofFirstHalf) {
+        memcpy(pResult, pFirstHalf, elemSize);
+        pFirstHalf += elemSize;
+        pResult += elemSize;
+    }
+
+    while(pSecondHalf < pEofSecondHalf) {
+        memcpy(pResult, pSecondHalf, elemSize);
+        pSecondHalf += elemSize;
+        pResult += elemSize;
+    }
+
+    memcpy(pArray, pResultBuffer, count * elemSize);
+}
+
 
 
 GBL_INLINE void gblSortSelection(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
@@ -115,9 +149,9 @@ GBL_INLINE void gblSortBubble(void* pArray, GblSize count, GblSize elemSize, Gbl
     }
 }
 
-GBL_INLINE GblSize gblSearchBinary(void* pArray, GblSize elemSize, GblInt l, GblInt r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
+GBL_INLINE GblSize gblSearchBinary(void* pArray, GblSize elemSize, int l, int r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     if(r >= l) {
-        GblInt mid = l + (r - l) / 2;
+        int mid = l + (r - l) / 2;
         void* pMid = (char*)pArray + elemSize*mid;
 
         if(pFnCmp(pMid, pTarget) == 0)

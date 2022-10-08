@@ -13,21 +13,21 @@ static GBL_RESULT GblArrayDeque_reserve_(GblArrayDeque* pSelf,
                                          GblBool       exact)
 {
     if(GBL_RING_PRIV_REF_(pSelf).capacity < capacity) {
-        GBL_API_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
+        GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
 
         if(!exact && capacity > 2)
             capacity = gblPow2Next(capacity);
         const GblSize newCapacityBytes = capacity * GBL_RING_PRIV_REF_(pSelf).elementSize;
 
         if(GBL_RING_PRIV_REF_(pSelf).pData) {
-            GBL_RING_PRIV_REF_(pSelf).pData = GBL_API_REALLOC(GBL_RING_PRIV_REF_(pSelf).pData,
+            GBL_RING_PRIV_REF_(pSelf).pData = GBL_CTX_REALLOC(GBL_RING_PRIV_REF_(pSelf).pData,
                                                               newCapacityBytes);
 
             // Have to move "end" chunk to end of new allocation
             const GblSize endSize = GblArrayDeque_endSize_(pSelf);
             if(endSize) {
                 const GblSize newFrontPos = capacity - endSize;
-                memcpy((void*)((uintptr_t)GBL_RING_PRIV_REF_(pSelf).pData +
+                memmove((void*)((uintptr_t)GBL_RING_PRIV_REF_(pSelf).pData +
                                 (newFrontPos * GblArrayDeque_elementSize(pSelf))),
                         GblArrayDeque_front(pSelf),
                         endSize * GblArrayDeque_elementSize(pSelf));
@@ -36,12 +36,12 @@ static GBL_RESULT GblArrayDeque_reserve_(GblArrayDeque* pSelf,
             }
 
         } else {
-            GBL_RING_PRIV_REF_(pSelf).pData = GBL_API_MALLOC(newCapacityBytes, 0, "GblArrayDeque");
+            GBL_RING_PRIV_REF_(pSelf).pData = GBL_CTX_MALLOC(newCapacityBytes, 0, "GblArrayDeque");
         }
 
         GBL_RING_PRIV_REF_(pSelf).capacity = capacity;
 
-        GBL_API_END();
+        GBL_CTX_END();
     }
     return GBL_RESULT_SUCCESS;
 }
@@ -86,9 +86,9 @@ GBL_EXPORT void* GblArrayDeque_emplaceFront(GblArrayDeque* pSelf) {
 GBL_EXPORT void* GblArrayDeque_popBack(GblArrayDeque* pSelf) {
     void* pSlot = NULL;
     if(GblArrayDeque_empty(pSelf)) {
-        GBL_API_BEGIN(NULL);
-        GBL_API_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
-        GBL_API_END_BLOCK();
+        GBL_CTX_BEGIN(NULL);
+        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_CTX_END_BLOCK();
     } else {
         pSlot = GblArrayDeque_back(pSelf);
         --GBL_RING_PRIV_REF_(pSelf).size;
@@ -139,9 +139,9 @@ GBL_EXPORT void* (GblArrayDeque_insert)(GblArrayDeque* pSelf, GblSize pos, const
                    GblArrayDeque_elementSize(pSelf) * count);
 
         } else {
-            GBL_API_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
-            GBL_API_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
-            GBL_API_END_BLOCK();
+            GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
+            GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
+            GBL_CTX_END_BLOCK();
         }
     }
     return pSlot;
@@ -175,9 +175,9 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_resize(GblArrayDeque* pSelf, GblSize size) {
     const GblSize oldSize = GblArrayDeque_size(pSelf);
 
     if(size != oldSize) {
-        GBL_API_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
+        GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
         if(size > GBL_RING_PRIV_REF_(pSelf).capacity) {
-            GBL_API_VERIFY_CALL(GblArrayDeque_reserve_(pSelf, size, GBL_FALSE));
+            GBL_CTX_VERIFY_CALL(GblArrayDeque_reserve_(pSelf, size, GBL_FALSE));
 
         } else if(size > oldSize) {
            GBL_RING_PRIV_REF_(pSelf).size += (size - oldSize);
@@ -186,7 +186,7 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_resize(GblArrayDeque* pSelf, GblSize size) {
             GBL_RING_PRIV_REF_(pSelf).size -= (oldSize - size);
         }
 
-        GBL_API_END();
+        GBL_CTX_END();
 
     } else return GBL_RESULT_SUCCESS;
 }
@@ -195,7 +195,7 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_shrinkToFit(GblArrayDeque* pSelf) {
     const GblSize oldSize = GblArrayDeque_size(pSelf);
 
     if(oldSize < GBL_RING_PRIV_REF_(pSelf).capacity) {
-        GBL_API_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
+        GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
         const GblSize endSize = GblArrayDeque_endSize_(pSelf);
 
         if(endSize) {
@@ -208,24 +208,24 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_shrinkToFit(GblArrayDeque* pSelf) {
 
             GBL_RING_PRIV_REF_(pSelf).frontPos = newFront;
 
-            GBL_RING_PRIV_REF_(pSelf).pData = GBL_API_REALLOC(GBL_RING_PRIV_REF_(pSelf).pData,
+            GBL_RING_PRIV_REF_(pSelf).pData = GBL_CTX_REALLOC(GBL_RING_PRIV_REF_(pSelf).pData,
                                                               GBL_RING_PRIV_REF_(pSelf).size * GBL_RING_PRIV_REF_(pSelf).elementSize);
 
             GBL_RING_PRIV_REF_(pSelf).capacity = GBL_RING_PRIV_REF_(pSelf).size;
         }
 
-        GBL_API_END();
+        GBL_CTX_END();
 
     } else return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT void GblArrayDeque_clear(GblArrayDeque* pSelf) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
+    GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
     GblRingBuffer_clear(GBL_RING_SELF_(pSelf));
-    GBL_API_FREE(GBL_RING_PRIV_REF_(pSelf).pData);
+    GBL_CTX_FREE(GBL_RING_PRIV_REF_(pSelf).pData);
     GBL_RING_PRIV_REF_(pSelf).pData = NULL;
     GBL_RING_PRIV_REF_(pSelf).capacity = 0;
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
 }
 
 

@@ -19,6 +19,8 @@
 
 GBL_DECLS_BEGIN
 
+typedef GblLinkedListCmpFn GblDoublyLinkedListCmpFn;
+
 /*! \brief Intrustive doubly linked list structure with vector-style API
  *  GblDoublyLinkedListNode is the low-level API around managing manually
  *  allocated, intrusive linked list structures with the list nodes
@@ -48,6 +50,7 @@ typedef struct GblDoublyLinkedListNode {                // Size (32-bit / 64-bit
 } GblDoublyLinkedListNode;                              // 8/16     total
 
 GBL_INLINE void           GblDoublyLinkedList_init         (GBL_SELF)                                     GBL_NOEXCEPT;
+GBL_INLINE void           GblDoublyLinkedList_move         (GBL_SELF, GBL_SELF_TYPE* pHead)               GBL_NOEXCEPT;
 
 GBL_INLINE GblBool        GblDoublyLinkedList_empty        (GBL_CSELF)                                    GBL_NOEXCEPT;
 GBL_INLINE GblSize        GblDoublyLinkedList_count        (GBL_CSELF)                                    GBL_NOEXCEPT;
@@ -57,6 +60,8 @@ GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_front        (GBL_CSELF)          
 GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_back         (GBL_CSELF)                                    GBL_NOEXCEPT;
 GBL_INLINE GblBool        GblDoublyLinkedList_contains     (GBL_CSELF, GBL_SELF_TYPE* pNode)              GBL_NOEXCEPT;
 GBL_INLINE GblSize        GblDoublyLinkedList_find         (GBL_CSELF, GBL_SELF_TYPE* pNode)              GBL_NOEXCEPT;
+GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_middle       (GBL_CSELF)                                    GBL_NOEXCEPT;
+GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_beforeMiddle (GBL_CSELF)                                    GBL_NOEXCEPT;
 
 GBL_INLINE void           GblDoublyLinkedList_pushBack     (GBL_SELF, GBL_SELF_TYPE* pNode)               GBL_NOEXCEPT;
 GBL_INLINE void           GblDoublyLinkedList_pushFront    (GBL_SELF, GBL_SELF_TYPE* pNode)               GBL_NOEXCEPT;
@@ -65,6 +70,11 @@ GBL_INLINE void           GblDoublyLinkedList_moveFront    (GBL_SELF, GBL_SELF_T
 GBL_INLINE GblBool        GblDoublyLinkedList_join         (GBL_SELF, intptr_t idx, GBL_SELF_TYPE* pList) GBL_NOEXCEPT;
 GBL_INLINE void           GblDoublyLinkedList_joinBack     (GBL_SELF, GBL_SELF_TYPE* pList)               GBL_NOEXCEPT;
 GBL_INLINE void           GblDoublyLinkedList_joinFront    (GBL_SELF, GBL_SELF_TYPE* pList)               GBL_NOEXCEPT;
+GBL_INLINE void           GblDoublyLinkedList_joinSorted   (GBL_SELF,
+                                                            GBL_SELF_TYPE*           pList,
+                                                            GblDoublyLinkedListCmpFn pCmpFn,
+                                                            void*                    pClosure)            GBL_NOEXCEPT;
+
 GBL_INLINE GblBool        GblDoublyLinkedList_insert       (GBL_SELF, intptr_t idx, GBL_SELF_TYPE* pNode) GBL_NOEXCEPT;
 GBL_INLINE void           GblDoublyLinkedList_insertBefore (GBL_SELF_TYPE* pNode1, GBL_SELF_TYPE* pNode2) GBL_NOEXCEPT;
 GBL_INLINE void           GblDoublyLinkedList_insertAfter  (GBL_SELF_TYPE* pNode1, GBL_SELF_TYPE* pNode2) GBL_NOEXCEPT;
@@ -77,8 +87,16 @@ GBL_INLINE void           GblDoublyLinkedList_remove       (GBL_SELF_TYPE* pNode
 GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_removeBefore (GBL_SELF_TYPE* pNode)                         GBL_NOEXCEPT;
 GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_removeAfter  (GBL_SELF_TYPE* pNode)                         GBL_NOEXCEPT;
 GBL_INLINE GblBool        GblDoublyLinkedList_replace      (GBL_SELF_TYPE* pNode1, GBL_SELF_TYPE* pNode2) GBL_NOEXCEPT;
+GBL_INLINE void           GblDoublyLinkedList_splitAfter   (GBL_SELF,
+                                                            GBL_SELF_TYPE* pHead2,
+                                                            GBL_SELF_TYPE* pAfter)                        GBL_NOEXCEPT;
+
 GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_erase        (GBL_SELF, intptr_t index)                     GBL_NOEXCEPT;
 GBL_INLINE void           GblDoublyLinkedList_clear        (GBL_SELF)                                     GBL_NOEXCEPT;
+
+GBL_INLINE void           GblDoublyLinkedList_mergeSort    (GBL_SELF,
+                                                            GblDoublyLinkedListCmpFn pCmpFn,
+                                                            void* pClosure)                               GBL_NOEXCEPT;
 
 GBL_INLINE void           GblDoublyLinkedList_rotate       (GBL_SELF, intptr_t n)                         GBL_NOEXCEPT;
 GBL_INLINE void           GblDoublyLinkedList_reverse      (GBL_SELF)                                     GBL_NOEXCEPT;
@@ -87,6 +105,17 @@ GBL_INLINE void           GblDoublyLinkedList_reverse      (GBL_SELF)           
 
 GBL_INLINE void GblDoublyLinkedList_init(GBL_SELF) GBL_NOEXCEPT {
     pSelf->pNext = pSelf->pPrev = pSelf;
+}
+
+GBL_INLINE void GblDoublyLinkedList_move(GBL_SELF, GBL_SELF_TYPE* pHead) GBL_NOEXCEPT {
+    if(!GblDoublyLinkedList_empty(pHead)) {
+        pHead->pPrev->pNext = pSelf;
+        pSelf->pPrev        = pHead->pPrev;
+        pHead->pNext->pPrev = pSelf;
+        pSelf->pNext        = pHead->pNext;
+        pHead->pNext        = pHead;
+        pHead->pPrev        = pHead;
+    }
 }
 
 GBL_INLINE void GblDoublyLinkedList_pushBack(GBL_SELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
@@ -142,6 +171,14 @@ GBL_INLINE GblDoublyLinkedListNode* GblDoublyLinkedList_back(GBL_CSELF) GBL_NOEX
     return pSelf->pPrev != pSelf? pSelf->pPrev : NULL;
 }
 
+GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_middle(GBL_CSELF) GBL_NOEXCEPT {
+    return (GBL_SELF_TYPE*)GblLinkedList_middle(&pSelf->singleNode);
+}
+
+GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_beforeMiddle(GBL_CSELF) GBL_NOEXCEPT {
+    return (GBL_SELF_TYPE*)GblLinkedList_beforeMiddle(&pSelf->singleNode);
+}
+
 GBL_INLINE void GblDoublyLinkedList_remove(GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
     pNode->pPrev->pNext = pNode->pNext;
     pNode->pNext->pPrev = pNode->pPrev;
@@ -163,6 +200,21 @@ GBL_EXPORT GblBool GblDoublyLinkedList_replace(GblDoublyLinkedListNode* pExistin
     pExisting->pNext            = pExisting;
     return GBL_TRUE;
 }
+
+GBL_INLINE void GblDoublyLinkedList_splitAfter(GBL_SELF,
+                                               GBL_SELF_TYPE* pNewHead,
+                                               GBL_SELF_TYPE* pAfter) GBL_NOEXCEPT
+{
+    GblDoublyLinkedListNode* pBack = GblDoublyLinkedList_back(pSelf);
+    GBL_ASSERT(pBack != pAfter);
+    pBack->pNext = pNewHead;
+    pAfter->pNext->pPrev = pNewHead;
+    pNewHead->pNext = pAfter->pNext;
+    pNewHead->pPrev = pBack;
+    pAfter->pNext = pSelf;
+    pSelf->pPrev = pAfter;
+}
+
 
 GBL_EXPORT GblBool GblDoublyLinkedList_swap(GblDoublyLinkedListNode* pExisting, GblDoublyLinkedListNode* pReplacement) GBL_NOEXCEPT {
     pExisting->pPrev->pNext     = pReplacement;
@@ -234,6 +286,46 @@ GBL_INLINE void GblDoublyLinkedList_joinFront(GBL_SELF, GblDoublyLinkedListNode*
         pList->pNext        = pList;
         pList->pPrev        = pList;
     }
+}
+
+GBL_INLINE void GblDoublyLinkedList_joinSorted(GBL_SELF,
+                                               GBL_SELF_TYPE* pList,
+                                               GblDoublyLinkedListCmpFn pCmpFn,
+                                               void* pClosure) GBL_NOEXCEPT
+{
+    GBL_DOUBLY_LINKED_LIST_NODE(dstList);
+    GBL_SELF_TYPE*  pSrc1 = pSelf->pNext;
+    GBL_SELF_TYPE*  pSrc2 = pList->pNext;
+
+    while(1) {
+
+        if(pSrc1 == pSelf) {
+            GblDoublyLinkedList_joinBack(&dstList, pList);
+            break;
+        } else if(pSrc2 == pList) {
+            GblDoublyLinkedList_joinBack(&dstList, pSelf);
+            break;
+        }
+
+        if(pCmpFn(pSrc1, pSrc2, pClosure) < 0) {
+            GBL_SELF_TYPE* pTemp = pSrc1;
+            pSrc1 = pSrc1->pNext;
+            GblDoublyLinkedList_remove(pTemp);
+            GblDoublyLinkedList_pushBack(&dstList, pTemp);
+            continue;
+        } else {
+            GBL_SELF_TYPE* pTemp = pSrc2;
+            pSrc2 = pSrc2->pNext;
+            GblDoublyLinkedList_remove(pTemp);
+            GblDoublyLinkedList_pushBack(&dstList, pTemp);
+            continue;
+        }
+    }
+
+    GBL_ASSERT(GblDoublyLinkedList_empty(pSelf));
+    GBL_ASSERT(GblDoublyLinkedList_empty(pList));
+
+    GblDoublyLinkedList_move(pSelf, &dstList);
 }
 
 
@@ -371,6 +463,20 @@ GBL_INLINE GblBool GblDoublyLinkedList_join (GBL_SELF, intptr_t idx, GBL_SELF_TY
     return success;
 }
 
+GBL_INLINE void GblDoublyLinkedList_mergeSort(GBL_SELF, GblDoublyLinkedListCmpFn pCmpFn, void* pClosure) GBL_NOEXCEPT {
+    if(GblDoublyLinkedList_count(pSelf) < 2) {
+        return;
+    }
+
+    GBL_DOUBLY_LINKED_LIST_NODE(halfList);
+
+    GblDoublyLinkedList_splitAfter(pSelf, &halfList, GblDoublyLinkedList_beforeMiddle(pSelf));
+
+    GblDoublyLinkedList_mergeSort(pSelf, pCmpFn, pClosure);
+    GblDoublyLinkedList_mergeSort(&halfList, pCmpFn, pClosure);
+
+    GblDoublyLinkedList_joinSorted(pSelf, &halfList, pCmpFn, pClosure);
+}
 
 GBL_DECLS_END
 

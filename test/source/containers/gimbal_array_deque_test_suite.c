@@ -1,6 +1,6 @@
 #include "containers/gimbal_array_deque_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/containers/gimbal_array_deque.h>
 
 #define GBL_ARRAY_DEQUE_TEST_SUITE_(inst)     ((GblArrayDequeTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_DEQUE_TEST_SUITE_TYPE))
@@ -17,16 +17,16 @@ static const char* stringLiterals_[] = {
 };
 
 static GBL_RESULT GblArrayDequeTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblArrayDequeTestSuite_));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_verify_(GblContext* pCtx, const GblArrayDeque* pBuffer, ...) {
     va_list varArgs;
     va_start(varArgs, pBuffer);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSize count = 0;
     const char* pStr = NULL;
@@ -58,123 +58,123 @@ static GBL_RESULT GblArrayDequeTestSuite_verify_(GblContext* pCtx, const GblArra
     GBL_TEST_COMPARE(GblArrayDeque_full(pBuffer),
                      (GblArrayDeque_size(pBuffer) == GblArrayDeque_capacity(pBuffer)? GBL_TRUE : GBL_FALSE));
 
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     va_end(varArgs);
-    return GBL_API_RESULT();
+    return GBL_CTX_RESULT();
 }
 
 
 static GBL_RESULT GblArrayDequeTestSuite_constructEmpty_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[0],
                                                 sizeof(const char*),
                                                 0, 0, NULL, pCtx));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0], NULL));
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0], NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_context(&pSelf_->deques[0]), pCtx);
     GBL_TEST_COMPARE(GblArrayDeque_elementSize(&pSelf_->deques[0]), sizeof(const char*));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_constructWithData_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[1],
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[1],
                                                 sizeof(const char*),
                                                 0, 1, &stringLiterals_[0], pCtx));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[1], "a", NULL));
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[1], "a", NULL));
 
     GBL_TEST_VERIFY(GblArrayDeque_full(&pSelf_->deques[1]));
     GBL_TEST_COMPARE(GblArrayDeque_context(&pSelf_->deques[1]), pCtx);
     GBL_TEST_COMPARE(GblArrayDeque_elementSize(&pSelf_->deques[1]), sizeof(const char*));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_copy_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[3],
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[3],
                                                 9999,
                                                 0, 0, NULL, pCtx));
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_copy(&pSelf_->deques[3], &pSelf_->deques[1]));
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_copy(&pSelf_->deques[3], &pSelf_->deques[1]));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[3], "a", NULL));
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[3], "a", NULL));
 
     GBL_TEST_VERIFY(GblArrayDeque_full(&pSelf_->deques[3]));
     GBL_TEST_COMPARE(GblArrayDeque_context(&pSelf_->deques[3]), pCtx);
     GBL_TEST_COMPARE(GblArrayDeque_elementSize(&pSelf_->deques[3]), sizeof(const char*));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_move_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[4],
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[4],
                                                 33,
                                                 0, 0, NULL, pCtx));
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_move(&pSelf_->deques[4], &pSelf_->deques[3]));
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_move(&pSelf_->deques[4], &pSelf_->deques[3]));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[4], "a", NULL));
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[4], "a", NULL));
 
     GBL_TEST_VERIFY(GblArrayDeque_full(&pSelf_->deques[4]));
     GBL_TEST_COMPARE(GblArrayDeque_context(&pSelf_->deques[4]), pCtx);
     GBL_TEST_COMPARE(GblArrayDeque_elementSize(&pSelf_->deques[4]), sizeof(const char*));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[3], NULL));
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[3], NULL));
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[3]), 0);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_atInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
     void* pData = GblArrayDeque_at(&pSelf_->deques[1], 1);
     GBL_TEST_VERIFY(!pData);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
 
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblArrayDequeTestSuite_pushBackResize_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     for(GblSize i = 0; i < 10; ++i) {
-        GBL_API_VERIFY_CALL(GblArrayDeque_pushBack(&pSelf_->deques[0], &stringLiterals_[10+i]));
+        GBL_CTX_VERIFY_CALL(GblArrayDeque_pushBack(&pSelf_->deques[0], &stringLiterals_[10+i]));
     }
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 16);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_emplaceBackResize_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[2],
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_construct(&pSelf_->deques[2],
                                                 sizeof(const char*),
                                                 0, 0, NULL, pCtx));
 
@@ -184,51 +184,51 @@ static GBL_RESULT GblArrayDequeTestSuite_emplaceBackResize_(GblTestSuite* pSelf,
         *pSlot = stringLiterals_[10+i];
     }
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
                         "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[2]), 16);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_pushFront_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     for(GblSize i = 0; i < 6; ++i) {
-        GBL_API_VERIFY_CALL(GblArrayDeque_pushFront(&pSelf_->deques[0], &stringLiterals_[9-i]));
+        GBL_CTX_VERIFY_CALL(GblArrayDeque_pushFront(&pSelf_->deques[0], &stringLiterals_[9-i]));
     }
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "e", "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 16);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_pushFrontResize_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     for(GblSize i = 0; i < 4; ++i) {
-        GBL_API_VERIFY_CALL(GblArrayDeque_pushFront(&pSelf_->deques[0], &stringLiterals_[3-i]));
+        GBL_CTX_VERIFY_CALL(GblArrayDeque_pushFront(&pSelf_->deques[0], &stringLiterals_[3-i]));
     }
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 32);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_emplaceFrontResize_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     for(GblSize i = 0; i < 10; ++i) {
         const char** pSlot = GblArrayDeque_emplaceFront(&pSelf_->deques[2]);
@@ -236,33 +236,33 @@ static GBL_RESULT GblArrayDequeTestSuite_emplaceFrontResize_(GblTestSuite* pSelf
         *pSlot = stringLiterals_[9-i];
     }
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
                         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[2]), 32);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_popBack_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     for(GblSize i = 0; i < 5; ++i) {
         const char ** ppStr = GblArrayDeque_popBack(&pSelf_->deques[0]);
         GBL_TEST_COMPARE(*ppStr, stringLiterals_[19-i]);
     }
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_popBackInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
@@ -270,132 +270,132 @@ static GBL_RESULT GblArrayDequeTestSuite_popBackInvalid_(GblTestSuite* pSelf, Gb
 
     void* pPtr = GblArrayDeque_popBack(&pSelf_->deques[1]);
     GBL_TEST_VERIFY(!pPtr);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_popFront_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     for(GblSize i = 0; i < 5; ++i) {
         const char ** ppStr = GblArrayDeque_popFront(&pSelf_->deques[0]);
         GBL_TEST_COMPARE(*ppStr, stringLiterals_[i]);
     }
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_popFrontInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
     void* pPtr = GblArrayDeque_popFront(&pSelf_->deques[1]);
     GBL_TEST_VERIFY(!pPtr);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_resizeShrink_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_resize(&pSelf_->deques[0], 5));
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_resize(&pSelf_->deques[0], 5));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "f", "g", "h", "i", "j", NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 32);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_resizeGrow_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_resize(&pSelf_->deques[0], 10));
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_resize(&pSelf_->deques[0], 10));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 32);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_reserveIgnored_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_reserve(&pSelf_->deques[0], 16));
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_reserve(&pSelf_->deques[0], 16));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 32);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_reserveGrow_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_reserve(&pSelf_->deques[0], 35));
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_reserve(&pSelf_->deques[0], 35));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 35);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_shrinkToFitShrink_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_shrinkToFit(&pSelf_->deques[0]));
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_shrinkToFit(&pSelf_->deques[0]));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 10);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_shrinkToFitIgnored_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArrayDeque_shrinkToFit(&pSelf_->deques[0]));
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_shrinkToFit(&pSelf_->deques[0]));
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 10);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_insertInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
@@ -405,16 +405,16 @@ static GBL_RESULT GblArrayDequeTestSuite_insertInvalid_(GblTestSuite* pSelf, Gbl
                                                3);
 
     GBL_TEST_VERIFY(!ppSlot);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblArrayDequeTestSuite_insertFront_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     const char** ppSlot = GblArrayDeque_insert(&pSelf_->deques[0],
                                                0,
@@ -423,17 +423,17 @@ static GBL_RESULT GblArrayDequeTestSuite_insertFront_(GblTestSuite* pSelf, GblCo
 
     GBL_TEST_COMPARE(*ppSlot, "a");
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "a", "b", "c", "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblArrayDequeTestSuite_insertBackEmpty_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     const char** ppSlot = GblArrayDeque_insert(&pSelf_->deques[3],
                                                0,
@@ -442,15 +442,15 @@ static GBL_RESULT GblArrayDequeTestSuite_insertBackEmpty_(GblTestSuite* pSelf, G
 
     GBL_TEST_COMPARE(*ppSlot, "a");
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[3],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[3],
                         "a", "b", "c", NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_insertBack_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     const char** ppSlot = GblArrayDeque_insert(&pSelf_->deques[0],
                                                GblArrayDeque_size(&pSelf_->deques[0]),
@@ -459,16 +459,16 @@ static GBL_RESULT GblArrayDequeTestSuite_insertBack_(GblTestSuite* pSelf, GblCon
 
     GBL_TEST_COMPARE(*ppSlot, "p");
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "a", "b", "c", "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_insertMiddleFront_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     const char** ppSlot = GblArrayDeque_insert(&pSelf_->deques[0],
                                                3,
@@ -477,16 +477,16 @@ static GBL_RESULT GblArrayDequeTestSuite_insertMiddleFront_(GblTestSuite* pSelf,
 
     GBL_TEST_COMPARE(*ppSlot, "d");
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_insertMiddleEnd_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     const char** ppSlot = GblArrayDeque_insert(&pSelf_->deques[0],
                                                16,
@@ -495,34 +495,34 @@ static GBL_RESULT GblArrayDequeTestSuite_insertMiddleEnd_(GblTestSuite* pSelf, G
 
     GBL_TEST_COMPARE(*ppSlot, "a");
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
                         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o", "p",
                         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
                         "k", "l", "m",
                         "q", "r", "s", "t", NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblArrayDequeTestSuite_clear_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblArrayDeque_clear(&pSelf_->deques[0]);
 
-    GBL_API_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0], NULL));
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0], NULL));
 
     GBL_TEST_COMPARE(GblArrayDeque_size(&pSelf_->deques[0]), 0);
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 0);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_atProfile_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     const char* pLiteral = "LOLOL";
 
@@ -534,12 +534,12 @@ static GBL_RESULT GblArrayDequeTestSuite_atProfile_(GblTestSuite* pSelf, GblCont
         pLiteral = GblArrayDeque_at(&pSelf_->deques[0], 0);
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_pushBackProfile_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     const char* pLiteral = "LOLOL";
 
@@ -549,12 +549,12 @@ static GBL_RESULT GblArrayDequeTestSuite_pushBackProfile_(GblTestSuite* pSelf, G
         GblArrayDeque_pushBack(&pSelf_->deques[0], &pLiteral);
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArrayDequeTestSuite_pushFrontProfile_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     const char* pLiteral = "LOLOL";
 
@@ -564,18 +564,18 @@ static GBL_RESULT GblArrayDequeTestSuite_pushFrontProfile_(GblTestSuite* pSelf, 
         GblArrayDeque_pushFront(&pSelf_->deques[0], &pLiteral);
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblArrayDequeTestSuite_destruct_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     for(GblSize i = 0; i < 5; ++i)
-        GBL_API_VERIFY_CALL(GblArrayDeque_destruct(&pSelf_->deques[i]));
+        GBL_CTX_VERIFY_CALL(GblArrayDeque_destruct(&pSelf_->deques[i]));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblType GblArrayDequeTestSuite_type(void) {
@@ -622,14 +622,14 @@ GBL_EXPORT GblType GblArrayDequeTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("GblArrayDequeTestSuite"),
                                      &vTable,
                                      sizeof(GblArrayDequeTestSuite),
                                      sizeof(GblArrayDequeTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
 
     return type;

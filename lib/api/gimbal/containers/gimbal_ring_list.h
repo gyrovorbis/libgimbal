@@ -108,7 +108,7 @@ GBL_EXPORT void*        GblRingList_popFront     (GBL_SELF, GblSize count)      
 GBL_EXPORT void*        GblRingList_remove       (GBL_SELF, intptr_t index, GblSize count)        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblRingList_clear        (GBL_SELF)                                       GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblRingList_sort         (GBL_SELF, GblRingListCmpFn pFnCmp, void* pCl)   GBL_NOEXCEPT;
+GBL_EXPORT void         GblRingList_sort         (GBL_SELF, GblRingListCmpFn pFnCmp, void* pCl)   GBL_NOEXCEPT;
 GBL_EXPORT void         GblRingList_rotate       (GBL_SELF, intptr_t n)                           GBL_NOEXCEPT;
 GBL_EXPORT void         GblRingList_reverse      (GBL_SELF)                                       GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblRingList_foreach      (GBL_SELF, GblRingListIterFn pFnIt, void* pCl)   GBL_NOEXCEPT;

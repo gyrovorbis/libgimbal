@@ -1,6 +1,6 @@
 #include "strings/gimbal_string_ref_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/strings/gimbal_string_ref.h>
 
 #define GBL_STRING_REF_TEST_SUITE_(inst)    ((GblStringRefTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_STRING_REF_TEST_SUITE_TYPE))
@@ -11,7 +11,7 @@ typedef struct GblStringRefTestSuite_ {
 } GblStringRefTestSuite_;
 
 static GBL_RESULT verifyEmpty_(GblContext* pCtx, GblStringRef* pRef, GblSize refCount, GblContext* pRefCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_VERIFY(pRef);
     GBL_TEST_COMPARE(pRef[0], '\0');
     GBL_TEST_COMPARE(strlen(pRef), 0);
@@ -23,11 +23,11 @@ static GBL_RESULT verifyEmpty_(GblContext* pCtx, GblStringRef* pRef, GblSize ref
     const GblStringView view = GblStringRef_view(pRef);
     GBL_TEST_COMPARE_UINT(view.length, 0);
     GBL_TEST_COMPARE(view.pData, pRef);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT verifyString_(GblContext* pCtx, GblStringRef* pRef, const char* pValue, GblSize refCount, GblContext* pRefCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_VERIFY(pRef);
     GBL_TEST_COMPARE(pRef[0], pValue[0]);
     GBL_TEST_COMPARE(strcmp(pRef, pValue), 0);
@@ -41,26 +41,26 @@ static GBL_RESULT verifyString_(GblContext* pCtx, GblStringRef* pRef, const char
     GBL_TEST_COMPARE_UINT(view.length, strlen(pValue));
     GBL_TEST_COMPARE(view.pData, pRef);
     GBL_TEST_COMPARE(GblStringRef_at(pRef, GblStringRef_length(pRef)-1), pValue[strlen(pValue)-1]);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     memset(pSelf_->pRefs, 0, sizeof(pSelf_->pRefs));
     pSelf_->beginActiveRefCount = GblRef_activeCount();
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblRef_activeCount(), pSelf_->beginActiveRefCount);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_null_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblStringRef_acquire(NULL), NULL);
     GBL_TEST_COMPARE(GblStringRef_release(NULL), 0);
@@ -74,99 +74,99 @@ static GBL_RESULT GblStringRefTestSuite_null_(GblTestSuite* pSelf, GblContext* p
     GBL_TEST_COMPARE(view.pData, NULL);
     GBL_TEST_EXPECT_ERROR();
     GBL_TEST_COMPARE(GblStringRef_at(pSelf_->pRefs[0], 0), '\0');
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
-    GBL_API_END();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_null_at_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
     GBL_TEST_COMPARE(GblStringRef_at(pSelf_->pRefs[0], 0), '\0');
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
-    GBL_API_END();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_createEmpty_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     pSelf_->pRefs[0] = GblStringRef_create(NULL);
-    GBL_API_VERIFY_CALL(verifyEmpty_(pCtx, pSelf_->pRefs[0], 1, NULL));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(verifyEmpty_(pCtx, pSelf_->pRefs[0], 1, NULL));
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_empty_at_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
 
     GBL_TEST_COMPARE(GblStringRef_at(pSelf_->pRefs[0], 0), '\0');
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblStringRef_at(pSelf_->pRefs[0], 1), '\0');
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
-    GBL_API_END();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_create_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     pSelf_->pRefs[1] = GblStringRef_create("lolz");
-    GBL_API_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[1], "lolz", 1, NULL));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[1], "lolz", 1, NULL));
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_createWithContext_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     pSelf_->pRefs[2] = GblStringRef_createWithContext("contextual", pCtx);
-    GBL_API_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[2], "contextual", 1, pCtx));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[2], "contextual", 1, pCtx));
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_createFromViewEmpty_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     pSelf_->pRefs[3] = GblStringRef_createFromView(GBL_STRING_VIEW(NULL));
-    GBL_API_VERIFY_CALL(verifyEmpty_(pCtx, pSelf_->pRefs[3], 1, NULL));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(verifyEmpty_(pCtx, pSelf_->pRefs[3], 1, NULL));
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_createFromView_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     pSelf_->pRefs[4] = GblStringRef_createFromView(GBL_STRING_VIEW("viewz"));
-    GBL_API_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[4], "viewz", 1, NULL));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[4], "viewz", 1, NULL));
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_createFromViewWithContext_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     pSelf_->pRefs[5] = GblStringRef_createFromViewWithContext(GBL_STRING_VIEW("contextual_viewz"), pCtx);
-    GBL_API_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[5], "contextual_viewz", 1, pCtx));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[5], "contextual_viewz", 1, pCtx));
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_acquire_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     pSelf_->pRefs[6] = GblStringRef_acquire(pSelf_->pRefs[5]);
-    GBL_API_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[6], "contextual_viewz", 2, pCtx));
+    GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[6], "contextual_viewz", 2, pCtx));
     GBL_TEST_COMPARE(pSelf_->pRefs[6], pSelf_->pRefs[5]);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringRefTestSuite_release_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     GblRefCount refCount = GblRef_activeCount();
     GblStringRef_release(pSelf_->pRefs[6]);
-    GBL_API_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[5], "contextual_viewz", 1, pCtx));
+    GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[5], "contextual_viewz", 1, pCtx));
     GBL_TEST_COMPARE(GblRef_activeCount(), refCount);
 
     GblStringRef_release(pSelf_->pRefs[5]);
@@ -186,7 +186,7 @@ static GBL_RESULT GblStringRefTestSuite_release_(GblTestSuite* pSelf, GblContext
 
     GblStringRef_release(pSelf_->pRefs[0]);
     GBL_TEST_COMPARE(GblRef_activeCount(), --refCount);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblType GblStringRefTestSuite_type(void) {
@@ -214,14 +214,14 @@ GBL_EXPORT GblType GblStringRefTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("StringRefTestSuite"),
                                      &vTable,
                                      sizeof(GblStringRefTestSuite),
                                      sizeof(GblStringRefTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
     return type;
 }

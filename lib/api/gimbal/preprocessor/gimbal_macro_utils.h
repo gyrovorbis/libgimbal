@@ -28,6 +28,7 @@ extern "C" {
 
 #define GBL_MIN(a,b) (((a)<(b))?(a):(b))
 #define GBL_MAX(a,b) (((a)>(b))?(a):(b))
+#define GBL_CEIL(numerator, denominator) ((numerator / denominator + (numerator % denominator != 0)))
 
 #define GBL_CONTAINER_OF(ptr, type, member) ((type*)((char*)(ptr) - offsetof(type, member)))
 

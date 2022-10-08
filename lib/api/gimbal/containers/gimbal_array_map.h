@@ -191,7 +191,7 @@ GBL_INLINE GBL_RESULT GblArrayMap_entrySetVariant_(GBL_PCSELF, GblArrayMapEntry*
 
 GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(GBL_PSELF, uintptr_t key) {
     GblArrayMapEntry* pEntry = NULL;
-    GBL_API_BEGIN(NULL);
+    GBL_CTX_BEGIN(NULL);
     const GblSize size = GblArrayMap_size(ppSelf);
 
     // Have to insert in sorted order for Nth entry when binary searchable
@@ -239,7 +239,7 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(GBL_PSELF, uintptr_t key) {
         }
 
         // resize array and initialize entry to point to new position
-        *ppSelf = (GblArrayMap*)GBL_API_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(size+1));
+        *ppSelf = (GblArrayMap*)GBL_CTX_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(size+1));
         ++GBL_PRIV_REF(*ppSelf).size;
         pEntry = GblArrayMap_entry_(ppSelf, insertionIdx);
 
@@ -256,11 +256,11 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(GBL_PSELF, uintptr_t key) {
     } else {
         // initial allocation
         if(!*ppSelf) GBL_UNLIKELY {
-            *ppSelf = (GblArrayMap*)GBL_API_MALLOC(GBL_ARRAY_MAP_SIZE(1));
+            *ppSelf = (GblArrayMap*)GBL_CTX_MALLOC(GBL_ARRAY_MAP_SIZE(1));
             memset(*ppSelf, 0, sizeof(GblArrayMap));
         //appending to the end
         } else GBL_LIKELY {
-            *ppSelf = (GblArrayMap*)GBL_API_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(size + 1));
+            *ppSelf = (GblArrayMap*)GBL_CTX_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(size + 1));
         }
         ++GBL_PRIV_REF(*ppSelf).size;
         pEntry = GblArrayMap_entry_(ppSelf, GblArrayMap_size(ppSelf)-1);
@@ -271,7 +271,7 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(GBL_PSELF, uintptr_t key) {
     pEntry->key = key;
 
     // return new entry
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pEntry;
 }
 
@@ -402,11 +402,11 @@ GBL_INLINE uintptr_t GblArrayMap_atValue(GBL_PCSELF, uintptr_t key) GBL_NOEXCEPT
     uintptr_t value = 0;
     GblArrayMapEntry* pEntry = GblArrayMap_find_entry_(ppSelf, key);
     if(!pEntry) GBL_UNLIKELY {
-        GBL_API_BEGIN(NULL);
-        GBL_API_VERIFY(GBL_FALSE,
+        GBL_CTX_BEGIN(NULL);
+        GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_OUT_OF_RANGE);
 
-        GBL_API_END_BLOCK();
+        GBL_CTX_END_BLOCK();
     } else GBL_LIKELY {
         value = GblArrayMap_valueFromVariant_(&pEntry->value);
     }
@@ -423,11 +423,11 @@ GBL_INLINE GblVariant* GblArrayMap_atVariant(GBL_PCSELF, uintptr_t key) GBL_NOEX
     GblVariant* pVariant = GBL_NULL;
     GblArrayMapEntry* pEntry = GblArrayMap_find_entry_(ppSelf, key);
     if(!pEntry) GBL_UNLIKELY {
-        GBL_API_BEGIN(NULL);
-        GBL_API_VERIFY(GBL_FALSE,
+        GBL_CTX_BEGIN(NULL);
+        GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_OUT_OF_RANGE);
 
-        GBL_API_END_BLOCK();
+        GBL_CTX_END_BLOCK();
     } else GBL_LIKELY {
         if(pEntry->value.type != GBL_INVALID_TYPE)
             pVariant = &pEntry->value;

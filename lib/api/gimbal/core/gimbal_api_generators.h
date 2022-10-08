@@ -191,8 +191,8 @@ extern "C" {
 
 #define GBL_UNUSED(...) GBL_MAP_LIST(GBL_UNUSED_, __VA_ARGS__)
 
-#ifdef GBL_API_SHARED_LIB
-#   ifdef GBL_API_EXPORTS
+#ifdef GBL_CTX_SHARED_LIB
+#   ifdef GBL_CTX_EXPORTS
 #       define GBL_EXPORT GBL_EXPORT_SHARED
 #   else
 #       define GBL_EXPORT GBL_IMPORT_SHARED
@@ -203,7 +203,7 @@ extern "C" {
 
 //========== CLEAN THIS ENUM SHIT UP AND MAKE IT IN THE FORM OF ==============
 
-//GBL_API_ENUM_GENERATE()
+//GBL_CTX_ENUM_GENERATE()
 
 // ===== MISC META SHIT TO CLEAN LATER ====
 #define GBL_DECL_VAR_TYPE(type, ...) \
@@ -251,7 +251,7 @@ extern "C" {
     }
 
 
-//GBL_API_ENUM_TUPLE
+//GBL_CTX_ENUM_TUPLE
 
 #define GBL_META_ENUM_TUPLE(tuple)
 

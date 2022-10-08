@@ -57,8 +57,8 @@ GBL_EXPORT void        GblContext_logBuildInfo     (GBL_CSELF)                  
 /* ========== PRIVATE ==========
  * Private methods, do not call directly.
  *
- * Call via API frame macros like GBL_API_MALLOC(), GBL_API_FREE(), GBL_API_LOG(), GBL_API_PUSH(), etc
- * after calling GBL_API_BEGIN(GblContext* pCtx) with the context.
+ * Call via API frame macros like GBL_CTX_MALLOC(), GBL_CTX_FREE(), GBL_CTX_LOG(), GBL_CTX_PUSH(), etc
+ * after calling GBL_CTX_BEGIN(GblContext* pCtx) with the context.
  */
 /// \cond
 GBL_EXPORT GBL_RESULT  GblContext_memAlloc_        (GBL_SELF,

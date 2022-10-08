@@ -1,6 +1,6 @@
 #include "meta/types/gimbal_type_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/meta/types/gimbal_type.h>
 #include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/meta/classes/gimbal_class.h>
@@ -36,14 +36,14 @@ typedef struct GblTypeTestSuite_ {
 
 static GBL_RESULT GblTypeTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     memset(pSelf_, 0, sizeof(GblTypeTestSuite_));
-    //GBL_API_CALL(GblType_final());
-    GBL_API_END();
+    //GBL_CTX_CALL(GblType_final());
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
     GblType_unregister(pSelf_->blankType);
@@ -68,13 +68,13 @@ static GBL_RESULT GblTypeTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx)
     GblType_unregister(pSelf_->dependent);
     GblType_unregister(pSelf_->dependentDependent);
     GblType_unregister(pSelf_->dependentDependentDerived);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_initDefaults_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
-    //GBL_API_CALL(GblType_init(pCtx, 0, 0));
+    GBL_CTX_BEGIN(pCtx);
+    //GBL_CTX_CALL(GblType_init(pCtx, 0, 0));
     //GBL_TEST_COMPARE(GblType_contextDefault(), pCtx);
     GBL_TEST_COMPARE(GblType_builtinCount(), GBL_TYPE_BUILTIN_COUNT);
     //GBL_TEST_COMPARE(GblType_registeredCount(), GBL_TYPE_BUILTIN_COUNT);
@@ -89,12 +89,12 @@ static GBL_RESULT GblTypeTestSuite_initDefaults_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(GblType_fromName(NULL), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_fromName("Lolol"), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_fromNameQuark(GBL_QUARK_INVALID), GBL_INVALID_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_COMPARE(strcmp("Invalid", GblType_name(GBL_INVALID_TYPE)), 0);
     GBL_TEST_COMPARE(GblType_nameQuark(GBL_INVALID_TYPE), GBL_QUARK_INVALID);
     GBL_TEST_COMPARE(GblType_parent(GBL_INVALID_TYPE), GBL_INVALID_TYPE);
@@ -110,18 +110,18 @@ static GBL_RESULT GblTypeTestSuite_invalid_(GblTestSuite* pSelf, GblContext* pCt
     GBL_TEST_COMPARE(GblType_plugin(GBL_INVALID_TYPE), NULL);
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_INVALID_TYPE), 0);
     GBL_TEST_COMPARE(GblType_instanceRefCount(GBL_INVALID_TYPE),0);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_blank_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
      pSelf_->blankType = GblType_registerStatic(GblQuark_internStringStatic("Blank"),
                                           GBL_INVALID_TYPE,
                                           NULL,
                                           GBL_TYPE_FLAGS_NONE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->blankType != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(!GBL_TYPE_DEPENDENT_CHECK(pSelf_->blankType));
     GBL_TEST_VERIFY(!GBL_TYPE_CLASSED_CHECK(pSelf_->blankType));
@@ -157,43 +157,43 @@ static GBL_RESULT GblTypeTestSuite_fundamental_blank_(GblTestSuite* pSelf, GblCo
     GBL_TEST_VERIFY(!GblType_derives(pSelf_->blankType, GBL_INVALID_TYPE));
     GBL_TEST_VERIFY(!GblType_maps(pSelf_->blankType, pSelf_->blankType));
     GBL_TEST_COMPARE(GblType_plugin(pSelf_->blankType), NULL);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_duplicate_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
     GblType dupe = GblType_registerStatic(GblQuark_internStringStatic("Blank"),
                                           GBL_INVALID_TYPE,
                                           NULL,
                                           GBL_TYPE_FLAGS_NONE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(dupe, GBL_INVALID_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_derived_register_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
     GblType invalid = GblType_registerStatic("DerivedInvalid",
                                              pSelf_->blankType,
                                              NULL,
                                              0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalid, GBL_INVALID_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_derived_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->derivable = GblType_registerStatic("Derivable",
                                                GBL_INVALID_TYPE,
                                                NULL,
                                                GBL_TYPE_ROOT_FLAG_DERIVABLE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->derivable != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_DERIVABLE_CHECK(pSelf_->derivable));
     GBL_TEST_VERIFY(!GBL_TYPE_DEEP_DERIVABLE_CHECK(pSelf_->derivable));
@@ -202,32 +202,32 @@ static GBL_RESULT GblTypeTestSuite_fundamental_derived_register_valid_(GblTestSu
                                             pSelf_->derivable,
                                              NULL,
                                              0);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->derived != GBL_INVALID_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
     GblType deepDerivedInvalid = GblType_registerStatic("DeepDerivedInvalid",
                                                         pSelf_->derived,
                                                         NULL,
                                                         0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(deepDerivedInvalid, GBL_INVALID_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->deepDerivable = GblType_registerStatic("DeepDerivable",
                                                GBL_INVALID_TYPE,
                                                NULL,
                                                GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->deepDerivable != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_DERIVABLE_CHECK(pSelf_->deepDerivable));
     GBL_TEST_VERIFY(GBL_TYPE_DEEP_DERIVABLE_CHECK(pSelf_->deepDerivable));
@@ -243,7 +243,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_valid_(GblT
                                                    pSelf_->deepDerivable,
                                                    NULL,
                                                    0);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->middleDerived != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(!GBL_TYPE_ROOT_CHECK(pSelf_->middleDerived));
     GBL_TEST_COMPARE(GblType_depth(pSelf_->middleDerived), 1);
@@ -256,7 +256,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_valid_(GblT
                                              pSelf_->middleDerived,
                                              NULL,
                                              0);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->deepDerived != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(!GBL_TYPE_ROOT_CHECK(pSelf_->deepDerived));
     GBL_TEST_COMPARE(GblType_depth(pSelf_->deepDerived), 2);
@@ -264,25 +264,25 @@ static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_valid_(GblT
     GBL_TEST_COMPARE(GblType_base(pSelf_->deepDerived, 1), pSelf_->middleDerived);
     GBL_TEST_VERIFY(GblType_derives(pSelf_->deepDerived, pSelf_->deepDerivable));
     GBL_TEST_VERIFY(GblType_check(pSelf_->deepDerived, pSelf_->deepDerivable));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_register_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
     GblType invalidClassed = GblType_registerStatic("InvalidClassed",
                                                     GBL_INVALID_TYPE,
                                                     NULL,
                                                     GBL_TYPE_ROOT_FLAG_CLASSED);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalidClassed, GBL_INVALID_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->classed = GblType_registerStatic("Classed",
                                              GBL_INVALID_TYPE,
@@ -291,14 +291,14 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_register_valid_(GblTestSu
                                              },
                                              GBL_TYPE_ROOT_FLAG_CLASSED |
                                              GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->classed != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->classed));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_inherit_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->classedDerived = GblType_registerStatic("ClassedDerived",
                                                     pSelf_->classed,
@@ -306,24 +306,24 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_inherit_(GblTestSuite* pS
                                                         .classSize = sizeof(GblClass)
                                                     },
                                                     0);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->classedDerived != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->classedDerived));
     GBL_TEST_VERIFY(GblType_derives(pSelf_->classedDerived, pSelf_->classed));
     GBL_TEST_VERIFY(GblType_check(pSelf_->classedDerived, pSelf_->classed));
     GBL_TEST_VERIFY(!GblType_maps(pSelf_->classedDerived, pSelf_->classed));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
     GblType invalidIFace = GblType_registerStatic("InvalidIFaced",
                                                   GBL_INVALID_TYPE,
                                                   NULL,
                                                   GBL_TYPE_ROOT_FLAG_INTERFACED);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalidIFace, GBL_INVALID_TYPE);
     invalidIFace = GblType_registerStatic("InvalidIFaced",
                                           GBL_INVALID_TYPE,
@@ -332,13 +332,13 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_invalid_(GblT
                                           },
                                           GBL_TYPE_ROOT_FLAG_INTERFACED |
                                           GBL_TYPE_ROOT_FLAG_INSTANTIABLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalidIFace, GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(!GBL_TYPE_INTERFACED_CHECK(invalidIFace));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->ifaced = GblType_registerStatic("IFaced",
                                             GBL_INVALID_TYPE,
@@ -347,7 +347,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_valid_(GblTes
                                             },
                                             GBL_TYPE_ROOT_FLAG_INTERFACED |
                                             GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->ifaced != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->ifaced));
     GBL_TEST_VERIFY(GBL_TYPE_INTERFACED_CHECK(pSelf_->ifaced));
@@ -358,7 +358,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_valid_(GblTes
                                             },
                                             GBL_TYPE_ROOT_FLAG_INTERFACED |
                                             GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->ifaced2 != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->ifaced2));
     GBL_TEST_VERIFY(GBL_TYPE_INTERFACED_CHECK(pSelf_->ifaced2));
@@ -369,15 +369,15 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_valid_(GblTes
                                              },
                                              GBL_TYPE_ROOT_FLAG_INTERFACED |
                                              GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->ifaced2 != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->ifaced3));
     GBL_TEST_VERIFY(GBL_TYPE_INTERFACED_CHECK(pSelf_->ifaced3));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_inherit_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->ifacedDerived = GblType_registerStatic("IFacedDerived",
                                                    pSelf_->ifaced,
@@ -385,7 +385,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_inherit_(GblTestSuite*
                                                        .classSize = sizeof(GblInterface)
                                                    },
                                                    0);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->ifaced != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->ifaced));
     GBL_TEST_VERIFY(GBL_TYPE_INTERFACED_CHECK(pSelf_->ifaced));
@@ -401,16 +401,16 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_inherit_(GblTestSuite*
                                                 .classSize = sizeof(GblInterface)
                                             },
                                             0);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->ifacedDerived2 != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->ifacedDerived2));
     GBL_TEST_VERIFY(GBL_TYPE_INTERFACED_CHECK(pSelf_->ifacedDerived2));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
 
@@ -430,7 +430,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
                                                     pSelf_->classedDerived,
                                                     &info,
                                                     0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
     // Invalid type
     info.interfaceCount = 1;
@@ -438,7 +438,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
 
     // Non-Inteface Type
@@ -447,7 +447,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
 
     // Invalid class size
@@ -456,7 +456,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
 
 
@@ -466,7 +466,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
 
     // Offset too far
@@ -475,7 +475,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
 
     // duplicated type
@@ -488,7 +488,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
 
     // ambiguous type
@@ -497,7 +497,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
 
     // overlapping interfaces
@@ -507,15 +507,15 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->classedDeepDerivedIfaceMap = GblType_registerStatic("ClassedDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
@@ -534,7 +534,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_valid_(GblTestSuit
                                                  }
                                             },
                                             0);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->classedDeepDerivedIfaceMap != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->classedDeepDerivedIfaceMap));
     GBL_TEST_VERIFY(GblType_derives(pSelf_->classedDeepDerivedIfaceMap, pSelf_->classedDerived));
@@ -548,12 +548,12 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_valid_(GblTestSuit
     GBL_TEST_VERIFY(GblType_check(pSelf_->classedDeepDerivedIfaceMap, pSelf_->ifaced));
     GBL_TEST_VERIFY(GblType_maps(pSelf_->classedDeepDerivedIfaceMap, pSelf_->ifaced3));
     GBL_TEST_VERIFY(GblType_check(pSelf_->classedDeepDerivedIfaceMap, pSelf_->ifaced3));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_inherit_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->classedDeepDerivedIfaceMapInherited  = GblType_registerStatic("ClassedDeepDerivedIfaceMappedInherited",
                                                                     pSelf_->classedDeepDerivedIfaceMap,
@@ -568,7 +568,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_inherit_(GblTestSu
                                                                         }
                                                                    },
                                                                    0);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->classedDeepDerivedIfaceMapInherited != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->classedDeepDerivedIfaceMapInherited));
     GBL_TEST_VERIFY(GblType_derives(pSelf_->classedDeepDerivedIfaceMapInherited, pSelf_->classedDeepDerivedIfaceMap));
@@ -588,11 +588,11 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_inherit_(GblTestSu
     GBL_TEST_VERIFY(GblType_check(pSelf_->classedDeepDerivedIfaceMapInherited, pSelf_->ifacedDerived2));
     GBL_TEST_VERIFY(GblType_maps(pSelf_->classedDeepDerivedIfaceMapInherited, pSelf_->ifaced2));
     GBL_TEST_VERIFY(GblType_check(pSelf_->classedDeepDerivedIfaceMapInherited, pSelf_->ifaced2));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->ifacedIfaceMap = GblType_registerStatic("IFaceMappedIFace",
                                             GBL_INVALID_TYPE,
@@ -612,7 +612,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_(GblTestSuite* 
                                              },
                                              GBL_TYPE_ROOT_FLAG_INTERFACED |
                                              GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->ifacedIfaceMap!= GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->ifacedIfaceMap));
     GBL_TEST_VERIFY(GBL_TYPE_INTERFACED_CHECK(pSelf_->ifacedIfaceMap));
@@ -622,11 +622,11 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_(GblTestSuite* 
     GBL_TEST_VERIFY(GblType_check(pSelf_->ifacedIfaceMap, pSelf_->ifaced));
     GBL_TEST_VERIFY(GblType_maps(pSelf_->ifacedIfaceMap,  pSelf_->ifaced3));
     GBL_TEST_VERIFY(GblType_check(pSelf_->ifacedIfaceMap, pSelf_->ifaced3));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_inherit_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
     GblTypeInterfaceMapEntry entries[] = {
@@ -644,7 +644,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_inherit_invalid
                                                   &info,
                                                   0);
     // Ambiguous type (inherited base is mapped)
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalidType, GBL_INVALID_TYPE);
 
     // Ambiguous type (inherited base common with mapped base)
@@ -652,13 +652,13 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_inherit_invalid
                                         pSelf_->ifacedDerived,
                                          &info,
                                          0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalidType, GBL_INVALID_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_inherit_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
     pSelf_->ifacedIfaceMapInherited = GblType_registerStatic("IfaceMappedIFaceInherited",
@@ -674,7 +674,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_inherit_valid_(
                                                            }
                                                       },
                                                       0);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->ifacedIfaceMapInherited != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_INTERFACED_CHECK(pSelf_->ifacedIfaceMapInherited));
     GBL_TEST_VERIFY(GblType_derives(pSelf_->ifacedIfaceMapInherited, pSelf_->ifacedIfaceMap));
@@ -690,12 +690,12 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_inherit_valid_(
     GBL_TEST_VERIFY(GblType_check(pSelf_->ifacedIfaceMapInherited, pSelf_->ifacedDerived2));
     GBL_TEST_VERIFY(GblType_maps(pSelf_->ifacedIfaceMapInherited, pSelf_->ifaced2));
     GBL_TEST_VERIFY(GblType_check(pSelf_->ifacedIfaceMapInherited, pSelf_->ifaced2));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_interfaced_mapped_inherit_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
     pSelf_->classedMapIfacedIfaceMapInherited = GblType_registerStatic("ClassedMapIfaceMappedIFaceInherited",
@@ -711,7 +711,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_interfaced_mapped_
                                                                      }
                                                                 },
                                                                 GBL_TYPE_ROOT_FLAG_CLASSED);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(pSelf_->classedMapIfacedIfaceMapInherited != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->classedMapIfacedIfaceMapInherited));
     GBL_TEST_VERIFY(!GblType_derives(pSelf_->classedMapIfacedIfaceMapInherited, pSelf_->ifacedIfaceMap));
@@ -727,12 +727,12 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_interfaced_mapped_
     GBL_TEST_VERIFY(GblType_check(pSelf_->classedMapIfacedIfaceMapInherited, pSelf_->ifacedDerived2));
     GBL_TEST_VERIFY(GblType_maps(pSelf_->classedMapIfacedIfaceMapInherited, pSelf_->ifaced2));
     GBL_TEST_VERIFY(GblType_check(pSelf_->classedMapIfacedIfaceMapInherited, pSelf_->ifaced2));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
     GblType invalid = GblType_registerStatic("Ininstanced",
                                                 GBL_INVALID_TYPE,
@@ -740,7 +740,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_invalid_(Gb
                                                          .instanceSize = sizeof(GblInstance)
                                                      },
                                                      GBL_TYPE_ROOT_FLAG_INSTANTIABLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalid, GBL_INVALID_TYPE);
 
     invalid = GblType_registerStatic("Ininstanced",
@@ -752,12 +752,12 @@ static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_invalid_(Gb
                                      GBL_TYPE_ROOT_FLAG_INSTANTIABLE |
                                      GBL_TYPE_ROOT_FLAG_CLASSED   |
                                      GBL_TYPE_ROOT_FLAG_INTERFACED);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalid, GBL_INVALID_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     pSelf_->instanced = GblType_registerStatic("Instanced",
                                         GBL_INVALID_TYPE,
@@ -766,18 +766,18 @@ static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_valid_(GblT
                                              .classSize = sizeof(GblClass)
                                          },
                                          GBL_TYPE_ROOT_FLAG_INSTANTIABLE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(GblType_instanceRefCount(pSelf_->instanced), 0);
     GBL_TEST_COMPARE(GblType_classRefCount(pSelf_->instanced), 0);
     GBL_TEST_VERIFY(pSelf_->instanced != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->instanced));
     GBL_TEST_VERIFY(GBL_TYPE_INSTANTIABLE_CHECK(pSelf_->instanced));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblTypeTestSuite_fundamental_dependent_register_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
 
@@ -791,15 +791,15 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_register_invalid_(GblTe
                                                             pSelf_->classedDerived
                                                         }
                                                     }, GBL_TYPE_ROOT_FLAG_DEPENDENT);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_TYPE);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_TYPE);
     GBL_TEST_COMPARE(pSelf_->dependent, GBL_INVALID_TYPE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_dependent_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
     // Dependencies on non-dependent types
@@ -817,11 +817,11 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_register_valid_(GblTest
     GBL_TEST_VERIFY(GBL_TYPE_DEPENDENT_CHECK(pSelf_->dependent));
     GBL_TEST_VERIFY(GblType_depends(pSelf_->dependent, pSelf_->classed));
     GBL_TEST_VERIFY(GblType_conforms(pSelf_->classed, pSelf_->dependent));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTypeTestSuite_fundamental_dependent_depends_dependent_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
     pSelf_->dependentDependent = GblType_registerStatic("ClassedIFacedDependent",
@@ -843,11 +843,11 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_depends_dependent_valid
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->ifaced, pSelf_->dependentDependent));
     GBL_TEST_VERIFY(GblType_conforms(pSelf_->classedDeepDerivedIfaceMap, pSelf_->dependentDependent));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 static GBL_RESULT GblTypeTestSuite_fundamental_dependent_derive_depends_dependent_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
@@ -876,7 +876,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_derive_depends_dependen
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->classedDeepDerivedIfaceMap, pSelf_->dependentDependentDerived));
     GBL_TEST_VERIFY(GblType_conforms(pSelf_->classedDeepDerivedIfaceMapInherited, pSelf_->dependentDependentDerived));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
@@ -921,14 +921,14 @@ GBL_EXPORT GblType GblTypeTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("TypeTestSuite"),
                                      &vTable,
                                      sizeof(GblTypeTestSuite),
                                      sizeof(GblTypeTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
     return type;
 }

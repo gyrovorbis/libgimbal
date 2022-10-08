@@ -92,14 +92,14 @@ GBL_EXPORT GBL_RESULT GblMarshal_ClassClosureMeta(GblClosure*        pClosure,
                                                   GblVariant*        pArgs,
                                                   GblPtr             pMarshalData)
 {
-    GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_ARG(argCount);
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_ARG(argCount);
 
     GblClassClosure* pClassClosure = (GblClassClosure*)pClosure;
 
-    GBL_API_VERIFY_TYPE(GBL_PRIV_REF(pClassClosure).classType);
+    GBL_CTX_VERIFY_TYPE(GBL_PRIV_REF(pClassClosure).classType);
 
-    GBL_API_VERIFY(GBL_PRIV_REF(pClassClosure).pInstance,
+    GBL_CTX_VERIFY(GBL_PRIV_REF(pClassClosure).pInstance,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Attempt to meta marshal class [%s] closure with no instance pointer!",
                    GblType_name(GBL_PRIV_REF(pClassClosure).classType));
@@ -109,8 +109,8 @@ GBL_EXPORT GBL_RESULT GblMarshal_ClassClosureMeta(GblClosure*        pClosure,
 
     pMarshalData.pFunc = *(GblFnPtr*)(uint8_t*)(pClass + GBL_PRIV_REF(pClassClosure).offset);
 
-    GBL_API_VERIFY_CALL(GBL_PRIV_REF(pClosure).pFnMarshal(pClosure, pRetValue, argCount, pArgs, pMarshalData));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(GBL_PRIV_REF(pClosure).pFnMarshal(pClosure, pRetValue, argCount, pArgs, pMarshalData));
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblMarshal_SignalForwarder(GblClosure* pClosure,
@@ -121,15 +121,15 @@ GBL_EXPORT GBL_RESULT GblMarshal_SignalForwarder(GblClosure* pClosure,
 {
     GBL_UNUSED(pRetValue);
     GBL_UNUSED(pMarshalData);
-    GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_ARG(argCount >= 1);
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_ARG(argCount >= 1);
 
     GblSignalClosure* pSignalClosure = (GblSignalClosure*)pClosure;
 
-    GBL_API_VERIFY_CALL(GblSignal_emitVariants(GblVariant_toPointer(&pArgs[0]),
+    GBL_CTX_VERIFY_CALL(GblSignal_emitVariants(GblVariant_toPointer(&pArgs[0]),
                                                GblQuark_toString(GBL_PRIV_REF(pSignalClosure).signalName),
                                                argCount > 1? &pArgs[1] : NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 
 }

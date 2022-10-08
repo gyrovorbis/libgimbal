@@ -15,7 +15,7 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblTreeSet);
 
-typedef GblInt  (*GblTreeSetEntryCompareFn) (GBL_CSELF, const void*, const void*);
+typedef int  (*GblTreeSetEntryCompareFn) (GBL_CSELF, const void*, const void*);
 typedef void    (*GblTreeSetEntryDestructFn)(GBL_CSELF, void*);
 
 typedef struct GblTreeSetNode {

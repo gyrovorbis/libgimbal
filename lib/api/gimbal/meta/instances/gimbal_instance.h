@@ -7,7 +7,7 @@
 #ifndef GIMBAL_INSTANCE_H
 #define GIMBAL_INSTANCE_H
 
-#include "../../core/gimbal_api_frame.h"
+#include "../../core/gimbal_ctx.h"
 #include "../classes/gimbal_class.h"
 
 #define GBL_INSTANCE_TYPE                              (GBL_BUILTIN_TYPE(INSTANCE))
@@ -83,17 +83,17 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass         (GBL_SELF)               
 #define GBL_INSTANCE_VCALL_(cType, method, ...)                                                       \
     GBL_STMT_START {                                                                                  \
         GBL_CLASSOF(cType)* pClass = GBL_INSTANCE_GET_CLASS(GBL_TUPLE_FIRST (__VA_ARGS__, 1), cType); \
-        GBL_API_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                                \
-        GBL_API_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                        \
-        GBL_API_CALL(pClass->method(__VA_ARGS__));                                                    \
+        GBL_CTX_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                                \
+        GBL_CTX_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                        \
+        GBL_CTX_CALL(pClass->method(__VA_ARGS__));                                                    \
     } GBL_STMT_END
 
 #define GBL_INSTANCE_VCALL_DEFAULT_(cType, method, ...)                                               \
     GBL_STMT_START {                                                                                  \
         GBL_CLASSOF(cType)* pClass = (GBL_CLASSOF(cType)*)GblClass_weakRefDefault(GBL_TYPEOF(cType)); \
-        GBL_API_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                                \
-        GBL_API_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                        \
-        GBL_API_CALL(pClass->method(__VA_ARGS__));                                                    \
+        GBL_CTX_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                                \
+        GBL_CTX_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                        \
+        GBL_CTX_CALL(pClass->method(__VA_ARGS__));                                                    \
     } GBL_STMT_END
 ///\endcond
 

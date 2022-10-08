@@ -41,6 +41,11 @@ int main(int argc, char* pArgv[]) {
 #endif
     GblTestScenario* pScenario = GblTestScenario_create("LibGimbalTests");
 
+    GBL_CTX_VERBOSE("lolol");
+    void* pData = GBL_CTX_MALLOC(128);
+    GBL_CTX_FREE(pData);
+
+
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO | GBL_LOG_LEVEL_WARNING | GBL_LOG_LEVEL_ERROR );
 
     GblTestScenario_enqueueSuite(pScenario,

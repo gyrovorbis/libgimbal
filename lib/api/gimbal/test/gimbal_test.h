@@ -9,7 +9,7 @@
 #include "../preprocessor/gimbal_macro_utils.h"
 #include <stdint.h>
 
-#define GBL_TEST_VERIFY(expr)                        GBL_API_VERIFY_EXPRESSION(expr)
+#define GBL_TEST_VERIFY(expr)                        GBL_CTX_VERIFY_EXPRESSION(expr)
 
 /// \cond
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_DFLT_(void) { return "Values differed"; }
@@ -81,41 +81,41 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
 #define GBL_TEST_COMPARE_CMP_(actual, expected)      GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_CMP_TABLE_, actual)(actual, expected)
 /// \endcond
 
-#define GBL_TEST_COMPARE(actual, expected)           GBL_API_VERIFY_EXPRESSION(GBL_TEST_COMPARE_CMP_(actual, expected),      \
+#define GBL_TEST_COMPARE(actual, expected)           GBL_CTX_VERIFY_EXPRESSION(GBL_TEST_COMPARE_CMP_(actual, expected),      \
                                                                                GBL_TEST_COMPARE_FMT_(actual),                \
                                                                                actual, expected)
 
-#define GBL_TEST_COMPARE_INT(actual, expected)       GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
+#define GBL_TEST_COMPARE_INT(actual, expected)       GBL_CTX_VERIFY_EXPRESSION(actual == expected,                           \
                                                                           "Values differed [expected: %d, actual: %d]",      \
                                                                           actual, expected)
 
-#define GBL_TEST_COMPARE_UINT(actual, expected)      GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
+#define GBL_TEST_COMPARE_UINT(actual, expected)      GBL_CTX_VERIFY_EXPRESSION(actual == expected,                           \
                                                                           "Values differed [expected: %u, actual: %u]",      \
                                                                           actual, expected)
 
-#define GBL_TEST_COMPARE_STRING(actual, expected)    GBL_API_VERIFY_EXPRESSION(strcmp(actual, expected) == 0,                \
+#define GBL_TEST_COMPARE_STRING(actual, expected)    GBL_CTX_VERIFY_EXPRESSION(strcmp(actual, expected) == 0,                \
                                                                           "Values differed [expected: %s, actual: %s]",      \
                                                                           actual, expected)
 
-#define GBL_TEST_COMPARE_FLOAT(actual, expected)     GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
+#define GBL_TEST_COMPARE_FLOAT(actual, expected)     GBL_CTX_VERIFY_EXPRESSION(actual == expected,                           \
                                                                           "Values differed [expected: %f, actual: %f]",      \
                                                                           actual, expected)
 
-#define GBL_TEST_COMPARE_POINTER(actual, expected)   GBL_API_VERIFY_EXPRESSION(actual == expected,                           \
+#define GBL_TEST_COMPARE_POINTER(actual, expected)   GBL_CTX_VERIFY_EXPRESSION(actual == expected,                           \
                                                                           "Values differed [exptected: %p, actual: %p]",     \
                                                                           actual, expected)
 
 
-#define GBL_TEST_SKIP(reason)                        GBL_API_VERIFY(GBL_FALSE,                                               \
+#define GBL_TEST_SKIP(reason)                        GBL_CTX_VERIFY(GBL_FALSE,                                               \
                                                                     GBL_RESULT_SKIPPED,                                      \
                                                                     reason)
 
-#define GBL_TEST_FAIL(reason)                        GBL_API_VERIFY(GBL_FALSE,                                               \
+#define GBL_TEST_FAIL(reason)                        GBL_CTX_VERIFY(GBL_FALSE,                                               \
                                                                     GBL_RESULT_ERROR,                                        \
                                                                     reason)
 
 #define GBL_TEST_EXPECT_ERROR()                         \
-    GBL_API_VERIFY(!GBL_CONFIG_ASSERT_ERROR_ENABLED,    \
+    GBL_CTX_VERIFY(!GBL_CONFIG_ASSERT_ERROR_ENABLED,    \
                    GBL_RESULT_SKIPPED,                  \
                    "Skipping test case due to GBL_CONFIG_ASSERT_ERROR_ENABLED.")
 

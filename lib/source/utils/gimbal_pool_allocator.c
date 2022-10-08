@@ -1,6 +1,6 @@
 #include <gimbal/utils/gimbal_pool_allocator.h>
 #include <gimbal/algorithms/gimbal_numeric.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 
 GBL_EXPORT GBL_RESULT (GblPoolAllocator_construct)(GblPoolAllocator*      pSelf,
                                                    GblSize                entrySize,
@@ -9,9 +9,9 @@ GBL_EXPORT GBL_RESULT (GblPoolAllocator_construct)(GblPoolAllocator*      pSelf,
                                                    GblArenaAllocatorPage* pInitialPage,
                                                    GblContext*            pCtx)
 {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(GblArenaAllocator_construct(&pSelf->arena,
+    GBL_CTX_VERIFY_CALL(GblArenaAllocator_construct(&pSelf->arena,
                                                     gblAlignedAllocSize(entrySize, entryAlign) * entriesPerPage,
                                                     entryAlign,
                                                     pInitialPage,
@@ -19,7 +19,7 @@ GBL_EXPORT GBL_RESULT (GblPoolAllocator_construct)(GblPoolAllocator*      pSelf,
     GblLinkedList_init(&pSelf->freeList);
     pSelf->entrySize    = entrySize;
     pSelf->entryAlign   = entryAlign;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblPoolAllocator_destruct(GblPoolAllocator* pSelf) {

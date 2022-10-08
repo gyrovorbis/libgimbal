@@ -214,7 +214,7 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (GBL_SELF)  GBL_NOEXCEPT
  *  We do this for our virtual save method:
  *  \code{.c}
  *      GBL_RESULT ISerializable_save(const ISerializable* pSelf, GblStringBuffer* pBuffer) {
- *          GBL_API_BEGIN(NULL);
+ *          GBL_CTX_BEGIN(NULL);
  *
  *          // exttract our interface from the given instance
  *          ISerializableClass* pClass = ISERIALIZABLE_GET_CLASS(pSelf);
@@ -227,10 +227,10 @@ GBL_EXPORT GblClass*     GblInterface_outerMostClass    (GBL_SELF)  GBL_NOEXCEPT
  *
  *                  // call virtual method implementation,
  *                  // propagating any error code returned
- *                  GBL_API_VERIFY_CALL(pClass->pFnSave(pSelf, pBuffer);
+ *                  GBL_CTX_VERIFY_CALL(pClass->pFnSave(pSelf, pBuffer);
  *              }
  *          }
- *          GBL_API_END();
+ *          GBL_CTX_END();
  *      }
  *  \endcode
  *  As you can see, when we expose our virtual methods via a public API wrapper,

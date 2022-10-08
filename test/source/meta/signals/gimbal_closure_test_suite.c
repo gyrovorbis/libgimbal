@@ -22,18 +22,18 @@ typedef struct GblClosureTestSuite_ {
 } GblClosureTestSuite_;
 
 static GBL_RESULT GblClosureTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblClosureTestSuite_));
     pSelf_->startGlobalRefCount = GblType_instanceRefCount(GBL_BOX_TYPE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblType_instanceRefCount(GBL_BOX_TYPE), pSelf_->startGlobalRefCount);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 typedef struct TestClosure_ {
@@ -43,14 +43,14 @@ typedef struct TestClosure_ {
 
 static GBL_RESULT testClosureDestruct_(const GblArrayMap* pMap, uintptr_t key, void* pClosure) {
     GBL_UNUSED(pMap, key);
-    GBL_API_BEGIN(NULL);
+    GBL_CTX_BEGIN(NULL);
     TestClosure_* pSelf = (TestClosure_*)GBL_CLOSURE(pClosure);
     ++pSelf->pTestSuite->testClosureDtorCount;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT testClosureMarshal_(GblClosure* pClosure, GblVariant* pRetValue, GblSize argCount, GblVariant* pArgs, GblPtr pMarshalData) {
-    GBL_API_BEGIN(NULL);
+    GBL_CTX_BEGIN(NULL);
     TestClosure_* pSelf = (TestClosure_*)pClosure;
     pSelf->pTestSuite->pTestClosureMarshalData = pMarshalData.pData;
     pSelf->pTestSuite->testClosureMarshalArgCount = argCount;
@@ -60,21 +60,21 @@ static GBL_RESULT testClosureMarshal_(GblClosure* pClosure, GblVariant* pRetValu
         pSelf->pTestSuite->testClosureMarshalArgTypes[a] = GblVariant_typeOf(&pArgs[a]);
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT testClosureMetaMarshal_(GblClosure* pClosure, GblVariant* pRetValue, GblSize argCount, GblVariant* pArgs, GblPtr pMarshalData) {
     GBL_UNUSED(pMarshalData);
-    GBL_API_BEGIN(NULL);
+    GBL_CTX_BEGIN(NULL);
 
     GblPtr ptr = { .pData = (void*)0xdeadbeef };
 
-    GBL_API_VERIFY_CALL(GBL_PRIV_REF(pClosure).pFnMarshal(pClosure, pRetValue, argCount, pArgs, ptr));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(GBL_PRIV_REF(pClosure).pFnMarshal(pClosure, pRetValue, argCount, pArgs, ptr));
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_closureCreate_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
     pSelf_->pTestClosure = (TestClosure_*)GBL_CLOSURE(GblClosure_create(GBL_CLOSURE_TYPE,
                                                                         sizeof(TestClosure_),
@@ -85,20 +85,20 @@ static GBL_RESULT GblClosureTestSuite_closureCreate_(GblTestSuite* pSelf, GblCon
     GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(&pSelf_->pTestClosure->base)), 1);
     GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(&pSelf_->pTestClosure->base)), (void*)0xdeadbeef);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_closureSetMarshal_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
     GblClosure_setMarshal(&pSelf_->pTestClosure->base, testClosureMarshal_);
     GBL_TEST_COMPARE(GBL_PRIV(pSelf_->pTestClosure->base).pFnMarshal, testClosureMarshal_);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_closureInvokeMarshal_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
     GblVariant ret;
@@ -109,7 +109,7 @@ static GBL_RESULT GblClosureTestSuite_closureInvokeMarshal_(GblTestSuite* pSelf,
     GblVariant_constructInt32(&args[1], 17);
 
 
-    GBL_API_VERIFY_CALL(GblClosure_invoke(&pSelf_->pTestClosure->base,
+    GBL_CTX_VERIFY_CALL(GblClosure_invoke(&pSelf_->pTestClosure->base,
                                           &ret,
                                           2,
                                           args));
@@ -124,21 +124,21 @@ static GBL_RESULT GblClosureTestSuite_closureInvokeMarshal_(GblTestSuite* pSelf,
     GblVariant_destruct(&args[0]);
     GblVariant_destruct(&args[1]);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_closureSetMetaMarshal_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
     GblClosure_setMetaMarshal(&pSelf_->pTestClosure->base, testClosureMetaMarshal_);
     GBL_TEST_VERIFY(GblClosure_hasMetaMarshal(&pSelf_->pTestClosure->base));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_closureInvokeMetaMarshal_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
     GblVariant ret;
@@ -150,7 +150,7 @@ static GBL_RESULT GblClosureTestSuite_closureInvokeMetaMarshal_(GblTestSuite* pS
     GblVariant_constructPointer(&args[2], GBL_POINTER_TYPE, (void*)0xdeadcafe);
 
 
-    GBL_API_VERIFY_CALL(GblClosure_invoke(&pSelf_->pTestClosure->base,
+    GBL_CTX_VERIFY_CALL(GblClosure_invoke(&pSelf_->pTestClosure->base,
                                           &ret,
                                           3,
                                           args));
@@ -167,20 +167,20 @@ static GBL_RESULT GblClosureTestSuite_closureInvokeMetaMarshal_(GblTestSuite* pS
     GblVariant_destruct(&args[1]);
     GblVariant_destruct(&args[2]);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_closureRef_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GBL_BOX_REF(&pSelf_->pTestClosure->base), pSelf_->pTestClosure);
     GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(&pSelf_->pTestClosure->base)), 2);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 static GBL_RESULT GblClosureTestSuite_closureUnref_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GBL_BOX_UNREF(&pSelf_->pTestClosure->base), 1);
@@ -189,7 +189,7 @@ static GBL_RESULT GblClosureTestSuite_closureUnref_(GblTestSuite* pSelf, GblCont
     GBL_TEST_COMPARE(GBL_BOX_UNREF(&pSelf_->pTestClosure->base), 0);
     GBL_TEST_COMPARE(pSelf_->testClosureDtorCount, 1);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static void cClosureFunction_(void* pPointer, const char* pString) {
@@ -208,7 +208,7 @@ static GBL_RESULT cClosureMarshal_(GblClosure* pClosure, GblVariant* pRetValue, 
 }
 
 static GBL_RESULT GblClosureTestSuite_cClosure_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
     GblCClosure* pCClosure = GblCClosure_create(cClosureFunction_, NULL);
@@ -228,11 +228,11 @@ static GBL_RESULT GblClosureTestSuite_cClosure_(GblTestSuite* pSelf, GblContext*
 
     GBL_TEST_COMPARE(pSelf_->pCClosureArg, "Dragon Quest");
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_classClosure_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
     struct BullshitClass {
@@ -258,7 +258,7 @@ static GBL_RESULT GblClosureTestSuite_classClosure_(GblTestSuite* pSelf, GblCont
     GblVariant_constructPointer(&args[0], GBL_POINTER_TYPE, pSelf_);
     GblVariant_constructPointer(&args[1], GBL_POINTER_TYPE, "Phantasy Star");
 
-    GBL_API_VERIFY_CALL(GblClosure_invoke(pClosure, NULL, 2, args));
+    GBL_CTX_VERIFY_CALL(GblClosure_invoke(pClosure, NULL, 2, args));
 
     GblVariant_destruct(&args[0]);
     GblVariant_destruct(&args[1]);
@@ -268,14 +268,14 @@ static GBL_RESULT GblClosureTestSuite_classClosure_(GblTestSuite* pSelf, GblCont
 
     GBL_TEST_COMPARE(pSelf_->pCClosureArg, "Phantasy Star");
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_captureNone_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_COMPARE(GblClosure_current(), NULL);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static void cClosureCaptureFunction_(void* pPointer, const char* pString) {
@@ -286,7 +286,7 @@ static void cClosureCaptureFunction_(void* pPointer, const char* pString) {
 }
 
 static GBL_RESULT GblClosureTestSuite_capture_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GblClosure_current(), NULL);
@@ -309,7 +309,7 @@ static GBL_RESULT GblClosureTestSuite_capture_(GblTestSuite* pSelf, GblContext* 
 
     GBL_TEST_COMPARE(pSelf_->pCClosureUserdata, (void*)0xdeadbabe);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static void cClosureCaptureClosureFunction_(GblClosureTestSuite_* pSelf_, const char* pString) {
@@ -317,7 +317,7 @@ static void cClosureCaptureClosureFunction_(GblClosureTestSuite_* pSelf_, const 
     GblClosure* pThisClosure = GblClosure_current();
     GblClosure* pInnerClosure = GBL_CLOSURE(GblBox_userdata(GBL_BOX(pThisClosure)));
 
-    GBL_API_BEGIN(NULL);
+    GBL_CTX_BEGIN(NULL);
 
     GblVariant args[2];
     GblVariant_constructPointer(&args[0], GBL_POINTER_TYPE, pSelf_);
@@ -329,12 +329,12 @@ static void cClosureCaptureClosureFunction_(GblClosureTestSuite_* pSelf_, const 
     GblVariant_destruct(&args[0]);
     GblVariant_destruct(&args[1]);
 
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
 }
 
 
 static GBL_RESULT GblClosureTestSuite_captureCapture_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
 
 
@@ -361,7 +361,7 @@ static GBL_RESULT GblClosureTestSuite_captureCapture_(GblTestSuite* pSelf, GblCo
 
     GBL_TEST_COMPARE(pSelf_->pCClosureUserdata, (void*)0xdeadbeef);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
@@ -391,14 +391,14 @@ GBL_EXPORT GblType GblClosureTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("ClosureTestSuite"),
                                      &vTable,
                                      sizeof(GblClosureTestSuite),
                                      sizeof(GblClosureTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
     return type;
 }

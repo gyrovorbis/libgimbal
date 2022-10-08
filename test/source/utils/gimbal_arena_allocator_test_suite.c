@@ -13,31 +13,31 @@ typedef struct GblArenaAllocatorTestSuite_ {
 } GblArenaAllocatorTestSuite_;
 
 static GBL_RESULT GblArenaAllocatorTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblArenaAllocatorTestSuite_));
 
     pSelf_->page.capacity    = 128;
     pSelf_->page.staticAlloc = GBL_TRUE;
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArenaAllocatorTestSuite_construct_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
-    GBL_API_VERIFY_CALL(GblArenaAllocator_construct(&pSelf_->arena, 128, 1, &pSelf_->page, pCtx));
+    GBL_CTX_VERIFY_CALL(GblArenaAllocator_construct(&pSelf_->arena, 128, 1, &pSelf_->page, pCtx));
 
     GBL_TEST_COMPARE(GblArenaAllocator_pageCount(&pSelf_->arena), 1);
     GBL_TEST_COMPARE(GblArenaAllocator_bytesUsed(&pSelf_->arena), 0);
     GBL_TEST_COMPARE(GblArenaAllocator_totalCapacity(&pSelf_->arena), 128);
     GBL_TEST_COMPARE(GblArenaAllocator_utilization(&pSelf_->arena), 0.0f);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArenaAllocatorTestSuite_alloc_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
     char* pStr = GblArenaAllocator_alloc(&pSelf_->arena, 12);
     GBL_TEST_VERIFY(pStr);
@@ -49,11 +49,11 @@ static GBL_RESULT GblArenaAllocatorTestSuite_alloc_(GblTestSuite* pSelf, GblCont
     GBL_TEST_COMPARE(GblArenaAllocator_totalCapacity(&pSelf_->arena), 128);
     GBL_TEST_VERIFY(GblArenaAllocator_utilization(&pSelf_->arena) >= 12.0f / 128.0f);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArenaAllocatorTestSuite_allocNewPage_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
 
     GblSize bytesAvail = GblArenaAllocator_bytesAvailable(&pSelf_->arena);
@@ -68,35 +68,35 @@ static GBL_RESULT GblArenaAllocatorTestSuite_allocNewPage_(GblTestSuite* pSelf, 
     GBL_TEST_COMPARE(GblArenaAllocator_totalCapacity(&pSelf_->arena), 256);
     GBL_TEST_VERIFY(GblArenaAllocator_fragmentedBytes(&pSelf_->arena) == bytesAvail);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArenaAllocatorTestSuite_allocAligned_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
 
     void* pPtr = GblArenaAllocator_allocAligned(&pSelf_->arena, 56, 64);
     GBL_TEST_VERIFY(!((uintptr_t)pPtr & 0x3f));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArenaAllocatorTestSuite_allocFail_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
 
     GBL_TEST_EXPECT_ERROR();
 
     void* pPtr = GblArenaAllocator_allocAligned(&pSelf_->arena, 256, 64);
     GBL_TEST_VERIFY(!pPtr);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OVERFLOW);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OVERFLOW);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArenaAllocatorTestSuite_saveLoadState_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
 
     char* pTestString = GblArenaAllocator_allocAligned(&pSelf_->arena, 20, 1);
@@ -111,36 +111,36 @@ static GBL_RESULT GblArenaAllocatorTestSuite_saveLoadState_(GblTestSuite* pSelf,
     for(GblSize i = 0; i < 5; ++i)
         GblArenaAllocator_alloc(&pSelf_->arena, 100);
 
-    GBL_API_VERIFY_CALL(GblArenaAllocator_loadState(&pSelf_->arena, &state));
+    GBL_CTX_VERIFY_CALL(GblArenaAllocator_loadState(&pSelf_->arena, &state));
 
     GBL_TEST_COMPARE(pTestString, "Restoration Point");
     GBL_TEST_COMPARE(GblArenaAllocator_bytesUsed(&pSelf_->arena), bytesUsed);
     GBL_TEST_COMPARE(GblArenaAllocator_pageCount(&pSelf_->arena), pageCount);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArenaAllocatorTestSuite_freeAll_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblArenaAllocator_freeAll(&pSelf_->arena));
+    GBL_CTX_VERIFY_CALL(GblArenaAllocator_freeAll(&pSelf_->arena));
 
     GBL_TEST_COMPARE(GblArenaAllocator_pageCount(&pSelf_->arena), 1);
     GBL_TEST_COMPARE(GblArenaAllocator_bytesUsed(&pSelf_->arena), 0);
     GBL_TEST_COMPARE(GblArenaAllocator_totalCapacity(&pSelf_->arena), 128);
     GBL_TEST_COMPARE(GblArenaAllocator_utilization(&pSelf_->arena), 0.0f);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblArenaAllocatorTestSuite_destruct_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblArenaAllocator_destruct(&pSelf_->arena));
+    GBL_CTX_VERIFY_CALL(GblArenaAllocator_destruct(&pSelf_->arena));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblType GblArenaAllocatorTestSuite_type(void) {
@@ -164,14 +164,14 @@ GBL_EXPORT GblType GblArenaAllocatorTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("GblArenaAllocatorTestSuite"),
                                      &vTable,
                                      sizeof(GblArenaAllocatorTestSuite),
                                      sizeof(GblArenaAllocatorTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
 
     return type;

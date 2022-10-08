@@ -47,7 +47,7 @@ static GblBool foreach_(const GblHashSet* pSet, void* pEntry, void* pUd) {
 }
 
 static GBL_RESULT verify_(const GblHashSet* pSet, GblSize entryCount, const HashSetEntry_* pEntries, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_COMPARE(GblHashSet_size(pSet), entryCount);
     if(!entryCount) GBL_TEST_VERIFY(GblHashSet_empty(pSet));
@@ -63,7 +63,7 @@ static GBL_RESULT verify_(const GblHashSet* pSet, GblSize entryCount, const Hash
     // at
     for(GblSize e = 0; e < entryCount; ++e) {
         HashSetEntry_* pEntry = GblHashSet_at(pSet, &pEntries[e]);
-        GBL_API_VERIFY_LAST_RECORD();
+        GBL_CTX_VERIFY_LAST_RECORD();
         GBL_TEST_VERIFY(pEntry);
         GBL_TEST_COMPARE(pEntry->pKey, pEntries[e].pKey);
         GBL_TEST_COMPARE(pEntry->value, pEntries[e].value);
@@ -111,27 +111,27 @@ static GBL_RESULT verify_(const GblHashSet* pSet, GblSize entryCount, const Hash
         GBL_TEST_VERIFY(!GblHashSet_foreach(pSet, foreach_, (void*)&pEntries[e]));
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblHashSetTestSuite_));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
-    GBL_API_END();
+    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_construct_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblHashSet_construct(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(GblHashSet_construct(&pSelf_->hashSet,
                                              sizeof(HashSetEntry_),
                                              hasher_,
                                              comparator_,
@@ -142,60 +142,60 @@ static GBL_RESULT GblHashSetTestSuite_construct_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(GblHashSet_context(&pSelf_->hashSet), pCtx);
     GBL_TEST_COMPARE(GblHashSet_userdata(&pSelf_->hashSet), pSelf_);
     GBL_TEST_VERIFY(GblHashSet_empty(&pSelf_->hashSet));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblHashSetTestSuite_getInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     const char* pKey = "Entry1";
 
     void* pEntry = GblHashSet_get(&pSelf_->hashSet, &pKey);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(pEntry, NULL);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_atInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     const char* pKey = "Entry1";
 
     GBL_TEST_EXPECT_ERROR();
     void* pEntry = GblHashSet_at(&pSelf_->hashSet, &pKey);
     GBL_TEST_COMPARE(pEntry, NULL);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_containsInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     const char* pKey = "Entry1";
 
     GBL_TEST_COMPARE(GblHashSet_contains(&pSelf_->hashSet, &pKey), GBL_FALSE);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_findInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     const char* pKey = "Entry1";
 
     GblHashSetIter it = GblHashSet_find(&pSelf_->hashSet, &pKey);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_VERIFY(!GblHashSetIter_valid(&it));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_setInsert_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     HashSetEntry_ entry = {
         .pKey = "Entry1",
@@ -203,19 +203,19 @@ static GBL_RESULT GblHashSetTestSuite_setInsert_(GblTestSuite* pSelf, GblContext
     };
 
     GBL_TEST_COMPARE(GblHashSet_set(&pSelf_->hashSet, &entry), NULL);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 1,
                                 &entry,
                                 pCtx));
 
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_setOverride_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     HashSetEntry_ entry = {
         .pKey = "Entry1",
@@ -225,19 +225,19 @@ static GBL_RESULT GblHashSetTestSuite_setOverride_(GblTestSuite* pSelf, GblConte
     HashSetEntry_* pEntry = GblHashSet_set(&pSelf_->hashSet, &entry);
     GBL_TEST_VERIFY(pEntry);
     GBL_TEST_COMPARE(pEntry->value, 2);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 1,
                                 &entry,
                                 pCtx));
 
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_insertInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     HashSetEntry_ entry = {
         .pKey = "Entry1",
@@ -246,17 +246,17 @@ static GBL_RESULT GblHashSetTestSuite_insertInvalid_(GblTestSuite* pSelf, GblCon
 
     GBL_TEST_VERIFY(!GblHashSet_insert(&pSelf_->hashSet, &entry));
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 1,
                                 &entry,
                                 pCtx));
 
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_insert_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     HashSetEntry_ entries[] = {
         {
@@ -270,16 +270,16 @@ static GBL_RESULT GblHashSetTestSuite_insert_(GblTestSuite* pSelf, GblContext* p
 
     GBL_TEST_VERIFY(GblHashSet_insert(&pSelf_->hashSet, &entries[1]));
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 2,
                                 entries,
                                 pCtx));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_insertOrAssignInsert_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     HashSetEntry_ entries[] = {
         {
@@ -296,16 +296,16 @@ static GBL_RESULT GblHashSetTestSuite_insertOrAssignInsert_(GblTestSuite* pSelf,
 
     GblHashSet_insertOrAssign(&pSelf_->hashSet, &entries[2]);
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 3,
                                 entries,
                                 pCtx));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_insertOrAssignAssign_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
 
     HashSetEntry_ entries[] = {
@@ -323,7 +323,7 @@ static GBL_RESULT GblHashSetTestSuite_insertOrAssignAssign_(GblTestSuite* pSelf,
 
     GblHashSet_insertOrAssign(&pSelf_->hashSet, &entries[2]);
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 3,
                                 entries,
                                 pCtx));
@@ -331,11 +331,11 @@ static GBL_RESULT GblHashSetTestSuite_insertOrAssignAssign_(GblTestSuite* pSelf,
     GBL_TEST_COMPARE(pSelf_->dtorCount, 1);
     GBL_TEST_COMPARE(pSelf_->pDtorLastKey, "Entry3");
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_emplaceOverExisting_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
 
 
@@ -356,17 +356,17 @@ static GBL_RESULT GblHashSetTestSuite_emplaceOverExisting_(GblTestSuite* pSelf, 
     HashSetEntry_* pEntry = GblHashSet_emplace(&pSelf_->hashSet, &pKey);
     pEntry->value = 0;
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 3,
                                 entries,
                                 pCtx));
 
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_emplaceInsert_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
 
     HashSetEntry_ entries[] = {
@@ -393,16 +393,16 @@ static GBL_RESULT GblHashSetTestSuite_emplaceInsert_(GblTestSuite* pSelf, GblCon
     //pEntry->pKey = pKey;
     pEntry->value = 4;
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 4,
                                 entries,
                                 pCtx));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_tryEmplaceInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     HashSetEntry_ entries[] = {
         {
@@ -424,17 +424,17 @@ static GBL_RESULT GblHashSetTestSuite_tryEmplaceInvalid_(GblTestSuite* pSelf, Gb
     HashSetEntry_* pEntry = GblHashSet_tryEmplace(&pSelf_->hashSet, &pKey);
     GBL_TEST_COMPARE(pEntry, NULL);
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 4,
                                 entries,
                                 pCtx));
 
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_tryEmplace_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     HashSetEntry_ entries[] = {
         {
@@ -462,15 +462,15 @@ static GBL_RESULT GblHashSetTestSuite_tryEmplace_(GblTestSuite* pSelf, GblContex
 //    pEntry->pKey = "Entry0";
     pEntry->value = 0;
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 5,
                                 entries,
                                 pCtx));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_eraseInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     HashSetEntry_ entries[] = {
         {
@@ -494,15 +494,15 @@ static GBL_RESULT GblHashSetTestSuite_eraseInvalid_(GblTestSuite* pSelf, GblCont
 
     GBL_TEST_VERIFY(!GblHashSet_erase(&pSelf_->hashSet, &pKey));
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 5,
                                 entries,
                                 pCtx));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_erase_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
 
     HashSetEntry_ entries[] = {
@@ -524,18 +524,18 @@ static GBL_RESULT GblHashSetTestSuite_erase_(GblTestSuite* pSelf, GblContext* pC
 
     GBL_TEST_VERIFY(GblHashSet_erase(&pSelf_->hashSet, &pKey));
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 4,
                                 entries,
                                 pCtx));
 
     GBL_TEST_COMPARE(pSelf_->pDtorLastKey, "Entry1");
     GBL_TEST_COMPARE(pSelf_->dtorCount, 2);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_extractInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
 
     HashSetEntry_ entries[] = {
@@ -557,15 +557,15 @@ static GBL_RESULT GblHashSetTestSuite_extractInvalid_(GblTestSuite* pSelf, GblCo
 
     GBL_TEST_COMPARE(GblHashSet_extract(&pSelf_->hashSet, &pKey), NULL);
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 4,
                                 entries,
                                 pCtx));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_extract_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
     HashSetEntry_ entries[] = {
         {
@@ -586,34 +586,34 @@ static GBL_RESULT GblHashSetTestSuite_extract_(GblTestSuite* pSelf, GblContext* 
     GBL_TEST_COMPARE(pEntry->pKey, "Entry0");
     GBL_TEST_COMPARE(pEntry->value, 0);
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 3,
                                 entries,
                                 pCtx));
 
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_clear_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
 
     GblHashSet_clear(&pSelf_->hashSet);
 
-    GBL_API_VERIFY_CALL(verify_(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(verify_(&pSelf_->hashSet,
                                 0,
                                 NULL,
                                 pCtx));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblHashSetTestSuite_destruct_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
-    GBL_API_VERIFY_CALL(GblHashSet_destruct(&pSelf_->hashSet));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(GblHashSet_destruct(&pSelf_->hashSet));
+    GBL_CTX_END();
 }
 
 static GblHash collidingHasher_(const GblHashSet* pSelf, const void* pEntry) {
@@ -622,12 +622,12 @@ static GblHash collidingHasher_(const GblHashSet* pSelf, const void* pEntry) {
 }
 
 static GBL_RESULT GblHashSetTestSuite_collidingConstruct_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblHashSetTestSuite_* pSelf_ = GBL_HASH_SET_TEST_SUITE_(pSelf);
 
     pSelf_->dtorCount = 0;
 
-    GBL_API_VERIFY_CALL(GblHashSet_construct(&pSelf_->hashSet,
+    GBL_CTX_VERIFY_CALL(GblHashSet_construct(&pSelf_->hashSet,
                                              sizeof(HashSetEntry_),
                                              collidingHasher_,
                                              comparator_,
@@ -639,7 +639,7 @@ static GBL_RESULT GblHashSetTestSuite_collidingConstruct_(GblTestSuite* pSelf, G
     GBL_TEST_COMPARE(GblHashSet_context(&pSelf_->hashSet), pCtx);
     GBL_TEST_COMPARE(GblHashSet_userdata(&pSelf_->hashSet), pSelf_);
     GBL_TEST_VERIFY(GblHashSet_empty(&pSelf_->hashSet));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblType GblHashSetTestSuite_type(void) {
@@ -689,14 +689,14 @@ GBL_EXPORT GblType GblHashSetTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("GblHashSetTestSuite"),
                                      &vTable,
                                      sizeof(GblHashSetTestSuite),
                                      sizeof(GblHashSetTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
     return type;
 }

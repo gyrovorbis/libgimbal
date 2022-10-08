@@ -200,17 +200,17 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
     GBL_INLINE GBL_RESULT object##_registerProperty_(GblEnum id,                        \
                                                      GblProperty** ppProp) GBL_NOEXCEPT \
     {                                                                                   \
-        GBL_API_BEGIN(NULL);                                                            \
+        GBL_CTX_BEGIN(NULL);                                                            \
         GblProperty* pProp = ppProp? *ppProp : GBL_NULL;                                \
         switch(id) {                                                                    \
             GBL_TUPLE_FOREACH(GBL_PROPERTY_REGISTER_, object, (__VA_ARGS__))            \
-            default: GBL_API_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_INVALID_PROPERTY);      \
+            default: GBL_CTX_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_INVALID_PROPERTY);      \
         }                                                                               \
         if(pProp) {                                                                     \
-            GBL_API_CALL(GblProperty_install(object##_type(), pProp));                  \
+            GBL_CTX_CALL(GblProperty_install(object##_type(), pProp));                  \
             if(ppProp) *ppProp = pProp;                                                 \
         }                                                                               \
-        GBL_API_END();                                                                  \
+        GBL_CTX_END();                                                                  \
     }
 
 #define GBL_PROPERTY_REGISTER_(object, property) \
@@ -221,7 +221,7 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
 
 #define GBL_PROPERTY_REGISTER___(object, name, type, ...)              \
     case object##_Property_Id_##name:                                  \
-        GBL_API_VERIFY_CALL(GblProperty_createOrConstruct_(&pProp,     \
+        GBL_CTX_VERIFY_CALL(GblProperty_createOrConstruct_(&pProp,     \
                 type##_PROPERTY_TYPE,                                  \
                 GblQuark_internStringStatic(GBL_STRINGIFY(name)),      \
                 id,                                                    \

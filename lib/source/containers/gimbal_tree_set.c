@@ -4,60 +4,60 @@
 // license that can be found in the LICENSE file.
 
 #include <gimbal/containers/gimbal_tree_set.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 
 #define GBL_TREE_SET_SPARE_COUNT_(p)         (sizeof(p->pSpares) / sizeof(void*))
 #define GBL_TREE_SET_MIN_COUNT_(max)         (max * 40/100)
 
 
 static GBL_RESULT grow_group_(GblTreeSet* pSelf, GblTreeSetGroup* pGroup) {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
 
     const GblSize capacity = pGroup->capacity ? pGroup->capacity*2 : 1;
-    GblTreeSetNode** ppNodes = GBL_API_MALLOC(sizeof(GblTreeSetNode*)*capacity);
+    GblTreeSetNode** ppNodes = GBL_CTX_MALLOC(sizeof(GblTreeSetNode*)*capacity);
 
     memcpy(ppNodes, pGroup->ppNodes, pGroup->length*sizeof(GblTreeSetNode*));
-    GBL_API_FREE(pGroup->ppNodes);
+    GBL_CTX_FREE(pGroup->ppNodes);
     pGroup->ppNodes = ppNodes;
     pGroup->capacity = capacity;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT takeaway_(GblTreeSet* pSelf, GblTreeSetNode* pNode) {
     const GblSize MAXLEN = 32;
     GblTreeSetGroup* pGroup = NULL;
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
     if(pNode->leaf) {
         pGroup = &pSelf->pool.leaves;
     } else {
         pGroup = &pSelf->pool.branches;
     }
     if(pGroup->length == MAXLEN) {
-        GBL_API_FREE(pNode);
+        GBL_CTX_FREE(pNode);
     } else {
         if (pGroup->length == pGroup->capacity) {
-            GBL_API_CALL(grow_group_(pSelf, pGroup));
+            GBL_CTX_CALL(grow_group_(pSelf, pGroup));
         }
         pGroup->ppNodes[pGroup->length++] = pNode;
     }
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GblTreeSetNode *node_new_(GblTreeSet* pSelf, GblBool leaf) {
     GblTreeSetNode* pNode = NULL;
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
     GblSize size = sizeof(GblTreeSetNode);
     if (!leaf) {
         size += sizeof(GblTreeSetNode*) * pSelf->maxCount;
     }
     GblSize entryOffset = size;
     size += pSelf->entrySize * (pSelf->maxCount-1);
-    pNode = GBL_API_MALLOC(size);
+    pNode = GBL_CTX_MALLOC(size);
     pNode->leaf = leaf;
     pNode->entryCount = 0;
     pNode->pEntries = (uint8_t*)pNode + entryOffset;
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pNode;
 }
 
@@ -66,26 +66,26 @@ static GblTreeSetNode *node_new_(GblTreeSet* pSelf, GblBool leaf) {
 // rebalancing. There needs to be at least one available leaf and N branches
 // where N is equal to the height of the tree.
 static GBL_RESULT fill_pool_(GblTreeSet* pSelf) {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
     if(!pSelf->pool.leaves.length) {
         if(!pSelf->pool.leaves.capacity) {
-            GBL_API_CALL(grow_group_(pSelf, &pSelf->pool.leaves));
+            GBL_CTX_CALL(grow_group_(pSelf, &pSelf->pool.leaves));
         }
         GblTreeSetNode* pLeaf = node_new_(pSelf, GBL_TRUE);
         pSelf->pool.leaves.ppNodes[pSelf->pool.leaves.length++] = pLeaf;
     }
     while(pSelf->pool.branches.length < pSelf->height) {
         if (pSelf->pool.branches.length == pSelf->pool.branches.capacity) {
-            GBL_API_CALL(grow_group_(pSelf, &pSelf->pool.branches));
+            GBL_CTX_CALL(grow_group_(pSelf, &pSelf->pool.branches));
         }
         GblTreeSetNode* pBranch = node_new_(pSelf, GBL_FALSE);
         pSelf->pool.branches.ppNodes[pSelf->pool.branches.length++] = pBranch;
     }
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT node_free_(GblTreeSet* pSelf, GblTreeSetNode* pNode) {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
     if(!pNode->leaf) {
         for(uint16_t e = 0; e < pNode->entryCount; ++e) {
             node_free_(pSelf, pNode->pChildren[e]);
@@ -98,22 +98,22 @@ static GBL_RESULT node_free_(GblTreeSet* pSelf, GblTreeSetNode* pNode) {
             pSelf->pFnDestruct(pSelf, pEntry);
         }
     }
-    GBL_API_FREE(pNode);
-    GBL_API_END();
+    GBL_CTX_FREE(pNode);
+    GBL_CTX_END();
 }
 
 static GBL_RESULT release_pool_(GblTreeSet* pSelf) {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
     for (GblSize i = 0; i < pSelf->pool.leaves.length; ++i) {
-        GBL_API_FREE(pSelf->pool.leaves.ppNodes[i]);
+        GBL_CTX_FREE(pSelf->pool.leaves.ppNodes[i]);
     }
-    GBL_API_FREE(pSelf->pool.leaves.ppNodes);
+    GBL_CTX_FREE(pSelf->pool.leaves.ppNodes);
     for (GblSize i = 0; i < pSelf->pool.branches.length; ++i) {
-        GBL_API_FREE(pSelf->pool.branches.ppNodes[i]);
+        GBL_CTX_FREE(pSelf->pool.branches.ppNodes[i]);
     }
-    GBL_API_FREE(pSelf->pool.branches.ppNodes);
+    GBL_CTX_FREE(pSelf->pool.branches.ppNodes);
     memset(&pSelf->pool, 0, sizeof(GblTreeSetPool));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE void reset_load_fields_(GblTreeSet* pSelf) {
@@ -122,9 +122,9 @@ GBL_INLINE void reset_load_fields_(GblTreeSet* pSelf) {
 }
 
 GBL_INLINE GblTreeSetNode* gimme_node_(GblTreeSet* pSelf, GblTreeSetGroup* pGroup) {
-    GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY_EXPRESSION(pGroup->length != 0, "[GblTreeSet]: Out of nodes!");
-    GBL_API_END_BLOCK();
+    GBL_CTX_BEGIN(pSelf->pCtx);
+    GBL_CTX_VERIFY_EXPRESSION(pGroup->length != 0, "[GblTreeSet]: Out of nodes!");
+    GBL_CTX_END_BLOCK();
     return pGroup->ppNodes[--pGroup->length];
 }
 
@@ -321,11 +321,11 @@ GBL_INLINE GblBool node_set_(GblTreeSet* pSelf, GblTreeSetNode* pNode, const voi
 static void* btree_set_x_(GblTreeSet* pSelf, const void* pEntry, GblBool leanLeft, uint64_t *pHint)
 {
     void* pRetValue = NULL;
-    GBL_API_BEGIN(pSelf->pCtx); {
+    GBL_CTX_BEGIN(pSelf->pCtx); {
         reset_load_fields_(pSelf);
 
-        GBL_API_VERIFY_POINTER(pEntry);
-        GBL_API_CALL(fill_pool_(pSelf));
+        GBL_CTX_VERIFY_POINTER(pEntry);
+        GBL_CTX_CALL(fill_pool_(pSelf));
 
         if(!pSelf->pRoot) {
             pSelf->pRoot = gimme_leaf_(pSelf);
@@ -334,11 +334,11 @@ static void* btree_set_x_(GblTreeSet* pSelf, const void* pEntry, GblBool leanLef
             pSelf->count++;
             pSelf->height++;
             pRetValue = NULL;
-            GBL_API_DONE();
+            GBL_CTX_DONE();
         }
         if (node_set_(pSelf, pSelf->pRoot, pEntry, leanLeft, pHint, 0)) {
             pRetValue = pSelf->pSpares[0];
-            GBL_API_DONE();
+            GBL_CTX_DONE();
         }
         ++pSelf->count;
         if ((GblSize)pSelf->pRoot->entryCount == (pSelf->maxCount-1)) {
@@ -353,7 +353,7 @@ static void* btree_set_x_(GblTreeSet* pSelf, const void* pEntry, GblBool leanLef
             pSelf->pRoot->entryCount = 1;
             ++pSelf->height;
         }
-    } GBL_API_END_BLOCK();
+    } GBL_CTX_END_BLOCK();
     return pRetValue;
 }
 
@@ -387,7 +387,7 @@ GBL_EXPORT GBL_RESULT GblTreeSet_construct_7(GblTreeSet* pSelf,
                                GblContext*               pCtx,
                                void*                     pUserdata) GBL_NOEXCEPT
 {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     if (maxEntries == 0) {
         maxEntries = 256;
@@ -396,13 +396,13 @@ GBL_EXPORT GBL_RESULT GblTreeSet_construct_7(GblTreeSet* pSelf,
         if (maxEntries < 4)      maxEntries = 4;
         if (maxEntries > 4096)   maxEntries = 4096;
     }
-    GBL_API_VERIFY_ARG(entrySize != 0);
-    GBL_API_VERIFY_POINTER(pFnCompare);
+    GBL_CTX_VERIFY_ARG(entrySize != 0);
+    GBL_CTX_VERIFY_POINTER(pFnCompare);
     memset(pSelf, 0, sizeof(GblTreeSet));
 
     const int spareCount = GBL_TREE_SET_SPARE_COUNT_(pSelf);
     for(int s = 0; s < spareCount; ++s) {
-        pSelf->pSpares[s] = GBL_API_MALLOC(entrySize);
+        pSelf->pSpares[s] = GBL_CTX_MALLOC(entrySize);
     }
 
    pSelf->pCtx          = pCtx;
@@ -413,7 +413,7 @@ GBL_EXPORT GBL_RESULT GblTreeSet_construct_7(GblTreeSet* pSelf,
    pSelf->entrySize     = entrySize;
    pSelf->pUserdata     = pUserdata;
 
-   GBL_API_END();
+   GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblTreeSet_construct_6(GblTreeSet* pSelf,
@@ -471,28 +471,28 @@ GBL_EXPORT GBL_RESULT GblTreeSet_construct_3(GblTreeSet* pSelf,
 
 
 GBL_EXPORT void GblTreeSet_clear(GblTreeSet* pSelf) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
     if(pSelf->pRoot) {
-        GBL_API_CALL(node_free_(pSelf, pSelf->pRoot));
+        GBL_CTX_CALL(node_free_(pSelf, pSelf->pRoot));
     }
-    GBL_API_CALL(release_pool_(pSelf));
+    GBL_CTX_CALL(release_pool_(pSelf));
     pSelf->pRoot = NULL;
     pSelf->count = 0;
     reset_load_fields_(pSelf);
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
 }
 
 GBL_EXPORT GBL_RESULT GblTreeSet_destruct(GblTreeSet* pSelf) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pSelf->pCtx);
-    //GBL_API_FREE(pSelf->pRoot);
+    GBL_CTX_BEGIN(pSelf->pCtx);
+    //GBL_CTX_FREE(pSelf->pRoot);
 
     GblTreeSet_clear(pSelf);
 
     const int spareCount = GBL_TREE_SET_SPARE_COUNT_(pSelf);
     for (int s = 0; s < spareCount; ++s) {
-        GBL_API_FREE(pSelf->pSpares[s]);
+        GBL_CTX_FREE(pSelf->pSpares[s]);
     }
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT void* GblTreeSet_set(GblTreeSet* pSelf, const void* pEntry) GBL_NOEXCEPT {
@@ -501,10 +501,10 @@ GBL_EXPORT void* GblTreeSet_set(GblTreeSet* pSelf, const void* pEntry) GBL_NOEXC
 
 GBL_EXPORT void* GblTreeSet_setHint(GblTreeSet* pSelf, const void* pEntry, uint64_t* pHint) GBL_NOEXCEPT {
     void* pExisting = NULL;
-    GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY_POINTER(pEntry);
+    GBL_CTX_BEGIN(pSelf->pCtx);
+    GBL_CTX_VERIFY_POINTER(pEntry);
     pExisting = btree_set_x_(pSelf, pEntry, GBL_FALSE, pHint);
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pExisting;
 }
 
@@ -514,10 +514,10 @@ GBL_EXPORT void* GblTreeSet_get(const GblTreeSet* pSelf, const void* pKey) GBL_N
 
 GBL_EXPORT void* GblTreeSet_getHint(const GblTreeSet* pSelf, const void* pKey, uint64_t* pHint) GBL_NOEXCEPT {
     void* pEntry = NULL;
-    GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY_POINTER(pKey);
+    GBL_CTX_BEGIN(pSelf->pCtx);
+    GBL_CTX_VERIFY_POINTER(pKey);
     pEntry = btree_get_hint_(pSelf, pKey, pHint);
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pEntry;
 }
 
@@ -527,12 +527,12 @@ GBL_EXPORT void* GblTreeSet_at(const GblTreeSet* pSelf, const void* pKey) GBL_NO
 
 GBL_EXPORT void* GblTreeSet_atHint(const GblTreeSet* pSelf, const void* pKey, uint64_t* pHint) GBL_NOEXCEPT {
     void* pEntry = NULL;
-    GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY_POINTER(pKey);
+    GBL_CTX_BEGIN(pSelf->pCtx);
+    GBL_CTX_VERIFY_POINTER(pKey);
     pEntry = GblTreeSet_getHint(pSelf, pKey, pHint);
-    GBL_API_VERIFY(pEntry,
+    GBL_CTX_VERIFY(pEntry,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pEntry;
 }
 
@@ -687,23 +687,23 @@ static void* delete_x_(GblTreeSet* pSelf, enum delact act, GblSize index,
 
 GBL_EXPORT void* GblTreeSet_extract(GblTreeSet* pSelf,  const void* pKey) GBL_NOEXCEPT {
     void* pEntry = NULL;
-    GBL_API_BEGIN(pSelf->pCtx);
-    GBL_API_VERIFY_POINTER(pKey);
+    GBL_CTX_BEGIN(pSelf->pCtx);
+    GBL_CTX_VERIFY_POINTER(pKey);
     pEntry = delete_x_(pSelf, DELKEY, 0, pKey, NULL);
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pEntry;
 }
 
 GBL_EXPORT GblBool GblTreeSet_erase(GblTreeSet* pSelf, const void* pKey) GBL_NOEXCEPT {
     void*   pEntry = NULL;
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
     pEntry = GblTreeSet_extract(pSelf, pKey);
     if(pEntry) {
         if(pSelf->pFnDestruct) {
             pSelf->pFnDestruct(pSelf, pEntry);
         }
     }
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pEntry != NULL;
 }
 

@@ -21,14 +21,14 @@ GBL_EXPORT GBL_RESULT GblBoolProperty_construct(GblBoolProperty* pSelf,
                                                 GblFlags    flags,
                                                 GblBool     defaultValue)
 {
-    GBL_API_BEGIN(NULL);
-    GBL_API_VERIFY_CALL(GblProperty_construct(GBL_PROPERTY(pSelf),
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblProperty_construct(GBL_PROPERTY(pSelf),
                                               GBL_BOOL_PROPERTY_TYPE,
                                               ownerType,
                                               pName,
                                               flags));
     pSelf->defaultValue = defaultValue;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblType GblBoolProperty_type(void) GBL_NOEXCEPT {

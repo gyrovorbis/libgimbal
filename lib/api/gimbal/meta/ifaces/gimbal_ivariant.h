@@ -57,7 +57,7 @@ typedef struct GblIVariantClassVTable {
     GBL_RESULT (*pFnSet)      (VARIANT, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
     GBL_RESULT (*pFnGet)      (VARIANT, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
     GBL_RESULT (*pFnDestruct) (VARIANT);
-    GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, GblInt* pResult);
+    GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, int* pResult);
     GBL_RESULT (*pFnSave)     (CVARIANT, GblStringBuffer* pString);
     GBL_RESULT (*pFnLoad)     (VARIANT,  const GblStringBuffer* pString);
 } GblIVariantClassVTable;
@@ -86,7 +86,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_destruct           (GBL_CSELF, VARIANT)  
 GBL_EXPORT GBL_RESULT GblIVariantClass_compare            (GBL_CSELF,
                                                            CVARIANT,
                                                            const GblVariant* pOther,
-                                                           GblInt* pCmpResult)                            GBL_NOEXCEPT;
+                                                           int* pCmpResult)                            GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblIVariantClass_save               (GBL_CSELF, CVARIANT, GblStringBuffer* pString) GBL_NOEXCEPT;
 

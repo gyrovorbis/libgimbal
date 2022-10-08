@@ -21,8 +21,6 @@ GBL_DECLS_BEGIN
 
 typedef GBL_BOOL    GblBool;
 typedef GBL_SIZE    GblSize;
-typedef int32_t     GblInt;
-typedef uint32_t    GblUint;
 typedef GBL_ENUM    GblEnum;
 typedef GBL_FLAGS   GblFlags;
 typedef GBL_HASH    GblHash;

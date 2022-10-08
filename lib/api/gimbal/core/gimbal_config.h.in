@@ -106,16 +106,16 @@ extern "C" {
 #   define GBL_SOURCE_COLUMN                    0
 #endif
 
-#ifndef GBL_API_FRAME_NAME
-#   define GBL_API_FRAME_NAME                   gblApiFrame_
+#ifndef GBL_CTX_FRAME_NAME
+#   define GBL_CTX_FRAME_NAME                   gblApiFrame_
 #endif
 
-#ifndef GBL_API_END_LABEL
-#   define GBL_API_END_LABEL                    gbl_api_end_
+#ifndef GBL_CTX_END_LABEL
+#   define GBL_CTX_END_LABEL                    gbl_api_end_
 #endif
 
-#ifndef GBL_API_ONCE_NAME
-#   define GBL_API_ONCE_NAME                    gblApiOnce_
+#ifndef GBL_CTX_ONCE_NAME
+#   define GBL_CTX_ONCE_NAME                    gblApiOnce_
 #endif
 
 #ifndef GBL_VA_SNPRINTF_BUFFER_SIZE
@@ -126,8 +126,8 @@ extern "C" {
 #   define GBL_STRING_BUFFER_STACK_SIZE         64
 #endif
 
-#ifndef GBL_API_RESULT_MSG_BUFFER_SIZE
-#   define GBL_API_RESULT_MSG_BUFFER_SIZE       128
+#ifndef GBL_CTX_RESULT_MSG_BUFFER_SIZE
+#   define GBL_CTX_RESULT_MSG_BUFFER_SIZE       128
 #endif
 
 #ifndef GBL_ARRAY_LIST_STACK_BUFFER_DEFAULT_SIZE

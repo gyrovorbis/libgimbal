@@ -1,6 +1,6 @@
 #include "containers/gimbal_ring_buffer_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/containers/gimbal_ring_buffer.h>
 
 #define GBL_RING_BUFFER_TEST_SUITE_(inst)     ((GblRingBufferTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_RING_BUFFER_TEST_SUITE_TYPE))
@@ -15,16 +15,16 @@ static const char* stringLiterals_[] = {
 };
 
 static GBL_RESULT GblRingBufferTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblRingBufferTestSuite_));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_verify_(GblContext* pCtx, const GblRingBuffer* pBuffer, ...) {
     va_list varArgs;
     va_start(varArgs, pBuffer);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSize count = 0;
     const char* pStr = NULL;
@@ -56,179 +56,179 @@ static GBL_RESULT GblRingBufferTestSuite_verify_(GblContext* pCtx, const GblRing
     GBL_TEST_COMPARE(GblRingBuffer_full(pBuffer),
                      (GblRingBuffer_size(pBuffer) == GblRingBuffer_capacity(pBuffer)? GBL_TRUE : GBL_FALSE));
 
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     va_end(varArgs);
-    return GBL_API_RESULT();
+    return GBL_CTX_RESULT();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_constructEmpty_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_construct(&pSelf_->ringBuffer[0],
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_construct(&pSelf_->ringBuffer[0],
                                                 sizeof(const char*),
                                                 10));
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[0], NULL));
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[0], NULL));
 
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_constructValues_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_construct(&pSelf_->ringBuffer[1],
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_construct(&pSelf_->ringBuffer[1],
                                                 sizeof(const char*),
                                                 10,
                                                 3,
                                                 stringLiterals_,
                                                 pCtx));
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[1], "a", "b", "c", NULL));
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[1], "a", "b", "c", NULL));
     GBL_TEST_COMPARE(GblRingBuffer_context(&pSelf_->ringBuffer[1]), pCtx);
     GBL_TEST_COMPARE(GblRingBuffer_capacity(&pSelf_->ringBuffer[1]), 10);
     GBL_TEST_COMPARE(GblRingBuffer_elementSize(&pSelf_->ringBuffer[1]), sizeof(const char*));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_copy_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_construct(&pSelf_->ringBuffer[2],
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_construct(&pSelf_->ringBuffer[2],
                                                 sizeof(GblTestSuite),
                                                 4,
                                                 0,
                                                 NULL,
                                                 pCtx));
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_copy(&pSelf_->ringBuffer[2],
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_copy(&pSelf_->ringBuffer[2],
                                            &pSelf_->ringBuffer[1]));
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[2], "a", "b", "c", NULL));
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[2], "a", "b", "c", NULL));
     GBL_TEST_COMPARE(GblRingBuffer_context(&pSelf_->ringBuffer[2]), pCtx);
     GBL_TEST_COMPARE(GblRingBuffer_capacity(&pSelf_->ringBuffer[2]), 10);
     GBL_TEST_COMPARE(GblRingBuffer_elementSize(&pSelf_->ringBuffer[2]), sizeof(const char*));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_move_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_construct(&pSelf_->ringBuffer[3],
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_construct(&pSelf_->ringBuffer[3],
                                                 sizeof(GblContext*),
                                                 4,
                                                 0,
                                                 NULL,
                                                 pCtx));
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_move(&pSelf_->ringBuffer[3],
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_move(&pSelf_->ringBuffer[3],
                                            &pSelf_->ringBuffer[2]));
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[2], NULL));
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[2], NULL));
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[3], "a", "b", "c", NULL));
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx, &pSelf_->ringBuffer[3], "a", "b", "c", NULL));
     GBL_TEST_COMPARE(GblRingBuffer_context(&pSelf_->ringBuffer[3]), pCtx);
     GBL_TEST_COMPARE(GblRingBuffer_capacity(&pSelf_->ringBuffer[3]), 10);
     GBL_TEST_COMPARE(GblRingBuffer_elementSize(&pSelf_->ringBuffer[3]), sizeof(const char*));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_atInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
     GBL_TEST_EXPECT_ERROR();
 
     const void* pData = GblRingBuffer_at(&pSelf_->ringBuffer[0], 0);
     GBL_TEST_VERIFY(!pData);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     pData = GblRingBuffer_at(&pSelf_->ringBuffer[1], 10);
     GBL_TEST_VERIFY(!pData);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblRingBufferTestSuite_frontInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
     GBL_TEST_EXPECT_ERROR();
 
     const void* pData = GblRingBuffer_front(&pSelf_->ringBuffer[0]);
     GBL_TEST_VERIFY(!pData);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_backInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
     GBL_TEST_EXPECT_ERROR();
 
     const void* pData = GblRingBuffer_back(&pSelf_->ringBuffer[0]);
     GBL_TEST_VERIFY(!pData);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_pushBack_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
     for(GblSize o = 3; o <= 9; ++o)
-        GBL_API_VERIFY_CALL(GblRingBuffer_pushBack(&pSelf_->ringBuffer[1], &stringLiterals_[o]));
+        GBL_CTX_VERIFY_CALL(GblRingBuffer_pushBack(&pSelf_->ringBuffer[1], &stringLiterals_[o]));
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
                                                        &pSelf_->ringBuffer[1],
                                                        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblRingBufferTestSuite_pushBackOverflow_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_pushBack(&pSelf_->ringBuffer[1], &stringLiterals_[10]));
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_pushBack(&pSelf_->ringBuffer[1], &stringLiterals_[10]));
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
                                                        &pSelf_->ringBuffer[1],
                                                        "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", NULL));
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_pushBack(&pSelf_->ringBuffer[1], &stringLiterals_[11]));
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_pushBack(&pSelf_->ringBuffer[1], &stringLiterals_[11]));
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
                                                        &pSelf_->ringBuffer[1],
                                                        "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_emplaceBack_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
     for(GblSize o = 0; o < 5; ++o) {
@@ -237,14 +237,14 @@ static GBL_RESULT GblRingBufferTestSuite_emplaceBack_(GblTestSuite* pSelf, GblCo
         *ppData = stringLiterals_[o];
     }
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
                                                        &pSelf_->ringBuffer[0],
                                                        "a", "b", "c", "d", "e", NULL));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_emplaceBackOverflow_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
     for(GblSize o = 5; o < 12; ++o) {
@@ -253,15 +253,15 @@ static GBL_RESULT GblRingBufferTestSuite_emplaceBackOverflow_(GblTestSuite* pSel
         *ppData = stringLiterals_[o];
     }
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
                                                        &pSelf_->ringBuffer[0],
                                                        "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_popFront_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
     for(GblSize o = 0; o < 5; ++o) {
@@ -270,7 +270,7 @@ static GBL_RESULT GblRingBufferTestSuite_popFront_(GblTestSuite* pSelf, GblConte
         GBL_TEST_COMPARE(*ppData, stringLiterals_[o+2]);
     }
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
                                                        &pSelf_->ringBuffer[0],
                                                        "h", "i", "j", "k", "l", NULL));
 
@@ -280,48 +280,48 @@ static GBL_RESULT GblRingBufferTestSuite_popFront_(GblTestSuite* pSelf, GblConte
         GBL_TEST_COMPARE(*ppData, stringLiterals_[o+7]);
     }
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
                                                        &pSelf_->ringBuffer[0],
                                                        NULL));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_popFrontInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
     GBL_TEST_EXPECT_ERROR();
 
     GBL_TEST_COMPARE(GblRingBuffer_popFront(&pSelf_->ringBuffer[0]), NULL);
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_clear_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
     GblRingBuffer_clear(&pSelf_->ringBuffer[1]);
 
-    GBL_API_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
+    GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
                                                        &pSelf_->ringBuffer[1],
                                                        NULL));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblRingBufferTestSuite_destruct_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblRingBuffer_destruct(&pSelf_->ringBuffer[0]));
-    GBL_API_VERIFY_CALL(GblRingBuffer_destruct(&pSelf_->ringBuffer[1]));
-    GBL_API_VERIFY_CALL(GblRingBuffer_destruct(&pSelf_->ringBuffer[2]));
-    GBL_API_VERIFY_CALL(GblRingBuffer_destruct(&pSelf_->ringBuffer[3]));
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_destruct(&pSelf_->ringBuffer[0]));
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_destruct(&pSelf_->ringBuffer[1]));
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_destruct(&pSelf_->ringBuffer[2]));
+    GBL_CTX_VERIFY_CALL(GblRingBuffer_destruct(&pSelf_->ringBuffer[3]));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblType GblRingBufferTestSuite_type(void) {
@@ -352,14 +352,14 @@ GBL_EXPORT GblType GblRingBufferTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("GblRingBufferTestSuite"),
                                      &vTable,
                                      sizeof(GblRingBufferTestSuite),
                                      sizeof(GblRingBufferTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
 
     return type;

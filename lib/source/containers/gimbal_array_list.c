@@ -30,9 +30,9 @@ static GBL_RESULT GblArrayList_alloc_(GblArrayList* pSelf, GblSize size) GBL_NOE
             allocSize = gblPow2Next(GBL_ALIGNOF(GBL_MAX_ALIGN_T));
         }
         GBL_PRIV_REF(pSelf).capacity = allocSize / GBL_PRIV_REF(pSelf).elementSize;
-        GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-        GBL_PRIV_REF(pSelf).pData = GBL_API_MALLOC(allocSize);
-        GBL_API_END_BLOCK();
+        GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+        GBL_PRIV_REF(pSelf).pData = GBL_CTX_MALLOC(allocSize);
+        GBL_CTX_END_BLOCK();
     }
 
     if(GBL_PRIV_REF(pSelf).pData && GBL_PRIV_REF(pSelf).zeroTerminated)
@@ -43,27 +43,27 @@ static GBL_RESULT GblArrayList_alloc_(GblArrayList* pSelf, GblSize size) GBL_NOE
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_destruct(GblArrayList* pSelf) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+    GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
    // Check if we have a buffer to free
    if(GBL_PRIV_REF(pSelf).pData && GBL_PRIV_REF(pSelf).pData != GblArrayList_stackBuffer(pSelf)) {
-       GBL_API_FREE(GBL_PRIV_REF(pSelf).pData);
+       GBL_CTX_FREE(GBL_PRIV_REF(pSelf).pData);
        GBL_PRIV_REF(pSelf).pData = (uint8_t*)GblArrayList_stackBuffer(pSelf);
    }
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_clear(GblArrayList* pSelf) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-    GBL_API_CALL(GblArrayList_destruct(pSelf));
+    GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+    GBL_CTX_CALL(GblArrayList_destruct(pSelf));
     GblArrayList_initialize_(pSelf);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_assign(GblArrayList* pSelf, const void* pData, GblSize elementCount) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+    GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
     if(GBL_PRIV_REF(pSelf).capacity < elementCount + (GBL_PRIV_REF(pSelf).zeroTerminated? 1 : 0)) {
-        GBL_API_CALL(GblArrayList_clear(pSelf));
-        if(elementCount) GBL_API_CALL(GblArrayList_alloc_(pSelf, elementCount));
+        GBL_CTX_CALL(GblArrayList_clear(pSelf));
+        if(elementCount) GBL_CTX_CALL(GblArrayList_alloc_(pSelf, elementCount));
     }
     if(elementCount) {
         if(pData) memcpy(GBL_PRIV_REF(pSelf).pData, pData, elementCount * GBL_PRIV_REF(pSelf).elementSize);
@@ -73,48 +73,48 @@ GBL_EXPORT GBL_RESULT GblArrayList_assign(GblArrayList* pSelf, const void* pData
     if(GBL_PRIV_REF(pSelf).pData && GBL_PRIV_REF(pSelf).zeroTerminated)
         GBL_UNLIKELY memset(&GBL_PRIV_REF(pSelf).pData[GBL_PRIV_REF(pSelf).size * GBL_PRIV_REF(pSelf).elementSize], 0, GBL_PRIV_REF(pSelf).elementSize);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_construct_7(GblArrayList* pSelf, uint16_t elementSize, GblSize elementCount, const void* pInitialData, GblSize structSize, GblBool zeroTerminated, GblContext* pCtx) GBL_NOEXCEPT {
-    GBL_API_BEGIN(pCtx);
-    GBL_API_VERIFY_POINTER(pSelf);
-    GBL_API_VERIFY_ARG(structSize >= sizeof(GblArrayList));
-    GBL_API_VERIFY_ARG(elementSize);
+    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_VERIFY_POINTER(pSelf);
+    GBL_CTX_VERIFY_ARG(structSize >= sizeof(GblArrayList));
+    GBL_CTX_VERIFY_ARG(elementSize);
     GBL_PRIV_REF(pSelf).pCtx           = pCtx;
     GBL_PRIV_REF(pSelf).stackCapacity  = (structSize - sizeof(GblArrayList)) / elementSize;
     GBL_PRIV_REF(pSelf).elementSize    = elementSize;
     GBL_PRIV_REF(pSelf).zeroTerminated = zeroTerminated;
     GblArrayList_initialize_(pSelf);
-    GBL_API_CALL(GblArrayList_assign(pSelf, pInitialData, elementCount));
-    GBL_API_END();
+    GBL_CTX_CALL(GblArrayList_assign(pSelf, pInitialData, elementCount));
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_release(GblArrayList* pSelf, void** ppVecPtr, GblSize* pSize, GblSize* pCapacity) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+    GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
     GblBool stack = GBL_FALSE;
-    GBL_API_VERIFY_POINTER(ppVecPtr);
-    GBL_API_VERIFY_POINTER(pCapacity);
-    GBL_API_VERIFY_POINTER(pSize);
+    GBL_CTX_VERIFY_POINTER(ppVecPtr);
+    GBL_CTX_VERIFY_POINTER(pCapacity);
+    GBL_CTX_VERIFY_POINTER(pSize);
     stack = GblArrayList_stack(pSelf);
-    GBL_API_VERIFY(!stack, GBL_RESULT_ERROR_INVALID_OPERATION, "Cannot Take Stack Buffer!");
+    GBL_CTX_VERIFY(!stack, GBL_RESULT_ERROR_INVALID_OPERATION, "Cannot Take Stack Buffer!");
     *ppVecPtr = GBL_PRIV_REF(pSelf).pData;
     *pCapacity = GBL_PRIV_REF(pSelf).capacity;
     *pSize = GBL_PRIV_REF(pSelf).size;
     GblArrayList_initialize_(pSelf);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_acquire(GblArrayList* pSelf, void* pData, GblSize size, GblSize capacity) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-    GBL_API_VERIFY_POINTER(pData);
-    GBL_API_VERIFY_ARG(capacity);
-    GBL_API_VERIFY_ARG(size);
-    GBL_API_CALL(GblArrayList_destruct(pSelf));
+    GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+    GBL_CTX_VERIFY_POINTER(pData);
+    GBL_CTX_VERIFY_ARG(capacity);
+    GBL_CTX_VERIFY_ARG(size);
+    GBL_CTX_CALL(GblArrayList_destruct(pSelf));
     GBL_PRIV_REF(pSelf).pData = (uint8_t*)pData;
     GBL_PRIV_REF(pSelf).capacity = capacity;
     GBL_PRIV_REF(pSelf).size = size;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_reserve(GblArrayList* pSelf, GblSize capacity) GBL_NOEXCEPT {
@@ -131,10 +131,10 @@ GBL_EXPORT GBL_RESULT GblArrayList_reserve(GblArrayList* pSelf, GblSize capacity
             memcpy(GBL_PRIV_REF(pSelf).pData, GblArrayList_stackBuffer(pSelf), oldSize * GBL_PRIV_REF(pSelf).elementSize);
             GBL_PRIV_REF(pSelf).size = oldSize;
         } else {
-            GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-            GBL_PRIV_REF(pSelf).pData = GBL_API_REALLOC(GBL_PRIV_REF(pSelf).pData,
+            GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+            GBL_PRIV_REF(pSelf).pData = GBL_CTX_REALLOC(GBL_PRIV_REF(pSelf).pData,
                                            (capacity + (GBL_PRIV_REF(pSelf).zeroTerminated? 1 : 0)) * GBL_PRIV_REF(pSelf).elementSize);
-            GBL_API_END_BLOCK();
+            GBL_CTX_END_BLOCK();
             GBL_PRIV_REF(pSelf).capacity = capacity;
         }
         if(GBL_PRIV_REF(pSelf).zeroTerminated) GBL_UNLIKELY
@@ -148,8 +148,8 @@ GBL_EXPORT GBL_RESULT GblArrayList_resize(GblArrayList* pSelf, GblSize size) GBL
     GBL_RESULT result = GBL_RESULT_SUCCESS;
 
     if(!pSelf) GBL_UNLIKELY {
-        GBL_API_BEGIN(NULL);
-        GBL_API_END();
+        GBL_CTX_BEGIN(NULL);
+        GBL_CTX_END();
     } else GBL_LIKELY {
 
         if(size > GBL_PRIV_REF(pSelf).size) GBL_UNLIKELY {
@@ -174,15 +174,15 @@ GBL_EXPORT GBL_RESULT GblArrayList_shrinkToFit(GblArrayList* pSelf) GBL_NOEXCEPT
         const GblSize fitSize = GBL_PRIV_REF(pSelf).size + ((GBL_PRIV_REF(pSelf).zeroTerminated)? 1 : 0);
         const GblSize bytes = fitSize * GBL_PRIV_REF(pSelf).elementSize;
 
-        GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+        GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
         if(fitSize <= GBL_PRIV_REF(pSelf).stackCapacity) {
             memcpy(GblArrayList_stackBuffer(pSelf), GBL_PRIV_REF(pSelf).pData, bytes);
-            GBL_API_FREE(GBL_PRIV_REF(pSelf).pData);
+            GBL_CTX_FREE(GBL_PRIV_REF(pSelf).pData);
             GBL_PRIV_REF(pSelf).pData = GblArrayList_stackBuffer(pSelf);
         } else {
-            GBL_PRIV_REF(pSelf).pData = GBL_API_REALLOC(GBL_PRIV_REF(pSelf).pData, bytes);
+            GBL_PRIV_REF(pSelf).pData = GBL_CTX_REALLOC(GBL_PRIV_REF(pSelf).pData, bytes);
         }
-        GBL_API_END_BLOCK();
+        GBL_CTX_END_BLOCK();
         GBL_PRIV_REF(pSelf).capacity = GBL_PRIV_REF(pSelf).size;
     }
     return result;
@@ -194,11 +194,11 @@ GBL_EXPORT void* GblArrayList_insert(GblArrayList* pSelf, GblSize index, GblSize
     void* pDataOut = NULL;
 
     if(!pSelf || !count || index > GBL_PRIV_REF(pSelf).size) GBL_UNLIKELY {
-        GBL_API_BEGIN(pSelf? (GblObject*)GBL_PRIV_REF(pSelf).pCtx : NULL);
-        GBL_API_VERIFY_ARG(count);
-        GBL_API_VERIFY(index <= GBL_PRIV_REF(pSelf).size,
+        GBL_CTX_BEGIN(pSelf? (GblObject*)GBL_PRIV_REF(pSelf).pCtx : NULL);
+        GBL_CTX_VERIFY_ARG(count);
+        GBL_CTX_VERIFY(index <= GBL_PRIV_REF(pSelf).size,
                        GBL_RESULT_ERROR_OUT_OF_RANGE);
-        GBL_API_END_BLOCK();
+        GBL_CTX_END_BLOCK();
 
     } else GBL_LIKELY {
         slideSize = GBL_PRIV_REF(pSelf).size - index;
@@ -224,33 +224,33 @@ GBL_EXPORT GBL_RESULT GblArrayList_erase(GblArrayList* pSelf, GblSize begin, Gbl
     GblSize lastIndex = 0;
     GblSize remainderCount  = 0;
 
-    GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-    GBL_API_VERIFY(GBL_PRIV_REF(pSelf).size > 0, GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_VERIFY(begin < GBL_PRIV_REF(pSelf).size, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+    GBL_CTX_VERIFY(GBL_PRIV_REF(pSelf).size > 0, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_VERIFY(begin < GBL_PRIV_REF(pSelf).size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     lastIndex = begin + count - 1;
-    GBL_API_VERIFY(lastIndex < GBL_PRIV_REF(pSelf).size, GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_VERIFY(begin <= lastIndex, GBL_RESULT_ERROR_OUT_OF_RANGE);
-    if(!count) GBL_API_DONE();
-    GBL_API_VERIFY(count > 0 && count <= GBL_PRIV_REF(pSelf).size, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_VERIFY(lastIndex < GBL_PRIV_REF(pSelf).size, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_VERIFY(begin <= lastIndex, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    if(!count) GBL_CTX_DONE();
+    GBL_CTX_VERIFY(count > 0 && count <= GBL_PRIV_REF(pSelf).size, GBL_RESULT_ERROR_OUT_OF_RANGE);
     remainderCount = GBL_PRIV_REF(pSelf).size - 1 - lastIndex;
     if(remainderCount) memmove(&GBL_PRIV_REF(pSelf).pData[begin * GBL_PRIV_REF(pSelf).elementSize],
                                &GBL_PRIV_REF(pSelf).pData[(lastIndex+1) * GBL_PRIV_REF(pSelf).elementSize],
                                remainderCount * GBL_PRIV_REF(pSelf).elementSize);
-    GBL_API_CALL(GblArrayList_resize(pSelf, GBL_PRIV_REF(pSelf).size - count));
-    GBL_API_END();
+    GBL_CTX_CALL(GblArrayList_resize(pSelf, GBL_PRIV_REF(pSelf).size - count));
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_popFront(GblArrayList* pSelf, void* pOut) {
-    GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+    GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
     if(pOut) memcpy(pOut, GblArrayList_at(pSelf, 0), GblArrayList_elementSize(pSelf));
-    GBL_API_VERIFY_CALL(GblArrayList_erase(pSelf, 0, 1));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(GblArrayList_erase(pSelf, 0, 1));
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArrayList_popBack(GblArrayList* pSelf, void* pOut) {
-    GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+    GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
     const GblSize index = GblArrayList_size(pSelf)-1;
     if(pOut) memcpy(pOut, GblArrayList_at(pSelf, index), GblArrayList_elementSize(pSelf));
-    GBL_API_VERIFY_CALL(GblArrayList_erase(pSelf, index, 1));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(GblArrayList_erase(pSelf, index, 1));
+    GBL_CTX_END();
 }

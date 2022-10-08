@@ -1,6 +1,6 @@
 #include <gimbal/core/gimbal_ext.h>
 #include <gimbal/meta/instances/gimbal_context.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 
 #define GBL_EXT_FN_DEFINE_(extName, contextName, ...) \
     GBL_EXPORT GBL_RESULT gblExt##extName (GBL_MAP_LIST(GBL_DECL_VAR_PAIR, __VA_ARGS__)) { \

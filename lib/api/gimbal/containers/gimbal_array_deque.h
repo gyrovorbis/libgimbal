@@ -185,9 +185,9 @@ GBL_INLINE void* GblArrayDeque_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
     void* pData = GBL_NULL;
 
     if(index >= GBL_RING_PRIV_REF_(pSelf).size) GBL_UNLIKELY {
-        GBL_API_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
-        GBL_API_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
-        GBL_API_END_BLOCK();
+        GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
+        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_CTX_END_BLOCK();
     } else GBL_LIKELY {
         const GblSize slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
                                 % GBL_RING_PRIV_REF_(pSelf).capacity;

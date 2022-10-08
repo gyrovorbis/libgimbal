@@ -6,7 +6,7 @@
 #ifndef GIMBAL_ARRAY_LIST_H
 #define GIMBAL_ARRAY_LIST_H
 
-#include "../core/gimbal_api_frame.h"
+#include "../core/gimbal_ctx.h"
 #include "../algorithms/gimbal_numeric.h"
 
 #define GBL_SELF_TYPE GblArrayList
@@ -195,10 +195,10 @@ GBL_INLINE void* GblArrayList_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
 
     if(!pSelf || index >= GBL_PRIV_REF(pSelf).size) GBL_UNLIKELY {
 
-        GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-        GBL_API_VERIFY(GBL_FALSE,
+        GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+        GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_OUT_OF_RANGE);
-        GBL_API_END_BLOCK();
+        GBL_CTX_END_BLOCK();
 
     } else GBL_LIKELY {
         pData = &GBL_PRIV_REF(pSelf).pData[index * GBL_PRIV_REF(pSelf).elementSize];
@@ -256,10 +256,10 @@ GBL_INLINE GblArrayList* GblArrayList_createInPlace(GBL_SELF,
                                                     GblContext* pCtx) GBL_NOEXCEPT
 {
     GblArrayList* pOut = NULL;
-    GBL_API_BEGIN(pCtx);
-    GBL_API_VERIFY_CALL(GblArrayList_construct_7(pSelf, elementSize, elementCount, pInitialData, structSize, zeroTerminated, pCtx));
+    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_VERIFY_CALL(GblArrayList_construct_7(pSelf, elementSize, elementCount, pInitialData, structSize, zeroTerminated, pCtx));
     pOut = pSelf;
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pOut;
 }
 

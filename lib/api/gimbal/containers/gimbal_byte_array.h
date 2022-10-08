@@ -15,6 +15,7 @@ GBL_DECLS_BEGIN
 
 /*! \brief Reference-counted resizable array of bytes
  *  \ingroup containers
+ *  \sa GblBitView
  */
 typedef struct GblByteArray {
     GblSize             size;
@@ -34,7 +35,7 @@ GBL_EXPORT GblRefCount      GblByteArray_unref      (GBL_SELF)                  
 
 GBL_INLINE GBL_RESULT       GblByteArray_copy       (GBL_SELF, const GblByteArray* pOther)                           GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblByteArray_move       (GBL_SELF, GblByteArray* pOther)                                 GBL_NOEXCEPT;
-GBL_EXPORT GblInt           GblByteArray_compare    (GBL_CSELF, const GblByteArray* pRhs)                            GBL_NOEXCEPT;
+GBL_EXPORT int              GblByteArray_compare    (GBL_CSELF, const GblByteArray* pRhs)                            GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblByteArray_equals     (GBL_CSELF, const GblByteArray* pRhs)                            GBL_NOEXCEPT;
 
 GBL_INLINE GblRefCount      GblByteArray_refCount   (GBL_CSELF)                                                      GBL_NOEXCEPT;
@@ -108,32 +109,32 @@ GBL_INLINE void* GblByteArray_data(GBL_CSELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_set(GBL_SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY_POINTER(pSelf);
-    GBL_API_CALL(GblByteArray_resize(pSelf, bytes));
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY_POINTER(pSelf);
+    GBL_CTX_CALL(GblByteArray_resize(pSelf, bytes));
     if(bytes && pData) memcpy(GblByteArray_data(pSelf), pData, bytes);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_copy(GBL_SELF, const GblByteArray* pOther) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY_POINTER(pSelf);
-    GBL_API_VERIFY_POINTER(pOther);
-    GBL_API_CALL(GblByteArray_set(pSelf, GblByteArray_size(pOther), GblByteArray_data(pOther)));
-    GBL_API_END();
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY_POINTER(pSelf);
+    GBL_CTX_VERIFY_POINTER(pOther);
+    GBL_CTX_CALL(GblByteArray_set(pSelf, GblByteArray_size(pOther), GblByteArray_data(pOther)));
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_move(GBL_SELF, GblByteArray* pOther) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY_POINTER(pSelf);
-    GBL_API_VERIFY_POINTER(pOther);
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY_POINTER(pSelf);
+    GBL_CTX_VERIFY_POINTER(pOther);
 
-    GBL_API_CALL(GblByteArray_clear(pSelf));
+    GBL_CTX_CALL(GblByteArray_clear(pSelf));
     pSelf->size     = pOther->size;
     pSelf->pData    = pOther->pData;
     pOther->size    = 0;
     pOther->pData   = NULL;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE GblBool GblByteArray_equals(GBL_CSELF, const GblByteArray* pRhs) GBL_NOEXCEPT {
@@ -141,83 +142,83 @@ GBL_INLINE GblBool GblByteArray_equals(GBL_CSELF, const GblByteArray* pRhs) GBL_
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_clear(GBL_SELF) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY_POINTER(pSelf);
-    if(pSelf->pData) GBL_API_FREE(pSelf->pData);
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY_POINTER(pSelf);
+    if(pSelf->pData) GBL_CTX_FREE(pSelf->pData);
     pSelf->pData = NULL;
     pSelf->size = 0;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 GBL_INLINE GBL_RESULT GblByteArray_acquire(GBL_SELF, GblSize bytes, void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY_ARG(bytes > 0);
-    GBL_API_VERIFY_POINTER(pData);
-    GBL_API_CALL(GblByteArray_clear(pSelf));
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY_ARG(bytes > 0);
+    GBL_CTX_VERIFY_POINTER(pData);
+    GBL_CTX_CALL(GblByteArray_clear(pSelf));
     pSelf->size = bytes;
     pSelf->pData = (uint8_t*)pData;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_release(GBL_SELF, GblSize* pSize, void** ppData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY_POINTER(pSize);
-    GBL_API_VERIFY_POINTER(ppData);
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY_POINTER(pSize);
+    GBL_CTX_VERIFY_POINTER(ppData);
     *pSize  = pSelf->size;
     *ppData = pSelf->pData;
     pSelf->size = 0;
     pSelf->pData = NULL;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_grow(GBL_SELF, GblSize bytes) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
     GblByteArray_resize(pSelf, GblByteArray_size(pSelf) + bytes);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_shrink(GBL_SELF, GblSize bytes) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_CALL(GblByteArray_resize(pSelf, GblByteArray_size(pSelf) - bytes));
-    GBL_API_END();
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_CALL(GblByteArray_resize(pSelf, GblByteArray_size(pSelf) - bytes));
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_append(GBL_SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY_POINTER(pSelf);
-    GBL_API_VERIFY_ARG(bytes > 0);
-    GBL_API_VERIFY_POINTER(pData);
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY_POINTER(pSelf);
+    GBL_CTX_VERIFY_ARG(bytes > 0);
+    GBL_CTX_VERIFY_POINTER(pData);
     {
         GblSize oldSize = GblByteArray_size(pSelf);
-        GBL_API_CALL(GblByteArray_grow(pSelf, bytes));
+        GBL_CTX_CALL(GblByteArray_grow(pSelf, bytes));
         memcpy((uint8_t*)pSelf->pData + oldSize, pData, bytes);
     }
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_prepend(GBL_SELF, GblSize bytes, const void* pData) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
     GblByteArray_insert(pSelf, 0, bytes, pData);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_read(GBL_CSELF, GblSize offset, GblSize bytes, void* pDataOut) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY(offset < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_VERIFY(offset + bytes <= pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_VERIFY_POINTER(pDataOut);
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY(offset < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_VERIFY(offset + bytes <= pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_VERIFY_POINTER(pDataOut);
     memcpy(pDataOut, (char*)pSelf->pData + offset, bytes);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblByteArray_write(GBL_SELF, GblSize offset, GblSize bytes, const void* pDataIn) GBL_NOEXCEPT {
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY(offset < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_VERIFY(offset + bytes <= pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_VERIFY_POINTER(pDataIn);
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY(offset < pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_VERIFY(offset + bytes <= pSelf->size, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_VERIFY_POINTER(pDataIn);
     memcpy((char*)pSelf->pData + offset, pDataIn, bytes);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_INLINE GblStringView GblByteArray_stringView(GBL_CSELF) GBL_NOEXCEPT {
@@ -229,11 +230,11 @@ GBL_INLINE const char* GblByteArray_cString(GBL_CSELF) GBL_NOEXCEPT {
 }
 GBL_INLINE uint8_t GblByteArray_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
     uint8_t byte = 0;
-    GBL_API_BEGIN(GblByteArray_context(pSelf));
-    GBL_API_VERIFY(index < pSelf->size,
+    GBL_CTX_BEGIN(GblByteArray_context(pSelf));
+    GBL_CTX_VERIFY(index < pSelf->size,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
     byte = pSelf->pData[index];
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return byte;
 }
 

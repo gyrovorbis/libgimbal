@@ -15,85 +15,85 @@ static GblQuark prefixQuark_     = GBL_QUARK_INVALID;
 static GblQuark typeCountQuark_  = GBL_QUARK_INVALID;
 
 GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
-    GBL_API_BEGIN(pPlugin);
+    GBL_CTX_BEGIN(pPlugin);
     GblModule* pModule = GBL_MODULE(pPlugin);
     GblObject* pObject = GBL_OBJECT(pModule);
     GblBox_ref(GBL_BOX(pObject));
     const GblRefCount refCount = GblBox_refCount(GBL_BOX(pObject));
-    GBL_API_DEBUG("[GblModule: %s] Used: %u",
+    GBL_CTX_DEBUG("[GblModule: %s] Used: %u",
                   GblObject_name(GBL_OBJECT(pObject)),
                   refCount);
     if(refCount == 1) {
         GBL_INSTANCE_VCALL(GblModule, pFnLoad, pModule);
     }
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
-    GBL_API_BEGIN(pPlugin);
+    GBL_CTX_BEGIN(pPlugin);
     GblModule* pModule = GBL_MODULE(pPlugin);
     GblObject* pObject = GBL_OBJECT(pModule);
     GblBox_unref(GBL_BOX(pObject));
     const GblRefCount refCount = GblBox_refCount(GBL_BOX(pObject));
-    GBL_API_DEBUG("[GblModule: %s] Unused: %u",
+    GBL_CTX_DEBUG("[GblModule: %s] Unused: %u",
                   GblObject_name(GBL_OBJECT(pObject)),
                   refCount);
     if(refCount == 0) {
         GBL_INSTANCE_VCALL(GblModule, pFnUnload, pModule);
     }
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModule_IPlugin_typeInfo_(const GblIPlugin* pPlugin, GblType type, GblTypeInfo* pInfo) {
-    GBL_API_BEGIN(pPlugin);
-    GBL_API_END();
+    GBL_CTX_BEGIN(pPlugin);
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModule_property_(const GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
-    GBL_API_BEGIN(pObject);
-    GBL_API_END();
+    GBL_CTX_BEGIN(pObject);
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModule_setProperty_(GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
-    GBL_API_BEGIN(pObject);
-    GBL_API_END();
+    GBL_CTX_BEGIN(pObject);
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModule_destructor_(GblBox* pBox) {
-    GBL_API_BEGIN(pBox);
+    GBL_CTX_BEGIN(pBox);
     GblModule* pSelf = GBL_MODULE(pBox);
     GblStringRef_release(&pSelf->author);
     GblStringRef_release(&pSelf->prefix);
     GblStringRef_release(&pSelf->description);
 
     GblContextClass* pClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
-    GBL_API_VERIFY_CALL(pClass->base.base.pFnDestructor(pBox));
-    GBL_API_END();
+    GBL_CTX_VERIFY_CALL(pClass->base.base.pFnDestructor(pBox));
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModule_load_(GblModule* pModule) {
-    GBL_API_BEGIN(pModule);
-    GBL_API_WARN("[GblModule: %s] Load: UNIMPLEMENTED!");
-    GBL_API_END();
+    GBL_CTX_BEGIN(pModule);
+    GBL_CTX_WARN("[GblModule: %s] Load: UNIMPLEMENTED!");
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModule_unload_(GblModule* pModule) {
-    GBL_API_BEGIN(pModule);
-    GBL_API_WARN("[GblModule: %s] Unload: UNIMPLEMENTED!");
-    GBL_API_END();
+    GBL_CTX_BEGIN(pModule);
+    GBL_CTX_WARN("[GblModule: %s] Unload: UNIMPLEMENTED!");
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModule_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblModule* pSelf = GBL_MODULE(pInstance);
 
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
     GBL_UNUSED(pData);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblModuleClass* pSelf = GBL_MODULE_CLASS(pClass);
     pSelf->pFnLoad                         = GblModule_load_;
     pSelf->pFnUnload                       = GblModule_unload_;
@@ -115,7 +115,7 @@ GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext*
         GBL_PROPERTIES_REGISTER(GblModule);
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_RESULT GblModuleClass_final_(GblClass* pClass, const void* pData, GblContext* pCtx) {
@@ -146,7 +146,7 @@ GBL_EXPORT GblType GblModule_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
 
         iface.interfaceType = GBL_IPLUGIN_TYPE;
 
@@ -155,8 +155,8 @@ GBL_EXPORT GblType GblModule_type(void) {
                                       &info,
                                       GBL_TYPE_FLAG_ABSTRACT |
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
 
     return type;

@@ -58,9 +58,9 @@ static GblBool signalSetComparator_(const GblHashSet* pSet, const void* pEntry1,
 
 static void signalSetDestructor_(const GblHashSet* pSet, void* pEntry) {
     GBL_UNUSED(pSet);
-    GBL_API_BEGIN(GblHashSet_context(pSet));
-    GBL_API_FREE(*(Signal_**)pEntry);
-    GBL_API_END_BLOCK();
+    GBL_CTX_BEGIN(GblHashSet_context(pSet));
+    GBL_CTX_FREE(*(Signal_**)pEntry);
+    GBL_CTX_END_BLOCK();
 }
 
 GBL_EXPORT GBL_RESULT GblSignal_install(GblType        ownerType,
@@ -73,17 +73,17 @@ GBL_EXPORT GBL_RESULT GblSignal_install(GblType        ownerType,
     va_start(varArgs, argCount);
     Signal_* pSignal = NULL;
 
-    GBL_API_BEGIN(GblHashSet_context(&signalSet_));
-    GBL_API_PUSH_VERBOSE("[GblSignal] Installing signal: [%s::%s]",
+    GBL_CTX_BEGIN(GblHashSet_context(&signalSet_));
+    GBL_CTX_PUSH_VERBOSE("[GblSignal] Installing signal: [%s::%s]",
                          GblType_name(ownerType),
                          pName);
 
-    GBL_API_VERIFY_TYPE(ownerType);
-    GBL_API_VERIFY_POINTER(pName);
+    GBL_CTX_VERIFY_TYPE(ownerType);
+    GBL_CTX_VERIFY_POINTER(pName);
 
     const GblSize allocSize = sizeof(Signal_) + sizeof(GblType)*argCount;
 
-    pSignal = GBL_API_MALLOC(gblAlignedAllocSizeDefault(allocSize),
+    pSignal = GBL_CTX_MALLOC(gblAlignedAllocSizeDefault(allocSize),
                              GBL_ALIGNOF(GBL_MAX_ALIGN_T),
                              pName);
 
@@ -94,43 +94,43 @@ GBL_EXPORT GBL_RESULT GblSignal_install(GblType        ownerType,
 
     for(GblSize a = 0; a < argCount; ++a) {
         pSignal->argTypes[a] = va_arg(varArgs, GblType);
-        GBL_API_VERIFY_TYPE(pSignal->argTypes[a]);
+        GBL_CTX_VERIFY_TYPE(pSignal->argTypes[a]);
     }
 
     void* pExisting = GblHashSet_set(&signalSet_, &pSignal);
 
     if(pExisting) {
-        GBL_API_WARN("Overwrote existing signal!");
+        GBL_CTX_WARN("Overwrote existing signal!");
     }
 
 
-    GBL_API_POP(1);
-    GBL_API_END_BLOCK();
+    GBL_CTX_POP(1);
+    GBL_CTX_END_BLOCK();
 
-    if(!GBL_RESULT_SUCCESS(GBL_API_RESULT())) {
-        GBL_API_FREE(pSignal);
+    if(!GBL_RESULT_SUCCESS(GBL_CTX_RESULT())) {
+        GBL_CTX_FREE(pSignal);
     }
 
     va_end(varArgs);
-    return GBL_API_RESULT();
+    return GBL_CTX_RESULT();
 }
 
 GBL_EXPORT GBL_RESULT GblSignal_uninstall(GblType     ownerType,
                                           const char* pName)
 {
-    GBL_API_BEGIN(GblHashSet_context(&signalSet_));
-    GBL_API_PUSH_VERBOSE("[GblSignal] Uninstalling signal: [%s::%s]",
+    GBL_CTX_BEGIN(GblHashSet_context(&signalSet_));
+    GBL_CTX_PUSH_VERBOSE("[GblSignal] Uninstalling signal: [%s::%s]",
                          GblType_name(ownerType), pName);
 
     Signal_* pKey = GBL_ALLOCA(sizeof(Signal_));
     pKey->ownerType = ownerType;
     pKey->name      = GblQuark_fromString(pName);
 
-    GBL_API_VERIFY(GblHashSet_erase(&signalSet_, &pKey),
+    GBL_CTX_VERIFY(GblHashSet_erase(&signalSet_, &pKey),
                    GBL_RESULT_ERROR_INVALID_HANDLE);
 
-    GBL_API_POP(1);
-    GBL_API_END();
+    GBL_CTX_POP(1);
+    GBL_CTX_END();
 }
 
 static Signal_* Signal_findByQuark_(GblType     ownerType,
@@ -181,21 +181,21 @@ static GblBool instanceConnectionTableComparator_(const GblHashSet* pSet, const 
 }
 
 static void instanceConnectionTableDestructor_(const GblHashSet* pSet, void* pEntry) {
-    GBL_API_BEGIN(GblHashSet_context(pSet));
+    GBL_CTX_BEGIN(GblHashSet_context(pSet));
     InstanceConnectionTable_* pConnections = *(InstanceConnectionTable_**)pEntry;
 
 #ifndef NDEBUG
-    GBL_API_VERIFY_EXPRESSION(!GblDoublyLinkedList_count(&pConnections->receiverConnections));
+    GBL_CTX_VERIFY_EXPRESSION(!GblDoublyLinkedList_count(&pConnections->receiverConnections));
     for(GblSize s = 0; s < GblArrayMap_size(&pConnections->pEmitterHandlers); ++s) {
        EmitterHandler_* pHandler = (void*)GblArrayMap_probeValue(&pConnections->pEmitterHandlers,
                                                                 s);
-       GBL_API_VERIFY_EXPRESSION(!GblDoublyLinkedList_count(&pHandler->connectionList));
+       GBL_CTX_VERIFY_EXPRESSION(!GblDoublyLinkedList_count(&pHandler->connectionList));
 
     }
 #endif
     GblArrayMap_destroy(&pConnections->pEmitterHandlers);
-    GBL_API_FREE(pConnections);
-    GBL_API_END_BLOCK();
+    GBL_CTX_FREE(pConnections);
+    GBL_CTX_END_BLOCK();
 }
 
 static InstanceConnectionTable_* InstanceConnectionTable_find_(GblInstance* pInstance) {
@@ -208,20 +208,20 @@ static InstanceConnectionTable_* InstanceConnectionTable_find_(GblInstance* pIns
 
 static InstanceConnectionTable_* InstanceConnectionTable_create_(GblInstance* pInstance) {
     InstanceConnectionTable_* pTable = NULL;
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
-    GBL_API_VERIFY_POINTER(pInstance);
-    pTable = GBL_API_MALLOC(sizeof(InstanceConnectionTable_));
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_VERIFY_POINTER(pInstance);
+    pTable = GBL_CTX_MALLOC(sizeof(InstanceConnectionTable_));
 
     memset(pTable, 0, sizeof(InstanceConnectionTable_));
     pTable->pInstance = pInstance;
 
     GblDoublyLinkedList_init(&pTable->receiverConnections);
 
-    GBL_API_VERIFY(GblHashSet_insert(&instanceConnectionTableSet_, &pTable),
+    GBL_CTX_VERIFY(GblHashSet_insert(&instanceConnectionTableSet_, &pTable),
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Failed to create an emitter connection table for type [%s]!",
                    GblType_name(GBL_INSTANCE_TYPEOF(pInstance)));
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pTable;
 }
 
@@ -237,9 +237,9 @@ GBL_INLINE InstanceConnectionTable_* InstanceConnectionTable_findOrCreate_(GblIn
 static GBL_RESULT emitterSignalHandlerDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntry) {
     GBL_UNUSED(key, pMap);
     EmitterHandler_* pHandlers = pEntry;
-    GBL_API_BEGIN(NULL);
-    GBL_API_FREE(pHandlers);
-    GBL_API_END();
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_FREE(pHandlers);
+    GBL_CTX_END();
 }
 
 static EmitterHandler_* EmitterHandler_find_(GblInstance*               pInstance,
@@ -276,16 +276,16 @@ static EmitterHandler_* EmitterHandler_findOrCreate_(GblInstance*               
                                                      Signal_**                  ppSignalOut)
 {
     EmitterHandler_* pHandler = NULL;
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
-    GBL_API_VERIFY_POINTER(pInstance);
+    GBL_CTX_VERIFY_POINTER(pInstance);
 
     if(nameQuark == GBL_QUARK_INVALID) {
         if(pSignal) nameQuark = pSignal->name;
         else nameQuark = GblQuark_tryString(pName);
     }
 
-    GBL_API_VERIFY(nameQuark != GBL_QUARK_INVALID,
+    GBL_CTX_VERIFY(nameQuark != GBL_QUARK_INVALID,
                    GBL_RESULT_ERROR_INVALID_HANDLE,
                    "[GblType] %s isn't even a quark, no way it can be a signal!",
                    pName);
@@ -300,7 +300,7 @@ static EmitterHandler_* EmitterHandler_findOrCreate_(GblInstance*               
         const GblType typeId = GBL_INSTANCE_TYPEOF(pInstance);
         if(!pSignal) pSignal = Signal_findByQuark_(typeId,
                                                    nameQuark);
-        GBL_API_VERIFY(pSignal,
+        GBL_CTX_VERIFY(pSignal,
                        GBL_RESULT_ERROR_INVALID_HANDLE,
                        "[GblType] %s is not a valid signal on type %s",
                        GblQuark_toString(nameQuark), GblType_name(typeId));
@@ -316,7 +316,7 @@ static EmitterHandler_* EmitterHandler_findOrCreate_(GblInstance*               
         if(ppTableOut) *ppTableOut = pTable;
 
         //finally add the emitter handler to the table for the given signal
-        pHandler = GBL_API_MALLOC(sizeof(EmitterHandler_));
+        pHandler = GBL_CTX_MALLOC(sizeof(EmitterHandler_));
         memset(pHandler, 0, sizeof(EmitterHandler_));
         GblDoublyLinkedList_init(&pHandler->connectionList);
 
@@ -326,7 +326,7 @@ static EmitterHandler_* EmitterHandler_findOrCreate_(GblInstance*               
                                 emitterSignalHandlerDtor_);
     }
 
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pHandler;
 
 }
@@ -337,11 +337,11 @@ static GBL_RESULT Signal_connect_(GblInstance*   pEmitter,
                                   GblInstance*   pReceiver,
                                   GblClosure*    pClosure)
 {
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
-    GBL_API_VERIFY_POINTER(pEmitter);
-    GBL_API_VERIFY_POINTER(pName);
-    GBL_API_VERIFY_POINTER(pReceiver);
-    GBL_API_VERIFY_POINTER(pClosure);
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_VERIFY_POINTER(pEmitter);
+    GBL_CTX_VERIFY_POINTER(pName);
+    GBL_CTX_VERIFY_POINTER(pReceiver);
+    GBL_CTX_VERIFY_POINTER(pClosure);
 
     Signal_* pSignal = NULL;
     InstanceConnectionTable_* pEmitterTable = NULL;
@@ -355,7 +355,7 @@ static GBL_RESULT Signal_connect_(GblInstance*   pEmitter,
                                                              NULL,
                                                              &pEmitterTable,
                                                              &pSignal);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
 
     // Fetch or create receiver connection table
     InstanceConnectionTable_* pReceiverTable = (pReceiver != pEmitter)?
@@ -365,7 +365,7 @@ static GBL_RESULT Signal_connect_(GblInstance*   pEmitter,
     // Initialize closure
     if(!GblClosure_hasMarshal(pClosure)) GblClosure_setMarshal(pClosure, pSignal->pFnCMarshal);
 
-    Connection_* pConnection = GBL_API_MALLOC(sizeof(Connection_));
+    Connection_* pConnection = GBL_CTX_MALLOC(sizeof(Connection_));
     memset(pConnection, 0, sizeof(Connection_));
     pConnection->pEmitter   = pEmitter;
     pConnection->pReceiver  = pReceiver;
@@ -380,11 +380,11 @@ static GBL_RESULT Signal_connect_(GblInstance*   pEmitter,
     GblDoublyLinkedList_pushBack(&pHandler->connectionList,
                                  &pConnection->emitterList);
 
-    GBL_API_END_BLOCK();
-    if(!GBL_RESULT_SUCCESS(GBL_API_RESULT())) {
+    GBL_CTX_END_BLOCK();
+    if(!GBL_RESULT_SUCCESS(GBL_CTX_RESULT())) {
         GBL_BOX_UNREF(pClosure);
     }
-    return GBL_API_RESULT();
+    return GBL_CTX_RESULT();
 }
 
 
@@ -408,16 +408,16 @@ GBL_EXPORT GBL_RESULT GblSignal_connectClass(GblInstance* pEmitter,
                                              GblType      classType,
                                              GblSize      methodOffset)
 {
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
-    GBL_API_VERIFY(GblInstance_check(pReceiver, classType),
+    GBL_CTX_VERIFY(GblInstance_check(pReceiver, classType),
                    GBL_RESULT_ERROR_TYPE_MISMATCH);
-    GBL_API_VERIFY_ARG(methodOffset >= sizeof(GblClass));
+    GBL_CTX_VERIFY_ARG(methodOffset >= sizeof(GblClass));
 
     GblClassClosure* pCClosure = GblClassClosure_create(classType, methodOffset, pReceiver, NULL);
-    GBL_API_VERIFY_CALL(Signal_connect_(pEmitter, pSignalName, GBL_QUARK_INVALID, pReceiver, GBL_CLOSURE(pCClosure)));
+    GBL_CTX_VERIFY_CALL(Signal_connect_(pEmitter, pSignalName, GBL_QUARK_INVALID, pReceiver, GBL_CLOSURE(pCClosure)));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
@@ -426,19 +426,19 @@ GBL_EXPORT GBL_RESULT GblSignal_connectSignal(GblInstance* pEmitter,
                                               GblInstance* pDstEmitter,
                                               const char*  pDstSignalName)
 {
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
     GblQuark quarkName = GblQuark_tryString(pDstSignalName);
 
-    GBL_API_VERIFY(quarkName != GBL_QUARK_INVALID,
+    GBL_CTX_VERIFY(quarkName != GBL_QUARK_INVALID,
                    GBL_RESULT_ERROR_INVALID_HANDLE);
 
-    GBL_API_VERIFY(Signal_findByQuark_(GBL_INSTANCE_TYPEOF(pDstEmitter), quarkName),
+    GBL_CTX_VERIFY(Signal_findByQuark_(GBL_INSTANCE_TYPEOF(pDstEmitter), quarkName),
                    GBL_RESULT_ERROR_INVALID_HANDLE);
 
     GblSignalClosure* pSignalClosure = GblSignalClosure_create(pDstSignalName, NULL);
-    GBL_API_VERIFY_CALL(Signal_connect_(pEmitter, pSignalName, GBL_QUARK_INVALID, pDstEmitter, GBL_CLOSURE(pSignalClosure)));
+    GBL_CTX_VERIFY_CALL(Signal_connect_(pEmitter, pSignalName, GBL_QUARK_INVALID, pDstEmitter, GBL_CLOSURE(pSignalClosure)));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblSignal_connectClosure(GblInstance* pInstance,
@@ -451,21 +451,21 @@ GBL_EXPORT GBL_RESULT GblSignal_connectClosure(GblInstance* pInstance,
 }
 
 GBL_INLINE GBL_RESULT deleteConnection_(Connection_* pConnection) {
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
     GblDoublyLinkedList_remove(&pConnection->emitterList);
     GblDoublyLinkedList_remove(&pConnection->receiverList);
     GBL_BOX_UNREF(pConnection->pClosure);
-    GBL_API_FREE(pConnection);
+    GBL_CTX_FREE(pConnection);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GblSize disconnectFromHandler_(EmitterHandler_*  pHandler,
                                       GblClosure*       pClosure)
 {
     GblSize disconnectedCount = 0;
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
     GblDoublyLinkedListNode* pNext;
     for(GblDoublyLinkedListNode* pNode = pHandler->connectionList.pNext;
         pNode != &pHandler->connectionList;
@@ -476,11 +476,11 @@ static GblSize disconnectFromHandler_(EmitterHandler_*  pHandler,
 
         if(!pClosure || pClosure == pConnection->pClosure)
         {
-            GBL_API_CALL(deleteConnection_(pConnection));
+            GBL_CTX_CALL(deleteConnection_(pConnection));
             ++disconnectedCount;
         }
     }
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return disconnectedCount;
 }
 
@@ -494,9 +494,9 @@ static GblSize GblSignal_disconnect_(GblInstance*               pEmitter,
 {
     GblSize disconnectedCount = 0;
 
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
-    GBL_API_VERIFY_POINTER(pEmitter || pReceiver,
+    GBL_CTX_VERIFY_POINTER(pEmitter || pReceiver,
                            "[GblSignal] disconnecting requires either an emitter or receiver!");
 
     const GblQuark signalName = GblQuark_tryString(pSignalName);
@@ -519,7 +519,7 @@ static GblSize GblSignal_disconnect_(GblInstance*               pEmitter,
                    (!pEmitter                       || pEmitter   == pConnection->pEmitter)      &&
                    (!pClosure                       || pClosure   == pConnection->pClosure))
                 {
-                    GBL_API_CALL(deleteConnection_(pConnection));
+                    GBL_CTX_CALL(deleteConnection_(pConnection));
                     ++disconnectedCount;
                 }
             }
@@ -549,7 +549,7 @@ static GblSize GblSignal_disconnect_(GblInstance*               pEmitter,
         }
     }
 
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return disconnectedCount;
 }
 
@@ -562,7 +562,7 @@ GBL_EXPORT GblSize GblSignal_disconnect(GblInstance* pEmitter,
 }
 
 GBL_EXPORT GBL_RESULT GblSignal_removeInstance_(GblInstance* pInstance) {
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
     InstanceConnectionTable_* pTable = InstanceConnectionTable_find_(pInstance);
     if(pTable) {
@@ -570,13 +570,13 @@ GBL_EXPORT GBL_RESULT GblSignal_removeInstance_(GblInstance* pInstance) {
         GblSignal_disconnect_(NULL, NULL, pInstance, NULL, NULL, pTable);
         GblSignal_disconnect_(pInstance, NULL, NULL, NULL, pTable, NULL);
 
-        GBL_API_VERIFY(GblHashSet_erase(&instanceConnectionTableSet_,
+        GBL_CTX_VERIFY(GblHashSet_erase(&instanceConnectionTableSet_,
                                         &pTable),
                        GBL_RESULT_ERROR_MEM_FREE,
                        "[GblSignal] Failed to erase instance connection table!");
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblBool GblSignal_block(GblInstance* pInstance,
@@ -584,7 +584,7 @@ GBL_EXPORT GblBool GblSignal_block(GblInstance* pInstance,
                                    GblBool      blocked)
 {
     GblBool old = GBL_FALSE;
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
     EmitterHandler_* pHandler = EmitterHandler_findOrCreate_(pInstance,
                                                              pSignalName,
@@ -593,14 +593,14 @@ GBL_EXPORT GblBool GblSignal_block(GblInstance* pInstance,
                                                              NULL,
                                                              NULL,
                                                              NULL);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
 
     if(pHandler) {
         old = pHandler->blocked;
         pHandler->blocked = blocked;
     }
 
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return old;
 }
 
@@ -645,9 +645,9 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
                                   GblVariant*  pVariantArgs)
 {
 
-    GBL_API_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
-    GBL_API_VERIFY_POINTER(pEmitter);
-    GBL_API_VERIFY_POINTER(pSignalName);
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+    GBL_CTX_VERIFY_POINTER(pEmitter);
+    GBL_CTX_VERIFY_POINTER(pSignalName);
 
     // if the instance has signal handlers for the specified signal (that aren't blocked)
     InstanceConnectionTable_* pEmitterTable = InstanceConnectionTable_find_(pEmitter);
@@ -663,19 +663,19 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
                 GblVariant*     pArgValues  = GBL_ALLOCA(sizeof(GblVariant) * argCount);
 
                 // initialize argument values
-                GBL_API_VERIFY_CALL(GblVariant_constructPointer(&pArgValues[0], GBL_POINTER_TYPE, pConnection->pReceiver));
+                GBL_CTX_VERIFY_CALL(GblVariant_constructPointer(&pArgValues[0], GBL_POINTER_TYPE, pConnection->pReceiver));
                 if(pVarArgs) {
                     for(GblSize a = 1; a < argCount; ++a) {
-                        GBL_API_VERIFY_CALL(GblVariant_constructValueCopyVaList(&pArgValues[a],
+                        GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopyVaList(&pArgValues[a],
                                                                                 pConnection->pSignal->argTypes[a-1],
                                                                                 pVarArgs));
                     }
                 } else if(pVariantArgs) {
                     for(GblSize a = 1; a < argCount; ++a) {
-                        GBL_API_VERIFY_CALL(GblVariant_constructCopy(&pArgValues[a],
+                        GBL_CTX_VERIFY_CALL(GblVariant_constructCopy(&pArgValues[a],
                                                                      &pVariantArgs[a-1]));
                     }
-                } else GBL_API_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION);
+                } else GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_OPERATION);
 
                 // call closures
                 GblBool firstConnection = GBL_TRUE;
@@ -684,7 +684,7 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
 
                     // update arg[0]: receiver (already set for first connection, though)
                     if(!firstConnection)
-                        GBL_API_VERIFY_CALL(GblVariant_setPointer(&pArgValues[0], GBL_POINTER_TYPE, pConnection->pReceiver));
+                        GBL_CTX_VERIFY_CALL(GblVariant_setPointer(&pArgValues[0], GBL_POINTER_TYPE, pConnection->pReceiver));
                     else
                         firstConnection = GBL_FALSE;
 
@@ -693,7 +693,7 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
                     pActiveConnection_ = pConnection;
 
                     // invoke closure
-                    GBL_API_VERIFY_CALL(GblClosure_invoke(pConnection->pClosure,
+                    GBL_CTX_VERIFY_CALL(GblClosure_invoke(pConnection->pClosure,
                                                           NULL,
                                                           argCount,
                                                           pArgValues));
@@ -704,13 +704,13 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
 
                 // destruct arguments
                 for(GblSize a = 0; a < argCount; ++a) {
-                    GBL_API_VERIFY_CALL(GblVariant_destruct(&pArgValues[a]));
+                    GBL_CTX_VERIFY_CALL(GblVariant_destruct(&pArgValues[a]));
                 }
             }
         }
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblSignal_emitVariants(GblInstance* pEmitter,
@@ -748,27 +748,27 @@ GBL_EXPORT GblInstance* GblSignal_receiver(void) {
 }
 
 GBL_EXPORT GBL_RESULT GblSignal_init_(GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
-    GBL_API_VERIFY_CALL(GblHashSet_construct(&signalSet_,
+    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_VERIFY_CALL(GblHashSet_construct(&signalSet_,
                                              sizeof(Signal_*),
                                              signalSetHasher_,
                                              signalSetComparator_,
                                              signalSetDestructor_,
                                              64,
                                              pCtx));
-    GBL_API_VERIFY_CALL(GblHashSet_construct(&instanceConnectionTableSet_,
+    GBL_CTX_VERIFY_CALL(GblHashSet_construct(&instanceConnectionTableSet_,
                                              sizeof(InstanceConnectionTable_*),
                                              instanceConnectionTableHasher_,
                                              instanceConnectionTableComparator_,
                                              instanceConnectionTableDestructor_,
                                              0,
                                              pCtx));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblSignal_final_(GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
-    GBL_API_CALL(GblHashSet_destruct(&signalSet_));
-    GBL_API_CALL(GblHashSet_destruct(&instanceConnectionTableSet_));
-    GBL_API_END();
+    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_CALL(GblHashSet_destruct(&signalSet_));
+    GBL_CTX_CALL(GblHashSet_destruct(&instanceConnectionTableSet_));
+    GBL_CTX_END();
 }

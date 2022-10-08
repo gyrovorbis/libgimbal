@@ -419,6 +419,10 @@ of choice. We go through a lot of effort to test throroughly and verify correctn
 	- GStreamer
 		- Probably the most pristine, extensible C-based codebase I have ever seen. A huge architecture inspiration. Your 
 		  User's Manual reads like fine poetry to me.
+  	- Objective C's Runtime
+  		- Believe it or not, the vast majority of the incredible power of the Objective-C language is implemented as a C-based runtime
+  		library, including its extremely flexible OO type system. LibGimbal shares a lot of similarities with Objective-C's type system,
+  		although libGimbal's system has more of a focus on performance and cannot afford some of the epic dynamic insanity Objective-C has.
 ## Bibliography
 	- "C Interfaces and Implementations: Techniques for Creating Reusable Software" by David R Hanson
 		- Probably the single best C programming book I have ever read. Have you ever wanted to write your own C-based standard

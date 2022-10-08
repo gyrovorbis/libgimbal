@@ -7,7 +7,7 @@
 #define GIMBAL_CALL_STACK_H
 
 #include "../core/gimbal_typedefs.h"
-#include "gimbal_thread.h"
+//#include "gimbal_thread.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,10 +22,18 @@ typedef struct GblSourceLocation {
 
 typedef struct GblCallRecord {
     GBL_ALIGNAS(128)
-    char                message[GBL_API_RESULT_MSG_BUFFER_SIZE];
+    char                message[GBL_CTX_RESULT_MSG_BUFFER_SIZE];
     GblSourceLocation   srcLocation;
     GBL_RESULT          result;
 } GblCallRecord;
+
+GBL_FORWARD_DECLARE_STRUCT(GblThread);
+
+GBL_INLINE GblThread*   GblThread_current        (void)                             GBL_NOEXCEPT;
+
+GBL_EXPORT GblContext*  GblThread_context        (const GblThread* pSelf)           GBL_NOEXCEPT;
+GBL_INLINE GblStackFrame*
+                        GblThread_stackFrameTop  (const GblThread* pSelf)           GBL_NOEXCEPT;
 
 GBL_INLINE void GBL_CALL_RECORD_CONSTRUCT(GblCallRecord* pRecord, struct GblObject* pObject, GBL_RESULT resultCode, GblSourceLocation source, const char* pFmt, ...) GBL_NOEXCEPT {
     va_list varArgs;
@@ -54,7 +62,7 @@ typedef struct GblStackFrame {
 GBL_EXPORT GblContext* GblObject_findContext(GblObject* pSelf) GBL_NOEXCEPT;
 
 // I think this can all become a tiny macro
-GBL_INLINE GBL_RESULT GBL_API_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObject, GBL_RESULT initialResult, GblSourceLocation entryLoc) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GBL_CTX_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObject, GBL_RESULT initialResult, GblSourceLocation entryLoc) GBL_NOEXCEPT {
     GBL_RESULT result               = GBL_RESULT_SUCCESS;
     GblContext* pContext            = GBL_NULL;
 

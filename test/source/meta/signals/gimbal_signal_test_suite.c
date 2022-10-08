@@ -125,7 +125,7 @@ void s_2_CB_Slot_(SignalInstance_* pReceiver, double arg) {
 }
 
 static GBL_RESULT classInit_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     union {
         GblClass*           pClass;
@@ -148,11 +148,11 @@ static GBL_RESULT classInit_(GblClass* pClass, const void* pUd, GblContext* pCtx
     default: break;
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblSignalTestSuite_));
 
@@ -224,11 +224,11 @@ static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx
         pSelf_->pInstances[i]->pSelf_   = pSelf_;
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
     for(int i = 0; i < INSTANCE_COUNT_; ++i) {
@@ -239,37 +239,37 @@ static GBL_RESULT GblSignalTestSuite_final_(GblTestSuite* pSelf, GblContext* pCt
         GblType_unregister(pSelf_->types[t]);
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblSignalTestSuite_emitterNone_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_COMPARE(GblSignal_emitter(), NULL);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_receiverNone_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_COMPARE(GblSignal_receiver(), NULL);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_installInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
     GBL_TEST_COMPARE(GblSignal_install(GBL_INVALID_TYPE, "lolol", NULL, 1, GBL_INVALID_TYPE),
                      GBL_RESULT_ERROR_INVALID_TYPE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_install(GBL_INSTANCE_TYPE, NULL, NULL, 0),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_install(GBL_INSTANCE_TYPE,
                                        "lolol",
@@ -278,13 +278,13 @@ static GBL_RESULT GblSignalTestSuite_installInvalid_(GblTestSuite* pSelf, GblCon
                                        GBL_INT32_TYPE,
                                        GBL_INVALID_TYPE),
                      GBL_RESULT_ERROR_INVALID_TYPE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_install_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -330,12 +330,12 @@ static GBL_RESULT GblSignalTestSuite_install_(GblTestSuite* pSelf, GblContext* p
                                        GBL_DOUBLE_TYPE),
                      GBL_RESULT_SUCCESS);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_connectInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -349,43 +349,43 @@ static GBL_RESULT GblSignalTestSuite_connectInvalid_(GblTestSuite* pSelf, GblCon
                                        GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                        GBL_CALLBACK(GblSignalTestSuite_connectInvalid_)),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connect(&instance,
                                        NULL,
                                        &instance,
                                        GBL_CALLBACK(GblSignalTestSuite_connectInvalid_)),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connect(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                        "S_IA",
                                        NULL,
                                        GBL_CALLBACK(GblSignalTestSuite_connectInvalid_)),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connect(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                        "S_IA",
                                        &instance,
                                        NULL),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connect(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                        "lolol",
                                        GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                        GBL_CALLBACK(GblSignalTestSuite_connectInvalid_)),
                      GBL_RESULT_ERROR_INVALID_HANDLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GblInstance_destruct(&instance);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_connect_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -438,12 +438,12 @@ static GBL_RESULT GblSignalTestSuite_connect_(GblTestSuite* pSelf, GblContext* p
 
     GBL_TEST_COMPARE(GblSignal_connectionCount(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), NULL), 5);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_connectClassInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
@@ -456,7 +456,7 @@ static GBL_RESULT GblSignalTestSuite_connectClassInvalid_(GblTestSuite* pSelf, G
                                             GBL_INSTANCE_TYPE,
                                             sizeof(GblClass)),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connectClass(&instance,
                                             NULL,
@@ -464,7 +464,7 @@ static GBL_RESULT GblSignalTestSuite_connectClassInvalid_(GblTestSuite* pSelf, G
                                             GBL_INSTANCE_TYPE,
                                             sizeof(GblClass)),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connectClass(&instance,
                                             "lolol",
@@ -472,7 +472,7 @@ static GBL_RESULT GblSignalTestSuite_connectClassInvalid_(GblTestSuite* pSelf, G
                                             GBL_INSTANCE_TYPE,
                                             sizeof(GblClass)),
                      GBL_RESULT_ERROR_TYPE_MISMATCH);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connectClass(&instance,
                                             "lolol",
@@ -480,7 +480,7 @@ static GBL_RESULT GblSignalTestSuite_connectClassInvalid_(GblTestSuite* pSelf, G
                                             GBL_INVALID_TYPE,
                                             sizeof(GblClass)),
                      GBL_RESULT_ERROR_TYPE_MISMATCH);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connectClass(&instance,
                                             "lolol",
@@ -488,15 +488,15 @@ static GBL_RESULT GblSignalTestSuite_connectClassInvalid_(GblTestSuite* pSelf, G
                                             GBL_INSTANCE_TYPE,
                                             0),
                      GBL_RESULT_ERROR_INVALID_ARG);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GblInstance_destruct(&instance);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_connectClass_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -513,12 +513,12 @@ static GBL_RESULT GblSignalTestSuite_connectClass_(GblTestSuite* pSelf, GblConte
 
     GBL_TEST_COMPARE(GblSignal_connectionCount(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), NULL), 6);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_connectSignalInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -532,44 +532,44 @@ static GBL_RESULT GblSignalTestSuite_connectSignalInvalid_(GblTestSuite* pSelf, 
                                              GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                              "SI_CB"),
                      GBL_RESULT_ERROR_INVALID_HANDLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connectSignal(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                              NULL,
                                              GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                              "SI_CB"),
                      GBL_RESULT_ERROR_INVALID_HANDLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connectSignal(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                              "SI_CB",
                                              NULL,
                                              "SI_CB"),
                      GBL_RESULT_ERROR_INVALID_HANDLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connectSignal(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                              "SI_CB",
                                              GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                              NULL),
                     GBL_RESULT_ERROR_INVALID_HANDLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_connectSignal(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                              "SI_CB",
                                              GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]),
                                              "lolol"),
                     GBL_RESULT_ERROR_INVALID_HANDLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
 
     GblInstance_destruct(&instance);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_connectSignal_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -584,11 +584,11 @@ static GBL_RESULT GblSignalTestSuite_connectSignal_(GblTestSuite* pSelf, GblCont
                                                "S_1_CB"),
                      1);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_connectClosureInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -600,11 +600,11 @@ static GBL_RESULT GblSignalTestSuite_connectClosureInvalid_(GblTestSuite* pSelf,
                                               NULL),
                      GBL_RESULT_ERROR_INVALID_POINTER);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_connectClosure_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -626,11 +626,11 @@ static GBL_RESULT GblSignalTestSuite_connectClosure_(GblTestSuite* pSelf, GblCon
 
     GBL_TEST_COMPARE(GblSignal_connectionCount(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), NULL), 7);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_emitInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -638,22 +638,22 @@ static GBL_RESULT GblSignalTestSuite_emitInvalid_(GblTestSuite* pSelf, GblContex
 
     GBL_TEST_COMPARE(GblSignal_emit(NULL, "S_1_CB", 1),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
 
     GBL_TEST_COMPARE(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), NULL, 1),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_emitSelf_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IA", GBL_TRUE));
+    GBL_CTX_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IA", GBL_TRUE));
 
     const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_I_A_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
@@ -662,15 +662,15 @@ static GBL_RESULT GblSignalTestSuite_emitSelf_(GblTestSuite* pSelf, GblContext* 
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_I_A_][emissionIndex], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_I_A_][emissionIndex], pSelf_->pInstances[INSTANCE_1_]);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_emitOther_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_CA", 17));
+    GBL_CTX_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_CA", 17));
 
     const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_C_A_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
@@ -679,41 +679,41 @@ static GBL_RESULT GblSignalTestSuite_emitOther_(GblTestSuite* pSelf, GblContext*
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_C_A_][emissionIndex], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_C_A_][emissionIndex], pSelf_->pInstances[INSTANCE_2_]);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_emitMulti_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IB_1", "C Marshals"));
+    GBL_CTX_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IB_1", "C Marshals"));
 
     const GblSize emissionCount = pSelf_->signalEmissions[SIGNAL_I_B_1_];
     GBL_TEST_COMPARE(emissionCount, 2);
 
     GBL_TEST_COMPARE((const char*)pSelf_->signalArgs[SIGNAL_I_B_1_][0], "C Marshals");
-    GBL_API_FREE((void*)pSelf_->signalArgs[SIGNAL_I_B_1_][0]);
+    GBL_CTX_FREE((void*)pSelf_->signalArgs[SIGNAL_I_B_1_][0]);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_I_B_1_][0], INSTANCE_1_);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_I_B_1_][0], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_I_B_1_][0], pSelf_->pInstances[INSTANCE_1_]);
 
 
     GBL_TEST_COMPARE((const char*)pSelf_->signalArgs[SIGNAL_I_B_1_][1], "C Marshals");
-    GBL_API_FREE((void*)pSelf_->signalArgs[SIGNAL_I_B_1_][1]);
+    GBL_CTX_FREE((void*)pSelf_->signalArgs[SIGNAL_I_B_1_][1]);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_I_B_1_][1], INSTANCE_2_);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_I_B_1_][1], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_I_B_1_][1], pSelf_->pInstances[INSTANCE_2_]);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_emitOtherClass_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IBBase", (void*)0xdeadbabe));
+    GBL_CTX_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IBBase", (void*)0xdeadbabe));
 
     const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_I_B_BASE_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
@@ -722,25 +722,25 @@ static GBL_RESULT GblSignalTestSuite_emitOtherClass_(GblTestSuite* pSelf, GblCon
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_I_B_BASE_][emissionIndex], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_I_B_BASE_][emissionIndex], pSelf_->pInstances[INSTANCE_2_]);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_emitVaListInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GblSignal_emitVaList(NULL, "S_1_CB", NULL),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
 
     GBL_TEST_COMPARE(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), NULL, NULL),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT emitVaList_(GblInstance* pEmitter, const char* pSignalName, ...) {
@@ -753,12 +753,12 @@ static GBL_RESULT emitVaList_(GblInstance* pEmitter, const char* pSignalName, ..
 }
 
 static GBL_RESULT GblSignalTestSuite_emitVaListOtherSignal_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
 
-    GBL_API_VERIFY_CALL(emitVaList_(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_2_]), "S_1_CB", 17.0f));
+    GBL_CTX_VERIFY_CALL(emitVaList_(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_2_]), "S_1_CB", 17.0f));
 
     const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_1_C_B_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
@@ -767,36 +767,36 @@ static GBL_RESULT GblSignalTestSuite_emitVaListOtherSignal_(GblTestSuite* pSelf,
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentEmitters[SIGNAL_1_C_B_][emissionIndex], pSelf_->pInstances[INSTANCE_1_]);
     GBL_TEST_COMPARE(pSelf_->pSignalCurrentReceivers[SIGNAL_1_C_B_][emissionIndex], pSelf_->pInstances[INSTANCE_2_]);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_emitVariantsInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GblSignal_emitVariants(NULL, "S_1_CB", NULL),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
 
     GBL_TEST_COMPARE(GblSignal_emitVariants(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), NULL, NULL),
                      GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_emitVariantsOtherClosure_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
     GblVariant v;
     GblVariant_constructDouble(&v, 33.3);
 
-    GBL_API_VERIFY_CALL(GblSignal_emitVariants(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_2_CB", &v));
+    GBL_CTX_VERIFY_CALL(GblSignal_emitVariants(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_2_CB", &v));
 
     const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_2_C_B_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
@@ -808,40 +808,40 @@ static GBL_RESULT GblSignalTestSuite_emitVariantsOtherClosure_(GblTestSuite* pSe
 
     GblVariant_destruct(&v);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_blockInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GblSignal_block(NULL, "trolo", GBL_TRUE), GBL_FALSE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_block(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "lola", GBL_TRUE), GBL_FALSE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_block_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GblSignal_block(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IB_1", GBL_TRUE), GBL_FALSE);
-    GBL_API_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IB_1", "Final Pheasantry"));
+    GBL_CTX_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IB_1", "Final Pheasantry"));
 
     GBL_TEST_COMPARE(pSelf_->signalEmissions[SIGNAL_I_B_1_], 2);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_blockBeforeConnecting_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -859,23 +859,23 @@ static GBL_RESULT GblSignalTestSuite_blockBeforeConnecting_(GblTestSuite* pSelf,
     GBL_TEST_COMPARE(pSelf_->signalEmissions[SIGNAL_I_A_], 1);
 
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_blockAllInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
     GBL_TEST_COMPARE(GblSignal_blockAll(NULL, GBL_TRUE), GBL_FALSE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_blockAll_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -892,11 +892,11 @@ static GBL_RESULT GblSignalTestSuite_blockAll_(GblTestSuite* pSelf, GblContext* 
     GBL_TEST_COMPARE(pSelf_->signalEmissions[SIGNAL_2_C_B_], 1);
     GBL_TEST_COMPARE(pSelf_->signalEmissions[SIGNAL_I_B_BASE_], 1);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_blockAllBeforeConnecting_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -913,32 +913,32 @@ static GBL_RESULT GblSignalTestSuite_blockAllBeforeConnecting_(GblTestSuite* pSe
 
     GBL_TEST_COMPARE(pSelf_->signalEmissions[SIGNAL_I_A_], 1);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_disconnectInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
     GBL_TEST_COMPARE(GblSignal_disconnect(NULL, "trololo", NULL, NULL), 0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_disconnect(NULL, "trololo", NULL, (void*)0xdeadbeef), 0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_disconnect(NULL, NULL, NULL, (void*)0xdeadbeef), 0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_disconnect(NULL, NULL, NULL, NULL), 0);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_disconnect_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -960,29 +960,29 @@ static GBL_RESULT GblSignalTestSuite_disconnect_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(GblSignal_disconnect(NULL, NULL, GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), NULL), 1);
     GBL_TEST_COMPARE(GblSignal_connectionCount(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IA"), 0);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_uninstallInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
     GBL_TEST_COMPARE(GblSignal_uninstall(GBL_INVALID_TYPE, "lolol"),
                      GBL_RESULT_ERROR_INVALID_HANDLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_TEST_COMPARE(GblSignal_uninstall(GBL_INTERFACE_TYPE, "lolol"),
                     GBL_RESULT_ERROR_INVALID_HANDLE);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblSignalTestSuite_uninstall_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
 
@@ -1010,7 +1010,7 @@ static GBL_RESULT GblSignalTestSuite_uninstall_(GblTestSuite* pSelf, GblContext*
                                          "S_2_CB"),
                      GBL_RESULT_SUCCESS);
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
@@ -1059,14 +1059,14 @@ GBL_EXPORT GblType GblSignalTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("SignalTestSuite"),
                                      &vTable,
                                      sizeof(GblSignalTestSuite),
                                      sizeof(GblSignalTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
     return type;
 }

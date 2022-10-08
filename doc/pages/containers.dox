@@ -13,19 +13,20 @@ STL APIs fairly closely and should be fairly intuitive to work with for any C++ 
 ## Choosing the Right Container
     The following table can be referenced when deciding which container type to use:
    
-    Type  			       | Description            						                                | Header
-	-----------------------|--------------------------------------------------------------------------------|-------
-	GblLinkedListNode      |Intrusive, circularly singly linked list with C++ std::vector-style API         | gimbal_linked_list.h
-	GblDoublyLinkedListNode|Intrusive, circularly doubly linked list with C++ std::vector-style API         | gimbal_doubly_linked_list.h
-	GblNaryTreeNode		   |Instrusive generic tree structure with parent + linked list of children         | gimbal_nary_tree.h
-	GblArrayList    	   |Dynamically resizable array, O(1) lookup, equivalent to C++ std::vector	        | gimbal_array_list.h
-	GblRingList            |Non-intrusive circular doubly-linked list with high-level, convenience API      | gimbal_ring_list.h
-	GblArrayDeque		   |Dynamically resizable array with good performance when resizing from either end | gimbal_array_deque.h
-	GblTreeSet             |Binary tree-based associative set structure, analogous to std::set		        | gimbal_tree_set.h
-	GblHashSet	           |Hash table-based associative set structure, analogous to std::unordered_set     | gimbal_hash_set.h
-	GblArrayMap		       |Resizable array-based, [K,V] container with optional binary searchability       | gimbal_array_map.h
-	GblByteArray		   |Reference-counted resizable byte array buffer with generic read/write API       | gimbal_byte_array.h
-	GblRingBuffer          |Fixed-capacity circular buffer backed by a contiguous array with queue semantics| gimbal_ring_buffer.h
+    Type  			       | Description            						                                  | Header
+	-----------------------|----------------------------------------------------------------------------------|-------
+	GblLinkedListNode      |Intrusive, circularly singly linked list with C++ std::vector-style API           | gimbal_linked_list.h
+	GblDoublyLinkedListNode|Intrusive, circularly doubly linked list with C++ std::vector-style API           | gimbal_doubly_linked_list.h
+	GblNaryTreeNode		   |Instrusive generic tree structure with parent + linked list of children           | gimbal_nary_tree.h
+	GblArrayList    	   |Dynamically resizable array, O(1) lookup, equivalent to C++ std::vector	          | gimbal_array_list.h
+	GblRingList            |Non-intrusive circular doubly-linked list with high-level, convenience API        | gimbal_ring_list.h
+	GblArrayDeque		   |Dynamically resizable array with good performance when resizing from either end   | gimbal_array_deque.h
+	GblTreeSet             |Binary tree-based associative set structure, analogous to std::set		          | gimbal_tree_set.h
+	GblHashSet	           |Hash table-based associative set structure, analogous to std::unordered_set       | gimbal_hash_set.h
+	GblArrayMap		       |Resizable array-based, [K,V] container with optional binary searchability         | gimbal_array_map.h
+	GblByteArray		   |Reference-counted resizable byte array buffer with generic read/write API         | gimbal_byte_array.h
+	GblRingBuffer          |Fixed-capacity circular buffer backed by a contiguous array with queue semantics  | gimbal_ring_buffer.h
+	GblBitView             |View-based container providing list API + bitwise ops to a range of bits in memory| gimbal_bit_view.h
 
 
 

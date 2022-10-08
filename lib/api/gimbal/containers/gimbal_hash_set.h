@@ -7,7 +7,7 @@
 #define GIMBAL_HASHSET_H
 
 #include "../core/gimbal_typedefs.h"
-#include "../core/gimbal_api_frame.h"
+#include "../core/gimbal_ctx.h"
 
 #define GBL_SELF_TYPE GblHashSet
 
@@ -193,9 +193,9 @@ GBL_INLINE GblSize GblHashSet_bucketCount(const GblHashSet* pSelf) GBL_NOEXCEPT 
 GBL_INLINE void* GblHashSet_get(const GblHashSet* pSelf, const void *pKey) GBL_NOEXCEPT {
     void* pEntry = NULL;
     if(!pKey) {
-        GBL_API_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-        GBL_API_VERIFY_POINTER(pKey);
-        GBL_API_END_BLOCK();
+        GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+        GBL_CTX_VERIFY_POINTER(pKey);
+        GBL_CTX_END_BLOCK();
     } else {
         const uint32_t hash = GblHashSet_getHash_(pSelf, pKey);
         size_t i = hash & GBL_PRIV_REF(pSelf).mask;
@@ -246,9 +246,9 @@ GBL_INLINE void* GblHashSet_at(const GblHashSet* pSet, const void* pKey) GBL_NOE
     void* pEntry = NULL;
     pEntry = GblHashSet_get(pSet, pKey);
     if(!pEntry) {
-        GBL_API_BEGIN(GBL_PRIV_REF(pSet).pCtx);
-        GBL_API_VERIFY(pEntry, GBL_RESULT_ERROR_OUT_OF_RANGE, "The requested key was not found in the hash map!");
-        GBL_API_END_BLOCK();
+        GBL_CTX_BEGIN(GBL_PRIV_REF(pSet).pCtx);
+        GBL_CTX_VERIFY(pEntry, GBL_RESULT_ERROR_OUT_OF_RANGE, "The requested key was not found in the hash map!");
+        GBL_CTX_END_BLOCK();
     }
     return pEntry;
 }
@@ -273,9 +273,9 @@ GBL_INLINE GblBool GblHashSet_insert(GblHashSet* pSet, const void* pItem) GBL_NO
         if(!pValue) {
             pValue = GblHashSet_set(pSet, pItem);
             if(!pValue) {
-                GBL_API_BEGIN(GBL_PRIV_REF(pSet).pCtx);
-                GBL_API_VERIFY_EXPRESSION(!pValue, "Somehow the item wasn't found in the map before inserting it, but it was there!");
-                GBL_API_END();
+                GBL_CTX_BEGIN(GBL_PRIV_REF(pSet).pCtx);
+                GBL_CTX_VERIFY_EXPRESSION(!pValue, "Somehow the item wasn't found in the map before inserting it, but it was there!");
+                GBL_CTX_END();
             }
             inserted = GBL_TRUE;
         }
@@ -285,9 +285,9 @@ GBL_INLINE GblBool GblHashSet_insert(GblHashSet* pSet, const void* pItem) GBL_NO
 
 GBL_INLINE void GblHashSet_insertOrAssign(GblHashSet* pSet, const void* pEntry) GBL_NOEXCEPT {
     if(!pEntry) {
-        GBL_API_BEGIN(GBL_PRIV_REF(pSet).pCtx);
-        GBL_API_VERIFY_POINTER(pEntry);
-        GBL_API_END_BLOCK();
+        GBL_CTX_BEGIN(GBL_PRIV_REF(pSet).pCtx);
+        GBL_CTX_VERIFY_POINTER(pEntry);
+        GBL_CTX_END_BLOCK();
     } else {
         void* pOldEntry = GblHashSet_set(pSet, pEntry);
         if(pOldEntry && GBL_PRIV_REF(pSet).pFnDestruct) GBL_PRIV_REF(pSet).pFnDestruct(pSet, pOldEntry);
@@ -299,9 +299,9 @@ GBL_INLINE void* GblHashSet_tryEmplace(GblHashSet* pSet, const void* pKey) GBL_N
     if(!GblHashSet_contains(pSet, pKey)) {
         pPrevEntry = GblHashSet_emplace(pSet, pKey);
         if(!pPrevEntry) {
-            GBL_API_BEGIN(GBL_PRIV_REF(pSet).pCtx);
-            GBL_API_VERIFY_EXPRESSION(pPrevEntry, "Fetching the previous entry should've succeeded after 'contains(key)' returned true!");
-            GBL_API_END_BLOCK();
+            GBL_CTX_BEGIN(GBL_PRIV_REF(pSet).pCtx);
+            GBL_CTX_VERIFY_EXPRESSION(pPrevEntry, "Fetching the previous entry should've succeeded after 'contains(key)' returned true!");
+            GBL_CTX_END_BLOCK();
         }
     }
     return pPrevEntry;

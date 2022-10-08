@@ -9,7 +9,7 @@
 #define GIMBAL_HASH_H
 
 #include "../core/gimbal_typedefs.h"
-#include "../core/gimbal_api_frame.h"
+#include "../core/gimbal_ctx.h"
 #include <time.h>
 
 #define GBL_SEED_COUNT                  2

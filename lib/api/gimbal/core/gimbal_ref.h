@@ -7,7 +7,7 @@
 #define GIMBAL_MEMORY_REF_H
 
 #include "../preprocessor/gimbal_atomics.h"
-#include "../core/gimbal_api_frame.h"
+#include "../core/gimbal_ctx.h"
 #include "gimbal_typedefs.h"
 
 #define GBL_SELF_TYPE GblRef

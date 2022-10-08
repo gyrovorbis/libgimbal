@@ -1,5 +1,5 @@
 #include <gimbal/utils/gimbal_arena_allocator.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 
 #define GBL_ARENA_PAGE_(node)  GBL_LINKED_LIST_ENTRY(node, GblArenaAllocatorPage, listNode)
 
@@ -9,7 +9,7 @@ GBL_EXPORT GBL_RESULT (GblArenaAllocator_construct)(GblArenaAllocator*     pSelf
                                                     GblArenaAllocatorPage* pInitialPage,
                                                     GblContext*            pCtx)
 {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     memset(pSelf, 0, sizeof(GblArenaAllocator));
     pSelf->pCtx = pCtx;
     GblLinkedList_init(&pSelf->listNode);
@@ -17,7 +17,7 @@ GBL_EXPORT GBL_RESULT (GblArenaAllocator_construct)(GblArenaAllocator*     pSelf
         GblLinkedList_pushFront(&pSelf->listNode, &pInitialPage->listNode);
     pSelf->pageSize = pageSize;
     pSelf->pageAlign = pageAlign < GBL_ALIGNOF(GBL_MAX_ALIGN_T)? GBL_ALIGNOF(GBL_MAX_ALIGN_T) : pageAlign;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblArenaAllocator_destruct(GblArenaAllocator* pSelf) {
@@ -26,14 +26,14 @@ GBL_EXPORT GBL_RESULT GblArenaAllocator_destruct(GblArenaAllocator* pSelf) {
 
 static GblArenaAllocatorPage* GblArenaAllocator_allocPage_(GblContext* pCtx, GblSize size, GblSize align) {
     GblArenaAllocatorPage* pPage = NULL;
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     const GblSize actualSize = gblAlignedAllocSize(sizeof(GblArenaAllocatorPage) + size-1, align);
-    pPage = GBL_API_MALLOC(actualSize, align);
+    pPage = GBL_CTX_MALLOC(actualSize, align);
     GblLinkedList_init(&pPage->listNode);
     pPage->capacity = size;
     pPage->used = 0;
     pPage->staticAlloc = GBL_FALSE;
-    GBL_API_END_BLOCK();
+    GBL_CTX_END_BLOCK();
     return pPage;
 }
 
@@ -57,12 +57,12 @@ GBL_EXPORT void* GblArenaAllocator_allocAligned(GblArenaAllocator* pSelf, GblSiz
                                                                                pSelf->pageAlign);
                 GblLinkedList_pushFront(&pSelf->listNode, &pNewPage->listNode);
             } else {
-                GBL_API_BEGIN(pSelf->pCtx);
-                GBL_API_VERIFY(actualSize <= pSelf->pageSize,
+                GBL_CTX_BEGIN(pSelf->pCtx);
+                GBL_CTX_VERIFY(actualSize <= pSelf->pageSize,
                                GBL_RESULT_ERROR_OVERFLOW,
                                "Cannot allocate chunk of size %u from pages of size %u",
                                actualSize, pSelf->pageSize);
-                GBL_API_END_BLOCK();
+                GBL_CTX_END_BLOCK();
                 goto end;
             }
         }
@@ -80,7 +80,7 @@ end:
 }
 
 GBL_EXPORT GBL_RESULT GblArenaAllocator_freeAll(GblArenaAllocator* pSelf) {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
 
     GblLinkedListNode staticList;
     GblLinkedList_init(&staticList);
@@ -94,7 +94,7 @@ GBL_EXPORT GBL_RESULT GblArenaAllocator_freeAll(GblArenaAllocator* pSelf) {
         GblArenaAllocatorPage* pPage = GBL_ARENA_PAGE_(pNode);
         if(!pPage->staticAlloc) {
             tempNode = *pNode;
-            GBL_API_FREE(pPage);
+            GBL_CTX_FREE(pPage);
             pNode = &tempNode;
         } else {
             pPage->used = 0;
@@ -108,7 +108,7 @@ GBL_EXPORT GBL_RESULT GblArenaAllocator_freeAll(GblArenaAllocator* pSelf) {
     GblLinkedList_joinFront(&pSelf->listNode, &staticList);
     pSelf->allocCount   = 0;
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblSize GblArenaAllocator_pageCount(const GblArenaAllocator* pSelf) {
@@ -176,12 +176,12 @@ GBL_EXPORT void GblArenaAllocator_saveState(const GblArenaAllocator* pSelf, GblA
 }
 
 GBL_EXPORT GBL_RESULT GblArenaAllocator_loadState(GblArenaAllocator* pSelf, const GblArenaAllocatorState* pState) {
-    GBL_API_BEGIN(pSelf->pCtx);
+    GBL_CTX_BEGIN(pSelf->pCtx);
     while(pSelf->pActivePage != pState->pActivePage) {
         GblArenaAllocatorPage* pPage = GBL_ARENA_PAGE_(GblLinkedList_popFront(&pSelf->listNode));
-        GBL_API_FREE(pPage);
+        GBL_CTX_FREE(pPage);
     }
     pSelf->pActivePage->used = pState->bytesUsed;
-    GBL_API_END();
+    GBL_CTX_END();
 }
 

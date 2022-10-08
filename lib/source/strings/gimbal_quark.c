@@ -63,13 +63,13 @@ static const char* quarkStringAllocCopy_(const char* pString) {
 
 static void gblQuarkInit_(void) {
     GblBool mtxLocked = GBL_FALSE;
-    GBL_API_BEGIN(pCtx_);
-    GBL_API_PUSH_VERBOSE("[GblQuark]: Initializing");
-    GBL_API_VERIFY_EXPRESSION(!initialized_);
+    GBL_CTX_BEGIN(pCtx_);
+    GBL_CTX_PUSH_VERBOSE("[GblQuark]: Initializing");
+    GBL_CTX_VERIFY_EXPRESSION(!initialized_);
     mtx_init(&registryMtx_, mtx_plain);
     mtx_lock(&registryMtx_);
     mtxLocked = GBL_TRUE;
-    GBL_API_CALL(GblHashSet_construct(&registry_,
+    GBL_CTX_CALL(GblHashSet_construct(&registry_,
                                       sizeof(const char*),
                                       (GblHashSetHashFn)registryHasher_,
                                       (GblHashSetCmpFn)registryComparator_,
@@ -77,15 +77,15 @@ static void gblQuarkInit_(void) {
                                       registryCap_,
                                       pCtx_));
 
-    GBL_API_CALL(GblArenaAllocator_construct(&arena_,
+    GBL_CTX_CALL(GblArenaAllocator_construct(&arena_,
                                              pageSize_,
                                              0,
                                              &pageStatic_.page,
                                              pCtx_));
     initialized_            = GBL_TRUE;
     inittedOnce_            = GBL_TRUE;
-    GBL_API_POP(1);
-    GBL_API_END_BLOCK();
+    GBL_CTX_POP(1);
+    GBL_CTX_END_BLOCK();
     if(mtxLocked) mtx_unlock(&registryMtx_);
 }
 
@@ -120,41 +120,41 @@ static inline GblQuark* GblQuark_tryString_(const char* pString) {
 
 GBL_EXPORT GBL_RESULT GblQuark_final(void) {
     GblBool hasMutex = GBL_FALSE;
-    GBL_API_BEGIN(pCtx_);
-    GBL_API_PUSH_VERBOSE("[GblQuark]: Finalizing");
-    GBL_API_VERIFY_EXPRESSION(initialized_);
+    GBL_CTX_BEGIN(pCtx_);
+    GBL_CTX_PUSH_VERBOSE("[GblQuark]: Finalizing");
+    GBL_CTX_VERIFY_EXPRESSION(initialized_);
     mtx_lock(&registryMtx_);
     hasMutex = GBL_TRUE;
-    GBL_API_VERIFY_CALL(GblHashSet_destruct(&registry_));
+    GBL_CTX_VERIFY_CALL(GblHashSet_destruct(&registry_));
 
-    GBL_API_VERIFY_CALL(GblArenaAllocator_destruct(&arena_));
+    GBL_CTX_VERIFY_CALL(GblArenaAllocator_destruct(&arena_));
 
     initialized_ = GBL_FALSE;
-    GBL_API_POP(1);
-    GBL_API_END_BLOCK();
+    GBL_CTX_POP(1);
+    GBL_CTX_END_BLOCK();
     if(hasMutex) {
         mtx_unlock(&registryMtx_);
         if(!initialized_) mtx_destroy(&registryMtx_);
     }
-    return GBL_API_RESULT();
+    return GBL_CTX_RESULT();
 }
 
 GBL_EXPORT GBL_RESULT GblQuark_init(GblContext* pCtx, GblSize pageSize, GblSize initialEntries) {
-    GBL_API_BEGIN(NULL);
+    GBL_CTX_BEGIN(NULL);
     if(!initialized_) {
         pCtx_           = pCtx;
         pageSize_       = pageSize;
         registryCap_    = initialEntries;
         GBL_QUARK_ENSURE_INITIALIZED_();
     } else {
-        GBL_API_PUSH_VERBOSE("[GblQuark]: Reinititalizing");
-        GBL_API_CALL(GblQuark_final());
+        GBL_CTX_PUSH_VERBOSE("[GblQuark]: Reinititalizing");
+        GBL_CTX_CALL(GblQuark_final());
         pCtx_           = pCtx;
         pageSize_       = pageSize;
         registryCap_    = initialEntries;
         gblQuarkInit_();
     }
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblSize GblQuark_pageCount(void) {

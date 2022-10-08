@@ -1,6 +1,6 @@
 #include "meta/ifaces/gimbal_interface_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/meta/ifaces/gimbal_interface.h>
 
 #define GBL_INTERFACE_TEST_SUITE_(inst)     (GBL_INSTANCE_PRIVATE(inst, GBL_INTERFACE_TEST_SUITE_TYPE))
@@ -98,7 +98,7 @@ typedef struct GblInterfaceTestSuite_ {
 } GblInterfaceTestSuite_;
 
 static GBL_RESULT typeClassInit_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     struct {
         union {
@@ -137,12 +137,12 @@ static GBL_RESULT typeClassInit_(GblClass* pClass, const void* pUd, GblContext* 
     case TYPE_CE_:          klass.pClassE               ->type = type; break;
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblInterfaceTestSuite_));
     pSelf_->initialInterfaceRefCount = GblType_classRefCount(GBL_INTERFACE_TYPE);
@@ -354,11 +354,11 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
 
     pSelf_->pClassEntries = staticClassEntries;
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_INTERFACE_TYPE), pSelf_->initialInterfaceRefCount);
@@ -366,15 +366,15 @@ static GBL_RESULT GblInterfaceTestSuite_final_(GblTestSuite* pSelf, GblContext* 
 
 
     for(int t = 0; t < TYPE_COUNT_; ++t) {
-        GBL_API_VERIFY_CALL(GblType_unregister(pSelf_->typeList[t]));
+        GBL_CTX_VERIFY_CALL(GblType_unregister(pSelf_->typeList[t]));
     }
 
     GBL_TEST_COMPARE(GblType_registeredCount(), pSelf_->initialTypeCount);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_classRefDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
     GblClass* pClass = GblClass_refDefault(GBL_INTERFACE_TYPE);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pClass), GBL_INTERFACE_TYPE);
@@ -387,33 +387,33 @@ static GBL_RESULT GblInterfaceTestSuite_classRefDefault_(GblTestSuite* pSelf, Gb
 
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_INTERFACE_TYPE),
                      pSelf_->initialInterfaceRefCount + 1);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_castDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_COMPARE(GBL_INTERFACE(GblClass_weakRefDefault(GBL_INTERFACE_TYPE)),
                      GblClass_weakRefDefault(GBL_INTERFACE_TYPE));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_tryDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_COMPARE(GBL_INTERFACE_TRY(GblClass_weakRefDefault(GBL_INTERFACE_TYPE)),
                      GblClass_weakRefDefault(GBL_INTERFACE_TYPE));
 
     GBL_TEST_COMPARE(GBL_INTERFACE(GblClass_weakRefDefault(GBL_INTERFACE_TYPE)),
                      GblClass_weakRefDefault(GBL_INTERFACE_TYPE));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblInterfaceTestSuite_outerClassNull_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
@@ -421,15 +421,15 @@ static GBL_RESULT GblInterfaceTestSuite_outerClassNull_(GblTestSuite* pSelf, Gbl
 
     GBL_TEST_COMPARE(GBL_INTERFACE_OUTER_CLASS(NULL), NULL);
 
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_outerClassDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_COMPARE(GblInterface_outerClass(GBL_INTERFACE(GblClass_weakRefDefault(GBL_INTERFACE_TYPE))),
                      GblClass_weakRefDefault(GBL_INTERFACE_TYPE));
@@ -437,12 +437,12 @@ static GBL_RESULT GblInterfaceTestSuite_outerClassDefault_(GblTestSuite* pSelf, 
     GBL_TEST_COMPARE(GBL_INTERFACE_OUTER_CLASS(GblClass_weakRefDefault(GBL_INTERFACE_TYPE)),
                      GblClass_weakRefDefault(GBL_INTERFACE_TYPE));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_outerMostClassNull_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_EXPECT_ERROR();
 
@@ -450,16 +450,16 @@ static GBL_RESULT GblInterfaceTestSuite_outerMostClassNull_(GblTestSuite* pSelf,
 
     GBL_TEST_COMPARE(GBL_INTERFACE_OUTER_MOST_CLASS(NULL), NULL);
 
-    GBL_TEST_COMPARE(GBL_API_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
-    GBL_API_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblInterfaceTestSuite_outerMostClassDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_COMPARE(GblInterface_outerMostClass(GBL_INTERFACE(GblClass_weakRefDefault(GBL_INTERFACE_TYPE))),
                      GblClass_weakRefDefault(GBL_INTERFACE_TYPE));
@@ -467,19 +467,19 @@ static GBL_RESULT GblInterfaceTestSuite_outerMostClassDefault_(GblTestSuite* pSe
     GBL_TEST_COMPARE(GBL_INTERFACE_OUTER_MOST_CLASS(GblClass_weakRefDefault(GBL_INTERFACE_TYPE)),
                      GblClass_weakRefDefault(GBL_INTERFACE_TYPE));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_classUnrefDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblClass_unrefDefault(GblClass_weakRefDefault(GBL_INTERFACE_TYPE)),
                      pSelf_->initialInterfaceRefCount);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT checkRefCountsBegin_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 
     pSelf_->ifaceRefCount = GblType_classRefCount(GBL_INTERFACE_TYPE);
@@ -488,11 +488,11 @@ static GBL_RESULT checkRefCountsBegin_(GblTestSuite* pSelf, GblContext* pCtx) {
         pSelf_->typeRefCounts[t] = GblType_classRefCount(pSelf_->typeList[t]);
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT checkRefCountsEnd_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_INTERFACE_TYPE), pSelf_->ifaceRefCount);
@@ -501,12 +501,12 @@ static GBL_RESULT checkRefCountsEnd_(GblTestSuite* pSelf, GblContext* pCtx) {
         GBL_TEST_COMPARE(GblType_classRefCount(pSelf_->typeList[t]), pSelf_->typeRefCounts[t]);
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT verifyCasts_(GblClass* pClass, GblSize count, const ClassEntry_* pEntries, GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     const ClassEntry_* pSrc = pEntries;
     GblSize srcCount = 0;
 
@@ -527,86 +527,86 @@ static GBL_RESULT verifyCasts_(GblClass* pClass, GblSize count, const ClassEntry
         ++pSrc;
     }
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT verifyClass_(GblType type, GblSize count, const ClassEntry_* pEntries,  GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
-    GBL_API_VERIFY_CALL(checkRefCountsBegin_(pSelf, pCtx));
+    GBL_CTX_VERIFY_CALL(checkRefCountsBegin_(pSelf, pCtx));
 
     GblClass* pClass = GblClass_createFloating(type);
 
-    GBL_API_VERIFY_CALL(verifyCasts_(pClass, count, pEntries, pSelf, pCtx));
+    GBL_CTX_VERIFY_CALL(verifyCasts_(pClass, count, pEntries, pSelf, pCtx));
 
-    GBL_API_VERIFY_CALL(GblClass_destroyFloating(pClass));
+    GBL_CTX_VERIFY_CALL(GblClass_destroyFloating(pClass));
 
-    GBL_API_VERIFY_CALL(checkRefCountsEnd_(pSelf, pCtx));
+    GBL_CTX_VERIFY_CALL(checkRefCountsEnd_(pSelf, pCtx));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_classMappingInterface_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CA_],
+    GBL_CTX_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CA_],
                                      TYPE_A_COUNT_,
                                      pSelf_->pClassEntries,
                                      pSelf,
                                      pCtx));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_derivedClassMappingInterfaces_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CB_],
+    GBL_CTX_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CB_],
                                      TYPE_B_COUNT_,
                                      pSelf_->pClassEntries,
                                      pSelf,
                                      pCtx));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_deepDerivedClassMappingDeepDerivedInterface_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CC_],
+    GBL_CTX_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CC_],
                                      TYPE_C_COUNT_,
                                      pSelf_->pClassEntries,
                                      pSelf,
                                      pCtx));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 
 static GBL_RESULT GblInterfaceTestSuite_deepDerivedClassMappingInterfaceMappingInterface_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CD_],
+    GBL_CTX_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CD_],
                                      TYPE_D_COUNT_,
                                      pSelf_->pClassEntries,
                                      pSelf,
                                      pCtx));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblInterfaceTestSuite_deepDerivedClassMappingDeepDerivedInterfaceMappingInterface_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 
-    GBL_API_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CE_],
+    GBL_CTX_VERIFY_CALL(verifyClass_(pSelf_->typeList[TYPE_CE_],
                                      TYPE_E_COUNT_,
                                      pSelf_->pClassEntries,
                                      pSelf,
                                      pCtx));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblType GblInterfaceTestSuite_type(void) {
@@ -640,14 +640,14 @@ GBL_EXPORT GblType GblInterfaceTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("InterfaceTestSuite"),
                                      &vTable,
                                      sizeof(GblInterfaceTestSuite),
                                      sizeof(GblInterfaceTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
     return type;
 }

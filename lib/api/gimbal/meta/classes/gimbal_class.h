@@ -649,12 +649,12 @@ GBL_DECLS_END
  *
  *      // a lambda is nice for being all ad-hoc
  *      pClass2->iEventHandlerIFace.pFnEvent = [](GblIEventHandler* pSelf, GblEvent* pEvent) {
- *          GBL_API_BEGIN(NULL);
- *          GBL_API_VERBOSE("So %s just sent a %s to a C++ lambda...",
+ *          GBL_CTX_BEGIN(NULL);
+ *          GBL_CTX_VERBOSE("So %s just sent a %s to a C++ lambda...",
  *                          GblType_name(GBL_CLASS_TYPEOF(pSelf)),
  *                          GblType_name(GblEvent_typeof(pEvent)));
  *          GblEvent_accept(pEvent);
- *          GBL_API_END();
+ *          GBL_CTX_END();
  *      };
  *
  *      // k, this class is now officially interesting

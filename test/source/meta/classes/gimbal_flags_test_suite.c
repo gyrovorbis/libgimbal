@@ -1,6 +1,6 @@
 #include "meta/classes/gimbal_flags_test_suite.h"
 #include <gimbal/test/gimbal_test.h>
-#include <gimbal/core/gimbal_api_frame.h>
+#include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/meta/classes/gimbal_flags.h>
 #include <gimbal/meta/types/gimbal_variant.h>
 #include <gimbal/meta/properties/gimbal_property.h>
@@ -21,22 +21,22 @@ GBL_DECLARE_FLAGS(PROPERTY_FLAGS) {
 };
 
 static GBL_RESULT GblFlagsTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblFlagsTestSuite_));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblClass_unrefDefault(GBL_CLASS(pSelf_->pFlagsClass)), 0);
     GblType_unregister(pSelf_->flagsType);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_register_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     pSelf_->flagsType = GblFlags_register("PropertyFlags",
                                    (const GblFlagEntry[]){
@@ -46,18 +46,18 @@ static GBL_RESULT GblFlagsTestSuite_register_(GblTestSuite* pSelf, GblContext* p
                                        GBL_FLAGS_ENTRY(SAVE,    "Save"),
                                        GBL_FLAGS_ENTRY_LAST()
                                    });
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_TEST_VERIFY(pSelf_->flagsType != GBL_INVALID_TYPE);
-    GBL_API_VERIFY_TYPE(pSelf_->flagsType, GBL_FLAGS_TYPE);
+    GBL_CTX_VERIFY_TYPE(pSelf_->flagsType, GBL_FLAGS_TYPE);
 
     pSelf_->pFlagsClass = (GblFlagsClass*)GblClass_refDefault(pSelf_->flagsType);
     GBL_TEST_VERIFY(pSelf_->pFlagsClass);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_class_name_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(strcmp(GblFlagsClass_nameFromIndex(pSelf_->pFlagsClass,
                                                   1),
@@ -75,11 +75,11 @@ static GBL_RESULT GblFlagsTestSuite_class_name_(GblTestSuite* pSelf, GblContext*
                                                                           SAVE)),
                        "SAVE"),
                 0);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_class_nick_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(strcmp(GblFlagsClass_nickFromIndex(pSelf_->pFlagsClass,
                                                   1),
@@ -97,11 +97,11 @@ static GBL_RESULT GblFlagsTestSuite_class_nick_(GblTestSuite* pSelf, GblContext*
                                                                           LOAD)),
                        "Load"),
                 0);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_class_value_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblFlagsClass_valueFromIndex(pSelf_->pFlagsClass, 1), WRITE);
     GBL_TEST_COMPARE(GblFlagsClass_valueFromName(pSelf_->pFlagsClass, "READ"), READ);
@@ -110,79 +110,79 @@ static GBL_RESULT GblFlagsTestSuite_class_value_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(GblFlagsClass_valueFromNickQuark(pSelf_->pFlagsClass, GblQuark_fromString("Write")), WRITE);
     GBL_TEST_VERIFY(GblFlagsClass_valueCheck(pSelf_->pFlagsClass, READ|WRITE|LOAD));
     GBL_TEST_VERIFY(!GblFlagsClass_valueCheck(pSelf_->pFlagsClass, SAVE|9999));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_class_string_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GblFlags flags = GblFlagsClass_valueFromString(pSelf_->pFlagsClass, "WRITE|SAVE");
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_TEST_COMPARE(flags, (WRITE|SAVE));
 
     GblStringBuffer buffer;
-    GBL_API_VERIFY_CALL(GblStringBuffer_construct(&buffer));
-    GBL_API_VERIFY_CALL(GblFlagsClass_valueAppendString(pSelf_->pFlagsClass,
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer));
+    GBL_CTX_VERIFY_CALL(GblFlagsClass_valueAppendString(pSelf_->pFlagsClass,
                                                         flags,
                                                         &buffer));
     GBL_TEST_COMPARE(strcmp(GblStringBuffer_cString(&buffer),
                        "WRITE|SAVE"), 0);
 
-    GBL_API_VERIFY_CALL(GblStringBuffer_destruct(&buffer));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_destruct(&buffer));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_value_from_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblFlags_fromName("READ", pSelf_->flagsType), READ);
     GBL_TEST_COMPARE(GblFlags_fromNameQuark(GblQuark_fromString("WRITE"), pSelf_->flagsType), WRITE);
     GBL_TEST_COMPARE(GblFlags_fromNick("Load", pSelf_->flagsType), LOAD);
     GBL_TEST_COMPARE(GblFlags_fromNickQuark(GblQuark_fromString("Save"), pSelf_->flagsType), SAVE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_value_to_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(strcmp(GblFlags_name(READ, pSelf_->flagsType), "READ"), 0);
     GBL_TEST_COMPARE(GblFlags_nameQuark(WRITE, pSelf_->flagsType), GblQuark_fromString("WRITE"));
     GBL_TEST_COMPARE(strcmp(GblFlags_nick(LOAD, pSelf_->flagsType), "Load"), 0);
     GBL_TEST_COMPARE(GblFlags_nickQuark(SAVE, pSelf_->flagsType), GblQuark_fromString("Save"));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_value_check_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GBL_TEST_VERIFY(!GblFlags_check(WRITE|99999, pSelf_->flagsType));
     GBL_TEST_VERIFY(GblFlags_check(SAVE, pSelf_->flagsType));
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_value_string_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GblFlags flags = GblFlags_fromString("READ|WRITE", pSelf_->flagsType);
-    GBL_API_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_TEST_COMPARE(flags, (READ|WRITE));
 
     GblStringBuffer buffer;
-    GBL_API_VERIFY_CALL(GblStringBuffer_construct(&buffer));
-    GBL_API_VERIFY_CALL(GblFlags_appendString(flags, pSelf_->flagsType, &buffer));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer));
+    GBL_CTX_VERIFY_CALL(GblFlags_appendString(flags, pSelf_->flagsType, &buffer));
     GBL_TEST_COMPARE(strcmp(GblStringBuffer_cString(&buffer),
                        "READ|WRITE"), 0);
 
-    GBL_API_VERIFY_CALL(GblStringBuffer_destruct(&buffer));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_destruct(&buffer));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_variant_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GblVariant v = GBL_VARIANT_INIT;
@@ -190,59 +190,59 @@ static GBL_RESULT GblFlagsTestSuite_variant_(GblTestSuite* pSelf, GblContext* pC
     const GblRefCount refCountBegin = GblType_classRefCount(pSelf_->flagsType);
 
     // Default constructor
-    GBL_API_VERIFY_CALL(GblVariant_constructDefault(&v, pSelf_->flagsType));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&v, pSelf_->flagsType));
     GBL_TEST_VERIFY(GblVariant_typeOf(&v) == pSelf_->flagsType);
     GBL_TEST_COMPARE(GblVariant_getFlags(&v), 0);
 
     // Copy Constructor
-    GBL_API_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
     GBL_TEST_VERIFY(GblVariant_equals(&v, &v2));
-    GBL_API_VERIFY_CALL(GblVariant_destruct(&v2));
+    GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v2));
 
     // Move Constructor
-    GBL_API_VERIFY_CALL(GblVariant_constructMove(&v2, &v));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructMove(&v2, &v));
     GBL_TEST_VERIFY(GblVariant_equals(&v, &v2));
-    GBL_API_VERIFY_CALL(GblVariant_destruct(&v2));
-    GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
+    GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v2));
+    GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
 
     // Utility / Value Copy Constructor
-    GBL_API_VERIFY_CALL(GblVariant_constructFlags(&v, pSelf_->flagsType, READ|WRITE));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructFlags(&v, pSelf_->flagsType, READ|WRITE));
     GBL_TEST_COMPARE(GblVariant_getFlags(&v), (READ|WRITE)); // Utility / Get Value
-    GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
+    GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
 
     // Value Move Constructor
-    GBL_API_VERIFY_CALL(GblVariant_constructValueMove(&v, pSelf_->flagsType, SAVE|LOAD));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v, pSelf_->flagsType, SAVE|LOAD));
     GBL_TEST_COMPARE(GblVariant_getFlags(&v), (SAVE|LOAD));
 
     // Utility / Value Set Copy
-    GBL_API_VERIFY_CALL(GblVariant_setFlags(&v, pSelf_->flagsType, WRITE|LOAD));
+    GBL_CTX_VERIFY_CALL(GblVariant_setFlags(&v, pSelf_->flagsType, WRITE|LOAD));
     GBL_TEST_COMPARE(GblVariant_getFlags(&v), (WRITE|LOAD));
 
     // Value Set Move
-    GBL_API_VERIFY_CALL(GblVariant_setValueMove(&v, pSelf_->flagsType, LOAD|SAVE));
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(&v, pSelf_->flagsType, LOAD|SAVE));
     GBL_TEST_COMPARE(GblVariant_getFlags(&v), (LOAD|SAVE));
 
     // Value Get Move
     PROPERTY_FLAGS flags = 0;
-    GBL_API_VERIFY_CALL(GblVariant_getValueMove(&v, &flags));
+    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &flags));
     GBL_TEST_COMPARE(flags, (LOAD|SAVE));
 
     // Value Get Peek
     GblVariant_setFlags(&v, pSelf_->flagsType, WRITE);
-    GBL_API_VERIFY_CALL(GblVariant_getValuePeek(&v, &flags));
+    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &flags));
     GBL_TEST_COMPARE(flags, WRITE);
 
     // Destructor
-    GBL_API_VERIFY_CALL(GblVariant_destruct(&v));
+    GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
 
     // Reference leak check
     GBL_TEST_COMPARE(refCountBegin, GblType_classRefCount(pSelf_->flagsType));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_variant_fail_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
 
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
@@ -255,81 +255,81 @@ static GBL_RESULT GblFlagsTestSuite_variant_fail_(GblTestSuite* pSelf, GblContex
                 GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_TEST_COMPARE(GblVariant_setValueCopy(&v, pSelf_->flagsType, 9999),
                 GBL_RESULT_ERROR_OUT_OF_RANGE);
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblFlagsTestSuite_variant_conversions_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_API_BEGIN(pCtx);
+    GBL_CTX_BEGIN(pCtx);
 
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
     GBL_VARIANT(variant);
     GBL_VARIANT(tVariant);
     const GblRefCount refCountBegin = GblType_classRefCount(pSelf_->flagsType);
 
-    GBL_API_VERIFY_CALL(GblVariant_constructValueCopy(&variant, pSelf_->flagsType, (READ|WRITE)));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(&variant, pSelf_->flagsType, (READ|WRITE)));
 
     // Bool
-    GBL_API_VERIFY_CALL(GblVariant_constructBool(&tVariant, GBL_FALSE));
-    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructBool(&tVariant, GBL_FALSE));
+    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_COMPARE(GblVariant_getBool(&tVariant), GBL_TRUE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint8
-    GBL_API_VERIFY_CALL(GblVariant_setUint8(&tVariant, 255));
-    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_CTX_VERIFY_CALL(GblVariant_setUint8(&tVariant, 255));
+    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_COMPARE(GblVariant_getUint8(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint16
-    GBL_API_VERIFY_CALL(GblVariant_setUint16(&tVariant, 255));
-    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_CTX_VERIFY_CALL(GblVariant_setUint16(&tVariant, 255));
+    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_COMPARE(GblVariant_getUint16(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Int16
-    GBL_API_VERIFY_CALL(GblVariant_setInt16(&tVariant, 255));
-    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_CTX_VERIFY_CALL(GblVariant_setInt16(&tVariant, 255));
+    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_COMPARE(GblVariant_getInt16(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint32
-    GBL_API_VERIFY_CALL(GblVariant_setUint32(&tVariant, 255));
-    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_CTX_VERIFY_CALL(GblVariant_setUint32(&tVariant, 255));
+    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_COMPARE(GblVariant_getUint32(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Int32
-    GBL_API_VERIFY_CALL(GblVariant_setInt32(&tVariant, 255));
-    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_CTX_VERIFY_CALL(GblVariant_setInt32(&tVariant, 255));
+    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_COMPARE(GblVariant_getInt32(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint64
-    GBL_API_VERIFY_CALL(GblVariant_setUint64(&tVariant, 255));
-    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_CTX_VERIFY_CALL(GblVariant_setUint64(&tVariant, 255));
+    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_COMPARE(GblVariant_getUint64(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // String
-    GBL_API_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
-    GBL_API_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
+    GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
+    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_VERIFY(GblStringView_equals(GblVariant_getStringView(&tVariant), GBL_STRV("READ|WRITE")));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // FROM String
-    GBL_API_VERIFY_CALL(GblVariant_setString(&tVariant, "READ|WRITE|LOAD|SAVE"));
+    GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "READ|WRITE|LOAD|SAVE"));
     GBL_TEST_VERIFY(GblVariant_canConvert(GblVariant_typeOf(&tVariant), GblVariant_typeOf(&variant)));
-    GBL_API_VERIFY_CALL(GblVariant_convert(&tVariant, &variant));
-    GBL_API_VERIFY_CALL(GblVariant_equals(&tVariant, &variant));
+    GBL_CTX_VERIFY_CALL(GblVariant_convert(&tVariant, &variant));
+    GBL_CTX_VERIFY_CALL(GblVariant_equals(&tVariant, &variant));
     GBL_TEST_COMPARE(GblVariant_getFlags(&variant), (READ|WRITE|LOAD|SAVE));
 
-    GBL_API_VERIFY_CALL(GblVariant_destruct(&tVariant));
-    GBL_API_VERIFY_CALL(GblVariant_destruct(&variant));
+    GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
+    GBL_CTX_VERIFY_CALL(GblVariant_destruct(&variant));
 
     // Reference leak check
     GBL_TEST_COMPARE(refCountBegin, GblType_classRefCount(pSelf_->flagsType));
 
-    GBL_API_END();
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblType GblFlagsTestSuite_type(void) {
@@ -358,14 +358,14 @@ GBL_EXPORT GblType GblFlagsTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_API_BEGIN(NULL);
+        GBL_CTX_BEGIN(NULL);
         type = GblTestSuite_register(GblQuark_internStringStatic("FlagsTestSuite"),
                                      &vTable,
                                      sizeof(GblFlagsTestSuite),
                                      sizeof(GblFlagsTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_API_VERIFY_LAST_RECORD();
-        GBL_API_END_BLOCK();
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_END_BLOCK();
     }
     return type;
 }
