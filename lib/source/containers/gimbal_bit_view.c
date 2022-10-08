@@ -1,3 +1,4 @@
+#if 0
 #include <gimbal/containers/gimbal_bit_view.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 
@@ -21,3 +22,4 @@ GBL_EXPORT GBL_RESULT (GblBitView_toString)(const GblBitView* pSelf, GblStringBu
     }
 
 }
+#endif

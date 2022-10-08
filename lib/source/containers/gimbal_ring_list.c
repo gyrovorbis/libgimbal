@@ -357,8 +357,8 @@ GBL_EXPORT GBL_RESULT GblRingList_clear(GblRingList* pSelf) {
 
 static int (GblRingList_sortDefault_)(const void* pV1, const void* pV2, void* pClosure) {
     GBL_UNUSED(pClosure);
-    return GBL_DOUBLY_LINKED_LIST_ENTRY(pV1, GblRingList, listNode)->pData -
-           GBL_DOUBLY_LINKED_LIST_ENTRY(pV2, GblRingList, listNode)->pData;
+    return (uintptr_t)GBL_DOUBLY_LINKED_LIST_ENTRY(pV1, GblRingList, listNode)->pData -
+           (uintptr_t)GBL_DOUBLY_LINKED_LIST_ENTRY(pV2, GblRingList, listNode)->pData;
 }
 
 typedef struct GblRingListSortAdapterClosure_ {
