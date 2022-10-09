@@ -233,16 +233,14 @@ list(APPEND
      GBL_TARGET_LINK_LIBS
      tinycthread)
 
-if (NOT DEFINED PLATFORM_DREAMCAST)
+if (NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA)
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-
-list(APPEND
-     GBL_TARGET_LINK_LIBS
-     Threads::Threads)
+    list(APPEND
+         GBL_TARGET_LINK_LIBS
+         Threads::Threads)
 
 endif()
 

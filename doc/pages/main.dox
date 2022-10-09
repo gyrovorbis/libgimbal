@@ -314,6 +314,8 @@ of choice. We go through a lot of effort to test throroughly and verify correctn
 	</td></tr>
 	</table>
 	where "GBL_SELF" and "GBL_CSELF" are predefined macros mimicking the non-const and const implicit "this" pointer in C++ and most OO languages.
+### Inlining
+### Encapsulation
 ### Macros
 	Lets go ahead and get something out of the way here... this project makes generous utilization of C macro black magic, voodoo, codegen,
 	DSLs, fuckery--call it what you will--but we do so unapologetically. This is a very advanced C codebase, and such macros are often literally 
@@ -395,6 +397,8 @@ of choice. We go through a lot of effort to test throroughly and verify correctn
 # Credits
 ## Author
 	- Falco Girgis
+## Contributors
+    - Mike Santiago (admin@ignoresolutions.xyz)
 
 ## Dependencies
 	- HashSet and BTree back-ends: Josh Baker (tidwall) 
