@@ -1,4 +1,5 @@
 #include <gimbal/test/gimbal_test_scenario.h>
+#include "algorithms/gimbal_sort_test_suite.h"
 #include "containers/gimbal_linked_list_test_suite.h"
 #include "containers/gimbal_doubly_linked_list_test_suite.h"
 #include "containers/gimbal_nary_tree_test_suite.h"
@@ -48,6 +49,8 @@ int main(int argc, char* pArgv[]) {
 
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO | GBL_LOG_LEVEL_WARNING | GBL_LOG_LEVEL_ERROR );
 
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_createFromType(GBL_SORT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_LINKED_LIST_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,

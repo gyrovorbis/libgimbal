@@ -1696,8 +1696,8 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_splitAfterMiddle2_(GblTestSuite* 
 }
 
 static int comparator_(const void* pValue1, const void* pValue2, void* pClosure) {
-    return strcmp((const char*)GBL_DOUBLY_LINKED_LIST_ENTRY(pValue1, TestStruct_, listNode),
-                  (const char*)GBL_DOUBLY_LINKED_LIST_ENTRY(pValue2, TestStruct_, listNode));
+    return strcmp((const char*)GBL_DOUBLY_LINKED_LIST_ENTRY(pValue1, TestStruct_, listNode)->pString,
+                  (const char*)GBL_DOUBLY_LINKED_LIST_ENTRY(pValue2, TestStruct_, listNode)->pString);
 }
 
 static GBL_RESULT GblDoublyLinkedListTestSuite_joinSortedAppend_(GblTestSuite* pSelf, GblContext* pCtx) {
@@ -2046,7 +2046,7 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_mergeSort2_(GblTestSuite* pSelf, 
     };
 
     for(GblSize i = 0; i < 4; ++i)
-        GblDoublyLinkedList_pushBack(&list1, &nodes[i]);
+        GblDoublyLinkedList_pushBack(&list1, &nodes[i].node);
 
     GblDoublyLinkedList_mergeSort(&list1, testComp_, NULL);
 
@@ -2057,7 +2057,6 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_mergeSort2_(GblTestSuite* pSelf, 
 
     GBL_CTX_END();
 }
-
 
 
 GBL_EXPORT GblType GblDoublyLinkedListTestSuite_type(void) {

@@ -16,6 +16,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_C_EXTENSIONS OFF)
 
 add_executable(GimbalTests
+    include/algorithms/gimbal_sort_test_suite.h
+    source/algorithms/gimbal_sort_test_suite.c
     include/containers/gimbal_linked_list_test_suite.h
     source/containers/gimbal_linked_list_test_suite.c
     include/containers/gimbal_doubly_linked_list_test_suite.h

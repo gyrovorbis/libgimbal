@@ -148,11 +148,11 @@ GBL_EXPORT void* (GblArrayDeque_insert)(GblArrayDeque* pSelf, GblSize pos, const
 }
 
 GBL_EXPORT void* GblArrayDeque_emplace(GblArrayDeque* pSelf, GblSize pos) {
-
+    return NULL;
 }
 
 GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, GblSize pos, GblSize count) {
-
+    return GBL_RESULT_UNIMPLEMENTED;
 }
 
 GBL_EXPORT void* GblArrayDeque_emplaceBack(GblArrayDeque* pSelf) GBL_NOEXCEPT {

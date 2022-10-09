@@ -19,6 +19,7 @@ GBL_DECLS_BEGIN
 
 GBL_INLINE int      gblRand              (void)             GBL_NOEXCEPT;
 GBL_INLINE int      gblRandRange         (int min, int max) GBL_NOEXCEPT;
+GBL_INLINE int      gblRandString        (char* pBuffer, int minSize, int maxSize, const char* pCharList) GBL_NOEXCEPT;
 GBL_INLINE uint64_t gblSeed              (uint8_t index)    GBL_NOEXCEPT;
 
 typedef    GblHash (*GblHashFn)(const void*, GblSize);
@@ -123,6 +124,24 @@ GBL_INLINE int gblRandRange(int min, int max) GBL_NOEXCEPT {
     }
     return (rand() % (max - min + 1)) + min;
 }
+
+GBL_INLINE int gblRandString(char* pBuffer, int minSize, int maxSize, const char* pCharList) GBL_NOEXCEPT {
+    static const char* pWordChars = "abcdefghijklmnopqrstuvwxyz "
+                                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                    "1234567890";
+
+    if(!pCharList) pCharList = pWordChars;
+    const int size = gblRandRange(minSize, maxSize);
+    const int listLength = strlen(pCharList);
+
+    for(GblSize c = 0; c < (GblSize)size; ++c) {
+        pBuffer[c] = pCharList[gblRandRange(0, listLength-1)];
+    }
+
+    pBuffer[size] = '\0';
+    return size;
+}
+
 
 GBL_FORCE_INLINE uint32_t fmix32 ( uint32_t h ) GBL_NOEXCEPT {
   h ^= h >> 16;

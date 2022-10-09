@@ -763,8 +763,9 @@ static GBL_RESULT GblLinkedListTestSuite_splitBefore_(GblTestSuite* pSelf, GblCo
 
 
 static int comparator_(const void* pValue1, const void* pValue2, void* pClosure) {
-    return strcmp((const char*)GBL_LINKED_LIST_ENTRY(pValue1, TestStruct_, listNode),
-                  (const char*)GBL_LINKED_LIST_ENTRY(pValue2, TestStruct_, listNode));
+    GBL_UNUSED(pClosure);
+    return strcmp((const char*)GBL_LINKED_LIST_ENTRY(pValue1, TestStruct_, listNode)->pString,
+                  (const char*)GBL_LINKED_LIST_ENTRY(pValue2, TestStruct_, listNode)->pString);
 
 }
 

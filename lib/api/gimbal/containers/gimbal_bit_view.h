@@ -81,19 +81,19 @@ GBL_INLINE GBL_RESULT    GblBitView_assign       (GBL_SELF, GblBool value, GblSi
 GBL_INLINE GBL_RESULT    GblBitView_set          (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblBitView_reset        (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblBitView_flip         (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
-
 GBL_INLINE GBL_RESULT    GblBitView_rotate       (GBL_SELF, ptrdiff_t n, GblSize offset, GblSize count)              GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblBitView_shiftLeft    (GBL_SELF, GblSize amount, GblSize offset, GblSize count)           GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblBitView_shiftRight   (GBL_SELF, GblSize amount, GblSize offset, GblSize count)           GBL_NOEXCEPT;
 
-GBL_INLINE GblBool       GblBitView_eq           (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblBitView_lt           (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblBitView_leq          (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_shiftL       (GBL_SELF, const GblBitView* pSrc, GblSize amount)                  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_shiftR       (GBL_SELF, const GblBitView* pSrc, GblSize amount)                  GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT    GblBitView_and          (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT    GblBitView_or           (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT    GblBitView_xor          (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT    GblBitView_andNot       (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
+
+GBL_INLINE GblBool       GblBitView_eq           (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_lt           (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_leq          (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
 
 // ===== Macro overrides =====
 #define GblBitView_init(...)                     GblBitView_initDefalt_(__VA_ARGS__)

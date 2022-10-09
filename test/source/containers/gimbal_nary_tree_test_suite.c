@@ -74,7 +74,7 @@ static GBL_RESULT GblNaryTreeTestSuite_init_(GblTestSuite* pSelf, GblContext* pC
 
 static GBL_RESULT GblNaryTreeTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+    //GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
     GBL_CTX_END();
 }
 
@@ -500,6 +500,128 @@ static GBL_RESULT GblNaryTreeTestSuite_disconnect_(GblTestSuite* pSelf, GblConte
     GBL_CTX_END();
 }
 
+
+typedef struct TraversalClosure_ {
+    int count;
+    int index[NARY_OBJECT_COUNT_+1];
+    int countReturnTrue;
+} TraversalClosure_;
+
+GblBool traversalIt_(const GblNaryTreeNode* pNode, void* pUd) {
+    TraversalClosure_* pClosure = pUd;
+    pClosure->index[pClosure->count++] = NARY_OBJECT_OF_(pNode)->id;
+    if(pClosure->count == pClosure->countReturnTrue) return GBL_TRUE;
+    else return GBL_FALSE;
+}
+
+static GblBool GblNaryTreeTestSuite_traverse_(GblTestSuite* pSelf, uintptr_t mask, TraversalClosure_* pClosure) {
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    for(GblSize i = 0; i < NARY_OBJECT_COUNT_; ++i) {
+        memset(NARY_OBJECT_NODE_(pSelf_, i), 0, sizeof(NaryObject_));
+        NARY_OBJECT_(pSelf_, i)->id = i;
+    }
+
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 0), NARY_OBJECT_NODE_(pSelf_, 1));
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 0), NARY_OBJECT_NODE_(pSelf_, 2));
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 0), NARY_OBJECT_NODE_(pSelf_, 3));
+
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 1), NARY_OBJECT_NODE_(pSelf_, 4));
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 1), NARY_OBJECT_NODE_(pSelf_, 5));
+
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 3), NARY_OBJECT_NODE_(pSelf_, 6));
+
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 6), NARY_OBJECT_NODE_(pSelf_, 7));
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 6), NARY_OBJECT_NODE_(pSelf_, 8));
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 6), NARY_OBJECT_NODE_(pSelf_, 9));
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 6), NARY_OBJECT_NODE_(pSelf_, 10));
+
+    pClosure->countReturnTrue = -1;
+
+    for(GblSize i = 0; i < NARY_OBJECT_COUNT_; ++i)
+        pClosure->index[i] = -1;
+
+    return GblNaryTree_traverse(NARY_OBJECT_NODE_(pSelf, 0),
+                                mask,
+                                traversalIt_,
+                                pClosure);
+}
+
+
+static GBL_RESULT GblNaryTreeTestSuite_traversePreOrder_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    TraversalClosure_ closure = {};
+
+    GBL_TEST_VERIFY(!GblNaryTreeTestSuite_traverse_(pSelf,
+                                                    GBL_NARY_TREE_TRAVERSAL_MASK(GBL_NARY_TREE_TRAVERSAL_ORDER_PRE,
+                                                                                 GBL_NARY_TREE_NODE_FLAGS_ALL),
+                                                    &closure));
+
+    GBL_TEST_COMPARE(closure.count, NARY_OBJECT_COUNT_);
+    GBL_TEST_COMPARE(closure.index[0], 0);
+    GBL_TEST_COMPARE(closure.index[1], 1);
+    GBL_TEST_COMPARE(closure.index[2], 4);
+    GBL_TEST_COMPARE(closure.index[3], 5);
+    GBL_TEST_COMPARE(closure.index[4], 2);
+    GBL_TEST_COMPARE(closure.index[5], 3);
+    GBL_TEST_COMPARE(closure.index[6], 6);
+    GBL_TEST_COMPARE(closure.index[7], 7);
+    GBL_TEST_COMPARE(closure.index[8], 8);
+    GBL_TEST_COMPARE(closure.index[9], 9);
+    GBL_TEST_COMPARE(closure.index[10], 10);
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_traversePostOrder_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    TraversalClosure_ closure = {};
+
+    GBL_TEST_VERIFY(!GblNaryTreeTestSuite_traverse_(pSelf,
+                                                    GBL_NARY_TREE_TRAVERSAL_MASK(GBL_NARY_TREE_TRAVERSAL_ORDER_POST,
+                                                                                 GBL_NARY_TREE_NODE_FLAGS_ALL),
+                                                    &closure));
+
+    GBL_TEST_COMPARE(closure.count, NARY_OBJECT_COUNT_);
+    GBL_TEST_COMPARE(closure.index[0], 4);
+    GBL_TEST_COMPARE(closure.index[1], 5);
+    GBL_TEST_COMPARE(closure.index[2], 1);
+    GBL_TEST_COMPARE(closure.index[3], 2);
+    GBL_TEST_COMPARE(closure.index[4], 7);
+    GBL_TEST_COMPARE(closure.index[5], 8);
+    GBL_TEST_COMPARE(closure.index[6], 9);
+    GBL_TEST_COMPARE(closure.index[7], 10);
+    GBL_TEST_COMPARE(closure.index[8], 6);
+    GBL_TEST_COMPARE(closure.index[9], 3);
+    GBL_TEST_COMPARE(closure.index[10], 0);
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_traverseInOrder_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    TraversalClosure_ closure = {};
+
+    GBL_TEST_VERIFY(!GblNaryTreeTestSuite_traverse_(pSelf,
+                                                    GBL_NARY_TREE_TRAVERSAL_MASK(GBL_NARY_TREE_TRAVERSAL_ORDER_IN,
+                                                                                 GBL_NARY_TREE_NODE_FLAGS_ALL),
+                                                    &closure));
+
+    GBL_TEST_COMPARE(closure.count, NARY_OBJECT_COUNT_);
+    GBL_TEST_COMPARE(closure.index[0], 4);
+    GBL_TEST_COMPARE(closure.index[1], 1);
+    GBL_TEST_COMPARE(closure.index[2], 5);
+    GBL_TEST_COMPARE(closure.index[3], 2);
+    GBL_TEST_COMPARE(closure.index[4], 0);
+    GBL_TEST_COMPARE(closure.index[5], 3);
+    GBL_TEST_COMPARE(closure.index[6], 7);
+    GBL_TEST_COMPARE(closure.index[7], 8);
+    GBL_TEST_COMPARE(closure.index[8], 9);
+    GBL_TEST_COMPARE(closure.index[9], 6);
+    GBL_TEST_COMPARE(closure.index[10], 10);
+    GBL_CTX_END();
+}
+
+
 GBL_EXPORT GblType GblNaryTreeTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
@@ -533,6 +655,9 @@ GBL_EXPORT GblType GblNaryTreeTestSuite_type(void) {
         { "siblingAt",        GblNaryTreeTestSuite_siblingAt_        },
         { "siblingIndex",     GblNaryTreeTestSuite_siblingIndex_     },
         { "disconnect",       GblNaryTreeTestSuite_disconnect_       },
+        { "traversePreOrder", GblNaryTreeTestSuite_traversePreOrder_ },
+        { "traversePostOrder",GblNaryTreeTestSuite_traversePostOrder_},
+        { "traverseInOrder",  GblNaryTreeTestSuite_traverseInOrder_  },
         { NULL,               NULL                                   }
     };
 

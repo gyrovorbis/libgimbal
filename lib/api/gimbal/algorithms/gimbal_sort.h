@@ -16,7 +16,7 @@ GBL_DECLS_BEGIN
 
 
 typedef int  (*GblSortComparatorFn)  (const void*, const void*);
-typedef void    (*GblSortFn)            (void*, GblSize, GblSize, GblSortComparatorFn);
+typedef void (*GblSortFn)            (void*, GblSize, GblSize, GblSortComparatorFn);
 
 GBL_INLINE void gblSortSelection   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_INLINE void gblSortQuick       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
@@ -44,7 +44,7 @@ GBL_INLINE void gblSortMerge(void* pArray, GblSize count, GblSize elemSize, GblS
     uint8_t* pResultBuffer, *pResult;
     GblSize halfSize;
 
-    if(count < 1) return;
+    if(count <= 1) return;
 
     halfSize = count / 2;
     pFirstHalf = (uint8_t*)pArray;
@@ -106,10 +106,10 @@ GBL_INLINE void gblSortQuick(void* pArray, GblSize count, GblSize elemSize, GblS
 
 GBL_INLINE void gblSortInsertion(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     void* pTemp = GBL_ALLOCA(elemSize);
-    for(GblSize i = 0; i < count; ++i) {
+    for(GblSize i = 2; i < count; ++i) {
         memcpy(pTemp, (char*)pArray + i*elemSize, elemSize);
         GblSize j = i;
-        while(pFnCmp(((char*)pArray + (j-1)*elemSize), pTemp) > 0) {
+        while(j && pFnCmp(((char*)pArray + (j-1)*elemSize), pTemp) > 0) {
             memcpy((char*)pArray + j*elemSize, (char*)pArray + (j-1)*elemSize, elemSize);
             --j;
         }

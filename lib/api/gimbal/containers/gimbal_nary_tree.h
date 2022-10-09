@@ -11,7 +11,7 @@
 
 #define GBL_NARY_TREE_NPOS                           GBL_NPOS
 #define GBL_NARY_TREE_ENTRY(node, structure, field)  GBL_CONTAINER_OF(node, structure, field)
-#define GBL_NARY_TREE_TRAVERSAL_MASK(order, flags)   ((order << 0x2) && flags)
+#define GBL_NARY_TREE_TRAVERSAL_MASK(order, flags)   ((order << 0x3) | (flags))
 
 #define GBL_SELF_TYPE GblNaryTreeNode
 
@@ -19,12 +19,13 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblNaryTreeNode);
 
-typedef GblBool (*GblNaryTreeIterFn)(GBL_CSELF, const GblNaryTreeNode*, void*);
+typedef GblBool (*GblNaryTreeIterFn)(const GblNaryTreeNode* pNode, void* pUd);
 
 typedef enum GBL_NARY_TREE_NODE_FLAGS {
     GBL_NARY_TREE_NODE_FLAG_ROOT     = 0x1,
     GBL_NARY_TREE_NODE_FLAG_INTERNAL = 0x2,
-    GBL_NARY_TREE_NODE_FLAG_LEAF     = 0x4
+    GBL_NARY_TREE_NODE_FLAG_LEAF     = 0x4,
+    GBL_NARY_TREE_NODE_FLAGS_ALL     = 0x7
 } GBL_NARY_TREE_NODE_FLAGS;
 
 typedef enum GBL_NARY_TREE_TRAVERSAL_ORDER {
@@ -121,7 +122,11 @@ GBL_INLINE void             GblNaryTree_disconnect          (GBL_SELF)          
 
 //GBL_INLINE GblNaryTreeNode* GblNaryTree_lowestCommonAncestor(GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 //GBL_INLINE GblSize          GblNaryTree_distance            (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
-//GBL_INLINE GblBool          GblNaryTree_traverse            (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIt, void* pUd) GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblNaryTree_traverse            (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIt, void* pUd) GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblNaryTree_traverseInOrder     (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblNaryTree_traversePreOrder    (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
+GBL_INLINE GblBool          GblNaryTree_traversePostOrder   (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
+
 
 // ===== IMPL ====
 
@@ -562,12 +567,83 @@ GBL_INLINE void GblNaryTree_disconnect(GBL_SELF) GBL_NOEXCEPT {
     }
 }
 
-GBL_INLINE GblBool GblNaryTree_traverse(GBL_CSELF,
-                                        GblEnum order,
-                                        GblNaryTreeIterFn pFnIter,
-                                        void* pUserdata) GBL_NOEXCEPT {
-    return GBL_FALSE; //lulznope
+GBL_INLINE GblBool GblNaryTree_traversePreOrder(GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT {
+    GblBool retVal = GBL_FALSE;
+
+    if(GblNaryTree_flags(pSelf) & mask) {
+        retVal = pFnIter(pSelf, pUd);
+        if(retVal) return GBL_TRUE;
+    }
+
+    for(GblNaryTreeNode* pIt = pSelf->pChildFirst;
+        pIt;
+        pIt = pIt->pSiblingNext)
+    {
+        retVal = GblNaryTree_traversePreOrder(pIt, mask, pFnIter, pUd);
+        if(retVal) return GBL_TRUE;
+    }
+    return GBL_FALSE;
 }
+
+GBL_INLINE GblBool GblNaryTree_traverseInOrder(GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT {
+    GblBool retVal = GBL_FALSE;
+    GblNaryTreeNode* pIt;
+
+    for(pIt = pSelf->pChildFirst;
+        pIt && pIt->pSiblingNext;
+        pIt = pIt->pSiblingNext)
+    {
+        retVal = GblNaryTree_traverseInOrder(pIt, mask, pFnIter, pUd);
+        if(retVal) return GBL_TRUE;
+    }
+
+    if(GblNaryTree_flags(pSelf) & mask) {
+        retVal = pFnIter(pSelf, pUd);
+        if(retVal) return GBL_TRUE;
+    }
+
+    if(pIt) {
+        retVal = GblNaryTree_traverseInOrder(pIt, mask, pFnIter, pUd);
+        if(retVal) return GBL_TRUE;
+    }
+
+    return GBL_FALSE;
+}
+
+GBL_INLINE GblBool GblNaryTree_traversePostOrder(GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT {
+
+    GblBool retVal = GBL_FALSE;
+    for(GblNaryTreeNode* pIt = pSelf->pChildFirst;
+        pIt;
+        pIt = pIt->pSiblingNext)
+    {
+        retVal = GblNaryTree_traversePostOrder(pIt, mask, pFnIter, pUd);
+        if(retVal) return GBL_TRUE;
+    }
+
+    if(GblNaryTree_flags(pSelf) & mask) {
+        retVal = pFnIter(pSelf, pUd);
+        if(retVal) return GBL_TRUE;
+    }
+
+    return GBL_FALSE;
+}
+
+GBL_INLINE GblBool GblNaryTree_traverse(GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT {
+    switch((mask >> 3)) {
+    case GBL_NARY_TREE_TRAVERSAL_ORDER_PRE:
+        return GblNaryTree_traversePreOrder(pSelf, mask, pFnIter, pUd);
+    case GBL_NARY_TREE_TRAVERSAL_ORDER_POST:
+        return GblNaryTree_traversePostOrder(pSelf, mask, pFnIter, pUd);
+    case GBL_NARY_TREE_TRAVERSAL_ORDER_IN:
+        return GblNaryTree_traverseInOrder(pSelf, mask, pFnIter, pUd);
+    default:
+    case GBL_NARY_TREE_TRAVERSAL_ORDER_LEVEL:
+        GBL_ASSERT(GBL_FALSE);
+        return GBL_FALSE;
+    }
+}
+
 
 GBL_DECLS_END
 
