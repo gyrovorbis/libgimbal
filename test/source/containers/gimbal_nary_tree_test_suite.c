@@ -551,7 +551,7 @@ static GblBool GblNaryTreeTestSuite_traverse_(GblTestSuite* pSelf, uintptr_t mas
 static GBL_RESULT GblNaryTreeTestSuite_traversePreOrder_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
-    TraversalClosure_ closure = {};
+    TraversalClosure_ closure = { 0 };
 
     GBL_TEST_VERIFY(!GblNaryTreeTestSuite_traverse_(pSelf,
                                                     GBL_NARY_TREE_TRAVERSAL_MASK(GBL_NARY_TREE_TRAVERSAL_ORDER_PRE,
@@ -575,7 +575,7 @@ static GBL_RESULT GblNaryTreeTestSuite_traversePreOrder_(GblTestSuite* pSelf, Gb
 
 static GBL_RESULT GblNaryTreeTestSuite_traversePostOrder_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    TraversalClosure_ closure = {};
+    TraversalClosure_ closure = {0};
 
     GBL_TEST_VERIFY(!GblNaryTreeTestSuite_traverse_(pSelf,
                                                     GBL_NARY_TREE_TRAVERSAL_MASK(GBL_NARY_TREE_TRAVERSAL_ORDER_POST,
@@ -599,7 +599,7 @@ static GBL_RESULT GblNaryTreeTestSuite_traversePostOrder_(GblTestSuite* pSelf, G
 
 static GBL_RESULT GblNaryTreeTestSuite_traverseInOrder_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    TraversalClosure_ closure = {};
+    TraversalClosure_ closure = { 0 };
 
     GBL_TEST_VERIFY(!GblNaryTreeTestSuite_traverse_(pSelf,
                                                     GBL_NARY_TREE_TRAVERSAL_MASK(GBL_NARY_TREE_TRAVERSAL_ORDER_IN,
