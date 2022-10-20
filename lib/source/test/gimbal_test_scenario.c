@@ -1,7 +1,7 @@
 #include <gimbal/test/gimbal_test_scenario.h>
 #include <gimbal/test/gimbal_test_suite.h>
 #include <gimbal/utils/gimbal_timer.h>
-#include <gimbal/test/gimbal_allocation_tracker.h>
+#include <gimbal/allocators/gimbal_allocation_tracker.h>
 #include <time.h>
 
 #define GBL_TEST_SCENARIO_(inst)    ((GblTestScenario_*)GBL_INSTANCE_PRIVATE(inst, GBL_TEST_SCENARIO_TYPE))
@@ -12,6 +12,7 @@ typedef struct GblTestScenario_ {
     const char*             pCurCase;
     double                  suiteMs;
     GblAllocationCounters   suiteAllocCounters;
+    GblBool                 runningCase;
 } GblTestScenario_;
 
 
@@ -139,9 +140,11 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                     GBL_CTX_PUSH();
 
                     GblTimer_start(&caseTimer);
+                    pSelf_->runningCase = GBL_TRUE;
 
                     GBL_RESULT result = GblTestSuite_runCase(pSuiteIt, pCtx, idx);
 
+                    pSelf_->runningCase = GBL_FALSE;
                     GblTimer_stop(&caseTimer);
                     pSelf_->suiteMs += GblTimer_elapsedMs(&caseTimer);
 
@@ -306,7 +309,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_alloc_(GblIAllocator* pIAlloca
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
     GBL_CTX_VERIFY_CALL(pCtxClass->GblIAllocatorImpl.pFnAlloc(pIAllocator, pFrame, size, align, pDbgStr, ppData));
-    GBL_CTX_VERIFY_CALL(GblAllocationTracker_allocEvent(pSelf_->pAllocTracker, *ppData, size, align, pDbgStr, pFrame->sourceEntry));
+    GBL_CTX_VERIFY_CALL(GblAllocationTracker_allocEvent(pSelf_->pAllocTracker, *ppData, size, align, pDbgStr, pFrame->record.srcLocation));
     GBL_CTX_END();
 }
 
@@ -317,7 +320,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_realloc_(GblIAllocator* pIAllo
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
     GBL_CTX_VERIFY_CALL(pCtxClass->GblIAllocatorImpl.pFnRealloc(pIAllocator, pFrame, pData, newSize, newAlign, ppNewData));
-    GBL_CTX_VERIFY_CALL(GblAllocationTracker_reallocEvent(pSelf_->pAllocTracker, pData, *ppNewData, newSize, newAlign, pFrame->sourceEntry));
+    GBL_CTX_VERIFY_CALL(GblAllocationTracker_reallocEvent(pSelf_->pAllocTracker, pData, *ppNewData, newSize, newAlign, pFrame->record.srcLocation));
     GBL_CTX_END();
 }
 
@@ -328,7 +331,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_free_(GblIAllocator* pIAllocat
     GblTestScenario* pSelf = (GblTestScenario*)pIAllocator;
     GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
     GBL_CTX_VERIFY_CALL(pCtxClass->GblIAllocatorImpl.pFnFree(pIAllocator, pFrame, pData));
-    GBL_CTX_VERIFY_CALL(GblAllocationTracker_freeEvent(pSelf_->pAllocTracker, pData, pFrame->sourceEntry));
+    GBL_CTX_VERIFY_CALL(GblAllocationTracker_freeEvent(pSelf_->pAllocTracker, pData, pFrame->record.srcLocation));
     GBL_CTX_END();
 }
 
@@ -359,6 +362,25 @@ static GBL_RESULT GblTestScenarioClass_destructor_(GblBox* pRecord) {
     GBL_CTX_END();
 }
 
+
+static GBL_RESULT GblTestScenarioClass_ILogger_write_(GblILogger* pILogger, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs){
+    GblTimer logTime;
+    GblTimer_start(&logTime);
+
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pILogger);
+    GblContextClass* pClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
+
+    const GBL_RESULT result = pClass->GblILoggerImpl.pFnWrite(pILogger, pFrame, level, pFmt, varArgs);
+
+    if(pSelf_->runningCase) {
+        GblTimer_stop(&logTime);
+        pSelf_->suiteMs -= GblTimer_elapsedMs(&logTime);
+    }
+
+    return result;
+}
+
+
 static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     GBL_UNUSED(pUd);
     GBL_CTX_BEGIN(pCtx);
@@ -376,9 +398,10 @@ static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd, 
     pSelfClass->base.base.pFnConstructor               = GblTestScenarioClass_constructor_;
     pSelfClass->base.base.base.pFnDestructor           = GblTestScenarioClass_destructor_;
     pSelfClass->base.base.pFnProperty                  = GblTestScenarioClass_property_;
-    pSelfClass->base.GblIAllocatorImpl.pFnAlloc   = GblTestScenarioClass_IAllocator_alloc_;
-    pSelfClass->base.GblIAllocatorImpl.pFnRealloc = GblTestScenarioClass_IAllocator_realloc_;
-    pSelfClass->base.GblIAllocatorImpl.pFnFree    = GblTestScenarioClass_IAllocator_free_;
+    pSelfClass->base.GblILoggerImpl.pFnWrite           = GblTestScenarioClass_ILogger_write_;
+    pSelfClass->base.GblIAllocatorImpl.pFnAlloc        = GblTestScenarioClass_IAllocator_alloc_;
+    pSelfClass->base.GblIAllocatorImpl.pFnRealloc      = GblTestScenarioClass_IAllocator_realloc_;
+    pSelfClass->base.GblIAllocatorImpl.pFnFree         = GblTestScenarioClass_IAllocator_free_;
     GBL_CTX_END();
 }
 

@@ -1,6 +1,6 @@
 #include <gimbal/containers/gimbal_ring_list.h>
 #include <gimbal/core/gimbal_ctx.h>
-#include <gimbal/utils/gimbal_pool_allocator.h>
+#include <gimbal/allocators/gimbal_pool_allocator.h>
 #include <stdarg.h>
 
 #define GBL_RING_LIST_(node) GBL_DOUBLY_LINKED_LIST_ENTRY(node, GblRingList, listNode)

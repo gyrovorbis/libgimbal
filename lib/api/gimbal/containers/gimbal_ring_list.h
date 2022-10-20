@@ -95,10 +95,12 @@ GBL_EXPORT GBL_RESULT   GblRingList_pushBack     (GBL_SELF, ...)                
 GBL_EXPORT GBL_RESULT   GblRingList_pushFront    (GBL_SELF, ...)                                  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblRingList_insert       (GBL_SELF, intptr_t index, ...)                  GBL_NOEXCEPT;
 GBL_EXPORT void*        GblRingList_replace      (GBL_SELF, intptr_t index, void* pData)          GBL_NOEXCEPT;
+
 GBL_EXPORT GBL_RESULT   GblRingList_insertSorted (GBL_SELF,
                                                   void*            pData,
                                                   GblRingListCmpFn pFnCmp,
                                                   void*            pCl)                           GBL_NOEXCEPT;
+
 GBL_EXPORT GblBool      GblRingList_join         (GBL_SELF,
                                                   intptr_t         index,
                                                   GblRingList*     pOther)                        GBL_NOEXCEPT;
@@ -112,6 +114,7 @@ GBL_EXPORT void         GblRingList_sort         (GBL_SELF, GblRingListCmpFn pFn
 GBL_EXPORT void         GblRingList_rotate       (GBL_SELF, intptr_t n)                           GBL_NOEXCEPT;
 GBL_EXPORT void         GblRingList_reverse      (GBL_SELF)                                       GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblRingList_foreach      (GBL_SELF, GblRingListIterFn pFnIt, void* pCl)   GBL_NOEXCEPT;
+
 GBL_EXPORT GblSize      GblRingList_find         (GBL_CSELF,
                                                   const void*      pVal,
                                                   GblRingListCmpFn pFnCmp,

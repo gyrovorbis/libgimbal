@@ -29,7 +29,7 @@ static uint32_t primes_[] = {
 };
 
 GBL_EXPORT uint32_t gblPrimeNextDouble(uint32_t number) {
-    const static GblSize entries = GBL_ARRAY_SIZE(primes_);
+    const static GblSize entries = GBL_COUNT_OF(primes_);
 
     for(GblSize p = 0; p < entries; ++p) {
         if(number < primes_[p])

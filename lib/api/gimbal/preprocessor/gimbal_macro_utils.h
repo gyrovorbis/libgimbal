@@ -26,15 +26,15 @@
 extern "C" {
 #endif
 
-#define GBL_MIN(a,b) (((a)<(b))?(a):(b))
-#define GBL_MAX(a,b) (((a)>(b))?(a):(b))
-#define GBL_CEIL(numerator, denominator) ((numerator / denominator + (numerator % denominator != 0)))
+#define GBL_MIN(a,b)                        (((a)<(b))?(a):(b))
+#define GBL_MAX(a,b)                        (((a)>(b))?(a):(b))
+#define GBL_CEIL(numerator, denominator)    ((numerator / denominator + (numerator % denominator != 0)))
+#define GBL_CLAMP(n, min, max)              (((n) > (max)) ? (max) : (((n) < (min)) ? (min) : (n)))
 
 #define GBL_CONTAINER_OF(ptr, type, member) ((type*)((char*)(ptr) - offsetof(type, member)))
+#define GBL_COUNT_OF(array)                 (sizeof(array)/sizeof(array[0]))
 
-#define GBL_ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
-
-#define GBL_NPOS    ((GblSize)-1)
+#define GBL_NPOS                            ((GblSize)-1)
 
 #define GBL_SWITCH_CASE_STRINGIFY(s) \
     case s: return #s

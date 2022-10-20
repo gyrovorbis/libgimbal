@@ -25,13 +25,6 @@ GblContext* GblThread_context(const GblThread* pThread) {
     return GblContext_global();
 }
 
-GBL_EXPORT const GblCallRecord* GblThread_callRecord(const GblThread* pThread) {
-    if(!pThread) {
-        pThread = GblThread_current();
-    }
-    return &pThread->callRecord;
-}
-
 GBL_EXPORT GBL_RESULT GblThread_setCallRecord(GblThread* pThread, const GblCallRecord* pRecord) {
     if(!pThread) pThread = GblThread_current();
     if(pRecord) {

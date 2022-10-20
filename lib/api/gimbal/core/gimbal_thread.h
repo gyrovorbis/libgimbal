@@ -42,8 +42,8 @@ GBL_EXPORT GblContext*  GblThread_context        (GBL_CSELF)                    
 GBL_EXPORT const char*  GblThread_name           (GBL_CSELF)                        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblThread_setName        (GBL_SELF, const char* pName)      GBL_NOEXCEPT;
 
-GBL_EXPORT const GblCallRecord*
-                        GblThread_callRecord     (GBL_CSELF)                        GBL_NOEXCEPT;
+GBL_INLINE GblCallRecord*
+                        GblThread_callRecord     (GBL_SELF)                        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblThread_setCallRecord  (GBL_SELF,
                                                   const GblCallRecord* pRecord)     GBL_NOEXCEPT;
 //private
@@ -86,6 +86,13 @@ GBL_INLINE GBL_RESULT GblThread_stackFramePop(GblThread* pThread) GBL_NOEXCEPT {
     pThread->pStackFrameTop = pThread->pStackFrameTop? pThread->pStackFrameTop->pPrevFrame : NULL;
     pPrevFrame->pPrevFrame = NULL;
     return GBL_RESULT_SUCCESS;
+}
+
+GBL_INLINE GblCallRecord* GblThread_callRecord(GblThread* pThread) {
+    if(!pThread) {
+        pThread = GblThread_current();
+    }
+    return &pThread->callRecord;
 }
 
 GBL_DECLS_END

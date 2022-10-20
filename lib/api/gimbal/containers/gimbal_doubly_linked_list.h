@@ -21,7 +21,8 @@ GBL_DECLS_BEGIN
 
 typedef GblLinkedListCmpFn GblDoublyLinkedListCmpFn;
 
-/*! \brief Intrustive doubly linked list structure with vector-style API
+/*! \brief Intrustive doubly linked list structure with vector-style API.
+ *
  *  GblDoublyLinkedListNode is the low-level API around managing manually
  *  allocated, intrusive linked list structures with the list nodes
  *  embedded within their containing structures.

@@ -65,6 +65,8 @@ GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_EMAIL GITLAB_USER_EMAIL)
 
 GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/core/gimbal_config.h.in FILEPATH "Path to user API configuration file")
 
+GBL_CONFIG_OPTION(GBL_CONFIG_PREFETCH_ENABLED  "Enable prefetching macro" ON)
+
 GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ENABLED   "Track most recent call record in GblHandle" ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS               "Enable C errno verification macros" ON)
 
@@ -92,6 +94,10 @@ set(GIMBAL_INCLUDES
     api/gimbal/algorithms/gimbal_sort.h
     api/gimbal/algorithms/gimbal_numeric.h
     api/gimbal/algorithms/gimbal_hash.h
+    api/gimbal/allocators/gimbal_allocation_tracker.h
+    api/gimbal/allocators/gimbal_arena_allocator.h
+    api/gimbal/allocators/gimbal_pool_allocator.h
+    api/gimbal/allocators/gimbal_scope_allocator.h
     api/gimbal/containers/gimbal_byte_array.h
     api/gimbal/containers/gimbal_linked_list.h
     api/gimbal/containers/gimbal_hash_set.h
@@ -104,6 +110,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_ring_list.h
     api/gimbal/containers/gimbal_array_deque.h
     api/gimbal/containers/gimbal_bit_view.h
+    api/gimbal/containers/gimbal_array_heap.h
     api/gimbal/core/gimbal_api_generators.h
     api/gimbal/core/gimbal_ctx.h
     api/gimbal/core/gimbal_call_stack.h
@@ -155,19 +162,20 @@ set(GIMBAL_INCLUDES
     api/gimbal/strings/gimbal_string_view.h
     api/gimbal/strings/gimbal_string_ref.h
     api/gimbal/strings/gimbal_string.h
+    api/gimbal/strings/gimbal_pattern_matcher.h
     api/gimbal/test/gimbal_test.h
     api/gimbal/test/gimbal_test_suite.h
     api/gimbal/test/gimbal_test_scenario.h
-    api/gimbal/test/gimbal_allocation_tracker.h
     api/gimbal/utils/gimbal_timer.h
     api/gimbal/utils/gimbal_uuid.h
-    api/gimbal/utils/gimbal_arena_allocator.h
-    api/gimbal/utils/gimbal_pool_allocator.h
 )
 
 
 set(GIMBAL_SOURCES
     source/algorithms/gimbal_numeric.c
+    source/allocators/gimbal_arena_allocator.c
+    source/allocators/gimbal_pool_allocator.c
+    source/allocators/gimbal_allocation_tracker.c
     source/containers/gimbal_hash_set.c
     source/containers/gimbal_tree_set.c
     source/containers/gimbal_linked_list.c
@@ -178,6 +186,7 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_ring_list.c
     source/containers/gimbal_array_deque.c
     source/containers/gimbal_bit_view.c
+    source/containers/gimbal_array_heap.c
     source/core/gimbal_thread.c
     source/core/gimbal_version.c
     source/core/gimbal_ref.c
@@ -215,12 +224,10 @@ set(GIMBAL_SOURCES
     source/strings/gimbal_quark.c
     source/strings/gimbal_string_ref.c
     source/strings/gimbal_string_buffer.c
+    source/strings/gimbal_string.c
     source/test/gimbal_test_suite.c
     source/test/gimbal_test_scenario.c
-    source/test/gimbal_allocation_tracker.c
     source/utils/gimbal_uuid.c
-    source/utils/gimbal_arena_allocator.c
-    source/utils/gimbal_pool_allocator.c
  )
 
 add_library(libGimbal STATIC
@@ -263,6 +270,11 @@ GBL_TARGET_PROPERTY_DEFINE(GBL_BUILD_CPP_EXTENSIONS libGimbal CXX_EXTENSIONS)
 # (according to https://cmake.org/cmake/help/latest/variable/MSVC_VERSION.html#variable:MSVC_VERSION)
 if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
         target_compile_options(libGimbal PUBLIC "/Zc:preprocessor")
+endif()
+
+# Strip out full file paths for __FILE__ macros to save .rodata space/look prettier
+if ((CMAKE_COMPILER_IS_GNUCC) OR CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
+    target_compile_options(libGimbal PUBLIC "-fmacro-prefix-map=${CMAKE_SOURCE_DIR}=libGimbal")
 endif()
 
 list(APPEND

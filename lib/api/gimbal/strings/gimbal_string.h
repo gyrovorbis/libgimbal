@@ -19,8 +19,10 @@ Unit tests
 
 GBL_DECLS_BEGIN
 
-GBL_INLINE int gblAsciiDigitValue   (char c) GBL_NOEXCEPT;
-GBL_INLINE int gblAsciiXDigitValue  (char c) GBL_NOEXCEPT;
+GBL_INLINE int      gblAsciiDigitValue   (char c)              GBL_NOEXCEPT;
+GBL_INLINE int      gblAsciiXDigitValue  (char c)              GBL_NOEXCEPT;
+GBL_EXPORT char*    gblStrdup            (const char* pString) GBL_NOEXCEPT;
+GBL_EXPORT char*    gblStrndup           (const char* pString, GblSize length) GBL_NOEXCEPT;
 
 // ===== IMPL =====
 
@@ -35,6 +37,7 @@ GBL_INLINE int gblAsciiXDigitValue(char c) GBL_NOEXCEPT {
         return c - 'a' + 10;
     return gblAsciiDigitValue(c);
 }
+
 
 
 GBL_DECLS_END

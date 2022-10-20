@@ -20,6 +20,8 @@ GBL_DECLS_BEGIN
 GBL_INLINE int      gblRand              (void)             GBL_NOEXCEPT;
 GBL_INLINE int      gblRandRange         (int min, int max) GBL_NOEXCEPT;
 GBL_INLINE int      gblRandString        (char* pBuffer, int minSize, int maxSize, const char* pCharList) GBL_NOEXCEPT;
+GBL_INLINE void     gblRandBuffer        (void* pData, GblSize size) GBL_NOEXCEPT;
+
 GBL_INLINE uint64_t gblSeed              (uint8_t index)    GBL_NOEXCEPT;
 
 typedef    GblHash (*GblHashFn)(const void*, GblSize);
@@ -140,6 +142,12 @@ GBL_INLINE int gblRandString(char* pBuffer, int minSize, int maxSize, const char
 
     pBuffer[size] = '\0';
     return size;
+}
+
+GBL_INLINE void gblRandBuffer(void* pData, GblSize size) GBL_NOEXCEPT {
+    for(GblSize i = 0; i < size; ++i) {
+        (((uint8_t*)pData)[i]) = (uint8_t)gblRandRange(0, 255);
+    }
 }
 
 

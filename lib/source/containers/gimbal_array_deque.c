@@ -98,17 +98,11 @@ GBL_EXPORT void* GblArrayDeque_popBack(GblArrayDeque* pSelf) {
 
 GBL_EXPORT void* (GblArrayDeque_insert)(GblArrayDeque* pSelf, GblSize pos, const void* pData, GblSize count) {
     void* pSlot = NULL;
+    GBL_ASSERT(count);
     GBL_RESULT result = GblArrayDeque_reserve_(pSelf, GblArrayDeque_size(pSelf) + count, GBL_FALSE);
     if(GBL_RESULT_SUCCESS(result)) {
-       /* if(pos == 0) { // insert into front
-            for(GblSize i = 0; i < count; ++i) {
-                GblArrayDeque_pushFront(pSelf, (void*)((uintptr_t)pData + GblArrayDeque_elementSize(pSelf)*i));
-            }
-        } else if(pos == GblArrayDeque_size(pSelf) - 1) { // insert into back
-            for(GblSize i = 0; i < count; ++i) {
-                GblArrayDeque_pushBack(pSelf, (void*)((uintptr_t)pData + GblArrayDeque_elementSize(pSelf)*i));
-            }
-        } else */if(pos <= GblArrayDeque_size(pSelf)){ // insert into middle
+
+        if(pos <= GblArrayDeque_size(pSelf)){ // insert into middle
 
             const GblSize wrapIndex = GblArrayDeque_endSize_(pSelf);
             const GblSize oldSize = GblArrayDeque_size(pSelf);
@@ -133,10 +127,11 @@ GBL_EXPORT void* (GblArrayDeque_insert)(GblArrayDeque* pSelf, GblSize pos, const
             }
 
             pSlot = GblArrayDeque_at(pSelf, pos);
-
-            memcpy(pSlot,
-                   pData,
-                   GblArrayDeque_elementSize(pSelf) * count);
+            if(pData) {
+                memcpy(pSlot,
+                       pData,
+                       GblArrayDeque_elementSize(pSelf) * count);
+            }
 
         } else {
             GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
@@ -148,11 +143,33 @@ GBL_EXPORT void* (GblArrayDeque_insert)(GblArrayDeque* pSelf, GblSize pos, const
 }
 
 GBL_EXPORT void* GblArrayDeque_emplace(GblArrayDeque* pSelf, GblSize pos) {
-    return NULL;
+    return GblArrayDeque_insert(pSelf, pos, NULL);
 }
 
 GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, GblSize pos, GblSize count) {
-    return GBL_RESULT_UNIMPLEMENTED;
+    GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
+
+    GBL_CTX_VERIFY_ARG(count);
+    GBL_CTX_VERIFY_ARG(pos+count <= GblArrayDeque_size(pSelf));
+
+    const GblSize wrapIndex = GblArrayDeque_endSize_(pSelf);
+    const GblSize oldSize = GblArrayDeque_size(pSelf);
+
+    if(pos < wrapIndex) {
+        memmove((void*)(((uintptr_t)GBL_RING_PRIV_REF_(pSelf).pData +
+                (GBL_RING_PRIV_REF_(pSelf).frontPos - count) * GBL_RING_PRIV_REF_(pSelf).elementSize)),
+                GblArrayDeque_front(pSelf),
+                GblArrayDeque_elementSize(pSelf) * (pos+count));
+
+
+    }
+
+
+
+
+
+
+    GBL_CTX_END();
 }
 
 GBL_EXPORT void* GblArrayDeque_emplaceBack(GblArrayDeque* pSelf) GBL_NOEXCEPT {

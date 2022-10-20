@@ -1,4 +1,4 @@
-#include <gimbal/utils/gimbal_pool_allocator.h>
+#include <gimbal/allocators/gimbal_pool_allocator.h>
 #include <gimbal/algorithms/gimbal_numeric.h>
 #include <gimbal/core/gimbal_ctx.h>
 

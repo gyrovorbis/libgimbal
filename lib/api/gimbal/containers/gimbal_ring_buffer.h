@@ -210,7 +210,8 @@ GBL_INLINE void* GblRingBuffer_popFront(GBL_SELF) GBL_NOEXCEPT {
     if(pFront) {
         --GBL_PRIV_REF(pSelf).size;
         ++GBL_PRIV_REF(pSelf).frontPos;
-        GBL_PRIV_REF(pSelf).frontPos %= GBL_PRIV_REF(pSelf).capacity;
+        if(GBL_PRIV_REF(pSelf).frontPos >= GBL_PRIV_REF(pSelf).capacity)
+            GBL_PRIV_REF(pSelf).frontPos = 0;
     } else {
         GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);

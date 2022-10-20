@@ -10,14 +10,16 @@
 #include "containers/gimbal_tree_set_test_suite.h"
 #include "containers/gimbal_hash_set_test_suite.h"
 #include "containers/gimbal_array_deque_test_suite.h"
-#include "utils/gimbal_arena_allocator_test_suite.h"
-#include "utils/gimbal_pool_allocator_test_suite.h"
+#include "containers/gimbal_array_heap_test_suite.h"
+#include "allocators/gimbal_arena_allocator_test_suite.h"
+#include "allocators/gimbal_pool_allocator_test_suite.h"
 #include "core/gimbal_ref_test_suite.h"
 #include "containers/gimbal_byte_array_test_suite.h"
 #include "strings/gimbal_quark_test_suite.h"
 #include "strings/gimbal_string_view_test_suite.h"
 #include "strings/gimbal_string_ref_test_suite.h"
 #include "strings/gimbal_string_buffer_test_suite.h"
+#include "strings/gimbal_pattern_matcher_test_suite.h"
 #include "meta/types/gimbal_type_test_suite.h"
 #include "meta/classes/gimbal_class_test_suite.h"
 #include "meta/ifaces/gimbal_interface_test_suite.h"
@@ -32,6 +34,8 @@
 #include "meta/instances/gimbal_object_test_suite.h"
 #include "utils/gimbal_uuid_test_suite.h"
 
+#include <math.h>
+
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
 #   include <arch/gdb.h>
 #endif
@@ -41,11 +45,6 @@ int main(int argc, char* pArgv[]) {
     gdb_init();
 #endif
     GblTestScenario* pScenario = GblTestScenario_create("LibGimbalTests");
-
-    GBL_CTX_VERBOSE("lolol");
-    void* pData = GBL_CTX_MALLOC(128);
-    GBL_CTX_FREE(pData);
-
 
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO | GBL_LOG_LEVEL_WARNING | GBL_LOG_LEVEL_ERROR );
 
@@ -72,6 +71,8 @@ int main(int argc, char* pArgv[]) {
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_ARRAY_DEQUE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_createFromType(GBL_ARRAY_HEAP_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_ARENA_ALLOCATOR_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_POOL_ALLOCATOR_TEST_SUITE_TYPE));
@@ -89,6 +90,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_createFromType(GBL_STRING_REF_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_STRING_BUFFER_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_createFromType(GBL_PATTERN_MATCHER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_TYPE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,

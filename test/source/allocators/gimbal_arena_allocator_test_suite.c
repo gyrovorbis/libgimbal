@@ -1,5 +1,5 @@
-#include "utils/gimbal_arena_allocator_test_suite.h"
-#include <gimbal/utils/gimbal_arena_allocator.h>
+#include "allocators/gimbal_arena_allocator_test_suite.h"
+#include <gimbal/allocators/gimbal_arena_allocator.h>
 #include <gimbal/test/gimbal_test.h>
 
 #define GBL_ARENA_ALLOCATOR_TEST_SUITE_(inst)   ((GblArenaAllocatorTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARENA_ALLOCATOR_TEST_SUITE_TYPE))

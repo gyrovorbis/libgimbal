@@ -8,12 +8,6 @@
 
 #include "../core/gimbal_result.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef uint32_t                                    GblVersion;
-
 #define GBL_VERSION_FIELD_MAJOR_BIT                 24u
 #define GBL_VERSION_FIELD_MAJOR_MASK                0xff
 
@@ -42,8 +36,9 @@ typedef uint32_t                                    GblVersion;
     GBL_STRINGIFY(minor) "."                       \
     GBL_STRINGIFY(patch)
 
-//#define GBL_BIT_MASK(...) \
-  //    GBL_VA_OVERLOAD_SUFFIXER_ARGC(GBL_BIT_COUNT_MASK, GBL_BIT_FIELD_MASK, __VA_ARGS__)
+GBL_DECLS_BEGIN
+
+typedef uint32_t    GblVersion;
 
 typedef struct GblVersionInfo {
     uint8_t     major;
@@ -66,9 +61,7 @@ GBL_EXPORT GBL_RESULT gblVersionInfoString(const GblVersionInfo* pInfo, char* pB
 
 
 
-#ifdef __cplusplus
-}
-#endif
+GBL_DECLS_END
 
 
 #endif // GIMBAL_VERSION_H

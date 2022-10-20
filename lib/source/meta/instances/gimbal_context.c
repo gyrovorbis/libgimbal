@@ -91,16 +91,17 @@ static GBL_RESULT GblContext_IAllocator_free_(GblIAllocator* pIAllocator, const 
 }
 
 static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs) GBL_NOEXCEPT {
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
     GblContext* pSelf = (GblContext*)(pILogger);
     GblContext* pCtx = (GblContext*)pILogger;
 
     if(!(pCtx->logFilter & level)) return GBL_RESULT_SUCCESS;
 
-    GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY_POINTER(pFmt);
-    GBL_CTX_VERIFY_ARG(level >= 0 /*&& level < GBL_LOG_LEVEL_COUNT*/); // or not to allow for user levels!
 
-    char buffer[GBL_VA_SNPRINTF_BUFFER_SIZE] = { '\0' };
+    GBL_ASSERT(pFmt);
+    GBL_ASSERT(level >= 0);
+
+    char buffer[GBL_VA_SNPRINTF_BUFFER_SIZE];// = { '\0' };
     char tabBuff[GBL_VA_SNPRINTF_BUFFER_SIZE];// = { '\t' };
     FILE* const pFile = (level >= GBL_LOG_LEVEL_ERROR)?
                 stderr : stdout;
@@ -118,7 +119,7 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
     const int vsnprintfBytes = vsnprintf(buffer, sizeof(buffer), pFmt, varArgs);
     if(vsnprintfBytes > (int)sizeof(buffer)) {
         pPrefix = "T - "; //Truncated prefix!
-        GBL_CTX_RECORD_SET(GBL_RESULT_TRUNCATED, "Log message truncated!");
+        result = GBL_RESULT_TRUNCATED;
     }
 
     //not per byte!
@@ -135,23 +136,23 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
     case GBL_LOG_LEVEL_WARNING:
     case GBL_LOG_LEVEL_ERROR: {
 
-        GBL_CTX_VERIFY((fprintf(pFile, "%s%s%s\n%s        @ %s(..): %s:%" GBL_SIZE_FMT"\n",
+        if((fprintf(pFile, "%s%s%s\n%s        @ %s(..): %s:%" GBL_SIZE_FMT"\n",
                             tabBuff, pPrefix, buffer, tabBuff,
-                            pFrame->sourceCurrent.pFunc,
-                            pFrame->sourceCurrent.pFile,
-                            pFrame->sourceCurrent.line)
-                    >= 0), GBL_RESULT_ERROR_FILE_WRITE);
+                            pFrame->record.srcLocation.pFunc,
+                            pFrame->record.srcLocation.pFile,
+                            pFrame->record.srcLocation.line)
+                    < 0)) result = GBL_RESULT_ERROR_FILE_WRITE;
         break;
     }
     default:
-        GBL_CTX_VERIFY((fprintf(pFile, "%s%s%s\n",
+        if(((fprintf(pFile, "%s%s%s\n",
                             tabBuff, pPrefix, buffer)
-                    >= 0), GBL_RESULT_ERROR_FILE_WRITE);
+                    >= 0))) result = GBL_RESULT_ERROR_FILE_WRITE;
         break;
     }
 
-    GBL_CTX_VERIFY(fflush(pFile) == 0, GBL_RESULT_ERROR_FILE_WRITE);
-    GBL_CTX_END();
+    if(fflush(pFile) == 0) result = GBL_RESULT_ERROR_FILE_WRITE;
+    return result;
 }
 
 static GBL_RESULT GblContext_ILogger_pop_(GblILogger* pILogger, const GblStackFrame* pFrame, uint32_t count) GBL_NOEXCEPT {

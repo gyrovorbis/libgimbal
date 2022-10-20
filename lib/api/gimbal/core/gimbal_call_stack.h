@@ -21,7 +21,7 @@ typedef struct GblSourceLocation {
 } GblSourceLocation;
 
 typedef struct GblCallRecord {
-    GBL_ALIGNAS(128)
+    GBL_ALIGNAS(64)
     char                message[GBL_CTX_RESULT_MSG_BUFFER_SIZE];
     GblSourceLocation   srcLocation;
     GBL_RESULT          result;
@@ -48,9 +48,7 @@ GBL_INLINE void GBL_CALL_RECORD_CONSTRUCT(GblCallRecord* pRecord, struct GblObje
 }
 
 typedef struct GblStackFrame {
-    GBL_ALIGNAS(256)
-    GblSourceLocation       sourceEntry;
-    GblSourceLocation       sourceCurrent;
+    GBL_ALIGNAS(64)
     GblCallRecord           record;
     uint32_t                sourceCurrentCaptureDepth;
     GblObject*              pObject;
@@ -62,7 +60,7 @@ typedef struct GblStackFrame {
 GBL_EXPORT GblContext* GblObject_findContext(GblObject* pSelf) GBL_NOEXCEPT;
 
 // I think this can all become a tiny macro
-GBL_INLINE GBL_RESULT GBL_CTX_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObject, GBL_RESULT initialResult, GblSourceLocation entryLoc) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GBL_CTX_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblObject* pObject, GBL_RESULT initialResult) GBL_NOEXCEPT {
     GBL_RESULT result               = GBL_RESULT_SUCCESS;
     GblContext* pContext            = GBL_NULL;
 
@@ -79,12 +77,11 @@ GBL_INLINE GBL_RESULT GBL_CTX_STACK_FRAME_CONSTRUCT(GblStackFrame* pFrame, GblOb
         pContext = GblThread_context(NULL);
     }
 
-    pFrame->record.srcLocation          = entryLoc;
+    pFrame->record.srcLocation.pFile    = GBL_NULL;
+    pFrame->record.srcLocation.pFunc    = GBL_NULL;
     pFrame->record.result               = initialResult;
     pFrame->stackDepth                  = 0;
     pFrame->sourceCurrentCaptureDepth   = 0;
-    pFrame->sourceEntry                 = entryLoc;
-    pFrame->sourceCurrent               = entryLoc;
     pFrame->pObject                     = pObject;
     pFrame->pContext                    = pContext;
     pFrame->pPrevFrame                  = NULL;

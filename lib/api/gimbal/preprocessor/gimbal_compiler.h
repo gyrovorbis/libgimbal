@@ -224,7 +224,6 @@
 #   endif
 #endif
 
-
 // Unlikely
 #if defined(__has_cpp_attribute)
 #   if __has_cpp_attribute(unlikely)
@@ -250,7 +249,6 @@
 #   define GBL_STATIC_ASSERT(cond)
 #   define GBL_STATIC_ASSERT_MSG(cond, msg)
 #endif
-
 
 #ifdef GBL_C_99
 #   define GBL_RESTRICT restrict
@@ -285,6 +283,21 @@
 #       define GBL_ALIGNED_ALLOC(a, s)      aligned_alloc(a, s)
 #       define GBL_ALIGNED_REALLOC(p, a, s) realloc(p, s)
 #       define GBL_ALIGNED_FREE(p)          free(p)
+#endif
+
+#if GBL_CONFIG_PREFETCH_ENABLED
+#   ifndef GBL_PREFETCH
+#       if defined(_MSC_VER) || defined(__MINGW64__)
+#           include <immintrin.h>
+#           define GBL_PREFETCH(addr) _mm_prefetch(addr, _MM_HINT_T0)
+#       elif defined(__GNUC__)
+#           define GBL_PREFETCH __builtin_prefetch
+#       endif
+#   else
+#       define GBL_PREFETCH(...)
+#   endif
+#else
+#   define GBL_PREFETCH(...)
 #endif
 
 #ifdef __cplusplus

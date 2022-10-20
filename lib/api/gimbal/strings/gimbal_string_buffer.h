@@ -72,7 +72,7 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_construct_2     (GBL_SELF,
                                                              GblStringView  view)                           GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_construct_1     (GBL_SELF)                                      GBL_NOEXCEPT;
 #define                     GblStringBuffer_construct(...) \
-                                GBL_VA_OVERLOAD_SELECT(GblStringBuffer_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
+                                GBL_VA_OVERLOAD_CALL(GblStringBuffer_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
 GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_4 (GBL_SELF,
                                                              GblStringView  view,
@@ -85,7 +85,7 @@ GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_2 (GBL_SELF,
                                                              GblStringView  view)                           GBL_NOEXCEPT;
 GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_1 (GBL_SELF)                                      GBL_NOEXCEPT;
 #define                     GblStringBuffer_createInPlace(...) \
-                                GBL_VA_OVERLOAD_SELECT(GblStringBuffer_createInPlace, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
+                                GBL_VA_OVERLOAD_CALL(GblStringBuffer_createInPlace, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_destruct        (GBL_SELF)                                      GBL_NOEXCEPT;
@@ -98,6 +98,7 @@ GBL_INLINE GblBool          GblStringBuffer_empty           (GBL_CSELF)         
 GBL_INLINE GblBool          GblStringBuffer_stack           (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE const char*      GblStringBuffer_cString         (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblStringView    GblStringBuffer_view            (GBL_CSELF)                                     GBL_NOEXCEPT;
+GBL_INLINE GblQuark         GblStringBuffer_quark           (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblContext*      GblStringBuffer_context         (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblSize          GblStringBuffer_stackBytes      (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblSize          GblStringBuffer_length          (GBL_CSELF)                                     GBL_NOEXCEPT;
@@ -190,6 +191,11 @@ GBL_INLINE GblStringView GblStringBuffer_view(GBL_CSELF) GBL_NOEXCEPT {
         view.length         = GBL_PRIV(pSelf->data).size;
     }
     return view;
+}
+
+GBL_INLINE GblQuark GblStringBuffer_quark(GBL_CSELF) GBL_NOEXCEPT {
+    const GblStringView view = GblStringBuffer_view(pSelf);
+    return GblQuark_fromStringSized(view.pData, view.length);
 }
 
 GBL_INLINE GBL_RESULT GblStringBuffer_destruct(GBL_SELF) GBL_NOEXCEPT {
