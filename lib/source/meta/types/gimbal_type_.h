@@ -6,7 +6,7 @@
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/containers/gimbal_nary_tree.h>
 #include <gimbal/strings/gimbal_quark.h>
-#include <gimbal/preprocessor/gimbal_atomics.h>
+#include <gimbal/core/gimbal_atomics.h>
 #ifdef _WIN32
 #   define NOGDI
 # else

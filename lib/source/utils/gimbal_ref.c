@@ -1,4 +1,4 @@
-#include <gimbal/core/gimbal_ref.h>
+#include <gimbal/utils/gimbal_ref.h>
 
 static GBL_ATOMIC_INT16 activeCount_ = 0;
 

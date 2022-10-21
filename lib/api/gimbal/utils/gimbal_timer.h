@@ -6,7 +6,7 @@
 #ifndef GIMBAL_TIMER_H
 #define GIMBAL_TIMER_H
 
-#include "../core/gimbal_typedefs.h"
+#include "../core/gimbal_ctx.h"
 #include <time.h>
 
 #define GBL_TIMER_INIT      { 0, 0, 0 }
@@ -49,6 +49,7 @@ GBL_INLINE void GblTimer_continue(GBL_SELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE double GblTimer_elapsedMs(GBL_CSELF) GBL_NOEXCEPT {
+    GBL_ASSERT(!pSelf->active);
     return (double)(pSelf->stopTime - pSelf->startTime) * 1000.0 / (double)CLOCKS_PER_SEC;
 }
 

@@ -36,9 +36,6 @@ GBL_BUILD_HOST_INFO_DEFINE(GBL_BUILD_HOST_PROCESSOR_CORES_LOGICAL NUMBER_OF_LOGI
 GBL_BUILD_HOST_INFO_DEFINE(GBL_BUILD_HOST_MEMORY_PHYSICAL_TOTAL TOTAL_PHYSICAL_MEMORY)
 GBL_BUILD_HOST_INFO_DEFINE(GBL_BUILD_HOST_MEMORY_PHYSICAL_AVAILABLE AVAILABLE_PHYSICAL_MEMORY)
 
-#set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*,-hicpp-braces-around-statements;")
-#set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=*;")
-
 GBL_BUILD_DEFINE(GBL_BUILD_CI $<BOOL:$ENV{GITLAB_CI}>)
 
 GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_PROJECT_TITLE CI_PROJECT_TITLE)
@@ -65,26 +62,20 @@ GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_EMAIL GITLAB_USER_EMAIL)
 
 GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/core/gimbal_config.h.in FILEPATH "Path to user API configuration file")
 
-GBL_CONFIG_OPTION(GBL_CONFIG_PREFETCH_ENABLED  "Enable prefetching macro" ON)
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL    GBL_LOG_LEVEL_WARNING STRING   "Log level for reporting partial results")
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL      GBL_LOG_LEVEL_ERROR STRING     "Log level for reporting error results")
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL    GBL_LOG_LEVEL_ERROR STRING     "Log level for reporting unknown results")
 
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ENABLED   "Track most recent call record in GblHandle" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS               "Enable C errno verification macros" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_PREFETCH_ENABLED       "Enable prefetching macro"                             ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS           "Enable C errno verification macros"                   ON)
 
-GBL_CONFIG_OPTION(GBL_CONFIG_LOG_PARTIAL_ENABLED    "Log all partial success results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LOG_ERROR_ENABLED      "Log all error results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LOG_UNKNOWN_ENABLED    "Log all unknown results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LOG_PARTIAL_ENABLED    "Log all partial success results from API calls"       ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LOG_ERROR_ENABLED      "Log all error results from API calls"                 ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_LOG_UNKNOWN_ENABLED    "Log all unknown results from API calls"               ON)
 
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL GBL_LOG_LEVEL_WARNING STRING   "Log level for reporting partial results")
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL GBL_LOG_LEVEL_ERROR STRING       "Log level for reporting error results")
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL GBL_LOG_LEVEL_ERROR STRING     "Log level for reporting unknown results")
-
-GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_PARTIAL_ENABLED     "Assert on all partial success results from API calls" OFF)
-GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_ERROR_ENABLED       "Assert on all error results from API calls" OFF)
-GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_UNKNOWN_ENABLED     "Assert on all unknown results from API calls" OFF)
-
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_PARTIAL_ENABLED   "Update Handle's LastCallRecord on all partial success results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_ERROR_ENABLED     "Update Handle's LastCallRecord on all error results from API calls" ON)
-GBL_CONFIG_OPTION(GBL_CONFIG_LAST_CALL_RECORD_UNKNOWN_ENABLED   "Update Handle's LastCallRecord on all unknown results from API calls" ON)
+GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_PARTIAL_ENABLED "Assert on all partial success results from API calls" OFF)
+GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_ERROR_ENABLED   "Assert on all error results from API calls"           OFF)
+GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_UNKNOWN_ENABLED "Assert on all unknown results from API calls"         OFF)
 
 set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/core/gimbal_config.h")
 
@@ -111,15 +102,13 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_array_deque.h
     api/gimbal/containers/gimbal_bit_view.h
     api/gimbal/containers/gimbal_array_heap.h
-    api/gimbal/core/gimbal_api_generators.h
+    api/gimbal/core/gimbal_decls.h
     api/gimbal/core/gimbal_ctx.h
-    api/gimbal/core/gimbal_call_stack.h
-    api/gimbal/core/gimbal_ext.h
+    api/gimbal/core/gimbal_stack_frame.h
     api/gimbal/core/gimbal_result.h
     api/gimbal/core/gimbal_typedefs.h
-    api/gimbal/core/gimbal_version.h
     api/gimbal/core/gimbal_thread.h
-    api/gimbal/core/gimbal_ref.h
+    api/gimbal/core/gimbal_atomics.h
     api/gimbal/meta/classes/gimbal_class.h
     api/gimbal/meta/classes/gimbal_opaque.h
     api/gimbal/meta/classes/gimbal_enum.h
@@ -156,7 +145,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/preprocessor/gimbal_macro_composition.h
     api/gimbal/preprocessor/gimbal_macro_utils.h
     api/gimbal/preprocessor/gimbal_macro_sequences.h
-    api/gimbal/preprocessor/gimbal_atomics.h
     api/gimbal/strings/gimbal_quark.h
     api/gimbal/strings/gimbal_string_buffer.h
     api/gimbal/strings/gimbal_string_view.h
@@ -168,6 +156,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/test/gimbal_test_scenario.h
     api/gimbal/utils/gimbal_timer.h
     api/gimbal/utils/gimbal_uuid.h
+    api/gimbal/utils/gimbal_ref.h
+    api/gimbal/utils/gimbal_version.h
 )
 
 
@@ -176,6 +166,7 @@ set(GIMBAL_SOURCES
     source/allocators/gimbal_arena_allocator.c
     source/allocators/gimbal_pool_allocator.c
     source/allocators/gimbal_allocation_tracker.c
+    source/allocators/gimbal_scope_allocator.c
     source/containers/gimbal_hash_set.c
     source/containers/gimbal_tree_set.c
     source/containers/gimbal_linked_list.c
@@ -188,9 +179,6 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_bit_view.c
     source/containers/gimbal_array_heap.c
     source/core/gimbal_thread.c
-    source/core/gimbal_version.c
-    source/core/gimbal_ref.c
-    source/core/gimbal_ext.c
     source/meta/classes/gimbal_class.c
     source/meta/classes/gimbal_opaque.c
     source/meta/classes/gimbal_flags.c
@@ -228,6 +216,8 @@ set(GIMBAL_SOURCES
     source/test/gimbal_test_suite.c
     source/test/gimbal_test_scenario.c
     source/utils/gimbal_uuid.c
+    source/utils/gimbal_version.c
+    source/utils/gimbal_ref.c
  )
 
 add_library(libGimbal STATIC

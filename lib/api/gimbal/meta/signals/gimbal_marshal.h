@@ -16,7 +16,10 @@
                                                               GblVariant* pArgs,        \
                                                               GblPtr      pMarshalData) GBL_NOEXCEPT
 
+GBL_DECLS_BEGIN
+
 GBL_FORWARD_DECLARE_STRUCT(GblClosure);
+GBL_FORWARD_DECLARE_STRUCT(GblVariant);
 
 typedef GBL_RESULT (*GblMarshalFn)  (GblClosure*        pClosure,
                                      GblVariant*        pRetValue,
@@ -83,6 +86,8 @@ GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOXED);
         pFnPtr(GBL_EVAL argList);                                                               \
         return GBL_RESULT_SUCCESS;                                                              \
     }
+
+GBL_DECLS_END
 
 
 #endif // GIMBAL_MARSHAL_H

@@ -58,12 +58,12 @@ GBL_EXPORT GBL_RESULT GblArrayHeap_move(GblArrayHeap* pSelf, GblArrayHeap* pRhs)
 GBL_EXPORT GBL_RESULT GblArrayHeap_push(GblArrayHeap* pSelf, const void* pEntry) {
     GblArrayList* pList = GBL_ARRAY_HEAP_LIST_(pSelf);
     GBL_CTX_BEGIN(GblArrayHeap_context(pSelf));
-    GBL_CTX_VERIFY_CALL(GblArrayHeap_reserve(pSelf, GblArrayHeap_capacity(pSelf)+1));
+    GBL_CTX_VERIFY_CALL(GblArrayHeap_reserve(pSelf, GblArrayHeap_size(pSelf)+1));
 
     GBL_CTX_VERIFY_CALL(GblArrayList_pushBack(pList, pEntry));
 
     const GblSize elementSize = GblArrayHeap_elementSize(pSelf);
-    intptr_t ipos = (intptr_t)GblArrayHeap_size(pSelf);
+    intptr_t ipos = (intptr_t)GblArrayHeap_size(pSelf)-1;
     intptr_t ppos = GBL_ARRAY_HEAP_PARENT_(ipos);
 
     void* pTempEntry = GBL_ALLOCA(elementSize);
@@ -83,12 +83,10 @@ GBL_EXPORT GBL_RESULT GblArrayHeap_push(GblArrayHeap* pSelf, const void* pEntry)
         ppos = GBL_ARRAY_HEAP_PARENT_(ipos);
     }
 
-    ++GBL_PRIV_REF(pList).size;
-
     GBL_CTX_END();
 }
 
-GBL_INLINE GBL_RESULT GblArrayHeap_pop(GblArrayHeap* pSelf, void* pEntryOut) {
+GBL_EXPORT GBL_RESULT GblArrayHeap_pop(GblArrayHeap* pSelf, void* pEntryOut) {
     if(!GblArrayHeap_size(pSelf)) return GBL_RESULT_ERROR_OUT_OF_RANGE;
 
     GblArrayList* pList = GBL_ARRAY_HEAP_LIST_(pSelf);
@@ -113,7 +111,7 @@ GBL_INLINE GBL_RESULT GblArrayHeap_pop(GblArrayHeap* pSelf, void* pEntryOut) {
             mpos = ipos;
         }
 
-        if(lpos < (intptr_t)GblArrayHeap_size(pSelf) &&
+        if(rpos < (intptr_t)GblArrayHeap_size(pSelf) &&
            GBL_PRIV_REF(pSelf).pFnCmp(GblArrayList_at(pList, rpos),
                                       GblArrayList_at(pList, mpos)) > 0) {
             mpos = rpos;

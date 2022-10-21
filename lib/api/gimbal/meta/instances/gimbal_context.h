@@ -54,47 +54,7 @@ GBL_EXPORT void        GblContext_setLogFilter     (GBL_SELF, GblFlags mask)    
 GBL_EXPORT void        GblContext_logBuildInfo     (GBL_CSELF)                             GBL_NOEXCEPT;
 
 
-/* ========== PRIVATE ==========
- * Private methods, do not call directly.
- *
- * Call via API frame macros like GBL_CTX_MALLOC(), GBL_CTX_FREE(), GBL_CTX_LOG(), GBL_CTX_PUSH(), etc
- * after calling GBL_CTX_BEGIN(GblContext* pCtx) with the context.
- */
-/// \cond
-GBL_EXPORT GBL_RESULT  GblContext_memAlloc_        (GBL_SELF,
-                                                    const GblStackFrame*  pFrame,
-                                                    GblSize               size,
-                                                    GblSize               align,
-                                                    const char*           pDbgStr,
-                                                    void**                ppData)          GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblContext_memRealloc_      (GBL_SELF,
-                                                    const GblStackFrame*  pFrame,
-                                                    void*                 pData,
-                                                    GblSize               newSize,
-                                                    GblSize               newAlign,
-                                                    void**                ppNewData)       GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT  GblContext_memFree_         (GBL_SELF,
-                                                    const GblStackFrame*  pFrame,
-                                                    void*                 pData)           GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT  GblContext_logWrite_        (GBL_SELF,
-                                                    const GblStackFrame*  pFrame,
-                                                    GBL_LOG_LEVEL         level,
-                                                    const char*           pFmt,
-                                                    va_list               varArgs)         GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT  GblContext_logPush_         (GBL_SELF,
-                                                    const GblStackFrame*  pFrame)          GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT  GblContext_logPop_          (GBL_SELF,
-                                                    const GblStackFrame*  pFrame,
-                                                    uint32_t              count)           GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT  GblContext_callRecordSet_   (GBL_SELF,
-                                                    const GblStackFrame* pFrame,
-                                                    const GblCallRecord* pRecord)          GBL_NOEXCEPT;
 
 /// \endcond
 GBL_DECLS_END

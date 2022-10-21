@@ -15,8 +15,8 @@
 GBL_DECLS_BEGIN
 
 
-typedef int  (*GblSortComparatorFn)  (const void*, const void*);
-typedef void (*GblSortFn)            (void*, GblSize, GblSize, GblSortComparatorFn);
+typedef int  (*GblSortComparatorFn) (const void*, const void*);
+typedef void (*GblSortFn)           (void*, GblSize, GblSize, GblSortComparatorFn);
 
 GBL_INLINE void gblSortSelection   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_INLINE void gblSortQuick       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;

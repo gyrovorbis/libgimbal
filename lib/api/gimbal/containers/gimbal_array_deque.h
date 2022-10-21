@@ -32,7 +32,7 @@ GBL_DECLS_BEGIN
  *  insertion (back or front)         | O(1)
  *  insertion (middle)                | O(N)
  *  removal (back or front)           | O(1)
- *  removal (middle)                  | O(N)
+ *  removal (middle) (WIP)            | O(N)
  *  access (front or back)            | O(1)
  *  random access (middle)            | O(1)
  *
@@ -66,6 +66,8 @@ GBL_DECLS_BEGIN
  *  from the front, pop from the back, and dynamically resize
  *  itself as it reaches its capacity.
  *
+ *  \todo
+ *     Finish implementing GblArrayDeque_erase()
  *  \sa GblRingBuffer, GblArrayList
  *  \ingroup containers
  */
@@ -125,7 +127,7 @@ GBL_EXPORT GBL_RESULT  GblArrayDeque_shrinkToFit  (GBL_SELF)                    
 
 ///\cond
 
-#define GBL_RING_SELF_(dequeSelf)   (&GBL_PRIV_REF(dequeSelf).ringBuffer)
+#define GBL_RING_SELF_(dequeSelf)      (&GBL_PRIV_REF(dequeSelf).ringBuffer)
 #define GBL_RING_PRIV_REF_(dequeSelf)  (GBL_PRIV_REF(GBL_RING_SELF_(dequeSelf)))
 
 #define GblArrayDeque_constructDefault_(...) \

@@ -1,6 +1,6 @@
 /*! \file
  *  \brief GblPoolAllocator chunked/paged pool based allocator + API
- *  \ingroup dataTypes
+ *  \ingroup allocators
  *  \copydoc GblPoolAllocator
  */
 

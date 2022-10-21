@@ -6,8 +6,7 @@
 #ifndef GIMBAL_ATOMICS_H
 #define GIMBAL_ATOMICS_H
 
-#include "gimbal_compiler.h"
-
+#include "../preprocessor/gimbal_compiler.h"
 
 #if 1
 #   define GBL_ATOMIC_INT16                    volatile int16_t

@@ -64,8 +64,8 @@ GBL_INLINE GblBool     GblArrayHeap_stack       (GBL_CSELF)                     
 GBL_INLINE void*       GblArrayHeap_data        (GBL_CSELF)                           GBL_NOEXCEPT;
 
 GBL_INLINE void*       GblArrayHeap_peek        (GBL_CSELF)                           GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT  GblArrayHeap_pop         (GBL_SELF, void* pEntryOut)           GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT  GblArrayHeap_push        (GBL_SELF, const void* pEntry)        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblArrayHeap_pop         (GBL_SELF, void* pEntryOut)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblArrayHeap_push        (GBL_SELF, const void* pEntry)        GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT  GblArrayHeap_clear       (GBL_SELF)                            GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT  GblArrayHeap_reserve     (GBL_SELF, GblSize capacity)          GBL_NOEXCEPT;

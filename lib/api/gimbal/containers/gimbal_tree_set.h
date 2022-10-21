@@ -7,7 +7,7 @@
 #define GIMBAL_BTREE_H
 
 #include <time.h>
-#include "../core/gimbal_typedefs.h"
+#include "../core/gimbal_ctx.h"
 
 #define GBL_SELF_TYPE GblTreeSet
 

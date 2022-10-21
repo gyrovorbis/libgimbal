@@ -4,17 +4,11 @@
  *  \sa gimbal_macro_utilities.h
  */
 
-#ifndef GIMBAL_API_GENERATORS_H
-#define GIMBAL_API_GENERATORS_H
+#ifndef GIMBAL_DECLS_H
+#define GIMBAL_DECLS_H
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <limits.h>
-#include <gimbal/core/gimbal_config.h>
-#include "../preprocessor/gimbal_macro_sequences.h"
+#include "gimbal_typedefs.h"
 #include "../preprocessor/gimbal_macro_utils.h"
-#include "../preprocessor/gimbal_macro_composition.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -131,21 +125,21 @@ extern "C" {
     typedef struct S##_ S
 
 #ifndef __cplusplus
-#   define GBL_DECLARE_ENUM(E)     \
-        typedef GBL_ENUM E;        \
+#   define GBL_DECLARE_ENUM(E)    \
+        typedef GblEnum E;        \
         enum E
 #else
 #   define GBL_DECLARE_ENUM(E)     \
-        enum E : GBL_ENUM
+        enum E : GblEnum
 #endif
 
 #ifndef __cplusplus
 #   define GBL_DECLARE_FLAGS(F)    \
-        typedef GBL_FLAGS F;       \
+        typedef GblFlags F;        \
         enum F
 #else
 #   define GBL_DECLARE_FLAGS(F)    \
-        enum F: GBL_FLAGS
+        enum F: GblFlags
 #endif
 
 #define GBL_FORWARD_DECLARE_ENUM(E) \
@@ -201,11 +195,7 @@ extern "C" {
 #   define GBL_EXPORT
 #endif
 
-//========== CLEAN THIS ENUM SHIT UP AND MAKE IT IN THE FORM OF ==============
-
-//GBL_CTX_ENUM_GENERATE()
-
-// ===== MISC META SHIT TO CLEAN LATER ====
+// ===== MISCELLANEOUS META TUPLES FOR MACRO GENERATORS ====
 #define GBL_DECL_VAR_TYPE(type, ...) \
     type
 #define GBL_DECL_VAR_NAME(type, name) \
@@ -224,7 +214,7 @@ extern "C" {
   GBL_DECL_VAR pair
 
 
-// === ENUM SHIT CLEAN ME LATER!!!===========
+// === ENUMERATION AUTOGENERATION ===========
 
 #define GBL_ENUM_TABLE_DECL_ENUM(cName, value, name, string) \
     cName = value,
@@ -250,9 +240,6 @@ extern "C" {
         return ""; \
     }
 
-
-//GBL_CTX_ENUM_TUPLE
-
 #define GBL_META_ENUM_TUPLE(tuple)
 
 #define GBL_META_ENUM_TUPLE_TYPE_INFO(typeInfo, valueTable) typeInfo
@@ -274,10 +261,8 @@ extern "C" {
 #define GBL_META_ENUM_TYPE_PROPERTY(table, postfix) GBL_META_ENUM_TUPLE_TYPE_INFO_PROPERTY_##postfix GBL_META_ENUM_TUPLE_TYPE_INFO table
 
 
-// @TODO: ADD META TUPLE SUPPORT FOR FLAGS, INCLUDING STRINGIFICATION AND VALIDATION!!
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif // GIMBAL_API_GENERATORS_H
+#endif // GIMBAL_DECLS_H

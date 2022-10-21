@@ -6,7 +6,7 @@
  *  \ingroup algorithms
  */
 
-#include "../core/gimbal_typedefs.h"
+#include "../core/gimbal_decls.h"
 #include "../preprocessor/gimbal_macro_utils.h"
 
 GBL_DECLS_BEGIN

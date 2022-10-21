@@ -40,9 +40,7 @@
 #ifndef GIMBAL_STRING_REF_H
 #define GIMBAL_STRING_REF_H
 
-#include "../core/gimbal_ctx.h"
-#include "../core/gimbal_typedefs.h"
-#include "../core/gimbal_ref.h"
+#include "../utils/gimbal_ref.h"
 #include "gimbal_string_view.h"
 
 #define GBL_SELF_TYPE GblStringRef

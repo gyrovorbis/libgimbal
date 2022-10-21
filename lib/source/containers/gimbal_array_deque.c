@@ -147,6 +147,8 @@ GBL_EXPORT void* GblArrayDeque_emplace(GblArrayDeque* pSelf, GblSize pos) {
 }
 
 GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, GblSize pos, GblSize count) {
+    return GBL_RESULT_UNIMPLEMENTED;
+#if 0
     GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
 
     GBL_CTX_VERIFY_ARG(count);
@@ -156,6 +158,29 @@ GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, GblSize pos, G
     const GblSize oldSize = GblArrayDeque_size(pSelf);
 
     if(pos < wrapIndex) {
+        GblSize endBegin = pos;
+        if(endBegin > wrapIndex) endBegin = wrapIndex;
+        GblSize endEnd = pos + count;
+        if(endEnd > wrapIndex) endEnd = wrapIndex;
+        const GblBool endRemoveChunk = endEnd - endBegin;
+
+        // check if we have anything to shave off of the end
+        const GblSize endRemovalSize = endEnd - endBegin;
+        if(endRemovalSize) {
+            const GblSize endSize = GblArrayDeque_endSize_(pSelf);
+
+            // scoot over remaining entries
+            if(endSize > endRemovalSize) {
+
+
+
+            }
+
+            GBL_RING_PRIV_REF_(pSelf).frontPos =
+        }
+
+
+
         memmove((void*)(((uintptr_t)GBL_RING_PRIV_REF_(pSelf).pData +
                 (GBL_RING_PRIV_REF_(pSelf).frontPos - count) * GBL_RING_PRIV_REF_(pSelf).elementSize)),
                 GblArrayDeque_front(pSelf),
@@ -170,6 +195,7 @@ GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, GblSize pos, G
 
 
     GBL_CTX_END();
+#endif
 }
 
 GBL_EXPORT void* GblArrayDeque_emplaceBack(GblArrayDeque* pSelf) GBL_NOEXCEPT {

@@ -10,11 +10,11 @@
 
 #define GBL_PROJECT_NAME                    "@CMAKE_PROJECT_NAME@"
 #define GBL_PROJECT_VERSION_MAJOR           @CMAKE_PROJECT_VERSION_MAJOR@u
-#define GBL_PROJECT_VERSION_MINOR           @PROJECT_VERSION_MINOR@u
-#define GBL_PROJECT_VERSION_PATCH           @PROJECT_VERSION_PATCH@u
-#define GBL_PROJECT_VERSION                 "${PROJECT_VERSION}"
-#define GBL_PROJECT_DESCRIPTION             "@PROJECT_DESCRIPTION@"
-#define GBL_PROJECT_URL                     "@PROJECT_HOMEPAGE_URL@"
+#define GBL_PROJECT_VERSION_MINOR           @CMAKE_PROJECT_VERSION_MINOR@u
+#define GBL_PROJECT_VERSION_PATCH           @CMAKE_PROJECT_VERSION_PATCH@u
+#define GBL_PROJECT_VERSION                 "@CMAKE_PROJECT_VERSION@"
+#define GBL_PROJECT_DESCRIPTION             "@CMAKE_PROJECT_DESCRIPTION@"
+#define GBL_PROJECT_URL                     "@CMAKE_PROJECT_HOMEPAGE_URL@"
 
 #define GBL_BUILD_TYPE                      "@CMAKE_BUILD_TYPE@"
 #define GBL_BUILD_CONFIG                    "@GBL_CONFIGURATION_ENABLED@"
@@ -44,66 +44,11 @@ extern "C" {
 #endif
 
 #ifndef GBL_ASSERT_1
-#   define GBL_ASSERT_1(expr)                    assert((expr))
+#   define GBL_ASSERT_1(expr)                   assert((expr))
 #endif
 
 #ifndef GBL_ASSERT_2
 #   define GBL_ASSERT_2(expr, cause)            GBL_ASSERT_1((expr) && (cause))
-#endif
-
-#ifndef GBL_BOOL
-#   define GBL_BOOL                             uint8_t
-#endif
-
-#ifndef GBL_ENUM
-#   define GBL_ENUM                             uint32_t
-#endif
-
-#ifndef GBL_FLAGS
-#   define GBL_FLAGS                            uint32_t
-#endif
-
-#ifndef GBL_VALUE
-#   define GBL_VALUE                            uintptr_t
-#endif
-
-#ifndef GBL_SIZE
-#   define GBL_SIZE                             size_t
-#   define GBL_SIZE_MAX                         SIZE_MAX
-#   ifndef __DREAMCAST__
-#      define GBL_SIZE_FMT                       "zu"
-#   else
-#     define GBL_SIZE_FMT                         "u"
-#  endif
-#endif
-
-#ifndef GBL_HASH
-#   define GBL_HASH                             uint32_t
-#endif
-
-#ifndef GBL_TRUE
-#   define GBL_TRUE                             1
-#endif
-
-#ifndef GBL_FALSE
-#   define GBL_FALSE                            0
-#endif
-
-#ifndef GBL_CMP_RESULT
-#   define GBL_CMP_RESULT                       GBL_SIZE
-#endif
-
-#ifndef GBL_SOURCE_FILE
-#   define GBL_SOURCE_FILE                      __FILE__
-#endif
-#ifndef GBL_SOURCE_FUNCTION
-#   define GBL_SOURCE_FUNCTION                  __func__
-#endif
-#ifndef GBL_SOURCE_LINE
-#   define GBL_SOURCE_LINE                      __LINE__
-#endif
-#ifndef GBL_SOURCE_COLUMN
-#   define GBL_SOURCE_COLUMN                    0
 #endif
 
 #ifndef GBL_CTX_FRAME_NAME
@@ -114,26 +59,13 @@ extern "C" {
 #   define GBL_CTX_END_LABEL                    gbl_api_end_
 #endif
 
-#ifndef GBL_CTX_ONCE_NAME
-#   define GBL_CTX_ONCE_NAME                    gblApiOnce_
-#endif
-
 #ifndef GBL_VA_SNPRINTF_BUFFER_SIZE
 #   define GBL_VA_SNPRINTF_BUFFER_SIZE          512
-#endif
-
-#ifndef GBL_STRING_BUFFER_STACK_SIZE
-#   define GBL_STRING_BUFFER_STACK_SIZE         64
 #endif
 
 #ifndef GBL_CTX_RESULT_MSG_BUFFER_SIZE
 #   define GBL_CTX_RESULT_MSG_BUFFER_SIZE       128
 #endif
-
-#ifndef GBL_ARRAY_LIST_STACK_BUFFER_DEFAULT_SIZE
-#   define GBL_ARRAY_LIST_STACK_BUFFER_DEFAULT_SIZE 1
-#endif
-
 
 #ifndef GBL_STRING_FLOAT_DECIMAL_PLACES
 #   define GBL_STRING_FLOAT_DECIMAL_PLACES      3

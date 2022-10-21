@@ -69,6 +69,7 @@ GBL_EXPORT const char*      GblTestScenario_currentCase  (GBL_CSELF)            
 GBL_EXPORT GBL_RESULT       GblTestScenario_run          (GBL_SELF, int argc, char* argv[])     GBL_NOEXCEPT;
 GBL_EXPORT GblBool          GblTestScenario_ran          (GBL_CSELF)                            GBL_NOEXCEPT;
 GBL_EXPORT GblBool          GblTestScenario_passed       (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT void             GblTestScenario_expectError  (GBL_CSELF)                            GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

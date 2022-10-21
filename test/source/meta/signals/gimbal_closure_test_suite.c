@@ -3,7 +3,7 @@
 #include <gimbal/meta/signals/gimbal_closure.h>
 #include <gimbal/meta/signals/gimbal_c_closure.h>
 #include <gimbal/meta/signals/gimbal_class_closure.h>
-#include <gimbal/core/gimbal_ref.h>
+#include <gimbal/utils/gimbal_ref.h>
 
 #define GBL_CLOSURE_TEST_SUITE_(inst)   ((GblClosureTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_CLOSURE_TEST_SUITE_TYPE))
 

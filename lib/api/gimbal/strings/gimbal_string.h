@@ -14,7 +14,7 @@ Unit tests
 #ifndef GIMBAL_STRING_H
 #define GIMBAL_STRING_H
 
-#include "../core/gimbal_typedefs.h"
+#include "../core/gimbal_ctx.h"
 #include <ctype.h>
 
 GBL_DECLS_BEGIN

@@ -8,6 +8,7 @@
 #ifndef GIMBAL_RING_LIST_H
 #define GIMBAL_RING_LIST_H
 
+#include "../core/gimbal_ctx.h"
 #include "gimbal_doubly_linked_list.h"
 
 #define GBL_RING_LIST_NPOS  GBL_NPOS

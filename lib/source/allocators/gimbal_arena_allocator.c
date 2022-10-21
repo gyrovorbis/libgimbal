@@ -1,5 +1,6 @@
 #include <gimbal/allocators/gimbal_arena_allocator.h>
 #include <gimbal/core/gimbal_ctx.h>
+#include <gimbal/meta/ifaces/gimbal_ilogger.h>
 
 #define GBL_ARENA_PAGE_(node)  GBL_LINKED_LIST_ENTRY(node, GblArenaAllocatorPage, listNode)
 

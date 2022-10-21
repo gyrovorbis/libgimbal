@@ -6,7 +6,7 @@
 #ifndef GIMBAL_BYTE_ARRAY_H
 #define GIMBAL_BYTE_ARRAY_H
 
-#include "../core/gimbal_ref.h"
+#include "../utils/gimbal_ref.h"
 #include "../strings/gimbal_string_view.h"
 
 #define GBL_SELF_TYPE GblByteArray

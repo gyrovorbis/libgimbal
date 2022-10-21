@@ -1,6 +1,6 @@
 #include <gimbal/core/gimbal_thread.h>
 #include <gimbal/meta/instances/gimbal_context.h>
-#include <gimbal/core/gimbal_call_stack.h>
+#include <gimbal/core/gimbal_stack_frame.h>
 
 
 GBL_THREAD_LOCAL GblThread thread_ = {
@@ -9,8 +9,7 @@ GBL_THREAD_LOCAL GblThread thread_ = {
         .srcLocation    = {
             .pFile      = NULL,
             .pFunc      = NULL,
-            .line       = 0,
-            .column     = 0
+            .line       = 0
         },
         .result         = GBL_RESULT_UNKNOWN
     },

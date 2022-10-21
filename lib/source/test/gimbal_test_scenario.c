@@ -13,6 +13,7 @@ typedef struct GblTestScenario_ {
     double                  suiteMs;
     GblAllocationCounters   suiteAllocCounters;
     GblBool                 runningCase;
+    GblBool                 expectError;
 } GblTestScenario_;
 
 
@@ -144,6 +145,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
 
                     GBL_RESULT result = GblTestSuite_runCase(pSuiteIt, pCtx, idx);
 
+                    pSelf_->expectError = GBL_FALSE;
                     pSelf_->runningCase = GBL_FALSE;
                     GblTimer_stop(&caseTimer);
                     pSelf_->suiteMs += GblTimer_elapsedMs(&caseTimer);
@@ -364,10 +366,13 @@ static GBL_RESULT GblTestScenarioClass_destructor_(GblBox* pRecord) {
 
 
 static GBL_RESULT GblTestScenarioClass_ILogger_write_(GblILogger* pILogger, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs){
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pILogger);
+    if(pSelf_->expectError && (level & (GBL_LOG_LEVEL_WARNING|GBL_LOG_LEVEL_ERROR)))
+        return GBL_RESULT_SUCCESS;
+
     GblTimer logTime;
     GblTimer_start(&logTime);
 
-    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pILogger);
     GblContextClass* pClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
 
     const GBL_RESULT result = pClass->GblILoggerImpl.pFnWrite(pILogger, pFrame, level, pFmt, varArgs);
@@ -519,4 +524,8 @@ GBL_EXPORT GblBool GblTestScenario_ran(const GblTestScenario* pSelf) {
 
 GBL_EXPORT GblBool GblTestScenario_passed(const GblTestScenario* pSelf) {
     return GblTestScenario_ran(pSelf) && !GBL_RESULT_ERROR(pSelf->result);
+}
+
+GBL_EXPORT void GblTestScenario_expectError(const GblTestScenario* pSelf) {
+    GBL_TEST_SCENARIO_(pSelf)->expectError = GBL_TRUE;
 }

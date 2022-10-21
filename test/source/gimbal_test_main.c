@@ -13,7 +13,8 @@
 #include "containers/gimbal_array_heap_test_suite.h"
 #include "allocators/gimbal_arena_allocator_test_suite.h"
 #include "allocators/gimbal_pool_allocator_test_suite.h"
-#include "core/gimbal_ref_test_suite.h"
+#include "allocators/gimbal_scope_allocator_test_suite.h"
+#include "utils/gimbal_ref_test_suite.h"
 #include "containers/gimbal_byte_array_test_suite.h"
 #include "strings/gimbal_quark_test_suite.h"
 #include "strings/gimbal_string_view_test_suite.h"
@@ -76,6 +77,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_createFromType(GBL_ARENA_ALLOCATOR_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_POOL_ALLOCATOR_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_createFromType(GBL_SCOPE_ALLOCATOR_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_REF_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,

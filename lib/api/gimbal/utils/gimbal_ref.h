@@ -6,15 +6,15 @@
 #ifndef GIMBAL_MEMORY_REF_H
 #define GIMBAL_MEMORY_REF_H
 
-#include "../preprocessor/gimbal_atomics.h"
+#include "../core/gimbal_atomics.h"
 #include "../core/gimbal_ctx.h"
-#include "gimbal_typedefs.h"
 
 #define GBL_SELF_TYPE GblRef
 
 GBL_DECLS_BEGIN
 
 typedef void            GblRef;
+
 typedef GBL_RESULT      (*GblRefDestructFn)     (GBL_SELF);
 
 GBL_EXPORT GBL_RESULT   GblRef_reinit           (void)                               GBL_NOEXCEPT;

@@ -17,6 +17,11 @@
 
 GBL_DECLS_BEGIN
 
+GBL_FORWARD_DECLARE_STRUCT(GblClass);
+GBL_FORWARD_DECLARE_STRUCT(GblInstance);
+GBL_FORWARD_DECLARE_STRUCT(GblInterface);
+GBL_FORWARD_DECLARE_STRUCT(GblIPlugin);
+
 /*! \brief Type representing meta type UUIDs
  *  \ingroup meta
  */

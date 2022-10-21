@@ -1,6 +1,6 @@
-#include "core/gimbal_ref_test_suite.h"
+#include "utils/gimbal_ref_test_suite.h"
 #include <gimbal/core/gimbal_ctx.h>
-#include <gimbal/core/gimbal_ref.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include <gimbal/test/gimbal_test.h>
 
 #define GBL_REF_TEST_SUITE_(inst)   ((GblRefTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_REF_TEST_SUITE_TYPE))

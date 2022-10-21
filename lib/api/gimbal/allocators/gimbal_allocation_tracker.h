@@ -1,13 +1,13 @@
 /*! \file
  *  \brief GblAllocationTracker, counters, and related API
- *  \ingroup testing
+ *  \ingroup allocators
  */
 
 #ifndef GIMBAL_ALLOCATION_TRACKER_H
 #define GIMBAL_ALLOCATION_TRACKER_H
 
 #include "../core/gimbal_typedefs.h"
-#include "gimbal/core/gimbal_call_stack.h"
+#include "gimbal/core/gimbal_stack_frame.h"
 
 #define GBL_SELF_TYPE GblAllocationTracker
 

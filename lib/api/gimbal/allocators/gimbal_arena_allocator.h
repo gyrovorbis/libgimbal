@@ -1,18 +1,20 @@
 /*! \file
  *  \brief GblArenaAllocator zone/region/area-based allocator + API
- *  \ingroup dataTypes
+ *  \ingroup allocators
  *  \copydoc GblArenaAllocator
  */
 
 #ifndef GIMBAL_ARENA_ALLOCATOR_H
 #define GIMBAL_ARENA_ALLOCATOR_H
 
-#include "../core/gimbal_typedefs.h"
 #include "../containers/gimbal_linked_list.h"
+#include "../core/gimbal_result.h"
 
 #define GBL_SELF_TYPE GblArenaAllocator
 
 GBL_DECLS_BEGIN
+
+GBL_FORWARD_DECLARE_STRUCT(GblContext);
 
 /*! \brief Represents a single arena allocation page
  *

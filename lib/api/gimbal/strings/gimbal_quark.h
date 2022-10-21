@@ -45,14 +45,14 @@
 #ifndef GIMBAL_QUARK_H
 #define GIMBAL_QUARK_H
 
-#include "../core/gimbal_typedefs.h"
+#include "../core/gimbal_result.h"
 
 /// \details Value of an invalid or NULL ::GblQuark
 #define GBL_QUARK_INVALID ((GblQuark)0)
 
-///\cond
 GBL_DECLS_BEGIN
-///\endcond
+
+GBL_FORWARD_DECLARE_STRUCT(GblContext);
 
 /*! \brief Uniquely identifiable interned string type
  *

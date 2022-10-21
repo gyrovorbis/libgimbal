@@ -47,6 +47,7 @@ static GBL_RESULT GblContext_IAllocator_realloc_(GblIAllocator* pIAllocator, con
         GBL_CTX_VERIFY_POINTER(pData);
         GBL_CTX_VERIFY_POINTER(ppNewData);
         const uintptr_t ptrVal = (uintptr_t)pData;
+        GBL_UNUSED(ptrVal);
         //GBL_CTX_DEBUG("Realloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") %p", newSize, newAlign, ptrVal);
 
         *ppNewData = GBL_ALIGNED_REALLOC(pData, newAlign, newSize);
@@ -75,7 +76,7 @@ static GBL_RESULT GblContext_IAllocator_free_(GblIAllocator* pIAllocator, const 
     } else {
 
         const uintptr_t ptrVal = (uintptr_t)pData;
-
+        GBL_UNUSED(ptrVal);
         GBL_ALIGNED_FREE(pData);
 
     #if 0
@@ -97,12 +98,11 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
 
     if(!(pCtx->logFilter & level)) return GBL_RESULT_SUCCESS;
 
-
     GBL_ASSERT(pFmt);
     GBL_ASSERT(level >= 0);
 
-    char buffer[GBL_VA_SNPRINTF_BUFFER_SIZE];// = { '\0' };
-    char tabBuff[GBL_VA_SNPRINTF_BUFFER_SIZE];// = { '\t' };
+    char buffer[GBL_VA_SNPRINTF_BUFFER_SIZE];
+    char tabBuff[GBL_VA_SNPRINTF_BUFFER_SIZE];
     FILE* const pFile = (level >= GBL_LOG_LEVEL_ERROR)?
                 stderr : stdout;
     const char* pPrefix = NULL;
@@ -189,7 +189,6 @@ static GBL_RESULT GblContextClass_init_(GblContextClass* pClass, void* pData, Gb
     GBL_CTX_BEGIN(pCtx);
 
     if(!GblType_classRefCount(GBL_CONTEXT_TYPE)) {
-        //GBL_PROPERTY_TABLE_REGISTER(GBL_CONTEXT, pClass);
         GBL_PROPERTIES_REGISTER(GblContext);
     }
 
@@ -199,7 +198,7 @@ static GBL_RESULT GblContextClass_init_(GblContextClass* pClass, void* pData, Gb
     pClass->GblILoggerImpl.pFnWrite       = GblContext_ILogger_write_;
     pClass->GblILoggerImpl.pFnPush        = GblContext_ILogger_push_;
     pClass->GblILoggerImpl.pFnPop         = GblContext_ILogger_pop_;
-    pClass->base.pFnConstructor                = GblContext_constructor_;
+    pClass->base.pFnConstructor           = GblContext_constructor_;
     GBL_CTX_END();
 }
 
@@ -216,7 +215,8 @@ static GblContextClass defaultClass = {
 static GblContext defaultCtx_ = {
     .base.base.pClass = (GblBoxClass*)&defaultClass,
     .base.base.private_.contextType = 1,
-    .logFilter = 0xffffffff
+    .logFilter = (GBL_LOG_LEVEL_INFO|GBL_LOG_LEVEL_WARNING|GBL_LOG_LEVEL_ERROR)
+    //.logFilter = 0xffffffff
 };
 
 static GblContext* globalCtx_ = &defaultCtx_;
@@ -294,7 +294,7 @@ GBL_EXPORT GBL_RESULT GblContext_memFree_      (GblContext* pSelf,
 
 GBL_EXPORT GBL_RESULT GblContext_logWrite_     (GblContext* pSelf,
                                   const GblStackFrame*  pFrame,
-                                  GBL_LOG_LEVEL         level,
+                                  GblFlags              level,
                                   const char*           pFmt,
                                   va_list               varArgs)    GBL_NOEXCEPT
 {
@@ -328,10 +328,8 @@ GBL_EXPORT void GblContext_setLogFilter(GblContext* pSelf, GblFlags mask) {
 GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
     GBL_CTX_BEGIN(pSelf);
 
-    GBL_CTX_INFO("Build Info");
-    GBL_CTX_PUSH();
-
     GBL_CTX_INFO("Project Info");
+    GBL_CTX_PUSH();
     GBL_CTX_INFO("%-20s: %-100.100s", "Name", GBL_PROJECT_NAME);
     GBL_CTX_INFO("%-20s: %-100.100s", "Version", GBL_PROJECT_VERSION);
     GBL_CTX_INFO("%-20s: %-100.100s", "URL", GBL_PROJECT_URL);

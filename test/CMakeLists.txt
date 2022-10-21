@@ -22,6 +22,8 @@ add_executable(GimbalTests
     source/allocators/gimbal_arena_allocator_test_suite.c
     include/allocators/gimbal_pool_allocator_test_suite.h
     source/allocators/gimbal_pool_allocator_test_suite.c
+    include/allocators/gimbal_scope_allocator_test_suite.h
+    source/allocators/gimbal_scope_allocator_test_suite.c
     include/containers/gimbal_linked_list_test_suite.h
     source/containers/gimbal_linked_list_test_suite.c
     include/containers/gimbal_doubly_linked_list_test_suite.h
@@ -46,8 +48,6 @@ add_executable(GimbalTests
     source/containers/gimbal_array_deque_test_suite.c
     include/containers/gimbal_array_heap_test_suite.h
     source/containers/gimbal_array_heap_test_suite.c
-    include/core/gimbal_ref_test_suite.h
-    source/core/gimbal_ref_test_suite.c
     include/meta/classes/gimbal_enum_test_suite.h
     source/meta/classes/gimbal_enum_test_suite.c
     include/meta/classes/gimbal_flags_test_suite.h
@@ -84,6 +84,8 @@ add_executable(GimbalTests
     source/strings/gimbal_pattern_matcher_test_suite.c
     include/utils/gimbal_uuid_test_suite.h
     source/utils/gimbal_uuid_test_suite.c
+    include/utils/gimbal_ref_test_suite.h
+    source/utils/gimbal_ref_test_suite.c
     source/gimbal_test_main.c)
 
 target_link_libraries(GimbalTests

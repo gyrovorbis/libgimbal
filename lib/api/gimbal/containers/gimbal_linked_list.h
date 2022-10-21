@@ -9,7 +9,7 @@
 #ifndef GIMBAL_LINKED_LIST_H
 #define GIMBAL_LINKED_LIST_H
 
-#include "../core/gimbal_typedefs.h"
+#include "../core/gimbal_decls.h"
 
 #define GBL_LINKED_LIST_NPOS                            GBL_NPOS
 #define GBL_LINKED_LIST_NODE_INITIALIZER()              { .pNext = NULL }

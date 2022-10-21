@@ -11,6 +11,8 @@
 #include "../preprocessor/gimbal_compiler.h"
 #include "gimbal_quark.h"
 #include <ctype.h>
+#include <stdint.h>
+#include <limits.h>
 
 #define GBL_STRING_VIEW_NPOS                GBL_NPOS
 #define GBL_STRING_VIEW_2(data, length)     GblStringView_fromStringSized(data, length)

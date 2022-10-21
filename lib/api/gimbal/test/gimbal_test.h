@@ -7,6 +7,7 @@
 #define GIMBAL_TEST_H
 
 #include "../preprocessor/gimbal_macro_utils.h"
+#include "gimbal_test_scenario.h"
 #include <stdint.h>
 
 #define GBL_TEST_VERIFY(expr)                        GBL_CTX_VERIFY_EXPRESSION(expr)
@@ -114,10 +115,14 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
                                                                     GBL_RESULT_ERROR,                                        \
                                                                     reason)
 
-#define GBL_TEST_EXPECT_ERROR()                         \
-    GBL_CTX_VERIFY(!GBL_CONFIG_ASSERT_ERROR_ENABLED,    \
-                   GBL_RESULT_SKIPPED,                  \
-                   "Skipping test case due to GBL_CONFIG_ASSERT_ERROR_ENABLED.")
+#define GBL_TEST_EXPECT_ERROR()                                                         \
+    GBL_STMT_START {                                                                    \
+        GBL_CTX_VERIFY(!GBL_CONFIG_ASSERT_ERROR_ENABLED,                                \
+                       GBL_RESULT_SKIPPED,                                              \
+                       "Skipping test case due to GBL_CONFIG_ASSERT_ERROR_ENABLED.");   \
+        GblTestScenario* pScenario = GBL_TEST_SCENARIO(GBL_CTX_CONTEXT());              \
+        if(pScenario) GblTestScenario_expectError(pScenario);                           \
+    } GBL_STMT_END
 
 
 

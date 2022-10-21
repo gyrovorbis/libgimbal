@@ -8,8 +8,8 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
 set(GIMBAL_VERSION_MAJOR 0)
-set(GIMBAL_VERSION_MINOR 0)
-set(GIMBAL_VERSION_PATCH 1)
+set(GIMBAL_VERSION_MINOR 1)
+set(GIMBAL_VERSION_PATCH 0)
 set(GIMBAL_VERSION
   ${GIMBAL_VERSION_MAJOR}.${GIMBAL_VERSION_MINOR}.${GIMBAL_VERSION_PATCH})
 
@@ -18,6 +18,7 @@ include(util/gimbal_utils.cmake)
 project(LibGimbal 
     VERSION ${GIMBAL_VERSION}
     DESCRIPTION "Aggregate project for libGimbal subprojects" 
+    HOMEPAGE_URL "libgimbal.elysianshadows.com"
     LANGUAGES C CXX)
 
 option(GBL_ENABLE_TESTS "Enable LibGimbal unit tests" OFF)

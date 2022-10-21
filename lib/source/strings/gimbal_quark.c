@@ -2,6 +2,7 @@
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/allocators/gimbal_arena_allocator.h>
+#include <limits.h>
 #ifdef _WIN32
 #   define NOGDI
 # else

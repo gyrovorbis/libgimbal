@@ -19,6 +19,8 @@ GBL_DECLS_BEGIN
 
 #define GBL_SELF_TYPE GblITable
 
+GBL_FORWARD_DECLARE_STRUCT(GblVariant);
+
 GBL_INTERFACE_DERIVE(GblITable)
     GBL_RESULT (*pFnIndex)    (GBL_CSELF, const GblVariant* pKey, GblVariant* pValue);
     GBL_RESULT (*pFnNewIndex) (GBL_SELF, const GblVariant* pKey, const GblVariant* pValue);

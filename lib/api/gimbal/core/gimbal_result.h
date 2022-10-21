@@ -6,23 +6,10 @@
 #ifndef GIMBAL_RESULT_H
 #define GIMBAL_RESULT_H
 
-#include "../preprocessor/gimbal_macro_composition.h"
-#include "../preprocessor/gimbal_macro_sequences.h"
-#include "../preprocessor/gimbal_macro_utils.h"
-#include "../core/gimbal_api_generators.h"
+#include "gimbal_decls.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-/*
-1) autogenerate count
-2) helpers for setting value
-    - previous + someShit
-    - previous | someShit
-3) Automatically prefix C values with name
-4) Handle user types (as + some shit)
-5) Default value for C/++ or Lua?
-*/
+GBL_DECLS_BEGIN
+
 #define GBL_META_RESULT_TABLE (                                                                                                                         \
         ( GBL_RESULT, Result, "C API Return Status Code", gblResultString),                                                                             \
         (                                                                                                                                               \
@@ -92,8 +79,6 @@ GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE)
 #define GBL_RESULT_ISSUE(value) \
     (!GBL_RESULT_SUCCESS(value))
 
-#ifdef __cplusplus
-}
-#endif
+GBL_DECLS_END
 
 #endif // GIMBAL_RESULT_H

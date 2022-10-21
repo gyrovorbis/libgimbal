@@ -7,7 +7,7 @@
 #ifndef GIMBAL_NARY_TREE_H
 #define GIMBAL_NARY_TREE_H
 
-#include "../core/gimbal_typedefs.h"
+#include "../core/gimbal_ctx.h"
 
 #define GBL_NARY_TREE_NPOS                           GBL_NPOS
 #define GBL_NARY_TREE_ENTRY(node, structure, field)  GBL_CONTAINER_OF(node, structure, field)

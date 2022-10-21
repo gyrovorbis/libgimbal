@@ -471,6 +471,12 @@ LibGimbal's features are conceptually split into the following high-level compon
 - random number generation API
 - CRC, parity, LCM, GCD, prime numbers
 
+\subpage Allocators
+- allocation trackers with leak detection
+- paged arena allocators with state rewinding
+- stack-based scope allocator with destructor chains
+- efficient pool-based, arena-backed allocator
+
 \subpage Meta 
 - generic, polymorphic variant types with type conversions
 - cross-language, extensible object-oriented type system

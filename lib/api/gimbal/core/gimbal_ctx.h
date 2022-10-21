@@ -5,18 +5,14 @@
 #ifndef GIMBAL_CTX_H
 #define GIMBAL_CTX_H
 
-#include "gimbal_api_generators.h"
 #include "../algorithms/gimbal_numeric.h"
-#include "gimbal_ext.h"
-#include "gimbal_call_stack.h"
+#include "../meta/ifaces/gimbal_ilogger.h"
 #include "gimbal_thread.h"
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+GBL_DECLS_BEGIN
 
 // ===== GBL API FRAME CONVENIENCE ACCESSORS =====
 
@@ -32,14 +28,13 @@ extern "C" {
 
 // ====== SOURCE LOCATION PROPAGATION UTILITIES =====
 
-#define GBL_SRC_FILE    GBL_SOURCE_FILE
-#define GBL_SRC_FN      GBL_SOURCE_FUNCTION
-#define GBL_SRC_LN      GBL_SOURCE_LINE
-#define GBL_SRC_COL     GBL_SOURCE_COLUMN
+#define GBL_SRC_FILE    __FILE__
+#define GBL_SRC_FN      __func__
+#define GBL_SRC_LN      __LINE__
 #define GBL_SRC_LOC     GBL_SOURCE_LOCATION
 #define GblSrcLoc       GblSourceLocation
 
-#define GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE, COL) ((GblSourceLocation){FILE, FUNCTION, LINE, COL})
+#define GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE) ((GblSourceLocation){FILE, FUNCTION, LINE})
 
 #define GBL_CTX_STACK_FRAME_SOURCE_PUSH(pStackFrame, current) \
     if(++pStackFrame->sourceCurrentCaptureDepth == 1) GBL_CTX_SOURCE() = current;
@@ -53,8 +48,8 @@ extern "C" {
 #define GBL_CTX_SOURCE_LOC_PUSH(srcLoc) \
     GBL_CTX_STACK_FRAME_SOURCE_PUSH(GBL_CTX_FRAME_NAME, srcLoc)
 
-#define GBL_CTX_SOURCE_PUSH(FILE, FUNCTION, LINE, COLUMN) \
-    GBL_CTX_SOURCE_LOC_PUSH(GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE, COLUMN))
+#define GBL_CTX_SOURCE_PUSH(FILE, FUNCTION, LINE) \
+    GBL_CTX_SOURCE_LOC_PUSH(GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE))
 
 #define GBL_CTX_SOURCE_POP()                    \
     GBL_CTX_STACK_FRAME_SOURCE_POP(GBL_CTX_FRAME_NAME)
@@ -81,7 +76,7 @@ extern "C" {
     } GBL_STMT_END
 
 #define GBL_CTX_RECORD_SET_JMP_CND(expr, result, label, ...) \
-    GBL_CTX_RECORD_SET_JMP_CND_(expr, result, goto label, GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__);
+    GBL_CTX_RECORD_SET_JMP_CND_(expr, result, goto label, GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), __VA_ARGS__);
 
 //====== VERIFY =========
 
@@ -99,7 +94,7 @@ extern "C" {
 
 #define GBL_CTX_VERIFY(...)                                                                                         \
     GBL_STMT_START {                                                                                                \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                      \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);                                   \
         GBL_VA_OVERLOAD_SELECT(GBL_CTX_VERIFY, GBL_VA_OVERLOAD_SUFFIXER_3_N, src_, __VA_ARGS__)(src_, __VA_ARGS__); \
     } GBL_STMT_END
 
@@ -113,7 +108,7 @@ extern "C" {
 
 #define GBL_CTX_VERIFY_EXPRESSION(...)                                                                                          \
     GBL_STMT_START {                                                                                                            \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                  \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);                                               \
         GBL_VA_OVERLOAD_SELECT(GBL_CTX_VERIFY_EXPRESSION, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);  \
     } GBL_STMT_END
 
@@ -126,7 +121,7 @@ extern "C" {
 
 #define GBL_CTX_VERIFY_POINTER(...)                                                                                             \
     GBL_STMT_START {                                                                                                            \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                  \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);                                               \
         GBL_VA_OVERLOAD_SELECT(GBL_CTX_VERIFY_POINTER, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);     \
     } GBL_STMT_END
 
@@ -139,7 +134,7 @@ extern "C" {
 
 #define GBL_CTX_VERIFY_ARG(...)                                                                                             \
     GBL_STMT_START {                                                                                                        \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                              \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);                                           \
         GBL_VA_OVERLOAD_SELECT(GBL_CTX_VERIFY_ARG, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);     \
     } GBL_STMT_END
 
@@ -155,7 +150,7 @@ extern "C" {
 
 #define GBL_CTX_VERIFY_TYPE(...)                                                                                            \
     GBL_STMT_START {                                                                                                        \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                              \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);                                           \
         GBL_VA_OVERLOAD_SELECT(GBL_CTX_VERIFY_TYPE, GBL_VA_OVERLOAD_SUFFIXER_3_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);    \
     } GBL_STMT_END
 
@@ -228,16 +223,22 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_ERRNO_RESULT(int ernum) {
         GBL_CTX_INLINE_##MethodPrefix##_(GBL_CTX_FRAME_NAME GBL_VA_ARGS(__VA_ARGS__))
 
 #define GBL_CTX_INLINE_CALL(MethodPrefix, ...) \
-    GBL_CTX_INLINE_CALL_(MethodPrefix, GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL) GBL_VA_ARG)
+    GBL_CTX_INLINE_CALL_(MethodPrefix, GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN) GBL_VA_ARG)
 
 // ============== GBL EXT USERMETHODS ==========
 
-#define GBL_CTX_EXT(prefix, ...)                                                                                        \
-    GBL_STMT_START {                                                                                                    \
-        GBL_MAYBE_UNUSED const GBL_RESULT localResult = GBL_EXT_##prefix(GBL_CTX_FRAME_NAME, ##__VA_ARGS__);            \
-        GBL_ASSERT(!(GBL_CONFIG_ASSERT_ERROR_ENABLED && GBL_RESULT_ERROR(localResult)), "Ext["#prefix"]: ERROR");       \
-        GBL_ASSERT(!(GBL_CONFIG_ASSERT_PARTIAL_ENABLED && GBL_RESULT_PARTIAL(localResult)), "Ext["#prefix"]: ERROR");   \
-        GBL_UNUSED(localResult);                                                                                        \
+#define GBL_CTX_EXT(prefix, ...)                                                \
+    GBL_STMT_START {                                                            \
+        const GBL_RESULT localResult = GblContext_##prefix(GBL_CTX_CONTEXT(),   \
+                                                           GBL_CTX_FRAME_NAME,  \
+                                                           ##__VA_ARGS__);      \
+        GBL_ASSERT(!(GBL_CONFIG_ASSERT_ERROR_ENABLED &&                         \
+                     GBL_RESULT_ERROR(localResult)),                            \
+                   "Ext["#prefix"]: ERROR");                                    \
+        GBL_ASSERT(!(GBL_CONFIG_ASSERT_PARTIAL_ENABLED &&                       \
+                     GBL_RESULT_PARTIAL(localResult)),                          \
+                   "Ext["#prefix"]: ERROR");                                    \
+        GBL_UNUSED(localResult);                                                \
     } GBL_STMT_END
 
 
@@ -248,7 +249,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
         size = gblAlignedAllocSizeDefault(size);
     }
     GBL_ASSERT(size % align == 0);
-    GBL_CTX_EXT(MALLOC, size, align, pDebugStr, &GBL_CTX_INLINE_RETVAL());
+    GBL_CTX_EXT(memAlloc_, size, align, pDebugStr, &GBL_CTX_INLINE_RETVAL());
     GBL_CTX_INLINE_END();
     // modify/set return value based on result
     GBL_CTX_INLINE_RETURN();
@@ -264,7 +265,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
     GBL_CTX_MALLOC_3(src, gblAlignedAllocSizeDefault(size), GBL_ALIGNOF(GBL_MAX_ALIGN_T))
 
 #define GBL_CTX_MALLOC(...)  \
-    GBL_VA_OVERLOAD_SELECT(GBL_CTX_MALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__)
+    GBL_VA_OVERLOAD_SELECT(GBL_CTX_MALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), __VA_ARGS__)
 
 #define GBL_CTX_NEW_4(src, type, count, dbgStr) \
     (type*)GBL_CTX_INLINE_CALL_(MALLOC, src, gblAlignedAllocSizeDefault(sizeof(type)*count), 0, dbgStr)
@@ -276,12 +277,12 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
     GBL_CTX_NEW_3(src, type, 1)
 
 #define GBL_CTX_NEW(...) \
-    GBL_VA_OVERLOAD_SELECT(GBL_CTX_NEW, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__)
+    GBL_VA_OVERLOAD_SELECT(GBL_CTX_NEW, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), __VA_ARGS__)
 
 GBL_MAYBE_UNUSED GBL_CTX_INLINE(REALLOC, void*, void* pData, GblSize newSize, GblSize newAlign) {
     GBL_CTX_INLINE_BEGIN(NULL);
 
-    GBL_CTX_EXT(REALLOC, pData, newSize, newAlign, &GBL_CTX_INLINE_RETVAL());
+    GBL_CTX_EXT(memRealloc_, pData, newSize, newAlign, &GBL_CTX_INLINE_RETVAL());
     GBL_CTX_INLINE_END();
     // modify/set return value based on result
     GBL_CTX_INLINE_RETURN();
@@ -294,7 +295,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
     GBL_CTX_REALLOC_4(src, pData, newSize, 1)
 
 #define GBL_CTX_REALLOC(...)  \
-     GBL_VA_OVERLOAD_SELECT(GBL_CTX_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__)
+     GBL_VA_OVERLOAD_SELECT(GBL_CTX_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), __VA_ARGS__)
 
 #define GBL_CTX_RENEW_5(src, ptr, type, count, dbgStr) \
     GBL_CTX_INLINE_CALL(REALLOC, src, ptr, sizeof(type)*count, dbgStr)
@@ -306,24 +307,24 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
     GBL_CTX_RENEW_4(src, ptr, type, 1)
 
 #define GBL_CTX_RENEW(...) \
-     GBL_VA_OVERLOAD_SELECT(GBL_CTX_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), __VA_ARGS__)
+     GBL_VA_OVERLOAD_SELECT(GBL_CTX_REALLOC, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), __VA_ARGS__)
 
 #define GBL_CTX_FREE(pData) \
-    GBL_CTX_SOURCE_SCOPED(GBL_CTX_EXT, (GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL)), FREE, pData)
+    GBL_CTX_SOURCE_SCOPED(GBL_CTX_EXT, (GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN)), memFree_, pData)
 
 #define GBL_CTX_PUSH_(srcLoc, ...)                                  \
     GBL_STMT_START {                                                \
         GBL_CTX_SOURCE_LOC_PUSH(srcLoc);                            \
         GBL_RESULT_SUCCESS(GblThread_logPush(NULL));                \
-        GBL_CTX_EXT(LOG_PUSH);                                      \
+        GBL_CTX_EXT(logPush_);                                      \
         GBL_CTX_SOURCE_POP();                                       \
         ++GBL_CTX_FRAME()->stackDepth;                              \
     } GBL_STMT_END
 
-#define GBL_CTX_PUSH()                                                  \
-    GBL_STMT_START {                                                    \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL); \
-        GBL_CTX_PUSH_(src_);                                            \
+#define GBL_CTX_PUSH()                                                              \
+    GBL_STMT_START {                                                                \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);   \
+        GBL_CTX_PUSH_(src_);                                                        \
     } GBL_STMT_END
 
 #define GBL_CTX_PUSH_VERBOSE_N(srcLoc, pFmt, ...)                               \
@@ -334,13 +335,13 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
 
 #define GBL_CTX_PUSH_VERBOSE(...)                                                                                               \
     GBL_STMT_START {                                                                                                            \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                                  \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);                                               \
         GBL_VA_OVERLOAD_SELECT(GBL_CTX_PUSH_VERBOSE, GBL_VA_OVERLOAD_SUFFIXER_1_N, src_, ##__VA_ARGS__)(src_, ##__VA_ARGS__);   \
     } GBL_STMT_END
 
 #define GBL_CTX_POP_2(srcLoc, count)                                    \
         GblThread_logPop(NULL, count);                                  \
-        GBL_CTX_SOURCE_SCOPED(GBL_CTX_EXT, srcLoc, LOG_POP, count);     \
+        GBL_CTX_SOURCE_SCOPED(GBL_CTX_EXT, srcLoc, logPop_, count);     \
         GBL_CTX_FRAME()->stackDepth -= count;
 
 #define GBL_CTX_POP_1(srcLoc) \
@@ -348,16 +349,16 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(REALLOC, void*, void* pData, GblSize newSize, Gb
 
 #define GBL_CTX_POP(...)                                                                        \
     GBL_STMT_START {                                                                            \
-        const GblSrcLoc loc = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);   \
+        const GblSrcLoc loc = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);                \
         GBL_VA_OVERLOAD_CALL(GBL_CTX_POP, GBL_VA_OVERLOAD_SUFFIXER_ARGC, loc, __VA_ARGS__);     \
     } GBL_STMT_END
 
-GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char* pFmt, ...) {
+GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GblFlags level, const char* pFmt, ...) {
     GBL_CTX_INLINE_BEGIN(GBL_RESULT_SUCCESS);
     va_list varArgs;
     va_start(varArgs, pFmt);
 
-    GBL_CTX_EXT(LOG_WRITE, level, pFmt, varArgs);
+    GBL_CTX_EXT(logWrite_, level, pFmt, varArgs);
     va_end(varArgs);
     GBL_CTX_INLINE_END();
     GBL_CTX_INLINE_RETURN();
@@ -366,32 +367,28 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_CTX_LOG_(src, level, pFmt, ...) \
     GBL_CTX_INLINE_CALL_(LOG, src, level, pFmt, ##__VA_ARGS__)
 #define GBL_CTX_LOG(level, pFmt, ...)       \
-   GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), level, pFmt, ##__VA_ARGS__)
+   GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), level, pFmt, ##__VA_ARGS__)
 
-#define GBL_CTX_DEBUG(pFmt, ...)                                        \
-    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), GBL_LOG_LEVEL_DEBUG, pFmt, ##__VA_ARGS__)
+#define GBL_CTX_DEBUG(pFmt, ...)    \
+    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), GBL_LOG_LEVEL_DEBUG, pFmt, ##__VA_ARGS__)
 
-#define GBL_CTX_VERBOSE(pFmt, ...)                                      \
-    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), GBL_LOG_LEVEL_VERBOSE, pFmt, ##__VA_ARGS__)
+#define GBL_CTX_VERBOSE(pFmt, ...)  \
+    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), GBL_LOG_LEVEL_VERBOSE, pFmt, ##__VA_ARGS__)
 
-#define GBL_CTX_INFO(pFmt, ...)                                         \
-    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), GBL_LOG_LEVEL_INFO, pFmt, ##__VA_ARGS__)
+#define GBL_CTX_INFO(pFmt, ...)     \
+    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), GBL_LOG_LEVEL_INFO, pFmt, ##__VA_ARGS__)
 
-#define GBL_CTX_WARN(pFmt, ...)                                         \
-    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), GBL_LOG_LEVEL_WARNING, pFmt, ##__VA_ARGS__)
+#define GBL_CTX_WARN(pFmt, ...)     \
+    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), GBL_LOG_LEVEL_WARNING, pFmt, ##__VA_ARGS__)
 
-#define GBL_CTX_ERROR(pFmt, ...)                                        \
-    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL), GBL_LOG_LEVEL_ERROR, pFmt, ##__VA_ARGS__)
-
-
-#define GBL_CTX_EVENT_2(srcLoc, event) \
-    GBL_CTX_SOURCE_SCOPED(GBL_CTX_EXT, srcLoc, EVENT, type, NULL, 0)
+#define GBL_CTX_ERROR(pFmt, ...)    \
+    GBL_CTX_LOG_(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), GBL_LOG_LEVEL_ERROR, pFmt, ##__VA_ARGS__)
 
 #define GBL_CTX_EVENT(event) \
     GBL_STMT_START { \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);  \
-        GBL_UNUSED(src_);                                                \
-       GblObject_sendEvent(GBL_CTX_OBJECT(), (GblEvent*)event);          \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);   \
+        GBL_UNUSED(src_);                                                           \
+       GblObject_sendEvent(GBL_CTX_OBJECT(), (GblEvent*)event);                     \
     } GBL_STMT_END
 
 
@@ -404,7 +401,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
     } GBL_STMT_END
 
 // Base Conditional Logic
-#define GBL_CTX_RECORD_ASSERT_CONDITIONAL_(enabled, record, test)              \
+#define GBL_CTX_RECORD_ASSERT_CONDITIONAL_(enabled, record, test)   \
     GBL_MACRO_CONDITIONAL_CALL(enabled, GBL_CTX_RECORD_ASSERT_, record, test)
 
 // Partial Success
@@ -469,27 +466,22 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 
 // ================= RECORD => HANDLE::LAST_ERROR ==============
-#define GBL_CTX_RECORD_LAST_RECORD_(prefix, record)                             \
-    GBL_STMT_START {                                                            \
-        if(GBL_RESULT_##prefix(record->result)) {                               \
-            gblExtCallRecordSet(GBL_CTX_FRAME_NAME, record);                    \
-            GblThread_setCallRecord(NULL, record);                              \
-        }                                                                       \
+#define GBL_CTX_RECORD_LAST_RECORD_(prefix, record)                                     \
+    GBL_STMT_START {                                                                    \
+        if(GBL_RESULT_##prefix(record->result)) {                                       \
+            GblContext_callRecordSet_(GBL_CTX_CONTEXT(), GBL_CTX_FRAME_NAME, record);   \
+            GblThread_setCallRecord(NULL, record);                                      \
+        }                                                                               \
     } GBL_STMT_END
 
-
-#define GBL_CTX_RECORD_LAST_RECORD_CONDITIONAL_(prefix, record)                     \
-    GBL_MACRO_CONDITIONAL_CALL(GBL_CONFIG_LAST_CALL_RECORD_##prefix##_ENABLED,      \
-                            GBL_CTX_RECORD_LAST_RECORD_, prefix, record)
-
 #define GBL_CTX_RECORD_LAST_RECORD_PARTIAL(record) \
-    GBL_CTX_RECORD_LAST_RECORD_CONDITIONAL_(PARTIAL, record)
+    GBL_CTX_RECORD_LAST_RECORD_(PARTIAL, record)
 
-#define GBL_CTX_RECORD_LAST_RECORD_ERROR(record) \
-    GBL_CTX_RECORD_LAST_RECORD_CONDITIONAL_(ERROR, record)
+#define GBL_CTX_RECORD_LAST_RECORD_ERROR(record)   \
+    GBL_CTX_RECORD_LAST_RECORD_(ERROR, record)
 
 #define GBL_CTX_RECORD_LAST_RECORD_UNKNOWN(record) \
-    GBL_CTX_RECORD_LAST_RECORD_CONDITIONAL_(UNKNOWN, record)
+    GBL_CTX_RECORD_LAST_RECORD_(UNKNOWN, record)
 
 #define GBL_CTX_RECORD_LAST_RECORD(record)          \
     GBL_STMT_START {                                \
@@ -497,7 +489,6 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         GBL_CTX_RECORD_LAST_RECORD_PARTIAL(record); \
         GBL_CTX_RECORD_LAST_RECORD_UNKNOWN(record); \
     } GBL_STMT_END
-
 
 // ================= RECORD => TOP-LEVEL DISPATCH ==============
 #define GBL_CTX_RECORD_HANDLER(record)            \
@@ -507,23 +498,22 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
         GBL_CTX_RECORD_ASSERT((record));          \
     } GBL_STMT_END
 
-#define GBL_CTX_RECORD_SET_N(file, func, line, col, result, ...)                                                    \
-    GBL_STMT_START {                                                                                                \
-        GBL_CTX_SOURCE_LOC_PUSH(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL));                    \
-        GBL_CALL_RECORD_CONSTRUCT(&GBL_CTX_RECORD(), GBL_CTX_OBJECT(), result, GBL_CTX_SOURCE(), __VA_ARGS__);      \
-        GBL_CTX_RECORD_HANDLER(&GBL_CTX_RECORD());                                                                  \
-        GBL_CTX_SOURCE_POP();                                                                                       \
+#define GBL_CTX_RECORD_SET_N(file, func, line,  result, ...)                                \
+    GBL_STMT_START {                                                                        \
+        GBL_CTX_SOURCE_LOC_PUSH(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN));         \
+        GblCallRecord_construct(&GBL_CTX_RECORD(), result, GBL_CTX_SOURCE(), __VA_ARGS__);  \
+        GBL_CTX_RECORD_HANDLER(&GBL_CTX_RECORD());                                          \
+        GBL_CTX_SOURCE_POP();                                                               \
     } GBL_STMT_END
 
-#define GBL_CTX_RECORD_SET_6(file, func, line, col, result, pFmt) \
-    GBL_CTX_RECORD_SET_N(file, func, line, col, result, "%s", pFmt)
+#define GBL_CTX_RECORD_SET_5(file, func, line, result, pFmt) \
+    GBL_CTX_RECORD_SET_N(file, func, line, result, "%s", pFmt)
 
-#define GBL_CTX_RECORD_SET_5(file, func, line, col, result) \
-    GBL_CTX_RECORD_SET_6(file, func, line, col, result, gblResultString(result))
+#define GBL_CTX_RECORD_SET_4(file, func, line, result) \
+    GBL_CTX_RECORD_SET_5(file, func, line, result, gblResultString(result))
 
 #define GBL_CTX_RECORD_SET(...)  \
-    GBL_VA_OVERLOAD_CALL(GBL_CTX_RECORD_SET, GBL_VA_OVERLOAD_SUFFIXER_6_N, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL, __VA_ARGS__)
-
+    GBL_VA_OVERLOAD_CALL(GBL_CTX_RECORD_SET, GBL_VA_OVERLOAD_SUFFIXER_5_N, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, __VA_ARGS__)
 
 #define GBL_CTX_CALL_N(src, funcCall, ...)                                      \
     GBL_STMT_START {                                                            \
@@ -540,13 +530,13 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 #define GBL_CTX_CALL(...)                                                                                           \
     GBL_STMT_START {                                                                                                \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                      \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);                                   \
         GBL_VA_OVERLOAD_SELECT(GBL_CTX_CALL, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
     } GBL_STMT_END
 
 #define GBL_CTX_VERIFY_CALL(...) \
     GBL_STMT_START {    \
-        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL);                      \
+        const GblSrcLoc src_ = GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN);                                   \
         GBL_VA_OVERLOAD_SELECT(GBL_CTX_CALL, GBL_VA_OVERLOAD_SUFFIXER_2_N, src_, __VA_ARGS__)(src_, __VA_ARGS__);   \
         if(!GBL_RESULT_SUCCESS(GBL_CTX_RESULT())) goto GBL_CTX_END_LABEL;                                           \
     } GBL_STMT_END
@@ -554,29 +544,29 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 
 // ================= TOP-LEVEL API UTILITIES ==============
 
-#define GBL_CTX_BEGIN_FRAME(file, func, line, col, pObject, frame)                                                  \
-    GBL_CTX_FRAME_DECLARE = frame;                                                                                  \
-    GBL_CTX_STACK_FRAME_CONSTRUCT(GBL_CTX_FRAME_NAME, (GblObject*)pObject, GBL_RESULT_SUCCESS);    \
+#define GBL_CTX_BEGIN_FRAME(file, func, line, pObject, frame)                               \
+    GBL_CTX_FRAME_DECLARE = frame;                                                          \
+    GblStackFrame_construct(GBL_CTX_FRAME_NAME, (GblObject*)pObject, GBL_RESULT_SUCCESS);   \
     GBL_RESULT_SUCCESS(GblThread_stackFramePush(NULL, GBL_CTX_FRAME_NAME))
 
-#define GBL_CTX_BEGIN_LOG_5(file, func, line, col, hHandle)  \
-    GBL_CTX_BEGIN_FRAME(file, func, line, col, hHandle, ((GblStackFrame*)GBL_ALLOCA(sizeof(GblStackFrame))))
+#define GBL_CTX_BEGIN_LOG_4(file, func, line, hHandle)  \
+    GBL_CTX_BEGIN_FRAME(file, func, line, hHandle, ((GblStackFrame*)GBL_ALLOCA(sizeof(GblStackFrame))))
 
-#define GBL_CTX_BEGIN_LOG_N(file, func, line, col, hHandle, ...)    \
-    GBL_CTX_BEGIN_LOG_5(file, func, line, col, hHandle);            \
+#define GBL_CTX_BEGIN_LOG_N(file, func, line, hHandle, ...)    \
+    GBL_CTX_BEGIN_LOG_5(file, func, line, hHandle);            \
     GBL_CTX_PUSH_VERBOSE(__VA_ARGS__);
 
 #define GBL_CTX_BEGIN(...) \
-        GBL_VA_OVERLOAD_CALL(GBL_CTX_BEGIN_LOG, GBL_VA_OVERLOAD_SUFFIXER_5_N, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL, __VA_ARGS__)
+        GBL_VA_OVERLOAD_CALL(GBL_CTX_BEGIN_LOG, GBL_VA_OVERLOAD_SUFFIXER_4_N, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, __VA_ARGS__)
 
 #define GBL_CTX_DONE()  \
     goto GBL_CTX_END_LABEL
 
-#define GBL_CTX_END_BLOCK()                             \
-    goto GBL_CTX_END_LABEL;                             \
-    GBL_LABEL_EMPTY(GBL_CTX_END_LABEL);                 \
-        if(GBL_CTX_FRAME_NAME->stackDepth)                 \
-            GBL_CTX_POP(GBL_CTX_FRAME_NAME->stackDepth);   \
+#define GBL_CTX_END_BLOCK()                                 \
+    goto GBL_CTX_END_LABEL;                                 \
+    GBL_LABEL_EMPTY(GBL_CTX_END_LABEL);                     \
+        if(GBL_CTX_FRAME_NAME->stackDepth)                  \
+            GBL_CTX_POP(GBL_CTX_FRAME_NAME->stackDepth);    \
             GblThread_stackFramePop(NULL)
 
 #define GBL_CTX_END()               \
@@ -586,23 +576,20 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GBL_LOG_LEVEL level, const char
 #define GBL_CTX_END_EMPTY()         \
         GBL_LABEL_EMPTY(GBL_CTX_END_LABEL)
 
-#define GBL_CTX_BLOCK_7(file, func, line, col, hHandle, frame, block)       \
-    GBL_CTX_BEGIN_FRAME(file, func, line, col, hHandle, frame);             \
-    block;                                                                  \
+#define GBL_CTX_BLOCK_6(file, func, line, hHandle, frame, block)       \
+    GBL_CTX_BEGIN_FRAME(file, func, line, hHandle, frame);             \
+    block;                                                             \
     GBL_CTX_END_BLOCK()
 
-#define GBL_CTX_BLOCK_6(file, func, line, col, hHandle, block) \
-    GBL_CTX_BLOCK_7(file, func, line, col, hHandle, ((GblStackFrame*)GBL_ALLOCA(sizeof(GblStackFrame))), block)
+#define GBL_CTX_BLOCK_5(file, func, line, hHandle, block) \
+    GBL_CTX_BLOCK_7(file, func, line, hHandle, ((GblStackFrame*)GBL_ALLOCA(sizeof(GblStackFrame))), block)
 
-#define GBL_CTX_BLOCK_5(file, func, line, col, block) \
-    GBL_CTX_BLOCK_6(file, func, line, col, NULL, block)
+#define GBL_CTX_BLOCK_4(file, func, line, block) \
+    GBL_CTX_BLOCK_6(file, func, line, NULL, block)
 
 #define GBL_CTX_BLOCK(...) \
-    GBL_VA_OVERLOAD_SELECT(GBL_CTX_BLOCK, GBL_VA_OVERLOAD_SUFFIXER_ARGC, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL, __VA_ARGS__)(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, GBL_SRC_COL, __VA_ARGS__)
+    GBL_VA_OVERLOAD_SELECT(GBL_CTX_BLOCK, GBL_VA_OVERLOAD_SUFFIXER_ARGC, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, __VA_ARGS__)(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, __VA_ARGS__)
 
-
-#ifdef __cplusplus
-}
-#endif
+GBL_DECLS_END
 
 #endif // GIMBAL_API_H

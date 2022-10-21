@@ -7,7 +7,6 @@
 #define GIMBAL_ARRAY_LIST_H
 
 #include "../core/gimbal_ctx.h"
-#include "../algorithms/gimbal_numeric.h"
 
 #define GBL_SELF_TYPE GblArrayList
 
