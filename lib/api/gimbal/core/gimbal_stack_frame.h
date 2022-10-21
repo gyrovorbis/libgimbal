@@ -7,6 +7,7 @@
 #define GIMBAL_CALL_STACK_H
 
 #include "../core/gimbal_result.h"
+#include <stdarg.h>
 
 GBL_DECLS_BEGIN
 

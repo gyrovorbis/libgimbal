@@ -8,6 +8,7 @@
 
 #include "../../core/gimbal_typedefs.h"
 #include "../types/gimbal_type.h"
+#include <stdarg.h>
 
 #define GBL_DECL_CCLOSURE_MARSHAL_VOID__(postFix) \
     GBL_EXPORT GBL_RESULT GblMarshal_CClosure_VOID__##postFix(GblClosure* pClosure,     \

@@ -8,6 +8,7 @@
 #define GIMBAL_ILOGGER_H
 
 #include "gimbal_interface.h"
+#include <stdarg.h>
 
 #define GBL_ILOGGER_TYPE                (GBL_TYPEOF(GblILogger))
 #define GBL_ILOGGER(instance)           (GBL_INSTANCE_CAST(instance, GblILogger))

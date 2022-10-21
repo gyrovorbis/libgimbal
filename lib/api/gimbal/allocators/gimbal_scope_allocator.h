@@ -28,7 +28,6 @@ typedef struct GblScopeAllocator {
     GblArenaAllocator*      pArena;
     GblArenaAllocatorState  rewindState;
     GblLinkedListNode       dtorList;
-    GblSize                 bytesUsed;
 } GblScopeAllocator;
 
 // ===== Public API =====

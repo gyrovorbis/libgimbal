@@ -8,6 +8,7 @@
 #define GIMBAL_IVARIANT_H
 
 #include "gimbal_interface.h"
+#include <stdarg.h>
 
 #define GBL_IVARIANT_TYPE                   (GBL_BUILTIN_TYPE(IVARIANT))
 #define GBL_IVARIANT(instance)              ((GblIVariant*)GblInstance_cast(GBL_INSTANCE(instance), GBL_IVARIANT_TYPE))
