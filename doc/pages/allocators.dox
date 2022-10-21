@@ -1,0 +1,9 @@
+/*! \defgroup allocators Allocators 
+* 	\brief Collection of specialied polymorphic custom allocators
+
+*/
+
+/*! \page Allocators Allocators 
+* 	\copydoc allocators
+*/
+
