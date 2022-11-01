@@ -266,7 +266,7 @@ test ios-15-sim:
     - xcrun simctl launch --console A64093FF-15E7-495A-8A9B-83DC1C37D8F5 GimbalTests
     - xcrun simctl shutdown A64093FF-15E7-495A-8A9B-83DC1C37D8F5 2>&1
     
-test dreamcast:
+test dreamcast-emu:
   stage: test 
   needs: ["build dreamcast"]
   dependencies:
@@ -277,6 +277,24 @@ test dreamcast:
     - exec > >(tee -a "build/results.txt" )
     - exec 2> >(tee -a "build/results.tx" >&2)
     - lxdream -H -d build/test/GimbalTests
+   
+   # - test -f build/results.txt && grep -L "********************* [   FAIL   ] *********************" build/results.txt
+
+test dreamcast-physical:
+  stage: test 
+  needs: ["build dreamcast"]
+  dependencies:
+    - build dreamcast 
+  tags:
+    - dreamcast
+  script:
+    - exec > >(tee -a "build/results.txt" )
+    - exec 2> >(tee -a "build/results.tx" >&2)
+    - hs100.sh -i 10.0.0.14 off
+    - hs100.sh -i 10.0.0.14 on 
+    - sleep 30
+    - /opt/toolchains/dc/dcload-ip/host-src/tool/dc-tool-ip -t 10.0.0.12 -x build/test/GimbalTests
+    - hs100.sh -i 10.0.0.14 off
    
    # - test -f build/results.txt && grep -L "********************* [   FAIL   ] *********************" build/results.txt
 
