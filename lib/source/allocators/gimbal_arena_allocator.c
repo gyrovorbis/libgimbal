@@ -51,7 +51,7 @@ GBL_EXPORT void* GblArenaAllocator_allocAligned(GblArenaAllocator* pSelf, GblSiz
         if(alignment == 0) alignment = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
         const GblSize actualSize = gblAlignedAllocSize(size, alignment);
 
-        if(!pPage || (pPage->capacity - pPage->used < actualSize)) {
+        if(!pPage || (pPage->capacity - pPage->used) < actualSize) {
             if(actualSize <= pSelf->pageSize) {
                 GblArenaAllocatorPage* pNewPage = GblArenaAllocator_allocPage_(pSelf->pCtx,
                                                                                pSelf->pageSize,
@@ -72,9 +72,11 @@ GBL_EXPORT void* GblArenaAllocator_allocAligned(GblArenaAllocator* pSelf, GblSiz
         pSelf->pActivePage->used += actualSize;
         ++pSelf->allocCount;
 
-        uintptr_t advancePointer = (alignment - ((uintptr_t)pData % alignment));
-        pData = (void*)(((uintptr_t)pData) + advancePointer);
-
+        const uintptr_t rem = (uintptr_t)pData % alignment;
+        if(rem) {
+            uintptr_t advancePointer = (alignment - rem);
+            pData = (void*)(((uintptr_t)pData) + advancePointer);
+        }
     }
 end:
     return pData;

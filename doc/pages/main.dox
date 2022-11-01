@@ -512,13 +512,35 @@ LibGimbal's features are conceptually split into the following high-level compon
 /*! \page Core Core Framework
 	\tableofcontents
 
-\subsection macros Macro Definitions
-\subsubsection platformMacros Compiler and Platform-Specific
-\subsubsection apiMacros API Declaration 
-\subsubsection debugMacros Debugging and Validation
+\subsection platformMacros Compiler and Platform Macros
+At the very lowest-level, within gimbal_compiler.h, resides a collection of platform and compiler-specific macros, feature flags, and utilities. 
+- C and language C++ version defines, RTTI and exception preprocessor flags
+- dllexport/visibility, (static) inline, forced inline modifiers
+- alignof, alignas, aligned_alloc
+- thread-local storage, alloca, prefetching macros
+- low-level bitmask operations
+- Cross language C/C++ macros (which are ignored when not supported)
+    - C99 static array parameters
+    - C restrict 
+    - C++ constexpr 
+    - static_assert
+    - likely/unlikely branch prediction hints
+    - noreturn, nodiscard, no unique address
+    - maybe unused, deprecated
+\subsection theads Threading
+Above this level, within the core is the basic concurrency primitives. Various cross-platform/language atomic types are provided by gimbal_atomics.h,
+while basic threading functionality is exposed within gimbal_thread.h. Note that libGimbal's API makes use of thread-local storage for impllicit
+API-specific data that is owned by each thread. For example, each thread maintains a record of its "Last Error" which can be queried at any time, and
+its general error propagation mechanism between functions and their callers happen via this thread-local storage.
 
 \subsection context Context Management
-LibGimbal provides 
+The core framework is built around the concept of "Context" objects (GblContext). These context objects provide runtime polymorphic functionality
+for the logging system and custom allocators. They also serve as a storage point for the previous error that was encountered when using the context 
+object.
+
+There exists a single global context object, which is initialized by default, and every thread can optionally have its own context or fall through
+to using the global context object if none is provided. Additionally, many API functions and macros allow you to manually pass around and manage
+individual contexts, so they can be used at multiple levels of granularity.
 
 \subsubsection contextError Error Handling
 \subsubsection contextogging Logging
@@ -530,3 +552,4 @@ LibGimbal provides
 \copydoc strings
 
 */
+ 

@@ -16,33 +16,32 @@
 
 GBL_DECLS_BEGIN
 
+typedef    GblHash (*GblHashFn)   (const void*, GblSize);
 
-GBL_INLINE int      gblRand              (void)             GBL_NOEXCEPT;
-GBL_INLINE int      gblRandRange         (int min, int max) GBL_NOEXCEPT;
-GBL_INLINE int      gblRandString        (char* pBuffer, int minSize, int maxSize, const char* pCharList) GBL_NOEXCEPT;
-GBL_INLINE void     gblRandBuffer        (void* pData, GblSize size) GBL_NOEXCEPT;
+GBL_INLINE int      gblRand       (void)                            GBL_NOEXCEPT;
+GBL_INLINE int      gblRandRange  (int min, int max)                GBL_NOEXCEPT;
 
-GBL_INLINE uint64_t gblSeed              (uint8_t index)    GBL_NOEXCEPT;
+GBL_INLINE int      gblRandString (char*       pBuffer,
+                                   int         minSize,
+                                   int         maxSize,
+                                   const char* pCharList)           GBL_NOEXCEPT;
 
-typedef    GblHash (*GblHashFn)(const void*, GblSize);
+GBL_INLINE void     gblRandBuffer (void*   pData,
+                                   GblSize size)                    GBL_NOEXCEPT;
+
+GBL_INLINE uint64_t gblSeed       (uint8_t index)                   GBL_NOEXCEPT;
 
 // make default hash function of entire bitch
-GBL_INLINE GblHash  gblHash              (const void* pData, GblSize size, GblHashFn pFnHash) GBL_NOEXCEPT;
+GBL_INLINE GblHash  gblHash       (const void* pData,
+                                   GblSize     size,
+                                   GblHashFn   pFnHash)             GBL_NOEXCEPT;
 
-
-GBL_EXPORT GblHash  gblHashSip           (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_INLINE GblHash  gblHashMurmur        (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_INLINE GblHash  gblHashFnv1          (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_INLINE GblHash  gblHashCrc           (const void* pData, GblSize size) GBL_NOEXCEPT;
+GBL_EXPORT GblHash  gblHashSip    (const void* pData, GblSize size) GBL_NOEXCEPT;
+GBL_INLINE GblHash  gblHashMurmur (const void* pData, GblSize size) GBL_NOEXCEPT;
+GBL_INLINE GblHash  gblHashFnv1   (const void* pData, GblSize size) GBL_NOEXCEPT;
+GBL_INLINE GblHash  gblHashCrc    (const void* pData, GblSize size) GBL_NOEXCEPT;
 
 /// @}
-
-
-
-
-
-
-
 
 // ===== INLINE IMPLEMENTATIONS =====
 

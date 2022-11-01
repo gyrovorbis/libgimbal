@@ -358,8 +358,11 @@ static GBL_RESULT GblArrayDequeTestSuite_reserveGrow_(GblTestSuite* pSelf, GblCo
                         "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
 
+#if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
+    GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 64);
+#else
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 35);
-
+#endif
     GBL_CTX_END();
 }
 
@@ -373,7 +376,11 @@ static GBL_RESULT GblArrayDequeTestSuite_shrinkToFitShrink_(GblTestSuite* pSelf,
                         "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
 
+#if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
+    GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 16);
+#else
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 10);
+#endif
 
     GBL_CTX_END();
 }
@@ -388,7 +395,12 @@ static GBL_RESULT GblArrayDequeTestSuite_shrinkToFitIgnored_(GblTestSuite* pSelf
                         "f", "g", "h", "i", "j",
                         "k", "l", "m", "n", "o",  NULL));
 
+#if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
+    GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 16);
+#else
     GBL_TEST_COMPARE(GblArrayDeque_capacity(&pSelf_->deques[0]), 10);
+#endif
+
 
     GBL_CTX_END();
 }
@@ -524,14 +536,17 @@ static GBL_RESULT GblArrayDequeTestSuite_atProfile_(GblTestSuite* pSelf, GblCont
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    const char* pLiteral = "LOLOL";
+    char buffer[] = "LOLOL";
+    char* pLiteral = buffer;
 
     GblArrayDeque_clear(&pSelf_->deques[0]);
     GblArrayDeque_pushBack(&pSelf_->deques[0], &pLiteral);
 
 
     for(GblSize i = 0; i < GBL_ARRAY_DEQUE_PROFILE_SIZE_; ++i) {
-        pLiteral = GblArrayDeque_at(&pSelf_->deques[0], 0);
+        pLiteral = GblArrayDeque_at(&pSelf_->deques[0],
+                                    gblRandRange(0, GblArrayDeque_size(&pSelf_->deques[0])-1));
+        pLiteral[0] = 'l';
     }
 
     GBL_CTX_END();

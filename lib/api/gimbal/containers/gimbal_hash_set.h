@@ -151,12 +151,12 @@ struct GblHashSetBucket_ {
     uint16_t dib;
 };
 
-GBL_INLINE struct GblHashSetBucket_ *GblHashSet_bucketAt_(const struct GblHashSet *map, size_t index) GBL_NOEXCEPT {
+GBL_INLINE struct GblHashSetBucket_* GblHashSet_bucketAt_(const struct GblHashSet *map, size_t index) GBL_NOEXCEPT {
     return (struct GblHashSetBucket_*)(((char*)GBL_PRIV_REF(map).pBuckets)+(GBL_PRIV_REF(map).bucketSize*index));
 }
 
 GBL_INLINE void *GblHashSet_bucketItem_(struct GblHashSetBucket_ *entry) GBL_NOEXCEPT {
-    return ((char*)entry)+sizeof(struct GblHashSetBucket_);
+    return ((char*)entry) + sizeof(struct GblHashSetBucket_);
 }
 
 GBL_INLINE uint32_t GblHashSet_getHash_(const struct GblHashSet *map, const void *key) GBL_NOEXCEPT {

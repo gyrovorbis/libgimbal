@@ -192,8 +192,7 @@ GBL_INLINE void* GblArrayList_data(GBL_CSELF) GBL_NOEXCEPT {
 GBL_INLINE void* GblArrayList_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
     void* pData = NULL;
 
-    if(!pSelf || index >= GBL_PRIV_REF(pSelf).size) GBL_UNLIKELY {
-
+    if(index >= GBL_PRIV_REF(pSelf).size) GBL_UNLIKELY {
         GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_OUT_OF_RANGE);

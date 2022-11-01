@@ -529,14 +529,17 @@ static GBL_RESULT GblArrayListTestSuite_atProfile_(GblTestSuite* pSelf, GblConte
     GblArrayListTestSuite_* pSelf_ = GBL_ARRAY_LIST_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    const char* pLiteral = "LOLOL";
+    char buffer[] = "LOLOL";
+    char* pLiteral = buffer;
 
     GblArrayList_clear(&pSelf_->stringList.vector);
     GblArrayList_pushBack(&pSelf_->stringList.vector, &pLiteral);
 
 
     for(GblSize i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
-        pLiteral = GblArrayList_at(&pSelf_->stringList.vector, 0);
+        pLiteral = GblArrayList_at(&pSelf_->stringList.vector,
+                                   gblRandRange(0, GblArrayList_size(&pSelf_->stringList.vector)-1));
+        pLiteral[0] = 'l';
     }
 
     GBL_CTX_END();

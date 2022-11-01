@@ -9,6 +9,10 @@
 
 #include "gimbal_ring_buffer.h"
 
+#ifndef GBL_ARRAY_DEQUE_FORCE_POW2
+#   define GBL_ARRAY_DEQUE_FORCE_POW2 1
+#endif
+
 #define GBL_SELF_TYPE GblArrayDeque
 
 GBL_DECLS_BEGIN
@@ -65,6 +69,15 @@ GBL_DECLS_BEGIN
  *  of the GblRingBuffer container, which is able to push
  *  from the front, pop from the back, and dynamically resize
  *  itself as it reaches its capacity.
+ *  \note
+ *  When the GBL_ARRAY_DEQUE_FORCE_POW2 macro is defined as 1
+ *  (default) behavior), the capacity of the deque will always
+ *  be rounded to the next power-of-two. This means any direct
+ *  requests to GblArrayDeque_reserve() or
+ *  GblArrayDeque_shrinkToFit() will not resize the container
+ *  to the exact value specified. As a consequence of this,
+ *  lookup times can be optimized by another 15-30% by reducing
+ *  a modulo operation to a decrement + bitmask.
  *
  *  \todo
  *     Finish implementing GblArrayDeque_erase()
@@ -191,8 +204,13 @@ GBL_INLINE void* GblArrayDeque_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
         GBL_CTX_END_BLOCK();
     } else GBL_LIKELY {
+#if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
         const GblSize slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
-                                % GBL_RING_PRIV_REF_(pSelf).capacity;
+                           & (GBL_RING_PRIV_REF_(pSelf).capacity-1);
+#else
+        const GblSize slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
+                           % (GBL_RING_PRIV_REF_(pSelf).capacity);
+#endif
         pData = &GBL_RING_PRIV_REF_(pSelf).pData[slot * GBL_RING_PRIV_REF_(pSelf).elementSize];
     }
 

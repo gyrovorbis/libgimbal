@@ -375,7 +375,7 @@ GBL_EXPORT GBL_RESULT GblHashSet_shrinkToFit(GblHashSet* pSelf) GBL_NOEXCEPT {
 }
 
 
-GBL_EXPORT void* GblHashSet_rawSet_(GblHashSet* map, const void* item, void** ppNewEntry) GBL_NOEXCEPT {
+static void* GblHashSet_rawSet_(GblHashSet* map, const void* item, void** ppNewEntry) GBL_NOEXCEPT {
     void* pPrevItem = NULL;
 
     void* edata = GBL_ALLOCA(GBL_PRIV_REF(map).bucketSize);

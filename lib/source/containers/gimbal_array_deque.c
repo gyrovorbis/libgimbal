@@ -210,7 +210,11 @@ GBL_EXPORT void* GblArrayDeque_emplaceBack(GblArrayDeque* pSelf) GBL_NOEXCEPT {
 GBL_EXPORT GBL_RESULT GblArrayDeque_reserve(GblArrayDeque* pSelf,
                                             GblSize        capacity)
 {
+#if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
+    return GblArrayDeque_reserve_(pSelf, capacity, GBL_FALSE);
+#else
     return GblArrayDeque_reserve_(pSelf, capacity, GBL_TRUE);
+#endif
 
 }
 
@@ -235,15 +239,20 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_resize(GblArrayDeque* pSelf, GblSize size) {
 }
 
 GBL_EXPORT GBL_RESULT GblArrayDeque_shrinkToFit(GblArrayDeque* pSelf) {
-    const GblSize oldSize = GblArrayDeque_size(pSelf);
+#if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
+    const GblSize newSize = gblPow2Next(GblArrayDeque_size(pSelf));
+#else
+    const GblSize newSize = GblArrayDeque_size(pSelf);
+#endif
 
-    if(oldSize < GBL_RING_PRIV_REF_(pSelf).capacity) {
+    if(newSize < GBL_RING_PRIV_REF_(pSelf).capacity) {
         GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
         const GblSize endSize = GblArrayDeque_endSize_(pSelf);
 
         if(endSize) {
+
             const GblSize newFront = GBL_RING_PRIV_REF_(pSelf).frontPos -
-                    (GblArrayDeque_capacity(pSelf) - GblArrayDeque_size(pSelf));
+                    (GblArrayDeque_capacity(pSelf) - newSize);
 
             memmove(GBL_RING_PRIV_REF_(pSelf).pData + (newFront * GBL_RING_PRIV_REF_(pSelf).elementSize),
                     GblArrayDeque_front(pSelf),
@@ -252,9 +261,9 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_shrinkToFit(GblArrayDeque* pSelf) {
             GBL_RING_PRIV_REF_(pSelf).frontPos = newFront;
 
             GBL_RING_PRIV_REF_(pSelf).pData = GBL_CTX_REALLOC(GBL_RING_PRIV_REF_(pSelf).pData,
-                                                              GBL_RING_PRIV_REF_(pSelf).size * GBL_RING_PRIV_REF_(pSelf).elementSize);
+                                                              newSize * GBL_RING_PRIV_REF_(pSelf).elementSize);
 
-            GBL_RING_PRIV_REF_(pSelf).capacity = GBL_RING_PRIV_REF_(pSelf).size;
+            GBL_RING_PRIV_REF_(pSelf).capacity = newSize;
         }
 
         GBL_CTX_END();

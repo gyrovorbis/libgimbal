@@ -1,6 +1,6 @@
 /*! \file
  *  \brief Fundamental atomic type for reference counting
- *  \ingroup preprocessor
+ *  \ingroup core
  */
 
 #ifndef GIMBAL_ATOMICS_H

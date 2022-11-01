@@ -15,15 +15,6 @@ GBL_DECLS_BEGIN
 
 typedef GBL_RESULT (*GblScopeAllocatorDtorFn)(void* pPtr);
 
-typedef struct GblScopeAllocatorDtorEntry {
-    union {
-        struct GblScopeAllocatorDtorEntry* pNext;
-        GblLinkedListNode                  node;
-    };
-    GblScopeAllocatorDtorFn                pFnDtor;
-    void*                                  pData;
-} GblScopeAllocatorDtorEntry;
-
 typedef struct GblScopeAllocator {
     GblArenaAllocator*      pArena;
     GblArenaAllocatorState  rewindState;
