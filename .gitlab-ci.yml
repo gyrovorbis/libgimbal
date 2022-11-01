@@ -277,7 +277,8 @@ test dreamcast-emu:
     - exec > >(tee -a "build/results.txt" )
     - exec 2> >(tee -a "build/results.tx" >&2)
     - lxdream -H -d build/test/GimbalTests
-    - grep "********************* [   PASS   ] *********************" build/results.txt
+    - cp build/results.txt build/results2.txt
+    - grep "********************* [   PASS   ] *********************" build/results2.txt
 
 test dreamcast-physical:
   stage: test 
@@ -294,7 +295,8 @@ test dreamcast-physical:
     - sleep 30
     - /opt/toolchains/dc/dcload-ip/host-src/tool/dc-tool-ip -t 10.0.0.18 -x build/test/GimbalTests
     - hs100.sh -i 10.0.0.14 off
-    - grep "********************* [   PASS   ] *********************" build/results.txt
+    - cp build/results.txt build/results2.txt
+    - grep "********************* [   PASS   ] *********************" build/results2.txt
 
 test ubuntu20-gcc10:
   extends: .test_common
