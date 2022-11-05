@@ -464,7 +464,7 @@ GBL_INLINE const char* GblStringView_intern(GBL_VSELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GblHash GblStringView_hash(GBL_VSELF) GBL_NOEXCEPT {
-    return self.length? gblHashMurmur(self.pData, self.length) : 0;
+    return self.length? gblHashFnv1(self.pData, self.length) : 0;
 }
 
 GBL_INLINE char* GblStringView_strdup(GBL_VSELF) GBL_NOEXCEPT {

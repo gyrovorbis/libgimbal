@@ -752,7 +752,7 @@ static GBL_RESULT GblStringViewTestSuite_hash_(GblTestSuite* pSelf, GblContext* 
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_COMPARE(GblStringView_hash(GBL_STRV("trolo")),
-                gblHashMurmur("trolo", 5));
+                     gblHashFnv1("trolo", 5));
     GBL_TEST_COMPARE(GblStringView_hash(GBL_STRV(NULL)), 0);
 
     GBL_CTX_END();

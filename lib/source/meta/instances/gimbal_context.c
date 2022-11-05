@@ -212,15 +212,14 @@ static GblContextClass defaultClass = {
     .GblILoggerImpl.pFnPop         = GblContext_ILogger_pop_
 };
 
-static GblContext defaultCtx_ = {
+GblContext GblContext_default_ = {
     .base.base.pClass = (GblBoxClass*)&defaultClass,
     .base.base.private_.contextType = 1,
     .logFilter = (GBL_LOG_LEVEL_INFO|GBL_LOG_LEVEL_WARNING|GBL_LOG_LEVEL_ERROR)
     //.logFilter = 0xffffffff
 };
 
-static GblContext* globalCtx_ = &defaultCtx_;
-
+GblContext* globalCtx_ = &GblContext_default_;
 
 void GblContext_setGlobal(GblContext* pCtx) GBL_NOEXCEPT {
     globalCtx_ = pCtx;

@@ -45,10 +45,11 @@ int main(int argc, char* pArgv[]) {
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
     gdb_init();
 #endif
-    GblTestScenario* pScenario = GblTestScenario_create("LibGimbalTests");
+    GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
 
-    GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO | GBL_LOG_LEVEL_WARNING | GBL_LOG_LEVEL_ERROR );
-
+    GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO    |
+                                                    GBL_LOG_LEVEL_WARNING |
+                                                    GBL_LOG_LEVEL_ERROR);
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_SORT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,

@@ -19,7 +19,6 @@ typedef struct GblThread {
     const char*     pName;
     uint32_t        logStackDepth;
     GblContext*     pContext;
-    GblStackFrame   bottomFrame;
     GblStackFrame*  pStackFrameTop;
     GblBool         initialized;
 } GblThread;
@@ -43,17 +42,13 @@ GBL_EXPORT GBL_RESULT     GblThread_logPop         (GBL_SELF, uint32_t count)   
 
 // ===== Implementation =====
 ///\cond
-extern GBL_THREAD_LOCAL GblThread thread_;
+extern GBL_THREAD_LOCAL GblThread GblThread_current_;
+
 GBL_EXPORT GblContext* GblContext_global(void) GBL_NOEXCEPT;
 ///\endcond
 
 GBL_INLINE GblThread* GblThread_current(void) GBL_NOEXCEPT {
-    if(!thread_.initialized) {
-        thread_.pStackFrameTop = &thread_.bottomFrame;
-        thread_.bottomFrame.pContext = GblContext_global();
-        thread_.initialized = GBL_TRUE;
-    }
-    return &thread_;
+    return &GblThread_current_;
 }
 
 GBL_INLINE GblStackFrame* GblThread_stackFrameTop(const GblThread* pThread) GBL_NOEXCEPT {

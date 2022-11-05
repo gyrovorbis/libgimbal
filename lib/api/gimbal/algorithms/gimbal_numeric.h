@@ -23,9 +23,9 @@ GBL_INLINE GBL_CONSTEXPR
     int           gblGcd                     (int u, int v)                GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
     int           gblLcm                     (int u, int v)                GBL_NOEXCEPT;
-GBL_INLINE GBL_CONSTEXPR
+GBL_INLINE
     uint32_t      gblNtohl                   (uint32_t n)                  GBL_NOEXCEPT;
-GBL_INLINE GBL_CONSTEXPR
+GBL_INLINE
     uint32_t      gblHtonl                   (uint32_t x)                  GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
     int           gblParity                  (uint8_t n)                   GBL_NOEXCEPT;
@@ -39,7 +39,7 @@ GBL_INLINE GBL_CONSTEXPR
     GblBool       gblPrimeCheck              (int n)                       GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
     unsigned long gblBinomialCoeff           (unsigned n, unsigned k)      GBL_NOEXCEPT;
-GBL_INLINE GBL_CONSTEXPR
+GBL_INLINE
     unsigned long gblCatalan                 (unsigned n)                  GBL_NOEXCEPT;
 
 /// @}
@@ -125,9 +125,7 @@ unsigned long gblBinomialCoeff(unsigned n, unsigned k) GBL_NOEXCEPT {
 }
 
 // Find nth catalan number in O(n) time
-GBL_INLINE GBL_CONSTEXPR
-unsigned long int gblCatalan(unsigned int n)
-{
+GBL_INLINE unsigned long int gblCatalan(unsigned int n) GBL_NOEXCEPT {
     // Calculate value of 2nCn
     unsigned long int c = gblBinomialCoeff(2 * n, n);
 
@@ -189,7 +187,7 @@ GBL_INLINE GBL_CONSTEXPR int gblParity(uint8_t n) GBL_NOEXCEPT {
     return p;
 }
 
-GBL_INLINE GBL_CONSTEXPR uint32_t gblNtohl(uint32_t n) GBL_NOEXCEPT {
+GBL_INLINE uint32_t gblNtohl(uint32_t n) GBL_NOEXCEPT {
     unsigned char *np = (unsigned char *)&n;
     return ((uint32_t)np[0] << 24) |
            ((uint32_t)np[1] << 16) |
@@ -197,7 +195,7 @@ GBL_INLINE GBL_CONSTEXPR uint32_t gblNtohl(uint32_t n) GBL_NOEXCEPT {
             (uint32_t)np[3];
 }
 
-GBL_INLINE GBL_CONSTEXPR uint32_t gblHtonl(uint32_t x) GBL_NOEXCEPT {
+GBL_INLINE uint32_t gblHtonl(uint32_t x) GBL_NOEXCEPT {
 #if GBL_BIG_ENDIAN == 0
     uint8_t *s = (uint8_t *)&x;
     return (uint32_t)(s[0] << 24 | s[1] << 16 | s[2] << 8 | s[3]);
@@ -208,7 +206,5 @@ GBL_INLINE GBL_CONSTEXPR uint32_t gblHtonl(uint32_t x) GBL_NOEXCEPT {
 
 
 GBL_DECLS_END
-
-
 
 #endif // GIMBAL_NUMERIC_H

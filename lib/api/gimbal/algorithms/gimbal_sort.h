@@ -14,27 +14,21 @@
 
 GBL_DECLS_BEGIN
 
+// ===== Public API =====
 
 typedef int  (*GblSortComparatorFn) (const void*, const void*);
 typedef void (*GblSortFn)           (void*, GblSize, GblSize, GblSortComparatorFn);
 
-GBL_INLINE void gblSortSelection   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-GBL_INLINE void gblSortQuick       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-GBL_INLINE void gblSortInsertion   (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-GBL_INLINE void gblSortShell       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-GBL_INLINE void gblSortMerge       (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
-GBL_INLINE void gblSortBubble      (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE void    gblSortSelection (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp)          GBL_NOEXCEPT;
+GBL_INLINE void    gblSortQuick     (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp)          GBL_NOEXCEPT;
+GBL_INLINE void    gblSortInsertion (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp)          GBL_NOEXCEPT;
+GBL_INLINE void    gblSortShell     (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp)          GBL_NOEXCEPT;
+GBL_INLINE void    gblSortMerge     (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp)          GBL_NOEXCEPT;
+GBL_INLINE void    gblSortBubble    (void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp)          GBL_NOEXCEPT;
 
-GBL_INLINE GblSize gblSearchBinary (void* pArray, GblSize elemSize, int l, int r, void* pTarget, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_INLINE GblSize gblSearchBinary  (void* pSrc, GblSize elemSize, int l, int r, void* pDst, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 
-
-/// @}
-
-
-
-
-
-// ======== INLINE IMPLEMENTATION ========
+// ======== Inline Implementation ========
 
 GBL_INLINE void gblSortMerge(void* pArray, GblSize count, GblSize elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT {
     uint8_t* pFirstHalf;

@@ -17,13 +17,13 @@ GBL_DECLS_BEGIN
 // ===== GBL API FRAME CONVENIENCE ACCESSORS =====
 
 #define GBL_CTX_FRAME_DECLARE   GblStackFrame* GBL_CTX_FRAME_NAME
-#define GBL_CTX_FRAME()         (thread_.pStackFrameTop)
+#define GBL_CTX_FRAME()         (GblThread_current()->pStackFrameTop)
 #define GBL_CTX_CONTEXT()       GBL_CTX_FRAME()->pContext
 #define GBL_CTX_OBJECT()        GBL_CTX_FRAME()->pObject
 #define GBL_CTX_RECORD()        (GBL_CTX_FRAME_NAME)->record
 #define GBL_CTX_RESULT()        (GBL_CTX_FRAME_NAME)->record.result
 #define GBL_CTX_SOURCE()        (GBL_CTX_FRAME_NAME)->record.srcLocation
-#define GBL_CTX_LAST_RECORD()   (thread_.callRecord)
+#define GBL_CTX_LAST_RECORD()   (GblThread_current()->callRecord)
 #define GBL_CTX_LAST_RESULT()   (GBL_CTX_LAST_RECORD().result)
 
 // ====== SOURCE LOCATION PROPAGATION UTILITIES =====
@@ -220,7 +220,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_ERRNO_RESULT(int ernum) {
 
 
 #define GBL_CTX_INLINE_CALL_(MethodPrefix, srcLoc, ...)                                 \
-        GBL_CTX_INLINE_##MethodPrefix##_(GBL_CTX_FRAME_NAME GBL_VA_ARGS(__VA_ARGS__))
+        GBL_CTX_INLINE_##MethodPrefix##_(GBL_CTX_FRAME() GBL_VA_ARGS(__VA_ARGS__))
 
 #define GBL_CTX_INLINE_CALL(MethodPrefix, ...) \
     GBL_CTX_INLINE_CALL_(MethodPrefix, GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN) GBL_VA_ARG)

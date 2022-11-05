@@ -48,7 +48,7 @@ static int registryComparator_(const GblHashSet* pSet, const char** pA, const ch
 
 static GblHash registryHasher_(const GblHashSet* pSet, const char** pStr) {
     GBL_UNUSED(pSet);
-    return gblHashMurmur(*pStr, strlen(*pStr));
+    return gblHashFnv1(*pStr, strlen(*pStr));
 }
 
 static const char* quarkStringAllocCopy_(const char* pString) {

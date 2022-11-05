@@ -2,8 +2,13 @@
 #include <gimbal/meta/instances/gimbal_context.h>
 #include <gimbal/core/gimbal_stack_frame.h>
 
+extern GblContext GblContext_default_;
 
-GBL_THREAD_LOCAL GblThread thread_ = {
+static GblStackFrame defaultStackFrame_ = {
+    .pContext = &GblContext_default_
+};
+
+GBL_THREAD_LOCAL GblThread GblThread_current_ = {
     .callRecord = {
         .message        = { '\0' },
         .srcLocation    = {
@@ -15,8 +20,8 @@ GBL_THREAD_LOCAL GblThread thread_ = {
     },
     .pName              = "Untitled",
     .logStackDepth      = 0,
+    .pStackFrameTop     = &defaultStackFrame_
 };
-
 
 GblContext* GblThread_context(const GblThread* pThread) {
     GBL_UNUSED(pThread);

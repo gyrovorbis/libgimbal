@@ -21,7 +21,7 @@ typedef struct GblAllocationEntry_ {
 
 GblHash GblAllocationTracker_hash_(const GblHashSet* pSet, const void* pEntry) {
     GBL_UNUSED(pSet);
-    return gblHashMurmur(pEntry, sizeof(void*));
+    return gblHashFnv1(pEntry, sizeof(void*));
 }
 
 GblBool GblAllocationTracker_compare_(const GblHashSet* pSet,

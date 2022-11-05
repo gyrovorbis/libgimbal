@@ -112,5 +112,5 @@ GBL_EXPORT int GblByteArray_compare(const GblByteArray* pSelf, const GblByteArra
 }
 
 GBL_EXPORT GblHash GblByteArray_hash(const GblByteArray* pSelf) {
-    return gblHashMurmur(pSelf->pData, pSelf->size);
+    return gblHashFnv1(pSelf->pData, pSelf->size);
 }
