@@ -53,7 +53,6 @@ int main(int argc, char* pArgv[]) {
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO    |
                                                     GBL_LOG_LEVEL_WARNING |
                                                     GBL_LOG_LEVEL_ERROR);
-    testCpp20();
 
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_SORT_TEST_SUITE_TYPE));

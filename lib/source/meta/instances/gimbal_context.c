@@ -373,7 +373,7 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
     GBL_CTX_INFO("Build Node Info");
     GBL_CTX_PUSH();
     GBL_CTX_INFO("%-20s: %-100.100s", "Description", GBL_BUILD_CI_RUNNER_DESCRIPTION);
-    GBL_CTX_INFO("%-20s: %-100.100s", "Tags", GBL_BUILD_CI_RUNNER_TAGS);
+    //GBL_CTX_INFO("%-20s: %-100.100s", "Tags", GBL_BUILD_CI_RUNNER_TAGS);
     GBL_CTX_INFO("%-20s: %-100.100s", "Architecture", GBL_BUILD_CI_RUNNER_ARCH);
     GBL_CTX_POP(1);
     #else
