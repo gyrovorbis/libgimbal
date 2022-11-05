@@ -28,7 +28,7 @@ GBL_MAYBE_UNUSED static int metaClassIFaceEntryComparator_(const void* pA, const
 static GblHash metaClassHasher_(const GblHashSet* pMap, const void* pItem) {
     GBL_UNUSED(pMap);
     const GblMetaClass** pMeta = (const GblMetaClass**)pItem;
-    return gblHashFnv1(&(*pMeta)->name, sizeof(GblQuark));
+    return gblHash(&(*pMeta)->name, sizeof(GblQuark));
 }
 
 static GblBool metaClassComparator_(const GblHashSet* pMap, const void* pA, const void* pB) {

@@ -18,7 +18,7 @@ static GblHashSet propertyRegistry_;
 
 static GblHash propertyHasher_(const GblHashSet* pSet, const GblProperty** pProperty) {
     GBL_UNUSED(pSet);
-    return gblHashFnv1(((uint8_t*)*pProperty) + offsetof(GblProperty, private_.objectType), sizeof(GblQuark) + sizeof(GblType));
+    return gblHash(((uint8_t*)*pProperty) + offsetof(GblProperty, private_.objectType), sizeof(GblQuark) + sizeof(GblType));
 }
 
 static GblBool propertyComparator_(const GblHashSet* pSet, const GblProperty** p1, const GblProperty** p2) {

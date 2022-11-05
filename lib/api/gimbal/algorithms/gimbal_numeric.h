@@ -93,7 +93,7 @@ GblBool gblPrimeCheck(int n) GBL_NOEXCEPT {
 
 GBL_INLINE GBL_CONSTEXPR
 int gblFibonacci(int n) GBL_NOEXCEPT {
-    int num1 = 0, num2 = 1, num3;
+    int num1 = 0, num2 = 1, num3 = 0;
 
     if(!n)
       return num1;
@@ -154,7 +154,7 @@ GBL_INLINE GBL_CONSTEXPR GblSize gblAlignedAllocSize(GblSize size, GblSize align
 
 // GCD using Euclid's algorithm, only >0 values
 GBL_INLINE GBL_CONSTEXPR int gblGcd(int u, int v) GBL_NOEXCEPT {
-    int R;
+    int R = 0;
     //if(!u) return v;
     //if(!v) return u;
     while ((u % v) > 0) GBL_LIKELY {

@@ -14,7 +14,7 @@
 
 // default hashing algorithm
 #ifndef gblHash
-#   define gblHash  superFastHash
+#   define gblHash  gblHashFnv1
 #endif
 
 #define GBL_SEED_COUNT                  2
@@ -214,13 +214,13 @@ GBL_NOEXCEPT
 #undef GBL_MURMUR_HASH_GET_BLOCK_
 }
 
-GBL_FORCE_INLINE GblHash gblHashMurmur(const void* pData, GblSize size) GBL_NOEXCEPT {
+GBL_INLINE GblHash gblHashMurmur(const void* pData, GblSize size) GBL_NOEXCEPT {
     uint32_t out;
     gblMurmurHash3_x86_32_(pData, size, gblSeed(0), &out);
     return out;
 }
 
-GBL_FORCE_INLINE GblHash gblHashFnv1(const void* pData, GblSize size) GBL_NOEXCEPT {
+GBL_INLINE GblHash gblHashFnv1(const void* pData, GblSize size) GBL_NOEXCEPT {
     uint32_t prime = 0x01000193;
     uint32_t hash = 0x811C9DC5;
     const unsigned char* p = (const unsigned char*)pData;

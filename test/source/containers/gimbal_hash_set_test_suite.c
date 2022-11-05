@@ -21,7 +21,7 @@ typedef struct HashSetEntry_ {
 static GblHash hasher_(const GblHashSet* pSet, const void* pEntry) {
     GBL_UNUSED(pSet);
     const HashSetEntry_* pActual = (const HashSetEntry_*)pEntry;
-    return gblHashFnv1(pActual->pKey, strlen(pActual->pKey));
+    return gblHash(pActual->pKey, strlen(pActual->pKey));
 }
 
 static GblBool comparator_(const GblHashSet* pSet, const void* pEntryA, const void* pEntryB) {

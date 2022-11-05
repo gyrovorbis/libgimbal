@@ -42,6 +42,10 @@ static GBL_RESULT GblArenaAllocatorTestSuite_alloc_(GblTestSuite* pSelf, GblCont
     char* pStr = GblArenaAllocator_alloc(&pSelf_->arena, 12);
     GBL_TEST_VERIFY(pStr);
 
+
+    void* pPtr = GBL_CTX_MALLOC(1024 * 1024 * 10);
+    GBL_ASSERT(pPtr);
+
     strcpy(pStr, "1234567890");
 
     GBL_TEST_COMPARE(GblArenaAllocator_pageCount(&pSelf_->arena), 1);

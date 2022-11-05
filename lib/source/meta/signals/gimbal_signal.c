@@ -46,7 +46,7 @@ static GBL_THREAD_LOCAL Connection_* pActiveConnection_ = NULL;
 static GblHash signalSetHasher_(const GblHashSet* pSet, const void* pEntry) {
     GBL_UNUSED(pSet);
     const Signal_* pSignal = *(const Signal_**)pEntry;
-    return gblHashFnv1(pSignal, sizeof(GblType) + sizeof(GblQuark));
+    return gblHash(pSignal, sizeof(GblType) + sizeof(GblQuark));
 }
 
 static GblBool signalSetComparator_(const GblHashSet* pSet, const void* pEntry1, const void* pEntry2) {
@@ -170,7 +170,7 @@ done:
 static GblHash instanceConnectionTableHasher_(const GblHashSet* pSet, const void* pEntry) {
     GBL_UNUSED(pSet);
     const InstanceConnectionTable_* pConnections = *(const InstanceConnectionTable_**)pEntry;
-    return gblHashFnv1(&pConnections->pInstance, sizeof(GblInstance*));
+    return gblHash(&pConnections->pInstance, sizeof(GblInstance*));
 }
 
 static GblBool instanceConnectionTableComparator_(const GblHashSet* pSet, const void* pEntry1, const void* pEntry2) {
