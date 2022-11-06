@@ -1,5 +1,5 @@
 #include "containers/gimbal_hash_set_test_suite.h"
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/containers/gimbal_hash_set.h>
 
 #define GBL_HASH_SET_TEST_SUITE_STRESS_TEST_ENTRY_COUNT_     2047

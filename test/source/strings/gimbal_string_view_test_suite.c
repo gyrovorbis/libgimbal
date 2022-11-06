@@ -1,6 +1,6 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/strings/gimbal_string_view.h>
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include "strings/gimbal_string_view_test_suite.h"
 
 

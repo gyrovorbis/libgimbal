@@ -1,5 +1,5 @@
 #include "strings/gimbal_pattern_matcher_test_suite.h"
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/strings/gimbal_pattern_matcher.h>
 
 static GBL_RESULT GblPatternMatcherTestSuite_matchInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {

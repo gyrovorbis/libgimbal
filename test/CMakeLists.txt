@@ -15,7 +15,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_C_EXTENSIONS OFF)
 
-add_executable(GimbalTests
+set(GIMBAL_TEST_SOURCES
     include/algorithms/gimbal_sort_test_suite.h
     source/algorithms/gimbal_sort_test_suite.c
     include/allocators/gimbal_arena_allocator_test_suite.h
@@ -86,7 +86,19 @@ add_executable(GimbalTests
     source/utils/gimbal_uuid_test_suite.c
     include/utils/gimbal_ref_test_suite.h
     source/utils/gimbal_ref_test_suite.c
-    source/gimbal_test_main.c)
+    source/gimbal_test_main.c
+)
+
+if(GBL_ENABLE_CPP)
+    list(APPEND
+         GIMBAL_TEST_SOURCES
+         source/gimbal_test_cpp.cpp)
+endif(GBL_ENABLE_CPP)
+
+
+add_executable(GimbalTests
+    ${GIMBAL_TEST_SOURCES}
+)
 
 target_link_libraries(GimbalTests
     libGimbal)

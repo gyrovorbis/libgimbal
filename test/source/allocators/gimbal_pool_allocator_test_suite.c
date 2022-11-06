@@ -1,6 +1,6 @@
 #include "allocators/gimbal_pool_allocator_test_suite.h"
 #include <gimbal/allocators/gimbal_pool_allocator.h>
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/containers/gimbal_array_list.h>
 #include <gimbal/containers/gimbal_doubly_linked_list.h>
 #include <gimbal/algorithms/gimbal_numeric.h>

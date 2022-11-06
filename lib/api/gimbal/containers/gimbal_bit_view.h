@@ -112,6 +112,7 @@ GBL_INLINE GblBool       GblBitView_leq          (GBL_CSELF, const GblBitView* p
 #define GblBitView_flip(...)                     GblBitView_flipDefault_(__VA_ARGS__)
 
 // ===== Implementation =====
+#if 0
 /// \cond
 #define GblBitView_initDefault_(...) \
     GblBitView_initDefault__(__VA_ARGS__, GBL_ALLOCA(GBL_BIT_VIEW_WORDS(GBL_TUPLE_FIRST(GBL_TUPLE_REST(__VA_ARGS__)))), 0)
@@ -143,7 +144,7 @@ GBL_INLINE uint8_t* GblBitView_byteFromBit_(GBL_CSELF, GblSize bit) {
 
 /// \endcond
 
-GBL_INLINE GblBool GblBitView_wordAligned(GBL_CSELF) {
+GBL_INLINE GblBool GblBitView_wordAligned(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->offset == 0;
 }
 
@@ -377,6 +378,7 @@ GBL_EXPORT GBL_RESULT GblBitView_fromUint64(GBL_SELF, uint64_t value, GblSize in
     }
 }
 
+#endif
 
 GBL_DECLS_END
 

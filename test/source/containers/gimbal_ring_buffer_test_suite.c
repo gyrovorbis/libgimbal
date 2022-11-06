@@ -1,5 +1,5 @@
 #include "containers/gimbal_ring_buffer_test_suite.h"
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/containers/gimbal_ring_buffer.h>
 

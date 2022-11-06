@@ -82,6 +82,15 @@ set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/core/gimb
 set(GIMBAL_INCLUDES
     ${GBL_CONFIGURATION_INPUT_PATH}
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH}
+    api/gimbal/gimbal_allocators.h
+    api/gimbal/gimbal_algorithms.h
+    api/gimbal/gimbal_containers.h
+    api/gimbal/gimbal_core.h
+    api/gimbal/gimbal_meta.h
+    api/gimbal/gimbal_preprocessor.h
+    api/gimbal/gimbal_strings.h
+    api/gimbal/gimbal_test.h
+    api/gimbal/gimbal_utils.h
     api/gimbal/algorithms/gimbal_sort.h
     api/gimbal/algorithms/gimbal_numeric.h
     api/gimbal/algorithms/gimbal_hash.h
@@ -151,7 +160,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/strings/gimbal_string_ref.h
     api/gimbal/strings/gimbal_string.h
     api/gimbal/strings/gimbal_pattern_matcher.h
-    api/gimbal/test/gimbal_test.h
+    api/gimbal/test/gimbal_test_macros.h
     api/gimbal/test/gimbal_test_suite.h
     api/gimbal/test/gimbal_test_scenario.h
     api/gimbal/utils/gimbal_timer.h

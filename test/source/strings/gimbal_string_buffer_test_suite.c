@@ -1,5 +1,5 @@
 #include "strings/gimbal_string_buffer_test_suite.h"
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 
 #define GBL_STRING_BUFFER_TEST_SUITE_(inst) ((GblStringBufferTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_STRING_BUFFER_TEST_SUITE_TYPE))

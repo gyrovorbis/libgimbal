@@ -22,6 +22,7 @@ project(LibGimbal
     LANGUAGES C CXX)
 
 option(GBL_ENABLE_TESTS "Enable LibGimbal unit tests" OFF)
+option(GBL_ENABLE_CPP   "Enable C++ libGimbal API"    OFF)
 
 add_subdirectory(lib)
 

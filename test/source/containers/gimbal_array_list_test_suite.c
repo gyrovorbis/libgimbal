@@ -1,5 +1,5 @@
 #include "containers/gimbal_array_list_test_suite.h"
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/containers/gimbal_array_list.h>
 
 #define GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_ 1024

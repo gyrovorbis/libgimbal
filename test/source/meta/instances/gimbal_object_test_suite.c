@@ -2,7 +2,7 @@
 #include <gimbal/meta/instances/gimbal_object.h>
 #include <gimbal/meta/instances/gimbal_event.h>
 #include <gimbal/meta/types/gimbal_variant.h>
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <math.h>
 
 GBL_FORWARD_DECLARE_STRUCT(TestObject);

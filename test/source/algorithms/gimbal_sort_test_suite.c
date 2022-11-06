@@ -1,6 +1,6 @@
 #include "algorithms/gimbal_sort_test_suite.h"
 #include <gimbal/algorithms/gimbal_sort.h>
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 
 #define GBL_SORT_TEST_SUITE_(inst)   ((GblSortTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_SORT_TEST_SUITE_TYPE))
 

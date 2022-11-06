@@ -1,6 +1,6 @@
 #include "allocators/gimbal_scope_allocator_test_suite.h"
 #include <gimbal/allocators/gimbal_scope_allocator.h>
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/containers/gimbal_doubly_linked_list.h>
 
 #define GBL_SCOPE_ALLOCATOR_TEST_SUITE_(inst)   ((GblScopeAllocatorTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_SCOPE_ALLOCATOR_TEST_SUITE_TYPE))

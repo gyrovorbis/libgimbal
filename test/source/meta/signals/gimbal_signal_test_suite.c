@@ -1,5 +1,5 @@
 #include "meta/signals/gimbal_signal_test_suite.h"
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/meta/signals/gimbal_signal.h>
 #include <gimbal/meta/signals/gimbal_closure.h>
 #include <gimbal/meta/signals/gimbal_c_closure.h>

@@ -1,5 +1,5 @@
 #include "containers/gimbal_array_heap_test_suite.h"
-#include <gimbal/test/gimbal_test.h>
+#include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/containers/gimbal_array_heap.h>
 
 #define GBL_ARRAY_HEAP_TEST_SUITE_(inst)     ((GblArrayHeapTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_HEAP_TEST_SUITE_TYPE))

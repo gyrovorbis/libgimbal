@@ -317,7 +317,7 @@ GBL_EXPORT GBL_RESULT    GblVariant_load                     (GBL_SELF,
 
 
 // ========== IMPL ==========
-GBL_INLINE GblBool GblVariant_checkTypeCompatible(GblType type) {
+GBL_INLINE GblBool GblVariant_checkTypeCompatible(GblType type) GBL_NOEXCEPT {
     return type != GBL_INVALID_TYPE? GblType_check(type, GBL_IVARIANT_TYPE) : GBL_TRUE;
 }
 
