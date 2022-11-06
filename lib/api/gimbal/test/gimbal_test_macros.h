@@ -53,11 +53,14 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
                                                                                                      strcmp(pActual, pExpected) == 0); }
 
 #ifdef __DREAMCAST__
-#   define GBL_TEST_CMP_PLATFORM_ENTRIES()       \
+#    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
         (GblSize, GBL_TEST_COMPARE_CMP_UINT32_), \
         (int,     GBL_TEST_COMPARE_CMP_INT32_),
-# else
-#   define GBL_TEST_CMP_PLATFORM_ENTRIES()
+#elif defined(__clang__) && defined(__APPLE__) && defined(GBL_64BIT)
+#    define GBL_TEST_CMP_PLATFORM_ENTRIES() \
+        (GblSize, GBL_TEST_COMPARE_CMP_UINT64_),
+#else
+#    define GBL_TEST_CMP_PLATFORM_ENTRIES()
 #endif
 
 #define GBL_TEST_COMPARE_CMP_TABLE_  (                      \

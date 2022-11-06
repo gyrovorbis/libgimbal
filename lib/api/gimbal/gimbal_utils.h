@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Utilities module-wide include
+ *  \ingroup algorithms
+ */
+
 #ifndef GIMBAL_UTILS_H
 #define GIMBAL_UTILS_H
 
