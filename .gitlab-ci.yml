@@ -124,7 +124,7 @@ build android-sim:
       - mkdir -p build
       - cd build 
       - env
-      - /home/falco/Qt/6.3.1/android_x86_64/bin/qt-cmake -DCMAKE_TOOLCHAIN_FILE=/home/falco/Documents/dev/android-ndk-r23c/build/cmake/android.toolchain.cmake -S ../ -B .
+      - /home/falco/Qt/6.4.0/android_x86_64/bin/qt-cmake -DCMAKE_TOOLCHAIN_FILE=/home/falco/Documents/dev/android-ndk-r23c/build/cmake/android.toolchain.cmake -S ../ -B .
       - cmake --build . --target all -- -j8
 
 build macos-clang13:
@@ -186,7 +186,7 @@ build wasm:
     - mkdir -p build
     - cd build
     - env
-    - /usr/bin/cmake -S ../ -B ./ -DGBL_ENABLE_TESTS=ON -DGBL_ENABLE_CPP -DCMAKE_GENERATOR:STRING=Ninja -DCMAKE_BUILD_TYPE:STRING=Debug '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/falco/Qt/Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' -DQT_QMAKE_EXECUTABLE:FILEPATH=/home/falco/Qt/6.3.1/wasm_32/bin/qmake -DCMAKE_PREFIX_PATH:PATH=/home/falco/Qt/6.3.1/wasm_32 -DCMAKE_C_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/emcc -DCMAKE_CXX_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/em++ -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/home/falco/Qt/6.3.1/wasm_32/lib/cmake/Qt6/qt.toolchain.cmake
+    - /usr/bin/cmake -S ../ -B ./ -DGBL_ENABLE_TESTS=ON -DGBL_ENABLE_CPP=ON -DCMAKE_GENERATOR:STRING=Ninja -DCMAKE_BUILD_TYPE:STRING=Debug '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/falco/Qt/Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' -DQT_QMAKE_EXECUTABLE:FILEPATH=/home/falco/Qt/6.4.0/wasm_32/bin/qmake -DCMAKE_PREFIX_PATH:PATH=/home/falco/Qt/6.4.0/wasm_32 -DCMAKE_C_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/emcc -DCMAKE_CXX_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/em++ -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/home/falco/Qt/6.4.0/wasm_32/lib/cmake/Qt6/qt.toolchain.cmake
     - /usr/bin/cmake --build ./ --target all
 
 .clang_tidy_common:
