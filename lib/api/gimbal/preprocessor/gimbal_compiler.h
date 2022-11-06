@@ -262,7 +262,7 @@
 #   define GBL_STATIC_ARRAY(idx) idx
 #endif
 
-#ifdef __cplusplus__
+#ifdef __cplusplus
 #   define GBL_ALIGNAS(e) alignas(e)
 #   define GBL_ALIGNOF(e) alignof(e)
 #elif defined(GBL_C_11)

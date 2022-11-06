@@ -41,11 +41,9 @@
 #   include <arch/gdb.h>
 #endif
 
-void testCpp20(void);
-
 int main(int argc, char* pArgv[]) {
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
-    //gdb_init();
+    gdb_init();
 #endif
     GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
 
