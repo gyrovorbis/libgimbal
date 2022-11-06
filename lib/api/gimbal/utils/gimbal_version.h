@@ -1,6 +1,6 @@
 /*! \file
  *  \brief GblVersion type, utlities and query functions
- *  \ingroup dataTypes
+ *  \ingroup utils
  */
 
 #ifndef GIMBAL_VERSION_H

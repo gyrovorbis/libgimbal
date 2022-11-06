@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Strings module-wide include
+ *  \ingroup strings
+ */
+
 #ifndef GIMBAL_STRINGS_H
 #define GIMBAL_STRINGS_H
 

@@ -129,14 +129,14 @@
 
 */
 
-/*! \defgroup dataTypes Data Types
-	\brief Core data types built into the library
+/*! \defgroup utils Utilities
+	\brief Auxiliary utility types
 */ 
 
-/*! \defgroup debug Debugging
-	\brief Debugging, validation, control flow, and logging API
+/*! \defgroup core Core
+	\brief Core framework module
+	\copydoc Core 
 */ 
-
 
 /*! \defgroup metaBuiltinTypes Builtin Types
 	\brief Meta types that are already built into libGimbal

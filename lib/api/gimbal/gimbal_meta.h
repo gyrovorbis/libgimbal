@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Meta type system module-wide include
+ *  \ingroup meta
+ */
+
 #ifndef GIMBAL_META_H
 #define GIMBAL_META_H
 

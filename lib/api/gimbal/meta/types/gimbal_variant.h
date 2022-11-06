@@ -1,6 +1,6 @@
 /*! \file
  *  \brief GblVariant structure and related functions
- *  \ingroup dataTypes
+ *  \ingroup meta
  */
 
 #ifndef GIMBAL_VARIANT_H

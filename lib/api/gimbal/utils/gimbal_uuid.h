@@ -11,7 +11,7 @@
  *  new version 4 UUIDs, serialize UUIDs, and compare two UUIDs,
  *  based on RFC 4122.
  *
- *  \ingroup dataTypes
+ *  \ingroup utils
  */
 
 #ifndef GIMBAL_UUID_H
@@ -31,7 +31,7 @@ GBL_DECLS_BEGIN
 /*! \brief Universally unique identifier
  *
  *  RFC 4122-based UUID type.
- *  \ingroup dataTypes
+ *  \ingroup utils
  */
 typedef struct GblUuid {
     union {

@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief Allocators module-wide include
+ *  \ingroup allocators
+ */
+
+
 #ifndef GIMBAL_ALLOCATORS_H
 #define GIMBAL_ALLOCATORS_H
 

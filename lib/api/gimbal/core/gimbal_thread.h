@@ -1,6 +1,6 @@
 /*! \file
  *  \brief GblThread, per-thread state and context management
- *  \ingroup debug
+ *  \ingroup core
  */
 
 #ifndef GIMBAL_THREAD_H

@@ -32,7 +32,7 @@ GBL_DECLS_BEGIN
  *
  *  The allocator also supports enforcing custom alignment
  *  constraints on each requested allocation.
- *  \ingroup dataTypes
+ *  \ingroup allocators
  *  \sa GblArenaAllocator
  */
 typedef struct GblPoolAllocator {

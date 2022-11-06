@@ -1,6 +1,6 @@
 /*! \file
  *  \brief Generic, atomic reference-counted data types
- *  \ingroup dataTypes
+ *  \ingroup utils
  */
 
 #ifndef GIMBAL_MEMORY_REF_H

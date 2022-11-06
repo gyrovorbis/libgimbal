@@ -21,7 +21,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblContext);
  *  GblArenaAllocatorPage is the meta data header and
  *  memory payload buffer for a preset number of bytes
  *  which can be allocated from a GblArenaAllocator
- *  \ingroup dataTypes
+ *  \ingroup allocators
  *  \sa GblArenaAllocator
  */
 typedef struct GblArenaAllocatorPage {

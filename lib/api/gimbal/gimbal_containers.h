@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief Containers module-wide include
+ *  \ingroup containers
+ */
+
+
 #ifndef GIMBAL_CONTAINERS_H
 #define GIMBAL_CONTAINERS_H
 

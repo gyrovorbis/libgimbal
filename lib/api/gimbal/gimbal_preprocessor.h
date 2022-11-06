@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Preprocessor module-wide include
+ *  \ingroup preprocessor
+ */
+
 #ifndef GIMBAL_PREPROCESSOR_H
 #define GIMBAL_PREPROCESSOR_H
 

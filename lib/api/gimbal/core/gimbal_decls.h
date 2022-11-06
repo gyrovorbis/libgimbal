@@ -1,6 +1,6 @@
 /*! \file
  *  \brief Helper defines for struct, enum, flags, handle delcarations
- *  \ingroup preprocessor
+ *  \ingroup core
  *  \sa gimbal_macro_utilities.h
  */
 

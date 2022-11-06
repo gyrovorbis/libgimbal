@@ -1,6 +1,6 @@
 /*! \file
  *  \brief GBL_RESULT values, stringifiers, and utilities
- *  \ingroup dataTypes
+ *  \ingroup core
  */
 
 #ifndef GIMBAL_RESULT_H

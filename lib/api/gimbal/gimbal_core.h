@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief Core module-wide include
+ *  \ingroup core
+ */
+
 #ifndef GIMBAL_CORE_H
 #define GIMBAL_CORE_H
 

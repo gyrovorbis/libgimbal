@@ -1,6 +1,6 @@
 ﻿/*! \file
  *  \brief GblContext top-level debug and control-flow macros
- *  \ingroup debug
+ *  \ingroup core
  */
 #ifndef GIMBAL_CTX_H
 #define GIMBAL_CTX_H

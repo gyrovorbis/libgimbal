@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief Test module-wide include
+ *  \ingroup testing
+ */
+
+
 #ifndef GIMBAL_TEST_H
 #define GIMBAL_TEST_H
 

@@ -1,6 +1,6 @@
 /*! \file
  *  \brief GblTimer simple system timer/stopwatch API
- *  \ingroup dataTypes
+ *  \ingroup utils
  */
 
 #ifndef GIMBAL_TIMER_H
