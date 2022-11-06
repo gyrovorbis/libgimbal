@@ -276,7 +276,7 @@ test dreamcast-emu:
   script:
     - exec > >(tee -a "build/results.txt" )
     - exec 2> >(tee -a "build/results.tx" >&2)
-    - lxdream -H -d build/test/GimbalTests
+    - lxdream -H -d build/test/GimbalTests.elf
     - cp build/results.txt build/results2.txt
     - grep "********************* [   PASS   ] *********************" build/results2.txt
 
@@ -293,7 +293,7 @@ test dreamcast-physical:
     - hs100.sh -i 10.0.0.14 off
     - hs100.sh -i 10.0.0.14 on 
     - sleep 30
-    - /opt/toolchains/dc/dcload-ip/host-src/tool/dc-tool-ip -t 10.0.0.18 -x build/test/GimbalTests
+    - /opt/toolchains/dc/dcload-ip/host-src/tool/dc-tool-ip -t 10.0.0.18 -x build/test/GimbalTests.elf
     - hs100.sh -i 10.0.0.14 off
     - cp build/results.txt build/results2.txt
     - grep "********************* [   PASS   ] *********************" build/results2.txt
