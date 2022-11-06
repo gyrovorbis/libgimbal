@@ -262,7 +262,7 @@
 #   define GBL_STATIC_ARRAY(idx) idx
 #endif
 
-#if defined(GBL_CPP_11)
+#ifdef __cplusplus__
 #   define GBL_ALIGNAS(e) alignas(e)
 #   define GBL_ALIGNOF(e) alignof(e)
 #elif defined(GBL_C_11)
@@ -445,11 +445,11 @@
 #   elif defined(_MSC_VER)
 #       include <intrin.h>
         GBL_MAYBE_UNUSED GBL_CONSTEXPR GBL_INLINE unsigned GBL_BITMASK_CLZ(unsigned mask) GBL_NOEXCEPT {
-            unsigned idx = 0;
+            unsigned long idx = 0;
             return _BitScanReverse(&idx, mask)? ((sizeof(unsigned) * 8) - idx) : 0;
         }
         GBL_MAYBE_UNUSED GBL_CONSTEXPR GBL_INLINE unsigned GBL_BITMASK_CTZ(unsigned mask) GBL_NOEXCEPT {
-            unsigned idx = 0;
+            unsigned long idx = 0;
             return _BitScanForward(&idx, mask)? idx : 0;
         }
         GBL_MAYBE_UNUSED GBL_CONSTEXPR GBL_INLINE unsigned GBL_BITMASK_FFS(unsigned mask) GBL_NOEXCEPT {
