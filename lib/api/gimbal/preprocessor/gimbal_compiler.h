@@ -263,6 +263,12 @@
 #endif
 
 #ifdef __cplusplus
+#   define GBL_STRUCT_INIT(type, ...)   (type{ __VA_ARGS__ })
+#else
+#   define GBL_STRUCT_INIT(type, ...)   ((type){ __VA_ARGS__ })
+#endif
+
+#ifdef __cplusplus
 #   define GBL_ALIGNAS(e) alignas(e)
 #   define GBL_ALIGNOF(e) alignof(e)
 #elif defined(GBL_C_11)

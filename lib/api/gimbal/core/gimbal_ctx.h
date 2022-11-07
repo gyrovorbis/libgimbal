@@ -34,7 +34,7 @@ GBL_DECLS_BEGIN
 #define GBL_SRC_LOC     GBL_SOURCE_LOCATION
 #define GblSrcLoc       GblSourceLocation
 
-#define GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE) ((GblSourceLocation){FILE, FUNCTION, LINE})
+#define GBL_SOURCE_LOCATION(FILE, FUNCTION, LINE) GBL_STRUCT_INIT(GblSourceLocation, FILE, FUNCTION, LINE)
 
 #define GBL_CTX_STACK_FRAME_SOURCE_PUSH(pStackFrame, current) \
     if(++pStackFrame->sourceCurrentCaptureDepth == 1) GBL_CTX_SOURCE() = current;
