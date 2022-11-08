@@ -22,23 +22,23 @@ typedef struct GblScopeAllocator {
 } GblScopeAllocator;
 
 // ===== Public API =====
-GBL_EXPORT GblScopeAllocator* GblScopeAllocator_create    (GblArenaAllocator* pArena)       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblScopeAllocator_construct (GBL_SELF,
-                                                           GblArenaAllocator* pArena)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_SELF_TYPE* GblScopeAllocator_create    (GblArenaAllocator* pArena)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT     GblScopeAllocator_construct (GBL_SELF,
+                                                       GblArenaAllocator* pArena)       GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT         GblScopeAllocator_destroy   (GBL_SELF)                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT         GblScopeAllocator_destruct  (GBL_SELF)                        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT     GblScopeAllocator_destroy   (GBL_SELF)                        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT     GblScopeAllocator_destruct  (GBL_SELF)                        GBL_NOEXCEPT;
 
-GBL_EXPORT void*              GblScopeAllocator_alloc     (GBL_SELF,
-                                                           GblSize                 size,
-                                                           GblSize                 align,
-                                                           GblScopeAllocatorDtorFn pFnDtor) GBL_NOEXCEPT;
+GBL_EXPORT void*          GblScopeAllocator_alloc     (GBL_SELF,
+                                                       GblSize                 size,
+                                                       GblSize                 align,
+                                                       GblScopeAllocatorDtorFn pFnDtor) GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT         GblScopeAllocator_pushDtor (GBL_SELF,
-                                                          GblScopeAllocatorDtorFn pFnDtor,
-                                                          void*                   pData)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT     GblScopeAllocator_pushDtor  (GBL_SELF,
+                                                       GblScopeAllocatorDtorFn pFnDtor,
+                                                       void*                   pData)   GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize            GblScopeAllocator_dtorCount (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_EXPORT GblSize        GblScopeAllocator_dtorCount (GBL_CSELF)                       GBL_NOEXCEPT;
 
 // ===== Macro Overrides =====
 #define GblScopeAllocator_alloc(...)                      GblScopeAllocator_allocDefault_(__VA_ARGS__)

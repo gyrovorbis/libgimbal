@@ -86,6 +86,8 @@ set(GIMBAL_TEST_SOURCES
     source/utils/gimbal_uuid_test_suite.c
     include/utils/gimbal_ref_test_suite.h
     source/utils/gimbal_ref_test_suite.c
+    include/utils/gimbal_version_test_suite.h
+    source/utils/gimbal_version_test_suite.c
     source/gimbal_test_main.c
 )
 

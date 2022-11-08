@@ -30,14 +30,15 @@ extern "C" {
 #define GBL_CEIL(numerator, denominator)    ((numerator / denominator + (numerator % denominator != 0)))
 #define GBL_CLAMP(n, min, max)              (((n) > (max)) ? (max) : (((n) < (min)) ? (min) : (n)))
 
+#define GBL_BCD_BYTE_PACK(n)                (((n/10)<<4)|(n%10))            // 0-99
+#define GBL_BCD_BYTE_UNPACK(n)              (unsigned)(((n>>4)*10)+(n&0xf))
+
 #define GBL_CONTAINER_OF(ptr, type, member) ((type*)((char*)(ptr) - offsetof(type, member)))
 #define GBL_COUNT_OF(array)                 (sizeof(array)/sizeof(array[0]))
 
-#define GBL_SWITCH_CASE_STRINGIFY(s) \
-    case s: return #s
+#define GBL_SWITCH_CASE_STRINGIFY(s)        case s: return #s
 
-#define GBL_LABEL_EMPTY(name) \
-    name: {;}
+#define GBL_LABEL_EMPTY(name)               name: {;}
 
 #define GBL_SWAP(x,y)                                       \
     GBL_STMT_START {                                        \
