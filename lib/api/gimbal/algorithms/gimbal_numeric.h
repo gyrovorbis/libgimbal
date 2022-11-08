@@ -15,8 +15,7 @@ GBL_DECLS_BEGIN
  * @{
  */
 
-#define           gblPow2Next(X)     GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS_, X)(X)
-
+#define           gblPow2Next(X)             GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS_, X)(X)
 GBL_INLINE GBL_CONSTEXPR
     int           gblFibonacci               (int n)                       GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR

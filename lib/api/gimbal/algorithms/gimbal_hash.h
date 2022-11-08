@@ -61,7 +61,6 @@ GBL_INLINE int gblRand(void) GBL_NOEXCEPT {
     return gblRandRange(0, RAND_MAX);
 }
 
-
 GBL_INLINE int gblRandRange(int min, int max) GBL_NOEXCEPT {
     GBL_ASSERT(max <= RAND_MAX);
     static GblBool seeded = GBL_FALSE;

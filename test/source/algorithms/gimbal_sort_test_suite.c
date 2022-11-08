@@ -42,7 +42,6 @@ static GBL_RESULT GblSortTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) 
     GBL_CTX_BEGIN(pCtx);
     GblSortTestSuite_* pSelf_ = GBL_SORT_TEST_SUITE_(pSelf);
 
-
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_CTX_END();
 }

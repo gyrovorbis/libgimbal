@@ -13,6 +13,7 @@ GBL_DECLS_BEGIN
 
 GBL_CLASS_DERIVE_EMPTY(GblSortTestSuite, GblTestSuite)
 
+
 GBL_INSTANCE_DERIVE_EMPTY(GblSortTestSuite, GblTestSuite)
 
 GBL_EXPORT GblType GblSortTestSuite_type(void) GBL_NOEXCEPT;
