@@ -281,6 +281,7 @@ test dreamcast-emu:
     - grep "********************* [   PASS   ] *********************" build/results2.txt
 
 test dreamcast-physical:
+  when: manual
   stage: test 
   needs: ["build dreamcast"]
   dependencies:
