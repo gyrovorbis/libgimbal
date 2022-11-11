@@ -10,5 +10,7 @@
 #include "utils/gimbal_timer.h"
 #include "utils/gimbal_uuid.h"
 #include "utils/gimbal_version.h"
+#include "utils/gimbal_cmd_context.h"
+#include "utils/gimbal_cmd_parser.h"
 
 #endif // GIMBAL_UTILS_H

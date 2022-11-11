@@ -80,46 +80,49 @@ typedef struct GblRingList {
 } GblRingList;                              // 12/24    total
 
 // === Regular Methods ====
-GBL_EXPORT GblRingList* GblRingList_createEmpty  (void)                                           GBL_NOEXCEPT;
-GBL_EXPORT GblRingList* GblRingList_create       (void* pData, ...)                               GBL_NOEXCEPT;
-GBL_EXPORT GblRingList* GblRingList_copy         (GBL_CSELF, GblRingListCopyFn pFnCpy, void* pCl) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblRingList_destroy      (GBL_SELF, GblRingListDtorFn pFnDtor, void* pCl) GBL_NOEXCEPT;
+GBL_EXPORT GblRingList* GblRingList_createEmpty     (void)                                           GBL_NOEXCEPT;
+GBL_EXPORT GblRingList* GblRingList_create          (void* pData, ...)                               GBL_NOEXCEPT;
+GBL_EXPORT GblRingList* GblRingList_copy            (GBL_CSELF, GblRingListCopyFn pFnCpy, void* pCl) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRingList_destroy         (GBL_SELF, GblRingListDtorFn pFnDtor, void* pCl) GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblRingList_size         (GBL_CSELF)                                      GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblRingList_empty        (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblRingList_size            (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblRingList_empty           (GBL_CSELF)                                      GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblRingList_front        (GBL_CSELF)                                      GBL_NOEXCEPT;
-GBL_EXPORT void*        GblRingList_back         (GBL_CSELF)                                      GBL_NOEXCEPT;
-GBL_EXPORT void*        GblRingList_at           (GBL_CSELF, intptr_t index)                      GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_front           (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_back            (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_at              (GBL_CSELF, intptr_t index)                      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblRingList_pushBack     (GBL_SELF, ...)                                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblRingList_pushFront    (GBL_SELF, ...)                                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblRingList_insert       (GBL_SELF, intptr_t index, ...)                  GBL_NOEXCEPT;
-GBL_EXPORT void*        GblRingList_replace      (GBL_SELF, intptr_t index, void* pData)          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRingList_pushBack        (GBL_SELF, ...)                                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRingList_pushBackVaList  (GBL_SELF, va_list* pList)                       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRingList_pushFront       (GBL_SELF, ...)                                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRingList_pushFrontVaList (GBL_SELF, va_list* plist)                       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRingList_insert          (GBL_SELF, intptr_t index, ...)                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRingList_insertVaList    (GBL_SELF, intptr_t index, va_list* pList)       GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_replace         (GBL_SELF, intptr_t index, void* pData)          GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblRingList_insertSorted (GBL_SELF,
-                                                  void*            pData,
-                                                  GblRingListCmpFn pFnCmp,
-                                                  void*            pCl)                           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRingList_insertSorted    (GBL_SELF,
+                                                     void*            pData,
+                                                     GblRingListCmpFn pFnCmp,
+                                                     void*            pCl)                           GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool      GblRingList_join         (GBL_SELF,
-                                                  intptr_t         index,
-                                                  GblRingList*     pOther)                        GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblRingList_splice          (GBL_SELF,
+                                                     GblRingList*     pOther,
+                                                     int32_t          index)                         GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblRingList_popBack      (GBL_SELF, GblSize count)                        GBL_NOEXCEPT;
-GBL_EXPORT void*        GblRingList_popFront     (GBL_SELF, GblSize count)                        GBL_NOEXCEPT;
-GBL_EXPORT void*        GblRingList_remove       (GBL_SELF, intptr_t index, GblSize count)        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblRingList_clear        (GBL_SELF)                                       GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_popBack         (GBL_SELF, GblSize count)                        GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_popFront        (GBL_SELF, GblSize count)                        GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_remove          (GBL_SELF, intptr_t index, GblSize count)        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblRingList_clear           (GBL_SELF)                                       GBL_NOEXCEPT;
 
-GBL_EXPORT void         GblRingList_sort         (GBL_SELF, GblRingListCmpFn pFnCmp, void* pCl)   GBL_NOEXCEPT;
-GBL_EXPORT void         GblRingList_rotate       (GBL_SELF, intptr_t n)                           GBL_NOEXCEPT;
-GBL_EXPORT void         GblRingList_reverse      (GBL_SELF)                                       GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblRingList_foreach      (GBL_SELF, GblRingListIterFn pFnIt, void* pCl)   GBL_NOEXCEPT;
+GBL_EXPORT void         GblRingList_sort            (GBL_SELF, GblRingListCmpFn pFnCmp, void* pCl)   GBL_NOEXCEPT;
+GBL_EXPORT void         GblRingList_rotate          (GBL_SELF, intptr_t n)                           GBL_NOEXCEPT;
+GBL_EXPORT void         GblRingList_reverse         (GBL_SELF)                                       GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblRingList_foreach         (GBL_SELF, GblRingListIterFn pFnIt, void* pCl)   GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblRingList_find         (GBL_CSELF,
-                                                  const void*      pVal,
-                                                  GblRingListCmpFn pFnCmp,
-                                                  void*            pCl)                           GBL_NOEXCEPT;
+GBL_EXPORT GblSize      GblRingList_find            (GBL_CSELF,
+                                                     const void*      pVal,
+                                                     GblRingListCmpFn pFnCmp,
+                                                     void*            pCl)                           GBL_NOEXCEPT;
 
 // ==== Macro Overrides (for default arguments) ====
 #define GblRingList_create(...)                 (GblRingList_create)(__VA_ARGS__, GBL_NULL)
@@ -129,6 +132,7 @@ GBL_EXPORT GblSize      GblRingList_find         (GBL_CSELF,
 #define GblRingList_pushFront(self, ...)        (GblRingList_pushFront)(self, __VA_ARGS__, GBL_NULL)
 #define GblRingList_insert(self, ...)           (GblRingList_insert)(self, __VA_ARGS__, GBL_NULL)
 #define GblRingList_insertSorted(...)           GblRingList_insertSortedDefault_(__VA_ARGS__)
+#define GblRingList_splice(...)                 GblRingList_spliceDefault_(__VA_ARGS__)
 #define GblRingList_popBack(...)                GblRingList_popBackDefault_(__VA_ARGS__)
 #define GblRingList_popFront(...)               GblRingList_popFrontDefault_(__VA_ARGS__)
 #define GblRingList_remove(...)                 GblRingList_removeDefault_(__VA_ARGS__)
@@ -153,6 +157,11 @@ GBL_EXPORT GblSize      GblRingList_find         (GBL_CSELF,
     GblRingList_insertSortedDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL)
 #define GblRingList_insertSortedDefault__(list, data, cmp, cl, ...) \
     (GblRingList_insertSorted)(list, data, cmp, cl)
+
+#define GblRingList_spliceDefault_(...) \
+    GblRingList_spliceDefault__(__VA_ARGS__, -1)
+#define GblRingList_spliceDefault__(list1, list2, index, ...) \
+    (GblRingList_splice)(list1, list2, index)
 
 #define GblRingList_popBackDefault_(...) \
     GblRingList_popBackDefault__(__VA_ARGS__, 1)

@@ -22,10 +22,10 @@ typedef struct GblTimer {
     GblBool active;
 } GblTimer;
 
-GBL_INLINE void     GblTimer_start      (GBL_SELF)  GBL_NOEXCEPT;
-GBL_INLINE void     GblTimer_stop       (GBL_SELF)  GBL_NOEXCEPT;
-GBL_INLINE void     GblTimer_continue   (GBL_SELF)  GBL_NOEXCEPT;
-GBL_INLINE double   GblTimer_elapsedMs  (GBL_CSELF) GBL_NOEXCEPT;
+GBL_INLINE void   GblTimer_start     (GBL_SELF)  GBL_NOEXCEPT;
+GBL_INLINE void   GblTimer_stop      (GBL_SELF)  GBL_NOEXCEPT;
+GBL_INLINE void   GblTimer_continue  (GBL_SELF)  GBL_NOEXCEPT;
+GBL_INLINE double GblTimer_elapsedMs (GBL_CSELF) GBL_NOEXCEPT;
 
 // ========== IMPL ==========
 

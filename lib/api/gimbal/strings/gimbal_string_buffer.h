@@ -31,7 +31,6 @@
 
 GBL_DECLS_BEGIN
 
-
 /*! \brief Mutable string type optimized for building and writing
  *
  *  GblStringBuffer is a type of string which is optimized for efficient

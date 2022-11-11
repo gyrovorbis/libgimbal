@@ -18,7 +18,15 @@
 
 static GblPoolAllocator allocPool_;
 
-static GBL_RESULT GblRingList_pushBackVaList_(GblRingList* pSelf, va_list* pList) {
+void* GblRingList_new_(void) {
+    return GBL_RING_LIST_NEW_();
+}
+
+void GblRingList_delete_(void* pPtr) {
+    GBL_RING_LIST_DELETE_(pPtr);
+}
+
+GBL_EXPORT GBL_RESULT GblRingList_pushBackVaList(GblRingList* pSelf, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
     void* pArg = NULL;
 
@@ -34,7 +42,7 @@ static GBL_RESULT GblRingList_pushBackVaList_(GblRingList* pSelf, va_list* pList
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblRingList_pushFrontVaList_(GblRingList* pSelf, va_list* pList) {
+GBL_EXPORT GBL_RESULT GblRingList_pushFrontVaList(GblRingList* pSelf, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
     void* pArg = NULL;
 
@@ -51,22 +59,21 @@ static GBL_RESULT GblRingList_pushFrontVaList_(GblRingList* pSelf, va_list* pLis
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblRingList_insertVaList_(GblRingList* pSelf, intptr_t index, va_list* pList) {
+GBL_EXPORT GBL_RESULT GblRingList_insertVaList(GblRingList* pSelf, intptr_t index, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
     if(index == 0) {
-        GBL_CTX_VERIFY_CALL(GblRingList_pushFrontVaList_(pSelf, pList));
+        GBL_CTX_VERIFY_CALL(GblRingList_pushFrontVaList(pSelf, pList));
     } else if(index == (intmax_t)pSelf->size) {
-        GBL_CTX_VERIFY_CALL(GblRingList_pushBackVaList_(pSelf, pList));
+        GBL_CTX_VERIFY_CALL(GblRingList_pushBackVaList(pSelf, pList));
     } else if(index == -((intmax_t)pSelf->size + 1)) {
-        GBL_CTX_VERIFY_CALL(GblRingList_pushFrontVaList_(pSelf, pList));
+        GBL_CTX_VERIFY_CALL(GblRingList_pushFrontVaList(pSelf, pList));
     } else {
+        void* pArg;
         GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_at(&pSelf->listNode, index));
         GBL_CTX_VERIFY_LAST_RECORD();
-        void* pArg;
+        GBL_CTX_VERIFY(pEntry, GBL_RESULT_ERROR_OUT_OF_RANGE);
 
-        GBL_CTX_VERIFY(pEntry,
-                       GBL_RESULT_ERROR_OUT_OF_RANGE);
         if(index > 0) {
             while((pArg = va_arg(*pList, void*))) {
                 GblRingList* pNewEntry = GBL_RING_LIST_NEW_();
@@ -118,7 +125,7 @@ GBL_EXPORT GblRingList* (GblRingList_create)(void* pData, ...) {
     pList = GblRingList_createEmpty();
 
     GBL_CTX_VERIFY_CALL(GblRingList_pushBack(pList, pData));
-    GBL_CTX_VERIFY_CALL(GblRingList_pushBackVaList_(pList, &varArgs));
+    GBL_CTX_VERIFY_CALL(GblRingList_pushBackVaList(pList, &varArgs));
 
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
@@ -204,7 +211,7 @@ GBL_EXPORT GBL_RESULT (GblRingList_pushBack)(GblRingList* pSelf, ...) {
     va_list varArgs;
     va_start(varArgs, pSelf);
 
-    GBL_RESULT result = GblRingList_pushBackVaList_(pSelf, &varArgs);
+    GBL_RESULT result = GblRingList_pushBackVaList(pSelf, &varArgs);
 
     va_end(varArgs);
     return result;
@@ -214,7 +221,7 @@ GBL_EXPORT GBL_RESULT (GblRingList_pushFront)(GblRingList* pSelf, ...) {
     va_list varArgs;
     va_start(varArgs, pSelf);
 
-    GBL_RESULT result = GblRingList_pushFrontVaList_(pSelf, &varArgs);
+    GBL_RESULT result = GblRingList_pushFrontVaList(pSelf, &varArgs);
 
     va_end(varArgs);
     return result;
@@ -224,7 +231,7 @@ GBL_EXPORT GBL_RESULT (GblRingList_insert)(GblRingList* pSelf, intptr_t index, .
     va_list varArgs;
     va_start(varArgs, index);
 
-    const GBL_RESULT result = GblRingList_insertVaList_(pSelf, index, &varArgs);
+    const GBL_RESULT result = GblRingList_insertVaList(pSelf, index, &varArgs);
 
     va_end(varArgs);
     return result;
@@ -278,7 +285,7 @@ GBL_EXPORT GBL_RESULT GblRingList_insertSorted(GblRingList* pSelf, void* pData, 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblBool GblRingList_join(GblRingList* pSelf, intptr_t index, GblRingList* pOther) {
+GBL_EXPORT GblBool (GblRingList_splice)(GblRingList* pSelf, GblRingList* pOther, int32_t index) {
     const GblBool result = GblDoublyLinkedList_join(&pSelf->listNode, index, &pOther->listNode);
     pSelf->size = GblDoublyLinkedList_count(&pSelf->listNode);
     return result;

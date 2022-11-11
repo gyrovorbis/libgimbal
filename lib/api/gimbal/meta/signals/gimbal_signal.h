@@ -13,6 +13,8 @@
 #include "../../core/gimbal_typedefs.h"
 #include "gimbal_closure.h"
 
+#define GBL_SIGNALS(...)
+
 GBL_DECLS_BEGIN
 
 GBL_EXPORT GBL_RESULT   GblSignal_install         (GblType        ownerType,

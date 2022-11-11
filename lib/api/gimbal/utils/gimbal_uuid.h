@@ -48,19 +48,19 @@ typedef struct GblUuid {
 } GblUuid;
 
 /// Initializes the given GblUuid structure to a "nil" UUID, per RFC 4122.
-GBL_EXPORT GBL_RESULT GblUuid_initNil       (GBL_SELF)                         GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblUuid_initNil        (GBL_SELF)                         GBL_NOEXCEPT;
 /// Initializes the given GblUuid structure to a new, randomly generated UUID per RFC 4122 (version 4).
-GBL_EXPORT GBL_RESULT GblUuid_initV4        (GBL_SELF)                         GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblUuid_initV4         (GBL_SELF)                         GBL_NOEXCEPT;
 /// Initializes the given GblUuid structure by deserializing the string representation given by pStrBuffer.
-GBL_EXPORT GBL_RESULT GblUuid_initFromString(GBL_SELF, const char* pStrBuffer) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblUuid_initFromString (GBL_SELF, const char* pStrBuffer) GBL_NOEXCEPT;
 /// Fills in the given 37-byte string buffer with the standardized string representation of the given UUID.
-GBL_EXPORT GBL_RESULT GblUuid_toString      (GBL_CSELF, char* pStrBuffer)      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblUuid_toString       (GBL_CSELF, char* pStrBuffer)      GBL_NOEXCEPT;
 /// Lexicographically Compares the given UUID to another, returning 0 if equal, -1 if less than, or 1 if greater than/
-GBL_EXPORT int        GblUuid_compare       (GBL_CSELF, const GblUuid* pOther) GBL_NOEXCEPT;
+GBL_EXPORT int        GblUuid_compare        (GBL_CSELF, const GblUuid* pOther) GBL_NOEXCEPT;
 /// Returns the UUID version type, according to RFC 4122.
-GBL_EXPORT unsigned   GblUuid_version       (GBL_CSELF)                        GBL_NOEXCEPT;
+GBL_EXPORT unsigned   GblUuid_version        (GBL_CSELF)                        GBL_NOEXCEPT;
 /// Returns true if the given UUID is equal to the NIL UUID, per RFC 4122 (all zeroes),
-GBL_EXPORT GblBool    GblUuid_isNil         (GBL_CSELF)                        GBL_NOEXCEPT;
+GBL_EXPORT GblBool    GblUuid_isNil          (GBL_CSELF)                        GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

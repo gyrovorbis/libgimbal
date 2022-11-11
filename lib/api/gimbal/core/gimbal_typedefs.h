@@ -27,7 +27,6 @@ typedef uint32_t    GblEnum;
 typedef uint32_t    GblFlags;
 typedef uint32_t    GblHash;
 typedef uint16_t    GblRefCount;
-typedef uint32_t    GblVersion;
 typedef void        (*GblFnPtr)();
 typedef union GblPtr {
     GblFnPtr        pFunc;

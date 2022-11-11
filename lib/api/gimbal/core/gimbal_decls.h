@@ -111,10 +111,18 @@ extern "C" {
     GBL_INSTANCE_DERIVE(derived, base)           \
     GBL_INSTANCE_END
 
-#define GBL_DECLARE_STRUCT_PUBLIC(S)    \
-    struct S;                           \
-    typedef struct S S;                 \
+#define GBL_TYPEOF(instanceStruct)  \
+    (instanceStruct##_type())
+
+#define GBL_DECLARE_STRUCT(S)   \
+    struct S;                   \
+    typedef struct S S;         \
     struct S
+
+#define GBL_DECLARE_STRUCT_PRIVATE(S)   \
+    struct S##_;                        \
+    typedef struct S##_ S##_;           \
+    struct S##_
 
 #define GBL_FORWARD_DECLARE_STRUCT(S)  \
     struct S;                          \
@@ -148,11 +156,6 @@ extern "C" {
 #define GBL_FORWARD_DECLARE_FLAGS(F) \
     typedef GBL_FLAGS F
 
-#define GBL_HANDLE void*
-
-#define GBL_DECLARE_HANDLE(S) \
-    typedef GBL_HANDLE S;
-
 #define GBL_DECLARE_OPAQUE(S)   \
     struct S##_;                \
     typedef struct S##_* S
@@ -172,7 +175,6 @@ extern "C" {
 #define GBL_SELF            GBL_SELF_TYPE* pSelf
 #define GBL_CSELF           const GBL_SELF
 
-#define GBL_TYPEOF(instanceStruct)  (instanceStruct##_type())
 
 //sizeof(emptyStruct) is 1 in Cpp, 0 in C!
 #define GBL_DEFINE_EMPTY_STRUCT(S)  \

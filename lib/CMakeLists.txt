@@ -118,6 +118,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_typedefs.h
     api/gimbal/core/gimbal_thread.h
     api/gimbal/core/gimbal_atomics.h
+    api/gimbal/core/gimbal_application.h
     api/gimbal/meta/classes/gimbal_class.h
     api/gimbal/meta/classes/gimbal_opaque.h
     api/gimbal/meta/classes/gimbal_enum.h
@@ -159,10 +160,13 @@ set(GIMBAL_INCLUDES
     api/gimbal/strings/gimbal_string_view.h
     api/gimbal/strings/gimbal_string_ref.h
     api/gimbal/strings/gimbal_string.h
+    api/gimbal/strings/gimbal_string_list.h
     api/gimbal/strings/gimbal_pattern_matcher.h
     api/gimbal/test/gimbal_test_macros.h
     api/gimbal/test/gimbal_test_suite.h
     api/gimbal/test/gimbal_test_scenario.h
+    api/gimbal/utils/gimbal_option_group.h
+    api/gimbal/utils/gimbal_cmd_parser.h
     api/gimbal/utils/gimbal_timer.h
     api/gimbal/utils/gimbal_uuid.h
     api/gimbal/utils/gimbal_ref.h
@@ -171,6 +175,7 @@ set(GIMBAL_INCLUDES
 
 
 set(GIMBAL_SOURCES
+    source/algorithms/gimbal_hash.c
     source/algorithms/gimbal_numeric.c
     source/allocators/gimbal_arena_allocator.c
     source/allocators/gimbal_pool_allocator.c
@@ -188,6 +193,7 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_bit_view.c
     source/containers/gimbal_array_heap.c
     source/core/gimbal_thread.c
+    source/core/gimbal_application.c
     source/meta/classes/gimbal_class.c
     source/meta/classes/gimbal_opaque.c
     source/meta/classes/gimbal_flags.c
@@ -222,8 +228,10 @@ set(GIMBAL_SOURCES
     source/strings/gimbal_string_ref.c
     source/strings/gimbal_string_buffer.c
     source/strings/gimbal_string.c
+    source/strings/gimbal_string_list.c
     source/test/gimbal_test_suite.c
     source/test/gimbal_test_scenario.c
+    source/utils/gimbal_cmd_parser.c
     source/utils/gimbal_uuid.c
     source/utils/gimbal_version.c
     source/utils/gimbal_ref.c

@@ -12,5 +12,6 @@
 #include "strings/gimbal_string_buffer.h"
 #include "strings/gimbal_string_ref.h"
 #include "strings/gimbal_string_view.h"
+#include "strings/gimbal_string_list.h"
 
 #endif // GIMBAL_STRINGS_H

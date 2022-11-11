@@ -82,6 +82,25 @@ static GBL_RESULT GblHashTestSuite_superFast_(GblTestSuite* pSelf, GblContext* p
 }
 
 
+static GBL_RESULT GblHashTestSuite_pearson_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
+
+    // warm up the algorithm
+    volatile GblSize total = gblHashPearson(pSelf_->words[0], 1);
+    for(GblSize w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+        total += gblHashPearson(pSelf_->words[w],
+                                strlen(pSelf_->words[w]));
+    }
+
+    pSelf_->total = total;
+
+    GBL_CTX_END();
+}
+
+
+
 static GBL_RESULT GblHashTestSuite_sip_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
@@ -123,6 +142,7 @@ GBL_EXPORT GblType GblHashTestSuite_type(void) {
         { "fnv1",       GblHashTestSuite_fnv1_         },
         { "murmur",     GblHashTestSuite_murmur_       },
         { "superFast",  GblHashTestSuite_superFast_    },
+        { "pearson",    GblHashTestSuite_pearson_      },
         { "sip",        GblHashTestSuite_sip_          },
         { "crc",        GblHashTestSuite_crc_          },
         { NULL,     NULL                               }

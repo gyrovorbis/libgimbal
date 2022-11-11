@@ -343,12 +343,12 @@ static GBL_RESULT GblRingListTestSuite_insertSorted_(GblTestSuite* pSelf, GblCon
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblRingListTestSuite_joinMiddleNegative_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblRingListTestSuite_spliceMiddleNegative_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
     GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
 
-    GBL_TEST_VERIFY(GblRingList_join(pSelf_->ringLists[0], -2, pSelf_->ringLists[3]));
+    GBL_TEST_VERIFY(GblRingList_splice(pSelf_->ringLists[0], pSelf_->ringLists[3], -2));
 
     GBL_CTX_VERIFY_CALL(GblRingListTestSuite_verify_(pCtx, pSelf_->ringLists[0],
                         "Apple", "Bad", "Dolphin", "PS2", "Dreamcast", "GameCube", "Zebra", NULL));
@@ -729,7 +729,7 @@ GBL_EXPORT GblType GblRingListTestSuite_type(void) {
         { "insertMultiBackNegative",    GblRingListTestSuite_insertMultiBackNegative_   },
         { "replaceMiddle",              GblRingListTestSuite_replaceMiddle_             },
         { "insertSorted",               GblRingListTestSuite_insertSorted_              },
-        { "joinMiddleNegative",         GblRingListTestSuite_joinMiddleNegative_        },
+        { "spliceMiddleNegative",       GblRingListTestSuite_spliceMiddleNegative_      },
         { "popBackSingle",              GblRingListTestSuite_popBackSingle_             },
         { "popBackMulti",               GblRingListTestSuite_popBackMulti_              },
         { "popFrontSingle",             GblRingListTestSuite_popFrontSingle_            },

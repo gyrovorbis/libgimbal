@@ -7,7 +7,8 @@
 
 #include "gimbal_context.h"
 #include "../ifaces/gimbal_iplugin.h"
-#include "../../strings/gimbal_string_buffer.h"
+#include "../../strings/gimbal_string_ref.h"
+#include "../../utils/gimbal_version.h"
 
 /// \ingroup metaBuiltinTypes
 #define GBL_MODULE_TYPE                 (GBL_TYPEOF(GblModule))
