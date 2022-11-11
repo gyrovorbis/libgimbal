@@ -208,15 +208,15 @@ GBL_INLINE GblBool GblStringList_empty(GBL_CSELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GblStringRef* GblStringList_front(GBL_CSELF) GBL_NOEXCEPT {
-    return GblRingList_front(pSelf);
+    return (GblStringRef*)GblRingList_front(pSelf);
 }
 
 GBL_INLINE GblStringRef* GblStringList_back(GBL_CSELF) GBL_NOEXCEPT {
-    return GblRingList_back(pSelf);
+    return (GblStringRef*)GblRingList_back(pSelf);
 }
 
 GBL_INLINE GblStringRef* GblStringList_at(GBL_CSELF, intptr_t index) GBL_NOEXCEPT {
-    return GblRingList_at(pSelf, index);
+    return (GblStringRef*)GblRingList_at(pSelf, index);
 }
 
 GBL_INLINE GblBool (GblStringList_contains)(GBL_CSELF, const char* pStr, GblBool matchCase) GBL_NOEXCEPT {
@@ -228,11 +228,11 @@ GBL_INLINE GblBool (GblStringList_splice)(GBL_SELF, GblStringList* pOther, intpt
 }
 
 GBL_INLINE GblStringRef* GblStringList_popBack(GBL_SELF) GBL_NOEXCEPT {
-    return GblRingList_popBack(pSelf);
+    return (GblStringRef*)GblRingList_popBack(pSelf);
 }
 
 GBL_INLINE GblStringRef* GblStringList_popFront(GBL_SELF) GBL_NOEXCEPT {
-    return GblRingList_popFront(pSelf);
+    return (GblStringRef*)GblRingList_popFront(pSelf);
 }
 
 GBL_INLINE void GblStringList_rotate(GBL_SELF, intptr_t n) GBL_NOEXCEPT {
@@ -248,7 +248,8 @@ GBL_INLINE GblBool (GblStringList_foreach)(GBL_SELF, GblStringListIterFn pFnIt, 
 }
 
 GBL_INLINE GBL_RESULT GblStringList_erase(GBL_SELF, intptr_t index, GblSize count) GBL_NOEXCEPT {
-    return GblRingList_remove(pSelf, index, count)? GBL_TRUE : GBL_FALSE;
+    return GblRingList_remove(pSelf, index, count)?
+                GBL_RESULT_SUCCESS : GBL_RESULT_ERROR_OUT_OF_RANGE;
 }
 
 GBL_DECLS_END

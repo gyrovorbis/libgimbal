@@ -2,6 +2,7 @@
 #define GIMBAL_CMD_PARSER_H
 
 #include "../meta/instances/gimbal_object.h"
+#include "../strings/gimbal_string_list.h"
 
 #define GBL_CMD_PARSER_TYPE                 (GBL_TYPEOF(GblCmdParser))
 
@@ -13,7 +14,6 @@
 
 GBL_DECLS_BEGIN
 
-GBL_FORWARD_DECLARE_STRUCT(GblStringList);
 GBL_FORWARD_DECLARE_STRUCT(GblCmdParser);
 
 GBL_DECLARE_FLAGS(GBL_CMD_FLAGS) {
