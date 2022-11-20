@@ -161,7 +161,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/strings/gimbal_string_ref.h
     api/gimbal/strings/gimbal_string.h
     api/gimbal/strings/gimbal_string_list.h
-    api/gimbal/strings/gimbal_pattern_matcher.h
+    api/gimbal/strings/gimbal_string_pattern.h
     api/gimbal/test/gimbal_test_macros.h
     api/gimbal/test/gimbal_test_suite.h
     api/gimbal/test/gimbal_test_scenario.h
@@ -229,6 +229,7 @@ set(GIMBAL_SOURCES
     source/strings/gimbal_string_buffer.c
     source/strings/gimbal_string.c
     source/strings/gimbal_string_list.c
+    source/strings/gimbal_string_pattern.c
     source/test/gimbal_test_suite.c
     source/test/gimbal_test_scenario.c
     source/utils/gimbal_cmd_parser.c
@@ -301,7 +302,11 @@ target_include_directories(libGimbal
 
 target_compile_definitions(libGimbal
     PUBLIC
-    ${GBL_DEFINES})
+    ${GBL_DEFINES}
+    -DGIMBAL_VERSION_MAJOR=${GIMBAL_VERSION_MAJOR}
+    -DGIMBAL_VERSION_MINOR=${GIMBAL_VERSION_MINOR}
+    -DGIMBAL_VERSION_PATCH=${GIMBAL_VERSION_PATCH}
+    -DGIMBAL_VERSION="${GIMBAL_VERSION}")
 
 configure_file(${GBL_CONFIGURATION_INPUT_PATH}
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH})

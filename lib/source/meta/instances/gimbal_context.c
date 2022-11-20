@@ -327,6 +327,11 @@ GBL_EXPORT void GblContext_setLogFilter(GblContext* pSelf, GblFlags mask) {
 GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
     GBL_CTX_BEGIN(pSelf);
 
+    GBL_CTX_INFO("LibGimbal Info");
+    GBL_CTX_PUSH();
+    GBL_CTX_INFO("%-20s: %-100.100s", "Version", GIMBAL_VERSION);
+    GBL_CTX_POP(1);
+
     GBL_CTX_INFO("Project Info");
     GBL_CTX_PUSH();
     GBL_CTX_INFO("%-20s: %-100.100s", "Name", GBL_PROJECT_NAME);

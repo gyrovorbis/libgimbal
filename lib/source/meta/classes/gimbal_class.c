@@ -127,7 +127,10 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
     GBL_CTX_VERBOSE("Type: %p", pMeta);
 
     // Zero initiailze class - NOPE OVERWRITING IFACE IF WE DO THAT!
-    //memset(pClass, 0, pMeta->pInfo->classSize);
+    if(!(classFlags & GBL_CLASS_FLAG_IFACE_IMPL_))
+        memset(pClass, 0, pMeta->pInfo->classSize);
+    else
+        memset((void*)((uintptr_t)pClass + sizeof(GblInterface)), 0, pMeta->pInfo->classSize-sizeof(GblInterface));
 
     //IMMEDIATELY initialize its type!!!
     /*
@@ -299,8 +302,8 @@ GBL_EXPORT GBL_RESULT GblClass_constructFloating(GblClass* pSelf, GblType type) 
     GBL_CTX_CALL(GblClass_verifyFloatingConstruction(type, GBL_TRUE));
     GblClass_refDefault(type); // have to reference actual type
     GBL_CTX_CALL(GbClass_construct_(pSelf,
-                                        GBL_META_CLASS_(type),
-                                        GBL_CLASS_FLAG_IN_PLACE_));
+                                    GBL_META_CLASS_(type),
+                                    GBL_CLASS_FLAG_IN_PLACE_));
     GBL_CTX_END();
 }
 

@@ -112,7 +112,7 @@ extern "C" {
     GBL_INSTANCE_END
 
 #define GBL_TYPEOF(instanceStruct)  \
-    (instanceStruct##_type())
+    GBL_GLUE(instanceStruct, _type())
 
 #define GBL_DECLARE_STRUCT(S)   \
     struct S;                   \

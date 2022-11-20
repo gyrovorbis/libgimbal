@@ -193,18 +193,41 @@ GBL_EXPORT GblBool GblRingList_empty(const GblRingList* pSelf) {
 }
 
 GBL_EXPORT void* GblRingList_front(const GblRingList* pSelf) {
-    GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_front(&pSelf->listNode));
-    return pEntry? pEntry->pData : NULL;
+    if(GblRingList_size(pSelf)) {
+        GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_front(&pSelf->listNode));
+        return pEntry->pData;
+    } else {
+        GBL_CTX_BEGIN(NULL);
+        GBL_CTX_VERIFY(GblRingList_size(pSelf),
+                       GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_CTX_END_BLOCK();
+        return NULL;
+    }
 }
 
 GBL_EXPORT void* GblRingList_back(const GblRingList* pSelf) {
-    GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_back(&pSelf->listNode));
-    return pEntry? pEntry->pData : NULL;
+    if(GblRingList_size(pSelf)) {
+        GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_back(&pSelf->listNode));
+        return pEntry->pData;
+    } else {
+        GBL_CTX_BEGIN(NULL);
+        GBL_CTX_VERIFY(GblRingList_size(pSelf),
+                       GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_CTX_END_BLOCK();
+        return NULL;
+    }
 }
 
 GBL_EXPORT void* GblRingList_at(const GblRingList* pSelf, intptr_t index) {
     GblDoublyLinkedListNode* pNode = GblDoublyLinkedList_at(&pSelf->listNode, index);
-    return pNode? GBL_RING_LIST_(pNode)->pData : NULL;
+    if(pNode) return GBL_RING_LIST_(pNode)->pData;
+    else {
+        GBL_CTX_BEGIN(NULL);
+        GBL_CTX_VERIFY(pNode,
+                       GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_CTX_END_BLOCK();
+        return NULL;
+    }
 }
 
 GBL_EXPORT GBL_RESULT (GblRingList_pushBack)(GblRingList* pSelf, ...) {
@@ -243,6 +266,11 @@ GBL_EXPORT void* GblRingList_replace(GblRingList* pSelf, intptr_t index, void* p
     if(pEntry) {
         pRetVal = pEntry->pData;
         pEntry->pData = pData;
+    } else {
+        GBL_CTX_BEGIN(NULL);
+        GBL_CTX_VERIFY(pEntry,
+                       GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_CTX_END_BLOCK();
     }
     return pRetVal;
 }
@@ -294,6 +322,10 @@ GBL_EXPORT GblBool (GblRingList_splice)(GblRingList* pSelf, GblRingList* pOther,
 GBL_EXPORT void* (GblRingList_popBack)(GblRingList* pSelf, GblSize count) {
     GBL_CTX_BEGIN(NULL);
     void* pData = NULL;
+
+    GBL_CTX_VERIFY(count <= GblRingList_size(pSelf),
+                   GBL_RESULT_ERROR_OUT_OF_RANGE);
+
     for(GblSize i = 0; i < count; ++i) {
         GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_popBack(&pSelf->listNode));
         if(pEntry) pData = pEntry->pData;
@@ -307,6 +339,10 @@ GBL_EXPORT void* (GblRingList_popBack)(GblRingList* pSelf, GblSize count) {
 GBL_EXPORT void* (GblRingList_popFront)(GblRingList* pSelf, GblSize count) {
     GBL_CTX_BEGIN(NULL);
     void* pData = NULL;
+
+    GBL_CTX_VERIFY(count <= GblRingList_size(pSelf),
+                   GBL_RESULT_ERROR_OUT_OF_RANGE);
+
     for(GblSize i = 0; i < count; ++i) {
         GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_popFront(&pSelf->listNode));
         if(pEntry) pData = pEntry->pData;

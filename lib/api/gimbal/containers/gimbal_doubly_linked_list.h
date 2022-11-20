@@ -361,6 +361,7 @@ GBL_INLINE void GblDoublyLinkedList_reverse(GBL_SELF) GBL_NOEXCEPT {
 GBL_INLINE void GblDoublyLinkedList_rotate(GBL_SELF, intptr_t n) GBL_NOEXCEPT {
     if(n != 0) {
         GblDoublyLinkedListNode* pPivot = GblDoublyLinkedList_at(pSelf, n);
+        GBL_ASSERT(pPivot);
         if(pPivot) {
             GblDoublyLinkedList_remove(pSelf);
             GblDoublyLinkedList_insertBefore(pPivot, pSelf);
@@ -455,6 +456,7 @@ GBL_INLINE GblBool GblDoublyLinkedList_join (GBL_SELF, intptr_t idx, GBL_SELF_TY
             const intptr_t count = GblDoublyLinkedList_count(pSelf);
             if(idx == count) GblDoublyLinkedList_joinBack(pSelf, pList);
             else if(idx == -(count+1)) GblDoublyLinkedList_joinFront(pSelf, pList);
+            else return GBL_FALSE;
         }
 
         GblDoublyLinkedList_init(pList);

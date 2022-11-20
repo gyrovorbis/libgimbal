@@ -21,7 +21,8 @@
 #include "strings/gimbal_string_view_test_suite.h"
 #include "strings/gimbal_string_ref_test_suite.h"
 #include "strings/gimbal_string_buffer_test_suite.h"
-#include "strings/gimbal_pattern_matcher_test_suite.h"
+#include "strings/gimbal_string_list_test_suite.h"
+#include "strings/gimbal_string_pattern_test_suite.h"
 #include "meta/types/gimbal_type_test_suite.h"
 #include "meta/classes/gimbal_class_test_suite.h"
 #include "meta/ifaces/gimbal_interface_test_suite.h"
@@ -101,7 +102,9 @@ int main(int argc, char* pArgv[]) {
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_STRING_BUFFER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_PATTERN_MATCHER_TEST_SUITE_TYPE));
+                                 GblTestSuite_createFromType(GBL_STRING_PATTERN_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_createFromType(GBL_STRING_LIST_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_TYPE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,

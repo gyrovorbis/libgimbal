@@ -75,15 +75,13 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_CTX_END();
 }
 
-
 static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, char* argv[]) {
     GBL_UNUSED(argc, argv);
     GBL_CTX_BEGIN(pSelf);
 
-
-    GblContext* pCtx = GblObject_findContext(GBL_OBJECT(pSelf));
+    GblContext*           pCtx   = GblObject_findContext(GBL_OBJECT(pSelf));
     GblTestScenarioClass* pClass = GBL_TEST_SCENARIO_GET_CLASS(pSelf);
-    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
+    GblTestScenario_*     pSelf_ = GBL_TEST_SCENARIO_(pSelf);
 
     pSelf->result = GBL_RESULT_SUCCESS;
     GBL_CTX_VERIFY_CALL(pClass->pFnBegin(pSelf));
@@ -95,6 +93,8 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                                     GblTestSuite))
     {
         pSelf_->pCurSuite = pSuiteIt;
+
+        GBL_CTX_RESULT() = GBL_RESULT_SUCCESS;
 
         GBL_CTX_VERIFY_CALL(pClass->pFnSuiteBegin(pSelf, pSuiteIt));
 
@@ -127,7 +127,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
                 GBL_CTX_CLEAR_LAST_RECORD();
 
                 if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) {
-                    GBL_CTX_ERROR("[GblTestSuite] Failed to initailize test case[%s]: SKIPPING",
+                    GBL_CTX_ERROR("[GblTestSuite] Failed to initialize test case[%s]: SKIPPING",
                                   pSelf_->pCurCase);
                     ++pSelf->casesSkipped;
                     suiteFailed = GBL_TRUE;
@@ -213,7 +213,6 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
 
     GBL_CTX_END();
 }
-
 
 static GBL_RESULT GblTestScenarioClass_suiteBegin_(GblTestScenario* pSelf, const GblTestSuite* pSuite) {
     GBL_CTX_BEGIN(pSelf);

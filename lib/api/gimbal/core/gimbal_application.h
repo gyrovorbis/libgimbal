@@ -48,8 +48,6 @@ GBL_EXPORT const char*          GblApplication_name           (GBL_CSELF)       
 GBL_EXPORT GblVersion           GblApplication_version        (GBL_CSELF)               GBL_NOEXCEPT;
 GBL_EXPORT const char*          GblApplication_organization   (GBL_CSELF)               GBL_NOEXCEPT;
 GBL_EXPORT const char*          GblApplication_domain         (GBL_CSELF)               GBL_NOEXCEPT;
-GBL_EXPORT int                  GblApplication_argc           (GBL_CSELF)               GBL_NOEXCEPT;
-GBL_EXPORT char**               GblApplication_argv           (GBL_CSELF)               GBL_NOEXCEPT;
 GBL_EXPORT const GblStringList* GblApplication_argList        (GBL_CSELF)               GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT           GblApplication_exec           (GBL_SELF)                GBL_NOEXCEPT;

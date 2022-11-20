@@ -20,7 +20,12 @@
 #define GBL_OBJECT_CLASS(klass)                     (GBL_CLASS_CAST(klass, GblObject))
 #define GBL_OBJECT_GET_CLASS(instance)              (GBL_INSTANCE_GET_CLASS(instance, GblObject))
 
-#define GBL_OBJECT_NEW(cType, ...)                  ((cType*)GblObject_create(GBL_TYPEOF(cType), __VA_ARGS__, NULL))
+#define GBL_OBJECT_NEW(...)                         GBL_VA_OVERLOAD_CALL(GBL_OBJECT_NEW, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
+
+#define GBL_OBJECT_NEW_1(typeName)                  ((typeName*)GblObject_create(GBL_TYPEOF(typeName), GBL_NULL))
+#define GBL_OBJECT_NEW_N(...)                       ((GBL_TUPLE_FIRST(__VA_ARGS__)*)GblObject_create(GBL_TYPEOF(GBL_TUPLE_FIRST(__VA_ARGS__)), \
+                                                                                                     GBL_TUPLE_REST(__VA_ARGS__), NULL))
+
 #define GBL_OBJECT_CONTRUCT(cType, instance, ...)   (GblObject_construct(instance, GBL_TYPEOF(cType), __VA_ARGS__, NULL))
 
 #define GBL_SELF_TYPE GblObject

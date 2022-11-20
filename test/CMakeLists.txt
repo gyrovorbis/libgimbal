@@ -76,14 +76,16 @@ set(GIMBAL_TEST_SOURCES
     source/meta/types/gimbal_pointer_test_suite.c
     include/strings/gimbal_quark_test_suite.h
     source/strings/gimbal_quark_test_suite.c
+    include/strings/gimbal_string_list_test_suite.h
+    source/strings/gimbal_string_list_test_suite.c
     include/strings/gimbal_string_view_test_suite.h
     source/strings/gimbal_string_view_test_suite.c
     include/strings/gimbal_string_ref_test_suite.h
     source/strings/gimbal_string_ref_test_suite.c
     include/strings/gimbal_string_buffer_test_suite.h
     source/strings/gimbal_string_buffer_test_suite.c
-    include/strings/gimbal_pattern_matcher_test_suite.h
-    source/strings/gimbal_pattern_matcher_test_suite.c
+    include/strings/gimbal_string_pattern_test_suite.h
+    source/strings/gimbal_string_pattern_test_suite.c
     include/utils/gimbal_uuid_test_suite.h
     source/utils/gimbal_uuid_test_suite.c
     include/utils/gimbal_ref_test_suite.h

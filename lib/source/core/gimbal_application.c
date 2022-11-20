@@ -14,6 +14,34 @@ GBL_DECLARE_STRUCT_PRIVATE(GblApplication) {
 static GblBool         startingUp_  = GBL_TRUE;
 static GblBool         closingDown_ = GBL_FALSE;
 static GblApplication* pInstance_   = NULL;
+static GblStringList*  pLibPaths_   = NULL;
+
+GBL_EXPORT GblBool GblApplication_startingUp(void) {
+    return startingUp_;
+}
+
+GBL_EXPORT GblBool GblApplication_closingDown(void) {
+    return closingDown_;
+}
+
+GBL_EXPORT GblApplication* GblApplication_instance(void) {
+    return pInstance_;
+}
+
+GBL_EXPORT const GblStringList* GblApplication_libraryPaths(void) {
+    if(!pLibPaths_) {
+        pLibPaths_ = GblStringList_createEmpty();
+    }
+    return pLibPaths_;
+}
+
+GBL_EXPORT void GblApplication_addLibraryPath(const char* pPath) {
+    if(!pLibPaths_) {
+        pLibPaths_ = GblStringList_createEmpty();
+    }
+    GblStringList_pushBack(pLibPaths_, pPath);
+}
+
 
 
 
