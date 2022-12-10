@@ -243,7 +243,7 @@ GBL_EXPORT GblType GblUuidTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("UuidTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStringStatic("GblUuidTestSuite"),
                                      &vTable,
                                      sizeof(GblUuidTestSuite),
                                      0,

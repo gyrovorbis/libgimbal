@@ -92,11 +92,11 @@ GBL_EXPORT uint64_t gblSeed(uint8_t index) GBL_NOEXCEPT {
     return seed[index];
 }
 
-GBL_EXPORT int gblRand(void) GBL_NOEXCEPT {
+GBL_EXPORT int gblRand(void) {
     return gblRandRange(0, RAND_MAX);
 }
 
-GBL_EXPORT int gblRandRange(int min, int max) GBL_NOEXCEPT {
+GBL_EXPORT int gblRandRange(int min, int max)  {
     GBL_ASSERT(max <= RAND_MAX);
     static GblBool seeded = GBL_FALSE;
     if(!seeded) GBL_UNLIKELY {
@@ -106,7 +106,11 @@ GBL_EXPORT int gblRandRange(int min, int max) GBL_NOEXCEPT {
     return (rand() % (max - min + 1)) + min;
 }
 
-GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char* pCharList) GBL_NOEXCEPT {
+GBL_EXPORT float gblRandFloat(float min, float max) {
+    return min + (float)(gblRand()) / ((float)RAND_MAX/(max-min));
+}
+
+GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char* pCharList) {
     static const char* pWordChars = "abcdefghijklmnopqrstuvwxyz "
                                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                     "1234567890";

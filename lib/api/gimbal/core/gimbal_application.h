@@ -30,9 +30,9 @@ GBL_PROPERTIES(GblApplication,
     (domain,       GBL_GENERIC, (READ, WRITE),     GBL_STRING_TYPE)
 )
 
-GBL_SIGNALS(GblApplication,
-    (aboutToQuit, GBL_INSTANCE_TYPE)
-)
+//GBL_SIGNALS(GblApplication,
+//    (aboutToQuit, GBL_INSTANCE_TYPE)
+//)
 
 GBL_EXPORT GblType              GblApplication_type           (void)                    GBL_NOEXCEPT;
 GBL_EXPORT GblApplication*      GblApplication_instance       (void)                    GBL_NOEXCEPT;

@@ -112,6 +112,7 @@ GBL_EXPORT GblBool      GblRingList_splice          (GBL_SELF,
 GBL_EXPORT void*        GblRingList_popBack         (GBL_SELF, GblSize count)                        GBL_NOEXCEPT;
 GBL_EXPORT void*        GblRingList_popFront        (GBL_SELF, GblSize count)                        GBL_NOEXCEPT;
 GBL_EXPORT void*        GblRingList_remove          (GBL_SELF, intptr_t index, GblSize count)        GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_extract         (GBL_SELF, GblRingList* pNode)                   GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblRingList_clear           (GBL_SELF)                                       GBL_NOEXCEPT;
 
 GBL_EXPORT void         GblRingList_sort            (GBL_SELF, GblRingListCmpFn pFnCmp, void* pCl)   GBL_NOEXCEPT;

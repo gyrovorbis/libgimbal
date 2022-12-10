@@ -353,6 +353,14 @@ GBL_EXPORT void* (GblRingList_popFront)(GblRingList* pSelf, GblSize count) {
     return pData;
 }
 
+GBL_EXPORT void* GblRingList_extract(GblRingList* pList, GblRingList* pNode) {
+    void* pData = pNode->pData;
+    GblDoublyLinkedList_remove(&pNode->listNode);
+    --pList->size;
+    GBL_RING_LIST_DELETE_(pNode);
+    return pData;
+}
+
 GBL_EXPORT void* (GblRingList_remove)(GblRingList* pSelf, intptr_t index, GblSize count) {
     void* pData = NULL;
     GBL_CTX_BEGIN(NULL);

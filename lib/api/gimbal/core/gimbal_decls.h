@@ -114,6 +114,11 @@ extern "C" {
 #define GBL_TYPEOF(instanceStruct)  \
     GBL_GLUE(instanceStruct, _type())
 
+#define GBL_DECLARE_UNION(S)   \
+    union S;                   \
+    typedef union S S;         \
+    union S
+
 #define GBL_DECLARE_STRUCT(S)   \
     struct S;                   \
     typedef struct S S;         \

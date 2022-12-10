@@ -1036,8 +1036,8 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
 GBL_EXPORT GblBool GblType_verify(GblType type) {
     GblBool valid = GBL_FALSE;
     if(type != GBL_INVALID_TYPE) {
-        const GblQuark nameQuark        = GblType_nameQuark(type);
-        const GblType registeredType    = GblType_fromNameQuark(nameQuark);
+        const GblQuark nameQuark     = GblType_nameQuark(type);
+        const GblType registeredType = GblType_fromNameQuark(nameQuark);
         if(registeredType != GBL_INVALID_TYPE) {
             valid = GBL_TRUE;
         }

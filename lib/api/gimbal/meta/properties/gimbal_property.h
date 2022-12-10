@@ -19,7 +19,11 @@
 
 GBL_DECLS_BEGIN
 
-typedef enum GBL_PROPERTY_FLAG {
+GBL_FORWARD_DECLARE_STRUCT(GblProperty);
+
+typedef GblBool (*GblPropertyIterFn)(const GblProperty* pProp, void* pClosure);
+
+GBL_DECLARE_ENUM(GBL_PROPERTY_FLAG) {
     GBL_PROPERTY_FLAG_CONSTRUCT     = 0x1,
     GBL_PROPERTY_FLAG_READ          = 0x2,
     GBL_PROPERTY_FLAG_WRITE         = 0x4,
@@ -30,9 +34,7 @@ typedef enum GBL_PROPERTY_FLAG {
     GBL_PROPERTY_FLAG_READ_WRITE    = 0x6,
     GBL_PROPERTY_FLAG_SAVE_LOAD     = 0x18,
     GBL_PROPERTY_FLAG_ALL           = 0xffff
-} GBL_PROPERTY_FLAG;
-
-GBL_FORWARD_DECLARE_STRUCT(GblProperty);
+};
 
 GBL_CLASS_DERIVE(GblProperty, GblBox)
     GBL_RESULT (*pFnInitOptionalArgs)(GBL_SELF, GblSize argCount, va_list* pVaList);
@@ -47,8 +49,10 @@ GBL_INSTANCE_DERIVE(GblProperty, GblBox)
         GblProperty* pNext;
         GblType      objectType;
     GBL_PRIVATE_END
-
-    GblQuark         name;
+    union {
+        GblQuark    name;
+        const char* pName;
+    };
     GblSize          id;
     GblFlags         flags;
     GblType          valueType;
@@ -80,6 +84,10 @@ GBL_EXPORT const GblProperty*
                         GblProperty_next           (GblType            objectType,
                                                     const GblProperty* pPrev,
                                                     GblFlags           mask)               GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblProperty_foreach        (GblType            objectType,
+                                                    GBL_PROPERTY_FLAG  flags,
+                                                    GblPropertyIterFn  pFnIt,
+                                                    void*              pClosure)           GBL_NOEXCEPT;
 // ===== INSTANCE =====
 
 GBL_EXPORT GblProperty* GblProperty_create         (GblType     derivedType,

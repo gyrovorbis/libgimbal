@@ -9,7 +9,7 @@ GBL_EXPORT void* GblInstance_basePtr_(const GblInstance* pInstance) {
 // not doing any type validation here...
 GBL_EXPORT void* GblInstance_private(const GblInstance* pInstance, GblType base) {
     GblMetaClass* pMeta = GBL_META_CLASS_(base);
-    return pMeta && pMeta->pInfo->instancePrivateSize?
+    return pMeta && pMeta->instancePrivateOffset?
                 (void*)((uint8_t*)pInstance + pMeta->instancePrivateOffset) :
                 NULL;
 }
@@ -17,7 +17,7 @@ GBL_EXPORT void* GblInstance_private(const GblInstance* pInstance, GblType base)
 // not doing any type validation here...
 GBL_EXPORT GblInstance* GblInstance_public(const void* pPrivate, GblType base) {
     GblMetaClass* pMeta = GBL_META_CLASS_(base);
-    return pMeta && pMeta->pInfo->instancePrivateSize?
+    return pMeta && pMeta->instancePrivateOffset?
                 (GblInstance*)((uint8_t*)pPrivate - pMeta->instancePrivateOffset) :
                 NULL;
 }
@@ -49,6 +49,11 @@ GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, Gb
 
     // Zero Initialize
     memset(pInstance, 0, pMeta->pInfo->instanceSize);
+    if(pMeta->pInfo->instancePrivateSize) {
+        memset((void*)(uintptr_t)pInstance + pMeta->instancePrivateOffset,
+               0,
+               pMeta->pInfo->instancePrivateSize);
+    }
 
     // Set Class
     if(!pClass) pClass = GblClass_refDefault(type);

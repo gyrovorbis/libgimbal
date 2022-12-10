@@ -123,6 +123,7 @@ GBL_INLINE GblStringRef*  GblStringList_popBack         (GBL_SELF)              
 GBL_INLINE GblStringRef*  GblStringList_popFront        (GBL_SELF)                                       GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_erase           (GBL_SELF, intptr_t index, GblSize count)        GBL_NOEXCEPT;
 GBL_EXPORT GblSize        GblStringList_remove          (GBL_SELF, const char* pStr, GblBool matchCase)  GBL_NOEXCEPT;
+GBL_INLINE GblStringRef*  GblStringList_extract         (GBL_SELF, GblStringList* pNode)                 GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_deduplicate     (GBL_SELF, GblBool matchCase)                    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_clear           (GBL_SELF)                                       GBL_NOEXCEPT;
 GBL_EXPORT void           GblStringList_sort            (GBL_SELF, GblBool descending)                   GBL_NOEXCEPT;
@@ -293,6 +294,10 @@ GBL_INLINE void GblStringList_reverse(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_INLINE GblBool (GblStringList_foreach)(GBL_SELF, GblStringListIterFn pFnIt, void* pCl) GBL_NOEXCEPT {
     return GblRingList_foreach(pSelf, (GblRingListIterFn)pFnIt, pCl);
+}
+
+GBL_INLINE GblStringRef* GblStringList_extract(GBL_SELF, GblStringList* pNode) GBL_NOEXCEPT {
+    return (GblStringRef*)GblRingList_extract(pSelf, pNode);
 }
 
 

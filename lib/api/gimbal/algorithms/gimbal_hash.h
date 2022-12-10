@@ -24,6 +24,8 @@ GBL_DECLS_BEGIN
 GBL_EXPORT int      gblRand          (void)                            GBL_NOEXCEPT;
 GBL_EXPORT int      gblRandRange     (int min, int max)                GBL_NOEXCEPT;
 
+GBL_EXPORT float    gblRandFloat     (float min, float max)            GBL_NOEXCEPT;
+
 GBL_EXPORT void     gblRandBuffer    (void*   pData,
                                       GblSize size)                    GBL_NOEXCEPT;
 

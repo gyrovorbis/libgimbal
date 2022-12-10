@@ -37,6 +37,7 @@
 #include "meta/instances/gimbal_object_test_suite.h"
 #include "utils/gimbal_uuid_test_suite.h"
 #include "utils/gimbal_version_test_suite.h"
+#include "utils/gimbal_option_group_test_suite.h"
 
 #include <math.h>
 
@@ -131,6 +132,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_createFromType(GBL_OBJECT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_VERSION_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_createFromType(GBL_OPTION_GROUP_TEST_SUITE_TYPE));
 
     const GBL_RESULT result = GblTestScenario_run(pScenario, argc, pArgv);
 

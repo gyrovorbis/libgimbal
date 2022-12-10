@@ -664,6 +664,21 @@ static GBL_RESULT GblRingListTestSuite_find_(GblTestSuite* pSelf, GblContext* pC
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblRingListTestSuite_extract_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
+
+    const GblSize size = GblRingList_size(pSelf_->ringLists[0]);
+
+    const char* pString = GblRingList_extract(pSelf_->ringLists[0],
+                                              pSelf_->ringLists[0]->ringNode.pNext);
+    GBL_TEST_COMPARE(pString, "GameCube");
+    GBL_TEST_COMPARE(size - 1, GblRingList_size(pSelf_->ringLists[0]));
+
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblRingListTestSuite_destroyShallow_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
@@ -749,6 +764,7 @@ GBL_EXPORT GblType GblRingListTestSuite_type(void) {
         { "reverse",                    GblRingListTestSuite_reverse_                   },
         { "foreach",                    GblRingListTestSuite_foreach_                   },
         { "find",                       GblRingListTestSuite_find_                      },
+        { "extract",                    GblRingListTestSuite_extract_                   },
         { "destroyShallow",             GblRingListTestSuite_destroyShallow_            },
         { "destroyDeep",                GblRingListTestSuite_destroyDeep_               },
         { "stressTest",                 GblRingListTestSuite_stressTest_                },

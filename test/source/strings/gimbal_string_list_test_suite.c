@@ -766,6 +766,23 @@ static GBL_RESULT GblStringListTestSuite_foreach_(GblTestSuite* pSelf, GblContex
     GBL_CTX_END();
 }
 
+
+static GBL_RESULT GblStringListTestSuite_extract_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    GblStringRef* pRef = GblStringList_extract(pSelf_->lists[4],
+                                               pSelf_->lists[4]->ringNode.pNext);
+
+    GBL_TEST_COMPARE(GblStringList_size(pSelf_->lists[4]), 5);
+    GBL_TEST_COMPARE(pRef, "A");
+    GblStringRef_release(pRef);
+
+
+    GBL_CTX_END();
+}
+
+
 static GBL_RESULT GblStringListTestSuite_clear_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
@@ -839,6 +856,7 @@ GBL_EXPORT GblType GblStringListTestSuite_type(void) {
         { "rotate",                GblStringListTestSuite_rotate_            },
         { "reverse",               GblStringListTestSuite_reverse_           },
         { "foreach",               GblStringListTestSuite_foreach_           },
+        { "extract",               GblStringListTestSuite_extract_           },
         { "clear",                 GblStringListTestSuite_clear_             },
         { "destroy",               GblStringListTestSuite_destroy_           },
         { NULL,                    NULL                                      }

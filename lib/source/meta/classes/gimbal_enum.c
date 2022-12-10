@@ -135,7 +135,9 @@ GBL_EXPORT GblEnum  GblEnumClass_valueFromIndex(const GblEnumClass* pSelf, uint1
 }
 
 GBL_INLINE GblBool GblEnumClass_valueInRange_(const GblEnumClass* pSelf, GblEnum value) {
-    return value <= pSelf->valueMax && value >= pSelf->valueMin;
+    return GBL_CLASS_TYPEOF(pSelf) != GBL_ENUM_TYPE?
+                value <= pSelf->valueMax && value >= pSelf->valueMin :
+                GBL_TRUE;
 }
 
 GBL_EXPORT GblQuark GblEnumClass_nameQuarkFromValue(const GblEnumClass* pSelf, GblEnum value) {
@@ -188,6 +190,8 @@ GBL_EXPORT GblEnum GblEnumClass_valueFromNickQuark(const GblEnumClass* pSelf, Gb
 
 GBL_EXPORT GblBool GblEnumClass_valueCheck(const GblEnumClass* pSelf, GblEnum value) {
     GblBool result = GBL_FALSE;
+
+    if(GBL_CLASS_TYPEOF(pSelf) == GBL_ENUM_TYPE) return GBL_TRUE;
 
     if(GblEnumClass_valueInRange_(pSelf, value)) {
         for(uint16_t e = 0; e < pSelf->entryCount; ++e) {

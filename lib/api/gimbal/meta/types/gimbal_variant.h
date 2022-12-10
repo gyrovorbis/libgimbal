@@ -247,7 +247,7 @@ GBL_EXPORT GblBool       GblVariant_canConvert               (GblType fromType,
 GBL_EXPORT GBL_RESULT    GblVariant_convert                  (GBL_CSELF,
                                                               GblVariant* pToVariant)        GBL_NOEXCEPT;
 
-GBL_EXPORT int        GblVariant_compare                  (GBL_CSELF,
+GBL_EXPORT int           GblVariant_compare                  (GBL_CSELF,
                                                               const GblVariant* pOther)      GBL_NOEXCEPT;
 
 GBL_INLINE GblBool       GblVariant_equals                   (GBL_CSELF,

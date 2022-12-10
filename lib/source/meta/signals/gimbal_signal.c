@@ -291,7 +291,10 @@ static EmitterHandler_* EmitterHandler_findOrCreate_(GblInstance*               
                    pName);
 
     // first check to see if we have an entry for the signal (fast path)
-    if(!pTable) pTable = InstanceConnectionTable_find_(pInstance);
+    if(!pTable) {
+        pTable = InstanceConnectionTable_find_(pInstance);
+        if(ppTableOut) *ppTableOut = pTable;
+    }
 
     pHandler = EmitterHandler_find_(pInstance, pName, nameQuark, pTable);
 

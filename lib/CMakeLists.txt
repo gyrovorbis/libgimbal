@@ -165,12 +165,12 @@ set(GIMBAL_INCLUDES
     api/gimbal/test/gimbal_test_macros.h
     api/gimbal/test/gimbal_test_suite.h
     api/gimbal/test/gimbal_test_scenario.h
-    api/gimbal/utils/gimbal_option_group.h
     api/gimbal/utils/gimbal_cmd_parser.h
     api/gimbal/utils/gimbal_timer.h
     api/gimbal/utils/gimbal_uuid.h
     api/gimbal/utils/gimbal_ref.h
     api/gimbal/utils/gimbal_version.h
+    api/gimbal/utils/gimbal_option_group.h
 )
 
 
@@ -236,6 +236,7 @@ set(GIMBAL_SOURCES
     source/utils/gimbal_uuid.c
     source/utils/gimbal_version.c
     source/utils/gimbal_ref.c
+    source/utils/gimbal_option_group.c
  )
 
 add_library(libGimbal STATIC

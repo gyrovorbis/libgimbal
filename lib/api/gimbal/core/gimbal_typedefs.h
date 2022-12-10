@@ -29,9 +29,10 @@ typedef uint32_t    GblHash;
 typedef uint16_t    GblRefCount;
 typedef void        (*GblFnPtr)();
 typedef union GblPtr {
-    GblFnPtr        pFunc;
     void*           pData;
+    GblFnPtr        pFunc;
 } GblPtr;
 
 
 #endif // GIMBAL_TYPEDEFS_H
+

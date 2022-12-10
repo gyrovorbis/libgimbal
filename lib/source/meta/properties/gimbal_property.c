@@ -141,6 +141,32 @@ GBL_EXPORT const GblProperty* GblProperty_find(GblType objectType, const char* p
     return GblProperty_findQuark(objectType, GblQuark_tryString(pName));
 }
 
+GBL_EXPORT GblBool GblProperty_foreach(GblType           objectType,
+                                       GBL_PROPERTY_FLAG flags,
+                                       GblPropertyIterFn pFnIt,
+                                       void*             pClosure) {
+    GBL_CTX_BEGIN(NULL);
+    GblBool result = GBL_FALSE;
+
+    GBL_CTX_VERIFY_TYPE(objectType);
+    GBL_CTX_VERIFY_POINTER(pFnIt);
+
+    const GblSize depth = GblType_depth(objectType);
+    for(GblSize d = 0; d <= depth; ++d) {
+        const GblType curType = GblType_base(objectType, d);
+        const GblProperty* pProp = NULL;
+        while((pProp = GblProperty_next(curType, pProp, flags))) {
+            if(pFnIt(pProp, pClosure)) {
+                result = GBL_TRUE;
+                GBL_CTX_DONE();
+            }
+        }
+    }
+
+    GBL_CTX_END_BLOCK();
+    return result;
+}
+
 GBL_EXPORT const GblProperty* GblProperty_next(GblType objectType, const GblProperty* pPrev, GblFlags mask) {
     const GblProperty* pNext = NULL;
     GBL_CTX_BEGIN(GblHashSet_context(&propertyRegistry_));
@@ -148,7 +174,10 @@ GBL_EXPORT const GblProperty* GblProperty_next(GblType objectType, const GblProp
 
     // We're first starting, grab the root node of the first type with a property entry
     if(!pPrev) {
-        pIt = (GblProperty*)propertyRootBase_(objectType);
+        pIt = (GblProperty*)propertyRoot_(objectType);
+        // Skip types which don't have the flag we're looking for
+        if(!pIt || !(pIt->flags&mask))
+            GBL_CTX_DONE();
     // We're continuing from an existing node
     } else {
         pIt = pPrev;
@@ -162,8 +191,7 @@ GBL_EXPORT const GblProperty* GblProperty_next(GblType objectType, const GblProp
             pIt = GblProperty_findQuark(objectType, GBL_PRIV_REF(pIt).pNext->name);
         //beginning of new type
         } else {
-            pIt = propertyFirstNextBase_(objectType, GBL_PRIV_REF(pIt).objectType);
-            if(!pIt) break;
+            break;
         }
 
         // Check if the mask matches and skip overrides!!

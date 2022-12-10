@@ -128,5 +128,83 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
     } GBL_STMT_END
 
 
+#ifndef GBL_TEST_SUITE_SELF_NAME
+#   define GBL_TEST_SUITE_SELF_NAME pSelf
+#endif
+
+#ifndef GBL_TEST_SUITE_CONTEXT_NAME
+#   define GBL_TEST_SUITE_CONTEXT_NAME pCtx
+#endif
+
+#ifndef GBL_TEST_SUITE_SELF_PRIVATE_NAME
+#   define GBL_TEST_SUITE_SELF_PRIVATE_NAME pFixture
+#endif
+
+#ifndef GBL_TEST_SUITE_SELF_PRIVATE
+#   define GBL_TEST_SUITE_SELF_PRIVATE  GBL_GLUE(GBL_TEST_SUITE_SELF, _)
+#endif
+
+#if 0
+#define GBL_TEST_CASE(name, body)                      \
+    GBL_TEST_CASE_BEGIN(GBL_TEST_SUITE_SELF, name)     \
+        body                                           \
+    GBL_TEST_CASE_END
+#endif
+#define GBL_TEST_CASE(name)                                                         \
+    static GBL_RESULT GBL_GLUE(GBL_GLUE(GBL_GLUE(GBL_TEST_SUITE_SELF, _), name), _) \
+                               (GblTestSuite* GBL_TEST_SUITE_SELF_NAME,             \
+                                GblContext*   GBL_TEST_SUITE_CONTEXT_NAME) {        \
+        GBL_CTX_BEGIN(GBL_TEST_SUITE_CONTEXT_NAME);                                 \
+        GBL_TEST_SUITE_SELF_PRIVATE* GBL_TEST_SUITE_SELF_PRIVATE_NAME =             \
+                (GBL_TEST_SUITE_SELF_PRIVATE*)                                      \
+                    GBL_INSTANCE_PRIVATE(pSelf, GBL_TYPEOF(GBL_TEST_SUITE_SELF));   \
+        GBL_UNUSED(GBL_TEST_SUITE_SELF_NAME,                                        \
+                   GBL_TEST_SUITE_CONTEXT_NAME,                                     \
+                   GBL_TEST_SUITE_SELF_PRIVATE_NAME);
+
+#define GBL_TEST_CASE_END   \
+    GBL_CTX_END(); }
+
+#define GBL_TEST_FIXTURE \
+    GBL_DECLARE_STRUCT(GBL_TEST_SUITE_SELF_PRIVATE)
+
+#define GBL_TEST_REGISTER(...) \
+    GBL_EXPORT GblType GBL_GLUE(GBL_GLUE(GBL_TEST_SUITE_SELF, _), type)(void) { \
+    static GblType type = GBL_INVALID_TYPE;                                   \
+    const static GblTestCase cases[] = { \
+        GBL_TUPLE_FOREACH(GBL_TEST_CASE_PAIR, GBL_GLUE(GBL_TEST_SUITE_SELF,_), (__VA_ARGS__)) \
+        { NULL, NULL } \
+    }; \
+    const static GblTestSuiteClassVTable vTable = {         \
+        .pFnSuiteInit  = GBL_GLUE(GBL_GLUE(GBL_GLUE(GBL_TEST_SUITE_SELF, _), init), _), \
+        .pFnSuiteFinal = GBL_GLUE(GBL_GLUE(GBL_GLUE(GBL_TEST_SUITE_SELF, _), final), _), \
+        .pCases        = cases             \
+    };  \
+    if(type == GBL_INVALID_TYPE) {  \
+        GBL_CTX_BEGIN(NULL);    \
+        type = GblTestSuite_register(GblQuark_internStringStatic(GBL_STRINGIFY(GBL_TEST_SUITE_SELF)), \
+                                     &vTable, \
+                                     sizeof(GBL_TEST_SUITE_SELF), \
+                                     sizeof(GBL_TEST_SUITE_SELF_PRIVATE), \
+                                     GBL_TYPE_FLAGS_NONE); \
+        GBL_CTX_VERIFY_LAST_RECORD(); \
+        GBL_CTX_END_BLOCK();\
+    } \
+    return type; \
+}
+
+#define GBL_TEST_CASE_PAIR(suiteName, caseName) \
+    { GBL_STRINGIFY(caseName), GBL_GLUE(GBL_GLUE(suiteName, caseName), _) },
+
+#define GBL_TEST_INIT()  GBL_TEST_CASE(init)
+#define GBL_TEST_FINAL() GBL_TEST_CASE(final)
+#define GBL_TEST_NO_INIT \
+    GBL_TEST_INIT() \
+    GBL_TEST_CASE_END
+#define GBL_TEST_NO_FINAL \
+    GBL_TEST_FINAL() \
+    GBL_TEST_CASE_END
+#define GBL_TEST_INIT_END  GBL_TEST_CASE_END
+#define GBL_TEST_FINAL_END GBL_TEST_CASE_END
 
 #endif // GIMBAL_TEST_H

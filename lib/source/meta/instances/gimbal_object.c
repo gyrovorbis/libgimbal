@@ -12,7 +12,6 @@
 #define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblArrayList))
 
 static GblQuark     objectNameQuark_            = GBL_QUARK_INVALID;
-static GblQuark     objectRefCountQuark_        = GBL_QUARK_INVALID;
 static GblQuark     objectParentQuark_          = GBL_QUARK_INVALID;
 static GblQuark     objectFamilyQuark_          = GBL_QUARK_INVALID;
 static GblQuark     objectEventFiltersQuark_    = GBL_QUARK_INVALID;
@@ -375,7 +374,6 @@ static GBL_RESULT GblObjectClass_init_(GblObjectClass* pClass, void* pData, GblC
     // static constructor for first instance of class
     if(!GblType_classRefCount(GBL_OBJECT_TYPE)) {
         objectNameQuark_            = GblQuark_fromStringStatic("_name");
-        objectRefCountQuark_        = GblQuark_fromStringStatic("_refCount");
         objectParentQuark_          = GblQuark_fromStringStatic("_parent");
         objectFamilyQuark_          = GblQuark_fromStringStatic("_family");
         objectEventFiltersQuark_    = GblQuark_fromStringStatic("_eventFilters");
@@ -491,11 +489,12 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVariant(const GblObject* pSelf,
 
 static GBL_RESULT GblObject_setProperty_(GblObject*         pSelf,
                                          const GblProperty* pProp,
-                                         GblVariant*        pValue)
+                                         GblVariant*        pValue,
+                                         GblFlags           flag)
 {
     GBL_CTX_BEGIN(NULL);
 
-    if((pProp->flags & GBL_PROPERTY_FLAG_WRITE)) {
+    if((pProp->flags & flag)) {
 
         if(!GblType_check(GblVariant_typeOf(pValue), pProp->valueType)) {
             GblVariant v;
@@ -516,7 +515,9 @@ static GBL_RESULT GblObject_setProperty_(GblObject*         pSelf,
 
     } else {
         GBL_CTX_RECORD_SET(GBL_RESULT_UNSUPPORTED,
-                           "[GblObject] Attempt to set NON-WRITE property %s[%s].",
+                           (flag&GBL_PROPERTY_FLAG_WRITE)?
+                               "[GblObject] Attempt to set NON-WRITE property %s[%s]." :
+                               "{GblObject] Attempt to construct NON-CONSTRUCT property %s[%s].",
                            GblType_name(GBL_INSTANCE_TYPEOF(pSelf)),
                            GblProperty_nameString(pProp));
     }
@@ -540,7 +541,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVariantByQuark(GblObject*  pSelf,
         GBL_CTX_END();
     }
 
-    return GblObject_setProperty_(pSelf, pProp, pValue);
+    return GblObject_setProperty_(pSelf, pProp, pValue, GBL_PROPERTY_FLAG_WRITE);
 }
 
 GBL_EXPORT GBL_RESULT GblObject_setPropertyVariant(GblObject* pSelf,
@@ -642,7 +643,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList_(GblObject* pSelf, const GblPr
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unwritable property: [%s]", GblProperty_nameString(pProp));
     GBL_CTX_CALL(GblVariant_constructValueCopyVaList(&variant, pProp->valueType, pList));
-    GBL_CTX_CALL(GblObject_setProperty_(pSelf, pProp, &variant));
+    GBL_CTX_CALL(GblObject_setProperty_(pSelf, pProp, &variant, GBL_PROPERTY_FLAG_WRITE));
     GBL_CTX_CALL(GblVariant_destruct(&variant));
     GBL_CTX_END_BLOCK();
     return GBL_CTX_RESULT();
@@ -770,6 +771,45 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants(GblObject* pSelf, GblSize 
     GBL_CTX_END();
 }
 
+GBL_DECLARE_STRUCT_PRIVATE(GblObjectCtorIterClosure) {
+    GblObject*          pObject;
+    GblSize             argCount;
+    const GblProperty** ppProperties;
+    GblVariant*         pValues;
+};
+
+static GblBool GblObject_iterateCtorProperties_(const GblProperty* pProp,
+                                                void* pClosure)
+{
+    GBL_CTX_BEGIN(NULL);
+    GblObjectCtorIterClosure_* pSelf = pClosure;
+    GblBool exitLoop = GBL_TRUE;
+
+    // Check whether we were passed a value for the property
+    for(GblSize v = 0; v < pSelf->argCount; ++v) {
+
+         // Set the required property to the given value
+        if(pSelf->ppProperties[v] == pProp) {
+            GBL_CTX_VERIFY_CALL(GblObject_setProperty_(pSelf->pObject,
+                                                       pProp,
+                                                       &pSelf->pValues[v],
+                                                       GBL_PROPERTY_FLAG_CONSTRUCT));
+            exitLoop = GBL_FALSE;
+            break;
+        }
+    }
+
+    // Bail if required property wasn't found
+    GBL_CTX_VERIFY(!exitLoop,
+                   GBL_RESULT_ERROR_INVALID_PROPERTY,
+                   "[GblObject] Cannot instantiate %s without required CONSTRUCT property %s[%s]",
+                   GblType_name(GBL_INSTANCE_TYPEOF(pSelf->pObject)),
+                   GblType_name(GblProperty_objectType(pProp)),
+                   GblProperty_nameString(pProp));
+    GBL_CTX_END_BLOCK();
+    return exitLoop;
+}
+
 static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
                                        GblSize            argCount,
                                        const GblProperty* pProperties[],
@@ -778,37 +818,21 @@ static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
     GBL_CTX_BEGIN(NULL);
 
     const GblType selfType  = GBL_INSTANCE_TYPEOF(pSelf);
-    const GblSize depth     = GblType_depth(selfType);
+    GblObjectCtorIterClosure_ closure = {
+        .pObject      = pSelf,
+        .argCount     = argCount,
+        .ppProperties = pProperties,
+        .pValues      = pValues
+    };
 
-    // Iterate bases from base -> derived type
-    for(GblSize d = 0; d <= depth; ++d) {
-        const GblType      curType  = GblType_base(selfType, depth);
-        const GblProperty* pCurProp = NULL;
-
-        // Iterate over each required CONSTRUCT-flagged property
-        while((pCurProp = GblProperty_next(curType, pCurProp, GBL_PROPERTY_FLAG_CONSTRUCT))) {
-            GblBool found = GBL_FALSE;
-
-            // Check whether we were passed a value for the property
-            for(GblSize v = 0; v < argCount; ++v) {
-
-                 // Set the required property to the given value
-                if(pProperties[v] == pCurProp) {
-                    GBL_CTX_VERIFY_CALL(GblObject_setProperty_(pSelf, pCurProp, &pValues[v]));
-                    found = GBL_TRUE;
-                    break;
-                }
-            }
-
-            // Bail if required property wasn't found
-            GBL_CTX_VERIFY(found,
-                           GBL_RESULT_ERROR_INVALID_PROPERTY,
-                           "[GblObject] Cannot instantiate %s without required CONSTRUCT property %s[%s]",
-                           GblType_name(selfType),
-                           GblType_name(curType),
-                           GblProperty_nameString(pCurProp));
-        }
-    }
+    GblBool earlyExit = GblProperty_foreach(selfType,
+                                            GBL_PROPERTY_FLAG_CONSTRUCT,
+                                            GblObject_iterateCtorProperties_,
+                                            &closure);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_CTX_VERIFY(!earlyExit,
+                   GBL_RESULT_ERROR_INVALID_ARG,
+                   "Unexpected error finding CTOR property");
 
     // Notify post-constructor that we constructed the object with the required properties
     GBL_CTX_VERIFY_CALL(GBL_OBJECT_GET_CLASS(pSelf)->pFnConstructed(pSelf));
@@ -816,7 +840,10 @@ static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
     // Iterate over the remaining properties, doing regular writes.
     for(GblSize v = 0; v < argCount; ++v) {
         if(pProperties[v] && !(pProperties[v]->flags & GBL_PROPERTY_FLAG_CONSTRUCT)) {
-            GBL_CTX_CALL(GblObject_setProperty_(pSelf, pProperties[v], &pValues[v]));
+            GBL_CTX_CALL(GblObject_setProperty_(pSelf,
+                                                pProperties[v],
+                                                &pValues[v],
+                                                GBL_PROPERTY_FLAG_WRITE));
         }
     }
 

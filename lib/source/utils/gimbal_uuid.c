@@ -65,8 +65,8 @@ GBL_EXPORT GBL_RESULT GblUuid_initFromString(GblUuid* pSelf, const char* pStrBuf
             continue;
         }
 
-        int high    = gblAsciiXDigitValue(GblStringView_at(strv, c++));
-        int low     = gblAsciiXDigitValue(GblStringView_at(strv, c++));
+        int high    = gblAsciiHexDigitValue(GblStringView_at(strv, c++));
+        int low     = gblAsciiHexDigitValue(GblStringView_at(strv, c++));
 
         GBL_CTX_VERIFY(high != -1,
                        GBL_RESULT_ERROR_INVALID_ARG);
