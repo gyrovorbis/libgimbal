@@ -49,10 +49,7 @@ GBL_INSTANCE_DERIVE(GblProperty, GblBox)
         GblProperty* pNext;
         GblType      objectType;
     GBL_PRIVATE_END
-    union {
-        GblQuark    name;
-        const char* pName;
-    };
+    GblQuark    name;
     GblSize          id;
     GblFlags         flags;
     GblType          valueType;

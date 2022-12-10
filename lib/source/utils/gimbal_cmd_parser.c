@@ -47,7 +47,9 @@ static GBL_RESULT GblCmdParser_parseArg_(GblCmdParser_* pSelf_, GblSize index, G
     GBL_CTX_BEGIN(NULL);
     GblVariant v1 = GBL_VARIANT_INIT;
     GblVariant v2 = GBL_VARIANT_INIT;
-
+#if 1
+    GBL_ASSERT(GBL_FALSE);
+#else
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v1,
                                                       GBL_STRING_TYPE,
                                                       GblStringRef_acquire(pValue)));
@@ -62,7 +64,7 @@ static GBL_RESULT GblCmdParser_parseArg_(GblCmdParser_* pSelf_, GblSize index, G
     GBL_CTX_END_BLOCK();
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v1));
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v2));
-
+#endif
     return GBL_CTX_RESULT();
 }
 
