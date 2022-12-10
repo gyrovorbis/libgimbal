@@ -15,7 +15,7 @@ GBL_DECLARE_STRUCT_PRIVATE(GblCmdParser) {
     GblBool          unknownOptionsDisabled;
 
     GBL_CMD_STATUS   status;
-    GblStringRef*    pErrorMsg;;
+    GblStringRef*    pErrorMsg;
 
     GblStringRef*    pExecutable;
     GblStringList*   pKnownArgs;
