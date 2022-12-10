@@ -227,7 +227,7 @@ static GBL_RESULT GblCmdParser_final_(GblBox* pInstance) {
 
 static GBL_RESULT GblCmdParserClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    GBL_CTX_UNUSED(pUd);
+    GBL_UNUSED(pUd);
 
     GBL_BOX_CLASS(pClass)->pFnDestructor = GblCmdParser_final_;
     GBL_CTX_END();
