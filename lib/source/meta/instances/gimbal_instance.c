@@ -50,7 +50,7 @@ GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, Gb
     // Zero Initialize
     memset(pInstance, 0, pMeta->pInfo->instanceSize);
     if(pMeta->pInfo->instancePrivateSize) {
-        memset((void*)(uintptr_t)pInstance + pMeta->instancePrivateOffset,
+        memset((void*)(((uintptr_t)pInstance) + pMeta->instancePrivateOffset),
                0,
                pMeta->pInfo->instancePrivateSize);
     }

@@ -427,14 +427,14 @@ static int GblRingList_sortAdapter_(const void* pV1, const void* pV2, void* pClo
 
 GBL_EXPORT void (GblRingList_sort)(GblRingList* pSelf, GblRingListCmpFn pCmpFn, void* pCl) {
     if(!pCmpFn) {
-        return GblDoublyLinkedList_mergeSort(&pSelf->listNode, (GblRingList_sortDefault_), NULL);
+        GblDoublyLinkedList_mergeSort(&pSelf->listNode, (GblRingList_sortDefault_), NULL);
     } else {
-        return GblDoublyLinkedList_mergeSort(&pSelf->listNode,
-                                             GblRingList_sortAdapter_,
-                                             &(GblRingListSortAdapterClosure_) {
-                                                .pFnCmp = pCmpFn,
-                                                .pClosure = pCl
-                                             });
+        GblDoublyLinkedList_mergeSort(&pSelf->listNode,
+                                      GblRingList_sortAdapter_,
+                                      &(GblRingListSortAdapterClosure_) {
+                                         .pFnCmp = pCmpFn,
+                                         .pClosure = pCl
+                                      });
     }
 
 }
