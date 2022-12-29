@@ -275,7 +275,7 @@ test dreamcast-emu:
   script:
     - exec > >(tee -a "build/results.txt" )
     - exec 2> >(tee -a "build/results.tx" >&2)
-    - lxdream-nitro -H -d build/test/GimbalTests.elf
+    - lxdream-nitro -H -d -e build/test/GimbalTests.elf
     - cp build/results.txt build/results2.txt
     - grep "********************* [   PASS   ] *********************" build/results2.txt
 
