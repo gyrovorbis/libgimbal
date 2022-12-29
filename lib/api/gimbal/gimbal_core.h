@@ -13,6 +13,6 @@
 #include "core/gimbal_stack_frame.h"
 #include "core/gimbal_thread.h"
 #include "core/gimbal_typedefs.h"
-#include "core/gimbal_application.h"
+#include "core/gimbal_app.h"
 
 #endif // GIMBAL_CORE_H

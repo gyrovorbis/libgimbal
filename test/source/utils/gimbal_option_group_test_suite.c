@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_option_group.h>
 #include <gimbal/meta/signals/gimbal_c_closure.h>
+#include <math.h>
 
 #define GBL_TEST_SUITE_SELF GblOptionGroupTestSuite
 
@@ -46,7 +47,7 @@ GBL_RESULT parseArg7_(GblOptionGroup* pGroup, const GblOption* pOption, GblStrin
     pFixture->seventh = GblStringView_toFloat(value);
 
     // Validate argument is within our range
-    GBL_CTX_VERIFY(!GBL_FLOAT_NAN(pFixture->seventh)
+    GBL_CTX_VERIFY(!isnan(pFixture->seventh)
                    && pFixture->seventh < 5.0f,
                    GBL_RESULT_ERROR_INVALID_CMDLINE_ARG,
                    "Failed to parse value for option %s. [%f]",

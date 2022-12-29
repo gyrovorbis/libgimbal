@@ -40,8 +40,6 @@ extern "C" {
 #define GBL_CONTAINER_OF(ptr, type, member) ((type*)((char*)(ptr) - offsetof(type, member)))
 #define GBL_COUNT_OF(array)                 (sizeof(array)/sizeof(array[0]))
 
-#define GBL_FLOAT_NAN(f)                    (f != f)
-
 #define GBL_SWITCH_CASE_STRINGIFY(s)        case s: return #s
 
 #define GBL_LABEL_EMPTY(name)               name: {;}

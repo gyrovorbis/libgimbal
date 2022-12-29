@@ -22,13 +22,13 @@ stages:
 .build_linux:
   extends: .build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.3.1/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.4.1/gcc_64
     GENERATOR: Ninja
     EXTRA_ARGS: ""
   tags:
     - linux
 
-build ubuntu20-gcc10:
+build ubuntu22-gcc12:
   extends: .build_linux
   tags:
     - linux, gcc
@@ -41,10 +41,10 @@ build ubuntu20-gcc10:
   tags: 
     - linux, clang
   variables:
-    CC: clang-11
-    CXX: clang++-11
+    CC: clang-14
+    CXX: clang++-14
 
-build ubuntu20-clang11:
+build ubuntu22-clang14:
   extends: .build_linux_clang
 
 build win10-vs2022:
@@ -124,7 +124,7 @@ build android-sim:
       - mkdir -p build
       - cd build 
       - env
-      - /home/falco/Qt/6.4.0/android_x86_64/bin/qt-cmake -DCMAKE_TOOLCHAIN_FILE=/home/falco/Documents/dev/android-ndk-r23c/build/cmake/android.toolchain.cmake -S ../ -B .
+      - /home/falco/Qt/6.4.1/android_x86_64/bin/qt-cmake -DGBL_ENABLE_TESTS=ON -DGBL_ENABLE_CPP=ON-DCMAKE_TOOLCHAIN_FILE=/home/falco/Android/Sdk/ndk/25.1.8937393/build/cmake/android.toolchain.cmake -S ../ -B .
       - cmake --build . --target all -- -j8
 
 build macos-clang13:
@@ -186,7 +186,7 @@ build wasm:
     - mkdir -p build
     - cd build
     - env
-    - /usr/local/bin/cmake -S ../ -B ./ -DGBL_ENABLE_TESTS=ON -DGBL_ENABLE_CPP=ON -DCMAKE_GENERATOR:STRING=Ninja -DCMAKE_BUILD_TYPE:STRING=Debug '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/falco/Qt/Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' -DQT_QMAKE_EXECUTABLE:FILEPATH=/home/falco/Qt/6.4.0/wasm_32/bin/qmake -DCMAKE_PREFIX_PATH:PATH=/home/falco/Qt/6.4.0/wasm_32 -DCMAKE_C_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/emcc -DCMAKE_CXX_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/em++ -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/home/falco/Qt/6.4.0/wasm_32/lib/cmake/Qt6/qt.toolchain.cmake
+    - /usr/local/bin/cmake -S ../ -B ./ -DGBL_ENABLE_TESTS=ON -DGBL_ENABLE_CPP=ON -DCMAKE_GENERATOR:STRING=Ninja -DCMAKE_BUILD_TYPE:STRING=Debug '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/falco/Qt/Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' -DQT_QMAKE_EXECUTABLE:FILEPATH=/home/falco/Qt/6.4.1/wasm_32/bin/qmake -DCMAKE_PREFIX_PATH:PATH=/home/falco/Qt/6.4.1/wasm_32 -DCMAKE_C_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/emcc -DCMAKE_CXX_COMPILER:FILEPATH=/home/falco/Documents/dev/emsdk/upstream/emscripten/em++ -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/home/falco/Qt/6.4.1/wasm_32/lib/cmake/Qt6/qt.toolchain.cmake
     - /usr/local/bin/cmake --build ./ --target all
 
 .clang_tidy_common:
@@ -201,10 +201,9 @@ analyze clang-tidy:
   extends: .clang_tidy_common
   needs: ["build ubuntu20-clang11"]
   dependencies:
-    - build ubuntu20-clang11
+    - build ubuntu22-clang14
   tags:
     - linux, clang, clang-tidy
-
 
 .scan_build_common:
   when: manual
@@ -237,14 +236,14 @@ analyze clang-tidy:
 analyze scan-build-clang:
   extends: .scan_build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.3.1/gcc_64
-    CC: clang-11
-    CXX: clang++-11
+    PREFIX_PATH: /home/falco/Qt/6.4.1/gcc_64
+    CC: clang-14
+    CXX: clang++-14
 
 analyze scan-build-gcc:
   extends: .scan_build_common
   variables:
-    PREFIX_PATH: /home/falco/Qt/6.3.1/gcc_64
+    PREFIX_PATH: /home/falco/Qt/6.4.1/gcc_64
     CC: gcc
     CXX: g++
     
@@ -298,19 +297,19 @@ test dreamcast-physical:
     - cp build/results.txt build/results2.txt
     - grep "********************* [   PASS   ] *********************" build/results2.txt
 
-test ubuntu20-gcc10:
+test ubuntu22-gcc12:
   extends: .test_common
-  needs: ["build ubuntu20-gcc10"]
+  needs: ["build ubuntu22-gcc12"]
   dependencies:
-    - build ubuntu20-gcc10
+    - build ubuntu22-gcc12
   tags:
     - linux, gcc
     
-test ubuntu20-clang11:
+test ubuntu22-clang14:
   extends: .test_common
-  needs: ["build ubuntu20-clang11"]
+  needs: ["build ubuntu22-clang14"]
   dependencies:
-    - build ubuntu20-clang11
+    - build ubuntu22-clang14
   tags:
     - linux, clang
 

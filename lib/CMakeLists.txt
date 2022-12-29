@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-SET(CMAKE_ANDROID_API 28)
+SET(ANDROID_NATIVE_API_LEVEL 28)
 
 project(LibGimbal 
     VERSION 
@@ -9,7 +9,7 @@ project(LibGimbal
         "Lightweight langauge independent cross-platform framework for creating static/dynamic libraries with a run-time extensible C API"
     HOMEPAGE_URL
         "libgimbal.elysianshadows.com"
-    LANGUAGES C)
+    LANGUAGES C CXX)
 
 #set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum OS X Deployment Version")
 
@@ -118,7 +118,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_typedefs.h
     api/gimbal/core/gimbal_thread.h
     api/gimbal/core/gimbal_atomics.h
-    api/gimbal/core/gimbal_application.h
+    api/gimbal/core/gimbal_app.h
     api/gimbal/meta/classes/gimbal_class.h
     api/gimbal/meta/classes/gimbal_opaque.h
     api/gimbal/meta/classes/gimbal_enum.h
@@ -193,7 +193,7 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_bit_view.c
     source/containers/gimbal_array_heap.c
     source/core/gimbal_thread.c
-    source/core/gimbal_application.c
+    source/core/gimbal_app.c
     source/meta/classes/gimbal_class.c
     source/meta/classes/gimbal_opaque.c
     source/meta/classes/gimbal_flags.c

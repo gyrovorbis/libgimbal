@@ -15,6 +15,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_C_EXTENSIONS OFF)
 
+# Because fuck trying to build an Android APK via CMake without Qt
+if(ANDROID)
+    set(CMAKE_AUTOMOC ON)
+    find_package(Qt6 COMPONENTS Core Svg REQUIRED)
+endif()
+
 set(GIMBAL_TEST_SOURCES
     include/algorithms/gimbal_sort_test_suite.h
     source/algorithms/gimbal_sort_test_suite.c
@@ -94,6 +100,8 @@ set(GIMBAL_TEST_SOURCES
     source/utils/gimbal_version_test_suite.c
     include/utils/gimbal_option_group_test_suite.h
     source/utils/gimbal_option_group_test_suite.c
+    include/utils/gimbal_cmd_parser_test_suite.h
+    source/utils/gimbal_cmd_parser_test_suite.c
     source/gimbal_test_main.c
 )
 
@@ -103,13 +111,31 @@ if(GBL_ENABLE_CPP)
          source/gimbal_test_cpp.cpp)
 endif(GBL_ENABLE_CPP)
 
+if(ANDROID)
+    qt_add_executable(GimbalTests
+        MANUAL_FINALIZATION
+        ${GIMBAL_TEST_SOURCES}
+    )
+    #set_property(TARGET GimbalTests APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android)
+else()
+    add_executable(GimbalTests
+        ${GIMBAL_TEST_SOURCES}
+    )
+endif()
 
-add_executable(GimbalTests
-    ${GIMBAL_TEST_SOURCES}
-)
+set(GBL_TEST_LINK_LIBS
+    libGimbal)
+
+if(ANDROID)
+    list(APPEND
+         GBL_TEST_LINK_LIBS
+         Qt6::Core
+         Qt6::Svg)
+endif()
 
 target_link_libraries(GimbalTests
-    libGimbal)
+    PRIVATE
+    ${GBL_TEST_LINK_LIBS})
 
 if(VITA)
     add_compile_definitions(GimbalTests PUBLIC VITA=1)
@@ -135,4 +161,27 @@ set_target_properties(GimbalTests PROPERTIES
     XCODE_ATTRIBUTE_PRODUCT_NAME "GimbalTests"
     XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
 
+
 add_test(NAME GimbalTests COMMAND GimbalTests)
+
+if(ANDROID)
+    # Figure ou the platform & architecture code we need
+    set(ANDROID_PLATFORM_ARCHITECTURE_CODE "xxx")
+    if (${ANDROID_ABI} STREQUAL "armeabi-v7a")
+      set(ANDROID_PLATFORM_ARCHITECTURE_CODE "032")
+    elseif (${ANDROID_ABI} STREQUAL "arm64-v8a")
+      set(ANDROID_PLATFORM_ARCHITECTURE_CODE "064")
+    elseif (${ANDROID_ABI} STREQUAL "x86")
+      set(ANDROID_PLATFORM_ARCHITECTURE_CODE "132")
+    elseif (${ANDROID_ABI} STREQUAL "x86_64")
+      set(ANDROID_PLATFORM_ARCHITECTURE_CODE "164")
+    endif()
+
+    # Slap the above together with a version code (major and minor only)
+    set(ANDROID_VERSION_CODE "${ANDROID_PLATFORM_ARCHITECTURE_CODE}${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}")
+    set_property(TARGET GimbalTests APPEND PROPERTY QT_ANDROID_VERSION_CODE ${ANDROID_VERSION_CODE})
+    message(STATUS ${ANDROID_VERSION_CODE})
+
+    qt_android_generate_deployment_settings(GimbalTests)
+    qt_finalize_executable(GimbalTests)
+endif()

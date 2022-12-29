@@ -1,5 +1,5 @@
 /*! \file
- *  \brief Modular command-line option parser
+ *  \brief Grouping of parsable command-line options
  *  \ingroup utils
  */
 
@@ -71,6 +71,15 @@ GBL_CLASS_DERIVE(GblOptionGroup, GblObject)
     GBL_RESULT (*pFnTry)   (GBL_SELF, GblStringView key, GblStringView value, GblSize* pUsed);
 GBL_CLASS_END
 
+/*! \brief Grouping of command-line options
+ *  \ingroup utils
+ *  GblOptionGroup represents a collection of configurable
+ *  command-line options, which may be parsed directly or
+ *  added to a top-level GblCmdParser. Options are divided
+ *  into groups so that each module within an application
+ *  can manage its own options independently.
+ *  \sa GblCmdParser
+ */
 GBL_INSTANCE_DERIVE(GblOptionGroup, GblObject)
     GblOption*     pOptions;
     GblSize        optionCount;

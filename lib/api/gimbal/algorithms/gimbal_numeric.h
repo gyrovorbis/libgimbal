@@ -2,12 +2,20 @@
 #define GIMBAL_NUMERIC_H
 
 /*! \file
- *  \brief General numeric computations
+ *  \brief General numeric constants and computations
  *  \ingroup algorithms
  */
 
 #include "../core/gimbal_decls.h"
 #include "../preprocessor/gimbal_macro_utils.h"
+
+#ifndef M_PI
+#   define M_PI (3.14159265358979323846264338327950288)
+#endif
+
+#ifndef M_E
+#   define M_E (2.71828182845904523536)
+#endif
 
 GBL_DECLS_BEGIN
 

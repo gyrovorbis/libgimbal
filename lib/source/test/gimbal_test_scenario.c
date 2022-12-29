@@ -40,13 +40,13 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
 
     GBL_CTX_INFO("Runtime Statistics");
     GBL_CTX_PUSH();
-    GBL_CTX_INFO("%-20s: %20.3fms", "Total Time",               pSelf->totalTime);
-    GBL_CTX_INFO("%-20s: %20u",     "Max Allocations",          pSelf_->pAllocTracker->maxAllocations);
-    GBL_CTX_INFO("%-20s: %20u",     "Max Allocation Size",      pSelf_->pAllocTracker->maxAllocationSize);
-    GBL_CTX_INFO("%-20s: %20u",     "Max Allocated Bytes",      pSelf_->pAllocTracker->maxBytes);
-    GBL_CTX_INFO("%-20s: %20u",     "Remaining Allocs",         pSelf_->pAllocTracker->counters.allocsActive);
-    GBL_CTX_INFO("%-20s: %20u",     "Remaining Bytes",          pSelf_->pAllocTracker->counters.bytesActive);
-    GBL_CTX_INFO("%-20s: %20u",     "Seed",                     gblSeed(0));
+    GBL_CTX_INFO("%-20s: %20.3f", "Total Time (ms)",     pSelf->totalTime);
+    GBL_CTX_INFO("%-20s: %20u",   "Max Allocations",     pSelf_->pAllocTracker->maxAllocations);
+    GBL_CTX_INFO("%-20s: %20u",   "Max Allocation Size", pSelf_->pAllocTracker->maxAllocationSize);
+    GBL_CTX_INFO("%-20s: %20u",   "Max Allocated Bytes", pSelf_->pAllocTracker->maxBytes);
+    GBL_CTX_INFO("%-20s: %20u",   "Remaining Allocs",    pSelf_->pAllocTracker->counters.allocsActive);
+    GBL_CTX_INFO("%-20s: %20u",   "Remaining Bytes",     pSelf_->pAllocTracker->counters.bytesActive);
+    GBL_CTX_INFO("%-20s: %20u",   "Seed",                gblSeed(0));
     GBL_CTX_POP(1);
 
     GBL_CTX_INFO("Test Suite Totals");

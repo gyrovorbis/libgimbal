@@ -1,6 +1,7 @@
 #include <gimbal/utils/gimbal_option_group.h>
 #include <gimbal/meta/signals/gimbal_signal.h>
 #include <gimbal/meta/signals/gimbal_marshal.h>
+#include <math.h>
 
 GblType argToGblType_(GBL_ARG_TYPE type) {
     switch(type) {
@@ -95,7 +96,7 @@ GBL_EXPORT GBL_RESULT GblOptionGroup_parse(GblOptionGroup* pSelf,
                 {
                     // Don't consider a negative number an option
                     double testNum = GblStringView_toDouble(value);
-                    if(GBL_FLOAT_NAN(testNum) || testNum >= 0.0) {
+                    if(isnan(testNum) || testNum >= 0.0) {
                         value = GblStringView_fromEmpty();
                         noValue = GBL_TRUE;
                     }
@@ -290,7 +291,7 @@ static GBL_RESULT GblOptionGroup_Box_destructor_(GblBox* pBox) {
     GblStringRef_release(pGroup->pSummary);
     GblStringList_destroy(pGroup->pParsedArgs);
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblBox, pFnDestructor, pBox);
+    GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 
     GBL_CTX_END();
 }
