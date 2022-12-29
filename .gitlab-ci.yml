@@ -199,7 +199,7 @@ analyze clang-tidy:
   stage: analyze
   when: manual
   extends: .clang_tidy_common
-  needs: ["build ubuntu20-clang11"]
+  needs: ["build ubuntu22-clang14"]
   dependencies:
     - build ubuntu22-clang14
   tags:
