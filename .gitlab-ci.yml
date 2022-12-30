@@ -309,18 +309,16 @@ test android-sim:
     - exec 2> >(tee -a "build/results.txt" >&2)
     - export ANDROID_AVD_HOME=/home/falco/.android/avd
     - cd /home/falco/Android/Sdk/emulator
-    - adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done || true
-    - sleep 30
-    - ./emulator -no-window -avd GalaxyNexus_x86_64 & 
+ #   - adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done || true
+ #   - sleep 30
+    - ./emulator -no-window -avd GalaxyNexus_x86_64 & || true
     - adb wait-for-device
-    - adb install build/test/GimbalTests.apk
+    - adb install build/test/android-build/build/outputs/apk/release/GimbalTests.apk
     - adb logcat &
     - adb shell am start -n org.chaosrift.GimbalTests/org.qtproject.qt.android.bindings.QtActivity
     - cp build/results.txt build/results2.txt
     - adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
     - grep "********************* [   PASS   ] *********************" build/results2.txt
-
-    
 
 test ubuntu22-gcc12:
   extends: .test_common
