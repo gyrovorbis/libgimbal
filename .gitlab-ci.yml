@@ -309,11 +309,14 @@ test android-sim:
     - exec 2> >(tee -a "build/results.txt" >&2)
     - export ANDROID_AVD_HOME=/home/falco/.android/avd
     - cd /home/falco/Android/Sdk/emulator
-    - ./emulator -avd GalaxyNexus_x86_64
+    - adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+    - ./emulator -no-window -avd GalaxyNexus_x86_64 & 
+    - adb wait-for-device
     - adb install build/test/GimbalTests.apk
     - adb logcat &
     - adb shell am start -n org.chaosrift.GimbalTests/org.qtproject.qt.android.bindings.QtActivity
     - cp build/results.txt build/results2.txt
+    - adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
     - grep "********************* [   PASS   ] *********************" build/results2.txt
 
     
