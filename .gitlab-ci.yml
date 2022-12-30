@@ -311,7 +311,7 @@ test android-sim:
     - cd /home/falco/Android/Sdk/emulator
  #   - adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done || true
  #   - sleep 30
-    - ./emulator -no-window -avd GalaxyNexus_x86_64 & || true
+    - ./emulator -no-window -avd GalaxyNexus_x86_64 || true & 
     - adb wait-for-device
     - adb install build/test/android-build/build/outputs/apk/release/GimbalTests.apk
     - adb logcat &
