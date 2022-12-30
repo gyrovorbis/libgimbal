@@ -274,7 +274,7 @@ test dreamcast-emu:
     - dreamcast
   script:
     - exec > >(tee -a "build/results.txt" )
-    - exec 2> >(tee -a "build/results.tx" >&2)
+    - exec 2> >(tee -a "build/results.txt" >&2)
     - lxdream-nitro -H -d -e build/test/GimbalTests.elf
     - cp build/results.txt build/results2.txt
     - grep "********************* [   PASS   ] *********************" build/results2.txt
@@ -288,7 +288,7 @@ test dreamcast-physical:
     - dreamcast
   script:
     - exec > >(tee -a "build/results.txt" )
-    - exec 2> >(tee -a "build/results.tx" >&2)
+    - exec 2> >(tee -a "build/results.txt" >&2)
     - hs100.sh -i 10.0.0.14 off
     - hs100.sh -i 10.0.0.14 on 
     - sleep 30
@@ -296,6 +296,26 @@ test dreamcast-physical:
     - hs100.sh -i 10.0.0.14 off
     - cp build/results.txt build/results2.txt
     - grep "********************* [   PASS   ] *********************" build/results2.txt
+
+test android-sim:
+  stage: test 
+  needs: ["build android-sim"]
+  dependencies:
+    - build android-sim 
+  tags:
+    - android, ndk
+  script:
+    - exec > >(tee -a "build/results.txt" )
+    - exec 2> >(tee -a "build/results.txt" >&2)
+    - cd /home/falco/Android/Sdk/emulator
+    - ./emulator -avd GalaxyNexus_x86_64
+    - adb install build/test/GimbalTests.apk
+    - adb logcat &
+    - adb shell am start -n org.chaosrift.GimbalTests/org.qtproject.qt.android.bindings.QtActivity
+    - cp build/results.txt build/results2.txt
+    - grep "********************* [   PASS   ] *********************" build/results2.txt
+
+    
 
 test ubuntu22-gcc12:
   extends: .test_common
