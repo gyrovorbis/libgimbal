@@ -309,7 +309,7 @@ test android-sim:
     - exec 2> >(tee -a "build/results.txt" >&2)
     - export ANDROID_AVD_HOME=/home/falco/.android/avd
     - cd /home/falco/Android/Sdk/emulator
-    - adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+    - adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done || true
     - ./emulator -no-window -avd GalaxyNexus_x86_64 & 
     - adb wait-for-device
     - adb install build/test/GimbalTests.apk
