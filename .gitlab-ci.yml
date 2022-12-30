@@ -313,7 +313,7 @@ test android-sim:
  #   - sleep 30
     - ./emulator -no-window -avd GalaxyNexus_x86_64 || true & 
     - adb wait-for-device
-    - adb install build/test/android-build/build/outputs/apk/release/GimbalTests.apk
+    - adb install build/test/GimbalTests
     - adb logcat &
     - adb shell am start -n org.chaosrift.GimbalTests/org.qtproject.qt.android.bindings.QtActivity
     - cp build/results.txt build/results2.txt
