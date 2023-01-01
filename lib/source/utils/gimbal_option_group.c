@@ -3,21 +3,21 @@
 #include <gimbal/meta/signals/gimbal_marshal.h>
 #include <math.h>
 
-GblType argToGblType_(GBL_ARG_TYPE type) {
+GblType argToGblType_(GBL_OPTION_TYPE type) {
     switch(type) {
     default:
-    case GBL_ARG_TYPE_STRING:  return GBL_STRING_TYPE;
-    case GBL_ARG_TYPE_BOOL:    return GBL_BOOL_TYPE;
-    case GBL_ARG_TYPE_UINT8:   return GBL_UINT8_TYPE;
-    case GBL_ARG_TYPE_CHAR:    return GBL_CHAR_TYPE;
-    case GBL_ARG_TYPE_UINT16:  return GBL_UINT16_TYPE;
-    case GBL_ARG_TYPE_INT16:   return GBL_INT16_TYPE;
-    case GBL_ARG_TYPE_UINT32:  return GBL_UINT32_TYPE;
-    case GBL_ARG_TYPE_INT32:   return GBL_INT32_TYPE;
-    case GBL_ARG_TYPE_UINT64:  return GBL_UINT64_TYPE;
-    case GBL_ARG_TYPE_INT64:   return GBL_INT64_TYPE;
-    case GBL_ARG_TYPE_FLOAT:   return GBL_FLOAT_TYPE;
-    case GBL_ARG_TYPE_DOUBLE:  return GBL_DOUBLE_TYPE;
+    case GBL_OPTION_TYPE_STRING:  return GBL_STRING_TYPE;
+    case GBL_OPTION_TYPE_BOOL:    return GBL_BOOL_TYPE;
+    case GBL_OPTION_TYPE_UINT8:   return GBL_UINT8_TYPE;
+    case GBL_OPTION_TYPE_CHAR:    return GBL_CHAR_TYPE;
+    case GBL_OPTION_TYPE_UINT16:  return GBL_UINT16_TYPE;
+    case GBL_OPTION_TYPE_INT16:   return GBL_INT16_TYPE;
+    case GBL_OPTION_TYPE_UINT32:  return GBL_UINT32_TYPE;
+    case GBL_OPTION_TYPE_INT32:   return GBL_INT32_TYPE;
+    case GBL_OPTION_TYPE_UINT64:  return GBL_UINT64_TYPE;
+    case GBL_OPTION_TYPE_INT64:   return GBL_INT64_TYPE;
+    case GBL_OPTION_TYPE_FLOAT:   return GBL_FLOAT_TYPE;
+    case GBL_OPTION_TYPE_DOUBLE:  return GBL_DOUBLE_TYPE;
     }
 }
 
@@ -34,8 +34,9 @@ GBL_EXPORT GblRefCount GblOptionGroup_unref(GblOptionGroup* pSelf) {
     return GBL_BOX_UNREF(pSelf);
 }
 
-GBL_EXPORT GBL_RESULT GblOptionGroup_parse(GblOptionGroup* pSelf,
-                                           GblStringList* pList) {
+GBL_EXPORT GBL_RESULT (GblOptionGroup_parse)(GblOptionGroup* pSelf,
+                                             GblStringList*  pList,
+                                             GblBool         prefixOnly) {
     GBL_CTX_BEGIN(NULL);
 
     GblOptionGroupClass* pClass = GBL_OPTION_GROUP_GET_CLASS(pSelf);
@@ -60,8 +61,8 @@ GBL_EXPORT GBL_RESULT GblOptionGroup_parse(GblOptionGroup* pSelf,
         }
         key = GblStringView_removePrefix(key, begin);
 
-        // remove 'prefix-' characters
-        if(GblStringView_startsWith(key, GBL_STRV(pSelf->pPrefix))) {
+        // remove 'prefix-' characters (requires --prefix-option with two hyphens)
+        if(begin == 2 && GblStringView_startsWith(key, GBL_STRV(pSelf->pPrefix))) {
             if(key.pData[GblStringRef_length(pSelf->pPrefix)] == '-') {
                 key = GblStringView_removePrefix(key, GblStringRef_length(pSelf->pPrefix)+1);
                 // don't support short prefixed commands like "-prefix-h"
@@ -70,6 +71,10 @@ GBL_EXPORT GBL_RESULT GblOptionGroup_parse(GblOptionGroup* pSelf,
                     continue;
                 }
             }
+        // skip option if it lacked a prefix while prefixes are required
+        } else if(prefixOnly) {
+            pIt = pIt->ringNode.pNext;
+            continue;
         }
 
         GblBool noValue  = GBL_FALSE;
@@ -109,18 +114,24 @@ GBL_EXPORT GBL_RESULT GblOptionGroup_parse(GblOptionGroup* pSelf,
             }
         }
 
-        GblSize consumed = 0;
-        GBL_CTX_VERIFY_CALL(pClass->pFnTry(pSelf, key, value, &consumed));
-        if(noValue && consumed == 2) --consumed;
-        if(consumed) {
-            // Remove all consumed arguments from input list and store in our own list
-            while(consumed--) {
-                pNext = pIt->ringNode.pNext;
-                GblDoublyLinkedList_remove(&pIt->listNode);
-                GblDoublyLinkedList_pushBack(&pSelf->pParsedArgs->listNode, &pIt->listNode);
-                pIt = pNext;
-            }
-        } else pIt = pNext;
+        // Skip short options with long names (-o or --option not -option)
+        if(begin == 1 && key.length != 1) {
+            pIt = pNext;
+        } else {
+            GblSize consumed = 0;
+            GBL_CTX_VERIFY_CALL(pClass->pFnTry(pSelf, key, value, &consumed));
+            if(noValue && consumed == 2) --consumed;
+            if(consumed) {
+                // Remove all consumed arguments from input list and store in our own list
+                while(consumed--) {
+                    pNext = pIt->ringNode.pNext;
+                    GblDoublyLinkedList_remove(&pIt->listNode);
+                    --pList->size;
+                    GblDoublyLinkedList_pushBack(&pSelf->pParsedArgs->listNode, &pIt->listNode);
+                    pIt = pNext;
+                }
+            } else pIt = pNext;
+        }
     }
 
     // Emit signal for postprocessing hook
@@ -153,7 +164,7 @@ static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, 
         {
 
             // Ensure there's a value provided if the option requires one
-            GBL_CTX_VERIFY(!(!(pOption->type == GBL_ARG_TYPE_BOOL &&
+            GBL_CTX_VERIFY(!(!(pOption->type == GBL_OPTION_TYPE_BOOL &&
                                (pOption->flags & GBL_OPTION_FLAG_BOOL_NO_VALUE))
                              && GblStringView_empty(value)),
                            GBL_RESULT_ERROR_INVALID_ARG,
@@ -161,7 +172,7 @@ static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, 
                            GblStringView_toCString(key, staging, sizeof(staging)));
 
             // Handle booleans with no arguments
-            if(pOption->type == GBL_ARG_TYPE_BOOL && GblStringView_empty(value)) {
+            if(pOption->type == GBL_OPTION_TYPE_BOOL && GblStringView_empty(value)) {
                 *(GblBool*)pOption->pOutput.pData =
                         (pOption->flags & GBL_OPTION_FLAG_BOOL_INVERTED)?
                             GBL_FALSE : GBL_TRUE;
@@ -169,14 +180,14 @@ static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, 
                 GBL_CTX_DONE();
 
             // Handle callbacks
-            } else if(pOption->type == GBL_ARG_TYPE_CALLBACK) {
+            } else if(pOption->type == GBL_OPTION_TYPE_CALLBACK) {
                 GblBool consumed = GBL_FALSE;
                 *pConsumed = 1;
                 GBL_CTX_VERIFY_POINTER(pOption->pOutput.pFn);
                 GBL_CTX_VERIFY_CALL(pOption->pOutput.pFn(pSelf, pOption, value, &consumed));
                 if(consumed) ++(*pConsumed);
             // Handle strings separately so that we can control their ownership
-            } else if(pOption->type == GBL_ARG_TYPE_STRING) {
+            } else if(pOption->type == GBL_OPTION_TYPE_STRING) {
                 *pConsumed = 2;
                 *(const char**)pOption->pOutput.pData = value.pData;
             } else {
@@ -190,7 +201,7 @@ static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, 
                 GBL_CTX_VERIFY_CALL(GblVariant_convert(&v1, &v2));
                 GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v2, pOption->pOutput.pData));
                 // Have to flip an inverted bool
-                if(pOption->type == GBL_ARG_TYPE_BOOL && (pOption->flags & GBL_OPTION_FLAG_BOOL_INVERTED)) {
+                if(pOption->type == GBL_OPTION_TYPE_BOOL && (pOption->flags & GBL_OPTION_FLAG_BOOL_INVERTED)) {
                     *(GblBool*)pOption->pOutput.pData =
                             (*(GblBool*)pOption->pOutput.pData == GBL_TRUE)? GBL_FALSE : GBL_TRUE;
                 }

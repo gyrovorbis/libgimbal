@@ -185,7 +185,7 @@ GBL_EXPORT GBL_RESULT (GblRingList_destroy)(GblRingList*      pSelf,
 
 
 GBL_EXPORT GblSize GblRingList_size(const GblRingList* pSelf) {
-    return GblDoublyLinkedList_count(&pSelf->listNode);
+    return pSelf->size;
 }
 
 GBL_EXPORT GblBool GblRingList_empty(const GblRingList* pSelf) {
@@ -316,6 +316,7 @@ GBL_EXPORT GBL_RESULT GblRingList_insertSorted(GblRingList* pSelf, void* pData, 
 GBL_EXPORT GblBool (GblRingList_splice)(GblRingList* pSelf, GblRingList* pOther, int32_t index) {
     const GblBool result = GblDoublyLinkedList_join(&pSelf->listNode, index, &pOther->listNode);
     pSelf->size = GblDoublyLinkedList_count(&pSelf->listNode);
+    pOther->size = 0;
     return result;
 }
 

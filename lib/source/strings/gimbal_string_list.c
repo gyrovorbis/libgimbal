@@ -490,6 +490,7 @@ GBL_EXPORT GblSize (GblStringList_remove)(GblStringList* pSelf, const char* pStr
             GblStringRef_release(pNode->pData);
             GblRingList_delete_(pNode);
             pNode = pPrev;
+            --pSelf->size;
             ++count;
         }
     }
@@ -515,6 +516,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_deduplicate)(GblStringList* pSelf, GblBool 
                 GblStringRef_release(pNode2->pData);
                 GblRingList_delete_(pNode2);
                 pNode2 = pPrev;
+                --pSelf->size;
             }
         }
     }

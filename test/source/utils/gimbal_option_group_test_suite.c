@@ -77,17 +77,17 @@ pFixture->pGroup =
          "description", "Executing unit test suites.",
          "userdata",    pFixture,
          "options",     (GblOption[]) {
-             { "first",   '1', GBL_ARG_TYPE_STRING,   { &pFixture->pFirst }, "1st value", "value1", GBL_OPTION_FLAG_NONE   },
-             { "second",  '2', GBL_ARG_TYPE_UINT32,   { &pFixture->second }, "2nd value", "value2", GBL_OPTION_FLAG_NONE   },
-             { "third",   '3', GBL_ARG_TYPE_BOOL,     { &pFixture->third  }, "3rd value", "value3", GBL_OPTION_FLAG_NONE   },
-             { "fourth",  '4', GBL_ARG_TYPE_DOUBLE,   { &pFixture->fourth }, "4th value", "value4", GBL_OPTION_FLAG_NONE   },
-             { "fifth",   '5', GBL_ARG_TYPE_CHAR,     { &pFixture->fifth  }, "5th value", "value5", GBL_OPTION_FLAG_HIDDEN },
-             { "sixth",   '6', GBL_ARG_TYPE_INT16,    { &pFixture->sixth  }, "6th value", "value6", GBL_OPTION_FLAG_HIDDEN },
-             { "seventh", '7', GBL_ARG_TYPE_CALLBACK, { .pFn = parseArg7_ }, "7th value", "value7", GBL_OPTION_FLAG_NONE   },
-             { "eighth",  '8', GBL_ARG_TYPE_CALLBACK, { .pFn = parseArg8_ }, "8th value", "value8", GBL_OPTION_FLAG_NONE   },
-             { "ninth",   '9', GBL_ARG_TYPE_BOOL,     { &pFixture->ninth  }, "9th value", "value9", GBL_OPTION_FLAG_BOOL_NO_VALUE },
-             { "tenth",    0,  GBL_ARG_TYPE_BOOL,     { &pFixture->tenth  }, "10th value", "val10", GBL_OPTION_FLAG_BOOL_NO_VALUE|GBL_OPTION_FLAG_BOOL_INVERTED },
-             { NULL,      'a', GBL_ARG_TYPE_BOOL,     {&pFixture->eleventh}, "11th value", "val11", GBL_OPTION_FLAG_BOOL_INVERTED },
+             { "first",   '1', GBL_OPTION_TYPE_STRING,   { &pFixture->pFirst }, "1st value", "value1", GBL_OPTION_FLAG_NONE   },
+             { "second",  '2', GBL_OPTION_TYPE_UINT32,   { &pFixture->second }, "2nd value", "value2", GBL_OPTION_FLAG_NONE   },
+             { "third",   '3', GBL_OPTION_TYPE_BOOL,     { &pFixture->third  }, "3rd value", "value3", GBL_OPTION_FLAG_NONE   },
+             { "fourth",  '4', GBL_OPTION_TYPE_DOUBLE,   { &pFixture->fourth }, "4th value", "value4", GBL_OPTION_FLAG_NONE   },
+             { "fifth",   '5', GBL_OPTION_TYPE_CHAR,     { &pFixture->fifth  }, "5th value", "value5", GBL_OPTION_FLAG_HIDDEN },
+             { "sixth",   '6', GBL_OPTION_TYPE_INT16,    { &pFixture->sixth  }, "6th value", "value6", GBL_OPTION_FLAG_HIDDEN },
+             { "seventh", '7', GBL_OPTION_TYPE_CALLBACK, { .pFn = parseArg7_ }, "7th value", "value7", GBL_OPTION_FLAG_NONE   },
+             { "eighth",  '8', GBL_OPTION_TYPE_CALLBACK, { .pFn = parseArg8_ }, "8th value", "value8", GBL_OPTION_FLAG_NONE   },
+             { "ninth",   '9', GBL_OPTION_TYPE_BOOL,     { &pFixture->ninth  }, "9th value", "value9", GBL_OPTION_FLAG_BOOL_NO_VALUE },
+             { "tenth",    0,  GBL_OPTION_TYPE_BOOL,     { &pFixture->tenth  }, "10th value", "val10", GBL_OPTION_FLAG_BOOL_NO_VALUE|GBL_OPTION_FLAG_BOOL_INVERTED },
+             { NULL,      'a', GBL_OPTION_TYPE_BOOL,     {&pFixture->eleventh}, "11th value", "val11", GBL_OPTION_FLAG_BOOL_INVERTED },
              { 0 }
          },
          NULL));
@@ -432,7 +432,6 @@ GBL_TEST_CASE(parseErrorNotify) {
     GBL_TEST_EXPECT_ERROR();
 
     GblStringList* pList = GblStringList_create("lolol");
-
 
     GblBool notified = GBL_FALSE;
     GblCClosure* pClosure = GblCClosure_create(GBL_CALLBACK(parseErrorNotify_),

@@ -35,20 +35,20 @@ GBL_DECLARE_FLAGS(GBL_OPTION_FLAGS) {
     GBL_OPTION_FLAG_BOOL_NO_VALUE   = 0x4
 };
 
-GBL_DECLARE_ENUM(GBL_ARG_TYPE) {
-    GBL_ARG_TYPE_STRING,
-    GBL_ARG_TYPE_BOOL,
-    GBL_ARG_TYPE_UINT8,
-    GBL_ARG_TYPE_CHAR,
-    GBL_ARG_TYPE_UINT16,
-    GBL_ARG_TYPE_INT16,
-    GBL_ARG_TYPE_UINT32,
-    GBL_ARG_TYPE_INT32,
-    GBL_ARG_TYPE_UINT64,
-    GBL_ARG_TYPE_INT64,
-    GBL_ARG_TYPE_FLOAT,
-    GBL_ARG_TYPE_DOUBLE,
-    GBL_ARG_TYPE_CALLBACK
+GBL_DECLARE_ENUM(GBL_OPTION_TYPE) {
+    GBL_OPTION_TYPE_STRING,
+    GBL_OPTION_TYPE_BOOL,
+    GBL_OPTION_TYPE_UINT8,
+    GBL_OPTION_TYPE_CHAR,
+    GBL_OPTION_TYPE_UINT16,
+    GBL_OPTION_TYPE_INT16,
+    GBL_OPTION_TYPE_UINT32,
+    GBL_OPTION_TYPE_INT32,
+    GBL_OPTION_TYPE_UINT64,
+    GBL_OPTION_TYPE_INT64,
+    GBL_OPTION_TYPE_FLOAT,
+    GBL_OPTION_TYPE_DOUBLE,
+    GBL_OPTION_TYPE_CALLBACK
 };
 
 GBL_DECLARE_UNION(GblOptionPtr) {
@@ -57,13 +57,13 @@ GBL_DECLARE_UNION(GblOptionPtr) {
 };
 
 GBL_DECLARE_STRUCT(GblOption) {
-    const char*  pLongName;
-    char         shortName;
-    GBL_ARG_TYPE type;
-    GblOptionPtr pOutput;
-    const char*  pDescription;
-    const char*  pValueName;
-    GblFlags     flags;
+    const char*     pLongName;
+    char            shortName;
+    GBL_OPTION_TYPE type;
+    GblOptionPtr    pOutput;
+    const char*     pDescription;
+    const char*     pValueName;
+    GblFlags        flags;
 };
 
 GBL_CLASS_DERIVE(GblOptionGroup, GblObject)
@@ -101,21 +101,29 @@ GBL_PROPERTIES(GblOptionGroup,
 )
 
 GBL_SIGNALS(GblOptionGroup,
-    (parsePrePass,  (GBL_INSTANCE_TYPE, pRecv), (GBL_POINTER_TYPE, pStringList)),
-    (parsePostPass, (GBL_INSTANCE_TYPE, pRecv), (GBL_POINTER_TYPE, pStringList)),
-    (parseError,    (GBL_INSTANCE_TYPE, pRecv), (GBL_ENUM_TYPE,    errorCode))
+    (parsePrePass,  (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pStringList)),
+    (parsePostPass, (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pStringList)),
+    (parseError,    (GBL_INSTANCE_TYPE, pReceiver), (GBL_ENUM_TYPE,    errorCode))
 )
 
-GBL_EXPORT GblType         GblOptionGroup_type   (void)                      GBL_NOEXCEPT;
+GBL_EXPORT GblType         GblOptionGroup_type   (void)                         GBL_NOEXCEPT;
 
 GBL_EXPORT GblOptionGroup* GblOptionGroup_create (const char*      pName,
                                                   const char*      pPrefix,
-                                                  const GblOption* pOptions) GBL_NOEXCEPT;
+                                                  const GblOption* pOptions)    GBL_NOEXCEPT;
 
-GBL_EXPORT GblRefCount     GblOptionGroup_unref  (GBL_SELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount     GblOptionGroup_unref  (GBL_SELF)                     GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT      GblOptionGroup_parse  (GBL_SELF,
-                                                  GblStringList* pList)      GBL_NOEXCEPT;
+                                                  GblStringList* pList,
+                                                  GblBool prefixOnly/*=false*/) GBL_NOEXCEPT;
+
+#define GblOptionGroup_parse(...) \
+    GblOptionGroup_parseDefault_(__VA_ARGS__, GBL_FALSE)
+
+#define GblOptionGroup_parseDefault_(self, list, prefix, ...) \
+    (GblOptionGroup_parse)(self, list, prefix)
+
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

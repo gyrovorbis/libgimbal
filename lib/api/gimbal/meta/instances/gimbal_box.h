@@ -17,7 +17,7 @@
 #define GBL_BOX_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblBox))
 
 #define GBL_BOX_REF(instance)        (GblBox_ref(GBL_BOX(instance)))
-#define GBL_BOX_UNREF(instance)      (GblBox_unref(GBL_BOX(instance)))
+#define GBL_BOX_UNREF(instance)      (GblBox_unref(instance? GBL_BOX(instance) : GBL_NULL))
 
 #define GBL_SELF_TYPE GblBox
 

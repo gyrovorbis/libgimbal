@@ -1,6 +1,12 @@
 /*! \file
  *  \brief Modular command-line option parser
  *  \ingroup utils
+ *
+ *  \todo More descriptive errors, help and version options,
+ *        use virtual methods for customization points,
+ *        implement signals for events (probably),
+ *        process(..) top-level method for handling exiting
+ *        upon failure, version, or help.
  */
 
 #ifndef GIMBAL_CMD_PARSER_H
@@ -18,6 +24,11 @@
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblCmdParser);
+
+GBL_DECLARE_STRUCT(GblCmdArg) {
+    GblStringRef* pName;
+    GblStringRef* pDesc;
+};
 
 GBL_CLASS_DERIVE(GblCmdParser, GblObject)
     GBL_RESULT (*pFnParse)           (GBL_SELF, GblStringView cmd);
@@ -41,18 +52,22 @@ GBL_INSTANCE_DERIVE(GblCmdParser, GblObject)
     uint8_t       allowExtraArgs       : 1;
     uint8_t       allowUnknownOptions  : 1;
     uint8_t       firstArgAsExecutable : 1;
-    uint8_t       addVersionOption     : 1;
-    uint8_t       addHelpOption        : 1;
+    uint8_t       enableVersionOption  : 1;
+    uint8_t       enableHelpOption     : 1;
 GBL_INSTANCE_END
 
-#if 0
-GBL_PROPERTIES(GblCmdParser,
-    (errorText, GBL_GENERIC, (READ, WRITE), GBL_STRING_TYPE),
-    (status,    GBL_GENERIC, (READ, WRITE), GBL_ENUM_TYPE)
-)
-#endif
 
-#if 0
+GBL_PROPERTIES(GblCmdParser,
+    (allowExtraArgs,       GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
+    (allowUnknownOptions,  GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
+    (firstArgAsExecutable, GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
+    (enableVersionOption,  GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
+    (enableHelpOption,     GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
+    (mainOptionGroup,      GBL_GENERIC, (READ, WRITE), GBL_POINTER_TYPE),
+    (optionGroups,         GBL_GENERIC, (READ, WRITE), GBL_POINTER_TYPE),
+    (positionalArgs,       GBL_GENERIC, (READ, WRITE), GBL_POINTER_TYPE)
+)
+
 GBL_SIGNALS(GblCmdParser,
     (parsePrePass,        (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pInitialArgs)),
     (parsePostPass,       (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pRemainingArgs)),
@@ -60,42 +75,59 @@ GBL_SIGNALS(GblCmdParser,
     (parseUnknownOptions, (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pRemaininArgs)),
     (parseError,          (GBL_INSTANCE_TYPE, pReceiver), (GBL_ENUM_TYPE,    errorCode))
 )
-#endif
 
-GBL_EXPORT GblType     GblCmdParser_type                (void)                   GBL_NOEXCEPT;
+GBL_EXPORT GblType     GblCmdParser_type                (void)                      GBL_NOEXCEPT;
 
 GBL_EXPORT GblCmdParser*
-                       GblCmdParser_create              (void)                   GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount GblCmdParser_unref               (GBL_SELF)               GBL_NOEXCEPT;
+                       GblCmdParser_create              (void)                      GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount GblCmdParser_unref               (GBL_SELF)                  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblCmdParser_parse               (GBL_SELF,
-                                                         GblStringList* pArgs)   GBL_NOEXCEPT;
+                                                         GblStringList* pArgs)      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblCmdParser_addOptionGroup      (GBL_SELF,
-                                                         GblOptionGroup* pGroup) GBL_NOEXCEPT;
+                                                         GblOptionGroup* pGroup)    GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT  GblCmdParser_setOptionGroups     (GBL_SELF,
+                                                         GblOptionGroup** ppGroups) GBL_NOEXCEPT;
+GBL_EXPORT GblOptionGroup*
+                       GblCmdParser_optionGroupAt       (GBL_CSELF, GblSize idx)    GBL_NOEXCEPT;
+GBL_EXPORT GblOptionGroup*
+                       GblCmdParser_findOptionGroup     (GBL_CSELF,
+                                                         const char* pName)         GBL_NOEXCEPT;
+
+GBL_EXPORT GblSize     GblCmdParser_optionGroupCount    (GBL_CSELF)                 GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblCmdParser_setMainOptionGroup  (GBL_SELF,
-                                                         GblOptionGroup* pGroup) GBL_NOEXCEPT;
+                                                         GblOptionGroup* pGroup)    GBL_NOEXCEPT;
+GBL_EXPORT GblOptionGroup*
+                       GblCmdParser_mainOptionGroup     (GBL_CSELF)                 GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblCmdParser_addPositionalArg    (GBL_SELF,
                                                          const char* pName,
-                                                         const char* pDesc)      GBL_NOEXCEPT;
+                                                         const char* pDesc)         GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblCmdParser_clearPositionalArgs (GBL_SELF)               GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblCmdParser_setPositionalArgs    (GBL_SELF,
+                                                          const GblCmdArg* pArgs)   GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT  GblCmdParser_clearPositionalArgs (GBL_SELF)                  GBL_NOEXCEPT;
+GBL_EXPORT GblSize     GblCmdParser_positionalArgCount  (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT const GblCmdArg*
+                       GblCmdParser_positionalArgAt     (GBL_CSELF, GblSize index)  GBL_NOEXCEPT;
 
 GBL_EXPORT GblSize     GblCmdParser_positionalArgValueCount
-                                                        (GBL_CSELF)              GBL_NOEXCEPT;
+                                                        (GBL_CSELF)                 GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblCmdParser_positionalArgValue  (GBL_CSELF,
                                                          GblSize    index,
                                                          GblType    toType,
-                                                         void*      pData)       GBL_NOEXCEPT;
+                                                         void*      pData)          GBL_NOEXCEPT;
 GBL_EXPORT const GblStringList*
-                       GblCmdParser_positionalArgValues (GBL_CSELF)              GBL_NOEXCEPT;
+                       GblCmdParser_positionalArgValues (GBL_CSELF)                 GBL_NOEXCEPT;
 
 GBL_EXPORT const GblStringRef*
-                       GblCmdParser_executable          (GBL_CSELF)              GBL_NOEXCEPT;
+                       GblCmdParser_executable          (GBL_CSELF)                 GBL_NOEXCEPT;
 GBL_EXPORT const GblStringList*
-                       GblCmdParser_unknownOptions      (GBL_CSELF)              GBL_NOEXCEPT;
+                       GblCmdParser_unknownOptions      (GBL_CSELF)                 GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

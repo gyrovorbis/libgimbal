@@ -5,16 +5,13 @@
 
 #define GBL_CMD_PARSER_(self) ((GblCmdParser_*)GBL_INSTANCE_PRIVATE(self, GBL_CMD_PARSER_TYPE))
 
-GBL_DECLARE_STRUCT_PRIVATE(GblCmdArg) {
-    GblStringRef* pName;
-    GblStringRef* pDesc;
-};
-
 GBL_DECLARE_STRUCT_PRIVATE(GblCmdParser) {
+    // Configuration values
     GblArrayList    posArgs;
     GblArrayList    optionGroups;
     GblOptionGroup* pMainOptionGroup;
 
+    // Derived/Parsed Values
     GblStringRef*   pExecutable;
     GblStringList*  pArgValues;
     GblStringList*  pUnknownOptions;
@@ -25,6 +22,14 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     GBL_CTX_VERIFY_POINTER(pArgs);
 
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+
+    // 0. Destroy any existing cached/parsed values in case we've already made a pass
+    GblStringRef_release(pSelf->pErrorMsg);
+    pSelf->pErrorMsg = NULL;
+    GblStringRef_release(pSelf_->pExecutable);
+    pSelf_->pExecutable = NULL;
+    GblStringList_clear(pSelf_->pArgValues);
+    GblStringList_clear(pSelf_->pUnknownOptions);
 
     // 1. Conditionally parse "executable" as first argument
     if(pSelf->firstArgAsExecutable) {
@@ -44,7 +49,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     // 3. Parse additional option groups
     for(GblSize o = 0; o < GblArrayList_size(&pSelf_->optionGroups); ++o) {
         GblOptionGroup** ppGroup = GblArrayList_at(&pSelf_->optionGroups, o);
-        GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(*ppGroup, pArgs));
+        GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(*ppGroup, pArgs, GBL_TRUE));
     }
 
     // 4. Parse remaining arguments
@@ -66,31 +71,39 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
             } else if(GblStringView_startsWith(argView, GBL_STRV("-"))) {
                 // Add option key to unknown option list
                 GblDoublyLinkedList_remove(&pIt->listNode);
+                --pArgs->size;
                 GblDoublyLinkedList_pushBack(&pSelf_->pUnknownOptions->listNode, &pIt->listNode);
+                ++pSelf_->pUnknownOptions->size;
 
                 // Advance to the next node
                 pIt = pNext;
+
+#if 0           // Don't support unknown options having values
                 pNext = pIt->ringNode.pNext;
 
                 // Add option value to unknown option list without removing it (if one exists)
                 if(pIt == pArgs) break;
 
                 GblStringList_pushBackRefs(pSelf_->pUnknownOptions,
-                                           GblStringRef_acquire(pIt->pData));
-
+                                           pIt->pData);
+#endif
+                continue;
             }
         }
 
         // Move current positional argument from source to internal list
         GblDoublyLinkedList_remove(&pIt->listNode);
+        pArgs->size--;
         GblDoublyLinkedList_pushBack(&pSelf_->pArgValues->listNode, &pIt->listNode);
-
+        pSelf_->pArgValues->size++;
         pIt = pNext;
     }
 
     // 5. Verify positional arguments
-    const GblSize actualCount = GblStringList_size(pArgs);
-    const GblSize expectedCount = GblArrayList_size(&pSelf_->posArgs);
+    const GblSize actualCount = GblStringList_size(pSelf_->pArgValues) +
+                                    (pSelf_->pExecutable? 1 : 0);
+    const GblSize expectedCount = GblArrayList_size(&pSelf_->posArgs) +
+                                    (pSelf_->pExecutable? 1 : 0);
 
     GBL_CTX_VERIFY(actualCount == expectedCount ||
                    (pSelf->allowExtraArgs && actualCount > expectedCount),
@@ -102,7 +115,8 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     GBL_CTX_VERIFY(GblStringList_empty(pSelf_->pUnknownOptions) ||
                    pSelf->allowUnknownOptions,
                    GBL_RESULT_ERROR_INVALID_CMDLINE_ARG,
-                   "Unknown option provided: %s", pIt->pData);
+                   "Unknown option provided: %s",
+                   GblStringList_front(pSelf_->pUnknownOptions));
 
     // 7. Free source list, store result code + message, and return
     GBL_CTX_END_BLOCK();
@@ -133,6 +147,10 @@ GBL_EXPORT GBL_RESULT GblCmdParser_setMainOptionGroup(GblCmdParser* pSelf, GblOp
     GBL_CTX_END();
 }
 
+GBL_EXPORT GblOptionGroup* GblCmdParser_mainOptionGroup(const GblCmdParser* pSelf) {
+    return GBL_CMD_PARSER_(pSelf)->pMainOptionGroup;
+}
+
 GBL_EXPORT GBL_RESULT GblCmdParser_addOptionGroup(GblCmdParser* pSelf, GblOptionGroup* pGroup) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pGroup);
@@ -141,12 +159,58 @@ GBL_EXPORT GBL_RESULT GblCmdParser_addOptionGroup(GblCmdParser* pSelf, GblOption
     GBL_CTX_END();
 }
 
+GBL_EXPORT GBL_RESULT GblCmdParser_setOptionGroups(GblCmdParser* pSelf, GblOptionGroup** ppGroups) {
+    GBL_CTX_BEGIN(NULL);
+    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+
+    GBL_CTX_VERIFY_CALL(GblArrayList_clear(&pSelf_->optionGroups));
+
+    GblSize count = 0;
+    if(ppGroups) {
+        while(ppGroups[count])
+            ++count;
+        GBL_CTX_VERIFY_CALL(GblArrayList_append(&pSelf_->optionGroups, ppGroups, count));
+    }
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GblSize GblCmdParser_optionGroupCount(const GblCmdParser* pSelf) {
+    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+    return GblArrayList_size(&pSelf_->optionGroups);
+}
+
+GBL_EXPORT GblOptionGroup* GblCmdParser_optionGroupAt(const GblCmdParser* pSelf, GblSize index) {
+    GblOptionGroup* pGroup = NULL;
+    GBL_CTX_BEGIN(NULL);
+    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+    GBL_CTX_VERIFY(index < GblArrayList_size(&pSelf_->optionGroups), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    pGroup = *(GblOptionGroup**)GblArrayList_at(&pSelf_->optionGroups, index);
+    GBL_CTX_END_BLOCK();
+    return pGroup;
+}
+
+GBL_EXPORT GblOptionGroup* GblCmdParser_findOptionGroup(const GblCmdParser* pSelf, const char* pName) {
+    GblOptionGroup* pGroup = NULL;
+    GBL_CTX_BEGIN(NULL);
+    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+    const GblSize size = GblArrayList_size(&pSelf_->optionGroups);
+    for(GblSize g = 0; g < size; ++g) {
+        GblOptionGroup* pIt = *(GblOptionGroup**)GblArrayList_at(&pSelf_->optionGroups, g);
+        if(strcmp(GblObject_name(GBL_OBJECT(pIt)), pName) == 0) {
+            pGroup = pIt;
+            break;
+        }
+    }
+    GBL_CTX_END_BLOCK();
+    return pGroup;
+}
+
 GBL_EXPORT GBL_RESULT GblCmdParser_addPositionalArg(GblCmdParser* pSelf, const char* pName, const char* pDesc) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pName);
 
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
-    const GblCmdArg_ arg = {
+    const GblCmdArg arg = {
         GblStringRef_create(pName),
         pDesc? GblStringRef_create(pDesc) : NULL
     };
@@ -156,18 +220,49 @@ GBL_EXPORT GBL_RESULT GblCmdParser_addPositionalArg(GblCmdParser* pSelf, const c
     GBL_CTX_END();
 }
 
+GBL_EXPORT GBL_RESULT GblCmdParser_setPositionalArgs(GblCmdParser* pSelf, const GblCmdArg* pArgs) {
+    GBL_CTX_BEGIN(NULL);
+    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+
+    GBL_CTX_VERIFY_CALL(GblArrayList_clear(&pSelf_->posArgs));
+
+    if(pArgs) {
+        while(pArgs->pName) {
+            GBL_CTX_VERIFY_CALL(GblCmdParser_addPositionalArg(pSelf,
+                                                              pArgs->pName,
+                                                              pArgs->pDesc));
+            ++pArgs;
+        }
+    }
+    GBL_CTX_END();
+}
+
 GBL_EXPORT GBL_RESULT GblCmdParser_clearPositionalArgs(GblCmdParser* pSelf) {
     GBL_CTX_BEGIN(NULL);
 
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
     for(GblSize p = 0; p < GblArrayList_size(&pSelf_->posArgs); ++p) {
-        GblCmdArg_* pArg = GblArrayList_at(&pSelf_->posArgs, p);
+        GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, p);
         GblStringRef_release(pArg->pName);
         GblStringRef_release(pArg->pDesc);
     }
     GBL_CTX_VERIFY_CALL(GblArrayList_clear(&pSelf_->posArgs));
 
     GBL_CTX_END();
+}
+
+GBL_EXPORT GblSize GblCmdParser_positionalArgCount(const GblCmdParser* pSelf) {
+    return GblArrayList_size(&GBL_CMD_PARSER_(pSelf)->posArgs);
+}
+
+GBL_EXPORT const GblCmdArg* GblCmdParser_positionalArgAt(const GblCmdParser* pSelf, GblSize index) {
+    const GblCmdArg* pArg = NULL;
+    GBL_CTX_BEGIN(NULL);
+    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+    pArg = GblArrayList_at(&pSelf_->posArgs, index);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_CTX_END_BLOCK();
+    return pArg;
 }
 
 GBL_EXPORT GblSize GblCmdParser_positionalArgValueCount(const GblCmdParser* pSelf) {
@@ -179,7 +274,7 @@ GBL_EXPORT GblSize GblCmdParser_positionalArgValueCount(const GblCmdParser* pSel
     return count;
 }
 
-GBL_EXPORT GBL_RESULT GblCmdParser_positonalArgValue(const GblCmdParser* pSelf, GblSize index, GblType toType, void* pData) {
+GBL_EXPORT GBL_RESULT GblCmdParser_positionalArgValue(const GblCmdParser* pSelf, GblSize index, GblType toType, void* pData) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_ARG(index < GblCmdParser_positionalArgValueCount(pSelf));
     GBL_CTX_VERIFY_TYPE(toType, GBL_IVARIANT_TYPE);
@@ -219,11 +314,32 @@ GBL_EXPORT const GblStringList* GblCmdParser_unknownOptions(const GblCmdParser* 
 static GBL_RESULT GblCmdParser_Object_property_(const GblObject* pObject, const GblProperty* pProp, GblVariant* pValue) {
     GBL_CTX_BEGIN(NULL);
     GblCmdParser* pSelf = GBL_CMD_PARSER(pObject);
-    GBL_UNUSED(pSelf, pValue);
+    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+
     switch(pProp->id) {
-    //case GblOptionGroup_Property_Id_name:
-    //    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_acquire(GblObject_name(pObject))));
-    //    break;
+    case GblCmdParser_Property_Id_allowExtraArgs:
+        GblVariant_setValueCopy(pValue, pProp->valueType, (GblBool)pSelf->allowExtraArgs);
+        break;
+    case GblCmdParser_Property_Id_allowUnknownOptions:
+        GblVariant_setValueCopy(pValue, pProp->valueType, (GblBool)pSelf->allowUnknownOptions);
+        break;
+    case GblCmdParser_Property_Id_firstArgAsExecutable:
+        GblVariant_setValueCopy(pValue, pProp->valueType, (GblBool)pSelf->firstArgAsExecutable);
+        break;
+    case GblCmdParser_Property_Id_enableVersionOption:
+        GblVariant_setValueCopy(pValue, pProp->valueType, (GblBool)pSelf->enableVersionOption);
+        break;
+    case GblCmdParser_Property_Id_enableHelpOption:
+        GblVariant_setValueCopy(pValue, pProp->valueType, (GblBool)pSelf->enableHelpOption);
+        break;
+    case GblCmdParser_Property_Id_mainOptionGroup:
+        GblVariant_setValueCopy(pValue, pProp->valueType, pSelf_->pMainOptionGroup);
+        break;
+    case GblCmdParser_Property_Id_optionGroups:
+        GblVariant_setValueCopy(pValue, pProp->valueType, GblArrayList_data(&pSelf_->optionGroups));
+    case GblCmdParser_Property_Id_positionalArgs:
+        GblVariant_setValueCopy(pValue, pProp->valueType, GblArrayList_data(&pSelf_->posArgs));
+        break;
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY, "Reading unhandled property: %s", GblProperty_nameString(pProp));
     }
     GBL_CTX_END();
@@ -233,14 +349,55 @@ static GBL_RESULT GblCmdParser_Object_setProperty_(GblObject* pObject, const Gbl
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(pProp);
     GblCmdParser* pSelf = GBL_CMD_PARSER(pObject);
-    GBL_UNUSED(pSelf, pValue);
+    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+
     switch(pProp->id) {
-    //case GblOptionGroup_Property_Id_name: {
-    //    const char* pName = NULL;
-    //   GBL_CTX_VERIFY_CALL(GblVariant_getValueCopy(pValue, &pName));
-    //    GblObject_setName(pObject, pName);
-    //    break;
-    //}
+    case GblCmdParser_Property_Id_allowExtraArgs: {
+        GblBool value = GBL_FALSE;
+        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &value));
+        pSelf->allowExtraArgs = value;
+        break;
+    }
+    case GblCmdParser_Property_Id_allowUnknownOptions: {
+        GblBool value = GBL_FALSE;
+        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &value));
+        pSelf->allowUnknownOptions = value;
+        break;
+    }
+    case GblCmdParser_Property_Id_firstArgAsExecutable: {
+        GblBool value = GBL_FALSE;
+        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &value));
+        pSelf->firstArgAsExecutable = value;
+        break;
+    }
+    case GblCmdParser_Property_Id_enableVersionOption: {
+        GblBool value = GBL_FALSE;
+        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &value));
+        pSelf->enableVersionOption = value;
+        break;
+    }
+    case GblCmdParser_Property_Id_enableHelpOption: {
+        GblBool value = GBL_FALSE;
+        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &value));
+        pSelf->enableHelpOption = value;
+        break;
+    }
+    case GblCmdParser_Property_Id_mainOptionGroup:
+        if(pSelf_->pMainOptionGroup) GBL_BOX_UNREF(pSelf_->pMainOptionGroup);
+        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &pSelf_->pMainOptionGroup));
+        break;
+    case GblCmdParser_Property_Id_optionGroups: {
+        GblOptionGroup** ppGroups = NULL;
+        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &ppGroups));
+        GBL_CTX_VERIFY_CALL(GblCmdParser_setOptionGroups(pSelf, ppGroups));
+        break;
+    }
+    case GblCmdParser_Property_Id_positionalArgs: {
+        GblCmdArg* pArgs = NULL;
+        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &pArgs));
+        GBL_CTX_VERIFY_CALL(GblCmdParser_setPositionalArgs(pSelf, pArgs));
+        break;
+    }
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Writing unhandled property: %s",
                                 GblProperty_nameString(pProp));
@@ -257,7 +414,6 @@ static GBL_RESULT GblCmdParser_Box_destructor_(GblBox* pBox) {
     GblStringRef_release(pSelf->pErrorMsg);
 
     GblStringRef_release(pSelf_->pExecutable);
-
     GblStringList_destroy(pSelf_->pArgValues);
     GblStringList_destroy(pSelf_->pUnknownOptions);
 
@@ -279,10 +435,13 @@ static GBL_RESULT GblCmdParser_Box_destructor_(GblBox* pBox) {
 
 static GBL_RESULT GblCmdParser_init_(GblInstance* pInstance, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pInstance);
+    GblCmdParser* pSelf = GBL_CMD_PARSER(pInstance);
+    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+
+    pSelf->firstArgAsExecutable = GBL_TRUE;
 
     GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->optionGroups, sizeof(GblOptionGroup*)));
-    GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->posArgs, sizeof(GblCmdArg_)));
+    GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->posArgs, sizeof(GblCmdArg)));
 
     pSelf_->pArgValues      = GblStringList_createEmpty();
     pSelf_->pUnknownOptions = GblStringList_createEmpty();
@@ -293,6 +452,10 @@ static GBL_RESULT GblCmdParser_init_(GblInstance* pInstance, GblContext* pCtx) {
 static GBL_RESULT GblCmdParserClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GBL_UNUSED(pUd);
+
+    if(!GblType_classRefCount(GBL_CLASS_TYPEOF(pClass))) {
+        GBL_PROPERTIES_REGISTER(GblCmdParser);
+    }
 
     GBL_BOX_CLASS(pClass)   ->pFnDestructor  = GblCmdParser_Box_destructor_;
     GBL_OBJECT_CLASS(pClass)->pFnProperty    = GblCmdParser_Object_property_;
