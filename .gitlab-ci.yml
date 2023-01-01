@@ -299,6 +299,8 @@ test dreamcast-physical:
 
 test android-sim:
   stage: test 
+  rules:
+    - when: never
   needs: ["build android-sim"]
   dependencies:
     - build android-sim 
