@@ -109,6 +109,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
                                                                           "Values differed [exptected: %p, actual: %p]",     \
                                                                           actual, expected)
 
+#define GBL_TEST_CALL                                GBL_CTX_VERIFY_CALL
 
 #define GBL_TEST_SKIP(reason)                        GBL_CTX_VERIFY(GBL_FALSE,                                               \
                                                                     GBL_RESULT_SKIPPED,                                      \
