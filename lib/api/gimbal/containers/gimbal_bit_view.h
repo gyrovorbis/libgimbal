@@ -55,45 +55,45 @@ typedef struct GblBitView {
 } GblBitView;
 
 // ===== Public methods =====
-GBL_INLINE GBL_RESULT    GblBitView_init         (GBL_SELF,
-                                                  GblSize bits,
-                                                  void*   pStorage,
-                                                  GblSize offset)                                                    GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_init        (GBL_SELF,
+                                                 GblSize bits,
+                                                 void*   pStorage,
+                                                 GblSize offset)                                                    GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT    GblBitView_initSubView  (GBL_SELF, const GblBitView* pSource, GblSize index, GblSize count) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_initSubView (GBL_SELF, const GblBitView* pSource, GblSize index, GblSize count) GBL_NOEXCEPT;
 
-GBL_INLINE GblSize       GblBitView_bytes        (GBL_CSELF)                                                         GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblBitView_words        (GBL_CSELF)                                                         GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblBitView_wordAligned  (GBL_CSELF)                                                         GBL_NOEXCEPT;
+GBL_INLINE GblSize       GblBitView_bytes       (GBL_CSELF)                                                         GBL_NOEXCEPT;
+GBL_INLINE GblSize       GblBitView_words       (GBL_CSELF)                                                         GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_wordAligned (GBL_CSELF)                                                         GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT    GblBitView_toString     (GBL_CSELF, GblStringBuffer* pBuffer, GblSize index, GblSize count) GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblBitView_fromString   (GBL_SELF, const char* pString, GblSize index, GblSize count)       GBL_NOEXCEPT;
-GBL_INLINE unsigned long GblBitView_toULong      (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblBitView_fromULong    (GBL_SELF, unsigned long value, GblSize index, GblSize count)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblBitView_toString    (GBL_CSELF, GblStringBuffer* pBuffer, GblSize index, GblSize count) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_fromString  (GBL_SELF, const char* pString, GblSize index, GblSize count)       GBL_NOEXCEPT;
+GBL_INLINE unsigned long GblBitView_toULong     (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_fromULong   (GBL_SELF, unsigned long value, GblSize index, GblSize count)       GBL_NOEXCEPT;
 
-GBL_INLINE GblBool       GblBitView_at           (GBL_CSELF, GblSize index)                                          GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblBitView_count        (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblBitView_any          (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblBitView_all          (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblBitView_none         (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_at          (GBL_CSELF, GblSize index)                                          GBL_NOEXCEPT;
+GBL_INLINE GblSize       GblBitView_count       (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_any         (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_all         (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_none        (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT    GblBitView_assign       (GBL_SELF, GblBool value, GblSize index, GblSize count)             GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblBitView_set          (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblBitView_reset        (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblBitView_flip         (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblBitView_rotate       (GBL_SELF, ptrdiff_t n, GblSize offset, GblSize count)              GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_assign      (GBL_SELF, GblBool value, GblSize index, GblSize count)             GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_set         (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_reset       (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_flip        (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_rotate      (GBL_SELF, ptrdiff_t n, GblSize offset, GblSize count)              GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT    GblBitView_shiftL       (GBL_SELF, const GblBitView* pSrc, GblSize amount)                  GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblBitView_shiftR       (GBL_SELF, const GblBitView* pSrc, GblSize amount)                  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_shiftL      (GBL_SELF, const GblBitView* pSrc, GblSize amount)                  GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblBitView_shiftR      (GBL_SELF, const GblBitView* pSrc, GblSize amount)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT    GblBitView_and          (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT    GblBitView_or           (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT    GblBitView_xor          (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT    GblBitView_andNot       (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblBitView_and         (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblBitView_or          (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblBitView_xor         (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblBitView_andNot      (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
 
-GBL_INLINE GblBool       GblBitView_eq           (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblBitView_lt           (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblBitView_leq          (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_eq          (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_lt          (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblBitView_leq         (GBL_CSELF, const GblBitView* pOther)                               GBL_NOEXCEPT;
 
 // ===== Macro overrides =====
 #define GblBitView_init(...)                     GblBitView_initDefalt_(__VA_ARGS__)

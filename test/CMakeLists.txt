@@ -102,6 +102,8 @@ set(GIMBAL_TEST_SOURCES
     source/utils/gimbal_option_group_test_suite.c
     include/utils/gimbal_cmd_parser_test_suite.h
     source/utils/gimbal_cmd_parser_test_suite.c
+    include/utils/gimbal_date_time_test_suite.h
+    source/utils/gimbal_date_time_test_suite.c
     source/gimbal_test_main.c
 )
 

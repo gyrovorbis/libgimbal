@@ -12,5 +12,6 @@
 #include "utils/gimbal_version.h"
 #include "utils/gimbal_option_group.h"
 #include "utils/gimbal_cmd_parser.h"
+#include "utils/gimbal_date_time.h"
 
 #endif // GIMBAL_UTILS_H

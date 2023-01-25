@@ -119,6 +119,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_thread.h
     api/gimbal/core/gimbal_atomics.h
     api/gimbal/core/gimbal_app.h
+    api/gimbal/core/gimbal_main_loop.h
+    api/gimbal/core/gimbal_task.h
     api/gimbal/meta/classes/gimbal_class.h
     api/gimbal/meta/classes/gimbal_opaque.h
     api/gimbal/meta/classes/gimbal_enum.h
@@ -171,6 +173,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/utils/gimbal_ref.h
     api/gimbal/utils/gimbal_version.h
     api/gimbal/utils/gimbal_option_group.h
+    api/gimbal/utils/gimbal_date_time.h
 )
 
 
@@ -237,6 +240,7 @@ set(GIMBAL_SOURCES
     source/utils/gimbal_version.c
     source/utils/gimbal_ref.c
     source/utils/gimbal_option_group.c
+    source/utils/gimbal_date_time.c
  )
 
 add_library(libGimbal STATIC

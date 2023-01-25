@@ -16,6 +16,8 @@
 
 GBL_DECLS_BEGIN
 
+GBL_FORWARD_DECLARE_STRUCT(GblMainLoop);
+
 GBL_CLASS_DERIVE(GblApp, GblObject)
     GBL_RESULT (*pFnNotify)(GblObject* pReceiver, GblEvent* pEvent);
 GBL_CLASS_END
@@ -23,6 +25,7 @@ GBL_CLASS_END
 GBL_INSTANCE_DERIVE(GblApp, GblObject)
     const char** ppArgv;
     GblSize      argc;
+    GblMainLoop* pLoop;
 GBL_INSTANCE_END
 
 GBL_PROPERTIES(GblApp,

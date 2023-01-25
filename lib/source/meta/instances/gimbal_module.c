@@ -2,17 +2,72 @@
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/meta/classes/gimbal_primitives.h>
 
+#define GBL_MODULE_REGISTRY_DEFAULT_CAPACITY_   5
+
 #define PROPERTY_IDX_(id)   (id - GBL_CONTEXT_PROPERTY_ID_COUNT)
 
 typedef struct GblModule_ {
     GblHashSet  typeRegistry;
 } GblModule_;
 
-static GblQuark versionQuark_    = GBL_QUARK_INVALID;
-static GblQuark authorQuark_     = GBL_QUARK_INVALID;
-static GblQuark descQuark_       = GBL_QUARK_INVALID;
-static GblQuark prefixQuark_     = GBL_QUARK_INVALID;
-static GblQuark typeCountQuark_  = GBL_QUARK_INVALID;
+static GblQuark   versionQuark_    = GBL_QUARK_INVALID;
+static GblQuark   authorQuark_     = GBL_QUARK_INVALID;
+static GblQuark   descQuark_       = GBL_QUARK_INVALID;
+static GblQuark   prefixQuark_     = GBL_QUARK_INVALID;
+static GblQuark   typeCountQuark_  = GBL_QUARK_INVALID;
+
+static GblHashSet registry_;
+static GblBool    initialized_ = GBL_FALSE;
+
+static GblHash GblModule_hash_(const GblHashSet* pSelf, const void* pData) {
+    GBL_UNUSED(pSelf);
+    const GblStringRef* pName = GblObject_name(*(GblObject**)pData);
+    return gblHashFnv1(pName, GblStringRef_length(pName));
+}
+
+static GblBool GblModule_cmp_(const GblHashSet* pSelf, const void* pLhs, const void* pRhs) {
+    GBL_UNUSED(pSelf);
+    const GblStringRef* pName1 = GblObject_name(*(GblObject**)pLhs);
+    const GblStringRef* pName2 = GblObject_name(*(GblObject**)pRhs);
+    GBL_ASSERT(pName1 && pName2);
+    return strcmp(pName1, pName2) == 0;
+}
+
+
+static GBL_RESULT GblModule_initialize_(void) {
+    GBL_CTX_BEGIN(NULL);
+    if(initialized_) GBL_CTX_DONE();
+
+    GBL_CTX_VERIFY_CALL(GblHashSet_construct(&registry_,
+                                             sizeof(GblModule*),
+                                             GblModule_hash_,
+                                             GblModule_cmp_,
+                                             GBL_NULL,
+                                             GBL_MODULE_REGISTRY_DEFAULT_CAPACITY_));
+
+    initialized_ = GBL_TRUE;
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblModule_finalize_(void) {
+    GBL_CTX_BEGIN(NULL);
+    if(!initialized_) GBL_CTX_DONE();
+
+    //uninitialized all of them
+
+    GBL_CTX_VERIFY_CALL(GblHashSet_destruct(&registry_));
+
+    initialized_ = GBL_FALSE;
+
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblModule_load(GblModule* pSelf) {
+
+
+}
+
+
 
 GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
     GBL_CTX_BEGIN(pPlugin);

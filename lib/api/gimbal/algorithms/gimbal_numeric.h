@@ -8,6 +8,8 @@
 
 #include "../core/gimbal_decls.h"
 #include "../preprocessor/gimbal_macro_utils.h"
+#include <float.h>
+#include <math.h>
 
 #ifndef M_PI
 #   define M_PI (3.14159265358979323846264338327950288)
@@ -25,29 +27,33 @@ GBL_DECLS_BEGIN
 
 #define           gblPow2Next(X)             GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS_, X)(X)
 GBL_INLINE GBL_CONSTEXPR
-    int           gblFibonacci               (int n)                       GBL_NOEXCEPT;
+    int           gblFibonacci               (int n)                        GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
-    int           gblGcd                     (int u, int v)                GBL_NOEXCEPT;
+    int           gblGcd                     (int u, int v)                 GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
-    int           gblLcm                     (int u, int v)                GBL_NOEXCEPT;
+    int           gblLcm                     (int u, int v)                 GBL_NOEXCEPT;
 GBL_INLINE
-    uint32_t      gblNtohl                   (uint32_t n)                  GBL_NOEXCEPT;
+    uint32_t      gblNtohl                   (uint32_t n)                   GBL_NOEXCEPT;
 GBL_INLINE
-    uint32_t      gblHtonl                   (uint32_t x)                  GBL_NOEXCEPT;
+    uint32_t      gblHtonl                   (uint32_t x)                   GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
-    int           gblParity                  (uint8_t n)                   GBL_NOEXCEPT;
+    int           gblParity                  (uint8_t n)                    GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
-    GblSize       gblAlignedAllocSizeDefault (GblSize bytes)               GBL_NOEXCEPT;
+    GblSize       gblAlignedAllocSizeDefault (GblSize bytes)                GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
-    GblSize       gblAlignedAllocSize        (GblSize size, GblSize align) GBL_NOEXCEPT;
+    GblSize       gblAlignedAllocSize        (GblSize size, GblSize align)  GBL_NOEXCEPT;
 GBL_EXPORT
-    uint32_t      gblPrimeNextDouble         (uint32_t number)             GBL_NOEXCEPT;
+    uint32_t      gblPrimeNextDouble         (uint32_t number)              GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
-    GblBool       gblPrimeCheck              (int n)                       GBL_NOEXCEPT;
+    GblBool       gblPrimeCheck              (int n)                        GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
-    unsigned long gblBinomialCoeff           (unsigned n, unsigned k)      GBL_NOEXCEPT;
+    unsigned long gblBinomialCoeff           (unsigned n, unsigned k)       GBL_NOEXCEPT;
 GBL_INLINE
-    unsigned long gblCatalan                 (unsigned n)                  GBL_NOEXCEPT;
+    unsigned long gblCatalan                 (unsigned n)                   GBL_NOEXCEPT;
+GBL_INLINE
+    GblBool       gblFloatEquals             (double a,
+                                              double b,
+                                              double e/*=DBL_EPSILON*/)     GBL_NOEXCEPT;
 
 /// @}
 
@@ -211,6 +217,26 @@ GBL_INLINE uint32_t gblHtonl(uint32_t x) GBL_NOEXCEPT {
 #endif
 }
 
+GBL_INLINE GblBool gblFloatEquals(double a, double b, double e) GBL_NOEXCEPT {
+    GBL_ASSERT(e >= DBL_EPSILON, "Epsilon value is smaller than system supports.");
+    GBL_ASSERT(e < 1.0f, "Epsilon must be fractional value.");
+
+    const double diff = fabs(a - b);
+
+    if(a == b)
+        return GBL_TRUE;
+    else if(a == 0 || b == 0 || diff < DBL_MIN)
+        return (diff < (e * DBL_MIN));
+    else
+        return (diff / (fabs(a) + fabs(b)) < e);
+}
+
+///\cond
+#define gblFloatEquals(...) \
+    gblFloatEqualsDefault_(__VA_ARGS__, DBL_EPSILON)
+#define gblFloatEqualsDefault_(a, b, e, ...) \
+    (gblFloatEquals)(a, b, e)
+///\endcond
 
 GBL_DECLS_END
 

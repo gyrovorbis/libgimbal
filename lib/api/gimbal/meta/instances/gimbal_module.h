@@ -19,6 +19,7 @@
 
 GBL_DECLS_BEGIN
 
+GBL_FORWARD_DECLARE_STRUCT(GblOptionGroup);
 GBL_FORWARD_DECLARE_STRUCT(GblModule);
 
 GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
@@ -31,6 +32,7 @@ GBL_INSTANCE_DERIVE(GblModule, GblContext)
     GblStringRef    prefix;
     GblStringRef    author;
     GblStringRef    description;
+    GblOptionGroup* pOptionGroup;
     GblType         resultType;
 GBL_INSTANCE_END
 
@@ -50,7 +52,17 @@ GblModule*  GblModule_ref           (GblQuark name)                 GBL_NOEXCEPT
 GblModule*  GblModule_weakRef       (GblQuark name)                 GBL_NOEXCEPT;
 GBL_RESULT  GblModule_unref         (GBL_SELF)                      GBL_NOEXCEPT;
 
+GblModule*  GblModule_next          (GblModule* pPrevious)          GBL_NOEXCEPT;
+GblSize     GblModule_count         (void)                          GBL_NOEXCEPT;
+
 // ===== Instance API =====
+
+GBL_RESULT  GblModule_load          (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_RESULT  GblModule_unload        (GBL_SELF)                      GBL_NOEXCEPT;
+
+
+
+
 GblModule*  GblModule_create        (GblType     derivedType,
                                      const char* pName,
                                      GblVersion  version,

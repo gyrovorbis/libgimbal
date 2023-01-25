@@ -48,14 +48,15 @@ GBL_DECLS_BEGIN
             (GBL_RESULT_ERROR_INVALID_INSTANCE,         GBL_RESULT_ERROR | 17,  ErrorInvalidInstance,       "Invalid Instance"),                        \
             (GBL_RESULT_ERROR_INVALID_CLASS,            GBL_RESULT_ERROR | 18,  ErrorInvalidClass,          "Invalid Class"),                           \
             (GBL_RESULT_ERROR_INVALID_TYPE,             GBL_RESULT_ERROR | 19,  ErrorInvalidType,           "Invalid Type"),                            \
-            (GBL_RESULT_ERROR_MEM_ALLOC,                GBL_RESULT_ERROR | 20,  ErrorMemAlloc,              "Memory Allocation Failed"),                \
-            (GBL_RESULT_ERROR_MEM_REALLOC,              GBL_RESULT_ERROR | 21,  ErrorMemRealloc,            "Memory Reallocation Failed"),              \
-            (GBL_RESULT_ERROR_MEM_FREE,                 GBL_RESULT_ERROR | 22,  ErrorMemFree,               "Memory Free Failed"),                      \
-            (GBL_RESULT_ERROR_FILE_OPEN,                GBL_RESULT_ERROR | 23,  ErrorFileOpen,              "Failed to Open File Descriptor"),          \
-            (GBL_RESULT_ERROR_FILE_CLOSE,               GBL_RESULT_ERROR | 24,  ErrorFileClose,             "Failed to Close File Descriptor"),         \
-            (GBL_RESULT_ERROR_FILE_READ,                GBL_RESULT_ERROR | 25,  ErrorFileRead,              "Failed to Read from File Descriptor"),     \
-            (GBL_RESULT_ERROR_FILE_WRITE,               GBL_RESULT_ERROR | 26,  ErrorFileWrite,             "Failed to Write to File Descriptor"),      \
-            (GBL_RESULT_COUNT,                          GBL_RESULT_ERROR | 27,  Count,                      "# of Different Error Codes")               \
+            (GBL_RESULT_ERROR_INVALID_DATE_TIME,        GBL_RESULT_ERROR | 20,  ErrorInvalidDateTime,       "Invalid Date/Time"),                       \
+            (GBL_RESULT_ERROR_MEM_ALLOC,                GBL_RESULT_ERROR | 21,  ErrorMemAlloc,              "Memory Allocation Failed"),                \
+            (GBL_RESULT_ERROR_MEM_REALLOC,              GBL_RESULT_ERROR | 22,  ErrorMemRealloc,            "Memory Reallocation Failed"),              \
+            (GBL_RESULT_ERROR_MEM_FREE,                 GBL_RESULT_ERROR | 23,  ErrorMemFree,               "Memory Free Failed"),                      \
+            (GBL_RESULT_ERROR_FILE_OPEN,                GBL_RESULT_ERROR | 24,  ErrorFileOpen,              "Failed to Open File Descriptor"),          \
+            (GBL_RESULT_ERROR_FILE_CLOSE,               GBL_RESULT_ERROR | 25,  ErrorFileClose,             "Failed to Close File Descriptor"),         \
+            (GBL_RESULT_ERROR_FILE_READ,                GBL_RESULT_ERROR | 26,  ErrorFileRead,              "Failed to Read from File Descriptor"),     \
+            (GBL_RESULT_ERROR_FILE_WRITE,               GBL_RESULT_ERROR | 27,  ErrorFileWrite,             "Failed to Write to File Descriptor"),      \
+            (GBL_RESULT_COUNT,                          GBL_RESULT_ERROR | 28,  Count,                      "# of Different Error Codes")               \
         )                                                                                                                                               \
     )
 

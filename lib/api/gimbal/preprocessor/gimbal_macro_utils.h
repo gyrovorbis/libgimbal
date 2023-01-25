@@ -25,8 +25,8 @@
 extern "C" {
 #endif
 
-#define GBL_MIN(a,b)                        (((a) < (b))? (a) : (b))
-#define GBL_MAX(a,b)                        (((a) > (b))? (a) : (b))
+#define GBL_MIN(a, b)                       (((a) < (b))? (a) : (b))
+#define GBL_MAX(a, b)                       (((a) > (b))? (a) : (b))
 #define GBL_CEIL(numerator, denominator)    ((numerator / denominator + (numerator % denominator != 0)))
 #define GBL_CLAMP(n, min, max)              (((n) > (max)) ? (max) : (((n) < (min)) ? (min) : (n)))
 

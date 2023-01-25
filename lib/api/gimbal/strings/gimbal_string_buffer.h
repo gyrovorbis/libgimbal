@@ -95,6 +95,7 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_release         (GBL_SELF, char** pp
 GBL_INLINE char*            GblStringBuffer_stackBuffer     (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblStringBuffer_empty           (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblStringBuffer_stack           (GBL_CSELF)                                     GBL_NOEXCEPT;
+GBL_INLINE char*            GblStringBuffer_data            (GBL_SELF)                                      GBL_NOEXCEPT;
 GBL_INLINE const char*      GblStringBuffer_cString         (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblStringView    GblStringBuffer_view            (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblQuark         GblStringBuffer_quark           (GBL_CSELF)                                     GBL_NOEXCEPT;
@@ -165,6 +166,14 @@ GBL_INLINE GblBool GblStringBuffer_empty(GBL_CSELF) GBL_NOEXCEPT {
 
 GBL_INLINE GblBool GblStringBuffer_stack(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf? GblArrayList_stack(&pSelf->data) : GBL_FALSE;
+}
+
+GBL_INLINE char* GblStringBuffer_data(GBL_SELF) GBL_NOEXCEPT {
+    char* pData = GBL_NULL;
+    if(pSelf) {
+        pData = (char*)GblArrayList_data(&pSelf->data);
+    }
+    return pData;
 }
 
 GBL_INLINE const char* GblStringBuffer_cString(GBL_CSELF) GBL_NOEXCEPT {

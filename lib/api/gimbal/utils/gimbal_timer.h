@@ -41,7 +41,7 @@ GBL_INLINE void GblTimer_stop(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_INLINE void GblTimer_continue(GBL_SELF) GBL_NOEXCEPT {
     if(!pSelf->active) {
-        clock_t elapsed = pSelf->stopTime - pSelf->startTime;
+        const clock_t elapsed = pSelf->stopTime - pSelf->startTime;
         pSelf->startTime = clock();
         pSelf->startTime -= elapsed;
         pSelf->active   = GBL_TRUE;
@@ -50,7 +50,8 @@ GBL_INLINE void GblTimer_continue(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_INLINE double GblTimer_elapsedMs(GBL_CSELF) GBL_NOEXCEPT {
     GBL_ASSERT(!pSelf->active);
-    return (double)(pSelf->stopTime - pSelf->startTime) * 1000.0 / (double)CLOCKS_PER_SEC;
+    return (double)(pSelf->stopTime - pSelf->startTime)
+            * 1000.0 / (double)CLOCKS_PER_SEC;
 }
 
 GBL_DECLS_END

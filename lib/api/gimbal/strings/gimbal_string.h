@@ -19,15 +19,19 @@ Unit tests
 
 GBL_DECLS_BEGIN
 
-GBL_INLINE int      gblAsciiDigitValue    (char c)              GBL_NOEXCEPT;
-GBL_INLINE int      gblAsciiHexDigitValue (char c)              GBL_NOEXCEPT;
+GBL_INLINE int   gblAsciiDigitValue    (char c)              GBL_NOEXCEPT;
+GBL_INLINE int   gblAsciiHexDigitValue (char c)              GBL_NOEXCEPT;
 
-GBL_EXPORT char*    gblStrdup             (const char* pString) GBL_NOEXCEPT;
-GBL_EXPORT char*    gblStrndup            (const char* pString, GblSize length) GBL_NOEXCEPT;
-GBL_EXPORT char*    gblStrnReverse        (char* pString, GblSize length) GBL_NOEXCEPT;
-GBL_EXPORT char*    gblStrnUpper          (char* pString) GBL_NOEXCEPT;
-GBL_EXPORT char*    gblStrnLower          (char* pString) GBL_NOEXCEPT;
-GBL_EXPORT char*    gblStpcpy             (char* pString);
+GBL_EXPORT int   gblStrnCaseCmp        (const char* pStr1,
+                                        const char* pStr2,
+                                        GblSize     length)  GBL_NOEXCEPT;
+
+GBL_EXPORT char* gblStrdup             (const char* pString) GBL_NOEXCEPT;
+GBL_EXPORT char* gblStrndup            (const char* pString, GblSize length) GBL_NOEXCEPT;
+GBL_EXPORT char* gblStrnReverse        (char* pString, GblSize length) GBL_NOEXCEPT;
+GBL_EXPORT char* gblStrnUpper          (char* pString) GBL_NOEXCEPT;
+GBL_EXPORT char* gblStrnLower          (char* pString) GBL_NOEXCEPT;
+GBL_EXPORT char* gblStpcpy             (char* pString);
 // everything string view has
 // everything that can be done in-place
 

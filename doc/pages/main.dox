@@ -41,6 +41,7 @@
 	- Compile-time configurable, macro-based API validation utilities
 	- Macro utilities for advanced preprocessor-based meta programming 
 	- Object-oriented runtime meta type system, providing an inheritance model, interfaces, properties, signals, etc.
+	- General app utilities for command-line parsing, date/time processing, etc
 	- Platform-independent unit testing framework
 
 # Code Examples
@@ -409,7 +410,9 @@ of choice. We go through a lot of effort to test throroughly and verify correctn
 	- SipHash: Jean-Philippe Amasson, Daniel J. Bernstein 
 		- http://creativecommons.org/publicdomain/zero/1.0/
 	- MurmurHash3: Austin Appleby
-
+	- strptime: Based on musl C Standard Library Implemenation
+		- https://git.musl-libc.org/cgit/musl/tree/src/time/strptime.c
+		
 ## Inspiration
 	- Microsoft COM
 		- Low-level, object-oriented binary interface and specification enabling object creation 
@@ -489,6 +492,13 @@ LibGimbal's features are conceptually split into the following high-level compon
 - event handling, filtering, propagation
 - plugin and module system
 
+\subpage Utilities
+- Generic reference-counted containers
+- Command-line option and argument parsing
+- Version parsing, packing, checking
+- UUIDv4 generation and manipulation
+- Date-Time parsing, formatting, processing
+
 \subpage Testing
 - cross-platform object-oriented C-based unit test framework
 - test scenarios, suites, cases
@@ -553,3 +563,10 @@ individual contexts, so they can be used at multiple levels of granularity.
 
 */
  
+
+/*! \page Utilities Utilities
+	\tableofcontents
+
+	\copydoc utilities
+
+*/
