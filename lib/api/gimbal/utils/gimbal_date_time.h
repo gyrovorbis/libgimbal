@@ -26,7 +26,6 @@
 #define GBL_DATE_UNIX_EPOCH_MONTH                   GBL_MONTH_JANUARY
 #define GBL_DATE_UNIX_EPOCH_DAY                     1
 
-
 #define GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST        1900
 #define GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET      -1
 #define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_INCREMENT  128
@@ -173,7 +172,7 @@ GBL_INLINE void        GblDateTime_setDate     (GblDateTime*   pSelf,
                                                 const GblDate* pDate)     GBL_NOEXCEPT;
 
 GBL_INLINE void        GblDateTime_setTime     (GblDateTime*   pSelf,
-                                                const GblTime* pTime);    GBL_NOEXCEPT;
+                                                const GblTime* pTime)     GBL_NOEXCEPT;
 
 GBL_INLINE GblBool     GblDateTime_equals      (const GblDateTime* pSelf,
                                                 const GblDateTime* pRhs)  GBL_NOEXCEPT;
@@ -224,7 +223,7 @@ GBL_INLINE GBL_RESULT  GblDateTime_addYears    (GblDateTime* pSelf,
 #define GblDate_time_set(...) \
     GBL_VA_OVERLOAD_CALL(GblDateTime_set, GBL_VA_OVERLOAD_SUFFIXER_ARGC), __VA_ARGS__)
 ///\endcond
-///
+
 GBL_INLINE GblBool GblDate_isLeapYear(GblYear year) GBL_NOEXCEPT {
     GBL_ASSERT(year > GBL_DATE_GREGORIAN_YEAR_FIRST, "Must be a Gregorian year!");
     if (year % 4) {
