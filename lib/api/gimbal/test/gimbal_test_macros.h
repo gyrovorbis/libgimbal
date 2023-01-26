@@ -56,7 +56,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
         (GblSize, GBL_TEST_COMPARE_CMP_UINT32_), \
         (int,     GBL_TEST_COMPARE_CMP_INT32_),
-#elif (defined(__clang__) && defined(__APPLE__) && defined(GBL_64BIT)) || defined(__EMSCRIPTEN__)
+#elif (/*defined(__clang__) &&*/ defined(__APPLE__) && defined(GBL_64BIT)) || defined(__EMSCRIPTEN__)
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES() \
         (GblSize, GBL_TEST_COMPARE_CMP_UINT64_),
 #else

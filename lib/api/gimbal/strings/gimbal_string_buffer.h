@@ -120,8 +120,8 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_appendPrintf    (GBL_SELF, const cha
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_appendNil       (GBL_SELF)                                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_appendBool      (GBL_SELF, GblBool value)                       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_appendInt       (GBL_SELF, int value)                        GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_appendUint      (GBL_SELF, unsigned value)                       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_appendInt       (GBL_SELF, int value)                           GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_appendUint      (GBL_SELF, unsigned value)                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_appendFloat     (GBL_SELF, float value)                         GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_appendDouble    (GBL_SELF, double value)                        GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_appendPointer   (GBL_SELF, const void* pPtr)                    GBL_NOEXCEPT;

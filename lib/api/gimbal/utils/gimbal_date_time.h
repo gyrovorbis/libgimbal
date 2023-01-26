@@ -98,7 +98,7 @@ GBL_INLINE GblWeekDay  GblDate_weekDay         (const GblDate* pSelf)     GBL_NO
 GBL_INLINE GblDay      GblDate_yearDay         (const GblDate* pSelf)     GBL_NOEXCEPT;
 GBL_INLINE uint8_t     GblDate_yearWeek        (const GblDate* pSelf)     GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT  GblDate_fromJulian      (GblDate* pSelf,
-                                                GblDay julienDate)        GBL_NOEXCEPT;
+                                                GblDay julianDate)        GBL_NOEXCEPT;
 
 GBL_INLINE void        GblDate_set             (GblDate* pSelf,
                                                 GblYear  year,
@@ -142,9 +142,7 @@ GBL_EXPORT const char* GblDateTime_parse       (GblDateTime* pSelf,
                                                 const char* pString,
                                                 const char* pFormat)      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblDateTime_toUnix      (const GblDateTime* pSelf,
-                                                time_t* pEpoch)           GBL_NOEXCEPT;
-
+GBL_EXPORT time_t      GblDateTime_toUnix      (const GblDateTime* pSelf) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblDateTime_toLocal     (const GblDateTime* pSelf,
                                                 struct tm* pBrokenDown)   GBL_NOEXCEPT;
 
@@ -153,7 +151,7 @@ GBL_EXPORT GBL_RESULT  GblDateTime_toUtc       (const GblDateTime* pSelf,
 
 GBL_EXPORT double      GblDateTime_toJulian    (const GblDateTime* pSelf) GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblDateTime_format      (const GblDateTime* pSelf,
+GBL_EXPORT const char* GblDateTime_format      (const GblDateTime* pSelf,
                                                 GblStringBuffer* pBuffer,
                                                 const char* pFormat)      GBL_NOEXCEPT;
 
@@ -213,15 +211,15 @@ GBL_INLINE GBL_RESULT  GblDateTime_addYears    (GblDateTime* pSelf,
 #define GblDateTime_set_4(self, year, month, day) \
     (GblDateTime_set_5(self, year, month, day, 0))
 #define GblDateTime_set_5(self, year, month, day, hour) \
-    (GblDateTime_set_6(self, year, month, day, hour, 0)
+    (GblDateTime_set_6(self, year, month, day, hour, 0))
 #define GblDateTime_set_6(self, year, month, day, hour, min) \
     (GblDateTime_set_7(self, year, month, day, hour, min, 0.0))
 #define GblDateTime_set_7(self, year, month, day, hour, min, sec) \
-    (GblDateTime_set_8(self, year, month, day, hour, min, sec, 0.0)
+    (GblDateTime_set_8(self, year, month, day, hour, min, sec, 0.0))
 #define GblDateTime_set_8(self, year, month, day, hour, min, sec, tz) \
     ((GblDateTime_set)(self, year, month, day, hour, min, sec, tz))
-#define GblDate_time_set(...) \
-    GBL_VA_OVERLOAD_CALL(GblDateTime_set, GBL_VA_OVERLOAD_SUFFIXER_ARGC), __VA_ARGS__)
+#define GblDateTime_set(...) \
+    GBL_VA_OVERLOAD_CALL(GblDateTime_set, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 ///\endcond
 
 GBL_INLINE GblBool GblDate_isLeapYear(GblYear year) GBL_NOEXCEPT {
@@ -298,10 +296,10 @@ GBL_INLINE uint8_t GblDate_yearWeek(const GblDate* pSelf) GBL_NOEXCEPT {
 }
 
 // MAYBE works with non-Gregorian times?
-GBL_INLINE GBL_RESULT GblDate_fromJulian(GblDate* pSelf, GblDay julienDate) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblDate_fromJulian(GblDate* pSelf, GblDay julianDate) GBL_NOEXCEPT {
     int i, j, k, n, l;
 
-    l = julienDate+68569;
+    l = julianDate+68569;
     n = 4*l/146097;
     l = l-(146097*n+3)/4;
     i = 4000*(l+1)/1461001;
@@ -359,7 +357,7 @@ GBL_INLINE GblBool GblDateTime_isValid(const GblDateTime* pSelf) GBL_NOEXCEPT {
     return GblDate_isValid(&pSelf->date) && GblTime_isValid(&pSelf->time);
 }
 
-GBL_INLINE void GblDateTime_set(GblDateTime* pSelf, GblYear year, GblMonth month, GblDay day, GblHour hours, GblMinute mins, GblSecond secs, GblSecond tzOff) GBL_NOEXCEPT {
+GBL_INLINE void (GblDateTime_set)(GblDateTime* pSelf, GblYear year, GblMonth month, GblDay day, GblHour hours, GblMinute mins, GblSecond secs, GblSecond tzOff) GBL_NOEXCEPT {
     GblDate_set(&pSelf->date, year, month, day);
     GblTime_set(&pSelf->time, hours, mins, secs);
     pSelf->utcOffset = tzOff;
@@ -378,6 +376,5 @@ GBL_INLINE GblBool GblDateTime_equals(const GblDateTime* pSelf, const GblDateTim
 }
 
 GBL_DECLS_END
-
 
 #endif // GIMBAL_DATE_TIME_H

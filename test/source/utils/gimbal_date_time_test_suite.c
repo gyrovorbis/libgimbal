@@ -1,6 +1,7 @@
 #include "utils/gimbal_date_time_test_suite.h"
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_date_time.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 #include <time.h>
 
 #define GBL_TEST_SUITE_SELF GblDateTimeTestSuite
@@ -327,7 +328,19 @@ GBL_TEST_CASE(dateTimeParse) {
 }
 
 GBL_TEST_CASE(dateTimeToUnix) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt;
+    GblDateTime_set(&dt,
+                    GBL_DATE_UNIX_EPOCH_YEAR,
+                    GBL_DATE_UNIX_EPOCH_MONTH,
+                    GBL_DATE_UNIX_EPOCH_DAY);
+
+    GBL_TEST_COMPARE(GblDateTime_toUnix(&dt), 0);
+
+    GblDateTime_set(&dt,
+                    2023, 1, 26,
+                    0, 22, 57.0);
+    GBL_TEST_COMPARE(GblDateTime_toUnix(&dt), 1674692577);
+
     GBL_TEST_CASE_END;
 }
 
@@ -342,7 +355,20 @@ GBL_TEST_CASE(dateTimeToUtc) {
 }
 
 GBL_TEST_CASE(dateTimeFormat) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt;
+    GblStringBuffer buffer;
+    GblStringBuffer_construct(&buffer);
+
+    GblDateTime_set(&dt,
+                    1989, GBL_MONTH_JULY, 23,
+                    22, 33, 12.2, GblTime_localUtcOffset());
+
+    GBL_TEST_COMPARE(GblDateTime_format(&dt,
+                                        &buffer,
+                                        "%m/%d/%y - %I:%M%p"),
+                     "07/23/89 - 10:33PM");
+
+    GblStringBuffer_destruct(&buffer);
     GBL_TEST_CASE_END;
 }
 

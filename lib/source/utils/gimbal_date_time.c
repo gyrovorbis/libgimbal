@@ -238,19 +238,19 @@ static char* strptime_(const char *restrict s, const char *restrict f, struct tm
     return (char *)s;
 }
 
-static long long diff_tm_(struct tm *a, struct tm *b){
+static long long diff_tm_(struct tm *a, struct tm *b) {
     return a->tm_sec - b->tm_sec
-            +60LL*(a->tm_min - b->tm_min)
-            +3600LL*(a->tm_hour - b->tm_hour)
-            +86400LL*(a->tm_yday - b->tm_yday)
-            +(a->tm_year-70)*31536000LL
-            -(a->tm_year-69)/4*86400LL
-            +(a->tm_year-1)/100*86400LL
-            -(a->tm_year+299)/400*86400LL
-            -(b->tm_year-70)*31536000LL
-            +(b->tm_year-69)/4*86400LL
-            -(b->tm_year-1)/100*86400LL
-            +(b->tm_year+299)/400*86400LL;
+            + 60LL*(a->tm_min - b->tm_min)
+            + 3600LL*(a->tm_hour - b->tm_hour)
+            + 86400LL*(a->tm_yday - b->tm_yday)
+            + (a->tm_year-70)*31536000LL
+            - (a->tm_year-69)/4*86400LL
+            + (a->tm_year-1)/100*86400LL
+            - (a->tm_year+299)/400*86400LL
+            - (b->tm_year-70)*31536000LL
+            + (b->tm_year-69)/4*86400LL
+            - (b->tm_year-1)/100*86400LL
+            + (b->tm_year+299)/400*86400LL;
 }
 
 static time_t add_tm_(struct tm* pLhs, struct tm* pRhs) {
@@ -315,6 +315,7 @@ static struct tm* now_tm_(void) {
 
 static time_t toBrokenDown_(const GblDateTime* pSelf, struct tm* pBrokenDown) {
     memset(pBrokenDown, 0, sizeof(struct tm));
+    pBrokenDown->tm_isdst = -1;
     pBrokenDown->tm_year = pSelf->date.year - GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST;
     pBrokenDown->tm_mon  = pSelf->date.month + GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET;
     pBrokenDown->tm_mday = pSelf->date.day;
@@ -437,11 +438,9 @@ GBL_EXPORT GBL_RESULT GblDateTime_nowUtc(GblDateTime* pSelf) {
     return GblDateTime_fromUtc(pSelf, &bdTime);
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_toUnix(const GblDateTime* pSelf, time_t* pEpoch) {
+GBL_EXPORT time_t GblDateTime_toUnix(const GblDateTime* pSelf) {
     struct tm local;
-    *pEpoch = toBrokenDown_(pSelf, &local);
-    return (*pEpoch == (time_t)-1)?
-                GBL_RESULT_ERROR_INVALID_DATE_TIME: GBL_RESULT_SUCCESS;
+    return toBrokenDown_(pSelf, &local) + GblTime_localUtcOffset();
 }
 
 GBL_EXPORT GBL_RESULT GblDateTime_toLocal(const GblDateTime* pSelf, struct tm* pBrokenDown) {
@@ -471,7 +470,9 @@ GBL_EXPORT const char* GblDateTime_parse(GblDateTime* pSelf, const char* pString
     return pResult;
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_format(const GblDateTime* pSelf, GblStringBuffer* pBuffer, const char* pFormat) {
+GBL_EXPORT const char* GblDateTime_format(const GblDateTime* pSelf, GblStringBuffer* pBuffer, const char* pFormat) {
+    const char* pResult = NULL;
+
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pBuffer);
     GBL_CTX_VERIFY_POINTER(pFormat);
@@ -491,8 +492,10 @@ GBL_EXPORT GBL_RESULT GblDateTime_format(const GblDateTime* pSelf, GblStringBuff
                      &localTime)
             == 0);
 
+    pResult = GblStringBuffer_data(pBuffer);
 
-    GBL_CTX_END();
+    GBL_CTX_END_BLOCK();
+    return pResult;
 }
 
 GBL_EXPORT GBL_RESULT GblDateTime_normalize(GblDateTime* pSelf) {
@@ -508,12 +511,11 @@ GBL_EXPORT GBL_RESULT GblDateTime_normalize(GblDateTime* pSelf) {
 }
 
 GBL_EXPORT double GblDateTime_diff(const GblDateTime* pSelf, const GblDateTime* pRhs) {
-    time_t unix1, unix2;
-    GblDateTime_toUnix(pSelf, &unix1);
-    GblDateTime_toUnix(pRhs, &unix2);
+    time_t unix1 = GblDateTime_toUnix(pSelf);
+    time_t unix2 = GblDateTime_toUnix(pRhs);
 
     if(unix1 == (time_t)-1 || unix2 == (time_t)-1)
-        return GBL_RESULT_ERROR_INVALID_DATE_TIME;
+        return NAN;
 
     return difftime(unix1, unix2);
 }
