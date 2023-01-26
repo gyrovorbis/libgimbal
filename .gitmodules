@@ -1,6 +1,3 @@
 [submodule "test/lib/elysian-test"]
 	path = test/lib/elysian-test
 	url = ../../open-source/elysian-test.git
-[submodule "doc/doxygenapidark"]
-	path = doc/doxygenapidark
-	url = ../../open-source/doxygenapidark.git
