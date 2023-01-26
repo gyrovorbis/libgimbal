@@ -4,9 +4,3 @@
 [submodule "doc/doxygenapidark"]
 	path = doc/doxygenapidark
 	url = ../../open-source/doxygenapidark.git
-[submodule "util/build-environment"]
-	path = util/build-environment
-	url = ../../open-source/build-environment.git
-[submodule "lib/lib/tinycthread"]
-	path = lib/lib/tinycthread
-	url = ../../open-source/tinycthread.git
