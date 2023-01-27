@@ -221,6 +221,7 @@ GBL_INLINE GblBool gblFloatEquals(double a, double b, double e) GBL_NOEXCEPT {
     GBL_ASSERT(e >= DBL_EPSILON, "Epsilon value is smaller than system supports.");
     GBL_ASSERT(e < 1.0f, "Epsilon must be fractional value.");
 
+#if 0
     const double diff = fabs(a - b);
 
     if(a == b)
@@ -229,6 +230,18 @@ GBL_INLINE GblBool gblFloatEquals(double a, double b, double e) GBL_NOEXCEPT {
         return (diff < (e * DBL_MIN));
     else
         return (diff / (fabs(a) + fabs(b)) < e);
+#else
+    // Calculate the difference.
+    const double diff = fabs(a - b);
+    a = fabs(a);
+    b = fabs(b);
+    // Find the largest
+    const double max = GBL_MAX(a, b);
+
+    if (diff <= max * e)
+        return GBL_TRUE;
+    return GBL_FALSE;
+#endif
 }
 
 ///\cond

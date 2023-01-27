@@ -177,6 +177,18 @@ GBL_TEST_CASE(dateFromJulian) {
     GBL_TEST_CASE_END;
 }
 
+GBL_TEST_CASE(dateFromOrdinal) {
+    GblDate date;
+
+    GBL_TEST_VERIFY(GblDate_fromOrdinal(&date, 1997, 256));
+
+    GBL_TEST_CALL(verifyDate_(pSelf, &date, 1997, GBL_MONTH_SEPTEMBER, 13));
+
+    GBL_TEST_COMPARE(GblDate_weekDay(&date), GBL_WEEK_DAY_SATURDAY);
+
+    GBL_TEST_CASE_END;
+}
+
 GBL_TEST_CASE(timeStr) {
     GBL_TEST_COMPARE(GblTime_amPmStr(GBL_FALSE), "AM");
     GBL_TEST_COMPARE(GblTime_amPmStr(GBL_TRUE),  "PM");
@@ -193,14 +205,6 @@ GBL_TEST_CASE(timeInitDefault) {
 GBL_TEST_CASE(timeIsPm) {
     const GblTime time = { .hours = 13 };
     GBL_TEST_VERIFY(GblTime_isPm(&time));
-    GBL_TEST_CASE_END;
-}
-
-GBL_TEST_CASE(timeSubSeconds) {
-    const GblTime time = { .seconds = 12.123456789 };
-    GBL_TEST_VERIFY(gblFloatEquals(GblTime_milliSeconds(&time), 123.456789, 0.0001));
-    GBL_TEST_VERIFY(gblFloatEquals(GblTime_microSeconds(&time), 123456.789, 0.0001));
-    GBL_TEST_VERIFY(gblFloatEquals(GblTime_nanoSeconds(&time), 123456789.0, 0.0001));
     GBL_TEST_CASE_END;
 }
 
@@ -228,7 +232,7 @@ GBL_TEST_CASE(dateTimeIsUtc) {
 GBL_TEST_CASE(dateTimeNormalizeDefault) {
     GblDateTime dt = { 0 };
 
-    GBL_TEST_CALL(GblDateTime_normalize(&dt));
+    GBL_TEST_VERIFY(GblDateTime_normalize(&dt));
     GBL_TEST_VERIFY(GblDateTime_isValid(&dt));
 
     GBL_TEST_CASE_END;
@@ -238,7 +242,7 @@ GBL_TEST_CASE(dateTimeEquals) {
     GblDateTime dt = { 0 };
     GBL_TEST_VERIFY(GblDateTime_equals(&dt, &dt));
 
-    GBL_TEST_CALL(GblDateTime_normalize(&dt));
+    GBL_TEST_VERIFY(GblDateTime_normalize(&dt));
     GBL_TEST_VERIFY(GblDateTime_equals(&dt, &dt));
 
     gblRandBuffer(&dt, sizeof(dt));
@@ -250,12 +254,12 @@ GBL_TEST_CASE(dateTimeEquals) {
 GBL_TEST_CASE(dateTimeFromUnix) {
     GblDateTime dt;
 
-    GBL_TEST_CALL(GblDateTime_fromUnix(&dt, 0));
+    GBL_TEST_VERIFY(GblDateTime_fromUnix(&dt, 0));
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
                                   GBL_DATE_UNIX_EPOCH_YEAR, GBL_DATE_UNIX_EPOCH_MONTH, GBL_DATE_UNIX_EPOCH_DAY,
                                   0, 0, 0.0, 0.0));
 
-    GBL_TEST_CALL(GblDateTime_fromUnix(&dt, 1674637231));
+    GBL_TEST_VERIFY(GblDateTime_fromUnix(&dt, 1674637231));
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt, 2023, 1, 25, 9, 0, 31.0, 0.0));
 
     GBL_TEST_CASE_END;
@@ -265,7 +269,7 @@ GBL_TEST_CASE(dateTimeFromLocal) {
     GblDateTime dt;
     struct tm bdTime = { .tm_year = 1, .tm_mday = 1 };
 
-    GBL_TEST_CALL(GblDateTime_fromLocal(&dt, &bdTime));
+    GBL_TEST_VERIFY(GblDateTime_fromLocal(&dt, &bdTime));
     GBL_TEST_VERIFY(GblDateTime_isLocal(&dt));
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
                                   GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST+1, GBL_MONTH_JANUARY, 1,
@@ -279,7 +283,7 @@ GBL_TEST_CASE(dateTimeFromUtc) {
 
     struct tm bdTime = { .tm_year = 1, .tm_mday = 1 };
 
-    GBL_TEST_CALL(GblDateTime_fromUtc(&dt, &bdTime));
+    GBL_TEST_VERIFY(GblDateTime_fromUtc(&dt, &bdTime));
     GBL_TEST_VERIFY(GblDateTime_isUtc(&dt));
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
                                   GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST+1, GBL_MONTH_JANUARY, 1,
@@ -291,7 +295,7 @@ GBL_TEST_CASE(dateTimeFromUtc) {
 
 GBL_TEST_CASE(dateTimeNowLocal) {
     GblDateTime dt;
-    GBL_TEST_CALL(GblDateTime_nowLocal(&dt));
+    GBL_TEST_VERIFY(GblDateTime_nowLocal(&dt));
     GBL_TEST_VERIFY(GblDateTime_isValid(&dt));
     GBL_TEST_VERIFY(GblDateTime_isLocal(&dt));
     GBL_TEST_CASE_END;
@@ -299,14 +303,14 @@ GBL_TEST_CASE(dateTimeNowLocal) {
 
 GBL_TEST_CASE(dateTimeNowUtc) {
     GblDateTime dt;
-    GBL_TEST_CALL(GblDateTime_nowUtc(&dt));
+    GBL_TEST_VERIFY(GblDateTime_nowUtc(&dt));
     GBL_TEST_VERIFY(GblDateTime_isValid(&dt));
     GBL_TEST_VERIFY(GblDateTime_isUtc(&dt));
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(dateTimeParse) {
-    GblDateTime dt[3];
+    GblDateTime dt[4];
     GblDateTime_parse(&dt[0], "2011-02-21", "%Y-%m-%d");
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt[0],
                                   2011, 2, 21,
@@ -323,6 +327,14 @@ GBL_TEST_CASE(dateTimeParse) {
                                   16, 38, 33.0, 0.0));
 
     GBL_TEST_VERIFY(GblDateTime_equals(&dt[1], &dt[2]));
+
+    GblDateTime_parse(&dt[2],
+                     "March 4, 1765 16.38.33 Mon -0530",
+                     "%B %d, %Y %H.%M.%S %a %z");
+
+    GBL_TEST_CALL(verifyDateTime_(pSelf, &dt[2],
+                                  1765, 3, 4,
+                                  16, 38, 33, -330));
 
     GBL_TEST_CASE_END;
 }
@@ -345,12 +357,29 @@ GBL_TEST_CASE(dateTimeToUnix) {
 }
 
 GBL_TEST_CASE(dateTimeToLocal) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt1, dt2;
+    struct tm bTime;
+
+    GblDateTime_nowLocal(&dt1);
+    GblDateTime_toLocal(&dt1, &bTime);
+    GblDateTime_fromLocal(&dt2, &bTime);
+
+    GBL_TEST_VERIFY(GblDateTime_equals(&dt1, &dt2));
+
+
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(dateTimeToUtc) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt1, dt2;
+    struct tm bTime;
+
+    GblDateTime_nowUtc(&dt1);
+    GblDateTime_toUtc(&dt1, &bTime);
+    GblDateTime_fromUtc(&dt2, &bTime);
+
+    GBL_TEST_VERIFY(GblDateTime_equals(&dt1, &dt2));
+
     GBL_TEST_CASE_END;
 }
 
@@ -361,7 +390,7 @@ GBL_TEST_CASE(dateTimeFormat) {
 
     GblDateTime_set(&dt,
                     1989, GBL_MONTH_JULY, 23,
-                    22, 33, 12.2, GblTime_localUtcOffset());
+                    22, 33, 12, GblTime_localUtcOffset());
 
     GBL_TEST_COMPARE(GblDateTime_format(&dt,
                                         &buffer,
@@ -373,42 +402,187 @@ GBL_TEST_CASE(dateTimeFormat) {
 }
 
 GBL_TEST_CASE(dateTimeDiff) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt1, dt2;
+
+    GblDateTime_nowLocal(&dt1);
+    memcpy(&dt2, &dt1, sizeof(GblDateTime));
+    dt2.time.seconds -= GblTime_localUtcOffset();
+    GblDateTime_normalize(&dt2);
+
+    GBL_TEST_COMPARE(GblDateTime_diff(&dt1, &dt2), GblTime_localUtcOffset());
+
+    GblDateTime_set(&dt1,
+                    1994, 12, 17,
+                    1, 0, 5.0);
+
+    GblDateTime_set(&dt2,
+                    1994, 12, 17,
+                    1, 30, 5.0);
+
+    const GblSecond diff = GblDateTime_diff(&dt2, &dt1);
+    GBL_TEST_VERIFY(gblFloatEquals(diff, 30 * 60.0, 0.000001));
+
+    GblDateTime dt3;
+    memcpy(&dt3, &dt1, sizeof(GblDateTime));
+    dt3.time.seconds += diff;
+    GblDateTime_normalize(&dt3);
+    GBL_TEST_COMPARE(GblDateTime_diff(&dt3, &dt2), 0.0);
+
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(dateTimeAddDays) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt, dt2;
+
+    GblDateTime_set(&dt,
+                    1994, 12, 17,
+                    1, 30, 5.0);
+
+    GblDateTime_addDays(&dt, 25600);
+
+    GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
+                                  2065, 1, 18,
+                                  1, 30, 5.0, 0.0));
+
+    GblDateTime_set(&dt2,
+                    2065, 1, 18,
+                    1, 30, 5.0);
+
+    GBL_TEST_VERIFY(GblDateTime_equals(&dt, &dt2));
+
+
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(dateTimeAddHours) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt, dt2;
+
+    GblDateTime_set(&dt,
+                    1994, 12, 17,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GblDateTime_addHours(&dt, 24);
+
+    GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
+                                  1994, 12, 18,
+                                  1, 30, 5.0, GblTime_localUtcOffset()));
+
+    GblDateTime_set(&dt2,
+                    1994, 12, 18,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GBL_TEST_VERIFY(GblDateTime_equals(&dt, &dt2));
+
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(dateTimeAddMinutes) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt, dt2;
+
+    GblDateTime_set(&dt,
+                    1994, 12, 17,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GblDateTime_addMinutes(&dt, -24*60);
+
+    GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
+                                  1994, 12, 16,
+                                  1, 30, 5.0, GblTime_localUtcOffset()));
+
+    GblDateTime_set(&dt2,
+                    1994, 12, 16,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GBL_TEST_VERIFY(GblDateTime_equals(&dt, &dt2));
+
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(dateTimeAddSeconds) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt, dt2;
+
+    GblDateTime_set(&dt,
+                    1994, 12, 17,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GblDateTime_addSeconds(&dt, -24*60*60.0);
+
+    GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
+                                  1994, 12, 16,
+                                  1, 30, 5.0, GblTime_localUtcOffset()));
+
+    GblDateTime_set(&dt2,
+                    1994, 12, 16,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GBL_TEST_VERIFY(GblDateTime_equals(&dt, &dt2));
+
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(dateTimeAddWeeks) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt, dt2;
+
+    GblDateTime_set(&dt,
+                    1994, 12, 17,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GblDateTime_addWeeks(&dt, 1);
+
+    GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
+                                  1994, 12, 24,
+                                  1, 30, 5.0, GblTime_localUtcOffset()));
+
+    GblDateTime_set(&dt2,
+                    1994, 12, 24,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GBL_TEST_VERIFY(GblDateTime_equals(&dt, &dt2));
+
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(dateTimeAddMonths) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt, dt2;
+
+    GblDateTime_set(&dt,
+                    1994, 12, 17,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GblDateTime_addMonths(&dt, -13);
+
+    GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
+                                  1993, 11, 17,
+                                  1, 30, 5.0, GblTime_localUtcOffset()));
+
+    GblDateTime_set(&dt2,
+                    1993, 11, 17,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GBL_TEST_VERIFY(GblDateTime_equals(&dt, &dt2));
+
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(dateTimeAddYears) {
-    GBL_TEST_SKIP("Unimplemented");
+    GblDateTime dt, dt2;
+
+    GblDateTime_set(&dt,
+                    1994, 12, 17,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GblDateTime_addYears(&dt, 50);
+
+    GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
+                                  2044, 12, 17,
+                                  1, 30, 5.0, GblTime_localUtcOffset()));
+
+    GblDateTime_set(&dt2,
+                    2044, 12, 17,
+                    1, 30, 5.0, GblTime_localUtcOffset());
+
+    GBL_TEST_VERIFY(GblDateTime_equals(&dt, &dt2));
+
     GBL_TEST_CASE_END;
 }
 
@@ -420,10 +594,10 @@ GBL_TEST_REGISTER(dateIsLeapYear,
                   dateWeekDay,
                   dateYearDayAndWeek,
                   dateFromJulian,
+                  dateFromOrdinal,
                   timeStr,
                   timeInitDefault,
                   timeIsPm,
-                  timeSubSeconds,
                   dateTimeInitDefault,
                   dateTimeIsUtc,
                   dateTimeNormalizeDefault,

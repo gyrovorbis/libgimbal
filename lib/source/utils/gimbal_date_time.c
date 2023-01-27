@@ -11,6 +11,14 @@
 #define AM_STR_     0x26
 #define PM_STR_     0x27
 
+#define FAIL_RETURN_NULL_() \
+    GBL_STMT_START { \
+        GBL_CTX_BEGIN(NULL); \
+        GBL_CTX_VERIFY(GBL_FALSE, GBL_RESULT_ERROR_INVALID_DATE_TIME); \
+        GBL_CTX_END_BLOCK(); \
+        return NULL; \
+    } GBL_STMT_END
+
 static const char c_time_strings_[] =
 /* 0x00 */  "Sun\0" "Mon\0" "Tue\0" "Wed\0" "Thu\0" "Fri\0" "Sat\0"
 /* 0x07 */  "Sunday\0" "Monday\0" "Tuesday\0" "Wednesday\0"
@@ -29,8 +37,7 @@ static const char* get_ctime_string_(GblSize entry) {
 }
 
 // Adapted and modified from musl implementation
-static char* strptime_(const char *restrict s, const char *restrict f, struct tm *restrict tm)
-{
+static char* strptime_(const char *restrict s, const char *restrict f, struct tm *restrict tm, int* restrict utcOffset) {
     int i, w, neg, adj, min, range, *dest, dummy;
     const char *ex;
     size_t len;
@@ -75,7 +82,7 @@ static char* strptime_(const char *restrict s, const char *restrict f, struct tm
             range = 12;
             goto symbolic_range;
         case 'c':
-            s = strptime_(s, "%a %b %e %T %Y", tm);
+            s = strptime_(s, "%a %b %e %T %Y", tm, utcOffset);
             if (!s) return 0;
             break;
         case 'C':
@@ -89,7 +96,7 @@ static char* strptime_(const char *restrict s, const char *restrict f, struct tm
             range = 31;
             goto numeric_range;
         case 'D':
-            s = strptime_(s, "%m/%d/%y", tm);
+            s = strptime_(s, "%m/%d/%y", tm, utcOffset);
             if (!s) return 0;
             break;
         case 'H':
@@ -140,11 +147,11 @@ static char* strptime_(const char *restrict s, const char *restrict f, struct tm
             }
             return 0;
         case 'r':
-            s = strptime_(s, "%I:%M:%S %p", tm);
+            s = strptime_(s, "%I:%M:%S %p", tm, utcOffset);
             if (!s) return 0;
             break;
         case 'R':
-            s = strptime_(s, "%H:%M", tm);
+            s = strptime_(s, "%H:%M", tm, utcOffset);
             if (!s) return 0;
             break;
         case 'S':
@@ -153,7 +160,7 @@ static char* strptime_(const char *restrict s, const char *restrict f, struct tm
             range = 61;
             goto numeric_range;
         case 'T':
-            s = strptime_(s, "%H:%M:%S", tm);
+            s = strptime_(s, "%H:%M:%S", tm, utcOffset);
             if (!s) return 0;
             break;
         case 'U':
@@ -169,11 +176,11 @@ static char* strptime_(const char *restrict s, const char *restrict f, struct tm
             range = 7;
             goto numeric_range;
         case 'x':
-            s = strptime_(s, "%a %b %e %T %Y", tm);
+            s = strptime_(s, "%a %b %e %T %Y", tm, utcOffset);
             if (!s) return 0;
             break;
         case 'X':
-            s = strptime_(s, "%H:%M:%S\0", tm);
+            s = strptime_(s, "%H:%M:%S\0", tm, utcOffset);
             if (!s) return 0;
             break;
         case 'y':
@@ -186,6 +193,10 @@ static char* strptime_(const char *restrict s, const char *restrict f, struct tm
             if (w<0) w=4;
             adj = 1900;
             want_century = 0;
+            goto numeric_digits;
+        case 'z':
+            dest = utcOffset;
+            w = 4;
             goto numeric_digits;
         case '%':
             if (*s++ != '%') return 0;
@@ -234,6 +245,10 @@ static char* strptime_(const char *restrict s, const char *restrict f, struct tm
         tm->tm_year = relyear;
         if (want_century & 2) tm->tm_year += century * 100 - 1900;
         else if (tm->tm_year <= 68) tm->tm_year += 100;
+    }
+    // check if we need to adjust UTC offset that was read
+    if(utcOffset && *utcOffset) {
+        *utcOffset = (*utcOffset / 100) * 60 + (*utcOffset % 100);
     }
     return (char *)s;
 }
@@ -354,6 +369,19 @@ GBL_EXPORT const char* GblDate_weekDayStrShort(GblWeekDay weekDay) {
                 get_ctime_string_(ABDAY_1_ + weekDay) : NULL;
 }
 
+GBL_EXPORT GblDate* GblDate_fromOrdinal(GblDate* pSelf, GblYear year, GblDay day) {
+    if(!pSelf) FAIL_RETURN_NULL_();
+
+    GblDateTime dt;
+    GblDateTime_set(&dt, year, GBL_MONTH_JANUARY, 1);
+
+    GblDateTime_addDays(&dt, day-1);
+
+    memcpy(pSelf, &dt.date, sizeof(GblDate));
+
+    return pSelf;
+}
+
 GBL_EXPORT GblBool GblDate_isDst(const GblDate* pSelf) {
     struct tm local = {
         .tm_year  = pSelf->year,
@@ -377,62 +405,47 @@ GBL_EXPORT GblSecond GblTime_localUtcOffset(void) {
     return (GblSecond)timezone_delta_secs_();
 }
 
-GBL_EXPORT double GblTime_milliSeconds(const GblTime* pSelf) {
-    double secs;
-    return modf(pSelf->seconds, &secs) * (double)GBL_TIME_MSECS_PER_SEC;
-}
-
-GBL_EXPORT double GblTime_microSeconds(const GblTime* pSelf) {
-    double secs;
-    return modf(pSelf->seconds, &secs) * (double)GBL_TIME_USECS_PER_SEC;
-}
-
-GBL_EXPORT double GblTime_nanoSeconds(const GblTime* pSelf) {
-    double secs;
-    return modf(pSelf->seconds, &secs) * (double)GBL_TIME_NSECS_PER_SEC;
-}
-
-GBL_EXPORT GBL_RESULT GblDateTime_fromUnix(GblDateTime* pSelf, const time_t epoch) {
+GBL_EXPORT GblDateTime* GblDateTime_fromUnix(GblDateTime* pSelf, const time_t epoch) {
     struct tm* pLocal = gmtime(&epoch);
 
     if(!pLocal)
-        return GBL_RESULT_ERROR_INVALID_DATE_TIME;
+        FAIL_RETURN_NULL_();
 
     fromBrokenDown_(pSelf, pLocal);
     pSelf->utcOffset = 0.0;
 
-    return GBL_RESULT_SUCCESS;
+    return pSelf;
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_fromLocal(GblDateTime* pSelf, const struct tm* pLocal) {
+GBL_EXPORT GblDateTime* GblDateTime_fromLocal(GblDateTime* pSelf, const struct tm* pLocal) {
     struct tm temp = *pLocal;
 
     if(mktime(&temp) == (time_t)-1)
-        return GBL_RESULT_ERROR_INVALID_DATE_TIME;
+        FAIL_RETURN_NULL_();
 
     fromBrokenDown_(pSelf, &temp);
     pSelf->utcOffset = GblTime_localUtcOffset();
 
-    return GBL_RESULT_SUCCESS;
+    return pSelf;
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_fromUtc(GblDateTime* pSelf, const struct tm* pUtc) {
+GBL_EXPORT GblDateTime* GblDateTime_fromUtc(GblDateTime* pSelf, const struct tm* pUtc) {
     struct tm temp = *pUtc;
 
     if(mktime(&temp) == (time_t)-1)
-        return GBL_RESULT_ERROR_INVALID_DATE_TIME;
+        FAIL_RETURN_NULL_();
 
     fromBrokenDown_(pSelf, &temp);
     pSelf->utcOffset = 0.0;
 
-    return GBL_RESULT_SUCCESS;
+    return pSelf;
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_nowLocal(GblDateTime* pSelf) {
+GBL_EXPORT GblDateTime* GblDateTime_nowLocal(GblDateTime* pSelf) {
     return GblDateTime_fromLocal(pSelf, now_tm_());
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_nowUtc(GblDateTime* pSelf) {
+GBL_EXPORT GblDateTime* GblDateTime_nowUtc(GblDateTime* pSelf) {
     struct tm bdTime = *now_tm_();
     bdTime.tm_sec -= GblTime_localUtcOffset();
     return GblDateTime_fromUtc(pSelf, &bdTime);
@@ -440,6 +453,7 @@ GBL_EXPORT GBL_RESULT GblDateTime_nowUtc(GblDateTime* pSelf) {
 
 GBL_EXPORT time_t GblDateTime_toUnix(const GblDateTime* pSelf) {
     struct tm local;
+    if(!pSelf) return (time_t)-1;
     return toBrokenDown_(pSelf, &local) + GblTime_localUtcOffset();
 }
 
@@ -463,10 +477,12 @@ GBL_EXPORT GBL_RESULT GblDateTime_toUtc(const GblDateTime* pSelf, struct tm* pBr
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_EXPORT const char* GblDateTime_parse(GblDateTime* pSelf, const char* pString, const char* pFormat) {
+GBL_EXPORT GblDateTime* GblDateTime_parse(GblDateTime* pSelf, const char* pString, const char* pFormat) {
     struct tm brokenDownTime = { 0 };
-    const char* pResult = strptime_(pString, pFormat, &brokenDownTime);
-    GblDateTime_fromUtc(pSelf, &brokenDownTime);
+    int utcOffset = 0;
+    strptime_(pString, pFormat, &brokenDownTime, &utcOffset);
+    GblDateTime* pResult = GblDateTime_fromUtc(pSelf, &brokenDownTime);
+    if(pResult) pResult->utcOffset = utcOffset;
     return pResult;
 }
 
@@ -498,19 +514,25 @@ GBL_EXPORT const char* GblDateTime_format(const GblDateTime* pSelf, GblStringBuf
     return pResult;
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_normalize(GblDateTime* pSelf) {
+GBL_EXPORT GblDateTime* GblDateTime_normalize(GblDateTime* pSelf) {
     struct tm bTime;
+
+    if(!pSelf)
+        goto fail;
+
     if(pSelf->date.month <= 0) pSelf->date.month = GBL_MONTH_JANUARY;
     if(pSelf->date.day <= 0) pSelf->date.day = 1;
 
     if(toBrokenDown_(pSelf, &bTime) == (time_t)-1)
-        return GBL_RESULT_ERROR_INVALID_DATE_TIME;
+        goto fail;
 
-    GblDateTime_fromLocal(pSelf, &bTime);
-    return GBL_RESULT_SUCCESS;
+    fromBrokenDown_(pSelf, &bTime);
+    return pSelf;
+fail:
+    FAIL_RETURN_NULL_();
 }
 
-GBL_EXPORT double GblDateTime_diff(const GblDateTime* pSelf, const GblDateTime* pRhs) {
+GBL_EXPORT int64_t GblDateTime_diff(const GblDateTime* pSelf, const GblDateTime* pRhs) {
     time_t unix1 = GblDateTime_toUnix(pSelf);
     time_t unix2 = GblDateTime_toUnix(pRhs);
 
@@ -520,25 +542,21 @@ GBL_EXPORT double GblDateTime_diff(const GblDateTime* pSelf, const GblDateTime* 
     return difftime(unix1, unix2);
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_add(GblDateTime* pSelf, const GblDateTime* pRhs) {
-    struct tm local1, local2;
-    GBL_RESULT retVal;
+GBL_EXPORT GblDateTime* GblDateTime_add(GblDateTime* pSelf, const GblDateTime* pRhs) {
+    if(!pSelf || !pRhs) FAIL_RETURN_NULL_();
 
-    retVal = GblDateTime_toLocal(pSelf, &local1);
-    if(!GBL_RESULT_SUCCESS(retVal))
-        return retVal;
+    pSelf->date.year    += pRhs->date.year,
+    pSelf->date.month   += pRhs->date.month,
+    pSelf->date.day     += pRhs->date.day;
+    pSelf->time.hours   += pRhs->time.hours,
+    pSelf->time.minutes += pRhs->time.minutes,
+    pSelf->time.seconds += pRhs->time.seconds;
+    pSelf->utcOffset    += pRhs->utcOffset;
 
-    retVal = GblDateTime_toLocal(pRhs, &local2);
-    if(!GBL_RESULT_SUCCESS(retVal))
-        return retVal;
-
-    if(add_tm_(&local1, &local2) == (time_t)-1)
-        return GBL_RESULT_ERROR_INVALID_DATE_TIME;
-
-    return GblDateTime_fromLocal(pSelf, &local1);
+    return GblDateTime_normalize(pSelf);
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_addDays(GblDateTime* pSelf, GblDay days) {
+GBL_EXPORT GblDateTime* GblDateTime_addDays(GblDateTime* pSelf, GblDay days) {
     const GblDateTime rhs = {
         .date = {
             .day = days
@@ -547,7 +565,7 @@ GBL_EXPORT GBL_RESULT GblDateTime_addDays(GblDateTime* pSelf, GblDay days) {
     return GblDateTime_add(pSelf, &rhs);
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_addHours(GblDateTime* pSelf, GblHour hours) {
+GBL_EXPORT GblDateTime* GblDateTime_addHours(GblDateTime* pSelf, GblHour hours) {
     const GblDateTime rhs = {
         .time = {
             .hours = hours
@@ -556,7 +574,7 @@ GBL_EXPORT GBL_RESULT GblDateTime_addHours(GblDateTime* pSelf, GblHour hours) {
     return GblDateTime_add(pSelf, &rhs);
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_addMinutes(GblDateTime* pSelf, GblMinute minutes) {
+GBL_EXPORT GblDateTime* GblDateTime_addMinutes(GblDateTime* pSelf, GblMinute minutes) {
     const GblDateTime rhs = {
         .time = {
             .minutes = minutes
@@ -565,16 +583,15 @@ GBL_EXPORT GBL_RESULT GblDateTime_addMinutes(GblDateTime* pSelf, GblMinute minut
     return GblDateTime_add(pSelf, &rhs);
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_addSeconds(GblDateTime* pSelf, GblSecond seconds) {
+GBL_EXPORT GblDateTime* GblDateTime_addSeconds(GblDateTime* pSelf, GblSecond seconds) {
     const GblDateTime rhs = {
         .time = {
             .seconds = seconds
         }
     };
-    return GblDateTime_add(pSelf, &rhs);
-}
+    return GblDateTime_add(pSelf, &rhs);}
 
-GBL_EXPORT GBL_RESULT GblDateTime_addWeeks(GblDateTime* pSelf, int weeks) {
+GBL_EXPORT GblDateTime* GblDateTime_addWeeks(GblDateTime* pSelf, int weeks) {
     const GblDateTime rhs = {
         .date = {
             .day = weeks * 7
@@ -583,7 +600,9 @@ GBL_EXPORT GBL_RESULT GblDateTime_addWeeks(GblDateTime* pSelf, int weeks) {
     return GblDateTime_add(pSelf, &rhs);
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_addMonths(GblDateTime* pSelf, GblMonth months) {
+GBL_EXPORT GblDateTime* GblDateTime_addMonths(GblDateTime* pSelf, int months) {
+    if(!pSelf) FAIL_RETURN_NULL_();
+
     pSelf->date.year += months / 12;
     pSelf->date.month += months % 12;
 
@@ -596,12 +615,13 @@ GBL_EXPORT GBL_RESULT GblDateTime_addMonths(GblDateTime* pSelf, GblMonth months)
     }
 
     pSelf->date.day = GBL_MIN(pSelf->date.day,
-                              GblDate_monthDays(pSelf->date.month, pSelf->date.year));
+                              GblDate_monthDays(pSelf->date.month,
+                                                pSelf->date.year));
 
-    return GBL_TRUE;
+    return pSelf;
 }
 
-GBL_EXPORT GBL_RESULT GblDateTime_addYears(GblDateTime* pSelf, GblYear years) {
+GBL_EXPORT GblDateTime* GblDateTime_addYears(GblDateTime* pSelf, GblYear years) {
     const GblDateTime rhs = {
         .date = {
             .year = years
