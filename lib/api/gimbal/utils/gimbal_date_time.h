@@ -3,7 +3,7 @@
  *  \ingroup utils
  *
  *  \todo
- *      - ISO8601 RFC
+ *      - GblDateTime_fromIso8601()
  *      - double GblDateTime_toJulian(): higher res, with seconds
  */
 
@@ -25,6 +25,7 @@
 #define GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST        1900
 #define GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET      -1
 #define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_INCREMENT  128
+#define GBL_DATE_TIME_ISO8601_STRING_SIZE           25
 
 GBL_DECLS_BEGIN
 
@@ -143,6 +144,9 @@ GBL_EXPORT GBL_RESULT   GblDateTime_toLocal     (const GblDateTime* pSelf,
 
 GBL_EXPORT GBL_RESULT   GblDateTime_toUtc       (const GblDateTime* pSelf,
                                                  struct tm* pBrokenDown)   GBL_NOEXCEPT;
+
+GBL_EXPORT const char*  GblDateTime_toIso8601   (const GblDateTime* pSelf,
+                                                 GblStringBuffer* pBuffer) GBL_NOEXCEPT;
 
 GBL_EXPORT const char*  GblDateTime_format      (const GblDateTime* pSelf,
                                                  GblStringBuffer* pBuffer,

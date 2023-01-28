@@ -586,6 +586,32 @@ GBL_TEST_CASE(dateTimeAddYears) {
     GBL_TEST_CASE_END;
 }
 
+GBL_TEST_CASE(dateTimeToIso8601) {
+    GblDateTime dt;
+    GblStringBuffer strBuff;
+
+    GblStringBuffer_construct(&strBuff);
+
+    GblDateTime_set(&dt,
+                    1994, 12, 17,
+                    1, 30, 5, 3780);
+
+    GBL_TEST_COMPARE(GblDateTime_toIso8601(&dt, &strBuff),
+                     "1994-12-17T01:30:05+0103");
+
+    GblDateTime_set(&dt,
+                    1914, 4, 20,
+                    14, 1, 55, -18000);
+
+    GBL_TEST_COMPARE(GblDateTime_toIso8601(&dt, &strBuff),
+                     "1914-04-20T14:01:55-0500");
+
+    GblStringBuffer_destruct(&strBuff);
+
+    GBL_TEST_CASE_END;
+}
+
+
 GBL_TEST_REGISTER(dateIsLeapYear,
                   dateMonthDays,
                   dateMonthString,
@@ -619,4 +645,5 @@ GBL_TEST_REGISTER(dateIsLeapYear,
                   dateTimeAddSeconds,
                   dateTimeAddWeeks,
                   dateTimeAddMonths,
-                  dateTimeAddYears)
+                  dateTimeAddYears,
+                  dateTimeToIso8601)

@@ -477,6 +477,24 @@ GBL_EXPORT GBL_RESULT GblDateTime_toUtc(const GblDateTime* pSelf, struct tm* pBr
     return GBL_RESULT_SUCCESS;
 }
 
+GBL_EXPORT const char* GblDateTime_toIso8601(const GblDateTime* pSelf, GblStringBuffer* pBuffer) {
+    if(!pSelf || !pBuffer)
+        FAIL_RETURN_NULL_();
+
+    GblStringBuffer_reserve(pBuffer, GBL_DATE_TIME_ISO8601_STRING_SIZE);
+
+    GblDateTime_format(pSelf, pBuffer, "%Y-%m-%dT%T");
+
+    if(pSelf->utcOffset >= 0)
+        GblStringBuffer_append(pBuffer, GBL_STRV("+"));
+    else
+        GblStringBuffer_append(pBuffer, GBL_STRV("-"));
+
+    const int mins = abs(pSelf->utcOffset) / 60;
+    GblStringBuffer_appendPrintf(pBuffer, "%02d%02d", mins / 60, mins % 60);
+    return GblStringBuffer_data(pBuffer);
+}
+
 GBL_EXPORT GblDateTime* GblDateTime_parse(GblDateTime* pSelf, const char* pString, const char* pFormat) {
     struct tm brokenDownTime = { 0 };
     int utcOffset = 0;
@@ -493,8 +511,9 @@ GBL_EXPORT const char* GblDateTime_format(const GblDateTime* pSelf, GblStringBuf
     GBL_CTX_VERIFY_POINTER(pBuffer);
     GBL_CTX_VERIFY_POINTER(pFormat);
 
-    struct tm localTime;
-    GBL_CTX_VERIFY_CALL(GblDateTime_toLocal(pSelf, &localTime));
+    struct tm bTime;
+    GBL_CTX_VERIFY(toBrokenDown_(pSelf, &bTime) != (time_t)-1,
+                   GBL_RESULT_ERROR_INVALID_DATE_TIME);
 
     int multiplier = 1;
 
@@ -505,10 +524,12 @@ GBL_EXPORT const char* GblDateTime_format(const GblDateTime* pSelf, GblStringBuf
     } while(strftime(GblStringBuffer_data(pBuffer),
                      GblStringBuffer_capacity(pBuffer),
                      pFormat,
-                     &localTime)
+                     &bTime)
             == 0);
 
     pResult = GblStringBuffer_data(pBuffer);
+
+    GBL_PRIV(pBuffer->data).size = strlen(pResult);
 
     GBL_CTX_END_BLOCK();
     return pResult;
