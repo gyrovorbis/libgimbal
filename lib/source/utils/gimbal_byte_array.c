@@ -1,4 +1,4 @@
-#include <gimbal/containers/gimbal_byte_array.h>
+#include <gimbal/utils/gimbal_byte_array.h>
 #include <gimbal/algorithms/gimbal_hash.h>
 
 GBL_INLINE GBL_RESULT GblByteArray_destruct(void* pRef) {

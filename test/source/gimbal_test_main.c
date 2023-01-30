@@ -16,7 +16,7 @@
 #include "allocators/gimbal_pool_allocator_test_suite.h"
 #include "allocators/gimbal_scope_allocator_test_suite.h"
 #include "utils/gimbal_ref_test_suite.h"
-#include "containers/gimbal_byte_array_test_suite.h"
+#include "utils/gimbal_byte_array_test_suite.h"
 #include "strings/gimbal_quark_test_suite.h"
 #include "strings/gimbal_string_view_test_suite.h"
 #include "strings/gimbal_string_ref_test_suite.h"

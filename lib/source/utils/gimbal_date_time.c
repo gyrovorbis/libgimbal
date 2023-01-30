@@ -558,7 +558,7 @@ GBL_EXPORT int64_t GblDateTime_diff(const GblDateTime* pSelf, const GblDateTime*
     time_t unix2 = GblDateTime_toUnix(pRhs);
 
     if(unix1 == (time_t)-1 || unix2 == (time_t)-1)
-        return NAN;
+        return -1;
 
     return difftime(unix1, unix2);
 }

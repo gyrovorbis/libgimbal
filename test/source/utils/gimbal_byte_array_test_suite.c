@@ -1,7 +1,7 @@
-#include "containers/gimbal_byte_array_test_suite.h"
+#include "utils/gimbal_byte_array_test_suite.h"
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_ctx.h>
-#include <gimbal/containers/gimbal_byte_array.h>
+#include <gimbal/utils/gimbal_byte_array.h>
 
 #define GBL_BYTE_ARRAY_TEST_SUITE_(inst)    ((GblByteArrayTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_BYTE_ARRAY_TEST_SUITE_TYPE))
 

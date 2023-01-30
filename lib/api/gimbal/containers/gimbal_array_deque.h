@@ -2,6 +2,9 @@
  *  \brief GblArrayDeque container and related functions
  *  \ingroup containers
  *  \copydoc GblArrayDeque
+ *
+ *  \todo
+ *    - GblArrayDeque_erase()
  */
 
 #ifndef GIMBAL_ARRAY_DEQUE_H
@@ -137,9 +140,7 @@ GBL_EXPORT GBL_RESULT  GblArrayDeque_shrinkToFit  (GBL_SELF)                    
 #define GblArrayDeque_erase(...)                  GblArrayDeque_eraseDefault_(__VA_ARGS__)
 
 // ===== IMPL =====
-
 ///\cond
-
 #define GBL_RING_SELF_(dequeSelf)      (&GBL_PRIV_REF(dequeSelf).ringBuffer)
 #define GBL_RING_PRIV_REF_(dequeSelf)  (GBL_PRIV_REF(GBL_RING_SELF_(dequeSelf)))
 
@@ -158,7 +159,6 @@ GBL_EXPORT GBL_RESULT  GblArrayDeque_shrinkToFit  (GBL_SELF)                    
 #define GblArrayDeque_eraseDefault__(self, pos, count, ...) \
     (GblArrayDeque_eraseDefault(self, pos, count))
 ///\endcond
-
 
 GBL_INLINE GBL_RESULT GblArrayDeque_destruct(GBL_SELF) GBL_NOEXCEPT {
     return GblRingBuffer_destruct(GBL_RING_SELF_(pSelf));

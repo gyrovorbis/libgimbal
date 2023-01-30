@@ -98,7 +98,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/allocators/gimbal_arena_allocator.h
     api/gimbal/allocators/gimbal_pool_allocator.h
     api/gimbal/allocators/gimbal_scope_allocator.h
-    api/gimbal/containers/gimbal_byte_array.h
     api/gimbal/containers/gimbal_linked_list.h
     api/gimbal/containers/gimbal_hash_set.h
     api/gimbal/containers/gimbal_tree_set.h
@@ -109,7 +108,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_ring_buffer.h
     api/gimbal/containers/gimbal_ring_list.h
     api/gimbal/containers/gimbal_array_deque.h
-    api/gimbal/containers/gimbal_bit_view.h
     api/gimbal/containers/gimbal_array_heap.h
     api/gimbal/core/gimbal_decls.h
     api/gimbal/core/gimbal_ctx.h
@@ -174,6 +172,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/utils/gimbal_version.h
     api/gimbal/utils/gimbal_option_group.h
     api/gimbal/utils/gimbal_date_time.h
+    api/gimbal/utils/gimbal_byte_array.h
+    api/gimbal/utils/gimbal_bit_view.h
 )
 
 
@@ -188,12 +188,10 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_tree_set.c
     source/containers/gimbal_linked_list.c
     source/containers/gimbal_array_map.c
-    source/containers/gimbal_byte_array.c
     source/containers/gimbal_array_list.c
     source/containers/gimbal_ring_buffer.c
     source/containers/gimbal_ring_list.c
     source/containers/gimbal_array_deque.c
-    source/containers/gimbal_bit_view.c
     source/containers/gimbal_array_heap.c
     source/core/gimbal_thread.c
     source/core/gimbal_app.c
@@ -241,6 +239,8 @@ set(GIMBAL_SOURCES
     source/utils/gimbal_ref.c
     source/utils/gimbal_option_group.c
     source/utils/gimbal_date_time.c
+    source/utils/gimbal_byte_array.c
+    source/utils/gimbal_bit_view.c
  )
 
 add_library(libGimbal STATIC

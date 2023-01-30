@@ -25,9 +25,7 @@ STL APIs fairly closely and should be fairly intuitive to work with for any C++ 
 	GblHashSet	           |Hash table-based associative set structure, analogous to std::unordered_set       | gimbal_hash_set.h
 	GblArrayMap		       |Resizable array-based, [K,V] container with optional binary searchability         | gimbal_array_map.h
 	GblArrayHeap           |Dynamic array-based, binary heap structure providing a priority queue API         | gimbal_array_heap.h
-	GblByteArray		   |Reference-counted resizable byte array buffer with generic read/write API         | gimbal_byte_array.h
 	GblRingBuffer          |Fixed-capacity circular buffer backed by a contiguous array with queue semantics  | gimbal_ring_buffer.h
-	GblBitView             |View-based container providing list API + bitwise ops to a range of bits in memory| gimbal_bit_view.h
 
 
 

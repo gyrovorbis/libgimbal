@@ -75,7 +75,6 @@ typedef struct GblMetaClass {
     struct GblMetaClass*        pBases[];
 } GblMetaClass;
 
-
 extern GblContext*              pCtx_;
 extern once_flag                initOnce_;
 extern GblBool                  inittedOnce_;
@@ -89,29 +88,29 @@ extern struct TypeBuiltins_ {
 } typeBuiltins_;
 
 
-extern void             GblType_init_                     (void);
-extern GBL_RESULT       GblType_refresh_                  (GblType type);
-extern GblInterface*    GblType_extension_                (GblType type, GblType ifaceType);
+extern void          GblType_init_                     (void);
+extern GBL_RESULT    GblType_refresh_                  (GblType type);
+extern GblInterface* GblType_extension_                (GblType type, GblType ifaceType);
 
-extern GblType          GblType_registerBuiltin_          (GblSize              expectedIndex,
-                                                           GblType              parentType,
-                                                           const char*          pName,
-                                                           const GblTypeInfo*   pTypeInfo,
-                                                           GblTypeFlags         flags);
+extern GblType       GblType_registerBuiltin_          (GblSize              expectedIndex,
+                                                        GblType              parentType,
+                                                        const char*          pName,
+                                                        const GblTypeInfo*   pTypeInfo,
+                                                        GblTypeFlags         flags);
 
-extern GBL_RESULT       GblProperty_init_                 (GblContext* pCtx);
-extern GBL_RESULT       GblProperty_final_                (GblContext* pCtx);
+extern GBL_RESULT    GblProperty_init_                 (GblContext* pCtx);
+extern GBL_RESULT    GblProperty_final_                (GblContext* pCtx);
 
-extern GBL_RESULT       GblSignal_init_                   (GblContext* pCtx);
-extern GBL_RESULT       GblSignal_final_                  (GblContext* pCtx);
-extern GBL_RESULT       GblSignal_removeInstance_         (GblInstance* pInstance);
+extern GBL_RESULT    GblSignal_init_                   (GblContext* pCtx);
+extern GBL_RESULT    GblSignal_final_                  (GblContext* pCtx);
+extern GBL_RESULT    GblSignal_removeInstance_         (GblInstance* pInstance);
 
-extern GBL_RESULT       GblVariant_init_                  (GblContext* pCtx);
-extern GBL_RESULT       GblVariant_final_                 (GblContext* pCtx);
+extern GBL_RESULT    GblVariant_init_                  (GblContext* pCtx);
+extern GBL_RESULT    GblVariant_final_                 (GblContext* pCtx);
 
-extern GBL_RESULT       GblIVariant_typeRegister_         (GblContext* pCtx);
-extern GBL_RESULT       GblPrimitive_valueTypesRegister_  (GblContext* pCtx);
-extern GBL_RESULT       GblPointer_typeRegister_          (GblContext* pCtx);
+extern GBL_RESULT    GblIVariant_typeRegister_         (GblContext* pCtx);
+extern GBL_RESULT    GblPrimitive_valueTypesRegister_  (GblContext* pCtx);
+extern GBL_RESULT    GblPointer_typeRegister_          (GblContext* pCtx);
 
 
 GBL_DECLS_END

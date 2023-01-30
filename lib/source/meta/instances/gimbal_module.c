@@ -33,7 +33,6 @@ static GblBool GblModule_cmp_(const GblHashSet* pSelf, const void* pLhs, const v
     return strcmp(pName1, pName2) == 0;
 }
 
-
 static GBL_RESULT GblModule_initialize_(void) {
     GBL_CTX_BEGIN(NULL);
     if(initialized_) GBL_CTX_DONE();
@@ -63,10 +62,46 @@ static GBL_RESULT GblModule_finalize_(void) {
 }
 
 GBL_EXPORT GBL_RESULT GblModule_load(GblModule* pSelf) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_POINTER(pSelf);
+    const char* pName = GblObject_name(GBL_OBJECT(pSelf));
 
+    GBL_CTX_INFO("Loading Module: %s", pName);
+    GBL_CTX_PUSH();
 
+    GBL_INSTANCE_VCALL(GblModule, pFnLoad, pSelf);
+
+    GblModule* pOld = GblHashSet_set(&registry_, &pSelf);
+
+    if(pOld) {
+        GBL_CTX_WARN("Overwrote existing module [refCount: %u].",
+                     GblBox_refCount(GBL_BOX(pOld)));
+        GBL_BOX_UNREF(pOld);
+    }
+
+    GBL_CTX_POP(1);
+    GBL_CTX_END();
 }
 
+GBL_EXPORT GBL_RESULT GblModule_unload(GblModule* pSelf) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_POINTER(pSelf);
+    const char* pName = GblObject_name(GBL_OBJECT(pSelf));
+
+    GBL_CTX_INFO("Unloading Module: %s", pName);
+    GBL_CTX_PUSH();
+
+    GBL_INSTANCE_VCALL(GblModule, pFnUnload, pSelf);
+
+    const GblBool erased = GblHashSet_erase(&registry_, &pSelf);
+
+    if(!erased) {
+        GBL_CTX_WARN("No registry entry found!");
+    }
+
+    GBL_CTX_POP(1);
+    GBL_CTX_END();
+}
 
 
 GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {

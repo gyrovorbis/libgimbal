@@ -515,6 +515,7 @@ GBL_EXPORT GblObject* GblVariant_getObjectCopy(const GblVariant* pSelf) GBL_NOEX
     GBL_CTX_END_BLOCK();
     return pObject;
 }
+
 GBL_EXPORT GblObject* GblVariant_getObjectMove(GblVariant* pSelf) GBL_NOEXCEPT {
     GblObject* pObject = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
@@ -523,6 +524,7 @@ GBL_EXPORT GblObject* GblVariant_getObjectMove(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return pObject;
 }
+
 GBL_EXPORT GblObject* GblVariant_getObjectweakRef(const GblVariant* pSelf) GBL_NOEXCEPT {
     GblObject* pObject = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
@@ -547,6 +549,7 @@ GBL_EXPORT GblBool GblVariant_toBool(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT char GblVariant_toChar(GblVariant* pSelf) GBL_NOEXCEPT {
     char value = '\0';
     GBL_CTX_BEGIN(NULL);
@@ -562,6 +565,7 @@ GBL_EXPORT char GblVariant_toChar(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT uint8_t GblVariant_toUint8(GblVariant* pSelf) GBL_NOEXCEPT {
     uint8_t value = 0;
     GBL_CTX_BEGIN(NULL);
@@ -577,6 +581,7 @@ GBL_EXPORT uint8_t GblVariant_toUint8(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT uint16_t GblVariant_toUint16(GblVariant* pSelf) GBL_NOEXCEPT {
     uint16_t value = 0;
     GBL_CTX_BEGIN(NULL);
@@ -592,6 +597,7 @@ GBL_EXPORT uint16_t GblVariant_toUint16(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT int16_t GblVariant_toInt16(GblVariant* pSelf) GBL_NOEXCEPT {
     int16_t value = 0;
     GBL_CTX_BEGIN(NULL);
@@ -607,6 +613,7 @@ GBL_EXPORT int16_t GblVariant_toInt16(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT uint32_t GblVariant_toUint32(GblVariant* pSelf) GBL_NOEXCEPT {
     uint32_t value = 0;
     GBL_CTX_BEGIN(NULL);
@@ -622,6 +629,7 @@ GBL_EXPORT uint32_t GblVariant_toUint32(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT int32_t GblVariant_toInt32(GblVariant* pSelf) GBL_NOEXCEPT {
     int32_t value = 0;
     GBL_CTX_BEGIN(NULL);
@@ -637,6 +645,7 @@ GBL_EXPORT int32_t GblVariant_toInt32(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT uint64_t GblVariant_toUint64(GblVariant* pSelf) GBL_NOEXCEPT {
     uint64_t value = 0;
     GBL_CTX_BEGIN(NULL);
@@ -652,6 +661,7 @@ GBL_EXPORT uint64_t GblVariant_toUint64(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT int64_t GblVariant_toInt64(GblVariant* pSelf) GBL_NOEXCEPT {
     int64_t value = 0;
     GBL_CTX_BEGIN(NULL);
@@ -667,6 +677,7 @@ GBL_EXPORT int64_t GblVariant_toInt64(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT GblEnum GblVariant_toEnum(GblVariant* pSelf) GBL_NOEXCEPT {
     GblEnum value = 0;
     GBL_CTX_BEGIN(NULL);
@@ -682,6 +693,7 @@ GBL_EXPORT GblEnum GblVariant_toEnum(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT GblFlags GblVariant_toFlags(GblVariant* pSelf) GBL_NOEXCEPT {
     GblFlags value = 0;
     GBL_CTX_BEGIN(NULL);
@@ -697,6 +709,7 @@ GBL_EXPORT GblFlags GblVariant_toFlags(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT float GblVariant_toFloat(GblVariant* pSelf) GBL_NOEXCEPT {
     float value = 0.0f;
     GBL_CTX_BEGIN(NULL);
@@ -712,6 +725,7 @@ GBL_EXPORT float GblVariant_toFloat(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT double GblVariant_toDouble(GblVariant* pSelf) GBL_NOEXCEPT {
     double value = 0.0f;
     GBL_CTX_BEGIN(NULL);
@@ -727,6 +741,7 @@ GBL_EXPORT double GblVariant_toDouble(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return value;
 }
+
 GBL_EXPORT void* GblVariant_toPointer(GblVariant* pSelf) GBL_NOEXCEPT {
     void* pValue = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
@@ -742,6 +757,7 @@ GBL_EXPORT void* GblVariant_toPointer(GblVariant* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END_BLOCK();
     return pValue;
 }
+
 GBL_EXPORT const char* GblVariant_toString(GblVariant* pSelf) GBL_NOEXCEPT {
     const GblStringRef* pValue = GBL_NULL;
 

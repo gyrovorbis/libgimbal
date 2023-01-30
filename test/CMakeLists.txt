@@ -40,8 +40,6 @@ set(GIMBAL_TEST_SOURCES
     source/containers/gimbal_array_map_test_suite.c
     include/containers/gimbal_tree_set_test_suite.h
     source/containers/gimbal_tree_set_test_suite.c
-    include/containers/gimbal_byte_array_test_suite.h
-    source/containers/gimbal_byte_array_test_suite.c
     include/containers/gimbal_array_list_test_suite.h
     source/containers/gimbal_array_list_test_suite.c
     include/containers/gimbal_hash_set_test_suite.h
@@ -104,6 +102,8 @@ set(GIMBAL_TEST_SOURCES
     source/utils/gimbal_cmd_parser_test_suite.c
     include/utils/gimbal_date_time_test_suite.h
     source/utils/gimbal_date_time_test_suite.c
+    include/utils/gimbal_byte_array_test_suite.h
+    source/utils/gimbal_byte_array_test_suite.c
     source/gimbal_test_main.c
 )
 

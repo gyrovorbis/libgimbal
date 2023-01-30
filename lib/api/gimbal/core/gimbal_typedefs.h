@@ -21,16 +21,18 @@
 
 // ======== Primitive Types ==========
 
-typedef uint8_t     GblBool;
-typedef size_t      GblSize;
-typedef uint32_t    GblEnum;
-typedef uint32_t    GblFlags;
-typedef uint32_t    GblHash;
-typedef uint16_t    GblRefCount;
-typedef void        (*GblFnPtr)();
+typedef uint8_t  GblBool;
+typedef size_t   GblSize;
+typedef uint32_t GblEnum;
+typedef uint32_t GblFlags;
+typedef uint32_t GblHash;
+typedef uint16_t GblRefCount;
+
+typedef void (*GblFnPtr)();
+
 typedef union GblPtr {
-    void*           pData;
-    GblFnPtr        pFunc;
+    void*    pData;
+    GblFnPtr pFunc;
 } GblPtr;
 
 

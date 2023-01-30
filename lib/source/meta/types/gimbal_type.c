@@ -18,7 +18,6 @@ GblHashSet               typeRegistry_;
 struct TypeBuiltins_     typeBuiltins_;
 
 
-
 GBL_MAYBE_UNUSED static int metaClassIFaceEntryComparator_(const void* pA, const void* pB) {
     const GblTypeInterfaceMapEntry* pIFaceA = pA;
     const GblTypeInterfaceMapEntry* pIfaceB = pB;
@@ -192,22 +191,6 @@ static GBL_RESULT typeValidate_(GblType parent,
                    "Cannot use FUNDAMENTAL FLAGS on DERIVED type!");
 
     if(pParentMeta) {
-#if 0
-        if(pParentMeta->instancePrivateOffset < 0)
-            GBL_CTX_VERIFY(pParentMeta->instancePrivateOffset - pInfo->instancePrivateSize < 0,
-                           GBL_RESULT_ERROR_OVERFLOW,
-                           "%u more private instance bytes causes an OVERFLOW!",
-                           pInfo->instancePrivateSize);
-
-
-        if(pParentMeta->classPrivateOffset < 0)
-            GBL_CTX_VERIFY(pParentMeta->classPrivateOffset - pInfo->classPrivateSize < 0,
-                           GBL_RESULT_ERROR_OVERFLOW,
-                           "%u more private class bytes causes an OVERFLOW!",
-                           pInfo->classPrivateSize);
-#endif
-
-
         const GblType fundamentalType = GblType_root(parent);
         fundFlags |= GBL_META_CLASS_(fundamentalType)->flags;
     }
@@ -351,8 +334,6 @@ static GBL_RESULT typeValidate_(GblType parent,
                                GBL_RESULT_ERROR_INVALID_TYPE,
                                "INTERFACE[%u: %s] data OVERLAPS with INTERFACE[%u: %s]",
                                i, GblType_name(ifaceType), ii, GblType_name(otherIfaceType));
-
-
             }
         }
 
@@ -536,7 +517,6 @@ extern GBL_RESULT GblType_refresh_(GblType type) {
             // not sure if needed
             //GBL_CTX_VERIFY_CALL(GblType_refresh_(GBL_TYPE_(pMeta->pParent)));
 
-
             GblTypeInfo info;
             if(pPlugin) {
                 GblIPluginClass* pIPluginIFace = GBL_IPLUGIN_GET_CLASS(pPlugin);
@@ -583,17 +563,6 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
 
     GblType_freeTypeInfoClassChunk_(pMeta);
 
-    // update metaclass class/instance info
-/*
-    if(!pMeta->pParent) {
-        pMeta->instancePrivateOffset    = 0;
-        pMeta->classPrivateOffset       = 0;
-    }*/
-/*else {
-        pMeta->instancePrivateOffset    = pMeta->pParent->instancePrivateOffset - pInfo->instancePrivateSize;
-        pMeta->classPrivateOffset       = pMeta->pParent->classPrivateOffset    - pInfo->classPrivateSize;
-    }
-*/
     // Calculate sizes and offsets for chunk and subchunks contained within it
     GblSize chunkSize               = 0;
     GblSize ifaceOffset             = 0;
