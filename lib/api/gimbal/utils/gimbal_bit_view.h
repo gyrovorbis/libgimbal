@@ -65,7 +65,7 @@ GBL_INLINE GblBitView* GblBitView_fromView   (GBL_SELF, const GblBitView* pView,
 GBL_EXPORT const char* GblBitView_string     (GBL_CSELF, GblStringBuffer* pBuffer, GblSize index, GblSize count) GBL_NOEXCEPT;
 GBL_INLINE uint64_t    GblBitView_uint64     (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
 
-GBL_EXPORT GblBitView* GblBitView_setString  (GBL_SELF, const char* pString, GblSize index, GblSize count)       GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_setString  (GBL_SELF, const char* pString, GblSize index, GblSize count)       GBL_NOEXCEPT;
 GBL_INLINE GblBitView* GblBitView_setUint64  (GBL_SELF, uint64_t value, GblSize index, GblSize count)            GBL_NOEXCEPT;
 
 GBL_INLINE GblSize     GblBitView_bytes      (GBL_CSELF)                                                         GBL_NOEXCEPT;
@@ -374,7 +374,7 @@ GBL_INLINE GblBool GblBitView_leq(GBL_CSELF, const GblBitView* pOther) GBL_NOEXC
     return result;
 }
 
-GBL_EXPORT GblBitView* (GblBitView_setString)(GBL_SELF, const char* pString, GblSize index, GblSize count) GBL_NOEXCEPT {
+GBL_INLINE GblBitView* (GblBitView_setString)(GBL_SELF, const char* pString, GblSize index, GblSize count) GBL_NOEXCEPT {
     GBL_ASSERT(strlen(pString) >= count);
     if(!count) count = strlen(pString);
     GBL_ASSERT(index + count < pSelf->length);
