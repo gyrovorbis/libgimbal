@@ -1,6 +1,6 @@
 /*! \file
  *  \brief GblByteArray structure and related functions
- *  \ingroup utilities
+ *  \ingroup utils
  */
 
 #ifndef GIMBAL_BYTE_ARRAY_H
@@ -14,7 +14,7 @@
 GBL_DECLS_BEGIN
 
 /*! \brief Reference-counted resizable array of bytes
- *  \ingroup utilities
+ *  \ingroup utils
  *  \sa GblBitView
  */
 typedef struct GblByteArray {

@@ -21,7 +21,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblStringBuffer);
 
 /*! \brief Mutable view to a field of bits within some
  *         block of memory.
- *  \ingroup utilities
+ *  \ingroup utils
  *
  *  GblBitView is a view-based container, which does not
  *  own, but simply references, an existing field of bits
