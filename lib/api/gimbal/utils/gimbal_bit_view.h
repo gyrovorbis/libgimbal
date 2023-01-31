@@ -97,7 +97,7 @@ GBL_INLINE GblBool     GblBitView_leq        (GBL_CSELF, const GblBitView* pOthe
 */
 
 // ===== Macro overrides =====
-#define GblBitView_fromBuffer(...)           GblBitView_fromBufferDefalt_(__VA_ARGS__)
+#define GblBitView_fromBuffer(...)           GblBitView_fromBufferDefault_(__VA_ARGS__)
 #define GblBitView_fromView(...)             GblBitView_fromViewDefault_(__VA_ARGS__)
 #define GblBitView_string(...)               GblBitView_stringDefault_(__VA_ARGS__)
 #define GblBitView_uint64(...)               GblBitView_uint64Default_(__VA_ARGS__)
@@ -115,20 +115,25 @@ GBL_INLINE GblBool     GblBitView_leq        (GBL_CSELF, const GblBitView* pOthe
 
 // ===== Implementation =====
 /// \cond
-#define GblBitView_fromBuffer_(...) \
+#define GblBitView_fromBufferDefault_(...) \
     GblBitView_fromBufferDefault__(__VA_ARGS__, 0)
-#define GblBitView_initDefault__(self, buffer, count, offset, ...) \
+#define GblBitView_fromBufferDefault__(self, buffer, count, offset, ...) \
     (GblBitView_fromBuffer)(self, buffer, count, offset)
 
 #define GblBitView_fromViewDefault_(...) \
-    GblBitView_viewDefault__(__VA_ARGS__, GBL_TUPLE_FIRST(__VA_ARGS__)->length, 0)
+    GblBitView_fromViewDefault__(__VA_ARGS__, GBL_TUPLE_FIRST(__VA_ARGS__)->length, 0)
 #define GblBitView_fromViewDefault__(self, view, count, offset, ...) \
     (GblBitView_fromView)(self, view, count, offset)
 
 #define GblBitView_stringDefault_(...) \
-    GblBitView_stringDefault_(__VA_ARGS__, 0, GBL_TUPLE_FIRST(__VA_ARGS__)->length)
+    GblBitView_stringDefault__(__VA_ARGS__, 0, (GBL_TUPLE_FIRST(__VA_ARGS__))->length)
 #define GblBitView_stringDefault__(self, buffer, index, count, ...) \
     (GblBitView_string)(self, buffer, index, count)
+
+#define GblBitView_uint64Default_(...) \
+    GblBitView_uint64Default__(__VA_ARGS__, 0, (GBL_TUPLE_FIRST(__VA_ARGS__))->length)
+#define GblBitView_uint64Default__(self, index, count, ...) \
+    (GblBitView_uint64)(self, index, count)
 
 #define GblBitView_setStringDefault_(...) \
     GblBitView_setStringDefault__(__VA_ARGS__, 0, 0)
@@ -184,8 +189,8 @@ extern uint8_t GblBitView_lsbMaskLut_[8];
 extern uint8_t GblBitView_msbMaskLut_[8];
 
 GBL_INLINE uint8_t* GblBitView_byteFromBit_(GBL_CSELF, GblSize bit) {
-    GBL_ASSERT(bit < pSelf->length);
-    return &pSelf->pBytes[bit/8];
+    GBL_ASSERT(bit < pSelf->length + pSelf->offset);
+    return &pSelf->pBytes[bit >> 3];
 }
 
 /// \endcond
@@ -196,15 +201,15 @@ GBL_INLINE GblBool GblBitView_wordAligned(GBL_CSELF) GBL_NOEXCEPT {
 
 GBL_INLINE GblBitView* (GblBitView_fromBuffer)(GBL_SELF, void* pStorage, GblSize bits, GblSize offset) GBL_NOEXCEPT {
     pSelf->length = bits;
-    pSelf->offset = offset % 8;
-    pSelf->pBytes = (uint8_t*)pStorage + (offset/8);
+    pSelf->offset = offset & 0x7;
+    pSelf->pBytes = (uint8_t*)pStorage + (offset >> 3);
     return pSelf;
 }
 
 GBL_INLINE GblBitView* (GblBitView_fromView)(GBL_SELF, const GblBitView* pSource, GblSize count, GblSize offset) GBL_NOEXCEPT {
     GBL_ASSERT(offset+count <= pSource->length);
     pSelf->length = count;
-    pSelf->offset = offset;
+    pSelf->offset = pSource->offset + offset;
     pSelf->pBytes = GblBitView_byteFromBit_(pSource, offset);
     return pSelf;
 }
@@ -220,7 +225,8 @@ GBL_INLINE GblSize GblBitView_words(GBL_CSELF) GBL_NOEXCEPT {
 GBL_EXPORT GblBool GblBitView_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
     GblBool value = GBL_FALSE;
     if(index < pSelf->length) {
-        value = (*GblBitView_byteFromBit_(pSelf, index) >> (index%8)) & 0x1;
+        index += pSelf->offset;
+        value = (*GblBitView_byteFromBit_(pSelf, index) >> (index & 0x7)) & 0x1;
     } else {
         GBL_CTX_BEGIN(NULL);
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
@@ -242,8 +248,10 @@ GBL_INLINE GblSize (GblBitView_count)(GBL_CSELF, GblSize index, GblSize count) G
     const GblSize end = start + count;
     if(start/4 < end/4) {
         pSelf->pBytes[start/8] |= GblBitView_msbMaskLut_[start%8];
+
         for(GblSize i = start/8+1; i < end/8; ++i)
             pSelf->pBytes[i] = 0xff;
+
         pSelf->pBytes[end/8] |= GblBitView_lsbMaskLut_[end%8];
     } else {
         pSelf->pBytes[start/8] |= (GblBitView_msbMaskLut_[start%8] &
@@ -279,7 +287,7 @@ GBL_INLINE GblBitView* (GblBitView_set)(GBL_SELF, GblSize index, GblSize count) 
             pSelf->pBytes[i] = 0xff;
         pSelf->pBytes[end/8] |= GblBitView_lsbMaskLut_[end%8];
     } else {
-        pSelf->pBytes[start/8] |= (GblBitView_msbMaskLut_[start%8] &
+        pSelf->pBytes[start/8] |= (GblBitView_msbMaskLut_[start%8] |
                                    GblBitView_lsbMaskLut_[end%8]);
     }
     return pSelf;
@@ -294,7 +302,7 @@ GBL_INLINE GblBitView* (GblBitView_reset)(GBL_SELF, GblSize index, GblSize count
             pSelf->pBytes[i] = 0x00;
         pSelf->pBytes[end/8] &= ~GblBitView_lsbMaskLut_[end%8];
     } else {
-        pSelf->pBytes[start/8] &= ~(GblBitView_msbMaskLut_[start%8] &
+        pSelf->pBytes[start/8] &= ~(GblBitView_msbMaskLut_[start%8] |
                                    GblBitView_lsbMaskLut_[end%8]);
     }
     return pSelf;
@@ -302,15 +310,24 @@ GBL_INLINE GblBitView* (GblBitView_reset)(GBL_SELF, GblSize index, GblSize count
 
 GBL_INLINE GblBitView* (GblBitView_flip)(GBL_SELF, GblSize index, GblSize count) GBL_NOEXCEPT {
     const GblSize start = pSelf->offset + index;
-    const GblSize end = start + count;
-    if(start/8 < end/8) {
-        pSelf->pBytes[start/8] ^= GblBitView_msbMaskLut_[start%8];
-        for(GblSize i = start/8+1; i < end/8; ++i)
+    const GblSize end   = start + count;
+
+    const GblSize startByte = start / 8;
+    const GblSize endByte   = end   / 8;
+    const GblSize startBit  = start % 8;
+    const GblSize endBit    = end   % 8;
+
+    if(startByte < endByte) {
+        pSelf->pBytes[startByte] ^= GblBitView_msbMaskLut_[startBit];
+
+        for(GblSize i = startByte + 1; i < endByte; ++i)
             pSelf->pBytes[i] ^= 0xff;
-        pSelf->pBytes[end/8] ^= GblBitView_lsbMaskLut_[end%8];
+
+        pSelf->pBytes[endByte] ^= GblBitView_lsbMaskLut_[endBit];
+
     } else {
-        pSelf->pBytes[start/8] ^= (GblBitView_msbMaskLut_[start%8] &
-                                   GblBitView_lsbMaskLut_[end%8]);
+        pSelf->pBytes[startByte] ^= (GblBitView_msbMaskLut_[startBit] |
+                                     GblBitView_lsbMaskLut_[endBit]);
     }
     return pSelf;
 }
@@ -403,6 +420,18 @@ GBL_EXPORT GblBitView* (GblBitView_setUint64)(GBL_SELF, uint64_t value, GblSize 
     for(GblSize b = 0; b < count; ++b) {
         GblBitView_assign(pSelf, (value>>b)&0x1, index+b);
     }
+    return pSelf;
+}
+
+GBL_INLINE GblBitView* (GblBitView_rotate)(GBL_SELF, ptrdiff_t n, GblSize offset, GblSize count) GBL_NOEXCEPT {
+    return pSelf;
+}
+
+GBL_INLINE GblBitView* GblBitView_shiftLeft(GBL_SELF, const GblBitView* pSrc, GblSize amount) GBL_NOEXCEPT {
+    return pSelf;
+}
+
+GBL_INLINE GblBitView* GblBitView_shiftRight(GBL_SELF, const GblBitView* pSrc, GblSize amount) GBL_NOEXCEPT {
     return pSelf;
 }
 

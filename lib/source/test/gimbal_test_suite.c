@@ -5,7 +5,7 @@
 #define GBL_TEST_SUITE_(inst)           ((GblTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_TEST_SUITE_TYPE))
 
 typedef struct GblTestSuite_ {
-    GblArrayList       testCases;
+    GblArrayList testCases;
 } GblTestSuite_;
 
 static GBL_RESULT GblTestSuiteClass_vTableDefault_(GblTestSuite* pSelf, GblContext* pCtx) {
@@ -183,6 +183,12 @@ GBL_EXPORT GBL_RESULT GblTestSuite_initSuite(GblTestSuite* pSelf, GblContext* pC
     if(!pClass->pVTable || !pClass->pVTable->pFnSuiteInit)
         GBL_CTX_DONE();
     GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnSuiteInit, pSelf, pCtx);
+
+    if(!GBL_RESULT_SUCCESS(GBL_CTX_RESULT())) {
+         pSelf->casesSkipped += GblTestSuite_caseCount(pSelf);
+         memcpy(&pSelf->failingIssue, &GBL_CTX_LAST_RECORD(), sizeof(GblCallRecord));
+    }
+
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END();
 }
@@ -203,6 +209,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_initCase(GblTestSuite* pSelf, GblContext* pCt
     if(!pClass->pVTable || !pClass->pVTable->pFnCaseInit)
         GBL_CTX_DONE();
     GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnCaseInit, pSelf, pCtx);
+
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END();
 }
@@ -312,15 +319,8 @@ GBL_EXPORT GblTestSuite* GblTestSuite_createFromType(GblType type) {
     return pSuite;
 }
 
-GBL_EXPORT GBL_RESULT GblTestSuite_destroy(GblTestSuite* pSelf) {
-    GBL_CTX_BEGIN(pSelf);
-    GBL_CTX_VERIFY(GblTestSuite_scenario(pSelf) == NULL,
-                   GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "Tried to destroy a GblTestSuite owned by a scenario!");
-    GBL_CTX_VERIFY(GblBox_unref(GBL_BOX(pSelf)) == 0,
-                   GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "Tried to destroy GblTestSuite, has other references!");
-    GBL_CTX_END();
+GBL_EXPORT GblRefCount GblTestSuite_destroy(GblTestSuite* pSelf) {
+    return GBL_BOX_UNREF(pSelf);
 }
 
 GBL_EXPORT GBL_RESULT GblTestSuite_addCase(GblTestSuite* pSelf, const char* pName, GblTestCaseRunFn pFnRun) {

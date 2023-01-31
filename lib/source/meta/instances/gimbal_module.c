@@ -61,13 +61,15 @@ static GBL_RESULT GblModule_finalize_(void) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblModule_load(GblModule* pSelf) {
+GBL_EXPORT GBL_RESULT GblModule_register(GblModule* pSelf) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf);
     const char* pName = GblObject_name(GBL_OBJECT(pSelf));
 
     GBL_CTX_INFO("Loading Module: %s", pName);
     GBL_CTX_PUSH();
+
+    GblModule_initialize_();
 
     GBL_INSTANCE_VCALL(GblModule, pFnLoad, pSelf);
 
@@ -83,7 +85,7 @@ GBL_EXPORT GBL_RESULT GblModule_load(GblModule* pSelf) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblModule_unload(GblModule* pSelf) {
+GBL_EXPORT GBL_RESULT GblModule_unregister(GblModule* pSelf) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf);
     const char* pName = GblObject_name(GBL_OBJECT(pSelf));

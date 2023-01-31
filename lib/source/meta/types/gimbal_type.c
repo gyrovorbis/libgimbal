@@ -510,7 +510,7 @@ extern GBL_RESULT GblType_refresh_(GblType type) {
     GBL_CTX_BEGIN(pCtx_);
     if(type != GBL_INVALID_TYPE) {
         GblMetaClass* pMeta   = GBL_META_CLASS_(type);
-        GblIPlugin* pPlugin = GblType_plugin(type);
+        GblIPlugin* pPlugin = NULL;//GblType_plugin(type);
 
         if(!pMeta->pClass || pPlugin) {
 

@@ -14,7 +14,7 @@
 #include "../../preprocessor/gimbal_macro_composition.h"
 #include "gimbal_closure.h"
 
-#define GBL_SIGNALS(instanceStruct, /* signals */...)               GBL_SIGNALS_(instanceStruct, __VA_ARGS__)
+#define GBL_SIGNALS(instanceStruct, /* signals */...) GBL_SIGNALS_(instanceStruct, __VA_ARGS__)
 #define GBL_SIGNALS_REGISTER(instanceStruct, /* marshals */...)
 
 GBL_DECLS_BEGIN
@@ -107,7 +107,6 @@ GBL_CTX_VERIFY_CALL(GblSignal_install(GBL_TYPEOF(instance), \
 
 #define GBL_SIGNALS_REGISTER_(instance, marshals) \
     instance##_registerSignals_(instance, marshals)
-
 
 ///\endcond
 

@@ -1,5 +1,7 @@
 #include <gimbal/meta/instances/gimbal_context.h>
 #include "../types/gimbal_type_.h"
+#include <gimbal/utils/gimbal_date_time.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 
 static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
@@ -326,6 +328,18 @@ GBL_EXPORT void GblContext_setLogFilter(GblContext* pSelf, GblFlags mask) {
 
 GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
     GBL_CTX_BEGIN(pSelf);
+
+    GblDateTime dt;
+    struct {
+        GblStringBuffer buffer;
+        char ext[256];
+    } str;
+    GblStringBuffer_construct(&str.buffer, GBL_STRV(""), sizeof(str));
+    GBL_CTX_INFO("%-20s: %-100.100s", "Local Time",
+                 GblDateTime_format(GblDateTime_nowLocal(&dt),
+                                    &str.buffer,
+                                    "%A, %m/%d/%Y %I:%M:%S %p"));
+    GblStringBuffer_destruct(&str.buffer);
 
     GBL_CTX_INFO("LibGimbal Info");
     GBL_CTX_PUSH();

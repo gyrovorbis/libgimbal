@@ -450,15 +450,15 @@
 #       define GBL_BITMASK_POPCOUNT(mask)   __builtin_popcount(mask)    // count number of 1s
 #   elif defined(_MSC_VER)
 #       include <intrin.h>
-        GBL_MAYBE_UNUSED GBL_CONSTEXPR GBL_INLINE unsigned GBL_BITMASK_CLZ(unsigned mask) GBL_NOEXCEPT {
+        GBL_CONSTEXPR GBL_INLINE unsigned GBL_BITMASK_CLZ(unsigned mask) GBL_NOEXCEPT {
             unsigned long idx = 0;
             return _BitScanReverse(&idx, mask)? ((sizeof(unsigned) * 8) - idx) : 0;
         }
-        GBL_MAYBE_UNUSED GBL_CONSTEXPR GBL_INLINE unsigned GBL_BITMASK_CTZ(unsigned mask) GBL_NOEXCEPT {
+        GBL_CONSTEXPR GBL_INLINE unsigned GBL_BITMASK_CTZ(unsigned mask) GBL_NOEXCEPT {
             unsigned long idx = 0;
             return _BitScanForward(&idx, mask)? idx : 0;
         }
-        GBL_MAYBE_UNUSED GBL_CONSTEXPR GBL_INLINE unsigned GBL_BITMASK_FFS(unsigned mask) GBL_NOEXCEPT {
+        GBL_CONSTEXPR GBL_INLINE unsigned GBL_BITMASK_FFS(unsigned mask) GBL_NOEXCEPT {
             const unsigned idx = GBL_BITMASK_CTZ(mask);
             return idx? idx + 1 : 0;
         }

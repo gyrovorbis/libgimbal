@@ -14,7 +14,6 @@ GBL_TEST_INIT() {
     GBL_TEST_CASE_END;
 }
 
-
 GBL_TEST_FINAL() {
     GBL_TEST_CASE_END;
 }

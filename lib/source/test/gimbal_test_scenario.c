@@ -106,11 +106,20 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
         GBL_CTX_CLEAR_LAST_RECORD();
         GBL_CTX_POP(1);
 
-        if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) {
-            GBL_CTX_ERROR("[GblTestSuite] Failed to initialize test suite[%s]: SKIPPING",
-                          GblTestSuite_name(pSuiteIt));
+        if(GBL_CTX_RESULT() == GBL_RESULT_SKIPPED) {
+            GBL_CTX_INFO("%-12s: %s", "[      SKIP ]",
+                         GblTestSuite_name(pSelf_->pCurSuite));
 
+            pSelf->casesSkipped += GblTestSuite_caseCount(pSuiteIt);
             ++pSelf->suitesSkipped;
+
+        } else if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) {
+            GBL_CTX_INFO("%-12s: %s", "[      FAIL ]",
+                         GblTestSuite_name(pSelf_->pCurSuite));
+
+            ++pSelf->suitesRun;
+            pSelf->casesSkipped += GblTestSuite_caseCount(pSuiteIt);
+            ++pSelf->suitesFailed;
 
         } else {
 
@@ -195,17 +204,17 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
 
             if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) {
 
-                GBL_CTX_ERROR("[GblTestSuite] Failed to finalize test suite[%s]: SKIPPING",
-                              GblTestSuite_name(pSuiteIt));
+                GBL_CTX_INFO("%-12s: %s", "[      FAIL ]",
+                             GblTestSuite_name(pSelf_->pCurSuite));
 
                 suiteFailed = GBL_TRUE;
             }
 
             if(!suiteFailed) ++pSelf->suitesPassed;
             else ++pSelf->suitesFailed;
-
-            GBL_CTX_CALL(pClass->pFnSuiteEnd(pSelf, pSuiteIt));
         }
+
+        GBL_CTX_CALL(pClass->pFnSuiteEnd(pSelf, pSuiteIt));
     }
 
     pSelf->result = pSelf->casesFailed || pSelf->suitesFailed? GBL_RESULT_ERROR : GBL_RESULT_SUCCESS;
@@ -447,7 +456,9 @@ GBL_EXPORT GblTestScenario* GblTestScenario_create(const char* pName) {
     return pScenario;
 }
 
-GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
+GBL_EXPORT GblRefCount GblTestScenario_unref(GblTestScenario* pSelf) {
+    GblRefCount retVal = 0;
+
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GblTestScenario_*   pSelf_  = GBL_TEST_SCENARIO_(pSelf);
@@ -467,12 +478,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_destroy(GblTestScenario* pSelf) {
 
     GBL_CTX_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
 
-    //GBL_CTX_DONE();
-
-
-    GBL_CTX_VERIFY(GblBox_unref(GBL_BOX(pSelf)) == 0,
-                   GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "[GblTestScenario] Destroy: Leaking unexpected existing references!");
+    retVal = GBL_BOX_UNREF(pSelf);
     GBL_CTX_END();
 }
 
