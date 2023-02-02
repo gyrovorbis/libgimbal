@@ -6,7 +6,7 @@
 #define GBL_TEST_SUITE_SELF GblBitViewTestSuite
 
 GBL_TEST_FIXTURE {
-    char dummy;
+    unsigned dummy;
 };
 
 GBL_TEST_INIT() {

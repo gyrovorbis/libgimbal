@@ -89,6 +89,25 @@ int start_logger(const char *app_name)
 
 #endif
 
+#ifdef __DREAMCAST__
+#include <arch/arch.h>
+
+//    assert_msg(false, "exec call failed");
+
+    KOS_INIT_FLAGS(INIT_DEFAULT | INIT_MALLOCSTATS);
+
+    /* This function will override the default stack protector handler that is
+       defined in Newlib. This is not necessary to enable the stack protector,
+       but is nice for being able to draw the error message to the screen or
+       whatnot (not that we do any of that here). */
+    void __stack_chk_fail(void) {
+        unsigned int pr = (unsigned int)arch_get_ret_addr();
+        GBL_CTX_ERROR("Stack smashed: [%x], aborting...");
+        exit(-1);
+    }
+
+#endif
+
 int main(int argc, char* pArgv[]) {
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
     gdb_init();

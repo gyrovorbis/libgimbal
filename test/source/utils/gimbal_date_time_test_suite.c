@@ -7,7 +7,7 @@
 #define GBL_TEST_SUITE_SELF GblDateTimeTestSuite
 
 GBL_TEST_FIXTURE {
-    char dummy;
+    unsigned dummy;
 };
 
 GBL_TEST_INIT() {
