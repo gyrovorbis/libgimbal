@@ -10,7 +10,7 @@ stages:
 build debian-gcc:
   extends: .build_debian
   tags:
-    - gcc
+    - debian, gcc
   variables:
     CC: gcc
     CXX: g++
@@ -18,7 +18,7 @@ build debian-gcc:
 build debian-clang:
   extends: .build_debian
   tags: 
-    - clang
+    - debian, clang
   variables:
     CC: clang
     CXX: clang++
@@ -26,7 +26,7 @@ build debian-clang:
 build win-msvc:
   extends: .build_win
   tags:
-    - msvc
+    - win, msvc
   variables:   
     CC: cl
     CXX: cl
@@ -35,7 +35,7 @@ build win-msvc:
 build win-mingw:
   extends: .build_win
   tags:
-    - mingw
+    - win, mingw
   variables:
     CC: x86_64-w64-mingw32-gcc
     CXX: x86_64-w64-mingw32-g++
@@ -44,7 +44,7 @@ build win-mingw:
 build macos-clang:
   extends: .build_macos
   tags:
-    - clang
+    - macos, clang
   variables:
     CC: clang
     CXX: clang++
@@ -52,7 +52,7 @@ build macos-clang:
 build macos-gcc:
   extends: .build_macos
   tags:
-    - gcc
+    - macos, gcc
   variables:
     CC: gcc-11
     CXX: g++-11
