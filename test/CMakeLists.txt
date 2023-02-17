@@ -157,6 +157,7 @@ target_include_directories(GimbalTests
     PRIVATE include)
 
 set_target_properties(GimbalTests PROPERTIES
+    BUNDLE true
     MACOSX_BUNDLE_INFO_STRING "Gimbal Tests v${GIMBAL_VERSION}"
     MACOSX_BUNDLE_BUNDLE_NAME "GimbalTests"
     MACOSX_BUNDLE_BUNDLE_VERSION ${GIMBAL_VERSION}

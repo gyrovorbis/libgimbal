@@ -19,7 +19,6 @@ variables:
   script:
     - mkdir -p ${BUILD_DIR}
     - cd ${BUILD_DIR}
-    - source ${ENVIRON_SH} || true
     - CC=${CC} CXX=${CXX} ${CMAKE} ../ -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
       -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE} 
       -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS}
@@ -66,6 +65,7 @@ variables:
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
     BINARY_EXTENSION: .elf
-    ENVIRON_SH: ${KOS_BASE}/../environ.sh
   tags: 
     - dreamcast
+  before_script:
+    - source ${KOS_BASE}/../environ.sh
