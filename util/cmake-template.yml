@@ -55,7 +55,7 @@ variables:
   extends: .build_cmake
   variables:
     PREFIX_PATH: ${QT_PATH}/macos
-    DEPOLOY_CMD: ${PREFIX_PATH}/bin/macdeployqt
+    DEPLOY_CMD: ${PREFIX_PATH}/bin/macdeployqt
     BINARY_EXTENSION: .app
   tags:
     - macos
@@ -65,7 +65,7 @@ variables:
   extends: .build_cmake
   variables:
     TOOLCHAIN_FILE: ${CI_PROJECT_DIR}/util/dreamcast.toolchain.cmake
-    GENERATOR: "\"Unix Makefiles\""
+    GENERATOR:
     EXTRA_GENERATOR_ARGS: -j8 
     BINARY_EXTENSION: .elf
   tags: 
