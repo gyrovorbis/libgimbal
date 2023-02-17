@@ -19,6 +19,7 @@ variables:
     EXTRA_GENERATOR_ARGS: ""
     DEPLOY_CMD: echo
   script:
+    - set -x #echo on
     - mkdir -p ${BUILD_DIR}
     - cd ${BUILD_DIR}
     - CC=${CC} CXX=${CXX} ${CMAKE_CONFIGURE} ../ -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
@@ -76,7 +77,7 @@ variables:
 .build_psvita:
   extends: .build_cmake
   variables:
-    TOOLCHAIN_FILE: ${VITA_SDK}/share/vita.toolchain.cmake
+    TOOLCHAIN_FILE: ${VITASDK}/share/vita.toolchain.cmake
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
   tags: 
@@ -86,7 +87,8 @@ variables:
 .build_android-sim:
   extends: .build_cmake
   variables:
-    CMAKE_CONFIGURE: ${QT_PATH}/android_x86_64/bin/qt-cmake 
+    PREFIX_PATH: ${QT_PATH}/android_x86_64
+    CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake 
     TOOLCHAIN_FILE: ${ANDROID_NDK}/build/cmake/android.toolchain.cmake
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
