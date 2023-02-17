@@ -90,7 +90,8 @@ variables:
     PREFIX_PATH: ${QT_PATH}/android_x86_64
     CMAKE_CONFIGURE: ${QT_PATH}/android_x86_64/bin/qt-cmake 
     TOOLCHAIN_FILE: ${ANDROID_NDK}/build/cmake/android.toolchain.cmake
-    EXTRA_CMAKE_ARGS: `-DCMAKE_PROJECT_INCLUDE_BEFORE=${QT_PATH}/../Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake'
+    EXTRA_CMAKE_ARGS: >
+      '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${QT_PATH}/../Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake'
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
   tags: 
