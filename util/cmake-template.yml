@@ -84,6 +84,7 @@ variables:
 
 # Top-level Android Simulator build job
 .build_android-sim:
+  extends: .build_cmake
   variables:
     CMAKE_CONFIGURE: ${QT_PATH}/android_x86_64/bin/qt-cmake 
     TOOLCHAIN_FILE: ${ANDROID_NDK}/build/cmake/android.toolchain.cmake
@@ -94,6 +95,7 @@ variables:
 
 # Top-level iOS Simulator build job
 .build_ios-sim:
+  extends: .build_cmake
   variables:
     PREFIX_PATH: ${QT_PATH}/ios
     CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake
@@ -101,11 +103,12 @@ variables:
     EXTRA_CMAKE_ARGS: -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator
     GENERATOR: Xcode
     BUILD_TARGET: ALL_BUILD
-   tags: 
+  tags: 
     - ios, simulator
 
 # Top-level WebASM build job
-.build_wasm:
+.build_webasm:
+  extends: .build_cmake
   variables:
     PREFIX_PATH: ${QT_PATH}/wasm_32
     CC: ${EMSDK}/upstream/emscriptgen/emcc
