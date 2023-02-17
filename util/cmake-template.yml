@@ -66,5 +66,6 @@ variables:
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
     BINARY_EXTENSION: .elf
+    ENVIRON_SH: ${KOS_BASE}/../environ.sh
   tags: 
     - dreamcast
