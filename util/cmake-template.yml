@@ -1,17 +1,19 @@
-# GLOBAL project-level configuration settings
+# GLOBAL project-level configuration settings (defaults)
 variables:
   BINARY_PATH: ""
   BUILD_DIR: build
   BUILD_TYPE: Release
   EXTRA_CMAKE_ARGS: ""
+  BUILD_TARGET: all
+  BUILD_CONFIG: ${BUILD_TYPE}
 
 # TOP-LEVEL CMake build job
 .build_cmake:
   stage: build
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
-    ENVIRON_SH: ""
-    CMAKE: cmake
+    CMAKE_CONFIGURE: cmake
+    CMAKE_BUILD: ${CMAKE_CONFIGURE}
     GENERATOR: Ninja
     TOOLCHAIN_FILE: ""  
     EXTRA_GENERATOR_ARGS: ""
@@ -19,10 +21,11 @@ variables:
   script:
     - mkdir -p ${BUILD_DIR}
     - cd ${BUILD_DIR}
-    - CC=${CC} CXX=${CXX} ${CMAKE} ../ -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
+    - CC=${CC} CXX=${CXX} ${CMAKE_CONFIGURE} ../ -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
       -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE} 
       -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS}
-    - ${ANALYZER} ${CMAKE} --build . --target all -- ${EXTRA_GENERATOR_ARGS}
+    - ${ANALYZER} ${CMAKE_BUILD} --build . --target ${BUILD_TARGET} --config ${BUILD_CONFIG} 
+      -- ${EXTRA_GENERATOR_ARGS}
   after_script:
     - ${DEPLOY_CMD} ${BUILD_DIR}/${BINARY_PATH}${BINARY_EXTENSION}  
   artifacts:
@@ -53,7 +56,6 @@ variables:
   variables:
     PREFIX_PATH: ${QT_PATH}/macos
     DEPLOY_CMD: ${PREFIX_PATH}/bin/macdeployqt
-    BINARY_EXTENSION: .app
   tags:
     - macos
 
@@ -65,7 +67,54 @@ variables:
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
     BINARY_EXTENSION: .elf
-  tags: 
-    - dreamcast
   before_script:
     - source ${KOS_BASE}/../environ.sh
+  tags: 
+    - dreamcast
+
+# Top-level PSVita build job
+.build_psvita:
+  extends: .build_cmake
+  variables:
+    TOOLCHAIN_FILE: ${VITA_SDK}/share/vita.toolchain.cmake
+    GENERATOR: "Unix Makefiles"
+    EXTRA_GENERATOR_ARGS: -j8 
+  tags: 
+    - psvita, vitasdk
+
+# Top-level Android Simulator build job
+.build_android-sim:
+  variables:
+    CMAKE_CONFIGURE: ${QT_PATH}/android_x86_64/bin/qt-cmake 
+    TOOLCHAIN_FILE: ${ANDROID_NDK}/build/cmake/android.toolchain.cmake
+    GENERATOR: "Unix Makefiles"
+    EXTRA_GENERATOR_ARGS: -j8 
+  tags: 
+    - android, ndk
+
+# Top-level iOS Simulator build job
+.build_ios-sim:
+  variables:
+    PREFIX_PATH: ${QT_PATH}/ios
+    CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake
+    CMAKE_BUILD: ${PREFIX_PATH}/../Tools/CMake/CMake.app/Contents/bin/cmake
+    EXTRA_CMAKE_ARGS: -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator
+    GENERATOR: Xcode
+    BUILD_TARGET: ALL_BUILD
+   tags: 
+    - ios, simulator
+
+# Top-level WebASM build job
+.build_wasm:
+  variables:
+    PREFIX_PATH: ${QT_PATH}/wasm_32
+    CC: ${EMSDK}/upstream/emscriptgen/emcc
+    CXX: ${EMSDK}/upstream/emscriptgen/em++
+    TOOLCHAIN_FILE: ${PREFIX_PATH}/lib/cmake/Qt6/qt.toolchain.cmake
+    EXTRA_CMAKE_ARGS: >
+      -DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${PREFIX_PATH}/../Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' 
+      -DQT_QMAKE_EXECUTABLE:FILEPATH=${PREFIX_PATH}/bin/qmake
+  before_script:
+    - source ${EMSDK}/emsdk_env.sh
+  tags: 
+    - webasm

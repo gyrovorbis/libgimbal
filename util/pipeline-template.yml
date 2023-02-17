@@ -59,3 +59,15 @@ build macos-gcc:
 
 build dreamcast:
   extends: .build_dreamcast
+
+build psvita:
+  extends: .build_psvita
+
+build android-sim:
+  extends: .build_android-sim
+
+build ios-sim:
+  extends: .build_ios-sim
+
+build webasm:
+  extends: .build_webasm
