@@ -1,5 +1,5 @@
 include:
-  - template: util/pipeline-template.yml
+  - local: util/pipeline-template.yml
 
 variables:
   BINARY_FILE: GimbalTests
