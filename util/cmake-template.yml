@@ -64,7 +64,7 @@ variables:
 .build_dreamcast:
   extends: .build_cmake
   variables:
-    TOOLCHAIN_FILE: /util/dreamcast.toolchain.cmake
+    TOOLCHAIN_FILE: util/dreamcast.toolchain.cmake
     GENERATOR: Unix Makefiles
     EXTRA_GENERATOR_ARGS: -j8 
     BINARY_EXTENSION: .elf

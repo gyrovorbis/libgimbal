@@ -1,5 +1,5 @@
 include:
-  - local: cmake-template.yml
+  - local: util/cmake-template.yml
 
 stages:
   - build
