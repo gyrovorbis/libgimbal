@@ -1,6 +1,6 @@
 # GLOBAL project-level configuration settings
 variables:
-  BINARY_FILE: ""
+  BINARY_PATH: ""
   BUILD_DIR: build
   BUILD_TYPE: Release
   EXTRA_CMAKE_ARGS: ""
@@ -25,7 +25,7 @@ variables:
       -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS}
     - ${ANALYZER} ${CMAKE} --build . --target all -- ${EXTRA_GENERATOR_ARGS}
   after_script:
-    - ${DEPLOY_CMD} ${BUILD_DIR}/${BINARY_FILE}${BINARY_EXTENSION}  
+    - ${DEPLOY_CMD} ${BUILD_DIR}/${BINARY_PATH}${BINARY_EXTENSION}  
   artifacts:
     paths:
        - ${BUILD_DIR}
