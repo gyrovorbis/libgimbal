@@ -20,14 +20,12 @@ variables:
     - mkdir -p ${BUILD_DIR}
     - cd ${BUILD_DIR}
     - source ${ENVIRON_SH} || true
-    - env
     - CC=${CC} CXX=${CXX} ${CMAKE} ../ -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
       -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE} 
-      -G${GENERATOR} ${EXTRA_CMAKE_ARGS}
+      -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS}
     - ${ANALYZER} ${CMAKE} --build . --target all -- ${EXTRA_GENERATOR_ARGS}
   after_script:
-    - pwd
-    - ${DEPLOY_CMD} ${BINARY_FILE}${BINARY_EXTENSION}  
+    - ${DEPLOY_CMD} ${BUILD_DIR}/${BINARY_FILE}${BINARY_EXTENSION}  
   artifacts:
     paths:
        - ${BUILD_DIR}
@@ -65,7 +63,7 @@ variables:
   extends: .build_cmake
   variables:
     TOOLCHAIN_FILE: ${CI_PROJECT_DIR}/util/dreamcast.toolchain.cmake
-    GENERATOR:
+    GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
     BINARY_EXTENSION: .elf
   tags: 
