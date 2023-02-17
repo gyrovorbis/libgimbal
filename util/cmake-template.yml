@@ -22,8 +22,8 @@ variables:
     - set -x #echo on
     - mkdir -p ${BUILD_DIR}
     - cd ${BUILD_DIR}
-    - CC=${CC} CXX=${CXX} ${CMAKE_CONFIGURE} ../ -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
-      -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE} 
+    - CC=${CC} CXX=${CXX} ${CMAKE_CONFIGURE} ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH}
+      -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE} 
       -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS}
     - ${ANALYZER} ${CMAKE_BUILD} --build . --target ${BUILD_TARGET} --config ${BUILD_CONFIG} 
       -- ${EXTRA_GENERATOR_ARGS}
@@ -89,7 +89,8 @@ variables:
   variables:
     PREFIX_PATH: ${QT_PATH}/android_x86_64
     CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake 
-    TOOLCHAIN_FILE: ${ANDROID_NDK}/build/cmake/android.toolchain.cmake
+    GENERATOR: "Unix Makefiles"
+    EXTRA_GENERATOR_ARGS: -j8 
   tags: 
     - android, ndk
 
