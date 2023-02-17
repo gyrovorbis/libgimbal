@@ -3,7 +3,7 @@ variables:
   BINARY_PATH: ""
   BUILD_DIR: build
   BUILD_TYPE: Release
-  EXTRA_CMAKE_ARGS: ""
+  PROJECT_CMAKE_ARGS: ""
   BUILD_TARGET: all
   BUILD_CONFIG: ${BUILD_TYPE}
 
@@ -24,7 +24,7 @@ variables:
     - cd ${BUILD_DIR}
     - CC=${CC} CXX=${CXX} ${CMAKE_CONFIGURE} ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH}
       -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE} 
-      -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS}
+      -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS} ${PROJECT_CMAKE_ARGS}
     - ${ANALYZER} ${CMAKE_BUILD} --build . --target ${BUILD_TARGET} --config ${BUILD_CONFIG} 
       -- ${EXTRA_GENERATOR_ARGS}
   after_script:
