@@ -22,6 +22,8 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblOptionGroup);
 GBL_FORWARD_DECLARE_STRUCT(GblModule);
 
+typedef GblBool (*GblModuleIterFn)(GblModule* pIt, void* pUd);
+
 GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
     GBL_RESULT  (*pFnLoad)  (GBL_SELF);
     GBL_RESULT  (*pFnUnload)(GBL_SELF);
@@ -47,17 +49,14 @@ GBL_PROPERTIES(GblModule,
 
 // ===== Static/Service API =====
 GblType     GblModule_type          (void)                          GBL_NOEXCEPT;
-
-GblModule*  GblModule_ref           (GblQuark name)                 GBL_NOEXCEPT;
-GblModule*  GblModule_weakRef       (GblQuark name)                 GBL_NOEXCEPT;
-GBL_RESULT  GblModule_unref         (GBL_SELF)                      GBL_NOEXCEPT;
-
-GblModule*  GblModule_next          (GblModule* pPrevious)          GBL_NOEXCEPT;
+GblModule*  GblModule_find          (const char* pName)             GBL_NOEXCEPT;
 GblSize     GblModule_count         (void)                          GBL_NOEXCEPT;
 
 GBL_RESULT  GblModule_register      (GBL_SELF)                      GBL_NOEXCEPT;
 GBL_RESULT  GblModule_unregister    (GBL_SELF)                      GBL_NOEXCEPT;
 
+GblBool     GblModule_foreach       (GblModuleIterFn pFnIter,
+                                     void*           pUserdata)     GBL_NOEXCEPT;
 // ===== Instance API =====
 
 GblModule*  GblModule_create        (GblType     derivedType,
@@ -65,6 +64,10 @@ GblModule*  GblModule_create        (GblType     derivedType,
                                      GblVersion  version,
                                      const char* pDescription,
                                      const char* pPrefix)           GBL_NOEXCEPT;
+
+GBL_RESULT  GblModule_unref         (GBL_SELF)                      GBL_NOEXCEPT;
+
+// ===== SubType API =====
 
 GblType     GblModule_registerType  (GBL_SELF,
                                      GblType            parent,

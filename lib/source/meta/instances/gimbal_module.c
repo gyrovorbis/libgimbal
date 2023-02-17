@@ -15,9 +15,8 @@ static GblQuark   authorQuark_     = GBL_QUARK_INVALID;
 static GblQuark   descQuark_       = GBL_QUARK_INVALID;
 static GblQuark   prefixQuark_     = GBL_QUARK_INVALID;
 static GblQuark   typeCountQuark_  = GBL_QUARK_INVALID;
-
-static GblHashSet registry_;
-static GblBool    initialized_ = GBL_FALSE;
+static GblHashSet registry_        = { 0 };
+static GblBool    initialized_     = GBL_FALSE;
 
 static GblHash GblModule_hash_(const GblHashSet* pSelf, const void* pData) {
     GBL_UNUSED(pSelf);
@@ -66,7 +65,7 @@ GBL_EXPORT GBL_RESULT GblModule_register(GblModule* pSelf) {
     GBL_CTX_VERIFY_POINTER(pSelf);
     const char* pName = GblObject_name(GBL_OBJECT(pSelf));
 
-    GBL_CTX_INFO("Loading Module: %s", pName);
+    GBL_CTX_INFO("Registering Module: %s", pName);
     GBL_CTX_PUSH();
 
     GblModule_initialize_();
@@ -90,7 +89,7 @@ GBL_EXPORT GBL_RESULT GblModule_unregister(GblModule* pSelf) {
     GBL_CTX_VERIFY_POINTER(pSelf);
     const char* pName = GblObject_name(GBL_OBJECT(pSelf));
 
-    GBL_CTX_INFO("Unloading Module: %s", pName);
+    GBL_CTX_INFO("Unregistering Module: %s", pName);
     GBL_CTX_PUSH();
 
     GBL_INSTANCE_VCALL(GblModule, pFnUnload, pSelf);
@@ -103,6 +102,11 @@ GBL_EXPORT GBL_RESULT GblModule_unregister(GblModule* pSelf) {
 
     GBL_CTX_POP(1);
     GBL_CTX_END();
+}
+
+GBL_EXPORT GblModule* GblModule_find(const char* pName) {
+
+
 }
 
 

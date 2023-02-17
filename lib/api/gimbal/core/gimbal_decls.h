@@ -180,8 +180,7 @@ extern "C" {
 #define GBL_SELF            GBL_SELF_TYPE* pSelf
 #define GBL_CSELF           const GBL_SELF
 
-
-//sizeof(emptyStruct) is 1 in Cpp, 0 in C!
+// sizeof(emptyStruct) is 1 in Cpp, 0 in C!
 #define GBL_DEFINE_EMPTY_STRUCT(S)  \
     typedef struct S {              \
         char cppCompat;             \
