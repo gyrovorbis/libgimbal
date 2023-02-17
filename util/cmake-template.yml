@@ -7,7 +7,7 @@ variables:
   BUILD_TARGET: all
   BUILD_CONFIG: ${BUILD_TYPE}
 
-# TOP-LEVEL CMake build job
+# Bottom-level Generic CMake build job
 .build_cmake:
   stage: build
   variables:
@@ -110,6 +110,7 @@ variables:
       -DCMAKE_C_COMPILER:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang 
       -DCMAKE_CXX_COMPILER:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++   
       -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${PREFIX_PATH}/lib/cmake/Qt6/qt.toolchain.cmake
+      -DCMAKE_CXX_FLAGS=-std=c++20
     GENERATOR: Xcode
     BUILD_TARGET: ALL_BUILD
   tags: 
