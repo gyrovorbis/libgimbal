@@ -7,16 +7,16 @@ stages:
 #  - test
 #  - deploy
 
-build ubuntu-gcc:
-  extends: .build_ubuntu
+build debian-gcc:
+  extends: .build_debian
   tags:
     - gcc
   variables:
     CC: gcc
     CXX: g++
     
-build ubuntu-clang:
-  extends: .build_ubuntu
+build debian-clang:
+  extends: .build_debian
   tags: 
     - clang
   variables:
