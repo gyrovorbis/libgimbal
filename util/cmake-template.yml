@@ -101,7 +101,7 @@ variables:
   variables:
     PREFIX_PATH: ${QT_PATH}/ios
     CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake
-    CMAKE_BUILD: ${PREFIX_PATH}/../Tools/CMake/CMake.app/Contents/bin/cmake
+    CMAKE_BUILD: ${PREFIX_PATH}/../../Tools/CMake/CMake.app/Contents/bin/cmake
     EXTRA_CMAKE_ARGS: >
       -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator 
       -DCMAKE_GENERATOR:STRING=Xcode 
