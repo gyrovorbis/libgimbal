@@ -88,7 +88,7 @@ variables:
   extends: .build_cmake
   variables:
     PREFIX_PATH: ${QT_PATH}/android_x86_64
-    CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake 
+    CMAKE_CONFIGURE: ${QT_PATH}/android_x86_64/bin/qt-cmake 
     TOOLCHAIN_FILE: ${ANDROID_NDK}/build/cmake/android.toolchain.cmake
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
@@ -99,6 +99,8 @@ variables:
 .build_ios-sim:
   extends: .build_cmake
   variables:
+    CC: clang
+    CXX: clang++
     PREFIX_PATH: ${QT_PATH}/ios
     CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake
     CMAKE_BUILD: ${PREFIX_PATH}/../Tools/CMake/CMake.app/Contents/bin/cmake
@@ -117,7 +119,7 @@ variables:
     CXX: ${EMSDK}/upstream/emscriptgen/em++
     TOOLCHAIN_FILE: ${PREFIX_PATH}/lib/cmake/Qt6/qt.toolchain.cmake
     EXTRA_CMAKE_ARGS: >
-      -DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${PREFIX_PATH}/../Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' 
+      '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${PREFIX_PATH}/../Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' 
       -DQT_QMAKE_EXECUTABLE:FILEPATH=${PREFIX_PATH}/bin/qmake
   before_script:
     - source ${EMSDK}/emsdk_env.sh
