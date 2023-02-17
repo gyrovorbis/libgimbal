@@ -89,6 +89,7 @@ variables:
   variables:
     PREFIX_PATH: ${QT_PATH}/android_x86_64
     CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake 
+    CMAKE_BUILD: cmake
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
   tags: 
