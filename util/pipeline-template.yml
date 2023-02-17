@@ -1,0 +1,61 @@
+include:
+  - template: cmake-template.yml
+
+stages:
+  - build
+#  - analyze
+#  - test
+#  - deploy
+
+build ubuntu-gcc:
+  extends: .build_ubuntu
+  tags:
+    - gcc
+  variables:
+    CC: gcc
+    CXX: g++
+    
+build ubuntu-clang:
+  extends: .build_ubuntu
+  tags: 
+    - clang
+  variables:
+    CC: clang
+    CXX: clang++
+
+build win-msvc:
+  extends: .build_win
+  tags:
+    - msvc
+  variables:   
+    CC: cl
+    CXX: cl
+    PREFIX_PATH: ${QT_PATH}/msvc2019_64
+
+build win-mingw:
+  extends: .build_win
+  tags:
+    - mingw
+  variables:
+    CC: x86_64-w64-mingw32-gcc
+    CXX: x86_64-w64-mingw32-g++
+    PREFIX_PATH: ${QT_PATH}/mingw_64
+
+build macos-clang:
+  extends: .build_macos
+  tags:
+    - clang
+  variables:
+    CC: clang
+    CXX: clang++
+
+build macos-gcc:
+  extends: .build_macos
+  tags:
+    - gcc
+  variables:
+    CC: gcc-11
+    CXX: g++-11
+
+build dreamcast:
+  extends: .build_dreamcast

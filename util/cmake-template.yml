@@ -1,0 +1,72 @@
+# GLOBAL project-level configuration settings
+variables:
+  BINARY_FILE: ""
+  BUILD_DIR: build
+  BUILD_TYPE: Release
+  EXTRA_CMAKE_ARGS: ""
+
+# TOP-LEVEL CMake build job
+.build_cmake:
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    ENVIRON_SH: ""
+    CMAKE: cmake
+    GENERATOR: Ninja
+    TOOLCHAIN_FILE: ""  
+    EXTRA_GENERATOR_ARGS: ""
+    DEPLOY_CMD: echo
+  script:
+    - mkdir -p ${BUILD_DIR}
+    - cd ${BUILD_DIR}
+    - source ${ENVIRON_SH} || true
+    - env
+    - CC=${CC} CXX=${CXX} ${CMAKE} ../ -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
+      -DCMAKE_PREFIX_PATH=${PREFIX_PATH} -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE} 
+      -G${GENERATOR} ${EXTRA_CMAKE_ARGS}
+    - ${ANALYZER} ${CMAKE} --build . --target all -- ${EXTRA_GENERATOR_ARGS}
+  after_script:
+    - pwd
+    - ${DEPLOY_CMD} ${BINARY_FILE}${BINARY_EXTENSION}  
+  artifacts:
+    paths:
+       - ${BUILD_DIR}
+    expire_in: 1 week
+
+# Top-level Debian linux build job
+.build_debian:
+  extends: .build_cmake
+  variables:
+    PREFIX_PATH: ${QT_PATH}/gcc_64
+  tags:
+    - linux
+
+# Top-level Windows build job
+.build_win:
+  extends: .build_cmake
+  variables:
+    DEPLOY_CMD: ${PREFIX_PATH}/bin/windeployqt
+    BINARY_EXTENSION: .exe
+  tags:
+    - win
+
+# Top-Level MacOS build job
+.build_macos:
+  extends: .build_cmake
+  variables:
+    PREFIX_PATH: ${QT_PATH}/macos
+    DEPOLOY_CMD: ${PREFIX_PATH}/bin/macdeployqt
+    BINARY_EXTENSION: .app
+  tags:
+    - macos
+
+# Top-Level Dreamcast build job
+.build_dreamcast:
+  extends: .build_cmake
+  variables:
+    TOOLCHAIN_FILE: /util/dreamcast.toolchain.cmake
+    GENERATOR: Unix Makefiles
+    EXTRA_GENERATOR_ARGS: -j8 
+    BINARY_EXTENSION: .elf
+  tags: 
+    - dreamcast

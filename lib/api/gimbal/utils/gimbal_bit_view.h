@@ -1,6 +1,6 @@
 /*! \file
  *  \brief GblBitView bitvector view container and related functions
- *  \ingroup utilities
+ *  \ingroup utils
  *  \copydoc GblBitView
  */
 
