@@ -5,7 +5,7 @@ stages:
   - build
 #  - analyze
   - test
-#  - deploy
+  - deploy
 
 build debian-gcc:
   extends: .build_debian
