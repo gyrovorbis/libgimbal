@@ -60,7 +60,7 @@ test dreamcast-physical:
     - sleep 30
     - dc-tool-ip -t 10.0.0.18 -x ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
     - hs100.sh -i 10.0.0.14 off
-    - cp ${BULD_DIR}/results.txt ${BUILD_DIR}/results2.txt
+    - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
 
 
