@@ -1,5 +1,4 @@
 variables:
-  DOCS_FTP_ADDRESS: ""
   DOCS_FTP_PARALLEL_JOBS: 10
   DOCS_DIR: "doc"
 
@@ -9,6 +8,9 @@ publish-docs:
   needs: []
   tags:
   - doxygen
+  only:
+    variables:
+      - $DOCS_FTP_ADDRESS
   script:
   - cd ${DOCS_DIR}
   - doxygen
