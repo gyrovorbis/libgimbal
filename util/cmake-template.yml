@@ -1,6 +1,7 @@
 # GLOBAL project-level configuration settings (defaults)
 variables:
-  BINARY_PATH: ""
+  BINARY_NAME: ""
+  BINARY_DIR: ""
   BUILD_DIR: build
   BUILD_TYPE: Release
   PROJECT_CMAKE_ARGS: ""
@@ -18,6 +19,7 @@ variables:
     TOOLCHAIN_FILE: ""  
     EXTRA_GENERATOR_ARGS: ""
     DEPLOY_CMD: echo
+    BINARY_EXTENSION: ""
   script:
     - set -x #echo on
     - mkdir -p ${BUILD_DIR}
@@ -28,7 +30,7 @@ variables:
     - ${ANALYZER} ${CMAKE_BUILD} --build . --target ${BUILD_TARGET} --config ${BUILD_CONFIG} 
       -- ${EXTRA_GENERATOR_ARGS}
   after_script:
-    - ${DEPLOY_CMD} ${BUILD_DIR}/${BINARY_PATH}${BINARY_EXTENSION}  
+    - ${DEPLOY_CMD} ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION}  
   artifacts:
     paths:
        - ${BUILD_DIR}

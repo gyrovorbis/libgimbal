@@ -1,6 +1,8 @@
 include:
   - local: util/pipeline-template.yml
+  - local: util/test-template.yml
 
 variables:
-  BINARY_PATH: test/GimbalTests
+  BINARY_PATH: test
+  BINARY_NAME: GimbalTests
   PROJECT_CMAKE_ARGS: -DGBL_ENABLE_TESTS=ON -DGBL_ENABLE_CPP=ON
