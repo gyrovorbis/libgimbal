@@ -7,7 +7,7 @@ variables:
 .test_common:
   stage: test
   script:
-    - ${BUILD_DIR}/${BINARY_PATH}${BINARY_EXTENSION} 
+    - ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
 
 test ios-sim:
   stage: test 
@@ -33,7 +33,7 @@ test dreamcast-emu:
   script:
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
-    - lxdream-nitro -H -d -e ${BUILD_DIR}/${BINARY_PATH}${BINARY_EXTENSION} 
+    - lxdream-nitro -H -d -e ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}/${BINARY_EXTENSION} 
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
 
@@ -50,7 +50,7 @@ test dreamcast-physical:
     - hs100.sh -i 10.0.0.14 off
     - hs100.sh -i 10.0.0.14 on 
     - sleep 30
-    - dc-tool-ip -t 10.0.0.18 -x ${BUILD_DIR}/${BINARY_PATH}${BINARY_EXTENSION} 
+    - dc-tool-ip -t 10.0.0.18 -x ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
     - hs100.sh -i 10.0.0.14 off
     - cp ${BULD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
