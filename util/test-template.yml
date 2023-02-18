@@ -3,6 +3,7 @@ variables:
   BINARY_PATH: ""
   BINARY_EXTENSION: ""
   BUILD_DIR: build
+  BUILD_TYPE: Release
 
 .test_common:
   stage: test
@@ -18,7 +19,7 @@ test ios-sim:
     - ios, simulator
   script:
     - xcrun simctl boot F328EC80-2B34-4249-B445-CCF0A69D50E8 2>&1
-    - xcrun simctl install F328EC80-2B34-4249-B445-CCF0A69D50E8 ${BUILD_DIR}/${BINARY_PATH}/Debug-iphonesimulator/${BINARY_NAME}${BINARY_EXTENSION}
+    - xcrun simctl install F328EC80-2B34-4249-B445-CCF0A69D50E8 ${BUILD_DIR}/${BINARY_PATH}/${BUILD_TYPE}-iphonesimulator/${BINARY_NAME}${BINARY_EXTENSION}
     - xcrun simctl launch --console F328EC80-2B34-4249-B445-CCF0A69D50E8 ${BINARY_NAME}
     - xcrun simctl shutdown F328EC80-2B34-4249-B445-CCF0A69D50E8 2>&1
 
@@ -28,6 +29,8 @@ test dreamcast-emu:
   needs: ["build dreamcast"]
   dependencies:
     - build dreamcast 
+  variables:
+    BINARY_EXTENSION: .elf
   tags:
     - dreamcast
   script:
@@ -42,6 +45,8 @@ test dreamcast-physical:
   needs: ["build dreamcast"]
   dependencies:
     - build dreamcast 
+  variables:
+    BINARY_EXTENSION: .elf
   tags:
     - dreamcast
   script:
