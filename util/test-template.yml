@@ -17,10 +17,10 @@ test ios-sim:
   tags:
     - ios, simulator
   script:
-    - xcrun simctl boot A64093FF-15E7-495A-8A9B-83DC1C37D8F5 2>&1
-    - xcrun simctl install A64093FF-15E7-495A-8A9B-83DC1C37D8F5 ${BUILD_DIR}/${BINARY_PATH}/Debug-iphonesimulator/${BINARY_NAME}${BINARY_EXTENSION}
-    - xcrun simctl launch --console A64093FF-15E7-495A-8A9B-83DC1C37D8F5 ${BINARY_NAME}
-    - xcrun simctl shutdown A64093FF-15E7-495A-8A9B-83DC1C37D8F5 2>&1
+    - xcrun simctl boot F328EC80-2B34-4249-B445-CCF0A69D50E8 2>&1
+    - xcrun simctl install F328EC80-2B34-4249-B445-CCF0A69D50E8 ${BUILD_DIR}/${BINARY_PATH}/Debug-iphonesimulator/${BINARY_NAME}${BINARY_EXTENSION}
+    - xcrun simctl launch --console F328EC80-2B34-4249-B445-CCF0A69D50E8 ${BINARY_NAME}
+    - xcrun simctl shutdown F328EC80-2B34-4249-B445-CCF0A69D50E8 2>&1
 
 
 test dreamcast-emu:
