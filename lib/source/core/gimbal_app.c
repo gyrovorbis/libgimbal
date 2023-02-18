@@ -64,7 +64,7 @@ static void GblApp_logInfo_(const GblApp* pApp) {
 
     GBL_CTX_INFO("CI Info");
     GBL_CTX_PUSH();
-    #if GBL_BUILD_CI
+#if GBL_BUILD_CI
     GBL_CTX_INFO("%-20s: %-100.100s", "Project", GBL_BUILD_CI_PROJECT_TITLE);
 
     GBL_CTX_INFO("Source Control Commit Info");
@@ -96,9 +96,9 @@ static void GblApp_logInfo_(const GblApp* pApp) {
     //GBL_CTX_INFO("%-20s: %-100.100s", "Tags", GBL_BUILD_CI_RUNNER_TAGS);
     GBL_CTX_INFO("%-20s: %-100.100s", "Architecture", GBL_BUILD_CI_RUNNER_ARCH);
     GBL_CTX_POP(1);
-    #else
+#else
     GBL_CTX_WARN("UNOFFICIAL LOCAL BUILD !");
-    #endif
+#endif
     GBL_CTX_POP(1);
 
     GBL_CTX_INFO("Compiler Info");
