@@ -1,0 +1,16 @@
+variables:
+  DOCS_FTP_ADDRESS: ""
+  DOCS_FTP_PARALLEL_JOBS: 10
+  DOCS_DIR: "doc"
+
+publish-docs:
+  stage: deploy
+  dependencies: []
+  needs: []
+  tags:
+  - doxygen
+  script:
+  - cd ${DOCS_DIR}
+  - doxygen
+  - cd html
+  - lftp -c "open ${DOCS_FTP_ADDRESS}; login $FTP_USER $FTP_PASS; mirror -X *. --reverse --verbose --parallel=${DOCS_FTP_PARALLEL_JOBS} ./ ./; bye"
