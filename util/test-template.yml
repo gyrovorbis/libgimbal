@@ -15,9 +15,12 @@ test ios-sim:
   needs: ["build ios-sim"]
   dependencies:
     - build ios-sim 
+  variables:
+    BINARY_EXTENSION: .app
   tags:
     - ios, simulator
   script:
+    - set -x #echo on
     - xcrun simctl boot F328EC80-2B34-4249-B445-CCF0A69D50E8 2>&1
     - xcrun simctl install F328EC80-2B34-4249-B445-CCF0A69D50E8 ${BUILD_DIR}/${BINARY_PATH}/${BUILD_TYPE}-iphonesimulator/${BINARY_NAME}${BINARY_EXTENSION}
     - xcrun simctl launch --console F328EC80-2B34-4249-B445-CCF0A69D50E8 ${BINARY_NAME}
