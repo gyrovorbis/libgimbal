@@ -1,7 +1,5 @@
 include:
   - local: util/pipeline-template.yml
-  - local: util/test-template.yml
-  - local: util/deploy-template.yml
 
 variables:
   BINARY_PATH: test
