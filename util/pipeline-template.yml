@@ -17,6 +17,7 @@ variables:
   DOCS_DIR: "doc"
   BINARY_PATH: ""
   BINARY_EXTENSION: ""
+  DC_BOOT_SLEEP_TIME: 30
 
 ############## BUILDS ####################
 
@@ -240,9 +241,12 @@ test ios-sim:
   needs: ["build ios-sim"]
   dependencies:
     - build ios-sim 
+  only:
+    variables:
+      - $IOS_SIM_DEVICE_ID
+      - $BUILD_IOS_SIM_DISABLED == null
   except:
     variables:
-      - $BUILD_IOS_SIM_DISABLED
       - $TEST_IOS_SIM_DISABLED  
   variables:
     BINARY_EXTENSION: .app
@@ -250,20 +254,23 @@ test ios-sim:
     - ios, simulator
   script:
     - set -x #echo on
-    - xcrun simctl boot F328EC80-2B34-4249-B445-CCF0A69D50E8 2>&1
-    - xcrun simctl install F328EC80-2B34-4249-B445-CCF0A69D50E8 ${BUILD_DIR}/${BINARY_PATH}/${BUILD_TYPE}-iphonesimulator/${BINARY_NAME}${BINARY_EXTENSION}
-    - xcrun simctl launch --console F328EC80-2B34-4249-B445-CCF0A69D50E8 ${BINARY_NAME}
-    - xcrun simctl shutdown F328EC80-2B34-4249-B445-CCF0A69D50E8 2>&1
+    - xcrun simctl shutdown ${IOS_SIM_DEVICE_ID} || true 
+    - xcrun simctl boot ${IOS_SIM_DEVICE_ID} 2>&1
+    - xcrun simctl install ${IOS_SIM_DEVICE_ID} ${BUILD_DIR}/${BINARY_PATH}/${BUILD_TYPE}-iphonesimulator/${BINARY_NAME}${BINARY_EXTENSION}
+    - xcrun simctl launch --console ${IOS_SIM_DEVICE_ID} ${BINARY_NAME}
+    - xcrun simctl shutdown ${IOS_SIM_DEVICE_ID} 2>&1
 
 test dreamcast-emu:
   stage: test 
   needs: ["build dreamcast"]
   dependencies:
     - build dreamcast 
+  only:
+    variables:
+      - $BUILD_DREAMCAST_DISABLED == null
   except:
     variables:
-      - $BUILD_DREAMCAST_DISABLED
-      - $TEST_DREAMCAST_EMU_DISABLED   
+      - $TEST_DREAMCAST_EMU_DISABLED    
   variables:
     BINARY_EXTENSION: .elf
   tags:
@@ -280,34 +287,48 @@ test dreamcast-physical:
   needs: ["build dreamcast"]
   dependencies:
     - build dreamcast 
+  only:
+    variables:
+      - $BUILD_DREAMCAST_DISABLED == null
+      - $DC_BBA_IP_ADDR
+      - $DC_OUTLET_IP_ADDR
   except:
     variables:
-      - $BUILD_DREAMCAST_DISABLED
       - $TEST_DREAMCAST_PHYSICAL_DISABLED   
   variables:
     BINARY_EXTENSION: .elf
   tags:
     - dreamcast
+  before_script:
+    - killall dc-tool-ip || true
   script:
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
-    - hs100.sh -i 10.0.0.14 off
-    - hs100.sh -i 10.0.0.14 on 
-    - sleep 30
-    - dc-tool-ip -t 10.0.0.18 -x ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
-    - hs100.sh -i 10.0.0.14 off
+    - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
+    - hs100.sh -i ${DC_OUTLET_IP_ADDR} on 
+    - sleep ${DC_BOOT_SLEEP_TIME}
+    - dc-tool-ip -t ${DC_BBA_IP_ADDR} -x ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
+    - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
+  after_script:
+    - killall dc-tool-ip || true
+  timeout: 2 minutes
+  retry:
+    max: 5
+    when: job_execution_timeout
 
 test debian-gcc:
   extends: .test_common
   needs: ["build debian-gcc"]
   dependencies:
     - build debian-gcc
+  only:
+    variables:
+      - $BUILD_DEBIAN_GCC_DISABLED == null
   except:
     variables:
-      - $BUILD_DEBIAN_GCC_DISABLED
-      - $TEST_DEBIAN_GCC_DISABLED 
+      - $TEST_DEBIAN_GCC_DISABLED    
   tags:
     - linux, gcc
     
@@ -316,10 +337,12 @@ test debian-clang:
   needs: ["build debian-clang"]
   dependencies:
     - build debian-clang
+  only:
+    variables:
+      - $BUILD_DEBIAN_CLANG_DISABLED == null
   except:
     variables:
-      - $BUILD_DEBIAN_CLANG_DISABLED
-      - $TEST_DEBIAN_CLANG_DISABLED 
+      - $TEST_DEBIAN_CLANG_DISABLED    
   tags:
     - linux, clang
 
@@ -328,10 +351,12 @@ test win-msvc:
   needs: ["build win-msvc"]
   dependencies:
     - build win-msvc
+  only:
+    variables:
+      - $BUILD_WIN_MSVC_DISABLED == null
   except:
     variables:
-      - $BUILD_WIN_MSVC_DISABLED
-      - $TEST_WIN_MSVC_DISABLED 
+      - $TEST_WIN_MSVC_EMU_DISABLED    
   tags:
     - win10, visual-studio
 
@@ -340,10 +365,12 @@ test win-mingw:
   needs: ["build win-mingw"]
   dependencies:
     - build win-mingw
+  only:
+    variables:
+      - $BUILD_WIN_MINGW_DISABLED == null
   except:
     variables:
-      - $BUILD_WIN_MINGW_DISABLED
-      - $TEST_WIN_MINGW_DISABLED 
+      - $TEST_WIN_MINGW_DISABLED    
   tags:
     - win10, mingw
 
@@ -352,10 +379,12 @@ test macos-clang:
   needs: ["build macos-clang"]
   dependencies:
     - build macos-clang
+  only:
+    variables:
+      - $BUILD_MACOS_CLANG_DISABLED == null
   except:
     variables:
-      - $BUILD_MACOS_CLANG_DISABLED
-      - $TEST_MACOS_CLANG_DISABLED 
+      - $TEST_MACOS_CLANG_DISABLED    
   tags:
     - macos, clang
 
@@ -364,10 +393,12 @@ test macos-gcc:
   needs: ["build macos-gcc"]
   dependencies:
     - build macos-gcc
+  only:
+    variables:
+      - $BUILD_MACOS_GCC_DISABLED == null
   except:
     variables:
-      - $BUILD_MACOS_GCC_DISABLED
-      - $TEST_MACOS_GCC_DISABLED 
+      - $TEST_MACOS_GCC_DISABLED    
   tags:
     - macos, gcc
 
@@ -376,7 +407,7 @@ publish-docs:
   dependencies: []
   needs: []
   tags:
-  - doxygen
+    - doxygen
   only:
     variables:
       - $DOCS_FTP_ADDRESS
