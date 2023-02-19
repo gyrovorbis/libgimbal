@@ -314,7 +314,7 @@ test dreamcast-physical:
   after_script:
     - killall dc-tool-ip || true
     - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
-  timeout: 2 minutes
+  timeout: 2m
   retry:
     max: 2
     when: job_execution_timeout
