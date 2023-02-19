@@ -316,7 +316,7 @@ test dreamcast-physical:
     - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
   timeout: 2 minutes
   retry:
-    max: 5
+    max: 2
     when: job_execution_timeout
 
 test debian-gcc:
