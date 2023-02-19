@@ -301,10 +301,10 @@ test dreamcast-physical:
     - dreamcast
   before_script:
     - killall dc-tool-ip || true
+    - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
   script:
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
-    - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
     - hs100.sh -i ${DC_OUTLET_IP_ADDR} on 
     - sleep ${DC_BOOT_SLEEP_TIME}
     - dc-tool-ip -t ${DC_BBA_IP_ADDR} -x ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
@@ -313,6 +313,7 @@ test dreamcast-physical:
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
   after_script:
     - killall dc-tool-ip || true
+    - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
   timeout: 2 minutes
   retry:
     max: 5
