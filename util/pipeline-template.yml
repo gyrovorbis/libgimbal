@@ -330,7 +330,7 @@ test win-msvc:
     - build win-msvc
   except:
     variables:
-      - $BUILD_WIN_MSVC_DIABLED
+      - $BUILD_WIN_MSVC_DISABLED
       - $TEST_WIN_MSVC_DISABLED 
   tags:
     - win10, visual-studio
