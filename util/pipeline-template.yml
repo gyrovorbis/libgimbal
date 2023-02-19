@@ -242,6 +242,7 @@ test ios-sim:
     - build ios-sim 
   except:
     variables:
+      - $BUILD_IOS_SIM_DISABLED
       - $TEST_IOS_SIM_DISABLED  
   variables:
     BINARY_EXTENSION: .app
@@ -261,6 +262,7 @@ test dreamcast-emu:
     - build dreamcast 
   except:
     variables:
+      - $BUILD_DREAMCAST_DISABLED
       - $TEST_DREAMCAST_EMU_DISABLED   
   variables:
     BINARY_EXTENSION: .elf
@@ -280,6 +282,7 @@ test dreamcast-physical:
     - build dreamcast 
   except:
     variables:
+      - $BUILD_DREAMCAST_DISABLED
       - $TEST_DREAMCAST_PHYSICAL_DISABLED   
   variables:
     BINARY_EXTENSION: .elf
@@ -303,6 +306,7 @@ test debian-gcc:
     - build debian-gcc
   except:
     variables:
+      - $BUILD_DEBIAN_GCC_DISABLED
       - $TEST_DEBIAN_GCC_DISABLED 
   tags:
     - linux, gcc
@@ -314,6 +318,7 @@ test debian-clang:
     - build debian-clang
   except:
     variables:
+      - $BUILD_DEBIAN_CLANG_DISABLED
       - $TEST_DEBIAN_CLANG_DISABLED 
   tags:
     - linux, clang
@@ -325,6 +330,7 @@ test win-msvc:
     - build win-msvc
   except:
     variables:
+      - $BUILD_WIN_MSVC_DIABLED
       - $TEST_WIN_MSVC_DISABLED 
   tags:
     - win10, visual-studio
@@ -336,6 +342,7 @@ test win-mingw:
     - build win-mingw
   except:
     variables:
+      - $BUILD_WIN_MINGW_DISABLED
       - $TEST_WIN_MINGW_DISABLED 
   tags:
     - win10, mingw
@@ -347,6 +354,7 @@ test macos-clang:
     - build macos-clang
   except:
     variables:
+      - $BUILD_MACOS_CLANG_DISABLED
       - $TEST_MACOS_CLANG_DISABLED 
   tags:
     - macos, clang
@@ -358,6 +366,7 @@ test macos-gcc:
     - build macos-gcc
   except:
     variables:
+      - $BUILD_MACOS_GCC_DISABLED
       - $TEST_MACOS_GCC_DISABLED 
   tags:
     - macos, gcc
