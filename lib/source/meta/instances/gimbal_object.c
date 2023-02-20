@@ -304,9 +304,10 @@ static GBL_RESULT GblObjectClass_constructor_(GblObject* pSelf) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblObjectClass_destructor_(GblBox* pRecord) {
+static GBL_RESULT GblObjectClass_destructor_(GblBox* pBox) {
     GBL_CTX_BEGIN(NULL);
-    GblObject* pSelf = (GblObject*)pRecord;
+    GblObject* pSelf = (GblObject*)pBox;
+
     GblObject_setParent(pSelf, NULL);
     for(GblObject* pIt = GblObject_childFirst(pSelf);
         pIt != NULL;
@@ -315,8 +316,8 @@ static GBL_RESULT GblObjectClass_destructor_(GblBox* pRecord) {
        GblObject_setParent(pIt, NULL);
     }
 
-    GblBoxClass* pRecordClass = GBL_BOX_CLASS(GblClass_weakRefDefault(GBL_BOX_TYPE));
-    GBL_CTX_VERIFY_CALL(pRecordClass->pFnDestructor(pRecord));
+    GblBoxClass* pBoxClass = GBL_BOX_CLASS(GblClass_weakRefDefault(GBL_BOX_TYPE));
+    GBL_CTX_VERIFY_CALL(pBoxClass->pFnDestructor(pBox));
     GBL_CTX_END();
 }
 
