@@ -30,7 +30,6 @@ GBL_INSTANCE_DERIVE(GblMainLoop, GblObject)
     GblMutex    mutex;
 GBL_INSTANCE_END
 
-
 GBL_SIGNALS(
     (execIdle,     GBL_INSTANCE_TYPE),
     (taskEnqueued, GBL_INSTANCE_TYPE, GBL_INSTANCE_TYPE)

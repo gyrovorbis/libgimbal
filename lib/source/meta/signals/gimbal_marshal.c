@@ -25,6 +25,11 @@ GBL_EXPORT GBL_RESULT GblCClosureMarshal_VOID__VOID(GblClosure*        pClosure,
     return GBL_RESULT_SUCCESS;
 }
 
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE,
+                                   1,
+                                   (GblInstance*),
+                                   (GblVariant_toPointer(&pArgs[0])))
+
 GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOOL,
                                    2,
                                    (GblInstance*, GblBool),

@@ -16,7 +16,11 @@
 #define GBL_CLOSURE_CLASS(klass)        (GBL_CLASS_CAST(klass, GblClosure))
 #define GBL_CLOSURE_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblClosure))
 
-#define GBL_CALLBACK(fn)                ((GblFnPtr)fn)
+#ifndef __cplusplus
+#   define GBL_CALLBACK(fn)                ((GblFnPtr)fn)
+#else
+    #define GBL_CALLBACK(fn)               ((GblFnPtr)+fn)
+#endif
 
 #define GBL_SELF_TYPE                   GblClosure
 

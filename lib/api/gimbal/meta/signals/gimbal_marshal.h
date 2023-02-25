@@ -54,7 +54,7 @@ GBL_EXPORT GBL_RESULT GblMarshal_SignalForwarder    (GblClosure*        pClosure
                                                      GblVariant*        pArgs,
                                                      GblPtr             pMarshalData)   GBL_NOEXCEPT;
 
-
+GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE);
 GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOOL);
 GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_UINT32);
 GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_INT32);
