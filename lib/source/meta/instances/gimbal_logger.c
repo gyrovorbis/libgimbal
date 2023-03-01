@@ -1,6 +1,6 @@
 #include <gimbal/meta/instances/gimbal_logger.h>
+
 #include <threads.h>
-#include <gimbal/utils/gimbal_date_time.h>
 
 #define GBL_LOGGER_THREAD_FILTER_FIELD_NAME_    "GblLogger.threadFilter"
 #define GBL_LOGGER_DOMAIN_FILTER_FIELD_NAME_    "GblLogger.domainFilter"
@@ -26,7 +26,7 @@ static GblBool   initializing_      = GBL_FALSE;
 static once_flag initOnce_          = ONCE_FLAG_INIT;
 static GblQuark  domainFilterQuark_ = GBL_QUARK_INVALID;
 static GblQuark  threadFilterQuark_ = GBL_QUARK_INVALID;
-static GBL_THEAD_LOCAL
+static GBL_THREAD_LOCAL
        GblSize   stackDepth_        = 0;
 
 static void GblLogger_initialize_(void) {
