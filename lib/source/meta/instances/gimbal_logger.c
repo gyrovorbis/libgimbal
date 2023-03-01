@@ -1,6 +1,10 @@
 #include <gimbal/meta/instances/gimbal_logger.h>
-
-#include <threads.h>
+#ifdef _WIN32
+#   define NOGDI
+# else
+#   define __USE_UNIX98
+#endif
+#include <tinycthread.h>
 
 #define GBL_LOGGER_THREAD_FILTER_FIELD_NAME_    "GblLogger.threadFilter"
 #define GBL_LOGGER_DOMAIN_FILTER_FIELD_NAME_    "GblLogger.domainFilter"
