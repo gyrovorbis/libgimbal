@@ -56,7 +56,6 @@ GblInterface* GblType_extension_(GblType type, GblType ifaceType) {
     return pExt;
 }
 
-
 static GblBool GblType_conforms_(GblType type, GblType dependent, GblBool verify) {
     GblBool conforms = GBL_FALSE;
     GBL_CTX_BEGIN(pCtx_);

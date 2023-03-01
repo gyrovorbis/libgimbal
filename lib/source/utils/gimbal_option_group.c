@@ -333,7 +333,6 @@ static GBL_RESULT GblOptionGroupClass_init_(GblClass* pClass, const void* pData,
                           1,
                           GBL_POINTER_TYPE);
 
-
         GblSignal_install(GBL_OPTION_GROUP_TYPE,
                           "parseError",
                           GblMarshal_CClosure_VOID__INSTANCE_ENUM,

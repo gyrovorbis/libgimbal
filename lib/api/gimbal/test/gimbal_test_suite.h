@@ -41,10 +41,10 @@ typedef struct GblTestSuiteClassVTable {
 GBL_CLASS_DERIVE(GblTestSuite, GblObject)
     const GblTestSuiteClassVTable* pVTable;
 
-    GBL_RESULT  (*pFnSuiteName)(GBL_CSELF, const char** ppName);
-    GBL_RESULT  (*pFnCaseCount)(GBL_CSELF, GblSize* pSize);
-    GBL_RESULT  (*pFnCaseName) (GBL_CSELF, GblSize index, const char** ppName);
-    GBL_RESULT  (*pFnCaseRun)  (GBL_SELF, GblContext* pCtx, GblSize index);
+    GBL_RESULT (*pFnSuiteName)(GBL_CSELF, const char** ppName);
+    GBL_RESULT (*pFnCaseCount)(GBL_CSELF, GblSize* pSize);
+    GBL_RESULT (*pFnCaseName) (GBL_CSELF, GblSize index, const char** ppName);
+    GBL_RESULT (*pFnCaseRun)  (GBL_SELF, GblContext* pCtx, GblSize index);
 GBL_CLASS_END
 
 /*! \brief GblObject representing a collection of unit test cases

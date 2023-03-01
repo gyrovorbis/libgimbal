@@ -57,7 +57,7 @@ GBL_RESULT  GblModule_unregister    (GBL_SELF)                      GBL_NOEXCEPT
 
 GblBool     GblModule_foreach       (GblModuleIterFn pFnIter,
                                      void*           pUserdata)     GBL_NOEXCEPT;
-// ===== Instance API =====
+// ===== Instance API =====k
 
 GblModule*  GblModule_create        (GblType     derivedType,
                                      const char* pName,

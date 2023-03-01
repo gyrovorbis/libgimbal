@@ -140,6 +140,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/instances/gimbal_module.h
     api/gimbal/meta/instances/gimbal_object.h
     api/gimbal/meta/instances/gimbal_box.h
+    api/gimbal/meta/instances/gimbal_logger.h
     api/gimbal/meta/properties/gimbal_property.h
     api/gimbal/meta/properties/gimbal_bool_property.h
     api/gimbal/meta/signals/gimbal_signal.h
@@ -216,6 +217,7 @@ set(GIMBAL_SOURCES
     source/meta/instances/gimbal_instance.c
     source/meta/instances/gimbal_module.c
     source/meta/instances/gimbal_box.c
+    source/meta/instances/gimbal_logger.c
     source/meta/properties/gimbal_property.c
     source/meta/properties/gimbal_bool_property.c
     source/meta/signals/gimbal_signal.c
