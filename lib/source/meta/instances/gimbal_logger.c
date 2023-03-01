@@ -26,7 +26,7 @@ static GblBool   initializing_      = GBL_FALSE;
 static once_flag initOnce_          = ONCE_FLAG_INIT;
 static GblQuark  domainFilterQuark_ = GBL_QUARK_INVALID;
 static GblQuark  threadFilterQuark_ = GBL_QUARK_INVALID;
-static thread_local
+static GBL_THEAD_LOCAL
        GblSize   stackDepth_        = 0;
 
 static void GblLogger_initialize_(void) {

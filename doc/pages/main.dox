@@ -223,9 +223,9 @@ GBL_PROPERTIES(GblObject,
 Creating an Object
 <table><tr><td>
 \code{.c}
-GblObject* pObject = GBL_OBJECT_CREATE(GblObject,
-                                       "name",     "childObject",
-                                       "userdata", (void*)0xdeadbabe);
+GblObject* pObject = GBL_OBJECT_NEW(GblObject,
+                                    "name",     "childObject",
+                                    "userdata", (void*)0xdeadbabe);
 
 \endcode
 </td></tr></table>
@@ -258,7 +258,7 @@ GblObject* pObject = GBL_OBJECT_CREATE(GblObject,
 # Validation
 Pretty big library with pretty lofty goals... Don't worry, we have like 600+ unit test cases which 
 are included within the repo, using our own unit testing framework, which you can run on your target
-of choice. We go through a lot of effort to test throroughly and verify correctness in CI. 
+of choice. We go through a lot of effort to test throroughly and verify correctness in CI, including running every commit on a physical Sega Dreamcast via our automated testing infrastructure.
 
 # Design Philosophy
 	We are well aware of the fact that trying to create a massively cross-platform, cross-language framework 
@@ -282,8 +282,8 @@ of choice. We go through a lot of effort to test throroughly and verify correctn
 	as it can possibly be for each language it supports, rather than simply wrapping a low-level C API to 
 	each. 
 
-## Coding Style
-### Naming Conventions
+# Coding Style
+## Naming Conventions
 	It's probably quite obvious to the reader that the majority of the APIs within the codebase are fairly
 	object-oriented in style. This is for two reasons. The first is that the meta type system provided by
 	libGimbal is fundamentally object-oriented, and the second is that it is our opinion that for C APIs
@@ -315,9 +315,7 @@ of choice. We go through a lot of effort to test throroughly and verify correctn
 	</td></tr>
 	</table>
 	where "GBL_SELF" and "GBL_CSELF" are predefined macros mimicking the non-const and const implicit "this" pointer in C++ and most OO languages.
-### Inlining
-### Encapsulation
-### Macros
+## Macros
 	Lets go ahead and get something out of the way here... this project makes generous utilization of C macro black magic, voodoo, codegen,
 	DSLs, fuckery--call it what you will--but we do so unapologetically. This is a very advanced C codebase, and such macros are often literally 
 	necessary (try to capture source context without one), and are often times far, far more convenient than duplicationg code paths.
@@ -388,10 +386,7 @@ of choice. We go through a lot of effort to test throroughly and verify correctn
 	- asserted upon
 
 # License
-	LibGimbal is being released under the "I-dont-give-a-shit-what-you-do" license (pretty sure that'd be MIT). 
-	A lot of time and energy were put into creating this framework, and we'd love to see it used in cool 
-	projects or on cool hardware. We would appreciate some credit or acknowlegement, but just seeing it get 
-	some love is plenty for us. 
+	LibGimbal is being released under the MIT license.
 
 	If you do use it, please feel free to log any bugs or feature requests or contribute back. 
 

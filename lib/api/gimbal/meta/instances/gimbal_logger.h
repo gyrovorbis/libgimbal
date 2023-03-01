@@ -1,3 +1,8 @@
+/*! \file
+ *  \brief GblLogger filterable log and logging macros
+ *  \ingroup core
+ */
+
 #ifndef GIMBAL_LOGGER_H
 #define GIMBAL_LOGGER_H
 
