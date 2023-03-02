@@ -39,7 +39,7 @@ function(GBL_GITLAB_CI_DEFINE buildVar envVar)
         set(env "?")
     endif()
     set(env "\"${env}\"")
-    GBL_BUILD_DEFINE(${buildVar} "${env}")
+    GBL_BUILD_DEFINE(${buildVar} "\"${env}\"")
     set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endFunction()
 
