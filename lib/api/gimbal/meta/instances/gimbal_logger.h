@@ -141,14 +141,4 @@ GBL_DECLS_END
 
 #undef GBL_SELF_TYPE
 
-// ===== Private =====
-///\cond
-#define GBL_LOG_DOMAIN_EXPORT_(name) \
-    GBL_LOG_DOMAIN_DECLARE(name) { \
-        static GblQuark quark = GBL_QUARK_INVALID; \
-        if(quark == GBL_QUARK_INVALID) \
-            quark = GblQuark_fromStringStatic(#name); \
-        return quark; \
-    }
-///\endcond
 #endif // GIMBAL_LOGGER_H
