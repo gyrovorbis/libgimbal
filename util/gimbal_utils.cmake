@@ -1,5 +1,5 @@
 function(GBL_ESCAPE_REGEX OUT_NAME INPUT)
-    foreach(CHAR "^$[]\(\)\"\\")
+    foreach(CHAR "^$[]()\"\\")
         string(REPLACE "${CHAR}" "\\${CHAR}" INPUT ${INPUT})
     endforeach()
     set(${OUT_NAME} ${INPUT} PARENT_SCOPE)
