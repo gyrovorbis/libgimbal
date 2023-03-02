@@ -25,6 +25,7 @@ variables:
 .build_cmake:
   stage: build
   variables:
+    ARTIFACT_DIR: "artifacts"
     GIT_SUBMODULE_STRATEGY: recursive
     CMAKE_CONFIGURE: cmake
     CMAKE_BUILD: ${CMAKE_CONFIGURE}
@@ -42,10 +43,13 @@ variables:
     - ${ANALYZER} ${CMAKE_BUILD} --build . --target ${BUILD_TARGET} --config ${BUILD_CONFIG} 
       -- ${EXTRA_GENERATOR_ARGS}
   after_script:
-    - ${DEPLOY_CMD} ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION}  
+    - mkdir -p ${BUILD_DIR}/${ARTIFACT_DIR}
+    - cp ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
+      ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
+    - ${DEPLOY_CMD} ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}  
   artifacts:
     paths:
-       - ${BUILD_DIR}
+       - ${BUILD_DIR}/${ARTIFACT_DIR}
     expire_in: 1 week
 
 # Base Debian linux build job
