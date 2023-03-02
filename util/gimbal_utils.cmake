@@ -1,3 +1,10 @@
+function(GBL_ESCAPE_REGEX OUT_NAME INPUT)
+    foreach(CHAR ^ $ . [ ] - + * \( \) )
+        string(REPLACE "${CHAR}" "\\${CHAR}" INPUT ${INPUT})
+    endforeach()
+    set(${OUT_NAME} ${INPUT} PARENT_SCOPE)
+endfunction()
+
 function(GBL_CONFIG_VARIABLE name value type desc)
     set(${name} ${value} CACHE ${type} ${desc})
     option(${name} ${desc} ${default})
@@ -22,16 +29,11 @@ function(GBL_CONFIG_OPTION name desc default)
 endfunction()
 
 function(GBL_BUILD_DEFINE buildDefine var)
-    #if(NOT ${buildDefine})
-        #if(NOT "${var}" STREQUAL "")
-            list(APPEND
-                GBL_BUILD_DEFINES
-                ${buildDefine}=${var})
-            set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
-        #endif()
-   # endif()
+    list(APPEND
+        GBL_BUILD_DEFINES
+        ${buildDefine}=${var})
+    set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endfunction()
-
 
 function(GBL_GITLAB_CI_DEFINE buildVar envVar)
     set(env $ENV{${envVar}})
@@ -39,7 +41,8 @@ function(GBL_GITLAB_CI_DEFINE buildVar envVar)
         set(env "?")
     endif()
     set(env "\"${env}\"")
-    GBL_BUILD_DEFINE(${buildVar} "\"${env}\"")
+    GBL_ESCAPE_REGEX(env, env)
+    GBL_BUILD_DEFINE(${buildVar} "${env}")
     set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endFunction()
 
