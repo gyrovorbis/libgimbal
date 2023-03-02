@@ -238,7 +238,7 @@ build webasm:
 .test_common:
   stage: test
   script:
-    - ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
+    - ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
 
 test ios-sim:
   stage: test 
@@ -260,6 +260,7 @@ test ios-sim:
     - set -x #echo on
     - xcrun simctl shutdown ${IOS_SIM_DEVICE_ID} || true 
     - xcrun simctl boot ${IOS_SIM_DEVICE_ID} 2>&1
+# wrong and needs to be fixed/updated to artifact path!!
     - xcrun simctl install ${IOS_SIM_DEVICE_ID} ${BUILD_DIR}/${BINARY_PATH}/${BUILD_TYPE}-iphonesimulator/${BINARY_NAME}${BINARY_EXTENSION}
     - xcrun simctl launch --console ${IOS_SIM_DEVICE_ID} ${BINARY_NAME}
     - xcrun simctl shutdown ${IOS_SIM_DEVICE_ID} 2>&1
@@ -282,7 +283,7 @@ test dreamcast-emu:
   script:
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
-    - lxdream-nitro -H -d -e ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}/${BINARY_EXTENSION} 
+    - lxdream-nitro -H -d -e ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}/${BINARY_EXTENSION} 
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
 
@@ -311,7 +312,7 @@ test dreamcast-physical:
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
     - hs100.sh -i ${DC_OUTLET_IP_ADDR} on 
     - sleep ${DC_BOOT_SLEEP_TIME}
-    - dc-tool-ip -t ${DC_BBA_IP_ADDR} -x ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
+    - dc-tool-ip -t ${DC_BBA_IP_ADDR} -x ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION} 
     - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
