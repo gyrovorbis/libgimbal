@@ -20,8 +20,6 @@ static GblStringList* pLibPaths_   = NULL;
 static void GblApp_logInfo_(const GblApp* pApp) {
     GBL_UNUSED(pApp);
     GBL_CTX_BEGIN(NULL);
-
-
     GBL_CTX_END_BLOCK();
 }
 
