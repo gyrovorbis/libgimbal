@@ -14,7 +14,7 @@ The official documentation for the project can be found at http://libgimbal.elys
 - platform-specific macros and utilities
 - error handling and propagation
 - debug and verification utilities
-- structured logging
+- structured logging with filtering
 
 ### Strings ###
 - specialized, optimized custom string types
