@@ -32,6 +32,7 @@ function(GBL_BUILD_DEFINE buildDefine var)
     list(APPEND
         GBL_BUILD_DEFINES
         ${buildDefine}=${var})
+    message("${var}")
     set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endfunction()
 
@@ -40,9 +41,9 @@ function(GBL_GITLAB_CI_DEFINE buildVar envVar)
     if("${env}" STREQUAL "")
         set(env "?")
     endif()
-    set(env "\"${env}\"")
-    GBL_ESCAPE_REGEX(env, env)
-    GBL_BUILD_DEFINE(${buildVar} "${env}")
+    set(env "${env}")
+    GBL_ESCAPE_REGEX(env, "${env}")
+    GBL_BUILD_DEFINE(${buildVar} "\"${env}\"")
     set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endFunction()
 
