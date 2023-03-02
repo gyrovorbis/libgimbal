@@ -1,5 +1,5 @@
 function(GBL_ESCAPE_REGEX OUT_NAME INPUT)
-    foreach(CHAR ^ $ . [ ] - + * \( \) \" \\)
+    foreach(CHAR "^$[]\(\)\"\\")
         string(REPLACE "${CHAR}" "\\${CHAR}" INPUT ${INPUT})
     endforeach()
     set(${OUT_NAME} ${INPUT} PARENT_SCOPE)
@@ -32,7 +32,6 @@ function(GBL_BUILD_DEFINE buildDefine var)
     list(APPEND
         GBL_BUILD_DEFINES
         ${buildDefine}=${var})
-    message("${var}")
     set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endfunction()
 
