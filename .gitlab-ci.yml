@@ -1,6 +1,6 @@
 include:
   - local: util/pipeline-template.yml
-
+ 
 variables:
   BINARY_PATH: test
   BINARY_NAME: GimbalTests
