@@ -10,6 +10,7 @@ variables:
   BINARY_NAME: ""
   BUILD_DIR: build
   BUILD_TYPE: Release
+  ARTIFACT_DIR: "artifacts"
   PROJECT_CMAKE_ARGS: ""
   BUILD_TARGET: all
   BUILD_CONFIG: ${BUILD_TYPE}
@@ -25,7 +26,6 @@ variables:
 .build_cmake:
   stage: build
   variables:
-    ARTIFACT_DIR: "artifacts"
     GIT_SUBMODULE_STRATEGY: recursive
     CMAKE_CONFIGURE: cmake
     CMAKE_BUILD: ${CMAKE_CONFIGURE}
