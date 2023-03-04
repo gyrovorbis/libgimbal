@@ -16,9 +16,9 @@
 #define GBL_VA_ARGS(...)                ,##__VA_ARGS__
 #define GBL_VA_REQUIRE(...)             ...
 
-#define GBL_STRINGIFY(a)                _GBL_STRINGIFY(a)
-#define _GBL_STRINGIFY(a)               #a
-#define GBL_STRINGIFY_MULTI(...)        #__VA_ARGS__
+#define GBL_STRINGIFY(a)                GBL_STRINGIFY_(a)
+#define GBL_STRINGIFY_(a)               #a
+#define GBL_STRINGIFY_MULTI(...)        GBL_STRINGIFY(__VA_ARGS__)
 
 #define GBL_CAT(A, B)                   A##B
 #define GBL_GLUE(A, B)                  GBL_CAT(A, B)
