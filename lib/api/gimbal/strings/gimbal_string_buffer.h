@@ -12,18 +12,6 @@
 #include <stdarg.h>
 #include <math.h>
 
-#define GBL_STRING_BUFFER_ALLOCA_3(view, size, ctx) \
-    GblStringBuffer_createInPlace(GBL_ALLOCA(size), view, size, ctx)
-
-#define GBL_STRING_BUFFER_ALLOCA_2(view, size) \
-    GBL_STRING_BUFFER_ALLOCA_3(view, size, GBL_NULL)
-
-#define GBL_STRING_BUFFER_ALLOCA_1(view) \
-    GBL_STRING_BUFFER_ALLOCA_2(view, sizeof(GblStringBuffer))
-
-#define GBL_STRING_BUFFER_ALLOCA_0() \
-    GBL_STRING_BUFFER_ALLOCA_1(GBL_STRV(""))
-
 #define GBL_STRING_BUFFER_ALLOCA(...) \
      GBL_VA_OVERLOAD_SELECT(GBL_STRING_BUFFER_ALLOCA, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 
@@ -85,7 +73,6 @@ GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_2 (GBL_SELF,
 GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_1 (GBL_SELF)                                      GBL_NOEXCEPT;
 #define                     GblStringBuffer_createInPlace(...) \
                                 GBL_VA_OVERLOAD_CALL(GblStringBuffer_createInPlace, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
-
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_destruct        (GBL_SELF)                                      GBL_NOEXCEPT;
 
@@ -155,6 +142,18 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_shrink          (GBL_SELF, GblSize d
 GBL_INLINE GBL_RESULT       GblStringBuffer_shrinkToFit     (GBL_SELF)                                      GBL_NOEXCEPT;
 
 //========== IMPL ==========
+
+#define GBL_STRING_BUFFER_ALLOCA_3(size, ctx, view) \
+    GblStringBuffer_createInPlace(GBL_ALLOCA(sizeof(GblStringBuffer) + size), view, sizeof(GblStringBuffer)+size, ctx)
+
+#define GBL_STRING_BUFFER_ALLOCA_2(size, ctx) \
+    GBL_STRING_BUFFER_ALLOCA_3(size, ctx, GBL_STRV(""))
+
+#define GBL_STRING_BUFFER_ALLOCA_1(size) \
+    GBL_STRING_BUFFER_ALLOCA_2(size, GBL_NULL)
+
+#define GBL_STRING_BUFFER_ALLOCA_0() \
+    GBL_STRING_BUFFER_ALLOCA_1(0)
 
 GBL_INLINE char* GblStringBuffer_stackBuffer(GBL_CSELF) GBL_NOEXCEPT {
     return (char*)GblArrayList_stackBuffer(&pSelf->data);

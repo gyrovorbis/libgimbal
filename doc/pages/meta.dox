@@ -13,87 +13,99 @@
 	One of the things libGimabl's type system aims to do is endow C programmers with a powerful 
 	set of tools and constructs from higher-level object-oriented languages. Constructs such as 
 	inheritance, private member variables, virtual functions, interfaces, and even signals and 
-	properties become accessible to C programs. The following is an actual header from libGimbal
-	using its own type system to implement the module system:
+	properties become accessible to C programs. The following is an almost complete header from 
+	the ElysianVMU emulator, creating an object-oriented type for the piezoelectric Buzzer peripheral:
 
 	\code{.c}
-		#ifndef GIMBAL_MODULE_H
-		#define GIMBAL_MODULE_H
+		#ifndef EVMU_BUZZER_H
+		#define EVMU_BUZZER_H
 
-		#include "gimbal_context.h"
-		#include "../ifaces/gimbal_iplugin.h"
+		#include <gimbal/meta.h>
 
-		// Type UUID
-		#define GBL_MODULE_TYPE                 (GBL_TYPE(GblModule))
+		// UUID associated with the given type 
+		#define EVMU_BUZZER_TYPE                (GBL_TYPEOF(EvmuBuzzer))
 
-		// Function-style utility cast operators
-		#define GBL_MODULE(instance)            (GBL_INSTANCE_CAST(instance, GblModule))
-		#define GBL_MODULE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblModule))
-		#define GBL_MODULE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblModule))
+		// Convenience function-style cast operators
+		#define EVMU_BUZZER(instance)           (GBL_INSTANCE_CAST(instance, EvmuBuzzer))
+		#define EVMU_BUZZER_CLASS(klass)        (GBL_CLASS_CAST(klass, EvmuBuzzer))
+		#define EVMU_BUZZER_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, EvmuBuzzer))
 
-		// Type of the "self" pointer for the current file scope
-		#define GBL_SELF_TYPE GblModule
+		// Define the "self" or "this" type for its methods
+		#define GBL_SELF_TYPE EvmuBuzzer
 
-		// Declares our header extern C
+		// Declare everything extern "C"
 		GBL_DECLS_BEGIN
 
-		// Defines a table of class virtual methods and static members,
-		// inheriting from GblContext, plus implementing the GblIPlugin interface
-		GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
-		    GBL_RESULT  (*pFnLoad)  (GBL_SELF);
-		    GBL_RESULT  (*pFnUnload)(GBL_SELF);
+		// Define a "type class" structure or vtable, containing overridable
+		// virtual functions, inheriting EvmuPeripheral's vtable.
+		GBL_CLASS_DERIVE(EvmuBuzzer, EvmuPeripheral)
+		    EVMU_RESULT (*pFnPlayPcm)  (GBL_SELF);
+		    EVMU_RESULT (*pFnStopPcm)  (GBL_SELF);
+		    EVMU_RESULT (*pFnBufferPcm)(GBL_SELF);
 		GBL_CLASS_END
 
-		// Declares the structure for public instanced members,
-		// inheriting from GblModule
-		GBL_INSTANCE_DERIVE(GblModule, GblContext)
-		    GblVersion      version;
-		    GblStringRef    prefix;
-		    GblStringRef    author;
-		    GblStringRef    description;
+		// Define a "type instance" structure containing public members, 
+		// inheriting EvmuPeripheral's public instance members.
+		GBL_INSTANCE_DERIVE(EvmuBuzzer, EvmuPeripheral)
+		    GblBool pcmChanged;     
+		    GblBool enableFreqResp; 
 		GBL_INSTANCE_END
 
-		// Defines a list of properties for our type
-		GBL_PROPERTIES(GblModule,
-		    (prefix,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
-		    (version,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_UINT32_TYPE),
-		    (author,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
-		    (description, GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
-		    (typeCount,   GBL_GENERIC, (READ),                    GBL_UINT32_TYPE)
+		// Create a list of properties for the given type.
+		GBL_PROPERTIES(EvmuBuzzer,
+		    (enabled,        GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
+		    (configured,     GBL_GENERIC, (READ),        GBL_BOOL_TYPE),
+		    (active,         GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
+		    (period,         GBL_GENERIC, (READ, WRITE), GBL_UINT16_TYPE),
+		    (invPulseLength, GBL_GENERIC, (READ, WRITE), GBL_UINT8_TYPE),
+		    (frequency,      GBL_GENERIC, (READ),        GBL_UINT32_TYPE),
+		    (gain,           GBL_GENERIC, (READ),        GBL_FLOAT_TYPE)
 		)
 
-		// Regular public function declrations
-		GblType     GblModule_type          (void)                          GBL_NOEXCEPT;
+		// Define a list of signals on the type, which can be
+		// subscribed to with custom callback logic.
+		GBL_SIGNALS(EvmuBuzzer,
+		    (toneStart,  (GBL_INSTANCE_TYPE, pReceiver)),
+		    (toneStop,   (GBL_INSTANCE_TYPE, pReceiver)),
+		    (toneUpdate, (GBL_INSTANCE_TYPE, pReceiver),
+		                 (GBL_UINT16_TYPE,   period),
+		                 (GBL_UINT8_TYPE,    invPulseLength))
+		)
 
-		GblModule*  GblModule_create        (const char* pName,
-		                                     GblVersion  version,
-		                                     const char* pDescription,
-		                                     const char* pPrefix)           GBL_NOEXCEPT;
+		// Declare all public methods for the EvmuBuzzer type
+		EVMU_EXPORT GblType     EvmuBuzzer_type         (void)                  GBL_NOEXCEPT;
 
-		GblType     GblModule_registerType  (GBL_SELF,
-		                                     GblType            parent,
-		                                     const char*        pName,
-		                                     const GblTypeInfo* pInfo,
-		                                     GblFlags           flags)      GBL_NOEXCEPT;
+		EVMU_EXPORT GblBool     EvmuBuzzer_isActive     (GBL_CSELF)             GBL_NOEXCEPT;
+		EVMU_EXPORT GblBool     EvmuBuzzer_isConfigured (GBL_CSELF)             GBL_NOEXCEPT;
+		EVMU_EXPORT GblBool     EvmuBuzzer_isEnabled    (GBL_CSELF)             GBL_NOEXCEPT;
 
-		GblType     GblModule_typeFromName  (GBL_CSELF, const char* pName)  GBL_NOEXCEPT;
-		GblType     GblModule_typeFromIndex (GBL_CSELF, GblSize     index)  GBL_NOEXCEPT;
-		GblSize     GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT;
+		EVMU_EXPORT void        EvmuBuzzer_setEnabled   (GBL_SELF,
+		                                                 GblBool enabled)       GBL_NOEXCEPT;
 
-		GblBool     GblModule_isLoaded      (GBL_CSELF)                     GBL_NOEXCEPT;
+		EVMU_EXPORT void        EvmuBuzzer_tone         (GBL_CSELF,
+		                                                 uint16_t* pPeriod,
+		                                                 uint8_t* pInvPulseLen) GBL_NOEXCEPT;
 
-		GBL_RESULT  GblModule_use           (GBL_SELF)                      GBL_NOEXCEPT;
-		GBL_RESULT  GblModule_unuse         (GBL_SELF)                      GBL_NOEXCEPT;
-		GblSize     GblModule_useCount      (GBL_CSELF)                     GBL_NOEXCEPT;
+		EVMU_EXPORT EVMU_RESULT EvmuBuzzer_setTone      (GBL_SELF,
+		                                                 uint16_t period,
+		                                                 uint8_t invPulseLen)   GBL_NOEXCEPT;
 
+		EVMU_EXPORT EVMU_RESULT EvmuBuzzer_playTone     (GBL_SELF)              GBL_NOEXCEPT;
+		EVMU_EXPORT EVMU_RESULT EvmuBuzzer_stopTone     (GBL_SELF)              GBL_NOEXCEPT;
+
+		EVMU_EXPORT const void* EvmuBuzzer_pcmBuffer    (GBL_CSELF)             GBL_NOEXCEPT;
+		EVMU_EXPORT GblSize     EvmuBuzzer_pcmSamples   (GBL_CSELF)             GBL_NOEXCEPT;
+		EVMU_EXPORT GblSize     EvmuBuzzer_pcmFrequency (GBL_CSELF)             GBL_NOEXCEPT;
+		EVMU_EXPORT float       EvmuBuzzer_pcmGain      (GBL_CSELF)             GBL_NOEXCEPT;
 
 		GBL_DECLS_END
 
 		#undef GBL_SELF_TYPE
 
-		#endif // GIMBAL_MODULE_H
+		#endif // EVMU_BUZZER_H
 	\endcode
 
+# Overview
 	At its core, the LibGimbal Type Framework utilizes a dynamic type system, provided
 	by the ::GblType API (within gimbal_type.h). This system provides a runtime type 
 	registry maintaining all type information provided by builtin or user-registered 
@@ -114,6 +126,8 @@
 	- GblInterface (gimbal_interface.h)
 		-# abstract/overridable methods
 		-# default method implementations
+
+\subpage Instances
 
 \subpage Classes
 
@@ -143,15 +157,56 @@
  *  \ingroup meta
 */ 
 
-
 /*! \defgroup signals Signals
 	\brief Signal emission mechanism and its related components
  *  \ingroup meta
 */ 
 
-
 /*! \defgroup interfaces Interfaces
 	\brief Built-in abstract interface types
  *  \ingroup meta
  	\copydoc Interfaces
+*/ 
+
+/*! \page Instances
+
+\tableofcontents
+
+# Base Classes
+Depending on what functionality your instanced data type needs, it will typically be derived from 1 of 3 builtin types, which form a hierarchy. Each layer of the hierarchy adds functionality but also increases the size of the type instance and type class structures. 
+
+## GblInstance
+\copydetails GblInstance
+
+## GblBox
+\copydetails GblBox
+
+## GblObject
+\copydetails GblObject
+
+# Private Data
+All libGimbal type instance and type class structures are capable of encapsulating and hiding private data within them. During type registration, the sizes for additional private structures may be provided to GblTypeInfo::classPrivateSize and GblTypeInfo::instancePrivateSize. Using this approach, private structures may be hidden from the types' public headers, similar to C++'s PIMPL idiom.
+
+# Object Layout 
+Unlike C++'s PIMPL idiom, which requires a separate heap allocation for private data and additional indirection, libGimbal uses a single, contigous allocation for both an object's public and private data.
+
+Inherited public data grows downwards, as with traditional OO inheritance schemes; however, inherited private data grows *upwards* in the opposite direction. "Casting" between the public and private structures is then a simple matter of the type system adjusting a pointer by a fixed offset.
+
+\code
+	+-----------+
+	| C Private |
+	+-----------+
+	| B Private |
+	+-----------+
+	| A Private |
+	+-----------+  <----- object pointer is here!!!
+	| A Public  |
+	+-----------+
+	| B Public  |
+	+-----------+
+	| C Public  |
+	+-----------+
+\endcode
+
+
 */ 

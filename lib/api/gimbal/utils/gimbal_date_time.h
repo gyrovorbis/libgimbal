@@ -175,7 +175,7 @@ GBL_INLINE GblBool      GblDateTime_equals      (const GblDateTime* pSelf,
 GBL_EXPORT int64_t      GblDateTime_diff        (const GblDateTime* pSelf,
                                                  const GblDateTime* pRhs)  GBL_NOEXCEPT;
 
-GBL_INLINE GblDateTime* GblDateTime_add         (GblDateTime* pSelf,
+GBL_EXPORT GblDateTime* GblDateTime_add         (GblDateTime* pSelf,
                                                  const GblDateTime* pRhs)  GBL_NOEXCEPT;
 
 GBL_EXPORT GblDateTime* GblDateTime_addDays     (GblDateTime* pSelf,

@@ -45,6 +45,9 @@ GBL_DECLS_BEGIN
  * GblInstance is the base structure which is to be inherited by instances of all
  * instantiable types. This means placing it or a type inheriting from it as the
  * first member of an instance struct.
+ *
+ * \note As the root instantiable type, an instance contains nothing but a
+ * pointer to its corresponding class. Its as lightweight as possible.
  * \sa GblClass, GblType, GblObject
  */
 typedef struct GblInstance {

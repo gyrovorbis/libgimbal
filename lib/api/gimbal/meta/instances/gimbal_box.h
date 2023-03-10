@@ -43,9 +43,21 @@ GBL_CLASS_END
 /*! \class GblBox
  *  \brief Minimally bindable GblInstance with reference semantics and opaque userdata.
  *  \ingroup metaBuiltinTypes
- *  \sa GblInstance, GblBoxClass
  *  \extends GblInstance
  *  \implements GblIVariant
+ *  \details
+ *  A GblBox is a GblInstance-derived type which simply adds the bare minimal set of
+ *  functionality that is typically required for language bindings and interop. This
+ *  includes:
+ *      - destructors
+ *      - reference counting semantics
+ *      - a dictionary for storing arbitrary associated userdata
+ *      - interop with GblVariant types
+ *      - arbitrary flag bits
+ *
+ *  \note
+ *  A GblBox is 12 or 20 bytes total (32 or 64 bit respectively).
+ *  \sa GblInstance, GblBoxClass
  */
 GBL_INSTANCE_BASE(GblBox)                       // Size (32-64 bit)
     GBL_PRIVATE()                               // 4/8  bytes (inherited)

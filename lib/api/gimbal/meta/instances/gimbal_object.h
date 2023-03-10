@@ -43,6 +43,29 @@ GBL_CLASS_DERIVE(GblObject, GblBox,
     GBL_RESULT (*pFnSetProperty)(GBL_SELF, const GblProperty* pProp, GblVariant* pValue);
 GBL_CLASS_END
 
+/*! \class GblObject
+ *  \brief Basic Object-Oriented Instance with Properties, EventHandlers, and Parenting
+ *  \ingroup metaBuiltinTypes
+ *  \extends GblBox
+ *  \implements GblITable
+ *  \implements GblIEventHandler
+ *  \implements GblIEventFilter
+ *  \details
+ *  A GblObject is the default, full-blown object-oriented instantiable type.
+ *  It is analogous to Qt's "QObject" or GNOME's "GObject" root type. It extends
+ *  GblBox to add the following additonal functionality:
+ *      - properties
+ *      - constructor / post-constructor
+ *      - event handling and filtering
+ *      - object parenting and hierarchy
+ *      - object name
+ *
+ *  \note
+ *  A GblObject by default has the same size of a GblBox. Additional data for
+ *  fields such as name, parent, children, event filters, etc are created lazily
+ *  and are stored within GblBox::pFields.
+ *  \sa GblBox, GblObjectClass, GblProperty
+ */
 GBL_INSTANCE_DERIVE_EMPTY(GblObject, GblBox)
 
 GBL_PROPERTIES(GblObject,
