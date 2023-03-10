@@ -86,7 +86,7 @@ build debian-clang:
 .build_win:
   extends: .build_cmake
   variables:
-    DEPLOY_CMD: ${PREFIX_PATH}/bin/windeployqt --compiler-runtime
+    DEPLOY_CMD: PATH="${PATH}:${PREFIX_PATH}/bin" windeployqt
     BINARY_EXTENSION: .exe
   tags:
     - win
