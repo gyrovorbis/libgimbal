@@ -58,7 +58,7 @@ static GBL_RESULT GblStringBufferTestSuite_destruct_(GblTestSuite* pSelf, GblCon
 static GBL_RESULT GblStringBufferTestSuite_constructAlloca_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GblStringBuffer* pBuffer = GBL_STRING_BUFFER_ALLOCA(GBL_STRV("Alloca String"), sizeof(GblStringBuffer), pCtx);
+    GblStringBuffer* pBuffer = GBL_STRING_BUFFER_ALLOCA(0, pCtx, GBL_STRV("Alloca String"));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(pBuffer, "Alloca String", pCtx));
     GBL_CTX_VERIFY_CALL(GblStringBuffer_destruct(pBuffer));
     GBL_CTX_END();
