@@ -42,7 +42,7 @@ function(GBL_GITLAB_CI_DEFINE buildVar envVar)
     endif()
     set(env "${env}")
     GBL_ESCAPE_REGEX(env, "${env}")
-    GBL_BUILD_DEFINE(${buildVar} "${env}")
+    GBL_BUILD_DEFINE(${buildVar} "\"${env}\"")
     set(GBL_BUILD_DEFINES ${GBL_BUILD_DEFINES} PARENT_SCOPE)
 endFunction()
 
