@@ -483,7 +483,7 @@ GBL_EXPORT const char* GblDateTime_toIso8601(const GblDateTime* pSelf, GblString
 
     GblStringBuffer_reserve(pBuffer, GBL_DATE_TIME_ISO8601_STRING_SIZE);
 
-    GblDateTime_format(pSelf, pBuffer, "%Y-%m-%dT%T");
+    GblDateTime_format(pSelf, pBuffer, "%Y-%m-%dT%H:%M:%S");
 
     if(pSelf->utcOffset >= 0)
         GblStringBuffer_append(pBuffer, GBL_STRV("+"));
@@ -520,7 +520,8 @@ GBL_EXPORT const char* GblDateTime_format(const GblDateTime* pSelf, GblStringBuf
     do {
         GBL_CTX_VERIFY_CALL(GblStringBuffer_reserve(pBuffer, multiplier * GBL_DATE_TIME_FORMAT_BUFFER_SIZE_INCREMENT));
         ++multiplier;
-
+        GBL_CTX_VERIFY(++multiplier <= GBL_DATE_TIME_FORMAT_BUFFER_SIZE_MULTIPLIER_MAX,
+                       GBL_RESULT_ERROR_INVALID_EXPRESSION);
     } while(strftime(GblStringBuffer_data(pBuffer),
                      GblStringBuffer_capacity(pBuffer),
                      pFormat,
@@ -541,8 +542,12 @@ GBL_EXPORT GblDateTime* GblDateTime_normalize(GblDateTime* pSelf) {
     if(!pSelf)
         goto fail;
 
-    if(pSelf->date.month <= 0) pSelf->date.month = GBL_MONTH_JANUARY;
-    if(pSelf->date.day <= 0) pSelf->date.day = 1;
+    if(pSelf->date.month <= 0)
+        pSelf->date.month = GBL_MONTH_JANUARY;
+    if(pSelf->date.day <= 0)
+        pSelf->date.day = 1;
+    if(pSelf->date.year < GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN)
+        pSelf->date.year = GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN;
 
     if(toBrokenDown_(pSelf, &bTime) == (time_t)-1)
         goto fail;

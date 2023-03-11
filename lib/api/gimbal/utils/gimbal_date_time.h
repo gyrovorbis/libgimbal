@@ -13,19 +13,17 @@
 #include "../gimbal_core.h"
 #include <time.h>
 
-#define GBL_TIME_MSECS_PER_SEC                      1000
-#define GBL_TIME_USECS_PER_SEC                      1000000
-#define GBL_TIME_NSECS_PER_SEC                      1000000000
+#define GBL_DATE_GREGORIAN_YEAR_FIRST                   1582
+#define GBL_DATE_UNIX_EPOCH_YEAR                        1970
+#define GBL_DATE_UNIX_EPOCH_MONTH                       GBL_MONTH_JANUARY
+#define GBL_DATE_UNIX_EPOCH_DAY                         1
 
-#define GBL_DATE_GREGORIAN_YEAR_FIRST               1582
-#define GBL_DATE_UNIX_EPOCH_YEAR                    1970
-#define GBL_DATE_UNIX_EPOCH_MONTH                   GBL_MONTH_JANUARY
-#define GBL_DATE_UNIX_EPOCH_DAY                     1
-
-#define GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST        1900
-#define GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET      -1
-#define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_INCREMENT  128
-#define GBL_DATE_TIME_ISO8601_STRING_SIZE           25
+#define GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST            1900
+#define GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN              1970
+#define GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET          -1
+#define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_INCREMENT      128
+#define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_MULTIPLIER_MAX 10
+#define GBL_DATE_TIME_ISO8601_STRING_SIZE               25
 
 GBL_DECLS_BEGIN
 
