@@ -266,12 +266,12 @@ GBL_TEST_CASE(dateTimeFromUnix) {
 
 GBL_TEST_CASE(dateTimeFromLocal) {
     GblDateTime dt;
-    struct tm bdTime = { .tm_year = 1, .tm_mday = 1 };
+    struct tm bdTime = { .tm_year = GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN - GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST + 4, .tm_mday = 1, .tm_isdst = -1 };
 
     GBL_TEST_VERIFY(GblDateTime_fromLocal(&dt, &bdTime));
     GBL_TEST_VERIFY(GblDateTime_isLocal(&dt));
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
-                                  GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST+1, GBL_MONTH_JANUARY, 1,
+                                  GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN + 4, GBL_MONTH_JANUARY, 1,
                                   0, 0, 0.0, GblTime_localUtcOffset()));
 
     GBL_TEST_CASE_END;
@@ -280,12 +280,12 @@ GBL_TEST_CASE(dateTimeFromLocal) {
 GBL_TEST_CASE(dateTimeFromUtc) {
     GblDateTime dt;
 
-    struct tm bdTime = { .tm_year = 1, .tm_mday = 1 };
+    struct tm bdTime = { .tm_year = GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN - GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST + 1, .tm_mday = 1, .tm_isdst = -1 };
 
     GBL_TEST_VERIFY(GblDateTime_fromUtc(&dt, &bdTime));
     GBL_TEST_VERIFY(GblDateTime_isUtc(&dt));
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt,
-                                  GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST+1, GBL_MONTH_JANUARY, 1,
+                                  GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN+1, GBL_MONTH_JANUARY, 1,
                                   0, 0, 0.0, 0.0));
 
 
@@ -315,24 +315,24 @@ GBL_TEST_CASE(dateTimeParse) {
                                   2011, 2, 21,
                                   0, 0, 0.0, 0.0));
 
-    GblDateTime_parse(&dt[1], "Monday, 3/4/1765 4:38:33 PM", "%A, %m/%d/%Y %I:%M:%S %p");
+    GblDateTime_parse(&dt[1], "Monday, 3/4/1995 4:38:33 PM", "%A, %m/%d/%Y %I:%M:%S %p");
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt[1],
-                                  1765, 3, 4,
+                                  1995, 3, 4,
                                   16, 38, 33.0, 0.0));
 
-    GblDateTime_parse(&dt[2], "March 4, 1765 16.38.33 Mon", "%B %d, %Y %H.%M.%S %a");
+    GblDateTime_parse(&dt[2], "March 4, 1995 16.38.33 Mon", "%B %d, %Y %H.%M.%S %a");
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt[2],
-                                  1765, 3, 4,
+                                  1995, 3, 4,
                                   16, 38, 33.0, 0.0));
 
     GBL_TEST_VERIFY(GblDateTime_equals(&dt[1], &dt[2]));
 
     GblDateTime_parse(&dt[2],
-                     "March 4, 1765 16.38.33 Mon -0530",
+                     "March 4, 2277 16.38.33 Mon -0530",
                      "%B %d, %Y %H.%M.%S %a %z");
 
     GBL_TEST_CALL(verifyDateTime_(pSelf, &dt[2],
-                                  1765, 3, 4,
+                                  2277, 3, 4,
                                   16, 38, 33, -330));
 
     GBL_TEST_CASE_END;
@@ -599,11 +599,11 @@ GBL_TEST_CASE(dateTimeToIso8601) {
                      "1994-12-17T01:30:05+0103");
 
     GblDateTime_set(&dt,
-                    1914, 4, 20,
+                    2041, 4, 20,
                     14, 1, 55, -18000);
 
     GBL_TEST_COMPARE(GblDateTime_toIso8601(&dt, &strBuff),
-                     "1914-04-20T14:01:55-0500");
+                     "2041-04-20T14:01:55-0500");
 
     GblStringBuffer_destruct(&strBuff);
 
