@@ -289,9 +289,14 @@ if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
         target_compile_options(libGimbal PUBLIC "/Zc:preprocessor")
 endif()
 
-# Strip out full file paths for __FILE__ macros to save .rodata space/look prettier
 if ((CMAKE_COMPILER_IS_GNUCC) OR CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
+# Strip out full file paths for __FILE__ macros to save .rodata space/look prettier
     target_compile_options(libGimbal PUBLIC "-fmacro-prefix-map=${CMAKE_SOURCE_DIR}=...")
+    target_compile_options(libGimbal PUBLIC "-Wno-deprecated-volatile")
+endif()
+
+if ((CMAKE_COMPILER_IS_GNUCC))
+    target_compile_options(libGimbal PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wno-volatile>)
 endif()
 
 list(APPEND

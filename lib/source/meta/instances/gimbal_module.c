@@ -105,8 +105,7 @@ GBL_EXPORT GBL_RESULT GblModule_unregister(GblModule* pSelf) {
 }
 
 GBL_EXPORT GblModule* GblModule_find(const char* pName) {
-
-
+    return NULL;
 }
 
 
