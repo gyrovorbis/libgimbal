@@ -50,9 +50,9 @@ GBL_INSTANCE_DERIVE(GblProperty, GblBox)
         GblType      objectType;
     GBL_PRIVATE_END
     GblQuark    name;
-    GblSize          id;
-    GblFlags         flags;
-    GblType          valueType;
+    GblSize     id;
+    GblFlags    flags;
+    GblType     valueType;
 GBL_INSTANCE_END
 
 // ===== MACRO DSL ====

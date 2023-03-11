@@ -462,15 +462,16 @@ static GBL_RESULT GblLogger_write_(GblLogger*    pSelf,
 
     // Print the message with extra debug info for errors and warnings
     if((flags & GBL_LOG_ERROR) || (flags & GBL_LOG_WARNING)) {
-        if((fprintf(pOut, "[%s] %s%s%s\n%s        @ %s(..): %s:%" GBL_SIZE_FMT"\n",
+        if((fprintf(pOut, "[%6s] %s%s%s\n[%6s] %s        @ %s(..): %s:%" GBL_SIZE_FMT"\n",
                     pDomain,
-                    tabBuff, pPrefix, buffer, tabBuff,
+                    tabBuff, pPrefix, buffer,
+                    pDomain, tabBuff,
                     pFunction,
                     pFile,
                     line)
             < 0)) result = GBL_RESULT_ERROR_FILE_WRITE;
     } else {// Print the message regularly
-        if(((fprintf(pOut, "[%s] %s%s%s\n",
+        if(((fprintf(pOut, "[%6s] %s%s%s\n",
                     pDomain,
                     tabBuff, pPrefix, buffer)
             >= 0))) result = GBL_RESULT_ERROR_FILE_WRITE;

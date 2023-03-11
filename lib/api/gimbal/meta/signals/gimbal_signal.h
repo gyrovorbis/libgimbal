@@ -86,6 +86,7 @@ GBL_EXPORT GblInstance* GblSignal_receiver        (void)                        
 
 #define GBL_SIGNALS_(instance, ...) \
     GBL_INLINE GBL_RESULT instance##_registerSignals_(instance* pSelf, GblMarshalFn* pMarshals) { \
+        GBL_UNUSED(pSelf, pMarshals); \
         GBL_CTX_BEGIN(NULL); \
         GBL_TUPLE_FOREACH(GBL_SIGNAL_INSTALL_, instance, (__VA_ARGS__)) \
         GBL_CTX_END(); \

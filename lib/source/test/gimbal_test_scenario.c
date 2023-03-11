@@ -220,7 +220,8 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
     pSelf->result = pSelf->casesFailed || pSelf->suitesFailed? GBL_RESULT_ERROR : GBL_RESULT_SUCCESS;
     GBL_CTX_CALL(pClass->pFnEnd(pSelf));
 
-    GBL_CTX_END();
+    GBL_CTX_END_BLOCK();
+    return pSelf->result;
 }
 
 static GBL_RESULT GblTestScenarioClass_suiteBegin_(GblTestScenario* pSelf, const GblTestSuite* pSuite) {

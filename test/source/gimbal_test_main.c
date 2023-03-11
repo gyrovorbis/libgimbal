@@ -210,5 +210,5 @@ int main(int argc, char* pArgv[]) {
 
     GblTestScenario_unref(pScenario);
 
-    return GBL_RESULT_SUCCESS(result)? 0 : -1;
+    return GBL_RESULT_SUCCESS(result)? EXIT_SUCCESS : EXIT_FAILURE;
 }

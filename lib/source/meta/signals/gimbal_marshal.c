@@ -35,6 +35,26 @@ GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOOL,
                                    (GblInstance*, GblBool),
                                    (GblVariant_toPointer(&pArgs[0]), GblVariant_toBool(&pArgs[1])))
 
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_CHAR,
+                                   2,
+                                   (GblInstance*, char),
+                                   (GblVariant_toPointer(&pArgs[0]), GblVariant_toChar(&pArgs[1])))
+
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_UINT8,
+                                   2,
+                                   (GblInstance*, uint8_t),
+                                   (GblVariant_toPointer(&pArgs[0]), GblVariant_toUint8(&pArgs[1])))
+
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_UINT16,
+                                   2,
+                                   (GblInstance*, uint16_t),
+                                   (GblVariant_toPointer(&pArgs[0]), GblVariant_toUint16(&pArgs[1])))
+
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_INT16,
+                                   2,
+                                   (GblInstance*, int16_t),
+                                   (GblVariant_toPointer(&pArgs[0]), GblVariant_toInt16(&pArgs[1])))
+
 GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_UINT32,
                                    2,
                                    (GblInstance*, uint32_t),
