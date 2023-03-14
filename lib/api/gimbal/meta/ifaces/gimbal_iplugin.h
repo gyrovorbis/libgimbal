@@ -11,7 +11,7 @@
 
 #define GBL_IPLUGIN_TYPE                (GBL_TYPEOF(GblIPlugin))
 #define GBL_IPLUGIN(instance)           (GBL_INSTANCE_CAST(instance, GblIPlugin))
-#define GBL_PLUGIN_CLASS(klass)         (GBL_CLASS_CAST(klass, GblIPlugin))
+#define GBL_IPLUGIN_CLASS(klass)        (GBL_CLASS_CAST(klass, GblIPlugin))
 #define GBL_IPLUGIN_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblIPlugin))
 
 #define GBL_SELF_TYPE GblIPlugin

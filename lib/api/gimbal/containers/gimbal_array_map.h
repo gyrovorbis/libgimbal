@@ -101,7 +101,7 @@ GBL_INLINE GBL_RESULT   GblArrayMap_setUserdata     (GBL_PSELF,
 GBL_INLINE GBL_RESULT   GblArrayMap_setVariant      (GBL_PSELF,
                                                      uintptr_t key,
                                                      GblVariant* pVariant)        GBL_NOEXCEPT;
-/// Attempts to insert  a new entry with the given key and userdata, returning the insertion index.
+/// Attempts to insert a new entry with the given key and userdata, returning the insertion index.
 GBL_INLINE GblSize      GblArrayMap_insertUserdata  (GBL_PSELF,
                                                      uintptr_t key,
                                                      uintptr_t value,

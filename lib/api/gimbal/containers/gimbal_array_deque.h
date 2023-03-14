@@ -227,7 +227,7 @@ GBL_INLINE void* GblArrayDeque_back(GBL_CSELF) GBL_NOEXCEPT {
 
 GBL_INLINE GBL_RESULT GblArrayDeque_pushBack(GBL_SELF, const void* pData) GBL_NOEXCEPT {
     void* pSlot = GblArrayDeque_emplaceBack(pSelf);
-    if(!pSlot) return GblThread_callRecord(GBL_NULL)->result;
+    if(!pSlot) return GblThd_callRecord(GBL_NULL)->result;
     else {
         GBL_ASSERT(pData);
         memcpy(pSlot, pData, GblArrayDeque_elementSize(pSelf));

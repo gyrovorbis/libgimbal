@@ -145,6 +145,9 @@
 
 /*! \defgroup utils Utilities
 	\brief Auxiliary utility types
+	\copydoc Utilities
+
+
 */ 
 
 /*! \defgroup core Core

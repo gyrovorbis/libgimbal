@@ -201,7 +201,7 @@ GBL_INLINE GBL_RESULT GblRingBuffer_pushBack(GBL_SELF, const void* pData) GBL_NO
     GBL_RESULT result = GBL_RESULT_SUCCESS;
     void* pBuffer = GblRingBuffer_emplaceBack(pSelf);
     if(pBuffer) GBL_LIKELY memcpy(pBuffer, pData, GBL_PRIV_REF(pSelf).elementSize);
-    else GBL_UNLIKELY result = GblThread_callRecord(GBL_NULL)->result;
+    else GBL_UNLIKELY result = GblThd_callRecord(GBL_NULL)->result;
     return result;
 }
 

@@ -33,25 +33,9 @@ static GblQuark  threadFilterQuark_ = GBL_QUARK_INVALID;
 static GBL_THREAD_LOCAL
        GblSize   stackDepth_        = 0;
 
-static void GblLogger_initialize_(void) {
-    if(!inittedOnce_) mtx_init(&listMtx_, mtx_recursive);
-    mtx_lock(&listMtx_);
-    inittedOnce_ = GBL_TRUE;
-    initializing_ = GBL_TRUE;
-
-    stackDepth_        = 0;
-    domainFilterQuark_ = GblQuark_fromStringStatic(GBL_LOGGER_DOMAIN_FILTER_FIELD_NAME_);
-    threadFilterQuark_ = GblQuark_fromStringStatic(GBL_LOGGER_THREAD_FILTER_FIELD_NAME_);
-
-    initializing_ = GBL_FALSE;
-    initialized_ = GBL_TRUE;
-    mtx_unlock(&listMtx_);
-}
-
-void GblLoger_finalize_(void) {
+static void GblLogger_finalize_(void) {
     if(!initialized_) return;
     mtx_lock(&listMtx_);
-
 
     for(GblLinkedListNode* pIt = loggerList_.pNext;
         pIt != &loggerList_;
@@ -64,6 +48,22 @@ void GblLoger_finalize_(void) {
 
     mtx_unlock(&listMtx_);
 
+}
+
+static void GblLogger_initialize_(void) {
+    if(!inittedOnce_) mtx_init(&listMtx_, mtx_recursive);
+    mtx_lock(&listMtx_);
+    inittedOnce_ = GBL_TRUE;
+    initializing_ = GBL_TRUE;
+
+    stackDepth_        = 0;
+    domainFilterQuark_ = GblQuark_fromStringStatic(GBL_LOGGER_DOMAIN_FILTER_FIELD_NAME_);
+    threadFilterQuark_ = GblQuark_fromStringStatic(GBL_LOGGER_THREAD_FILTER_FIELD_NAME_);
+
+    initializing_ = GBL_FALSE;
+    initialized_ = GBL_TRUE;
+    atexit(GblLogger_finalize_);
+    mtx_unlock(&listMtx_);
 }
 
 GBL_EXPORT GBL_RESULT GblLogger_register(GblLogger* pLogger) {
@@ -159,7 +159,7 @@ GBL_EXPORT GblRefCount GblLogger_unref(GblLogger* pSelf) {
 
 
 GBL_EXPORT GblBool GblLogger_hasFilter(const GblLogger* pSelf,
-                                       const GblThread* pThread,
+                                       const GblThd* pThread,
                                        const char*      pDomain,
                                        GBL_LOG_FLAGS    flags) {
     if(!(pSelf->flagsFilter & flags))
@@ -228,8 +228,8 @@ GBL_EXPORT const char** GblLogger_domainFilters(const GblLogger* pSelf) {
 }
 
 GBL_EXPORT GblBool GblLogger_hasThreadFilter(const GblLogger* pSelf,
-                                             const GblThread* pThread) {
-    const GblThread** ppThreads = GblLogger_threadFilters(pSelf);
+                                             const GblThd* pThread) {
+    const GblThd** ppThreads = GblLogger_threadFilters(pSelf);
     if(ppThreads) {
         while(*ppThreads) {
             if(*ppThreads++ == pThread) {
@@ -248,7 +248,7 @@ GBL_RESULT threadFilterDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntr
 }
 
 GBL_EXPORT GBL_RESULT GblLogger_setThreadFilters(GblLogger* pSelf,
-                                                 const GblThread* pThreads[]) {
+                                                 const GblThd* pThreads[]) {
     GBL_CTX_BEGIN(NULL);
 
     GblSize count = 0;
@@ -257,8 +257,8 @@ GBL_EXPORT GBL_RESULT GblLogger_setThreadFilters(GblLogger* pSelf,
     // Don't bother if it's just an empty delimeter list
     if(count == 1) GBL_CTX_DONE();
 
-    const GblThread** ppThreads = GBL_CTX_NEW(const GblThread*, count);
-    memcpy(ppThreads, pThreads, sizeof(GblThread*) * count);
+    const GblThd** ppThreads = GBL_CTX_NEW(const GblThd*, count);
+    memcpy(ppThreads, pThreads, sizeof(GblThd*) * count);
 
     // Cram the bitch into the box
     GBL_CTX_VERIFY_CALL(GblBox_setField(GBL_BOX(pSelf),
@@ -268,8 +268,8 @@ GBL_EXPORT GBL_RESULT GblLogger_setThreadFilters(GblLogger* pSelf,
     GBL_CTX_END();
 }
 
-GBL_EXPORT const GblThread** GblLogger_threadFilters(const GblLogger* pSelf) {
-    return (const GblThread**)GblBox_getField(GBL_BOX(pSelf),
+GBL_EXPORT const GblThd** GblLogger_threadFilters(const GblLogger* pSelf) {
+    return (const GblThd**)GblBox_getField(GBL_BOX(pSelf),
                                               threadFilterQuark_);
 }
 
@@ -281,7 +281,7 @@ GBL_EXPORT GBL_RESULT GblLogger_push(void) {
 
     ++stackDepth_;
 
-    GblThread* pThread = GblThread_current();
+    GblThd* pThread = GblThd_current();
 
     for(GblLinkedListNode* pIt = loggerList_.pNext;
         pIt != &loggerList_;
@@ -307,7 +307,7 @@ GBL_EXPORT GBL_RESULT GblLogger_pop(GblSize count) {
     GBL_ASSERT(stackDepth_, "Underflowed log stack for thread!");
     --stackDepth_;
 
-    GblThread* pThread = GblThread_current();
+    GblThd* pThread = GblThd_current();
 
     for(GblLinkedListNode* pIt = loggerList_.pNext;
         pIt != &loggerList_;
@@ -337,13 +337,13 @@ GBL_EXPORT GBL_RESULT GblLogger_write(const char*   pFile,
     va_list varArgs;
     va_start(varArgs, pFmt);
 
-    GBL_RESULT retVal= GblLogger_writeVa(pFile,
-                                         pFunction,
-                                         line,
-                                         pDomain,
-                                         flags,
-                                         pFmt,
-                                         varArgs);
+    GBL_RESULT retVal = GblLogger_writeVa(pFile,
+                                          pFunction,
+                                          line,
+                                          pDomain,
+                                          flags,
+                                          pFmt,
+                                          varArgs);
     va_end(varArgs);
     return retVal;
 
@@ -360,7 +360,7 @@ GBL_EXPORT GBL_RESULT GblLogger_writeVa(const char*   pFile,
     GBL_LOGGER_ENSURE_INITIALIZED_();
     mtx_lock(&listMtx_);
 
-    GblThread* pThread = GblThread_current();
+    GblThd* pThread = GblThd_current();
     const time_t timeStamp = time(NULL);
 
     for(GblLinkedListNode* pIt = loggerList_.pNext;
@@ -400,12 +400,12 @@ GBL_EXPORT GBL_RESULT GblLogger_writeVa(const char*   pFile,
 }
 
 
-static GBL_RESULT GblLogger_push_(GblLogger* pSelf, GblThread* pThread) {
+static GBL_RESULT GblLogger_push_(GblLogger* pSelf, GblThd* pThread) {
     GBL_UNUSED(pSelf, pThread);
     return GBL_RESULT_SUCCESS;
 }
 
-static GBL_RESULT GblLogger_pop_(GblLogger* pSelf, GblThread* pThread, GblSize count) {
+static GBL_RESULT GblLogger_pop_(GblLogger* pSelf, GblThd* pThread, GblSize count) {
     GBL_UNUSED(pSelf, pThread, count);
     return GBL_RESULT_SUCCESS;
 }
@@ -414,7 +414,7 @@ static GBL_RESULT GblLogger_write_(GblLogger*    pSelf,
                                    const char*   pFile,
                                    const char*   pFunction,
                                    GblSize       line,
-                                   GblThread*    pThread,
+                                   GblThd*    pThread,
                                    time_t        timeStamp,
                                    const char*   pDomain,
                                    GBL_LOG_FLAGS flags,
@@ -436,7 +436,7 @@ static GBL_RESULT GblLogger_write_(GblLogger*    pSelf,
 
     // Add prefix for most severe flag
          if(flags & GBL_LOG_ERROR)   pPrefix = "X ";
-    else if(flags & GBL_LOG_WARNING) pPrefix = "! ";
+    else if(flags & GBL_LOG_WARN) pPrefix = "! ";
     else if(flags & GBL_LOG_INFO)    pPrefix = "* ";
     else if(flags & GBL_LOG_DEBUG)   pPrefix = "# ";
     else                             pPrefix = "";
@@ -461,7 +461,7 @@ static GBL_RESULT GblLogger_write_(GblLogger*    pSelf,
     }
 
     // Print the message with extra debug info for errors and warnings
-    if((flags & GBL_LOG_ERROR) || (flags & GBL_LOG_WARNING)) {
+    if((flags & GBL_LOG_ERROR) || (flags & GBL_LOG_WARN)) {
         if((fprintf(pOut, "[%6s] %s%s%s\n[%6s] %s        @ %s(..): %s:%" GBL_SIZE_FMT"\n",
                     pDomain,
                     tabBuff, pPrefix, buffer,

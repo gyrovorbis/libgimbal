@@ -2,6 +2,7 @@
 #define GIMBAL_MAIN_LOOP_H
 
 #include "../meta/instances/gimbal_object.h"
+#include "../meta/signals/gimbal_signal.h"
 
 #define GBL_PRIORITY_HIGH       -100
 #define GBL_PRIORITY_DEFUAULT   0
@@ -27,10 +28,9 @@ GBL_CLASS_END
 
 GBL_INSTANCE_DERIVE(GblMainLoop, GblObject)
     GblBool     pending;
-    GblMutex    mutex;
 GBL_INSTANCE_END
 
-GBL_SIGNALS(
+GBL_SIGNALS(GblMainLoop,
     (execIdle,     GBL_INSTANCE_TYPE),
     (taskEnqueued, GBL_INSTANCE_TYPE, GBL_INSTANCE_TYPE)
 )

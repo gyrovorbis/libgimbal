@@ -35,6 +35,11 @@
  *      GblStringRef_release(pRef);  // now refCount is 1
  *      GblStringRef_release(pRef2); // now it's deleted
  *  \ingroup strings
+ *
+ *  \todo
+ *      - clean up API to use overloads and default methods
+ *      - rename acquire/release to ref/unref
+ *      - make it use some epic buddy allocator shit
  */
 
 #ifndef GIMBAL_STRING_REF_H
@@ -58,28 +63,37 @@ GBL_DECLS_BEGIN
  */
 typedef char GblStringRef;
 
-GBL_INLINE GblStringRef*    GblStringRef_create                    (const char* pString)      GBL_NOEXCEPT;
-GBL_INLINE GblStringRef*    GblStringRef_createWithContext         (const char* pString,
-                                                                    GblContext* pCtx)         GBL_NOEXCEPT;
-GBL_INLINE GblStringRef*    GblStringRef_createFromView            (GblStringView view)       GBL_NOEXCEPT;
-GBL_EXPORT GblStringRef*    GblStringRef_createFromViewWithContext (GblStringView view,
-                                                                    GblContext*   pCtx)       GBL_NOEXCEPT;
+GBL_INLINE GblStringRef* GblStringRef_create                    (const char* pString)      GBL_NOEXCEPT;
+GBL_INLINE GblStringRef* GblStringRef_createWithContext         (const char* pString,
+                                                                 GblContext* pCtx)         GBL_NOEXCEPT;
+GBL_INLINE GblStringRef* GblStringRef_createFromView            (GblStringView view)       GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblStringRef_createFromViewWithContext (GblStringView view,
+                                                                 GblContext*   pCtx)       GBL_NOEXCEPT;
 
-GBL_EXPORT GblStringRef*    GblStringRef_acquire                   (GBL_CSELF)                GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount      GblStringRef_release                   (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblStringRef_acquire                   (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount   GblStringRef_release                   (GBL_CSELF)                GBL_NOEXCEPT;
 
-GBL_EXPORT char             GblStringRef_at                        (GBL_CSELF, GblSize index) GBL_NOEXCEPT;
+GBL_EXPORT char          GblStringRef_at                        (GBL_CSELF, GblSize index) GBL_NOEXCEPT;
 
-GBL_INLINE GblContext*      GblStringRef_context                   (GBL_CSELF)                GBL_NOEXCEPT;
-GBL_INLINE GblRefCount      GblStringRef_refCount                  (GBL_CSELF)                GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringRef_length                    (GBL_CSELF)                GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringRef_empty                     (GBL_CSELF)                GBL_NOEXCEPT;
-GBL_INLINE GblBool          GblStringRef_valid                     (GBL_CSELF)                GBL_NOEXCEPT;
-GBL_INLINE GblStringView    GblStringRef_view                      (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_INLINE GblContext*   GblStringRef_context                   (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_INLINE GblRefCount   GblStringRef_refCount                  (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_INLINE GblSize       GblStringRef_length                    (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringRef_empty                     (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringRef_valid                     (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringRef_view                      (GBL_CSELF)                GBL_NOEXCEPT;
+
+#define GblStringRef_create(...) GBL_VA_OVERLOAD_CALL(GblStringRef_create_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
+#define GblStringRef_ref(str)    GblStringRef_acquire(str)
+#define GblStringRef_unref(str)  GblStringRef_release(str)
 
 // ========== IMPL ==========
 
 /// \cond
+
+#define GblStringRef_create__1(str)             (GblStringRef_create)(str)
+#define GblStringRef_create__2(str, len)        GblStringRef_createFromView(GblStringView_fromStringSized(str, len))
+#define GblStringRef_create__3(str, len, ctx)   GblStringRef_createFromViewWithContext(GblStringView_fromStringSized(str, len), ctx)
+
 typedef struct GblStringRef_ {
     GblSize     length;
     char        data[1];

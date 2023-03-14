@@ -6,7 +6,19 @@
 #include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/containers/gimbal_array_list.h>
 #include <gimbal/containers/gimbal_doubly_linked_list.h>
+#include <gimbal/allocators/gimbal_pool_allocator.h>
 #include "../types/gimbal_type_.h"
+
+#define GBL_CONNECTION_POOL_ALLOCATOR_
+
+#ifdef GBL_CONNECTION_POOL_ALLOCATOR_
+#   define GBL_CONNECTION_POOL_ALLOCATOR_PAGE_SIZE_  16
+#   define GBL_CONNECTION_NEW_()                     (GblPoolAllocator_new(&connectionAllocator_))
+#   define GBL_CONNECTION_DELETE_(ptr)               (GblPoolAllocator_delete(&connectionAllocator_, ptr))
+#else
+#   define GBL_CONNECTION_NEW_()                     GBL_CTX_NEW(Connection_)
+#   define GBL_CONNECTION_DELETE_(ptr)               GBL_CTX_FREE(ptr)
+#endif
 
 typedef struct Signal_ {
     GblType         ownerType;
@@ -38,8 +50,11 @@ typedef struct InstanceConnectionTable_ {
     GblBool                     signalsBlocked;
 } InstanceConnectionTable_;
 
-static GblHashSet   signalSet_;
-static GblHashSet   instanceConnectionTableSet_;
+static GblHashSet       signalSet_;
+static GblHashSet       instanceConnectionTableSet_;
+#ifdef GBL_CONNECTION_POOL_ALLOCATOR_
+static GblPoolAllocator connectionAllocator_;
+#endif
 
 static GBL_THREAD_LOCAL Connection_* pActiveConnection_ = NULL;
 
@@ -63,10 +78,10 @@ static void signalSetDestructor_(const GblHashSet* pSet, void* pEntry) {
     GBL_CTX_END_BLOCK();
 }
 
-GBL_EXPORT GBL_RESULT GblSignal_install(GblType        ownerType,
-                                        const char*    pName,
-                                        GblMarshalFn   pFnCMarshal,
-                                        GblSize        argCount,
+GBL_EXPORT GBL_RESULT GblSignal_install(GblType      ownerType,
+                                        const char*  pName,
+                                        GblMarshalFn pFnCMarshal,
+                                        GblSize      argCount,
                                         ...)
 {
     va_list varArgs;
@@ -368,7 +383,7 @@ static GBL_RESULT Signal_connect_(GblInstance*   pEmitter,
     // Initialize closure
     if(!GblClosure_hasMarshal(pClosure)) GblClosure_setMarshal(pClosure, pSignal->pFnCMarshal);
 
-    Connection_* pConnection = GBL_CTX_MALLOC(sizeof(Connection_));
+    Connection_* pConnection = GBL_CONNECTION_NEW_();
     memset(pConnection, 0, sizeof(Connection_));
     pConnection->pEmitter   = pEmitter;
     pConnection->pReceiver  = pReceiver;
@@ -459,7 +474,7 @@ GBL_INLINE GBL_RESULT deleteConnection_(Connection_* pConnection) {
     GblDoublyLinkedList_remove(&pConnection->emitterList);
     GblDoublyLinkedList_remove(&pConnection->receiverList);
     GBL_BOX_UNREF(pConnection->pClosure);
-    GBL_CTX_FREE(pConnection);
+    GBL_CONNECTION_DELETE_(pConnection);
 
     GBL_CTX_END();
 }
@@ -759,6 +774,7 @@ GBL_EXPORT GBL_RESULT GblSignal_init_(GblContext* pCtx) {
                                              signalSetDestructor_,
                                              64,
                                              pCtx));
+
     GBL_CTX_VERIFY_CALL(GblHashSet_construct(&instanceConnectionTableSet_,
                                              sizeof(InstanceConnectionTable_*),
                                              instanceConnectionTableHasher_,
@@ -766,6 +782,13 @@ GBL_EXPORT GBL_RESULT GblSignal_init_(GblContext* pCtx) {
                                              instanceConnectionTableDestructor_,
                                              0,
                                              pCtx));
+
+#ifdef GBL_CONNECTION_POOL_ALLOCATOR_
+        GBL_CTX_VERIFY_CALL(GblPoolAllocator_construct(&connectionAllocator_,
+                                                       sizeof(Connection_),
+                                                       GBL_CONNECTION_POOL_ALLOCATOR_PAGE_SIZE_));
+#endif
+
     GBL_CTX_END();
 }
 
@@ -773,5 +796,8 @@ GBL_EXPORT GBL_RESULT GblSignal_final_(GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GBL_CTX_CALL(GblHashSet_destruct(&signalSet_));
     GBL_CTX_CALL(GblHashSet_destruct(&instanceConnectionTableSet_));
+#ifdef GBL_CONNECTION_POOL_ALLOCATOR_
+    GBL_CTX_CALL(GblPoolAllocator_destruct(&connectionAllocator_));
+#endif
     GBL_CTX_END();
 }

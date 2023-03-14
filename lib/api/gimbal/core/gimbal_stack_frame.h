@@ -49,11 +49,11 @@ GBL_INLINE GBL_RESULT GblStackFrame_construct (GblStackFrame* pFrame,
 
 // ===== Implementation =====
 ///\cond
-GBL_FORWARD_DECLARE_STRUCT(GblThread);
+GBL_FORWARD_DECLARE_STRUCT(GblThd);
 GBL_FORWARD_DECLARE_STRUCT(GblContext);
-GBL_INLINE GblThread*     GblThread_current         (void)                            GBL_NOEXCEPT;
-GBL_EXPORT GblContext*    GblThread_context         (const GblThread* pSelf)          GBL_NOEXCEPT;
-GBL_INLINE GblStackFrame* GblThread_stackFrameTop   (const GblThread* pSelf)          GBL_NOEXCEPT;
+GBL_INLINE GblThd*     GblThd_current         (void)                            GBL_NOEXCEPT;
+GBL_EXPORT GblContext*    GblThd_context         (const GblThd* pSelf)          GBL_NOEXCEPT;
+GBL_INLINE GblStackFrame* GblThd_stackFrameTop   (const GblThd* pSelf)          GBL_NOEXCEPT;
 GBL_EXPORT GblContext*    GblObject_findContext     (GblObject* pSelf)                GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT     GblContext_memAlloc_      (GblContext* pSelf,
@@ -110,7 +110,7 @@ GBL_INLINE GBL_RESULT GblStackFrame_construct(GblStackFrame* pFrame, GblObject* 
     GblContext* pContext            = GBL_NULL;
 
     if(pObject) GBL_UNLIKELY {
-        const GblStackFrame* pPrev = GblThread_stackFrameTop(NULL);
+        const GblStackFrame* pPrev = GblThd_stackFrameTop(NULL);
         if(pPrev && pPrev->pObject == pObject) GBL_LIKELY {
             pContext = pPrev->pContext;
         } else GBL_UNLIKELY {
@@ -119,7 +119,7 @@ GBL_INLINE GBL_RESULT GblStackFrame_construct(GblStackFrame* pFrame, GblObject* 
     }
 
     if(!pContext) GBL_LIKELY {
-        pContext = GblThread_context(NULL);
+        pContext = GblThd_context(NULL);
     }
 
     pFrame->record.srcLocation.pFile    = GBL_NULL;

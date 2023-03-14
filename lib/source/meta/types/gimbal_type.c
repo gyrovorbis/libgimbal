@@ -689,6 +689,30 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
     GBL_CTX_END();
 }
 
+static void GblType_final_(void) {
+    GblBool hasMutex = GBL_FALSE;
+    GBL_CTX_BEGIN(pCtx_);
+    GBL_CTX_PUSH_VERBOSE("[GblType]: Finalizing");
+    mtx_lock(&typeRegMtx_);
+    hasMutex = GBL_TRUE;
+
+    //iterate over types and cleanup classes
+    GBL_CTX_CALL(GblSignal_final_(pCtx_));
+    GBL_CTX_CALL(GblProperty_final_(pCtx_));
+    GBL_CTX_CALL(GblVariant_final_(pCtx_));
+    GBL_CTX_CALL(GblArrayList_clear(&typeBuiltins_.vector));
+    GBL_CTX_CALL(GblArrayList_destruct(&typeBuiltins_.vector));
+    GBL_CTX_CALL(GblHashSet_destruct(&typeRegistry_));
+
+    GBL_CTX_POP(1);
+    initialized_ = GBL_FALSE;
+    GBL_CTX_END_BLOCK();
+    if(hasMutex) {
+        mtx_unlock(&typeRegMtx_);
+        //if(!initialized_) mtx_destroy(&typeRegMtx_); keep to support reinit
+    }
+}
+
 void GblType_init_(void) {
     initializing_ = GBL_TRUE;
     GBL_CTX_BEGIN(pCtx_);
@@ -721,6 +745,7 @@ void GblType_init_(void) {
     initialized_    = GBL_TRUE;
     initializing_   = GBL_FALSE;
     inittedOnce_    = GBL_TRUE;
+    atexit(GblType_final_);
     GBL_CTX_END_BLOCK();
     mtx_unlock(&typeRegMtx_);
 }
@@ -755,31 +780,6 @@ GblType GblType_registerBuiltin_(GblSize            expectedIndex,
     GBL_CTX_POP(1);
     GBL_CTX_END_BLOCK();
     return type;
-}
-
-GBL_EXPORT GBL_RESULT GblType_final(void) {
-    GblBool hasMutex = GBL_FALSE;
-    GBL_CTX_BEGIN(pCtx_);
-    GBL_CTX_PUSH_VERBOSE("[GblType]: Finalizing");
-    mtx_lock(&typeRegMtx_);
-    hasMutex = GBL_TRUE;
-
-    //iterate over types and cleanup classes
-    GBL_CTX_CALL(GblSignal_final_(pCtx_));
-    GBL_CTX_CALL(GblProperty_final_(pCtx_));
-    GBL_CTX_CALL(GblVariant_final_(pCtx_));
-    GBL_CTX_CALL(GblArrayList_clear(&typeBuiltins_.vector));
-    GBL_CTX_CALL(GblArrayList_destruct(&typeBuiltins_.vector));
-    GBL_CTX_CALL(GblHashSet_destruct(&typeRegistry_));
-
-    GBL_CTX_POP(1);
-    initialized_ = GBL_FALSE;
-    GBL_CTX_END_BLOCK();
-    if(hasMutex) {
-        mtx_unlock(&typeRegMtx_);
-        //if(!initialized_) mtx_destroy(&typeRegMtx_); keep to support reinit
-    }
-    return GBL_CTX_RESULT();
 }
 
 GBL_EXPORT GblType GblType_fromBuiltinIndex(GblSize index) {

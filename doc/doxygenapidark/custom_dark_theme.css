@@ -23,7 +23,11 @@ div.fragment, pre.fragment {
 }
 
 a, a:link, a:visited {
-	color: #67d8ef;
+	color: #1cbfff;
+}
+
+a.code.hl_struct {
+    color: #d7d7d7;
 }
 
 .highlighted {
@@ -34,8 +38,10 @@ a.highlighted {
 	background: none !important;
 }
 
+
+
 div#titlearea {
-	background-color: #516f94;
+	background-color: #303f68;
 }
 
 .classindex dl.odd {
@@ -47,7 +53,7 @@ div#titlearea {
 }
 
 #projectname {
-	color: #67d8ef;
+	color: #1cbfff;
 }
 
 #projectbrief {
@@ -56,7 +62,7 @@ div#titlearea {
 }
 
 .contents a:visited {
-	color: #AEA70E;
+	color: #f16b6b !important;
 }
 
 .alphachar > a {
@@ -311,17 +317,17 @@ div.line a {
 }
 
 span.keyword {
-	color: #f92472;
+	color: #55ff00;;
 	font-style: italic;
 }
 
 span.keywordtype {
-	color: #67cfc1;
+	color: #ff4a4a;
 	font-style: italic;
 }
 
 span.keywordflow {
-	color: #f92472;
+	color: #55ff00;
 	font-style: italic;
 }
 
@@ -330,7 +336,7 @@ span.comment {
 }
 
 span.preprocessor {
-	color: #a6e22b;
+	color: #20abff;
 }
 
 span.stringliteral {
@@ -359,6 +365,8 @@ span.vhdllogic {
 
 span.lineno {
 	background: transparent;
+	color: #819ca7;
+	border-right: 2px solid #646464;
 }
 
 span.lineno a {

@@ -116,6 +116,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_stack_frame.h
     api/gimbal/core/gimbal_result.h
     api/gimbal/core/gimbal_typedefs.h
+    api/gimbal/core/gimbal_thd.h
     api/gimbal/core/gimbal_thread.h
     api/gimbal/core/gimbal_atomics.h
     api/gimbal/core/gimbal_app.h
@@ -177,6 +178,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/utils/gimbal_date_time.h
     api/gimbal/utils/gimbal_byte_array.h
     api/gimbal/utils/gimbal_bit_view.h
+    api/gimbal/utils/gimbal_scanner.h
+    api/gimbal/utils/gimbal_uri.h
 )
 
 
@@ -196,6 +199,7 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_ring_list.c
     source/containers/gimbal_array_deque.c
     source/containers/gimbal_array_heap.c
+    source/core/gimbal_thd.c
     source/core/gimbal_thread.c
     source/core/gimbal_app.c
     source/meta/classes/gimbal_class.c
@@ -245,7 +249,8 @@ set(GIMBAL_SOURCES
     source/utils/gimbal_date_time.c
     source/utils/gimbal_byte_array.c
     source/utils/gimbal_bit_view.c
- )
+    source/utils/gimbal_uri.c
+)
 
 add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}

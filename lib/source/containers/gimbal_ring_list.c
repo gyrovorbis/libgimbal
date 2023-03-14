@@ -9,6 +9,7 @@
 #define GBL_RING_LIST_POOL_ALLOCATOR
 
 #ifdef GBL_RING_LIST_POOL_ALLOCATOR
+#  define GBL_RING_LIST_POOL_PAGE_SIZE   16
 #  define GBL_RING_LIST_NEW_()           (GblPoolAllocator_new(&allocPool_))
 #  define GBL_RING_LIST_DELETE_(ptr)     (GblPoolAllocator_delete(&allocPool_, ptr))
 #else
@@ -16,7 +17,9 @@
 #  define GBL_RING_LIST_DELETE_(ptr)     GBL_CTX_FREE(ptr)
 #endif
 
+#ifdef GBL_RING_LIST_POOL_ALLOCATOR
 static GblPoolAllocator allocPool_;
+#endif
 
 void* GblRingList_new_(void) {
     return GBL_RING_LIST_NEW_();
@@ -98,16 +101,25 @@ GBL_EXPORT GBL_RESULT GblRingList_insertVaList(GblRingList* pSelf, intptr_t inde
     GBL_CTX_END();
 }
 
+#ifdef GBL_RING_LIST_POOL_ALLOCATOR
+static void GblRingList_final_(void) {
+    GblPoolAllocator_destruct(&allocPool_);
+}
+#endif
+
 GBL_EXPORT GblRingList* GblRingList_createEmpty(void) {
     GblRingList* pList = NULL;
     GBL_CTX_BEGIN(NULL);
 
+#ifdef GBL_RING_LIST_POOL_ALLOCATOR
     // top-level entry point, ensure pool is created!
     if(!allocPool_.entrySize) {
         GBL_CTX_VERIFY_CALL(GblPoolAllocator_construct(&allocPool_,
                                                        sizeof(GblRingList),
-                                                       20));
+                                                       GBL_RING_LIST_POOL_PAGE_SIZE));
+        atexit(GblRingList_final_);
     }
+#endif
 
     pList = GBL_RING_LIST_NEW_();
     GblDoublyLinkedList_init(&pList->listNode);

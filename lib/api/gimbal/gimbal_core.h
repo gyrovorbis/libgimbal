@@ -11,7 +11,7 @@
 #include "core/gimbal_decls.h"
 #include "core/gimbal_result.h"
 #include "core/gimbal_stack_frame.h"
-#include "core/gimbal_thread.h"
+#include "core/gimbal_thd.h"
 #include "core/gimbal_typedefs.h"
 #include "core/gimbal_app.h"
 

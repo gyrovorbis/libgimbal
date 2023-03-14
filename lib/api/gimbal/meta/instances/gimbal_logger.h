@@ -15,11 +15,11 @@
 #define GBL_LOGGER_CLASS(klass)           (GBL_CLASS_CAST(klass, GblLogger))
 #define GBL_LOGGER_GET_CLASS(self)        (GBL_INSTANCE_GET_CLASS(self, GblLogger))
 
-#define GBL_LOG_WRITE(flags, domain, ...) GblLogger_write(__FILE__, __FUNCTION__, __LINE__, domain, flags, __VA_ARGS__)
+#define GBL_LOG_WRITE(flags, domain, ...) GblLogger_write(__FILE__, __func__, __LINE__, domain, flags, __VA_ARGS__)
 #define GBL_LOG_DEBUG(domain, ...)        GBL_LOG_WRITE(GBL_LOG_DEBUG, domain, __VA_ARGS__)
 #define GBL_LOG_VERBOSE(domain, ...)      GBL_LOG_WRITE(GBL_LOG_VERBOSE, domain, __VA_ARGS__)
 #define GBL_LOG_INFO(domain, ...)         GBL_LOG_WRITE(GBL_LOG_INFO, domain, __VA_ARGS__)
-#define GBL_LOG_WARNING(domain, ...)      GBL_LOG_WRITE(GBL_LOG_WARNING, domain, __VA_ARGS__)
+#define GBL_LOG_WARN(domain, ...)         GBL_LOG_WRITE(GBL_LOG_WARN, domain, __VA_ARGS__)
 #define GBL_LOG_ERROR(domain, ...)        GBL_LOG_WRITE(GBL_LOG_ERROR, domain, __VA_ARGS__)
 #define GBL_LOG_PUSH()                    GblLogger_push()
 #define GBL_LOG_POP(n)                    GblLogger_pop(n)
@@ -37,7 +37,7 @@ GBL_DECLARE_FLAGS(GBL_LOG_FLAGS) {
     GBL_LOG_DEBUG     = 0x2,
     GBL_LOG_VERBOSE   = 0x4,
     GBL_LOG_INFO      = 0x8,
-    GBL_LOG_WARNING   = 0x10,
+    GBL_LOG_WARN      = 0x10,
     GBL_LOG_ERROR     = 0x20,
     GBL_LOG_USER      = 0x40
 };
@@ -47,7 +47,7 @@ GBL_CLASS_DERIVE(GblLogger, GblObject)
                            const char*   pFile,
                            const char*   pFunction,
                            GblSize       line,
-                           GblThread*    pThread,
+                           GblThd*       pThread,
                            time_t        timeStamp,
                            const char*   pDomain,
                            GBL_LOG_FLAGS flags,
@@ -55,10 +55,10 @@ GBL_CLASS_DERIVE(GblLogger, GblObject)
                            va_list       varArgs);
 
     GBL_RESULT (*pFnPush) (GBL_SELF,
-                           GblThread* pThread);
+                           GblThd* pThread);
 
     GBL_RESULT (*pFnPop)  (GBL_SELF,
-                           GblThread* pThread,
+                           GblThd* pThread,
                            GblSize    count);
 GBL_CLASS_END
 
@@ -117,7 +117,7 @@ GBL_EXPORT GBL_RESULT        GblLogger_construct        (GBL_SELF,
 GBL_EXPORT GblRefCount       GblLogger_unref            (GBL_SELF)                 GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool           GblLogger_hasFilter        (GBL_CSELF,
-                                                         const GblThread* pThread,
+                                                         const GblThd*    pThread,
                                                          const char*      pDomain,
                                                          GBL_LOG_FLAGS    flags)   GBL_NOEXCEPT;
 
@@ -130,12 +130,12 @@ GBL_EXPORT GblBool           GblLogger_hasDomainFilter  (GBL_CSELF,
                                                          const char* pDomain)      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT        GblLogger_setThreadFilters (GBL_SELF,
-                                                         const GblThread* pThrs[]) GBL_NOEXCEPT;
+                                                         const GblThd* pThrs[]) GBL_NOEXCEPT;
 
-GBL_EXPORT const GblThread** GblLogger_threadFilters    (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_EXPORT const GblThd**    GblLogger_threadFilters    (GBL_CSELF)                GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool           GblLogger_hasThreadFilter  (GBL_CSELF,
-                                                         const GblThread* pThr)    GBL_NOEXCEPT;
+                                                         const GblThd* pThr)    GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

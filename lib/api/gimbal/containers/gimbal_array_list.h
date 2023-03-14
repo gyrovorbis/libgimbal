@@ -215,7 +215,7 @@ GBL_INLINE void* GblArrayList_back(GBL_CSELF) GBL_NOEXCEPT {
 
 GBL_INLINE GBL_RESULT GblArrayList_pushBack(GBL_SELF, const void* pData) GBL_NOEXCEPT {
     return !GblArrayList_insert(pSelf, GblArrayList_size(pSelf), 1, pData)?
-                GblThread_callRecord(NULL)->result :
+                GblThd_callRecord(NULL)->result :
                 GBL_RESULT_SUCCESS;
 }
 
@@ -225,7 +225,7 @@ GBL_INLINE void* GblArrayList_emplaceBack(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_INLINE GBL_RESULT GblArrayList_pushFront(GBL_SELF, const void* pData) GBL_NOEXCEPT {
     return !GblArrayList_insert(pSelf, 0, 1, pData)?
-                GblThread_callRecord(NULL)->result :
+                GblThd_callRecord(NULL)->result :
                 GBL_RESULT_SUCCESS;
 }
 
@@ -235,13 +235,13 @@ GBL_INLINE void* GblArrayList_emplaceFront(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_INLINE GBL_RESULT GblArrayList_append(GblArrayList* pSelf, const void* pData, GblSize elementCount) GBL_NOEXCEPT {
     return !GblArrayList_insert(pSelf, GblArrayList_size(pSelf), elementCount, pData)?
-                GblThread_callRecord(NULL)->result :
+                GblThd_callRecord(NULL)->result :
                 GBL_RESULT_SUCCESS;
 }
 
 GBL_INLINE GBL_RESULT GblArrayList_prepend(GblArrayList* pSelf, const void* pData, GblSize elementCount) GBL_NOEXCEPT {
     return !GblArrayList_insert(pSelf, 0, elementCount, pData)?
-                GblThread_callRecord(NULL)->result :
+                GblThd_callRecord(NULL)->result :
                 GBL_RESULT_SUCCESS;
 }
 

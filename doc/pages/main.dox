@@ -561,7 +561,11 @@ individual contexts, so they can be used at multiple levels of granularity.
 
 /*! \page Utilities Utilities
 	\tableofcontents
-
-	\copydoc utilities
-
+	
+	LibGimbal provides a rich set of additional structures and APIs
+	which are not part of the core or runtime framework, yet are 
+	extremely useful for extending and enhancing what is typically
+	provided by a language's standard library or by general-purpose
+	applications frameworks such as GLib, QtCore, or Objective-C's
+	foundation framework.
 */

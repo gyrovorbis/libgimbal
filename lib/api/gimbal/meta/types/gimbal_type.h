@@ -80,8 +80,6 @@ GBL_EXPORT GBL_RESULT         GblType_addExtension     (GblType type,
 
 GBL_EXPORT GBL_RESULT         GblType_removeExtension  (GblType type, GblType iface)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT         GblType_final            (void)                          GBL_NOEXCEPT;
-
 GBL_EXPORT GblSize            GblType_registeredCount  (void)                          GBL_NOEXCEPT;
 GBL_EXPORT GblSize            GblType_builtinCount     (void)                          GBL_NOEXCEPT;
 GBL_EXPORT GblType            GblType_nextRegistered   (GblType previousType)          GBL_NOEXCEPT;

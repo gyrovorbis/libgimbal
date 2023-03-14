@@ -78,6 +78,29 @@
 #   define GBL_IMPORT_SHARED
 #endif
 
+#ifdef __cplusplus
+#   define GBL_INITIALIZER(f) \
+        static void f(void); \
+        struct f##_t_ { f##_t_(void) { f(); } }; static f##_t_ f##_; \
+        static void f(void)
+#elif defined(_MSC_VER)
+#   pragma section(".CRT$XCU",read)
+#   define GBL_INITIALIZER2_(f,p) \
+        static void f(void); \
+        __declspec(allocate(".CRT$XCU")) void (*f##_)(void) = f; \
+        __pragma(comment(linker,"/include:" p #f "_")) \
+        static void f(void)
+#   ifdef _WIN64
+        #define GBL_INITIALIZER(f) GBL_INITIALIZER2_(f,"")
+#   else
+        #define GBL_INITIALIZER(f) GBL_INITIALIZER2_(f,"_")
+#   endif
+#else
+#   define GBL_INITIALIZER(f) \
+        static void f(void) __attribute__((constructor)); \
+        static void f(void)
+#endif
+
 // Thread-local storage
 #ifdef _MSC_VER
 #   define GBL_THREAD_LOCAL __declspec(thread)

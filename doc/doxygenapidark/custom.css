@@ -1,6 +1,12 @@
 html {
 	background-color: black;
 	overflow-y: hidden;
+	/* index */
+	--index-odd-item-bg-color: #0B101A;
+	--index-even-item-bg-color: black;
+	--index-header-color: #C4CFE5;
+	--index-separator-color: #334975;
+    --fragment-lineno-border-color: #686868;
 }
 
 body {
@@ -30,11 +36,11 @@ div.summary {
 }
 
 .arrow.arrow, h2.groupheader.groupheader, .memtitle.memtitle {
-	color: #bf5f82;
+	color: #7aff8a;
 }
 
 div.title {
-    color: #3ded51;
+    color: #E6E6E6
 }
 
 div.fragment, pre.fragment {
@@ -270,11 +276,11 @@ dl.reflist dd {
 	color: #67d8ef;
 }
 .contents a:visited {
-    color: #AEA70E !important;
+    color: #f16b6b !important;
 }
 
 #nav-tree .selected a {
-	color: #AEA70E !important;
+	color: #ff4a4a !important;
 }
 /*********************************************/
 /**               Reference list            **/

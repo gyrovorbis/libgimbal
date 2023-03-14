@@ -62,6 +62,10 @@ static const char* quarkStringAllocCopy_(const char* pString) {
     return pNewString;
 }
 
+static void GblQuark_final_(void) {
+    GblQuark_final();
+}
+
 static void gblQuarkInit_(void) {
     GblBool mtxLocked = GBL_FALSE;
     GBL_CTX_BEGIN(pCtx_);
@@ -85,6 +89,7 @@ static void gblQuarkInit_(void) {
                                              pCtx_));
     initialized_            = GBL_TRUE;
     inittedOnce_            = GBL_TRUE;
+    atexit(GblQuark_final_);
     GBL_CTX_POP(1);
     GBL_CTX_END_BLOCK();
     if(mtxLocked) mtx_unlock(&registryMtx_);

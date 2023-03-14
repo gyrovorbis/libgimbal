@@ -1,187 +1,355 @@
 #include <gimbal/meta/instances/gimbal_module.h>
 #include <gimbal/containers/gimbal_hash_set.h>
+#include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/meta/classes/gimbal_primitives.h>
+#include <gimbal/meta/instances/gimbal_logger.h>
+#include <gimbal/utils/gimbal_version.h>
+#include <gimbal/utils/gimbal_option_group.h>
 
-#define GBL_MODULE_REGISTRY_DEFAULT_CAPACITY_   5
+#ifdef _WIN32
+#   define NOGDI
+# else
+#   define __USE_UNIX98
+#endif
+#include <tinycthread.h>
 
-#define PROPERTY_IDX_(id)   (id - GBL_CONTEXT_PROPERTY_ID_COUNT)
+#define GBL_MODULE_(self)   ((GblModule_*)GBL_INSTANCE_PRIVATE(self, GBL_MODULE_TYPE))
+
+#define GBL_MODULE_ENSURE_INITIALIZED_()                \
+    GBL_STMT_START {                                    \
+        if(!initializing_) GBL_LIKELY {                 \
+            if(!inittedOnce_) GBL_UNLIKELY              \
+                call_once(&initOnce_, GblModule_init_); \
+            else if(!initialized_) GBL_UNLIKELY         \
+                GblModule_init_();                      \
+        }                                               \
+    } GBL_STMT_END
+
 
 typedef struct GblModule_ {
-    GblHashSet  typeRegistry;
+    GblHashSet          typeRegistry;
+    GBL_ATOMIC_INT16    useCount;
 } GblModule_;
 
-static GblQuark   versionQuark_    = GBL_QUARK_INVALID;
-static GblQuark   authorQuark_     = GBL_QUARK_INVALID;
-static GblQuark   descQuark_       = GBL_QUARK_INVALID;
-static GblQuark   prefixQuark_     = GBL_QUARK_INVALID;
-static GblQuark   typeCountQuark_  = GBL_QUARK_INVALID;
-static GblHashSet registry_        = { 0 };
-static GblBool    initialized_     = GBL_FALSE;
+static GblQuark     versionQuark_    = GBL_QUARK_INVALID;
+static GblQuark     authorQuark_     = GBL_QUARK_INVALID;
+static GblQuark     descQuark_       = GBL_QUARK_INVALID;
+static GblQuark     prefixQuark_     = GBL_QUARK_INVALID;
+static GblQuark     typeCountQuark_  = GBL_QUARK_INVALID;
 
-static GblHash GblModule_hash_(const GblHashSet* pSelf, const void* pData) {
-    GBL_UNUSED(pSelf);
-    const GblStringRef* pName = GblObject_name(*(GblObject**)pData);
-    return gblHashFnv1(pName, GblStringRef_length(pName));
-}
+static mtx_t        moduleMtx_;
+static GblBool      inittedOnce_     = GBL_FALSE;
+static once_flag    initOnce_        = ONCE_FLAG_INIT;
+static GblBool      initializing_    = GBL_FALSE;
+static GblBool      initialized_     = GBL_FALSE;
+static GblArrayMap* pModules_        = NULL;
 
-static GblBool GblModule_cmp_(const GblHashSet* pSelf, const void* pLhs, const void* pRhs) {
-    GBL_UNUSED(pSelf);
-    const GblStringRef* pName1 = GblObject_name(*(GblObject**)pLhs);
-    const GblStringRef* pName2 = GblObject_name(*(GblObject**)pRhs);
-    GBL_ASSERT(pName1 && pName2);
-    return strcmp(pName1, pName2) == 0;
-}
-
-static GBL_RESULT GblModule_initialize_(void) {
-    GBL_CTX_BEGIN(NULL);
-    if(initialized_) GBL_CTX_DONE();
-
-    GBL_CTX_VERIFY_CALL(GblHashSet_construct(&registry_,
-                                             sizeof(GblModule*),
-                                             GblModule_hash_,
-                                             GblModule_cmp_,
-                                             GBL_NULL,
-                                             GBL_MODULE_REGISTRY_DEFAULT_CAPACITY_));
-
-    initialized_ = GBL_TRUE;
-    GBL_CTX_END();
-}
-
-static GBL_RESULT GblModule_finalize_(void) {
+static void GblModule_final_(void) {
     GBL_CTX_BEGIN(NULL);
     if(!initialized_) GBL_CTX_DONE();
 
     //uninitialized all of them
 
-    GBL_CTX_VERIFY_CALL(GblHashSet_destruct(&registry_));
+    GblArrayMap_destroy(&pModules_);
 
     initialized_ = GBL_FALSE;
 
-    GBL_CTX_END();
+    GBL_CTX_END_BLOCK();
+}
+
+static void GblModule_init_(void) {
+    GBL_CTX_BEGIN(NULL);
+    if(initialized_) GBL_CTX_DONE();
+
+    GblArrayMap_create(NULL, GBL_TRUE, NULL);
+
+    atexit(GblModule_final_);
+    initialized_ = GBL_TRUE;
+    GBL_CTX_END_BLOCK();
+}
+
+static GBL_RESULT GblModule_arrayMapDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntry) {
+    GBL_UNUSED(pMap, key);
+    GblModule* pModule = GBL_MODULE(pEntry);
+    const GblSize uses = GblModule_useCount(pModule);
+
+    if(uses) GBL_UNLIKELY {
+        GBL_LOG_WARN("gimbal",
+                        "[Module] Unregistering %s which still has %u uses!",
+                        GblQuark_toString(key),
+                        uses);
+    }
+
+    GBL_BOX_UNREF(pModule);
+    return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT GBL_RESULT GblModule_register(GblModule* pSelf) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf);
+    GBL_MODULE_ENSURE_INITIALIZED_();
+
     const char* pName = GblObject_name(GBL_OBJECT(pSelf));
+    const GblQuark quark = GblQuark_fromString(pName);
 
-    GBL_CTX_INFO("Registering Module: %s", pName);
-    GBL_CTX_PUSH();
+    GBL_LOG_INFO("gimbal", "Registering Module: [%s]", pName);
+    GBL_LOG_PUSH();
 
-    GblModule_initialize_();
+    mtx_lock(&moduleMtx_);
 
-    GBL_INSTANCE_VCALL(GblModule, pFnLoad, pSelf);
+    GblModule* pOld = GBL_MODULE(GblArrayMap_atValue(&pModules_, quark));
 
-    GblModule* pOld = GblHashSet_set(&registry_, &pSelf);
-
-    if(pOld) {
-        GBL_CTX_WARN("Overwrote existing module [refCount: %u].",
-                     GblBox_refCount(GBL_BOX(pOld)));
-        GBL_BOX_UNREF(pOld);
+    if(pOld) GBL_UNLIKELY {
+        GBL_LOG_WARN("gimbal", "Orphaning existing module [refCount: %u, useCount: %u].",
+                        GblBox_refCount(GBL_BOX(pOld)),
+                        GblModule_useCount(pOld));
     }
 
-    GBL_CTX_POP(1);
+    GblArrayMap_setUserdata(&pModules_, quark, (uintptr_t)GBL_BOX_REF(pSelf), GblModule_arrayMapDtor_);
+
+    mtx_unlock(&moduleMtx_);
+
+    GBL_LOG_POP(1);
     GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblModule_unregister(GblModule* pSelf) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf);
+
     const char* pName = GblObject_name(GBL_OBJECT(pSelf));
 
-    GBL_CTX_INFO("Unregistering Module: %s", pName);
-    GBL_CTX_PUSH();
+    GBL_LOG_INFO("gimbal", "Unregistering Module: %s", pName);
+    GBL_LOG_PUSH();
 
-    GBL_INSTANCE_VCALL(GblModule, pFnUnload, pSelf);
+    const GblQuark quark = GblQuark_tryString(pName);
+    GBL_CTX_VERIFY(quark != GBL_QUARK_INVALID,
+                   GBL_RESULT_ERROR_INVALID_HANDLE,
+                   "Quark wasn't even found, can't be registered!");
 
-    const GblBool erased = GblHashSet_erase(&registry_, &pSelf);
+    mtx_lock(&moduleMtx_);
+    const GblBool erased = GblArrayMap_erase(&pModules_, quark);
+    mtx_unlock(&moduleMtx_);
 
     if(!erased) {
-        GBL_CTX_WARN("No registry entry found!");
+        GBL_LOG_WARN("gimbal", "No registry entry found!");
     }
 
-    GBL_CTX_POP(1);
+    GBL_LOG_POP(1);
     GBL_CTX_END();
 }
 
 GBL_EXPORT GblModule* GblModule_find(const char* pName) {
-    return NULL;
+    return GblModule_findQuark(GblQuark_tryString(pName));
 }
 
+GBL_EXPORT GblModule* GblModule_findQuark(GblQuark quark) {
+    GblModule* pModule = NULL;
+    GBL_CTX_BEGIN(NULL);
+    GBL_MODULE_ENSURE_INITIALIZED_();
 
-GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
-    GBL_CTX_BEGIN(pPlugin);
-    GblModule* pModule = GBL_MODULE(pPlugin);
-    GblObject* pObject = GBL_OBJECT(pModule);
-    GblBox_ref(GBL_BOX(pObject));
-    const GblRefCount refCount = GblBox_refCount(GBL_BOX(pObject));
-    GBL_CTX_DEBUG("[GblModule: %s] Used: %u",
-                  GblObject_name(GBL_OBJECT(pObject)),
-                  refCount);
-    if(refCount == 1) {
-        GBL_INSTANCE_VCALL(GblModule, pFnLoad, pModule);
+    if(quark != GBL_QUARK_INVALID) GBL_LIKELY {
+        mtx_lock(&moduleMtx_);
+        const uintptr_t value = GblArrayMap_atValue(&pModules_, quark);
+        mtx_unlock(&moduleMtx_);
+
+        if(value) {
+            pModule = GBL_MODULE(value);
+        }
     }
-    GBL_CTX_END();
+
+    GBL_CTX_END_BLOCK();
+    return pModule;
 }
 
-GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
-    GBL_CTX_BEGIN(pPlugin);
-    GblModule* pModule = GBL_MODULE(pPlugin);
-    GblObject* pObject = GBL_OBJECT(pModule);
-    GblBox_unref(GBL_BOX(pObject));
-    const GblRefCount refCount = GblBox_refCount(GBL_BOX(pObject));
-    GBL_CTX_DEBUG("[GblModule: %s] Unused: %u",
-                  GblObject_name(GBL_OBJECT(pObject)),
-                  refCount);
-    if(refCount == 0) {
-        GBL_INSTANCE_VCALL(GblModule, pFnUnload, pModule);
+GBL_EXPORT GblModule* GblModule_at(GblSize index) {
+    GblModule* pModule = NULL;
+    GBL_MODULE_ENSURE_INITIALIZED_();
+
+    mtx_lock(&moduleMtx_);
+    const uintptr_t value = GblArrayMap_probeValue(&pModules_, index);
+    mtx_unlock(&moduleMtx_);
+
+    if(value) pModule = GBL_MODULE(value);
+
+    return pModule;
+}
+
+GBL_EXPORT GblSize GblModule_count(void) {
+    GBL_MODULE_ENSURE_INITIALIZED_();
+    mtx_lock(&moduleMtx_);
+    GblSize count = GblArrayMap_size(&pModules_);
+    mtx_unlock(&moduleMtx_);
+    return count;
+}
+
+GBL_EXPORT GblBool GblModule_foreach(GblModuleIterFn pFnIter,
+                                     void*           pUserdata) {
+    GblBool retVal = GBL_FALSE;
+
+    GBL_MODULE_ENSURE_INITIALIZED_();
+    mtx_lock(&moduleMtx_);
+    GblSize count = GblArrayMap_size(&pModules_);
+    for(GblSize m = 0; m < count; ++m) GBL_LIKELY {
+        GblModule* pModule = GBL_MODULE(GblArrayMap_probeValue(&pModules_, m));
+        if((retVal = pFnIter(pModule, pUserdata))) GBL_UNLIKELY {
+            break;
+        }
     }
+    mtx_unlock(&moduleMtx_);
+
+    return retVal;
+}
+
+
+GBL_EXPORT GblModule* GblModule_require(const char* pName,
+                                        const char* pVersion,
+                                        const char* pFile,
+                                        const char* pFunc,
+                                        GblSize     line)
+{
+    return GblModule_requireQuark(GblQuark_tryString(pName),
+                                  pVersion,
+                                  pFile,
+                                  pFunc,
+                                  line);
+}
+
+GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
+                                             const char* pVersion,
+                                             const char* pFile,
+                                             const char* pFunc,
+                                             GblSize     line)
+{
+    GblModule* pModule = GblModule_findQuark(quark);
+
+    if(!pModule) GBL_UNLIKELY {
+        GblLogger_write(pFile, pFunc, line, "gimbal", GBL_LOG_ERROR,
+                        "Module [%s] could not be imported: Not Found",
+                        GblQuark_toString(quark));
+
+    } else if(pVersion && GblVersion_parse(pVersion) != pModule->version) GBL_UNLIKELY {
+        char versionBuffer[GBL_VERSION_STRING_SIZE];
+
+        GblLogger_write(pFile, pFunc, line, "gimbal", GBL_LOG_ERROR,
+                        "Module [%s] could not be imported: "
+                        "Version Mismatch [Actual: %s, Expected %s]",
+                        GblQuark_toString(quark),
+                        GblVersion_string(pModule->version, versionBuffer),
+                        pVersion);
+
+        pModule = NULL;
+    } else GBL_LIKELY {
+        GblModule_use(pModule);
+    }
+
+    return pModule;
+}
+
+GBL_EXPORT GblRefCount GblModule_useCount(const GblModule* pSelf) {
+    return GBL_ATOMIC_INT16_LOAD(GBL_MODULE_(pSelf)->useCount);
+}
+
+GBL_EXPORT GblBool GblModule_isLoaded(const GblModule* pSelf) {
+    return !GblModule_useCount(pSelf);
+}
+
+GBL_EXPORT GBL_RESULT GblModule_use(GblModule* pSelf) {
+    return GblIPlugin_use(GBL_IPLUGIN(pSelf));
+}
+
+GBL_EXPORT GBL_RESULT GblModule_unuse(GblModule* pSelf) {
+    return GblIPlugin_unuse(GBL_IPLUGIN(pSelf));
+}
+
+
+GBL_EXPORT GblModule* GblModule_create(GblType     derivedType,
+                                       const char* pName,
+                                       GblVersion  version,
+                                       const char* pDescription,
+                                       const char* pPrefix)
+{
+    GblModule* pModule = NULL;
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_TYPE(derivedType, GBL_MODULE_TYPE);
+
+    pModule = GBL_MODULE(GBL_OBJECT_NEW(GblModule,
+                                        "name",        pName,
+                                        "version",     version,
+                                        "description", pDescription,
+                                        "prefix,       pPrefix"));
+
+    GBL_CTX_END_BLOCK();
+    return pModule;
+}
+
+GBL_EXPORT GblRefCount GblModule_unref(GblModule* pSelf) {
+    return GBL_BOX_UNREF(pSelf);
+}
+
+static GBL_RESULT GblModule_load_(GblModule* pModule) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_LOG_WARN("gimbal", "[GblModule: %s] Load: UNIMPLEMENTED!");
     GBL_CTX_END();
 }
 
-GBL_RESULT GblModule_IPlugin_typeInfo_(const GblIPlugin* pPlugin, GblType type, GblTypeInfo* pInfo) {
+static GBL_RESULT GblModule_unload_(GblModule* pModule) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_LOG_WARN("gimbal", "[GblModule: %s] Unload: UNIMPLEMENTED!");
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
+    GBL_CTX_BEGIN(NULL);
+
+    GblModule* pSelf = GBL_MODULE(pPlugin);
+    GblModule_* pSelf_ = GBL_MODULE_(pSelf);
+
+    if(!GBL_ATOMIC_INT16_INC(pSelf_->useCount)) GBL_UNLIKELY {
+        GBL_INSTANCE_VCALL(GblModule, pFnLoad, pSelf);
+    }
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
+    GBL_CTX_BEGIN(NULL);
+
+    GblModule* pSelf = GBL_MODULE(pPlugin);
+    GblModule_* pSelf_ = GBL_MODULE_(pSelf);
+
+    if(GBL_ATOMIC_INT16_DEC(pSelf_->useCount) == 1) GBL_UNLIKELY {
+        GBL_INSTANCE_VCALL(GblModule, pFnUnload, pSelf);
+    }
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblModule_IPlugin_typeInfo_(const GblIPlugin* pPlugin, GblType type, GblTypeInfo* pInfo) {
     GBL_CTX_BEGIN(pPlugin);
     GBL_CTX_END();
 }
 
-GBL_RESULT GblModule_property_(const GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
+static GBL_RESULT GblModule_GblObject_property_(const GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
     GBL_CTX_BEGIN(pObject);
     GBL_CTX_END();
 }
 
-GBL_RESULT GblModule_setProperty_(GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
+static GBL_RESULT GblModule_GblObject_setProperty_(GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
     GBL_CTX_BEGIN(pObject);
     GBL_CTX_END();
 }
 
-GBL_RESULT GblModule_destructor_(GblBox* pBox) {
+static GBL_RESULT GblModule_GblBox_destructor_(GblBox* pBox) {
     GBL_CTX_BEGIN(pBox);
     GblModule* pSelf = GBL_MODULE(pBox);
-    GblStringRef_release(&pSelf->author);
-    GblStringRef_release(&pSelf->prefix);
-    GblStringRef_release(&pSelf->description);
 
-    GblContextClass* pClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
-    GBL_CTX_VERIFY_CALL(pClass->base.base.pFnDestructor(pBox));
-    GBL_CTX_END();
-}
+    GblStringRef_release(pSelf->pAuthor);
+    GblStringRef_release(pSelf->pPrefix);
+    GblStringRef_release(pSelf->pDescription);
+    GblOptionGroup_unref(pSelf->pOptionGroup);
 
-GBL_RESULT GblModule_load_(GblModule* pModule) {
-    GBL_CTX_BEGIN(pModule);
-    GBL_CTX_WARN("[GblModule: %s] Load: UNIMPLEMENTED!");
-    GBL_CTX_END();
-}
-
-GBL_RESULT GblModule_unload_(GblModule* pModule) {
-    GBL_CTX_BEGIN(pModule);
-    GBL_CTX_WARN("[GblModule: %s] Unload: UNIMPLEMENTED!");
-    GBL_CTX_END();
-}
-
-GBL_RESULT GblModule_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
-    GblModule* pSelf = GBL_MODULE(pInstance);
-
+    GBL_INSTANCE_VCALL_DEFAULT(GblContext, base.base.pFnDestructor, GBL_BOX(pSelf));
 
     GBL_CTX_END();
 }
@@ -189,38 +357,23 @@ GBL_RESULT GblModule_init_(GblInstance* pInstance, GblContext* pCtx) {
 GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
     GBL_UNUSED(pData);
     GBL_CTX_BEGIN(pCtx);
-    GblModuleClass* pSelf = GBL_MODULE_CLASS(pClass);
-    pSelf->pFnLoad                         = GblModule_load_;
-    pSelf->pFnUnload                       = GblModule_unload_;
-    pSelf->base.base.base.pFnDestructor    = GblModule_destructor_;
-    pSelf->base.base.pFnProperty           = GblModule_property_;
-    pSelf->base.base.pFnSetProperty        = GblModule_setProperty_;
-    pSelf->GblIPluginImpl.pFnUse           = GblModule_IPlugin_use_;
-    pSelf->GblIPluginImpl.pFnUnuse         = GblModule_IPlugin_unuse_;
-    pSelf->GblIPluginImpl.pFnTypeInfo      = GblModule_IPlugin_typeInfo_;
 
     if(!GblType_classRefCount(GBL_MODULE_TYPE)) {
-
-        versionQuark_    = GblQuark_fromStringStatic("version");
-        authorQuark_     = GblQuark_fromStringStatic("author");
-        descQuark_       = GblQuark_fromStringStatic("description");
-        prefixQuark_     = GblQuark_fromStringStatic("prefix");
-        typeCountQuark_  = GblQuark_fromStringStatic("typeCount");
-
         GBL_PROPERTIES_REGISTER(GblModule);
     }
+
+    GBL_BOX_CLASS(pClass)    ->pFnDestructor  = GblModule_GblBox_destructor_;
+    GBL_OBJECT_CLASS(pClass) ->pFnProperty    = GblModule_GblObject_property_;
+    GBL_OBJECT_CLASS(pClass) ->pFnSetProperty = GblModule_GblObject_setProperty_;
+    GBL_IPLUGIN_CLASS(pClass)->pFnUse         = GblModule_IPlugin_use_;
+    GBL_IPLUGIN_CLASS(pClass)->pFnUnuse       = GblModule_IPlugin_unuse_;
+    GBL_IPLUGIN_CLASS(pClass)->pFnTypeInfo    = GblModule_IPlugin_typeInfo_;
+    GBL_MODULE_CLASS(pClass) ->pFnLoad        = GblModule_load_;
+    GBL_MODULE_CLASS(pClass) ->pFnUnload      = GblModule_unload_;
 
     GBL_CTX_END();
 }
 
-GBL_RESULT GblModuleClass_final_(GblClass* pClass, const void* pData, GblContext* pCtx) {
-    GBL_UNUSED(pData);
-
-    if(!GblType_classRefCount(GBL_MODULE_TYPE)) {
-  //      memset(pPropertyList_, 0, sizeof(pPropertyList_));
-    }
-    return GBL_RESULT_UNIMPLEMENTED;
-}
 
 GBL_EXPORT GblType GblModule_type(void) {
     static GblType type = GBL_INVALID_TYPE;
@@ -231,9 +384,7 @@ GBL_EXPORT GblType GblModule_type(void) {
 
     static GblTypeInfo info = {
         .pFnClassInit         = GblModuleClass_init_,
-        .pFnClassFinal        = GblModuleClass_final_,
         .classSize            = sizeof(GblModuleClass),
-        .pFnInstanceInit      = GblModule_init_,
         .instanceSize         = sizeof(GblModule),
         .instancePrivateSize  = sizeof(GblModule_),
         .interfaceCount       = 1,
@@ -257,13 +408,4 @@ GBL_EXPORT GblType GblModule_type(void) {
     return type;
 }
 
-GblType GblModule_registerType(GblModule*           pSelf,
-                               GblType              parent,
-                               const char*          pName,
-                               const GblTypeInfo*   pInfo,
-                               GblFlags             flags) GBL_NOEXCEPT {
-
-    GblType newType = GBL_INVALID_TYPE; //GblType_registerDynamic(pName, parent, GBL_IPLUGIN(pSelf), flags);
-    return newType;
-}
 

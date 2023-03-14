@@ -70,7 +70,7 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_pushFront(GblArrayDeque* pSelf, const void* 
         GBL_ASSERT(pData);
         memcpy(pEntry, pData, GblArrayDeque_elementSize(pSelf));
         return GBL_RESULT_SUCCESS;
-    } else return GblThread_callRecord(NULL)->result;
+    } else return GblThd_callRecord(NULL)->result;
 }
 
 GBL_EXPORT void* GblArrayDeque_emplaceFront(GblArrayDeque* pSelf) {

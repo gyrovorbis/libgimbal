@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblVersion type, utlities and query functions
  *  \ingroup utils
+ *  \todo
+ *      - implement fuzzy comparison: GblVersion_compare(version, ">=3.23.0")
  */
 
 #ifndef GIMBAL_VERSION_H
