@@ -49,9 +49,11 @@ static void GblModule_final_(void) {
     if(!initialized_) GBL_CTX_DONE();
 
     //uninitialized all of them
-
+    mtx_lock(&moduleMtx_);
     GblArrayMap_destroy(&pModules_);
+    mtx_unlock(&moduleMtx_);
 
+    mtx_destroy(&moduleMtx_);
     initialized_ = GBL_FALSE;
 
     GBL_CTX_END_BLOCK();
@@ -61,7 +63,9 @@ static void GblModule_init_(void) {
     GBL_CTX_BEGIN(NULL);
     if(initialized_) GBL_CTX_DONE();
 
-    GblArrayMap_create(NULL, GBL_TRUE, NULL);
+    mtx_init(&moduleMtx_, mtx_plain);
+
+    pModules_ = GblArrayMap_create(NULL, GBL_TRUE, NULL);
 
     atexit(GblModule_final_);
     initialized_ = GBL_TRUE;
@@ -354,7 +358,7 @@ static GBL_RESULT GblModule_GblBox_destructor_(GblBox* pBox) {
     GBL_CTX_END();
 }
 
-GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
+static GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
     GBL_UNUSED(pData);
     GBL_CTX_BEGIN(pCtx);
 

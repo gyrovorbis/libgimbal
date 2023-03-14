@@ -23,7 +23,7 @@ typedef struct GblThd {
 } GblThd;
 
 // ===== Public API =====
-GBL_INLINE GblThd*     GblThd_current        (void)                                   GBL_NOEXCEPT;
+GBL_INLINE GblThd*        GblThd_current        (void)                                   GBL_NOEXCEPT;
 GBL_EXPORT GblContext*    GblThd_context        (GBL_CSELF)                              GBL_NOEXCEPT;
 
 GBL_EXPORT const char*    GblThd_name           (GBL_CSELF)                              GBL_NOEXCEPT;
