@@ -1,15 +1,54 @@
-# libGimbal #
-C17-Based Extended Standard Library and Cross-Language Type System
-<p align="left"><img src="http://libgimbal.elysianshadows.com/libgimbal_icon.png" alt="libGimbal">
 
-LibGimbal is a cross-platform, general-purpose core applications framework written in C17 with C++20 bindings, inspired by GLib, QtCore, and the Objective-C Foundation framework. It is composed of a series of modules providing a core application layer, specialized string types, generic STL-style containers, sorting and searching algorithms, custom allocators, preprocessor metaprogramming constructs, miscellaneous utility structures, and a full-fledged dynamic type system bringing object-oriented constructs such as classes, signals, and properties to C and bindable languages. Additionally, it includes a C-based OO unit-testing framework built upon its type system and object model.
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/gyrovorbis/libgimbal">
+    <img src="http://libgimbal.elysianshadows.com/libgimbal_icon.png" alt="libGimbal">
+  </a>
 
-LibGimbal originated as the core of the Elysian Shadows tech stack, and as such supports a myriad of embedded devices and video game consoles such as the Sega Dreamcast and Sony PSP. It places a strong emphasis on performance and language interoperability, with the core being written in standard C17 for easily binding to languages such as Rust, Swift, Go, Lua, and any other C-compatible language. The library is currently being tested and validated via the included suite of unit tests for Windows, MacOS, Linux, Android, iOS, Sega Dreamcast, Sony PSVita, and WebAssembly targets. 
+  <h3 align="center">libGimbal</h3>
 
-## Documentation ##
-The official documentation for the project can be found at http://libgimbal.elysianshadows.com. This documentation is still a work in progress.
+  <p align="center">
+    C17-Based Extended Standard Library and Cross-Language Runtime Framework
+    <br />
+    <a href="http://libgimbal.elysianshadows.com"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    Cross-Platform
+    ·
+    Cross-Language
+    ·
+    Dependency Free
+  </p>
+</div>
 
 ## Features ##
+- Generic Containers 
+- Generic Algorithms 
+- Custom Allocators
+- Specialized Strings 
+- Standard Library Utilities
+- Preprocessor Programming
+- Dynamic Type System 
+- Unit Test Framework
+
+## Platforms ##
+- Windows 
+- MacOS 
+- Linux 
+- Sega Dreamcast
+- Sony PSVita
+- WebAssembly
+- iOS
+- Android
+
+## Compilers ##
+- Microsoft Visual Studio
+- GCC
+- Clang
+- Emscriptgen
+
+## Modules ##
 ### Core Framework ###
 - platform-specific macros and utilities
 - error handling and propagation
@@ -72,3 +111,5 @@ The official documentation for the project can be found at http://libgimbal.elys
 - automatic timing and performance measurements
 - memory utilization and leak detection
 - dynamic/run-time test-plan construction and management
+
+
