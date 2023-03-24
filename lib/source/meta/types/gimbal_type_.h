@@ -7,11 +7,7 @@
 #include <gimbal/containers/gimbal_nary_tree.h>
 #include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/core/gimbal_atomics.h>
-#ifdef _WIN32
-#   define NOGDI
-# else
-#   define __USE_UNIX98
-#endif
+
 #include <tinycthread.h>
 
 #define GBL_CLASS_FLAGS_BIT_COUNT_                      5

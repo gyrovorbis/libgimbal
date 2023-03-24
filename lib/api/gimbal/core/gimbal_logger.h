@@ -7,8 +7,8 @@
 #define GIMBAL_LOGGER_H
 
 #include <time.h>
-#include "gimbal_object.h"
-#include "../../containers/gimbal_linked_list.h"
+#include "../meta/instances/gimbal_object.h"
+#include "../containers/gimbal_linked_list.h"
 
 #define GBL_LOGGER_TYPE                   (GBL_TYPEOF(GblLogger))
 #define GBL_LOGGER(self)                  (GBL_INSTANCE_CAST(self, GblLogger))

@@ -52,6 +52,11 @@ extern "C" {
 * tinycthread.h.
 */
 
+#ifdef _WIN32
+#   define NOGDI
+# else
+#   define __USE_UNIX98
+#endif
 
 /* Which platform are we on? */
 #if !defined(_TTHREAD_PLATFORM_DEFINED_)

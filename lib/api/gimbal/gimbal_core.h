@@ -14,5 +14,7 @@
 #include "core/gimbal_thd.h"
 #include "core/gimbal_typedefs.h"
 #include "core/gimbal_app.h"
+#include "core/gimbal_module.h"
+#include "core/gimbal_logger.h"
 
 #endif // GIMBAL_CORE_H

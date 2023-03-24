@@ -1,9 +1,4 @@
-#include <gimbal/meta/instances/gimbal_logger.h>
-#ifdef _WIN32
-#   define NOGDI
-# else
-#   define __USE_UNIX98
-#endif
+#include <gimbal/core/gimbal_logger.h>
 #include <tinycthread.h>
 
 #define GBL_LOGGER_THREAD_FILTER_FIELD_NAME_    "GblLogger.threadFilter"

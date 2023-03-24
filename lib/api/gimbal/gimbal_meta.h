@@ -25,7 +25,6 @@
 #include "meta/instances/gimbal_context.h"
 #include "meta/instances/gimbal_event.h"
 #include "meta/instances/gimbal_instance.h"
-#include "meta/instances/gimbal_module.h"
 #include "meta/instances/gimbal_object.h"
 
 #include "meta/properties/gimbal_property.h"

@@ -3,11 +3,7 @@
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/allocators/gimbal_arena_allocator.h>
 #include <limits.h>
-#ifdef _WIN32
-#   define NOGDI
-# else
-#   define __USE_UNIX98
-#endif
+
 #include <tinycthread.h>
 
 #define GBL_QUARK_PAGE_SIZE_DEFAULT_            1024
@@ -28,16 +24,16 @@ static struct {
     }
 };
 
-static GblArenaAllocator    arena_;
-static GblHashSet           registry_;
-static GblBool              initialized_    = GBL_FALSE;
-static GblBool              inittedOnce_    = GBL_FALSE;
-static once_flag            initOnce_       = ONCE_FLAG_INIT;
-static mtx_t                registryMtx_;
+static GblArenaAllocator arena_;
+static GblHashSet        registry_;
+static GblBool           initialized_    = GBL_FALSE;
+static GblBool           inittedOnce_    = GBL_FALSE;
+static once_flag         initOnce_       = ONCE_FLAG_INIT;
+static mtx_t             registryMtx_;
 
-static GblContext*          pCtx_           = NULL;
-static GblSize              pageSize_       = GBL_QUARK_PAGE_SIZE_DEFAULT_;
-static GblSize              registryCap_    = GBL_QUARK_REGISTRY_CAPACITY_DEFAULT_;
+static GblContext*       pCtx_           = NULL;
+static GblSize           pageSize_       = GBL_QUARK_PAGE_SIZE_DEFAULT_;
+static GblSize           registryCap_    = GBL_QUARK_REGISTRY_CAPACITY_DEFAULT_;
 
 static int registryComparator_(const GblHashSet* pSet, const char** pA, const char** pB) {
     GBL_UNUSED(pSet);

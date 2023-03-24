@@ -150,6 +150,7 @@ GBL_INLINE GBL_RESULT    GblVariant_setFloat                 (GBL_SELF, float va
 GBL_INLINE GBL_RESULT    GblVariant_setDouble                (GBL_SELF, double value)        GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblVariant_setString                (GBL_SELF, const char* pValue)  GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblVariant_setStringView            (GBL_SELF, GblStringView value) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setStringRef             (GBL_SELF, GblStringRef* pRef)  GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblVariant_setTypeValue             (GBL_SELF, GblType value)       GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT    GblVariant_setEnum                  (GBL_SELF,
@@ -203,6 +204,7 @@ GBL_INLINE float         GblVariant_getFloat                 (GBL_CSELF)        
 GBL_INLINE double        GblVariant_getDouble                (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE const char*   GblVariant_getString                (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE GblStringView GblVariant_getStringView            (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblStringRef* GblVariant_getStringRef             (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE GblType       GblVariant_getTypeValue             (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE void*         GblVariant_getPointer               (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE void*         GblVariant_getOpaqueCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
@@ -641,6 +643,15 @@ GBL_INLINE const char* GblVariant_getString(GBL_CSELF) GBL_NOEXCEPT {
     return pValue;
 }
 
+GBL_INLINE GblStringRef* GblVariant_getStringRef(GBL_CSELF) GBL_NOEXCEPT {
+    GblStringRef* pValue = GBL_NULL;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_STRING_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(pSelf, &pValue));
+    GBL_CTX_END_BLOCK();
+    return pValue;
+}
+
 GBL_INLINE GblStringView GblVariant_getStringView(GBL_CSELF) GBL_NOEXCEPT {
     return GblStringRef_view(GblVariant_getString(pSelf));
 }
@@ -793,6 +804,12 @@ GBL_INLINE GBL_RESULT GblVariant_setString(GBL_SELF, const char* pValue) GBL_NOE
 
 GBL_INLINE GBL_RESULT GblVariant_setStringView(GBL_SELF, GblStringView value) GBL_NOEXCEPT {
     return GblVariant_setString(pSelf, GBL_STRING_VIEW_CSTR(value));
+}
+
+GBL_INLINE GBL_RESULT GblVariant_setStringRef(GBL_SELF, GblStringRef* pValue) GBL_NOEXCEPT {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_STRING_TYPE, pValue));
+    GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_setTypeValue(GBL_SELF, GblType value) GBL_NOEXCEPT {

@@ -11,10 +11,10 @@
 #ifndef GIMBAL_MODULE_H
 #define GIMBAL_MODULE_H
 
-#include "gimbal_context.h"
-#include "../ifaces/gimbal_iplugin.h"
-#include "../../strings/gimbal_string_ref.h"
-#include "../../utils/gimbal_version.h"
+#include "../meta/instances/gimbal_context.h"
+#include "../meta/ifaces/gimbal_iplugin.h"
+#include "../strings/gimbal_string_ref.h"
+#include "../utils/gimbal_version.h"
 
 /// \ingroup metaBuiltinTypes
 #define GBL_MODULE_TYPE                 (GBL_TYPEOF(GblModule))
@@ -95,6 +95,7 @@ GBL_EXPORT GblModule*  GblModule_requireQuark (GblQuark    quark,
 GBL_EXPORT GblModule*  GblModule_create       (GblType     derivedType,
                                                const char* pName,
                                                GblVersion  version,
+                                               const char* pAuthor,
                                                const char* pDescription,
                                                const char* pPrefix)      GBL_NOEXCEPT;
 
@@ -131,14 +132,14 @@ GblSize     GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT
 
 #define GBL_REQUIRE__1(type) \
     GBL_INSTANCE_CAST(GblModule_require(GblType_name(GBL_TYPEOF(type)), \
-                                                     GBL_NULL, __FILE__, __FUNC__, \
+                                                     GBL_NULL, __FILE__, __func__, \
                                                      __LINE__), type)
 #define GBL_REQUIRE__2(type, name) \
-    GBL_INSTANCE_CAST(GblModule_require(name, GBL_NULL, __FILE__, __FUNC__, \
+    GBL_INSTANCE_CAST(GblModule_require(name, GBL_NULL, __FILE__, __func__, \
                                         __LINE__), type)
 
 #define GBL_REQUIRE__3(type, name, version) \
-    GBL_INSTANCE_CAST(GblModule_require(name, version, __FILE__, __FUNC__, \
+    GBL_INSTANCE_CAST(GblModule_require(name, version, __FILE__, __func__, \
                                         __LINE__), type)
 
 ///\endcond

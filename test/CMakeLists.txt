@@ -54,6 +54,10 @@ set(GIMBAL_TEST_SOURCES
     source/containers/gimbal_array_deque_test_suite.c
     include/containers/gimbal_array_heap_test_suite.h
     source/containers/gimbal_array_heap_test_suite.c
+    include/core/gimbal_module_test_suite.h
+    source/core/gimbal_module_test_suite.c
+    include/core/gimbal_thread_test_suite.h
+    source/core/gimbal_thread_test_suite.c
     include/meta/classes/gimbal_enum_test_suite.h
     source/meta/classes/gimbal_enum_test_suite.c
     include/meta/classes/gimbal_flags_test_suite.h
