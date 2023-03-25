@@ -65,7 +65,7 @@ static GBL_RESULT GblNaryTreeTestSuite_init_(GblTestSuite* pSelf, GblContext* pC
     GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblNaryTreeTestSuite_));
 
-    for(GblSize i = 0; i < NARY_OBJECT_COUNT_; ++i) {
+    for(size_t  i = 0; i < NARY_OBJECT_COUNT_; ++i) {
         NARY_OBJECT_(pSelf_, i)->id = i;
     }
 
@@ -517,7 +517,7 @@ GblBool traversalIt_(const GblNaryTreeNode* pNode, void* pUd) {
 static GblBool GblNaryTreeTestSuite_traverse_(GblTestSuite* pSelf, uintptr_t mask, TraversalClosure_* pClosure) {
     GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
 
-    for(GblSize i = 0; i < NARY_OBJECT_COUNT_; ++i) {
+    for(size_t  i = 0; i < NARY_OBJECT_COUNT_; ++i) {
         memset(NARY_OBJECT_NODE_(pSelf_, i), 0, sizeof(NaryObject_));
         NARY_OBJECT_(pSelf_, i)->id = i;
     }
@@ -538,7 +538,7 @@ static GblBool GblNaryTreeTestSuite_traverse_(GblTestSuite* pSelf, uintptr_t mas
 
     pClosure->countReturnTrue = -1;
 
-    for(GblSize i = 0; i < NARY_OBJECT_COUNT_; ++i)
+    for(size_t  i = 0; i < NARY_OBJECT_COUNT_; ++i)
         pClosure->index[i] = -1;
 
     return GblNaryTree_traverse(NARY_OBJECT_NODE_(pSelf, 0),

@@ -17,7 +17,7 @@ typedef struct GblTestScenario_ {
 } GblTestScenario_;
 
 
-GblSize GblTestScenario_suiteCount_(const GblTestScenario* pSelf) {
+size_t  GblTestScenario_suiteCount_(const GblTestScenario* pSelf) {
     return pSelf? GblObject_childCount(GBL_OBJECT(pSelf)) : 0;
 }
 
@@ -124,10 +124,10 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
         } else {
 
             ++pSelf->suitesRun;
-            const GblSize caseCount = GblTestSuite_caseCount(pSuiteIt);
+            const size_t  caseCount = GblTestSuite_caseCount(pSuiteIt);
             GblBool suiteFailed = GBL_FALSE;
 
-            for(GblSize idx = 0; idx < caseCount; ++idx) {
+            for(size_t  idx = 0; idx < caseCount; ++idx) {
 
                 pSelf_->pCurCase = GblTestSuite_caseName(pSuiteIt, idx);
 
@@ -313,7 +313,7 @@ static GBL_RESULT GblTestScenarioClass_property_(const GblObject* pSelf, const G
 
 
 
-static GBL_RESULT GblTestScenarioClass_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
+static GBL_RESULT GblTestScenarioClass_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, size_t  size, size_t  align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
     GBL_CTX_BEGIN(pParentCtx);
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
@@ -324,7 +324,7 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_alloc_(GblIAllocator* pIAlloca
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestScenarioClass_IAllocator_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData) GBL_NOEXCEPT {
+static GBL_RESULT GblTestScenarioClass_IAllocator_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, size_t  newSize, size_t  newAlign, void** ppNewData) GBL_NOEXCEPT {
     GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
     GBL_CTX_BEGIN(pParentCtx);
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));

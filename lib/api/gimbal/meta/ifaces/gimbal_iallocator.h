@@ -20,8 +20,8 @@
 GBL_DECLS_BEGIN
 
 GBL_INTERFACE_DERIVE(GblIAllocator)
-    GBL_RESULT (*pFnAlloc)  (GBL_SELF, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData);
-    GBL_RESULT (*pFnRealloc)(GBL_SELF, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData);
+    GBL_RESULT (*pFnAlloc)  (GBL_SELF, const GblStackFrame* pFrame, size_t  size, size_t  align, const char* pDbgStr, void** ppData);
+    GBL_RESULT (*pFnRealloc)(GBL_SELF, const GblStackFrame* pFrame, void* pData, size_t  newSize, size_t  newAlign, void** ppNewData);
     GBL_RESULT (*pFnFree)   (GBL_SELF, const GblStackFrame* pFrame, void* pData);
 GBL_INTERFACE_END
 
@@ -29,16 +29,16 @@ GBL_EXPORT GblType    GblIAllocator_type    (void)                              
 
 GBL_EXPORT GBL_RESULT GblIAllocator_alloc   (GBL_SELF,
                                              const GblStackFrame* pFrame,
-                                             GblSize              size,
-                                             GblSize              alignment,
+                                             size_t               size,
+                                             size_t               alignment,
                                              const char*          pDebugString,
                                              void**               ppData)       GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblIAllocator_realloc (GBL_SELF,
                                              const GblStackFrame* pFrame,
                                              void*                pData,
-                                             GblSize              newSize,
-                                             GblSize              newAlign,
+                                             size_t               newSize,
+                                             size_t               newAlign,
                                              void**               ppNewData)    GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblIAllocator_free    (GBL_SELF,

@@ -5,6 +5,7 @@
  *  \todo
  *      - GblDateTime_fromIso8601()
  *      - double GblDateTime_toJulian(): higher res, with seconds
+ *      - use timespec to get nanoseconds
  */
 
 #ifndef GIMBAL_DATE_TIME_H
@@ -12,6 +13,10 @@
 
 #include "../gimbal_core.h"
 #include <time.h>
+
+#define GBL_TIME_MSECS_PER_SEC                          1000
+#define GBL_TIME_USECS_PER_SEC                          1000000
+#define GBL_TIME_NSECS_PER_SEC                          1000000000
 
 #define GBL_DATE_GREGORIAN_YEAR_FIRST                   1582
 #define GBL_DATE_UNIX_EPOCH_YEAR                        1970
@@ -56,149 +61,186 @@ GBL_DECLARE_ENUM(GblWeekDay) {
 
 typedef int32_t GblYear;
 typedef int32_t GblDay;
+typedef int32_t GblNanoSecond;
 typedef int64_t GblSecond;
 typedef int32_t GblMinute;
 typedef int32_t GblHour;
 
-typedef struct GblDate {     // Size (bytes)
-    GblYear  year;           // 4
-    GblMonth month;          // 4
-    GblDay   day;            // 4
-} GblDate;                   // 12 Total
+typedef struct timespec GblTimeSpec;
 
-typedef struct GblTime {     // Size (bytes)
-    GblHour   hours;         // 4
-    GblMinute minutes;       // 4
-    GblSecond seconds;       // 8
-} GblTime;                   // 16 Total
+typedef struct GblDate {    // Size (bytes)
+    GblYear  year;          // 4
+    GblMonth month;         // 4
+    GblDay   day;           // 4
+} GblDate;                  // 12 Total
 
-typedef struct GblDateTime { // Size (bytes)
-    GblDate   date;          // 12
-    GblTime   time;          // 16
-    int16_t   utcOffset;     // 4
-} GblDateTime;               // 32 Total
+typedef struct GblTime {    // Size (bytes)
+    GblHour       hours;    // 4
+    GblMinute     minutes;  // 4
+    GblSecond     seconds;  // 8
+    GblNanoSecond nSeconds; // 4
+} GblTime;                  // 20 Total
 
-GBL_INLINE GblBool      GblDate_isLeapYear      (GblYear year)             GBL_NOEXCEPT;
-GBL_INLINE GblDay       GblDate_monthDays       (GblMonth month,
-                                                 GblYear year)             GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblDate_monthStr        (GblMonth month)           GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblDate_monthStrShort   (GblMonth month)           GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblDate_weekDayStr      (GblWeekDay weekDay)       GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblDate_weekDayStrShort (GblWeekDay weekDay)       GBL_NOEXCEPT;
+typedef struct GblDateTime {// Size (bytes)
+    GblDate   date;         // 12
+    GblTime   time;         // 20
+    int16_t   utcOffset;    // 2
+} GblDateTime;              // 34 Total
 
-GBL_INLINE GblBool      GblDate_isValid         (const GblDate* pSelf)     GBL_NOEXCEPT;
-GBL_EXPORT GblBool      GblDate_isDst           (const GblDate* pSelf)     GBL_NOEXCEPT;
-GBL_INLINE GblDay       GblDate_toJulian        (const GblDate* pSelf)     GBL_NOEXCEPT;
-GBL_INLINE GblWeekDay   GblDate_weekDay         (const GblDate* pSelf)     GBL_NOEXCEPT;
-GBL_INLINE GblDay       GblDate_yearDay         (const GblDate* pSelf)     GBL_NOEXCEPT;
-GBL_INLINE uint8_t      GblDate_yearWeek        (const GblDate* pSelf)     GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblDate_isLeapYear       (GblYear year)              GBL_NOEXCEPT;
 
-GBL_INLINE GblDate*     GblDate_fromJulian      (GblDate* pSelf,
-                                                 GblDay julianDate)        GBL_NOEXCEPT;
+GBL_INLINE GblDay       GblDate_monthDays        (GblMonth month,
+                                                  GblYear year)              GBL_NOEXCEPT;
 
-GBL_EXPORT GblDate*     GblDate_fromOrdinal     (GblDate* pSelf,
-                                                 GblYear  year,
-                                                 GblDay   day)             GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblDate_monthStr         (GblMonth month)            GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblDate_monthStrShort    (GblMonth month)            GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblDate_weekDayStr       (GblWeekDay weekDay)        GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblDate_weekDayStrShort  (GblWeekDay weekDay)        GBL_NOEXCEPT;
 
-GBL_INLINE void         GblDate_set             (GblDate* pSelf,
-                                                 GblYear  year,
-                                                 GblMonth month,
-                                                 GblDay   day)             GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblDate_isValid          (const GblDate* pSelf)      GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblDate_isDst            (const GblDate* pSelf)      GBL_NOEXCEPT;
+GBL_INLINE GblDay       GblDate_toJulian         (const GblDate* pSelf)      GBL_NOEXCEPT;
+GBL_INLINE GblWeekDay   GblDate_weekDay          (const GblDate* pSelf)      GBL_NOEXCEPT;
+GBL_INLINE GblDay       GblDate_yearDay          (const GblDate* pSelf)      GBL_NOEXCEPT;
+GBL_INLINE uint8_t      GblDate_yearWeek         (const GblDate* pSelf)      GBL_NOEXCEPT;
 
-GBL_EXPORT const char*  GblTime_amPmStr         (GblBool isPm)             GBL_NOEXCEPT;
-GBL_EXPORT GblSecond    GblTime_localUtcOffset  (void)                     GBL_NOEXCEPT;
-GBL_INLINE GblBool      GblTime_isValid         (const GblTime* pSelf)     GBL_NOEXCEPT;
+GBL_INLINE GblDate*     GblDate_fromJulian       (GblDate* pSelf,
+                                                  GblDay julianDate)         GBL_NOEXCEPT;
 
-GBL_INLINE GblBool      GblTime_isPm            (const GblTime* pSelf)     GBL_NOEXCEPT;
-GBL_INLINE void         GblTime_set             (GblTime*  pSelf,
-                                                 GblHour   hours,
-                                                 GblMinute mins,
-                                                 GblSecond secs)           GBL_NOEXCEPT;
+GBL_EXPORT GblDate*     GblDate_fromOrdinal      (GblDate* pSelf,
+                                                  GblYear  year,
+                                                  GblDay   day)              GBL_NOEXCEPT;
 
-GBL_INLINE GblBool      GblDateTime_isValid     (const GblDateTime* pSelf) GBL_NOEXCEPT;
-GBL_INLINE GblBool      GblDateTime_isUtc       (const GblDateTime* pSelf) GBL_NOEXCEPT;
-GBL_INLINE GblBool      GblDateTime_isLocal     (const GblDateTime* pSelf) GBL_NOEXCEPT;
+GBL_INLINE void         GblDate_set              (GblDate* pSelf,
+                                                  GblYear  year,
+                                                  GblMonth month,
+                                                  GblDay   day)              GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_fromUnix    (GblDateTime* pSelf,
-                                                 time_t epoch)             GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblTime_amPmStr          (GblBool isPm)              GBL_NOEXCEPT;
+GBL_EXPORT GblSecond    GblTime_localUtcOffset   (void)                      GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_fromLocal   (GblDateTime* pSelf,
-                                                 const struct tm* pLocal)  GBL_NOEXCEPT;
+GBL_INLINE GblTimeSpec  GblTime_specDiff         (const GblTimeSpec* pSrc1,
+                                                  const GblTimeSpec* pSrc2)  GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_fromUtc     (GblDateTime* pSelf,
-                                                 const struct tm* pUtc)    GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblTime_isValid          (const GblTime* pSelf)      GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_nowLocal    (GblDateTime* pSelf)       GBL_NOEXCEPT;
-GBL_EXPORT GblDateTime* GblDateTime_nowUtc      (GblDateTime* pSelf)       GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblTime_isPm             (const GblTime* pSelf)      GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_parse       (GblDateTime* pSelf,
-                                                 const char* pString,
-                                                 const char* pFormat)      GBL_NOEXCEPT; // based on strptime()
+GBL_INLINE void         GblTime_set              (GblTime*      pSelf,
+                                                  GblHour       hours,
+                                                  GblMinute     mins,
+                                                  GblSecond     secs,
+                                                  GblNanoSecond nsec/*=0*/)  GBL_NOEXCEPT;
 
-GBL_EXPORT time_t       GblDateTime_toUnix      (const GblDateTime* pSelf) GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblDateTime_isValid      (const GblDateTime* pSelf)  GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblDateTime_isUtc        (const GblDateTime* pSelf)  GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblDateTime_isLocal      (const GblDateTime* pSelf)  GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblDateTime_toLocal     (const GblDateTime* pSelf,
-                                                 struct tm* pBrokenDown)   GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime* GblDateTime_fromUnix     (GblDateTime* pSelf,
+                                                  time_t epoch)              GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT   GblDateTime_toUtc       (const GblDateTime* pSelf,
-                                                 struct tm* pBrokenDown)   GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime* GblDateTime_fromSpecUtc  (GblDateTime* pSelf,
+                                                  const GblTimeSpec* pSpec)  GBL_NOEXCEPT;
 
-GBL_EXPORT const char*  GblDateTime_toIso8601   (const GblDateTime* pSelf,
-                                                 GblStringBuffer* pBuffer) GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime* GblDateTime_fromLocal    (GblDateTime* pSelf,
+                                                  const struct tm* pLocal)   GBL_NOEXCEPT;
 
-GBL_EXPORT const char*  GblDateTime_format      (const GblDateTime* pSelf,
-                                                 GblStringBuffer* pBuffer,
-                                                 const char* pFormat)      GBL_NOEXCEPT; // based on strftime()
+GBL_EXPORT GblDateTime* GblDateTime_fromUtc      (GblDateTime* pSelf,
+                                                  const struct tm* pUtc)     GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_normalize   (GblDateTime* pSelf)       GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime* GblDateTime_nowLocal     (GblDateTime* pSelf)        GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime* GblDateTime_nowUtc       (GblDateTime* pSelf)        GBL_NOEXCEPT;
 
-GBL_INLINE void         GblDateTime_set         (GblDateTime* pSelf,
-                                                 GblYear      year,
-                                                 GblMonth     month/*=1*/,
-                                                 GblDay       day  /*=1*/,
-                                                 GblHour      hours/*=0*/,
-                                                 GblMinute    mins /*=0*/,
-                                                 GblSecond    secs /*=0*/,
-                                                 GblSecond    tzOff/*=0*/) GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime* GblDateTime_parse        (GblDateTime* pSelf,
+                                                  const char* pString,
+                                                  const char* pFormat)       GBL_NOEXCEPT; // based on strptime()
 
-GBL_INLINE void         GblDateTime_setDate     (GblDateTime*   pSelf,
-                                                 const GblDate* pDate)     GBL_NOEXCEPT;
+GBL_EXPORT time_t       GblDateTime_toUnix       (const GblDateTime* pSelf)  GBL_NOEXCEPT;
 
-GBL_INLINE void         GblDateTime_setTime     (GblDateTime*   pSelf,
-                                                 const GblTime* pTime)     GBL_NOEXCEPT;
+GBL_EXPORT GblTimeSpec  GblDateTime_toSpecUtc    (const GblDateTime* pSelf)  GBL_NOEXCEPT;
 
-GBL_INLINE GblBool      GblDateTime_equals      (const GblDateTime* pSelf,
-                                                 const GblDateTime* pRhs)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblDateTime_toLocal      (const GblDateTime* pSelf,
+                                                  struct tm* pBrokenDown)    GBL_NOEXCEPT;
 
-GBL_EXPORT int64_t      GblDateTime_diff        (const GblDateTime* pSelf,
-                                                 const GblDateTime* pRhs)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblDateTime_toUtc        (const GblDateTime* pSelf,
+                                                  struct tm* pBrokenDown)    GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_add         (GblDateTime* pSelf,
-                                                 const GblDateTime* pRhs)  GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblDateTime_toIso8601    (const GblDateTime* pSelf,
+                                                  GblStringBuffer* pBuffer)  GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_addDays     (GblDateTime* pSelf,
-                                                 GblDay days)              GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblDateTime_format       (const GblDateTime* pSelf,
+                                                  GblStringBuffer*   pBuffer,
+                                                  const char*        pFmt)   GBL_NOEXCEPT; // based on strftime()
 
-GBL_EXPORT GblDateTime* GblDateTime_addHours    (GblDateTime* pSelf,
-                                                 GblHour hours)            GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime* GblDateTime_normalize    (GblDateTime* pSelf)        GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_addMinutes  (GblDateTime* pSelf,
-                                                 GblMinute minutes)        GBL_NOEXCEPT;
+GBL_INLINE void         GblDateTime_set          (GblDateTime*  pSelf,
+                                                  GblYear       year,
+                                                  GblMonth      month/*=1*/,
+                                                  GblDay        day  /*=1*/,
+                                                  GblHour       hours/*=0*/,
+                                                  GblMinute     mins /*=0*/,
+                                                  GblSecond     secs /*=0*/,
+                                                  GblNanoSecond ns   /*=0*/,
+                                                  GblSecond     tzOff/*=0*/) GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_addSeconds  (GblDateTime* pSelf,
-                                                 GblSecond seconds)        GBL_NOEXCEPT;
+GBL_INLINE void         GblDateTime_setDate      (GblDateTime*   pSelf,
+                                                  const GblDate* pDate)      GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_addWeeks    (GblDateTime* pSelf,
-                                                 int weeks)                GBL_NOEXCEPT;
+GBL_INLINE void         GblDateTime_setTime      (GblDateTime*   pSelf,
+                                                  const GblTime* pTime)      GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_addMonths   (GblDateTime* pSelf,
-                                                 int months)               GBL_NOEXCEPT;
+GBL_INLINE int          GblDateTime_compare      (const GblDateTime* pSelf,
+                                                  const GblDateTime* pRhs)   GBL_NOEXCEPT;
 
-GBL_EXPORT GblDateTime* GblDateTime_addYears    (GblDateTime* pSelf,
-                                                 GblYear years)            GBL_NOEXCEPT;
+GBL_INLINE GblBool      GblDateTime_equals       (const GblDateTime* pSelf,
+                                                  const GblDateTime* pRhs)   GBL_NOEXCEPT;
+
+GBL_EXPORT GblTimeSpec  GblDateTime_diff         (const GblDateTime* pSelf,
+                                                  const GblDateTime* pRhs)   GBL_NOEXCEPT;
+
+GBL_EXPORT GblDateTime* GblDateTime_add          (GblDateTime* pSelf,
+                                                  const GblDateTime* pRhs)   GBL_NOEXCEPT;
+
+GBL_EXPORT GblDateTime* GblDateTime_addDays      (GblDateTime* pSelf,
+                                                  GblDay days)               GBL_NOEXCEPT;
+
+GBL_EXPORT GblDateTime* GblDateTime_addHours     (GblDateTime* pSelf,
+                                                  GblHour hours)             GBL_NOEXCEPT;
+
+GBL_EXPORT GblDateTime* GblDateTime_addMinutes   (GblDateTime* pSelf,
+                                                  GblMinute minutes)         GBL_NOEXCEPT;
+
+GBL_EXPORT GblDateTime* GblDateTime_addSeconds   (GblDateTime* pSelf,
+                                                  GblSecond seconds)         GBL_NOEXCEPT;
+
+GBL_INLINE GblDateTime* GblDateTime_addMilliSecs (GblDateTime* pSelf,
+                                                  int          mSecs)        GBL_NOEXCEPT;
+
+GBL_INLINE GblDateTime* GblDateTime_addMicroSecs (GblDateTime* pSelf,
+                                                  int          uSecs)        GBL_NOEXCEPT;
+
+GBL_EXPORT GblDateTime* GblDateTime_addNanoSecs  (GblDateTime* pSelf,
+                                                  GblNanoSecond nSecs)       GBL_NOEXCEPT;
+
+GBL_EXPORT GblDateTime* GblDateTime_addWeeks     (GblDateTime* pSelf,
+                                                  int weeks)                 GBL_NOEXCEPT;
+
+GBL_EXPORT GblDateTime* GblDateTime_addMonths    (GblDateTime* pSelf,
+                                                  int months)                GBL_NOEXCEPT;
+
+GBL_EXPORT GblDateTime* GblDateTime_addYears     (GblDateTime* pSelf,
+                                                  GblYear years)             GBL_NOEXCEPT;
 
 // ===== IMPL =====
 ///\cond
+#define GblTime_set_5(self, hour, min, sec, ns) \
+    (GblTime_set)(self, hour, min, sec, ns)
+#define GblTime_set_4(self, hour, min, sec) \
+    (GblTime_set_5(self, hour, min, sec, 0))
+#define GblTime_set(...) \
+    GBL_VA_OVERLOAD_CALL_ARGC(GblTime_set, __VA_ARGS__)
+
 #define GblDateTime_set_2(self, year) \
     (GblDateTime_set_3(self, year, GBL_MONTH_JANUARY))
 #define GblDateTime_set_3(self, year, month) \
@@ -211,10 +253,12 @@ GBL_EXPORT GblDateTime* GblDateTime_addYears    (GblDateTime* pSelf,
     (GblDateTime_set_7(self, year, month, day, hour, min, 0))
 #define GblDateTime_set_7(self, year, month, day, hour, min, sec) \
     (GblDateTime_set_8(self, year, month, day, hour, min, sec, 0))
-#define GblDateTime_set_8(self, year, month, day, hour, min, sec, tz) \
-    ((GblDateTime_set)(self, year, month, day, hour, min, sec, tz))
+#define GblDateTime_set_8(self, year, month, day, hour, min, sec, ns) \
+    (GblDateTime_set_9(self, year, month, day, hour, min, sec, ns, 0))
+#define GblDateTime_set_9(self, year, month, day, hour, min, sec, ns, tz) \
+    ((GblDateTime_set)(self, year, month, day, hour, min, sec, ns, tz))
 #define GblDateTime_set(...) \
-    GBL_VA_OVERLOAD_CALL(GblDateTime_set, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
+    GBL_VA_OVERLOAD_CALL_ARGC(GblDateTime_set, __VA_ARGS__)
 ///\endcond
 
 GBL_INLINE GblBool GblDate_isLeapYear(GblYear year) GBL_NOEXCEPT {
@@ -313,11 +357,15 @@ GBL_INLINE GblDate* GblDate_fromJulian(GblDate* pSelf, GblDay julianDate) GBL_NO
 }
 
 GBL_INLINE GblBool GblTime_isValid(const GblTime* pSelf) GBL_NOEXCEPT {
+    if(pSelf->nSeconds < 0)
+        return GBL_FALSE;
     if(pSelf->seconds < 0)
         return GBL_FALSE;
     if(pSelf->minutes < 0)
         return GBL_FALSE;
     if(pSelf->hours < 0)
+        return GBL_FALSE;
+    if(pSelf->nSeconds > GBL_TIME_NSECS_PER_SEC-1)
         return GBL_FALSE;
     if(pSelf->seconds > 59)
         return GBL_FALSE;
@@ -326,6 +374,20 @@ GBL_INLINE GblBool GblTime_isValid(const GblTime* pSelf) GBL_NOEXCEPT {
     if(pSelf->hours > 23)
         return GBL_FALSE;
     return GBL_TRUE;
+}
+
+GBL_INLINE GblTimeSpec GblTime_specDiff(const GblTimeSpec* pSrc1, const GblTimeSpec* pSrc2) GBL_NOEXCEPT {
+    GblTimeSpec temp;
+
+    if((pSrc1->tv_nsec - pSrc2->tv_nsec) < 0) {
+        temp.tv_sec  = pSrc1->tv_sec - pSrc2->tv_sec - 1;
+        temp.tv_nsec = GBL_TIME_NSECS_PER_SEC + pSrc1->tv_nsec - pSrc2->tv_nsec;
+    } else {
+        temp.tv_sec  = pSrc1->tv_sec - pSrc2->tv_sec;
+        temp.tv_nsec = pSrc1->tv_nsec - pSrc2->tv_nsec;
+    }
+
+    return temp;
 }
 
 GBL_INLINE GblBool GblDateTime_isUtc(const GblDateTime* pSelf) GBL_NOEXCEPT {
@@ -344,17 +406,17 @@ GBL_INLINE GblBool GblTime_isPm(const GblTime* pSelf) GBL_NOEXCEPT {
     return pSelf->hours >= 12;
 }
 
-GBL_INLINE void GblTime_set(GblTime* pSelf, GblHour hours, GblMinute mins, GblSecond secs) GBL_NOEXCEPT {
-    pSelf->hours = hours; pSelf->minutes = mins; pSelf->seconds = secs;
+GBL_INLINE void (GblTime_set)(GblTime* pSelf, GblHour hours, GblMinute mins, GblSecond secs, GblNanoSecond ns) GBL_NOEXCEPT {
+    pSelf->hours = hours; pSelf->minutes = mins; pSelf->seconds = secs; pSelf->nSeconds = ns;
 }
 
 GBL_INLINE GblBool GblDateTime_isValid(const GblDateTime* pSelf) GBL_NOEXCEPT {
     return GblDate_isValid(&pSelf->date) && GblTime_isValid(&pSelf->time);
 }
 
-GBL_INLINE void (GblDateTime_set)(GblDateTime* pSelf, GblYear year, GblMonth month, GblDay day, GblHour hours, GblMinute mins, GblSecond secs, GblSecond tzOff) GBL_NOEXCEPT {
+GBL_INLINE void (GblDateTime_set)(GblDateTime* pSelf, GblYear year, GblMonth month, GblDay day, GblHour hours, GblMinute mins, GblSecond secs, GblNanoSecond ns, GblSecond tzOff) GBL_NOEXCEPT {
     GblDate_set(&pSelf->date, year, month, day);
-    GblTime_set(&pSelf->time, hours, mins, secs);
+    GblTime_set(&pSelf->time, hours, mins, secs, ns);
     pSelf->utcOffset = tzOff;
 }
 
@@ -366,8 +428,25 @@ GBL_INLINE void GblDateTime_setTime(GblDateTime* pSelf, const GblTime* pTime) GB
     memcpy(&pSelf->time, pTime, sizeof(GblTime));
 }
 
+GBL_INLINE int GblDateTime_compare(const GblDateTime* pSelf, const GblDateTime* pRhs) GBL_NOEXCEPT {
+    GblTimeSpec ts = GblDateTime_diff(pSelf, pRhs);
+    if(ts.tv_sec  > 0) return 1;
+    if(ts.tv_sec  < 0) return -1;
+    if(ts.tv_nsec > 0) return 1;
+    if(ts.tv_nsec < 0) return -1;
+    return 0;
+}
+
 GBL_INLINE GblBool GblDateTime_equals(const GblDateTime* pSelf, const GblDateTime* pOther) GBL_NOEXCEPT {
-    return (GblDateTime_diff(pSelf, pOther) == 0.0)? GBL_TRUE : GBL_FALSE;
+    return GblDateTime_compare(pSelf, pOther) == 0;
+}
+
+GBL_INLINE GblDateTime* GblDateTime_addMilliSecs(GblDateTime* pSelf, int mSecs) GBL_NOEXCEPT {
+    return GblDateTime_addMicroSecs(pSelf, mSecs * 1000);
+}
+
+GBL_INLINE GblDateTime* GblDateTime_addMicroSecs(GblDateTime* pSelf, int uSecs) GBL_NOEXCEPT {
+    return GblDateTime_addNanoSecs(pSelf, uSecs * 1000);
 }
 
 GBL_DECLS_END

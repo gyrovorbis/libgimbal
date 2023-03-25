@@ -10,7 +10,7 @@ typedef struct GblStringRefTestSuite_ {
     GblRefCount     beginActiveRefCount;
 } GblStringRefTestSuite_;
 
-static GBL_RESULT verifyEmpty_(GblContext* pCtx, GblStringRef* pRef, GblSize refCount, GblContext* pRefCtx) {
+static GBL_RESULT verifyEmpty_(GblContext* pCtx, GblStringRef* pRef, size_t  refCount, GblContext* pRefCtx) {
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_VERIFY(pRef);
     GBL_TEST_COMPARE(pRef[0], '\0');
@@ -26,7 +26,7 @@ static GBL_RESULT verifyEmpty_(GblContext* pCtx, GblStringRef* pRef, GblSize ref
     GBL_CTX_END();
 }
 
-static GBL_RESULT verifyString_(GblContext* pCtx, GblStringRef* pRef, const char* pValue, GblSize refCount, GblContext* pRefCtx) {
+static GBL_RESULT verifyString_(GblContext* pCtx, GblStringRef* pRef, const char* pValue, size_t  refCount, GblContext* pRefCtx) {
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_VERIFY(pRef);
     GBL_TEST_COMPARE(pRef[0], pValue[0]);

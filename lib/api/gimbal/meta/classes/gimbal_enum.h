@@ -21,15 +21,15 @@
 GBL_DECLS_BEGIN
 
 typedef struct GblEnumEntry {
-    GblEnum         value;
-    const char*     pName;
-    const char*     pNick;
+    GblEnum     value;
+    const char* pName;
+    const char* pNick;
 } GblEnumEntry;
 
 GBL_CLASS_DERIVE(GblEnum, GblPrimitive)
-    GblEnum             valueMax;
-    GblEnum             valueMin;
-    uint16_t            entryCount;
+    GblEnum   valueMax;
+    GblEnum   valueMin;
+    uint16_t  entryCount;
 GBL_CLASS_END
 
 // ========== GblEnumClass ==========#

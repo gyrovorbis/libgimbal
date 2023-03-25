@@ -11,7 +11,7 @@
 #define GBL_TRUE                1
 #define GBL_FALSE               0
 #define GBL_INDEX_INVALID       SIZE_MAX
-#define GBL_NPOS                ((GblSize)-1)
+#define GBL_NPOS                ((size_t )-1)
 
 #ifndef __DREAMCAST__
 #   define GBL_SIZE_FMT         "zu"
@@ -21,12 +21,29 @@
 
 // ======== Primitive Types ==========
 
-typedef uint8_t  GblBool;
-typedef size_t   GblSize;
-typedef uint32_t GblEnum;
-typedef uint32_t GblFlags;
-typedef uint32_t GblHash;
-typedef uint16_t GblRefCount;
+typedef uint8_t     GblBool;
+typedef char        GblChar;
+typedef uint8_t     GblUint8;
+typedef int8_t      GblInt8;
+typedef uint16_t    GblUint16;
+typedef int16_t     GblInt16;
+typedef uint32_t    GblUint32;
+typedef int32_t     GblInt32;
+typedef uint64_t    GblUint64;
+typedef int64_t     GblInt64;
+typedef size_t      GblSize;
+typedef float       GblFloat;
+typedef double      GblDouble;
+typedef void*       GblPointer;
+typedef void      (*GblFunction)();
+typedef const char* GblString;
+typedef uint32_t    GblEnum;
+typedef uint32_t    GblFlags;
+
+// ==========  Auxiliary Types ==========
+
+typedef uint32_t    GblHash;
+typedef uint16_t    GblRefCount;
 
 typedef void (*GblFnPtr)();
 

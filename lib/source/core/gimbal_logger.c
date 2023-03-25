@@ -26,7 +26,7 @@ static once_flag initOnce_          = ONCE_FLAG_INIT;
 static GblQuark  domainFilterQuark_ = GBL_QUARK_INVALID;
 static GblQuark  threadFilterQuark_ = GBL_QUARK_INVALID;
 static GBL_THREAD_LOCAL
-       GblSize   stackDepth_        = 0;
+       size_t    stackDepth_        = 0;
 
 static void GblLogger_finalize_(void) {
     if(!initialized_) return;
@@ -115,7 +115,7 @@ GBL_EXPORT GblBool GblLogger_foreach(GblLoggerIterFn pFnIt,
 }
 
 GBL_EXPORT GblLogger* GblLogger_create(GblType derived,
-                                       GblSize allocSize,
+                                       size_t  allocSize,
                                        GblLoggerClass* pClass) {
     GblLogger* pSelf = NULL;
     GBL_CTX_BEGIN(NULL);
@@ -197,14 +197,14 @@ GBL_EXPORT GBL_RESULT GblLogger_setDomainFilters(GblLogger* pSelf,
                                                  const char* pDomains[]) {
     GBL_CTX_BEGIN(NULL);
 
-    GblSize count = 0;
+    size_t  count = 0;
     while(pDomains[count++]);
 
     // don't bother if it's just an empty delimeter list
     if(count == 1) GBL_CTX_DONE();
 
     char** ppDomains = GBL_CTX_NEW(char*, count);
-    for(GblSize s = 0; s < count-1; ++s) {
+    for(size_t  s = 0; s < count-1; ++s) {
         ppDomains[s] = GBL_CTX_NEW(char, strlen(pDomains[s]));
         strcpy(ppDomains[s], pDomains[s]);
     }
@@ -246,7 +246,7 @@ GBL_EXPORT GBL_RESULT GblLogger_setThreadFilters(GblLogger* pSelf,
                                                  const GblThd* pThreads[]) {
     GBL_CTX_BEGIN(NULL);
 
-    GblSize count = 0;
+    size_t  count = 0;
     while(pThreads[count++]);
 
     // Don't bother if it's just an empty delimeter list
@@ -293,7 +293,7 @@ GBL_EXPORT GBL_RESULT GblLogger_push(void) {
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblLogger_pop(GblSize count) {
+GBL_EXPORT GBL_RESULT GblLogger_pop(size_t  count) {
 
     GBL_CTX_BEGIN(NULL);
     GBL_LOGGER_ENSURE_INITIALIZED_();
@@ -324,7 +324,7 @@ GBL_EXPORT GBL_RESULT GblLogger_pop(GblSize count) {
 
 GBL_EXPORT GBL_RESULT GblLogger_write(const char*   pFile,
                                       const char*   pFunction,
-                                      GblSize       line,
+                                      size_t        line,
                                       const char*   pDomain,
                                       GBL_LOG_FLAGS flags,
                                       const char*   pFmt,
@@ -346,7 +346,7 @@ GBL_EXPORT GBL_RESULT GblLogger_write(const char*   pFile,
 
 GBL_EXPORT GBL_RESULT GblLogger_writeVa(const char*   pFile,
                                         const char*   pFunction,
-                                        GblSize       line,
+                                        size_t        line,
                                         const char*   pDomain,
                                         GBL_LOG_FLAGS flags,
                                         const char*   pFmt,
@@ -400,7 +400,7 @@ static GBL_RESULT GblLogger_push_(GblLogger* pSelf, GblThd* pThread) {
     return GBL_RESULT_SUCCESS;
 }
 
-static GBL_RESULT GblLogger_pop_(GblLogger* pSelf, GblThd* pThread, GblSize count) {
+static GBL_RESULT GblLogger_pop_(GblLogger* pSelf, GblThd* pThread, size_t  count) {
     GBL_UNUSED(pSelf, pThread, count);
     return GBL_RESULT_SUCCESS;
 }
@@ -408,7 +408,7 @@ static GBL_RESULT GblLogger_pop_(GblLogger* pSelf, GblThd* pThread, GblSize coun
 static GBL_RESULT GblLogger_write_(GblLogger*    pSelf,
                                    const char*   pFile,
                                    const char*   pFunction,
-                                   GblSize       line,
+                                   size_t        line,
                                    GblThd*    pThread,
                                    time_t        timeStamp,
                                    const char*   pDomain,

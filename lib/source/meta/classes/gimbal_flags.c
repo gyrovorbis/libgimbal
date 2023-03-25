@@ -13,7 +13,7 @@ typedef struct GblFlagsClass_ {
     GblFlagsEntry_* pEntries;
 } GblFlagsClass_;
 
-static GBL_RESULT flagsConstruct_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT flagsConstruct_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc && pArgs);
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT);
@@ -38,7 +38,7 @@ static GBL_RESULT flagsLoad_(GblVariant* pVariant, const GblStringBuffer* pStrin
     GBL_CTX_END();
 }
 
-static GBL_RESULT flagsSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT flagsSet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -51,7 +51,7 @@ static GBL_RESULT flagsSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArg
     GBL_CTX_END();
 }
 
-static GBL_RESULT flagsGet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT flagsGet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -221,7 +221,7 @@ GBL_EXPORT GBL_RESULT GblFlagsClass_valueAppendString(const GblFlagsClass* pClas
     GblFlagsClass* pSelf = GBL_FLAGS_CLASS(pClass);
     GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pClass), GBL_FLAGS_TYPE);
 
-    GblSize count = 0;
+    size_t  count = 0;
     for(uint16_t f = 0; f < pSelf->entryCount; ++f) {
         if(flags & pSelf_->pEntries[f].value) {
             if(count++) GBL_CTX_CALL(GblStringBuffer_append(pStr, GBL_STRV("|")));

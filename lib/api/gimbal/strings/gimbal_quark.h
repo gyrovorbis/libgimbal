@@ -66,33 +66,33 @@ GBL_FORWARD_DECLARE_STRUCT(GblContext);
 typedef uintptr_t       GblQuark;
 
 GBL_EXPORT GBL_RESULT   GblQuark_init               (GblContext* pCtx,
-                                                     GblSize extraPageSize,
-                                                     GblSize initialEntries)              GBL_NOEXCEPT;
+                                                     size_t  extraPageSize,
+                                                     size_t  initialEntries)              GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblQuark_final              (void)                                GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblQuark_pageCount          (void)                                GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblQuark_pageSize           (void)                                GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblQuark_bytesUsed          (void)                                GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblQuark_bytesAvailable     (void)                                GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblQuark_totalCapacity      (void)                                GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblQuark_fragmentedBytes    (void)                                GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblQuark_pageCount          (void)                                GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblQuark_pageSize           (void)                                GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblQuark_bytesUsed          (void)                                GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblQuark_bytesAvailable     (void)                                GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblQuark_totalCapacity      (void)                                GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblQuark_fragmentedBytes    (void)                                GBL_NOEXCEPT;
 GBL_EXPORT float        GblQuark_utilization        (void)                                GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblQuark_count              (void)                                GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblQuark_count              (void)                                GBL_NOEXCEPT;
 GBL_EXPORT GblContext*  GblQuark_context            (void)                                GBL_NOEXCEPT;
 
 GBL_EXPORT GblQuark     GblQuark_fromString         (const char* pString)                 GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblQuark_fromStringSized    (const char* pString, GblSize length) GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_fromStringSized    (const char* pString, size_t  length) GBL_NOEXCEPT;
 GBL_EXPORT GblQuark     GblQuark_fromStringStatic   (const char* pSstring)                GBL_NOEXCEPT;
 
 GBL_EXPORT GblQuark     GblQuark_tryString          (const char* pString)                 GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblQuark_tryStringSized     (const char* pString, GblSize length) GBL_NOEXCEPT;
+GBL_EXPORT GblQuark     GblQuark_tryStringSized     (const char* pString, size_t  length) GBL_NOEXCEPT;
 
 GBL_EXPORT const char*  GblQuark_toString           (GblQuark quark)                      GBL_NOEXCEPT;
 
 GBL_EXPORT const char*  GblQuark_internString       (const char* pString)                 GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblQuark_internStringSized  (const char* pString, GblSize length) GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblQuark_internStringSized  (const char* pString, size_t  length) GBL_NOEXCEPT;
 GBL_EXPORT const char*  GblQuark_internStringStatic (const char* pString)                 GBL_NOEXCEPT;
 
 /// \cond
@@ -100,7 +100,7 @@ GBL_DECLS_END
 /// \endcond
 
 /*!
-    \fn GblQuark_init(GblContext* pCtx, GblSize extraPageSize, GblSize initialEntries)
+    \fn GblQuark_init(GblContext* pCtx, size_t  extraPageSize, size_t  initialEntries)
     \details
         Initializes the GblQuark API with the given configuration parameters or
         default if they're all set to NULL and 0.
@@ -182,7 +182,7 @@ GBL_DECLS_END
 */
 
 /*!
-    \fn GblQuark_fromStringSized(const char* pString, GblSize length)
+    \fn GblQuark_fromStringSized(const char* pString, size_t  length)
     \details
         Equivalent to GblQuark_fromString(), except for only the specified
         length of the string. This is useful for either substrings, or
@@ -215,7 +215,7 @@ GBL_DECLS_END
 */
 
 /*!
-    \fn GblQuark_tryStringSized(const char* pString, GblSize length)
+    \fn GblQuark_tryStringSized(const char* pString, size_t  length)
     \details
         Equivalent to GblQuark_tryString() with a substring.
     \param pString array of characters
@@ -248,7 +248,7 @@ GBL_DECLS_END
 */
 
 /*!
-    \fn GblQuark_internStringSized(const char* pString, GblSize length)
+    \fn GblQuark_internStringSized(const char* pString, size_t  length)
     \details
         Equivalent to GblQuark_internString() with a substring.
     \param pString NULL-teriminated C string or NULL

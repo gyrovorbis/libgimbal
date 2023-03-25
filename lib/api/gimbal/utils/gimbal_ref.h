@@ -20,8 +20,8 @@ typedef GBL_RESULT      (*GblRefDestructFn)     (GBL_SELF);
 GBL_EXPORT GBL_RESULT   GblRef_reinit           (void)                               GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount  GblRef_activeCount      (void)                               GBL_NOEXCEPT;
 
-GBL_INLINE void*        GblRef_alloc            (GblSize size)                       GBL_NOEXCEPT;
-GBL_EXPORT void*        GblRef_allocWithContext (GblSize size, GblContext* pCtx)     GBL_NOEXCEPT;
+GBL_INLINE void*        GblRef_alloc            (size_t  size)                       GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRef_allocWithContext (size_t  size, GblContext* pCtx)     GBL_NOEXCEPT;
 
 GBL_INLINE void*        GblRef_acquire          (GBL_SELF)                           GBL_NOEXCEPT;
 GBL_INLINE GblRefCount  GblRef_release          (GBL_SELF)                           GBL_NOEXCEPT;
@@ -54,7 +54,7 @@ GBL_INLINE GblRef_* GblRef_header_(const void* pData) GBL_NOEXCEPT {
 }
 /// \endcond
 
-GBL_INLINE void* GblRef_alloc(GblSize size) GBL_NOEXCEPT {
+GBL_INLINE void* GblRef_alloc(size_t  size) GBL_NOEXCEPT {
     return GblRef_allocWithContext(size, NULL);
 }
 

@@ -73,7 +73,7 @@ GBL_NOEXCEPT
 #undef GBL_MURMUR_HASH_GET_BLOCK_
 }
 
-GBL_EXPORT GblHash gblHashMurmur(const void* pData, GblSize size) GBL_NOEXCEPT {
+GBL_EXPORT GblHash gblHashMurmur(const void* pData, size_t  size) GBL_NOEXCEPT {
     uint32_t out;
     gblMurmurHash3_x86_32_(pData, size, gblSeed(0), &out);
     return out;
@@ -119,7 +119,7 @@ GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char
     const int size = gblRandRange(minSize, maxSize);
     const int listLength = strlen(pCharList);
 
-    for(GblSize c = 0; c < (GblSize)size; ++c) {
+    for(size_t  c = 0; c < (size_t )size; ++c) {
         pBuffer[c] = pCharList[gblRandRange(0, listLength-1)];
     }
 
@@ -127,14 +127,14 @@ GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char
     return size;
 }
 
-GBL_EXPORT void gblRandBuffer(void* pData, GblSize size) GBL_NOEXCEPT {
-    for(GblSize i = 0; i < size; ++i) {
+GBL_EXPORT void gblRandBuffer(void* pData, size_t  size) GBL_NOEXCEPT {
+    for(size_t  i = 0; i < size; ++i) {
         (((uint8_t*)pData)[i]) = (uint8_t)gblRandRange(0, 255);
     }
 }
 
-GBL_MAYBE_UNUSED GBL_INLINE GblHash gblCrc32LittleEndian(const void* pData, GblSize size) GBL_NOEXCEPT {
-    GblSize i;
+GBL_MAYBE_UNUSED GBL_INLINE GblHash gblCrc32LittleEndian(const void* pData, size_t  size) GBL_NOEXCEPT {
+    size_t  i;
     uint32_t rv = 0xFFFFFFFF;
 
     for(i = 0; i < size; ++i) {
@@ -172,7 +172,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GblHash gblCrc32BigEndian(const void *pData, int siz
     return rv;
 }
 
-GBL_EXPORT GblHash gblHashCrc(const void* pData, GblSize size) GBL_NOEXCEPT {
+GBL_EXPORT GblHash gblHashCrc(const void* pData, size_t  size) GBL_NOEXCEPT {
 #if GBL_BIG_ENDIAN == 0
     return gblCrc32LittleEndian(pData, size);
 #else
@@ -261,7 +261,7 @@ static uint64_t SIP64(const uint8_t *in, const size_t inlen,
 }
 
 
-GBL_EXPORT GblHash gblHashSip(const void* pData, GblSize size) GBL_NOEXCEPT {
+GBL_EXPORT GblHash gblHashSip(const void* pData, size_t  size) GBL_NOEXCEPT {
     return SIP64((uint8_t*)pData, size, gblSeed(0), gblSeed(1));
 }
 
@@ -269,7 +269,7 @@ GBL_EXPORT GblHash gblHashSip(const void* pData, GblSize size) GBL_NOEXCEPT {
 //
 // super hash function by Paul Hsieh
 //
-GBL_EXPORT GblHash gblHashSuperFast(const void* pData, GblSize size) GBL_NOEXCEPT {
+GBL_EXPORT GblHash gblHashSuperFast(const void* pData, size_t  size) GBL_NOEXCEPT {
 #define GBL_HASH_SUPER_FAST_GET_16_BITS_(d) \
     ((((uint32_t)(((const uint8_t *)(d))[1])) << 8) + (uint32_t)(((const uint8_t *)(d))[0]))
 
@@ -319,7 +319,7 @@ GBL_EXPORT GblHash gblHashSuperFast(const void* pData, GblSize size) GBL_NOEXCEP
 #undef GBL_HASH_SUPER_FAST_GET_16_BITS_
 }
 
-GBL_EXPORT GblHash gblHashPearson(const void* pData, GblSize size) {
+GBL_EXPORT GblHash gblHashPearson(const void* pData, size_t  size) {
     static uint8_t randomBytes_[256];
     static GblBool initialized_ = GBL_FALSE;
 
@@ -330,7 +330,7 @@ GBL_EXPORT GblHash gblHashPearson(const void* pData, GblSize size) {
         initialized_ = GBL_TRUE;
     }
 
-    for(GblSize b = 0; b < size; ++b) {
+    for(size_t  b = 0; b < size; ++b) {
         hash = randomBytes_[hash ^ ((uint8_t*)pData)[b]];
     }
 

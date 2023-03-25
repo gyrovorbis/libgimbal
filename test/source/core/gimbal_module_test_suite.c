@@ -175,7 +175,7 @@ GBL_RESULT registerVerify_(GblModule* pModule, GblModuleTestSuite_* pFixture) {
     GBL_CTX_BEGIN(NULL);
 
     const char* pName = GblObject_name(GBL_OBJECT(pModule));
-    const GblSize newCount = GblModule_count() + 1;
+    const size_t  newCount = GblModule_count() + 1;
 
     GBL_TEST_CALL(GblModule_register(pModule));
     GBL_TEST_COMPARE(GblModule_unref(pModule), 1);
@@ -185,7 +185,7 @@ GBL_RESULT registerVerify_(GblModule* pModule, GblModuleTestSuite_* pFixture) {
     GBL_TEST_COMPARE(GblModule_findQuark(GblQuark_fromString(pName)), pModule);
 
     GblBool found = GBL_FALSE;
-    for(GblSize m = 0; m < GblModule_count(); ++m)
+    for(size_t  m = 0; m < GblModule_count(); ++m)
         if(GblModule_at(m) == pModule) {
             found = GBL_TRUE;
             break;

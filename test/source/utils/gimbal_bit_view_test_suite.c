@@ -29,7 +29,7 @@ static GBL_RESULT verifyBits_(GblTestSuite* pSelf,
     GBL_TEST_COMPARE(pView->length,
                      strlen(pPattern));
 
-    for(GblSize b = 0; b < pView->length; ++b) {
+    for(size_t  b = 0; b < pView->length; ++b) {
 
         GBL_TEST_COMPARE(GblBitView_at(pView, b),
                          (pPattern[b] == '1')? GBL_TRUE : GBL_FALSE);

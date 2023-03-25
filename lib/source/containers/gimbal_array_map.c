@@ -20,7 +20,7 @@ GBL_EXPORT GblArrayMap* GblArrayMap_clone(GblArrayMap*const* ppSelf) GBL_NOEXCEP
     GblArrayMap* pMap = GBL_NULL;
     if(*ppSelf) {
         GBL_CTX_BEGIN((*ppSelf)->pCtx);
-        const GblSize bytes = GBL_ARRAY_MAP_SIZE((*ppSelf)->size);
+        const size_t  bytes = GBL_ARRAY_MAP_SIZE((*ppSelf)->size);
         pMap =GBL_CTX_MALLOC(bytes);
         memcpy(pMap, *ppSelf, bytes);
         GBL_CTX_END_BLOCK();
@@ -33,7 +33,7 @@ GBL_EXPORT GBL_RESULT GblArrayMap_destroy(GblArrayMap** ppSelf) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL);
     GblArrayMap* pSelf = *ppSelf;
     if(pSelf) {
-        for(GblSize e = 0; e < GBL_PRIV_REF(pSelf).size; ++e) {
+        for(size_t  e = 0; e < GBL_PRIV_REF(pSelf).size; ++e) {
             GBL_CTX_CALL(GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, e)));
         }
         GBL_CTX_FREE(pSelf);
@@ -47,7 +47,7 @@ static GblBool GblArrayMap_erase_(GblArrayMap** ppSelf, uintptr_t key, GblBool f
     GBL_CTX_BEGIN(NULL);
 
     if(*ppSelf) {
-        GblSize index = GblArrayMap_find(ppSelf, key);
+        size_t  index = GblArrayMap_find(ppSelf, key);
 
         if(index != GBL_ARRAY_MAP_NPOS) {
             if(free)
@@ -58,7 +58,7 @@ static GblBool GblArrayMap_erase_(GblArrayMap** ppSelf, uintptr_t key, GblBool f
                 removed = GBL_TRUE;
 
             } else {
-                GblSize remainder = GblArrayMap_size(ppSelf)-1 - index;
+                size_t  remainder = GblArrayMap_size(ppSelf)-1 - index;
 
                 if(remainder)
                     memmove(GblArrayMap_entry_(ppSelf, index),
@@ -80,7 +80,7 @@ GBL_EXPORT GblBool GblArrayMap_erase(GblArrayMap** ppSelf, uintptr_t key) GBL_NO
 
 GBL_EXPORT GblBool GblArrayMap_extractVariant(GblArrayMap** ppSelf, uintptr_t key, GblVariant* pVariant) GBL_NOEXCEPT {
     GblBool found = GBL_FALSE;
-    const GblSize index = GblArrayMap_find(ppSelf, key);
+    const size_t  index = GblArrayMap_find(ppSelf, key);
     if(index != GBL_ARRAY_MAP_NPOS) {
         GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, index);
         if(pEntry) {
@@ -95,7 +95,7 @@ GBL_EXPORT GblBool GblArrayMap_extractVariant(GblArrayMap** ppSelf, uintptr_t ke
 
 GBL_EXPORT GblBool GblArrayMap_extractValue(GblArrayMap**ppSelf, uintptr_t key, uintptr_t* pValue) GBL_NOEXCEPT {
     GblBool found = GBL_FALSE;
-    const GblSize index = GblArrayMap_find(ppSelf, key);
+    const size_t  index = GblArrayMap_find(ppSelf, key);
     if(index != GBL_ARRAY_MAP_NPOS) {
         GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, index);
         if(pEntry) {
@@ -110,8 +110,8 @@ GBL_EXPORT GblBool GblArrayMap_extractValue(GblArrayMap**ppSelf, uintptr_t key, 
 GBL_EXPORT void GblArrayMap_clear(GblArrayMap** ppSelf) {
     if(*ppSelf) {
         GBL_CTX_BEGIN(NULL);
-        const GblSize size = GblArrayMap_size(ppSelf);
-        for(GblSize e = 0; e < size; ++e)
+        const size_t  size = GblArrayMap_size(ppSelf);
+        for(size_t  e = 0; e < size; ++e)
             GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, e));
 
         if(GBL_PRIV_REF(*ppSelf).pCtx || GBL_PRIV_REF(*ppSelf).pFnComparator) {

@@ -30,15 +30,15 @@ GBL_EXPORT GBL_RESULT     GblScopeAllocator_destroy   (GBL_SELF)                
 GBL_EXPORT GBL_RESULT     GblScopeAllocator_destruct  (GBL_SELF)                        GBL_NOEXCEPT;
 
 GBL_EXPORT void*          GblScopeAllocator_alloc     (GBL_SELF,
-                                                       GblSize                 size,
-                                                       GblSize                 align,
+                                                       size_t                  size,
+                                                       size_t                  align,
                                                        GblScopeAllocatorDtorFn pFnDtor) GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT     GblScopeAllocator_pushDtor  (GBL_SELF,
                                                        GblScopeAllocatorDtorFn pFnDtor,
                                                        void*                   pData)   GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize        GblScopeAllocator_dtorCount (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_EXPORT size_t         GblScopeAllocator_dtorCount (GBL_CSELF)                       GBL_NOEXCEPT;
 
 // ===== Macro Overrides =====
 #define GblScopeAllocator_alloc(...)                      GblScopeAllocator_allocDefault_(__VA_ARGS__)

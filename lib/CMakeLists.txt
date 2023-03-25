@@ -124,6 +124,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_task.h
     api/gimbal/core/gimbal_logger.h
     api/gimbal/core/gimbal_module.h
+    api/gimbal/core/gimbal_exception.h
     api/gimbal/meta/classes/gimbal_class.h
     api/gimbal/meta/classes/gimbal_opaque.h
     api/gimbal/meta/classes/gimbal_enum.h
@@ -204,6 +205,7 @@ set(GIMBAL_SOURCES
     source/core/gimbal_app.c
     source/core/gimbal_module.c
     source/core/gimbal_logger.c
+    source/core/gimbal_exception.c
     source/meta/classes/gimbal_class.c
     source/meta/classes/gimbal_opaque.c
     source/meta/classes/gimbal_flags.c

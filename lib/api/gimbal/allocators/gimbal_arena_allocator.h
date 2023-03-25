@@ -29,11 +29,11 @@ typedef struct GblArenaAllocatorPage {
         struct GblArenaAllocatorPage* pNext;    ///< Next (used) allocator page
         GblLinkedListNode             listNode; ///< Linked list node base
     };
-    GblSize             capacity;               ///< Page capacity
-    GblSize             used;                   ///< # of bytes filled on page
+    size_t              capacity;               ///< Page capacity
+    size_t              used;                   ///< # of bytes filled on page
     union {
         GblBool         staticAlloc;            ///< Whether this page is static or heap allocated
-        GblSize         padding;
+        size_t          padding;
     };
     unsigned char bytes[1];                     ///< first byte of data segment
 } GblArenaAllocatorPage;
@@ -66,9 +66,9 @@ typedef struct GblArenaAllocator {
         GblLinkedListNode      listNode;    ///< Linked list node base
     };
     GblContext* pCtx;                       ///< Custom context associated with allocator
-    GblSize     pageSize;                   ///< Default page size for all new pages
-    GblSize     pageAlign;                  ///< Alignment of each page, also maximum requestable alignment
-    GblSize     allocCount;                 ///< Total # of allocations across all pages
+    size_t      pageSize;                   ///< Default page size for all new pages
+    size_t      pageAlign;                  ///< Alignment of each page, also maximum requestable alignment
+    size_t      allocCount;                 ///< Total # of allocations across all pages
 } GblArenaAllocator;
 
 /*! \brief Represents the current state of a GblArenaAllocator
@@ -86,31 +86,31 @@ typedef struct GblArenaAllocator {
  */
 typedef struct GblArenaAllocatorState {
     GblArenaAllocatorPage* pActivePage;
-    GblSize                bytesUsed;
+    size_t                 bytesUsed;
 } GblArenaAllocatorState;
 
 // ===== Public methods =====
 GBL_EXPORT GBL_RESULT GblArenaAllocator_construct       (GBL_SELF,
-                                                         GblSize                pageSize,
-                                                         GblSize                pageAlign,
+                                                         size_t                 pageSize,
+                                                         size_t                 pageAlign,
                                                          GblArenaAllocatorPage* pInitialPage,
                                                          GblContext*            pCtx)                    GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblArenaAllocator_destruct        (GBL_SELF)                                       GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize    GblArenaAllocator_pageCount       (GBL_CSELF)                                      GBL_NOEXCEPT;
-GBL_EXPORT GblSize    GblArenaAllocator_bytesUsed       (GBL_CSELF)                                      GBL_NOEXCEPT;
-GBL_EXPORT GblSize    GblArenaAllocator_bytesAvailable  (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblArenaAllocator_pageCount       (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblArenaAllocator_bytesUsed       (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblArenaAllocator_bytesAvailable  (GBL_CSELF)                                      GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize    GblArenaAllocator_totalCapacity   (GBL_CSELF)                                      GBL_NOEXCEPT;
-GBL_EXPORT GblSize    GblArenaAllocator_fragmentedBytes (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblArenaAllocator_totalCapacity   (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblArenaAllocator_fragmentedBytes (GBL_CSELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT float      GblArenaAllocator_utilization     (GBL_CSELF)                                      GBL_NOEXCEPT;
 
 GBL_EXPORT void       GblArenaAllocator_saveState       (GBL_CSELF, GblArenaAllocatorState* pState)      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblArenaAllocator_loadState       (GBL_SELF, const GblArenaAllocatorState* pState) GBL_NOEXCEPT;
 
-GBL_EXPORT void*      GblArenaAllocator_alloc           (GBL_SELF, GblSize)                              GBL_NOEXCEPT;
-GBL_EXPORT void*      GblArenaAllocator_allocAligned    (GBL_SELF, GblSize size, GblSize alignment)      GBL_NOEXCEPT;
+GBL_EXPORT void*      GblArenaAllocator_alloc           (GBL_SELF, size_t )                              GBL_NOEXCEPT;
+GBL_EXPORT void*      GblArenaAllocator_allocAligned    (GBL_SELF, size_t  size, size_t  alignment)      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblArenaAllocator_freeAll         (GBL_SELF)                                       GBL_NOEXCEPT;
 
 // ===== Macro overloads =====

@@ -3,9 +3,9 @@
 #include <gimbal/core/gimbal_ctx.h>
 
 GBL_EXPORT GBL_RESULT (GblPoolAllocator_construct)(GblPoolAllocator*      pSelf,
-                                                   GblSize                entrySize,
-                                                   GblSize                entriesPerPage,
-                                                   GblSize                entryAlign,
+                                                   size_t                 entrySize,
+                                                   size_t                 entriesPerPage,
+                                                   size_t                 entryAlign,
                                                    GblArenaAllocatorPage* pInitialPage,
                                                    GblContext*            pCtx)
 {
@@ -43,6 +43,6 @@ GBL_EXPORT GBL_RESULT GblPoolAllocator_delete(GblPoolAllocator* pSelf, void* pEn
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_EXPORT GblSize GblPoolAllocator_freeListSize(const GblPoolAllocator* pSelf) {
+GBL_EXPORT size_t  GblPoolAllocator_freeListSize(const GblPoolAllocator* pSelf) {
     return GblLinkedList_count(&pSelf->freeList);
 }

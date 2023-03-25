@@ -33,15 +33,15 @@ GBL_CLASS_END
  */
 GBL_INSTANCE_DERIVE(GblTestScenario, GblContext)
     GBL_RESULT result;
-    GblSize    suitesRun;
-    GblSize    suitesPassed;
-    GblSize    suitesFailed;
-    GblSize    suitesSkipped;
-    GblSize    caseCount;
-    GblSize    casesRun;
-    GblSize    casesPassed;
-    GblSize    casesFailed;
-    GblSize    casesSkipped;
+    size_t     suitesRun;
+    size_t     suitesPassed;
+    size_t     suitesFailed;
+    size_t     suitesSkipped;
+    size_t     caseCount;
+    size_t     casesRun;
+    size_t     casesPassed;
+    size_t     casesFailed;
+    size_t     casesSkipped;
     double     totalTime;
 GBL_INSTANCE_END
 

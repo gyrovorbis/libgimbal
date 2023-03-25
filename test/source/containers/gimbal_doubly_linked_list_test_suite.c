@@ -148,7 +148,7 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_popBack_(GblTestSuite* pSelf, Gbl
     GblDoublyLinkedListTestSuite_* pSelf_ = GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(pSelf);
     GblDoublyLinkedList_pushBack(&pSelf_->list1, &test.listNode);
 
-    const GblSize count = GblDoublyLinkedList_count(&pSelf_->list1);
+    const size_t  count = GblDoublyLinkedList_count(&pSelf_->list1);
     GblDoublyLinkedListNode* pNode = GblDoublyLinkedList_popBack(&pSelf_->list1);
 
     GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list1), count-1);
@@ -167,7 +167,7 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_popFront_(GblTestSuite* pSelf, Gb
     GblDoublyLinkedListTestSuite_* pSelf_ = GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(pSelf);
     GblDoublyLinkedList_pushFront(&pSelf_->list1, &test.listNode);
 
-    const GblSize count = GblDoublyLinkedList_count(&pSelf_->list1);
+    const size_t  count = GblDoublyLinkedList_count(&pSelf_->list1);
     GblDoublyLinkedListNode* pNode = GblDoublyLinkedList_popFront(&pSelf_->list1);
 
     GBL_TEST_COMPARE(GblDoublyLinkedList_count(&pSelf_->list1), count-1);
@@ -2045,7 +2045,7 @@ static GBL_RESULT GblDoublyLinkedListTestSuite_mergeSort2_(GblTestSuite* pSelf, 
         {.pString = "Gamecube"  },
     };
 
-    for(GblSize i = 0; i < 4; ++i)
+    for(size_t  i = 0; i < 4; ++i)
         GblDoublyLinkedList_pushBack(&list1, &nodes[i].node);
 
     GblDoublyLinkedList_mergeSort(&list1, testComp_, NULL);

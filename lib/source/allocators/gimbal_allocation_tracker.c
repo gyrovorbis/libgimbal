@@ -13,8 +13,8 @@ typedef struct GblAllocationTracker_ {
 
 typedef struct GblAllocationEntry_ {
     const void*         pPointer;
-    GblSize             size;
-    GblSize             alignment;
+    size_t              size;
+    size_t              alignment;
     const char*         pDebugStr;
     GblSourceLocation   sourceLocation;
 } GblAllocationEntry_;
@@ -68,8 +68,8 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_destroy(GblAllocationTracker* pSelf) 
 
 GBL_EXPORT GBL_RESULT GblAllocationTracker_allocEvent(GblAllocationTracker* pSelf,
                                                       const void*           pPtr,
-                                                      GblSize               size,
-                                                      GblSize               align,
+                                                      size_t                size,
+                                                      size_t                align,
                                                       const char*           pDbg,
                                                       GblSourceLocation     srcLoc)
 {
@@ -115,8 +115,8 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_allocEvent(GblAllocationTracker* pSel
 GBL_EXPORT GBL_RESULT GblAllocationTracker_reallocEvent(GblAllocationTracker*   pSelf,
                                                         const void*             pExisting,
                                                         const void*             pNew,
-                                                        GblSize                 newSize,
-                                                        GblSize                 newAlign,
+                                                        size_t                  newSize,
+                                                        size_t                  newAlign,
                                                         GblSourceLocation       srcLoc)
 {
     GblAllocationEntry_ entry = {
@@ -204,7 +204,7 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_logActive(const GblAllocationTracker*
     GBL_CTX_BEGIN(GblHashSet_context(&pSelf_->activeSet));
     GBL_CTX_INFO("[Allocation Tracker] Dumping Active Allocations:");
     GBL_CTX_PUSH();
-    GblSize count = 0;
+    size_t  count = 0;
     for(GblHashSetIter it = GblHashSet_next(&pSelf_->activeSet, NULL);
         GblHashSetIter_valid(&it);
         it = GblHashSet_next(&pSelf_->activeSet, &it), count++)

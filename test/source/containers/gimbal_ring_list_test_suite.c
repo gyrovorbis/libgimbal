@@ -20,7 +20,7 @@ static GBL_RESULT GblRingListTestSuite_verify_(GblContext* pCtx, const GblRingLi
     va_start(varArgs, pList);
     GBL_CTX_BEGIN(pCtx);
 
-    GblSize count = 0;
+    size_t  count = 0;
     const char* pStr = NULL;
 
     while((pStr = va_arg(varArgs, const char*))) {
@@ -105,7 +105,7 @@ static GBL_RESULT GblRingListTestSuite_copyShallow_(GblTestSuite* pSelf, GblCont
 }
 
 static void* deepCopyStr_(const void* pValue, void* pClosure) {
-    const GblSize totalLen = strlen((const char*)pValue) + (pClosure? strlen((const char*)pClosure) : 0) + 1;
+    const size_t  totalLen = strlen((const char*)pValue) + (pClosure? strlen((const char*)pClosure) : 0) + 1;
     char* pNewStr = NULL;
     GBL_CTX_BEGIN(NULL);
     pNewStr = GBL_CTX_MALLOC(totalLen);
@@ -669,7 +669,7 @@ static GBL_RESULT GblRingListTestSuite_extract_(GblTestSuite* pSelf, GblContext*
 
     GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
 
-    const GblSize size = GblRingList_size(pSelf_->ringLists[0]);
+    const size_t  size = GblRingList_size(pSelf_->ringLists[0]);
 
     const char* pString = GblRingList_extract(pSelf_->ringLists[0],
                                               pSelf_->ringLists[0]->ringNode.pNext);
@@ -684,7 +684,7 @@ static GBL_RESULT GblRingListTestSuite_destroyShallow_(GblTestSuite* pSelf, GblC
 
     GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
 
-    for(GblSize l = 0; l < 4; ++l)
+    for(size_t  l = 0; l < 4; ++l)
         GBL_CTX_VERIFY_CALL(GblRingList_destroy(pSelf_->ringLists[l]));
 
     GBL_CTX_END();
@@ -712,7 +712,7 @@ static GBL_RESULT GblRingListTestSuite_stressTest_(GblTestSuite* pSelf, GblConte
 
     GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
 
-    for(GblSize i = 0; i < 2000; ++i) {
+    for(size_t  i = 0; i < 2000; ++i) {
         GblRingList* pList = GblRingList_create("a", "b", "c", "d", "e", "f", "g");
         GblRingList_remove(pList, 0, 3);
         GblRingList_destroy(pList);

@@ -9,7 +9,7 @@ GBL_EXPORT GblClosure* GblClosure_current(void) {
 }
 
 GBL_EXPORT GblClosure* GblClosure_create(GblType           derivedType,
-                                         GblSize           size,
+                                         size_t            size,
                                          void*             pUserdata,
                                          GblArrayMapDtorFn pFnDtor)
 {
@@ -41,7 +41,7 @@ GBL_EXPORT GBL_RESULT GblClosure_setMetaMarshal(GblClosure* pSelf,
 
 GBL_EXPORT GBL_RESULT GblClosure_invoke(GblClosure*     pSelf,
                                         GblVariant*     pRetValue,
-                                        GblSize         argCount,
+                                        size_t          argCount,
                                         GblVariant*     pArgValues)
 {
     GBL_CTX_BEGIN(NULL);

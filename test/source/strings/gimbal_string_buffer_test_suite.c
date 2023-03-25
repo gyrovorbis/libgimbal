@@ -10,7 +10,7 @@ typedef struct GblStringBufferTestSuite_ {
         char            ext[5];
     } str;
     char*   pBuffer;
-    GblSize capacity;
+    size_t  capacity;
     GblStringBuffer heapOnlyStr;
 } GblStringBufferTestSuite_;
 
@@ -504,7 +504,7 @@ static GBL_RESULT GblStringBufferTestSuite_shrink_(GblTestSuite* pSelf, GblConte
 static GBL_RESULT GblStringBufferTestSuite_shrinkToFit_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
-    const GblSize capacity = GblStringBuffer_capacity(&pSelf_->str.buffer);
+    const size_t  capacity = GblStringBuffer_capacity(&pSelf_->str.buffer);
     GBL_CTX_VERIFY_CALL(GblStringBuffer_shrinkToFit(&pSelf_->str.buffer));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
                                       "GA",

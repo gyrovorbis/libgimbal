@@ -54,13 +54,13 @@ GBL_INLINE void           GblDoublyLinkedList_init         (GBL_SELF)           
 GBL_INLINE void           GblDoublyLinkedList_move         (GBL_SELF, GBL_SELF_TYPE* pHead)               GBL_NOEXCEPT;
 
 GBL_INLINE GblBool        GblDoublyLinkedList_empty        (GBL_CSELF)                                    GBL_NOEXCEPT;
-GBL_INLINE GblSize        GblDoublyLinkedList_count        (GBL_CSELF)                                    GBL_NOEXCEPT;
+GBL_INLINE size_t         GblDoublyLinkedList_count        (GBL_CSELF)                                    GBL_NOEXCEPT;
 
 GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_at           (GBL_CSELF, intptr_t index)                    GBL_NOEXCEPT;
 GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_front        (GBL_CSELF)                                    GBL_NOEXCEPT;
 GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_back         (GBL_CSELF)                                    GBL_NOEXCEPT;
 GBL_INLINE GblBool        GblDoublyLinkedList_contains     (GBL_CSELF, GBL_SELF_TYPE* pNode)              GBL_NOEXCEPT;
-GBL_INLINE GblSize        GblDoublyLinkedList_find         (GBL_CSELF, GBL_SELF_TYPE* pNode)              GBL_NOEXCEPT;
+GBL_INLINE size_t         GblDoublyLinkedList_find         (GBL_CSELF, GBL_SELF_TYPE* pNode)              GBL_NOEXCEPT;
 GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_middle       (GBL_CSELF)                                    GBL_NOEXCEPT;
 GBL_INLINE GBL_SELF_TYPE* GblDoublyLinkedList_beforeMiddle (GBL_CSELF)                                    GBL_NOEXCEPT;
 
@@ -134,7 +134,7 @@ GBL_INLINE void GblDoublyLinkedList_pushFront(GBL_SELF, GblDoublyLinkedListNode*
     pSelf->pNext = pNode;
 }
 
-GBL_INLINE GblSize GblDoublyLinkedList_find(GBL_CSELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblDoublyLinkedList_find(GBL_CSELF, GblDoublyLinkedListNode* pNode) GBL_NOEXCEPT {
     return GblLinkedList_find(&pSelf->singleNode, &pNode->singleNode);
 }
 
@@ -146,7 +146,7 @@ GBL_INLINE GblBool GblDoublyLinkedList_empty(GBL_CSELF) GBL_NOEXCEPT {
     return GblLinkedList_empty(&pSelf->singleNode) && (pSelf->pPrev == pSelf || pSelf->pPrev == NULL);
 }
 
-GBL_INLINE GblSize GblDoublyLinkedList_count(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblDoublyLinkedList_count(GBL_CSELF) GBL_NOEXCEPT {
     return GblLinkedList_count(&pSelf->singleNode);
 }
 

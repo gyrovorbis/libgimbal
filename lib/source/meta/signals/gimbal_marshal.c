@@ -8,7 +8,7 @@
 
 GBL_EXPORT GBL_RESULT GblCClosureMarshal_VOID__VOID(GblClosure*        pClosure,
                                                     GblVariant*        pRetValue,
-                                                    GblSize            argCount,
+                                                    size_t             argCount,
                                                     GblVariant*        pArgs,
                                                     GblPtr             pMarshalData)
 {
@@ -113,7 +113,7 @@ GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOXED,
 
 GBL_EXPORT GBL_RESULT GblMarshal_ClassClosureMeta(GblClosure*        pClosure,
                                                   GblVariant*        pRetValue,
-                                                  GblSize            argCount,
+                                                  size_t             argCount,
                                                   GblVariant*        pArgs,
                                                   GblPtr             pMarshalData)
 {
@@ -140,7 +140,7 @@ GBL_EXPORT GBL_RESULT GblMarshal_ClassClosureMeta(GblClosure*        pClosure,
 
 GBL_EXPORT GBL_RESULT GblMarshal_SignalForwarder(GblClosure* pClosure,
                                                  GblVariant* pRetValue,
-                                                 GblSize     argCount,
+                                                 size_t      argCount,
                                                  GblVariant* pArgs,
                                                  GblPtr      pMarshalData)
 {

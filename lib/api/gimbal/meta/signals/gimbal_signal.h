@@ -22,7 +22,7 @@ GBL_DECLS_BEGIN
 GBL_EXPORT GBL_RESULT   GblSignal_install         (GblType        ownerType,
                                                    const char*    pName,
                                                    GblMarshalFn   pFnCMarshal,
-                                                   GblSize        argCount,
+                                                   size_t         argCount,
                                                    ...)                           GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblSignal_uninstall       (GblType        ownerType,
@@ -37,7 +37,7 @@ GBL_EXPORT GBL_RESULT   GblSignal_connectClass    (GblInstance*   pEmitter,
                                                    const char*    pSignalName,
                                                    GblInstance*   pReceiver,
                                                    GblType        classType,
-                                                   GblSize        methodOffset)   GBL_NOEXCEPT;
+                                                   size_t         methodOffset)   GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblSignal_connectSignal   (GblInstance*   pEmitter,
                                                    const char*    pSignalName,
@@ -49,7 +49,7 @@ GBL_EXPORT GBL_RESULT   GblSignal_connectClosure  (GblInstance*   pEmitter,
                                                    GblInstance*   pReceiver,
                                                    GblClosure*    pClosure)       GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblSignal_disconnect      (GblInstance*   pEmitter,
+GBL_EXPORT size_t       GblSignal_disconnect      (GblInstance*   pEmitter,
                                                    const char*    pSignalName,
                                                    GblInstance*   pReceiver,
                                                    GblClosure*    pClosure)       GBL_NOEXCEPT;
@@ -61,7 +61,7 @@ GBL_EXPORT GblBool      GblSignal_block           (GblInstance*   pInstance,
 GBL_EXPORT GblBool      GblSignal_blockAll        (GblInstance*   pInstance,
                                                    GblBool        blocked)        GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblSignal_connectionCount (GblInstance*   pInstance,
+GBL_EXPORT size_t       GblSignal_connectionCount (GblInstance*   pInstance,
                                                    const char*    pSignalName)    GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblSignal_emit            (GblInstance*   pEmitter,

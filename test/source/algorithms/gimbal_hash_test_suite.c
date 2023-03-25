@@ -11,12 +11,12 @@
 
 typedef struct GblHashTestSuite_ {
     char words[GBL_HASH_TEST_SUITE_WORD_COUNT_][GBL_HASH_TEST_SUITE_WORD_SIZE_MAX_+1];
-    GblSize total;
+    size_t  total;
 } GblHashTestSuite_;
 
 static void* GblHashTestSuite_randomizeWords_(GblTestSuite* pSelf) {
     GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
-    for(GblSize w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w)
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w)
         gblRandString(pSelf_->words[w],
                       GBL_HASH_TEST_SUITE_WORD_SIZE_MIN_,
                       GBL_HASH_TEST_SUITE_WORD_SIZE_MAX_,
@@ -37,8 +37,8 @@ static GBL_RESULT GblHashTestSuite_fnv1_(GblTestSuite* pSelf, GblContext* pCtx) 
 
     GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
 
-    volatile GblSize total = 0;
-    for(GblSize w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+    volatile size_t  total = 0;
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
         total += gblHashFnv1(pSelf_->words[w],
                              strlen(pSelf_->words[w]));
     }
@@ -53,8 +53,8 @@ static GBL_RESULT GblHashTestSuite_murmur_(GblTestSuite* pSelf, GblContext* pCtx
 
     GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
 
-    volatile GblSize total = 0;
-    for(GblSize w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+    volatile size_t  total = 0;
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
         total += gblHashMurmur(pSelf_->words[w],
                                strlen(pSelf_->words[w]));
     }
@@ -70,8 +70,8 @@ static GBL_RESULT GblHashTestSuite_superFast_(GblTestSuite* pSelf, GblContext* p
 
     GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
 
-    volatile GblSize total = 0;
-    for(GblSize w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+    volatile size_t  total = 0;
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
         total += gblHashSuperFast(pSelf_->words[w],
                                   strlen(pSelf_->words[w]));
     }
@@ -88,8 +88,8 @@ static GBL_RESULT GblHashTestSuite_pearson_(GblTestSuite* pSelf, GblContext* pCt
     GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
 
     // warm up the algorithm
-    volatile GblSize total = gblHashPearson(pSelf_->words[0], 1);
-    for(GblSize w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+    volatile size_t  total = gblHashPearson(pSelf_->words[0], 1);
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
         total += gblHashPearson(pSelf_->words[w],
                                 strlen(pSelf_->words[w]));
     }
@@ -106,8 +106,8 @@ static GBL_RESULT GblHashTestSuite_sip_(GblTestSuite* pSelf, GblContext* pCtx) {
 
     GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
 
-    volatile GblSize total = 0;
-    for(GblSize w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+    volatile size_t  total = 0;
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
         total += gblHashSip(pSelf_->words[w],
                             strlen(pSelf_->words[w]));
     }
@@ -123,8 +123,8 @@ static GBL_RESULT GblHashTestSuite_crc_(GblTestSuite* pSelf, GblContext* pCtx) {
 
     GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
 
-    volatile GblSize total = 0;
-    for(GblSize w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+    volatile size_t  total = 0;
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
         total += gblHashCrc(pSelf_->words[w],
                             strlen(pSelf_->words[w]));
     }

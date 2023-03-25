@@ -46,7 +46,7 @@ GBL_CLASS_DERIVE(GblLogger, GblObject)
     GBL_RESULT (*pFnWrite)(GBL_SELF,
                            const char*   pFile,
                            const char*   pFunction,
-                           GblSize       line,
+                           size_t        line,
                            GblThd*       pThread,
                            time_t        timeStamp,
                            const char*   pDomain,
@@ -59,7 +59,7 @@ GBL_CLASS_DERIVE(GblLogger, GblObject)
 
     GBL_RESULT (*pFnPop)  (GBL_SELF,
                            GblThd* pThread,
-                           GblSize    count);
+                           size_t  count);
 GBL_CLASS_END
 
 GBL_INSTANCE_DERIVE(GblLogger, GblObject)
@@ -80,62 +80,63 @@ GBL_PROPERTIES(GblLogger,
 )
 
 // ===== Static Methods =====
-GBL_EXPORT GblType           GblLogger_type             (void)                     GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT        GblLogger_register         (GblLogger* pLogger)       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT        GblLogger_unregister       (GblLogger* pLogger)       GBL_NOEXCEPT;
+GBL_EXPORT GblType      GblLogger_type             (void)                     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblLogger_register         (GblLogger* pLogger)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblLogger_unregister       (GblLogger* pLogger)       GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool           GblLogger_foreach          (GblLoggerIterFn pIt,
-                                                         void* pClosure)           GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblLogger_foreach          (GblLoggerIterFn pIt,
+                                                    void* pClosure)           GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblLogger_push             (void)                     GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT        GblLogger_pop              (GblSize count)            GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblLogger_push             (void)                     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblLogger_pop              (size_t  count)            GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblLogger_write            (const char*   pFile,
-                                                         const char*   pFunction,
-                                                         GblSize       line,
-                                                         const char*   pDomain,
-                                                         GBL_LOG_FLAGS flags,
-                                                         const char*   pFmt,
-                                                         ...)                      GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblLogger_write            (const char*   pFile,
+                                                    const char*   pFunction,
+                                                    size_t        line,
+                                                    const char*   pDomain,
+                                                    GBL_LOG_FLAGS flags,
+                                                    const char*   pFmt,
+                                                    ...)                      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblLogger_writeVa          (const char*   pFile,
-                                                         const char*   pFunction,
-                                                         GblSize       line,
-                                                         const char*   pDomain,
-                                                         GBL_LOG_FLAGS flags,
-                                                         const char*   pFmt,
-                                                         va_list       varArgs)    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblLogger_writeVa          (const char*   pFile,
+                                                    const char*   pFunction,
+                                                    size_t        line,
+                                                    const char*   pDomain,
+                                                    GBL_LOG_FLAGS flags,
+                                                    const char*   pFmt,
+                                                    va_list       varArgs)    GBL_NOEXCEPT;
 // ===== Instance Methods =====
-GBL_EXPORT GblLogger*        GblLogger_create           (GblType         derived,
-                                                         GblSize         allocSize,
-                                                         GblLoggerClass* pClass)   GBL_NOEXCEPT;
+GBL_EXPORT GblLogger*   GblLogger_create           (GblType         derived,
+                                                    size_t          allocSize,
+                                                    GblLoggerClass* pClass)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblLogger_construct        (GBL_SELF,
-                                                         GblType         derived,
-                                                         GblLoggerClass* pClass)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblLogger_construct        (GBL_SELF,
+                                                    GblType         derived,
+                                                    GblLoggerClass* pClass)   GBL_NOEXCEPT;
 
-GBL_EXPORT GblRefCount       GblLogger_unref            (GBL_SELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblLogger_unref            (GBL_SELF)                 GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool           GblLogger_hasFilter        (GBL_CSELF,
-                                                         const GblThd*    pThread,
-                                                         const char*      pDomain,
-                                                         GBL_LOG_FLAGS    flags)   GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblLogger_hasFilter        (GBL_CSELF,
+                                                    const GblThd*    pThread,
+                                                    const char*      pDomain,
+                                                    GBL_LOG_FLAGS    flags)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblLogger_setDomainFilters (GBL_SELF,
-                                                         const char* domains[])    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblLogger_setDomainFilters (GBL_SELF,
+                                                    const char* domains[])    GBL_NOEXCEPT;
 
-GBL_EXPORT const char**      GblLogger_domainFilters    (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_EXPORT const char** GblLogger_domainFilters    (GBL_CSELF)                GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool           GblLogger_hasDomainFilter  (GBL_CSELF,
-                                                         const char* pDomain)      GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblLogger_hasDomainFilter  (GBL_CSELF,
+                                                    const char* pDomain)      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblLogger_setThreadFilters (GBL_SELF,
-                                                         const GblThd* pThrs[]) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT   GblLogger_setThreadFilters (GBL_SELF,
+                                                    const GblThd* pThrs[])    GBL_NOEXCEPT;
 
-GBL_EXPORT const GblThd**    GblLogger_threadFilters    (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_EXPORT const GblThd**
+                        GblLogger_threadFilters    (GBL_CSELF)                GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool           GblLogger_hasThreadFilter  (GBL_CSELF,
-                                                         const GblThd* pThr)    GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblLogger_hasThreadFilter  (GBL_CSELF,
+                                                    const GblThd* pThr)       GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

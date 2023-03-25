@@ -70,9 +70,9 @@ GBL_EXPORT GblClass*   GblClass_public             (const void* pPrivate,
                                                     GblType     base)          GBL_NOEXCEPT;
 
 GBL_EXPORT GblType     GblClass_typeOf             (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblClass_size               (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblClass_privateSize        (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblClass_totalSize          (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblClass_size               (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblClass_privateSize        (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblClass_totalSize          (GBL_CSELF)                 GBL_NOEXCEPT;
 
 GBL_EXPORT GblClass*   GblClass_super              (GBL_CSELF)                 GBL_NOEXCEPT;
 GBL_EXPORT GblClass*   GblClass_default            (GBL_CSELF)                 GBL_NOEXCEPT;
@@ -387,7 +387,7 @@ GBL_DECLS_END
 */
 
 /*!
- * \fn GblSize GblClass_size(const GblClass* pSelf)
+ * \fn size_t  GblClass_size(const GblClass* pSelf)
  * Returns the size of the public class structure for the
  * given GblClass pointer or 0 if NULL
  * \param pSelf pointer to a GblClass
@@ -397,7 +397,7 @@ GBL_DECLS_END
 */
 
 /*!
- * \fn GblSize GblClass_privateSize(const GblClass* pSelf)
+ * \fn size_t  GblClass_privateSize(const GblClass* pSelf)
  * Returns the TOTAL size of the private data structure
  * associated with the type of the given class and all
  * of its base types.
@@ -408,7 +408,7 @@ GBL_DECLS_END
 */
 
 /*!
- * \fn GblSize GblClass_totalSize(const GblClass* pSelf)
+ * \fn size_t  GblClass_totalSize(const GblClass* pSelf)
  * Returns the total combined size of the public and private
  * class structures for the class type and all of its inherited
  * bases.

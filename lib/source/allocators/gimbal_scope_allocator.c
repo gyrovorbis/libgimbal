@@ -54,8 +54,8 @@ GBL_EXPORT GBL_RESULT GblScopeAllocator_destruct(GblScopeAllocator* pSelf) {
 }
 
 GBL_EXPORT void* GblScopeAllocator_alloc(GblScopeAllocator*      pSelf,
-                                         GblSize                 size,
-                                         GblSize                 align,
+                                         size_t                  size,
+                                         size_t                  align,
                                          GblScopeAllocatorDtorFn pFnDtor)
 {
     void* pPtr = GblArenaAllocator_allocAligned(pSelf->pArena,
@@ -88,7 +88,7 @@ GBL_EXPORT GBL_RESULT GblScopeAllocator_pushDtor(GblScopeAllocator*      pSelf,
 }
 
 
-GBL_EXPORT GblSize GblScopeAllocator_dtorCount(const GblScopeAllocator* pSelf) {
+GBL_EXPORT size_t  GblScopeAllocator_dtorCount(const GblScopeAllocator* pSelf) {
     return GblLinkedList_count(&pSelf->dtorList);
 }
 

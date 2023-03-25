@@ -32,7 +32,7 @@ GBL_DECLARE_STRUCT(GblCmdArg) {
 
 GBL_CLASS_DERIVE(GblCmdParser, GblObject)
     GBL_RESULT (*pFnParse)           (GBL_SELF, GblStringView cmd);
-    GBL_RESULT (*pFnTryUnknownOption)(GBL_SELF, GblStringView key, GblStringView value, GblSize* pUsed);
+    GBL_RESULT (*pFnTryUnknownOption)(GBL_SELF, GblStringView key, GblStringView value, size_t * pUsed);
 GBL_CLASS_END
 
 /*! \brief General-purpose command-line argument parser
@@ -90,12 +90,12 @@ GBL_EXPORT GBL_RESULT  GblCmdParser_addOptionGroup      (GBL_SELF,
 GBL_EXPORT GBL_RESULT  GblCmdParser_setOptionGroups     (GBL_SELF,
                                                          GblOptionGroup** ppGroups) GBL_NOEXCEPT;
 GBL_EXPORT GblOptionGroup*
-                       GblCmdParser_optionGroupAt       (GBL_CSELF, GblSize idx)    GBL_NOEXCEPT;
+                       GblCmdParser_optionGroupAt       (GBL_CSELF, size_t  idx)    GBL_NOEXCEPT;
 GBL_EXPORT GblOptionGroup*
                        GblCmdParser_findOptionGroup     (GBL_CSELF,
                                                          const char* pName)         GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize     GblCmdParser_optionGroupCount    (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblCmdParser_optionGroupCount    (GBL_CSELF)                 GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblCmdParser_setMainOptionGroup  (GBL_SELF,
                                                          GblOptionGroup* pGroup)    GBL_NOEXCEPT;
@@ -110,15 +110,15 @@ GBL_EXPORT GBL_RESULT  GblCmdParser_setPositionalArgs    (GBL_SELF,
                                                           const GblCmdArg* pArgs)   GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblCmdParser_clearPositionalArgs (GBL_SELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblCmdParser_positionalArgCount  (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblCmdParser_positionalArgCount  (GBL_CSELF)                 GBL_NOEXCEPT;
 GBL_EXPORT const GblCmdArg*
-                       GblCmdParser_positionalArgAt     (GBL_CSELF, GblSize index)  GBL_NOEXCEPT;
+                       GblCmdParser_positionalArgAt     (GBL_CSELF, size_t  index)  GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize     GblCmdParser_positionalArgValueCount
+GBL_EXPORT size_t      GblCmdParser_positionalArgValueCount
                                                         (GBL_CSELF)                 GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblCmdParser_positionalArgValue  (GBL_CSELF,
-                                                         GblSize    index,
+                                                         size_t     index,
                                                          GblType    toType,
                                                          void*      pData)          GBL_NOEXCEPT;
 GBL_EXPORT const GblStringList*

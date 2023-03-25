@@ -25,7 +25,7 @@ GBL_CLASS_DERIVE_EMPTY(GblClassClosure, GblClosure)
 GBL_INSTANCE_DERIVE(GblClassClosure, GblClosure)
     GBL_PRIVATE()
         GblType         classType;
-        GblSize         offset;
+        size_t          offset;
         GblInstance*    pInstance;
     GBL_PRIVATE_END
 GBL_INSTANCE_END
@@ -33,13 +33,13 @@ GBL_INSTANCE_END
 GBL_EXPORT GblType          GblClassClosure_type        (void)                   GBL_NOEXCEPT;
 
 GBL_EXPORT GblClassClosure* GblClassClosure_create      (GblType      classType,
-                                                         GblSize      offset,
+                                                         size_t       offset,
                                                          GblInstance* pInstance,
                                                          void*        pUserdata) GBL_NOEXCEPT;
 
 GBL_INLINE void             GblClassClosure_setMethod   (GBL_SELF,
                                                          GblType classType,
-                                                         GblSize offset)         GBL_NOEXCEPT;
+                                                         size_t  offset)         GBL_NOEXCEPT;
 
 GBL_INLINE void             GblClassClosure_setInstance (GBL_SELF,
                                                          GblInstance* pInstance) GBL_NOEXCEPT;
@@ -47,7 +47,7 @@ GBL_INLINE void             GblClassClosure_setInstance (GBL_SELF,
 // ===== IMPL ======
 
 
-GBL_INLINE void GblClassClosure_setMethod(GBL_SELF, GblType classType, GblSize offset) GBL_NOEXCEPT {
+GBL_INLINE void GblClassClosure_setMethod(GBL_SELF, GblType classType, size_t  offset) GBL_NOEXCEPT {
     GBL_PRIV_REF(pSelf).classType = classType;
     GBL_PRIV_REF(pSelf).offset = offset;
 }

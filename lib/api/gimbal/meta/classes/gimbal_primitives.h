@@ -8,6 +8,7 @@
 
 #include "../types/gimbal_type.h"
 #include "../ifaces/gimbal_ivariant.h"
+#include "../../preprocessor/gimbal_compiler.h"
 
 #define GBL_NIL_TYPE        (GBL_BUILTIN_TYPE(NIL))     ///< \details Builtin ID for nil GblVariant type
 #define GBL_BOOL_TYPE       (GBL_BUILTIN_TYPE(BOOL))    ///< \details Builtin ID for boolean GblVariant type
@@ -24,22 +25,44 @@
 #define GBL_STRING_TYPE     (GBL_BUILTIN_TYPE(STRING))  ///< \details Builtin ID for string GblVariant type
 #define GBL_TYPE_TYPE       (GblType_type())            ///< \details Builtin ID for ::GblType GblVariant type
 
+#ifdef GBL_64BIT
+#   define GBL_SIZE_TYPE GBL_UINT64_TYPE
+#else
+#   define GBL_SIZE_TYPE GBL_UINT32_TYPE
+#endif
+
+#define GblNil_type()       GBL_NIL_TYPE
+#define GblBool_type()      GBL_BOOL_TYPE
+#define GblChar_type()      GBL_CHAR_TYPE
+#define GblUint8_type()     GBL_UINT8_TYPE
+#define GblInt16_type()     GBL_INT16_TYPE
+#define GblUint16_type()    GBL_UINT16_TYPE
+#define GblInt32_type()     GBL_INT32_TYPE
+#define GblUint32_type()    GBL_UINT32_TYPE
+#define GblInt64_type()     GBL_INT64_TYPE
+#define GblUint64_type()    GBL_UINT64_TYPE
+#define GblFloat_type()     GBL_FLOAT_TYPE
+#define GblDouble_type()    GBL_DOUBLE_TYPE
+#define GblString_type()    GBL_STRING_TYPE
+#define GblSize_type()      GBL_SIZE_TYPE
+
 GBL_CLASS_BASE_EMPTY(GblPrimitive, GblIVariant)
 
-GblType GblType_type                 (void)                                           GBL_NOEXCEPT;
+GBL_EXPORT GblType GblType_type          (void)                                           GBL_NOEXCEPT;
 
-GblType GblPrimitive_register        (const char*                    pName,
-                                      GblSize                        classSize,
-                                      GblSize                        classPrivateSize,
-                                      const GblIVariantClassVTable*  pIVTable,
-                                      GblFlags                       typeFlags)       GBL_NOEXCEPT;
+GBL_EXPORT GblType GblPrimitive_register (const char*                    pName,
+                                          size_t                         classSize,
+                                          size_t                         classPrivateSize,
+                                          const GblIVariantClassVTable*  pIVTable,
+                                          GblFlags                       typeFlags)       GBL_NOEXCEPT;
 
-GblType GblPrimitive_registerBuiltin (GblSize                        index,
-                                      const char*                    pName,
-                                      GblSize                        classSize,
-                                      GblSize                        classPrivateSize,
-                                      const GblIVariantClassVTable*  pIVTable,
-                                      GblFlags                       typeFlags)       GBL_NOEXCEPT;
+GBL_EXPORT GblType GblPrimitive_registerBuiltin
+                                         (size_t                         index,
+                                          const char*                    pName,
+                                          size_t                         classSize,
+                                          size_t                         classPrivateSize,
+                                          const GblIVariantClassVTable*  pIVTable,
+                                          GblFlags                       typeFlags)       GBL_NOEXCEPT;
 
 
 #endif // GIMBAL_PRIMITIVES_H

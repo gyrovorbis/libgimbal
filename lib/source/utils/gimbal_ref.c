@@ -18,11 +18,11 @@ GBL_EXPORT GblRefCount GblRef_activeCount(void) {
     return (GblRefCount)GBL_ATOMIC_INT16_LOAD(activeCount_);
 }
 
-GBL_EXPORT void* GblRef_allocWithContext(GblSize     size,
+GBL_EXPORT void* GblRef_allocWithContext(size_t      size,
                                          GblContext* pCtx)
 {
     void* pPtr = NULL;
-    const GblSize totalSize = size + sizeof(GblRef_);
+    const size_t  totalSize = size + sizeof(GblRef_);
     GblRef_* pMemory = NULL;
     GBL_CTX_BEGIN(pCtx);
     GBL_CTX_VERIFY_ARG(size);

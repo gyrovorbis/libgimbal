@@ -88,7 +88,7 @@ extern void          GblType_init_                     (void);
 extern GBL_RESULT    GblType_refresh_                  (GblType type);
 extern GblInterface* GblType_extension_                (GblType type, GblType ifaceType);
 
-extern GblType       GblType_registerBuiltin_          (GblSize              expectedIndex,
+extern GblType       GblType_registerBuiltin_          (size_t               expectedIndex,
                                                         GblType              parentType,
                                                         const char*          pName,
                                                         const GblTypeInfo*   pTypeInfo,

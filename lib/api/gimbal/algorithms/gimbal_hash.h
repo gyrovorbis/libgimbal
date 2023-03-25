@@ -27,7 +27,7 @@ GBL_EXPORT int      gblRandRange     (int min, int max)                GBL_NOEXC
 GBL_EXPORT float    gblRandFloat     (float min, float max)            GBL_NOEXCEPT;
 
 GBL_EXPORT void     gblRandBuffer    (void*   pData,
-                                      GblSize size)                    GBL_NOEXCEPT;
+                                      size_t  size)                    GBL_NOEXCEPT;
 
 GBL_EXPORT int      gblRandString    (char*       pBuffer,
                                       int         minSize,
@@ -40,12 +40,12 @@ GBL_INLINE GblHash  gblHash32Bit     (uint32_t value)                  GBL_NOEXC
 GBL_INLINE uint32_t gblUnhash32Bit   (GblHash hash)                    GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHash16Bit     (uint16_t value)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblHash  gblHashSip       (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_EXPORT GblHash  gblHashMurmur    (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_INLINE GblHash  gblHashFnv1      (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_EXPORT GblHash  gblHashSuperFast (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_EXPORT GblHash  gblHashPearson   (const void* pData, GblSize size) GBL_NOEXCEPT;
-GBL_EXPORT GblHash  gblHashCrc       (const void* pData, GblSize size) GBL_NOEXCEPT;
+GBL_EXPORT GblHash  gblHashSip       (const void* pData, size_t  size) GBL_NOEXCEPT;
+GBL_EXPORT GblHash  gblHashMurmur    (const void* pData, size_t  size) GBL_NOEXCEPT;
+GBL_INLINE GblHash  gblHashFnv1      (const void* pData, size_t  size) GBL_NOEXCEPT;
+GBL_EXPORT GblHash  gblHashSuperFast (const void* pData, size_t  size) GBL_NOEXCEPT;
+GBL_EXPORT GblHash  gblHashPearson   (const void* pData, size_t  size) GBL_NOEXCEPT;
+GBL_EXPORT GblHash  gblHashCrc       (const void* pData, size_t  size) GBL_NOEXCEPT;
 
 // ===== INLINE IMPLEMENTATIONS =====
 
@@ -75,7 +75,7 @@ GBL_INLINE GblHash gblHash16Bit(uint16_t value) GBL_NOEXCEPT {
     return value;
 }
 
-GBL_INLINE GblHash gblHashFnv1(const void* pData, GblSize size) GBL_NOEXCEPT {
+GBL_INLINE GblHash gblHashFnv1(const void* pData, size_t  size) GBL_NOEXCEPT {
     uint32_t prime = 0x01000193;
     uint32_t hash = 0x811C9DC5;
     const unsigned char* p = (const unsigned char*)pData;

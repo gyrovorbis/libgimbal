@@ -90,8 +90,8 @@ GBL_RESULT GblVariant_final_(GblContext* pCtx) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblSize GblVariant_converterCount(void) {
-    GblSize count = 0;
+GBL_EXPORT size_t  GblVariant_converterCount(void) {
+    size_t  count = 0;
     GBL_CTX_BEGIN(GblTreeSet_context(&converterRegistry_));
     count = GblTreeSet_size(&converterRegistry_);
     GBL_CTX_END_BLOCK();
@@ -673,6 +673,22 @@ GBL_EXPORT int64_t GblVariant_toInt64(GblVariant* pSelf) GBL_NOEXCEPT {
         GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
     }
     value = GblVariant_getInt64(pSelf);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT size_t  GblVariant_toSize(GblVariant* pSelf) GBL_NOEXCEPT {
+    size_t  value = 0;
+    GBL_CTX_BEGIN(NULL);
+    if(GblVariant_typeOf(pSelf) != GBL_INT64_TYPE) {
+        GBL_VARIANT(v);
+        GBL_CTX_VERIFY_CALL(GblVariant_constructSize(&v, 0));
+        GBL_CTX_VERIFY_CALL(GblVariant_convert(pSelf, &v));
+        GBL_CTX_VERIFY_CALL(GblVariant_setMove(pSelf, &v));
+        GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
+    }
+    value = GblVariant_getSize(pSelf);
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END_BLOCK();
     return value;

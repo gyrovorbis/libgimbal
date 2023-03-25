@@ -3,7 +3,7 @@
 #include <gimbal/utils/gimbal_date_time.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 
-static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
+static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, size_t  size, size_t  align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
     GBL_CTX_BEGIN(pParentCtx);
 
@@ -34,7 +34,7 @@ static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblContext_IAllocator_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData) GBL_NOEXCEPT {
+static GBL_RESULT GblContext_IAllocator_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, size_t  newSize, size_t  newAlign, void** ppNewData) GBL_NOEXCEPT {
     GBL_UNUSED(pFrame);
 
     GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
@@ -270,8 +270,8 @@ GBL_EXPORT const char*  GblContext_lastIssueMessage (const GblContext* pSelf) GB
 
 GBL_EXPORT GBL_RESULT GblContext_memAlloc_     (GblContext* pSelf,
                                   const GblStackFrame*  pFrame,
-                                  GblSize               size,
-                                  GblSize               align,
+                                  size_t                size,
+                                  size_t                align,
                                   const char*           pDbgStr,
                                   void**                ppData)     GBL_NOEXCEPT
 {
@@ -280,8 +280,8 @@ GBL_EXPORT GBL_RESULT GblContext_memAlloc_     (GblContext* pSelf,
 GBL_EXPORT GBL_RESULT GblContext_memRealloc_   (GblContext* pSelf,
                                   const GblStackFrame*  pFrame,
                                   void*                 pData,
-                                  GblSize               newSize,
-                                  GblSize               newAlign,
+                                  size_t                newSize,
+                                  size_t                newAlign,
                                   void**                ppNewData)  GBL_NOEXCEPT
 {
     return pSelf->pClass->GblIAllocatorImpl.pFnRealloc((GblIAllocator*)pSelf, pFrame, pData, newSize, newAlign, ppNewData);

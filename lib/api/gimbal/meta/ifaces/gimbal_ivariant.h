@@ -57,9 +57,9 @@ typedef struct GblIVariantClassVTable {
     char                    pSetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
     char                    pGetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
 
-    GBL_RESULT (*pFnConstruct)(VARIANT, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
-    GBL_RESULT (*pFnSet)      (VARIANT, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
-    GBL_RESULT (*pFnGet)      (VARIANT, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnConstruct)(VARIANT, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnSet)      (VARIANT, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnGet)      (VARIANT, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
     GBL_RESULT (*pFnDestruct) (VARIANT);
     GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, int* pResult);
     GBL_RESULT (*pFnSave)     (CVARIANT, GblStringBuffer* pString);

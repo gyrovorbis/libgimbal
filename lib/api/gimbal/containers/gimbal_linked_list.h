@@ -33,13 +33,13 @@ GBL_INLINE void           GblLinkedList_init         (GBL_SELF)                 
 GBL_INLINE void           GblLinkedList_move         (GBL_SELF, GBL_SELF_TYPE* pHead)                         GBL_NOEXCEPT;
 
 GBL_INLINE GblBool        GblLinkedList_empty        (GBL_CSELF)                                              GBL_NOEXCEPT;
-GBL_INLINE GblSize        GblLinkedList_count        (GBL_CSELF)                                              GBL_NOEXCEPT;
+GBL_INLINE size_t         GblLinkedList_count        (GBL_CSELF)                                              GBL_NOEXCEPT;
 
-GBL_INLINE GBL_SELF_TYPE* GblLinkedList_at           (GBL_CSELF, GblSize index)                               GBL_NOEXCEPT;
+GBL_INLINE GBL_SELF_TYPE* GblLinkedList_at           (GBL_CSELF, size_t  index)                               GBL_NOEXCEPT;
 GBL_INLINE GBL_SELF_TYPE* GblLinkedList_front        (GBL_CSELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GBL_SELF_TYPE* GblLinkedList_back         (GBL_CSELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GblBool        GblLinkedList_contains     (GBL_CSELF, GBL_SELF_TYPE* pNode)                        GBL_NOEXCEPT;
-GBL_INLINE GblSize        GblLinkedList_find         (GBL_CSELF, GBL_SELF_TYPE* PNode)                        GBL_NOEXCEPT;
+GBL_INLINE size_t         GblLinkedList_find         (GBL_CSELF, GBL_SELF_TYPE* PNode)                        GBL_NOEXCEPT;
 GBL_INLINE GBL_SELF_TYPE* GblLinkedList_middle       (GBL_CSELF)                                              GBL_NOEXCEPT;
 GBL_INLINE GBL_SELF_TYPE* GblLinkedList_beforeMiddle (GBL_CSELF)                                              GBL_NOEXCEPT;
 
@@ -54,7 +54,7 @@ GBL_INLINE void           GblLinkedList_joinSorted   (GBL_SELF,
                                                       GblLinkedListCmpFn pCmpFn,
                                                       void*              pCl)                                 GBL_NOEXCEPT;
 
-GBL_INLINE GblBool        GblLinkedList_insert       (GBL_SELF, GBL_SELF_TYPE* pNode, GblSize index)          GBL_NOEXCEPT;
+GBL_INLINE GblBool        GblLinkedList_insert       (GBL_SELF, GBL_SELF_TYPE* pNode, size_t  index)          GBL_NOEXCEPT;
 GBL_INLINE void           GblLinkedList_insertAfter  (GBL_SELF_TYPE* pNode1, GBL_SELF_TYPE* pNode2)           GBL_NOEXCEPT;
 
 GBL_INLINE GBL_SELF_TYPE* GblLinkedList_popBack      (GBL_SELF)                                               GBL_NOEXCEPT;
@@ -65,7 +65,7 @@ GBL_INLINE GblBool        GblLinkedList_remove       (GBL_SELF, GBL_SELF_TYPE* p
 GBL_EXPORT GblBool        GblLinkedList_replace      (GBL_SELF, GBL_SELF_TYPE* pNode1, GBL_SELF_TYPE* pNode2) GBL_NOEXCEPT;
 GBL_INLINE void           GblLinkedList_splitAfter   (GBL_SELF, GBL_SELF_TYPE* pHead2, GBL_SELF_TYPE* pAfter) GBL_NOEXCEPT;
 
-GBL_INLINE GBL_SELF_TYPE* GblLinkedList_erase        (GBL_SELF, GblSize index)                                GBL_NOEXCEPT;
+GBL_INLINE GBL_SELF_TYPE* GblLinkedList_erase        (GBL_SELF, size_t  index)                                GBL_NOEXCEPT;
 GBL_INLINE void           GblLinkedList_clear        (GBL_SELF)                                               GBL_NOEXCEPT;
 
 GBL_INLINE void           GblLinkedList_mergeSort    (GBL_SELF, GblLinkedListCmpFn pCmpFn, void* pClosure)    GBL_NOEXCEPT;
@@ -122,8 +122,8 @@ GBL_INLINE GblBool GblLinkedList_remove(GBL_SELF, GblLinkedListNode* pNode) GBL_
     return found;
 }
 
-GBL_INLINE GBL_SELF_TYPE* GblLinkedList_erase(GBL_SELF, GblSize index) GBL_NOEXCEPT {
-    GblSize count = 0;
+GBL_INLINE GBL_SELF_TYPE* GblLinkedList_erase(GBL_SELF, size_t  index) GBL_NOEXCEPT {
+    size_t  count = 0;
     GblLinkedListNode* pPrevIt = pSelf;
     for(GblLinkedListNode* pIt = pSelf->pNext;
         pIt != pSelf;
@@ -140,9 +140,9 @@ GBL_INLINE GBL_SELF_TYPE* GblLinkedList_erase(GBL_SELF, GblSize index) GBL_NOEXC
 }
 
 
-GBL_INLINE GblSize GblLinkedList_find(GBL_CSELF, GblLinkedListNode* pNode) GBL_NOEXCEPT {
-    GblSize index = GBL_LINKED_LIST_NPOS;
-    GblSize count = 0;
+GBL_INLINE size_t  GblLinkedList_find(GBL_CSELF, GblLinkedListNode* pNode) GBL_NOEXCEPT {
+    size_t  index = GBL_LINKED_LIST_NPOS;
+    size_t  count = 0;
     for(GblLinkedListNode* pIt = pSelf->pNext;
         pIt != pSelf;
         pIt = pIt->pNext)
@@ -164,8 +164,8 @@ GBL_INLINE GblBool GblLinkedList_empty(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->pNext == pSelf || pSelf->pNext == GBL_NULL;
 }
 
-GBL_INLINE GblSize GblLinkedList_count(GBL_CSELF) GBL_NOEXCEPT {
-    GblSize count = 0;
+GBL_INLINE size_t  GblLinkedList_count(GBL_CSELF) GBL_NOEXCEPT {
+    size_t  count = 0;
     for(GblLinkedListNode* pIt = pSelf->pNext;
         pIt != pSelf;
         pIt = pIt->pNext)
@@ -175,9 +175,9 @@ GBL_INLINE GblSize GblLinkedList_count(GBL_CSELF) GBL_NOEXCEPT {
     return count;
 }
 
-GBL_INLINE GblLinkedListNode* GblLinkedList_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE GblLinkedListNode* GblLinkedList_at(GBL_CSELF, size_t  index) GBL_NOEXCEPT {
     GblLinkedListNode* pNode = GBL_NULL;
-    GblSize count = 0;
+    size_t  count = 0;
     for(GblLinkedListNode* pIt = pSelf->pNext;
         pIt != pSelf;
         pIt = pIt->pNext)
@@ -395,8 +395,8 @@ GBL_INLINE void GblLinkedList_insertAfter(GBL_SELF_TYPE* pNode1, GBL_SELF_TYPE* 
     pNode1->pNext = pNode2;
 }
 
-GBL_INLINE GblBool GblLinkedList_insert(GBL_SELF, GBL_SELF_TYPE* pNode, GblSize index) GBL_NOEXCEPT {
-    GblSize count = 0;
+GBL_INLINE GblBool GblLinkedList_insert(GBL_SELF, GBL_SELF_TYPE* pNode, size_t  index) GBL_NOEXCEPT {
+    size_t  count = 0;
     GblLinkedListNode* pPrev = pSelf;
     for(GblLinkedListNode* pIt = pSelf->pNext;
         pIt != pSelf;

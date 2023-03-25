@@ -22,7 +22,7 @@ GBL_DECLS_BEGIN
 /// Base struct for all interfaces, inherits from GblClass
 typedef struct GblInterface {
     GblClass    base;               ///< inherited GblClass base info
-    GblSize     outerClassOffset_;  ///< offset from the interface to the class containing it (private, managed by internals)
+    size_t      outerClassOffset_;  ///< offset from the interface to the class containing it (private, managed by internals)
 } GblInterface;
 
 GBL_EXPORT GblClass*     GblInterface_outerClass        (GBL_SELF)  GBL_NOEXCEPT;

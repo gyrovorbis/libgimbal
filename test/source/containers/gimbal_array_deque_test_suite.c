@@ -28,7 +28,7 @@ static GBL_RESULT GblArrayDequeTestSuite_verify_(GblContext* pCtx, const GblArra
     va_start(varArgs, pBuffer);
     GBL_CTX_BEGIN(pCtx);
 
-    GblSize count = 0;
+    size_t  count = 0;
     const char* pStr = NULL;
 
     while((pStr = va_arg(varArgs, const char*))) {
@@ -158,7 +158,7 @@ static GBL_RESULT GblArrayDequeTestSuite_pushBackResize_(GblTestSuite* pSelf, Gb
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    for(GblSize i = 0; i < 10; ++i) {
+    for(size_t  i = 0; i < 10; ++i) {
         GBL_CTX_VERIFY_CALL(GblArrayDeque_pushBack(&pSelf_->deques[0], &stringLiterals_[10+i]));
     }
 
@@ -178,7 +178,7 @@ static GBL_RESULT GblArrayDequeTestSuite_emplaceBackResize_(GblTestSuite* pSelf,
                                                 sizeof(const char*),
                                                 0, 0, NULL, pCtx));
 
-    for(GblSize i = 0; i < 10; ++i) {
+    for(size_t  i = 0; i < 10; ++i) {
         const char** pSlot = GblArrayDeque_emplaceBack(&pSelf_->deques[2]);
         GBL_TEST_VERIFY(pSlot);
         *pSlot = stringLiterals_[10+i];
@@ -196,7 +196,7 @@ static GBL_RESULT GblArrayDequeTestSuite_pushFront_(GblTestSuite* pSelf, GblCont
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    for(GblSize i = 0; i < 6; ++i) {
+    for(size_t  i = 0; i < 6; ++i) {
         GBL_CTX_VERIFY_CALL(GblArrayDeque_pushFront(&pSelf_->deques[0], &stringLiterals_[9-i]));
     }
 
@@ -213,7 +213,7 @@ static GBL_RESULT GblArrayDequeTestSuite_pushFrontResize_(GblTestSuite* pSelf, G
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    for(GblSize i = 0; i < 4; ++i) {
+    for(size_t  i = 0; i < 4; ++i) {
         GBL_CTX_VERIFY_CALL(GblArrayDeque_pushFront(&pSelf_->deques[0], &stringLiterals_[3-i]));
     }
 
@@ -230,7 +230,7 @@ static GBL_RESULT GblArrayDequeTestSuite_emplaceFrontResize_(GblTestSuite* pSelf
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    for(GblSize i = 0; i < 10; ++i) {
+    for(size_t  i = 0; i < 10; ++i) {
         const char** pSlot = GblArrayDeque_emplaceFront(&pSelf_->deques[2]);
         GBL_TEST_VERIFY(pSlot);
         *pSlot = stringLiterals_[9-i];
@@ -249,7 +249,7 @@ static GBL_RESULT GblArrayDequeTestSuite_popBack_(GblTestSuite* pSelf, GblContex
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    for(GblSize i = 0; i < 5; ++i) {
+    for(size_t  i = 0; i < 5; ++i) {
         const char ** ppStr = GblArrayDeque_popBack(&pSelf_->deques[0]);
         GBL_TEST_COMPARE(*ppStr, stringLiterals_[19-i]);
     }
@@ -280,7 +280,7 @@ static GBL_RESULT GblArrayDequeTestSuite_popFront_(GblTestSuite* pSelf, GblConte
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    for(GblSize i = 0; i < 5; ++i) {
+    for(size_t  i = 0; i < 5; ++i) {
         const char ** ppStr = GblArrayDeque_popFront(&pSelf_->deques[0]);
         GBL_TEST_COMPARE(*ppStr, stringLiterals_[i]);
     }
@@ -543,7 +543,7 @@ static GBL_RESULT GblArrayDequeTestSuite_atProfile_(GblTestSuite* pSelf, GblCont
     GblArrayDeque_pushBack(&pSelf_->deques[0], &pLiteral);
 
 
-    for(GblSize i = 0; i < GBL_ARRAY_DEQUE_PROFILE_SIZE_; ++i) {
+    for(size_t  i = 0; i < GBL_ARRAY_DEQUE_PROFILE_SIZE_; ++i) {
         pLiteral = GblArrayDeque_at(&pSelf_->deques[0],
                                     gblRandRange(0, GblArrayDeque_size(&pSelf_->deques[0])-1));
         pLiteral[0] = 'l';
@@ -560,7 +560,7 @@ static GBL_RESULT GblArrayDequeTestSuite_pushBackProfile_(GblTestSuite* pSelf, G
 
     GblArrayDeque_clear(&pSelf_->deques[0]);
 
-    for(GblSize i = 0; i < GBL_ARRAY_DEQUE_PROFILE_SIZE_; ++i) {
+    for(size_t  i = 0; i < GBL_ARRAY_DEQUE_PROFILE_SIZE_; ++i) {
         GblArrayDeque_pushBack(&pSelf_->deques[0], &pLiteral);
     }
 
@@ -575,7 +575,7 @@ static GBL_RESULT GblArrayDequeTestSuite_pushFrontProfile_(GblTestSuite* pSelf, 
 
     GblArrayDeque_clear(&pSelf_->deques[0]);
 
-    for(GblSize i = 0; i < GBL_ARRAY_DEQUE_PROFILE_SIZE_; ++i) {
+    for(size_t  i = 0; i < GBL_ARRAY_DEQUE_PROFILE_SIZE_; ++i) {
         GblArrayDeque_pushFront(&pSelf_->deques[0], &pLiteral);
     }
 
@@ -587,7 +587,7 @@ static GBL_RESULT GblArrayDequeTestSuite_destruct_(GblTestSuite* pSelf, GblConte
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    for(GblSize i = 0; i < 5; ++i)
+    for(size_t  i = 0; i < 5; ++i)
         GBL_CTX_VERIFY_CALL(GblArrayDeque_destruct(&pSelf_->deques[i]));
 
     GBL_CTX_END();

@@ -12,10 +12,10 @@ GBL_FORWARD_DECLARE_STRUCT(TestClosure_);
 typedef struct GblClosureTestSuite_ {
     GblRefCount     startGlobalRefCount;
     TestClosure_*   pTestClosure;
-    GblSize         testClosureDtorCount;
+    size_t          testClosureDtorCount;
     void*           pTestClosureMarshalData;
     GblType         testClosureMarshalArgTypes[4];
-    GblSize         testClosureMarshalArgCount;
+    size_t          testClosureMarshalArgCount;
     GblType         testClosureMarshalRetType;
     const char*     pCClosureArg;
     void*           pCClosureUserdata;
@@ -49,21 +49,21 @@ static GBL_RESULT testClosureDestruct_(const GblArrayMap* pMap, uintptr_t key, v
     GBL_CTX_END();
 }
 
-static GBL_RESULT testClosureMarshal_(GblClosure* pClosure, GblVariant* pRetValue, GblSize argCount, GblVariant* pArgs, GblPtr pMarshalData) {
+static GBL_RESULT testClosureMarshal_(GblClosure* pClosure, GblVariant* pRetValue, size_t  argCount, GblVariant* pArgs, GblPtr pMarshalData) {
     GBL_CTX_BEGIN(NULL);
     TestClosure_* pSelf = (TestClosure_*)pClosure;
     pSelf->pTestSuite->pTestClosureMarshalData = pMarshalData.pData;
     pSelf->pTestSuite->testClosureMarshalArgCount = argCount;
     pSelf->pTestSuite->testClosureMarshalRetType = GblVariant_typeOf(pRetValue);
 
-    for(GblSize a = 0; a < argCount; ++a) {
+    for(size_t  a = 0; a < argCount; ++a) {
         pSelf->pTestSuite->testClosureMarshalArgTypes[a] = GblVariant_typeOf(&pArgs[a]);
     }
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT testClosureMetaMarshal_(GblClosure* pClosure, GblVariant* pRetValue, GblSize argCount, GblVariant* pArgs, GblPtr pMarshalData) {
+static GBL_RESULT testClosureMetaMarshal_(GblClosure* pClosure, GblVariant* pRetValue, size_t  argCount, GblVariant* pArgs, GblPtr pMarshalData) {
     GBL_UNUSED(pMarshalData);
     GBL_CTX_BEGIN(NULL);
 
@@ -197,7 +197,7 @@ static void cClosureFunction_(void* pPointer, const char* pString) {
     pSelf_->pCClosureArg = pString;
 }
 
-static GBL_RESULT cClosureMarshal_(GblClosure* pClosure, GblVariant* pRetValue, GblSize argCount, GblVariant* pArgs, GblPtr pMarshalData) {
+static GBL_RESULT cClosureMarshal_(GblClosure* pClosure, GblVariant* pRetValue, size_t  argCount, GblVariant* pArgs, GblPtr pMarshalData) {
     GBL_UNUSED(pRetValue && argCount);
     if(!pMarshalData.pFunc) {
         GblCClosure* pCClosure = GBL_C_CLOSURE(pClosure);

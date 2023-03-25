@@ -50,11 +50,11 @@ typedef struct GblStringBuffer {
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_construct_4     (GBL_SELF,
                                                              GblStringView  view,
-                                                             GblSize        extraStackSize,
+                                                             size_t         extraStackSize,
                                                              GblContext*    pCtx)                           GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_construct_3     (GBL_SELF,
                                                              GblStringView  view,
-                                                             GblSize        extraStackSize)                 GBL_NOEXCEPT;
+                                                             size_t         extraStackSize)                 GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_construct_2     (GBL_SELF,
                                                              GblStringView  view)                           GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_construct_1     (GBL_SELF)                                      GBL_NOEXCEPT;
@@ -63,11 +63,11 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_construct_1     (GBL_SELF)          
 
 GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_4 (GBL_SELF,
                                                              GblStringView  view,
-                                                             GblSize        extraStackSize,
+                                                             size_t         extraStackSize,
                                                              GblContext*    pCtx)                           GBL_NOEXCEPT;
 GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_3 (GBL_SELF,
                                                              GblStringView  view,
-                                                             GblSize        extraStackSize)                 GBL_NOEXCEPT;
+                                                             size_t         extraStackSize)                 GBL_NOEXCEPT;
 GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_2 (GBL_SELF,
                                                              GblStringView  view)                           GBL_NOEXCEPT;
 GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_1 (GBL_SELF)                                      GBL_NOEXCEPT;
@@ -76,8 +76,8 @@ GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_1 (GBL_SELF)          
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_destruct        (GBL_SELF)                                      GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblStringBuffer_acquire         (GBL_SELF, char* pData, GblSize capacity)       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_release         (GBL_SELF, char** ppStrPtr, GblSize* pCapacity) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_acquire         (GBL_SELF, char* pData, size_t  capacity)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_release         (GBL_SELF, char** ppStrPtr, size_t * pCapacity) GBL_NOEXCEPT;
 
 GBL_INLINE char*            GblStringBuffer_stackBuffer     (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblStringBuffer_empty           (GBL_CSELF)                                     GBL_NOEXCEPT;
@@ -87,16 +87,16 @@ GBL_INLINE const char*      GblStringBuffer_cString         (GBL_CSELF)         
 GBL_INLINE GblStringView    GblStringBuffer_view            (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblQuark         GblStringBuffer_quark           (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE GblContext*      GblStringBuffer_context         (GBL_CSELF)                                     GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringBuffer_stackBytes      (GBL_CSELF)                                     GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringBuffer_length          (GBL_CSELF)                                     GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblStringBuffer_capacity        (GBL_CSELF)                                     GBL_NOEXCEPT;
+GBL_INLINE size_t           GblStringBuffer_stackBytes      (GBL_CSELF)                                     GBL_NOEXCEPT;
+GBL_INLINE size_t           GblStringBuffer_length          (GBL_CSELF)                                     GBL_NOEXCEPT;
+GBL_INLINE size_t           GblStringBuffer_capacity        (GBL_CSELF)                                     GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_set             (GBL_SELF, GblStringView view)                  GBL_NOEXCEPT;
-GBL_INLINE char             GblStringBuffer_char            (GBL_CSELF, GblSize index)                      GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_setChar         (GBL_CSELF, GblSize index, char value)          GBL_NOEXCEPT;
+GBL_INLINE char             GblStringBuffer_char            (GBL_CSELF, size_t  index)                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_setChar         (GBL_CSELF, size_t  index, char value)          GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_insert          (GBL_SELF,
-                                                             GblSize        index,
+                                                             size_t         index,
                                                              GblStringView  view)                           GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_append          (GBL_SELF, GblStringView other)                 GBL_NOEXCEPT;
@@ -113,16 +113,16 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_appendFloat     (GBL_SELF, float val
 GBL_INLINE GBL_RESULT       GblStringBuffer_appendDouble    (GBL_SELF, double value)                        GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_appendPointer   (GBL_SELF, const void* pPtr)                    GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblStringBuffer_erase           (GBL_SELF, GblSize offset, GblSize length)      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_erase           (GBL_SELF, size_t  offset, size_t  length)      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_clear           (GBL_SELF)                                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_overwrite       (GBL_SELF,
-                                                             GblSize        index,
+                                                             size_t         index,
                                                              GblStringView  other)                          GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT       GblStringBuffer_replace         (GBL_SELF,
                                                              GblStringView substr,
                                                              GblStringView replacement,
-                                                             GblSize       limit)                           GBL_NOEXCEPT;
+                                                             size_t        limit)                           GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT       GblStringBuffer_remove          (GBL_SELF, GblStringView substr)                GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_chop            (GBL_SELF)                                      GBL_NOEXCEPT;
@@ -130,15 +130,15 @@ GBL_EXPORT GBL_RESULT       GblStringBuffer_chomp           (GBL_SELF)          
 GBL_INLINE GBL_RESULT       GblStringBuffer_lower           (GBL_SELF)                                      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_upper           (GBL_SELF)                                      GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblStringBuffer_padLeft         (GBL_SELF, char value, GblSize count)           GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblStringBuffer_padRight        (GBL_SELF, char value, GblSize count)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblStringBuffer_padLeft         (GBL_SELF, char value, size_t  count)           GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblStringBuffer_padRight        (GBL_SELF, char value, size_t  count)           GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_trimStart       (GBL_SELF, char value)                          GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_trimEnd         (GBL_SELF, char value)                          GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblStringBuffer_reserve         (GBL_SELF, GblSize capacity)                    GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_resize          (GBL_SELF, GblSize size)                        GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_grow            (GBL_SELF, GblSize delta)                       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT       GblStringBuffer_shrink          (GBL_SELF, GblSize delta)                       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_reserve         (GBL_SELF, size_t  capacity)                    GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_resize          (GBL_SELF, size_t  size)                        GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_grow            (GBL_SELF, size_t  delta)                       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT       GblStringBuffer_shrink          (GBL_SELF, size_t  delta)                       GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_shrinkToFit     (GBL_SELF)                                      GBL_NOEXCEPT;
 
 //========== IMPL ==========
@@ -222,7 +222,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_set(GBL_SELF, GblStringView view) GBL_NOEX
 
 GBL_INLINE GBL_RESULT GblStringBuffer_construct_4(GBL_SELF,
                                                   GblStringView  view,
-                                                  GblSize        structSize,
+                                                  size_t         structSize,
                                                   GblContext*    pCtx) GBL_NOEXCEPT
 {
     GBL_CTX_BEGIN(pCtx);
@@ -232,7 +232,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_construct_4(GBL_SELF,
 }
 GBL_INLINE GBL_RESULT GblStringBuffer_construct_3(GBL_SELF,
                                                   GblStringView   view,
-                                                  GblSize        structSize) GBL_NOEXCEPT
+                                                  size_t         structSize) GBL_NOEXCEPT
 {
     return GblStringBuffer_construct_4(pSelf, view, structSize, NULL);
 }
@@ -248,7 +248,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_construct_1(GBL_SELF) GBL_NOEXCEPT
 
 GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_4 (GBL_SELF,
                                                              GblStringView  view,
-                                                             GblSize        extraStackSize,
+                                                             size_t         extraStackSize,
                                                              GblContext*    pCtx) GBL_NOEXCEPT
 {
     GblStringBuffer_construct_4(pSelf, view, extraStackSize, pCtx);
@@ -257,7 +257,7 @@ GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_4 (GBL_SELF,
 
 GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_3 (GBL_SELF,
                                                              GblStringView  view,
-                                                             GblSize        extraStackSize) GBL_NOEXCEPT
+                                                             size_t         extraStackSize) GBL_NOEXCEPT
 {
     GblStringBuffer_construct_3(pSelf, view, extraStackSize);
     return pSelf;
@@ -277,12 +277,12 @@ GBL_INLINE GblStringBuffer* GblStringBuffer_createInPlace_1 (GBL_SELF) GBL_NOEXC
 }
 
 
-GBL_INLINE GBL_RESULT GblStringBuffer_release(GBL_SELF, char** ppStrPtr, GblSize* pCapacity) GBL_NOEXCEPT {
-    GblSize size = 0;
+GBL_INLINE GBL_RESULT GblStringBuffer_release(GBL_SELF, char** ppStrPtr, size_t * pCapacity) GBL_NOEXCEPT {
+    size_t  size = 0;
     return GblArrayList_release(&pSelf->data, (void**)ppStrPtr, &size, pCapacity);
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_acquire(GBL_SELF, char* pData, GblSize capacity) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_acquire(GBL_SELF, char* pData, size_t  capacity) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     if(!pData && !capacity) GBL_CTX_DONE();
     if(!capacity && pData) capacity = strlen(pData);
@@ -295,31 +295,31 @@ GBL_INLINE GblContext* GblStringBuffer_context(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf? GblArrayList_context(&pSelf->data) : NULL;
 }
 
-GBL_INLINE GblSize GblStringBuffer_stackBytes(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblStringBuffer_stackBytes(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf? GblArrayList_stackBytes(&pSelf->data) : 0;
 }
 
-GBL_INLINE GblSize GblStringBuffer_length(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblStringBuffer_length(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf? GblArrayList_size(&pSelf->data) : 0;
 }
 
-GBL_INLINE GblSize GblStringBuffer_capacity(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblStringBuffer_capacity(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf? GblArrayList_capacity(&pSelf->data) : 0;
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_reserve(GBL_SELF, GblSize capacity) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_reserve(GBL_SELF, size_t  capacity) GBL_NOEXCEPT {
     return GblArrayList_reserve(&pSelf->data, capacity);
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_resize(GBL_SELF, GblSize size) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_resize(GBL_SELF, size_t  size) GBL_NOEXCEPT {
     return GblArrayList_resize(&pSelf->data, size);
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_grow(GBL_SELF, GblSize delta) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_grow(GBL_SELF, size_t  delta) GBL_NOEXCEPT {
     return GblStringBuffer_resize(pSelf, GblStringBuffer_length(pSelf) + delta);
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_shrink(GBL_SELF, GblSize delta) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_shrink(GBL_SELF, size_t  delta) GBL_NOEXCEPT {
     return GblStringBuffer_resize(pSelf, GblStringBuffer_length(pSelf) - delta);
 }
 
@@ -349,7 +349,7 @@ GBL_INLINE int GblStringBuffer_compare(GBL_CSELF, const GblStringBuffer* pOther)
     return result;
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_insert(GBL_SELF, GblSize index, GblStringView view) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_insert(GBL_SELF, size_t  index, GblStringView view) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     GBL_CTX_VERIFY_POINTER(view.pData);
     GBL_CTX_VERIFY_EXPRESSION(view.length);
@@ -423,7 +423,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_prepend(GBL_SELF, GblStringView view) GBL_
     GBL_CTX_END();
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_overwrite(GBL_SELF, GblSize index, GblStringView view) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_overwrite(GBL_SELF, size_t  index, GblStringView view) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     //GBL_CTX_VERIFY_ARG(index < GblStringBuffer_length(pSelf));
     const GblBool resized = (index + view.length > GblStringBuffer_length(pSelf));
@@ -434,7 +434,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_overwrite(GBL_SELF, GblSize index, GblStri
     GBL_CTX_END();
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_erase(GBL_SELF, GblSize index, GblSize len) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_erase(GBL_SELF, size_t  index, size_t  len) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     GBL_CTX_CALL(GblArrayList_erase(&pSelf->data, index, len));
     GBL_CTX_END();
@@ -447,7 +447,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_shrinkToFit(GBL_SELF) GBL_NOEXCEPT {
     GBL_CTX_END();
 }
 
-GBL_INLINE char GblStringBuffer_char(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE char GblStringBuffer_char(GBL_CSELF, size_t  index) GBL_NOEXCEPT {
     char result = '\0';
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     const char* pChar = (const char*)GblArrayList_at(&pSelf->data, index);
@@ -457,7 +457,7 @@ GBL_INLINE char GblStringBuffer_char(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
     return result;
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_setChar(GBL_CSELF, GblSize index, char value) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_setChar(GBL_CSELF, size_t  index, char value) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     GBL_CTX_VERIFY(index < GblStringBuffer_length(pSelf), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_PRIV(pSelf->data).pData[index] = value;
@@ -470,7 +470,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_chop(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_INLINE GBL_RESULT GblStringBuffer_lower(GBL_SELF) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    for(GblSize c = 0; c < GblStringBuffer_length(pSelf); ++c) {
+    for(size_t  c = 0; c < GblStringBuffer_length(pSelf); ++c) {
         GblStringBuffer_setChar(pSelf, c, tolower(GblStringBuffer_char(pSelf, c)));
     }
     GBL_CTX_END();
@@ -478,7 +478,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_lower(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_INLINE GBL_RESULT GblStringBuffer_upper(GBL_SELF) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    for(GblSize c = 0; c < GblStringBuffer_length(pSelf); ++c) {
+    for(size_t  c = 0; c < GblStringBuffer_length(pSelf); ++c) {
         GblStringBuffer_setChar(pSelf, c, toupper(GblStringBuffer_char(pSelf, c)));
     }
     GBL_CTX_END();

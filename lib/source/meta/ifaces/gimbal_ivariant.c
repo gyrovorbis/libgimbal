@@ -226,7 +226,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_compare(const GblIVariantClass* pSelf, co
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblIVariantClass_valuesFromVa_(const GblIVariantClass* pSelf, const char* pFmt, va_list* pArgList, GblSize* pCount, GblVariant pVariant[]) {
+static GBL_RESULT GblIVariantClass_valuesFromVa_(const GblIVariantClass* pSelf, const char* pFmt, va_list* pArgList, size_t * pCount, GblVariant pVariant[]) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_CTX_VERIFY_POINTER(pCount);
@@ -257,7 +257,7 @@ static GBL_RESULT GblIVariantClass_valuesFromVa_(const GblIVariantClass* pSelf, 
 GBL_EXPORT GBL_RESULT GblIVariantClass_constructValueCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
-        GblSize count = 0;
+        size_t  count = 0;
         GblVariant* pVariants = GBL_ALLOCA(sizeof(GblVariant)*GBL_IVARIANT_VALUE_VAR_ARG_MAX);
         GBL_CTX_CALL(GblIVariantClass_valuesFromVa_(pSelf, pSelf->pVTable->pSetValueFmt, pArgs, &count, pVariants));
         if(pSelf->pVTable->supportedOps & GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY) {
@@ -286,7 +286,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_constructValueCopy(const GblIVariantClass
 GBL_EXPORT GBL_RESULT GblIVariantClass_constructValueMove(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
-        GblSize count = 0;
+        size_t  count = 0;
         GblVariant* pVariants = GBL_ALLOCA(sizeof(GblVariant)*GBL_IVARIANT_VALUE_VAR_ARG_MAX);
         GBL_CTX_CALL(GblIVariantClass_valuesFromVa_(pSelf, pSelf->pVTable->pSetValueFmt, pArgs, &count, pVariants));
         if(pSelf->pVTable->supportedOps & GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE) {
@@ -320,7 +320,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_constructValueMove(const GblIVariantClass
 GBL_EXPORT GBL_RESULT GblIVariantClass_setValueCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
-        GblSize count = 0;
+        size_t  count = 0;
         GblVariant* pVariants = GBL_ALLOCA(sizeof(GblVariant)*GBL_IVARIANT_VALUE_VAR_ARG_MAX);
         GBL_CTX_CALL(GblIVariantClass_valuesFromVa_(pSelf, pSelf->pVTable->pSetValueFmt, pArgs, &count, pVariants));
         if(pSelf->pVTable->supportedOps & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY) {
@@ -336,7 +336,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_setValueCopy(const GblIVariantClass* pSel
 GBL_EXPORT GBL_RESULT GblIVariantClass_setValueMove(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
-        GblSize count = 0;
+        size_t  count = 0;
         GblVariant* pVariants = GBL_ALLOCA(sizeof(GblVariant)*GBL_IVARIANT_VALUE_VAR_ARG_MAX);
         GBL_CTX_CALL(GblIVariantClass_valuesFromVa_(pSelf, pSelf->pVTable->pSetValueFmt, pArgs, &count, pVariants));
         if(pSelf->pVTable->supportedOps & GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE) {
@@ -357,7 +357,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_setValueMove(const GblIVariantClass* pSel
 GBL_EXPORT GBL_RESULT GblIVariantClass_getValueCopy(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
-        GblSize count = 0;
+        size_t  count = 0;
         GblVariant* pVariants = GBL_ALLOCA(sizeof(GblVariant)*GBL_IVARIANT_VALUE_VAR_ARG_MAX);
         GBL_CTX_CALL(GblIVariantClass_valuesFromVa_(pSelf, pSelf->pVTable->pGetValueFmt, pArgs, &count, pVariants));
         if(pSelf->pVTable->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY) {
@@ -374,7 +374,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_getValueCopy(const GblIVariantClass* pSel
 GBL_EXPORT GBL_RESULT GblIVariantClass_getValuePeek(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
-        GblSize count = 0;
+        size_t  count = 0;
         GblVariant* pVariants = GBL_ALLOCA(sizeof(GblVariant)*GBL_IVARIANT_VALUE_VAR_ARG_MAX);
         GBL_CTX_CALL(GblIVariantClass_valuesFromVa_(pSelf, pSelf->pVTable->pGetValueFmt, pArgs, &count, pVariants));
         if(pSelf->pVTable->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK) {
@@ -391,7 +391,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_getValuePeek(const GblIVariantClass* pSel
 GBL_EXPORT GBL_RESULT GblIVariantClass_getValueMove(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
-        GblSize count = 0;
+        size_t  count = 0;
         GblVariant* pVariants = GBL_ALLOCA(sizeof(GblVariant)*GBL_IVARIANT_VALUE_VAR_ARG_MAX);
         GBL_CTX_CALL(GblIVariantClass_valuesFromVa_(pSelf, pSelf->pVTable->pGetValueFmt, pArgs, &count, pVariants));
         if(pSelf->pVTable->supportedOps & GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE) {

@@ -12,7 +12,7 @@ GBL_EXPORT GblRefCount GblByteArray_unref(GblByteArray* pSelf) {
     return GblRef_releaseWithDtor(pSelf, GblByteArray_destruct);
 }
 
-GBL_EXPORT GblByteArray* GblByteArray_create_3(GblSize bytes, const void* pData, GblContext* pCtx) GBL_NOEXCEPT {
+GBL_EXPORT GblByteArray* GblByteArray_create_3(size_t  bytes, const void* pData, GblContext* pCtx) GBL_NOEXCEPT {
     GblByteArray* pSelf = NULL;
     GBL_CTX_BEGIN(pCtx);
     GBL_CTX_VERIFY_ARG(!(bytes == 0 && pData != NULL),
@@ -32,7 +32,7 @@ GBL_EXPORT GblByteArray* GblByteArray_create_3(GblSize bytes, const void* pData,
     return pSelf;
 }
 
-GBL_EXPORT GBL_RESULT GblByteArray_resize(GblByteArray* pSelf, GblSize bytes) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblByteArray_resize(GblByteArray* pSelf, size_t  bytes) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GblByteArray_context(pSelf));
     GBL_CTX_VERIFY_POINTER(pSelf);
     if(!bytes) GBL_CTX_CALL(GblByteArray_clear(pSelf));
@@ -52,12 +52,12 @@ GBL_EXPORT GBL_RESULT GblByteArray_resize(GblByteArray* pSelf, GblSize bytes) GB
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblByteArray_insert(GblByteArray* pSelf, GblSize offset, GblSize bytes, const void* pDataIn) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblByteArray_insert(GblByteArray* pSelf, size_t  offset, size_t  bytes, const void* pDataIn) GBL_NOEXCEPT {
     uintptr_t insertionPoint = 0;
     GBL_CTX_BEGIN(GblByteArray_context(pSelf));
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_ARG(offset <= GblByteArray_size(pSelf));
-    GblSize oldSize = GblByteArray_size(pSelf);
+    size_t  oldSize = GblByteArray_size(pSelf);
     GBL_CTX_CALL(GblByteArray_resize(pSelf, GblByteArray_size(pSelf) + bytes));
     {
         int      slideSize       = oldSize - offset;
@@ -68,9 +68,9 @@ GBL_EXPORT GBL_RESULT GblByteArray_insert(GblByteArray* pSelf, GblSize offset, G
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblByteArray_erase(GblByteArray* pSelf, GblSize offset, GblSize bytes) GBL_NOEXCEPT {
-    GblSize lastPos = 0;
-    GblSize remainderSize  = 0;
+GBL_EXPORT GBL_RESULT GblByteArray_erase(GblByteArray* pSelf, size_t  offset, size_t  bytes) GBL_NOEXCEPT {
+    size_t  lastPos = 0;
+    size_t  remainderSize  = 0;
     GBL_CTX_BEGIN(GblByteArray_context(pSelf));
     GBL_CTX_VERIFY_EXPRESSION(GblByteArray_size(pSelf) > 0);
     GBL_CTX_VERIFY_ARG(offset < GblByteArray_size(pSelf));

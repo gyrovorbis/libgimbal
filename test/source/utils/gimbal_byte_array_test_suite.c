@@ -6,7 +6,7 @@
 #define GBL_BYTE_ARRAY_TEST_SUITE_(inst)    ((GblByteArrayTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_BYTE_ARRAY_TEST_SUITE_TYPE))
 
 typedef struct GblByteArrayTestSuite_ {
-    GblSize         refActiveCount;
+    size_t          refActiveCount;
     GblByteArray*   pByteArray1;
     GblByteArray*   pByteArray2;
 } GblByteArrayTestSuite_;
@@ -35,7 +35,7 @@ static GBL_RESULT GblByteArray_verify_(GblContext* pCtx,
                                        GblRefCount refCount)
 {
     GBL_CTX_BEGIN(pCtx);
-    GblSize size = pData? strlen(pData)+1 : 0;
+    size_t  size = pData? strlen(pData)+1 : 0;
     GBL_TEST_COMPARE(GblByteArray_empty(pByteArray), size? 0 : 1);
     GBL_TEST_COMPARE(GblByteArray_size(pByteArray), size);
     GBL_TEST_COMPARE(GblByteArray_refCount(pByteArray), refCount);
@@ -155,7 +155,7 @@ static GBL_RESULT GblByteArrayTestSuite_unref_(GblTestSuite* pSelf, GblContext* 
                                              "lol",
                                              1));
 
-    GblSize refCount = GblRef_activeCount();
+    size_t  refCount = GblRef_activeCount();
     GBL_TEST_COMPARE(GblByteArray_unref(pSelf_->pByteArray2), 0);
     GBL_TEST_COMPARE(refCount, GblRef_activeCount()+1);
 
@@ -220,7 +220,7 @@ static GBL_RESULT GblByteArrayTestSuite_acquire_release_(GblTestSuite* pSelf, Gb
                                              "Megaman",
                                              1));
     char* pBuffer = NULL;
-    GblSize size = 0;
+    size_t  size = 0;
     GBL_CTX_VERIFY_CALL(GblByteArray_release(pSelf_->pByteArray1, &size, (void**)&pBuffer));
     GBL_TEST_COMPARE(size, strv.length+1);
     GBL_TEST_COMPARE(pBuffer, "Megaman");

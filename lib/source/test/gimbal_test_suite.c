@@ -20,7 +20,7 @@ static GBL_RESULT GblTestSuiteClass_suiteName_(const GblTestSuite* pSelf, const 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestSuiteClass_caseCount_(const GblTestSuite* pSelf, GblSize* pSize) {
+static GBL_RESULT GblTestSuiteClass_caseCount_(const GblTestSuite* pSelf, size_t * pSize) {
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSize);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
@@ -29,7 +29,7 @@ static GBL_RESULT GblTestSuiteClass_caseCount_(const GblTestSuite* pSelf, GblSiz
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestSuiteClass_caseName_(const GblTestSuite* pSelf, GblSize index, const char** ppName) {
+static GBL_RESULT GblTestSuiteClass_caseName_(const GblTestSuite* pSelf, size_t  index, const char** ppName) {
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(ppName);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
@@ -39,7 +39,7 @@ static GBL_RESULT GblTestSuiteClass_caseName_(const GblTestSuite* pSelf, GblSize
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestSuiteClass_caseRun_(GblTestSuite* pSelf, GblContext* pCtx, GblSize index) {
+static GBL_RESULT GblTestSuiteClass_caseRun_(GblTestSuite* pSelf, GblContext* pCtx, size_t  index) {
     GBL_CTX_BEGIN(pCtx);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
     const GblTestCase* pCase = GblArrayList_at(&pSelf_->testCases, index);
@@ -224,8 +224,8 @@ GBL_EXPORT GBL_RESULT GblTestSuite_finalCase(GblTestSuite* pSelf, GblContext* pC
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblSize GblTestSuite_caseCount(const GblTestSuite* pSelf) {
-    GblSize count = 0;
+GBL_EXPORT size_t  GblTestSuite_caseCount(const GblTestSuite* pSelf) {
+    size_t  count = 0;
     GBL_CTX_BEGIN(pSelf);
     GBL_INSTANCE_VCALL(GblTestSuite, pFnCaseCount, pSelf, &count);
     GBL_CTX_VERIFY_LAST_RECORD();
@@ -233,7 +233,7 @@ GBL_EXPORT GblSize GblTestSuite_caseCount(const GblTestSuite* pSelf) {
     return count;
 }
 
-GBL_EXPORT const char* GblTestSuite_caseName(const GblTestSuite* pSelf, GblSize index) {
+GBL_EXPORT const char* GblTestSuite_caseName(const GblTestSuite* pSelf, size_t  index) {
     const char* pName = NULL;
     GBL_CTX_BEGIN(pSelf);
     GBL_INSTANCE_VCALL(GblTestSuite, pFnCaseName, pSelf, index, &pName);
@@ -244,7 +244,7 @@ GBL_EXPORT const char* GblTestSuite_caseName(const GblTestSuite* pSelf, GblSize 
 
 GBL_EXPORT GBL_RESULT GblTestSuite_runCase(GblTestSuite* pSelf,
                                            GblContext* pCtx,
-                                           GblSize index)
+                                           size_t  index)
 {
     GBL_CTX_BEGIN(pSelf);
     GBL_INSTANCE_VCALL(GblTestSuite, pFnCaseRun, pSelf, pCtx, index);
@@ -356,12 +356,12 @@ GBL_EXPORT GblBool GblTestSuite_passed(const GblTestSuite* pSelf) {
     return GblTestSuite_ran(pSelf) && !GBL_RESULT_ERROR(pSelf->failingIssue.result);
 }
 
-static GblSize GblTestSuite_caseIndex_(const GblTestSuite* pSelf, const char* pCaseName) {
-    GblSize index = GBL_NPOS;
+static size_t  GblTestSuite_caseIndex_(const GblTestSuite* pSelf, const char* pCaseName) {
+    size_t  index = GBL_NPOS;
     GBL_CTX_BEGIN(NULL);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
-    const GblSize caseCount = GblArrayList_size(&pSelf_->testCases);
-    for(GblSize i = 0; i < caseCount; ++i) {
+    const size_t  caseCount = GblArrayList_size(&pSelf_->testCases);
+    for(size_t  i = 0; i < caseCount; ++i) {
         const GblTestCase* pCase = GblArrayList_at(&pSelf_->testCases, i);
         if(strcmp(pCase->pName, pCaseName) == 0) {
             index = i;
@@ -375,7 +375,7 @@ static GblSize GblTestSuite_caseIndex_(const GblTestSuite* pSelf, const char* pC
 GBL_EXPORT GblBool GblTestSuite_caseRan(const GblTestSuite* pSelf, const char* pCaseName) {
     GblBool ran = GBL_FALSE;
     GBL_CTX_BEGIN(NULL);
-    GblSize caseIdx = GblTestSuite_caseIndex_(pSelf, pCaseName);
+    size_t  caseIdx = GblTestSuite_caseIndex_(pSelf, pCaseName);
     if(caseIdx != GBL_NPOS) {
         ran = (caseIdx < pSelf->casesRun);
     }
@@ -387,7 +387,7 @@ GBL_EXPORT GblBool GblTestSuite_caseRan(const GblTestSuite* pSelf, const char* p
 GBL_EXPORT GblBool GblTestSuite_casePassed(const GblTestSuite* pSelf, const char* pCaseName) {
     GblBool passed = GBL_FALSE;
     GBL_CTX_BEGIN(NULL);
-    GblSize caseIdx = GblTestSuite_caseIndex_(pSelf, pCaseName);
+    size_t  caseIdx = GblTestSuite_caseIndex_(pSelf, pCaseName);
     if(caseIdx != GBL_NPOS) {
         if(caseIdx+1 < pSelf->casesRun)
             passed = GBL_TRUE;
@@ -405,8 +405,8 @@ GBL_EXPORT GblTestScenario* GblTestSuite_scenario(const GblTestSuite* pSelf) {
 
 GBL_EXPORT GblType GblTestSuite_register(const char* pName,
                                          const GblTestSuiteClassVTable* pVTable,
-                                         GblSize instanceSize,
-                                         GblSize instancePrivateSize,
+                                         size_t  instanceSize,
+                                         size_t  instancePrivateSize,
                                          GblFlags typeFlags)
 {
     GblType type = GBL_INVALID_TYPE;

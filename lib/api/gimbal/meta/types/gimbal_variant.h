@@ -1,6 +1,9 @@
 /*! \file
  *  \brief GblVariant structure and related functions
  *  \ingroup meta
+ *  \todo
+ *  - DateTime/Ref types
+ *  -
  */
 
 #ifndef GIMBAL_VARIANT_H
@@ -91,7 +94,7 @@ GBL_INLINE GBL_RESULT    GblVariant_constructDouble          (GBL_SELF, double v
 GBL_INLINE GBL_RESULT    GblVariant_constructString          (GBL_SELF, const char* pValue)  GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblVariant_constructStringView      (GBL_SELF, GblStringView value) GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblVariant_constructTypeValue       (GBL_SELF, GblType type)        GBL_NOEXCEPT;
-
+GBL_INLINE GBL_RESULT    GblVariant_constructSize            (GBL_SELF, size_t  value)       GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblVariant_constructEnum            (GBL_SELF,
                                                               GblType type,
                                                               GblEnum value)                 GBL_NOEXCEPT;
@@ -152,6 +155,7 @@ GBL_INLINE GBL_RESULT    GblVariant_setString                (GBL_SELF, const ch
 GBL_INLINE GBL_RESULT    GblVariant_setStringView            (GBL_SELF, GblStringView value) GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblVariant_setStringRef             (GBL_SELF, GblStringRef* pRef)  GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT    GblVariant_setTypeValue             (GBL_SELF, GblType value)       GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblVariant_setSize                  (GBL_SELF, size_t  value)       GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT    GblVariant_setEnum                  (GBL_SELF,
                                                               GblType enumType,
@@ -210,6 +214,7 @@ GBL_INLINE void*         GblVariant_getPointer               (GBL_CSELF)        
 GBL_INLINE void*         GblVariant_getOpaqueCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_INLINE void*         GblVariant_getOpaqueMove            (GBL_SELF)                      GBL_NOEXCEPT;
 GBL_INLINE void*         GblVariant_getOpaquePeek            (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE size_t        GblVariant_getSize                  (GBL_CSELF)                     GBL_NOEXCEPT;
 
 GBL_INLINE GblInstance*  GblVariant_getInstance              (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_EXPORT GblObject*    GblVariant_getObjectCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
@@ -233,6 +238,7 @@ GBL_EXPORT void*         GblVariant_toPointer                (GBL_SELF)         
 GBL_EXPORT const char*   GblVariant_toString                 (GBL_SELF)                      GBL_NOEXCEPT;
 GBL_EXPORT GblStringView GblVariant_toStringView             (GBL_SELF)                      GBL_NOEXCEPT;
 GBL_EXPORT GblType       GblVariant_toTypeValue              (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT size_t        GblVariant_toSize                   (GBL_SELF)                      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT    GblVariant_registerConverter        (GblType fromType,
                                                               GblType toType,
@@ -241,7 +247,7 @@ GBL_EXPORT GBL_RESULT    GblVariant_registerConverter        (GblType fromType,
 GBL_EXPORT GBL_RESULT    GblVariant_unregisterConverter      (GblType fromType,
                                                               GblType toType)                GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize       GblVariant_converterCount           (void)                          GBL_NOEXCEPT;
+GBL_EXPORT size_t        GblVariant_converterCount           (void)                          GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool       GblVariant_canConvert               (GblType fromType,
                                                               GblType toType)                GBL_NOEXCEPT;
@@ -388,6 +394,12 @@ GBL_INLINE GBL_RESULT GblVariant_constructUint64(GBL_SELF, uint64_t value) GBL_N
 GBL_INLINE GBL_RESULT GblVariant_constructInt64(GBL_SELF, int64_t value) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_NULL);
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INT64_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_INLINE GBL_RESULT GblVariant_constructSize(GBL_SELF, size_t  value) GBL_NOEXCEPT {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_SIZE_TYPE, value));
     GBL_CTX_END();
 }
 
@@ -557,6 +569,15 @@ GBL_INLINE int64_t GblVariant_getInt64(GBL_CSELF) GBL_NOEXCEPT {
     int64_t value = 0;
     GBL_CTX_BEGIN(GBL_NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_INT64_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_INLINE size_t  GblVariant_getSize(GBL_CSELF) GBL_NOEXCEPT {
+    size_t  value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_SIZE_TYPE);
     GBL_CTX_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &value));
     GBL_CTX_END_BLOCK();
     return value;
@@ -740,6 +761,12 @@ GBL_INLINE GBL_RESULT GblVariant_setUint64(GBL_SELF, uint64_t value) GBL_NOEXCEP
 GBL_INLINE GBL_RESULT GblVariant_setInt64(GBL_SELF, int64_t value) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INT64_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_INLINE GBL_RESULT GblVariant_setSize(GBL_SELF, size_t  value) GBL_NOEXCEPT {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_SIZE_TYPE, value));
     GBL_CTX_END();
 }
 

@@ -149,7 +149,7 @@ static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd, GblCo
     if(!GblType_classRefCount(TEST_OBJECT_TYPE)) {
         GBL_PROPERTIES_REGISTER(TestObject);
 #if 0
-        GblSize p = 0;
+        size_t  p = 0;
         const GblProperty* pProp = NULL;
         while((pProp = GblProperty_next(TEST_OBJECT_TYPE, pProp, 0xfffff))) {
             GBL_CTX_INFO("Property[%u] = %s[%s]",

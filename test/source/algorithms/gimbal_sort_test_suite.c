@@ -15,7 +15,7 @@ typedef struct GblSortTestSuite_ {
 
 static void* GblSortTestSuite_randomizeWords_(GblTestSuite* pSelf) {
     GblSortTestSuite_* pSelf_ = GBL_SORT_TEST_SUITE_(pSelf);
-    for(GblSize w = 0; w < GBL_SORT_TEST_SUITE_WORD_COUNT_; ++w)
+    for(size_t  w = 0; w < GBL_SORT_TEST_SUITE_WORD_COUNT_; ++w)
         gblRandString(pSelf_->words[w],
                       GBL_SORT_TEST_SUITE_WORD_SIZE_MIN_,
                       GBL_SORT_TEST_SUITE_WORD_SIZE_MAX_,

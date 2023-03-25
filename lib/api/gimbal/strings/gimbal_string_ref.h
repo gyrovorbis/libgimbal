@@ -73,11 +73,11 @@ GBL_EXPORT GblStringRef* GblStringRef_createFromViewWithContext (GblStringView v
 GBL_EXPORT GblStringRef* GblStringRef_acquire                   (GBL_CSELF)                GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount   GblStringRef_release                   (GBL_CSELF)                GBL_NOEXCEPT;
 
-GBL_EXPORT char          GblStringRef_at                        (GBL_CSELF, GblSize index) GBL_NOEXCEPT;
+GBL_EXPORT char          GblStringRef_at                        (GBL_CSELF, size_t  index) GBL_NOEXCEPT;
 
 GBL_INLINE GblContext*   GblStringRef_context                   (GBL_CSELF)                GBL_NOEXCEPT;
 GBL_INLINE GblRefCount   GblStringRef_refCount                  (GBL_CSELF)                GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblStringRef_length                    (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringRef_length                    (GBL_CSELF)                GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringRef_empty                     (GBL_CSELF)                GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringRef_valid                     (GBL_CSELF)                GBL_NOEXCEPT;
 GBL_INLINE GblStringView GblStringRef_view                      (GBL_CSELF)                GBL_NOEXCEPT;
@@ -95,7 +95,7 @@ GBL_INLINE GblStringView GblStringRef_view                      (GBL_CSELF)     
 #define GblStringRef_create__3(str, len, ctx)   GblStringRef_createFromViewWithContext(GblStringView_fromStringSized(str, len), ctx)
 
 typedef struct GblStringRef_ {
-    GblSize     length;
+    size_t      length;
     char        data[1];
 } GblStringRef_;
 
@@ -135,8 +135,8 @@ GBL_INLINE GblRefCount GblStringRef_refCount(GBL_CSELF) GBL_NOEXCEPT {
     return refCount;
 }
 
-GBL_INLINE GblSize GblStringRef_length(GBL_CSELF) GBL_NOEXCEPT {
-    GblSize length = 0;
+GBL_INLINE size_t  GblStringRef_length(GBL_CSELF) GBL_NOEXCEPT {
+    size_t  length = 0;
     if(pSelf) {
         GblStringRef_* pStrHeader = GblStringRef_header_(pSelf);
         length = pStrHeader->length;

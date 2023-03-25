@@ -16,7 +16,7 @@ static GblQuark     objectParentQuark_          = GBL_QUARK_INVALID;
 static GblQuark     objectFamilyQuark_          = GBL_QUARK_INVALID;
 static GblQuark     objectEventFiltersQuark_    = GBL_QUARK_INVALID;
 
-static GBL_RESULT GblObjectClass_ivariantIFace_construct_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblObjectClass_ivariantIFace_construct_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
     GBL_CTX_BEGIN(NULL);
     if(op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT) {
@@ -41,7 +41,7 @@ static GBL_RESULT GblObjectClass_ivariantIFace_compare_(const GblVariant* pVaria
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblObjectClass_ivariantIFace_get_(GblVariant* pSelf, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblObjectClass_ivariantIFace_get_(GblVariant* pSelf, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
     GBL_CTX_BEGIN(NULL);
     *(GblObject**)pArgs[0].pVoid = pSelf->pVoid;
@@ -54,7 +54,7 @@ static GBL_RESULT GblObjectClass_ivariantIFace_get_(GblVariant* pSelf, GblSize a
 }
 
 
-static GBL_RESULT GblObjectClass_ivariantIFace_set_(GblVariant* pSelf, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblObjectClass_ivariantIFace_set_(GblVariant* pSelf, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
     GBL_CTX_BEGIN(NULL);
     pSelf->pVoid = pArgs[0].pVoid;
@@ -191,8 +191,8 @@ GBL_EXPORT GBL_RESULT GblObject_notifyEvent(GblObject* pSelf, GblEvent* pEvent) 
 
 
      // Run the event through the event filters
-     const GblSize eventFilterCount = GblObject_eventFilterCount(pObject);
-     for(GblSize f = 0; f < eventFilterCount; ++f)
+     const size_t  eventFilterCount = GblObject_eventFilterCount(pObject);
+     for(size_t  f = 0; f < eventFilterCount; ++f)
      {
          GblIEventFilter* pFilter = GblObject_eventFilterAt(pSelf, f);
          GBL_CTX_CALL(GblIEventFilter_eventFilter(pFilter, GBL_IEVENT_HANDLER(pObject), pEvent));
@@ -259,11 +259,11 @@ GBL_EXPORT GBL_RESULT GblObject_uninstallEventFilter(GblObject* pSelf, GblIEvent
     GBL_CTX_VERIFY_POINTER(pFilter);
     pVector = GblObject_eventFilters_(pSelf);
     GBL_CTX_VERIFY_POINTER(pVector);
-    GblSize count = GblArrayList_size(pVector);
+    size_t  count = GblArrayList_size(pVector);
     GBL_CTX_VERIFY(count, GBL_RESULT_ERROR_INVALID_HANDLE,
                    "Object has no event filter list to remove filter from: %x", pFilter);
     GblBool found = GBL_FALSE;
-    for(GblSize f = 0; f < count; ++f) {
+    for(size_t  f = 0; f < count; ++f) {
         GblIEventFilter** ppFilter = GblArrayList_at(pVector, f);
         if(*ppFilter == pFilter) {
             found = GBL_TRUE;
@@ -276,7 +276,7 @@ GBL_EXPORT GBL_RESULT GblObject_uninstallEventFilter(GblObject* pSelf, GblIEvent
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblIEventFilter* GblObject_eventFilterAt(const GblObject* pSelf, GblSize index) {
+GBL_EXPORT GblIEventFilter* GblObject_eventFilterAt(const GblObject* pSelf, size_t  index) {
     GblIEventFilter** ppFilter = NULL;
     GBL_CTX_BEGIN(NULL);
     GblArrayList* pFilters = GblObject_eventFilters_(pSelf);
@@ -286,8 +286,8 @@ GBL_EXPORT GblIEventFilter* GblObject_eventFilterAt(const GblObject* pSelf, GblS
     return ppFilter? *ppFilter : NULL;
 }
 
-GBL_EXPORT GblSize GblObject_eventFilterCount(const GblObject* pSelf) {
-    GblSize count = 0;
+GBL_EXPORT size_t  GblObject_eventFilterCount(const GblObject* pSelf) {
+    size_t  count = 0;
     GBL_CTX_BEGIN(NULL);
     GblArrayList* pFilters = GblObject_eventFilters_(pSelf);
     if(pFilters) {
@@ -724,11 +724,11 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVaList(GblObject* pSelf, va_list* p
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pVarArgs);
 
-    GblSize count = GblProperty_count(GBL_INSTANCE_TYPEOF(pSelf));
+    size_t  count = GblProperty_count(GBL_INSTANCE_TYPEOF(pSelf));
     GblVariant*  pVariants  = GBL_ALLOCA(sizeof(GblVariant) * count);
     const char** pKeys      = GBL_ALLOCA(sizeof(const char*) * count);
 
-    GblSize p = 0;
+    size_t  p = 0;
     const char* pKey = NULL;
     while((pKey = va_arg(*pVarArgs, const char*))) {
         pKeys[p] = pKey;
@@ -749,24 +749,24 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVaList(GblObject* pSelf, va_list* p
 
     GBL_CTX_CALL(GblObject_setPropertiesVariants(pSelf, p, pKeys, pVariants));
 
-    for(GblSize v = 0; v < p; ++v) {
+    for(size_t  v = 0; v < p; ++v) {
        GBL_CTX_CALL(GblVariant_destruct(&pVariants[v]));
     }
 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_propertiesVariant(const GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
+GBL_EXPORT GBL_RESULT GblObject_propertiesVariant(const GblObject* pSelf, size_t  propertyCount, const char* pNames[], GblVariant* pValues) {
     GBL_CTX_BEGIN(NULL);
-    for(GblSize p = 0; p < propertyCount; ++p) {
+    for(size_t  p = 0; p < propertyCount; ++p) {
         GBL_CTX_CALL(GblObject_propertyVariant(pSelf, pNames[p], &pValues[p]));
     }
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants(GblObject* pSelf, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
+GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants(GblObject* pSelf, size_t  propertyCount, const char* pNames[], GblVariant* pValues) {
     GBL_CTX_BEGIN(NULL);
-    for(GblSize p = 0; p < propertyCount; ++p) {
+    for(size_t  p = 0; p < propertyCount; ++p) {
         GBL_CTX_CALL(GblObject_setPropertyVariant(pSelf, pNames[p], &pValues[p]));
     }
     GBL_CTX_END();
@@ -774,7 +774,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants(GblObject* pSelf, GblSize 
 
 GBL_DECLARE_STRUCT_PRIVATE(GblObjectCtorIterClosure) {
     GblObject*          pObject;
-    GblSize             argCount;
+    size_t              argCount;
     const GblProperty** ppProperties;
     GblVariant*         pValues;
 };
@@ -787,7 +787,7 @@ static GblBool GblObject_iterateCtorProperties_(const GblProperty* pProp,
     GblBool exitLoop = GBL_TRUE;
 
     // Check whether we were passed a value for the property
-    for(GblSize v = 0; v < pSelf->argCount; ++v) {
+    for(size_t  v = 0; v < pSelf->argCount; ++v) {
 
          // Set the required property to the given value
         if(pSelf->ppProperties[v] == pProp) {
@@ -812,7 +812,7 @@ static GblBool GblObject_iterateCtorProperties_(const GblProperty* pProp,
 }
 
 static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
-                                       GblSize            argCount,
+                                       size_t             argCount,
                                        const GblProperty* pProperties[],
                                        GblVariant*        pValues)
 {
@@ -839,7 +839,7 @@ static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
     GBL_CTX_VERIFY_CALL(GBL_OBJECT_GET_CLASS(pSelf)->pFnConstructed(pSelf));
 
     // Iterate over the remaining properties, doing regular writes.
-    for(GblSize v = 0; v < argCount; ++v) {
+    for(size_t  v = 0; v < argCount; ++v) {
         if(pProperties[v] && !(pProperties[v]->flags & GBL_PROPERTY_FLAG_CONSTRUCT)) {
             GBL_CTX_CALL(GblObject_setProperty_(pSelf,
                                                 pProperties[v],
@@ -897,7 +897,7 @@ GBL_EXPORT GBL_RESULT GblObject_constructWithClass(GblObject* pSelf, GblObjectCl
 }
 
 static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va_list* pVarArgs) {
-    GblSize count = 0;
+    size_t  count = 0;
 
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
@@ -905,7 +905,7 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
     GBL_CTX_VERIFY_POINTER(pVarArgs);
 
     const GblType       selfType       = GBL_INSTANCE_TYPEOF(pSelf);
-    const GblSize       totalCount     = GblProperty_count(GBL_INSTANCE_TYPEOF(pSelf));
+    const size_t        totalCount     = GblProperty_count(GBL_INSTANCE_TYPEOF(pSelf));
     GblVariant*         pVariants      = GBL_ALLOCA(sizeof(GblVariant)   * totalCount);
     const GblProperty** ppProperties   = GBL_ALLOCA(sizeof(GblProperty*) * totalCount);
 
@@ -933,7 +933,7 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
     GBL_CTX_VERIFY_CALL(GblObject_construct_(pSelf, count, ppProperties, pVariants));
 
     GBL_CTX_END_BLOCK();
-    for(GblSize v = 0; v < count; ++v)
+    for(size_t  v = 0; v < count; ++v)
         GblVariant_destruct(&pVariants[v]);
 
     return GBL_CTX_RESULT();
@@ -979,7 +979,7 @@ GBL_EXPORT GBL_RESULT GblObject_constructVaListWithClass(GblObject* pSelf, GblOb
 
 static GBL_RESULT GblObject_constructVariants_(GblObject*  pSelf,
                                                GblType     type,
-                                               GblSize     propertyCount,
+                                               size_t      propertyCount,
                                                const char* pNames[],
                                                GblVariant* pValues)
 {
@@ -989,7 +989,7 @@ static GBL_RESULT GblObject_constructVariants_(GblObject*  pSelf,
 
     const GblProperty** pProps = GBL_ALLOCA(sizeof(GblProperty*) * propertyCount);
 
-    for(GblSize p = 0; p < propertyCount; ++p) {
+    for(size_t  p = 0; p < propertyCount; ++p) {
         pProps[p] = GblProperty_find(GBL_INSTANCE_TYPEOF(pSelf), pNames[p]);
 
         if(!pProps[p]) {
@@ -1003,7 +1003,7 @@ static GBL_RESULT GblObject_constructVariants_(GblObject*  pSelf,
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblObject* GblObject_createVariants(GblType type, GblSize propertyCount, const char* pNames[], GblVariant* pValues) {
+GBL_EXPORT GblObject* GblObject_createVariants(GblType type, size_t  propertyCount, const char* pNames[], GblVariant* pValues) {
     GblObject* pObject = NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
@@ -1014,7 +1014,7 @@ GBL_EXPORT GblObject* GblObject_createVariants(GblType type, GblSize propertyCou
 }
 
 GBL_EXPORT GblObject* GblObject_createVariantsWithClass(GblObjectClass* pClass,
-                                                        GblSize         propertyCount,
+                                                        size_t          propertyCount,
                                                         const char*     pNames[],
                                                         GblVariant*     pValues)
 {
@@ -1030,7 +1030,7 @@ GBL_EXPORT GblObject* GblObject_createVariantsWithClass(GblObjectClass* pClass,
 
 GBL_EXPORT GBL_RESULT GblObject_constructVariants(GblObject*  pSelf,
                                                   GblType     type,
-                                                  GblSize     propertyCount,
+                                                  size_t      propertyCount,
                                                   const char* pNames[],
                                                   GblVariant* pValues)
 {
@@ -1043,7 +1043,7 @@ GBL_EXPORT GBL_RESULT GblObject_constructVariants(GblObject*  pSelf,
 
 GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass(GblObject*      pSelf,
                                                            GblObjectClass* pClass,
-                                                           GblSize         propertyCount,
+                                                           size_t          propertyCount,
                                                            const char*     pNames[],
                                                            GblVariant*     pValues)
 {
@@ -1215,7 +1215,7 @@ GBL_EXPORT GblObject* GblObject_findChildByName(const GblObject* pSelf, const ch
     return pChild;
 }
 
-GBL_EXPORT GblObject* GblObject_findChildByIndex(const GblObject* pSelf, GblSize index) {
+GBL_EXPORT GblObject* GblObject_findChildByIndex(const GblObject* pSelf, size_t  index) {
     GblObject* pChild = NULL;
     GBL_CTX_BEGIN(NULL);
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
@@ -1226,8 +1226,8 @@ GBL_EXPORT GblObject* GblObject_findChildByIndex(const GblObject* pSelf, GblSize
     return pChild;
 }
 
-GBL_EXPORT GblSize GblObject_childCount(const GblObject* pSelf) {
-    GblSize count = 0;
+GBL_EXPORT size_t  GblObject_childCount(const GblObject* pSelf) {
+    size_t  count = 0;
     GBL_CTX_BEGIN(NULL);
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
     if(pFamily) {
@@ -1237,8 +1237,8 @@ GBL_EXPORT GblSize GblObject_childCount(const GblObject* pSelf) {
     return count;
 }
 
-GBL_EXPORT GblSize GblObject_depth(const GblObject* pSelf) {
-    GblSize depth = 0;
+GBL_EXPORT size_t  GblObject_depth(const GblObject* pSelf) {
+    size_t  depth = 0;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
     if(pFamily) {
         depth = GblNaryTree_depth(&pFamily->treeNode);
@@ -1292,7 +1292,7 @@ GBL_EXPORT GblObject* GblObject_findAncestorByName(const GblObject* pSelf, const
     return pAncestor;
 }
 
-GBL_EXPORT GblObject* GblObject_findAncestorByHeight(const GblObject* pSelf, GblSize height) {
+GBL_EXPORT GblObject* GblObject_findAncestorByHeight(const GblObject* pSelf, size_t  height) {
     GblObject* pAncestor = NULL;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
     if(pFamily) {
@@ -1302,7 +1302,7 @@ GBL_EXPORT GblObject* GblObject_findAncestorByHeight(const GblObject* pSelf, Gbl
 }
 
 
-GBL_EXPORT GblObject* GblObject_findAncestorBaseByDepth(const GblObject* pSelf, GblSize depth) {
+GBL_EXPORT GblObject* GblObject_findAncestorBaseByDepth(const GblObject* pSelf, size_t  depth) {
     GblObject* pBase = NULL;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
     if(pFamily) {
@@ -1329,7 +1329,7 @@ GBL_EXPORT GblObject* GblObject_findSiblingByName(const GblObject* pSelf, const 
     return pObject;
 }
 
-GBL_EXPORT GblObject* GblObject_findSiblingByIndex(const GblObject* pSelf, GblSize index) {
+GBL_EXPORT GblObject* GblObject_findSiblingByIndex(const GblObject* pSelf, size_t  index) {
     GblObject* pAncestor = NULL;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
     if(pFamily) {

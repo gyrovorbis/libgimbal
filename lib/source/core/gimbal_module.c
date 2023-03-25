@@ -63,7 +63,7 @@ static void GblModule_init_(void) {
 static GBL_RESULT GblModule_arrayMapDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntry) {
     GBL_UNUSED(pMap, key);
     GblModule* pModule = GBL_MODULE(pEntry);
-    const GblSize uses = GblModule_useCount(pModule);
+    const size_t  uses = GblModule_useCount(pModule);
 
     if(uses) GBL_UNLIKELY {
         GBL_LOG_WARN("gimbal",
@@ -144,7 +144,7 @@ GBL_EXPORT GblModule* GblModule_findQuark(GblQuark quark) {
         mtx_lock(&moduleMtx_);
 
         uintptr_t value = 0;
-        const GblSize index = GblArrayMap_find(&pModules_, quark);
+        const size_t  index = GblArrayMap_find(&pModules_, quark);
 
         if(index != GBL_ARRAY_MAP_NPOS) GBL_LIKELY {
             value = GblArrayMap_probeValue(&pModules_, index);
@@ -161,7 +161,7 @@ GBL_EXPORT GblModule* GblModule_findQuark(GblQuark quark) {
     return pModule;
 }
 
-GBL_EXPORT GblModule* GblModule_at(GblSize index) {
+GBL_EXPORT GblModule* GblModule_at(size_t  index) {
     GblModule* pModule = NULL;
     GBL_MODULE_ENSURE_INITIALIZED_();
 
@@ -174,10 +174,10 @@ GBL_EXPORT GblModule* GblModule_at(GblSize index) {
     return pModule;
 }
 
-GBL_EXPORT GblSize GblModule_count(void) {
+GBL_EXPORT size_t  GblModule_count(void) {
     GBL_MODULE_ENSURE_INITIALIZED_();
     mtx_lock(&moduleMtx_);
-    GblSize count = GblArrayMap_size(&pModules_);
+    size_t  count = GblArrayMap_size(&pModules_);
     mtx_unlock(&moduleMtx_);
     return count;
 }
@@ -188,8 +188,8 @@ GBL_EXPORT GblBool GblModule_foreach(GblModuleIterFn pFnIter,
 
     GBL_MODULE_ENSURE_INITIALIZED_();
     mtx_lock(&moduleMtx_);
-    GblSize count = GblArrayMap_size(&pModules_);
-    for(GblSize m = 0; m < count; ++m) GBL_LIKELY {
+    size_t  count = GblArrayMap_size(&pModules_);
+    for(size_t  m = 0; m < count; ++m) GBL_LIKELY {
         GblModule* pModule = GBL_MODULE(GblArrayMap_probeValue(&pModules_, m));
         if((retVal = pFnIter(pModule, pUserdata))) GBL_UNLIKELY {
             break;
@@ -205,7 +205,7 @@ GBL_EXPORT GblModule* GblModule_require(const char* pName,
                                         const char* pVersion,
                                         const char* pFile,
                                         const char* pFunc,
-                                        GblSize     line)
+                                        size_t      line)
 {
     return GblModule_requireQuark(GblQuark_tryString(pName),
                                   pVersion,
@@ -218,7 +218,7 @@ GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
                                              const char* pVersion,
                                              const char* pFile,
                                              const char* pFunc,
-                                             GblSize     line)
+                                             size_t      line)
 {
     GblModule* pModule = GblModule_findQuark(quark);
 
@@ -288,7 +288,7 @@ GBL_EXPORT GblRefCount GblModule_unref(GblModule* pSelf) {
     return GBL_BOX_UNREF(pSelf);
 }
 
-GBL_EXPORT GblSize GblModule_typeCount(const GblModule* pSelf) {
+GBL_EXPORT size_t  GblModule_typeCount(const GblModule* pSelf) {
     GBL_UNUSED(pSelf);
     return 0;
 }

@@ -56,7 +56,7 @@ static GBL_RESULT GblArenaAllocatorTestSuite_allocNewPage_(GblTestSuite* pSelf, 
     GBL_CTX_BEGIN(pCtx);
     GblArenaAllocatorTestSuite_* pSelf_ = GBL_ARENA_ALLOCATOR_TEST_SUITE_(pSelf);
 
-    GblSize bytesAvail = GblArenaAllocator_bytesAvailable(&pSelf_->arena);
+    size_t  bytesAvail = GblArenaAllocator_bytesAvailable(&pSelf_->arena);
     GBL_TEST_VERIFY(bytesAvail <= 128 - 12);
 
     char* pStr = GblArenaAllocator_alloc(&pSelf_->arena, bytesAvail+1);
@@ -102,13 +102,13 @@ static GBL_RESULT GblArenaAllocatorTestSuite_saveLoadState_(GblTestSuite* pSelf,
     char* pTestString = GblArenaAllocator_allocAligned(&pSelf_->arena, 20, 1);
     strcpy(pTestString, "Restoration Point");
 
-    const GblSize bytesUsed = GblArenaAllocator_bytesUsed(&pSelf_->arena);
-    const GblSize pageCount = GblArenaAllocator_pageCount(&pSelf_->arena);
+    const size_t  bytesUsed = GblArenaAllocator_bytesUsed(&pSelf_->arena);
+    const size_t  pageCount = GblArenaAllocator_pageCount(&pSelf_->arena);
 
     GblArenaAllocatorState state;
     GblArenaAllocator_saveState(&pSelf_->arena, &state);
 
-    for(GblSize i = 0; i < 5; ++i)
+    for(size_t  i = 0; i < 5; ++i)
         GblArenaAllocator_alloc(&pSelf_->arena, 100);
 
     GBL_CTX_VERIFY_CALL(GblArenaAllocator_loadState(&pSelf_->arena, &state));

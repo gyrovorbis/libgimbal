@@ -46,34 +46,34 @@ typedef struct GblRingBuffer {      // Size (32/64-bit)
     GBL_PRIVATE()
         GblContext* pCtx;           // 4/8      bytes
         uint8_t*    pData;          // 4/8      bytes
-        GblSize     size;           // 4/8      bytes
-        GblSize     capacity;       // 4/8      bytes
-        GblSize     frontPos;       // 4/8      bytes
+        size_t      size;           // 4/8      bytes
+        size_t      capacity;       // 4/8      bytes
+        size_t      frontPos;       // 4/8      bytes
         uint16_t    elementSize;    // 2        bytes
     GBL_PRIVATE_END
 } GblRingBuffer;                    // 22/42    total
 
 GBL_EXPORT GBL_RESULT  GblRingBuffer_construct_6(GBL_SELF,
                                                  uint16_t    elementSize,
-                                                 GblSize     capacity,
-                                                 GblSize     initialSize,
+                                                 size_t      capacity,
+                                                 size_t      initialSize,
                                                  const void* pInitialData,
                                                  GblContext* pCtx)                            GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT  GblRingBuffer_construct_5(GBL_SELF,
                                                  uint16_t    elementSize,
-                                                 GblSize     capacity,
-                                                 GblSize     initialSize,
+                                                 size_t      capacity,
+                                                 size_t      initialSize,
                                                  const void* pInitialData)                    GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT  GblRingBuffer_construct_4(GBL_SELF,
                                                  uint16_t   elementSize,
-                                                 GblSize    capacity,
-                                                 GblSize    initialSize)                      GBL_NOEXCEPT;
+                                                 size_t     capacity,
+                                                 size_t     initialSize)                      GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT  GblRingBuffer_construct_3(GBL_SELF,
                                                  uint16_t   elementSize,
-                                                 GblSize    capacity)                         GBL_NOEXCEPT;
+                                                 size_t     capacity)                         GBL_NOEXCEPT;
 
 #define                GblRingBuffer_construct(...)  GBL_VA_OVERLOAD_CALL(GblRingBuffer_construct,       \
                                                                           GBL_VA_OVERLOAD_SUFFIXER_ARGC, \
@@ -84,14 +84,14 @@ GBL_EXPORT GBL_RESULT  GblRingBuffer_copy        (GBL_SELF, const GblRingBuffer*
 GBL_EXPORT GBL_RESULT  GblRingBuffer_move        (GBL_SELF, GblRingBuffer* pOther)            GBL_NOEXCEPT;
 
 GBL_INLINE GblContext* GblRingBuffer_context     (GBL_CSELF)                                  GBL_NOEXCEPT;
-GBL_INLINE GblSize     GblRingBuffer_capacity    (GBL_CSELF)                                  GBL_NOEXCEPT;
-GBL_INLINE GblSize     GblRingBuffer_size        (GBL_CSELF)                                  GBL_NOEXCEPT;
-GBL_INLINE GblSize     GblRingBuffer_elementSize (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_INLINE size_t      GblRingBuffer_capacity    (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_INLINE size_t      GblRingBuffer_size        (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_INLINE size_t      GblRingBuffer_elementSize (GBL_CSELF)                                  GBL_NOEXCEPT;
 
 GBL_INLINE GblBool     GblRingBuffer_empty       (GBL_CSELF)                                  GBL_NOEXCEPT;
 GBL_INLINE GblBool     GblRingBuffer_full        (GBL_CSELF)                                  GBL_NOEXCEPT;
 
-GBL_INLINE void*       GblRingBuffer_at          (GBL_CSELF, GblSize index)                   GBL_NOEXCEPT;
+GBL_INLINE void*       GblRingBuffer_at          (GBL_CSELF, size_t  index)                   GBL_NOEXCEPT;
 GBL_INLINE void*       GblRingBuffer_front       (GBL_CSELF)                                  GBL_NOEXCEPT;
 GBL_INLINE void*       GblRingBuffer_back        (GBL_CSELF)                                  GBL_NOEXCEPT;
 
@@ -105,7 +105,7 @@ GBL_INLINE void        GblRingBuffer_clear       (GBL_SELF)                     
 
 /// \cond
 
-GBL_INLINE GblSize GblRingBuffer_mappedIndex_(GBL_CSELF, GblSize index) {
+GBL_INLINE size_t  GblRingBuffer_mappedIndex_(GBL_CSELF, size_t  index) {
     return (GBL_PRIV_REF(pSelf).frontPos + index) % GBL_PRIV_REF(pSelf).capacity;
 }
 
@@ -121,8 +121,8 @@ GBL_INLINE void GblRingBuffer_advance_(GBL_SELF) GBL_NOEXCEPT {
 
 GBL_INLINE GBL_RESULT GblRingBuffer_construct_5(GBL_SELF,
                                                 uint16_t    elementSize,
-                                                GblSize     capacity,
-                                                GblSize     initialSize,
+                                                size_t      capacity,
+                                                size_t      initialSize,
                                                 const void* pInitialData) GBL_NOEXCEPT
 {
     return GblRingBuffer_construct_6(pSelf, elementSize, capacity, initialSize, pInitialData, GBL_NULL);
@@ -130,15 +130,15 @@ GBL_INLINE GBL_RESULT GblRingBuffer_construct_5(GBL_SELF,
 
 GBL_INLINE GBL_RESULT GblRingBuffer_construct_4(GBL_SELF,
                                                 uint16_t   elementSize,
-                                                GblSize    capacity,
-                                                GblSize    initialSize) GBL_NOEXCEPT
+                                                size_t     capacity,
+                                                size_t     initialSize) GBL_NOEXCEPT
 {
     return GblRingBuffer_construct_5(pSelf, elementSize, capacity, initialSize, GBL_NULL);
 }
 
 GBL_INLINE GBL_RESULT GblRingBuffer_construct_3(GBL_SELF,
                                                 uint16_t   elementSize,
-                                                GblSize    capacity)        GBL_NOEXCEPT
+                                                size_t     capacity)        GBL_NOEXCEPT
 {
     return GblRingBuffer_construct_4(pSelf, elementSize, capacity, 0);
 }
@@ -147,15 +147,15 @@ GBL_INLINE GblContext* GblRingBuffer_context(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_PRIV_REF(pSelf).pCtx;
 }
 
-GBL_INLINE GblSize GblRingBuffer_capacity(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblRingBuffer_capacity(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_PRIV_REF(pSelf).capacity;
 }
 
-GBL_INLINE GblSize GblRingBuffer_size(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblRingBuffer_size(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_PRIV_REF(pSelf).size;
 }
 
-GBL_INLINE GblSize GblRingBuffer_elementSize(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblRingBuffer_elementSize(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_PRIV_REF(pSelf).elementSize;
 }
 
@@ -167,8 +167,8 @@ GBL_INLINE GblBool GblRingBuffer_full(GBL_CSELF) GBL_NOEXCEPT {
     return GblRingBuffer_size(pSelf) == GBL_PRIV_REF(pSelf).capacity? GBL_TRUE : GBL_FALSE;
 }
 
-GBL_INLINE void* GblRingBuffer_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
-    const GblSize size = GblRingBuffer_size(pSelf);
+GBL_INLINE void* GblRingBuffer_at(GBL_CSELF, size_t  index) GBL_NOEXCEPT {
+    const size_t  size = GblRingBuffer_size(pSelf);
     void* pData = GBL_NULL;
 
     if(index >= size) GBL_UNLIKELY {

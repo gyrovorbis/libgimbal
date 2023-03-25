@@ -38,7 +38,7 @@ GBL_SIGNALS(GblMainLoop,
 GBL_EXPORT GBL_RESULT GblMainLoop_enqueue (GBL_SELF, GblTask* pTask) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblMainLoop_cancel  (GBL_SELF, GblTask* pTask) GBL_NOEXCEPT;
 GBL_EXPORT GblTask*   GblMainLoop_top     (GBL_CSELF)                GBL_NOEXCEPT;
-GBL_EXPORT GblSize    GblMainLoop_depth   (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblMainLoop_depth   (GBL_CSELF)                GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblMainLoop_iteration (GBL_SELF)  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblMainLoop_exec      (GBL_SELF)  GBL_NOEXCEPT;

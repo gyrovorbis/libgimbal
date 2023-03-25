@@ -24,7 +24,7 @@ GBL_CLASS_END
 
 GBL_INSTANCE_DERIVE(GblApp, GblObject)
     const char** ppArgv;
-    GblSize      argc;
+    size_t       argc;
     GblMainLoop* pLoop;
 GBL_INSTANCE_END
 

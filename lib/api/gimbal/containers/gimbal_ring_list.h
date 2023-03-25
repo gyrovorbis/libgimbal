@@ -85,7 +85,7 @@ GBL_EXPORT GblRingList* GblRingList_create          (void* pData, ...)          
 GBL_EXPORT GblRingList* GblRingList_copy            (GBL_CSELF, GblRingListCopyFn pFnCpy, void* pCl) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblRingList_destroy         (GBL_SELF, GblRingListDtorFn pFnDtor, void* pCl) GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblRingList_size            (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblRingList_size            (GBL_CSELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblRingList_empty           (GBL_CSELF)                                      GBL_NOEXCEPT;
 
 GBL_EXPORT void*        GblRingList_front           (GBL_CSELF)                                      GBL_NOEXCEPT;
@@ -109,9 +109,9 @@ GBL_EXPORT GblBool      GblRingList_splice          (GBL_SELF,
                                                      GblRingList*     pOther,
                                                      int32_t          index)                         GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblRingList_popBack         (GBL_SELF, GblSize count)                        GBL_NOEXCEPT;
-GBL_EXPORT void*        GblRingList_popFront        (GBL_SELF, GblSize count)                        GBL_NOEXCEPT;
-GBL_EXPORT void*        GblRingList_remove          (GBL_SELF, intptr_t index, GblSize count)        GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_popBack         (GBL_SELF, size_t  count)                        GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_popFront        (GBL_SELF, size_t  count)                        GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRingList_remove          (GBL_SELF, intptr_t index, size_t  count)        GBL_NOEXCEPT;
 GBL_EXPORT void*        GblRingList_extract         (GBL_SELF, GblRingList* pNode)                   GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblRingList_clear           (GBL_SELF)                                       GBL_NOEXCEPT;
 
@@ -120,7 +120,7 @@ GBL_EXPORT void         GblRingList_rotate          (GBL_SELF, intptr_t n)      
 GBL_EXPORT void         GblRingList_reverse         (GBL_SELF)                                       GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblRingList_foreach         (GBL_SELF, GblRingListIterFn pFnIt, void* pCl)   GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblRingList_find            (GBL_CSELF,
+GBL_EXPORT size_t       GblRingList_find            (GBL_CSELF,
                                                      const void*      pVal,
                                                      GblRingListCmpFn pFnCmp,
                                                      void*            pCl)                           GBL_NOEXCEPT;

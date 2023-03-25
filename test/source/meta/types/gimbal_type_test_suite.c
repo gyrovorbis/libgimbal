@@ -80,7 +80,7 @@ static GBL_RESULT GblTypeTestSuite_initDefaults_(GblTestSuite* pSelf, GblContext
     //GBL_TEST_COMPARE(GblType_registeredCount(), GBL_TYPE_BUILTIN_COUNT);
 
     GblType prev = GBL_INVALID_TYPE;
-    for(GblSize t = 0; t < GBL_TYPE_BUILTIN_COUNT; ++t) {
+    for(size_t  t = 0; t < GBL_TYPE_BUILTIN_COUNT; ++t) {
         GBL_TEST_VERIFY((prev = GblType_nextRegistered(prev))
                                   != GBL_INVALID_TYPE);
     }

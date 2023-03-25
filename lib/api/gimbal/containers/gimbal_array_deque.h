@@ -96,8 +96,8 @@ typedef struct GblArrayDeque {      // Size (32/64-bit)
 // ===== Public methods =====
 GBL_EXPORT GBL_RESULT  GblArrayDeque_construct    (GBL_SELF,
                                                    uint16_t    elementSize,
-                                                   GblSize     capacity,
-                                                   GblSize     initialSize,
+                                                   size_t      capacity,
+                                                   size_t      initialSize,
                                                    const void* pInitialData,
                                                    GblContext* pCtx)                                        GBL_NOEXCEPT;
 
@@ -106,14 +106,14 @@ GBL_INLINE GBL_RESULT  GblArrayDeque_copy         (GBL_SELF, const GblArrayDeque
 GBL_INLINE GBL_RESULT  GblArrayDeque_move         (GBL_SELF, GblArrayDeque* pOther)                         GBL_NOEXCEPT;
 
 GBL_INLINE GblContext* GblArrayDeque_context      (GBL_CSELF)                                               GBL_NOEXCEPT;
-GBL_INLINE GblSize     GblArrayDeque_capacity     (GBL_CSELF)                                               GBL_NOEXCEPT;
-GBL_INLINE GblSize     GblArrayDeque_size         (GBL_CSELF)                                               GBL_NOEXCEPT;
-GBL_INLINE GblSize     GblArrayDeque_elementSize  (GBL_CSELF)                                               GBL_NOEXCEPT;
+GBL_INLINE size_t      GblArrayDeque_capacity     (GBL_CSELF)                                               GBL_NOEXCEPT;
+GBL_INLINE size_t      GblArrayDeque_size         (GBL_CSELF)                                               GBL_NOEXCEPT;
+GBL_INLINE size_t      GblArrayDeque_elementSize  (GBL_CSELF)                                               GBL_NOEXCEPT;
 
 GBL_INLINE GblBool     GblArrayDeque_empty        (GBL_CSELF)                                               GBL_NOEXCEPT;
 GBL_INLINE GblBool     GblArrayDeque_full         (GBL_CSELF)                                               GBL_NOEXCEPT;
 
-GBL_INLINE void*       GblArrayDeque_at           (GBL_CSELF, GblSize index)                                GBL_NOEXCEPT;
+GBL_INLINE void*       GblArrayDeque_at           (GBL_CSELF, size_t  index)                                GBL_NOEXCEPT;
 GBL_INLINE void*       GblArrayDeque_front        (GBL_CSELF)                                               GBL_NOEXCEPT;
 GBL_INLINE void*       GblArrayDeque_back         (GBL_CSELF)                                               GBL_NOEXCEPT;
 
@@ -125,13 +125,13 @@ GBL_EXPORT void*       GblArrayDeque_emplaceFront (GBL_SELF)                    
 GBL_EXPORT void*       GblArrayDeque_popBack      (GBL_SELF)                                                GBL_NOEXCEPT;
 GBL_INLINE void*       GblArrayDeque_popFront     (GBL_SELF)                                                GBL_NOEXCEPT;
 
-GBL_EXPORT void*       GblArrayDeque_insert       (GBL_SELF, GblSize pos, const void* pData, GblSize count) GBL_NOEXCEPT;
-GBL_EXPORT void*       GblArrayDeque_emplace      (GBL_SELF, GblSize pos)                                   GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblArrayDeque_erase        (GBL_SELF, GblSize pos, GblSize count)                    GBL_NOEXCEPT;
+GBL_EXPORT void*       GblArrayDeque_insert       (GBL_SELF, size_t  pos, const void* pData, size_t  count) GBL_NOEXCEPT;
+GBL_EXPORT void*       GblArrayDeque_emplace      (GBL_SELF, size_t  pos)                                   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblArrayDeque_erase        (GBL_SELF, size_t  pos, size_t  count)                    GBL_NOEXCEPT;
 
 GBL_EXPORT void        GblArrayDeque_clear        (GBL_SELF)                                                GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblArrayDeque_reserve      (GBL_SELF, GblSize capacity)                              GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblArrayDeque_resize       (GBL_SELF, GblSize size)                                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblArrayDeque_reserve      (GBL_SELF, size_t  capacity)                              GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblArrayDeque_resize       (GBL_SELF, size_t  size)                                  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblArrayDeque_shrinkToFit  (GBL_SELF)                                                GBL_NOEXCEPT;
 
 // ===== Public macros =====
@@ -176,15 +176,15 @@ GBL_INLINE GblContext* GblArrayDeque_context(GBL_CSELF) GBL_NOEXCEPT {
     return GblRingBuffer_context(GBL_RING_SELF_(pSelf));
 }
 
-GBL_INLINE GblSize GblArrayDeque_capacity(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblArrayDeque_capacity(GBL_CSELF) GBL_NOEXCEPT {
     return GblRingBuffer_capacity(GBL_RING_SELF_(pSelf));
 }
 
-GBL_INLINE GblSize GblArrayDeque_size(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblArrayDeque_size(GBL_CSELF) GBL_NOEXCEPT {
     return GblRingBuffer_size(GBL_RING_SELF_(pSelf));
 }
 
-GBL_INLINE GblSize GblArrayDeque_elementSize(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblArrayDeque_elementSize(GBL_CSELF) GBL_NOEXCEPT {
     return GblRingBuffer_elementSize(GBL_RING_SELF_(pSelf));
 }
 
@@ -196,7 +196,7 @@ GBL_INLINE GblBool GblArrayDeque_full(GBL_CSELF) GBL_NOEXCEPT {
     return GblRingBuffer_full(GBL_RING_SELF_(pSelf));
 }
 
-GBL_INLINE void* GblArrayDeque_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE void* GblArrayDeque_at(GBL_CSELF, size_t  index) GBL_NOEXCEPT {
     void* pData = GBL_NULL;
 
     if(index >= GBL_RING_PRIV_REF_(pSelf).size) GBL_UNLIKELY {
@@ -205,10 +205,10 @@ GBL_INLINE void* GblArrayDeque_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
         GBL_CTX_END_BLOCK();
     } else GBL_LIKELY {
 #if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
-        const GblSize slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
+        const size_t  slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
                            & (GBL_RING_PRIV_REF_(pSelf).capacity-1);
 #else
-        const GblSize slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
+        const size_t  slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
                            % (GBL_RING_PRIV_REF_(pSelf).capacity);
 #endif
         pData = &GBL_RING_PRIV_REF_(pSelf).pData[slot * GBL_RING_PRIV_REF_(pSelf).elementSize];

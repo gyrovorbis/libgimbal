@@ -55,11 +55,11 @@ typedef struct GblArrayMap {
     GBL_PRIVATE()
         GblContext*             pCtx;                   ///< Optional custom context
         GblArrayMapCmpFn        pFnComparator;          ///< Optional custom comparator
-        GblSize                 binarySearches  : 1;    ///< Optionally sort values and use binary searches
+        size_t                  binarySearches  : 1;    ///< Optionally sort values and use binary searches
 #ifdef GBL_64BIT
-        GblSize                 size            : 63;   ///< Number of elements within the map
+        size_t                  size            : 63;   ///< Number of elements within the map
 #elif defined(GBL_32BIT)
-        GblSize                 size            : 31;
+        size_t                  size            : 31;
 #endif
     GBL_PRIVATE_END
 } GblArrayMap;
@@ -71,7 +71,7 @@ GBL_EXPORT GblArrayMap* GblArrayMap_create          (GblArrayMapCmpFn pFnComp,
 /// Destroys a GblArrayMap.
 GBL_EXPORT GBL_RESULT   GblArrayMap_destroy         (GBL_PSELF)                    GBL_NOEXCEPT;
 /// Returns the number of entries within the given map.
-GBL_INLINE GblSize      GblArrayMap_size            (GBL_PCSELF)                   GBL_NOEXCEPT;
+GBL_INLINE size_t       GblArrayMap_size            (GBL_PCSELF)                   GBL_NOEXCEPT;
 /// Returns the context associated with the given map.
 GBL_INLINE GblContext*  GblArrayMap_context         (GBL_PCSELF)                   GBL_NOEXCEPT;
 /// Returns whether the given map is empty.
@@ -102,12 +102,12 @@ GBL_INLINE GBL_RESULT   GblArrayMap_setVariant      (GBL_PSELF,
                                                      uintptr_t key,
                                                      GblVariant* pVariant)        GBL_NOEXCEPT;
 /// Attempts to insert a new entry with the given key and userdata, returning the insertion index.
-GBL_INLINE GblSize      GblArrayMap_insertUserdata  (GBL_PSELF,
+GBL_INLINE size_t       GblArrayMap_insertUserdata  (GBL_PSELF,
                                                      uintptr_t key,
                                                      uintptr_t value,
                                                      GblArrayMapDtorFn pDtor)     GBL_NOEXCEPT;
 /// Attempts to insert a new entry with the given key and GblVariant value, returning insertion index.
-GBL_INLINE GblSize      GblArrayMap_insertVariant   (GBL_PSELF,
+GBL_INLINE size_t       GblArrayMap_insertVariant   (GBL_PSELF,
                                                      uintptr_t key,
                                                      GblVariant* pVariant)        GBL_NOEXCEPT;
 /// Attempts to erase the value with the given key, returning GBL_FALSE if not found.
@@ -123,25 +123,25 @@ GBL_EXPORT GblBool      GblArrayMap_extractValue    (GBL_PSELF,
 /// Clears all entries within the given map.
 GBL_EXPORT void         GblArrayMap_clear           (GBL_PSELF)                   GBL_NOEXCEPT;
 /// Returns the index of the entry with the given key.
-GBL_INLINE GblSize      GblArrayMap_find            (GBL_PCSELF, uintptr_t key)   GBL_NOEXCEPT;
+GBL_INLINE size_t       GblArrayMap_find            (GBL_PCSELF, uintptr_t key)   GBL_NOEXCEPT;
 /// Returns the key for the entry at the given index.
-GBL_INLINE uintptr_t    GblArrayMap_probeKey        (GBL_PCSELF, GblSize index)   GBL_NOEXCEPT;
+GBL_INLINE uintptr_t    GblArrayMap_probeKey        (GBL_PCSELF, size_t  index)   GBL_NOEXCEPT;
 /// Returns the value for the entry at the given index.
-GBL_INLINE uintptr_t    GblArrayMap_probeValue      (GBL_PCSELF, GblSize index)   GBL_NOEXCEPT;
+GBL_INLINE uintptr_t    GblArrayMap_probeValue      (GBL_PCSELF, size_t  index)   GBL_NOEXCEPT;
 /// Returns the GblVariant for the entry at the given index.
-GBL_INLINE GblVariant*  GblArrayMap_probeVariant    (GBL_PCSELF, GblSize index)   GBL_NOEXCEPT;
+GBL_INLINE GblVariant*  GblArrayMap_probeVariant    (GBL_PCSELF, size_t  index)   GBL_NOEXCEPT;
 
 //========== IMPL ==========
 
 ///\cond
-GBL_INLINE GblArrayMapEntry* GblArrayMap_entry_(GBL_PCSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE GblArrayMapEntry* GblArrayMap_entry_(GBL_PCSELF, size_t  index) GBL_NOEXCEPT {
     return (*ppSelf && index < GblArrayMap_size(ppSelf))?
             (GblArrayMapEntry*)((uint8_t*)*ppSelf + sizeof(GblArrayMap) + sizeof(GblArrayMapEntry)*index) :
             GBL_NULL;
 }
 
 GBL_INLINE GblArrayMapEntry* GblArrayMap_find_entry_(GBL_PCSELF, uintptr_t key) GBL_NOEXCEPT {
-    const GblSize index = GblArrayMap_find(ppSelf, key);
+    const size_t  index = GblArrayMap_find(ppSelf, key);
     return (index != GBL_ARRAY_MAP_NPOS)?
                 GblArrayMap_entry_(ppSelf, index) :
                 GBL_NULL;
@@ -158,7 +158,7 @@ GBL_INLINE uintptr_t GblArrayMap_valueFromVariant_(GblVariant* pVariant) GBL_NOE
     return value;
 }
 
-GBL_INLINE ptrdiff_t GblArrayMap_diffEntry_(GBL_PCSELF, GblSize index, uintptr_t key) GBL_NOEXCEPT {
+GBL_INLINE ptrdiff_t GblArrayMap_diffEntry_(GBL_PCSELF, size_t  index, uintptr_t key) GBL_NOEXCEPT {
     ptrdiff_t diff = GBL_ARRAY_MAP_NPOS;
     const GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, index);
     if(GBL_PRIV_REF(*ppSelf).pFnComparator) {
@@ -192,16 +192,16 @@ GBL_INLINE GBL_RESULT GblArrayMap_entrySetVariant_(GBL_PCSELF, GblArrayMapEntry*
 GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(GBL_PSELF, uintptr_t key) {
     GblArrayMapEntry* pEntry = NULL;
     GBL_CTX_BEGIN(NULL);
-    const GblSize size = GblArrayMap_size(ppSelf);
+    const size_t  size = GblArrayMap_size(ppSelf);
 
     // Have to insert in sorted order for Nth entry when binary searchable
     if(*ppSelf && size && GblArrayMap_binarySearches(ppSelf)) {
-        GblSize insertionIdx = size;
+        size_t  insertionIdx = size;
 
         // If we have a little bitch array that's fast linearly
         if(size < GBL_ARRAY_MAP_BINARY_SEARCH_CUTOFF_SIZE) {
             // iterate (linearly, fuck you) to find insertion point
-            for(GblSize i = 0; i < size; ++i) {
+            for(size_t  i = 0; i < size; ++i) {
                 // insertion point is less than or equal to next
                 if(GblArrayMap_diffEntry_(ppSelf, i, key) >= 0) {
                     insertionIdx = i;
@@ -219,7 +219,7 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(GBL_PSELF, uintptr_t key) {
             const GblArrayMapEntry* pEntryBegin = GblArrayMap_entry_(ppSelf, 0);
 
             do {
-                const GblSize mid = lower + ((upper-lower) >> 1);
+                const size_t  mid = lower + ((upper-lower) >> 1);
                 const GblArrayMapEntry* pEntry = pEntryBegin + mid;
                 const ptrdiff_t diff = GBL_PRIV_REF(pSelf).pFnComparator?
                                             GBL_PRIV_REF(pSelf).pFnComparator(pSelf, pEntry->key, key) :
@@ -244,7 +244,7 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(GBL_PSELF, uintptr_t key) {
         pEntry = GblArrayMap_entry_(ppSelf, insertionIdx);
 
         // calculate slide adjustments for the rest of the items
-        const GblSize slideSize = (size - insertionIdx);
+        const size_t  slideSize = (size - insertionIdx);
         if(slideSize) {
             // scooch the bitches over by one
             memmove(pEntry + 1,
@@ -291,7 +291,7 @@ GBL_INLINE GBL_RESULT GblArrayMap_entrySetUserdata_(GBL_PCSELF, GblArrayMapEntry
  * \return size of the map
  * \relatedalso GblArrayMap
  */
-GBL_INLINE GblSize GblArrayMap_size(GBL_PCSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblArrayMap_size(GBL_PCSELF) GBL_NOEXCEPT {
     return *ppSelf? GBL_PRIV_REF(*ppSelf).size : 0;
 }
 /*!
@@ -441,13 +441,13 @@ GBL_INLINE GblVariant* GblArrayMap_atVariant(GBL_PCSELF, uintptr_t key) GBL_NOEX
  * \return Index of the entry with the given key, or GBL_ARRAY_MAP_NPOS if not found
  * \relatedalso GblArrayMap
  */
-GBL_INLINE GblSize GblArrayMap_find(GBL_PCSELF, uintptr_t key) GBL_NOEXCEPT {
-    GblSize index = GBL_ARRAY_MAP_NPOS;
+GBL_INLINE size_t  GblArrayMap_find(GBL_PCSELF, uintptr_t key) GBL_NOEXCEPT {
+    size_t  index = GBL_ARRAY_MAP_NPOS;
     // Don't look for shit if this is a NIL array map
     if(*ppSelf) {
         GblArrayMap* pSelf = *ppSelf;
         const GblBool binarySearches = GblArrayMap_binarySearches(ppSelf);
-        const GblSize size = GblArrayMap_size(ppSelf);
+        const size_t  size = GblArrayMap_size(ppSelf);
 
         /* Perform binary search if there are enough entries to warrant the complexity,
            and we have a sorted list. */
@@ -459,7 +459,7 @@ GBL_INLINE GblSize GblArrayMap_find(GBL_PCSELF, uintptr_t key) GBL_NOEXCEPT {
             // Only run this loop if we're doing a binary search using a comparator
             if(GBL_PRIV_REF(pSelf).pFnComparator) {
                 do {
-                    const GblSize mid = lower + ((upper-lower) >> 1);
+                    const size_t  mid = lower + ((upper-lower) >> 1);
                     const GblArrayMapEntry* pEntry = pEntryBegin + mid;
                     const ptrdiff_t diff = GBL_PRIV_REF(pSelf).pFnComparator(pSelf, pEntry->key, key);
                     if(diff > 0) {
@@ -476,7 +476,7 @@ GBL_INLINE GblSize GblArrayMap_find(GBL_PCSELF, uintptr_t key) GBL_NOEXCEPT {
             } else {
 
                 do {
-                    const GblSize mid = lower + ((upper-lower) >> 1);
+                    const size_t  mid = lower + ((upper-lower) >> 1);
                     const GblArrayMapEntry* pEntry = pEntryBegin + mid;
                     const ptrdiff_t diff = pEntry->key - key;
                     if(diff > 0) {
@@ -496,7 +496,7 @@ GBL_INLINE GblSize GblArrayMap_find(GBL_PCSELF, uintptr_t key) GBL_NOEXCEPT {
             // Only run this loop for linear searches with a comparator
             if(GBL_PRIV_REF(pSelf).pFnComparator) {
                 const GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, 0);
-                for(GblSize e = 0; e < size; ++e) {
+                for(size_t  e = 0; e < size; ++e) {
                     if(GBL_PRIV_REF(pSelf).pFnComparator(pSelf, pEntry->key, key) == 0) {
                          index = e;
                          break;
@@ -506,7 +506,7 @@ GBL_INLINE GblSize GblArrayMap_find(GBL_PCSELF, uintptr_t key) GBL_NOEXCEPT {
             // Only run this loop for linear searches without a comparator
             } else {
                 const GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, 0);
-                for(GblSize e = 0; e < size; ++e) {
+                for(size_t  e = 0; e < size; ++e) {
                     if(pEntry->key == key) {
                          index = e;
                          break;
@@ -526,7 +526,7 @@ GBL_INLINE GblSize GblArrayMap_find(GBL_PCSELF, uintptr_t key) GBL_NOEXCEPT {
  * \return value of the entry at the given index or 0 if there isn't one
  * \relatedalso GblArrayMap
  */
-GBL_INLINE uintptr_t GblArrayMap_probeKey(GBL_PCSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE uintptr_t GblArrayMap_probeKey(GBL_PCSELF, size_t  index) GBL_NOEXCEPT {
     GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, index);
     return pEntry? pEntry->key : 0;
 }
@@ -537,7 +537,7 @@ GBL_INLINE uintptr_t GblArrayMap_probeKey(GBL_PCSELF, GblSize index) GBL_NOEXCEP
  * \return GblVariant of the entry at the given index or NULL if there isn't one
  * \relatedalso GblArrayMap
  */
-GBL_INLINE GblVariant* GblArrayMap_probeVariant(GBL_PCSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE GblVariant* GblArrayMap_probeVariant(GBL_PCSELF, size_t  index) GBL_NOEXCEPT {
     GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, index);
     return pEntry && pEntry->value.type != GBL_INVALID_TYPE? &pEntry->value : GBL_NULL;
 }
@@ -548,7 +548,7 @@ GBL_INLINE GblVariant* GblArrayMap_probeVariant(GBL_PCSELF, GblSize index) GBL_N
  * \return value of the entry at the given index, or 0 if there isn't one
  * \relatedalso GblArrayMap
  */
-GBL_INLINE uintptr_t GblArrayMap_probeValue(GBL_PCSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE uintptr_t GblArrayMap_probeValue(GBL_PCSELF, size_t  index) GBL_NOEXCEPT {
     GblArrayMapEntry* pEntry = GblArrayMap_entry_(ppSelf, index);
     return pEntry? GblArrayMap_valueFromVariant_(&pEntry->value) : 0;
 }
@@ -595,8 +595,8 @@ GBL_INLINE GBL_RESULT GblArrayMap_setUserdata(GBL_PSELF, uintptr_t key, uintptr_
  * \return Index the given variant was inserted at, or GBL_ARRAY_MAP_NPOS if it wasn't
  * \relatedalso GblArrayMap
  */
-GBL_INLINE GblSize GblArrayMap_insertVariant(GBL_PSELF, uintptr_t key, GblVariant* pVariant) GBL_NOEXCEPT {
-    GblSize index = GblArrayMap_find(ppSelf, key);
+GBL_INLINE size_t  GblArrayMap_insertVariant(GBL_PSELF, uintptr_t key, GblVariant* pVariant) GBL_NOEXCEPT {
+    size_t  index = GblArrayMap_find(ppSelf, key);
     if(index == GBL_ARRAY_MAP_NPOS) {
         GblArrayMapEntry* pEntry = GblArrayMap_entryAdd_(ppSelf, key);
         GblVariant_constructCopy(&pEntry->value, pVariant);
@@ -613,8 +613,8 @@ GBL_INLINE GblSize GblArrayMap_insertVariant(GBL_PSELF, uintptr_t key, GblVarian
  * \return Index the given userdata value was inserted at, or GBL_ARRAY_MAP_NPOS if it wasn't
  * \relatedalso GblArrayMap
  */
-GBL_INLINE GblSize GblArrayMap_insertUserdata(GBL_PSELF, uintptr_t key, uintptr_t value, GblArrayMapDtorFn pDtor) GBL_NOEXCEPT {
-    GblSize index = GblArrayMap_find(ppSelf, key);
+GBL_INLINE size_t  GblArrayMap_insertUserdata(GBL_PSELF, uintptr_t key, uintptr_t value, GblArrayMapDtorFn pDtor) GBL_NOEXCEPT {
+    size_t  index = GblArrayMap_find(ppSelf, key);
     if(index == GBL_ARRAY_MAP_NPOS) {
         GblArrayMapEntry* pEntry = GblArrayMap_entryAdd_(ppSelf, key);
         GblArrayMap_entrySetUserdata_(ppSelf, pEntry, value, pDtor);

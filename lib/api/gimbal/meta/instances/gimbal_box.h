@@ -71,7 +71,7 @@ GBL_INSTANCE_END                                // 12/20 total
 
 // ===== Class =====
 GBL_EXPORT GblBoxClass* GblBoxClass_createFloatingExt    (GblType           derivedType,
-                                                          GblSize           totalSize,
+                                                          size_t            totalSize,
                                                           void*             pUserdata,
                                                           GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
@@ -106,7 +106,7 @@ GBL_EXPORT GBL_RESULT   GblBox_construct                 (GBL_SELF, GblType deri
 GBL_EXPORT GBL_RESULT   GblBox_constructWithClass        (GBL_SELF, GblBoxClass* pClass) GBL_NOEXCEPT;
 
 GBL_EXPORT GblBox*      GblBox_createExt                 (GblType           derivedType,
-                                                          GblSize           totalSize,
+                                                          size_t            totalSize,
                                                           void*             pUserdata,
                                                           GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
@@ -116,7 +116,7 @@ GBL_EXPORT GBL_RESULT   GblBox_constructExt              (GBL_SELF,
                                                           GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 
 GBL_EXPORT GblBox*      GblBox_createExtWithClass        (GblBoxClass*      pClass,
-                                                          GblSize           totalSize,
+                                                          size_t            totalSize,
                                                           void*             pUserdata,
                                                           GblArrayMapDtorFn pFnUdDtor)   GBL_NOEXCEPT;
 

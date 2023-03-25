@@ -72,7 +72,7 @@ static GBL_RESULT boolLoad_(GblVariant* pVariant, const GblStringBuffer* pString
     GBL_CTX_END();
 }
 
-static GBL_RESULT boolSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT boolSet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -80,7 +80,7 @@ static GBL_RESULT boolSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs
     GBL_CTX_END();
 }
 
-static GBL_RESULT boolGet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT boolGet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -130,7 +130,7 @@ static GBL_RESULT charSave_(const GblVariant* pVariant, GblStringBuffer* pString
 static GBL_RESULT charLoad_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
     const char* pStr = NULL;
-    GblSize length = GblStringBuffer_length(pString);
+    size_t  length = GblStringBuffer_length(pString);
     if(length == 3) {
         pStr = GblStringBuffer_cString(pString);
         GBL_CTX_VERIFY_EXPRESSION(pStr[0] == '\'');
@@ -140,7 +140,7 @@ static GBL_RESULT charLoad_(GblVariant* pVariant, const GblStringBuffer* pString
     GBL_CTX_END();
 }
 
-static GBL_RESULT charSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT charSet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -149,7 +149,7 @@ static GBL_RESULT charSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs
     GBL_CTX_END();
 }
 
-static GBL_RESULT charGet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT charGet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -206,7 +206,7 @@ static GBL_RESULT u8Load_(GblVariant* pVariant, const GblStringBuffer* pString) 
     GBL_CTX_END();
 }
 
-static GBL_RESULT u8Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u8Set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -215,7 +215,7 @@ static GBL_RESULT u8Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, 
     GBL_CTX_END();
 }
 
-static GBL_RESULT u8Get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u8Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -277,7 +277,7 @@ static GBL_RESULT i16Load_(GblVariant* pVariant, const GblStringBuffer* pString)
     GBL_CTX_END();
 }
 
-static GBL_RESULT i16Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i16Set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -286,7 +286,7 @@ static GBL_RESULT i16Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
-static GBL_RESULT i16Get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i16Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -347,7 +347,7 @@ static GBL_RESULT u16Load_(GblVariant* pVariant, const GblStringBuffer* pString)
     GBL_CTX_END();
 }
 
-static GBL_RESULT u16Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u16Set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -356,7 +356,7 @@ static GBL_RESULT u16Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
-static GBL_RESULT u16Get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u16Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -417,7 +417,7 @@ static GBL_RESULT i32Load_(GblVariant* pVariant, const GblStringBuffer* pString)
     GBL_CTX_END();
 }
 
-static GBL_RESULT i32Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i32Set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -426,7 +426,7 @@ static GBL_RESULT i32Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
-static GBL_RESULT i32Get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i32Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -488,7 +488,7 @@ static GBL_RESULT u32Load_(GblVariant* pVariant, const GblStringBuffer* pString)
     GBL_CTX_END();
 }
 
-static GBL_RESULT u32Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u32Set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -497,7 +497,7 @@ static GBL_RESULT u32Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
-static GBL_RESULT u32Get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u32Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY|GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -558,7 +558,7 @@ static GBL_RESULT i64Load_(GblVariant* pVariant, const GblStringBuffer* pString)
     GBL_CTX_END();
 }
 
-static GBL_RESULT i64Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i64Set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -567,7 +567,7 @@ static GBL_RESULT i64Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
-static GBL_RESULT i64Get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT i64Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -632,7 +632,7 @@ static GBL_RESULT u64Load_(GblVariant* pVariant, const GblStringBuffer* pString)
     GBL_CTX_END();
 }
 
-static GBL_RESULT u64Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u64Set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -641,7 +641,7 @@ static GBL_RESULT u64Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
-static GBL_RESULT u64Get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT u64Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -703,7 +703,7 @@ static GBL_RESULT f32Load_(GblVariant* pVariant, const GblStringBuffer* pString)
     GBL_CTX_END();
 }
 
-static GBL_RESULT f32Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT f32Set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -712,7 +712,7 @@ static GBL_RESULT f32Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
-static GBL_RESULT f32Get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT f32Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -772,7 +772,7 @@ static GBL_RESULT f64Load_(GblVariant* pVariant, const GblStringBuffer* pString)
     GBL_CTX_END();
 }
 
-static GBL_RESULT f64Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT f64Set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -781,7 +781,7 @@ static GBL_RESULT f64Set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
-static GBL_RESULT f64Get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT f64Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -829,7 +829,7 @@ static GBL_RESULT f64Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT stringConstruct_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT stringConstruct_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pVariant);
 
@@ -890,7 +890,7 @@ static GBL_RESULT stringLoad_(GblVariant* pVariant, const GblStringBuffer* pStri
     GBL_CTX_END();
 }
 
-static GBL_RESULT stringSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT stringSet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY) {
@@ -925,7 +925,7 @@ static GBL_RESULT stringSet_(GblVariant* pVariant, GblSize argc, GblVariant* pAr
     GBL_CTX_END();
 }
 
-static GBL_RESULT stringGet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT stringGet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
@@ -959,7 +959,7 @@ static GBL_RESULT stringConvert_(const GblVariant* pVariant, GblVariant* pOther)
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, GblStringView_toBool(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_CHAR_TYPE) {
-        const GblSize len = GblStringRef_length(pVariant->pString);
+        const size_t  len = GblStringRef_length(pVariant->pString);
         GBL_CTX_VERIFY(len <= 1,
                        GBL_RESULT_ERROR_INVALID_CONVERSION);
         if(GblStringRef_length(pVariant->pString) == 1)
@@ -1004,7 +1004,7 @@ static GBL_RESULT typeLoad_(GblVariant* pVariant, const GblStringBuffer* pString
     GBL_CTX_END();
 }
 
-static GBL_RESULT typeSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT typeSet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -1013,7 +1013,7 @@ static GBL_RESULT typeSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs
     GBL_CTX_END();
 }
 
-static GBL_RESULT typeGet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT typeGet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
@@ -1046,8 +1046,8 @@ static GBL_RESULT typeConvert_(const GblVariant* pVariant, GblVariant* pOther) {
 
 
 GblType GblPrimitive_register(const char*                     pName,
-                              GblSize                         classSize,
-                              GblSize                         classPrivateSize,
+                              size_t                          classSize,
+                              size_t                          classPrivateSize,
                               const GblIVariantClassVTable*   pVTable,
                               GblFlags                        typeFlags)
 {
@@ -1077,10 +1077,10 @@ GblType GblPrimitive_register(const char*                     pName,
 }
 
 
-GblType GblPrimitive_registerBuiltin(GblSize                         index,
+GblType GblPrimitive_registerBuiltin(size_t                          index,
                                      const char*                     pName,
-                                     GblSize                         classSize,
-                                     GblSize                         classPrivateSize,
+                                     size_t                          classSize,
+                                     size_t                          classPrivateSize,
                                      const GblIVariantClassVTable*   pVTable,
                                      GblFlags                        typeFlags)
 {

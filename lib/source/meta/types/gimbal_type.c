@@ -69,7 +69,7 @@ static GblBool GblType_conforms_(GblType type, GblType dependent, GblBool verify
             for(int a = (int)GblType_depth(dependent); a >= 0; --a) {
                 GblType ancestor = GblType_ancestor(dependent, a);
                 GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
-                for(GblSize p = 0; p < pMeta->pInfo->dependencyCount; ++p) {
+                for(size_t  p = 0; p < pMeta->pInfo->dependencyCount; ++p) {
                     if(GblType_check(type, pMeta->pInfo->pDependencies[p]) ||
                             GblType_conforms_(type, pMeta->pInfo->pDependencies[p], verify))
                     {
@@ -136,7 +136,7 @@ static GBL_RESULT typeLog_(GblType parent,
 
     if(pInfo->interfaceCount) {
         GBL_CTX_PUSH_VERBOSE("Interface Map");
-        for(GblSize i = 0; i < pInfo->interfaceCount; ++i) {
+        for(size_t  i = 0; i < pInfo->interfaceCount; ++i) {
             GBL_CTX_VERBOSE("%u: [Type: %s, Class Offset: %u]",
                             i,
                             GblType_name(pInfo->pInterfaceMap[i].interfaceType),
@@ -147,7 +147,7 @@ static GBL_RESULT typeLog_(GblType parent,
 
     if(pInfo->dependencyCount) {
         GBL_CTX_PUSH_VERBOSE("Dependencies");
-        for(GblSize p = 0; p < pInfo->dependencyCount; ++p) {
+        for(size_t  p = 0; p < pInfo->dependencyCount; ++p) {
             GBL_CTX_VERBOSE("%u: [Type: %s]",
                             p,
                             GblType_name(pInfo->pDependencies[p]));
@@ -251,8 +251,8 @@ static GBL_RESULT typeValidate_(GblType parent,
                        GBL_RESULT_ERROR_INVALID_TYPE,
                        "PREREQUESITES are only supported for DEPENDENT types!");
 
-        GblSize primaryCount = 0;
-        for(GblSize p = 0; p < pInfo->dependencyCount; ++p) {
+        size_t  primaryCount = 0;
+        for(size_t  p = 0; p < pInfo->dependencyCount; ++p) {
             // have to check whether other dependencies have concrete type
             // also allowed to specify additional specificity on concrete type
             if(!GblType_flagsCheck(pInfo->pDependencies[p], GBL_TYPE_ROOT_FLAG_DEPENDENT))
@@ -276,7 +276,7 @@ static GBL_RESULT typeValidate_(GblType parent,
                        "Cannot specify an INTERFACE MAP on NON-CLASSED fundamental type!");
 
         // Interface pass 1: validate individual entries
-        for(GblSize i = 0; i < pInfo->interfaceCount; ++i) {
+        for(size_t  i = 0; i < pInfo->interfaceCount; ++i) {
             const GblTypeInterfaceMapEntry* pEntry = &pInfo->pInterfaceMap[i];
             const GblType ifaceType = pEntry->interfaceType;
 
@@ -313,11 +313,11 @@ static GBL_RESULT typeValidate_(GblType parent,
         }
 
         // Interfae pass 2: validate relative to each other
-        for(GblSize i = 0; i < pInfo->interfaceCount; ++i) {
+        for(size_t  i = 0; i < pInfo->interfaceCount; ++i) {
             const GblTypeInterfaceMapEntry* pEntry = &pInfo->pInterfaceMap[i];
             const GblType ifaceType = pEntry->interfaceType;
             GblMetaClass* pIMeta = GBL_META_CLASS_(ifaceType);
-            for(GblSize ii = i+1; ii < pInfo->interfaceCount; ++ii) {
+            for(size_t  ii = i+1; ii < pInfo->interfaceCount; ++ii) {
                 const GblTypeInterfaceMapEntry* pOtherEntry = &pInfo->pInterfaceMap[ii];
                 const GblType otherIfaceType = pOtherEntry->interfaceType;
 
@@ -336,12 +336,12 @@ static GBL_RESULT typeValidate_(GblType parent,
             }
         }
 
-        for(GblSize i = 0; i < pInfo->interfaceCount; ++i) {
+        for(size_t  i = 0; i < pInfo->interfaceCount; ++i) {
             const GblTypeInterfaceMapEntry* pEntry = &pInfo->pInterfaceMap[i];
             const GblType ifaceType = pEntry->interfaceType;
             GblMetaClass* pIMeta = GBL_META_CLASS_(ifaceType);
 
-            for(GblSize p = 0; p < pIMeta->pInfo->dependencyCount; ++p) {
+            for(size_t  p = 0; p < pIMeta->pInfo->dependencyCount; ++p) {
                 GblType prereqType = pIMeta->pInfo->pDependencies[p];
 
                 GblBool satisfied = GBL_FALSE;
@@ -349,14 +349,14 @@ static GBL_RESULT typeValidate_(GblType parent,
                     continue;
                 }
 
-                for(GblSize ii = 0; ii < i; ++ii) {
+                for(size_t  ii = 0; ii < i; ++ii) {
                     GblType prevIFaceType = pInfo->pInterfaceMap[ii].interfaceType;
                     if(GblType_check(prevIFaceType, prereqType)) {
                         satisfied = GBL_TRUE;
                         break;
                     }
 
-                    for(GblSize pp = 0; pp < p; ++pp) {
+                    for(size_t  pp = 0; pp < p; ++pp) {
                         GblType prevPrereqType = pIMeta->pInfo->pDependencies[pp];
                         if(GblType_check(prevPrereqType, prereqType)) {
                             satisfied = GBL_TRUE;
@@ -427,9 +427,9 @@ static GblType typeRegister_(GblType parent,
             pParentIt = pParentIt->pParent;
         }
 
-        const GblSize classPrivateOffset  =  ((!pParent? 0 : pParent->classPrivateOffset) - pInfo->classPrivateSize);
+        const size_t  classPrivateOffset  =  ((!pParent? 0 : pParent->classPrivateOffset) - pInfo->classPrivateSize);
 
-        GblSize metaSize = sizeof(GblMetaClass) + baseCount * sizeof(GblMetaClass*);
+        size_t  metaSize = sizeof(GblMetaClass) + baseCount * sizeof(GblMetaClass*);
 
         metaSize = gblAlignedAllocSize(metaSize, GBL_META_CLASS_ALIGNMENT_);
 
@@ -563,9 +563,9 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
     GblType_freeTypeInfoClassChunk_(pMeta);
 
     // Calculate sizes and offsets for chunk and subchunks contained within it
-    GblSize chunkSize               = 0;
-    GblSize ifaceOffset             = 0;
-    GblSize prereqOffset            = 0;
+    size_t  chunkSize               = 0;
+    size_t  ifaceOffset             = 0;
+    size_t  prereqOffset            = 0;
 
     // Only include typeinfo within the chunk if it isn't statically allocated
     if(!(pMeta->flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)) {
@@ -575,8 +575,8 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
     }
 
     // Class subchunk is private struct data followed by public struct data
-    const GblSize classPublicOffset = chunkSize += -pMeta->classPrivateOffset;
-    const GblSize classTotalSize    = pInfo->classSize + -(pMeta->classPrivateOffset);
+    const size_t  classPublicOffset = chunkSize += -pMeta->classPrivateOffset;
+    const size_t  classTotalSize    = pInfo->classSize + -(pMeta->classPrivateOffset);
     chunkSize += classTotalSize;
 
     // Log stats so we can optimize
@@ -752,14 +752,14 @@ void GblType_init_(void) {
 
 // === PUBLIC API ====
 
-GblType GblType_registerBuiltin_(GblSize            expectedIndex,
+GblType GblType_registerBuiltin_(size_t             expectedIndex,
                                  GblType            parentType,
                                  const char*        pName,
                                  const GblTypeInfo* pTypeInfo,
                                  GblTypeFlags       flags)
 {
     GblType type = GBL_INVALID_TYPE;
-    GblSize size = 0;
+    size_t  size = 0;
     GBL_CTX_BEGIN(pCtx_);
     GBL_TYPE_ENSURE_INITIALIZED_();
     GBL_CTX_PUSH_VERBOSE("[GblType] Registering Builtin Type: %s", pName);
@@ -782,7 +782,7 @@ GblType GblType_registerBuiltin_(GblSize            expectedIndex,
     return type;
 }
 
-GBL_EXPORT GblType GblType_fromBuiltinIndex(GblSize index) {
+GBL_EXPORT GblType GblType_fromBuiltinIndex(size_t  index) {
     GblType type = GBL_INVALID_TYPE;
     GBL_TYPE_ENSURE_INITIALIZED_();
     {
@@ -816,8 +816,8 @@ GBL_EXPORT GblType GblType_fromName(const char* pTypeName) {
     return GblType_fromNameQuark(GblQuark_tryString(pTypeName));
 }
 
-GBL_EXPORT GblSize GblType_registeredCount(void) {
-    GblSize count = 0;
+GBL_EXPORT size_t  GblType_registeredCount(void) {
+    size_t  count = 0;
     GBL_CTX_BEGIN(pCtx_);
     GBL_TYPE_ENSURE_INITIALIZED_();
     mtx_lock(&typeRegMtx_);
@@ -827,8 +827,8 @@ GBL_EXPORT GblSize GblType_registeredCount(void) {
     return count;
 }
 
-GBL_EXPORT GblSize GblType_builtinCount(void) {
-    GblSize count = 0;
+GBL_EXPORT size_t  GblType_builtinCount(void) {
+    size_t  count = 0;
     GBL_CTX_BEGIN(pCtx_);
     GBL_TYPE_ENSURE_INITIALIZED_();
     mtx_lock(&typeRegMtx_);
@@ -843,7 +843,7 @@ GBL_EXPORT GblType GblType_nextRegistered(GblType prevType) {
     GBL_CTX_BEGIN(pCtx_);
 
     GblBool useNext = (prevType == GBL_INVALID_TYPE);
-    for(GblSize p = 0; p < GblHashSet_bucketCount(&typeRegistry_); ++p) {
+    for(size_t  p = 0; p < GblHashSet_bucketCount(&typeRegistry_); ++p) {
         GblMetaClass** ppMeta = GblHashSet_probe(&typeRegistry_, p);
         if(ppMeta) {
             GblType type = GBL_TYPE_(*ppMeta);
@@ -895,7 +895,7 @@ GBL_EXPORT GblType GblType_root(GblType type) {
     return base;
 } 
 
-GBL_EXPORT GblType GblType_base(GblType type, GblSize depth) {
+GBL_EXPORT GblType GblType_base(GblType type, size_t  depth) {
     GblType base = GBL_INVALID_TYPE;
     GblMetaClass* pMeta =  GBL_META_CLASS_(type);
     //GBL_CTX_BEGIN(pCtx_);
@@ -910,7 +910,7 @@ GBL_EXPORT GblType GblType_base(GblType type, GblSize depth) {
     return base;
 }
 
-GBL_EXPORT GblType GblType_ancestor(GblType type, GblSize level) {
+GBL_EXPORT GblType GblType_ancestor(GblType type, size_t  level) {
     GblType ancestor = GBL_INVALID_TYPE;
     GblMetaClass* pMeta =  GBL_META_CLASS_(type);
     GBL_CTX_BEGIN(pCtx_);
@@ -925,8 +925,8 @@ GBL_EXPORT GblType GblType_ancestor(GblType type, GblSize level) {
     return ancestor;
 }
 
-GBL_EXPORT GblSize GblType_depth(GblType type) {
-    GblSize depth = 0;
+GBL_EXPORT size_t  GblType_depth(GblType type) {
+    size_t  depth = 0;
     GBL_CTX_BEGIN(pCtx_);
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     if(pMeta) {
@@ -983,7 +983,7 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
                 break;
             } else if(ifaceChecks) {
                 // recurse over interfaces checking
-                for(GblSize i = 0; i < pIter->pInfo->interfaceCount; ++i) {
+                for(size_t  i = 0; i < pIter->pInfo->interfaceCount; ++i) {
                     if(GblType_typeIsA_(pIter->pInfo->pInterfaceMap[i].interfaceType,
                                         base,
                                         GBL_TRUE,
@@ -1038,7 +1038,7 @@ GBL_EXPORT GblType GblType_common(GblType type, GblType other) {
 
     GblBool ifaced = GblType_flagsCheck(other, GBL_TYPE_ROOT_FLAG_INTERFACED);
 
-    for(GblSize b = 0; b <= GblType_depth(other); ++b) {
+    for(size_t  b = 0; b <= GblType_depth(other); ++b) {
         const GblType otherBase = GblType_base(other, b);
         const GblMetaClass* pOtherBase = GBL_META_CLASS_(otherBase);
         if(GblType_implements(type, otherBase)) {
@@ -1047,7 +1047,7 @@ GBL_EXPORT GblType GblType_common(GblType type, GblType other) {
             else
                 return otherBase;
         } else if(!(pOtherBase->flags & GBL_TYPE_FLAG_UNMAPPABLE)){
-            for(GblSize i = 0; i < pOtherBase->pInfo->interfaceCount; ++i) {
+            for(size_t  i = 0; i < pOtherBase->pInfo->interfaceCount; ++i) {
                 const GblType otherIface = pOtherBase->pInfo->pInterfaceMap[i].interfaceType;
                 const GblType common = GblType_common(type, otherIface);
                 if(common != GBL_INVALID_TYPE) {
@@ -1068,7 +1068,7 @@ GBL_EXPORT GblBool GblType_depends(GblType dependent, GblType dependency) {
             for(int a = (int)GblType_depth(dependent); a >= 0; --a) {
                 GblType ancestor = GblType_ancestor(dependent, a);
                 GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
-                for(GblSize p = 0; p < pMeta->pInfo->dependencyCount; ++p) {
+                for(size_t  p = 0; p < pMeta->pInfo->dependencyCount; ++p) {
                     if(pMeta->pInfo->pDependencies[p] == dependency ||
                             GblType_depends(pMeta->pInfo->pDependencies[p], dependency))
                     {

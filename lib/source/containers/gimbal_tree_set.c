@@ -13,7 +13,7 @@
 static GBL_RESULT grow_group_(GblTreeSet* pSelf, GblTreeSetGroup* pGroup) {
     GBL_CTX_BEGIN(pSelf->pCtx);
 
-    const GblSize capacity = pGroup->capacity ? pGroup->capacity*2 : 1;
+    const size_t  capacity = pGroup->capacity ? pGroup->capacity*2 : 1;
     GblTreeSetNode** ppNodes = GBL_CTX_MALLOC(sizeof(GblTreeSetNode*)*capacity);
 
     memcpy(ppNodes, pGroup->ppNodes, pGroup->length*sizeof(GblTreeSetNode*));
@@ -25,7 +25,7 @@ static GBL_RESULT grow_group_(GblTreeSet* pSelf, GblTreeSetGroup* pGroup) {
 
 
 static GBL_RESULT takeaway_(GblTreeSet* pSelf, GblTreeSetNode* pNode) {
-    const GblSize MAXLEN = 32;
+    const size_t  MAXLEN = 32;
     GblTreeSetGroup* pGroup = NULL;
     GBL_CTX_BEGIN(pSelf->pCtx);
     if(pNode->leaf) {
@@ -47,11 +47,11 @@ static GBL_RESULT takeaway_(GblTreeSet* pSelf, GblTreeSetNode* pNode) {
 static GblTreeSetNode *node_new_(GblTreeSet* pSelf, GblBool leaf) {
     GblTreeSetNode* pNode = NULL;
     GBL_CTX_BEGIN(pSelf->pCtx);
-    GblSize size = sizeof(GblTreeSetNode);
+    size_t  size = sizeof(GblTreeSetNode);
     if (!leaf) {
         size += sizeof(GblTreeSetNode*) * pSelf->maxCount;
     }
-    GblSize entryOffset = size;
+    size_t  entryOffset = size;
     size += pSelf->entrySize * (pSelf->maxCount-1);
     pNode = GBL_CTX_MALLOC(size);
     pNode->leaf = leaf;
@@ -104,11 +104,11 @@ static GBL_RESULT node_free_(GblTreeSet* pSelf, GblTreeSetNode* pNode) {
 
 static GBL_RESULT release_pool_(GblTreeSet* pSelf) {
     GBL_CTX_BEGIN(pSelf->pCtx);
-    for (GblSize i = 0; i < pSelf->pool.leaves.length; ++i) {
+    for (size_t  i = 0; i < pSelf->pool.leaves.length; ++i) {
         GBL_CTX_FREE(pSelf->pool.leaves.ppNodes[i]);
     }
     GBL_CTX_FREE(pSelf->pool.leaves.ppNodes);
-    for (GblSize i = 0; i < pSelf->pool.branches.length; ++i) {
+    for (size_t  i = 0; i < pSelf->pool.branches.length; ++i) {
         GBL_CTX_FREE(pSelf->pool.branches.ppNodes[i]);
     }
     GBL_CTX_FREE(pSelf->pool.branches.ppNodes);
@@ -136,29 +136,29 @@ GBL_INLINE GblTreeSetNode* gimme_branch_(GblTreeSet* pSelf) {
     return gimme_node_(pSelf, &pSelf->pool.branches);
 }
 
-GBL_INLINE void* get_item_at_(GblTreeSetNode* pNode, GblSize entrySize, GblSize index) {
+GBL_INLINE void* get_item_at_(GblTreeSetNode* pNode, size_t  entrySize, size_t  index) {
     return (uint8_t*)pNode->pEntries + entrySize*index;
 }
 
-GBL_INLINE void set_item_at_(GblTreeSetNode* pNode, GblSize entrySize, GblSize index, const void* pEntry) {
+GBL_INLINE void set_item_at_(GblTreeSetNode* pNode, size_t  entrySize, size_t  index, const void* pEntry) {
     memcpy(get_item_at_(pNode, entrySize, index), pEntry, entrySize);
 }
 
 
-GBL_INLINE void copy_item_into_(GblTreeSetNode* pNode, GblSize entrySize, GblSize index,
+GBL_INLINE void copy_item_into_(GblTreeSetNode* pNode, size_t  entrySize, size_t  index,
                            void* pInto)
 {
     memcpy(pInto, get_item_at_(pNode, entrySize, index), entrySize);
 }
 
-GBL_INLINE void copy_item_(GblTreeSetNode* pNodeA, GblSize entrySize, GblSize indexA,
-                                   GblTreeSetNode* pNodeB, GblSize indexB)
+GBL_INLINE void copy_item_(GblTreeSetNode* pNodeA, size_t  entrySize, size_t  indexA,
+                                   GblTreeSetNode* pNodeB, size_t  indexB)
 {
     memcpy(get_item_at_(pNodeA, entrySize, indexA),
            get_item_at_(pNodeB, entrySize, indexB), entrySize);
 }
 
-GBL_INLINE void swap_item_at_(GblTreeSetNode* pNode, GblSize entrySize, GblSize index,
+GBL_INLINE void swap_item_at_(GblTreeSetNode* pNode, size_t  entrySize, size_t  index,
                          const void* pEntry, void* pInto)
 {
     void *pPtr = get_item_at_(pNode, entrySize, index);
@@ -177,7 +177,7 @@ static int node_find_(const GblTreeSet* pSelf, GblTreeSetNode* pNode, const void
             if(index > pNode->entryCount-1) {
                 index = pNode->entryCount - 1;
             }
-            void* pItem = get_item_at_(pNode, pSelf->entrySize, (GblSize)index);
+            void* pItem = get_item_at_(pNode, pSelf->entrySize, (size_t )index);
             const int cmp = pSelf->pFnCompare(pSelf, pKey, pItem);
             if(cmp == 0) {
                 *pFound = GBL_TRUE;
@@ -193,7 +193,7 @@ static int node_find_(const GblTreeSet* pSelf, GblTreeSetNode* pNode, const void
     int index;
     while (low <= high) {
         const int mid = (low + high) / 2;
-        void* pItem = get_item_at_(pNode, pSelf->entrySize, (GblSize)mid);
+        void* pItem = get_item_at_(pNode, pSelf->entrySize, (size_t )mid);
         const int cmp = pSelf->pFnCompare(pSelf, pKey, pItem);
         if(cmp == 0) {
             *pFound = GBL_TRUE;
@@ -247,7 +247,7 @@ static void node_split_(GblTreeSet* pSelf, GblTreeSetNode* pNode,
     pNode->entryCount = (uint16_t)mid;
 }
 
-static void node_join_(GblTreeSetNode* pLeft, GblTreeSetNode* pRight, GblSize entrySize) {
+static void node_join_(GblTreeSetNode* pLeft, GblTreeSetNode* pRight, size_t  entrySize) {
     memcpy((uint8_t*)pLeft->pEntries + entrySize*(size_t)pLeft->entryCount,
            pRight->pEntries,
            (size_t)pRight->entryCount * entrySize);
@@ -260,7 +260,7 @@ static void node_join_(GblTreeSetNode* pLeft, GblTreeSetNode* pRight, GblSize en
 }
 
 
-GBL_INLINE void node_shift_right_(GblTreeSetNode* pNode, GblSize entrySize, GblSize index) {
+GBL_INLINE void node_shift_right_(GblTreeSetNode* pNode, size_t  entrySize, size_t  index) {
     memmove((uint8_t*)pNode->pEntries + entrySize*(index+1),
             (uint8_t*)pNode->pEntries + entrySize*index,
             ((size_t)pNode->entryCount-index)*entrySize);
@@ -273,7 +273,7 @@ GBL_INLINE void node_shift_right_(GblTreeSetNode* pNode, GblSize entrySize, GblS
     ++pNode->entryCount;
 }
 
-GBL_INLINE void node_shift_left_(GblTreeSetNode* pNode, GblSize entrySize, size_t index,
+GBL_INLINE void node_shift_left_(GblTreeSetNode* pNode, size_t  entrySize, size_t index,
                             GblBool forMerge)
 {
     memmove((uint8_t*)pNode->pEntries + entrySize*index,
@@ -296,23 +296,23 @@ GBL_INLINE GblBool node_set_(GblTreeSet* pSelf, GblTreeSetNode* pNode, const voi
     GblBool found = GBL_FALSE;
     int i = node_find_(pSelf, pNode, pEntry, &found, pHint, depth);
     if(found) {
-        swap_item_at_(pNode, pSelf->entrySize, (GblSize)i, pEntry, pSelf->pSpares[0]);
+        swap_item_at_(pNode, pSelf->entrySize, (size_t )i, pEntry, pSelf->pSpares[0]);
         return GBL_TRUE;
     }
     else if(pNode->leaf) {
-        node_shift_right_(pNode, pSelf->entrySize, (GblSize)i);
-        set_item_at_(pNode, pSelf->entrySize, (GblSize)i, pEntry);
+        node_shift_right_(pNode, pSelf->entrySize, (size_t )i);
+        set_item_at_(pNode, pSelf->entrySize, (size_t )i, pEntry);
         return GBL_FALSE;
     }
     else if(node_set_(pSelf, pNode->pChildren[i], pEntry, leanLeft, pHint, depth+1)) {
         return GBL_TRUE;
     }
-    else if((GblSize)pNode->pChildren[i]->entryCount == (pSelf->maxCount-1)) {
+    else if((size_t )pNode->pChildren[i]->entryCount == (pSelf->maxCount-1)) {
         void*           pMedian = NULL;
         GblTreeSetNode* pRight  = NULL;
         node_split_(pSelf, pNode->pChildren[i], &pRight, &pMedian, leanLeft);
-        node_shift_right_(pNode, pSelf->entrySize, (GblSize)i);
-        set_item_at_(pNode, pSelf->entrySize, (GblSize)i, pMedian);
+        node_shift_right_(pNode, pSelf->entrySize, (size_t )i);
+        set_item_at_(pNode, pSelf->entrySize, (size_t )i, pMedian);
         pNode->pChildren[i+1] = pRight;
     }
     return GBL_FALSE;
@@ -341,7 +341,7 @@ static void* btree_set_x_(GblTreeSet* pSelf, const void* pEntry, GblBool leanLef
             GBL_CTX_DONE();
         }
         ++pSelf->count;
-        if ((GblSize)pSelf->pRoot->entryCount == (pSelf->maxCount-1)) {
+        if ((size_t )pSelf->pRoot->entryCount == (pSelf->maxCount-1)) {
             void *pOldRoot          = pSelf->pRoot;
             GblTreeSetNode *pRight  = NULL;
             void *pMedian           = NULL;
@@ -369,7 +369,7 @@ void *btree_get_hint_(const GblTreeSet* pSelf, const void* pKey, uint64_t* pHint
         GblBool found = GBL_FALSE;
         const int i = node_find_(pSelf, pNode, pKey, &found, pHint, depth);
         if(found) {
-            return get_item_at_(pNode, pSelf->entrySize, (GblSize)i);
+            return get_item_at_(pNode, pSelf->entrySize, (size_t )i);
         }
         if(pNode->leaf) {
             return NULL;
@@ -380,10 +380,10 @@ void *btree_get_hint_(const GblTreeSet* pSelf, const void* pKey, uint64_t* pHint
 
 
 GBL_EXPORT GBL_RESULT GblTreeSet_construct_7(GblTreeSet* pSelf,
-                               GblSize                   entrySize,
+                               size_t                    entrySize,
                                GblTreeSetEntryCompareFn  pFnCompare,
                                GblTreeSetEntryDestructFn pFnDestruct,
-                               GblSize                   maxEntries,
+                               size_t                    maxEntries,
                                GblContext*               pCtx,
                                void*                     pUserdata) GBL_NOEXCEPT
 {
@@ -417,10 +417,10 @@ GBL_EXPORT GBL_RESULT GblTreeSet_construct_7(GblTreeSet* pSelf,
 }
 
 GBL_EXPORT GBL_RESULT GblTreeSet_construct_6(GblTreeSet* pSelf,
-                               GblSize                   entrySize,
+                               size_t                    entrySize,
                                GblTreeSetEntryCompareFn  pFnCompare,
                                GblTreeSetEntryDestructFn pFnDestruct,
-                               GblSize                   maxEntries,
+                               size_t                    maxEntries,
                                GblContext*               pCtx) GBL_NOEXCEPT
 {
     return GblTreeSet_construct_7(pSelf,
@@ -434,10 +434,10 @@ GBL_EXPORT GBL_RESULT GblTreeSet_construct_6(GblTreeSet* pSelf,
 
 
 GBL_EXPORT GBL_RESULT GblTreeSet_construct_5(GblTreeSet* pSelf,
-                               GblSize                   entrySize,
+                               size_t                    entrySize,
                                GblTreeSetEntryCompareFn  pFnCompare,
                                GblTreeSetEntryDestructFn pFnDestruct,
-                               GblSize                   maxEntries) GBL_NOEXCEPT
+                               size_t                    maxEntries) GBL_NOEXCEPT
 {
     return GblTreeSet_construct_6(pSelf,
                                   entrySize,
@@ -448,7 +448,7 @@ GBL_EXPORT GBL_RESULT GblTreeSet_construct_5(GblTreeSet* pSelf,
 }
 
 GBL_EXPORT GBL_RESULT GblTreeSet_construct_4(GblTreeSet* pSelf,
-                               GblSize                   entrySize,
+                               size_t                    entrySize,
                                GblTreeSetEntryCompareFn  pFnCompare,
                                GblTreeSetEntryDestructFn pFnDestruct) GBL_NOEXCEPT
 {
@@ -460,7 +460,7 @@ GBL_EXPORT GBL_RESULT GblTreeSet_construct_4(GblTreeSet* pSelf,
 }
 
 GBL_EXPORT GBL_RESULT GblTreeSet_construct_3(GblTreeSet* pSelf,
-                               GblSize                   entrySize,
+                               size_t                    entrySize,
                                GblTreeSetEntryCompareFn  pFnCompare) GBL_NOEXCEPT
 {
     return GblTreeSet_construct_4(pSelf,
@@ -540,7 +540,7 @@ GBL_EXPORT GblBool GblTreeSet_contains(const GblTreeSet* pSelf, const void* pKey
     return GblTreeSet_get(pSelf, pKey) != NULL;
 }
 
-GBL_EXPORT GblSize GblTreeSet_count(const GblTreeSet* pSelf, const void* pKey) GBL_NOEXCEPT {
+GBL_EXPORT size_t  GblTreeSet_count(const GblTreeSet* pSelf, const void* pKey) GBL_NOEXCEPT {
     return GblTreeSet_contains(pSelf, pKey)? 1 : 0;
 }
 
@@ -550,7 +550,7 @@ enum delact {
 };
 
 static GblBool node_delete_(GblTreeSet* pSelf, GblTreeSetNode* pNode, enum delact act,
-                        GblSize index, const void* pKey, void* pPrev, uint64_t* pHint, int depth)
+                        size_t  index, const void* pKey, void* pPrev, uint64_t* pHint, int depth)
 {
     int i = 0;
     GblBool found = GBL_FALSE;
@@ -579,8 +579,8 @@ static GblBool node_delete_(GblTreeSet* pSelf, GblTreeSetNode* pNode, enum delac
     if(pNode->leaf) {
         if(found) {
             // item was found in leaf, copy its contents and delete it.
-            copy_item_into_(pNode, pSelf->entrySize, (GblSize)i, pPrev);
-            node_shift_left_(pNode, pSelf->entrySize, (GblSize)i, GBL_FALSE);
+            copy_item_into_(pNode, pSelf->entrySize, (size_t )i, pPrev);
+            node_shift_left_(pNode, pSelf->entrySize, (size_t )i, GBL_FALSE);
             return GBL_TRUE;
         }
         return GBL_FALSE;
@@ -598,10 +598,10 @@ static GblBool node_delete_(GblTreeSet* pSelf, GblTreeSetNode* pNode, enum delac
         } else {
             // item was found in branch, copy its contents, delete it, and
             // begin popping off the max items in child nodes.
-            copy_item_into_(pNode, pSelf->entrySize, (GblSize)i, pPrev);
+            copy_item_into_(pNode, pSelf->entrySize, (size_t )i, pPrev);
             node_delete_(pSelf, pNode->pChildren[i], POPMAX, 0, NULL,
                         pSelf->pSpares[2], pHint, depth+1);
-            set_item_at_(pNode, pSelf->entrySize, (GblSize)i, pSelf->pSpares[2]);
+            set_item_at_(pNode, pSelf->entrySize, (size_t )i, pSelf->pSpares[2]);
             deleted = GBL_TRUE;
         }
     } else {
@@ -613,7 +613,7 @@ static GblBool node_delete_(GblTreeSet* pSelf, GblTreeSetNode* pNode, enum delac
         return GBL_FALSE;
     }
 
-    if ((GblSize)pNode->pChildren[i]->entryCount >= pSelf->minCount) {
+    if ((size_t )pNode->pChildren[i]->entryCount >= pSelf->minCount) {
         return GBL_TRUE;
     }
 
@@ -624,40 +624,40 @@ static GblBool node_delete_(GblTreeSet* pSelf, GblTreeSetNode* pNode, enum delac
     GblTreeSetNode* pLeft   = pNode->pChildren[i];
     GblTreeSetNode* pRight  = pNode->pChildren[i+1];
 
-    if((GblSize)(pLeft->entryCount + pRight->entryCount + 1) < (pSelf->maxCount - 1)) {
+    if((size_t )(pLeft->entryCount + pRight->entryCount + 1) < (pSelf->maxCount - 1)) {
         // merge left + item + right
-        copy_item_(pLeft, pSelf->entrySize, (GblSize)pLeft->entryCount, pNode, (GblSize)i);
+        copy_item_(pLeft, pSelf->entrySize, (size_t )pLeft->entryCount, pNode, (size_t )i);
         ++pLeft->entryCount;
         node_join_(pLeft, pRight, pSelf->entrySize);
         takeaway_(pSelf, pRight);
-        node_shift_left_(pNode, pSelf->entrySize, (GblSize)i, GBL_TRUE);
+        node_shift_left_(pNode, pSelf->entrySize, (size_t )i, GBL_TRUE);
     } else if (pLeft->entryCount > pRight->entryCount) {
         // move left -> right
         node_shift_right_(pRight, pSelf->entrySize, 0);
-        copy_item_(pRight, pSelf->entrySize, 0, pNode, (GblSize)i);
+        copy_item_(pRight, pSelf->entrySize, 0, pNode, (size_t )i);
         if(!pLeft->leaf) {
             pRight->pChildren[0] = pLeft->pChildren[pLeft->entryCount];
         }
-        copy_item_(pNode, pSelf->entrySize, (GblSize)i, pLeft, (GblSize)(pLeft->entryCount - 1));
+        copy_item_(pNode, pSelf->entrySize, (size_t )i, pLeft, (size_t )(pLeft->entryCount - 1));
         if (!pLeft->leaf) {
             pLeft->pChildren[pLeft->entryCount] = NULL;
         }
         --pLeft->entryCount;
     } else {
         // move right -> left
-        copy_item_(pLeft, pSelf->entrySize, (GblSize)pLeft->entryCount, pNode, (GblSize)i);
+        copy_item_(pLeft, pSelf->entrySize, (size_t )pLeft->entryCount, pNode, (size_t )i);
         if (!pLeft->leaf) {
             pLeft->pChildren[pLeft->entryCount+1] = pRight->pChildren[0];
         }
         ++pLeft->entryCount;
-        copy_item_(pNode, pSelf->entrySize, (GblSize)i, pRight, 0);
+        copy_item_(pNode, pSelf->entrySize, (size_t )i, pRight, 0);
         node_shift_left_(pRight, pSelf->entrySize, 0, GBL_FALSE);
     }
     return deleted;
 }
 
 
-static void* delete_x_(GblTreeSet* pSelf, enum delact act, GblSize index,
+static void* delete_x_(GblTreeSet* pSelf, enum delact act, size_t  index,
                       const void* pKey, uint64_t* pHint)
 {
     reset_load_fields_(pSelf);

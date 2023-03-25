@@ -3,7 +3,7 @@
 #include <gimbal/strings/gimbal_quark.h>
 #include "../types/gimbal_type_.h"
 
-static GBL_RESULT GblIAllocatorClass_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, GblSize size, GblSize align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
+static GBL_RESULT GblIAllocatorClass_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, size_t  size, size_t  align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GBL_UNUSED(pIAllocator);
     GBL_UNUSED(pFrame);
     GBL_UNUSED(pDbgStr);
@@ -12,7 +12,7 @@ static GBL_RESULT GblIAllocatorClass_alloc_(GblIAllocator* pIAllocator, const Gb
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblIAllocatorClass_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, GblSize newSize, GblSize newAlign, void** ppNewData) GBL_NOEXCEPT {
+static GBL_RESULT GblIAllocatorClass_realloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, void* pData, size_t  newSize, size_t  newAlign, void** ppNewData) GBL_NOEXCEPT {
     GBL_UNUSED(pFrame && pIAllocator && newAlign);
     GBL_CTX_BEGIN(NULL);
     *ppNewData = GBL_ALIGNED_REALLOC(pData, newAlign, newSize);
@@ -37,8 +37,8 @@ static GBL_RESULT GblIAllocatorClass_init_(GblIAllocatorClass* pIFace, void* pDa
 
 GBL_RESULT GblIAllocator_alloc  (GblIAllocator* pSelf,
                                  const GblStackFrame* pStackFrame,
-                                 GblSize size,
-                                 GblSize alignment,
+                                 size_t  size,
+                                 size_t  alignment,
                                  const char* pDebugString,
                                  void** ppData)                     GBL_NOEXCEPT
 {
@@ -51,8 +51,8 @@ GBL_RESULT GblIAllocator_alloc  (GblIAllocator* pSelf,
 GBL_RESULT GblIAllocator_realloc(GblIAllocator* pSelf,
                                  const GblStackFrame* pStackFrame,
                                  void* pData,
-                                 GblSize newSize,
-                                 GblSize newAlign,
+                                 size_t  newSize,
+                                 size_t  newAlign,
                                  void** ppNewData)                  GBL_NOEXCEPT
 {
     GBL_CTX_BEGIN(NULL);

@@ -54,36 +54,36 @@ typedef struct GblBitView {
         uint8_t*  pBytes;
         uint32_t* pWords;
     };
-    GblSize length;
+    size_t  length;
     uint8_t offset;
 } GblBitView;
 
 // ===== Public methods =====
-GBL_INLINE GblBitView* GblBitView_fromBuffer (GBL_SELF, void* pBuffer, GblSize bitCount, GblSize offset)         GBL_NOEXCEPT;
-GBL_INLINE GblBitView* GblBitView_fromView   (GBL_SELF, const GblBitView* pView, GblSize count, GblSize offset)  GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_fromBuffer (GBL_SELF, void* pBuffer, size_t  bitCount, size_t  offset)         GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_fromView   (GBL_SELF, const GblBitView* pView, size_t  count, size_t  offset)  GBL_NOEXCEPT;
 
-GBL_EXPORT const char* GblBitView_string     (GBL_CSELF, GblStringBuffer* pBuffer, GblSize index, GblSize count) GBL_NOEXCEPT;
-GBL_INLINE uint64_t    GblBitView_uint64     (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
+GBL_EXPORT const char* GblBitView_string     (GBL_CSELF, GblStringBuffer* pBuffer, size_t  index, size_t  count) GBL_NOEXCEPT;
+GBL_INLINE uint64_t    GblBitView_uint64     (GBL_CSELF, size_t  index, size_t  count)                           GBL_NOEXCEPT;
 
-GBL_INLINE GblBitView* GblBitView_setString  (GBL_SELF, const char* pString, GblSize index, GblSize count)       GBL_NOEXCEPT;
-GBL_INLINE GblBitView* GblBitView_setUint64  (GBL_SELF, uint64_t value, GblSize index, GblSize count)            GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_setString  (GBL_SELF, const char* pString, size_t  index, size_t  count)       GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_setUint64  (GBL_SELF, uint64_t value, size_t  index, size_t  count)            GBL_NOEXCEPT;
 
-GBL_INLINE GblSize     GblBitView_bytes      (GBL_CSELF)                                                         GBL_NOEXCEPT;
-GBL_INLINE GblSize     GblBitView_words      (GBL_CSELF)                                                         GBL_NOEXCEPT;
+GBL_INLINE size_t      GblBitView_bytes      (GBL_CSELF)                                                         GBL_NOEXCEPT;
+GBL_INLINE size_t      GblBitView_words      (GBL_CSELF)                                                         GBL_NOEXCEPT;
 
-GBL_INLINE GblBool     GblBitView_at         (GBL_CSELF, GblSize index)                                          GBL_NOEXCEPT;
-GBL_INLINE GblSize     GblBitView_count      (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
-GBL_INLINE GblBool     GblBitView_any        (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
-GBL_INLINE GblBool     GblBitView_all        (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
-GBL_INLINE GblBool     GblBitView_none       (GBL_CSELF, GblSize index, GblSize count)                           GBL_NOEXCEPT;
+GBL_INLINE GblBool     GblBitView_at         (GBL_CSELF, size_t  index)                                          GBL_NOEXCEPT;
+GBL_INLINE size_t      GblBitView_count      (GBL_CSELF, size_t  index, size_t  count)                           GBL_NOEXCEPT;
+GBL_INLINE GblBool     GblBitView_any        (GBL_CSELF, size_t  index, size_t  count)                           GBL_NOEXCEPT;
+GBL_INLINE GblBool     GblBitView_all        (GBL_CSELF, size_t  index, size_t  count)                           GBL_NOEXCEPT;
+GBL_INLINE GblBool     GblBitView_none       (GBL_CSELF, size_t  index, size_t  count)                           GBL_NOEXCEPT;
 
-GBL_INLINE GblBitView* GblBitView_assign     (GBL_SELF, GblBool value, GblSize index, GblSize count)             GBL_NOEXCEPT;
-GBL_INLINE GblBitView* GblBitView_set        (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
-GBL_INLINE GblBitView* GblBitView_reset      (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
-GBL_INLINE GblBitView* GblBitView_flip       (GBL_SELF, GblSize index, GblSize count)                            GBL_NOEXCEPT;
-GBL_INLINE GblBitView* GblBitView_rotate     (GBL_SELF, ptrdiff_t n, GblSize offset, GblSize count)              GBL_NOEXCEPT;
-GBL_INLINE GblBitView* GblBitView_shiftLeft  (GBL_SELF, const GblBitView* pSrc, GblSize amount)                  GBL_NOEXCEPT;
-GBL_INLINE GblBitView* GblBitView_shiftRight (GBL_SELF, const GblBitView* pSrc, GblSize amount)                  GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_assign     (GBL_SELF, GblBool value, size_t  index, size_t  count)             GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_set        (GBL_SELF, size_t  index, size_t  count)                            GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_reset      (GBL_SELF, size_t  index, size_t  count)                            GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_flip       (GBL_SELF, size_t  index, size_t  count)                            GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_rotate     (GBL_SELF, ptrdiff_t n, size_t  offset, size_t  count)              GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_shiftLeft  (GBL_SELF, const GblBitView* pSrc, size_t  amount)                  GBL_NOEXCEPT;
+GBL_INLINE GblBitView* GblBitView_shiftRight (GBL_SELF, const GblBitView* pSrc, size_t  amount)                  GBL_NOEXCEPT;
 
 /* todo
 GBL_EXPORT GBL_RESULT  GblBitView_and        (GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2)    GBL_NOEXCEPT;
@@ -188,7 +188,7 @@ GBL_INLINE GblBool     GblBitView_leq        (GBL_CSELF, const GblBitView* pOthe
 extern uint8_t GblBitView_lsbMaskLut_[8];
 extern uint8_t GblBitView_msbMaskLut_[8];
 
-GBL_INLINE uint8_t* GblBitView_byteFromBit_(GBL_CSELF, GblSize bit) {
+GBL_INLINE uint8_t* GblBitView_byteFromBit_(GBL_CSELF, size_t  bit) {
     GBL_ASSERT(bit < pSelf->length + pSelf->offset);
     return &pSelf->pBytes[bit >> 3];
 }
@@ -199,14 +199,14 @@ GBL_INLINE GblBool GblBitView_wordAligned(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->offset == 0;
 }
 
-GBL_INLINE GblBitView* (GblBitView_fromBuffer)(GBL_SELF, void* pStorage, GblSize bits, GblSize offset) GBL_NOEXCEPT {
+GBL_INLINE GblBitView* (GblBitView_fromBuffer)(GBL_SELF, void* pStorage, size_t  bits, size_t  offset) GBL_NOEXCEPT {
     pSelf->length = bits;
     pSelf->offset = offset & 0x7;
     pSelf->pBytes = (uint8_t*)pStorage + (offset >> 3);
     return pSelf;
 }
 
-GBL_INLINE GblBitView* (GblBitView_fromView)(GBL_SELF, const GblBitView* pSource, GblSize count, GblSize offset) GBL_NOEXCEPT {
+GBL_INLINE GblBitView* (GblBitView_fromView)(GBL_SELF, const GblBitView* pSource, size_t  count, size_t  offset) GBL_NOEXCEPT {
     GBL_ASSERT(offset+count <= pSource->length);
     pSelf->length = count;
     pSelf->offset = pSource->offset + offset;
@@ -214,15 +214,15 @@ GBL_INLINE GblBitView* (GblBitView_fromView)(GBL_SELF, const GblBitView* pSource
     return pSelf;
 }
 
-GBL_INLINE GblSize GblBitView_bytes(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblBitView_bytes(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_BIT_VIEW_BYTES(pSelf->length);
 }
 
-GBL_INLINE GblSize GblBitView_words(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblBitView_words(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_BIT_VIEW_WORDS(pSelf->length);
 }
 
-GBL_EXPORT GblBool GblBitView_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblBitView_at(GBL_CSELF, size_t  index) GBL_NOEXCEPT {
     GblBool value = GBL_FALSE;
     if(index < pSelf->length) {
         index += pSelf->offset;
@@ -235,21 +235,21 @@ GBL_EXPORT GblBool GblBitView_at(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
     return value;
 }
 
-GBL_INLINE GblSize (GblBitView_count)(GBL_CSELF, GblSize index, GblSize count) GBL_NOEXCEPT {
+GBL_INLINE size_t  (GblBitView_count)(GBL_CSELF, size_t  index, size_t  count) GBL_NOEXCEPT {
 /* Would've been epic as shit, but doesn't do any good
  * when not on a byte boundary...
     static const uint8_t lut[16] = {
         0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
     };
 */
-    GblSize bits = 0;
+    size_t  bits = 0;
 
-    const GblSize start = pSelf->offset + index;
-    const GblSize end = start + count;
+    const size_t  start = pSelf->offset + index;
+    const size_t  end = start + count;
     if(start/4 < end/4) {
         pSelf->pBytes[start/8] |= GblBitView_msbMaskLut_[start%8];
 
-        for(GblSize i = start/8+1; i < end/8; ++i)
+        for(size_t  i = start/8+1; i < end/8; ++i)
             pSelf->pBytes[i] = 0xff;
 
         pSelf->pBytes[end/8] |= GblBitView_lsbMaskLut_[end%8];
@@ -261,29 +261,29 @@ GBL_INLINE GblSize (GblBitView_count)(GBL_CSELF, GblSize index, GblSize count) G
     return bits;
 }
 
-GBL_INLINE GblBool (GblBitView_any)(GBL_CSELF, GblSize index, GblSize count) GBL_NOEXCEPT {
+GBL_INLINE GblBool (GblBitView_any)(GBL_CSELF, size_t  index, size_t  count) GBL_NOEXCEPT {
     return GblBitView_count(pSelf, index, count) != 0;
 }
 
-GBL_INLINE GblBool (GblBitView_all)(GBL_CSELF, GblSize index, GblSize count) GBL_NOEXCEPT {
+GBL_INLINE GblBool (GblBitView_all)(GBL_CSELF, size_t  index, size_t  count) GBL_NOEXCEPT {
     return GblBitView_count(pSelf, index, count) == count;
 }
 
-GBL_INLINE GblBool (GblBitView_none)(GBL_CSELF, GblSize index, GblSize count) GBL_NOEXCEPT {
+GBL_INLINE GblBool (GblBitView_none)(GBL_CSELF, size_t  index, size_t  count) GBL_NOEXCEPT {
     return GblBitView_count(pSelf, index, count) == 0;
 }
 
-GBL_INLINE GblBitView* (GblBitView_assign)(GBL_SELF, GblBool value, GblSize index, GblSize count) GBL_NOEXCEPT {
+GBL_INLINE GblBitView* (GblBitView_assign)(GBL_SELF, GblBool value, size_t  index, size_t  count) GBL_NOEXCEPT {
     if(value) return GblBitView_set(pSelf, index, count);
     return GblBitView_reset(pSelf, index, count);
 }
 
-GBL_INLINE GblBitView* (GblBitView_set)(GBL_SELF, GblSize index, GblSize count) GBL_NOEXCEPT {
-    const GblSize start = pSelf->offset + index;
-    const GblSize end = start + count;
+GBL_INLINE GblBitView* (GblBitView_set)(GBL_SELF, size_t  index, size_t  count) GBL_NOEXCEPT {
+    const size_t  start = pSelf->offset + index;
+    const size_t  end = start + count;
     if(start/8 < end/8) {
         pSelf->pBytes[start/8] |= GblBitView_msbMaskLut_[start%8];
-        for(GblSize i = start/8+1; i < end/8; ++i)
+        for(size_t  i = start/8+1; i < end/8; ++i)
             pSelf->pBytes[i] = 0xff;
         pSelf->pBytes[end/8] |= GblBitView_lsbMaskLut_[end%8];
     } else {
@@ -293,12 +293,12 @@ GBL_INLINE GblBitView* (GblBitView_set)(GBL_SELF, GblSize index, GblSize count) 
     return pSelf;
 }
 
-GBL_INLINE GblBitView* (GblBitView_reset)(GBL_SELF, GblSize index, GblSize count) GBL_NOEXCEPT {
-    const GblSize start = pSelf->offset + index;
-    const GblSize end = start + count;
+GBL_INLINE GblBitView* (GblBitView_reset)(GBL_SELF, size_t  index, size_t  count) GBL_NOEXCEPT {
+    const size_t  start = pSelf->offset + index;
+    const size_t  end = start + count;
     if(start/8 < end/8) {
         pSelf->pBytes[start/8] &= ~GblBitView_msbMaskLut_[start%8];
-        for(GblSize i = start/8+1; i < end/8; ++i)
+        for(size_t  i = start/8+1; i < end/8; ++i)
             pSelf->pBytes[i] = 0x00;
         pSelf->pBytes[end/8] &= ~GblBitView_lsbMaskLut_[end%8];
     } else {
@@ -308,19 +308,19 @@ GBL_INLINE GblBitView* (GblBitView_reset)(GBL_SELF, GblSize index, GblSize count
     return pSelf;
 }
 
-GBL_INLINE GblBitView* (GblBitView_flip)(GBL_SELF, GblSize index, GblSize count) GBL_NOEXCEPT {
-    const GblSize start = pSelf->offset + index;
-    const GblSize end   = start + count;
+GBL_INLINE GblBitView* (GblBitView_flip)(GBL_SELF, size_t  index, size_t  count) GBL_NOEXCEPT {
+    const size_t  start = pSelf->offset + index;
+    const size_t  end   = start + count;
 
-    const GblSize startByte = start / 8;
-    const GblSize endByte   = end   / 8;
-    const GblSize startBit  = start % 8;
-    const GblSize endBit    = end   % 8;
+    const size_t  startByte = start / 8;
+    const size_t  endByte   = end   / 8;
+    const size_t  startBit  = start % 8;
+    const size_t  endBit    = end   % 8;
 
     if(startByte < endByte) {
         pSelf->pBytes[startByte] ^= GblBitView_msbMaskLut_[startBit];
 
-        for(GblSize i = startByte + 1; i < endByte; ++i)
+        for(size_t  i = startByte + 1; i < endByte; ++i)
             pSelf->pBytes[i] ^= 0xff;
 
         pSelf->pBytes[endByte] ^= GblBitView_lsbMaskLut_[endBit];
@@ -334,15 +334,15 @@ GBL_INLINE GblBitView* (GblBitView_flip)(GBL_SELF, GblSize index, GblSize count)
 
 GBL_INLINE GblBool GblBitView_eq(GBL_CSELF, const GblBitView* pOther) GBL_NOEXCEPT {
 #if 0
-    const GblSize start = pSelf->offset + index;
-    const GblSize end = start + count;
+    const size_t  start = pSelf->offset + index;
+    const size_t  end = start + count;
     if(start/8 < end/8) {
         if(start/32 < end/32) {
 
         } else { // per-byte
             pSelf->pBytes[start/8] ^= GblBitView_msbMaskLut_[start%8];
 
-            for(GblSize i = start/8+1; i < end/8; ++i)
+            for(size_t  i = start/8+1; i < end/8; ++i)
                 if(pSelf->pBytes[i] != pOther->pBytes[i]) return;
 
             pSelf->pBytes[end/8] ^= GblBitView_lsbMaskLut_[end%8];
@@ -353,7 +353,7 @@ GBL_INLINE GblBool GblBitView_eq(GBL_CSELF, const GblBitView* pOther) GBL_NOEXCE
     }
 #else
     GblBool result = GBL_TRUE;
-    for(GblSize i = 0; i < pSelf->length; ++i)
+    for(size_t  i = 0; i < pSelf->length; ++i)
         if(GblBitView_at(pSelf, i) != GblBitView_at(pOther, i)) {
             result = GBL_FALSE;
             break;
@@ -364,7 +364,7 @@ GBL_INLINE GblBool GblBitView_eq(GBL_CSELF, const GblBitView* pOther) GBL_NOEXCE
 
 GBL_INLINE GblBool GblBitView_lt(GBL_CSELF, const GblBitView* pOther) GBL_NOEXCEPT {
     GblBool result = GBL_FALSE;
-    for(GblSize i = 0; i < pSelf->length; ++i) {
+    for(size_t  i = 0; i < pSelf->length; ++i) {
         const GblBool lvalue = GblBitView_at(pSelf, i);
         const GblBool rvalue = GblBitView_at(pOther, i);
         if(!lvalue && rvalue) {
@@ -380,7 +380,7 @@ GBL_INLINE GblBool GblBitView_lt(GBL_CSELF, const GblBitView* pOther) GBL_NOEXCE
 
 GBL_INLINE GblBool GblBitView_leq(GBL_CSELF, const GblBitView* pOther) GBL_NOEXCEPT {
     GblBool result = GBL_TRUE;
-    for(GblSize i = 0; i < pSelf->length; ++i) {
+    for(size_t  i = 0; i < pSelf->length; ++i) {
         const GblBool lvalue = GblBitView_at(pSelf, i);
         const GblBool rvalue = GblBitView_at(pOther, i);
         if(lvalue && !rvalue) {
@@ -391,12 +391,12 @@ GBL_INLINE GblBool GblBitView_leq(GBL_CSELF, const GblBitView* pOther) GBL_NOEXC
     return result;
 }
 
-GBL_INLINE GblBitView* (GblBitView_setString)(GBL_SELF, const char* pString, GblSize index, GblSize count) GBL_NOEXCEPT {
+GBL_INLINE GblBitView* (GblBitView_setString)(GBL_SELF, const char* pString, size_t  index, size_t  count) GBL_NOEXCEPT {
     GBL_ASSERT(strlen(pString) >= count);
     if(!count) count = strlen(pString);
     GBL_ASSERT(index + count < pSelf->length);
 
-    for(GblSize i = 0; i < count; ++i) {
+    for(size_t  i = 0; i < count; ++i) {
         const char digit = pString[i];
         GBL_ASSERT(digit == '0' || digit == '1');
         const GblBool value = digit == '1'? GBL_TRUE : GBL_FALSE;
@@ -406,32 +406,32 @@ GBL_INLINE GblBitView* (GblBitView_setString)(GBL_SELF, const char* pString, Gbl
     return pSelf;
 }
 
-GBL_EXPORT uint64_t (GblBitView_uint64)(GBL_CSELF, GblSize index, GblSize count) GBL_NOEXCEPT {
+GBL_EXPORT uint64_t (GblBitView_uint64)(GBL_CSELF, size_t  index, size_t  count) GBL_NOEXCEPT {
     uint64_t value = 0;
-    const GblSize end = index + count;
+    const size_t  end = index + count;
     GBL_ASSERT(end <= pSelf->length);
-    for(GblSize b = 0; b < count; ++b) {
+    for(size_t  b = 0; b < count; ++b) {
         value |= (GblBitView_at(pSelf, index+b) << b);
     }
     return value;
 }
 
-GBL_EXPORT GblBitView* (GblBitView_setUint64)(GBL_SELF, uint64_t value, GblSize index, GblSize count) GBL_NOEXCEPT {
-    for(GblSize b = 0; b < count; ++b) {
+GBL_EXPORT GblBitView* (GblBitView_setUint64)(GBL_SELF, uint64_t value, size_t  index, size_t  count) GBL_NOEXCEPT {
+    for(size_t  b = 0; b < count; ++b) {
         GblBitView_assign(pSelf, (value>>b)&0x1, index+b);
     }
     return pSelf;
 }
 
-GBL_INLINE GblBitView* (GblBitView_rotate)(GBL_SELF, ptrdiff_t n, GblSize offset, GblSize count) GBL_NOEXCEPT {
+GBL_INLINE GblBitView* (GblBitView_rotate)(GBL_SELF, ptrdiff_t n, size_t  offset, size_t  count) GBL_NOEXCEPT {
     return pSelf;
 }
 
-GBL_INLINE GblBitView* GblBitView_shiftLeft(GBL_SELF, const GblBitView* pSrc, GblSize amount) GBL_NOEXCEPT {
+GBL_INLINE GblBitView* GblBitView_shiftLeft(GBL_SELF, const GblBitView* pSrc, size_t  amount) GBL_NOEXCEPT {
     return pSelf;
 }
 
-GBL_INLINE GblBitView* GblBitView_shiftRight(GBL_SELF, const GblBitView* pSrc, GblSize amount) GBL_NOEXCEPT {
+GBL_INLINE GblBitView* GblBitView_shiftRight(GBL_SELF, const GblBitView* pSrc, size_t  amount) GBL_NOEXCEPT {
     return pSelf;
 }
 
@@ -439,28 +439,28 @@ GBL_INLINE GblBitView* GblBitView_shiftRight(GBL_SELF, const GblBitView* pSrc, G
 
 GBL_EXPORT GBL_RESULT GblBitView_and(GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2) GBL_NOEXCEPT {
     GBL_ASSERT(pSelf->length == pValue1->length && pSelf->length == pValue2->length);
-    for(GblSize i = 0; i < pSelf->length; ++i) {
+    for(size_t  i = 0; i < pSelf->length; ++i) {
         GblBitView_assign(pSelf, GblBitView_at(pValue1, i) & GblBitView_at(pValue2, i), i);
     }
 }
 
 GBL_EXPORT GBL_RESULT GblBitView_or(GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2) GBL_NOEXCEPT {
     GBL_ASSERT(pSelf->length == pValue1->length && pSelf->length == pValue2->length);
-    for(GblSize i = 0; i < pSelf->length; ++i) {
+    for(size_t  i = 0; i < pSelf->length; ++i) {
         GblBitView_assign(pSelf, GblBitView_at(pValue1, i) | GblBitView_at(pValue2, i), i);
     }
 }
 
 GBL_EXPORT GBL_RESULT GblBitView_xor(GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2) GBL_NOEXCEPT {
     GBL_ASSERT(pSelf->length == pValue1->length && pSelf->length == pValue2->length);
-    for(GblSize i = 0; i < pSelf->length; ++i) {
+    for(size_t  i = 0; i < pSelf->length; ++i) {
         GblBitView_assign(pSelf, GblBitView_at(pValue1, i) ^ GblBitView_at(pValue2, i), i);
     }
 }
 
 GBL_EXPORT GBL_RESULT GblBitView_andNot(GBL_SELF, const GblBitView* pValue1, const GblBitView* pValue2) GBL_NOEXCEPT {
     GBL_ASSERT(pSelf->length == pValue1->length && pSelf->length == pValue2->length);
-    for(GblSize i = 0; i < pSelf->length; ++i) {
+    for(size_t  i = 0; i < pSelf->length; ++i) {
         GblBitView_assign(pSelf, GblBitView_at(pValue1, i) & ~GblBitView_at(pValue2, i), i);
     }
 }

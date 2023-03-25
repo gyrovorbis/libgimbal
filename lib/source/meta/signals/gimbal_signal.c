@@ -25,7 +25,7 @@ typedef struct Signal_ {
     GblQuark        name;
     //GblLinkedListnNode next;
     GblMarshalFn    pFnCMarshal;
-    GblSize         argCount;
+    size_t          argCount;
     GblType         argTypes[];
 } Signal_;
 
@@ -81,7 +81,7 @@ static void signalSetDestructor_(const GblHashSet* pSet, void* pEntry) {
 GBL_EXPORT GBL_RESULT GblSignal_install(GblType      ownerType,
                                         const char*  pName,
                                         GblMarshalFn pFnCMarshal,
-                                        GblSize      argCount,
+                                        size_t       argCount,
                                         ...)
 {
     va_list varArgs;
@@ -96,7 +96,7 @@ GBL_EXPORT GBL_RESULT GblSignal_install(GblType      ownerType,
     GBL_CTX_VERIFY_TYPE(ownerType);
     GBL_CTX_VERIFY_POINTER(pName);
 
-    const GblSize allocSize = sizeof(Signal_) + sizeof(GblType)*argCount;
+    const size_t  allocSize = sizeof(Signal_) + sizeof(GblType)*argCount;
 
     pSignal = GBL_CTX_MALLOC(gblAlignedAllocSizeDefault(allocSize),
                              GBL_ALIGNOF(GBL_MAX_ALIGN_T),
@@ -107,7 +107,7 @@ GBL_EXPORT GBL_RESULT GblSignal_install(GblType      ownerType,
     pSignal->pFnCMarshal    = pFnCMarshal;
     pSignal->argCount       = argCount;
 
-    for(GblSize a = 0; a < argCount; ++a) {
+    for(size_t  a = 0; a < argCount; ++a) {
         pSignal->argTypes[a] = va_arg(varArgs, GblType);
         GBL_CTX_VERIFY_TYPE(pSignal->argTypes[a]);
     }
@@ -201,7 +201,7 @@ static void instanceConnectionTableDestructor_(const GblHashSet* pSet, void* pEn
 
 #ifndef NDEBUG
     GBL_CTX_VERIFY_EXPRESSION(!GblDoublyLinkedList_count(&pConnections->receiverConnections));
-    for(GblSize s = 0; s < GblArrayMap_size(&pConnections->pEmitterHandlers); ++s) {
+    for(size_t  s = 0; s < GblArrayMap_size(&pConnections->pEmitterHandlers); ++s) {
        EmitterHandler_* pHandler = (void*)GblArrayMap_probeValue(&pConnections->pEmitterHandlers,
                                                                 s);
        GBL_CTX_VERIFY_EXPRESSION(!GblDoublyLinkedList_count(&pHandler->connectionList));
@@ -424,7 +424,7 @@ GBL_EXPORT GBL_RESULT GblSignal_connectClass(GblInstance* pEmitter,
                                              const char*  pSignalName,
                                              GblInstance* pReceiver,
                                              GblType      classType,
-                                             GblSize      methodOffset)
+                                             size_t       methodOffset)
 {
     GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
@@ -479,10 +479,10 @@ GBL_INLINE GBL_RESULT deleteConnection_(Connection_* pConnection) {
     GBL_CTX_END();
 }
 
-static GblSize disconnectFromHandler_(EmitterHandler_*  pHandler,
+static size_t  disconnectFromHandler_(EmitterHandler_*  pHandler,
                                       GblClosure*       pClosure)
 {
-    GblSize disconnectedCount = 0;
+    size_t  disconnectedCount = 0;
     GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
     GblDoublyLinkedListNode* pNext;
     for(GblDoublyLinkedListNode* pNode = pHandler->connectionList.pNext;
@@ -503,14 +503,14 @@ static GblSize disconnectFromHandler_(EmitterHandler_*  pHandler,
 }
 
 
-static GblSize GblSignal_disconnect_(GblInstance*               pEmitter,
+static size_t  GblSignal_disconnect_(GblInstance*               pEmitter,
                                      const char*                pSignalName,
                                      GblInstance*               pReceiver,
                                      GblClosure*                pClosure,
                                      InstanceConnectionTable_*  pEmitterTable,
                                      InstanceConnectionTable_*  pReceiverTable)
 {
-    GblSize disconnectedCount = 0;
+    size_t  disconnectedCount = 0;
 
     GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
@@ -557,8 +557,8 @@ static GblSize GblSignal_disconnect_(GblInstance*               pEmitter,
                     disconnectedCount += disconnectFromHandler_(pHandler, pClosure);
 
             } else {
-                const GblSize signalHandlerCount = GblArrayMap_size(&pEmitterTable->pEmitterHandlers);
-                for(GblSize s = 0; s < signalHandlerCount; ++s) {
+                const size_t  signalHandlerCount = GblArrayMap_size(&pEmitterTable->pEmitterHandlers);
+                for(size_t  s = 0; s < signalHandlerCount; ++s) {
                     EmitterHandler_* pHandler = (void*)GblArrayMap_probeValue(&pEmitterTable->pEmitterHandlers,
                                                                               s);
                     disconnectedCount += disconnectFromHandler_(pHandler, pClosure);
@@ -571,7 +571,7 @@ static GblSize GblSignal_disconnect_(GblInstance*               pEmitter,
     return disconnectedCount;
 }
 
-GBL_EXPORT GblSize GblSignal_disconnect(GblInstance* pEmitter,
+GBL_EXPORT size_t  GblSignal_disconnect(GblInstance* pEmitter,
                                         const char*  pSignalName,
                                         GblInstance* pReceiver,
                                         GblClosure*  pClosure)
@@ -635,10 +635,10 @@ GBL_EXPORT GblBool GblSignal_blockAll(GblInstance* pInstance,
     return old;
 }
 
-GBL_EXPORT GblSize GblSignal_connectionCount(GblInstance* pInstance,
+GBL_EXPORT size_t  GblSignal_connectionCount(GblInstance* pInstance,
                                              const char*  pSignalName)
 {
-    GblSize count = 0;
+    size_t  count = 0;
     if(pSignalName) {
         EmitterHandler_* pHandler = EmitterHandler_find_(pInstance, pSignalName, GBL_QUARK_INVALID, NULL);
         if(pHandler) {
@@ -647,8 +647,8 @@ GBL_EXPORT GblSize GblSignal_connectionCount(GblInstance* pInstance,
     } else {
         InstanceConnectionTable_* pTable = InstanceConnectionTable_find_(pInstance);
         if(pTable) {
-            const GblSize size = GblArrayMap_size(&pTable->pEmitterHandlers);
-            for(GblSize s = 0; s < size; ++s) {
+            const size_t  size = GblArrayMap_size(&pTable->pEmitterHandlers);
+            for(size_t  s = 0; s < size; ++s) {
                 EmitterHandler_* pHandler = (EmitterHandler_*)GblArrayMap_probeValue(&pTable->pEmitterHandlers, s);
                 count += GblDoublyLinkedList_count(&pHandler->connectionList);
             }
@@ -677,19 +677,19 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
             // Don't bother setting up stack frame if there's no connections
             if(pNode) {
                 Connection_*    pConnection = GBL_DOUBLY_LINKED_LIST_ENTRY(pNode, Connection_, emitterList);
-                const GblSize   argCount    = pConnection->pSignal->argCount + 1;
+                const size_t    argCount    = pConnection->pSignal->argCount + 1;
                 GblVariant*     pArgValues  = GBL_ALLOCA(sizeof(GblVariant) * argCount);
 
                 // initialize argument values
                 GBL_CTX_VERIFY_CALL(GblVariant_constructPointer(&pArgValues[0], GBL_POINTER_TYPE, pConnection->pReceiver));
                 if(pVarArgs) {
-                    for(GblSize a = 1; a < argCount; ++a) {
+                    for(size_t  a = 1; a < argCount; ++a) {
                         GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopyVaList(&pArgValues[a],
                                                                                 pConnection->pSignal->argTypes[a-1],
                                                                                 pVarArgs));
                     }
                 } else if(pVariantArgs) {
-                    for(GblSize a = 1; a < argCount; ++a) {
+                    for(size_t  a = 1; a < argCount; ++a) {
                         GBL_CTX_VERIFY_CALL(GblVariant_constructCopy(&pArgValues[a],
                                                                      &pVariantArgs[a-1]));
                     }
@@ -721,7 +721,7 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
                 } while((pNode = pNode->pNext) != &pHandler->connectionList);
 
                 // destruct arguments
-                for(GblSize a = 0; a < argCount; ++a) {
+                for(size_t  a = 0; a < argCount; ++a) {
                     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&pArgValues[a]));
                 }
             }

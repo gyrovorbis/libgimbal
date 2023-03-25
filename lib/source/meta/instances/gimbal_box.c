@@ -101,7 +101,7 @@ GBL_EXPORT GBL_RESULT GblBox_constructWithClass(GblBox* pSelf,
 }
 
 GBL_EXPORT GblBox* GblBox_createExt(GblType           derivedType,
-                                    GblSize           totalSize,
+                                    size_t            totalSize,
                                     void*             pUserdata,
                                     GblArrayMapDtorFn pFnUdDtor)
 {
@@ -131,7 +131,7 @@ GBL_EXPORT GBL_RESULT GblBox_constructExt(GblBox*           pSelf,
 }
 
 GBL_EXPORT GblBox* GblBox_createExtWithClass(GblBoxClass*      pClass,
-                                             GblSize           totalSize,
+                                             size_t            totalSize,
                                              void*             pUserdata,
                                              GblArrayMapDtorFn pFnUdDtor)
 {
@@ -262,7 +262,7 @@ GBL_EXPORT GBL_RESULT GblBoxClass_setField(GblBoxClass*      pSelf,
 
 
 GBL_EXPORT GblBoxClass* GblBoxClass_createFloatingExt(GblType           derivedType,
-                                                      GblSize           totalSize,
+                                                      size_t            totalSize,
                                                       void*             pUserdata,
                                                       GblArrayMapDtorFn pFnUdDtor)
 {

@@ -242,7 +242,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GBL_RESULT GBL_ERRNO_RESULT(int ernum) {
     } GBL_STMT_END
 
 
-GBL_MAYBE_UNUSED GBL_CTX_INLINE(MALLOC, void*, GblSize size, GblSize align, const char* pDebugStr) {
+GBL_MAYBE_UNUSED GBL_CTX_INLINE(MALLOC, void*, size_t  size, size_t  align, const char* pDebugStr) {
     GBL_CTX_INLINE_BEGIN(GBL_NULL);
     if(align == 0) {
         align = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
@@ -279,7 +279,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(MALLOC, void*, GblSize size, GblSize align, cons
 #define GBL_CTX_NEW(...) \
     GBL_VA_OVERLOAD_SELECT(GBL_CTX_NEW, GBL_VA_OVERLOAD_SUFFIXER_ARGC, 1, __VA_ARGS__)(GBL_SRC_LOC(GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN), __VA_ARGS__)
 
-GBL_MAYBE_UNUSED GBL_CTX_INLINE(REALLOC, void*, void* pData, GblSize newSize, GblSize newAlign) {
+GBL_MAYBE_UNUSED GBL_CTX_INLINE(REALLOC, void*, void* pData, size_t  newSize, size_t  newAlign) {
     GBL_CTX_INLINE_BEGIN(NULL);
 
     GBL_CTX_EXT(memRealloc_, pData, newSize, newAlign, &GBL_CTX_INLINE_RETVAL());

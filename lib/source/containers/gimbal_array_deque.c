@@ -3,13 +3,13 @@
 #define GBL_RING_SELF_(dequeSelf)      (&GBL_PRIV_REF(dequeSelf).ringBuffer)
 #define GBL_RING_PRIV_REF_(dequeSelf)  (GBL_PRIV_REF(GBL_RING_SELF_(dequeSelf)))
 
-static GblSize GblArrayDeque_endSize_(const GblArrayDeque* pSelf) {
+static size_t  GblArrayDeque_endSize_(const GblArrayDeque* pSelf) {
     return GBL_RING_PRIV_REF_(pSelf).frontPos?
                 (GBL_RING_PRIV_REF_(pSelf).capacity - GBL_RING_PRIV_REF_(pSelf).frontPos) : 0;
 }
 
 static GBL_RESULT GblArrayDeque_reserve_(GblArrayDeque* pSelf,
-                                         GblSize       capacity,
+                                         size_t        capacity,
                                          GblBool       exact)
 {
     if(GBL_RING_PRIV_REF_(pSelf).capacity < capacity) {
@@ -17,16 +17,16 @@ static GBL_RESULT GblArrayDeque_reserve_(GblArrayDeque* pSelf,
 
         if(!exact && capacity > 2)
             capacity = gblPow2Next(capacity);
-        const GblSize newCapacityBytes = capacity * GBL_RING_PRIV_REF_(pSelf).elementSize;
+        const size_t  newCapacityBytes = capacity * GBL_RING_PRIV_REF_(pSelf).elementSize;
 
         if(GBL_RING_PRIV_REF_(pSelf).pData) {
             GBL_RING_PRIV_REF_(pSelf).pData = GBL_CTX_REALLOC(GBL_RING_PRIV_REF_(pSelf).pData,
                                                               newCapacityBytes);
 
             // Have to move "end" chunk to end of new allocation
-            const GblSize endSize = GblArrayDeque_endSize_(pSelf);
+            const size_t  endSize = GblArrayDeque_endSize_(pSelf);
             if(endSize) {
-                const GblSize newFrontPos = capacity - endSize;
+                const size_t  newFrontPos = capacity - endSize;
                 memmove((void*)((uintptr_t)GBL_RING_PRIV_REF_(pSelf).pData +
                                 (newFrontPos * GblArrayDeque_elementSize(pSelf))),
                         GblArrayDeque_front(pSelf),
@@ -48,8 +48,8 @@ static GBL_RESULT GblArrayDeque_reserve_(GblArrayDeque* pSelf,
 
 GBL_EXPORT GBL_RESULT (GblArrayDeque_construct)(GblArrayDeque* pSelf,
                                                 uint16_t       elementSize,
-                                                GblSize        capacity,
-                                                GblSize        initialSize,
+                                                size_t         capacity,
+                                                size_t         initialSize,
                                                 const void*    pInitialData,
                                                 GblContext*    pCtx) GBL_NOEXCEPT
 {
@@ -96,7 +96,7 @@ GBL_EXPORT void* GblArrayDeque_popBack(GblArrayDeque* pSelf) {
     return pSlot;
 }
 
-GBL_EXPORT void* (GblArrayDeque_insert)(GblArrayDeque* pSelf, GblSize pos, const void* pData, GblSize count) {
+GBL_EXPORT void* (GblArrayDeque_insert)(GblArrayDeque* pSelf, size_t  pos, const void* pData, size_t  count) {
     void* pSlot = NULL;
     GBL_ASSERT(count);
     GBL_RESULT result = GblArrayDeque_reserve_(pSelf, GblArrayDeque_size(pSelf) + count, GBL_FALSE);
@@ -104,8 +104,8 @@ GBL_EXPORT void* (GblArrayDeque_insert)(GblArrayDeque* pSelf, GblSize pos, const
 
         if(pos <= GblArrayDeque_size(pSelf)){ // insert into middle
 
-            const GblSize wrapIndex = GblArrayDeque_endSize_(pSelf);
-            const GblSize oldSize = GblArrayDeque_size(pSelf);
+            const size_t  wrapIndex = GblArrayDeque_endSize_(pSelf);
+            const size_t  oldSize = GblArrayDeque_size(pSelf);
             GblArrayDeque_resize(pSelf, oldSize + count);
             if(pos >= wrapIndex) {  // inserting into begin segment
 
@@ -142,11 +142,11 @@ GBL_EXPORT void* (GblArrayDeque_insert)(GblArrayDeque* pSelf, GblSize pos, const
     return pSlot;
 }
 
-GBL_EXPORT void* GblArrayDeque_emplace(GblArrayDeque* pSelf, GblSize pos) {
+GBL_EXPORT void* GblArrayDeque_emplace(GblArrayDeque* pSelf, size_t  pos) {
     return GblArrayDeque_insert(pSelf, pos, NULL);
 }
 
-GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, GblSize pos, GblSize count) {
+GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, size_t  pos, size_t  count) {
     return GBL_RESULT_UNIMPLEMENTED;
 #if 0
     GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
@@ -154,20 +154,20 @@ GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, GblSize pos, G
     GBL_CTX_VERIFY_ARG(count);
     GBL_CTX_VERIFY_ARG(pos+count <= GblArrayDeque_size(pSelf));
 
-    const GblSize wrapIndex = GblArrayDeque_endSize_(pSelf);
-    const GblSize oldSize = GblArrayDeque_size(pSelf);
+    const size_t  wrapIndex = GblArrayDeque_endSize_(pSelf);
+    const size_t  oldSize = GblArrayDeque_size(pSelf);
 
     if(pos < wrapIndex) {
-        GblSize endBegin = pos;
+        size_t  endBegin = pos;
         if(endBegin > wrapIndex) endBegin = wrapIndex;
-        GblSize endEnd = pos + count;
+        size_t  endEnd = pos + count;
         if(endEnd > wrapIndex) endEnd = wrapIndex;
         const GblBool endRemoveChunk = endEnd - endBegin;
 
         // check if we have anything to shave off of the end
-        const GblSize endRemovalSize = endEnd - endBegin;
+        const size_t  endRemovalSize = endEnd - endBegin;
         if(endRemovalSize) {
-            const GblSize endSize = GblArrayDeque_endSize_(pSelf);
+            const size_t  endSize = GblArrayDeque_endSize_(pSelf);
 
             // scoot over remaining entries
             if(endSize > endRemovalSize) {
@@ -208,7 +208,7 @@ GBL_EXPORT void* GblArrayDeque_emplaceBack(GblArrayDeque* pSelf) GBL_NOEXCEPT {
 }
 
 GBL_EXPORT GBL_RESULT GblArrayDeque_reserve(GblArrayDeque* pSelf,
-                                            GblSize        capacity)
+                                            size_t         capacity)
 {
 #if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
     return GblArrayDeque_reserve_(pSelf, capacity, GBL_FALSE);
@@ -218,8 +218,8 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_reserve(GblArrayDeque* pSelf,
 
 }
 
-GBL_EXPORT GBL_RESULT GblArrayDeque_resize(GblArrayDeque* pSelf, GblSize size) {
-    const GblSize oldSize = GblArrayDeque_size(pSelf);
+GBL_EXPORT GBL_RESULT GblArrayDeque_resize(GblArrayDeque* pSelf, size_t  size) {
+    const size_t  oldSize = GblArrayDeque_size(pSelf);
 
     if(size != oldSize) {
         GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
@@ -240,18 +240,18 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_resize(GblArrayDeque* pSelf, GblSize size) {
 
 GBL_EXPORT GBL_RESULT GblArrayDeque_shrinkToFit(GblArrayDeque* pSelf) {
 #if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
-    const GblSize newSize = gblPow2Next(GblArrayDeque_size(pSelf));
+    const size_t  newSize = gblPow2Next(GblArrayDeque_size(pSelf));
 #else
-    const GblSize newSize = GblArrayDeque_size(pSelf);
+    const size_t  newSize = GblArrayDeque_size(pSelf);
 #endif
 
     if(newSize < GBL_RING_PRIV_REF_(pSelf).capacity) {
         GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
-        const GblSize endSize = GblArrayDeque_endSize_(pSelf);
+        const size_t  endSize = GblArrayDeque_endSize_(pSelf);
 
         if(endSize) {
 
-            const GblSize newFront = GBL_RING_PRIV_REF_(pSelf).frontPos -
+            const size_t  newFront = GBL_RING_PRIV_REF_(pSelf).frontPos -
                     (GblArrayDeque_capacity(pSelf) - newSize);
 
             memmove(GBL_RING_PRIV_REF_(pSelf).pData + (newFront * GBL_RING_PRIV_REF_(pSelf).elementSize),

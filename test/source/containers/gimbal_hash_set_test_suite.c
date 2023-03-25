@@ -8,8 +8,8 @@
 
 typedef struct GblHashSetTestSuite_ {
     GblHashSet  hashSet;
-    GblSize     initialAllocCount;
-    GblSize     dtorCount;
+    size_t      initialAllocCount;
+    size_t      dtorCount;
     const char* pDtorLastKey;
 } GblHashSetTestSuite_;
 
@@ -46,14 +46,14 @@ static GblBool foreach_(const GblHashSet* pSet, void* pEntry, void* pUd) {
             pActual->value == pComp->value)? GBL_FALSE : GBL_TRUE;
 }
 
-static GBL_RESULT verify_(const GblHashSet* pSet, GblSize entryCount, const HashSetEntry_* pEntries, GblContext* pCtx) {
+static GBL_RESULT verify_(const GblHashSet* pSet, size_t  entryCount, const HashSetEntry_* pEntries, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
     GBL_TEST_COMPARE(GblHashSet_size(pSet), entryCount);
     if(!entryCount) GBL_TEST_VERIFY(GblHashSet_empty(pSet));
 
     // get
-    for(GblSize e = 0; e < entryCount; ++e) {
+    for(size_t  e = 0; e < entryCount; ++e) {
         HashSetEntry_* pEntry = GblHashSet_get(pSet, &pEntries[e]);
         GBL_TEST_VERIFY(pEntry);
         GBL_TEST_COMPARE(pEntry->pKey, pEntries[e].pKey);
@@ -61,7 +61,7 @@ static GBL_RESULT verify_(const GblHashSet* pSet, GblSize entryCount, const Hash
     }
 
     // at
-    for(GblSize e = 0; e < entryCount; ++e) {
+    for(size_t  e = 0; e < entryCount; ++e) {
         HashSetEntry_* pEntry = GblHashSet_at(pSet, &pEntries[e]);
         GBL_CTX_VERIFY_LAST_RECORD();
         GBL_TEST_VERIFY(pEntry);
@@ -70,17 +70,17 @@ static GBL_RESULT verify_(const GblHashSet* pSet, GblSize entryCount, const Hash
     }
 
     // contains
-    for(GblSize e = 0; e < entryCount; ++e) {
+    for(size_t  e = 0; e < entryCount; ++e) {
         GBL_TEST_VERIFY(GblHashSet_contains(pSet, &pEntries[e]));
     }
 
     // count
-    for(GblSize e = 0; e < entryCount; ++e) {
+    for(size_t  e = 0; e < entryCount; ++e) {
         GBL_TEST_COMPARE(GblHashSet_count(pSet, &pEntries[e]), 1);
     }
 
     //find
-    for(GblSize e = 0; e < entryCount; ++e) {
+    for(size_t  e = 0; e < entryCount; ++e) {
         GblHashSetIter it = GblHashSet_find(pSet, &pEntries[e]);
         GBL_TEST_VERIFY(GblHashSetIter_valid(&it));
         HashSetEntry_* pEntry = GblHashSetIter_value(&it);
@@ -90,9 +90,9 @@ static GBL_RESULT verify_(const GblHashSet* pSet, GblSize entryCount, const Hash
     }
 
     // probe
-    for(GblSize e = 0; e < entryCount; ++e) {
+    for(size_t  e = 0; e < entryCount; ++e) {
         GblBool found = GBL_FALSE;
-        for(GblSize b = 0; b < GblHashSet_bucketCount(pSet); ++b) {
+        for(size_t  b = 0; b < GblHashSet_bucketCount(pSet); ++b) {
             HashSetEntry_* pEntry = GblHashSet_probe(pSet, b);
             if(pEntry) {
                 if(strcmp(pEntry->pKey, pEntries[e].pKey) == 0 &&
@@ -107,7 +107,7 @@ static GBL_RESULT verify_(const GblHashSet* pSet, GblSize entryCount, const Hash
     }
 
     // foreach
-    for(GblSize e = 0; e < entryCount; ++e) {
+    for(size_t  e = 0; e < entryCount; ++e) {
         GBL_TEST_VERIFY(!GblHashSet_foreach(pSet, foreach_, (void*)&pEntries[e]));
     }
 

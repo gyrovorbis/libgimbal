@@ -148,7 +148,7 @@ static GBL_RESULT GblPoolAllocatorTestSuite_overflowPage_(GblTestSuite* pSelf, G
     GBL_CTX_BEGIN(pCtx);
     GblPoolAllocatorTestSuite_* pSelf_ = GBL_POOL_ALLOCATOR_TEST_SUITE_(pSelf);
 
-    for(GblSize i = 0; i < 10; ++i) {
+    for(size_t  i = 0; i < 10; ++i) {
         GblVariantList_* pVariant = GblPoolAllocator_new(&pSelf_->pool);
         GBL_TEST_VERIFY(pVariant);
         GBL_TEST_VERIFY(!((uintptr_t)pVariant & 0x1f));
@@ -174,7 +174,7 @@ static GBL_RESULT GblPoolAllocatorTestSuite_renewAllOverflow_(GblTestSuite* pSel
     GblPoolAllocatorTestSuite_* pSelf_ = GBL_POOL_ALLOCATOR_TEST_SUITE_(pSelf);
 
     GblDoublyLinkedListNode* pNode = NULL;
-    GblSize freeCount = 0;
+    size_t  freeCount = 0;
     while((pNode = GblDoublyLinkedList_popFront(&pSelf_->variantList.list))) {
         GBL_CTX_VERIFY_CALL(GblPoolAllocator_delete(&pSelf_->pool, pNode));
         ++freeCount;
@@ -182,7 +182,7 @@ static GBL_RESULT GblPoolAllocatorTestSuite_renewAllOverflow_(GblTestSuite* pSel
 
     GBL_TEST_COMPARE(GblPoolAllocator_freeListSize(&pSelf_->pool), freeCount);
 
-    for(GblSize i = 0; i < 13; ++i) {
+    for(size_t  i = 0; i < 13; ++i) {
         GblVariantList_* pVariant = GblPoolAllocator_new(&pSelf_->pool);
         GBL_TEST_VERIFY(pVariant);
         GBL_TEST_VERIFY(!((uintptr_t)pVariant & 0x1f));

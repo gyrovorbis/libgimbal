@@ -11,8 +11,8 @@ typedef struct GblArrayListTestSuite_ {
         const char* pExtraData[4];
     } stringList;
     void*   pReleasedData;
-    GblSize releasedSize;
-    GblSize releasedCapacity;
+    size_t  releasedSize;
+    size_t  releasedCapacity;
 } GblArrayListTestSuite_;
 
 const static char* initialStrings_[4] = {
@@ -24,7 +24,7 @@ const static char* initialStrings_[4] = {
 
 GBL_RESULT GblArrayListTestSuite_verify_(const GblArrayList* pVec, const char** pList, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    GblSize i = 0;
+    size_t  i = 0;
     const char* pString;
 
     while ((pString = pList[i])) {
@@ -99,7 +99,7 @@ GBL_RESULT GblArrayListTestSuite_assign_(GblTestSuite* pSelf, GblContext* pCtx) 
 GBL_RESULT GblArrayListTestSuite_release_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblArrayListTestSuite_* pSelf_ = GBL_ARRAY_LIST_TEST_SUITE_(pSelf);
-    const GblSize prevCapacity = GblArrayList_capacity(&pSelf_->stringList.vector);
+    const size_t  prevCapacity = GblArrayList_capacity(&pSelf_->stringList.vector);
     GBL_CTX_VERIFY_CALL(GblArrayList_release(&pSelf_->stringList.vector,
                                           &pSelf_->pReleasedData,
                                           &pSelf_->releasedSize,
@@ -460,7 +460,7 @@ GBL_RESULT GblArrayListTestSuite_resizeSmaller_(GblTestSuite* pSelf, GblContext*
     GBL_CTX_BEGIN(pCtx);
     GblArrayListTestSuite_* pSelf_ = GBL_ARRAY_LIST_TEST_SUITE_(pSelf);
 
-    GblSize oldCapacity = GblArrayList_capacity(&pSelf_->stringList.vector);
+    size_t  oldCapacity = GblArrayList_capacity(&pSelf_->stringList.vector);
     GBL_CTX_VERIFY_CALL(GblArrayList_resize(&pSelf_->stringList.vector, 4));
     GBL_TEST_COMPARE(GblArrayList_size(&pSelf_->stringList.vector), 4);
     GBL_TEST_COMPARE(GblArrayList_capacity(&pSelf_->stringList.vector), oldCapacity);
@@ -536,7 +536,7 @@ static GBL_RESULT GblArrayListTestSuite_atProfile_(GblTestSuite* pSelf, GblConte
     GblArrayList_pushBack(&pSelf_->stringList.vector, &pLiteral);
 
 
-    for(GblSize i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
+    for(size_t  i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
         pLiteral = GblArrayList_at(&pSelf_->stringList.vector,
                                    gblRandRange(0, GblArrayList_size(&pSelf_->stringList.vector)-1));
         pLiteral[0] = 'l';
@@ -554,7 +554,7 @@ GBL_RESULT GblArrayListTestSuite_pushBackProfile_(GblTestSuite* pSelf, GblContex
 
     const char* pLiteral = "LOLOL";
 
-    for(GblSize i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
+    for(size_t  i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
         GblArrayList_pushBack(&pSelf_->stringList.vector, &pLiteral);
     }
 
@@ -569,7 +569,7 @@ GBL_RESULT GblArrayListTestSuite_pushFrontProfile_(GblTestSuite* pSelf, GblConte
 
     GblArrayList_clear(&pSelf_->stringList.vector);
 
-    for(GblSize i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
+    for(size_t  i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
         GblArrayList_pushFront(&pSelf_->stringList.vector, &pLiteral);
     }
 

@@ -2,8 +2,8 @@
 
 GBL_EXPORT GBL_RESULT GblRingBuffer_construct_6(GblRingBuffer* pSelf,
                                                 uint16_t       elementSize,
-                                                GblSize        capacity,
-                                                GblSize        initialSize,
+                                                size_t         capacity,
+                                                size_t         initialSize,
                                                 const void*    pInitialData,
                                                 GblContext*    pCtx)
 {
@@ -21,7 +21,7 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_construct_6(GblRingBuffer* pSelf,
     if(capacity)
         GBL_PRIV_REF(pSelf).pData       = GBL_CTX_MALLOC(capacity * elementSize, 0, "GblRingBuffer");
 
-    for(GblSize i = 0; i < initialSize; ++i) {
+    for(size_t  i = 0; i < initialSize; ++i) {
         GBL_CTX_VERIFY_CALL(GblRingBuffer_pushBack(pSelf, (void*)((uintptr_t)pInitialData + (elementSize * i))));
     }
     GBL_CTX_END();

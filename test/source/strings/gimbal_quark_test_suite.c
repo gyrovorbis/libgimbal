@@ -10,9 +10,9 @@ typedef struct GblQuarkTestSuite_ {
     GblQuark    string;
     GblQuark    sizedString;
     GblQuark    pagedString;
-    GblSize     quarkStartCount;
-    GblSize     quarkStartBytes;
-    GblSize     quarkStartPages;
+    size_t      quarkStartCount;
+    size_t      quarkStartBytes;
+    size_t      quarkStartPages;
 } GblQuarkTestSuite_;
 
 static GBL_RESULT GblQuarkTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
@@ -137,12 +137,12 @@ static GBL_RESULT GblQuarkTestSuite_tryStringSized_(GblTestSuite* pSelf, GblCont
 static GBL_RESULT GblQuarkTestSuite_extraPage_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
-    const GblSize pageCount = GblQuark_pageCount();
+    const size_t  pageCount = GblQuark_pageCount();
 
-    const GblSize oldBytesUsed = GblQuark_bytesUsed();
-    const GblSize pageFreeBytes = GblQuark_pageSize() - oldBytesUsed - 1;
+    const size_t  oldBytesUsed = GblQuark_bytesUsed();
+    const size_t  pageFreeBytes = GblQuark_pageSize() - oldBytesUsed - 1;
     char* pBuffer = GBL_ALLOCA(pageFreeBytes);
-    for(GblSize i = 0; i < pageFreeBytes; ++i) pBuffer[i] = 'a';
+    for(size_t  i = 0; i < pageFreeBytes; ++i) pBuffer[i] = 'a';
     const GblQuark wasterQuark = GblQuark_fromStringSized(pBuffer, pageFreeBytes);
 
     GBL_TEST_VERIFY(wasterQuark != GBL_QUARK_INVALID);

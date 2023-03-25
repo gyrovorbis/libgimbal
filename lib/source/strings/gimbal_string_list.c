@@ -50,8 +50,8 @@ GBL_EXPORT GblStringList* GblStringList_createSplit(const char* pStr, const char
     GblStringList* pList = GblStringList_createEmpty();
     GblStringView srcView = GblStringView_fromString(pStr);
     GblStringView delimView = GblStringView_fromString(pDelim);
-    GblSize stop = 0;
-    GblSize start = 0;
+    size_t  stop = 0;
+    size_t  start = 0;
 
     while(start < srcView.length) {
         stop = GblStringView_findFirstOf(srcView, delimView, start);
@@ -59,7 +59,7 @@ GBL_EXPORT GblStringList* GblStringList_createSplit(const char* pStr, const char
             stop = srcView.length;
         }
 
-        const GblSize length = stop-start;
+        const size_t  length = stop-start;
 
         if(length) {
             GblStringView subView = GblStringView_fromStringSized(srcView.pData + start,
@@ -76,8 +76,8 @@ GBL_EXPORT GblStringList* GblStringList_createSplit(const char* pStr, const char
 
 }
 
-GBL_EXPORT GblStringList* (GblStringList_createFromArray)(const char** ppStrs, GblSize size) {
-    GblSize pos = 0;
+GBL_EXPORT GblStringList* (GblStringList_createFromArray)(const char** ppStrs, size_t  size) {
+    size_t  pos = 0;
 
     GblStringList* pList = GblStringList_createEmpty();
 
@@ -92,7 +92,7 @@ GBL_EXPORT GblStringList* (GblStringList_createFromArray)(const char** ppStrs, G
 
 GBL_EXPORT GblStringList* GblStringList_createSubList(const GblStringList* pOther,
                                                       intptr_t             index,
-                                                      GblSize              count)
+                                                      size_t               count)
 {
 
     GblStringList* pList = NULL;
@@ -168,9 +168,9 @@ GBL_EXPORT GblBool (GblStringList_equals)(const GblStringList* pSelf, const GblS
     return GBL_TRUE;
 }
 
-GBL_EXPORT GblSize (GblStringList_rfind)(const GblStringList* pSelf, const char* pStr, GblBool matchCase, GblSize offset) {
-    GblSize pos = GBL_STRING_LIST_NPOS;
-    GblSize i = GblStringList_size(pSelf) - 1;
+GBL_EXPORT size_t  (GblStringList_rfind)(const GblStringList* pSelf, const char* pStr, GblBool matchCase, size_t  offset) {
+    size_t  pos = GBL_STRING_LIST_NPOS;
+    size_t  i = GblStringList_size(pSelf) - 1;
 
     if(offset == GBL_STRING_LIST_NPOS || offset == GblStringList_size(pSelf))
         offset = GblStringList_size(pSelf) - 1;
@@ -199,9 +199,9 @@ GBL_EXPORT GblSize (GblStringList_rfind)(const GblStringList* pSelf, const char*
     return pos;
 }
 
-GBL_EXPORT GblSize (GblStringList_find)(const GblStringList* pSelf, const char* pStr, GblBool matchCase, GblSize offset) {
-    GblSize pos = GBL_STRING_LIST_NPOS;
-    GblSize i = 0;
+GBL_EXPORT size_t  (GblStringList_find)(const GblStringList* pSelf, const char* pStr, GblBool matchCase, size_t  offset) {
+    size_t  pos = GBL_STRING_LIST_NPOS;
+    size_t  i = 0;
 
     GblStringView strView = GblStringView_fromString(pStr);
     for(GblStringList* pNode = pSelf->ringNode.pNext;
@@ -227,9 +227,9 @@ GBL_EXPORT GblSize (GblStringList_find)(const GblStringList* pSelf, const char* 
     return pos;
 }
 
-GBL_EXPORT GblSize (GblStringList_count)(const GblStringList* pSelf, const char* pStr, GblBool matchCase) {
-    GblSize index = 0;
-    GblSize count = 0;
+GBL_EXPORT size_t  (GblStringList_count)(const GblStringList* pSelf, const char* pStr, GblBool matchCase) {
+    size_t  index = 0;
+    size_t  count = 0;
 
     while((index = GblStringList_find(pSelf, pStr, matchCase, index)) != GBL_STRING_LIST_NPOS) {
         ++count;
@@ -316,7 +316,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushBackRefs)(GblStringList* pSelf, ...) {
 
 static GBL_RESULT GblStringList_pushFrontVaList_(GblStringList* pSelf, va_list* pList) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
-    GblSize index = 0;
+    size_t  index = 0;
     const char* pStr;
     while((pStr = va_arg(*pList, const char*))) {
         result = GblRingList_insert(pSelf, index++, GblStringRef_create(pStr));
@@ -341,7 +341,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushFrontRefs)(GblStringList* pSelf, ...) {
     va_list varArgs;
     va_start(varArgs, pSelf);
 
-    GblSize index = 0;
+    size_t  index = 0;
     GblStringRef* pStr;
     while((pStr = va_arg(varArgs, GblStringRef*))) {
         result = GblRingList_insert(pSelf, index++, GblStringRef_acquire(pStr));
@@ -437,7 +437,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_insertRefs)(GblStringList* pSelf, intptr_t 
     return result;
 }
 
-GBL_EXPORT GBL_RESULT (GblStringList_erase)(GblStringList* pSelf, intptr_t index, GblSize count) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT (GblStringList_erase)(GblStringList* pSelf, intptr_t index, size_t  count) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL);
 
     if(index >= 0)
@@ -475,8 +475,8 @@ GBL_EXPORT void (GblStringList_sort)(GblStringList* pSelf, GblBool ascending) {
     GblRingList_sort(pSelf, GblStringList_sortComparator_, &ascending);
 }
 
-GBL_EXPORT GblSize (GblStringList_remove)(GblStringList* pSelf, const char* pStr, GblBool matchCase) {
-    GblSize count = 0;
+GBL_EXPORT size_t  (GblStringList_remove)(GblStringList* pSelf, const char* pStr, GblBool matchCase) {
+    size_t  count = 0;
     for(GblStringList* pNode = pSelf->ringNode.pNext;
         pNode != pSelf;
         pNode = pNode->ringNode.pNext)
@@ -551,15 +551,15 @@ GBL_EXPORT GBL_RESULT (GblStringList_setRef)(GblStringList* pSelf, intptr_t inde
     return result;
 }
 
-GBL_EXPORT GblSize (GblStringList_replace)(GblStringList* pSelf,
+GBL_EXPORT size_t  (GblStringList_replace)(GblStringList* pSelf,
                                            const char*    pOld,
                                            const char*    pNew,
                                            GblBool        matchCase,
-                                           GblSize        limit)
+                                           size_t         limit)
 {
-    GblSize foundCount = 0;
-    GblSize index;
-    GblSize offset = 0;
+    size_t  foundCount = 0;
+    size_t  index;
+    size_t  offset = 0;
     while((index = GblStringList_find(pSelf, pOld, matchCase, offset)) != GBL_STRING_LIST_NPOS) {
         GblStringList_set(pSelf, index, pNew);
         if(++foundCount == limit && limit) break;
@@ -569,14 +569,14 @@ GBL_EXPORT GblSize (GblStringList_replace)(GblStringList* pSelf,
     return foundCount;
 }
 
-GBL_EXPORT GblSize (GblStringList_replaceWithRef)(GblStringList* pSelf,
+GBL_EXPORT size_t  (GblStringList_replaceWithRef)(GblStringList* pSelf,
                                                   const char*    pOld,
                                                   GblStringRef*  pNew,
                                                   GblBool        matchCase,
-                                                  GblSize        limit) {
-    GblSize foundCount = 0;
-    GblSize index;
-    GblSize offset = 0;
+                                                  size_t         limit) {
+    size_t  foundCount = 0;
+    size_t  index;
+    size_t  offset = 0;
     while((index = GblStringList_find(pSelf, pOld, matchCase, offset)) != GBL_STRING_LIST_NPOS) {
         GblStringList_setRef(pSelf, index, pNew);
         if(++foundCount == limit && limit) break;

@@ -13,7 +13,7 @@ typedef struct GblEnumClass_ {
     GblEnumEntry_* pEntries;
 } GblEnumClass_;
 
-static GBL_RESULT enumConstruct_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT enumConstruct_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc && pArgs);
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT);
@@ -38,7 +38,7 @@ static GBL_RESULT enumLoad_(GblVariant* pVariant, const GblStringBuffer* pString
     GBL_CTX_END();
 }
 
-static GBL_RESULT enumSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT enumSet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -51,7 +51,7 @@ static GBL_RESULT enumSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs
     GBL_CTX_END();
 }
 
-static GBL_RESULT enumGet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT enumGet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);

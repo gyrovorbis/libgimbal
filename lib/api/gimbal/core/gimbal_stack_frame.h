@@ -17,7 +17,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblObject);
 typedef struct GblSourceLocation {
     const char*     pFile;
     const char*     pFunc;
-    GblSize         line;
+    size_t          line;
 } GblSourceLocation;
 
 typedef struct GblCallRecord {
@@ -58,16 +58,16 @@ GBL_EXPORT GblContext*    GblObject_findContext     (GblObject* pSelf)          
 
 GBL_EXPORT GBL_RESULT     GblContext_memAlloc_      (GblContext* pSelf,
                                                      const GblStackFrame*  pFrame,
-                                                     GblSize               size,
-                                                     GblSize               align,
+                                                     size_t                size,
+                                                     size_t                align,
                                                      const char*           pDbgStr,
                                                      void**                ppData)    GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT     GblContext_memRealloc_    (GblContext* pSelf,
                                                      const GblStackFrame*  pFrame,
                                                      void*                 pData,
-                                                     GblSize               newSize,
-                                                     GblSize               newAlign,
+                                                     size_t                newSize,
+                                                     size_t                newAlign,
                                                      void**                ppNewData) GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT     GblContext_memFree_       (GblContext* pSelf,

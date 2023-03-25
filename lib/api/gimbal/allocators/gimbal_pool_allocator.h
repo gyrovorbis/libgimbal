@@ -38,22 +38,22 @@ GBL_DECLS_BEGIN
 typedef struct GblPoolAllocator {
     GblArenaAllocator arena;            ///< Arena allocator instance providing backing allocations
     GblLinkedListNode freeList;         ///< Link list of deleted entries for efficient recycling
-    GblSize           entrySize;        ///< Base struct size of each entry
-    GblSize           entryAlign;       ///< Alignment requirement for each entry
-    GblSize           activeEntries;    ///< # of allocated, used entries
+    size_t            entrySize;        ///< Base struct size of each entry
+    size_t            entryAlign;       ///< Alignment requirement for each entry
+    size_t            activeEntries;    ///< # of allocated, used entries
 } GblPoolAllocator;
 
 // ===== Public methods =====
 GBL_EXPORT GBL_RESULT GblPoolAllocator_construct    (GBL_SELF,
-                                                     GblSize                entrySize,
-                                                     GblSize                entriesPerPage,
-                                                     GblSize                entryAlign,
+                                                     size_t                 entrySize,
+                                                     size_t                 entriesPerPage,
+                                                     size_t                 entryAlign,
                                                      GblArenaAllocatorPage* pInitialPage,
                                                      GblContext*            pCtx)           GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblPoolAllocator_destruct     (GBL_SELF)                              GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize    GblPoolAllocator_freeListSize (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblPoolAllocator_freeListSize (GBL_CSELF)                             GBL_NOEXCEPT;
 
 GBL_EXPORT void*      GblPoolAllocator_new          (GBL_SELF)                              GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblPoolAllocator_delete       (GBL_SELF, void* pEntry)                GBL_NOEXCEPT;

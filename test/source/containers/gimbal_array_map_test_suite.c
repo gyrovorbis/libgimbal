@@ -178,7 +178,7 @@ static GBL_RESULT GblArrayMapTestSuite_validate_userdata_(GblTestSuite* pSelf, G
     GBL_TEST_VERIFY(GblArrayMap_containsUserdata(&pMap, key));
     GBL_TEST_COMPARE(GblArrayMap_getValue(&pMap, key), value);
     GBL_TEST_COMPARE(GblArrayMap_atValue(&pMap, key), value);
-    GblSize loc = GblArrayMap_find(&pMap, key);
+    size_t  loc = GblArrayMap_find(&pMap, key);
     GBL_TEST_VERIFY(loc != GBL_ARRAY_MAP_NPOS);
     const char* pKey = (const char*)GblArrayMap_probeKey(&pSelf_->pMap1, loc);
     GBL_TEST_VERIFY(pKey);
@@ -202,7 +202,7 @@ static GBL_RESULT GblArrayMapTestSuite_validate_variant_(GblTestSuite* pSelf, Gb
     GBL_TEST_COMPARE(val, value);
     GBL_TEST_COMPARE(GblArrayMap_atValue(&pMap, key), value);
     GBL_TEST_COMPARE(GblArrayMap_atVariant(&pMap, key), pVariant);
-    GblSize loc = GblArrayMap_find(&pMap, key);
+    size_t  loc = GblArrayMap_find(&pMap, key);
     GBL_TEST_VERIFY(loc != GBL_ARRAY_MAP_NPOS);
     const char* pKey = (const char*)GblArrayMap_probeKey(&pSelf_->pMap1, loc);
     GBL_TEST_VERIFY(pKey);
@@ -341,8 +341,8 @@ static GBL_RESULT GblArrayMapTestSuite_verifyInsertionSort_(GblTestSuite* pSelf,
     GBL_CTX_BEGIN(pCtx);
     GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
 
-    for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
-        GblSize prevSize = GblArrayMap_size(&pSelf_->pMap1);
+    for(size_t  i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
+        size_t  prevSize = GblArrayMap_size(&pSelf_->pMap1);
         while(GblArrayMap_size(&pSelf_->pMap1) <= prevSize) {
             uintptr_t key = gblRand();
             GBL_CTX_VERIFY_CALL(GblArrayMap_setUserdata(&pSelf_->pMap1, key, key, NULL));
@@ -352,7 +352,7 @@ static GBL_RESULT GblArrayMapTestSuite_verifyInsertionSort_(GblTestSuite* pSelf,
     GBL_TEST_COMPARE(GblArrayMap_size(&pSelf_->pMap1), GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_);
 
     uintptr_t prevKey = 0;
-    for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
+    for(size_t  i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
         const uintptr_t key = GblArrayMap_probeKey(&pSelf_->pMap1, i);
         GBL_TEST_VERIFY(prevKey <= key);
         prevKey = key;
@@ -365,7 +365,7 @@ static GBL_RESULT GblArrayMapTestSuite_findBinarySearch_(GblTestSuite* pSelf, Gb
     GBL_CTX_BEGIN(pCtx);
     GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
 
-    for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
+    for(size_t  i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
         const uintptr_t key = GblArrayMap_probeKey(&pSelf_->pMap1, i);
         GBL_TEST_COMPARE(GblArrayMap_getValue(&pSelf_->pMap1, key), key);
     }
@@ -378,7 +378,7 @@ static GBL_RESULT GblArrayMapTestSuite_findLinearSearch_(GblTestSuite* pSelf, Gb
     GblArrayMapTestSuite_* pSelf_ = GBL_ARRAY_MAP_TEST_SUITE_(pSelf);
     GBL_PRIV_REF(pSelf_->pMap1).binarySearches = GBL_FALSE;
 
-    for(GblSize i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
+    for(size_t  i = 0; i < GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_; ++i) {
         const uintptr_t key = GblArrayMap_probeKey(&pSelf_->pMap1, i);
         GBL_TEST_COMPARE(GblArrayMap_getValue(&pSelf_->pMap1, key), key);
     }

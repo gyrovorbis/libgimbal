@@ -56,13 +56,13 @@ typedef struct GblNaryTreeNode {
     struct GblNaryTreeNode* pSiblingNext;   ///< Node's next sibling (next entry of child linked list)
 } GblNaryTreeNode;
 
-//GBL_INLINE GblSize        GblNaryTree_size                (GBL_CSELF)                                                    GBL_NOEXCEPT;
-//GBL_INLINE GblSize        GblNaryTree_width               (GBL_CSELF, GblSize depth);                                    GBL_NOEXCEPT;
-//GBL_INLINE GblSize        GblNaryTree_height              (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblNaryTree_depth               (GBL_CSELF)                                                    GBL_NOEXCEPT;
-//GBL_INLINE GblSize        GblNaryTree_breadth             (GBL_CSELF)                                                    GBL_NOEXCEPT;
-//GBL_INLINE GblSize        GblNaryTree_degree              (GBL_CSELF)                                                    GBL_NOEXCEPT;
-//GBL_INLINE GblSize        GblNaryTree_arity               (GBL_CSELF)                                                    GBL_NOEXCEPT;
+//GBL_INLINE size_t         GblNaryTree_size                (GBL_CSELF)                                                    GBL_NOEXCEPT;
+//GBL_INLINE size_t         GblNaryTree_width               (GBL_CSELF, size_t  depth);                                    GBL_NOEXCEPT;
+//GBL_INLINE size_t         GblNaryTree_height              (GBL_CSELF)                                                    GBL_NOEXCEPT;
+GBL_INLINE size_t           GblNaryTree_depth               (GBL_CSELF)                                                    GBL_NOEXCEPT;
+//GBL_INLINE size_t         GblNaryTree_breadth             (GBL_CSELF)                                                    GBL_NOEXCEPT;
+//GBL_INLINE size_t         GblNaryTree_degree              (GBL_CSELF)                                                    GBL_NOEXCEPT;
+//GBL_INLINE size_t         GblNaryTree_arity               (GBL_CSELF)                                                    GBL_NOEXCEPT;
 GBL_INLINE GblFlags         GblNaryTree_flags               (GBL_CSELF)                                                    GBL_NOEXCEPT;
 
 GBL_INLINE GblBool          GblNaryTree_isConnected         (GBL_CSELF)                                                    GBL_NOEXCEPT;
@@ -77,51 +77,51 @@ GBL_INLINE GblBool          GblNaryTree_isChild             (GBL_CSELF, const Gb
 GBL_INLINE GblBool          GblNaryTree_isDescendent        (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 //GBL_INLINE GblBool        GblNaryTree_isRelative          (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 
-GBL_INLINE GblSize          GblNaryTree_childCount          (GBL_CSELF)                                                    GBL_NOEXCEPT;
+GBL_INLINE size_t           GblNaryTree_childCount          (GBL_CSELF)                                                    GBL_NOEXCEPT;
 GBL_INLINE GblNaryTreeNode* GblNaryTree_childLast           (GBL_CSELF)                                                    GBL_NOEXCEPT;
 GBL_INLINE GblNaryTreeNode* GblNaryTree_childBefore         (GBL_CSELF, const GblNaryTreeNode* pChild)                     GBL_NOEXCEPT;
-GBL_INLINE GblNaryTreeNode* GblNaryTree_childAt             (GBL_CSELF, GblSize index)                                     GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblNaryTree_childIndex          (GBL_CSELF, const GblNaryTreeNode* pChild)                     GBL_NOEXCEPT;
+GBL_INLINE GblNaryTreeNode* GblNaryTree_childAt             (GBL_CSELF, size_t  index)                                     GBL_NOEXCEPT;
+GBL_INLINE size_t           GblNaryTree_childIndex          (GBL_CSELF, const GblNaryTreeNode* pChild)                     GBL_NOEXCEPT;
 
 GBL_INLINE void             GblNaryTree_addChildFront       (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
 GBL_INLINE void             GblNaryTree_addChildBack        (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
-GBL_INLINE void             GblNaryTree_addChildTo          (GBL_SELF, GblSize index, GblNaryTreeNode* pChild)             GBL_NOEXCEPT;
+GBL_INLINE void             GblNaryTree_addChildTo          (GBL_SELF, size_t  index, GblNaryTreeNode* pChild)             GBL_NOEXCEPT;
 GBL_INLINE void             GblNaryTree_addChildBefore      (GBL_SELF, GblNaryTreeNode* pBefore,GblNaryTreeNode* pChild)   GBL_NOEXCEPT;
 GBL_INLINE void             GblNaryTree_addChildAfter       (GBL_SELF, GblNaryTreeNode* pAfter, GblNaryTreeNode* pChild)   GBL_NOEXCEPT;
 
 GBL_INLINE void             GblNaryTree_moveChildFront      (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
 GBL_INLINE void             GblNaryTree_moveChildBack       (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
-GBL_INLINE void             GblNaryTree_moveChildTo         (GBL_SELF, GblSize index, GblNaryTreeNode* pChild)             GBL_NOEXCEPT;
+GBL_INLINE void             GblNaryTree_moveChildTo         (GBL_SELF, size_t  index, GblNaryTreeNode* pChild)             GBL_NOEXCEPT;
 
 GBL_INLINE GblNaryTreeNode* GblNaryTree_removeChild         (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
 GBL_INLINE GblNaryTreeNode* GblNaryTree_removeChildFront    (GBL_SELF)                                                     GBL_NOEXCEPT;
 GBL_INLINE GblNaryTreeNode* GblNaryTree_removeChildBack     (GBL_SELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE GblNaryTreeNode* GblNaryTree_removeChildAt       (GBL_SELF, GblSize index)                                      GBL_NOEXCEPT;
+GBL_INLINE GblNaryTreeNode* GblNaryTree_removeChildAt       (GBL_SELF, size_t  index)                                      GBL_NOEXCEPT;
 
 GBL_INLINE void             GblNaryTree_replaceChild        (GBL_SELF, GblNaryTreeNode* pOld, GblNaryTreeNode* pNew)       GBL_NOEXCEPT;
-GBL_INLINE void             GblNaryTree_replaceChildAt      (GBL_SELF, GblSize index, GblNaryTreeNode* pNewChild)          GBL_NOEXCEPT;
+GBL_INLINE void             GblNaryTree_replaceChildAt      (GBL_SELF, size_t  index, GblNaryTreeNode* pNewChild)          GBL_NOEXCEPT;
 
 GBL_INLINE void             GblNaryTree_swapChildren        (GBL_SELF, GblNaryTreeNode* pChild1, GblNaryTreeNode* pChild2) GBL_NOEXCEPT;
-GBL_INLINE void             GblNaryTree_swapChildrenAt      (GBL_SELF, GblSize index1, GblSize index2)                     GBL_NOEXCEPT;
+GBL_INLINE void             GblNaryTree_swapChildrenAt      (GBL_SELF, size_t  index1, size_t  index2)                     GBL_NOEXCEPT;
 
 GBL_INLINE void             GblNaryTree_reverseChildren     (GBL_SELF)                                                     GBL_NOEXCEPT;
 
 GBL_INLINE GblNaryTreeNode* GblNaryTree_root                (GBL_SELF)                                                     GBL_NOEXCEPT;
-GBL_INLINE GblNaryTreeNode* GblNaryTree_base                (GBL_SELF, GblSize depth)                                      GBL_NOEXCEPT;
-GBL_INLINE GblNaryTreeNode* GblNaryTree_ancestor            (GBL_CSELF, GblSize height)                                    GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblNaryTree_ancestorHeight      (GBL_CSELF, const GblNaryTreeNode* pParent)                    GBL_NOEXCEPT;
+GBL_INLINE GblNaryTreeNode* GblNaryTree_base                (GBL_SELF, size_t  depth)                                      GBL_NOEXCEPT;
+GBL_INLINE GblNaryTreeNode* GblNaryTree_ancestor            (GBL_CSELF, size_t  height)                                    GBL_NOEXCEPT;
+GBL_INLINE size_t           GblNaryTree_ancestorHeight      (GBL_CSELF, const GblNaryTreeNode* pParent)                    GBL_NOEXCEPT;
 
-GBL_INLINE GblSize          GblNaryTree_siblingCount        (GBL_CSELF)                                                    GBL_NOEXCEPT;
+GBL_INLINE size_t           GblNaryTree_siblingCount        (GBL_CSELF)                                                    GBL_NOEXCEPT;
 GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingLast         (GBL_CSELF)                                                    GBL_NOEXCEPT;
 GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingBefore       (GBL_CSELF)                                                    GBL_NOEXCEPT;
 GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingFirst        (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingAt           (GBL_CSELF, GblSize index)                                     GBL_NOEXCEPT;
-GBL_INLINE GblSize          GblNaryTree_siblingIndex        (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
+GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingAt           (GBL_CSELF, size_t  index)                                     GBL_NOEXCEPT;
+GBL_INLINE size_t           GblNaryTree_siblingIndex        (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 
 GBL_INLINE void             GblNaryTree_disconnect          (GBL_SELF)                                                     GBL_NOEXCEPT;
 
 //GBL_INLINE GblNaryTreeNode* GblNaryTree_lowestCommonAncestor(GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
-//GBL_INLINE GblSize          GblNaryTree_distance            (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
+//GBL_INLINE size_t           GblNaryTree_distance            (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblNaryTree_traverse            (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIt, void* pUd) GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblNaryTree_traverseInOrder     (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
 GBL_INLINE GblBool          GblNaryTree_traversePreOrder    (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
@@ -176,8 +176,8 @@ GBL_INLINE GblFlags GblNaryTree_flags(GBL_CSELF) GBL_NOEXCEPT {
     return flags;
 }
 
-GBL_INLINE GblSize GblNaryTree_childCount(GBL_CSELF) GBL_NOEXCEPT {
-    GblSize size = 0;
+GBL_INLINE size_t  GblNaryTree_childCount(GBL_CSELF) GBL_NOEXCEPT {
+    size_t  size = 0;
     for(const GblNaryTreeNode* pNode = pSelf->pChildFirst;
         pNode;
         pNode = pNode->pSiblingNext)
@@ -203,7 +203,7 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_childBefore(GBL_CSELF, const GblNaryTree
     return GBL_NULL;
 }
 
-GBL_INLINE GblNaryTreeNode* GblNaryTree_childAt(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE GblNaryTreeNode* GblNaryTree_childAt(GBL_CSELF, size_t  index) GBL_NOEXCEPT {
     for(GblNaryTreeNode* pNode = pSelf->pChildFirst;
         pNode;
         pNode = pNode->pSiblingNext)
@@ -211,8 +211,8 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_childAt(GBL_CSELF, GblSize index) GBL_NO
     return GBL_NULL;
 }
 
-GBL_INLINE GblSize GblNaryTree_childIndex(GBL_CSELF, const GblNaryTreeNode* pChild) GBL_NOEXCEPT {
-    GblSize i = 0;
+GBL_INLINE size_t  GblNaryTree_childIndex(GBL_CSELF, const GblNaryTreeNode* pChild) GBL_NOEXCEPT {
+    size_t  i = 0;
     for(GblNaryTreeNode* pNode = pSelf->pChildFirst;
         pNode;
         pNode = pNode->pSiblingNext)
@@ -237,13 +237,13 @@ GBL_INLINE void GblNaryTree_addChildBack(GBL_SELF, GblNaryTreeNode* pChild) GBL_
     pChild->pSiblingNext = GBL_NULL;
 }
 
-GBL_INLINE void GblNaryTree_addChildTo(GBL_SELF, GblSize index, GblNaryTreeNode* pChild) GBL_NOEXCEPT {
+GBL_INLINE void GblNaryTree_addChildTo(GBL_SELF, size_t  index, GblNaryTreeNode* pChild) GBL_NOEXCEPT {
     if(!index) { //insert beginning
         pChild->pSiblingNext = pSelf->pChildFirst;
         pSelf->pChildFirst = pChild;
         pChild->pParent = pSelf;
     } else {
-        GblSize i = 0;
+        size_t  i = 0;
         GblNaryTreeNode* pPrev = GBL_NULL;
         for(GblNaryTreeNode* pNode = pSelf->pChildFirst;
             pNode;
@@ -291,7 +291,7 @@ GBL_INLINE void GblNaryTree_moveChildBack(GBL_SELF, GblNaryTreeNode* pChild) GBL
     GblNaryTree_addChildBack(pSelf, pChild);
 }
 
-GBL_INLINE void GblNaryTree_moveChildTo(GBL_SELF, GblSize index, GblNaryTreeNode* pChild) GBL_NOEXCEPT {
+GBL_INLINE void GblNaryTree_moveChildTo(GBL_SELF, size_t  index, GblNaryTreeNode* pChild) GBL_NOEXCEPT {
     GblNaryTreeNode* pPrev = index? GblNaryTree_childAt(pSelf, index-1) : GBL_NULL;
 
     GblNaryTree_removeChild(pSelf, pChild);
@@ -339,10 +339,10 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_removeChildBack(GBL_SELF) GBL_NOEXCEPT {
     return GBL_NULL;
 }
 
-GBL_INLINE GblNaryTreeNode* GblNaryTree_removeChildAt(GBL_SELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE GblNaryTreeNode* GblNaryTree_removeChildAt(GBL_SELF, size_t  index) GBL_NOEXCEPT {
     if(!index) return GblNaryTree_removeChildFront(pSelf);
     else {
-        GblSize i = 0;
+        size_t  i = 0;
         for(GblNaryTreeNode* pNode = pSelf->pChildFirst;
             pNode;
             pNode = pNode->pSiblingNext)
@@ -376,8 +376,8 @@ GBL_INLINE void GblNaryTree_replaceChild(GBL_SELF, GblNaryTreeNode* pOld, GblNar
     }
 }
 
-GBL_INLINE void GblNaryTree_replaceChildAt(GBL_SELF, GblSize index, GblNaryTreeNode* pNewChild) GBL_NOEXCEPT {
-    GblSize i = 0;
+GBL_INLINE void GblNaryTree_replaceChildAt(GBL_SELF, size_t  index, GblNaryTreeNode* pNewChild) GBL_NOEXCEPT {
+    size_t  i = 0;
     GblNaryTreeNode* pNode = pSelf->pChildFirst;
     if(!index) {
         pNewChild->pSiblingNext = pSelf->pChildFirst? pSelf->pChildFirst->pSiblingNext: GBL_NULL;
@@ -425,7 +425,7 @@ GBL_INLINE void GblNaryTree_swapChildren(GBL_SELF,
 
 }
 
-GBL_INLINE void GblNaryTree_swapChildrenAt(GBL_SELF, GblSize index1, GblSize index2) GBL_NOEXCEPT {
+GBL_INLINE void GblNaryTree_swapChildrenAt(GBL_SELF, size_t  index1, size_t  index2) GBL_NOEXCEPT {
     GblNaryTree_swapChildren(pSelf, GblNaryTree_childAt(pSelf, index1), GblNaryTree_childAt(pSelf, index2));
 }
 
@@ -444,8 +444,8 @@ GBL_INLINE void GblNaryTree_reverseChildren(GBL_SELF) GBL_NOEXCEPT {
     pSelf->pChildFirst = pPrev;
 }
 
-GBL_INLINE GblSize GblNaryTree_depth(GBL_CSELF) GBL_NOEXCEPT {
-    GblSize depth = 0;
+GBL_INLINE size_t  GblNaryTree_depth(GBL_CSELF) GBL_NOEXCEPT {
+    size_t  depth = 0;
     const GblNaryTreeNode* pNode = pSelf;
     while(pNode->pParent) GBL_LIKELY {
         ++depth;
@@ -454,8 +454,8 @@ GBL_INLINE GblSize GblNaryTree_depth(GBL_CSELF) GBL_NOEXCEPT {
     return depth;
 }
 
-GBL_INLINE GblNaryTreeNode* GblNaryTree_base(GBL_SELF, GblSize depth) GBL_NOEXCEPT {
-    GblSize d = GblNaryTree_depth(pSelf) - depth;
+GBL_INLINE GblNaryTreeNode* GblNaryTree_base(GBL_SELF, size_t  depth) GBL_NOEXCEPT {
+    size_t  d = GblNaryTree_depth(pSelf) - depth;
     return d? GblNaryTree_ancestor(pSelf, d - 1) : pSelf;
 }
 
@@ -465,8 +465,8 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_root(GBL_SELF) GBL_NOEXCEPT {
     return pNode;
 }
 
-GBL_INLINE GblNaryTreeNode* GblNaryTree_ancestor(GBL_CSELF, GblSize height) GBL_NOEXCEPT {
-    GblSize i = 0;
+GBL_INLINE GblNaryTreeNode* GblNaryTree_ancestor(GBL_CSELF, size_t  height) GBL_NOEXCEPT {
+    size_t  i = 0;
     GblNaryTreeNode* pNode = pSelf->pParent;
     while(pNode && i <= height) GBL_LIKELY {
         if(i++ == height) {
@@ -477,8 +477,8 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_ancestor(GBL_CSELF, GblSize height) GBL_
     return GBL_NULL;
 }
 
-GBL_INLINE GblSize GblNaryTree_ancestorHeight(GBL_CSELF, const GblNaryTreeNode* pParent) GBL_NOEXCEPT {
-    GblSize i = 0;
+GBL_INLINE size_t  GblNaryTree_ancestorHeight(GBL_CSELF, const GblNaryTreeNode* pParent) GBL_NOEXCEPT {
+    size_t  i = 0;
     const GblNaryTreeNode* pNode = pSelf->pParent;
     while(pNode) {
         if(pNode == pParent) {
@@ -494,8 +494,8 @@ GBL_INLINE GblBool GblNaryTree_empty(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->pChildFirst? GBL_FALSE : GBL_TRUE;
 }
 
-GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingAt(GBL_CSELF, GblSize index) GBL_NOEXCEPT {
-    GblSize i = 0;
+GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingAt(GBL_CSELF, size_t  index) GBL_NOEXCEPT {
+    size_t  i = 0;
     GblNaryTreeNode* pNode = pSelf->pParent->pChildFirst;
     while(pNode) {
         if(pNode != pSelf && i++ == index) return pNode;
@@ -504,8 +504,8 @@ GBL_INLINE GblNaryTreeNode* GblNaryTree_siblingAt(GBL_CSELF, GblSize index) GBL_
     return GBL_NULL;
 }
 
-GBL_INLINE GblSize GblNaryTree_siblingIndex(GBL_CSELF, const GblNaryTreeNode* pSibling) GBL_NOEXCEPT {
-    GblSize index = 0;
+GBL_INLINE size_t  GblNaryTree_siblingIndex(GBL_CSELF, const GblNaryTreeNode* pSibling) GBL_NOEXCEPT {
+    size_t  index = 0;
     const GblNaryTreeNode* pNode = pSelf->pParent->pChildFirst;
     while(pNode) {
         if(pNode != pSelf) {
@@ -517,7 +517,7 @@ GBL_INLINE GblSize GblNaryTree_siblingIndex(GBL_CSELF, const GblNaryTreeNode* pS
     return GBL_NARY_TREE_NPOS;
 }
 
-GBL_INLINE GblSize GblNaryTree_siblingCount(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblNaryTree_siblingCount(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->pParent? GblNaryTree_childCount(pSelf->pParent) - 1 : 0;
 }
 

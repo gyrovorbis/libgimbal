@@ -36,15 +36,15 @@ typedef GblBool (*GblHashSetIterFn)(GBL_CSELF, void*, void*);             ///< U
 typedef struct GblHashSet {
     GBL_PRIVATE()
         GblContext*        pCtx;
-        GblSize            entrySize;
-        GblSize            capacity;
+        size_t             entrySize;
+        size_t             capacity;
         GblHashSetHashFn   pFnHash;
         GblHashSetCmpFn    pFnCompare;
         GblHashSetDtorFn   pFnDestruct;
-        GblSize            bucketSize;
-        GblSize            bucketCount;
-        GblSize            count;
-        GblSize            mask;
+        size_t             bucketSize;
+        size_t             bucketCount;
+        size_t             count;
+        size_t             mask;
         void*              pBuckets;
         void*              pSpare;
         void*              pUserdata;
@@ -57,38 +57,38 @@ typedef struct GblHashSet {
 typedef struct GblHashSetIter {
     GBL_PRIVATE()
         GblHashSet*        pSet;
-        GblSize            bucketIdx;
+        size_t             bucketIdx;
     GBL_PRIVATE_END
 } GblHashSetIter;
 
 GBL_EXPORT GBL_RESULT        GblHashSet_construct_8   (GBL_SELF,
-                                                       GblSize            entrySize,
+                                                       size_t             entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare,
                                                        GblHashSetDtorFn   pFnDestruct,
-                                                       GblSize            capacity,
+                                                       size_t             capacity,
                                                        GblContext*        pCtx,
                                                        void*              pUserdata)    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT        GblHashSet_construct_7   (GBL_SELF,
-                                                       GblSize            entrySize,
+                                                       size_t             entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare,
                                                        GblHashSetDtorFn   pFnDestruct,
-                                                       GblSize            capacity,
+                                                       size_t             capacity,
                                                        GblContext*        pCtx)         GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT        GblHashSet_construct_6   (GBL_SELF,
-                                                       GblSize            entrySize,
+                                                       size_t             entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare,
                                                        GblHashSetDtorFn   pFnDestruct,
-                                                       GblSize            capacity)     GBL_NOEXCEPT;
+                                                       size_t             capacity)     GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT        GblHashSet_construct_5   (GBL_SELF,
-                                                       GblSize            entrySize,
+                                                       size_t             entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare,
                                                        GblHashSetDtorFn   pFnDestruct)  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT        GblHashSet_construct_4   (GBL_SELF,
-                                                       GblSize            entrySize,
+                                                       size_t             entrySize,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare)   GBL_NOEXCEPT;
 #define                      GblHashSet_construct(...) \
@@ -106,9 +106,9 @@ GBL_EXPORT GBL_RESULT        GblHashSet_constructClone(GBL_SELF, GblHashSet* pRh
 GBL_EXPORT GBL_RESULT        GblHashSet_assignMove    (GBL_SELF, GblHashSet* pRhs)      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT        GblHashSet_destruct      (GBL_SELF)                        GBL_NOEXCEPT;
 
-GBL_INLINE GblSize           GblHashSet_size          (GBL_CSELF)                       GBL_NOEXCEPT;
-GBL_INLINE GblSize           GblHashSet_bucketCount   (GBL_CSELF)                       GBL_NOEXCEPT;
-GBL_INLINE GblSize           GblHashSet_bucketSize    (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_INLINE size_t            GblHashSet_size          (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_INLINE size_t            GblHashSet_bucketCount   (GBL_CSELF)                       GBL_NOEXCEPT;
+GBL_INLINE size_t            GblHashSet_bucketSize    (GBL_CSELF)                       GBL_NOEXCEPT;
 GBL_INLINE GblContext*       GblHashSet_context       (GBL_CSELF)                       GBL_NOEXCEPT;
 GBL_INLINE GblBool           GblHashSet_empty         (GBL_CSELF)                       GBL_NOEXCEPT;
 GBL_INLINE void*             GblHashSet_userdata      (GBL_CSELF)                       GBL_NOEXCEPT;
@@ -116,7 +116,7 @@ GBL_INLINE void*             GblHashSet_userdata      (GBL_CSELF)               
 GBL_INLINE void*             GblHashSet_get           (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT; //raw get, no error
 GBL_INLINE void*             GblHashSet_at            (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT; //throws range error
 GBL_INLINE GblBool           GblHashSet_contains      (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT; //true if entry exists
-GBL_INLINE GblSize           GblHashSet_count         (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT; //# of matching entries (0 or 1)
+GBL_INLINE size_t            GblHashSet_count         (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT; //# of matching entries (0 or 1)
 GBL_INLINE GblHashSetIter    GblHashSet_find          (GBL_CSELF, const void* pKey)     GBL_NOEXCEPT;
 
 GBL_EXPORT void*             GblHashSet_set           (GBL_SELF, const void* pEntry)    GBL_NOEXCEPT; //raw set, returns existing item w/o deleting
@@ -131,7 +131,7 @@ GBL_EXPORT void              GblHashSet_clear         (GBL_SELF)                
 
 GBL_EXPORT GBL_RESULT        GblHashSet_shrinkToFit   (GBL_SELF)                        GBL_NOEXCEPT;
 
-GBL_EXPORT void*             GblHashSet_probe         (GBL_CSELF, GblSize position)     GBL_NOEXCEPT; //returns entry at slot or NULL, sparse
+GBL_EXPORT void*             GblHashSet_probe         (GBL_CSELF, size_t  position)     GBL_NOEXCEPT; //returns entry at slot or NULL, sparse
 
 GBL_EXPORT GblBool           GblHashSet_foreach       (GBL_CSELF,
                                                        GblHashSetIterFn iter,
@@ -176,15 +176,15 @@ GBL_INLINE GblContext* GblHashSet_context(const GblHashSet* pSelf) GBL_NOEXCEPT 
     return GBL_PRIV_REF(pSelf).pCtx;
 }
 
-GBL_INLINE GblSize  GblHashSet_bucketSize(const GblHashSet* pSelf) GBL_NOEXCEPT {
+GBL_INLINE size_t   GblHashSet_bucketSize(const GblHashSet* pSelf) GBL_NOEXCEPT {
     return GBL_PRIV_REF(pSelf).bucketSize;
 }
 
-GBL_INLINE GblSize GblHashSet_size(const GblHashSet* pSelf) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblHashSet_size(const GblHashSet* pSelf) GBL_NOEXCEPT {
     return GBL_PRIV_REF(pSelf).count;
 }
 
-GBL_INLINE GblSize GblHashSet_bucketCount(const GblHashSet* pSelf) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblHashSet_bucketCount(const GblHashSet* pSelf) GBL_NOEXCEPT {
     return GBL_PRIV_REF(pSelf).bucketCount;
 }
 
@@ -259,8 +259,8 @@ GBL_INLINE GblBool GblHashSet_contains(const GblHashSet* pSet, const void* pKey)
     return found;
 }
 
-GBL_INLINE GblSize GblHashSet_count(const GblHashSet* pSet, const void* pKey) GBL_NOEXCEPT {
-    GblSize count = 0;
+GBL_INLINE size_t  GblHashSet_count(const GblHashSet* pSet, const void* pKey) GBL_NOEXCEPT {
+    size_t  count = 0;
     if(GblHashSet_get(pSet, pKey)) ++count;
     return count;
 }

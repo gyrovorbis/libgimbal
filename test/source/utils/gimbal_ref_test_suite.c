@@ -7,7 +7,7 @@
 
 typedef struct GblRefTestSuite_ {
     GblRef* pRefs[4];
-    GblSize startRefCount;
+    size_t  startRefCount;
 } GblRefTestSuite_;
 
 static unsigned dtorBadCalls_ = 0;

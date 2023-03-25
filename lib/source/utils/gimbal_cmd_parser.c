@@ -47,7 +47,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     }
 
     // 3. Parse additional option groups
-    for(GblSize o = 0; o < GblArrayList_size(&pSelf_->optionGroups); ++o) {
+    for(size_t  o = 0; o < GblArrayList_size(&pSelf_->optionGroups); ++o) {
         GblOptionGroup** ppGroup = GblArrayList_at(&pSelf_->optionGroups, o);
         GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(*ppGroup, pArgs, GBL_TRUE));
     }
@@ -100,9 +100,9 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     }
 
     // 5. Verify positional arguments
-    const GblSize actualCount = GblStringList_size(pSelf_->pArgValues) +
+    const size_t  actualCount = GblStringList_size(pSelf_->pArgValues) +
                                     (pSelf_->pExecutable? 1 : 0);
-    const GblSize expectedCount = GblArrayList_size(&pSelf_->posArgs) +
+    const size_t  expectedCount = GblArrayList_size(&pSelf_->posArgs) +
                                     (pSelf_->pExecutable? 1 : 0);
 
     GBL_CTX_VERIFY(actualCount == expectedCount ||
@@ -165,7 +165,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_setOptionGroups(GblCmdParser* pSelf, GblOptio
 
     GBL_CTX_VERIFY_CALL(GblArrayList_clear(&pSelf_->optionGroups));
 
-    GblSize count = 0;
+    size_t  count = 0;
     if(ppGroups) {
         while(ppGroups[count])
             ++count;
@@ -174,12 +174,12 @@ GBL_EXPORT GBL_RESULT GblCmdParser_setOptionGroups(GblCmdParser* pSelf, GblOptio
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblSize GblCmdParser_optionGroupCount(const GblCmdParser* pSelf) {
+GBL_EXPORT size_t  GblCmdParser_optionGroupCount(const GblCmdParser* pSelf) {
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
     return GblArrayList_size(&pSelf_->optionGroups);
 }
 
-GBL_EXPORT GblOptionGroup* GblCmdParser_optionGroupAt(const GblCmdParser* pSelf, GblSize index) {
+GBL_EXPORT GblOptionGroup* GblCmdParser_optionGroupAt(const GblCmdParser* pSelf, size_t  index) {
     GblOptionGroup* pGroup = NULL;
     GBL_CTX_BEGIN(NULL);
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
@@ -193,8 +193,8 @@ GBL_EXPORT GblOptionGroup* GblCmdParser_findOptionGroup(const GblCmdParser* pSel
     GblOptionGroup* pGroup = NULL;
     GBL_CTX_BEGIN(NULL);
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
-    const GblSize size = GblArrayList_size(&pSelf_->optionGroups);
-    for(GblSize g = 0; g < size; ++g) {
+    const size_t  size = GblArrayList_size(&pSelf_->optionGroups);
+    for(size_t  g = 0; g < size; ++g) {
         GblOptionGroup* pIt = *(GblOptionGroup**)GblArrayList_at(&pSelf_->optionGroups, g);
         if(strcmp(GblObject_name(GBL_OBJECT(pIt)), pName) == 0) {
             pGroup = pIt;
@@ -241,7 +241,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_clearPositionalArgs(GblCmdParser* pSelf) {
     GBL_CTX_BEGIN(NULL);
 
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
-    for(GblSize p = 0; p < GblArrayList_size(&pSelf_->posArgs); ++p) {
+    for(size_t  p = 0; p < GblArrayList_size(&pSelf_->posArgs); ++p) {
         GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, p);
         GblStringRef_release(pArg->pName);
         GblStringRef_release(pArg->pDesc);
@@ -251,11 +251,11 @@ GBL_EXPORT GBL_RESULT GblCmdParser_clearPositionalArgs(GblCmdParser* pSelf) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblSize GblCmdParser_positionalArgCount(const GblCmdParser* pSelf) {
+GBL_EXPORT size_t  GblCmdParser_positionalArgCount(const GblCmdParser* pSelf) {
     return GblArrayList_size(&GBL_CMD_PARSER_(pSelf)->posArgs);
 }
 
-GBL_EXPORT const GblCmdArg* GblCmdParser_positionalArgAt(const GblCmdParser* pSelf, GblSize index) {
+GBL_EXPORT const GblCmdArg* GblCmdParser_positionalArgAt(const GblCmdParser* pSelf, size_t  index) {
     const GblCmdArg* pArg = NULL;
     GBL_CTX_BEGIN(NULL);
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
@@ -265,8 +265,8 @@ GBL_EXPORT const GblCmdArg* GblCmdParser_positionalArgAt(const GblCmdParser* pSe
     return pArg;
 }
 
-GBL_EXPORT GblSize GblCmdParser_positionalArgValueCount(const GblCmdParser* pSelf) {
-    GblSize count = 0;
+GBL_EXPORT size_t  GblCmdParser_positionalArgValueCount(const GblCmdParser* pSelf) {
+    size_t  count = 0;
     GBL_CTX_BEGIN(NULL);
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
     count = GblStringList_size(pSelf_->pArgValues);
@@ -274,7 +274,7 @@ GBL_EXPORT GblSize GblCmdParser_positionalArgValueCount(const GblCmdParser* pSel
     return count;
 }
 
-GBL_EXPORT GBL_RESULT GblCmdParser_positionalArgValue(const GblCmdParser* pSelf, GblSize index, GblType toType, void* pData) {
+GBL_EXPORT GBL_RESULT GblCmdParser_positionalArgValue(const GblCmdParser* pSelf, size_t  index, GblType toType, void* pData) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_ARG(index < GblCmdParser_positionalArgValueCount(pSelf));
     GBL_CTX_VERIFY_TYPE(toType, GBL_IVARIANT_TYPE);
@@ -419,7 +419,7 @@ static GBL_RESULT GblCmdParser_Box_destructor_(GblBox* pBox) {
 
     GblOptionGroup_unref(pSelf_->pMainOptionGroup);
 
-    for(GblSize o = 0; o < GblArrayList_size(&pSelf_->optionGroups); ++o) {
+    for(size_t  o = 0; o < GblArrayList_size(&pSelf_->optionGroups); ++o) {
         GblOptionGroup** ppGroup = GblArrayList_at(&pSelf_->optionGroups, o);
         GblOptionGroup_unref(*ppGroup);
     }

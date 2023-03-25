@@ -8,7 +8,7 @@
 
 typedef struct GblPropertyRoot_ {
     GblProperty     base;
-    GblSize         count;
+    size_t          count;
     GblProperty*    pLast;
 } GblPropertyRoot_;
 
@@ -33,7 +33,7 @@ static void propertyDestructor_(const GblHashSet* pSet, GblProperty** pProperty)
     GBL_CTX_END_BLOCK();
 }
 
-GBL_EXPORT GblSize GblProperty_totalCount(void) GBL_NOEXCEPT {
+GBL_EXPORT size_t  GblProperty_totalCount(void) GBL_NOEXCEPT {
     return GblHashSet_size(&propertyRegistry_);
 }
 
@@ -74,7 +74,7 @@ extern GBL_RESULT GblProperty_init_(GblContext* pCtx) {
 
 extern GBL_RESULT GblProperty_final_(GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    GblSize count = GblHashSet_size(&propertyRegistry_);
+    size_t  count = GblHashSet_size(&propertyRegistry_);
     GBL_CTX_VERIFY(!count,
                    GBL_RESULT_ERROR_MEM_FREE,
                    "[GblProperty]: Cannot finalize nonempty table! [%u remaining]",
@@ -84,7 +84,7 @@ extern GBL_RESULT GblProperty_final_(GblContext* pCtx) {
 }
 
 
-GBL_EXPORT GblSize gblpropertyTableSize(void) {
+GBL_EXPORT size_t  gblpropertyTableSize(void) {
     return GblHashSet_size(&propertyRegistry_);
 }
 
@@ -151,8 +151,8 @@ GBL_EXPORT GblBool GblProperty_foreach(GblType           objectType,
     GBL_CTX_VERIFY_TYPE(objectType);
     GBL_CTX_VERIFY_POINTER(pFnIt);
 
-    const GblSize depth = GblType_depth(objectType);
-    for(GblSize d = 0; d <= depth; ++d) {
+    const size_t  depth = GblType_depth(objectType);
+    for(size_t  d = 0; d <= depth; ++d) {
         const GblType curType = GblType_base(objectType, d);
         const GblProperty* pProp = NULL;
         while((pProp = GblProperty_next(curType, pProp, flags))) {
@@ -342,8 +342,8 @@ GBL_EXPORT int GblProperty_compareValues(const GblProperty* pSelf, const GblVari
     return result;
 }
 
-GBL_EXPORT GblSize GblProperty_count(GblType objectType) {
-    GblSize count = 0;
+GBL_EXPORT size_t  GblProperty_count(GblType objectType) {
+    size_t  count = 0;
     while(objectType != GBL_INVALID_TYPE) {
         const GblPropertyRoot_* pRoot = propertyRoot_(objectType);
         if(pRoot) {
@@ -362,9 +362,9 @@ GBL_EXPORT GblFlags GblProperty_combinedFlags(GblType objectType) {
 static GBL_RESULT GblProperty_initVaList_(GblProperty* pSelf,
                                           GblType      derivedType,
                                           const char*  pName,
-                                          GblSize      id,
+                                          size_t       id,
                                           GblFlags     flags,
-                                          GblSize      optionalArgCount,
+                                          size_t       optionalArgCount,
                                           va_list*     pList)
 {
     GBL_CTX_BEGIN(NULL);
@@ -383,9 +383,9 @@ static GBL_RESULT GblProperty_initVaList_(GblProperty* pSelf,
 
 GBL_EXPORT GblProperty* GblProperty_createVaList(GblType     derivedType,
                                                  const char* pName,
-                                                 GblSize     id,
+                                                 size_t      id,
                                                  GblFlags    flags,
-                                                 GblSize     optionalArgCount,
+                                                 size_t      optionalArgCount,
                                                  va_list*    pList)
 {
     GblProperty* pProp = GBL_PROPERTY(GblBox_create(derivedType));
@@ -402,9 +402,9 @@ GBL_EXPORT GblProperty* GblProperty_createVaList(GblType     derivedType,
 GBL_EXPORT GBL_RESULT GblProperty_constructVaList(GblProperty* pSelf,
                                                   GblType     derivedType,
                                                   const char* pName,
-                                                  GblSize     id,
+                                                  size_t      id,
                                                   GblFlags    flags,
-                                                  GblSize     optionalArgCount,
+                                                  size_t      optionalArgCount,
                                                   va_list*    pList)
 {
     GBL_CTX_BEGIN(NULL);
@@ -421,9 +421,9 @@ GBL_EXPORT GBL_RESULT GblProperty_constructVaList(GblProperty* pSelf,
 
 GBL_EXPORT GblProperty* GblProperty_create(GblType     derivedType,
                                            const char* pName,
-                                           GblSize     id,
+                                           size_t      id,
                                            GblFlags    flags,
-                                           GblSize     optionalArgCount,
+                                           size_t      optionalArgCount,
                                            ...)
 {
 
@@ -442,9 +442,9 @@ GBL_EXPORT GblProperty* GblProperty_create(GblType     derivedType,
 GBL_EXPORT GBL_RESULT GblProperty_construct(GblProperty* pSelf,
                                             GblType     derivedType,
                                             const char* pName,
-                                            GblSize     id,
+                                            size_t      id,
                                             GblFlags    flags,
-                                            GblSize     optionalArgCount,
+                                            size_t      optionalArgCount,
                                             ...)
 {
     va_list varArgs;
@@ -460,7 +460,7 @@ GBL_EXPORT GBL_RESULT GblProperty_construct(GblProperty* pSelf,
     return result;
 }
 
-static GBL_RESULT GblProperty_initOptionalArgs_(GblProperty* pProp, GblSize argCount, va_list* pList) {
+static GBL_RESULT GblProperty_initOptionalArgs_(GblProperty* pProp, size_t  argCount, va_list* pList) {
     GBL_UNUSED(pProp, argCount, pList);
     if(!argCount)
         return GBL_RESULT_SUCCESS;

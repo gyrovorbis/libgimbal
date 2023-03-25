@@ -84,13 +84,13 @@ typedef struct ClassE {
 typedef struct ClassEntry_ {
     GblType     type;
     GblEnum     enumVal;
-    GblSize     enumOffset;
+    size_t      enumOffset;
 } ClassEntry_;
 
 typedef struct GblInterfaceTestSuite_ {
-    GblSize             initialInterfaceRefCount;
-    GblSize             initialStaticClassRefCount;
-    GblSize             initialTypeCount;
+    size_t              initialInterfaceRefCount;
+    size_t              initialStaticClassRefCount;
+    size_t              initialTypeCount;
     GblType             typeList[TYPE_COUNT_];
     GblType             typeRefCounts[TYPE_COUNT_];
     GblType             ifaceRefCount;
@@ -504,11 +504,11 @@ static GBL_RESULT checkRefCountsEnd_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT verifyCasts_(GblClass* pClass, GblSize count, const ClassEntry_* pEntries, GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT verifyCasts_(GblClass* pClass, size_t  count, const ClassEntry_* pEntries, GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     const ClassEntry_* pSrc = pEntries;
-    GblSize srcCount = 0;
+    size_t  srcCount = 0;
 
     while(srcCount++ < count) {
         GblClass* pSrcClass = GblClass_cast(pClass, pSrc->type);
@@ -516,7 +516,7 @@ static GBL_RESULT verifyCasts_(GblClass* pClass, GblSize count, const ClassEntry
         GBL_TEST_COMPARE(*(GblEnum*)((uint8_t*)pSrcClass + pSrc->enumOffset), pSrc->enumVal);
 
         const ClassEntry_* pDst = pEntries;
-        GblSize dstCount = 0;
+        size_t  dstCount = 0;
 
         while(dstCount++ < count) {
             GblClass* pDstClass = GblClass_cast(pSrcClass, pDst->type);
@@ -530,7 +530,7 @@ static GBL_RESULT verifyCasts_(GblClass* pClass, GblSize count, const ClassEntry
     GBL_CTX_END();
 }
 
-static GBL_RESULT verifyClass_(GblType type, GblSize count, const ClassEntry_* pEntries,  GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT verifyClass_(GblType type, size_t  count, const ClassEntry_* pEntries,  GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
     GBL_CTX_VERIFY_CALL(checkRefCountsBegin_(pSelf, pCtx));

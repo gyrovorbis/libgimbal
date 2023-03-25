@@ -279,6 +279,10 @@ GBL_EXPORT GblThread* GblThread_current(void) {
     return pCurThread_;
 }
 
+GBL_EXPORT GblThread* GblThread_main(void) {
+    return NULL;
+}
+
 GBL_EXPORT GblClosure* GblThread_closure(const GblThread* pSelf) {
     return GBL_CLOSURE(GblBox_getField(GBL_BOX(pSelf), closureQuark_));
 }
@@ -363,7 +367,7 @@ GBL_EXPORT GBL_RESULT (GblThread_exit)(GBL_RESULT  result,
                                        const char* pMessage,
                                        const char* pFile,
                                        const char* pFunc,
-                                       GblSize     line)
+                                       size_t      line)
 {
     GBL_CTX_BEGIN(NULL);
 
@@ -520,12 +524,8 @@ GBL_EXPORT GBL_RESULT GblThread_setName(GblThread* pSelf, const char* pName) {
     return GBL_RESULT_UNIMPLEMENTED;
 }
 
-GBL_EXPORT GblSize GblThread_coreCount(void) {
+GBL_EXPORT size_t  GblThread_coreCount(void) {
     return 1;
-}
-
-GBL_EXPORT uintptr_t GblThread_processId(void) {
-    return 0;
 }
 
 GBL_EXPORT GblBool GblThread_isMain(const GblThread* pSelf) {

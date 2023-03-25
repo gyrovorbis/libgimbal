@@ -6,7 +6,7 @@
 #define GBL_CLASS_TEST_SUITE_(inst)     (GBL_INSTANCE_PRIVATE(inst, GBL_CLASS_TEST_SUITE_TYPE))
 
 typedef struct GblClassTestSuite_ {
-    GblSize     initialStaticClassRefCount;
+    size_t      initialStaticClassRefCount;
     GblClass*   pClassRef;
     GblClass*   pClassRef2;
 } GblClassTestSuite_;

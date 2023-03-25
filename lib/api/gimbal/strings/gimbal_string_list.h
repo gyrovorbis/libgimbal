@@ -55,11 +55,11 @@ GBL_INLINE GblStringList* GblStringList_createEmpty     (void)                  
 GBL_EXPORT GblStringList* GblStringList_create          (const char* pFirst, ...)                        GBL_NOEXCEPT;
 GBL_EXPORT GblStringList* GblStringList_createWithRefs  (GblStringRef* pFirst, ...)                      GBL_NOEXCEPT;
 GBL_EXPORT GblStringList* GblStringList_createSplit     (const char* pStr, const char* pDelim)           GBL_NOEXCEPT;
-GBL_EXPORT GblStringList* GblStringList_createFromArray (const char** ppStr, GblSize size)               GBL_NOEXCEPT;
+GBL_EXPORT GblStringList* GblStringList_createFromArray (const char** ppStr, size_t  size)               GBL_NOEXCEPT;
 
 GBL_EXPORT GblStringList* GblStringList_createSubList   (const GblStringList* pOther,
                                                          intptr_t             startIndex,
-                                                         GblSize              count)                     GBL_NOEXCEPT;
+                                                         size_t               count)                     GBL_NOEXCEPT;
 
 GBL_EXPORT GblStringList* GblStringList_createFilter    (const GblStringList* pOther,
                                                          const char*          pPattern)                  GBL_NOEXCEPT;
@@ -71,25 +71,25 @@ GBL_EXPORT GblBool        GblStringList_equals          (GBL_CSELF,
                                                          const GblStringList* pOther,
                                                          GblBool              matchCase)                 GBL_NOEXCEPT;
 
-GBL_INLINE GblSize        GblStringList_size            (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_INLINE size_t         GblStringList_size            (GBL_CSELF)                                      GBL_NOEXCEPT;
 GBL_INLINE GblBool        GblStringList_empty           (GBL_CSELF)                                      GBL_NOEXCEPT;
 
 GBL_INLINE GblStringRef*  GblStringList_front           (GBL_CSELF)                                      GBL_NOEXCEPT;
 GBL_INLINE GblStringRef*  GblStringList_back            (GBL_CSELF)                                      GBL_NOEXCEPT;
 GBL_INLINE GblStringRef*  GblStringList_at              (GBL_CSELF, intptr_t index)                      GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize        GblStringList_find            (GBL_CSELF,
+GBL_EXPORT size_t         GblStringList_find            (GBL_CSELF,
                                                          const char* pStr,
                                                          GblBool     matchCase,
-                                                         GblSize     offset)                             GBL_NOEXCEPT;
+                                                         size_t      offset)                             GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize        GblStringList_rfind           (GBL_CSELF,
+GBL_EXPORT size_t         GblStringList_rfind           (GBL_CSELF,
                                                          const char* pStr,
                                                          GblBool     matchCase,
-                                                         GblSize     offset)                             GBL_NOEXCEPT;
+                                                         size_t      offset)                             GBL_NOEXCEPT;
 
 GBL_INLINE GblBool        GblStringList_contains        (GBL_CSELF, const char* pStr, GblBool matchCase) GBL_NOEXCEPT;
-GBL_EXPORT GblSize        GblStringList_count           (GBL_CSELF, const char* pStr, GblBool matchCase) GBL_NOEXCEPT;
+GBL_EXPORT size_t         GblStringList_count           (GBL_CSELF, const char* pStr, GblBool matchCase) GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT     GblStringList_set             (GBL_SELF, intptr_t index, const char* pData)    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_setRef          (GBL_SELF, intptr_t index, GblStringRef* pRef)   GBL_NOEXCEPT;
@@ -100,17 +100,17 @@ GBL_EXPORT GBL_RESULT     GblStringList_pushFrontRefs   (GBL_SELF, ...)         
 GBL_EXPORT GBL_RESULT     GblStringList_insert          (GBL_SELF, intptr_t index, ...)                  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_insertRefs      (GBL_SELF, intptr_t index, ...)                  GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize        GblStringList_replace         (GBL_SELF,
+GBL_EXPORT size_t         GblStringList_replace         (GBL_SELF,
                                                          const char* pOld,
                                                          const char* pNew,
                                                          GblBool     matchCase,
-                                                         GblSize     limit)                              GBL_NOEXCEPT;
+                                                         size_t      limit)                              GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize        GblStringList_replaceWithRef  (GBL_SELF,
+GBL_EXPORT size_t         GblStringList_replaceWithRef  (GBL_SELF,
                                                          const char*   pOld,
                                                          GblStringRef* pNew,
                                                          GblBool       matchCase,
-                                                         GblSize       limit)                            GBL_NOEXCEPT;
+                                                         size_t        limit)                            GBL_NOEXCEPT;
 
 GBL_INLINE GblBool        GblStringList_splice          (GBL_SELF,
                                                          GblStringList* pOther,
@@ -121,8 +121,8 @@ GBL_EXPORT GblStringRef*  GblStringList_join            (GBL_CSELF,
 
 GBL_INLINE GblStringRef*  GblStringList_popBack         (GBL_SELF)                                       GBL_NOEXCEPT;
 GBL_INLINE GblStringRef*  GblStringList_popFront        (GBL_SELF)                                       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_erase           (GBL_SELF, intptr_t index, GblSize count)        GBL_NOEXCEPT;
-GBL_EXPORT GblSize        GblStringList_remove          (GBL_SELF, const char* pStr, GblBool matchCase)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT     GblStringList_erase           (GBL_SELF, intptr_t index, size_t  count)        GBL_NOEXCEPT;
+GBL_EXPORT size_t         GblStringList_remove          (GBL_SELF, const char* pStr, GblBool matchCase)  GBL_NOEXCEPT;
 GBL_INLINE GblStringRef*  GblStringList_extract         (GBL_SELF, GblStringList* pNode)                 GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_deduplicate     (GBL_SELF, GblBool matchCase)                    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_clear           (GBL_SELF)                                       GBL_NOEXCEPT;
@@ -248,7 +248,7 @@ GBL_INLINE GblStringList* GblStringList_createEmpty(void) GBL_NOEXCEPT {
     return GblRingList_createEmpty();
 }
 
-GBL_INLINE GblSize GblStringList_size(GBL_CSELF) GBL_NOEXCEPT {
+GBL_INLINE size_t  GblStringList_size(GBL_CSELF) GBL_NOEXCEPT {
     return GblRingList_size(pSelf);
 }
 

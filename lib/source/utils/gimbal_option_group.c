@@ -50,7 +50,7 @@ GBL_EXPORT GBL_RESULT (GblOptionGroup_parse)(GblOptionGroup* pSelf,
     while(pIt != pList) {
         // remove leading '-' characters
         GblStringView key = GblStringRef_view(pIt->pData);
-        const GblSize begin = GblStringView_findFirstNotOf(key, GBL_STRV("-"), 0);
+        const size_t  begin = GblStringView_findFirstNotOf(key, GBL_STRV("-"), 0);
         // check whether we even have an option
         if(begin == 0 || (begin > 2 && begin != GBL_STRING_VIEW_NPOS)) {
             pIt = pIt->ringNode.pNext;
@@ -81,7 +81,7 @@ GBL_EXPORT GBL_RESULT (GblOptionGroup_parse)(GblOptionGroup* pSelf,
         GblStringList* pNext = pIt->ringNode.pNext;
         GblStringView value = { 0 };
 
-        GblSize equalsPos = GblStringView_find(key, GBL_STRV("="), 0);
+        size_t  equalsPos = GblStringView_find(key, GBL_STRV("="), 0);
         // Check for '=' sign, value is part of option string
         if(equalsPos != GBL_STRING_VIEW_NPOS) {
             GBL_CTX_VERIFY(key.length > equalsPos,
@@ -118,7 +118,7 @@ GBL_EXPORT GBL_RESULT (GblOptionGroup_parse)(GblOptionGroup* pSelf,
         if(begin == 1 && key.length != 1) {
             pIt = pNext;
         } else {
-            GblSize consumed = 0;
+            size_t  consumed = 0;
             GBL_CTX_VERIFY_CALL(pClass->pFnTry(pSelf, key, value, &consumed));
             if(noValue && consumed == 2) --consumed;
             if(consumed) {
@@ -146,7 +146,7 @@ GBL_EXPORT GBL_RESULT (GblOptionGroup_parse)(GblOptionGroup* pSelf,
     return GBL_CTX_RESULT();
 }
 
-static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, GblStringView value, GblSize* pConsumed) {
+static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, GblStringView value, size_t * pConsumed) {
     GBL_CTX_BEGIN(NULL);
 
     GblVariant v1 = GBL_VARIANT_INIT;
@@ -155,7 +155,7 @@ static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, 
 
     *pConsumed = 0;
     // search through all options, looking for a match
-    for(GblSize o = 0; o < pSelf->optionCount; ++o) {
+    for(size_t  o = 0; o < pSelf->optionCount; ++o) {
         const GblOption* pOption = &pSelf->pOptions[o];
 
         // Ensure that there's either a long or short name matching

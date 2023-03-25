@@ -13,7 +13,7 @@
 #define GBL_DECL_CCLOSURE_MARSHAL_VOID__(postFix) \
     GBL_EXPORT GBL_RESULT GblMarshal_CClosure_VOID__##postFix(GblClosure* pClosure,     \
                                                               GblVariant* pRetValue,    \
-                                                              GblSize     argCount,     \
+                                                              size_t      argCount,     \
                                                               GblVariant* pArgs,        \
                                                               GblPtr      pMarshalData) GBL_NOEXCEPT
 
@@ -24,7 +24,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblVariant);
 
 typedef GBL_RESULT (*GblMarshalFn)  (GblClosure*        pClosure,
                                      GblVariant*        pRetValue,
-                                     GblSize            argCount,
+                                     size_t             argCount,
                                      GblVariant*        pArgs,
                                      GblPtr             pMarshalData);
 
@@ -33,24 +33,24 @@ typedef GBL_RESULT (*GblMarshalVaFn)(GblClosure*        pClosure,
                                      void*              pInstance,
                                      va_list            args,
                                      void*              pMarshalData,
-                                     GblSize            argCount,
+                                     size_t             argCount,
                                      const GblType*     pParamTypes);
 
 GBL_EXPORT GBL_RESULT GblMarshal_CClosure_VOID__VOID (GblClosure*        pClosure,
                                                       GblVariant*        pRetValue,
-                                                      GblSize            argCount,
+                                                      size_t             argCount,
                                                       GblVariant*        pArgs,
                                                       GblPtr             pMarshalData)   GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblMarshal_ClassClosureMeta   (GblClosure*        pClosure,
                                                      GblVariant*        pRetValue,
-                                                     GblSize            argCount,
+                                                     size_t             argCount,
                                                      GblVariant*        pArgs,
                                                      GblPtr             pMarshalData)   GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblMarshal_SignalForwarder    (GblClosure*        pClosure,
                                                      GblVariant*        pRetValue,
-                                                     GblSize            argCount,
+                                                     size_t             argCount,
                                                      GblVariant*        pArgs,
                                                      GblPtr             pMarshalData)   GBL_NOEXCEPT;
 
@@ -77,7 +77,7 @@ GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOXED);
 #define GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(paramsPostfix, paramCount, paramList, argList)       \
     GBL_EXPORT GBL_RESULT GblMarshal_CClosure_VOID__##paramsPostfix(GblClosure* pClosure,       \
                                                                     GblVariant* pRetValue,      \
-                                                                    GblSize     argCount,       \
+                                                                    size_t      argCount,       \
                                                                     GblVariant* pArgs,          \
                                                                     GblPtr      pMarshalData)   \
     GBL_NOEXCEPT {                                                                              \

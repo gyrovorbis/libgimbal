@@ -56,7 +56,7 @@ static GBL_RESULT GblLinkedListTestSuite_empty_(GblTestSuite* pSelf, GblContext*
 static GBL_RESULT verifyListNode_(GblContext* pCtx,
                                   GblLinkedListNode* pList,
                                   GblLinkedListNode* pNode,
-                                  GblSize expectedIndex,
+                                  size_t  expectedIndex,
                                   const char* pString)
 {
     GBL_CTX_BEGIN(pCtx);
@@ -158,7 +158,7 @@ static GBL_RESULT GblLinkedListTestSuite_popBack_(GblTestSuite* pSelf, GblContex
     GblLinkedListTestSuite_* pSelf_ = GBL_LINKED_LIST_TEST_SUITE_(pSelf);
     GblLinkedList_pushBack(&pSelf_->list1, &test.listNode);
 
-    const GblSize count = GblLinkedList_count(&pSelf_->list1);
+    const size_t  count = GblLinkedList_count(&pSelf_->list1);
     GblLinkedListNode* pNode = GblLinkedList_popBack(&pSelf_->list1);
 
     GBL_TEST_COMPARE(GblLinkedList_count(&pSelf_->list1), count-1);
@@ -177,7 +177,7 @@ static GBL_RESULT GblLinkedListTestSuite_popFront_(GblTestSuite* pSelf, GblConte
     GblLinkedListTestSuite_* pSelf_ = GBL_LINKED_LIST_TEST_SUITE_(pSelf);
     GblLinkedList_pushFront(&pSelf_->list1, &test.listNode);
 
-    const GblSize count = GblLinkedList_count(&pSelf_->list1);
+    const size_t  count = GblLinkedList_count(&pSelf_->list1);
     GblLinkedListNode* pNode = GblLinkedList_popFront(&pSelf_->list1);
 
     GBL_TEST_COMPARE(GblLinkedList_count(&pSelf_->list1), count-1);

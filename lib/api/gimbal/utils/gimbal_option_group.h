@@ -68,7 +68,7 @@ GBL_DECLARE_STRUCT(GblOption) {
 
 GBL_CLASS_DERIVE(GblOptionGroup, GblObject)
     GBL_RESULT (*pFnParse) (GBL_SELF, GblStringList* pList);
-    GBL_RESULT (*pFnTry)   (GBL_SELF, GblStringView key, GblStringView value, GblSize* pUsed);
+    GBL_RESULT (*pFnTry)   (GBL_SELF, GblStringView key, GblStringView value, size_t * pUsed);
 GBL_CLASS_END
 
 /*! \brief Grouping of command-line options
@@ -82,7 +82,7 @@ GBL_CLASS_END
  */
 GBL_INSTANCE_DERIVE(GblOptionGroup, GblObject)
     GblOption*     pOptions;
-    GblSize        optionCount;
+    size_t         optionCount;
     GblStringRef*  pPrefix;
     GblVersion     version;
     GblStringRef*  pSummary;

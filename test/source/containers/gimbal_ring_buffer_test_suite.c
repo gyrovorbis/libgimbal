@@ -26,7 +26,7 @@ static GBL_RESULT GblRingBufferTestSuite_verify_(GblContext* pCtx, const GblRing
     va_start(varArgs, pBuffer);
     GBL_CTX_BEGIN(pCtx);
 
-    GblSize count = 0;
+    size_t  count = 0;
     const char* pStr = NULL;
 
     while((pStr = va_arg(varArgs, const char*))) {
@@ -196,7 +196,7 @@ static GBL_RESULT GblRingBufferTestSuite_pushBack_(GblTestSuite* pSelf, GblConte
 
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    for(GblSize o = 3; o <= 9; ++o)
+    for(size_t  o = 3; o <= 9; ++o)
         GBL_CTX_VERIFY_CALL(GblRingBuffer_pushBack(&pSelf_->ringBuffer[1], &stringLiterals_[o]));
 
     GBL_CTX_VERIFY_CALL(GblRingBufferTestSuite_verify_(pCtx,
@@ -231,7 +231,7 @@ static GBL_RESULT GblRingBufferTestSuite_emplaceBack_(GblTestSuite* pSelf, GblCo
     GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    for(GblSize o = 0; o < 5; ++o) {
+    for(size_t  o = 0; o < 5; ++o) {
         const char** ppData = GblRingBuffer_emplaceBack(&pSelf_->ringBuffer[0]);
         GBL_TEST_VERIFY(ppData);
         *ppData = stringLiterals_[o];
@@ -247,7 +247,7 @@ static GBL_RESULT GblRingBufferTestSuite_emplaceBackOverflow_(GblTestSuite* pSel
     GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    for(GblSize o = 5; o < 12; ++o) {
+    for(size_t  o = 5; o < 12; ++o) {
         const char** ppData = GblRingBuffer_emplaceBack(&pSelf_->ringBuffer[0]);
         GBL_TEST_VERIFY(ppData);
         *ppData = stringLiterals_[o];
@@ -264,7 +264,7 @@ static GBL_RESULT GblRingBufferTestSuite_popFront_(GblTestSuite* pSelf, GblConte
     GBL_CTX_BEGIN(pCtx);
     GblRingBufferTestSuite_* pSelf_ = GBL_RING_BUFFER_TEST_SUITE_(pSelf);
 
-    for(GblSize o = 0; o < 5; ++o) {
+    for(size_t  o = 0; o < 5; ++o) {
         const char** ppData = GblRingBuffer_popFront(&pSelf_->ringBuffer[0]);
         GBL_TEST_VERIFY(ppData);
         GBL_TEST_COMPARE(*ppData, stringLiterals_[o+2]);
@@ -274,7 +274,7 @@ static GBL_RESULT GblRingBufferTestSuite_popFront_(GblTestSuite* pSelf, GblConte
                                                        &pSelf_->ringBuffer[0],
                                                        "h", "i", "j", "k", "l", NULL));
 
-    for(GblSize o = 0; o < 5; ++o) {
+    for(size_t  o = 0; o < 5; ++o) {
         const char** ppData = GblRingBuffer_popFront(&pSelf_->ringBuffer[0]);
         GBL_TEST_VERIFY(ppData);
         GBL_TEST_COMPARE(*ppData, stringLiterals_[o+7]);

@@ -56,7 +56,7 @@ GBL_EXPORT GBL_RESULT GblUuid_initFromString(GblUuid* pSelf, const char* pStrBuf
     GBL_CTX_VERIFY(strv.length == GBL_UUID_STRING_LENGTH,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
 
-    for(GblSize b = 0, c = 0;
+    for(size_t  b = 0, c = 0;
         b < GBL_UUID_BYTE_COUNT && c < strv.length;)
     {
         if(c == 8 || c == 13 || c == 18 || c == 23) {

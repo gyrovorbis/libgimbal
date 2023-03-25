@@ -8,9 +8,9 @@
 
 
 GBL_EXPORT GBL_RESULT (GblArrayHeap_construct)(GblArrayHeap*     pSelf,
-                                               GblSize           elemSize,
+                                               size_t            elemSize,
                                                GblArrayHeapCmpFn pFnCmp,
-                                               GblSize           structSize,
+                                               size_t            structSize,
                                                GblContext*       pCtx)
 {
     GBL_CTX_BEGIN(pCtx);
@@ -42,8 +42,8 @@ GBL_EXPORT GBL_RESULT GblArrayHeap_copy(GblArrayHeap* pSelf, const GblArrayHeap*
 
 GBL_EXPORT GBL_RESULT GblArrayHeap_move(GblArrayHeap* pSelf, GblArrayHeap* pRhs) {
     void* pData;
-    GblSize size;
-    GblSize capacity;
+    size_t  size;
+    size_t  capacity;
 
     GblArrayList_destruct(GBL_ARRAY_HEAP_LIST_(pSelf));
 
@@ -62,7 +62,7 @@ GBL_EXPORT GBL_RESULT GblArrayHeap_push(GblArrayHeap* pSelf, const void* pEntry)
 
     GBL_CTX_VERIFY_CALL(GblArrayList_pushBack(pList, pEntry));
 
-    const GblSize elementSize = GblArrayHeap_elementSize(pSelf);
+    const size_t  elementSize = GblArrayHeap_elementSize(pSelf);
     intptr_t ipos = (intptr_t)GblArrayHeap_size(pSelf)-1;
     intptr_t ppos = GBL_ARRAY_HEAP_PARENT_(ipos);
 

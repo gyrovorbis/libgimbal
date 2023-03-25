@@ -9,12 +9,12 @@ GBL_INLINE void* GblClass_basePtr_(const GblClass* pClass) {
     return pMeta? (void*)((uint8_t*)pClass + pMeta->classPrivateOffset) : NULL;
 }
 
-GBL_EXPORT GblSize GblClass_totalSize(const GblClass* pClass) {
+GBL_EXPORT size_t  GblClass_totalSize(const GblClass* pClass) {
     GblMetaClass* pMeta = GBL_META_CLASS_(GBL_CLASS_TYPEOF(pClass));
     return pMeta? (pMeta->pInfo->classSize - pMeta->classPrivateOffset) : 0;
 }
 
-GBL_EXPORT GblSize GblClass_privateSize(const GblClass* pClass) {
+GBL_EXPORT size_t  GblClass_privateSize(const GblClass* pClass) {
     GblMetaClass* pMeta = GBL_META_CLASS_(GBL_CLASS_TYPEOF(pClass));
     return pMeta? pMeta->pInfo->classPrivateSize  : 0;
 }
@@ -61,7 +61,7 @@ GBL_EXPORT GblBool GblClass_isOverridden(const GblClass* pSelf) {
     GblClass*   pDefault;
 
     if(pSelf && pSelf != (pDefault = GblClass_default(pSelf))) {
-        const GblSize cmpSize = GblClass_size(pSelf) - sizeof(GblClass);
+        const size_t  cmpSize = GblClass_size(pSelf) - sizeof(GblClass);
         /* we have to move past the class's private_ field, because it has
          * the encoded FLAGS which have bits for floating/owned, etc. */
         if(cmpSize && memcmp((uint8_t*)GblClass_basePtr_(pSelf)    + sizeof(GblClass),
@@ -156,7 +156,7 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
         if(!pIter->pInfo->interfaceCount) {
             //GBL_CTX_VERBOSE("Interfaces: None");
         } else {
-            for(GblSize i = 0; i < pIter->pInfo->interfaceCount; ++i) {
+            for(size_t  i = 0; i < pIter->pInfo->interfaceCount; ++i) {
                 const GblTypeInterfaceMapEntry* pIEntry = &pIter->pInfo->pInterfaceMap[i];
                 GblMetaClass* pIMeta = (GblMetaClass*)pIEntry->interfaceType;
                 GBL_CTX_VERIFY_EXPRESSION(pIMeta);
@@ -338,7 +338,7 @@ static GBL_EXPORT GBL_RESULT GblClass_destruct_(GblClass* pClass) {
         }
 
         // iterate over all interfaces
-        for(GblSize i = 0; i < pIter->pInfo->interfaceCount; ++i) {
+        for(size_t  i = 0; i < pIter->pInfo->interfaceCount; ++i) {
             GblInterface* pInterface = (GblInterface*)((const char*)pClass +
                                                        pIter->pInfo->pInterfaceMap[i].classOffset);
             GblClass* pDefaultIFaceClass = GblClass_weakRefDefault(GBL_CLASS_TYPEOF(pInterface));
@@ -581,8 +581,8 @@ GBL_EXPORT GblClass* GblClass_default(const GblClass* pSelf) GBL_NOEXCEPT {
     return pSelf? GblClass_weakRefDefault(GBL_CLASS_TYPEOF(pSelf)) : GBL_NULL;
 }
 
-GBL_EXPORT GblSize GblClass_size(const GblClass* pSelf) GBL_NOEXCEPT {
-    GblSize size = 0;
+GBL_EXPORT size_t  GblClass_size(const GblClass* pSelf) GBL_NOEXCEPT {
+    size_t  size = 0;
     if(pSelf) {
         const GblTypeInfo* pInfo = GblType_info(GBL_CLASS_TYPEOF(pSelf));
         if(pInfo) {

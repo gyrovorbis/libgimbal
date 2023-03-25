@@ -71,7 +71,7 @@ GBL_EXPORT GblType     GblClosure_type           (void)                         
 GBL_EXPORT GblClosure* GblClosure_current        (void)                          GBL_NOEXCEPT;
 
 GBL_EXPORT GblClosure* GblClosure_create         (GblType           derivedType,
-                                                  GblSize           size,
+                                                  size_t            size,
                                                   void*             pUserdata,
                                                   GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
 
@@ -86,7 +86,7 @@ GBL_INLINE GblBool     GblClosure_hasMetaMarshal (GBL_CSELF)                    
 
 GBL_EXPORT GBL_RESULT  GblClosure_invoke         (GBL_SELF,
                                                   GblVariant* pRetValue,
-                                                  GblSize     argCount,
+                                                  size_t      argCount,
                                                   GblVariant* pArgValues)        GBL_NOEXCEPT;
 
 // ===== IMPL =====

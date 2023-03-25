@@ -12,8 +12,8 @@
 // instance vcall
 
 typedef struct GblInstanceTestSuite_ {
-    GblSize         instanceStartInstanceRefCount;
-    GblSize         instanceStartClassRefCount;
+    size_t          instanceStartInstanceRefCount;
+    size_t          instanceStartClassRefCount;
     GblInstance*    pInstance;
 } GblInstanceTestSuite_;
 

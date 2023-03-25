@@ -19,7 +19,7 @@ static int comparator_(const void* pV1, const void* pV2) {
     return strcmp((const char*)pV2, (const char*)pV1);
 }
 
-static GBL_RESULT GblArrayHeapTestSuite_verify_(GblTestSuite* pSelf, GblSize heapIndex, GblSize size, const char* pHead) {
+static GBL_RESULT GblArrayHeapTestSuite_verify_(GblTestSuite* pSelf, size_t  heapIndex, size_t  size, const char* pHead) {
     GBL_CTX_BEGIN(pSelf);
     GblArrayHeapTestSuite_* pSelf_ = GBL_ARRAY_HEAP_TEST_SUITE_(pSelf);
     GblArrayHeap* pHeap = &pSelf_->heaps[heapIndex];
@@ -227,7 +227,7 @@ static GBL_RESULT GblArrayHeapTestSuite_releaseAcquire_(GblTestSuite* pSelf, Gbl
     GblArrayHeapTestSuite_* pSelf_ = GBL_ARRAY_HEAP_TEST_SUITE_(pSelf);
 
     void* pData;
-    GblSize size, capacity;
+    size_t  size, capacity;
 
     GBL_CTX_VERIFY_CALL(GblArrayHeap_release(&pSelf_->heaps[2], &pData, &size, &capacity));
 

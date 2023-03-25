@@ -137,6 +137,9 @@ extern "C" {
     struct S##_;                                \
     typedef struct S##_ S
 
+#define GBL_FORWARD_DECLARE_TYPE(t) \
+    GBL_TYPEOF(t)
+
 #ifndef __cplusplus
 #   define GBL_DECLARE_ENUM(E)    \
         typedef GblEnum E;        \

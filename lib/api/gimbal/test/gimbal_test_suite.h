@@ -42,9 +42,9 @@ GBL_CLASS_DERIVE(GblTestSuite, GblObject)
     const GblTestSuiteClassVTable* pVTable;
 
     GBL_RESULT (*pFnSuiteName)(GBL_CSELF, const char** ppName);
-    GBL_RESULT (*pFnCaseCount)(GBL_CSELF, GblSize* pSize);
-    GBL_RESULT (*pFnCaseName) (GBL_CSELF, GblSize index, const char** ppName);
-    GBL_RESULT (*pFnCaseRun)  (GBL_SELF, GblContext* pCtx, GblSize index);
+    GBL_RESULT (*pFnCaseCount)(GBL_CSELF, size_t * pSize);
+    GBL_RESULT (*pFnCaseName) (GBL_CSELF, size_t  index, const char** ppName);
+    GBL_RESULT (*pFnCaseRun)  (GBL_SELF, GblContext* pCtx, size_t  index);
 GBL_CLASS_END
 
 /*! \brief GblObject representing a collection of unit test cases
@@ -52,10 +52,10 @@ GBL_CLASS_END
  */
 GBL_INSTANCE_DERIVE(GblTestSuite, GblObject)
     GblCallRecord failingIssue;
-    GblSize       casesRun;
-    GblSize       casesPassed;
-    GblSize       casesFailed;
-    GblSize       casesSkipped;
+    size_t        casesRun;
+    size_t        casesPassed;
+    size_t        casesFailed;
+    size_t        casesSkipped;
 GBL_INSTANCE_END
 
 GBL_PROPERTIES(GblTestSuite,
@@ -72,8 +72,8 @@ GBL_EXPORT GblType       GblTestSuite_type             (void)                   
 
 GBL_EXPORT GblType       GblTestSuite_register         (const char* pName,
                                                         const GblTestSuiteClassVTable* pVTable,
-                                                        GblSize    instanceSize,
-                                                        GblSize    instancePrivateSize,
+                                                        size_t     instanceSize,
+                                                        size_t     instancePrivateSize,
                                                         GblFlags   typeFlags)                   GBL_NOEXCEPT;
 
 GBL_EXPORT GblTestSuite* GblTestSuite_create           (const char* pName)                      GBL_NOEXCEPT;
@@ -100,15 +100,15 @@ GBL_EXPORT GBL_RESULT    GblTestSuite_addCases         (GBL_SELF,
 
 GBL_EXPORT GblBool       GblTestSuite_caseRan          (GBL_CSELF, const char* pCaseName)       GBL_NOEXCEPT;
 GBL_EXPORT GblBool       GblTestSuite_casePassed       (GBL_CSELF, const char* pCaseName)       GBL_NOEXCEPT;
-GBL_EXPORT GblSize       GblTestSuite_caseCount        (GBL_CSELF)                              GBL_NOEXCEPT;
-GBL_EXPORT const char*   GblTestSuite_caseName         (GBL_CSELF, GblSize index)               GBL_NOEXCEPT;
+GBL_EXPORT size_t        GblTestSuite_caseCount        (GBL_CSELF)                              GBL_NOEXCEPT;
+GBL_EXPORT const char*   GblTestSuite_caseName         (GBL_CSELF, size_t  index)               GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT    GblTestSuite_initCase         (GBL_SELF, GblContext* pCtx)             GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT    GblTestSuite_finalCase        (GBL_SELF, GblContext* pCtx)             GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT    GblTestSuite_runCase          (GBL_SELF,
                                                         GblContext* pCtx,
-                                                        GblSize     index)                      GBL_NOEXCEPT;
+                                                        size_t      index)                      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT    GblTestSuite_initSuite        (GBL_SELF, GblContext* pCtx)             GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT    GblTestSuite_finalSuite       (GBL_SELF, GblContext* pCtx)             GBL_NOEXCEPT;

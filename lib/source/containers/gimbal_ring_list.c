@@ -49,7 +49,7 @@ GBL_EXPORT GBL_RESULT GblRingList_pushFrontVaList(GblRingList* pSelf, va_list* p
     GBL_CTX_BEGIN(NULL);
     void* pArg = NULL;
 
-    GblSize idx = 0;
+    size_t  idx = 0;
     while((pArg = va_arg(*pList, void*))) {
         GblRingList* pEntry = GBL_RING_LIST_NEW_();
         pEntry->pData = pArg;
@@ -196,7 +196,7 @@ GBL_EXPORT GBL_RESULT (GblRingList_destroy)(GblRingList*      pSelf,
 }
 
 
-GBL_EXPORT GblSize GblRingList_size(const GblRingList* pSelf) {
+GBL_EXPORT size_t  GblRingList_size(const GblRingList* pSelf) {
     return pSelf->size;
 }
 
@@ -332,14 +332,14 @@ GBL_EXPORT GblBool (GblRingList_splice)(GblRingList* pSelf, GblRingList* pOther,
     return result;
 }
 
-GBL_EXPORT void* (GblRingList_popBack)(GblRingList* pSelf, GblSize count) {
+GBL_EXPORT void* (GblRingList_popBack)(GblRingList* pSelf, size_t  count) {
     GBL_CTX_BEGIN(NULL);
     void* pData = NULL;
 
     GBL_CTX_VERIFY(count <= GblRingList_size(pSelf),
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
 
-    for(GblSize i = 0; i < count; ++i) {
+    for(size_t  i = 0; i < count; ++i) {
         GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_popBack(&pSelf->listNode));
         if(pEntry) pData = pEntry->pData;
         GBL_RING_LIST_DELETE_(pEntry);
@@ -349,14 +349,14 @@ GBL_EXPORT void* (GblRingList_popBack)(GblRingList* pSelf, GblSize count) {
     return pData;
 }
 
-GBL_EXPORT void* (GblRingList_popFront)(GblRingList* pSelf, GblSize count) {
+GBL_EXPORT void* (GblRingList_popFront)(GblRingList* pSelf, size_t  count) {
     GBL_CTX_BEGIN(NULL);
     void* pData = NULL;
 
     GBL_CTX_VERIFY(count <= GblRingList_size(pSelf),
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
 
-    for(GblSize i = 0; i < count; ++i) {
+    for(size_t  i = 0; i < count; ++i) {
         GblRingList* pEntry = GBL_RING_LIST_(GblDoublyLinkedList_popFront(&pSelf->listNode));
         if(pEntry) pData = pEntry->pData;
         GBL_RING_LIST_DELETE_(pEntry);
@@ -374,7 +374,7 @@ GBL_EXPORT void* GblRingList_extract(GblRingList* pList, GblRingList* pNode) {
     return pData;
 }
 
-GBL_EXPORT void* (GblRingList_remove)(GblRingList* pSelf, intptr_t index, GblSize count) {
+GBL_EXPORT void* (GblRingList_remove)(GblRingList* pSelf, intptr_t index, size_t  count) {
     void* pData = NULL;
     GBL_CTX_BEGIN(NULL);
 
@@ -470,12 +470,12 @@ GBL_EXPORT GblBool (GblRingList_foreach)(GblRingList* pSelf, GblRingListIterFn p
     return GBL_FALSE;
 }
 
-GBL_EXPORT GblSize GblRingList_find(const GblRingList* pSelf,
+GBL_EXPORT size_t  GblRingList_find(const GblRingList* pSelf,
                                     const void*        pVal,
                                     GblRingListCmpFn   pFnCmp,
                                     void*              pCl)
 {
-    GblSize index = 0;
+    size_t  index = 0;
     for(GblRingList* pIt = pSelf->ringNode.pNext;
         pIt != pSelf;
         pIt = pIt->ringNode.pNext)

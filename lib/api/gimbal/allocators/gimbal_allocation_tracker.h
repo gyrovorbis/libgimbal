@@ -14,19 +14,19 @@
 GBL_DECLS_BEGIN
 
 typedef struct GblAllocationCounters {
-    GblSize     allocEvents;
-    GblSize     reallocEvents;
-    GblSize     freeEvents;
-    GblSize     bytesAllocated;
-    GblSize     bytesFreed;
+    size_t      allocEvents;
+    size_t      reallocEvents;
+    size_t      freeEvents;
+    size_t      bytesAllocated;
+    size_t      bytesFreed;
     ptrdiff_t   bytesActive;
     ptrdiff_t   allocsActive;
 } GblAllocationCounters;
 
 typedef struct GblAllocationTracker {
-    GblSize                 maxAllocations;
-    GblSize                 maxBytes;
-    GblSize                 maxAllocationSize;
+    size_t                  maxAllocations;
+    size_t                  maxBytes;
+    size_t                  maxAllocationSize;
     GblAllocationCounters   counters;
 } GblAllocationTracker;
 
@@ -35,16 +35,16 @@ GBL_EXPORT GBL_RESULT     GblAllocationTracker_destroy         (GBL_SELF)       
 
 GBL_EXPORT GBL_RESULT     GblAllocationTracker_allocEvent      (GBL_SELF,
                                                                 const void*        pPtr,
-                                                                GblSize            size,
-                                                                GblSize            align,
+                                                                size_t             size,
+                                                                size_t             align,
                                                                 const char*        pDbg,
                                                                 GblSourceLocation  srcLoc)         GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT     GblAllocationTracker_reallocEvent    (GBL_SELF,
                                                                 const void*        pExisting,
                                                                 const void*        pNew,
-                                                                GblSize            newSize,
-                                                                GblSize            newAlign,
+                                                                size_t             newSize,
+                                                                size_t             newAlign,
                                                                 GblSourceLocation  srcLoc)         GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT     GblAllocationTracker_freeEvent       (GBL_SELF,

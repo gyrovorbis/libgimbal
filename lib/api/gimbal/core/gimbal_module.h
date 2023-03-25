@@ -1,9 +1,8 @@
 /*! \file
  *  \brief GblModule loadable plugin instance and management API
- *  \ingroup metaBuiltinTypes
+ *  \ingroup core
  *  \todo
- *      - implement properties
- *      - unit testing
+ *      - advanced unit testing
  *      - plan out type registration/management
  *      - rig up option group parsery
  *      - stop inheriting GblContext
@@ -65,15 +64,15 @@ GBL_PROPERTIES(GblModule,
     (author,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
     (description, GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
     (useCount,    GBL_GENERIC, (READ),                    GBL_INT16_TYPE),
-    (typeCount,   GBL_GENERIC, (READ),                    GBL_UINT32_TYPE)
+    (typeCount,   GBL_GENERIC, (READ),                    GBL_SIZE_TYPE)
 )
 
 // ===== Static/Service API =====
 GBL_EXPORT GblType     GblModule_type         (void)                     GBL_NOEXCEPT;
 GBL_EXPORT GblModule*  GblModule_find         (const char* pName)        GBL_NOEXCEPT;
 GBL_EXPORT GblModule*  GblModule_findQuark    (GblQuark name)            GBL_NOEXCEPT;
-GBL_EXPORT GblModule*  GblModule_at           (GblSize index)            GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblModule_count        (void)                     GBL_NOEXCEPT;
+GBL_EXPORT GblModule*  GblModule_at           (size_t  index)            GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblModule_count        (void)                     GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool     GblModule_foreach      (GblModuleIterFn pFnIter,
                                                void*           pClosure) GBL_NOEXCEPT;
@@ -82,13 +81,13 @@ GBL_EXPORT GblModule*  GblModule_require      (const char* pName,
                                                const char* pVersion,
                                                const char* pFile,
                                                const char* pFunc,
-                                               GblSize     line)         GBL_NOEXCEPT;
+                                               size_t      line)         GBL_NOEXCEPT;
 
 GBL_EXPORT GblModule*  GblModule_requireQuark (GblQuark    quark,
                                                const char* pVersion,
                                                const char* pFile,
                                                const char* pFunc,
-                                               GblSize     line)         GBL_NOEXCEPT;
+                                               size_t      line)         GBL_NOEXCEPT;
 
 // ===== Instance API =====
 
@@ -120,8 +119,8 @@ GblType     GblModule_registerType  (GBL_SELF,
                                      GblFlags           flags)      GBL_NOEXCEPT;
 
 GblType     GblModule_typeFromName  (GBL_CSELF, const char* pName)  GBL_NOEXCEPT;
-GblType     GblModule_typeFromIndex (GBL_CSELF, GblSize     index)  GBL_NOEXCEPT;
-GblSize     GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT;
+GblType     GblModule_typeFromIndex (GBL_CSELF, size_t      index)  GBL_NOEXCEPT;
+size_t      GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT;
 
 
 // ====== IMPLEMENTATION =====

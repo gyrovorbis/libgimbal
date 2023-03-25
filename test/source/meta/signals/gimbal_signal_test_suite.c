@@ -72,7 +72,7 @@ typedef struct SignalInstance_ {
 typedef struct GblSignalTestSuite_ {
     GblType             types[TYPE_COUNT_];
     SignalInstance_*    pInstances[INSTANCE_COUNT_];
-    GblSize             signalEmissions[SIGNAL_COUNT_];
+    size_t              signalEmissions[SIGNAL_COUNT_];
     uintptr_t           signalReceivers[SIGNAL_COUNT_][INSTANCE_COUNT_];
     uintptr_t           signalArgs[SIGNAL_COUNT_][INSTANCE_COUNT_];
     GblInstance*        pSignalCurrentReceivers[SIGNAL_COUNT_][INSTANCE_COUNT_];
@@ -655,7 +655,7 @@ static GBL_RESULT GblSignalTestSuite_emitSelf_(GblTestSuite* pSelf, GblContext* 
 
     GBL_CTX_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IA", GBL_TRUE));
 
-    const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_I_A_] - 1;
+    const size_t  emissionIndex = pSelf_->signalEmissions[SIGNAL_I_A_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
     GBL_TEST_COMPARE((GblBool)pSelf_->signalArgs[SIGNAL_I_A_][emissionIndex], GBL_TRUE);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_I_A_][emissionIndex], INSTANCE_1_);
@@ -672,7 +672,7 @@ static GBL_RESULT GblSignalTestSuite_emitOther_(GblTestSuite* pSelf, GblContext*
 
     GBL_CTX_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_CA", 17));
 
-    const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_C_A_] - 1;
+    const size_t  emissionIndex = pSelf_->signalEmissions[SIGNAL_C_A_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
     GBL_TEST_COMPARE(pSelf_->signalArgs[SIGNAL_C_A_][emissionIndex], 17);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_C_A_][emissionIndex], INSTANCE_2_);
@@ -689,7 +689,7 @@ static GBL_RESULT GblSignalTestSuite_emitMulti_(GblTestSuite* pSelf, GblContext*
 
     GBL_CTX_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IB_1", "C Marshals"));
 
-    const GblSize emissionCount = pSelf_->signalEmissions[SIGNAL_I_B_1_];
+    const size_t  emissionCount = pSelf_->signalEmissions[SIGNAL_I_B_1_];
     GBL_TEST_COMPARE(emissionCount, 2);
 
     GBL_TEST_COMPARE((const char*)pSelf_->signalArgs[SIGNAL_I_B_1_][0], "C Marshals");
@@ -715,7 +715,7 @@ static GBL_RESULT GblSignalTestSuite_emitOtherClass_(GblTestSuite* pSelf, GblCon
 
     GBL_CTX_VERIFY_CALL(GblSignal_emit(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_IBBase", (void*)0xdeadbabe));
 
-    const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_I_B_BASE_] - 1;
+    const size_t  emissionIndex = pSelf_->signalEmissions[SIGNAL_I_B_BASE_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
     GBL_TEST_COMPARE(pSelf_->signalArgs[SIGNAL_I_B_BASE_][emissionIndex], 0xdeadbabe);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_I_B_BASE_][emissionIndex], INSTANCE_2_);
@@ -760,7 +760,7 @@ static GBL_RESULT GblSignalTestSuite_emitVaListOtherSignal_(GblTestSuite* pSelf,
 
     GBL_CTX_VERIFY_CALL(emitVaList_(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_2_]), "S_1_CB", 17.0f));
 
-    const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_1_C_B_] - 1;
+    const size_t  emissionIndex = pSelf_->signalEmissions[SIGNAL_1_C_B_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
     GBL_TEST_COMPARE(pSelf_->signalArgs[SIGNAL_1_C_B_][emissionIndex], (uintptr_t)17.0f);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_1_C_B_][emissionIndex], INSTANCE_2_);
@@ -798,7 +798,7 @@ static GBL_RESULT GblSignalTestSuite_emitVariantsOtherClosure_(GblTestSuite* pSe
 
     GBL_CTX_VERIFY_CALL(GblSignal_emitVariants(GBL_INSTANCE(pSelf_->pInstances[INSTANCE_1_]), "S_2_CB", &v));
 
-    const GblSize emissionIndex = pSelf_->signalEmissions[SIGNAL_2_C_B_] - 1;
+    const size_t  emissionIndex = pSelf_->signalEmissions[SIGNAL_2_C_B_] - 1;
     GBL_TEST_COMPARE(emissionIndex, 0);
     GBL_TEST_COMPARE(pSelf_->signalArgs[SIGNAL_2_C_B_][emissionIndex], (uintptr_t)33.3);
     GBL_TEST_COMPARE(pSelf_->signalReceivers[SIGNAL_2_C_B_][emissionIndex], INSTANCE_2_);

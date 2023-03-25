@@ -71,9 +71,9 @@ GBL_EXPORT GblInstance* GblInstance_public             (const void* pPrivate,
                                                         GblType     base)           GBL_NOEXCEPT;
 
 GBL_EXPORT GblType      GblInstance_typeOf             (GBL_CSELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblInstance_size               (GBL_CSELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblInstance_privateSize        (GBL_CSELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblInstance_totalSize          (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblInstance_size               (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblInstance_privateSize        (GBL_CSELF)                  GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblInstance_totalSize          (GBL_CSELF)                  GBL_NOEXCEPT;
 
 GBL_EXPORT GblClass*    GblInstance_class              (GBL_CSELF)                  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblInstance_swizzleClass       (GBL_SELF, GblClass* pClass) GBL_NOEXCEPT;
@@ -250,7 +250,7 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass         (GBL_SELF)               
 * \returns type ID or NULL if the instance is NULL
 */
 
-/*! \fn GblSize GblInstance_size(const GblInstance* pSelf)
+/*! \fn size_t  GblInstance_size(const GblInstance* pSelf)
 * Returns the size of the public instance struct for the given instance.
 * \relatesalso GblInstance
 * \param pSelf instance pointer
@@ -258,14 +258,14 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass         (GBL_SELF)               
 * \sa GblInstance_privateSize, GblInstance_totalSize
 */
 
-/*! \fn GblSize GblInstance_privateSize(const GblInstance* pSelf)
+/*! \fn size_t  GblInstance_privateSize(const GblInstance* pSelf)
 * Returns the size of the private instance struct for the given instance.
 * \relatesalso GblInstance
 * \param pSelf instance pointer
 * \returns size or 0 if instance is NULL
 */
 
-/*! \fn GblSize GblInstance_totalSize(const GblInstance* pSelf)
+/*! \fn size_t  GblInstance_totalSize(const GblInstance* pSelf)
 * Returns the total size for both public and private instance data for the given instance.
 * \relatesalso GblInstance
 * \param pSelf instance pointer

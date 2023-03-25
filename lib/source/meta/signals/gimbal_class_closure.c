@@ -9,7 +9,7 @@ static GBL_RESULT GblClassClosureClass_init_(GblClass* pClass, const void* pUd, 
 }
 
 GBL_EXPORT GblClassClosure* GblClassClosure_create(GblType      classType,
-                                                   GblSize      offset,
+                                                   size_t       offset,
                                                    GblInstance* pInstance,
                                                    void*        pUserdata)
 {

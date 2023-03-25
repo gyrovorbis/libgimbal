@@ -11,14 +11,14 @@ typedef struct GblStringListTestSuite_ {
 } GblStringListTestSuite_;
 
 
-static GBL_RESULT GblStringListTestSuite_verify_(GblTestSuite* pSelf, GblSize index, ...) {
+static GBL_RESULT GblStringListTestSuite_verify_(GblTestSuite* pSelf, size_t  index, ...) {
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
     va_list varArgs;
     va_start(varArgs, index);
     GBL_CTX_BEGIN(pSelf);
 
-    GblSize size = 0;
+    size_t  size = 0;
     const char* pCurStr = NULL;
     GblStringList* pList = pSelf_->lists[index];
 
@@ -82,7 +82,7 @@ static GBL_RESULT GblStringListTestSuite_createWithRefs_(GblTestSuite* pSelf, Gb
     GBL_CTX_BEGIN(pCtx);
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
-    const GblSize refs = GblRef_activeCount();
+    const size_t  refs = GblRef_activeCount();
 
     GblStringRef* pRef1 = GblStringRef_create("one");
     GblStringRef* pRef2 = GblStringRef_create("two");
@@ -800,7 +800,7 @@ static GBL_RESULT GblStringListTestSuite_destroy_(GblTestSuite* pSelf, GblContex
     GBL_CTX_BEGIN(pCtx);
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
-    for(GblSize l = 0; l < GBL_COUNT_OF(pSelf_->lists); ++l) {
+    for(size_t  l = 0; l < GBL_COUNT_OF(pSelf_->lists); ++l) {
         GBL_CTX_VERIFY_CALL(GblStringList_destroy(pSelf_->lists[l]));
     }
 

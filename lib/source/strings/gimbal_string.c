@@ -5,7 +5,7 @@ GBL_EXPORT char* gblStrdup(const char* pStr) {
     return gblStrndup(pStr, strlen(pStr));
 }
 
-GBL_EXPORT char* gblStrndup(const char* pStr, GblSize length) {
+GBL_EXPORT char* gblStrndup(const char* pStr, size_t  length) {
     char* pNew = NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pStr);
@@ -16,10 +16,10 @@ GBL_EXPORT char* gblStrndup(const char* pStr, GblSize length) {
     return pNew;
 }
 
-GBL_EXPORT int gblStrnCaseCmp(const char* pStr1, const char* pStr2, GblSize length) {
+GBL_EXPORT int gblStrnCaseCmp(const char* pStr1, const char* pStr2, size_t  length) {
     GBL_ASSERT(pStr1 && pStr2, "NULL string!");
     int result;
-    GblSize l = 0;
+    size_t  l = 0;
 
     if(pStr1 == pStr2) return 0;
 

@@ -73,7 +73,7 @@ GBL_PROPERTIES(GblThread,
     (autoStart, GBL_GENERIC, (READ, WRITE          ), GBL_BOOL_TYPE),
     (detached,  GBL_GENERIC, (READ, WRITE          ), GBL_BOOL_TYPE),
     (closure,   GBL_GENERIC, (READ, WRITE          ), GBL_CLOSURE_TYPE),
-    (callback,  GBL_GENERIC, (READ, WRITE          ), GBL_POINTER_TYPE)
+    (callback,  GBL_GENERIC, (READ, WRITE          ), GBL_FUNCTION_TYPE)
 )
 
 GBL_SIGNALS(GblThread,
@@ -84,11 +84,10 @@ GBL_SIGNALS(GblThread,
 
 // ===== Static Methods =====
 GBL_EXPORT GblType     GblThread_type        (void)                           GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblThread_coreCount   (void)                           GBL_NOEXCEPT;
-GBL_EXPORT uintptr_t   GblThread_processId   (void)                           GBL_NOEXCEPT;
-GBL_EXPORT GblSize     GblThread_count       (void)                           GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblThread_coreCount   (void)                           GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblThread_count       (void)                           GBL_NOEXCEPT;
 GBL_EXPORT GblThread*  GblThread_find        (const char* pName)              GBL_NOEXCEPT;
-GBL_EXPORT GblThread*  GblThread_at          (GblSize index)                  GBL_NOEXCEPT;
+GBL_EXPORT GblThread*  GblThread_at          (size_t  index)                  GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool     GblThread_foreach     (GblThreadIterFn pIt,
                                               void*           pCl/*=NULL*/)   GBL_NOEXCEPT;
@@ -115,14 +114,13 @@ GBL_EXPORT GBL_RESULT  GblThread_setPriority (GBL_SELF,
 GBL_EXPORT GBL_RESULT  GblThread_setAffinity (GBL_SELF,
                                               GblThreadAffinity affinity)     GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool     GblThread_isMain      (GBL_CSELF)                      GBL_NOEXCEPT;
-
 GBL_EXPORT GBL_RESULT  GblThread_start       (GBL_SELF)                       GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblThread_wait        (GBL_SELF)                       GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblThread_detach      (GBL_SELF)                       GBL_NOEXCEPT;
 
 // ===== Instance Methods for Child Thread =====
 GBL_EXPORT GblThread*  GblThread_current     (void)                           GBL_NOEXCEPT;
+GBL_EXPORT GblThread*  GblThread_main        (void)                           GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblThread_yield       (void)                           GBL_NOEXCEPT;
 
@@ -133,7 +131,7 @@ GBL_EXPORT GBL_RESULT  GblThread_exit        (GBL_RESULT  result,
                                               const char* pMessage/*=NULL*/,
                                               const char* pFile   /*=NULL*/,
                                               const char* pFunc   /*=NULL*/,
-                                              GblSize     line    /*=0*/)     GBL_NOEXCEPT;
+                                              size_t      line    /*=0*/)     GBL_NOEXCEPT;
 
 // ===== Overloaded Function Macros =====
 #define                GblThread_create(...)    GBL_VA_OVERLOAD_CALL_ARGC(GblThread_create_, __VA_ARGS__)

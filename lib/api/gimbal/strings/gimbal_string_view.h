@@ -31,54 +31,54 @@ GBL_DECLS_BEGIN
  */
 typedef struct GblStringView {
     const char* pData;
-    GblSize     nullTerminated  : 1;
+    size_t      nullTerminated  : 1;
 #ifdef GBL_64BIT
-    GblSize     length          : 63;
+    size_t      length          : 63;
 #elif defined(GBL_32BIT)
-    GblSize     length          : 31;
+    size_t      length          : 31;
 #endif
 } GblStringView;
 
 GBL_INLINE GblStringView GblStringView_fromEmpty         (void)                                                 GBL_NOEXCEPT;
 GBL_INLINE GblStringView GblStringView_fromString        (const char* pString)                                  GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_fromStringSized   (const char* pData, GblSize length)                    GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_fromStringSized   (const char* pData, size_t  length)                    GBL_NOEXCEPT;
 GBL_INLINE GblStringView GblStringView_fromQuark         (GblQuark quark)                                       GBL_NOEXCEPT;
 GBL_INLINE int           GblStringView_compare           (GBL_VSELF, GblStringView other)                       GBL_NOEXCEPT;
 GBL_INLINE int           GblStringView_compareIgnoreCase (GBL_VSELF, GblStringView other)                       GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_equals            (GBL_VSELF, GblStringView other)                       GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_equalsIgnoreCase  (GBL_VSELF, GblStringView other)                       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblStringView_copy              (GBL_VSELF, void* pDst, GblSize offset, GblSize bytes) GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblStringView_copy              (GBL_VSELF, void* pDst, size_t  offset, size_t  bytes) GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_empty             (GBL_VSELF)                                            GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_blank             (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE char          GblStringView_at                (GBL_VSELF, GblSize index)                             GBL_NOEXCEPT;
+GBL_INLINE char          GblStringView_at                (GBL_VSELF, size_t  index)                             GBL_NOEXCEPT;
 GBL_INLINE char          GblStringView_first             (GBL_VSELF)                                            GBL_NOEXCEPT;
 GBL_INLINE char          GblStringView_last              (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_removePrefix      (GBL_VSELF, GblSize length)                            GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_removeSuffix      (GBL_VSELF, GblSize length)                            GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_removePrefix      (GBL_VSELF, size_t  length)                            GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_removeSuffix      (GBL_VSELF, size_t  length)                            GBL_NOEXCEPT;
 GBL_INLINE GblStringView GblStringView_chomp             (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_substr            (GBL_VSELF, GblSize offset, GblSize length)            GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_substr            (GBL_VSELF, size_t  offset, size_t  length)            GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_contains          (GBL_VSELF, GblStringView subStr)                      GBL_NOEXCEPT;
 //GBL_INLINE GblBool     GblStringView_containsIgnoreCase(GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblStringView_count             (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-//GBL_INLINE GblSize     GblStringView_countIgnoreCase   (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblStringView_find              (GBL_VSELF, GblStringView substr, GblSize offset)      GBL_NOEXCEPT;
-//GBL_INILNE GblSize     GblStringView_findIgnoreCase    (GBL_VSELF, GblStringView substr, GblSize offset)      GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblStringView_rfind             (GBL_VSELF, GblStringView substr, GblSize offset)      GBL_NOEXCEPT;
-//GBL_INLINE GblSize     GblStringView_rfindIgnoreCase   (GBL_VSELF, GblStringView substr, GblSize offset)      GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_count             (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
+//GBL_INLINE size_t      GblStringView_countIgnoreCase   (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_find              (GBL_VSELF, GblStringView substr, size_t  offset)      GBL_NOEXCEPT;
+//GBL_INILNE size_t      GblStringView_findIgnoreCase    (GBL_VSELF, GblStringView substr, size_t  offset)      GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_rfind             (GBL_VSELF, GblStringView substr, size_t  offset)      GBL_NOEXCEPT;
+//GBL_INLINE size_t      GblStringView_rfindIgnoreCase   (GBL_VSELF, GblStringView substr, size_t  offset)      GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_startsWith        (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
 //GBL_INLINE GblBool     GblStringView_startsWithIgnoreCase(GBL_VSELF, GblStringView substr)                    GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_endsWith          (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
 //GBL_INLINE GblBool     GblStringView_endsWithIgnoreCase(GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblStringView_findFirstOf       (GBL_VSELF, GblStringView chars, GblSize offset)       GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblStringView_findLastOf        (GBL_VSELF, GblStringView chars, GblSize end)          GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblStringView_findFirstNotOf    (GBL_VSELF, GblStringView chars, GblSize offset)       GBL_NOEXCEPT;
-GBL_INLINE GblSize       GblStringView_findLastNotOf     (GBL_VSELF, GblStringView chars, GblSize end)          GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_findFirstOf       (GBL_VSELF, GblStringView chars, size_t  offset)       GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_findLastOf        (GBL_VSELF, GblStringView chars, size_t  end)          GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_findFirstNotOf    (GBL_VSELF, GblStringView chars, size_t  offset)       GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_findLastNotOf     (GBL_VSELF, GblStringView chars, size_t  end)          GBL_NOEXCEPT;
 GBL_INLINE GblQuark      GblStringView_quark             (GBL_VSELF)                                            GBL_NOEXCEPT;
 GBL_INLINE GblQuark      GblStringView_quarkTry          (GBL_VSELF)                                            GBL_NOEXCEPT;
 GBL_INLINE const char*   GblStringView_intern            (GBL_VSELF)                                            GBL_NOEXCEPT;
 GBL_INLINE GblHash       GblStringView_hash              (GBL_VSELF)                                            GBL_NOEXCEPT;
 GBL_INLINE char*         GblStringView_strdup            (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE char*         GblStringView_toCString         (GBL_VSELF, char* pDest, GblSize destSize)             GBL_NOEXCEPT;
+GBL_INLINE char*         GblStringView_toCString         (GBL_VSELF, char* pDest, size_t  destSize)             GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_toNil             (GBL_VSELF)                                            GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_toBool            (GBL_VSELF)                                            GBL_NOEXCEPT;
 GBL_INLINE int           GblStringView_toInt             (GBL_VSELF)                                            GBL_NOEXCEPT;
@@ -105,7 +105,7 @@ GBL_INLINE GblStringView GblStringView_fromString(const char* pString) GBL_NOEXC
     return view;
 }
 
-GBL_INLINE GblStringView GblStringView_fromStringSized(const char* pString, GblSize length) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringView_fromStringSized(const char* pString, size_t  length) GBL_NOEXCEPT {
     GblStringView view = {
         .pData  = pString,
         .length = length
@@ -142,10 +142,10 @@ GBL_INLINE int GblStringView_compareIgnoreCase(GBL_VSELF, GblStringView other) G
     else GBL_LIKELY {
         char* pString1 = GBL_STRING_VIEW_CSTR_ALLOCA(self);
         char* pString2 = GBL_STRING_VIEW_CSTR_ALLOCA(other);
-        for(GblSize i = 0; i < self.length; ++i) {
+        for(size_t  i = 0; i < self.length; ++i) {
             pString1[i] = toupper(pString1[i]);
         }
-        for(GblSize i = 0; i < other.length; ++i) {
+        for(size_t  i = 0; i < other.length; ++i) {
             pString2[i] = toupper(pString2[i]);
         }
         return strcmp(pString1, pString2);
@@ -160,7 +160,7 @@ GBL_INLINE GblBool GblStringView_equalsIgnoreCase(GBL_VSELF, GblStringView other
     return GblStringView_compareIgnoreCase(self, other) == 0;
 }
 
-GBL_INLINE GBL_RESULT GblStringView_copy(GBL_VSELF, void* pDst, GblSize offset, GblSize bytes) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringView_copy(GBL_VSELF, void* pDst, size_t  offset, size_t  bytes) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_NULL);
     GBL_CTX_VERIFY_POINTER(pDst);
     GBL_CTX_VERIFY(offset + bytes < self.length,
@@ -180,7 +180,7 @@ GBL_INLINE GblBool GblStringView_blank(GBL_VSELF) GBL_NOEXCEPT {
     else return GblStringView_findFirstNotOf(self, GBL_STRING_VIEW(" \t\n\r"), 0) == GBL_STRING_VIEW_NPOS;
 }
 
-GBL_INLINE char GblStringView_at(GBL_VSELF, GblSize index) GBL_NOEXCEPT {
+GBL_INLINE char GblStringView_at(GBL_VSELF, size_t  index) GBL_NOEXCEPT {
     char value = '\0';
     if(index >= self.length) GBL_UNLIKELY {
         GBL_CTX_BEGIN(GBL_NULL);
@@ -213,7 +213,7 @@ GBL_INLINE char GblStringView_last(GBL_VSELF) GBL_NOEXCEPT {
     return value;
 }
 
-GBL_INLINE GblStringView GblStringView_removePrefix(GBL_VSELF, GblSize length) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringView_removePrefix(GBL_VSELF, size_t  length) GBL_NOEXCEPT {
     GblStringView view = {
         .pData          = GBL_NULL,
         .nullTerminated = 0,
@@ -230,7 +230,7 @@ GBL_INLINE GblStringView GblStringView_removePrefix(GBL_VSELF, GblSize length) G
     return view;
 }
 
-GBL_INLINE GblStringView GblStringView_removeSuffix(GBL_VSELF, GblSize length) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringView_removeSuffix(GBL_VSELF, size_t  length) GBL_NOEXCEPT {
     GblStringView view = {
         .pData          = GBL_NULL,
         .nullTerminated = 0,
@@ -247,13 +247,13 @@ GBL_INLINE GblStringView GblStringView_removeSuffix(GBL_VSELF, GblSize length) G
 }
 
 GBL_INLINE GblStringView GblStringView_chomp(GBL_VSELF) GBL_NOEXCEPT {
-    GblSize subStrLen = self.length;
+    size_t  subStrLen = self.length;
     if(self.length && self.pData[self.length-1] == '\n') --subStrLen;
     if(self.length >= 2 && self.pData[self.length-2] == '\r') --subStrLen;
     return GblStringView_substr(self, 0, subStrLen);
 }
 
-GBL_INLINE GblStringView GblStringView_substr(GBL_VSELF, GblSize offset, GblSize length) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringView_substr(GBL_VSELF, size_t  offset, size_t  length) GBL_NOEXCEPT {
     GblStringView view = {
         .pData          = GBL_NULL,
         .nullTerminated = 0,
@@ -281,9 +281,9 @@ GBL_INLINE GblBool GblStringView_contains(GBL_VSELF, GblStringView substr) GBL_N
     return result;
 }
 
-GBL_INLINE GblSize GblStringView_count(GBL_VSELF, GblStringView substr) GBL_NOEXCEPT {
-    GblSize count = 0;
-    GblSize offset = 0;
+GBL_INLINE size_t  GblStringView_count(GBL_VSELF, GblStringView substr) GBL_NOEXCEPT {
+    size_t  count = 0;
+    size_t  offset = 0;
     while((offset = GblStringView_find(self, substr, offset)) != GBL_STRING_VIEW_NPOS) {
         ++count;
         offset += substr.length;
@@ -292,8 +292,8 @@ GBL_INLINE GblSize GblStringView_count(GBL_VSELF, GblStringView substr) GBL_NOEX
     return count;
 }
 
-GBL_INLINE GblSize GblStringView_find(GBL_VSELF, GblStringView substr, GblSize offset) GBL_NOEXCEPT {
-    GblSize pos = GBL_STRING_VIEW_NPOS;
+GBL_INLINE size_t  GblStringView_find(GBL_VSELF, GblStringView substr, size_t  offset) GBL_NOEXCEPT {
+    size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(NULL);
     if(!self.length && !offset) GBL_CTX_DONE();
     GBL_CTX_VERIFY(offset < self.length,
@@ -303,15 +303,15 @@ GBL_INLINE GblSize GblStringView_find(GBL_VSELF, GblStringView substr, GblSize o
         const char* pCStr2  = GBL_STRING_VIEW_CSTR(substr);
         const char* pSubstr = strstr(pCStr1+offset, pCStr2);
         if(pSubstr) {
-            pos = (GblSize)(pSubstr - pCStr1);
+            pos = (size_t )(pSubstr - pCStr1);
         }
     }
     GBL_CTX_END_BLOCK();
     return pos;
 }
 
-GBL_INLINE GblSize GblStringView_rfind(GBL_VSELF, GblStringView substr, GblSize end) GBL_NOEXCEPT {
-    GblSize pos = GBL_STRING_VIEW_NPOS;
+GBL_INLINE size_t  GblStringView_rfind(GBL_VSELF, GblStringView substr, size_t  end) GBL_NOEXCEPT {
+    size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(NULL);
     if(!self.length && end == GBL_STRING_VIEW_NPOS)
         GBL_CTX_DONE();
@@ -322,19 +322,19 @@ GBL_INLINE GblSize GblStringView_rfind(GBL_VSELF, GblStringView substr, GblSize 
         char* pCStr1 = (char*)GBL_ALLOCA(end + 2);
         char* pCStr2 = (char*)GBL_ALLOCA(substr.length + 1);
 
-        for(GblSize i = end+1; i > 0; --i) {
+        for(size_t  i = end+1; i > 0; --i) {
             pCStr1[i-1] = self.pData[end+1 - i];
         }
         pCStr1[end+1] = '\0';
 
-        for(GblSize i = substr.length; i > 0; --i) {
+        for(size_t  i = substr.length; i > 0; --i) {
             pCStr2[i-1] = substr.pData[substr.length - i];
         }
         pCStr2[substr.length] = '\0';
 
         const char* pSubstr = strstr(pCStr1, pCStr2);
         if(pSubstr) {
-            pos = end-(GblSize)(pSubstr - pCStr1)-(substr.length-1);
+            pos = end-(size_t )(pSubstr - pCStr1)-(substr.length-1);
         }
     }
     GBL_CTX_END_BLOCK();
@@ -344,7 +344,7 @@ GBL_INLINE GblSize GblStringView_rfind(GBL_VSELF, GblStringView substr, GblSize 
 GBL_INLINE GblBool GblStringView_startsWith(GBL_VSELF, GblStringView substr) GBL_NOEXCEPT {
     if(substr.length > self.length)
         return GBL_FALSE;
-    for(GblSize i = 0; i < substr.length; ++i) {
+    for(size_t  i = 0; i < substr.length; ++i) {
         if(self.pData[i] != substr.pData[i])
             return GBL_FALSE;
     }
@@ -354,20 +354,20 @@ GBL_INLINE GblBool GblStringView_startsWith(GBL_VSELF, GblStringView substr) GBL
 GBL_INLINE GblBool GblStringView_endsWith(GBL_VSELF, GblStringView substr) GBL_NOEXCEPT {
     if(substr.length > self.length)
         return GBL_FALSE;
-    for(GblSize i = 0; i < substr.length; ++i) {
+    for(size_t  i = 0; i < substr.length; ++i) {
         if(self.pData[self.length-substr.length+i] != substr.pData[i])
             return GBL_FALSE;
     }
     return GBL_TRUE;
 }
 
-GBL_INLINE GblSize GblStringView_findFirstOf(GBL_VSELF, GblStringView chars, GblSize offset) GBL_NOEXCEPT {
-    GblSize pos = GBL_STRING_VIEW_NPOS;
+GBL_INLINE size_t  GblStringView_findFirstOf(GBL_VSELF, GblStringView chars, size_t  offset) GBL_NOEXCEPT {
+    size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(GBL_NULL);
     GBL_CTX_VERIFY(offset < self.length || (!self.length && !offset),
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
-    for(GblSize i = offset; i < self.length; ++i) {
-        for(GblSize c = 0; c < chars.length; ++c) {
+    for(size_t  i = offset; i < self.length; ++i) {
+        for(size_t  c = 0; c < chars.length; ++c) {
             if(self.pData[i] == chars.pData[c]) {
                 pos = i;
                 GBL_CTX_DONE();
@@ -378,8 +378,8 @@ GBL_INLINE GblSize GblStringView_findFirstOf(GBL_VSELF, GblStringView chars, Gbl
     return pos;
 }
 
-GBL_INLINE GblSize GblStringView_findLastOf(GBL_VSELF, GblStringView chars, GblSize end) GBL_NOEXCEPT {
-    GblSize pos = GBL_STRING_VIEW_NPOS;
+GBL_INLINE size_t  GblStringView_findLastOf(GBL_VSELF, GblStringView chars, size_t  end) GBL_NOEXCEPT {
+    size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(GBL_NULL);
     if(!self.length && (!end || end == GBL_STRING_VIEW_NPOS)) {
         GBL_CTX_DONE();
@@ -387,8 +387,8 @@ GBL_INLINE GblSize GblStringView_findLastOf(GBL_VSELF, GblStringView chars, GblS
     if(end == GBL_STRING_VIEW_NPOS) end = self.length-1;
     GBL_CTX_VERIFY(end < self.length,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
-    for(GblSize i = end+1; i >= 1; --i) {
-        for(GblSize c = 0; c < chars.length; ++c) {
+    for(size_t  i = end+1; i >= 1; --i) {
+        for(size_t  c = 0; c < chars.length; ++c) {
             if(self.pData[i-1] == chars.pData[c]) {
                 pos = i-1;
                 GBL_CTX_DONE();
@@ -399,17 +399,17 @@ GBL_INLINE GblSize GblStringView_findLastOf(GBL_VSELF, GblStringView chars, GblS
     return pos;
 }
 
-GBL_INLINE GblSize GblStringView_findFirstNotOf(GBL_VSELF, GblStringView chars, GblSize offset) GBL_NOEXCEPT {
-    GblSize pos = GBL_STRING_VIEW_NPOS;
+GBL_INLINE size_t  GblStringView_findFirstNotOf(GBL_VSELF, GblStringView chars, size_t  offset) GBL_NOEXCEPT {
+    size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(GBL_NULL);
     GBL_CTX_VERIFY(offset < self.length || (!self.length && !offset),
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
     if(!chars.length) {
         pos = 0;
     } else {
-        for(GblSize i = 0; i < self.length; ++i) {
+        for(size_t  i = 0; i < self.length; ++i) {
             GblBool found = GBL_FALSE;
-            for(GblSize c = 0; c < chars.length; ++c) {
+            for(size_t  c = 0; c < chars.length; ++c) {
                 if(self.pData[i] == chars.pData[c]) {
                     found = GBL_TRUE;
                     break;
@@ -425,8 +425,8 @@ GBL_INLINE GblSize GblStringView_findFirstNotOf(GBL_VSELF, GblStringView chars, 
     return pos;
 }
 
-GBL_INLINE GblSize GblStringView_findLastNotOf(GBL_VSELF, GblStringView chars, GblSize end) GBL_NOEXCEPT {
-    GblSize pos = GBL_STRING_VIEW_NPOS;
+GBL_INLINE size_t  GblStringView_findLastNotOf(GBL_VSELF, GblStringView chars, size_t  end) GBL_NOEXCEPT {
+    size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(GBL_NULL);
     if(!self.length && (!end || end == GBL_STRING_VIEW_NPOS)) {
         GBL_CTX_DONE();
@@ -434,9 +434,9 @@ GBL_INLINE GblSize GblStringView_findLastNotOf(GBL_VSELF, GblStringView chars, G
     if(end == GBL_STRING_VIEW_NPOS) end = self.length-1;
     GBL_CTX_VERIFY(end < self.length,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
-    for(GblSize i = end+1; i >= 1; --i) {
+    for(size_t  i = end+1; i >= 1; --i) {
         GblBool found = GBL_FALSE;
-        for(GblSize c = 0; c < chars.length; ++c) {
+        for(size_t  c = 0; c < chars.length; ++c) {
             if(self.pData[i-1] == chars.pData[c]) {
                 found = GBL_TRUE;
                 break;
@@ -477,9 +477,9 @@ GBL_INLINE char* GblStringView_strdup(GBL_VSELF) GBL_NOEXCEPT {
     return pStr;
 }
 
-GBL_INLINE char* GblStringView_toCString(GBL_VSELF, char* pDst, GblSize destSize) GBL_NOEXCEPT {
+GBL_INLINE char* GblStringView_toCString(GBL_VSELF, char* pDst, size_t  destSize) GBL_NOEXCEPT {
     if(!destSize) return GBL_NULL;
-    GblSize length = destSize-1 < self.length? destSize-1 : self.length;
+    size_t  length = destSize-1 < self.length? destSize-1 : self.length;
     memcpy(pDst, self.pData, length);
     pDst[length] = '\0';
     return pDst;

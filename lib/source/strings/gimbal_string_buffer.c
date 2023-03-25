@@ -2,9 +2,9 @@
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, const char* pFmt, va_list varArgs) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GblSize newCapacity = 0;
+    size_t  newCapacity = 0;
     size_t expectedSize = 0;
-    GblSize originalSize = 0;
+    size_t  originalSize = 0;
     va_list varArgsCopy;
 
     GBL_CTX_VERIFY_POINTER(pFmt);
@@ -50,16 +50,16 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_remove(GblStringBuffer* pSelf, GblStringVi
     while(1) {
         const char* pLoc = strstr(GblStringBuffer_cString(pSelf), pNeedle);
         if(pLoc) {
-            GblSize offset = pLoc - GblStringBuffer_cString(pSelf);
+            size_t  offset = pLoc - GblStringBuffer_cString(pSelf);
             GBL_CTX_CALL(GblStringBuffer_erase(pSelf, offset, view.length));
         } else break;
     }
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_replace(GblStringBuffer* pSelf, GblStringView substr, GblStringView replacement, GblSize limit) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblStringBuffer_replace(GblStringBuffer* pSelf, GblStringView substr, GblStringView replacement, size_t  limit) GBL_NOEXCEPT {
     const char* pNeedle = NULL;
-    GblSize iterations = 0;
+    size_t  iterations = 0;
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     GBL_CTX_VERIFY_POINTER(substr.pData);
     GBL_CTX_VERIFY_POINTER(replacement.pData);
@@ -68,7 +68,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_replace(GblStringBuffer* pSelf, GblStringV
     while(iterations < limit) {
         const char* pLoc = strstr(GblStringBuffer_cString(pSelf), pNeedle);
         if(pLoc) {
-          GblSize offset = pLoc - GblStringBuffer_cString(pSelf);
+          size_t  offset = pLoc - GblStringBuffer_cString(pSelf);
           GBL_CTX_CALL(GblStringBuffer_erase(pSelf, offset, substr.length));
           GBL_CTX_CALL(GblStringBuffer_insert(pSelf, offset, replacement));
           ++iterations;
@@ -79,7 +79,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_replace(GblStringBuffer* pSelf, GblStringV
 
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_chomp(GblStringBuffer* pSelf) GBL_NOEXCEPT {
-    const GblSize len = GblStringBuffer_length(pSelf);
+    const size_t  len = GblStringBuffer_length(pSelf);
     const char* pCStr = GblStringBuffer_cString(pSelf);
     unsigned chopCount = 0;
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
@@ -95,33 +95,33 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_chomp(GblStringBuffer* pSelf) GBL_NOEXCEPT
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_padLeft(GblStringBuffer* pSelf, char value, GblSize count) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblStringBuffer_padLeft(GblStringBuffer* pSelf, char value, size_t  count) GBL_NOEXCEPT {
     const GblStringView view = {
         .pData          = &value,
         .nullTerminated = 0,
         .length         = 1
     };
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    for(GblSize i = 0; i < count; ++i)
+    for(size_t  i = 0; i < count; ++i)
         GBL_CTX_VERIFY_CALL(GblStringBuffer_prepend(pSelf, view));
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_padRight(GblStringBuffer* pSelf, char value, GblSize count) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblStringBuffer_padRight(GblStringBuffer* pSelf, char value, size_t  count) GBL_NOEXCEPT {
     const GblStringView view = {
         .pData          = &value,
         .nullTerminated = 0,
         .length         = 1
     };
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    for(GblSize i = 0; i < count; ++i)
+    for(size_t  i = 0; i < count; ++i)
         GBL_CTX_VERIFY_CALL(GblStringBuffer_append(pSelf, view));
     GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_trimStart(GblStringBuffer* pSelf, char value) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GblSize count = 0;
+    size_t  count = 0;
 
     while(GblStringBuffer_length(pSelf) > count &&
           GblStringBuffer_char(pSelf, count) == value) {
@@ -136,7 +136,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_trimStart(GblStringBuffer* pSelf, char val
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_trimEnd(GblStringBuffer* pSelf, char value) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GblSize count = 0;
+    size_t  count = 0;
 
     while(GblStringBuffer_length(pSelf) > count &&
           GblStringBuffer_char(pSelf, GblStringBuffer_length(pSelf)-1-count) == value) {

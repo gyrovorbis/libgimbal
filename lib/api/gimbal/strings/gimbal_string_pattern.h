@@ -24,7 +24,7 @@ GBL_INLINE GblBool GblStringPattern_matchHere_(const char* pRegExp, const char* 
 /* matchplus: search for c*pRegExp at beginning of text */
 GBL_INLINE GblBool GblStringPattern_matchQuestion_(int c, const char *pRegExp, const char* pText) GBL_NOEXCEPT {
     GBL_UNUSED(pRegExp);
-    GblSize matchCount = 0;
+    size_t  matchCount = 0;
     do {    /* a * matches zero or 1 instances */
       //if (GblStringPattern_matchHere_(pRegExp, pText))
           if(++matchCount >= 2) return GBL_FALSE;
@@ -34,7 +34,7 @@ GBL_INLINE GblBool GblStringPattern_matchQuestion_(int c, const char *pRegExp, c
 
 /* matchplus: search for c*pRegExp at beginning of text */
 GBL_INLINE GblBool GblStringPattern_matchPlus_(int c, const char *pRegExp, const char* pText) GBL_NOEXCEPT {
-    GblSize matchCount = 0;
+    size_t  matchCount = 0;
     do {    /* a * matches one or more instances */
       if (GblStringPattern_matchHere_(pRegExp, pText))
           if(++matchCount >= 2) return GBL_TRUE;

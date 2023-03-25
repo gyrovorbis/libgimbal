@@ -13,11 +13,11 @@ uint8_t GblBitView_msbMaskLut_[8] = {
     0x1f, 0x3f, 0x7f, 0xff
 };
 
-GBL_EXPORT const char* (GblBitView_string)(const GblBitView* pSelf, GblStringBuffer* pBuffer, GblSize index, GblSize count) {
+GBL_EXPORT const char* (GblBitView_string)(const GblBitView* pSelf, GblStringBuffer* pBuffer, size_t  index, size_t  count) {
     if(!count) count = pSelf->length;
 
     GblStringBuffer_reserve(pBuffer, count);
-    for(GblSize i = 0; i < count; ++i) {
+    for(size_t  i = 0; i < count; ++i) {
        const GblBool value = GblBitView_at(pSelf, index + i);
        GblStringBuffer_append(pBuffer, value? GBL_STRV("1") : GBL_STRV("0"));
     }

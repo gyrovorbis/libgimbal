@@ -49,7 +49,7 @@ GBL_EXPORT GblRefCount GblStringRef_release(const GblStringRef* pSelf) GBL_NOEXC
     return count;
 }
 
-GBL_EXPORT char GblStringRef_at(const GblStringRef* pSelf, GblSize index) GBL_NOEXCEPT {
+GBL_EXPORT char GblStringRef_at(const GblStringRef* pSelf, size_t  index) GBL_NOEXCEPT {
     char value = '\0';
     GBL_CTX_BEGIN(GblStringRef_context(pSelf));
     GBL_CTX_VERIFY(index < GblStringRef_length(pSelf),

@@ -41,18 +41,18 @@ GBL_INSTANCE_END
 
 GBL_EXPORT GblType     GblScanner_type           (void);
 
-GBL_EXPORT GblScanner* GblScanner_create         (const char* pString, GblSize length);
+GBL_EXPORT GblScanner* GblScanner_create         (const char* pString, size_t  length);
 GBL_EXPORT GblRefCount GblScanner_unref          (GBL_SELF);
 
-GBL_EXPORT GBL_RESULT  GblScanner_setInputString (GBL_SELF, const char* pString, GblSize length);
+GBL_EXPORT GBL_RESULT  GblScanner_setInputString (GBL_SELF, const char* pString, size_t  length);
 GBL_EXPORT void        GblScanner_setDelimeters  (GBL_SELF, const char* pDelimeters);
 
 GBL_EXPORT void        GblScanner_raise          (GBL_SELF, GBL_RESULT error, const char* pDetails, ...);
 GBL_EXPORT GBL_RESULT  GblScanner_reset          (GBL_SELF);
 GBL_EXPORT GBL_RESULT  GblScanner_seek           (GBL_SELF, intptr_t offset);
-GBL_EXPORT GblSize     GblScanner_tell           (GBL_CSELF);
-GBL_EXPORT GblSize     GblScanner_bytesTotal     (GBL_CSELF);
-GBL_EXPORT GblSize     GblScanner_bytesLeft      (GBL_CSELF);
+GBL_EXPORT size_t      GblScanner_tell           (GBL_CSELF);
+GBL_EXPORT size_t      GblScanner_bytesTotal     (GBL_CSELF);
+GBL_EXPORT size_t      GblScanner_bytesLeft      (GBL_CSELF);
 GBL_EXPORT GblBool     GblScanner_eof            (GBL_CSELF);
 
 GBL_EXPORT GblBool     GblScanner_peekNext       (GBL_SELF);

@@ -30,9 +30,9 @@ static const char c_time_strings_[] =
 /* 0x22 */  "September\0" "October\0" "November\0" "December\0"
 /* 0x26 */  "AM\0" "PM\0";
 
-static const char* get_ctime_string_(GblSize entry) {
+static const char* get_ctime_string_(size_t  entry) {
     const char* pStr = c_time_strings_;
-    for (GblSize idx = entry; idx; idx--, pStr++) for (; *pStr; pStr++);
+    for (size_t  idx = entry; idx; idx--, pStr++) for (; *pStr; pStr++);
     return pStr;
 }
 
@@ -258,26 +258,14 @@ static long long diff_tm_(struct tm *a, struct tm *b) {
             + 60LL*(a->tm_min - b->tm_min)
             + 3600LL*(a->tm_hour - b->tm_hour)
             + 86400LL*(a->tm_yday - b->tm_yday)
-            + (a->tm_year-70)*31536000LL
-            - (a->tm_year-69)/4*86400LL
-            + (a->tm_year-1)/100*86400LL
-            - (a->tm_year+299)/400*86400LL
-            - (b->tm_year-70)*31536000LL
-            + (b->tm_year-69)/4*86400LL
-            - (b->tm_year-1)/100*86400LL
-            + (b->tm_year+299)/400*86400LL;
-}
-
-static time_t add_tm_(struct tm* pLhs, struct tm* pRhs) {
-    pLhs->tm_year += pRhs->tm_year;
-    pLhs->tm_mon  += pRhs->tm_mon;
-    pLhs->tm_yday += pRhs->tm_yday;
-    pLhs->tm_mday += pRhs->tm_mday;
-    pLhs->tm_wday += pRhs->tm_wday;
-    pLhs->tm_hour += pRhs->tm_hour;
-    pLhs->tm_min  += pRhs->tm_min;
-    pLhs->tm_sec  += pRhs->tm_sec;
-    return mktime(pLhs);
+            + (a->tm_year-70) * 31536000LL
+            - (a->tm_year-69) / 4 * 86400LL
+            + (a->tm_year-1) / 100 * 86400LL
+            - (a->tm_year+299) / 400 * 86400LL
+            - (b->tm_year-70) * 31536000LL
+            + (b->tm_year-69) / 4 * 86400LL
+            - (b->tm_year-1) / 100 * 86400LL
+            + (b->tm_year+299) / 400 * 86400LL;
 }
 
 /*
@@ -323,9 +311,11 @@ static long long timezone_delta_secs_(void) {
     return result;
 }
 
-static struct tm* now_tm_(void) {
-    time_t now = time(&now);
-    return localtime(&now);
+static struct tm* now_tm_(GblNanoSecond* pNSecs) {
+    GblTimeSpec spec;
+    timespec_get(&spec, TIME_UTC);
+    if(pNSecs) *pNSecs = spec.tv_nsec;
+    return localtime(&spec.tv_sec);
 }
 
 static time_t toBrokenDown_(const GblDateTime* pSelf, struct tm* pBrokenDown) {
@@ -341,12 +331,13 @@ static time_t toBrokenDown_(const GblDateTime* pSelf, struct tm* pBrokenDown) {
 }
 
 GBL_EXPORT void fromBrokenDown_(GblDateTime* pSelf, const struct tm* pBrokenDown)  {
-    pSelf->date.year    = pBrokenDown->tm_year + GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST;
-    pSelf->date.month   = pBrokenDown->tm_mon - GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET;
-    pSelf->date.day     = pBrokenDown->tm_mday;
-    pSelf->time.hours   = pBrokenDown->tm_hour;
-    pSelf->time.minutes = pBrokenDown->tm_min;
-    pSelf->time.seconds = pBrokenDown->tm_sec;
+    pSelf->date.year     = pBrokenDown->tm_year + GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST;
+    pSelf->date.month    = pBrokenDown->tm_mon - GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET;
+    pSelf->date.day      = pBrokenDown->tm_mday;
+    pSelf->time.hours    = pBrokenDown->tm_hour;
+    pSelf->time.minutes  = pBrokenDown->tm_min;
+    pSelf->time.seconds  = pBrokenDown->tm_sec;
+    pSelf->time.nSeconds = 0;
 }
 
 GBL_EXPORT const char* GblDate_monthStr(GblMonth month) {
@@ -412,7 +403,20 @@ GBL_EXPORT GblDateTime* GblDateTime_fromUnix(GblDateTime* pSelf, const time_t ep
         FAIL_RETURN_NULL_();
 
     fromBrokenDown_(pSelf, pLocal);
+    pSelf->time.nSeconds = 0;
     pSelf->utcOffset = 0.0;
+    return pSelf;
+}
+
+GBL_EXPORT GblDateTime* GblDateTime_fromSpecUtc(GblDateTime* pSelf,
+                                                const GblTimeSpec* pSpec)
+{
+    GblDateTime* pDt = GblDateTime_fromUnix(pSelf, pSpec->tv_sec);
+
+    if(!pDt)
+        FAIL_RETURN_NULL_();
+
+    pDt->time.nSeconds = pSpec->tv_nsec;
 
     return pSelf;
 }
@@ -424,6 +428,7 @@ GBL_EXPORT GblDateTime* GblDateTime_fromLocal(GblDateTime* pSelf, const struct t
         FAIL_RETURN_NULL_();
 
     fromBrokenDown_(pSelf, &temp);
+    pSelf->time.nSeconds = 0;
     pSelf->utcOffset = GblTime_localUtcOffset();
 
     return pSelf;
@@ -442,11 +447,11 @@ GBL_EXPORT GblDateTime* GblDateTime_fromUtc(GblDateTime* pSelf, const struct tm*
 }
 
 GBL_EXPORT GblDateTime* GblDateTime_nowLocal(GblDateTime* pSelf) {
-    return GblDateTime_fromLocal(pSelf, now_tm_());
+    return GblDateTime_fromLocal(pSelf, now_tm_(&pSelf->time.nSeconds));
 }
 
 GBL_EXPORT GblDateTime* GblDateTime_nowUtc(GblDateTime* pSelf) {
-    struct tm bdTime = *now_tm_();
+    struct tm bdTime = *now_tm_(&pSelf->time.nSeconds);
     bdTime.tm_sec -= GblTime_localUtcOffset();
     return GblDateTime_fromUtc(pSelf, &bdTime);
 }
@@ -475,6 +480,15 @@ GBL_EXPORT GBL_RESULT GblDateTime_toUtc(const GblDateTime* pSelf, struct tm* pBr
         return GBL_RESULT_ERROR_INVALID_DATE_TIME;
 
     return GBL_RESULT_SUCCESS;
+}
+
+GBL_EXPORT GblTimeSpec GblDateTime_toSpecUtc(const GblDateTime* pSelf) {
+    GblTimeSpec spec = {
+        .tv_sec  = GblDateTime_toUnix(pSelf),
+        .tv_nsec = pSelf->time.nSeconds
+    };
+
+    return spec;
 }
 
 GBL_EXPORT const char* GblDateTime_toIso8601(const GblDateTime* pSelf, GblStringBuffer* pBuffer) {
@@ -548,39 +562,57 @@ GBL_EXPORT GblDateTime* GblDateTime_normalize(GblDateTime* pSelf) {
         pSelf->date.day = 1;
     if(pSelf->date.year < GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN)
         pSelf->date.year = GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN;
+    if(abs(pSelf->time.nSeconds) > GBL_TIME_NSECS_PER_SEC) {
+        pSelf->time.seconds  += pSelf->time.nSeconds / GBL_TIME_NSECS_PER_SEC;
+        pSelf->time.nSeconds %= GBL_TIME_NSECS_PER_SEC;
+    }
+    const GblNanoSecond ns = pSelf->time.nSeconds;
 
     if(toBrokenDown_(pSelf, &bTime) == (time_t)-1)
         goto fail;
 
     fromBrokenDown_(pSelf, &bTime);
+    pSelf->time.nSeconds = ns;
     return pSelf;
 fail:
     FAIL_RETURN_NULL_();
 }
 
-GBL_EXPORT int64_t GblDateTime_diff(const GblDateTime* pSelf, const GblDateTime* pRhs) {
-    time_t unix1 = GblDateTime_toUnix(pSelf);
-    time_t unix2 = GblDateTime_toUnix(pRhs);
+GBL_EXPORT GblTimeSpec GblDateTime_diff(const GblDateTime* pSelf, const GblDateTime* pRhs) {
+    GblTimeSpec spec1 = {
+        .tv_sec  = GblDateTime_toUnix(pSelf),
+        .tv_nsec = pSelf->time.nSeconds
+    };
 
-    if(unix1 == (time_t)-1 && unix2 == (time_t)-1)
-        return 0;
+    GblTimeSpec spec2 = {
+        .tv_sec  = GblDateTime_toUnix(pRhs),
+        .tv_nsec = pSelf->time.nSeconds
+    };
 
-    if(unix1 == (time_t)-1 || unix2 == (time_t)-1)
-        return -1;
+    GblTimeSpec spec = { 0 };
 
-    return difftime(unix1, unix2);
+    if(spec1.tv_sec == (time_t)-1 && spec2.tv_sec == (time_t)-1)
+        return spec;
+
+    if(spec1.tv_sec == (time_t)-1 || spec2.tv_sec == (time_t)-1) {
+        spec.tv_sec = -1;
+        return spec;
+    }
+
+    return GblTime_specDiff(&spec1, &spec2);
 }
 
 GBL_EXPORT GblDateTime* GblDateTime_add(GblDateTime* pSelf, const GblDateTime* pRhs) {
     if(!pSelf || !pRhs) FAIL_RETURN_NULL_();
 
-    pSelf->date.year    += pRhs->date.year,
-    pSelf->date.month   += pRhs->date.month,
-    pSelf->date.day     += pRhs->date.day;
-    pSelf->time.hours   += pRhs->time.hours,
-    pSelf->time.minutes += pRhs->time.minutes,
-    pSelf->time.seconds += pRhs->time.seconds;
-    pSelf->utcOffset    += pRhs->utcOffset;
+    pSelf->date.year     += pRhs->date.year,
+    pSelf->date.month    += pRhs->date.month,
+    pSelf->date.day      += pRhs->date.day;
+    pSelf->time.hours    += pRhs->time.hours,
+    pSelf->time.minutes  += pRhs->time.minutes,
+    pSelf->time.seconds  += pRhs->time.seconds;
+    pSelf->time.nSeconds += pRhs->time.nSeconds;
+    pSelf->utcOffset     += pRhs->utcOffset;
 
     return GblDateTime_normalize(pSelf);
 }
@@ -618,7 +650,17 @@ GBL_EXPORT GblDateTime* GblDateTime_addSeconds(GblDateTime* pSelf, GblSecond sec
             .seconds = seconds
         }
     };
-    return GblDateTime_add(pSelf, &rhs);}
+    return GblDateTime_add(pSelf, &rhs);
+}
+
+GBL_EXPORT GblDateTime* GblDateTime_addNanoSecs(GblDateTime* pSelf, GblNanoSecond nSecs) {
+    const GblDateTime rhs = {
+        .time = {
+            .nSeconds = nSecs
+        }
+    };
+    return GblDateTime_add(pSelf, &rhs);
+}
 
 GBL_EXPORT GblDateTime* GblDateTime_addWeeks(GblDateTime* pSelf, int weeks) {
     const GblDateTime rhs = {

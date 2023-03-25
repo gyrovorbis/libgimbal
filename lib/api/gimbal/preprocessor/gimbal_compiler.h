@@ -300,18 +300,18 @@
 #endif
 
 #if defined(_MSC_VER) || defined(__MINGW64__)
-#       define GBL_ALIGNED_ALLOC(a, s)      _aligned_malloc(s, a)
-#       define GBL_ALIGNED_REALLOC(p, a, s) _aligned_realloc(p, s, a)
-#       define GBL_ALIGNED_FREE(p)          _aligned_free(p)
+#   define GBL_ALIGNED_ALLOC(a, s)      _aligned_malloc(s, a)
+#   define GBL_ALIGNED_REALLOC(p, a, s) _aligned_realloc(p, s, a)
+#   define GBL_ALIGNED_FREE(p)          _aligned_free(p)
 #elif defined(__MINGW32__)
-#       define GBL_ALIGNED_ALLOC(a, s)      __mingw_aligned_malloc(s, a)
-#       define GBL_ALIGNED_REALLOC(p, a, s) __mingw_aligned_realloc(p, s, a)
-#       define GBL_ALIGNED_FREE(p)          __mingw_aligned_free(p)
+#   define GBL_ALIGNED_ALLOC(a, s)      __mingw_aligned_malloc(s, a)
+#   define GBL_ALIGNED_REALLOC(p, a, s) __mingw_aligned_realloc(p, s, a)
+#   define GBL_ALIGNED_FREE(p)          __mingw_aligned_free(p)
 #elif defined(GBL_C_11) || defined(GBL_CPP_17)
-#       include <stdlib.h>
-#       define GBL_ALIGNED_ALLOC(a, s)      aligned_alloc(a, s)
-#       define GBL_ALIGNED_REALLOC(p, a, s) realloc(p, s)
-#       define GBL_ALIGNED_FREE(p)          free(p)
+#   include <stdlib.h>
+#   define GBL_ALIGNED_ALLOC(a, s)      aligned_alloc(a, s)
+#   define GBL_ALIGNED_REALLOC(p, a, s) realloc(p, s)
+#   define GBL_ALIGNED_FREE(p)          free(p)
 #endif
 
 #if GBL_CONFIG_PREFETCH_ENABLED
@@ -388,7 +388,6 @@
 #   endif
 #   define GBL_ALLOCA alloca
 #endif
-
 
 #if __APPLE__  // at very least fucking MacOS headers are missing it!
 #   define GBL_QUICK_EXIT(c) exit(c)

@@ -37,7 +37,7 @@ GBL_DECLARE_ENUM(GBL_PROPERTY_FLAG) {
 };
 
 GBL_CLASS_DERIVE(GblProperty, GblBox)
-    GBL_RESULT (*pFnInitOptionalArgs)(GBL_SELF, GblSize argCount, va_list* pVaList);
+    GBL_RESULT (*pFnInitOptionalArgs)(GBL_SELF, size_t  argCount, va_list* pVaList);
     GBL_RESULT (*pFnDefaultValue)    (GBL_CSELF, GblVariant* pValue);
     GBL_RESULT (*pFnCheckValue)      (GBL_CSELF, const GblVariant* pValue);
     GBL_RESULT (*pFnValidateValue)   (GBL_CSELF, GblVariant* pValue);
@@ -50,7 +50,7 @@ GBL_INSTANCE_DERIVE(GblProperty, GblBox)
         GblType      objectType;
     GBL_PRIVATE_END
     GblQuark    name;
-    GblSize     id;
+    size_t      id;
     GblFlags    flags;
     GblType     valueType;
 GBL_INSTANCE_END
@@ -63,14 +63,14 @@ GBL_INSTANCE_END
 // ===== STATICS =====
 
 GBL_EXPORT GblType      GblProperty_type           (void)                                  GBL_NOEXCEPT;
-GBL_EXPORT GblSize      GblProperty_totalCount     (void)                                  GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblProperty_totalCount     (void)                                  GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblProperty_install        (GblType objType, GblProperty* pProp)   GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblProperty_uninstall      (GblType objType, const char* pName)    GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblProperty_uninstallQuark (GblType objType, GblQuark name)        GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblProperty_uninstallAll   (GblType objType)                       GBL_NOEXCEPT;
 
-GBL_EXPORT GblSize      GblProperty_count          (GblType objectType)                    GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblProperty_count          (GblType objectType)                    GBL_NOEXCEPT;
 GBL_EXPORT GblFlags     GblProperty_combinedFlags  (GblType objectType)                    GBL_NOEXCEPT;
 
 GBL_EXPORT const GblProperty*
@@ -89,32 +89,32 @@ GBL_EXPORT GblBool      GblProperty_foreach        (GblType            objectTyp
 
 GBL_EXPORT GblProperty* GblProperty_create         (GblType     derivedType,
                                                     const char* pName,
-                                                    GblSize     id,
+                                                    size_t      id,
                                                     GblFlags    flags,
-                                                    GblSize     optionalArgCount,
+                                                    size_t      optionalArgCount,
                                                     ...)                                   GBL_NOEXCEPT;
 
 GBL_EXPORT GblProperty* GblProperty_createVaList   (GblType     derivedType,
                                                     const char* pName,
-                                                    GblSize     id,
+                                                    size_t      id,
                                                     GblFlags    flags,
-                                                    GblSize     optionalArgCount,
+                                                    size_t      optionalArgCount,
                                                     va_list*    pList)                     GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblProperty_construct      (GBL_SELF,
                                                     GblType     derivedType,
                                                     const char* pName,
-                                                    GblSize     id,
+                                                    size_t      id,
                                                     GblFlags    flags,
-                                                    GblSize     optionalArgCount,
+                                                    size_t      optionalArgCount,
                                                     ...)                                   GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblProperty_constructVaList(GBL_SELF,
                                                     GblType     derivedType,
                                                     const char* pName,
-                                                    GblSize     id,
+                                                    size_t      id,
                                                     GblFlags    flags,
-                                                    GblSize     optionalArgCount,
+                                                    size_t      optionalArgCount,
                                                     va_list*    pList)                     GBL_NOEXCEPT;
 
 GBL_INLINE GblType      GblProperty_objectType     (GBL_CSELF)                             GBL_NOEXCEPT;
@@ -140,9 +140,9 @@ GBL_INLINE GblType GblProperty_objectType(GBL_CSELF) GBL_NOEXCEPT {
 GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
                                                      GblType       derivedType,
                                                      const char*   pName,
-                                                     GblSize       id,
+                                                     size_t        id,
                                                      GblFlags      flags,
-                                                     GblSize       optionalArgCount,
+                                                     size_t        optionalArgCount,
                                                      ...)
 {
     va_list varArgs;
@@ -167,6 +167,7 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
     }
 }
 
+///\cond
 #define GBL_PROPERTIES_(object, ...)                        \
     GBL_PROPERTIES_IDS_(object, __VA_ARGS__)                \
     GBL_PROPERTIES_REGISTER_DEFINE_(object, __VA_ARGS__)
@@ -179,7 +180,7 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
 
 #define GBL_PROPERTIES_REGISTER_2(object, list)                     \
     GBL_STMT_START {                                                \
-        for(GblSize p = 0; p < object##_Property_Id_count; ++p) {   \
+        for(size_t  p = 0; p < object##_Property_Id_count; ++p) {   \
             object##_registerProperty_(p,                           \
                                        list? &list[p] : GBL_NULL);  \
         }                                                           \
@@ -248,6 +249,8 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
 
 #define GBL_PROPERTY_FLAGS_MASK__(suffix)  \
     GBL_PROPERTY_FLAG_##suffix |
+
+///\endcond
 
 GBL_DECLS_END
 

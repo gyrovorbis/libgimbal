@@ -15,7 +15,7 @@ static GBL_RESULT pLoad_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT pSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT pSet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
@@ -24,7 +24,7 @@ static GBL_RESULT pSet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, G
     GBL_CTX_END();
 }
 
-static GBL_RESULT pGet_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT pGet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);

@@ -10,7 +10,7 @@ static GBL_RESULT GblOpaqueClass_init_(GblClass* pClass, const void* pData, GblC
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblOpaque_construct_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblOpaque_construct_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_ARG(argc == 1 || (op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT));
 
@@ -56,7 +56,7 @@ static GBL_RESULT GblOpaque_destruct_(GblVariant* pVariant) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblOpaque_set_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblOpaque_set_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(argc);
     GBL_CTX_VERIFY_ARG(argc == 1);
@@ -88,7 +88,7 @@ static GBL_RESULT GblOpaque_set_(GblVariant* pVariant, GblSize argc, GblVariant*
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblOpaque_get_(GblVariant* pVariant, GblSize argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblOpaque_get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_ARG(argc == 1);
     GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);

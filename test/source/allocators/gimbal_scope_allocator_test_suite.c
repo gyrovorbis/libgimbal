@@ -101,7 +101,7 @@ static GBL_RESULT GblScopeAllocatorTestSuite_pushDtor_(GblTestSuite* pSelf, GblC
     GBL_CTX_BEGIN(pCtx);
     GblScopeAllocatorTestSuite_* pSelf_ = GBL_SCOPE_ALLOCATOR_TEST_SUITE_(pSelf);
 
-    for(GblSize i = 0; i < 3; ++i)
+    for(size_t  i = 0; i < 3; ++i)
         GBL_CTX_VERIFY_CALL(GblScopeAllocator_pushDtor(pSelf_->pScope,
                                                        dtor_,
                                                        pSelf_));
