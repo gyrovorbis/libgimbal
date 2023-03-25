@@ -23,10 +23,6 @@ static GblQuark     callbackQuark_  = GBL_QUARK_INVALID;
 static GBL_THREAD_LOCAL
 GblThread*          pCurThread_     = NULL;
 
-static uintptr_t GblThread_nativeHandle_(void) {
-    return (uintptr_t)thrd_current();
-}
-
 static void GblThread_finalize_(void) {
     mtx_lock(&mapMtx_);
     GblArrayMap_destroy(&pThreadMap_);
@@ -63,7 +59,7 @@ static void GblThread_unregister_(GblThread* pSelf) {
 static void GblThread_initSelf_(GblThread* pSelf) {
     pCurThread_  = pSelf;
     GblThread_* pSelf_ = GBL_THREAD_(pSelf);
-    pSelf_->nativeHandle = GblThread_nativeHandle_();
+    pSelf_->nativeHandle = thrd_current();
     // set up thread priority
     // set up thread affinity
     // set up thread name
