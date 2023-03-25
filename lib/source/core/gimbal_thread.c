@@ -82,7 +82,7 @@ static GblThread* GblThread_initUnknown_(GblBool mainThread) {
     char buffer[16+1] = { '\0' };
 
     if(!mainThread) {
-        snprintf(buffer, sizeof(buffer), "%p", (void*)GblThread_nativeHandle_());
+        snprintf(buffer, sizeof(buffer), "%zu", GblThread_count());
     } else {
         strcpy(buffer, "main");
         signal(SIGTERM, GblThread_signalHandler_);
