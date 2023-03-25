@@ -6,7 +6,7 @@
 #define GBL_THREAD_(self)   ((GblThread_*)GBL_INSTANCE_PRIVATE(self, GBL_THREAD_TYPE))
 
 GBL_DECLARE_STRUCT(GblThread_) {
-    uintptr_t  nativeHandle;
+    thrd_t  nativeHandle;
     struct {
         uint32_t autoStart : 1;
         uint32_t detached  : 1;
@@ -89,7 +89,7 @@ static GblThread* GblThread_initUnknown_(GblBool mainThread) {
         snprintf(buffer, sizeof(buffer), "%p", (void*)GblThread_nativeHandle_());
     } else {
         strcpy(buffer, "main");
-        signal(SIGKILL, GblThread_signalHandler_);
+        signal(SIGTERM, GblThread_signalHandler_);
     }
 
     pCurThread_ = GBL_OBJECT_NEW(GblThread,
