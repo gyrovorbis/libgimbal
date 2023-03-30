@@ -3,8 +3,6 @@
 
 #include <time.h>
 
-#define GBL_NO_TIMESPEC_
-
 #ifndef GBL_NO_TIMESPEC_
 #   if defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA)
 #       define GBL_NO_TIMESPEC_
