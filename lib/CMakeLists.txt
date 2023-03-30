@@ -262,10 +262,12 @@ add_library(libGimbal STATIC
     ${GIMBAL_INCLUDES})
 
 add_subdirectory(lib/tinycthread)
+add_subdirectory(lib/tiny-regex-c)
 
 list(APPEND
      GBL_TARGET_LINK_LIBS
-     tinycthread)
+     tinycthread
+     TinyRegexC)
 
 if (NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA)
 
