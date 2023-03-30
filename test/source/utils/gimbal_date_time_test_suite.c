@@ -426,7 +426,7 @@ GBL_TEST_CASE(dateTimeDiff) {
     memcpy(&dt3, &dt1, sizeof(GblDateTime));
     dt3.time.seconds += diff;
     GblDateTime_normalize(&dt3);
-    GBL_TEST_COMPARE(GblDateTime_diff(&dt3, &dt2).tv_sec, 0.0);
+    GBL_TEST_COMPARE(GblDateTime_diff(&dt3, &dt2).tv_sec, 0);
 
     GBL_TEST_CASE_END;
 }
