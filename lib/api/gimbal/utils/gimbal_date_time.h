@@ -15,7 +15,7 @@
 #define GIMBAL_DATE_TIME_H
 
 #include "../gimbal_core.h"
-#include <time.h>
+#include "../platform/gimbal_time_.h"
 
 #define GBL_TIME_MSECS_PER_SEC                          1000
 #define GBL_TIME_USECS_PER_SEC                          1000000

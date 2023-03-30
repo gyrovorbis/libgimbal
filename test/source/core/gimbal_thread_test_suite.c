@@ -180,6 +180,7 @@ GBL_TEST_CASE(join)
 GBL_TEST_CASE_END
 
 static void thread2OnFinished_(GblThread* pSelf) {
+    GBL_UNUSED(pSelf);
     GblFixture* pFixture = GblClosure_currentUserdata();
     pFixture->thread2Finished = GBL_TRUE;
 }
