@@ -20,13 +20,8 @@
 #define GBL_OBJECT_CLASS(klass)                     (GBL_CLASS_CAST(klass, GblObject))
 #define GBL_OBJECT_GET_CLASS(instance)              (GBL_INSTANCE_GET_CLASS(instance, GblObject))
 
-#define GBL_OBJECT_NEW(...)                         GBL_VA_OVERLOAD_CALL(GBL_OBJECT_NEW, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
-
-#define GBL_OBJECT_NEW_1(typeName)                  ((typeName*)GblObject_create(GBL_TYPEOF(typeName), GBL_NULL))
-#define GBL_OBJECT_NEW_N(...)                       ((GBL_TUPLE_FIRST(__VA_ARGS__)*)GblObject_create(GBL_TYPEOF(GBL_TUPLE_FIRST(__VA_ARGS__)), \
-                                                                                                     GBL_TUPLE_REST(__VA_ARGS__), NULL))
-
-#define GBL_OBJECT_CONTRUCT(cType, instance, ...)   (GblObject_construct(instance, GBL_TYPEOF(cType), __VA_ARGS__, NULL))
+#define GBL_NEW                                     GBL_OBJECT_NEW
+#define GBL_PLACEMENT_NEW                           GBL_OBJECT_CONSTRUCT
 
 #define GBL_SELF_TYPE GblObject
 
@@ -69,10 +64,11 @@ GBL_CLASS_END
 GBL_INSTANCE_DERIVE_EMPTY(GblObject, GblBox)
 
 GBL_PROPERTIES(GblObject,
-    (name,     GBL_GENERIC,  (READ, WRITE, LOAD, SAVE), GBL_POINTER_TYPE),
-    (parent,   GBL_GENERIC,  (READ, WRITE),             GBL_OBJECT_TYPE),
-    (userdata, GBL_GENERIC,  (READ, WRITE),             GBL_POINTER_TYPE),
-    (refCount, GBL_GENERIC,  (READ),                    GBL_UINT16_TYPE)
+    (name,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_POINTER_TYPE),
+    (parent,   GBL_GENERIC, (READ, WRITE),             GBL_OBJECT_TYPE),
+    (userdata, GBL_GENERIC, (READ, WRITE),             GBL_POINTER_TYPE),
+    (refCount, GBL_GENERIC, (READ),                    GBL_UINT16_TYPE),
+    (class,    GBL_GENERIC, (READ, WRITE, CONSTRUCT),  GBL_POINTER_TYPE)
 )
 
 GBL_EXPORT GblType     GblObject_type                       (void)                                             GBL_NOEXCEPT;
@@ -176,6 +172,18 @@ GBL_EXPORT GBL_RESULT  GblObject_uninstallEventFilter       (GBL_SELF, GblIEvent
 GBL_EXPORT size_t      GblObject_eventFilterCount           (GBL_CSELF)                                        GBL_NOEXCEPT;
 GBL_EXPORT GblIEventFilter*
                        GblObject_eventFilterAt              (GBL_CSELF, size_t  index)                         GBL_NOEXCEPT;
+
+// ========== Implementation ==========
+///\cond
+#define GBL_OBJECT_NEW(...)                         GBL_VA_OVERLOAD_CALL(GBL_OBJECT_NEW, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
+
+#define GBL_OBJECT_NEW_1(typeName)                  ((typeName*)GblObject_create(GBL_TYPEOF(typeName), GBL_NULL))
+#define GBL_OBJECT_NEW_N(...)                       ((GBL_TUPLE_FIRST(__VA_ARGS__)*)GblObject_create(GBL_TYPEOF(GBL_TUPLE_FIRST(__VA_ARGS__)), \
+                                                                                                     GBL_TUPLE_REST(__VA_ARGS__), NULL))
+
+#define GBL_OBJECT_CONTRUCT(instance, cType, ...)   (GblObject_construct(instance, GBL_TYPEOF(cType), __VA_ARGS__, NULL))
+
+///\endcond
 
 GBL_DECLS_END
 

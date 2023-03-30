@@ -156,7 +156,6 @@ GBL_INLINE GblStringView GblStringRef_view(GBL_CSELF) GBL_NOEXCEPT {
     return GBL_STRING_VIEW(pSelf, GblStringRef_length(pSelf));
 }
 
-
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

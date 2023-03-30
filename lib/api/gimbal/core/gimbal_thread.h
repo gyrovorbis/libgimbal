@@ -45,11 +45,10 @@ GBL_DECLARE_ENUM(GBL_THREAD_PRIORITY) {
 
 GBL_DECLARE_ENUM(GBL_THREAD_STATE) {
     GBL_THREAD_STATE_UNKNOWN,
-    GBL_THREAD_STATE_CONSTRUCTING,
+    GBL_THREAD_STATE_INITIALIZING,
     GBL_THREAD_STATE_READY,
     GBL_THREAD_STATE_RUNNING,
-    GBL_THREAD_STATE_FINISHED,
-    GBL_THREAD_STATE_DESTRUCTING,
+    GBL_THREAD_STATE_FINISHED
 };
 
 GBL_CLASS_DERIVE(GblThread, GblObject)
@@ -64,31 +63,27 @@ GBL_INSTANCE_DERIVE(GblThread, GblObject)
 GBL_INSTANCE_END
 
 GBL_PROPERTIES(GblThread,
-    (name,      GBL_GENERIC, (READ, WRITE, OVERRIDE), GBL_STRING_TYPE),
+//    (name,      GBL_GENERIC, (READ, WRITE, OVERRIDE), GBL_STRING_TYPE),
     (result,    GBL_GENERIC, (READ                 ), GBL_ENUM_TYPE),
     (state,     GBL_GENERIC, (READ                 ), GBL_ENUM_TYPE),
     (signal,    GBL_GENERIC, (READ                 ), GBL_ENUM_TYPE),
+    (joined,    GBL_GENERIC, (READ                 ), GBL_BOOL_TYPE),
     (priority,  GBL_GENERIC, (      WRITE          ), GBL_ENUM_TYPE),
     (affinity,  GBL_GENERIC, (      WRITE          ), GBL_FLAGS_TYPE),
-    (autoStart, GBL_GENERIC, (READ, WRITE          ), GBL_BOOL_TYPE),
-    (detached,  GBL_GENERIC, (READ, WRITE          ), GBL_BOOL_TYPE),
     (closure,   GBL_GENERIC, (READ, WRITE          ), GBL_CLOSURE_TYPE),
     (callback,  GBL_GENERIC, (READ, WRITE          ), GBL_FUNCTION_TYPE)
 )
 
 GBL_SIGNALS(GblThread,
     (started,  (GBL_INSTANCE_TYPE, pReceiver)),
-    (finished, (GBL_INSTANCE_TYPE, pReceiver)),
+    (finished, (GBL_INSTANCE_TYPE, pReceiver), (GBL_ENUM_TYPE, result)),
     (signaled, (GBL_INSTANCE_TYPE, pReceiver), (GBL_ENUM_TYPE, signal))
 )
 
 // ===== Static Methods =====
 GBL_EXPORT GblType     GblThread_type        (void)                           GBL_NOEXCEPT;
-GBL_EXPORT size_t      GblThread_coreCount   (void)                           GBL_NOEXCEPT;
 GBL_EXPORT size_t      GblThread_count       (void)                           GBL_NOEXCEPT;
 GBL_EXPORT GblThread*  GblThread_find        (const char* pName)              GBL_NOEXCEPT;
-GBL_EXPORT GblThread*  GblThread_at          (size_t  index)                  GBL_NOEXCEPT;
-
 GBL_EXPORT GblBool     GblThread_foreach     (GblThreadIterFn pIt,
                                               void*           pCl/*=NULL*/)   GBL_NOEXCEPT;
 
@@ -98,6 +93,8 @@ GBL_EXPORT GblThread*  GblThread_create      (GblThreadFn pCallback,
                                               GblBool     autoStart/*=0*/)    GBL_NOEXCEPT;
 
 GBL_EXPORT GblRefCount GblThread_unref       (GBL_SELF)                       GBL_NOEXCEPT;
+
+GBL_EXPORT GblBool     GblThread_isJoined    (GBL_CSELF)                      GBL_NOEXCEPT;
 
 GBL_EXPORT const char* GblThread_name        (GBL_CSELF)                      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblThread_setName     (GBL_SELF, const char* pName)    GBL_NOEXCEPT;
@@ -115,12 +112,11 @@ GBL_EXPORT GBL_RESULT  GblThread_setAffinity (GBL_SELF,
                                               GblThreadAffinity affinity)     GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblThread_start       (GBL_SELF)                       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblThread_wait        (GBL_SELF)                       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblThread_detach      (GBL_SELF)                       GBL_NOEXCEPT;
-
+GBL_EXPORT GBL_RESULT  GblThread_join        (GBL_SELF)                       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblThread_spinWait    (GBL_SELF/*,
+                                              const GblTimeSpec* pTimeout*/)  GBL_NOEXCEPT;
 // ===== Instance Methods for Child Thread =====
 GBL_EXPORT GblThread*  GblThread_current     (void)                           GBL_NOEXCEPT;
-GBL_EXPORT GblThread*  GblThread_main        (void)                           GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblThread_yield       (void)                           GBL_NOEXCEPT;
 

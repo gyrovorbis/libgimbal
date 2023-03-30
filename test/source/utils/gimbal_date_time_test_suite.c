@@ -672,6 +672,13 @@ GBL_TEST_CASE(dateTimeToIso8601) {
     GBL_TEST_COMPARE(GblDateTime_toIso8601(&dt, &strBuff),
                      "2041-04-20T14:01:55-0500");
 
+    GblDateTime_set(&dt,
+                    2041, 4, 20,
+                    14, 1, 55, 123000000, -18000);
+
+    //GBL_TEST_COMPARE(GblDateTime_toIso8601(&dt, &strBuff),
+    //                 "2041-04-20T14:01:55.123-0500");
+
     GblStringBuffer_destruct(&strBuff);
 
     GBL_TEST_CASE_END;

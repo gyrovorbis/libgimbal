@@ -14,8 +14,10 @@
 #include "../../preprocessor/gimbal_macro_composition.h"
 #include "gimbal_closure.h"
 
-#define GBL_SIGNALS(instanceStruct, /* signals */...) GBL_SIGNALS_(instanceStruct, __VA_ARGS__)
+#define GBL_SIGNALS(instanceStruct, /* signals */...)               GBL_SIGNALS_(instanceStruct, __VA_ARGS__)
 #define GBL_SIGNALS_REGISTER(instanceStruct, /* marshals */...)
+#define GBL_EMIT(emitter, ...)                                      (GblSignal_emit(GBL_INSTANCE(emitter), __VA_ARGS__))
+#define GBL_CONNECT(...)                                            (GBL_VA_OVERLOAD_CALL_ARGC(GBL_CONNECT, __VA_ARGS__))
 
 GBL_DECLS_BEGIN
 
@@ -31,7 +33,8 @@ GBL_EXPORT GBL_RESULT   GblSignal_uninstall       (GblType        ownerType,
 GBL_EXPORT GBL_RESULT   GblSignal_connect         (GblInstance*   pEmitter,
                                                    const char*    pSignalName,
                                                    GblInstance*   pReceiver,
-                                                   GblFnPtr       pFnCCallback)   GBL_NOEXCEPT;
+                                                   GblFnPtr       pFnCCallback,
+                                                   void*          pUserdata)      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblSignal_connectClass    (GblInstance*   pEmitter,
                                                    const char*    pSignalName,
@@ -80,9 +83,25 @@ GBL_EXPORT GblInstance* GblSignal_emitter         (void)                        
 
 GBL_EXPORT GblInstance* GblSignal_receiver        (void)                          GBL_NOEXCEPT;
 
+#define                 GblSignal_connect(...)    GBL_VA_OVERLOAD_CALL_ARGC(GblSignal_connect, __VA_ARGS__)
+
 // ===== IMPLEMENTATION =====
 
 ///\cond
+
+#define GblSignal_connect_3(emitter, signal, callback) \
+    (GblSignal_connect_4(emitter, signal, emitter, callback))
+#define GblSignal_connect_4(emitter, signal, receiver, callback) \
+    (GblSignal_connect_5(emitter, signal, receiver, callback, GBL_NULL))
+#define GblSignal_connect_5(emitter, signal, receiver, callback, userdata) \
+    ((GblSignal_connect)(emitter, signal, receiver, callback, userdata))
+
+#define GBL_CONNECT_3(emitter, signal, callback) \
+    (GBL_CONNECT_4(emitter, signal, emitter, callback))
+#define GBL_CONNECT_4(emitter, signal, receiver, callback) \
+    (GBL_CONNECT_5(emitter, signal, receiver, callback, GBL_NULL))
+#define GBL_CONNECT_5(emitter, signal, receiver, callback, userdata) \
+    ((GblSignal_connect)(GBL_INSTANCE(emitter), signal, GBL_INSTANCE(receiver), GBL_CALLBACK(callback), (void*)userdata))
 
 #define GBL_SIGNALS_(instance, ...) \
     GBL_INLINE GBL_RESULT instance##_registerSignals_(instance* pSelf, GblMarshalFn* pMarshals) { \

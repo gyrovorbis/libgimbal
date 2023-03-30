@@ -499,6 +499,10 @@ GBL_EXPORT const char* GblDateTime_toIso8601(const GblDateTime* pSelf, GblString
 
     GblDateTime_format(pSelf, pBuffer, "%Y-%m-%dT%H:%M:%S");
 
+    const unsigned ms = pSelf->time.nSeconds / 1000000;
+    if(ms)
+        GblStringBuffer_appendPrintf(pBuffer, ".%.3u", ms);
+
     if(pSelf->utcOffset >= 0)
         GblStringBuffer_append(pBuffer, GBL_STRV("+"));
     else

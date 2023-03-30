@@ -37,7 +37,10 @@ GBL_TEST_FIXTURE {
     TestModule1* pModule1;
     TestModule2* pModule2;
     GblModule*   pModule3;
-    uint16_t     refCount;
+    GblRefCount  classRefCount;
+    GblRefCount  instances;
+    GblRefCount  refCount;
+    size_t       typeCount;
     unsigned     foreachCount;
 };
 
@@ -76,12 +79,21 @@ static GblType TestModule2_type(void) {
 }
 
 GBL_TEST_INIT() {
-    pFixture->refCount = GblRef_activeCount();
+    pFixture->classRefCount = GblType_classRefCount(GBL_MODULE_TYPE);
+    pFixture->instances     = GblType_instanceRefCount(GBL_MODULE_TYPE);
+    pFixture->refCount      = GblRef_activeCount();
+    pFixture->typeCount     = GblType_registeredCount();
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_FINAL() {
-   // GBL_TEST_COMPARE(GblRef_activeCount(), pFixture->refCount);
+    GblType_unregister(TEST_MODULE1_TYPE_);
+    GblType_unregister(TEST_MODULE2_TYPE_);
+
+    GBL_TEST_COMPARE(GblRef_activeCount(), pFixture->refCount);
+    GBL_TEST_COMPARE(GblType_instanceRefCount(GBL_MODULE_TYPE), pFixture->instances);
+    GBL_TEST_COMPARE(GblType_classRefCount(GBL_MODULE_TYPE), pFixture->classRefCount);
+    GBL_TEST_COMPARE(GblType_registeredCount(), pFixture->typeCount);
     GBL_TEST_CASE_END;
 }
 
@@ -238,7 +250,7 @@ GBL_TEST_CASE(require) {
 GBL_TEST_CASE(unregister) {
     GBL_TEST_CALL(GblModule_unregister(GBL_MODULE(pFixture->pModule1)));
     GBL_TEST_CALL(GblModule_unregister(GBL_MODULE(pFixture->pModule2)));
-    //GBL_TEST_CALL(GblModule_unregister(pFixture->pModule3));
+    GBL_TEST_CALL(GblModule_unregister(pFixture->pModule3));
     GBL_TEST_CASE_END;
 }
 

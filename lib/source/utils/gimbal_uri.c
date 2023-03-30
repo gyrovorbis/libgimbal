@@ -22,6 +22,7 @@ static GBL_RESULT GblUri_dtor_(GblUri* pUri) {
     GblStringRef_release(pUri->pPath);
     GblStringRef_release(pUri->pQuery);
     GblStringRef_release(pUri->pFragment);
+    return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT GblUri* GblUri_create(void) {

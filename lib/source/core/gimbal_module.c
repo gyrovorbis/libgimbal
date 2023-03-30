@@ -32,9 +32,23 @@ static GblBool      initializing_ = GBL_FALSE;
 static GblBool      initialized_  = GBL_FALSE;
 static GblArrayMap* pModules_     = NULL;
 
-static void GblModule_final_(void) {
+static void GblModule_init_(void) {
     GBL_CTX_BEGIN(NULL);
-    if(!initialized_) GBL_CTX_DONE();
+    if(initialized_) GBL_CTX_DONE();
+
+    mtx_init(&moduleMtx_, mtx_plain);
+
+    pModules_ = GblArrayMap_create(NULL, GBL_TRUE, NULL);
+
+    //atexit(GblModule_final_);
+    initialized_ = GBL_TRUE;
+    GBL_CTX_END_BLOCK();
+}
+
+
+GBL_RESULT GblModule_final_(void) {
+    GBL_MODULE_ENSURE_INITIALIZED_();
+    GBL_CTX_BEGIN(NULL);
 
     //uninitialized all of them
     mtx_lock(&moduleMtx_);
@@ -44,20 +58,7 @@ static void GblModule_final_(void) {
     mtx_destroy(&moduleMtx_);
     initialized_ = GBL_FALSE;
 
-    GBL_CTX_END_BLOCK();
-}
-
-static void GblModule_init_(void) {
-    GBL_CTX_BEGIN(NULL);
-    if(initialized_) GBL_CTX_DONE();
-
-    mtx_init(&moduleMtx_, mtx_plain);
-
-    pModules_ = GblArrayMap_create(NULL, GBL_TRUE, NULL);
-
-    atexit(GblModule_final_);
-    initialized_ = GBL_TRUE;
-    GBL_CTX_END_BLOCK();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblModule_arrayMapDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntry) {
@@ -89,15 +90,20 @@ GBL_EXPORT GBL_RESULT GblModule_register(GblModule* pSelf) {
 
     mtx_lock(&moduleMtx_);
 
-    GblModule* pOld = GBL_MODULE(GblArrayMap_atValue(&pModules_, quark));
+    const size_t prevPos = GblArrayMap_find(&pModules_, quark);
 
-    if(pOld) GBL_UNLIKELY {
-        GBL_LOG_WARN("gimbal", "Orphaning existing module [refCount: %u, useCount: %u].",
-                        GblBox_refCount(GBL_BOX(pOld)),
-                        GblModule_useCount(pOld));
+    if(prevPos != GBL_ARRAY_MAP_NPOS) GBL_UNLIKELY {
+        GblModule* pOld = GBL_MODULE(GblArrayMap_probeValue(&pModules_, prevPos));
+        GBL_LOG_WARN("gimbal",
+                     "Orphaning existing module [refCount: %u, useCount: %u].",
+                     GblBox_refCount(GBL_BOX(pOld)),
+                     GblModule_useCount(pOld));
     }
 
-    GblArrayMap_setUserdata(&pModules_, quark, (uintptr_t)GBL_BOX_REF(pSelf), GblModule_arrayMapDtor_);
+    GblArrayMap_setUserdata(&pModules_,
+                            quark,
+                            (uintptr_t)GBL_BOX_REF(pSelf),
+                            GblModule_arrayMapDtor_);
 
     mtx_unlock(&moduleMtx_);
 
@@ -347,17 +353,17 @@ static GBL_RESULT GblModule_GblObject_property_(const GblObject* pObject, const 
 
     switch(pProperty->id) {
     case GblModule_Property_Id_prefix:
-        GblVariant_setStringRef(pValue, GblStringRef_ref(pSelf->pPrefix));      break;
+        GblVariant_setStringRef(pValue, pSelf->pPrefix); break;
     case GblModule_Property_Id_version:
-        GblVariant_setUint32(pValue, pSelf->version);                           break;
+        GblVariant_setUint32(pValue, pSelf->version); break;
     case GblModule_Property_Id_author:
-        GblVariant_setStringRef(pValue, GblStringRef_ref(pSelf->pAuthor));      break;
+        GblVariant_setStringRef(pValue, pSelf->pAuthor); break;
     case GblModule_Property_Id_description:
-        GblVariant_setStringRef(pValue, GblStringRef_ref(pSelf->pDescription)); break;
+        GblVariant_setStringRef(pValue, pSelf->pDescription); break;
     case GblModule_Property_Id_useCount:
-        GblVariant_setUint16(pValue, GblModule_useCount(pSelf));                break;
+        GblVariant_setUint16(pValue, GblModule_useCount(pSelf)); break;
     case GblModule_Property_Id_typeCount:
-        GblVariant_setUint32(pValue, GblModule_typeCount(pSelf));               break;
+        GblVariant_setUint32(pValue, GblModule_typeCount(pSelf)); break;
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Attemping to read invalid property [%s] on GblModule",
@@ -394,12 +400,14 @@ static GBL_RESULT GblModule_GblBox_destructor_(GblBox* pBox) {
     GBL_CTX_BEGIN(pBox);
     GblModule* pSelf = GBL_MODULE(pBox);
 
+    // Unload first!?
+
     GblStringRef_release(pSelf->pAuthor);
     GblStringRef_release(pSelf->pPrefix);
     GblStringRef_release(pSelf->pDescription);
     GblOptionGroup_unref(pSelf->pOptionGroup);
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblContext, base.base.pFnDestructor, GBL_BOX(pSelf));
+    GBL_INSTANCE_VCALL_DEFAULT(GblContext, base.base.pFnDestructor, pBox);
 
     GBL_CTX_END();
 }

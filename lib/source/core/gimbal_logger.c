@@ -42,7 +42,6 @@ static void GblLogger_finalize_(void) {
     initialized_ = GBL_FALSE;
 
     mtx_unlock(&listMtx_);
-
 }
 
 static void GblLogger_initialize_(void) {

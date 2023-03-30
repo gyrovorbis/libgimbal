@@ -697,6 +697,8 @@ static void GblType_final_(void) {
     hasMutex = GBL_TRUE;
 
     //iterate over types and cleanup classes
+    GBL_CTX_CALL(GblThread_final_());
+    GBL_CTX_CALL(GblModule_final_());
     GBL_CTX_CALL(GblSignal_final_(pCtx_));
     GBL_CTX_CALL(GblProperty_final_(pCtx_));
     GBL_CTX_CALL(GblVariant_final_(pCtx_));

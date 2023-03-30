@@ -67,27 +67,28 @@ GBL_INSTANCE_DERIVE(GblClosure, GblBox)
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 
-GBL_EXPORT GblType     GblClosure_type           (void)                          GBL_NOEXCEPT;
-GBL_EXPORT GblClosure* GblClosure_current        (void)                          GBL_NOEXCEPT;
+GBL_EXPORT GblType     GblClosure_type            (void)                          GBL_NOEXCEPT;
+GBL_EXPORT GblClosure* GblClosure_current         (void)                          GBL_NOEXCEPT;
+GBL_EXPORT void*       GblClosure_currentUserdata (void)                          GBL_NOEXCEPT;
 
-GBL_EXPORT GblClosure* GblClosure_create         (GblType           derivedType,
-                                                  size_t            size,
-                                                  void*             pUserdata,
-                                                  GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
+GBL_EXPORT GblClosure* GblClosure_create          (GblType           derivedType,
+                                                   size_t            size,
+                                                   void*             pUserdata,
+                                                   GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
 
-GBL_INLINE void        GblClosure_setMarshal     (GBL_SELF,
-                                                  GblMarshalFn pFnMarshal)       GBL_NOEXCEPT;
+GBL_INLINE void        GblClosure_setMarshal      (GBL_SELF,
+                                                   GblMarshalFn pFnMarshal)       GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblClosure_setMetaMarshal (GBL_SELF,
-                                                  GblMarshalFn pFnMeta)          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblClosure_setMetaMarshal  (GBL_SELF,
+                                                   GblMarshalFn pFnMeta)          GBL_NOEXCEPT;
 
-GBL_INLINE GblBool     GblClosure_hasMarshal     (GBL_CSELF)                     GBL_NOEXCEPT;
-GBL_INLINE GblBool     GblClosure_hasMetaMarshal (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblBool     GblClosure_hasMarshal      (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_INLINE GblBool     GblClosure_hasMetaMarshal  (GBL_CSELF)                     GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT  GblClosure_invoke         (GBL_SELF,
-                                                  GblVariant* pRetValue,
-                                                  size_t      argCount,
-                                                  GblVariant* pArgValues)        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblClosure_invoke          (GBL_SELF,
+                                                   GblVariant* pRetValue,
+                                                   size_t      argCount,
+                                                   GblVariant* pArgValues)        GBL_NOEXCEPT;
 
 // ===== IMPL =====
 

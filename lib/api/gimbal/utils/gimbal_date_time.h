@@ -5,7 +5,10 @@
  *  \todo
  *      - GblDateTime_fromIso8601()
  *      - double GblDateTime_toJulian(): higher res, with seconds
- *      - use timespec to get nanoseconds
+ *      - toIso8601() string corrupting with msec resolution
+ *      - GblDateTime_format() support ms, us, ns
+ *      - GblDateTime_parse() support ms, us, ns
+ *      - are we misnaming GMT as UTC anywhere?
  */
 
 #ifndef GIMBAL_DATE_TIME_H
@@ -28,7 +31,7 @@
 #define GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET          -1
 #define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_INCREMENT      128
 #define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_MULTIPLIER_MAX 10
-#define GBL_DATE_TIME_ISO8601_STRING_SIZE               25
+#define GBL_DATE_TIME_ISO8601_STRING_SIZE               29
 
 GBL_DECLS_BEGIN
 

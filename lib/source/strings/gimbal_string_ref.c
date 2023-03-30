@@ -14,6 +14,8 @@ GBL_EXPORT GblStringRef* GblStringRef_createFromViewWithContext(GblStringView vi
     GBL_CTX_VERIFY_LAST_RECORD();
     if(view.pData && view.length)
         strncpy(pStrHeader->data, view.pData, view.length);
+    else
+        pStrHeader->data[0] = '\0';
     pStrHeader->length = view.length;
     pStr = pStrHeader->data;
     GBL_CTX_END_BLOCK();

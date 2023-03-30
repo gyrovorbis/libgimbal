@@ -252,6 +252,7 @@ set(GIMBAL_SOURCES
     source/utils/gimbal_byte_array.c
     source/utils/gimbal_bit_view.c
     source/utils/gimbal_uri.c
+    source/utils/gimbal_scanner.c
 )
 
 add_library(libGimbal STATIC

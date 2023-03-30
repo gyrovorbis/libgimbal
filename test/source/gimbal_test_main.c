@@ -43,6 +43,7 @@
 #include "utils/gimbal_bit_view_test_suite.h"
 #include "core/gimbal_module_test_suite.h"
 #include "core/gimbal_thread_test_suite.h"
+#include "utils/gimbal_scanner_test_suite.h"
 
 #include <math.h>
 
@@ -208,9 +209,12 @@ int main(int argc, char* pArgv[]) {
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_BIT_VIEW_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_createFromType(GBL_SCANNER_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_MODULE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_THREAD_TEST_SUITE_TYPE));
+
 
     const GBL_RESULT result = GblTestScenario_run(pScenario, argc, pArgv);
 

@@ -1,21 +1,34 @@
 #include <gimbal/core/gimbal_thread.h>
 #include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/utils/gimbal_date_time.h>
+#include <gimbal/containers/gimbal_linked_list.h>
+#include <gimbal/meta/signals/gimbal_marshal.h>
 #include <tinycthread.h>
 
-#define GBL_THREAD_(self)   ((GblThread_*)GBL_INSTANCE_PRIVATE(self, GBL_THREAD_TYPE))
+#define GBL_THREAD_(self)               ((GblThread_*)GBL_INSTANCE_PRIVATE(self, GBL_THREAD_TYPE))
+#define GBL_THREAD_PUBLIC_(priv)        ((GblThread*)GBL_INSTANCE_PUBLIC(priv, GBL_THREAD_TYPE))
+#define GBL_THREAD_ENTRY_(node)         (GBL_DOUBLY_LINKED_LIST_ENTRY(node, GblThread_, listNode))
+#define GBL_THREAD_ENTRY_PUBLIC_(node)  (GBL_THREAD_PUBLIC_(GBL_THREAD_ENTRY_(node)))
+#define GBL_THREAD_SHUTDOWN_RETRIES     10
 
 GBL_DECLARE_STRUCT(GblThread_) {
+    union {
+        GblDoublyLinkedListNode listNode;
+        GblThread_*             pNext;
+    };
     thrd_t  nativeHandle;
     struct {
-        uint32_t autoStart : 1;
-        uint32_t detached  : 1;
+        uint8_t joined  : 1;
     };
 };
 
-static mtx_t        mapMtx_;
+static mtx_t        listMtx_;
 static once_flag    initOnce_       = ONCE_FLAG_INIT;
-static GblArrayMap* pThreadMap_     = NULL;
+static GblDoublyLinkedListNode
+                    threadList_     = {
+                        .pNext = &threadList_,
+                        .pPrev = &threadList_
+                    };
 
 static GblQuark     closureQuark_   = GBL_QUARK_INVALID;
 static GblQuark     callbackQuark_  = GBL_QUARK_INVALID;
@@ -23,37 +36,62 @@ static GblQuark     callbackQuark_  = GBL_QUARK_INVALID;
 static GBL_THREAD_LOCAL
 GblThread*          pCurThread_     = NULL;
 
-static void GblThread_finalize_(void) {
-    mtx_lock(&mapMtx_);
-    GblArrayMap_destroy(&pThreadMap_);
-    mtx_unlock(&mapMtx_);
-    mtx_destroy(&mapMtx_);
+static void GblThread_init_(void) {
+    mtx_init(&listMtx_, mtx_recursive);
+   // atexit(GblThread_finalize_);
 }
 
-static void GblThread_initialize_(void) {
-    mtx_init(&mapMtx_, mtx_plain);
-    pThreadMap_ = GblArrayMap_create(NULL, GBL_TRUE, NULL);
-    atexit(GblThread_finalize_);
+GBL_RESULT GblThread_final_(void) {
+    GBL_CTX_BEGIN(NULL);
+    call_once(&initOnce_, &GblThread_init_);
+
+    mtx_lock(&listMtx_);
+
+    size_t retries = 0;
+    GblThread* pCur  = NULL;
+    GblThread* pPrev = NULL;
+    GblDoublyLinkedListNode* pIt = NULL;
+    while((pIt = GblDoublyLinkedList_front(&threadList_))) {
+        pCur = GBL_THREAD_ENTRY_PUBLIC_(pIt);
+
+        if(!pCur) break;
+        else if(pCur != pPrev) {
+            GblThread_yield();
+            pPrev = pCur;
+            retries = 0;
+        } else if(++retries >= 10) {
+            GblDoublyLinkedList_remove(pIt);
+            retries = 0;
+            GBL_CTX_RECORD_SET(GBL_RESULT_TIMEOUT,
+                               "Timed out waiting for thread to join!");
+        }
+    }
+
+    mtx_unlock(&listMtx_);
+    mtx_destroy(&listMtx_);
+
+    GBL_CTX_END();
 }
 
 static void GblThread_register_(GblThread* pSelf) {
     GBL_UNUSED(pSelf);
-    call_once(&initOnce_, &GblThread_initialize_);
+    call_once(&initOnce_, &GblThread_init_);
 
-    mtx_lock(&mapMtx_);
+    mtx_lock(&listMtx_);
 
-    // add to vector
+    GblDoublyLinkedList_pushBack(&threadList_,
+                                 &GBL_THREAD_(pSelf)->listNode);
 
-    mtx_unlock(&mapMtx_);
+    mtx_unlock(&listMtx_);
 }
 
 static void GblThread_unregister_(GblThread* pSelf) {
     GBL_UNUSED(pSelf);
-    mtx_lock(&mapMtx_);
+    mtx_lock(&listMtx_);
 
-    // remove from vector
+    GblDoublyLinkedList_remove(&GBL_THREAD_(pSelf)->listNode);
 
-    mtx_unlock(&mapMtx_);
+    mtx_unlock(&listMtx_);
 }
 
 static void GblThread_initSelf_(GblThread* pSelf) {
@@ -88,18 +126,17 @@ static GblThread* GblThread_initUnknown_(GblBool mainThread) {
         signal(SIGTERM, GblThread_signalHandler_);
     }
 
-    pCurThread_ = GBL_OBJECT_NEW(GblThread,
-                                 "name", buffer);
-    pCurThread_->state = GBL_THREAD_STATE_UNKNOWN;
+    pCurThread_ = GBL_NEW(GblThread,
+                          "name", buffer);
+
     GblThread_initSelf_(pCurThread_);
-    GblThread_register_(pCurThread_);
 
     return pCurThread_;
 }
 
 static GBL_RESULT GblThread_signal_(GblThread* pSelf, int signal) {
     GBL_CTX_BEGIN(NULL);
-    GblSignal_emit(GBL_INSTANCE(pSelf), "signaled", signal);
+    GBL_EMIT(pSelf, "signaled", signal);
     GBL_CTX_END();
 }
 
@@ -143,19 +180,20 @@ static GBL_RESULT GblThread_run_(GblThread* pSelf) {
 
 // Low-level thread exit point
 static GBL_RESULT GblThread_exit_(GblThread* pSelf) {
-    GblThread_* pSelf_ = GBL_THREAD_(pSelf);
-
     // update status for finished
     pCurThread_->state = GBL_THREAD_STATE_FINISHED;
 
     // copy thread-local status into this thread's return status
     memcpy(&pSelf->returnStatus, GblThd_callRecord(NULL), sizeof(GblCallRecord));
 
+    // remove thread from active list
+    GblThread_unregister_(pSelf);
+
     // inform connected slots that thread has finished
-    GblSignal_emit(GBL_INSTANCE(pSelf), "finished", pSelf->returnStatus.result);
+    GBL_EMIT(pSelf, "finished", pSelf->returnStatus.result);
 
     // commit suicide and clean itself up if detached
-    if(pSelf_->detached) GBL_BOX_UNREF(pSelf);
+    GBL_UNREF(pSelf);
 
     // return casted result code
     return pSelf->returnStatus.result;
@@ -173,7 +211,7 @@ static int GblThread_start_(void* pThread) {
     pCurThread_->state = GBL_THREAD_STATE_RUNNING;
 
     // inform connected slots that thread has started
-    GblSignal_emit(GBL_INSTANCE(pSelf), "started");
+    GBL_EMIT(pSelf, "started");
 
     // clear thread-local status
     GBL_CTX_BEGIN(NULL);
@@ -185,6 +223,13 @@ static int GblThread_start_(void* pThread) {
     return GblThread_exit_(pSelf);
 }
 
+GBL_EXPORT size_t GblThread_count(void) {
+    mtx_lock(&listMtx_);
+    const size_t size = GblDoublyLinkedList_count(&threadList_);
+    mtx_unlock(&listMtx_);
+    return size;
+}
+
 GBL_EXPORT GBL_RESULT GblThread_start(GblThread* pSelf) {
     GBL_CTX_BEGIN(NULL);
 
@@ -193,6 +238,8 @@ GBL_EXPORT GBL_RESULT GblThread_start(GblThread* pSelf) {
     GBL_CTX_VERIFY(pSelf->state == GBL_THREAD_STATE_READY,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Failed to start thread that isn't READY!");
+
+    GblThread_register_(pSelf);
 
     /* Notice we IMMEDIATEY give the new thread its own reference,
        before we return to the caller who could possibly unref and
@@ -209,21 +256,21 @@ GBL_EXPORT GBL_RESULT GblThread_start(GblThread* pSelf) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblThread_wait(GblThread* pSelf) {
+GBL_EXPORT GBL_RESULT GblThread_join(GblThread* pSelf) {
     GblThread_* pSelf_ = GBL_THREAD_(pSelf);
 
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY(pSelf->state != GBL_THREAD_STATE_UNKNOWN &&
-                   pSelf->state < GBL_THREAD_STATE_FINISHED,
+                   pSelf->state <= GBL_THREAD_STATE_FINISHED,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "Attempt to wait on thread [%s] in invalid state: [%u]",
+                   "Attempt to join thread [%s] in invalid state: [%u]",
                    GblObject_name(GBL_OBJECT(pSelf)),
                    pSelf->state);
 
-    GBL_CTX_VERIFY(!pSelf_->detached,
+    GBL_CTX_VERIFY(!pSelf_->joined,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "Attempt to wait on detached thread: [%s]",
+                   "Attempt to join already joined thread: [%s]",
                    GblObject_name(GBL_OBJECT(pSelf)));
 
     int result;
@@ -231,41 +278,19 @@ GBL_EXPORT GBL_RESULT GblThread_wait(GblThread* pSelf) {
 
     GBL_CTX_VERIFY(status == thrd_success,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "Failed to wait on thread[%s]: [%d]",
+                   "Failed to join thread[%s]: [%d]",
                    GblObject_name(GBL_OBJECT(pSelf)),
                    status);
 
+    pSelf_->joined = GBL_TRUE;
 
     GBL_CTX_RESULT() = result;
 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblThread_detach(GblThread* pSelf) {
-    GblThread_* pSelf_ = GBL_THREAD_(pSelf);
-
-    GBL_CTX_BEGIN(NULL);
-
-    GBL_CTX_VERIFY(pSelf->state != GBL_THREAD_STATE_UNKNOWN,
-                   GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "Attempt to detach thread [%s] in invalid state: [%u]",
-                   GblObject_name(GBL_OBJECT(pSelf)),
-                   pSelf->state);
-
-    GBL_CTX_VERIFY(!pSelf_->detached,
-                   GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "Attempt to detach an already detached thread: [%s]",
-                   GblObject_name(GBL_OBJECT(pSelf)));
-
-    const int status = thrd_detach(pSelf_->nativeHandle);
-
-    GBL_CTX_VERIFY(status == thrd_success,
-                   GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "Failed to detach thread[%s]: [%d]",
-                   GblObject_name(GBL_OBJECT(pSelf)),
-                   status);
-
-    GBL_CTX_END();
+GBL_EXPORT GblBool GblThread_isJoined(const GblThread* pSelf) {
+    return GBL_THREAD_(pSelf)->joined;
 }
 
 GBL_EXPORT GblThread* GblThread_current(void) {
@@ -275,12 +300,8 @@ GBL_EXPORT GblThread* GblThread_current(void) {
     return pCurThread_;
 }
 
-GBL_EXPORT GblThread* GblThread_main(void) {
-    return NULL;
-}
-
 GBL_EXPORT GblClosure* GblThread_closure(const GblThread* pSelf) {
-    return GBL_CLOSURE(GblBox_getField(GBL_BOX(pSelf), closureQuark_));
+    return (GblClosure*)GblBox_getField(GBL_BOX(pSelf), closureQuark_);
 }
 
 GBL_EXPORT GblThreadFn GblThread_callback(const GblThread* pSelf) {
@@ -289,7 +310,7 @@ GBL_EXPORT GblThreadFn GblThread_callback(const GblThread* pSelf) {
 
 static GBL_RESULT GblThread_closureDtor_(const GblArrayMap* pMap, uintptr_t key, void* pUd) {
     GBL_UNUSED(pMap, key);
-    GBL_BOX_UNREF(pUd);
+    GBL_UNREF(pUd);
     return GBL_RESULT_SUCCESS;
 }
 
@@ -305,14 +326,18 @@ GBL_EXPORT GblThread* (GblThread_create)(GblThreadFn pCallback,
                                          void*       pUserdata,
                                          GblBool     autoStart)
 {
-    return GBL_THREAD(GBL_OBJECT_NEW(GblThread,
-                                     "callback",  pCallback,
-                                     "userdata",  pUserdata,
-                                     "autoStart", autoStart));
+    GblThread* pThread =
+            GBL_THREAD(GBL_NEW(GblThread,
+                               "callback",  pCallback,
+                               "userdata",  pUserdata));
+
+    if(autoStart) GblThread_start(pThread);
+
+    return pThread;
 }
 
 GBL_EXPORT GblRefCount GblThread_unref(GblThread* pSelf) {
-    return GBL_BOX_UNREF(pSelf);
+    return GBL_UNREF(pSelf);
 }
 
 GBL_EXPORT GBL_RESULT GblThread_yield(void) {
@@ -389,12 +414,7 @@ static GBL_RESULT GblThread_GblObject_constructed_(GblObject* pObject) {
     GBL_CTX_BEGIN(NULL);
 
     GblThread* pSelf = GBL_THREAD(pObject);
-
-    if(GBL_THREAD_(pSelf)->autoStart) {
-        GblThread_start(pSelf);
-    } else {
-        pSelf->state = GBL_THREAD_STATE_READY;
-    }
+    pSelf->state = GBL_THREAD_STATE_READY;
 
     GBL_CTX_END();
 }
@@ -410,10 +430,6 @@ static GBL_RESULT GblThread_GblObject_setProperty_(GblObject* pObject, const Gbl
         GblThread_setPriority(pSelf, GblVariant_toEnum(pValue)); break;
     case GblThread_Property_Id_affinity:
         GblThread_setAffinity(pSelf, GblVariant_toFlags(pValue)); break;
-    case GblThread_Property_Id_autoStart:
-        pSelf_->autoStart = GblVariant_toBool(pValue); break;
-    case GblThread_Property_Id_detached:
-        if(GblVariant_toBool(pValue)) GblThread_detach(pSelf); break;
     case GblThread_Property_Id_closure: {
         GblClosure* pClosure = NULL;
         GblVariant_getValueMove(pValue, &pClosure);
@@ -426,7 +442,7 @@ static GBL_RESULT GblThread_GblObject_setProperty_(GblObject* pObject, const Gbl
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Failed to set property %s for type %s",
-                           GblProperty_nameString(pProp), GBL_INSTANCE_TYPEOF(pSelf));
+                           GblProperty_nameString(pProp), GblType_name(GBL_INSTANCE_TYPEOF(pSelf)));
     }
     GBL_CTX_END();
 }
@@ -444,16 +460,16 @@ static GBL_RESULT GblThread_GblObject_property_(const GblObject* pObject, const 
         GblVariant_setEnum(pValue, GBL_ENUM_TYPE, pSelf->state); break;
     case GblThread_Property_Id_signal:
         GblVariant_setEnum(pValue, GBL_ENUM_TYPE, pSelf->signalStatus); break;
-    case GblThread_Property_Id_autoStart:
-        GblVariant_setBool(pValue, pSelf_->autoStart); break;
     case GblThread_Property_Id_closure:
         GblVariant_setValueCopy(pValue, GBL_CLOSURE_TYPE, GblThread_closure(pSelf)); break;
     case GblThread_Property_Id_callback:
         GblVariant_setPointer(pValue, GBL_POINTER_TYPE, GblThread_callback(pSelf)); break;
+    case GblThread_Property_Id_joined:
+        GblVariant_setBool(pValue, GblThread_isJoined(pSelf)); break;
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Failed to get property %s for type %s",
-                           GblProperty_nameString(pProp), GBL_INSTANCE_TYPEOF(pSelf));
+                           GblProperty_nameString(pProp), GblType_name(GBL_INSTANCE_TYPEOF(pSelf)));
     }
 
     GBL_CTX_END();
@@ -461,27 +477,56 @@ static GBL_RESULT GblThread_GblObject_property_(const GblObject* pObject, const 
 
 static GBL_RESULT GblThread_GblBox_destructor_(GblBox* pBox) {
     GBL_CTX_BEGIN(NULL);
-    GblThread* pThread = GBL_THREAD(pBox);
-    pThread->state = GBL_THREAD_STATE_DESTRUCTING;
-    GblThread_unregister_(pThread);
+
+    GblThread*  pSelf = GBL_THREAD(pBox);
+    GblThread_* pSelf_  = GBL_THREAD_(pSelf);
+
+    if(!pSelf_->joined) {
+        const int retVal = thrd_detach(pSelf_->nativeHandle);
+        GBL_CTX_VERIFY(retVal == thrd_success,
+                       GBL_RESULT_ERROR_INVALID_OPERATION,
+                       "Failed to detach thread[%s]: [%d]",
+                       GblObject_name(GBL_OBJECT(pSelf)),
+                       retVal);
+
+    }
+
+    GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, GBL_BOX(pBox));
+
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblThread_init_(GblInstance* pInstance, GblContext* pCtx) {
+static GBL_RESULT GblThread_initialize_(GblInstance* pInstance, GblContext* pCtx) {
     GBL_UNUSED(pCtx);
     GBL_CTX_BEGIN(NULL);
-    GblThread* pThread = GBL_THREAD(pInstance);
-    pThread->state = GBL_THREAD_STATE_CONSTRUCTING;
-    GblThread_register_(pThread);
+    GblThread*  pThread  = GBL_THREAD(pInstance);
+    pThread->state = GBL_THREAD_STATE_INITIALIZING;
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblThreadClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
+static GBL_RESULT GblThreadClass_initialize_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     GBL_UNUSED(pUd, pCtx);
     GBL_CTX_BEGIN(NULL);
 
     if(!GblType_classRefCount(GBL_CLASS_TYPEOF(pClass))) {
         GBL_PROPERTIES_REGISTER(GblThread);
+
+        GblSignal_install(GBL_THREAD_TYPE,
+                          "started",
+                          GblMarshal_CClosure_VOID__INSTANCE,
+                          0);
+
+        GblSignal_install(GBL_THREAD_TYPE,
+                          "finished",
+                          GblMarshal_CClosure_VOID__INSTANCE_ENUM,
+                          1,
+                          GBL_ENUM_TYPE);
+
+        GblSignal_install(GBL_THREAD_TYPE,
+                          "signaled",
+                          GblMarshal_CClosure_VOID__INSTANCE_ENUM,
+                          1,
+                          GBL_ENUM_TYPE);
 
         closureQuark_  = GblQuark_fromStringStatic("_GblThread_closure");
         callbackQuark_ = GblQuark_fromStringStatic("_GblThread_callback");
@@ -496,8 +541,6 @@ static GBL_RESULT GblThreadClass_init_(GblClass* pClass, const void* pUd, GblCon
 
     GBL_CTX_END();
 }
-
-
 
 GBL_EXPORT GBL_RESULT GblThread_setPriority(GblThread* pSelf,
                                             GBL_THREAD_PRIORITY priority) {
@@ -520,33 +563,22 @@ GBL_EXPORT GBL_RESULT GblThread_setName(GblThread* pSelf, const char* pName) {
     return GBL_RESULT_UNIMPLEMENTED;
 }
 
-GBL_EXPORT size_t  GblThread_coreCount(void) {
-    return 1;
-}
-
-GBL_EXPORT GblBool GblThread_isMain(const GblThread* pSelf) {
-    // reested, fixme! POSIX: pid == tid
-    return pSelf->state == GBL_THREAD_STATE_UNKNOWN;
-}
-
 GBL_EXPORT GblType GblThread_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     static const GblTypeInfo info = {
         .classSize           = sizeof(GblThreadClass),
-        .pFnClassInit        = GblThreadClass_init_,
+        .pFnClassInit        = GblThreadClass_initialize_,
         .instanceSize        = sizeof(GblThread),
         .instancePrivateSize = sizeof(GblThread_),
-        .pFnInstanceInit     = GblThread_init_
+        .pFnInstanceInit     = GblThread_initialize_
     };
 
     if(type == GBL_INVALID_TYPE) {
         type = GblType_registerStatic(GblQuark_internStringStatic("GblThread"),
                                       GBL_OBJECT_TYPE,
                                       &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC |
-                                      GBL_TYPE_FLAG_CLASS_PINNED    |
-                                      GBL_TYPE_FLAG_CLASS_PREINIT);
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
 
     return type;

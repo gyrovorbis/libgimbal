@@ -39,53 +39,53 @@ typedef struct GblStringView {
 #endif
 } GblStringView;
 
-GBL_INLINE GblStringView GblStringView_fromEmpty         (void)                                                 GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_fromString        (const char* pString)                                  GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_fromStringSized   (const char* pData, size_t  length)                    GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_fromQuark         (GblQuark quark)                                       GBL_NOEXCEPT;
-GBL_INLINE int           GblStringView_compare           (GBL_VSELF, GblStringView other)                       GBL_NOEXCEPT;
-GBL_INLINE int           GblStringView_compareIgnoreCase (GBL_VSELF, GblStringView other)                       GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblStringView_equals            (GBL_VSELF, GblStringView other)                       GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblStringView_equalsIgnoreCase  (GBL_VSELF, GblStringView other)                       GBL_NOEXCEPT;
-GBL_INLINE GBL_RESULT    GblStringView_copy              (GBL_VSELF, void* pDst, size_t  offset, size_t  bytes) GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblStringView_empty             (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblStringView_blank             (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE char          GblStringView_at                (GBL_VSELF, size_t  index)                             GBL_NOEXCEPT;
-GBL_INLINE char          GblStringView_first             (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE char          GblStringView_last              (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_removePrefix      (GBL_VSELF, size_t  length)                            GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_removeSuffix      (GBL_VSELF, size_t  length)                            GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_chomp             (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_substr            (GBL_VSELF, size_t  offset, size_t  length)            GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblStringView_contains          (GBL_VSELF, GblStringView subStr)                      GBL_NOEXCEPT;
-//GBL_INLINE GblBool     GblStringView_containsIgnoreCase(GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-GBL_INLINE size_t        GblStringView_count             (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-//GBL_INLINE size_t      GblStringView_countIgnoreCase   (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-GBL_INLINE size_t        GblStringView_find              (GBL_VSELF, GblStringView substr, size_t  offset)      GBL_NOEXCEPT;
-//GBL_INILNE size_t      GblStringView_findIgnoreCase    (GBL_VSELF, GblStringView substr, size_t  offset)      GBL_NOEXCEPT;
-GBL_INLINE size_t        GblStringView_rfind             (GBL_VSELF, GblStringView substr, size_t  offset)      GBL_NOEXCEPT;
-//GBL_INLINE size_t      GblStringView_rfindIgnoreCase   (GBL_VSELF, GblStringView substr, size_t  offset)      GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblStringView_startsWith        (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-//GBL_INLINE GblBool     GblStringView_startsWithIgnoreCase(GBL_VSELF, GblStringView substr)                    GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblStringView_endsWith          (GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-//GBL_INLINE GblBool     GblStringView_endsWithIgnoreCase(GBL_VSELF, GblStringView substr)                      GBL_NOEXCEPT;
-GBL_INLINE size_t        GblStringView_findFirstOf       (GBL_VSELF, GblStringView chars, size_t  offset)       GBL_NOEXCEPT;
-GBL_INLINE size_t        GblStringView_findLastOf        (GBL_VSELF, GblStringView chars, size_t  end)          GBL_NOEXCEPT;
-GBL_INLINE size_t        GblStringView_findFirstNotOf    (GBL_VSELF, GblStringView chars, size_t  offset)       GBL_NOEXCEPT;
-GBL_INLINE size_t        GblStringView_findLastNotOf     (GBL_VSELF, GblStringView chars, size_t  end)          GBL_NOEXCEPT;
-GBL_INLINE GblQuark      GblStringView_quark             (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE GblQuark      GblStringView_quarkTry          (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE const char*   GblStringView_intern            (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE GblHash       GblStringView_hash              (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE char*         GblStringView_strdup            (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE char*         GblStringView_toCString         (GBL_VSELF, char* pDest, size_t  destSize)             GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblStringView_toNil             (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE GblBool       GblStringView_toBool            (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE int           GblStringView_toInt             (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE unsigned      GblStringView_toUInt            (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE float         GblStringView_toFloat           (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE double        GblStringView_toDouble          (GBL_VSELF)                                            GBL_NOEXCEPT;
-GBL_INLINE void*         GblStringView_toPointer         (GBL_VSELF)                                            GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_fromEmpty         (void)                                                GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_fromString        (const char* pString)                                 GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_fromStringSized   (const char* pData, size_t  length)                   GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_fromQuark         (GblQuark quark)                                      GBL_NOEXCEPT;
+GBL_INLINE int           GblStringView_compare           (GBL_VSELF, GblStringView other)                      GBL_NOEXCEPT;
+GBL_INLINE int           GblStringView_compareIgnoreCase (GBL_VSELF, GblStringView other)                      GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringView_equals            (GBL_VSELF, GblStringView other)                      GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringView_equalsIgnoreCase  (GBL_VSELF, GblStringView other)                      GBL_NOEXCEPT;
+GBL_INLINE GBL_RESULT    GblStringView_copy              (GBL_VSELF, void* pDst, size_t  offset, size_t bytes) GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringView_empty             (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringView_blank             (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE char          GblStringView_at                (GBL_VSELF, size_t  index)                            GBL_NOEXCEPT;
+GBL_INLINE char          GblStringView_first             (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE char          GblStringView_last              (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_removePrefix      (GBL_VSELF, size_t  length)                           GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_removeSuffix      (GBL_VSELF, size_t  length)                           GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_chomp             (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_substr            (GBL_VSELF, size_t  offset, size_t  length)           GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringView_contains          (GBL_VSELF, GblStringView subStr)                     GBL_NOEXCEPT;
+//GBL_INLINE GblBool     GblStringView_containsIgnoreCase(GBL_VSELF, GblStringView substr)                     GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_count             (GBL_VSELF, GblStringView substr)                     GBL_NOEXCEPT;
+//GBL_INLINE size_t      GblStringView_countIgnoreCase   (GBL_VSELF, GblStringView substr)                     GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_find              (GBL_VSELF, GblStringView substr, size_t offset)      GBL_NOEXCEPT;
+//GBL_INILNE size_t      GblStringView_findIgnoreCase    (GBL_VSELF, GblStringView substr, size_t offset)      GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_rfind             (GBL_VSELF, GblStringView substr, size_t offset)      GBL_NOEXCEPT;
+//GBL_INLINE size_t      GblStringView_rfindIgnoreCase   (GBL_VSELF, GblStringView substr, size_t offset)      GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringView_startsWith        (GBL_VSELF, GblStringView substr)                     GBL_NOEXCEPT;
+//GBL_INLINE GblBool     GblStringView_startsWithIgnoreCase(GBL_VSELF, GblStringView substr)                   GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringView_endsWith          (GBL_VSELF, GblStringView substr)                     GBL_NOEXCEPT;
+//GBL_INLINE GblBool     GblStringView_endsWithIgnoreCase(GBL_VSELF, GblStringView substr)                     GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_findFirstOf       (GBL_VSELF, GblStringView chars, size_t offset)       GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_findLastOf        (GBL_VSELF, GblStringView chars, size_t end)          GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_findFirstNotOf    (GBL_VSELF, GblStringView chars, size_t offset)       GBL_NOEXCEPT;
+GBL_INLINE size_t        GblStringView_findLastNotOf     (GBL_VSELF, GblStringView chars, size_t end)          GBL_NOEXCEPT;
+GBL_INLINE GblQuark      GblStringView_quark             (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE GblQuark      GblStringView_quarkTry          (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE const char*   GblStringView_intern            (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE GblHash       GblStringView_hash              (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE char*         GblStringView_strdup            (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE char*         GblStringView_toCString         (GBL_VSELF, char* pDest, size_t destSize)             GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringView_toNil             (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE GblBool       GblStringView_toBool            (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE int           GblStringView_toInt             (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE unsigned      GblStringView_toUInt            (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE float         GblStringView_toFloat           (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE double        GblStringView_toDouble          (GBL_VSELF)                                           GBL_NOEXCEPT;
+GBL_INLINE void*         GblStringView_toPointer         (GBL_VSELF)                                           GBL_NOEXCEPT;
 
 
 //========== IMPL ==========
@@ -105,7 +105,7 @@ GBL_INLINE GblStringView GblStringView_fromString(const char* pString) GBL_NOEXC
     return view;
 }
 
-GBL_INLINE GblStringView GblStringView_fromStringSized(const char* pString, size_t  length) GBL_NOEXCEPT {
+GBL_INLINE GblStringView GblStringView_fromStringSized(const char* pString, size_t length) GBL_NOEXCEPT {
     GblStringView view = {
         .pData  = pString,
         .length = length

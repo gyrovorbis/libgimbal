@@ -94,6 +94,9 @@ extern GblType       GblType_registerBuiltin_          (size_t               exp
                                                         const GblTypeInfo*   pTypeInfo,
                                                         GblTypeFlags         flags);
 
+extern GBL_RESULT    GblThread_final_                  (void);
+extern GBL_RESULT    GblModule_final_                  (void);
+
 extern GBL_RESULT    GblProperty_init_                 (GblContext* pCtx);
 extern GBL_RESULT    GblProperty_final_                (GblContext* pCtx);
 

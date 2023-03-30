@@ -8,6 +8,10 @@ GBL_EXPORT GblClosure* GblClosure_current(void) {
     return pCurrentClosure_;
 }
 
+GBL_EXPORT void* GblClosure_currentUserdata(void) {
+    return GblBox_userdata(GBL_BOX(GblClosure_current()));
+}
+
 GBL_EXPORT GblClosure* GblClosure_create(GblType           derivedType,
                                          size_t            size,
                                          void*             pUserdata,

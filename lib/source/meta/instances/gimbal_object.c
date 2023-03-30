@@ -784,7 +784,9 @@ static GblBool GblObject_iterateCtorProperties_(const GblProperty* pProp,
 {
     GBL_CTX_BEGIN(NULL);
     GblObjectCtorIterClosure_* pSelf = pClosure;
-    GblBool exitLoop = GBL_TRUE;
+    /* Only require CONSTRUCT-able properties at construction-time
+     * which are not also WRITE-able and cannot be set later on! */
+    GblBool exitLoop = !(pProp->flags & GBL_PROPERTY_FLAG_WRITE);
 
     // Check whether we were passed a value for the property
     for(size_t  v = 0; v < pSelf->argCount; ++v) {
@@ -803,7 +805,7 @@ static GblBool GblObject_iterateCtorProperties_(const GblProperty* pProp,
     // Bail if required property wasn't found
     GBL_CTX_VERIFY(!exitLoop,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
-                   "[GblObject] Cannot instantiate %s without required CONSTRUCT property %s[%s]",
+                   "[GblObject] Cannot instantiate %s without required CONSTRUCT-only property %s[%s]",
                    GblType_name(GBL_INSTANCE_TYPEOF(pSelf->pObject)),
                    GblType_name(GblProperty_objectType(pProp)),
                    GblProperty_nameString(pProp));

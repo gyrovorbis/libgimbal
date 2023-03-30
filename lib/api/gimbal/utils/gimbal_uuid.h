@@ -12,6 +12,8 @@
  *  based on RFC 4122.
  *
  *  \ingroup utils
+ *  \todo
+ *      - fix reliance on apparently determinsitic random mechanism
  */
 
 #ifndef GIMBAL_UUID_H

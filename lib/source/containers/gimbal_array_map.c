@@ -47,18 +47,16 @@ static GblBool GblArrayMap_erase_(GblArrayMap** ppSelf, uintptr_t key, GblBool f
     GBL_CTX_BEGIN(NULL);
 
     if(*ppSelf) {
-        size_t  index = GblArrayMap_find(ppSelf, key);
+        const size_t  index = GblArrayMap_find(ppSelf, key);
 
-        if(index != GBL_ARRAY_MAP_NPOS) {
-            if(free)
-                GBL_CTX_CALL(GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, index)));
-
+        if(index != GBL_ARRAY_MAP_NPOS) GBL_UNLIKELY {
             if(GblArrayMap_size(ppSelf) == 1) {
                 GblArrayMap_clear(ppSelf);
-                removed = GBL_TRUE;
+            } else GBL_LIKELY {
+                if(free)
+                    GBL_CTX_CALL(GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, index)));
 
-            } else {
-                size_t  remainder = GblArrayMap_size(ppSelf)-1 - index;
+                const size_t remainder = GblArrayMap_size(ppSelf) - 1 - index;
 
                 if(remainder)
                     memmove(GblArrayMap_entry_(ppSelf, index),
@@ -68,6 +66,7 @@ static GblBool GblArrayMap_erase_(GblArrayMap** ppSelf, uintptr_t key, GblBool f
                 --GBL_PRIV_REF(*ppSelf).size;
                 removed = GBL_TRUE;
             }
+            removed = GBL_TRUE;
         }
     }
     GBL_CTX_END_BLOCK();

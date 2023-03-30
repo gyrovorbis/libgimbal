@@ -373,18 +373,20 @@ static GBL_RESULT GblOptionGroupClass_final_(GblClass* pClass, const void* pData
 GBL_EXPORT GblType GblOptionGroup_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
+    static GblTypeInfo info = {
+        .classSize       = sizeof(GblOptionGroupClass),
+        .pFnClassInit    = GblOptionGroupClass_init_,
+        .pFnClassFinal   = GblOptionGroupClass_final_,
+        .instanceSize    = sizeof(GblOptionGroup),
+        .pFnInstanceInit = GblOptionGroup_init_
+    };
+
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
         type = GblType_registerStatic(GblQuark_internStringStatic("GblOptionGroup"),
                                       GBL_OBJECT_TYPE,
-                                      &(GblTypeInfo){
-                                          .classSize       = sizeof(GblOptionGroupClass),
-                                          .pFnClassInit    = GblOptionGroupClass_init_,
-                                          .pFnClassFinal   = GblOptionGroupClass_final_,
-                                          .instanceSize    = sizeof(GblOptionGroup),
-                                          .pFnInstanceInit = GblOptionGroup_init_
-                                      },
-                                      GBL_TYPE_FLAGS_NONE);
+                                      &info,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
         GBL_CTX_VERIFY_LAST_RECORD();
         GBL_CTX_END_BLOCK();
     }

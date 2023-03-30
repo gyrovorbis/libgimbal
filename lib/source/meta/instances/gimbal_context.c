@@ -126,10 +126,11 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
 
     //not per byte!
     if(pSelf) {
-        for(unsigned t = 0; t < pSelf->logStackDepth*8; ++t) {
+        size_t depth = GblThd_current()->logStackDepth;
+        for(unsigned t = 0; t < depth*8; ++t) {
             tabBuff[t] = ' ';
         }
-        tabBuff[pSelf->logStackDepth*8] = '\0';
+        tabBuff[depth*8] = '\0';
     } else {
         tabBuff[0] = '\0';
     }

@@ -16,8 +16,8 @@
 #define GBL_BOX_CLASS(klass)         (GBL_CLASS_CAST(klass, GblBox))
 #define GBL_BOX_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblBox))
 
-#define GBL_BOX_REF(instance)        (GblBox_ref(GBL_BOX(instance)))
-#define GBL_BOX_UNREF(instance)      (GblBox_unref(instance? GBL_BOX(instance) : GBL_NULL))
+#define GBL_REF                      GBL_BOX_REF
+#define GBL_UNREF                    GBL_BOX_UNREF
 
 #define GBL_SELF_TYPE GblBox
 
@@ -144,6 +144,12 @@ GBL_EXPORT GBL_RESULT   GblBox_setField                  (GBL_SELF,
                                                           GblQuark          key,
                                                           uintptr_t         ud,
                                                           GblArrayMapDtorFn pFnDtor)     GBL_NOEXCEPT;
+// ========== Implementation ==========
+///\cond
+#define GBL_BOX_REF(instance)        (GblBox_ref(GBL_BOX(instance)))
+#define GBL_BOX_UNREF(instance)      (GblBox_unref(instance? GBL_BOX(instance) : GBL_NULL))
+///\endcond
+
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

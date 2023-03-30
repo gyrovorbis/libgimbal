@@ -407,15 +407,16 @@ static GBL_RESULT Signal_connect_(GblInstance*   pEmitter,
 
 
 
-GBL_EXPORT GBL_RESULT GblSignal_connect(GblInstance* pEmitter,
-                                        const char*  pSignalName,
-                                        GblInstance* pReceiver,
-                                        GblFnPtr     pFnCCallback)
+GBL_EXPORT GBL_RESULT (GblSignal_connect)(GblInstance* pEmitter,
+                                          const char*  pSignalName,
+                                          GblInstance* pReceiver,
+                                          GblFnPtr     pFnCCallback,
+                                          void*        pUserdata)
 {
     if(!pFnCCallback)
         return GBL_RESULT_ERROR_INVALID_POINTER;
     else {
-        GblCClosure* pCClosure = GblCClosure_create(pFnCCallback, NULL);
+        GblCClosure* pCClosure = GblCClosure_create(pFnCCallback, pUserdata);
         return Signal_connect_(pEmitter, pSignalName, GBL_QUARK_INVALID, pReceiver, GBL_CLOSURE(pCClosure));
     }
 }

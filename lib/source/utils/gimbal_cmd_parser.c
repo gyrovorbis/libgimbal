@@ -467,19 +467,21 @@ static GBL_RESULT GblCmdParserClass_init_(GblClass* pClass, const void* pUd, Gbl
 GBL_EXPORT GblType GblCmdParser_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
+    static GblTypeInfo info = {
+        .pFnClassInit        = GblCmdParserClass_init_,
+        .classSize           = sizeof(GblCmdParserClass),
+        .pFnInstanceInit     = GblCmdParser_init_,
+        .instanceSize        = sizeof(GblCmdParser),
+        .instancePrivateSize = sizeof(GblCmdParser_)
+    };
+
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
 
         type = GblType_registerStatic(GblQuark_internStringStatic("GblCmdParser"),
                                       GBL_OBJECT_TYPE,
-                                      &(GblTypeInfo) {
-                                          .pFnClassInit        = GblCmdParserClass_init_,
-                                          .classSize           = sizeof(GblCmdParserClass),
-                                          .pFnInstanceInit     = GblCmdParser_init_,
-                                          .instanceSize        = sizeof(GblCmdParser),
-                                          .instancePrivateSize = sizeof(GblCmdParser_)
-                                      },
-                                      GBL_TYPE_FLAGS_NONE);
+                                      &info,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
 
         GBL_CTX_VERIFY_LAST_RECORD();
         GBL_CTX_END_BLOCK();

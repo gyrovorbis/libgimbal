@@ -110,6 +110,8 @@ set(GIMBAL_TEST_SOURCES
     source/utils/gimbal_byte_array_test_suite.c
     include/utils/gimbal_bit_view_test_suite.h
     source/utils/gimbal_bit_view_test_suite.c
+    include/utils/gimbal_scanner_test_suite.h
+    source/utils/gimbal_scanner_test_suite.c
     source/gimbal_test_main.c
 )
 

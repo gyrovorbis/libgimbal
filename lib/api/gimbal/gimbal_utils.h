@@ -15,5 +15,7 @@
 #include "utils/gimbal_date_time.h"
 #include "utils/gimbal_bit_view.h"
 #include "utils/gimbal_byte_array.h"
+#include "utils/gimbal_scanner.h"
+#include "utils/gimbal_uri.h"
 
 #endif // GIMBAL_UTILS_H
