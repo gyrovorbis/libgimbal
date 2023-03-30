@@ -4,7 +4,7 @@
 #include <time.h>
 
 #ifndef GBL_NO_TIMESPEC_
-#   if defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA)
+#   if defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA) || defined(DREAMCAST)
 #       define GBL_NO_TIMESPEC_
 #   endif
 #endif
@@ -13,10 +13,12 @@
 
 #define TIME_UTC 1
 
+#if 0
 struct timespec {
     time_t tv_sec;
     long   tv_nsec;
 };
+#endif
 
 int timespec_get(struct timespec* pSpec, int base);
 
