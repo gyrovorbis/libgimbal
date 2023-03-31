@@ -167,7 +167,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/strings/gimbal_string_ref.h
     api/gimbal/strings/gimbal_string.h
     api/gimbal/strings/gimbal_string_list.h
-    api/gimbal/strings/gimbal_string_pattern.h
+    api/gimbal/strings/gimbal_pattern.h
     api/gimbal/test/gimbal_test_macros.h
     api/gimbal/test/gimbal_test_suite.h
     api/gimbal/test/gimbal_test_scenario.h
@@ -242,7 +242,7 @@ set(GIMBAL_SOURCES
     source/strings/gimbal_string_buffer.c
     source/strings/gimbal_string.c
     source/strings/gimbal_string_list.c
-    source/strings/gimbal_string_pattern.c
+    source/strings/gimbal_pattern.c
     source/test/gimbal_test_suite.c
     source/test/gimbal_test_scenario.c
     source/utils/gimbal_cmd_parser.c

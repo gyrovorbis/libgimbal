@@ -6,7 +6,7 @@
 #define GIMBAL_SCANNER_H
 
 #include "../meta/instances/gimbal_object.h"
-#include "../strings/gimbal_string_pattern.h"
+#include "../strings/gimbal_pattern.h"
 
 #define GBL_SCANNER_TYPE                (GBL_TYPEOF(GblScanner))
 #define GBL_SCANNER(self)               (GBL_INSTANCE_CAST(self, GblScanner))

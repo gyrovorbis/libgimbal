@@ -1,6 +1,6 @@
 ﻿#include <gimbal/strings/gimbal_string_list.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
-#include <gimbal/strings/gimbal_string_pattern.h>
+#include <gimbal/strings/gimbal_pattern.h>
 
 #define GBL_STRING_LIST_(node) GBL_DOUBLY_LINKED_LIST_ENTRY(node, GblStringList, listNode)
 
@@ -353,16 +353,19 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushFrontRefs)(GblStringList* pSelf, ...) {
     return result;
 }
 
+// Should this only put the matched portion in the filtered list?
 GBL_EXPORT GblStringList* GblStringList_createFilter(const GblStringList* pOther,
                                                      const char*          pPattern) {
     GblStringList* pList = GblStringList_createEmpty();
+
+    GblPattern* pCompiled = GblPattern_compile(pPattern);
 
     for(GblStringList* pNode = pOther->ringNode.pNext;
         pNode != pOther;
         pNode = pNode->ringNode.pNext)
     {
-        if(GblStringPattern_match(pPattern, pNode->pData)) {
-            GblRingList_pushBack(pList, GblStringRef_acquire(pNode->pData));
+        if(GblPattern_firstMatchc(pCompiled, pNode->pData) >= 0) {
+            GblRingList_pushBack(pList, GblStringRef_ref(pNode->pData));
         }
     }
 

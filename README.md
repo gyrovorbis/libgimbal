@@ -18,7 +18,7 @@
     ·
     Cross-Language
     ·
-    Dependency Free
+    High Performance
   </p>
 </div>
 
@@ -46,14 +46,16 @@
 - Microsoft Visual Studio
 - GCC
 - Clang
-- Emscriptgen
+- MinGW-w64
+- Emscripten
 
 ## Modules ##
 ### Core Framework ###
 - platform-specific macros and utilities
-- error handling and propagation
+- error and exception handling
 - debug and verification utilities
 - structured logging with filtering
+- object-oriented threading and concurrency model
 
 ### Strings ###
 - specialized, optimized custom string types
@@ -112,4 +114,28 @@
 - memory utilization and leak detection
 - dynamic/run-time test-plan construction and management
 
+### Building ###
+Building is done with standard CMake, and all generators and mainstream compilers should be supported. You should be able to open CMakeLists.txt directly as a project file in most IDEs such as MSVC, XCode, Qt Creator, CLion, etc if you wish to build from a UI.
+
+To build the project and its unit tests from the command-line, you can do the following:
+```
+mkdir build
+cd build
+cmake -DGBL_ENABLE_TESTS=ON ..
+cmake --build . 
+```
+
+### Dependencies ###
+  - Original HashSet and BTree back-ends: Josh Baker (tidwall) 
+    - https://github.com/tidwall/hashmap.c
+    - https://github.com/tidwall/btree.c
+  - Original TinyCThreads: Marcus Geelnard, Evan Nemerson
+    - https://tinycthread.github.io/
+  - SipHash: Jean-Philippe Amasson, Daniel J. Bernstein 
+    - http://creativecommons.org/publicdomain/zero/1.0/
+  - MurmurHash3: Austin Appleby
+  - Original strptime: Based on musl C Standard Library Implementation
+    - https://git.musl-libc.org/cgit/musl/tree/src/time/strptime.c
+  - GblPattern engine back-end: tiny-regex-c 
+    - https://github.com/kokke/tiny-regex-c
 

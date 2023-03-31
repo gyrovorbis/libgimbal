@@ -396,17 +396,19 @@ of choice. We go through a lot of effort to test throroughly and verify correctn
 ## Contributors
     - Mike Santiago (admin@ignoresolutions.xyz)
 
-## Dependencies
-	- HashSet and BTree back-ends: Josh Baker (tidwall) 
-		- https://github.com/tidwall/hashmap.c
-		- https://github.com/tidwall/btree.c
-	- TinyCThread: Marcus Geelnard, Evan Nemerson
-		- https://tinycthread.github.io/
-	- SipHash: Jean-Philippe Amasson, Daniel J. Bernstein 
-		- http://creativecommons.org/publicdomain/zero/1.0/
-	- MurmurHash3: Austin Appleby
-	- strptime: Based on musl C Standard Library Implemenation
-		- https://git.musl-libc.org/cgit/musl/tree/src/time/strptime.c
+### Dependencies ###
+  - Original HashSet and BTree back-ends: Josh Baker (tidwall) 
+    - https://github.com/tidwall/hashmap.c
+    - https://github.com/tidwall/btree.c
+  - Original TinyCThreads: Marcus Geelnard, Evan Nemerson
+    - https://tinycthread.github.io/
+  - SipHash: Jean-Philippe Amasson, Daniel J. Bernstein 
+    - http://creativecommons.org/publicdomain/zero/1.0/
+  - MurmurHash3: Austin Appleby
+  - Original strptime: Based on musl C Standard Library Implementation
+    - https://git.musl-libc.org/cgit/musl/tree/src/time/strptime.c
+  - GblPattern engine back-end: tiny-regex-c 
+    - https://github.com/kokke/tiny-regex-c
 		
 ## Inspiration
 	- Microsoft COM
