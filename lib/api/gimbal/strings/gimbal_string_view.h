@@ -41,7 +41,7 @@ typedef struct GblStringView {
 
 GBL_INLINE GblStringView GblStringView_fromEmpty         (void)                                                GBL_NOEXCEPT;
 GBL_INLINE GblStringView GblStringView_fromString        (const char* pString)                                 GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_fromStringSized   (const char* pData, size_t  length)                   GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_fromStringSized   (const char* pData, size_t length)                    GBL_NOEXCEPT;
 GBL_INLINE GblStringView GblStringView_fromQuark         (GblQuark quark)                                      GBL_NOEXCEPT;
 GBL_INLINE int           GblStringView_compare           (GBL_VSELF, GblStringView other)                      GBL_NOEXCEPT;
 GBL_INLINE int           GblStringView_compareIgnoreCase (GBL_VSELF, GblStringView other)                      GBL_NOEXCEPT;
@@ -53,10 +53,10 @@ GBL_INLINE GblBool       GblStringView_blank             (GBL_VSELF)            
 GBL_INLINE char          GblStringView_at                (GBL_VSELF, size_t  index)                            GBL_NOEXCEPT;
 GBL_INLINE char          GblStringView_first             (GBL_VSELF)                                           GBL_NOEXCEPT;
 GBL_INLINE char          GblStringView_last              (GBL_VSELF)                                           GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_removePrefix      (GBL_VSELF, size_t  length)                           GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_removeSuffix      (GBL_VSELF, size_t  length)                           GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_removePrefix      (GBL_VSELF, size_t length)                            GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_removeSuffix      (GBL_VSELF, size_t length)                            GBL_NOEXCEPT;
 GBL_INLINE GblStringView GblStringView_chomp             (GBL_VSELF)                                           GBL_NOEXCEPT;
-GBL_INLINE GblStringView GblStringView_substr            (GBL_VSELF, size_t  offset, size_t  length)           GBL_NOEXCEPT;
+GBL_INLINE GblStringView GblStringView_substr            (GBL_VSELF, size_t offset, size_t length)             GBL_NOEXCEPT;
 GBL_INLINE GblBool       GblStringView_contains          (GBL_VSELF, GblStringView subStr)                     GBL_NOEXCEPT;
 //GBL_INLINE GblBool     GblStringView_containsIgnoreCase(GBL_VSELF, GblStringView substr)                     GBL_NOEXCEPT;
 GBL_INLINE size_t        GblStringView_count             (GBL_VSELF, GblStringView substr)                     GBL_NOEXCEPT;

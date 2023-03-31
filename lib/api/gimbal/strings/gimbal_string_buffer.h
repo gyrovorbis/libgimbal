@@ -115,6 +115,7 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_appendPointer   (GBL_SELF, const voi
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_erase           (GBL_SELF, size_t  offset, size_t  length)      GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_clear           (GBL_SELF)                                      GBL_NOEXCEPT;
+
 GBL_INLINE GBL_RESULT       GblStringBuffer_overwrite       (GBL_SELF,
                                                              size_t         index,
                                                              GblStringView  other)                          GBL_NOEXCEPT;

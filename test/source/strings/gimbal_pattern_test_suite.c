@@ -2,6 +2,18 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/strings/gimbal_pattern.h>
 
+#define GBL_TEST_SUITE_SELF GblPatternTestSuite
+
+GBL_TEST_FIXTURE {
+    int padding;
+};
+
+GBL_TEST_INIT()
+GBL_TEST_CASE_END
+
+GBL_TEST_FINAL()
+GBL_TEST_CASE_END
+
 static GBL_RESULT GblPatternTestSuite_matchInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
@@ -116,37 +128,27 @@ static GBL_RESULT GblPatternTestSuite_matchComplex_(GblTestSuite* pSelf, GblCont
     GBL_CTX_END();
 }
 
+GBL_TEST_CASE(iso8601BasicDate)
+    int length = 0;
+    GBL_TEST_COMPARE(GblPattern_firstMatch("^[0-9]{8}$", "12345678", &length), 0);
+    GBL_TEST_COMPARE(length, 8);
+GBL_TEST_CASE_END
 
-GBL_EXPORT GblType GblPatternTestSuite_type(void) {
-    static GblType type = GBL_INVALID_TYPE;
+GBL_TEST_CASE(iso8601)
+    //int length = 0;
+   // GblPattern* pPattern = GblPattern_compile("^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$");
+   // GBL_TEST_VERIFY(GblPattern_exactMatchc(pPattern, "2002-12-31T23:00:00+01:00"));
+GBL_TEST_CASE_END
 
-    const static GblTestCase cases[] = {
-        { "matchInvalid",       GblPatternTestSuite_matchInvalid_    },
-        { "matchExact",         GblPatternTestSuite_matchExact_      },
-        { "matchBegin",         GblPatternTestSuite_matchBegin_      },
-        { "matchEnd",           GblPatternTestSuite_matchEnd_        },
-        { "matchAnyChar",       GblPatternTestSuite_matchAnyChar_    },
-        { "matchStar",          GblPatternTestSuite_matchStar_       },
-        { "matchPlus",          GblPatternTestSuite_matchPlus_       },
-        { "matchQuestion",      GblPatternTestSuite_matchQuestion_   },
-        { "matchComplex",       GblPatternTestSuite_matchComplex_    },
-        { NULL,                 NULL                                        }
-    };
 
-    const static GblTestSuiteClassVTable vTable = {
-        .pCases         = cases
-    };
-
-    if(type == GBL_INVALID_TYPE) {
-        GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblPatternTestSuite"),
-                                     &vTable,
-                                     sizeof(GblPatternTestSuite),
-                                     0,
-                                     GBL_TYPE_FLAGS_NONE);
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
-    }
-
-    return type;
-}
+GBL_TEST_REGISTER(matchInvalid,
+                  matchExact,
+                  matchBegin,
+                  matchEnd,
+                  matchAnyChar,
+                  matchStar,
+                  matchPlus,
+                  matchQuestion,
+                  matchComplex,
+                  iso8601BasicDate,
+                  iso8601)
