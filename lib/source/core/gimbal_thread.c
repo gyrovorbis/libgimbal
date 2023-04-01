@@ -224,6 +224,7 @@ static int GblThread_start_(void* pThread) {
 }
 
 GBL_EXPORT size_t GblThread_count(void) {
+    call_once(&initOnce_, &GblThread_init_);
     mtx_lock(&listMtx_);
     const size_t size = GblDoublyLinkedList_count(&threadList_);
     mtx_unlock(&listMtx_);
@@ -231,6 +232,7 @@ GBL_EXPORT size_t GblThread_count(void) {
 }
 
 GBL_EXPORT GBL_RESULT GblThread_start(GblThread* pSelf) {
+    call_once(&initOnce_, &GblThread_init_);
     GBL_CTX_BEGIN(NULL);
 
     GblThread_* pSelf_ = GBL_THREAD_(pSelf);
@@ -244,9 +246,9 @@ GBL_EXPORT GBL_RESULT GblThread_start(GblThread* pSelf) {
     /* Notice we IMMEDIATEY give the new thread its own reference,
        before we return to the caller who could possibly unref and
        delete it. */
-    int result = thrd_create(&pSelf_->nativeHandle,
-                             GblThread_start_,
-                             GBL_BOX_REF(pSelf));
+    const int result = thrd_create(&pSelf_->nativeHandle,
+                                  GblThread_start_,
+                                  GBL_BOX_REF(pSelf));
 
     GBL_CTX_VERIFY(result == thrd_success,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
