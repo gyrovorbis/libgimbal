@@ -114,7 +114,7 @@
 - memory utilization and leak detection
 - dynamic/run-time test-plan construction and management
 
-### Building ###
+## Building ##
 Building is done with standard CMake, and all generators and mainstream compilers should be supported. You should be able to open CMakeLists.txt directly as a project file in most IDEs such as MSVC, XCode, Qt Creator, CLion, etc if you wish to build from a UI.
 
 To build the project and its unit tests from the command-line, you can do the following:
@@ -125,7 +125,7 @@ cmake -DGBL_ENABLE_TESTS=ON ..
 cmake --build . 
 ```
 
-### Dependencies ###
+## Dependencies ##
   - Original HashSet and BTree back-ends: Josh Baker (tidwall) 
     - https://github.com/tidwall/hashmap.c
     - https://github.com/tidwall/btree.c

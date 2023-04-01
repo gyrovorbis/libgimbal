@@ -3,9 +3,8 @@
 
 #include <time.h>
 
-#ifdef DREAMCAST
-#   include <kos/time.h>
-#elif !defined(GBL_NO_TIMESPEC_)
+
+#if !defined(GBL_NO_TIMESPEC_)
 #   if defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA)
 #       define GBL_NO_TIMESPEC_
 #   endif

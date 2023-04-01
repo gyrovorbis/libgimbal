@@ -375,7 +375,7 @@
 // alloca()
 #ifndef GBL_ALLOCA
 #   ifndef alloca
-#       if defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__) || defined(__EMSCRIPTEN__) || defined(VITA) || defined(DREAMCAST)
+#       if defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__) || defined(__EMSCRIPTEN__) || defined(VITA) || defined(__DREAMCAST__)
 #           include <alloca.h>     // alloca
 #       elif defined(_WIN32)
 #           include <malloc.h>     // alloca
