@@ -153,7 +153,7 @@ build dreamcast:
     variables:
       - $BUILD_DREAMCAST_DISABLED
   variables:
-    TOOLCHAIN_FILE: ${KOS_CMAKE_TOOLCHAIN}
+    TOOLCHAIN_FILE: ${KOS_BASE}/utils/cmake/dreamcast.toolchain.cmake
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j8 
     BINARY_EXTENSION: .elf
