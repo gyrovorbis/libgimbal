@@ -6,6 +6,7 @@
 #ifndef GIMBAL_THD_H
 #define GIMBAL_THD_H
 
+#include <tinycthread.h>
 #include <gimbal/core/gimbal_typedefs.h>
 #include "gimbal_stack_frame.h"
 

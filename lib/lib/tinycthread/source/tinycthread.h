@@ -62,7 +62,7 @@ extern "C" {
 #if !defined(_TTHREAD_PLATFORM_DEFINED_)
   #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
     #define _TTHREAD_WIN32_
-  #elif __STDC_VERSION__ == 201710L && !(__STDC_NO_THREADS__) && __DREAMCAST__
+  #elif defined( __DREAMCAST__)
     #define _TTHREAD_CTHREADS_
     #include <threads.h>
   #else
@@ -484,8 +484,10 @@ int tss_set(tss_t key, void *val);
   #define call_once(flag,func) pthread_once(flag,func)
 #endif
 
+#endif
+
 #ifdef __cplusplus
-}
+  }
 #endif
-#endif
+
 #endif /* _TINYTHREAD_H_ */

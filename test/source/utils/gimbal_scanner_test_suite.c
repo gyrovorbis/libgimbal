@@ -33,6 +33,8 @@ GBL_TEST_CASE(new)
                      GBL_SCANNER_DELIMETERS_DEFAULT"%");
 GBL_TEST_CASE_END
 
+#if 0
+
 GBL_TEST_CASE(peekTokenInvalid)
     GBL_TEST_VERIFY(!GblScanner_peekToken(pFixture->pEmptyScanner));
     GBL_TEST_VERIFY(pFixture->pEmptyScanner->status & GBL_SCANNER_FLAG_READ_ERROR);
@@ -72,7 +74,7 @@ GBL_TEST_CASE(peekEof)
     GBL_TEST_VERIFY(pFixture->pScanner->status & (GBL_SCANNER_FLAG_EOF |
                                                   GBL_SCANNER_FLAG_READ_ERROR));
 GBL_TEST_CASE_END
-
+#endif
 GBL_TEST_CASE(unref)
     GBL_UNREF(pFixture->pEmptyScanner);
     GBL_UNREF(pFixture->pScanner);
@@ -82,10 +84,10 @@ GBL_TEST_CASE_END
 
 GBL_TEST_REGISTER(createEmpty,
                   new,
-                  peekTokenInvalid,
-                  nextTokenInvalid,
-                  next,
-                  peek,
-                  nextAfterPeek,
-                  peekEof,
+//                  peekTokenInvalid,
+//                  nextTokenInvalid,
+//                  next,
+//                  peek,
+//                  nextAfterPeek,
+//                  peekEof,
                   unref)

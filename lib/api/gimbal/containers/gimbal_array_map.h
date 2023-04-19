@@ -198,9 +198,9 @@ GBL_INLINE GblArrayMapEntry* GblArrayMap_entryAdd_(GBL_PSELF, uintptr_t key) {
     if(*ppSelf && size && GblArrayMap_binarySearches(ppSelf)) {
         size_t  insertionIdx = size;
 
-        // If we have a little bitch array that's fast linearly
+        // If we have a little array that's fast linearly
         if(size < GBL_ARRAY_MAP_BINARY_SEARCH_CUTOFF_SIZE) {
-            // iterate (linearly, fuck you) to find insertion point
+            // iterate (linearly) to find insertion point
             for(size_t  i = 0; i < size; ++i) {
                 // insertion point is less than or equal to next
                 if(GblArrayMap_diffEntry_(ppSelf, i, key) >= 0) {

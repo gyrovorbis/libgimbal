@@ -21,6 +21,11 @@ if(ANDROID)
     find_package(Qt6 COMPONENTS Core Svg REQUIRED)
 endif()
 
+if ((CMAKE_COMPILER_IS_GNUCC))
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Os -g")
+endif()
+
+
 set(GIMBAL_TEST_SOURCES
     include/algorithms/gimbal_sort_test_suite.h
     source/algorithms/gimbal_sort_test_suite.c

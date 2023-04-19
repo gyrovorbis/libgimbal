@@ -25,6 +25,10 @@ static GBL_RESULT GblUri_dtor_(GblUri* pUri) {
     return GBL_RESULT_SUCCESS;
 }
 
+static void GblUri_validate_(GblUri* pUri) {
+
+}
+
 GBL_EXPORT GblUri* GblUri_create(void) {
     return GblRef_create(sizeof(GblUri));
 }
@@ -71,8 +75,74 @@ GBL_EXPORT void GblUri_clear(GblUri* pSelf) {
     memset(pSelf, 0, sizeof(GblUri));
 }
 
-GBL_EXPORT void GblUri_setScheme(GblUri* pSelf, const char* pStr) {
-    return GblUri_moveScheme(pSelf, GblStringRef_create(pStr));
+GBL_EXPORT void GblUri_setSchemeRef(GblUri* pSelf, GblStringRef* pRef) {
+    GblStringRef_unref(pSelf->pScheme);
+    pSelf->pScheme = pRef;
+    GblUri_validate_(pSelf);
 }
+
+GBL_EXPORT void GblUri_setScheme(GblUri* pSelf, const char* pStr) {
+    return GblUri_setSchemeRef(pSelf, GblStringRef_create(pStr));
+}
+
+GBL_EXPORT GblStringRef* GblUri_scheme(const GblUri* pSelf) {
+    return pSelf->pScheme;
+}
+
+GBL_EXPORT void GblUri_setAuthority(GblUri* pSelf, const char* pStr) {
+    GblStringRef_unref(pSelf->pUserName);
+    GblStringRef_unref(pSelf->pPassword);
+    // parse new shit
+    GblUri_validate_(pSelf);
+}
+
+GBL_EXPORT const char* GblUri_authority(const GblUri* pSelf, GblStringBuffer* pBuffer) {
+    // concatenate username + password
+    // return pointer to concatted buffer
+    return NULL;
+}
+
+GBL_EXPORT void GblUri_setUserInfo(GblUri* pSelf, const char* pStr) {
+    GblUri_setUserInfoRef(pSelf, pStr? GblStringRef_create(pStr) : NULL);
+}
+
+GBL_EXPORT void GblUri_setUserInfoRef(GblUri* pSelf, GblStringRef* pRef) {
+
+}
+
+GBL_EXPORT GblStringRef* GblUri_userInfo(const GblUri* pSelf) {
+    return NULL;
+}
+
+GBL_EXPORT void GblUri_setUserName(GblUri* pSelf, const char* pStr) {
+    GblUri_setUserNameRef(pSelf, pStr? GblStringRef_create(pStr) : NULL);
+}
+
+GBL_EXPORT void GblUri_setUserNameRef(GblUri* pSelf, GblStringRef* pRef) {
+    GblStringRef_unref(pSelf->pUserName);
+    pSelf->pUserName = pRef;
+    GblUri_validate_(pSelf);
+}
+
+GBL_EXPORT GblStringRef* GblUri_userName(const GblUri* pSelf) {
+    return pSelf->pUserName;
+}
+
+GBL_EXPORT void GblUri_setPassword(GblUri* pSelf, const char* pStr) {
+    GblUri_setPasswordRef(pSelf, pStr? GblStringRef_create(pStr) : NULL);
+}
+
+GBL_EXPORT void GblUri_setPasswordRef(GblUri* pSelf, GblStringRef* pRef)  {
+    GblStringRef_unref(pSelf->pPassword);
+    pSelf->pPassword = pRef;
+    GblUri_validate_(pSelf);
+}
+
+GBL_EXPORT GblStringRef* GblUri_password(const GblUri* pSelf) {
+    return pSelf->pPassword;
+}
+
+
+
 
 

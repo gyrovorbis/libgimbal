@@ -358,13 +358,13 @@ GBL_EXPORT GblStringList* GblStringList_createFilter(const GblStringList* pOther
                                                      const char*          pPattern) {
     GblStringList* pList = GblStringList_createEmpty();
 
-    GblPattern* pCompiled = GblPattern_compile(pPattern);
+    const GblPattern* pCompiled = GblPattern_compile(pPattern);
 
     for(GblStringList* pNode = pOther->ringNode.pNext;
         pNode != pOther;
         pNode = pNode->ringNode.pNext)
     {
-        if(GblPattern_firstMatchc(pCompiled, pNode->pData) >= 0) {
+        if(GblPattern_match(pCompiled, pNode->pData)) {
             GblRingList_pushBack(pList, GblStringRef_ref(pNode->pData));
         }
     }

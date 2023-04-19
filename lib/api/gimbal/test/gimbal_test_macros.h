@@ -22,7 +22,7 @@ GBL_INLINE const char* GBL_TEST_COMPARE_FMT_FLT_ (void) { return "Values differe
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_ (void) { return "Values differed [actual: %p, expected: %p]"; }
 
 #define GBL_TEST_COMPARE_FMT_TABLE_  (                      \
-        GBL_TEST_COMPARE_FMT_DFLT_,                         \
+        GBL_TEST_COMPARE_FMT_PTR_,                          \
         (                                                   \
             (char,          GBL_TEST_COMPARE_FMT_CHAR_),    \
             (int16_t,       GBL_TEST_COMPARE_FMT_INT_),     \
