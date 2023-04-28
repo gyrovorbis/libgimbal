@@ -28,12 +28,12 @@ static GblBool GblScanner_advance_(GblScanner* pSelf, size_t bytes) {
     return GBL_TRUE;
 }
 
-static GblBool GblScanner_isValidPos_(const GblScanner* pSelf, ssize_t pos) {
+static GblBool GblScanner_isValidPos_(const GblScanner* pSelf, int pos) {
     return (pos >= 0 || pos < GblStringRef_length(GBL_PRIV_REF(pSelf).pInputString));
 }
 
-char GblScanner_char_(const GblScanner* pSelf, ssize_t offset) {
-    const ssize_t pos = GblScanner_tell(pSelf) + offset;
+char GblScanner_char_(const GblScanner* pSelf, int offset) {
+    const int pos = GblScanner_tell(pSelf) + offset;
     if(GblScanner_isValidPos_(pSelf, pos)){
         return GBL_PRIV_REF(pSelf).pInputString[pos];
     }
@@ -140,7 +140,7 @@ GBL_EXPORT GblBool GblScanner_skipTokens(GblScanner* pSelf, size_t count) {
 }
 
 GBL_EXPORT GblBool GblScanner_skipLines(GblScanner* pSelf, size_t count) {
-    ssize_t offset = 0;
+    int offset = 0;
     for(size_t t = 0; t < count; ++t) {
 
         char value;
@@ -197,9 +197,9 @@ GBL_EXPORT GblBool GblScanner_setPos_(GblScanner* pSelf, size_t offset) {
     return GblScanner_advance_(pSelf, offset);
 }
 
-GBL_EXPORT GblBool GblScanner_seek(GblScanner* pSelf, ssize_t whence) {
-    const ssize_t pos = GblScanner_tell(pSelf);
-    const ssize_t newPos = pos + whence;
+GBL_EXPORT GblBool GblScanner_seek(GblScanner* pSelf, int whence) {
+    const int pos = GblScanner_tell(pSelf);
+    const int newPos = pos + whence;
     if(!GblScanner_isValidPos_(pSelf, newPos)) {
         return GBL_FALSE;
     } else {

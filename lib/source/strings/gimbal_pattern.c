@@ -10,15 +10,15 @@ GBL_EXPORT const GblPattern* GblPattern_compile(const char* pRegExp) {
 GBL_EXPORT GblBool (GblPattern_match)(const GblPattern* pSelf,
                                       const char*       pString,
                                       GblStringView*    pMatch,
-                                      ssize_t*          pCount)
+                                      int*          pCount)
 {
     GblBool retVal = GBL_FALSE;
     // Default arguments
     GblStringView defaultMatch = { 0 };
-    ssize_t       defaultCount = 1;
+    int       defaultCount = 1;
 
     // Running counters
-    ssize_t count      = 0;
+    int count      = 0;
     int     prevPos    = 0;
     int     pos        = 0;
     int     prevLength = 0;
@@ -69,7 +69,7 @@ GBL_EXPORT GblBool (GblPattern_match)(const GblPattern* pSelf,
 GBL_EXPORT GblBool (GblPattern_matchStr)(const char*    pRegExp,
                                          const char*    pString,
                                          GblStringView* pMatch,
-                                         ssize_t*       pCount)
+                                         int*       pCount)
 {
     return GblPattern_match(GblPattern_compile(pRegExp),
                             pString,
@@ -80,7 +80,7 @@ GBL_EXPORT GblBool (GblPattern_matchStr)(const char*    pRegExp,
 GBL_EXPORT GblBool (GblPattern_matchNot)(const GblPattern* pSelf,
                                          const char*       pString,
                                          GblStringView*    pMatch,
-                                         ssize_t*          pCount)
+                                         int*          pCount)
 {
 
 
@@ -89,7 +89,7 @@ GBL_EXPORT GblBool (GblPattern_matchNot)(const GblPattern* pSelf,
 GBL_EXPORT GblBool GblPattern_matchNotStr(const char*    pRegExp,
                                           const char*    pString,
                                           GblStringView* pMatch,
-                                          ssize_t*       pCount)
+                                          int*       pCount)
 {
     return GblPattern_matchNot(GblPattern_compile(pRegExp),
                                pString,
@@ -121,7 +121,7 @@ GBL_EXPORT GblBool GblPattern_matchExactStr(const char* pRegExp,
 
 
 GBL_EXPORT size_t GblPattern_matchCount(const GblPattern* pSelf, const char* pString) {
-    ssize_t count = -1;
+    int count = -1;
     GblPattern_match(pSelf, pString, NULL, &count);
     return count;
 }
