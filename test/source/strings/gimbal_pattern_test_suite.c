@@ -26,7 +26,7 @@ GBL_TEST_CASE(matchInvalid)
     GBL_TEST_EXPECT_ERROR();
 
     GblStringView match;
-    ssize_t count = 0;
+    int count = 0;
 
     GBL_TEST_VERIFY(!GblPattern_match(NULL,
                                       "12345678",
@@ -46,7 +46,7 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(matchNone)
     GblStringView match;
-    ssize_t count = 0;
+    int count = 0;
 
     GBL_TEST_VERIFY(GblPattern_match(pFixture->pPattern,
                                      "lolol",
@@ -74,7 +74,7 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(match)
     GblStringView view;
-    ssize_t count = 2;
+    int count = 2;
 
     GBL_TEST_VERIFY(GblPattern_match(pFixture->pPattern,
                                      "12345678amd12345678",
@@ -88,7 +88,7 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(matchLast)
     GblStringView view;
-    ssize_t count = -1;
+    int count = -1;
 
     GBL_TEST_VERIFY(GblPattern_match(pFixture->pPattern,
                                      "12345678amd12345678",

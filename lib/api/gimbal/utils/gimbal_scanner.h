@@ -85,7 +85,7 @@ GBL_EXPORT GblScanner* GblScanner_create        (const char* pStr,
 GBL_EXPORT GblRefCount GblScanner_unref         (GBL_SELF)                   GBL_NOEXCEPT;
 
 GBL_EXPORT size_t      GblScanner_tell          (GBL_CSELF)                  GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblScanner_seek          (GBL_SELF, ssize_t whence)   GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblScanner_seek          (GBL_SELF, int whence)       GBL_NOEXCEPT;
 GBL_EXPORT void        GblScanner_reset         (GBL_SELF)                   GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblScanner_pushCursor    (GBL_SELF)                   GBL_NOEXCEPT;

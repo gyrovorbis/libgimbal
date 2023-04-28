@@ -22,22 +22,22 @@ GBL_EXPORT const GblPattern*
 GBL_EXPORT GblBool GblPattern_match         (GBL_CSELF,
                                              const char*    pString,
                                              GblStringView* pMatch/*=NULL*/,
-                                             ssize_t*       pCount/*=NULL*/) GBL_NOEXCEPT;
+                                             int*           pCount/*=NULL*/) GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool GblPattern_matchStr      (const char*    pRegExp,
                                              const char*    pString,
                                              GblStringView* pMatch/*=NULL*/,
-                                             ssize_t*       pCount/*=NULL*/) GBL_NOEXCEPT;
+                                             int*           pCount/*=NULL*/) GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool GblPattern_matchNot      (GBL_CSELF,
                                              const char*    pString,
                                              GblStringView* pMatch/*=NULL*/,
-                                             ssize_t*       pCount/*=NULL*/) GBL_NOEXCEPT;
+                                             int*           pCount/*=NULL*/) GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool GblPattern_matchNotStr   (const char*    pRegExp,
                                              const char*    pString,
                                              GblStringView* pMatch/*=NULL*/,
-                                             ssize_t*       pCount/*=NULL*/) GBL_NOEXCEPT;
+                                             int*           pCount/*=NULL*/) GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool GblPattern_matchExact    (GBL_CSELF, const char* pString) GBL_NOEXCEPT;
 

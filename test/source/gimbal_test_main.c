@@ -209,11 +209,12 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_createFromType(GBL_BIT_VIEW_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_SCANNER_TEST_SUITE_TYPE));
+#ifndef _WIN32
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_MODULE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_createFromType(GBL_THREAD_TEST_SUITE_TYPE));
-
+#endif
 
     const GBL_RESULT result = GblTestScenario_run(pScenario, argc, pArgv);
 
