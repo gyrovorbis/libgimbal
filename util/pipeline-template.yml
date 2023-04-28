@@ -189,6 +189,7 @@ build android-sim:
     CMAKE_CONFIGURE: ${PREFIX_PATH}/../../Tools/CMake/bin/cmake 
     CMAKE_BUILD: cmake
     EXTRA_CMAKE_ARGS: >
+      -DQT_HOST_PATH=${QT_PATH}/gcc_64
       -DANDROID_PLATFORM=android-23
       -DANDROID_NDK=${ANDROID_NDK}
       -DANDROID_ABI=x86_64
