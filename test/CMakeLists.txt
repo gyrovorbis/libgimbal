@@ -131,7 +131,6 @@ if(ANDROID)
         MANUAL_FINALIZATION
         ${GIMBAL_TEST_SOURCES}
     )
-    set_property(TARGET GimbalTests APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android)
 else()
     add_executable(GimbalTests
         ${GIMBAL_TEST_SOURCES}
