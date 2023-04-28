@@ -191,7 +191,7 @@ build android-sim:
     EXTRA_CMAKE_ARGS: >
       -DCMAKE_FIND_ROOT_PATH=${PREFIX_PATH}
       -DQT_HOST_PATH=${QT_PATH}/gcc_64
-      -DANDROID_PLATFORM=android-23
+      -DANDROID_PLATFORM=android-33
       -DANDROID_NDK=${ANDROID_NDK}
       -DANDROID_ABI=x86_64
       -DANDROID_STL=c++_shared  
