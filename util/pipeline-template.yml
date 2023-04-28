@@ -210,19 +210,24 @@ build ios-sim:
     PREFIX_PATH: ${QT_PATH}/ios
     CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake
     CMAKE_BUILD: ${PREFIX_PATH}/../../Tools/CMake/CMake.app/Contents/bin/cmake
+    GENERATOR: Xcode
+    BUILD_TARGET: ALL_BUILD
+    BINARY_EXTENSION: .app
     EXTRA_CMAKE_ARGS: >
-      -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator 
-      -DCMAKE_GENERATOR:STRING=Xcode 
-      '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${PREFIX_PATH}/../../Qt/Qt Creator.app/Contents/Resources/package-manager/auto-setup.cmake' 
       -DQT_QMAKE_EXECUTABLE:FILEPATH=${PREFIX_PATH}/bin/qmake 
+      -DCMAKE_OSX_ARCHITECTURES=x86_64 
+      -DCMAKE_OSX_SYSROOT=iphonesimulator 
+      -DCMAKE_GENERATOR:STRING=Xcode 
       -DCMAKE_C_COMPILER:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang 
       -DCMAKE_CXX_COMPILER:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++   
       -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${PREFIX_PATH}/lib/cmake/Qt6/qt.toolchain.cmake
       -DCMAKE_CXX_FLAGS=-std=c++20
-    GENERATOR: Xcode
-    BUILD_TARGET: ALL_BUILD
   tags: 
     - ios, simulator
+  artifacts:
+    paths:
+       - ${BUILD_DIR}
+    expire_in: 1 week
 
 # Top-level WebASM build job
 build webasm:
