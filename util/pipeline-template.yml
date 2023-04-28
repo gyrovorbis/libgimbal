@@ -14,7 +14,7 @@ variables:
   PROJECT_CMAKE_ARGS: ""
   BUILD_TARGET: all
   BUILD_CONFIG: ${BUILD_TYPE}
-  DOCS_FTP_PARALLEL_JOBS: 10
+  DOCS_FTP_PARALLEL_JOBS: 32
   DOCS_DIR: "doc"
   BINARY_PATH: ""
   BINARY_EXTENSION: ""
@@ -421,4 +421,8 @@ publish-docs:
   - cd ${DOCS_DIR}
   - doxygen
   - cd html
-  - lftp -c "open ${DOCS_FTP_ADDRESS}; login $FTP_USER $FTP_PASS; mirror -X *. --reverse --verbose --parallel=${DOCS_FTP_PARALLEL_JOBS} ./ ./; bye"
+  - lftp -c "set ssl:verify-certificate false;
+    open ${DOCS_FTP_ADDRESS}; 
+    login $FTP_USER $FTP_PASS; 
+    mirror -X *. --reverse --verbose --parallel=${DOCS_FTP_PARALLEL_JOBS} ./ ./; 
+    bye"
