@@ -155,7 +155,7 @@ build dreamcast:
   variables:
     TOOLCHAIN_FILE: ${KOS_BASE}/utils/cmake/dreamcast.toolchain.cmake
     GENERATOR: "Unix Makefiles"
-    EXTRA_GENERATOR_ARGS: -j8 
+    EXTRA_GENERATOR_ARGS: -j32 
     BINARY_EXTENSION: .elf
   before_script:
     - source ${KOS_BASE}/../environ.sh
@@ -171,7 +171,7 @@ build psvita:
   variables:
     TOOLCHAIN_FILE: ${VITASDK}/share/vita.toolchain.cmake
     GENERATOR: "Unix Makefiles"
-    EXTRA_GENERATOR_ARGS: -j8 
+    EXTRA_GENERATOR_ARGS: -j32
   tags: 
     - psvita, vitasdk
 
@@ -186,7 +186,7 @@ build android-sim:
     CMAKE_CONFIGURE: ${PREFIX_PATH}/bin/qt-cmake 
     CMAKE_BUILD: cmake
     GENERATOR: "Unix Makefiles"
-    EXTRA_GENERATOR_ARGS: -j8 
+    EXTRA_GENERATOR_ARGS: -j32 
   tags: 
     - android, ndk
 
@@ -221,12 +221,12 @@ build webasm:
     variables:
       - $BUILD_WEBASM_DISABLED
   variables:
-    PREFIX_PATH: ${QT_PATH}/wasm_32
+    PREFIX_PATH: ${QT_PATH}/wasm_singlethread
     CC: ${EMSDK}/upstream/emscriptgen/emcc
     CXX: ${EMSDK}/upstream/emscriptgen/em++
     TOOLCHAIN_FILE: ${PREFIX_PATH}/lib/cmake/Qt6/qt.toolchain.cmake
     EXTRA_CMAKE_ARGS: >
-      '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${PREFIX_PATH}/../Tools/Preview/Qt Creator 7.0.0-rc1/share/qtcreator/package-manager/auto-setup.cmake' 
+      '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${PREFIX_PATH}/../Tools/Q Creator/share/qtcreator/package-manager/auto-setup.cmake' 
       -DQT_QMAKE_EXECUTABLE:FILEPATH=${PREFIX_PATH}/bin/qmake
   before_script:
     - source ${EMSDK}/emsdk_env.sh
