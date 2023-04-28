@@ -183,9 +183,8 @@ build android-sim:
       - $BUILD_ANDROID_SIM_DISABLED
   variables:
     PREFIX_PATH: ${QT_PATH}/android_x86_64
-    CMAKE_CONFIGURE: ${PREFIX_PATH}/../../Tools/Cmake/bin/cmake 
+    CMAKE_CONFIGURE: ${PREFIX_PATH}/../../Tools/CMake/bin/cmake 
     CMAKE_BUILD: cmake
-    EXTRA_GENERATOR_ARGS: -j32 
   tags: 
     - android, ndk
 
