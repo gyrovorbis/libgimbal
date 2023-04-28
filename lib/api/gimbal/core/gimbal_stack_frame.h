@@ -8,6 +8,7 @@
 
 #include "../core/gimbal_result.h"
 #include <stdarg.h>
+#include <stdio.h>
 
 GBL_DECLS_BEGIN
 
@@ -99,7 +100,7 @@ GBL_INLINE void GblCallRecord_construct(GblCallRecord* pRecord, GBL_RESULT resul
     pRecord->result = GBL_RESULT_UNKNOWN;
     pRecord->message[0] = '\0';
     pRecord->srcLocation.pFile = pRecord->srcLocation.pFunc = GBL_NULL;
-    if(pFmt) GBL_UNLIKELY vsnprintf(pRecord->message, sizeof(pRecord->message), pFmt, varArgs);
+    if(pFmt) GBL_UNLIKELY vsprintf(pRecord->message, pFmt, varArgs);
     va_end(varArgs);
     pRecord->srcLocation    = source;
     pRecord->result         = resultCode;
