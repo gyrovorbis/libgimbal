@@ -332,7 +332,7 @@ test dreamcast-emu:
   script:
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
-    - lxdream-nitro -H -d -e ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}/${BINARY_EXTENSION} 
+    - lxdream-nitro -H -d -e ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
 
