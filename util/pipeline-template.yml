@@ -207,6 +207,7 @@ build android-sim:
     --jdk ${JDK}
     --gradle
     --release
+    --sign
   tags: 
     - android, ndk
   artifacts:
@@ -290,14 +291,15 @@ test android-sim:
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
     - ${ANDROID_SDK}/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do ${ANDROID_SDK}/paltform-tools/adb -s $line emu kill; done || true
-    - ${ANDROID_SDK}/platform-tools/adb kill-server || true
+#   - ${ANDROID_SDK}/platform-tools/adb kill-server || true
     - nohup ${ANDROID_SDK}/emulator/emulator -avd Pixel_3a_API_33_x86_64 -no-window || true </dev/null &
-    - sleep 3
+#   - ${ANDROID_SDK}/paltform-tools/adb start-server || true
+    - sleep 30
     - ${ANDROID_SDK}/platform-tools/adb install ${BUILD_DIR}/${BINARY_PATH}/android-build/build/outputs/apk/release/android-build-release.apk
     - ${ANDROID_SDK}/platform-tools/adb shell logcat -b main &
     - ${ANDROID_SDK}/platform-tools/adb shell am start -a android.intent.acton.MAIN -n org.qtproject.example.${BINARY_NAME}/org.qtproject.qt.android.bindings.QtActivity
     - ${ANDROID_SDK}/paltform-tools/adb devices | grep emulator | cut -f1 | while read line; do ${ANDROID_SDK}/paltform-tools/adb -s $line emu kill; done
-    - ${ANDROID_SDK}/paltform-tools/adb kill-server
+#   - ${ANDROID_SDK}/paltform-tools/adb kill-server
   timeout: 2m
 
 test ios-sim:
