@@ -200,10 +200,10 @@ build android-sim:
       -DQT_NO_GLOBAL_APK_TARGET_PART_OF_ALL=ON
   after_script: >
     ${QT_PATH}/gcc_64/bin/androiddeployqt 
-      --verbose 
-      --output ${BUILD_DIR}/${BINARY_PATH}/android-build 
-      --android-platform=android-33 
-      --input ${BUILD_DIR}/${BINARY_PATH}/android-${BINARY_NAME}-deployment-settings.json
+    --verbose 
+    --output ${BUILD_DIR}/${BINARY_PATH}/android-build 
+    --android-platform=android-33 
+    --input ${BUILD_DIR}/${BINARY_PATH}/android-${BINARY_NAME}-deployment-settings.json
   tags: 
     - android, ndk
   artifacts:
