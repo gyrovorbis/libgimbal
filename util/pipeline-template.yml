@@ -287,7 +287,10 @@ test android-sim:
     - android, simulator
   script:
     - set -x #echo on
-    - nohup ${ANDROID_SDK}/emulator/emulator -avd Pixel_3a_API_33_x86_64 -no-window 2>&1 </dev/null & || true
+    - exec > >(tee -a "${BUILD_DIR}/results.txt" )
+    - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
+    - nohup ${ANDROID_SDK}/emulator/emulator -avd Pixel_3a_API_33_x86_64 -no-window || true </dev/null &
+    - tail -f nohup.out
     - sleep 3
     - ${ANDROID_SDK}/platform-tools/adb install ${BUILD_DIR}/${BINARY_PATH}/android-build/build/outputs/apk/release/android-build-release.apk
     - ${ANDROID_SDK}/platform-tools/adb shell logcat -b main &
