@@ -104,8 +104,12 @@
 // Thread-local storage
 #ifdef _MSC_VER
 #   define GBL_THREAD_LOCAL __declspec(thread)
-#elif !defined(__DREAMCAST__)
-#   define GBL_THREAD_LOCAL __thread
+#else
+#   if defined(__DREAMCAST__)
+#       define GBL_THREAD_LOCAL
+#   else
+#       define GBL_THREAD_LOCAL __thread
+#   endif
 #endif
 
 //====== C++ FEATURE SUPPORT ==============

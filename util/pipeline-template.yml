@@ -197,6 +197,12 @@ build android-sim:
       -DANDROID_STL=c++_shared  
       -DANDROID_SDK_ROOT=${ANDROID_SDK}
       -DQT_NO_GLOBAL_APK_TARGET_PART_OF_ALL=ON
+    after_script: >
+      ${QT_PATH}/gcc_64/bin/androiddeployqt 
+        --verbose 
+        --output ${BUILD_DIR}/${BINARY_PATH}/android-build 
+        --android-platform=android-33 
+        --input ${BUILD_DIR}/${BINARY_PATH}/android-${BINARY_NAME}-deployment-settings.json
   tags: 
     - android, ndk
   artifacts:
@@ -245,7 +251,7 @@ build webasm:
     CXX: ${EMSDK}/upstream/emscriptgen/em++
     TOOLCHAIN_FILE: ${PREFIX_PATH}/lib/cmake/Qt6/qt.toolchain.cmake
     EXTRA_CMAKE_ARGS: >
-      '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${PREFIX_PATH}/../Tools/Q Creator/share/qtcreator/package-manager/auto-setup.cmake' 
+      '-DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${PREFIX_PATH}/../Tools/Qt Creator/share/qtcreator/package-manager/auto-setup.cmake' 
       -DQT_QMAKE_EXECUTABLE:FILEPATH=${PREFIX_PATH}/bin/qmake
   before_script:
     - source ${EMSDK}/emsdk_env.sh
