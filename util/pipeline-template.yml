@@ -208,6 +208,7 @@ build android-sim:
     --gradle
     --release
     --sign
+    --no-generated-assets-cache
   tags: 
     - android, ndk
   artifacts:
