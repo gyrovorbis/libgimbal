@@ -287,10 +287,14 @@ test android-sim:
     - android, simulator
   script:
     - set -x #echo on
-    - ${ANDROID_SDK}/emulator/emulator -avd Pixel_3a_API_33_x86_64 -no-window &
+    - nohup ${ANDROID_SDK}/emulator/emulator -avd Pixel_3a_API_33_x86_64 -no-window 2>&1 </dev/null & || true
+    - sleep 3
     - ${ANDROID_SDK}/platform-tools/adb install ${BUILD_DIR}/${BINARY_PATH}/android-build/build/outputs/apk/release/android-build-release.apk
     - ${ANDROID_SDK}/platform-tools/adb shell logcat -b main &
     - ${ANDROID_SDK}/platform-tools/adb shell am start -a android.intent.acton.MAIN -n org.qtproject.example.GimbalTests/org.qtproject.qt.android.bindings.QtActivity
+    - ${ANDROID_SDK}/paltform-tools/adb devices | grep emulator | cutv -f1 | while read line; do ${ANDROID_SDK}/paltform-tools/adb -s $line emu kill; done
+    - ${ANDROID_SDK}/paltform-tools/adb kill-server
+  timeout: 2m
 
 test ios-sim:
   stage: test 
