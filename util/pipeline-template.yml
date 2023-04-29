@@ -199,6 +199,10 @@ build android-sim:
       -DQT_NO_GLOBAL_APK_TARGET_PART_OF_ALL=ON
   tags: 
     - android, ndk
+  artifacts:
+    paths:
+       - ${BUILD_DIR}
+    expire_in: 1 week
 
 # Top-level iOS Simulator build job
 build ios-sim:
