@@ -255,6 +255,30 @@ build webasm:
   script:
     - ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
 
+test android-sim:
+  stage: test 
+  needs: ["build android-sim"]
+  dependencies:
+    - build android-sim 
+  only:
+    variables:
+      - $ANDROID_SIM_DEVICE_ID
+      - $BUILD_ANDROID_SIM_DISABLED == null
+  except:
+    variables:
+      - $TEST_ANDROID_SIM_DISABLED  
+  variables:
+    BINARY_EXTENSION: .apk
+  tags:
+    - android, simulator
+  script:
+    - set -x #echo on
+    - ${ANDROID_SDK}/emulator/emulator -avd Pixel_3a_API_33_x86_64 || true
+    - ${ANDROID_SDK}/platform-tools/adb install ${BUILD_DIR}/${BINARY_PATH}/android-build/build/outputs/apk/release/android-build-release.apk
+    - ${ANDROID_SDK}/platform-tools/adb start-server
+    - ${ANDROID_SDK}/platform-tools/adb shell logcat -b main &
+    - ${ANDROID_SDK}/platform-tools/adb shell am start -a android.intent.acton.MAIN -n org.qtproject.example.GimbalTests/org.qtproject.qt.android.bindings.QtActivity
+
 test ios-sim:
   stage: test 
   needs: ["build ios-sim"]
