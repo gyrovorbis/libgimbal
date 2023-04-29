@@ -289,8 +289,9 @@ test android-sim:
     - set -x #echo on
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
+    - ${ANDROID_SDK}/paltform-tools/adb devices | grep emulator | cutv -f1 | while read line; do ${ANDROID_SDK}/paltform-tools/adb -s $line emu kill; done || true
+    - ${ANDROID_SDK}/paltform-tools/adb kill-server || true
     - nohup ${ANDROID_SDK}/emulator/emulator -avd Pixel_3a_API_33_x86_64 -no-window || true </dev/null &
-    - tail -f nohup.out
     - sleep 3
     - ${ANDROID_SDK}/platform-tools/adb install ${BUILD_DIR}/${BINARY_PATH}/android-build/build/outputs/apk/release/android-build-release.apk
     - ${ANDROID_SDK}/platform-tools/adb shell logcat -b main &
