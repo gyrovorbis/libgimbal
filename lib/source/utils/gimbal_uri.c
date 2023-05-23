@@ -39,6 +39,11 @@ GBL_EXPORT GblUri* GblUri_createParsed(const char* pStr, GblBool relaxed) {
     return pUri;
 }
 
+GBL_EXPORT GBL_RESULT GblUri_parse(GblUri* pUri, const char* pStr, GblBool relaxed) {
+    // TODO: Unimplemented.
+    return GBL_RESULT_UNIMPLEMENTED;
+}
+
 GBL_EXPORT GblUri* GblUri_ref(GblUri* pUri) {
     return GblRef_ref(pUri);
 }
@@ -141,8 +146,3 @@ GBL_EXPORT void GblUri_setPasswordRef(GblUri* pSelf, GblStringRef* pRef)  {
 GBL_EXPORT GblStringRef* GblUri_password(const GblUri* pSelf) {
     return pSelf->pPassword;
 }
-
-
-
-
-
