@@ -9,7 +9,7 @@
   <h3 align="center">libGimbal</h3>
 
   <p align="center">
-    C17-Based Extended Standard Library and Cross-Language Runtime Framework
+    C17-Based Extended Standard Library and Object-Oriented Type System
     <br />
     <a href="http://libgimbal.elysianshadows.com"><strong>Explore the docs »</strong></a>
     <br />
@@ -56,7 +56,26 @@ libGimbal is being built in CI with the following compilers:
 - MinGW-w64
 - Emscripten
 
+## Building ##
+Building is done with standard CMake, and all generators and mainstream compilers should be supported. You should be able to open CMakeLists.txt directly as a project file in most IDEs such as MSVC, XCode, Qt Creator, CLion, etc if you wish to build from a UI.
+
+To build the project and its unit tests from the command-line, you can do the following:
+```
+mkdir build
+cd build
+cmake -DGBL_ENABLE_TESTS=ON ..
+cmake --build . 
+```
+
+## Bindings ##
+LibGimbal was specifically written with language interoperability in mind. As such, we will be happy to support and feature bindings to your favorite language. The following is a list of libraries which offer bindings between libGimbal and other languages:
+
+|Library                                                                         | Language |
+|--------------------------------------------------------------------------------|----------|
+|<a href="https://github.com/AaronGlazer/jimbal"><strong>Jimbal</strong></a>     |Jai       |
+
 ## Modules ##
+The following is a closer look at the contents of each module:
 ### Core Framework ###
 - platform-specific macros and utilities
 - error and exception handling
@@ -121,34 +140,20 @@ libGimbal is being built in CI with the following compilers:
 - memory utilization and leak detection
 - dynamic/run-time test-plan construction and management
 
-## Building ##
-Building is done with standard CMake, and all generators and mainstream compilers should be supported. You should be able to open CMakeLists.txt directly as a project file in most IDEs such as MSVC, XCode, Qt Creator, CLion, etc if you wish to build from a UI.
+## Credits ##
+### Author ###
+Falco Girgis
+### Dependencies ###
+- Original HashSet and BTree back-ends: Josh Baker (tidwall) 
+  - https://github.com/tidwall/hashmap.c
+  - https://github.com/tidwall/btree.c
+- Original TinyCThreads: Marcus Geelnard, Evan Nemerson
+  - https://tinycthread.github.io/
+- SipHash: Jean-Philippe Amasson, Daniel J. Bernstein 
+  - http://creativecommons.org/publicdomain/zero/1.0/
+- MurmurHash3: Austin Appleby
+- Original strptime: Based on musl C Standard Library Implementation
+  - https://git.musl-libc.org/cgit/musl/tree/src/time/strptime.c
+- GblPattern engine back-end: tiny-regex-c 
+  - https://github.com/kokke/tiny-regex-c
 
-To build the project and its unit tests from the command-line, you can do the following:
-```
-mkdir build
-cd build
-cmake -DGBL_ENABLE_TESTS=ON ..
-cmake --build . 
-```
-
-## Dependencies ##
-  - Original HashSet and BTree back-ends: Josh Baker (tidwall) 
-    - https://github.com/tidwall/hashmap.c
-    - https://github.com/tidwall/btree.c
-  - Original TinyCThreads: Marcus Geelnard, Evan Nemerson
-    - https://tinycthread.github.io/
-  - SipHash: Jean-Philippe Amasson, Daniel J. Bernstein 
-    - http://creativecommons.org/publicdomain/zero/1.0/
-  - MurmurHash3: Austin Appleby
-  - Original strptime: Based on musl C Standard Library Implementation
-    - https://git.musl-libc.org/cgit/musl/tree/src/time/strptime.c
-  - GblPattern engine back-end: tiny-regex-c 
-    - https://github.com/kokke/tiny-regex-c
-
-## Bindings ##
-LibGimbal was specifically written with language interoperability in mind. As such, we will be happy to support and feature bindings to your favorite language. The following is a list of libraries which offer bindings between libGimbal and other languages:
-
-|Library                                                                         | Language |
-|--------------------------------------------------------------------------------|----------|
-|<a href="https://github.com/AaronGlazer/jimbal"><strong>Jimbal</strong></a>     |Jai       |
