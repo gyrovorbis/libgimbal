@@ -23,7 +23,7 @@
 </div>
 
 ## Overview ##
-libGimbal aims to bring high-level constructs and niceties of modern languages and their standard libraries to low-level C, where they can be implemented with a focus on performance for embedded devices and game consoles. libGimbal includes features typically found in core application frameworks such as Foundation, QtCore, or GLib, or in languages such as C# or Java. At its core, libGimbal utilizes an object-oriented dynamic type system, which allows C to transcend its own language limitations and provides a flexible avenue for interoperability with other languages. 
+libGimbal aims to bring the high-level constructs and niceties of modern languages and their standard libraries to low-level C, where they can be implemented with a focus on performance for embedded devices and game consoles. libGimbal includes features typically found in core application frameworks such as Foundation, QtCore, or GLib, or in languages such as C# or Java. At its core, libGimbal utilizes an object-oriented dynamic type system, which allows C to transcend its own language limitations and provides a flexible avenue for interoperability with other languages. 
 
 ## Features ##
 libGimbal is split into a series of modules, featuring:
