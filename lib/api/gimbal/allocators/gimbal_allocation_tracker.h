@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblAllocationTracker, counters, and related API
  *  \ingroup allocators
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_ALLOCATION_TRACKER_H

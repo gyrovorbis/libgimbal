@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Builtin closure marshals and generator macros
  *  \ingroup signals
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_MARSHAL_H

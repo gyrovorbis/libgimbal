@@ -146,7 +146,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/instances/gimbal_object.h
     api/gimbal/meta/instances/gimbal_box.h
     api/gimbal/meta/properties/gimbal_property.h
-    api/gimbal/meta/properties/gimbal_bool_property.h
     api/gimbal/meta/signals/gimbal_signal.h
     api/gimbal/meta/signals/gimbal_marshal.h
     api/gimbal/meta/signals/gimbal_closure.h
@@ -159,6 +158,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/types/gimbal_builtin_types.h
     source/meta/types/gimbal_type_.h
     api/gimbal/platform/gimbal_time_.h
+    api/gimbal/platform/gimbal_thread_.h
+    api/gimbal/platform/gimbal_system_.h
     api/gimbal/preprocessor/gimbal_compiler.h
     api/gimbal/preprocessor/gimbal_macro_composition.h
     api/gimbal/preprocessor/gimbal_macro_utils.h
@@ -184,6 +185,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/utils/gimbal_bit_view.h
     api/gimbal/utils/gimbal_scanner.h
     api/gimbal/utils/gimbal_uri.h
+    api/gimbal/utils/gimbal_settings.h
 )
 
 
@@ -228,7 +230,6 @@ set(GIMBAL_SOURCES
     source/meta/instances/gimbal_instance.c
     source/meta/instances/gimbal_box.c
     source/meta/properties/gimbal_property.c
-    source/meta/properties/gimbal_bool_property.c
     source/meta/signals/gimbal_signal.c
     source/meta/signals/gimbal_marshal.c
     source/meta/signals/gimbal_closure.c
@@ -245,6 +246,7 @@ set(GIMBAL_SOURCES
     source/strings/gimbal_string.c
     source/strings/gimbal_string_list.c
     source/strings/gimbal_pattern.c
+    source/strings/gimbal_string_view.c
     source/test/gimbal_test_suite.c
     source/test/gimbal_test_scenario.c
     source/utils/gimbal_cmd_parser.c
@@ -257,6 +259,7 @@ set(GIMBAL_SOURCES
     source/utils/gimbal_bit_view.c
     source/utils/gimbal_uri.c
     source/utils/gimbal_scanner.c
+    source/utils/gimbal_settings.c
 )
 
 add_library(libGimbal STATIC

@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Preprocessor module-wide include
  *  \ingroup preprocessor
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_PREPROCESSOR_H

@@ -1,6 +1,10 @@
 /*! \file
  *  \brief GblContext API management instance type
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
+ *  \todo
+ *      - get the eff rid of me
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_CONTEXT_H

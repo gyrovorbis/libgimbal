@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Unit testing macro utilities
  *  \ingroup testing
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_TEST_H

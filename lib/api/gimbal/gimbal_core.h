@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Core module-wide include
  *  \ingroup core
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_CORE_H

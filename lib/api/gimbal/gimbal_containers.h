@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Containers module-wide include
  *  \ingroup containers
+ *
+ *  \author Falco Girgis
  */
 
 

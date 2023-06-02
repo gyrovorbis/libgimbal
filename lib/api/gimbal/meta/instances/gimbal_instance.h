@@ -2,6 +2,8 @@
  *  \brief GblInstance structure and related functions
  *  \ingroup meta
  *  \sa gimbal_type.h, gimbal_class.h
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_INSTANCE_H

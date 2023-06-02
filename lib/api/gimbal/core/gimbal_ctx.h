@@ -1,6 +1,8 @@
 ﻿/*! \file
  *  \brief GblContext top-level debug and control-flow macros
  *  \ingroup core
+ *
+ *  \author Falco Girgis
  */
 #ifndef GIMBAL_CTX_H
 #define GIMBAL_CTX_H
@@ -185,7 +187,7 @@ GBL_DECLS_BEGIN
             GBL_CTX_VERIFY(                         \
                 GBL_RESULT_SUCCESS(code),           \
                 code,                               \
-                "ERRNO: %x", errno);                \
+                "ERRNO: %s", strerror(errno));      \
         }                                           \
     } GBL_STMT_END
 #else

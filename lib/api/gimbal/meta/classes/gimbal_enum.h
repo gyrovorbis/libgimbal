@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblEnumClass and API for managing enumerated types
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_ENUM_H

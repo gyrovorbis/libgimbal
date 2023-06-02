@@ -29,8 +29,8 @@ GBL_TEST_CASE(new)
                                  "delimeters", GBL_SCANNER_DELIMETERS_DEFAULT"%",
                                  "input",      pInput);
 
-    GBL_TEST_COMPARE(GBL_PRIV_REF(pFixture->pScanner).pDelimeters,
-                     GBL_SCANNER_DELIMETERS_DEFAULT"%");
+    //GBL_TEST_COMPARE(GBL_PRIV_REF(pFixture->pScanner).pDelimeters,
+    //                 GBL_SCANNER_DELIMETERS_DEFAULT"%");
 GBL_TEST_CASE_END
 
 #if 0

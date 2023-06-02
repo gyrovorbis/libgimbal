@@ -4,6 +4,8 @@
  *  \todo
  *      - design URI flags
  *      - implement back-end
+ *
+ *  \author Falco Girgis
  */
 #ifndef GIMBAL_URI_H
 #define GIMBAL_URI_H

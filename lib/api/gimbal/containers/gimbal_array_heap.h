@@ -2,6 +2,8 @@
  *  \brief GblArrayHeap container and related functions
  *  \ingroup containers
  *  \copydoc GblArrayHeap
+ *
+ *  \author Falco Girgis
  */
 #ifndef GIMBAL_ARRAY_HEAP_H
 #define GIMBAL_ARRAY_HEAP_H

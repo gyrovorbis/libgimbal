@@ -8,6 +8,8 @@
  *   - GblArrayMap for underlying structure doesn't make sensse, use GblArrayList
  *   - need code for adding and removing to/from vector
  *   - checking for auto invocation upon constructed won't work--hasn't been set yet
+ *
+ *   \author Falco Girgis
  */
 #ifndef GIMBAL_THREAD_H
 #define GIMBAL_THREAD_H
@@ -33,7 +35,6 @@ GBL_FORWARD_DECLARE_STRUCT(GblThread);
 
 typedef GBL_RESULT (*GblThreadFn)    (GBL_SELF);
 typedef GblBool    (*GblThreadIterFn)(GBL_SELF, void* pClosure);
-typedef uintptr_t   GblThreadId;
 typedef uintptr_t   GblThreadAffinity;
 
 GBL_DECLARE_ENUM(GBL_THREAD_PRIORITY) {

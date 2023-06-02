@@ -1,6 +1,11 @@
 /*! \file
  *  \brief GblIPlugin abstract plugin interface
  *  \ingroup interfaces
+ *  \sa GblModule
+ *  \todo
+ *      - finalize with GblModule
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_PLUGIN_H

@@ -3,6 +3,8 @@
  *  \ingroup utils
  *  \todo
  *      - change whole model to use timespec nsec
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_TIMER_H

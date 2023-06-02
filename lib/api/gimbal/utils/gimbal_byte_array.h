@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblByteArray structure and related functions
  *  \ingroup utils
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_BYTE_ARRAY_H

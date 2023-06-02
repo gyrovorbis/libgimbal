@@ -57,9 +57,10 @@ GBL_EXPORT GblApp* GblApp_create(int argc, const char** ppArgv) {
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Attempted create a GblApp with one already active!");
 
-    pApp = GBL_OBJECT_NEW(GblApp,
-                          "argc", argc,
-                          "argv", ppArgv);
+    pApp = GBL_NEW(GblApp,
+                   "argc", argc,
+                   "argv", ppArgv);
+
     GBL_CTX_END_BLOCK();
     pInstance_ = pApp;
     return pApp;

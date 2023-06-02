@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblTestScenario and related functions.
  *  \ingroup testing
+ *
+ *  \author Falco Girgis
  */
 #ifndef GIMBAL_TEST_SCENARIO_H
 #define GIMBAL_TEST_SCENARIO_H

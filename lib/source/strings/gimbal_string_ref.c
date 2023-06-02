@@ -1,8 +1,9 @@
 #include <gimbal/strings/gimbal_string_ref.h>
+#include <gimbal/algorithms/gimbal_hash.h>
 
 
 GBL_EXPORT GblStringRef* GblStringRef_createFromViewWithContext(GblStringView view,
-                                                                GblContext* pCtx) GBL_NOEXCEPT
+                                                                GblContext* pCtx)
 {
     GblStringRef* pStr = NULL;
     GBL_CTX_BEGIN(pCtx);
@@ -22,7 +23,7 @@ GBL_EXPORT GblStringRef* GblStringRef_createFromViewWithContext(GblStringView vi
     return pStr;
 }
 
-GBL_EXPORT GblStringRef* GblStringRef_acquire(const GblStringRef* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblStringRef* GblStringRef_acquire(const GblStringRef* pSelf) {
     GBL_CTX_BEGIN(NULL);
     GblStringRef* pOut = NULL;
     if(pSelf) {
@@ -37,7 +38,7 @@ GBL_EXPORT GblStringRef* GblStringRef_acquire(const GblStringRef* pSelf) GBL_NOE
     return pOut;
 }
 
-GBL_EXPORT GblRefCount GblStringRef_release(const GblStringRef* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblRefCount GblStringRef_release(const GblStringRef* pSelf) {
     GBL_CTX_BEGIN(NULL);
     GblRefCount count = 0;
     if(pSelf) {
@@ -51,7 +52,7 @@ GBL_EXPORT GblRefCount GblStringRef_release(const GblStringRef* pSelf) GBL_NOEXC
     return count;
 }
 
-GBL_EXPORT char GblStringRef_at(const GblStringRef* pSelf, size_t  index) GBL_NOEXCEPT {
+GBL_EXPORT char GblStringRef_at(const GblStringRef* pSelf, size_t  index) {
     char value = '\0';
     GBL_CTX_BEGIN(GblStringRef_context(pSelf));
     GBL_CTX_VERIFY(index < GblStringRef_length(pSelf),
@@ -59,4 +60,8 @@ GBL_EXPORT char GblStringRef_at(const GblStringRef* pSelf, size_t  index) GBL_NO
     value = pSelf[index];
     GBL_CTX_END_BLOCK();
     return value;
+}
+
+GBL_EXPORT GblHash GblStringRef_hash(const GblStringRef* pSelf) {
+    return gblHash(pSelf, GblStringRef_length(pSelf));
 }

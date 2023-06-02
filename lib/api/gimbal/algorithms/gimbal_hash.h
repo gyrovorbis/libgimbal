@@ -1,8 +1,8 @@
-/*! \addtogroup algorithms
- * @{
- */
 /*! \file
  *  \brief Random number generation, hashing, and CRC algorithms
+ *  \ingroup algorithms
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_HASH_H
@@ -17,7 +17,7 @@
 #   define gblHash  gblHashFnv1
 #endif
 
-#define GBL_SEED_COUNT                  2
+#define GBL_SEED_COUNT      2
 
 GBL_DECLS_BEGIN
 

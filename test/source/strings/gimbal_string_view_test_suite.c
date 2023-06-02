@@ -794,22 +794,22 @@ static GBL_RESULT GblStringViewTestSuite_toBool_(GblTestSuite* pSelf, GblContext
 static GBL_RESULT GblStringViewTestSuite_toInt_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblStringView_toInt(GBL_STRV(NULL)), 0);
-    GBL_TEST_COMPARE(GblStringView_toInt(GBL_STRV("")), 0);
-    GBL_TEST_COMPARE(GblStringView_toInt(GBL_STRV("0")), 0);
-    GBL_TEST_COMPARE(GblStringView_toInt(GBL_STRV("-22")), -22);
-    GBL_TEST_COMPARE(GblStringView_toInt(GBL_STRV("333")), 333);
+    GBL_TEST_COMPARE(GblStringView_toInt32(GBL_STRV(NULL)), 0);
+    GBL_TEST_COMPARE(GblStringView_toInt16(GBL_STRV("")), 0);
+    GBL_TEST_COMPARE(GblStringView_toInt32(GBL_STRV("0")), 0);
+    GBL_TEST_COMPARE(GblStringView_toInt64(GBL_STRV("-22")), -22);
+    GBL_TEST_COMPARE(GblStringView_toInt16(GBL_STRV("333")), 333);
     GBL_CTX_END();
 }
 
 static GBL_RESULT GblStringViewTestSuite_toUint_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblStringView_toUint(GBL_STRV(NULL)), 0);
-    GBL_TEST_COMPARE(GblStringView_toUint(GBL_STRV("")), 0);
-    GBL_TEST_COMPARE(GblStringView_toUint(GBL_STRV("0")), 0);
-    GBL_TEST_COMPARE(GblStringView_toUint(GBL_STRV("-22")), (unsigned)-22);
-    GBL_TEST_COMPARE(GblStringView_toUint(GBL_STRV("333")), 333);
+    GBL_TEST_COMPARE(GblStringView_toUint8(GBL_STRV(NULL)), 0);
+    GBL_TEST_COMPARE(GblStringView_toUint16(GBL_STRV("")), 0);
+    GBL_TEST_COMPARE(GblStringView_toUint32(GBL_STRV("0")), 0);
+    GBL_TEST_COMPARE(GblStringView_toUint64(GBL_STRV("-22")), (uint64_t)-22);
+    GBL_TEST_COMPARE(GblStringView_toUint16(GBL_STRV("333")), 333);
     GBL_CTX_END();
 }
 
@@ -844,12 +844,13 @@ static GBL_RESULT GblStringViewTestSuite_toPointer_invalid_(GblTestSuite* pSelf,
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
 
-    GblStringView_toPointer(GBL_STRV(NULL));
-    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_OPERATION);
+    GblBool success;
+    GblStringView_toPointer(GBL_STRV(NULL), &success);
+    GBL_TEST_VERIFY(!success);
     GBL_CTX_CLEAR_LAST_RECORD();
 
-    GblStringView_toPointer(GBL_STRV("lolz"));
-    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_OPERATION);
+    GblStringView_toPointer(GBL_STRV("lolz"), &success);
+    GBL_TEST_VERIFY(!success);
     GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_CTX_END();

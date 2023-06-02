@@ -1,10 +1,12 @@
-#ifndef GIMBAL_NUMERIC_H
-#define GIMBAL_NUMERIC_H
-
 /*! \file
  *  \brief General numeric constants and computations
  *  \ingroup algorithms
+ *
+ *  \author Falco Girgis
  */
+
+#ifndef GIMBAL_NUMERIC_H
+#define GIMBAL_NUMERIC_H
 
 #include "../core/gimbal_decls.h"
 #include "../preprocessor/gimbal_macro_utils.h"

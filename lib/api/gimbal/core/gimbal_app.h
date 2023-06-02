@@ -1,3 +1,13 @@
+/*! \file
+ *  \brief GblApp top-level application object
+ *  \ingroup core
+ *  \todo
+ *      - finish me
+ *      - test me
+ *
+ *   \author Falco Girgis
+ */
+
 #ifndef GIMBAL_APP_H
 #define GIMBAL_APP_H
 
@@ -41,6 +51,7 @@ GBL_SIGNALS(GblApp,
     (quitting, (GBL_INSTANCE_TYPE, pReceiver))
 )
 
+// ========== Static API ==========
 GBL_EXPORT GblType     GblApp_type           (void)                 GBL_NOEXCEPT;
 GBL_EXPORT GblApp*     GblApp_instance       (void)                 GBL_NOEXCEPT;
 GBL_EXPORT GblBool     GblApp_startingUp     (void)                 GBL_NOEXCEPT;
@@ -49,6 +60,7 @@ GBL_EXPORT void        GblApp_addLibraryPath (const char* pPath)    GBL_NOEXCEPT
 GBL_EXPORT const GblStringList*
                        GblApp_libraryPaths   (void)                 GBL_NOEXCEPT;
 
+// ========== Instance API ==========
 GBL_EXPORT GblApp*     GblApp_create         (int argc,
                                               const char** ppArgv)  GBL_NOEXCEPT;
 

@@ -2,6 +2,8 @@
  *  \brief GblSignalClosure base instance and API
  *  \copydoc GblSignalClosure
  *  \ingroup signals
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_SIGNAL_CLOSURE_H

@@ -1,6 +1,10 @@
 /*! \file
  *  \brief GblBox (reference-counted, opaque userdata), and related functions
  *  \ingroup metaBuiltinTypes
+ *  \todo
+ *      - default values
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_BOX_H

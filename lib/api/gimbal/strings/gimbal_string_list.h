@@ -2,6 +2,8 @@
  *  \brief GblStringList structure and related functions
  *  \ingroup strings
  *  \copydoc GblStringList
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_STRING_LIST_H

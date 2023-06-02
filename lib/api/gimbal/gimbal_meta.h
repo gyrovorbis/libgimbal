@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Meta type system module-wide include
  *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_META_H
@@ -28,7 +30,6 @@
 #include "meta/instances/gimbal_object.h"
 
 #include "meta/properties/gimbal_property.h"
-#include "meta/properties/gimbal_bool_property.h"
 
 #include "meta/signals/gimbal_c_closure.h"
 #include "meta/signals/gimbal_class_closure.h"

@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Allocators module-wide include
  *  \ingroup allocators
+ *
+ *  \author Falco Girgis
  */
 
 

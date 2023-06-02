@@ -1,6 +1,9 @@
 /*! \file
  *  \brief GblHashSet structure and related functions
  *  \ingroup containers
+ *
+ *  \author Josh Baker
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_BTREE_H
@@ -15,8 +18,8 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblTreeSet);
 
-typedef int  (*GblTreeSetEntryCompareFn) (GBL_CSELF, const void*, const void*);
-typedef void (*GblTreeSetEntryDestructFn)(GBL_CSELF, void*);
+typedef int  (*GblTreeSetCompareFn) (GBL_CSELF, const void*, const void*);
+typedef void (*GblTreeSetDestructFn)(GBL_CSELF, void*);
 
 typedef struct GblTreeSetNode {
     uint16_t                    entryCount;
@@ -41,20 +44,20 @@ typedef struct GblTreeSetPool {
  *  \ingroup containers
  */
 typedef struct GblTreeSet {
-    GblContext*                 pCtx;
-    size_t                      entrySize;
-    GblTreeSetEntryCompareFn    pFnCompare;
-    GblTreeSetEntryDestructFn   pFnDestruct;
-    GblTreeSetPool              pool;
-    GblTreeSetNode*             pRoot;
-    size_t                      count;
-    size_t                      height;
-    size_t                      maxCount;
-    size_t                      minCount;
-    void*                       pSpares[3];
-    void*                       pLastEntry;
-    void*                       pLastNode;
-    void*                       pUserdata;
+    GblContext*             pCtx;
+    size_t                  entrySize;
+    GblTreeSetCompareFn     pFnCompare;
+    GblTreeSetDestructFn    pFnDestruct;
+    GblTreeSetPool          pool;
+    GblTreeSetNode*         pRoot;
+    size_t                  count;
+    size_t                  height;
+    size_t                  maxCount;
+    size_t                  minCount;
+    void*                   pSpares[3];
+    void*                   pLastEntry;
+    void*                   pLastNode;
+    void*                   pUserdata;
 } GblTreeSet;
 
 typedef struct GblTreeSetIterator {
@@ -66,32 +69,31 @@ typedef struct GblTreeSetIterator {
 
 GBL_EXPORT GBL_RESULT   GblTreeSet_construct_7  (GBL_SELF,
                                                  size_t                    entrySize,
-                                                 GblTreeSetEntryCompareFn  pFnCompare,
-                                                 GblTreeSetEntryDestructFn pFnDestruct,
+                                                 GblTreeSetCompareFn  pFnCompare,
+                                                 GblTreeSetDestructFn pFnDestruct,
                                                  size_t                    maxEntries,
                                                  GblContext*               pCtx,
                                                  void*                     pUserdata)   GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblTreeSet_construct_6  (GBL_SELF,
                                                  size_t                    entrySize,
-                                                 GblTreeSetEntryCompareFn  pFnCompare,
-                                                 GblTreeSetEntryDestructFn pFnDestruct,
+                                                 GblTreeSetCompareFn  pFnCompare,
+                                                 GblTreeSetDestructFn pFnDestruct,
                                                  size_t                    maxEntries,
                                                  GblContext*               pCtx)        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblTreeSet_construct_5  (GBL_SELF,
                                                  size_t                    entrySize,
-                                                 GblTreeSetEntryCompareFn  pFnCompare,
-                                                 GblTreeSetEntryDestructFn pFnDestruct,
+                                                 GblTreeSetCompareFn  pFnCompare,
+                                                 GblTreeSetDestructFn pFnDestruct,
                                                  size_t                    maxEntries)  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblTreeSet_construct_4  (GBL_SELF,
                                                  size_t                    entrySize,
-                                                 GblTreeSetEntryCompareFn  pFnCompare,
-                                                 GblTreeSetEntryDestructFn pFnDestruct) GBL_NOEXCEPT;
+                                                 GblTreeSetCompareFn  pFnCompare,
+                                                 GblTreeSetDestructFn pFnDestruct) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblTreeSet_construct_3  (GBL_SELF,
                                                  size_t                    entrySize,
-                                                 GblTreeSetEntryCompareFn  pFnCompare)  GBL_NOEXCEPT;
-#define                 GblTreeSet_construct(...)                                                 \
-                                                  GBL_VA_OVERLOAD_CALL(GblTreeSet_construct,      \
-                                                  GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
+                                                 GblTreeSetCompareFn  pFnCompare)  GBL_NOEXCEPT;
+#define                 GblTreeSet_construct(...) \
+                                                  GBL_VA_OVERLOAD_CALL_ARGC(GblTreeSet_construct, __VA_ARGS__)
 
 GBL_EXPORT GBL_RESULT   GblTreeSet_destruct     (GBL_SELF)                              GBL_NOEXCEPT;
 
@@ -122,9 +124,17 @@ GBL_EXPORT void*        GblTreeSet_setHint      (GBL_SELF,
 //GBL_EXPORT void*        GblTreeSet_emplace      (GBL_SELF, const void* pEntry)              GBL_NOEXCEPT;
 //GBL_EXPORT void*        GblTreeSet_tryEmplace   (GBL_SELF, const void* pEntry)              GBL_NOEXCEPT;
 
+GBL_EXPORT void*        GblTreeSet_popMax       (GBL_SELF)                              GBL_NOEXCEPT;
+GBL_EXPORT void*        GblTreeSet_popMin       (GBL_SELF)                              GBL_NOEXCEPT;
+
+GBL_EXPORT void*        GblTreeSet_min          (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT void*        GblTreeSet_max          (GBL_CSELF)                             GBL_NOEXCEPT;
+
 GBL_EXPORT GblBool      GblTreeSet_erase        (GBL_SELF,  const void* pKey)           GBL_NOEXCEPT;
 GBL_EXPORT void*        GblTreeSet_extract      (GBL_SELF,  const void* pKey)           GBL_NOEXCEPT;
 GBL_EXPORT void         GblTreeSet_clear        (GBL_SELF)                              GBL_NOEXCEPT;
+
+
 
 // probe, foreach, or next for iteration
 

@@ -2,6 +2,8 @@
  *  \brief GblScopeAllocator stack-like arena sub allocator
  *  \ingroup allocators
  *  \copydoc GblScopeAllocator
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_SCOPE_ALLOCATOR_H
@@ -23,6 +25,7 @@ typedef struct GblScopeAllocator {
 
 // ===== Public API =====
 GBL_EXPORT GBL_SELF_TYPE* GblScopeAllocator_create    (GblArenaAllocator* pArena)       GBL_NOEXCEPT;
+
 GBL_EXPORT GBL_RESULT     GblScopeAllocator_construct (GBL_SELF,
                                                        GblArenaAllocator* pArena)       GBL_NOEXCEPT;
 

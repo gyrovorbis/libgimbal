@@ -60,7 +60,7 @@ GBL_TEST_CASE(create) {
                  "description", "Manages options for main group",
                  "options",     (GblOption[]) {
                      { "first",   '1', GBL_OPTION_TYPE_STRING, { &pFixture->pFirst }, "1st value", "value1", GBL_OPTION_FLAG_NONE },
-                     { "second",  '2', GBL_OPTION_TYPE_UINT32, { &pFixture->second }, "2nd value", "value2", GBL_OPTION_FLAG_NONE },
+                     { "second",  '2', GBL_OPTION_TYPE_INT32,  { &pFixture->second }, "2nd value", "value2", GBL_OPTION_FLAG_NONE },
                      { "third",   '3', GBL_OPTION_TYPE_BOOL,   { &pFixture->third  }, "3rd value", "value3", GBL_OPTION_FLAG_BOOL_NO_VALUE },
                      { 0 }
                  },

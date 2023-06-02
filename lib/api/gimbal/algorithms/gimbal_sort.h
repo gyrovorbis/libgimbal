@@ -1,9 +1,10 @@
-/*! \addtogroup algorithms
- * @{
- */
 /*! \file
  *  \brief Generialized array sorting algorithms
- *  \todo gblSortRadix()
+ *  \ingroup algorithms
+ *  \todo
+ *      - gblSortRadix()
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_SORT_H

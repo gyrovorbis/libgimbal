@@ -2,6 +2,8 @@
  *  \brief Macro primitives for variadic function overloads and resolution
  *  \ingroup preprocessor
  *  \sa gimbal_sequences.h
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_MACRO_COMPOSITION_H
@@ -117,7 +119,7 @@
     GBL_VA_OVERLOAD_SELECT(BASE, SUFFIXER, ## __VA_ARGS__)(__VA_ARGS__)
 
 #define GBL_VA_OVERLOAD_CALL_ARGC(BASE, ...) \
-    GBL_VA_OVERLOAD_CALL(BASE, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
+GBL_VA_OVERLOAD_CALL(BASE, GBL_VA_OVERLOAD_SUFFIXER_ARGC, ## __VA_ARGS__)
 
 // Tuple processing
 #define GBL_TUPLE_FIRST(...) GBL_TUPLE_FIRST__(__VA_ARGS__,)

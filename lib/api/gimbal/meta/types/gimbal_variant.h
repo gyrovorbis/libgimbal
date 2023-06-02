@@ -2,8 +2,9 @@
  *  \brief GblVariant structure and related functions
  *  \ingroup meta
  *  \todo
- *  - DateTime/Ref types
- *  -
+ *      - DateTime/Ref types
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_VARIANT_H
@@ -266,6 +267,9 @@ GBL_EXPORT GBL_RESULT    GblVariant_save                     (GBL_CSELF,
 
 GBL_EXPORT GBL_RESULT    GblVariant_load                     (GBL_SELF,
                                                               const GblStringBuffer* pStr)   GBL_NOEXCEPT;
+
+GBL_EXPORT GblHash       GblVariant_hash                    (GBL_CSELF)                      GBL_NOEXCEPT;
+
 
 //========== MACRO OVERLOADS ==========
 /// \cond

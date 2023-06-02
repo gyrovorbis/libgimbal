@@ -5,6 +5,8 @@
  *
  *  \todo
  *    - GblArrayDeque_erase()
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_ARRAY_DEQUE_H
@@ -82,8 +84,6 @@ GBL_DECLS_BEGIN
  *  lookup times can be optimized by another 15-30% by reducing
  *  a modulo operation to a decrement + bitmask.
  *
- *  \todo
- *     Finish implementing GblArrayDeque_erase()
  *  \sa GblRingBuffer, GblArrayList
  *  \ingroup containers
  */

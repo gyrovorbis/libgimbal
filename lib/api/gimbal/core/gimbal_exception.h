@@ -1,3 +1,12 @@
+/*! \file
+ *  \brief GblException extensible OO error type
+ *  \ingroup core
+ *  \todo
+ *   - finish me
+ *
+ *   \author Falco Girgis
+ */
+
 #ifndef GIMBAL_EXCEPTION_H
 #define GIMBAL_EXCEPTION_H
 

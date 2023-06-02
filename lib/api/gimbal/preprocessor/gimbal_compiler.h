@@ -2,6 +2,8 @@
  *  \brief Helper Definitions for language, compiler, and platform
  *  \ingroup preprocessor
  *  \sa gimbal_macro_utilities.h
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_COMPILER_H

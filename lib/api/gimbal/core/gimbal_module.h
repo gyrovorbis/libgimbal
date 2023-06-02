@@ -6,6 +6,8 @@
  *      - plan out type registration/management
  *      - rig up option group parsery
  *      - stop inheriting GblContext
+ *
+ *  \author Falco Girgis
  */
 #ifndef GIMBAL_MODULE_H
 #define GIMBAL_MODULE_H

@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblProperty instance, DSL, and management API
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_PROPERTY_H

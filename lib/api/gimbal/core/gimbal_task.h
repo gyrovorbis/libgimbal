@@ -1,3 +1,12 @@
+/*! \file
+ *  \brief GblTask high-level concurrent runnable object
+ *  \ingroup core
+ *  \todo
+ *   - implement me
+ *
+ *   \author Falco Girgis
+ */
+
 #ifndef GIMBAL_TASK_H
 #define GIMBAL_TASK_H
 

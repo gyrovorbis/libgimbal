@@ -2,6 +2,8 @@
  *  \brief GblClassClosure base instance and API
  *  \copydoc GblClassClosure
  *  \ingroup signals
+ *
+ *  \author Falco Girgis
  */
 
 

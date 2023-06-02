@@ -2,6 +2,8 @@
  *  \brief Helper defines for struct, enum, flags, handle delcarations
  *  \ingroup core
  *  \sa gimbal_macro_utilities.h
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_DECLS_H

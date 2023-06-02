@@ -3,6 +3,8 @@
  *  \ingroup utils
  *  \todo
  *      - implement fuzzy comparison: GblVersion_compare(version, ">=3.23.0")
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_VERSION_H

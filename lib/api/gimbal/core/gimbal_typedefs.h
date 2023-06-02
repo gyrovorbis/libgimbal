@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Basic primtive typedefs and forward declarations
  *  \ingroup core
+ *
+ *  \author Falco Girgis
  */
 #ifndef GIMBAL_TYPEDEFS_H
 #define GIMBAL_TYPEDEFS_H
@@ -12,12 +14,6 @@
 #define GBL_FALSE               0
 #define GBL_INDEX_INVALID       SIZE_MAX
 #define GBL_NPOS                ((size_t )-1)
-
-#ifndef __DREAMCAST__
-#   define GBL_SIZE_FMT         "zu"
-#else
-#   define GBL_SIZE_FMT         "u"
-#endif
 
 // ======== Primitive Types ==========
 

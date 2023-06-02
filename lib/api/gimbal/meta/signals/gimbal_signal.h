@@ -1,9 +1,10 @@
-/*! \todo GblSignal_next() for iterating over signals for a type
- *       - will allow for auto signal cleanup upon type registration
- */
 /*! \file
  *  \brief Signals, connections, and related API
  *  \ingroup signals
+ *  \todo
+ *      - GblSignal_next() for iteration
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_SIGNAL_H

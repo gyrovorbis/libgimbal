@@ -1,8 +1,9 @@
 /*! \file
  *  \brief GblIVariant interface for GblVariant compatibility
  *  \ingroup interfaces
+ *
+ *  \author Falco Girgis
  */
-
 
 #ifndef GIMBAL_IVARIANT_H
 #define GIMBAL_IVARIANT_H

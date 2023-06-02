@@ -2,6 +2,8 @@
  *  \brief GblArenaAllocator zone/region/area-based allocator + API
  *  \ingroup allocators
  *  \copydoc GblArenaAllocator
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_ARENA_ALLOCATOR_H
@@ -29,11 +31,11 @@ typedef struct GblArenaAllocatorPage {
         struct GblArenaAllocatorPage* pNext;    ///< Next (used) allocator page
         GblLinkedListNode             listNode; ///< Linked list node base
     };
-    size_t              capacity;               ///< Page capacity
-    size_t              used;                   ///< # of bytes filled on page
+    size_t          capacity;                   ///< Page capacity
+    size_t          used;                       ///< # of bytes filled on page
     union {
-        GblBool         staticAlloc;            ///< Whether this page is static or heap allocated
-        size_t          padding;
+        GblBool     staticAlloc;                ///< Whether this page is static or heap allocated
+        size_t      padding;
     };
     unsigned char bytes[1];                     ///< first byte of data segment
 } GblArenaAllocatorPage;
@@ -109,19 +111,25 @@ GBL_EXPORT float      GblArenaAllocator_utilization     (GBL_CSELF)             
 GBL_EXPORT void       GblArenaAllocator_saveState       (GBL_CSELF, GblArenaAllocatorState* pState)      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblArenaAllocator_loadState       (GBL_SELF, const GblArenaAllocatorState* pState) GBL_NOEXCEPT;
 
-GBL_EXPORT void*      GblArenaAllocator_alloc           (GBL_SELF, size_t )                              GBL_NOEXCEPT;
-GBL_EXPORT void*      GblArenaAllocator_allocAligned    (GBL_SELF, size_t  size, size_t  alignment)      GBL_NOEXCEPT;
+GBL_EXPORT void*      GblArenaAllocator_alloc           (GBL_SELF, size_t size, size_t alignment)        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblArenaAllocator_freeAll         (GBL_SELF)                                       GBL_NOEXCEPT;
 
 // ===== Macro overloads =====
 #define GblArenaAllocator_construct(...)    GblArenaAllocator_constructDefault_(__VA_ARGS__)
+#define GblArenaAllocator_alloc(...)        GblArenaAllocator_allocDefault_(__VA_ARGS__)
 
 // ===== IMPL =====
+///\cond
 #define GblArenaAllocator_constructDefault_(...) \
     GblArenaAllocator_constructDefault__(__VA_ARGS__, 16, GBL_NULL, GBL_NULL)
 #define GblArenaAllocator_constructDefault__(self, size, align, initial, ctx, ...) \
     (GblArenaAllocator_construct)(self, size, align, initial, ctx)
 
+#define GblArenaAllocator_allocDefault_(...) \
+    GblArenaAllocator_allocDefault__(__VA_ARGS__, 0)
+#define GblArenaAllocator_allocDefault__(self, size, align, ...) \
+    (GblArenaAllocator_alloc)(self, size, align)
+///\endcond
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

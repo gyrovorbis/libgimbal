@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Strings module-wide include
  *  \ingroup strings
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_STRINGS_H

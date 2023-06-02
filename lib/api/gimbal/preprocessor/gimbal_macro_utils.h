@@ -2,6 +2,8 @@
  *  \brief Miscellaneous macro utilities and meta generators
  *  \ingroup preprocessor
  *  \sa gimbal_macro_composition.h, gimbal_macro_sequences.h
+ *
+ *  \author Falco Girgis
  */
 
 /*! \defgroup preprocessor Preprocessor

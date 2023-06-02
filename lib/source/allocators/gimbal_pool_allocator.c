@@ -29,9 +29,9 @@ GBL_EXPORT GBL_RESULT GblPoolAllocator_destruct(GblPoolAllocator* pSelf) {
 GBL_EXPORT void* GblPoolAllocator_new(GblPoolAllocator* pSelf) {
     GblLinkedListNode* pPtr = GblLinkedList_popFront(&pSelf->freeList);
     if(!pPtr) {
-        pPtr = GblArenaAllocator_allocAligned(&pSelf->arena,
-                                              pSelf->entrySize,
-                                              pSelf->entryAlign);
+        pPtr = GblArenaAllocator_alloc(&pSelf->arena,
+                                       pSelf->entrySize,
+                                       pSelf->entryAlign);
     }
     if(pPtr) ++pSelf->activeEntries;
     return pPtr;

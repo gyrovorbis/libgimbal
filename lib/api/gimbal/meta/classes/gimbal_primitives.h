@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblPrimitiveClass abstract primitive base plus builtin types
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_PRIMITIVES_H

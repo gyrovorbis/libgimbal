@@ -1,6 +1,10 @@
 /*! \file
- *  \brief GblPattern RegExp-style pattern matching
+ *  \brief   GblPattern RegExp-style pattern matching
  *  \ingroup strings
+ *  \todo
+ *      - Complete unit testing
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_PATTERN_H
@@ -57,7 +61,6 @@ GBL_EXPORT size_t  GblPattern_matchCountStr (const char* pRegExp,
 
 // ===== Implementation =====
 ///\cond
-
 #define GblPattern_matchDefault_(...) \
     (GblPattern_matchDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL))
 #define GblPattern_matchDefault__(pat, str, match, count, ...) \
@@ -77,7 +80,6 @@ GBL_EXPORT size_t  GblPattern_matchCountStr (const char* pRegExp,
     (GblPattern_matchNotStrDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL))
 #define GblPattern_matchNotStrDefault__(exp, str, match, count, ...) \
     ((GblPattern_matchNotStr)(exp, str, match, count))
-
 ///\endcond
 
 GBL_DECLS_END

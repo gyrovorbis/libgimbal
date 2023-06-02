@@ -2,6 +2,8 @@
  *  \brief GblClosure base instance and API
  *  \copydoc GblClosure
  *  \ingroup signals
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_CLOSURE_H

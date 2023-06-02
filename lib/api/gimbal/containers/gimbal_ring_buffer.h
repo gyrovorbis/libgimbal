@@ -2,6 +2,8 @@
  *  \brief GblRingBuffer container and related functions
  *  \ingroup containers
  *  \copydoc GblRingBuffer
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_RING_BUFFER_H

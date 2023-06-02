@@ -1,4 +1,64 @@
 #include <gimbal/utils/gimbal_scanner.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
+#include <gimbal/strings/gimbal_pattern.h>
+
+#define GBL_SCANNER_ERROR_BUFFER_DEFAULT_SIZE_   256
+
+#define GBL_SCANNER_CLASS_(klass)               ((GblScannerClass_*)GBL_CLASS_PRIVATE(klass, GBL_SCANNER_TYPE))
+
+#define GBL_SCANNER_(self)                      ((GblScanner_*)GBL_INSTANCE_PRIVATE(self, GBL_SCANNER_TYPE))
+#define GBL_SCANNER_CURSOR_(self)               ((GblScannerCursor*)(GblScanner_cursor(pSelf)))
+#define GBL_SCANNER_CHAR_(self, idx)            (GblStringView_at(GBL_SCANNER_(self)->streamBuffer, idx))
+
+GBL_DECLARE_STRUCT(GblScannerClass_) {
+    GblStringRef* pDefaultDelimeters;
+};
+
+GBL_DECLARE_STRUCT(GblScanner_) {
+    GblArrayList  cursorStack;
+    GblStringView streamBuffer;
+    GblStringRef* pInputString;
+    GblStringRef* pDelimeters;
+};
+
+GBL_EXPORT GblStringRef* GblScannerClass_defaultDelimeters(const GblScannerClass* pClass) {
+    return GBL_SCANNER_CLASS_(pClass)->pDefaultDelimeters;
+}
+
+GBL_EXPORT void GblScannerClass_setDefaultDelimeters(GblScannerClass* pClass, const char* pStr) {
+    GblScannerClass_* pClass_ = GBL_SCANNER_CLASS_(pClass);
+
+    GblStringRef_unref(pClass_->pDefaultDelimeters);
+    if(pStr) pClass_->pDefaultDelimeters = GblStringRef_create(pStr);
+}
+
+GBL_EXPORT void GblScannerClass_setDefaultDelimetersRef(GblScannerClass* pClass, GblStringRef* pRef) {
+    GblScannerClass_* pClass_ = GBL_SCANNER_CLASS_(pClass);
+
+    GblStringRef_unref(pClass_->pDefaultDelimeters);
+    pClass_->pDefaultDelimeters = pRef;
+}
+
+GBL_EXPORT size_t GblScanner_cursorDepth(const GblScanner* pSelf) {
+    return GblArrayList_size(&GBL_SCANNER_(pSelf)->cursorStack);
+}
+
+GBL_EXPORT const GblScannerCursor* GblScanner_cursor(const GblScanner* pSelf, size_t depth) {
+    return GblArrayList_at(&GBL_SCANNER_(pSelf)->cursorStack,
+                           GblScanner_cursorDepth(pSelf) - depth - 1);
+}
+
+GBL_EXPORT GBL_RESULT GblScanner_pushCursor(GblScanner* pSelf) {
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+
+    return GblArrayList_pushBack(&pSelf_->cursorStack,
+                                 GblArrayList_back(&pSelf_->cursorStack));
+}
+
+GBL_EXPORT GBL_RESULT GblScanner_popCursor(GblScanner* pSelf) {
+    GBL_ASSERT(GblScanner_cursorDepth(pSelf), "Cannot pop last cursor!");
+    return GblArrayList_popBack(&GBL_SCANNER_(pSelf)->cursorStack, NULL);
+}
 
 GBL_EXPORT GblScanner* GblScanner_create(const char* pStr,
                                          size_t      count)
@@ -12,120 +72,342 @@ GBL_EXPORT GblRefCount GblScanner_unref(GblScanner* pSelf) {
     return GBL_UNREF(pSelf);
 }
 
-static GblBool GblScanner_advance_(GblScanner* pSelf, size_t bytes) {
-    if(bytes > GBL_PRIV_REF(pSelf).streamBuffer.length) {
-        pSelf->status |= GBL_SCANNER_SCAN_ERROR;
-        return GBL_FALSE;
-    } else if(bytes == GBL_PRIV_REF(pSelf).streamBuffer.length)
-        pSelf->status |= GBL_SCANNER_EOF;
-    else GBL_LIKELY {
-        GBL_PRIV_REF(pSelf).streamBuffer.pData += bytes;
-        GBL_PRIV_REF(pSelf).streamBuffer.length -= bytes;
-    }
-
-    pSelf->next = GblStringView_fromEmpty();
-
-    return GBL_TRUE;
+GBL_EXPORT GblStringRef* GblScanner_input(const GblScanner* pSelf) {
+    return GBL_SCANNER_(pSelf)->pInputString;
 }
 
-static GblBool GblScanner_isValidPos_(const GblScanner* pSelf, int pos) {
-    return (pos >= 0 || pos < GblStringRef_length(GBL_PRIV_REF(pSelf).pInputString));
+GBL_EXPORT void GblScanner_setInput(GblScanner* pSelf, const char* pStr, size_t length) {
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+
+    GblStringRef_unref(pSelf_->pInputString);
+    pSelf_->pInputString = GblStringRef_create(pStr, length);
+    GblScanner_reset(pSelf);
 }
 
-char GblScanner_char_(const GblScanner* pSelf, int offset) {
-    const int pos = GblScanner_tell(pSelf) + offset;
-    if(GblScanner_isValidPos_(pSelf, pos)){
-        return GBL_PRIV_REF(pSelf).pInputString[pos];
-    }
+void GblScanner_reset(GblScanner* pSelf) {
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
-    return '\0';
+    GblScanner_clearError(pSelf);
+
+    pSelf->token = GblStringView_fromEmpty();
+    pSelf->next  = GblStringView_fromEmpty();
+
+    pSelf_->streamBuffer =
+        GblStringRef_view(pSelf_->pInputString);
+
+    GblArrayList_resize(&pSelf_->cursorStack, 1);
+
+    memset(GBL_SCANNER_CURSOR_(pSelf), 0, sizeof(GblScannerCursor));
+
+    pSelf->status = (GblStringView_empty(pSelf_->streamBuffer))?
+                       GBL_SCANNER_EOF :
+                       GBL_SCANNER_OK;
 }
 
-
-static void GblScanner_takeNextToken_(GblScanner* pSelf, GblStringView* pView) {
-    pView->length = 0;
-    pView->pData = NULL;
-
-    pSelf->status &= ~GBL_SCANNER_SCAN_ERROR;
-
-    const size_t begin = GblStringView_findFirstNotOf(GBL_PRIV_REF(pSelf).streamBuffer,
-                                                      GBL_STRV(GBL_PRIV_REF(pSelf).pDelimeters),
-                                                      0);
-
-    if(begin == GBL_STRING_VIEW_NPOS) {
-        pView->length = 0;
-        GBL_PRIV_REF(pSelf).streamBuffer.length = 0;
-        pSelf->status |= GBL_SCANNER_SCAN_ERROR;
-        return;
-    }
-
-    size_t end = GblStringView_findFirstOf(GBL_PRIV_REF(pSelf).streamBuffer,
-                                           GBL_STRV(GBL_PRIV_REF(pSelf).pDelimeters),
-                                           begin+1);
-
-    if(end == GBL_STRING_VIEW_NPOS) {
-        end = GBL_PRIV_REF(pSelf).streamBuffer.length;
-    }
-
-    const size_t size = end - begin;
-
-    pView->pData  = GBL_PRIV_REF(pSelf).streamBuffer.pData + begin;
-    pView->length = size;
-//    GBL_PRIV_REF(pSelf).streamBuffer.pData  += end;
-//    GBL_PRIV_REF(pSelf).streamBuffer.length -= size;
-
-    if(!size) pSelf->status |= GBL_SCANNER_SCAN_ERROR;
+GBL_EXPORT void GblScanner_setDelimeters(GblScanner* pSelf, const char* pDelimeters) {
+    GblStringRef_unref(GBL_SCANNER_(pSelf)->pDelimeters);
+    GBL_SCANNER_(pSelf)->pDelimeters = GblStringRef_create(pDelimeters);
 }
 
-static GBL_RESULT GblScanner_peek_(GblScanner* pSelf) {
-    GBL_CTX_BEGIN(NULL);
-    GblScanner_takeNextToken_(pSelf, &pSelf->next);
-
-    if(GblStringView_empty(pSelf->next))
-        pSelf->status |= GBL_SCANNER_EOF;
-    GBL_CTX_END();
+GBL_EXPORT void GblScanner_clearError(GblScanner* pSelf) {
+    pSelf->status &= ~GBL_SCANNER_ERROR;
+    GblStringRef_unref(pSelf->pError);
+    pSelf->pError = NULL;
 }
 
-static GBL_RESULT GblScanner_nextToken_(GblScanner* pSelf) {
+GBL_EXPORT void GblScanner_raiseError(GblScanner* pSelf,
+                                      GblFlags    flags,
+                                      const char* pFmt,
+                                      ...)
+{
     GBL_CTX_BEGIN(NULL);
 
-    if(!GblStringView_empty(pSelf->next)) {
-        pSelf->token = pSelf->next;
-    } else {
-        GblScanner_takeNextToken_(pSelf, &pSelf->token);
-    }
+    va_list varArgs;
+    va_start(varArgs, pFmt);
 
-    // If the token is empty or the entire streambuffer, zero it out
-    if(GblStringView_empty(pSelf->token))
-    {
-        GBL_PRIV_REF(pSelf).streamBuffer = GblStringView_fromEmpty();
-    } else {
-        const size_t size = (pSelf->token.pData + pSelf->token.length -
-                             GBL_PRIV_REF(pSelf).streamBuffer.pData);
+    GblScanner_clearError(pSelf);
 
-        if(size == GBL_PRIV_REF(pSelf).streamBuffer.length) {
-            GBL_PRIV_REF(pSelf).streamBuffer = GblStringView_fromEmpty();
-        } else {
-            GblScanner_advance_(pSelf, size + 1);
-        }
-    }
+    pSelf->status |= flags;
 
-    GBL_CTX_END();
-}
+    GblStringBuffer* pStrBuff =
+        GBL_STRING_BUFFER_ALLOCA(GBL_SCANNER_ERROR_BUFFER_DEFAULT_SIZE_);
 
-GBL_EXPORT GblBool GblScanner_nextToken(GblScanner* pSelf) {
-    GBL_CTX_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GblScanner, pFnScanToken, pSelf);
+    GblStringBuffer_appendPrintf(pStrBuff,
+                                 "ERROR [line: %zu, column: %zu]: ",
+                                 GBL_SCANNER_CURSOR_(pSelf)->line,
+                                 GBL_SCANNER_CURSOR_(pSelf)->column);
+
+    GblStringBuffer_appendVPrintf(pStrBuff,
+                                  pFmt,
+                                  varArgs);
+
+    pSelf->pError =
+        GblStringRef_create(GblStringBuffer_cString(pStrBuff),
+                            GblStringBuffer_length(pStrBuff));
+
+    GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_TOKEN,
+                       pSelf->pError);
+
+    GblStringBuffer_destruct(pStrBuff);
+
+    va_end(varArgs);
+
     GBL_CTX_END_BLOCK();
-    return !GblStringView_empty(pSelf->token);
+}
+
+static inline GblBool GblScanner_isValidPos_(const GblScanner* pSelf, int pos) {
+    return (pos >= 0 && pos < GblStringRef_length(GBL_SCANNER_(pSelf)->pInputString));
+}
+
+static GblBool GblScanner_advance_(GblScanner* pSelf, size_t bytes) {
+    GblScanner_*      pSelf_     = GBL_SCANNER_(pSelf);
+    GblScannerCursor* pCursor    = GBL_SCANNER_CURSOR_(pSelf);
+    GblBool           outOfRange = GBL_FALSE;
+
+    if(bytes > GBL_SCANNER_(pSelf)->streamBuffer.length) {
+        bytes = pSelf_->streamBuffer.length;
+        outOfRange = GBL_TRUE;
+    }
+
+    for(size_t c = 0; c < bytes; ++c) {
+        switch(pSelf_->streamBuffer.pData[c]) {
+        case '\n':
+            ++pCursor->line;
+            pCursor->column = 0;
+            break;
+        default:
+            ++pCursor->column;
+            break;
+        }
+        ++pCursor->position;
+    }
+
+    GBL_SCANNER_(pSelf)->streamBuffer =
+        GblStringView_removePrefix(pSelf_->streamBuffer, bytes);
+
+    if(GblStringView_empty(pSelf_->streamBuffer))
+        pSelf->status |= GBL_SCANNER_EOF;
+
+    pCursor->length = pSelf->token.length;
+
+    if(outOfRange) {
+        GblScanner_raiseError(pSelf,
+                              GBL_SCANNER_SCAN_ERROR,
+                              "Unexpected end-of-stream!");
+        return GBL_FALSE;
+    } else return GBL_TRUE;
+}
+
+static inline GblBool GblScanner_setPos_(GblScanner* pSelf, size_t offset) {
+    GblScanner_reset(pSelf);
+    return GblScanner_advance_(pSelf, offset);
+}
+
+GBL_EXPORT size_t GblScanner_tell(const GblScanner* pSelf) {
+    return GBL_SCANNER_CURSOR_(pSelf)->position;
+}
+
+GBL_EXPORT GblBool GblScanner_seek(GblScanner* pSelf, int whence) {
+    const int pos    = GblScanner_tell(pSelf);
+    const int newPos = pos + whence;
+
+    if(!GblScanner_isValidPos_(pSelf, newPos))
+        return GBL_FALSE;
+    else
+        return GblScanner_setPos_(pSelf, newPos);
+}
+
+static GBL_RESULT GblScanner_nextToken_(GblScanner* pSelf, GblStringView* pToken) {
+    GBL_CTX_BEGIN(NULL);
+
+    GblPattern_matchNotStr(GBL_SCANNER_(pSelf)->pDelimeters,
+                           GBL_STRING_VIEW_CSTR(GBL_SCANNER_(pSelf)->streamBuffer),
+                           pToken);
+
+    GBL_CTX_END();
+}
+
+static GblBool GblScanner_readToken_(GblScanner*    pSelf,
+                                     GblStringView* pToken,
+                                     GblFlags       errorFlag,
+                                     GblBool        advanceStream)
+{
+    GBL_CTX_BEGIN(NULL);
+
+    pSelf->status &= ~GBL_SCANNER_ERROR;
+
+    if(!(pSelf->status & GBL_SCANNER_EOF))
+        GBL_INSTANCE_VCALL(GblScanner, pFnNextToken, pSelf, pToken);
+    else
+        *pToken = GblStringView_fromEmpty();
+
+    GBL_CTX_END_BLOCK();
+
+    if(!GBL_RESULT_SUCCESS(GBL_CTX_RESULT()) || GblStringView_empty(*pToken)) {
+        pSelf->status |= errorFlag;
+
+        if(advanceStream)
+            GblScanner_raiseError(pSelf,
+                                  errorFlag,
+                                  "Failed to retrieve next token!");
+
+        return GBL_FALSE;
+    } else if(advanceStream)
+        return GblScanner_advance_(pSelf, pToken->length);
+    else
+        return GBL_TRUE;
 }
 
 GBL_EXPORT GblBool GblScanner_peekToken(GblScanner* pSelf) {
-    GBL_CTX_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GblScanner, pFnPeekToken, pSelf);
-    GBL_CTX_END_BLOCK();
-    return !GblStringView_empty(pSelf->next);
+    return GblScanner_readToken_(pSelf,
+                                 &pSelf->next,
+                                 GBL_SCANNER_PEEK_ERROR,
+                                 GBL_FALSE);
 }
+
+GBL_EXPORT GblBool GblScanner_scanToken(GblScanner* pSelf) {
+    return GblScanner_readToken_(pSelf,
+                                 &pSelf->token,
+                                 GBL_SCANNER_SCAN_ERROR,
+                                 GBL_TRUE);
+}
+
+static GblBool GblScanner_readLines_(GblScanner*    pSelf,
+                                     size_t         count,
+                                     GblStringView* pView,
+                                     GblFlags       errorFlag,
+                                     GblBool        advanceStream)
+{
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+
+    pSelf->status &= ~GBL_SCANNER_ERROR;
+
+    for(size_t c = 0; c < pSelf_->streamBuffer.length; ++c) {
+        if(GBL_SCANNER_CHAR_(pSelf, c) == '\n') {
+            if(!--count) {
+                *pView =
+                    GblStringView_removePrefix(pSelf_->streamBuffer, c);
+                if(advanceStream)
+                    return GblScanner_advance_(pSelf, c);
+                else
+                    return GBL_TRUE;
+            }
+        }
+    }
+
+    *pView = GblStringView_fromEmpty();
+    pSelf->status |= errorFlag;
+
+    if(advanceStream)
+        GblScanner_raiseError(pSelf,
+                              errorFlag,
+                              "Failed to read %zu lines!",
+                              count);
+
+    return GBL_FALSE;
+}
+
+GBL_EXPORT GblBool GblScanner_peekLines(GblScanner* pSelf, size_t count) {
+    return GblScanner_readLines_(pSelf, count, &pSelf->next, GBL_SCANNER_PEEK_ERROR, GBL_FALSE);
+}
+
+GBL_EXPORT GblBool GblScanner_scanLines(GblScanner* pSelf, size_t count) {
+    return GblScanner_readLines_(pSelf, count, &pSelf->token, GBL_SCANNER_SCAN_ERROR, GBL_TRUE);
+}
+
+static GblBool GblScanner_readBytes_(GblScanner*    pSelf,
+                                     size_t         count,
+                                     GblStringView* pView,
+                                     GblFlags       errorFlag,
+                                     GblBool        advanceStream)
+{
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+
+    pSelf->status &= ~GBL_SCANNER_ERROR;
+
+    if(count <= pSelf_->streamBuffer.length) {
+        *pView = GblStringView_removePrefix(pSelf_->streamBuffer, count);
+
+        if(advanceStream)
+            return GblScanner_advance_(pSelf, count);
+        else
+            return GBL_TRUE;
+    }
+
+    *pView = GblStringView_fromEmpty();
+    pSelf->status |= errorFlag;
+    if(advanceStream)
+        GblScanner_raiseError(pSelf,
+                              errorFlag,
+                              "Failed to read %zu bytes!",
+                              count);
+    return GBL_FALSE;
+}
+
+GBL_EXPORT GblBool GblScanner_peekBytes(GblScanner* pSelf, size_t bytes) {
+    return GblScanner_readBytes_(pSelf, bytes, &pSelf->next, GBL_SCANNER_PEEK_ERROR, GBL_FALSE);
+}
+
+GBL_EXPORT GblBool GblScanner_scanBytes(GblScanner* pSelf, size_t bytes) {
+    return GblScanner_readBytes_(pSelf, bytes, &pSelf->token, GBL_SCANNER_SCAN_ERROR, GBL_TRUE);
+}
+
+#define GblScanner_readType_(type, postfix, initialValue) \
+    static GblBool GblScanner_read##postfix##_(GblScanner*    pSelf, \
+                                               type*          pValue, \
+                                               GblStringView* pView, \
+                                               GblFlags       errorFlag, \
+                                               GblBool        advanceStream) \
+    { \
+        *pValue = initialValue; \
+         \
+        if(!GblScanner_readToken_(pSelf, \
+                                  pView, \
+                                  errorFlag, \
+                                  advanceStream)) \
+            return GBL_FALSE; \
+         \
+        GblBool success; \
+        *pValue = GblStringView_toBool(*pView, &success); \
+         \
+        if(success) \
+            return GBL_TRUE; \
+        else { \
+            pSelf->status |= errorFlag; \
+            if(advanceStream) \
+                GblScanner_raiseError(pSelf, \
+                                      errorFlag, \
+                                      "Failed to read "GBL_STRINGIFY(postfix)"."); \
+            return GBL_FALSE; \
+        } \
+    }
+
+#define GblScanner_peekType_(type, postfix) \
+    GBL_EXPORT GblBool GblScanner_peek##postfix(GblScanner* pSelf, type* pValue) { \
+        return GblScanner_read##postfix##_(pSelf, pValue, &pSelf->next, GBL_SCANNER_PEEK_ERROR, GBL_FALSE); \
+    }
+
+#define GblScanner_scanType_(type, postfix) \
+    GBL_EXPORT GblBool GblScanner_scan##postfix(GblScanner* pSelf, type* pValue) { \
+        return GblScanner_read##postfix##_(pSelf, pValue, &pSelf->token, GBL_SCANNER_SCAN_ERROR, GBL_TRUE); \
+}
+
+#define GblScanner_exportType_(type, postfix, initialValue) \
+    GblScanner_readType_(type, postfix, initialValue) \
+    GblScanner_peekType_(type, postfix) \
+    GblScanner_scanType_(type, postfix)
+
+GblScanner_exportType_(GblBool,  Bool,   GBL_FALSE)
+GblScanner_exportType_(char,     Char,   '\0')
+GblScanner_exportType_(uint8_t,  Uint8,  0)
+GblScanner_exportType_(uint16_t, Uint16, 0)
+GblScanner_exportType_(int16_t,  Int16,  0)
+GblScanner_exportType_(uint32_t, Uint32, 0)
+GblScanner_exportType_(int32_t,  Int32,  0)
+GblScanner_exportType_(uint64_t, Uint64, 0)
+GblScanner_exportType_(int64_t,  Int64,  0)
+GblScanner_exportType_(float,    Float,  0.0f)
+GblScanner_exportType_(double,   Double, 0.0)
 
 GBL_EXPORT GblBool GblScanner_skipBytes(GblScanner* pSelf, size_t count) {
     return GblScanner_advance_(pSelf, count);
@@ -133,7 +415,7 @@ GBL_EXPORT GblBool GblScanner_skipBytes(GblScanner* pSelf, size_t count) {
 
 GBL_EXPORT GblBool GblScanner_skipTokens(GblScanner* pSelf, size_t count) {
     for(size_t t = 0; t < count; ++t) {
-        if(!GblScanner_nextToken(pSelf))
+        if(!GblScanner_scanToken(pSelf))
             return GBL_FALSE;
     }
     return GBL_TRUE;
@@ -176,51 +458,19 @@ GBL_EXPORT GblBool GblScanner_skipPattern(GblScanner* pSelf) {
 }
 #endif
 
-void GblScanner_reset(GblScanner* pSelf) {
-    pSelf->token = GblStringView_fromEmpty();
-    pSelf->next  = GblStringView_fromEmpty();
 
-    GBL_PRIV_REF(pSelf).streamBuffer =
-            GblStringRef_view(GBL_PRIV_REF(pSelf).pInputString);
 
-    pSelf->status  = (GblStringView_empty(GBL_PRIV_REF(pSelf).streamBuffer))?
-                        GBL_SCANNER_EOF :
-                        0;
-}
 
-GBL_EXPORT size_t GblScanner_tell(const GblScanner* pSelf) {
-    return GBL_PRIV_REF(pSelf).streamBuffer.pData - GBL_PRIV_REF(pSelf).pInputString;
-}
 
-GBL_EXPORT GblBool GblScanner_setPos_(GblScanner* pSelf, size_t offset) {
-    GblScanner_reset(pSelf);
-    return GblScanner_advance_(pSelf, offset);
-}
 
-GBL_EXPORT GblBool GblScanner_seek(GblScanner* pSelf, int whence) {
-    const int pos = GblScanner_tell(pSelf);
-    const int newPos = pos + whence;
-    if(!GblScanner_isValidPos_(pSelf, newPos)) {
-        return GBL_FALSE;
-    } else {
-        return GblScanner_setPos_(pSelf, newPos);
-    }
-}
 
-GBL_EXPORT const char* GblScanner_input(const GblScanner* pSelf) {
-    return GBL_PRIV_REF(pSelf).pInputString;
-}
 
-GBL_EXPORT void GblScanner_setInput(GblScanner* pSelf, const char* pStr, size_t length) {
-    GblStringRef_unref(GBL_PRIV_REF(pSelf).pInputString);
-    GBL_PRIV_REF(pSelf).pInputString = GblStringRef_create(pStr, length);
-    GblScanner_reset(pSelf);
-}
 
-GBL_EXPORT void GblScanner_setDelimeters(GblScanner* pSelf, const char* pDelimeters) {
-    GblStringRef_unref(GBL_PRIV_REF(pSelf).pDelimeters);
-    GBL_PRIV_REF(pSelf).pDelimeters = GblStringRef_create(pDelimeters);
-}
+
+
+
+
+
 
 GBL_EXPORT int GblScanner_scanf(GblScanner* pSelf, const char* pFmt, ...) {
     int retVal = 0;
@@ -233,7 +483,7 @@ GBL_EXPORT int GblScanner_scanf(GblScanner* pSelf, const char* pFmt, ...) {
 
 GBL_EXPORT int GblScanner_vscanf(GblScanner* pSelf, const char* pFmt, va_list* pList) {
     if(!(pSelf->status & GBL_SCANNER_EOF)) {
-        return vsscanf(GBL_PRIV_REF(pSelf).streamBuffer.pData,
+        return vsscanf(GBL_SCANNER_(pSelf)->streamBuffer.pData,
                        pFmt,
                        *pList);
     } else {
@@ -250,16 +500,16 @@ static GBL_RESULT GblScanner_GblObject_setProperty_(GblObject* pObject, const Gb
     case GblScanner_Property_Id_input: {
         GblStringRef* pStr = NULL;
         GblVariant_getValueMove(pValue, &pStr);
-        GblStringRef_unref(GBL_PRIV_REF(pSelf).pInputString);
-        GBL_PRIV_REF(pSelf).pInputString = pStr;
+        GblStringRef_unref(GBL_SCANNER_(pSelf)->pInputString);
+        GBL_SCANNER_(pSelf)->pInputString = pStr;
         GblScanner_reset(pSelf);
         break;
     }
     case GblScanner_Property_Id_delimeters: {
         GblStringRef* pStr = NULL;
         GblVariant_getValueMove(pValue, &pStr);
-        GblStringRef_unref(GBL_PRIV_REF(pSelf).pDelimeters);
-        GBL_PRIV_REF(pSelf).pDelimeters = pStr;
+        GblStringRef_unref(GBL_SCANNER_(pSelf)->pDelimeters);
+        GBL_SCANNER_(pSelf)->pDelimeters = pStr;
         break;
     }
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -277,9 +527,9 @@ static GBL_RESULT GblScanner_GblObject_property_(const GblObject* pObject, const
 
     switch(pProp->id) {
     case GblScanner_Property_Id_input:
-        GblVariant_setString(pValue, GBL_PRIV_REF(pSelf).pInputString); break;
+        GblVariant_setString(pValue, GBL_SCANNER_(pSelf)->pInputString); break;
     case GblScanner_Property_Id_delimeters:
-        GblVariant_setString(pValue, GBL_PRIV_REF(pSelf).pDelimeters); break;
+        GblVariant_setString(pValue, GBL_SCANNER_(pSelf)->pDelimeters); break;
     case GblScanner_Property_Id_token:
         GblVariant_setStringView(pValue, pSelf->token); break;
     case GblScanner_Property_Id_next:
@@ -298,8 +548,10 @@ static GBL_RESULT GblScanner_GblBox_destructor_(GblBox* pBox) {
     GBL_CTX_BEGIN(NULL);
 
     GblScanner* pSelf = GBL_SCANNER(pBox);
-    GblStringRef_unref(GBL_PRIV_REF(pSelf).pInputString);
-    GblStringRef_unref(GBL_PRIV_REF(pSelf).pDelimeters);
+    GblStringRef_unref(GBL_SCANNER_(pSelf)->pInputString);
+    GblStringRef_unref(GBL_SCANNER_(pSelf)->pDelimeters);
+
+    GBL_CTX_CALL(GblArrayList_destruct(&GBL_SCANNER_(pSelf)->cursorStack));
 
     GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 
@@ -313,7 +565,14 @@ static GBL_RESULT GblScanner_init_(GblInstance* pInstance, GblContext* pCtx) {
     GblScanner* pSelf = GBL_SCANNER(pInstance);
     GblScannerClass* pClass = GBL_SCANNER_GET_CLASS(pSelf);
 
-    GBL_PRIV_REF(pSelf).pDelimeters = GblStringRef_ref(GBL_PRIV_REF(pClass).pDefaultDelimeters);
+    GBL_SCANNER_(pSelf)->pDelimeters =
+        GblStringRef_ref(GblScannerClass_defaultDelimeters(pClass));
+
+    GBL_CTX_CALL(GblArrayList_construct(&GBL_SCANNER_(pSelf)->cursorStack,
+                                        sizeof(GblScannerCursor),
+                                        1));
+
+    GblScanner_reset(pSelf);
 
     GBL_CTX_END();
 }
@@ -323,7 +582,7 @@ static GBL_RESULT GblScannerClass_final_(GblClass* pClass, const void* pUd, GblC
     GBL_CTX_BEGIN(NULL);
 
     GblScannerClass* pSelfClass = GBL_SCANNER_CLASS(pClass);
-    GblStringRef_unref(GBL_PRIV_REF(pSelfClass).pDefaultDelimeters);
+    GblScannerClass_setDefaultDelimeters(pSelfClass, NULL);
 
     GBL_CTX_END();
 }
@@ -337,22 +596,21 @@ static GBL_RESULT GblScannerClass_init_(GblClass* pClass, const void* pUd, GblCo
     if(!GblType_classRefCount(GBL_CLASS_TYPEOF(pClass))) {
         GBL_PROPERTIES_REGISTER(GblScanner);
 
-        GBL_PRIV_REF(pSelfClass).pDefaultDelimeters =
-                GblStringRef_create(GBL_SCANNER_DELIMETERS_DEFAULT);
+        GblScannerClass_setDefaultDelimeters(pSelfClass, GBL_SCANNER_DELIMETERS_DEFAULT);
+
     } else {
-        GBL_PRIV_REF(pSelfClass).pDefaultDelimeters =
+
+        GblScannerClass_setDefaultDelimetersRef(pSelfClass,
             GblStringRef_ref(
-                    GBL_PRIV_REF(
-                        GBL_SCANNER_CLASS(
-                            GblClass_weakRefDefault(GBL_SCANNER_TYPE)))
-                    .pDefaultDelimeters);
+                GblScannerClass_defaultDelimeters(
+                    GBL_SCANNER_CLASS(
+                        GblClass_weakRefDefault(GBL_SCANNER_TYPE)))));
     }
 
-    GBL_BOX_CLASS(pClass)->pFnDestructor     = GblScanner_GblBox_destructor_;
-    GBL_OBJECT_CLASS(pClass)->pFnProperty    = GblScanner_GblObject_property_;
-    GBL_OBJECT_CLASS(pClass)->pFnSetProperty = GblScanner_GblObject_setProperty_;
-    GBL_SCANNER_CLASS(pClass)->pFnScanToken  = GblScanner_nextToken_;
-    GBL_SCANNER_CLASS(pClass)->pFnPeekToken  = GblScanner_peek_;
+    GBL_BOX_CLASS(pClass)    ->pFnDestructor  = GblScanner_GblBox_destructor_;
+    GBL_OBJECT_CLASS(pClass) ->pFnProperty    = GblScanner_GblObject_property_;
+    GBL_OBJECT_CLASS(pClass) ->pFnSetProperty = GblScanner_GblObject_setProperty_;
+    GBL_SCANNER_CLASS(pClass)->pFnNextToken   = GblScanner_nextToken_;
 
     GBL_CTX_END();
 }
@@ -361,11 +619,13 @@ GBL_EXPORT GblType GblScanner_type(void) GBL_NOEXCEPT {
     static GblType type = GBL_INVALID_TYPE;
 
     static const GblTypeInfo info = {
-        .pFnClassInit    = GblScannerClass_init_,
-        .pFnClassFinal   = GblScannerClass_final_,
-        .classSize       = sizeof(GblScannerClass),
-        .pFnInstanceInit = GblScanner_init_,
-        .instanceSize    = sizeof(GblScanner)
+        .pFnClassInit        = GblScannerClass_init_,
+        .pFnClassFinal       = GblScannerClass_final_,
+        .classSize           = sizeof(GblScannerClass),
+        .classPrivateSize    = sizeof(GblScannerClass_),
+        .pFnInstanceInit     = GblScanner_init_,
+        .instanceSize        = sizeof(GblScanner),
+        .instancePrivateSize = sizeof(GblScanner_)
     };
 
     if(type == GBL_INVALID_TYPE) {

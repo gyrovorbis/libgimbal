@@ -1,6 +1,10 @@
 /*! \file
  *  \brief GblThd, per-thread state and context management
  *  \ingroup core
+ *  \todo
+ *      - get rid of me
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_THD_H

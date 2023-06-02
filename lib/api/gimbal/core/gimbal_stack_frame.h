@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Stack frame, call record, source capture debug utilities
- *  \ingroup debug
+ *  \ingroup core
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_CALL_STACK_H

@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Utilities module-wide include
  *  \ingroup algorithms
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_UTILS_H
@@ -17,5 +19,6 @@
 #include "utils/gimbal_byte_array.h"
 #include "utils/gimbal_scanner.h"
 #include "utils/gimbal_uri.h"
+#include "utils/gimbal_settings.h"
 
 #endif // GIMBAL_UTILS_H

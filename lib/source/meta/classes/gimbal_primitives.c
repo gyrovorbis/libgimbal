@@ -201,7 +201,7 @@ static GBL_RESULT u8Save_(const GblVariant* pVariant, GblStringBuffer* pString) 
 
 static GBL_RESULT u8Load_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    int integer = GblStringView_toInt(GblStringBuffer_view(pString));
+    int integer = GblStringView_toUint8(GblStringBuffer_view(pString));
     pVariant->u8 = (uint8_t)integer;
     GBL_CTX_END();
 }
@@ -272,7 +272,7 @@ static GBL_RESULT i16Save_(const GblVariant* pVariant, GblStringBuffer* pString)
 
 static GBL_RESULT i16Load_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    int integer = GblStringView_toInt(GblStringBuffer_view(pString));
+    int integer = GblStringView_toInt16(GblStringBuffer_view(pString));
     pVariant->i16 = (int16_t)integer;
     GBL_CTX_END();
 }
@@ -342,7 +342,7 @@ static GBL_RESULT u16Save_(const GblVariant* pVariant, GblStringBuffer* pString)
 
 static GBL_RESULT u16Load_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    int integer = GblStringView_toInt(GblStringBuffer_view(pString));
+    int integer = GblStringView_toUint16(GblStringBuffer_view(pString));
     pVariant->u16 = (uint16_t)integer;
     GBL_CTX_END();
 }
@@ -412,7 +412,7 @@ static GBL_RESULT i32Save_(const GblVariant* pVariant, GblStringBuffer* pString)
 
 static GBL_RESULT i32Load_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    int integer = GblStringView_toInt(GblStringBuffer_view(pString));
+    int integer = GblStringView_toInt32(GblStringBuffer_view(pString));
     pVariant->i32 = (int32_t)integer;
     GBL_CTX_END();
 }
@@ -483,7 +483,7 @@ static GBL_RESULT u32Save_(const GblVariant* pVariant, GblStringBuffer* pString)
 
 static GBL_RESULT u32Load_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    int integer = GblStringView_toInt(GblStringBuffer_view(pString));
+    int integer = GblStringView_toUint32(GblStringBuffer_view(pString));
     pVariant->u32 = (uint32_t)integer;
     GBL_CTX_END();
 }
@@ -553,7 +553,7 @@ static GBL_RESULT i64Save_(const GblVariant* pVariant, GblStringBuffer* pString)
 
 static GBL_RESULT i64Load_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    int integer = GblStringView_toInt(GblStringBuffer_view(pString));
+    int integer = GblStringView_toInt64(GblStringBuffer_view(pString));
     pVariant->i64 = (int64_t)integer;
     GBL_CTX_END();
 }
@@ -627,7 +627,7 @@ static GBL_RESULT u64Save_(const GblVariant* pVariant, GblStringBuffer* pString)
 
 static GBL_RESULT u64Load_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    int integer = GblStringView_toInt(GblStringBuffer_view(pString));
+    int integer = GblStringView_toUint64(GblStringBuffer_view(pString));
     pVariant->u64 = (uint64_t)integer;
     GBL_CTX_END();
 }
@@ -967,19 +967,19 @@ static GBL_RESULT stringConvert_(const GblVariant* pVariant, GblVariant* pOther)
         else GblVariant_setChar(pOther, '\0');
     }
     else if(type == GBL_UINT8_TYPE)
-        GblVariant_setUint8(pOther, GblStringView_toUint(GblStringRef_view(pVariant->pString)));
+        GblVariant_setUint8(pOther, GblStringView_toUint8(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_UINT16_TYPE)
-        GblVariant_setUint16(pOther, GblStringView_toUint(GblStringRef_view(pVariant->pString)));
+        GblVariant_setUint16(pOther, GblStringView_toUint16(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_INT16_TYPE)
-        GblVariant_setInt16(pOther, GblStringView_toInt(GblStringRef_view(pVariant->pString)));
+        GblVariant_setInt16(pOther, GblStringView_toInt16(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_UINT32_TYPE)
-        GblVariant_setUint32(pOther, GblStringView_toUint(GblStringRef_view(pVariant->pString)));
+        GblVariant_setUint32(pOther, GblStringView_toUint32(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_INT32_TYPE)
-        GblVariant_setInt32(pOther, GblStringView_toInt(GblStringRef_view(pVariant->pString)));
+        GblVariant_setInt32(pOther, GblStringView_toInt32(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_UINT64_TYPE)
-        GblVariant_setUint64(pOther, GblStringView_toUint(GblStringRef_view(pVariant->pString)));
+        GblVariant_setUint64(pOther, GblStringView_toUint64(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_INT64_TYPE)
-        GblVariant_setInt64(pOther, GblStringView_toInt(GblStringRef_view(pVariant->pString)));
+        GblVariant_setInt64(pOther, GblStringView_toInt64(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_FLOAT_TYPE)
         GblVariant_setFloat(pOther, GblStringView_toFloat(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_DOUBLE_TYPE)

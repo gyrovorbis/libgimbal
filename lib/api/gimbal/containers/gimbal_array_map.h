@@ -2,6 +2,8 @@
  *  \brief ::GblArrayMap container and related functions
  *  \ingroup containers
  *  \copydoc GblArrayMap
+ *
+ *  \author Falco Girgis
  */
 #ifndef GIMBAL_ARRAY_MAP_H
 #define GIMBAL_ARRAY_MAP_H

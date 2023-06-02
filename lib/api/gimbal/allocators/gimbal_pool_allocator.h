@@ -2,6 +2,8 @@
  *  \brief GblPoolAllocator chunked/paged pool based allocator + API
  *  \ingroup allocators
  *  \copydoc GblPoolAllocator
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_POOL_ALLOCATOR_H

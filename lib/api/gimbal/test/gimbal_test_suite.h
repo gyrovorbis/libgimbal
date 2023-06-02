@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblTestSuite structure and related functions
  *  \ingroup testing
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_TEST_SUITE_H

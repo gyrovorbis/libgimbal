@@ -1,19 +1,16 @@
-/*! \todo
- *  Make GblUuid a Meta type
- *  - conversions to and from string, byte arrays
- *  - finish documenting
- */
 /*! \file
  *  \brief GblUuid generator, stringifier, validator, etc
+ *  \ingroup utils
  *
  *  LibGimbal provides basic UUID functionality by allowing
  *  you to deserialize existing UUIDs from strings, generate
  *  new version 4 UUIDs, serialize UUIDs, and compare two UUIDs,
  *  based on RFC 4122.
  *
- *  \ingroup utils
  *  \todo
  *      - fix reliance on apparently determinsitic random mechanism
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_UUID_H

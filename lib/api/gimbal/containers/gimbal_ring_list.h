@@ -2,7 +2,9 @@
  *  \brief GblRingList structure and related functions
  *  \ingroup containers
  *  \todo
- *    GblRingList_sort()
+ *      - GblRingList_sort()
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_RING_LIST_H

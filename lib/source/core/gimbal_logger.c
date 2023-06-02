@@ -456,7 +456,7 @@ static GBL_RESULT GblLogger_write_(GblLogger*    pSelf,
 
     // Print the message with extra debug info for errors and warnings
     if((flags & GBL_LOG_ERROR) || (flags & GBL_LOG_WARN)) {
-        if((fprintf(pOut, "[%6s] %s%s%s\n[%6s] %s        @ %s(..): %s:%" GBL_SIZE_FMT"\n",
+        if((fprintf(pOut, "[%6s] %s%s%s\n[%6s] %s        @ %s(..): %s:%zu\n",
                     pDomain,
                     tabBuff, pPrefix, buffer,
                     pDomain, tabBuff,

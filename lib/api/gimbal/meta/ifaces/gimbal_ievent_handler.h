@@ -1,6 +1,10 @@
 /*! \file
  *  \brief GblIEventHandler abstract event handler interface
  *  \ingroup interfaces
+ *  \todo
+ *      - combine me with event filter
+ *
+ *  \author Falco Girgis
  */
 
 

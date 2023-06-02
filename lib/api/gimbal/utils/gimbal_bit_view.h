@@ -2,6 +2,8 @@
  *  \brief GblBitView bitvector view container and related functions
  *  \ingroup utils
  *  \copydoc GblBitView
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_BIT_VIEW_H

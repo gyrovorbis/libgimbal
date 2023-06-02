@@ -1,5 +1,6 @@
 /*! \file
  *  \brief ::GblQuark and related functions.
+ *  \ingroup strings
  *
  *  A GblQuark is an integral unique identifier associated with a given string.
  *  Two different C string pointers containing the same string value will have
@@ -39,7 +40,7 @@
  *      GBL_ASSERT(strcmp(GblQuark_toString(quark1),
  *                        GblQuark_toString(quark2) == 0);
  *
- *  \ingroup strings
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_QUARK_H

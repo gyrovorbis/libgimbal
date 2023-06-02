@@ -1,6 +1,9 @@
 /*! \file
  *  \brief GblHashSet structure and related functions
  *  \ingroup containers
+ *
+ *  \author Josh Baker
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_HASHSET_H
@@ -92,7 +95,7 @@ GBL_EXPORT GBL_RESULT        GblHashSet_construct_4   (GBL_SELF,
                                                        GblHashSetHashFn   pFnHash,
                                                        GblHashSetCmpFn    pFnCompare)   GBL_NOEXCEPT;
 #define                      GblHashSet_construct(...) \
-        GBL_VA_OVERLOAD_CALL(GblHashSet_construct, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
+        GBL_VA_OVERLOAD_CALL_ARGC(GblHashSet_construct,  __VA_ARGS__)
 
 GBL_EXPORT GBL_RESULT        GblHashSet_clone         (GBL_SELF,
                                                        const GblHashSet* pRhs,

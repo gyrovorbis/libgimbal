@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblObject structure and related functions
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_OBJECT_H

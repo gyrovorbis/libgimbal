@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Test module-wide include
  *  \ingroup testing
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_TEST_H

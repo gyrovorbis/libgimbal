@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Pointer and opaque type registration and checking
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_POINTER_H

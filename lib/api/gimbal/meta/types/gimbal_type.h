@@ -1,6 +1,8 @@
 /*! \file
  *  \brief ::GblType identifier and related functions
  *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 #ifndef GIMBAL_TYPE_H
 #define GIMBAL_TYPE_H

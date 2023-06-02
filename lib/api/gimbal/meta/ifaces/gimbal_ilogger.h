@@ -1,6 +1,10 @@
 /*! \file
  *  \brief GblILogger abstract logger interface
  *  \ingroup interfaces
+ *  \todo
+ *      - obsolete me
+ *
+ *  \author Falco Girgis
  */
 
 

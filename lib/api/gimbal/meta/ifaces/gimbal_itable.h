@@ -1,6 +1,10 @@
 /*! \file
  *  \brief GblITable abstract table interface
  *  \ingroup interfaces
+ *  \todo
+ *      - get rid of me
+ *
+ *  \author Falco Girgis
  */
 
 

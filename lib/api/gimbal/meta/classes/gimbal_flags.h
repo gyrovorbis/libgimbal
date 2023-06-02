@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblFlagsClass and API for managing flag types
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_FLAGS_H
@@ -27,8 +29,8 @@ typedef struct GblFlagEntry {
 } GblFlagEntry;
 
 GBL_CLASS_DERIVE(GblFlags, GblPrimitive)
-    GblFlags            valueMask;
-    uint16_t            entryCount;
+    GblFlags        valueMask;
+    uint16_t        entryCount;
 GBL_CLASS_END
 
 // ========== GblFlagsClass ==========

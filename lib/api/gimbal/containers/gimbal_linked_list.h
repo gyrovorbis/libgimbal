@@ -2,8 +2,11 @@
  *  \brief GblLinkedListNode structure and related functions
  *  \ingroup containers
  *  \todo
- *    GblLinkedList_insert(): insert into middle by index
- *    GblLinkedList_insertAfter(): no list head required
+ *    - GblLinkedList_insert(): insert into middle by index
+ *    - GblLinkedList_insertAfter(): no list head required
+ *    - Slick KOS/BSD-style macro for() looping over nodes
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_LINKED_LIST_H

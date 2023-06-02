@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblLogger filterable log and logging macros
  *  \ingroup core
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_LOGGER_H

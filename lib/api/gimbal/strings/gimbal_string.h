@@ -1,14 +1,12 @@
-/*! \todo
-gblStrdup()
-gblStrndup()
-gblStrdupa()
-gblStrndupa()
-Unit tests
-*/
-
 /*! \file
  *  \brief C char and char array manipulation
  *  \ingroup strings
+ *  \todo
+ *      - gblStrdupa()
+ *      - gblStrndupa()
+ *      - Unit tests
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_STRING_H

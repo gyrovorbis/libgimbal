@@ -54,7 +54,7 @@ extern "C" {
 
 #ifdef _WIN32
 #   define NOGDI
-# else
+# elif !defined(__USE_UNIX98)
 #   define __USE_UNIX98
 #endif
 

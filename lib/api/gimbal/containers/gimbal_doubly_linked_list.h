@@ -1,8 +1,11 @@
 /*! \file
  *  \brief GblDoublyLinkedListNode structure and related functions
  *  \ingroup containers
- *
  *  \copydoc GblDoublyLinkedListNode
+ *  \todo
+ *      - epic BSD-style for loop macros
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_DOUBLY_LINKED_LIST_HPP

@@ -58,9 +58,9 @@ GBL_EXPORT void* GblScopeAllocator_alloc(GblScopeAllocator*      pSelf,
                                          size_t                  align,
                                          GblScopeAllocatorDtorFn pFnDtor)
 {
-    void* pPtr = GblArenaAllocator_allocAligned(pSelf->pArena,
-                                                size,
-                                                align);
+    void* pPtr = GblArenaAllocator_alloc(pSelf->pArena,
+                                         size,
+                                         align);
 
     if(pPtr && pFnDtor) {
         GblScopeAllocator_pushDtor(pSelf, pFnDtor, pPtr);

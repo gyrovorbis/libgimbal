@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblInterface and related functions.
  *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_INTERFACE_H
@@ -25,8 +27,8 @@ typedef struct GblInterface {
     size_t      outerClassOffset_;  ///< offset from the interface to the class containing it (private, managed by internals)
 } GblInterface;
 
-GBL_EXPORT GblClass*     GblInterface_outerClass        (GBL_SELF)  GBL_NOEXCEPT;
-GBL_EXPORT GblClass*     GblInterface_outerMostClass    (GBL_SELF)  GBL_NOEXCEPT;
+GBL_EXPORT GblClass* GblInterface_outerClass     (GBL_SELF)  GBL_NOEXCEPT;
+GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
 
 /*! \def GBL_INTERFACE_TYPE
  *  Builtin type ID associated with GblInterface

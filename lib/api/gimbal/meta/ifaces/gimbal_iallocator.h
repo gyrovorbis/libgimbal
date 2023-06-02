@@ -1,6 +1,10 @@
 /*! \file
  *  \brief GblIAllocator abstract allocator interface
  *  \ingroup interfaces
+ *  \todo
+ *      - make specific allocators implement me
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_IALLOCATOR_H

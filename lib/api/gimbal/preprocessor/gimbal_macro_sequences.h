@@ -2,6 +2,9 @@
  *  \brief Macro primitives for metaprogramming
  *  \ingroup preprocessor
  *  \sa gimbal_macro_composition.h
+ *
+ *  \author William Swanson
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_MACRO_SEQUENCES_H

@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblOpaqueClass and API for managing Opaque types
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_OPAQUE_H

@@ -52,7 +52,7 @@ static const char* quarkStringAllocCopy_(const char* pString) {
     GBL_ASSERT(pString);
 
     const size_t  size = strlen(pString) + 1;
-    pNewString = GblArenaAllocator_allocAligned(&arena_, size, 1);
+    pNewString = GblArenaAllocator_alloc(&arena_, size, 1);
     if(pNewString) strcpy(pNewString, pString);
 
     return pNewString;

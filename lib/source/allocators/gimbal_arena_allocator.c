@@ -38,11 +38,7 @@ static GblArenaAllocatorPage* GblArenaAllocator_allocPage_(GblContext* pCtx, siz
     return pPage;
 }
 
-GBL_EXPORT void* GblArenaAllocator_alloc(GblArenaAllocator* pSelf, size_t  size) {
-    return GblArenaAllocator_allocAligned(pSelf, size, 0);
-}
-
-GBL_EXPORT void* GblArenaAllocator_allocAligned(GblArenaAllocator* pSelf, size_t  size, size_t  alignment) {
+GBL_EXPORT void* GblArenaAllocator_alloc(GblArenaAllocator* pSelf, size_t  size, size_t alignment) {
     void* pData = NULL;
     if(size) {
 

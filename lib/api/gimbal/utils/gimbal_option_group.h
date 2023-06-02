@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Grouping of parsable command-line options
  *  \ingroup utils
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_OPTION_GROUP_H

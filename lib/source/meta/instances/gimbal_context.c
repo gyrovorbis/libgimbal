@@ -14,7 +14,7 @@ static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const
         GBL_CTX_VERIFY_ARG(size);
         GBL_CTX_VERIFY_ARG(align <= size && align >= 0);
         GBL_CTX_VERIFY_POINTER(ppData);
-        //GBL_CTX_DEBUG("Malloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ")", size, align);
+        //GBL_CTX_DEBUG("Malloc(Size: %z, Align: %z)", size, align);
         GBL_CTX_ERRNO_CLEAR();
 
         *ppData = GBL_ALIGNED_ALLOC(align, size);
@@ -26,7 +26,7 @@ static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const
         GBL_CTX_DEBUG("%-20s: %20p", "Address", *ppData);
         GBL_CTX_DEBUG("%-20s: %20s", "Debug Marker", pDbgStr? pDbgStr : "NULL");
         GBL_CTX_DEBUG("%-20s: %20s", "Function", pFrame->sourceCurrent.pFunc);
-        GBL_CTX_DEBUG("%-20s: %20"GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
+        GBL_CTX_DEBUG("%-20s: %20z", "Line", pFrame->sourceCurrent.line);
         GBL_CTX_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
     #endif
         GBL_CTX_POP(1);
@@ -50,7 +50,7 @@ static GBL_RESULT GblContext_IAllocator_realloc_(GblIAllocator* pIAllocator, con
         GBL_CTX_VERIFY_POINTER(ppNewData);
         const uintptr_t ptrVal = (uintptr_t)pData;
         GBL_UNUSED(ptrVal);
-        //GBL_CTX_DEBUG("Realloc(Size: %" GBL_SIZE_FMT ", Align: %" GBL_SIZE_FMT ") %p", newSize, newAlign, ptrVal);
+        //GBL_CTX_DEBUG("Realloc(Size: %z, Align: %z) %p", newSize, newAlign, ptrVal);
 
         *ppNewData = GBL_ALIGNED_REALLOC(pData, newAlign, newSize);
 
@@ -59,7 +59,7 @@ static GBL_RESULT GblContext_IAllocator_realloc_(GblIAllocator* pIAllocator, con
         GBL_CTX_PUSH();
         GBL_CTX_DEBUG("%-20s: %20p", "Address", *ppNewData);
         GBL_CTX_DEBUG("%-20s: %20s", "Function", pFrame->sourceCurrent.pFunc);
-        GBL_CTX_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
+        GBL_CTX_DEBUG("%-20s: %20z", "Line", pFrame->sourceCurrent.line);
         GBL_CTX_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
         GBL_CTX_POP(1);
     #endif
@@ -85,7 +85,7 @@ static GBL_RESULT GblContext_IAllocator_free_(GblIAllocator* pIAllocator, const 
         GBL_CTX_DEBUG("Free(%p)", ptrVal);
         GBL_CTX_PUSH();
         GBL_CTX_DEBUG("%-20s: %20s", "Function", pFrame->sourceCurrent.pFunc);
-        GBL_CTX_DEBUG("%-20s: %20" GBL_SIZE_FMT, "Line", pFrame->sourceCurrent.line);
+        GBL_CTX_DEBUG("%-20s: %20z", "Line", pFrame->sourceCurrent.line);
         GBL_CTX_DEBUG("%-20s: %20s", "File", pFrame->sourceCurrent.pFile);
         GBL_CTX_POP(1);
     #endif
@@ -139,7 +139,7 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
     case GBL_LOG_LEVEL_WARNING:
     case GBL_LOG_LEVEL_ERROR: {
 
-        if((fprintf(pFile, "%s%s%s\n%s        @ %s(..): %s:%" GBL_SIZE_FMT"\n",
+        if((fprintf(pFile, "%s%s%s\n%s        @ %s(..): %s:%zu\n",
                             tabBuff, pPrefix, buffer, tabBuff,
                             pFrame->record.srcLocation.pFunc,
                             pFrame->record.srcLocation.pFile,

@@ -4,6 +4,7 @@
  *  \copydoc GblClass
  *  \sa gimbal_instance.h, gimbal_type.h
  *
+ *  \author Falco Girgis
  */
 #ifndef GIMBAL_CLASS_H
 #define GIMBAL_CLASS_H

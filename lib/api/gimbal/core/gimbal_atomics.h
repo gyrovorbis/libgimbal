@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Fundamental atomic type for reference counting
  *  \ingroup core
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_ATOMICS_H

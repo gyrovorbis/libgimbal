@@ -7,6 +7,8 @@
  *        implement signals for events (probably),
  *        process(..) top-level method for handling exiting
  *        upon failure, version, or help.
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_CMD_PARSER_H

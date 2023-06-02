@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief Type IDs for builtin types
+ *  \ingroup meta
+ *
+ *  \author Falco Girgis
+ */
 #ifndef GIMBAL_BUILTIN_TYPES_H
 #define GIMBAL_BUILTIN_TYPES_H
 

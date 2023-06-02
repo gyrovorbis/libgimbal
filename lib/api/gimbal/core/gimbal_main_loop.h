@@ -1,3 +1,12 @@
+/*! \file
+ *  \brief GblMainLoop task scheduler priority queue
+ *  \ingroup core
+ *  \todo
+ *   - implement me
+ *
+ *   \author Falco Girgis
+ */
+
 #ifndef GIMBAL_MAIN_LOOP_H
 #define GIMBAL_MAIN_LOOP_H
 

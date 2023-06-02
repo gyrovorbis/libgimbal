@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Algorithms module-wide include
  *  \ingroup algorithms
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_ALGORITHMS_H

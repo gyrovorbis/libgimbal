@@ -1,6 +1,8 @@
 /*! \file
  *  \brief GblEvent base type and basic API
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_EVENT_H

@@ -1,6 +1,8 @@
 /*! \file
  *  \brief Generic, atomic reference-counted data types
  *  \ingroup utils
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_MEMORY_REF_H
@@ -30,9 +32,9 @@ GBL_EXPORT GblRefCount  GblRef_releaseWithDtor  (GBL_SELF, GblRefDestructFn pFnD
 GBL_INLINE GblRefCount  GblRef_refCount         (GBL_CSELF)                          GBL_NOEXCEPT;
 GBL_INLINE GblContext*  GblRef_context          (GBL_CSELF)                          GBL_NOEXCEPT;
 
-#define GblRef_create(...)  GBL_VA_OVERLOAD_CALL(GblRef_create_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
+#define GblRef_create(...)  GBL_VA_OVERLOAD_CALL_ARGC(GblRef_create_, __VA_ARGS__)
 #define GblRef_ref(ref)     GblRef_acquire(ref)
-#define GblRef_unref(...)   GBL_VA_OVERLOAD_CALL(GblRef_unref_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
+#define GblRef_unref(...)   GBL_VA_OVERLOAD_CALL_ARGC(GblRef_unref_, __VA_ARGS__)
 
 // ========== IMPL ==========
 

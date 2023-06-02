@@ -1,7 +1,6 @@
 /*! \file
  *  \brief Date and time conversions and utilities
  *  \ingroup utils
- *
  *  \todo
  *      - GblDateTime_fromIso8601()
  *      - double GblDateTime_toJulian(): higher res, with seconds
@@ -9,6 +8,8 @@
  *      - GblDateTime_format() support ms, us, ns
  *      - GblDateTime_parse() support ms, us, ns
  *      - are we misnaming GMT as UTC anywhere?
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_DATE_TIME_H

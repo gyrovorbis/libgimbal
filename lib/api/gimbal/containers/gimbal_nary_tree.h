@@ -2,6 +2,8 @@
  *  \brief GblNaryTreeNode structure and related functions
  *  \todo Finish implementing commented out API operations
  *  \ingroup containers
+ *
+ *  \author Falco Girgis
  */
 
 #ifndef GIMBAL_NARY_TREE_H
