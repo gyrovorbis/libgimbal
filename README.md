@@ -22,17 +22,23 @@
   </p>
 </div>
 
+## Overview ##
+libGimbal aims to bring high-level constructs and niceties of modern languages and their standard libraries to low-level C, where they can be implemented with a focus on performance for embedded devices and game consoles. libGimbal includes features typically found in core application frameworks such as Foundation, QtCore, or GLib, or in languages such as C# or Java. At its core, libGimbal utilizes an object-oriented dynamic type system, which allows C to transcend its own language limitations and provides a flexible avenue for interoperability with other languages. 
+
 ## Features ##
-- Generic Containers 
+libGimbal is split into a series of modules, featuring:
+- Containers and Data Structures
 - Generic Algorithms 
 - Custom Allocators
 - Specialized Strings 
 - Standard Library Utilities
 - Preprocessor Programming
 - Dynamic Type System 
+- Threading and Concurrency
 - Unit Test Framework
 
 ## Platforms ##
+libGimbal is being actively tested in CI on the following targets:
 - Windows 
 - MacOS 
 - Linux 
@@ -43,6 +49,7 @@
 - Android
 
 ## Compilers ##
+libGimbal is being built in CI with the following compilers:
 - Microsoft Visual Studio
 - GCC
 - Clang
