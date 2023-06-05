@@ -1945,8 +1945,6 @@ static GBL_RESULT GblVariantTestSuite_string_conversions_(GblTestSuite* pSelf, G
     GBL_CTX_VERIFY_CALL(GblVariant_constructString(&variant, "97"));
 
     // Bool
-
-    GBL_TEST_COMPARE(strtoul("97", NULL, 0), 97);
     GBL_CTX_VERIFY_CALL(GblVariant_constructBool(&tVariant, GBL_FALSE));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_COMPARE(GblVariant_getBool(&tVariant), GBL_TRUE);

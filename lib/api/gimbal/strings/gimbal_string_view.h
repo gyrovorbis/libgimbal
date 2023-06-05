@@ -23,7 +23,7 @@
 #define GBL_STRING_VIEW_NPOS            GBL_NPOS
 #define GBL_STRING_VIEW(...)            GBL_VA_OVERLOAD_SELECT(GBL_STRING_VIEW, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 #define GBL_STRV(...)                   GBL_STRING_VIEW(__VA_ARGS__)
-#define GBL_STRING_VIEW_CSTR(view)      (view.nullTerminated? view.pData : GBL_STRING_VIEW_CSTR_ALLOCA(view))
+#define GBL_STRING_VIEW_CSTR(view)      ((view).nullTerminated? (view).pData : GBL_STRING_VIEW_CSTR_ALLOCA((view)))
 
 #define GBL_SELF_TYPE GblStringView
 

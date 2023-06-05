@@ -352,7 +352,7 @@ GBL_EXPORT GblBool GblScanner_scanBytes(GblScanner* pSelf, size_t bytes) {
     return GblScanner_readBytes_(pSelf, bytes, &pSelf->token, GBL_SCANNER_SCAN_ERROR, GBL_TRUE);
 }
 
-#define GblScanner_readType_(type, postfix, initialValue) \
+#define GblScanner_readPrimitive_(type, postfix, initialValue) \
     static GblBool GblScanner_read##postfix##_(GblScanner*    pSelf, \
                                                type*          pValue, \
                                                GblStringView* pView, \
@@ -382,32 +382,208 @@ GBL_EXPORT GblBool GblScanner_scanBytes(GblScanner* pSelf, size_t bytes) {
         } \
     }
 
-#define GblScanner_peekType_(type, postfix) \
+#define GblScanner_peekPrimitive_(type, postfix) \
     GBL_EXPORT GblBool GblScanner_peek##postfix(GblScanner* pSelf, type* pValue) { \
         return GblScanner_read##postfix##_(pSelf, pValue, &pSelf->next, GBL_SCANNER_PEEK_ERROR, GBL_FALSE); \
     }
 
-#define GblScanner_scanType_(type, postfix) \
+#define GblScanner_scanPrimitive_(type, postfix) \
     GBL_EXPORT GblBool GblScanner_scan##postfix(GblScanner* pSelf, type* pValue) { \
         return GblScanner_read##postfix##_(pSelf, pValue, &pSelf->token, GBL_SCANNER_SCAN_ERROR, GBL_TRUE); \
+    }
+
+#define GblScanner_exportPrimitive_(type, postfix, initialValue) \
+    GblScanner_readPrimitive_(type, postfix, initialValue) \
+    GblScanner_peekPrimitive_(type, postfix) \
+    GblScanner_scanPrimitive_(type, postfix)
+
+GblScanner_exportPrimitive_(GblBool,  Bool,   GBL_FALSE)
+GblScanner_exportPrimitive_(char,     Char,   '\0')
+GblScanner_exportPrimitive_(uint8_t,  Uint8,  0)
+GblScanner_exportPrimitive_(uint16_t, Uint16, 0)
+GblScanner_exportPrimitive_(int16_t,  Int16,  0)
+GblScanner_exportPrimitive_(uint32_t, Uint32, 0)
+GblScanner_exportPrimitive_(int32_t,  Int32,  0)
+GblScanner_exportPrimitive_(uint64_t, Uint64, 0)
+GblScanner_exportPrimitive_(int64_t,  Int64,  0)
+GblScanner_exportPrimitive_(float,    Float,  0.0f)
+GblScanner_exportPrimitive_(double,   Double, 0.0)
+
+static GblBool GblScanner_readType_(GblScanner*    pSelf,
+                                    GblType        type,
+                                    GblStringView* pView,
+                                    GblFlags       errorFlag,
+                                    GblBool        advanceStream,
+                                    va_list*       pVarArgs)
+{
+    GblBool    success = GBL_FALSE;
+    GblVariant sVar    = GBL_VARIANT_INIT;
+    GblVariant tVar    = GBL_VARIANT_INIT;
+
+    // Grab + validate next token
+    if(!GblScanner_readToken_(pSelf,
+                               pView,
+                               errorFlag,
+                               advanceStream))
+        goto done;
+
+    // Ensure we can even convert the token to the desired type
+    if(!GblVariant_canConvert(GBL_STRING_TYPE, type)) {
+        GblScanner_raiseError(pSelf,
+                              errorFlag,
+                              "Cannot convert token to type: [%s]",
+                              GblType_name(type));
+
+        goto done;
+    }
+
+    // Create source and destination variants for conversion
+    GblVariant_constructStringView(&sVar, *pView);
+    GblVariant_constructDefault(&tVar, type);
+
+    // Convert token to desired variant type and validate result
+    const GBL_RESULT conversionResult = GblVariant_convert(&sVar, &tVar);
+    if(!GBL_RESULT_SUCCESS(conversionResult)) {
+        GblScanner_raiseError(pSelf,
+                              errorFlag,
+                              "Conversion to token to type [%s] failed: [%s]",
+                              GblType_name(type),
+                              gblResultString(conversionResult));
+
+        goto done;
+    }
+
+    // Extract value from result variant and validate result
+    const GBL_RESULT moveResult = GblVariant_getValueMoveVaList(&tVar, pVarArgs);
+    if(!GBL_RESULT_SUCCESS(moveResult)) {
+        GblScanner_raiseError(pSelf,
+                              errorFlag,
+                              "Extraction of value type from variant type [%s] failed!",
+                              GblType_name(type));
+
+        goto done;
+    }
+
+    success = GBL_TRUE;
+
+done:
+    // Clean up after ourselves and return whether we succeeded
+    GblVariant_destruct(&sVar);
+    GblVariant_destruct(&tVar);
+
+    return success;
 }
 
-#define GblScanner_exportType_(type, postfix, initialValue) \
-    GblScanner_readType_(type, postfix, initialValue) \
-    GblScanner_peekType_(type, postfix) \
-    GblScanner_scanType_(type, postfix)
+GBL_EXPORT GblBool GblScanner_peekType(GblScanner* pSelf, GblType type, ...) {
+    va_list varArgs;
+    va_start(varArgs, type);
 
-GblScanner_exportType_(GblBool,  Bool,   GBL_FALSE)
-GblScanner_exportType_(char,     Char,   '\0')
-GblScanner_exportType_(uint8_t,  Uint8,  0)
-GblScanner_exportType_(uint16_t, Uint16, 0)
-GblScanner_exportType_(int16_t,  Int16,  0)
-GblScanner_exportType_(uint32_t, Uint32, 0)
-GblScanner_exportType_(int32_t,  Int32,  0)
-GblScanner_exportType_(uint64_t, Uint64, 0)
-GblScanner_exportType_(int64_t,  Int64,  0)
-GblScanner_exportType_(float,    Float,  0.0f)
-GblScanner_exportType_(double,   Double, 0.0)
+    const GblBool success =
+        GblScanner_readType_(pSelf,
+                             type,
+                             &pSelf->next,
+                             GBL_SCANNER_PEEK_ERROR,
+                             GBL_FALSE,
+                             &varArgs);
+
+    va_end(varArgs);
+
+    return success;
+}
+
+GBL_EXPORT GblBool GblScanner_scanType(GblScanner* pSelf, GblType type, ...) {
+    va_list varArgs;
+    va_start(varArgs, type);
+
+    const GblBool success =
+        GblScanner_readType_(pSelf,
+                             type,
+                             &pSelf->token,
+                             GBL_SCANNER_SCAN_ERROR,
+                             GBL_TRUE,
+                             &varArgs);
+
+    va_end(varArgs);
+
+    return success;
+}
+
+static GblBool GblScanner_readMatch_(GblScanner*    pSelf,
+                                     const char*    pPattern,
+                                     GblStringView* pView,
+                                     GblFlags       flags,
+                                     GblBool        advanceStream)
+{
+    GblBool success = GBL_TRUE;
+
+    if(!GblScanner_readToken_(pSelf, pView, flags, advanceStream)) {
+        return GBL_FALSE;
+    }
+
+    const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(*pView);
+    if(!GblPattern_matchExactStr(pPattern,
+                                 pStreamBuffer))
+    {
+        pSelf->status |= flags;
+        if(advanceStream)
+            GblScanner_raiseError(pSelf,
+                                  flags,
+                                  "Failed to match token [%s] to pattern: [%s]",
+                                  pStreamBuffer,
+                                  pPattern);
+        return GBL_FALSE;
+
+    }
+
+    return GBL_TRUE;
+}
+
+GBL_EXPORT GblBool GblScanner_peekMatch(GblScanner* pSelf, const char* pPattern) {
+    return GblScanner_readMatch_(pSelf,
+                                 pPattern,
+                                 &pSelf->next,
+                                 GBL_SCANNER_PEEK_ERROR,
+                                 GBL_FALSE);
+}
+
+GBL_EXPORT GblBool GblScanner_scanMatch(GblScanner* pSelf, const char* pPattern) {
+    return GblScanner_readMatch_(pSelf,
+                                 pPattern,
+                                 &pSelf->token,
+                                 GBL_SCANNER_SCAN_ERROR,
+                                 GBL_TRUE);
+}
+
+GBL_EXPORT GblBool GblScanner_skipMatch(GblScanner* pSelf, const char* pStr) {
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+
+    const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+    if(!GblPattern_matchStr(pStr, pStreamBuffer, &pSelf->token)) {
+        GblScanner_raiseError(pSelf,
+                              GBL_SCANNER_EOF,
+                              "skipMatch() failed, could not find pattern: [%s]",
+                              pStr);
+        return GBL_FALSE;
+    }
+
+    return GblScanner_advance_(pSelf, pSelf->token.pData - pStreamBuffer + pSelf->token.length);
+}
+
+GBL_EXPORT GblBool GblScanner_skipToMatch(GblScanner* pSelf, const char* pStr) {
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+
+    const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+    if(!GblPattern_matchStr(pStr, pStreamBuffer, &pSelf->token)) {
+        GblScanner_raiseError(pSelf,
+                              GBL_SCANNER_EOF,
+                              "skipToMatch() failed, could not find pattern: [%s]",
+                              pStr);
+        return GBL_FALSE;
+    }
+
+    return GblScanner_advance_(pSelf, pSelf->token.pData - pStreamBuffer);
+
+}
 
 GBL_EXPORT GblBool GblScanner_skipBytes(GblScanner* pSelf, size_t count) {
     return GblScanner_advance_(pSelf, count);
@@ -427,50 +603,19 @@ GBL_EXPORT GblBool GblScanner_skipLines(GblScanner* pSelf, size_t count) {
 
         char value;
         GblBool found = GBL_FALSE;
-#if 0
-        while((value = GblScanner_at_(pSelf, offset++))) {
+
+        while((value = GBL_SCANNER_CHAR_(pSelf, offset++))) {
             if(value == '\n') {
                 found = GBL_TRUE;
                 break;
             }
         }
-#endif
+
         if(!found) return GBL_FALSE;
     }
 
     return GblScanner_seek(pSelf, offset);
 }
-
-#if 0
-GBL_EXPORT GblBool GblScanner_skipPattern(GblScanner* pSelf) {
-    int length = 0;
-
-    if(GblPattern_firstMatch(pStr,
-                             GblScanner_inputString(pSelf),
-                             &length) == 0 &&
-        length >= 0)
-    {
-        return GblScanner_advance_(pSelf, length);
-    } else {
-        pSelf->status |= GBL_SCANNER_STATUS_READ_ERROR;
-        return GBL_FALSE;
-    }
-}
-#endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 GBL_EXPORT int GblScanner_scanf(GblScanner* pSelf, const char* pFmt, ...) {
     int retVal = 0;
@@ -483,12 +628,13 @@ GBL_EXPORT int GblScanner_scanf(GblScanner* pSelf, const char* pFmt, ...) {
 
 GBL_EXPORT int GblScanner_vscanf(GblScanner* pSelf, const char* pFmt, va_list* pList) {
     if(!(pSelf->status & GBL_SCANNER_EOF)) {
-        return vsscanf(GBL_SCANNER_(pSelf)->streamBuffer.pData,
+        GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+        const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+
+        return vsscanf(pStreamBuffer,
                        pFmt,
                        *pList);
-    } else {
-        return EOF;
-    }
+    } else return EOF;
 }
 
 static GBL_RESULT GblScanner_GblObject_setProperty_(GblObject* pObject, const GblProperty* pProp, GblVariant* pValue) {
@@ -536,6 +682,8 @@ static GBL_RESULT GblScanner_GblObject_property_(const GblObject* pObject, const
         GblVariant_setStringView(pValue, pSelf->next); break;
     case GblScanner_Property_Id_status:
         GblVariant_setEnum(pValue, GBL_ENUM_TYPE, pSelf->status); break;
+    case GblScanner_Property_Id_error:
+        GblVariant_setStringRef(pValue, pSelf->pError); break;
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Attempted to get invalid property %s for GblScanner",
                                 GblProperty_nameString(pProp));
