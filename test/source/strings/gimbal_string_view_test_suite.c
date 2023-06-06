@@ -863,6 +863,22 @@ static GBL_RESULT GblStringViewTestSuite_toPointer_(GblTestSuite* pSelf, GblCont
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblStringViewTestSuite_scanf_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+    GblStringView view = GblStringView_fromString("3:30:45");
+
+    unsigned hour, minute, second, chars;
+    GBL_TEST_COMPARE(GblStringView_scanf(view, "%u:%u:%2u%n", &hour, &minute, &second, &chars),
+                     3);
+
+    GBL_TEST_COMPARE(hour, 3);
+    GBL_TEST_COMPARE(minute, 30);
+    GBL_TEST_COMPARE(second, 45);
+    GBL_TEST_COMPARE(chars, 7);
+
+    GBL_CTX_END();
+}
 
 GBL_EXPORT GblType GblStringViewTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
@@ -922,6 +938,7 @@ GBL_EXPORT GblType GblStringViewTestSuite_type(void) {
         { "toDouble",               GblStringViewTestSuite_toDouble_                },
         { "toPointerInvalid",       GblStringViewTestSuite_toPointer_invalid_       },
         { "toPointer",              GblStringViewTestSuite_toPointer_               },
+        { "scanf",                  GblStringViewTestSuite_scanf_                   },
         { NULL,                     NULL                                            }
     };
 

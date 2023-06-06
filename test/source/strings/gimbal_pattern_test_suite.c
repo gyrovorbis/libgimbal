@@ -26,8 +26,8 @@ GBL_TEST_CASE(matchInvalid)
     GBL_TEST_EXPECT_ERROR();
 
     GblStringView match;
-    int count = 0;
 
+    int count = 0;
     GBL_TEST_VERIFY(!GblPattern_match(NULL,
                                       "12345678",
                                       &match,
@@ -100,7 +100,110 @@ GBL_TEST_CASE(matchLast)
     GBL_TEST_COMPARE(count, 2);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(matchNotInvalid)
+    GBL_TEST_EXPECT_ERROR();
 
+    GblStringView match;
+
+    int count = 0;
+    GBL_TEST_VERIFY(!GblPattern_matchNot(NULL,
+                                         "12345678",
+                                         &match,
+                                         &count));
+    GBL_TEST_VERIFY(GblStringView_empty(match));
+    GBL_TEST_COMPARE(count, 0);
+
+    count = -1;
+    GBL_TEST_VERIFY(!GblPattern_matchNot(pFixture->pPattern,
+                                         NULL,
+                                         &match,
+                                         &count));
+    GBL_TEST_VERIFY(GblStringView_empty(match));
+    GBL_TEST_COMPARE(count, 0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(matchNotNone)
+    GblStringView match;
+    int count = 0;
+
+    GBL_TEST_VERIFY(GblPattern_matchNot(pFixture->pPattern,
+                                        "12345678",
+                                        &match,
+                                        &count));
+    GBL_TEST_VERIFY(GblStringView_empty(match));
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(matchNotDefaultMatchDefaultCount)
+    GBL_TEST_VERIFY(!GblPattern_matchNot(pFixture->pPattern,
+                                         "12345678"));
+    GBL_TEST_VERIFY(GblPattern_matchNot(pFixture->pPattern,
+                                        "amd"));
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(matchNotDefaultCount)
+    GblStringView match;
+
+    GBL_TEST_VERIFY(!GblPattern_matchNot(pFixture->pPattern,
+                                         "12345678",
+                                         &match));
+    GBL_TEST_VERIFY(GblStringView_empty(match));
+
+    GBL_TEST_VERIFY(GblPattern_matchNot(pFixture->pPattern,
+                                        "amd12345678",
+                                        &match));
+    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("amd")));
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(matchNot)
+    GblStringView match;
+
+    // Find second match
+    int count = 2;
+    GBL_TEST_VERIFY(GblPattern_matchNot(pFixture->pPattern,
+                                        "12345678amd12345678nvidia12345678",
+                                        &match,
+                                        &count));
+    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("nvidia")));
+    GBL_TEST_COMPARE(count, 2);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(matchNotLast)
+    GblStringView match;
+    int           count;
+
+    // Find last match
+    count = -1;
+    GBL_TEST_VERIFY(GblPattern_matchNot(pFixture->pPattern,
+                                        "intel",
+                                        &match,
+                                        &count));
+    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("intel")));
+    GBL_TEST_COMPARE(count, 1);
+
+    // Find last match
+    count = -1;
+    GBL_TEST_VERIFY(GblPattern_matchNot(pFixture->pPattern,
+                                        "12345678amd12345678nvidia12345678intel",
+                                        &match,
+                                        &count));
+    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("intel")));
+    GBL_TEST_COMPARE(count, 3);
+GBL_TEST_CASE_END
+
+GBL_TEST_REGISTER(compileInvalid,
+                  compile,
+                  matchInvalid,
+                  matchNone,
+                  matchDefaultMatchDefaultCount,
+                  matchDefaultCount,
+                  match,
+                  matchLast,
+                  matchNotInvalid,
+                  matchNotNone,
+                  matchNotDefaultMatchDefaultCount,
+                  matchNotDefaultCount,
+                  matchNot,
+                  matchNotLast)
 #if 0
 
 GBL_TEST_CASE(iso8601BasicDate)
@@ -117,12 +220,3 @@ GBL_TEST_CASE(iso8601)
     //([0-9]{1,3}[\.]){3}[0-9]{1,3}
 GBL_TEST_CASE_END
 #endif
-
-GBL_TEST_REGISTER(compileInvalid,
-                  compile,
-                  matchInvalid,
-                  matchNone,
-                  matchDefaultMatchDefaultCount,
-                  matchDefaultCount,
-                  match,
-                  matchLast)

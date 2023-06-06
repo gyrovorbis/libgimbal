@@ -12,7 +12,7 @@
 #include "gimbal_test_scenario.h"
 #include <stdint.h>
 
-#define GBL_TEST_VERIFY(expr)                        GBL_CTX_VERIFY_EXPRESSION(expr)
+#define GBL_TEST_VERIFY(expr)   GBL_CTX_VERIFY_EXPRESSION(expr)
 
 /// \cond
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_DFLT_(void) { return "Values differed"; }

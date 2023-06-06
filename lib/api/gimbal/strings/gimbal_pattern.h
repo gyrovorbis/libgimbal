@@ -2,7 +2,7 @@
  *  \brief   GblPattern RegExp-style pattern matching
  *  \ingroup strings
  *  \todo
- *      - Complete unit testing
+ *      - Refactor GblPattern_matchNot() to be less disgusting
  *
  *  \author Falco Girgis
  */

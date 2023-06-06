@@ -3,7 +3,7 @@
  *  \ingroup strings
  *
  *  \todo
- *  Move larger inline functions to source file
+ *      - ignore case variants/default arguments
  *
  *  \author Falco Girgis
  */
@@ -81,6 +81,8 @@ GBL_INLINE GblQuark      GblStringView_quarkTry          (GBL_VSELF)            
 GBL_INLINE const char*   GblStringView_intern            (GBL_VSELF)                                          GBL_NOEXCEPT;
 GBL_INLINE GblHash       GblStringView_hash              (GBL_VSELF)                                          GBL_NOEXCEPT;
 GBL_EXPORT char*         GblStringView_strdup            (GBL_VSELF)                                          GBL_NOEXCEPT;
+GBL_EXPORT int           GblStringView_scanf             (GBL_VSELF, const char* pFmt, ...)                   GBL_NOEXCEPT;
+GBL_EXPORT int           GblStringView_scanfVa           (GBL_VSELF, const char* pFmt, va_list* pVarArgs)     GBL_NOEXCEPT;
 GBL_EXPORT char*         GblStringView_toCString         (GBL_VSELF, char* pDest, size_t destSize)            GBL_NOEXCEPT;
 GBL_EXPORT GblBool       GblStringView_toNil             (GBL_VSELF)                                          GBL_NOEXCEPT;
 GBL_EXPORT GblBool       GblStringView_toBool            (GBL_VSELF, GblBool* pSuccess)                       GBL_NOEXCEPT;

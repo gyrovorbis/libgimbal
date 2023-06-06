@@ -3,6 +3,8 @@
  *  \ingroup utils
  *  \todo
  *      - ensure proper handling of Windows line endings
+ *      - write own scanf() implementation that knows how
+ *        many characters have been read
  *
  *  \author Falco Girgis
  */
@@ -27,12 +29,19 @@ GBL_FORWARD_DECLARE_STRUCT(GblScanner);
 GBL_FORWARD_DECLARE_STRUCT(GblArrayList);
 
 GBL_DECLARE_ENUM(GBL_SCANNER_FLAGS) {
-    GBL_SCANNER_OK         = 0x0,
-    GBL_SCANNER_SCAN_ERROR = 0x1,
-    GBL_SCANNER_PEEK_ERROR = 0x2,
-    GBL_SCANNER_ERROR      = 0x3,
-    GBL_SCANNER_EOF        = 0x4,
-    GBL_SCANNER_USER_FLAGS = 0xfff8
+    // Builtin Non-error state flags (bit 0)
+    GBL_SCANNER_OK         = 0x00000000,
+    GBL_SCANNER_EOF        = 0x00000001,
+    // Builtin Error flags (bits 29-31)
+    GBL_SCANNER_SCAN_ERROR = 0x20000000,
+    GBL_SCANNER_PEEK_ERROR = 0x40000000,
+    GBL_SCANNER_SKIP_ERROR = 0x80000000,
+    // User masks (bits 1-28)
+    GBL_SCANNER_USER_STATE = 0x00fffff2,
+    GBL_SCANNER_USER_ERROR = 0x1f000000,
+    // Masks for combined state and error flags
+    GBL_SCANNER_STATE      = 0x00ffffff,
+    GBL_SCANNER_ERROR      = 0xff000000,
 };
 
 GBL_DECLARE_STRUCT(GblScannerCursor) {
@@ -69,6 +78,7 @@ GBL_SIGNALS(GblScanner,
     (scanned, (GBL_INSTANCE_TYPE, pReceiver)),
     (raised,  (GBL_INSTANCE_TYPE, pReceiver))
 )
+//skipped?
 
 GBL_EXPORT void          GblScannerClass_setDefaultDelimeters
                                                   (GBL_KLASS,
@@ -93,6 +103,8 @@ GBL_EXPORT GblStringRef* GblScanner_input         (GBL_CSELF)                  G
 GBL_EXPORT void          GblScanner_setInput      (GBL_SELF,
                                                    const char* pStr,
                                                    size_t      count)          GBL_NOEXCEPT;
+
+GBL_EXPORT GblStringRef* GblScanner_delimeters    (GBL_CSELF)                  GBL_NOEXCEPT;
 
 GBL_EXPORT void          GblScanner_setDelimeters (GBL_SELF,
                                                    const char* pPattern)       GBL_NOEXCEPT;

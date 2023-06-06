@@ -104,6 +104,10 @@ void GblScanner_reset(GblScanner* pSelf) {
                        GBL_SCANNER_OK;
 }
 
+GBL_EXPORT GblStringRef* GblScanner_delimeters(const GblScanner* pSelf) {
+    return GBL_SCANNER_(pSelf)->pDelimeters;
+}
+
 GBL_EXPORT void GblScanner_setDelimeters(GblScanner* pSelf, const char* pDelimeters) {
     GblStringRef_unref(GBL_SCANNER_(pSelf)->pDelimeters);
     GBL_SCANNER_(pSelf)->pDelimeters = GblStringRef_create(pDelimeters);
@@ -134,8 +138,8 @@ GBL_EXPORT void GblScanner_raiseError(GblScanner* pSelf,
 
     GblStringBuffer_appendPrintf(pStrBuff,
                                  "ERROR [line: %zu, column: %zu]: ",
-                                 GBL_SCANNER_CURSOR_(pSelf)->line,
-                                 GBL_SCANNER_CURSOR_(pSelf)->column);
+                                 GBL_SCANNER_CURSOR_(pSelf)->line   + 1,
+                                 GBL_SCANNER_CURSOR_(pSelf)->column + 1);
 
     GblStringBuffer_appendVPrintf(pStrBuff,
                                   pFmt,
@@ -220,8 +224,11 @@ GBL_EXPORT GblBool GblScanner_seek(GblScanner* pSelf, int whence) {
 static GBL_RESULT GblScanner_nextToken_(GblScanner* pSelf, GblStringView* pToken) {
     GBL_CTX_BEGIN(NULL);
 
-    GblPattern_matchNotStr(GBL_SCANNER_(pSelf)->pDelimeters,
-                           GBL_STRING_VIEW_CSTR(GBL_SCANNER_(pSelf)->streamBuffer),
+    GblScanner_* pSelf_        = GBL_SCANNER_(pSelf);
+    const char*  pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+
+    GblPattern_matchNotStr(pSelf_->pDelimeters,
+                           pStreamBuffer,
                            pToken);
 
     GBL_CTX_END();
@@ -560,7 +567,7 @@ GBL_EXPORT GblBool GblScanner_skipMatch(GblScanner* pSelf, const char* pStr) {
     const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
     if(!GblPattern_matchStr(pStr, pStreamBuffer, &pSelf->token)) {
         GblScanner_raiseError(pSelf,
-                              GBL_SCANNER_EOF,
+                              GBL_SCANNER_SKIP_ERROR,
                               "skipMatch() failed, could not find pattern: [%s]",
                               pStr);
         return GBL_FALSE;
@@ -575,7 +582,7 @@ GBL_EXPORT GblBool GblScanner_skipToMatch(GblScanner* pSelf, const char* pStr) {
     const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
     if(!GblPattern_matchStr(pStr, pStreamBuffer, &pSelf->token)) {
         GblScanner_raiseError(pSelf,
-                              GBL_SCANNER_EOF,
+                              GBL_SCANNER_SKIP_ERROR,
                               "skipToMatch() failed, could not find pattern: [%s]",
                               pStr);
         return GBL_FALSE;
@@ -611,17 +618,19 @@ GBL_EXPORT GblBool GblScanner_skipLines(GblScanner* pSelf, size_t count) {
             }
         }
 
-        if(!found) return GBL_FALSE;
+        if(!found) {
+            pSelf->status |= GBL_SCANNER_SKIP_ERROR;
+            return GBL_FALSE;
+        }
     }
 
     return GblScanner_seek(pSelf, offset);
 }
 
 GBL_EXPORT int GblScanner_scanf(GblScanner* pSelf, const char* pFmt, ...) {
-    int retVal = 0;
     va_list varArgs;
     va_start(varArgs, pFmt);
-    retVal = GblScanner_vscanf(pSelf, pFmt, &varArgs);
+    const int retVal = GblScanner_vscanf(pSelf, pFmt, &varArgs);
     va_end(varArgs);
     return retVal;
 }
@@ -630,52 +639,58 @@ GBL_EXPORT int GblScanner_vscanf(GblScanner* pSelf, const char* pFmt, va_list* p
     if(!(pSelf->status & GBL_SCANNER_EOF)) {
         GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
         const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
-
-        return vsscanf(pStreamBuffer,
-                       pFmt,
-                       *pList);
+        return vsscanf(pStreamBuffer, pFmt, *pList);
     } else return EOF;
 }
 
-static GBL_RESULT GblScanner_GblObject_setProperty_(GblObject* pObject, const GblProperty* pProp, GblVariant* pValue) {
+static GBL_RESULT GblScanner_GblObject_setProperty_(GblObject*         pObject,
+                                                    const GblProperty* pProp,
+                                                    GblVariant*        pValue)
+{
     GBL_CTX_BEGIN(NULL);
 
-    GblScanner* pSelf = GBL_SCANNER(pObject);
+    GblScanner*  pSelf  = GBL_SCANNER(pObject);
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
     switch(pProp->id) {
     case GblScanner_Property_Id_input: {
         GblStringRef* pStr = NULL;
         GblVariant_getValueMove(pValue, &pStr);
-        GblStringRef_unref(GBL_SCANNER_(pSelf)->pInputString);
-        GBL_SCANNER_(pSelf)->pInputString = pStr;
+        GblStringRef_unref(pSelf_->pInputString);
+        pSelf_->pInputString = pStr;
         GblScanner_reset(pSelf);
         break;
     }
     case GblScanner_Property_Id_delimeters: {
         GblStringRef* pStr = NULL;
         GblVariant_getValueMove(pValue, &pStr);
-        GblStringRef_unref(GBL_SCANNER_(pSelf)->pDelimeters);
-        GBL_SCANNER_(pSelf)->pDelimeters = pStr;
+        GblStringRef_unref(pSelf_->pDelimeters);
+        pSelf_->pDelimeters = pStr;
         break;
     }
-    default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
-                                "Attempted to set invalid property %s for GblScanner",
-                                GblProperty_nameString(pProp));
+    default:
+        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
+                           "Attempted to set invalid property %s for GblScanner",
+                            GblProperty_nameString(pProp));
     }
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblScanner_GblObject_property_(const GblObject* pObject, const GblProperty* pProp, GblVariant* pValue) {
+static GBL_RESULT GblScanner_GblObject_property_(const GblObject*   pObject,
+                                                 const GblProperty* pProp,
+                                                 GblVariant*        pValue)
+{
     GBL_CTX_BEGIN(NULL);
 
-    GblScanner* pSelf = GBL_SCANNER(pObject);
+    GblScanner*  pSelf  = GBL_SCANNER(pObject);
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
     switch(pProp->id) {
     case GblScanner_Property_Id_input:
-        GblVariant_setString(pValue, GBL_SCANNER_(pSelf)->pInputString); break;
+        GblVariant_setString(pValue, pSelf_->pInputString); break;
     case GblScanner_Property_Id_delimeters:
-        GblVariant_setString(pValue, GBL_SCANNER_(pSelf)->pDelimeters); break;
+        GblVariant_setString(pValue, pSelf_->pDelimeters); break;
     case GblScanner_Property_Id_token:
         GblVariant_setStringView(pValue, pSelf->token); break;
     case GblScanner_Property_Id_next:
@@ -684,9 +699,10 @@ static GBL_RESULT GblScanner_GblObject_property_(const GblObject* pObject, const
         GblVariant_setEnum(pValue, GBL_ENUM_TYPE, pSelf->status); break;
     case GblScanner_Property_Id_error:
         GblVariant_setStringRef(pValue, pSelf->pError); break;
-    default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
-                                "Attempted to get invalid property %s for GblScanner",
-                                GblProperty_nameString(pProp));
+    default:
+        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
+                           "Attempted to get invalid property %s for GblScanner",
+                           GblProperty_nameString(pProp));
     }
 
     GBL_CTX_END();
@@ -695,11 +711,13 @@ static GBL_RESULT GblScanner_GblObject_property_(const GblObject* pObject, const
 static GBL_RESULT GblScanner_GblBox_destructor_(GblBox* pBox) {
     GBL_CTX_BEGIN(NULL);
 
-    GblScanner* pSelf = GBL_SCANNER(pBox);
-    GblStringRef_unref(GBL_SCANNER_(pSelf)->pInputString);
-    GblStringRef_unref(GBL_SCANNER_(pSelf)->pDelimeters);
+    GblScanner* pSelf   = GBL_SCANNER(pBox);
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
-    GBL_CTX_CALL(GblArrayList_destruct(&GBL_SCANNER_(pSelf)->cursorStack));
+    GblStringRef_unref(pSelf_->pInputString);
+    GblStringRef_unref(pSelf_->pDelimeters);
+
+    GBL_CTX_CALL(GblArrayList_destruct(&pSelf_->cursorStack));
 
     GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 
@@ -710,13 +728,14 @@ static GBL_RESULT GblScanner_init_(GblInstance* pInstance, GblContext* pCtx) {
     GBL_UNUSED(pCtx);
     GBL_CTX_BEGIN(NULL);
 
-    GblScanner* pSelf = GBL_SCANNER(pInstance);
+    GblScanner*      pSelf  = GBL_SCANNER(pInstance);
+    GblScanner_*     pSelf_ = GBL_SCANNER_(pSelf);
     GblScannerClass* pClass = GBL_SCANNER_GET_CLASS(pSelf);
 
-    GBL_SCANNER_(pSelf)->pDelimeters =
+    pSelf_->pDelimeters =
         GblStringRef_ref(GblScannerClass_defaultDelimeters(pClass));
 
-    GBL_CTX_CALL(GblArrayList_construct(&GBL_SCANNER_(pSelf)->cursorStack,
+    GBL_CTX_CALL(GblArrayList_construct(&pSelf_->cursorStack,
                                         sizeof(GblScannerCursor),
                                         1));
 
@@ -747,7 +766,6 @@ static GBL_RESULT GblScannerClass_init_(GblClass* pClass, const void* pUd, GblCo
         GblScannerClass_setDefaultDelimeters(pSelfClass, GBL_SCANNER_DELIMETERS_DEFAULT);
 
     } else {
-
         GblScannerClass_setDefaultDelimetersRef(pSelfClass,
             GblStringRef_ref(
                 GblScannerClass_defaultDelimeters(
@@ -763,7 +781,7 @@ static GBL_RESULT GblScannerClass_init_(GblClass* pClass, const void* pUd, GblCo
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblType GblScanner_type(void) GBL_NOEXCEPT {
+GBL_EXPORT GblType GblScanner_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     static const GblTypeInfo info = {

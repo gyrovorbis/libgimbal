@@ -10,19 +10,20 @@ GBL_EXPORT const GblPattern* GblPattern_compile(const char* pRegExp) {
 GBL_EXPORT GblBool (GblPattern_match)(const GblPattern* pSelf,
                                       const char*       pString,
                                       GblStringView*    pMatch,
-                                      int*          pCount)
+                                      int*              pCount)
 {
-    GblBool retVal = GBL_FALSE;
+    GblBool       retVal = GBL_FALSE;
+
     // Default arguments
     GblStringView defaultMatch = { 0 };
-    int       defaultCount = 1;
+    int           defaultCount = 1;
 
     // Running counters
     int count      = 0;
-    int     prevPos    = 0;
-    int     pos        = 0;
-    int     prevLength = 0;
-    int     length     = 0;
+    int prevPos    = 0;
+    int pos        = 0;
+    int prevLength = 0;
+    int length     = 0;
 
     // Set default arguments
     if(!pCount)
@@ -52,7 +53,7 @@ GBL_EXPORT GblBool (GblPattern_match)(const GblPattern* pSelf,
         (count == *pCount)))          // If we found a particular match number)
     {
         // SUCCESS: Match is the last substring
-        pMatch->pData  = pString + prevPos;
+        pMatch->pData  = prevLength? pString + prevPos : NULL;
         pMatch->length = prevLength;
         retVal         = GBL_TRUE;
     } else {
@@ -80,10 +81,91 @@ GBL_EXPORT GblBool (GblPattern_matchStr)(const char*    pRegExp,
 GBL_EXPORT GblBool (GblPattern_matchNot)(const GblPattern* pSelf,
                                          const char*       pString,
                                          GblStringView*    pMatch,
-                                         int*          pCount)
+                                         int*              pCount)
 {
+    GblBool retVal = GBL_FALSE;
 
+    // Default arguments
+    GblStringView defaultMatch = { 0 };
+    int           defaultCount = 1;
 
+    if(!pCount)
+        pCount = &defaultCount;
+    if(!pMatch)
+        pMatch = &defaultMatch;
+
+    if(!pSelf || !pString) {
+        *pMatch = GblStringView_fromEmpty();
+        *pCount = 0;
+        return GBL_FALSE;
+    }
+
+    GblStringView token;
+    GblStringView prevToken;
+    int totalCount = 0;
+    *pMatch = GblStringView_fromEmpty();
+
+    int count = 1;
+    // Find first token
+    if(!GblPattern_match(pSelf, pString, &token, &count)) {
+        *pMatch = GblStringView_fromString(pString);
+        if(*pCount == 1)
+            return GBL_TRUE;
+        else if(*pCount == -1) {
+            *pCount = 1;
+            return GBL_TRUE;
+        } else {
+            *pCount = 1;
+            return GBL_FALSE;
+        }
+    }
+
+    // If there's a non-match before the first token
+    if(token.pData != pString) {
+        *pMatch = GblStringView_fromStringSized(pString, token.pData - pString);
+        ++totalCount;
+    }
+
+    const size_t length = strlen(pString);
+
+    prevToken = token;
+    while((*pCount == -1 || totalCount < *pCount) &&
+          token.pData + token.length < pString + length &&
+          GblPattern_match(pSelf, token.pData += token.length, &token, &count))
+    {
+        *pMatch = GblStringView_fromStringSized(prevToken.pData + prevToken.length,
+                                                token.pData - prevToken.pData);
+
+        prevToken = token;
+        ++totalCount;
+    }
+
+    // check if we still have one last token remaining
+    if((*pCount == -1 || totalCount < *pCount) &&
+       token.pData + token.length < pString + length) {
+        const char* pNewHead = prevToken.pData + prevToken.length;
+        *pMatch = GblStringView_fromStringSized(pNewHead,
+                                                pString + length - pNewHead);
+
+        ++totalCount;
+    }
+
+    count = 1;
+    if(totalCount &&
+        (*pCount == -1 || totalCount == *pCount) &&
+       GblPattern_match(pSelf, pMatch->pData, &token, &count)) {
+        pMatch->length = token.pData - pMatch->pData;
+    }
+
+    if(*pCount == -1)
+        *pCount = totalCount;
+
+    if(totalCount == *pCount)
+        return GBL_TRUE;
+    else {
+        *pCount = totalCount;
+        return GBL_FALSE;
+    }
 }
 
 GBL_EXPORT GblBool GblPattern_matchNotStr(const char*    pRegExp,

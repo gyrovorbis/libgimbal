@@ -420,3 +420,16 @@ GBL_EXPORT size_t GblStringView_findLastOf(GblStringView self, GblStringView cha
     GBL_CTX_END_BLOCK();
     return pos;
 }
+
+GBL_EXPORT int GblStringView_scanf(GblStringView self, const char* pFmt, ...) {
+    va_list varArgs;
+    va_start(varArgs, pFmt);
+    const int retVal = GblStringView_scanfVa(self, pFmt, &varArgs);
+    va_end(varArgs);
+    return retVal;
+}
+
+GBL_EXPORT int GblStringView_scanfVa(GblStringView self, const char* pFmt, va_list* pVarArgs) {
+    const char* pCString = GBL_STRING_VIEW_CSTR(self);
+    return vsscanf(pCString, pFmt, pVarArgs);
+}
