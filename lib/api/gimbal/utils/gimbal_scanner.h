@@ -2,7 +2,7 @@
  *  \brief GblScanner, generic text tokenizer and lexer
  *  \ingroup utils
  *  \todo
- *      - ensure proper handling of Windows line endings
+ *      - _Generic()/type-deduced peek/scanPrimitive()s
  *      - write own scanf() implementation that knows how
  *        many characters have been read
  *
@@ -14,14 +14,13 @@
 #include "../meta/instances/gimbal_object.h"
 #include "../strings/gimbal_pattern.h"
 #include "../meta/signals/gimbal_signal.h"
-#include "../containers/gimbal_array_list.h"
 
 #define GBL_SCANNER_TYPE                (GBL_TYPEOF(GblScanner))
 #define GBL_SCANNER(self)               (GBL_INSTANCE_CAST(self, GblScanner))
 #define GBL_SCANNER_CLASS(klass)        (GBL_CLASS_CAST(klass, GblScanner))
 #define GBL_SCANNER_GET_CLASS(self)     (GBL_INSTANCE_GET_CLASS(self, GblScanner))
 
-#define GBL_SCANNER_DELIMETERS_DEFAULT  " \t\n\r"
+#define GBL_SCANNER_DELIMETERS_DEFAULT  "[ \t\n\r]"
 
 #define GBL_SELF_TYPE GblScanner
 

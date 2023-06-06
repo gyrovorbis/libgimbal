@@ -3,7 +3,7 @@
  *  \ingroup utils
  *  \todo
  *      - design URI flags
- *      - implement back-end
+ *      - implement parsing, formatting, validating back-end
  *
  *  \author Falco Girgis
  */
@@ -36,7 +36,7 @@ GBL_EXPORT GblUri*       GblUri_ref             (GBL_SELF)                     G
 GBL_EXPORT GblRefCount   GblUri_unref           (GBL_SELF)                     GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount   GblUri_refCount        (GBL_CSELF)                    GBL_NOEXCEPT;
 
-GBL_EXPORT GblUri*       GblUri_copy            (GBL_SELF, GblUri* pDest)      GBL_NOEXCEPT;
+GBL_EXPORT GblUri*       GblUri_copy            (GBL_CSELF, GblUri* pDest)     GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT    GblUri_parse           (GBL_SELF,
                                                  const char* pStr,
@@ -83,6 +83,7 @@ GBL_EXPORT void          GblUri_setPath         (GBL_SELF, const char* pStr)   G
 GBL_EXPORT void          GblUri_setPathRef      (GBL_SELF, GblStringRef* pRef) GBL_NOEXCEPT;
 GBL_EXPORT GblStringRef* GblUri_path            (GBL_CSELF)                    GBL_NOEXCEPT;
 
+GBL_EXPORT GblStringView GblUri_directory       (GBL_CSELF)                    GBL_NOEXCEPT;
 GBL_EXPORT GblStringView GblUri_fileName        (GBL_CSELF)                    GBL_NOEXCEPT;
 GBL_EXPORT GblStringView GblUri_extension       (GBL_CSELF)                    GBL_NOEXCEPT;
 

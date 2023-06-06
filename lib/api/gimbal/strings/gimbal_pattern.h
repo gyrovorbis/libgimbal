@@ -3,6 +3,7 @@
  *  \ingroup strings
  *  \todo
  *      - Refactor GblPattern_matchNot() to be less disgusting
+ *      - GblPattern_matchNot() incorrect when more than one match in a row
  *
  *  \author Falco Girgis
  */

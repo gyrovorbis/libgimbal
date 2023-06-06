@@ -2,8 +2,8 @@
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, const char* pFmt, va_list varArgs) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    size_t  newCapacity = 0;
-    size_t expectedSize = 0;
+    size_t  newCapacity  = 0;
+    size_t  expectedSize = 0;
     size_t  originalSize = 0;
     va_list varArgsCopy;
 
@@ -25,7 +25,8 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, cons
                                  GBL_PRIV(pSelf->data).capacity-originalSize,
                                  pFmt,
                                  varArgsCopy);
-        GBL_PRIV(pSelf->data).size = expectedSize;
+        GBL_PRIV(pSelf->data).size = expectedSize + originalSize;
+        //GBL_PRIV(pSelf->data).pData[expectedSize] = '\0';
         va_end(varArgsCopy);
         GBL_CTX_PERROR("vsnprintf failed with code: %zu", expectedSize);
         //Multi-pass, try again with real size!

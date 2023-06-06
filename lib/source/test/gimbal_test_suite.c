@@ -39,7 +39,7 @@ static GBL_RESULT GblTestSuiteClass_caseName_(const GblTestSuite* pSelf, size_t 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestSuiteClass_caseRun_(GblTestSuite* pSelf, GblContext* pCtx, size_t  index) {
+static GBL_RESULT GblTestSuiteClass_caseRun_(GblTestSuite* pSelf, GblContext* pCtx, size_t index) {
     GBL_CTX_BEGIN(pCtx);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
     const GblTestCase* pCase = GblArrayList_at(&pSelf_->testCases, index);

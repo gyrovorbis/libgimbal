@@ -168,7 +168,9 @@ GBL_INLINE GblBool GblStringRef_valid(GBL_CSELF) GBL_NOEXCEPT {
 }
 
 GBL_INLINE GblStringView GblStringRef_view(GBL_CSELF) GBL_NOEXCEPT {
-    return GBL_STRING_VIEW(pSelf, GblStringRef_length(pSelf));
+    GblStringView view = GBL_STRING_VIEW(pSelf, GblStringRef_length(pSelf));
+    view.nullTerminated = 1;
+    return view;
 }
 
 GBL_DECLS_END

@@ -431,5 +431,5 @@ GBL_EXPORT int GblStringView_scanf(GblStringView self, const char* pFmt, ...) {
 
 GBL_EXPORT int GblStringView_scanfVa(GblStringView self, const char* pFmt, va_list* pVarArgs) {
     const char* pCString = GBL_STRING_VIEW_CSTR(self);
-    return vsscanf(pCString, pFmt, pVarArgs);
+    return vsscanf(pCString, pFmt, *pVarArgs);
 }

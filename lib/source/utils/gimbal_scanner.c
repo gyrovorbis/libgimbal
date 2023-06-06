@@ -1,6 +1,7 @@
 #include <gimbal/utils/gimbal_scanner.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/strings/gimbal_pattern.h>
+#include <gimbal/containers/gimbal_array_list.h>
 
 #define GBL_SCANNER_ERROR_BUFFER_DEFAULT_SIZE_   256
 
@@ -133,11 +134,13 @@ GBL_EXPORT void GblScanner_raiseError(GblScanner* pSelf,
 
     pSelf->status |= flags;
 
-    GblStringBuffer* pStrBuff =
-        GBL_STRING_BUFFER_ALLOCA(GBL_SCANNER_ERROR_BUFFER_DEFAULT_SIZE_);
+    const size_t bufferSize = sizeof(GblStringBuffer) +
+                              GBL_SCANNER_ERROR_BUFFER_DEFAULT_SIZE_;
+    GblStringBuffer* pStrBuff = GBL_ALLOCA(bufferSize);
+    GblStringBuffer_construct(pStrBuff, GBL_STRV(""), bufferSize);
 
     GblStringBuffer_appendPrintf(pStrBuff,
-                                 "ERROR [line: %zu, column: %zu]: ",
+                                 "[line: %zu, column: %zu]: ",
                                  GBL_SCANNER_CURSOR_(pSelf)->line   + 1,
                                  GBL_SCANNER_CURSOR_(pSelf)->column + 1);
 
@@ -168,7 +171,7 @@ static GblBool GblScanner_advance_(GblScanner* pSelf, size_t bytes) {
     GblScannerCursor* pCursor    = GBL_SCANNER_CURSOR_(pSelf);
     GblBool           outOfRange = GBL_FALSE;
 
-    if(bytes > GBL_SCANNER_(pSelf)->streamBuffer.length) {
+    if(bytes > pSelf_->streamBuffer.length) {
         bytes = pSelf_->streamBuffer.length;
         outOfRange = GBL_TRUE;
     }
@@ -186,7 +189,7 @@ static GblBool GblScanner_advance_(GblScanner* pSelf, size_t bytes) {
         ++pCursor->position;
     }
 
-    GBL_SCANNER_(pSelf)->streamBuffer =
+    pSelf_->streamBuffer =
         GblStringView_removePrefix(pSelf_->streamBuffer, bytes);
 
     if(GblStringView_empty(pSelf_->streamBuffer))
@@ -260,7 +263,7 @@ static GblBool GblScanner_readToken_(GblScanner*    pSelf,
 
         return GBL_FALSE;
     } else if(advanceStream)
-        return GblScanner_advance_(pSelf, pToken->length);
+        return GblScanner_advance_(pSelf, (pToken->pData - GBL_SCANNER_(pSelf)->streamBuffer.pData) + pToken->length);
     else
         return GBL_TRUE;
 }
@@ -589,16 +592,24 @@ GBL_EXPORT GblBool GblScanner_skipToMatch(GblScanner* pSelf, const char* pStr) {
     }
 
     return GblScanner_advance_(pSelf, pSelf->token.pData - pStreamBuffer);
-
 }
 
 GBL_EXPORT GblBool GblScanner_skipBytes(GblScanner* pSelf, size_t count) {
-    return GblScanner_advance_(pSelf, count);
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+
+    if(count > pSelf_->streamBuffer.length) {
+        pSelf->status |= GBL_SCANNER_SKIP_ERROR;
+        return GBL_FALSE;
+    } else return GblScanner_advance_(pSelf, count);
 }
 
 GBL_EXPORT GblBool GblScanner_skipTokens(GblScanner* pSelf, size_t count) {
+    GblStringView token;
     for(size_t t = 0; t < count; ++t) {
-        if(!GblScanner_scanToken(pSelf))
+        if(!GblScanner_readToken_(pSelf,
+                                  &token,
+                                  GBL_SCANNER_SKIP_ERROR,
+                                  GBL_TRUE))
             return GBL_FALSE;
     }
     return GBL_TRUE;
@@ -713,6 +724,8 @@ static GBL_RESULT GblScanner_GblBox_destructor_(GblBox* pBox) {
 
     GblScanner* pSelf   = GBL_SCANNER(pBox);
     GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+
+    GblScanner_clearError(pSelf);
 
     GblStringRef_unref(pSelf_->pInputString);
     GblStringRef_unref(pSelf_->pDelimeters);

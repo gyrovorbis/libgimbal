@@ -11,10 +11,10 @@
 
 #define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblArrayList))
 
-static GblQuark     objectNameQuark_            = GBL_QUARK_INVALID;
-static GblQuark     objectParentQuark_          = GBL_QUARK_INVALID;
-static GblQuark     objectFamilyQuark_          = GBL_QUARK_INVALID;
-static GblQuark     objectEventFiltersQuark_    = GBL_QUARK_INVALID;
+static GblQuark objectNameQuark_         = GBL_QUARK_INVALID;
+static GblQuark objectParentQuark_       = GBL_QUARK_INVALID;
+static GblQuark objectFamilyQuark_       = GBL_QUARK_INVALID;
+static GblQuark objectEventFiltersQuark_ = GBL_QUARK_INVALID;
 
 static GBL_RESULT GblObjectClass_ivariantIFace_construct_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
@@ -52,7 +52,6 @@ static GBL_RESULT GblObjectClass_ivariantIFace_get_(GblVariant* pSelf, size_t  a
     }
     GBL_CTX_END();
 }
-
 
 static GBL_RESULT GblObjectClass_ivariantIFace_set_(GblVariant* pSelf, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
