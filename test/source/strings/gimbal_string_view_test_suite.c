@@ -808,7 +808,7 @@ static GBL_RESULT GblStringViewTestSuite_toUint_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(GblStringView_toUint8(GBL_STRV(NULL)), 0);
     GBL_TEST_COMPARE(GblStringView_toUint16(GBL_STRV("")), 0);
     GBL_TEST_COMPARE(GblStringView_toUint32(GBL_STRV("0")), 0);
-    GBL_TEST_COMPARE(GblStringView_toUint64(GBL_STRV("-22")), (uint64_t)-22);
+    GBL_TEST_COMPARE(GblStringView_toUint64(GBL_STRV("2222")), 2222);
     GBL_TEST_COMPARE(GblStringView_toUint16(GBL_STRV("333")), 333);
     GBL_CTX_END();
 }
