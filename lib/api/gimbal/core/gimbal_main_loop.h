@@ -28,9 +28,9 @@ GBL_FORWARD_DECLARE_STRUCT(GblMainLoop);
 
 GBL_CLASS_DERIVE(GblMainLoop, GblObject)
     GBL_RESULT (*pFnEnqueueTask)(GBL_SELF, GblTask* pTask);
-    GBL_RESULT (*pFnExecTask)  (GBL_SELF, GblTask* pTask);
-    GBL_RESULT (*pFnCancelTask)(GBL_SELF, GblTask* pTask);
-    GBL_RESULT (*pFnExecIdle)  (GBL_SELF);
+    GBL_RESULT (*pFnExecTask)   (GBL_SELF, GblTask* pTask);
+    GBL_RESULT (*pFnCancelTask) (GBL_SELF, GblTask* pTask);
+    GBL_RESULT (*pFnExecIdle)   (GBL_SELF);
 GBL_CLASS_END
 
 // Needs a context with queue
@@ -53,8 +53,6 @@ GBL_EXPORT GBL_RESULT GblMainLoop_iteration (GBL_SELF)  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblMainLoop_exec      (GBL_SELF)  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblMainLoop_stop      (GBL_SELF)  GBL_NOEXCEPT;
 GBL_EXPORT GblBool    GblMainLoop_isRunning (GBL_CSELF) GBL_NOEXCEPT;
-
-
 
 GBL_DECLS_END
 

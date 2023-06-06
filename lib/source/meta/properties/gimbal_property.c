@@ -33,7 +33,7 @@ static void propertyDestructor_(const GblHashSet* pSet, GblProperty** pProperty)
     GBL_CTX_END_BLOCK();
 }
 
-GBL_EXPORT size_t  GblProperty_totalCount(void) GBL_NOEXCEPT {
+GBL_EXPORT size_t  GblProperty_totalCount(void) {
     return GblHashSet_size(&propertyRegistry_);
 }
 
@@ -243,7 +243,7 @@ GBL_EXPORT GBL_RESULT GblProperty_install(GblType objectType, GblProperty* pProp
 }
 
 
-GBL_EXPORT GblBool GblProperty_uninstallQuark(GblType objectType, GblQuark name) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblProperty_uninstallQuark(GblType objectType, GblQuark name) {
     GblBool success = GBL_FALSE;
     GBL_CTX_BEGIN(GblHashSet_context(&propertyRegistry_));
     GBL_CTX_VERIFY(name != GBL_QUARK_INVALID,

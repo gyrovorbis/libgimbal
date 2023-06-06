@@ -28,7 +28,7 @@ typedef struct GblThd {
 } GblThd;
 
 // ===== Public API =====
-GBL_INLINE GblThd*        GblThd_current        (void)                                   GBL_NOEXCEPT;
+GBL_EXPORT GblThd*        GblThd_current        (void)                                   GBL_NOEXCEPT;
 GBL_EXPORT GblContext*    GblThd_context        (GBL_CSELF)                              GBL_NOEXCEPT;
 
 GBL_EXPORT const char*    GblThd_name           (GBL_CSELF)                              GBL_NOEXCEPT;
@@ -46,14 +46,9 @@ GBL_EXPORT GBL_RESULT     GblThd_logPop         (GBL_SELF, uint32_t count)      
 
 // ===== Implementation =====
 ///\cond
-extern GBL_THREAD_LOCAL GblThd GblThd_current_;
 
 GBL_EXPORT GblContext* GblContext_global(void) GBL_NOEXCEPT;
 ///\endcond
-
-GBL_INLINE GblThd* GblThd_current(void) GBL_NOEXCEPT {
-    return &GblThd_current_;
-}
 
 GBL_INLINE GblStackFrame* GblThd_stackFrameTop(const GblThd* pThread) GBL_NOEXCEPT {
     if(!pThread) pThread = GblThd_current();
