@@ -41,7 +41,6 @@ GBL_RESULT typeInstanceConstructValidate_(GblType type, GblBool inPlace) {
     GBL_CTX_END();
 }
 
-
 GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, GblClass* pClass) {
     GblMetaClass*   pMeta = GBL_META_CLASS_(type);
     GBL_CTX_BEGIN(pCtx_);
@@ -302,7 +301,7 @@ GBL_EXPORT GblType GblInstance_typeOf(const GblInstance* pSelf) GBL_NOEXCEPT {
     return pSelf? GblClass_typeOf(pSelf->pClass) : GBL_INVALID_TYPE;
 }
 
-GBL_EXPORT size_t  GblInstance_size(const GblInstance* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT size_t GblInstance_size(const GblInstance* pSelf) GBL_NOEXCEPT {
     size_t  size = 0;
     if(pSelf) {
         const GblTypeInfo* pInfo = GblType_info(GBL_INSTANCE_TYPEOF(pSelf));
@@ -311,7 +310,7 @@ GBL_EXPORT size_t  GblInstance_size(const GblInstance* pSelf) GBL_NOEXCEPT {
     return size;
 }
 
-GBL_EXPORT size_t  GblInstance_privateSize(const GblInstance* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT size_t GblInstance_privateSize(const GblInstance* pSelf) GBL_NOEXCEPT {
     size_t  size = 0;
     if(pSelf) {
         const GblTypeInfo* pInfo = GblType_info(GBL_INSTANCE_TYPEOF(pSelf));
@@ -320,8 +319,7 @@ GBL_EXPORT size_t  GblInstance_privateSize(const GblInstance* pSelf) GBL_NOEXCEP
     return size;
 }
 
-
-GBL_EXPORT size_t  GblInstance_totalSize(const GblInstance* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT size_t GblInstance_totalSize(const GblInstance* pSelf) GBL_NOEXCEPT {
     GblMetaClass* pMeta = GBL_META_CLASS_(GBL_INSTANCE_TYPEOF(pSelf));
     return pMeta? (pMeta->pInfo->instanceSize - pMeta->instancePrivateOffset) : 0;
 }
@@ -337,5 +335,4 @@ GBL_EXPORT GblInstance* GblInstance_try(GblInstance* pSelf, GblType type) GBL_NO
 GBL_EXPORT  GblInstance* GblInstance_cast(GblInstance* pSelf, GblType type) GBL_NOEXCEPT {
     return GblInstance_convert_(pSelf, type, GBL_TRUE);
 }
-
 

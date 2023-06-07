@@ -8,7 +8,7 @@ static GblStackFrame defaultStackFrame_ = {
     .pContext = &GblContext_default_
 };
 
-GBL_THREAD_LOCAL GblThd GblThd_current_ = {
+static GBL_THREAD_LOCAL GblThd GblThd_current_ = {
     .callRecord = {
         .message        = { '\0' },
         .srcLocation    = {
@@ -22,6 +22,10 @@ GBL_THREAD_LOCAL GblThd GblThd_current_ = {
     .logStackDepth      = 0,
     .pStackFrameTop     = &defaultStackFrame_
 };
+
+GBL_EXPORT GblThd* GblThd_current(void) {
+    return &GblThd_current_;
+}
 
 GblContext* GblThd_context(const GblThd* pThread) {
     GBL_UNUSED(pThread);

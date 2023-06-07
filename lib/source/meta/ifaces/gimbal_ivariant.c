@@ -4,24 +4,8 @@
 #include <gimbal/strings/gimbal_quark.h>
 #include "../types/gimbal_type_.h"
 
-extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
-
-    static const GblTypeInfo typeInfo = {
-        .classSize      = sizeof(GblIVariantClass)
-    };
-
-    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_IVARIANT,
-                            GBL_INTERFACE_TYPE,
-                            GblQuark_internStringStatic("GblIVariant"),
-                            &typeInfo,
-                            GBL_TYPE_FLAG_ABSTRACT |
-                            GBL_TYPE_FLAG_TYPEINFO_STATIC);
-    GBL_CTX_END();
-}
-
 // never even being used anywhere!
-GBL_EXPORT GBL_RESULT GblIVariantClass_validate(const GblIVariantClass* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_validate(const GblIVariantClass* pSelf) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
 
@@ -66,7 +50,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_validate(const GblIVariantClass* pSelf) G
 }
 
 
-GBL_EXPORT GBL_RESULT GblIVariantClass_constructDefault(const GblIVariantClass* pSelf, GblVariant* pVariant) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructDefault(const GblIVariantClass* pSelf, GblVariant* pVariant) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_CTX_VERIFY_POINTER(pVariant);
@@ -83,7 +67,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_constructDefault(const GblIVariantClass* 
  * 2) Try default constructor + copy assignment
  * 3) Shit pants
  */
-GBL_EXPORT GBL_RESULT GblIVariantClass_constructCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblVariant* pOther) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_CTX_VERIFY_POINTER(pVariant);
@@ -117,7 +101,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_constructCopy(const GblIVariantClass* pSe
  * 5) Try memcpy
  * 6) Shit pants
  */
-GBL_EXPORT GBL_RESULT GblIVariantClass_constructMove(const GblIVariantClass* pSelf, GblVariant* pVariant, GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_constructMove(const GblIVariantClass* pSelf, GblVariant* pVariant, GblVariant* pOther) {
    GBL_CTX_BEGIN(NULL);
    GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
    GBL_CTX_VERIFY_POINTER(pVariant);
@@ -152,7 +136,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_constructMove(const GblIVariantClass* pSe
    GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblIVariantClass_setCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_setCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblVariant* pOther) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_CTX_VERIFY_POINTER(pVariant);
@@ -178,7 +162,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_setCopy(const GblIVariantClass* pSelf, Gb
  * 3) Try memcpy
  * 4) Shit pants
  */
-GBL_EXPORT GBL_RESULT GblIVariantClass_setMove(const GblIVariantClass* pSelf, GblVariant* pVariant, GblVariant* pOther) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_setMove(const GblIVariantClass* pSelf, GblVariant* pVariant, GblVariant* pOther) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_CTX_VERIFY_POINTER(pVariant);
@@ -200,7 +184,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_setMove(const GblIVariantClass* pSelf, Gb
 }
 
 
-GBL_EXPORT GBL_RESULT GblIVariantClass_destruct(const GblIVariantClass* pSelf, GblVariant* pVariant) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_destruct(const GblIVariantClass* pSelf, GblVariant* pVariant) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_CTX_VERIFY_POINTER(pVariant);
@@ -210,7 +194,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_destruct(const GblIVariantClass* pSelf, G
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblIVariantClass_compare(const GblIVariantClass* pSelf, const GblVariant* pVariant, const GblVariant* pOther, int* pCmpResult) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_compare(const GblIVariantClass* pSelf, const GblVariant* pVariant, const GblVariant* pOther, int* pCmpResult) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_CTX_VERIFY_POINTER(pVariant);
@@ -317,7 +301,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_constructValueMove(const GblIVariantClass
     } GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblIVariantClass_setValueCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_setValueCopy(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
         size_t  count = 0;
@@ -333,7 +317,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_setValueCopy(const GblIVariantClass* pSel
         }
     } GBL_CTX_END();
 }
-GBL_EXPORT GBL_RESULT GblIVariantClass_setValueMove(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_setValueMove(const GblIVariantClass* pSelf, GblVariant* pVariant, va_list* pArgs) {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
         size_t  count = 0;
@@ -354,7 +338,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_setValueMove(const GblIVariantClass* pSel
 }
 
 
-GBL_EXPORT GBL_RESULT GblIVariantClass_getValueCopy(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_getValueCopy(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
         size_t  count = 0;
@@ -371,7 +355,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_getValueCopy(const GblIVariantClass* pSel
     } GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblIVariantClass_getValuePeek(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_getValuePeek(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
         size_t  count = 0;
@@ -388,7 +372,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_getValuePeek(const GblIVariantClass* pSel
     } GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblIVariantClass_getValueMove(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_getValueMove(const GblIVariantClass* pSelf, const GblVariant* pVariant, va_list* pArgs) {
     GBL_CTX_BEGIN(NULL); {
         GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
         size_t  count = 0;
@@ -408,20 +392,35 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_getValueMove(const GblIVariantClass* pSel
     } GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblIVariantClass_save(const GblIVariantClass* pSelf, const GblVariant* pVariant, GblStringBuffer* pString) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_save(const GblIVariantClass* pSelf, const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_CTX_VERIFY_POINTER(pSelf->pVTable->pFnSave);
     GBL_CTX_CALL(pSelf->pVTable->pFnSave(pVariant, pString));
     GBL_CTX_END();
 }
-GBL_EXPORT GBL_RESULT GblIVariantClass_load(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblStringBuffer* pString) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblIVariantClass_load(const GblIVariantClass* pSelf, GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf && pSelf->pVTable);
     GBL_CTX_VERIFY_POINTER(pSelf->pVTable->pFnLoad);
     GBL_CTX_CALL(pSelf->pVTable->pFnLoad(pVariant, pString));
     GBL_CTX_END();
+}
 
+extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    static const GblTypeInfo typeInfo = {
+        .classSize      = sizeof(GblIVariantClass)
+    };
+
+    GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_IVARIANT,
+                             GBL_INTERFACE_TYPE,
+                             GblQuark_internStringStatic("GblIVariant"),
+                             &typeInfo,
+                             GBL_TYPE_FLAG_ABSTRACT |
+                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);
+    GBL_CTX_END();
 }
 
 

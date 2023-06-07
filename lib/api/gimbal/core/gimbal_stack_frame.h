@@ -54,7 +54,7 @@ GBL_INLINE GBL_RESULT GblStackFrame_construct (GblStackFrame* pFrame,
 ///\cond
 GBL_FORWARD_DECLARE_STRUCT(GblThd);
 GBL_FORWARD_DECLARE_STRUCT(GblContext);
-GBL_INLINE GblThd*     GblThd_current         (void)                            GBL_NOEXCEPT;
+GBL_EXPORT GblThd*     GblThd_current         (void)                            GBL_NOEXCEPT;
 GBL_EXPORT GblContext*    GblThd_context         (const GblThd* pSelf)          GBL_NOEXCEPT;
 GBL_INLINE GblStackFrame* GblThd_stackFrameTop   (const GblThd* pSelf)          GBL_NOEXCEPT;
 GBL_EXPORT GblContext*    GblObject_findContext     (GblObject* pSelf)                GBL_NOEXCEPT;
