@@ -94,10 +94,11 @@ static void GblThread_unregister_(GblThread* pSelf) {
     mtx_unlock(&listMtx_);
 }
 
-static void GblThread_initSelf_(GblThread* pSelf) {
+static void GblThread_initSelf_(GblThread* pSelf, GblBool mainThread) {
     pCurThread_  = pSelf;
     GblThread_* pSelf_ = GBL_THREAD_(pSelf);
-    pSelf_->nativeHandle = thrd_current();
+    if(mainThread)
+        pSelf_->nativeHandle = thrd_current();
     // set up thread priority
     // set up thread affinity
     // set up thread name
@@ -129,7 +130,7 @@ static GblThread* GblThread_initUnknown_(GblBool mainThread) {
     pCurThread_ = GBL_NEW(GblThread,
                           "name", buffer);
 
-    GblThread_initSelf_(pCurThread_);
+    GblThread_initSelf_(pCurThread_, mainThread);
 
     return pCurThread_;
 }
@@ -205,7 +206,7 @@ static int GblThread_start_(void* pThread) {
     GblThread* pSelf = GBL_THREAD(pThread);
 
     // initialize thread settings
-    GblThread_initSelf_(pSelf);
+    GblThread_initSelf_(pSelf, GBL_FALSE);
 
     // update status
     pCurThread_->state = GBL_THREAD_STATE_RUNNING;
