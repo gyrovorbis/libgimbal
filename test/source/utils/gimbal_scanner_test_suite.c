@@ -52,6 +52,7 @@ GBL_TEST_CASE(peekTokenInvalid)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(scanTokenInvalid)
+    GBL_TEST_EXPECT_ERROR();
     GBL_TEST_VERIFY(!GblScanner_scanToken(pFixture->pEmptyScanner));
     GBL_TEST_VERIFY(pFixture->pEmptyScanner->status & GBL_SCANNER_SCAN_ERROR);
     GBL_TEST_VERIFY(pFixture->pEmptyScanner->status & GBL_SCANNER_EOF);
@@ -94,6 +95,7 @@ GBL_TEST_CASE(peekTokenEof)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(scanTokenEof)
+    GBL_TEST_EXPECT_ERROR();
     GBL_TEST_VERIFY(!GblScanner_scanToken(pFixture->pScanner));
 
     GBL_TEST_VERIFY(GblStringView_empty(pFixture->pScanner->token));
@@ -290,6 +292,61 @@ GBL_TEST_CASE(scanf)
     GBL_TEST_COMPARE(utcOffset, -500);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(peekMatchInvalid)
+    GblScanner_setInput(pFixture->pScanner, "1234 hello worldX:)");
+    GBL_TEST_VERIFY(!GblScanner_peekMatch(pFixture->pEmptyScanner, "[ ]"));
+    GBL_TEST_VERIFY(pFixture->pEmptyScanner->status & GBL_SCANNER_PEEK_ERROR);
+    GBL_TEST_VERIFY(GblStringView_empty(pFixture->pEmptyScanner->next));
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(scanMatchInvalid)
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_VERIFY(!GblScanner_scanMatch(pFixture->pEmptyScanner, "[ ]"));
+    GBL_TEST_VERIFY(pFixture->pEmptyScanner->status & GBL_SCANNER_SCAN_ERROR);
+    GBL_TEST_VERIFY(GblStringView_empty(pFixture->pEmptyScanner->token));
+    GBL_TEST_VERIFY(GblStringView_empty(pFixture->pEmptyScanner->next));
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekMatch)
+    GblScanner_setDelimeters(pFixture->pScanner, "[X]");
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peekMatch(pFixture->pScanner, "^:\\)$"));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next, GBL_STRV(":)")));
+    GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(scanMatch)
+    GBL_TEST_VERIFY(GblScanner_scanMatch(pFixture->pScanner, "^:\\)$"));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV(":)")));
+    GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_EOF);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekLinesInvalid)
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(scanLinesInvalid)
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekLines)
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(scanLines)
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekBytesInvalid)
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(scanBytesInvalid)
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekBytes)
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(scanBytes)
+GBL_TEST_CASE_END
+
 GBL_TEST_CASE(unref)
     GblScanner_unref(pFixture->pEmptyScanner);
     GBL_UNREF(pFixture->pScanner);
@@ -321,4 +378,8 @@ GBL_TEST_REGISTER(createEmpty,
                   skipBytesInvalid,
                   skipBytes,
                   scanf,
+                  peekMatchInvalid,
+                  scanMatchInvalid,
+                  peekMatch,
+                  scanMatch,
                   unref)

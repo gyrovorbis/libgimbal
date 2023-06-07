@@ -9,7 +9,7 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-add_library(tinycthread STATIC source/tinycthread.c)
+add_library(tinycthread STATIC source/tinycthread.c source/tinycthread.h)
 if(NOT DEFINED PLATFORM_DREAMCAST)
 find_package(Threads REQUIRED)
 target_link_libraries(tinycthread ${CMAKE_THREAD_LIBS_INIT})

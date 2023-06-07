@@ -93,7 +93,7 @@ GBL_EXPORT GblStringRef* GblScannerClass_defaultDelimeters
 GBL_EXPORT GblType       GblScanner_type          (void)                       GBL_NOEXCEPT;
 
 GBL_EXPORT GblScanner*   GblScanner_create        (const char* pStr,
-                                                   size_t      count)          GBL_NOEXCEPT;
+                                                   size_t      length)         GBL_NOEXCEPT;
 
 GBL_EXPORT GblRefCount   GblScanner_unref         (GBL_SELF)                   GBL_NOEXCEPT;
 

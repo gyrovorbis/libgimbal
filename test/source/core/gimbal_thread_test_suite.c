@@ -60,7 +60,7 @@ GBL_TEST_FIXTURE {
 typedef GblThreadTestSuite_ GblFixture;
 
 static GBL_ATOMIC_INT16 threadActiveCount_ = 0;
-#if 0
+#if 1
 static GBL_THREAD_LOCAL                 uint16_t      tlsUint16_      = '\0';
 static GBL_THREAD_LOCAL GBL_ALIGNAS(16) int32_t       tlsInt32_       = -346;
 static GBL_THREAD_LOCAL                 GblStringRef* tlsStringRef_   = NULL;
@@ -87,7 +87,7 @@ static GblType GblTestThread_type(void) {
 
 static GBL_RESULT GblTestThread_GblThread_run_(GblThread* pThread) {
     GBL_CTX_BEGIN(NULL);
-#if 0
+#if 1
     GblTestThread* pSelf = GBL_TEST_THREAD_(pThread);
 
     // check TLS BSS zeroed values
@@ -114,7 +114,7 @@ static GBL_RESULT GblTestThread_GblThread_run_(GblThread* pThread) {
     pSelf->tlsInitAlignPass = GBL_TRUE;
     pSelf->tlsInitRan = GBL_TRUE;
 #endif
-    GBL_CTX_END_BLOCK();
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTestThreadClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {

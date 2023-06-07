@@ -64,7 +64,7 @@ GBL_INSTANCE_DERIVE(GblThread, GblObject)
 GBL_INSTANCE_END
 
 GBL_PROPERTIES(GblThread,
-//    (name,      GBL_GENERIC, (READ, WRITE, OVERRIDE), GBL_STRING_TYPE),
+//  (name,      GBL_GENERIC, (READ, WRITE, OVERRIDE), GBL_STRING_TYPE),
     (result,    GBL_GENERIC, (READ                 ), GBL_ENUM_TYPE),
     (state,     GBL_GENERIC, (READ                 ), GBL_ENUM_TYPE),
     (signal,    GBL_GENERIC, (READ                 ), GBL_ENUM_TYPE),
