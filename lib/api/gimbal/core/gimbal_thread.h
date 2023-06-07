@@ -148,7 +148,7 @@ GBL_EXPORT GBL_RESULT  GblThread_exit        (GBL_RESULT  result,
     (GblThread_exit(result, GBL_NULL, __FILE__, __func__, __LINE__))
 
 #define GblThread_nanoSleep__2(nsec, pRem) \
-    ((GblThread_nanoSleep)(nSec, pRem))
+    ((GblThread_nanoSleep)(nsec, pRem))
 #define GblThread_nanoSleep__1(nsec) \
     (GblThread_nanoSleep__2(nsec, GBL_NULL))
 

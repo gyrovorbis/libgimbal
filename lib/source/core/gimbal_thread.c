@@ -378,7 +378,7 @@ GBL_EXPORT GBL_RESULT (GblThread_nanoSleep)(uint64_t  duration,
                    "Thread [%s] was woken prematurely!",
                    GblObject_name(GBL_OBJECT(pSelf)));
 
-    GBL_CTX_VERIFY(retVal == thrd_success,
+    GBL_CTX_VERIFY(retVal == 0,
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Thread [%s] failed to sleep for %u nsec.",
                    GblObject_name(GBL_OBJECT(pSelf)),
@@ -511,7 +511,7 @@ static GBL_RESULT GblThreadClass_initialize_(GblClass* pClass, const void* pUd, 
     GBL_UNUSED(pUd, pCtx);
     GBL_CTX_BEGIN(NULL);
 
-    if(!GblType_classRefCount(GBL_CLASS_TYPEOF(pClass))) {
+    if(!GblType_classRefCount(GBL_THREAD_TYPE)) {
         GBL_PROPERTIES_REGISTER(GblThread);
 
         GblSignal_install(GBL_THREAD_TYPE,
