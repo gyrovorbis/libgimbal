@@ -11,7 +11,7 @@
 #define GBL_TEST_THREAD_CLASS_(klass)           (GBL_CLASS_CAST(klass, GblTestThread))
 #define GBL_TEST_THREAD_GET_CLASS_(self)        (GBL_INSTANCE_GET_CLASS(self, GblTestThread))
 
-#define GBL_TEST_THREAD_TLS_THREAD_COUNT_       3
+#define GBL_TEST_THREAD_TLS_THREAD_COUNT_       5
 #define GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_   10
 
 GBL_CLASS_DERIVE(GblTestThread, GblThread)
