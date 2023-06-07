@@ -175,19 +175,17 @@ GBL_TEST_CASE(createBase) {
 }
 
 static GblBool findIter_(GblModule* pIt, void* pClosure) {
-    ++((GblModuleTestSuite_*)pClosure)->foreachCount;
-    if(strcmp(GblObject_name(GBL_OBJECT(pIt)),
-              "TestModule3") == 0) {
+    if(--((GblModuleTestSuite_*)pClosure)->foreachCount == 0)
         return GBL_TRUE;
-    }
+
     return GBL_FALSE;
 }
 
 GBL_RESULT registerVerify_(GblModule* pModule, GblModuleTestSuite_* pFixture) {
     GBL_CTX_BEGIN(NULL);
 
-    const char* pName = GblObject_name(GBL_OBJECT(pModule));
-    const size_t  newCount = GblModule_count() + 1;
+    const char*  pName    = GblObject_name(GBL_OBJECT(pModule));
+    const size_t newCount = GblModule_count() + 1;
 
     GBL_TEST_CALL(GblModule_register(pModule));
     GBL_TEST_COMPARE(GblModule_unref(pModule), 1);
@@ -204,12 +202,11 @@ GBL_RESULT registerVerify_(GblModule* pModule, GblModuleTestSuite_* pFixture) {
         }
     GBL_TEST_VERIFY(found);
 
-    pFixture->foreachCount = 0;
+    pFixture->foreachCount = newCount;
     GBL_TEST_COMPARE(GblModule_foreach(findIter_, pFixture), GBL_TRUE);
-    GBL_TEST_COMPARE(pFixture->foreachCount, newCount);
+    GBL_TEST_COMPARE(pFixture->foreachCount, 0);
 
     GBL_CTX_END();
-
 }
 
 GBL_TEST_CASE(registerBase) {
