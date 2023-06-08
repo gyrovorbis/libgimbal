@@ -41,9 +41,9 @@ GBL_INLINE
 GBL_INLINE GBL_CONSTEXPR
     int           gblParity                  (uint8_t n)                    GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
-    size_t        gblAlignedAllocSizeDefault (size_t  bytes)                GBL_NOEXCEPT;
+    size_t        gblAlignedAllocSizeDefault (size_t bytes)                 GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
-    size_t        gblAlignedAllocSize        (size_t  size, size_t  align)  GBL_NOEXCEPT;
+    size_t        gblAlignedAllocSize        (size_t size, size_t align)    GBL_NOEXCEPT;
 GBL_EXPORT
     uint32_t      gblPrimeNextDouble         (uint32_t number)              GBL_NOEXCEPT;
 GBL_INLINE GBL_CONSTEXPR
@@ -157,7 +157,7 @@ GBL_INLINE GBL_CONSTEXPR size_t  gblAlignedAllocSizeDefault(size_t  bytes) GBL_N
     return newSize;
 }
 
-GBL_INLINE GBL_CONSTEXPR size_t  gblAlignedAllocSize(size_t  size, size_t  align) GBL_NOEXCEPT {
+GBL_INLINE GBL_CONSTEXPR size_t  gblAlignedAllocSize(size_t size, size_t align) GBL_NOEXCEPT {
     if(!align) align = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
     const size_t  alignRem = size % align;
     size_t  newSize = size;

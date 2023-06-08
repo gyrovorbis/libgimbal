@@ -64,23 +64,21 @@ static GblType GblTestThread_type(void);
 
 static GBL_ATOMIC_INT16 threadActiveCount_ = 0;
 
-#if 0
-static GBL_THREAD_LOCAL GBL_ALIGNAS(4)  Align4_       tlsBuff4_       = {.inner = {2, 2, 2}};
-static GBL_THREAD_LOCAL GBL_ALIGNAS(16) Align16_      tlsBuff16_      = {.inner = {1, 1, 1}};
-#endif
-static GBL_THREAD_LOCAL                 uint16_t      tlsUint16_      = 0;
-static GBL_THREAD_LOCAL GBL_ALIGNAS(16) int32_t       tlsInt32_       = -346;
-static GBL_THREAD_LOCAL                 GblStringRef* tlsStringRef_   = NULL;
-static GBL_THREAD_LOCAL GBL_ALIGNAS(32) char          tlsCharArray_[] = { "abcdefghijklmnopqrstuvwxyz012345" };
-static GBL_THREAD_LOCAL GBL_ALIGNAS(64) GblObject     tlsObject_;
-static GBL_THREAD_LOCAL GBL_ALIGNAS(8)  double        tlsDouble_      = 12345.6789;
+static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(4)  Align4_       tlsBuff4_       = {.inner = {2, 2, 2}};
+static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(16) Align16_      tlsBuff16_      = {.inner = {1, 1, 1}};
+static volatile GBL_THREAD_LOCAL                 uint16_t      tlsUint16_      = 0;
+static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(16) int32_t       tlsInt32_       = -346;
+static volatile GBL_THREAD_LOCAL                 GblStringRef* tlsStringRef_   = NULL;
+static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(32) char          tlsCharArray_[] = { "abcdefghijklmnopqrstuvwxyz012345" };
+static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(64) GblObject     tlsObject_;
+static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(8)  double        tlsDouble_      = 12345.6789;
 
 static GBL_RESULT GblTestThread_tlsInitCheck_(GblTestThread* pSelf) {
     GBL_CTX_BEGIN(NULL);
 
     // check TLS BSS zeroed values
     GBL_TEST_COMPARE(tlsUint16_, 0);
-    GBL_TEST_COMPARE(tlsStringRef_, NULL);
+    GBL_TEST_COMPARE((const char*)tlsStringRef_, NULL);
     for(size_t b = 0; b < sizeof(GblObject); ++b)
         GBL_TEST_COMPARE(*(((uint8_t*)&tlsObject_) + 1), 0);
 
@@ -88,15 +86,15 @@ static GBL_RESULT GblTestThread_tlsInitCheck_(GblTestThread* pSelf) {
 
     // check TSL DATA initialized values
     GBL_TEST_COMPARE(tlsInt32_, -346);
-    GBL_TEST_COMPARE(tlsCharArray_, "abcdefghijklmnopqrstuvwxyz012345");
+    GBL_TEST_COMPARE((const char*)tlsCharArray_, "abcdefghijklmnopqrstuvwxyz012345");
     GBL_TEST_COMPARE(tlsDouble_, 12345.6789);
-#if 0
+
     for(unsigned b = 0; b < 3; ++b)
         GBL_TEST_COMPARE(tlsBuff4_.inner[b], 2);
 
     for(unsigned b = 0; b < 3; ++b)
         GBL_TEST_COMPARE(tlsBuff16_.inner[b], 1);
-#endif
+
     pSelf->tlsInitDataPass = GBL_TRUE;
 
     // check alignment
