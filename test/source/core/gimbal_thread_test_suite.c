@@ -102,10 +102,10 @@ static GBL_RESULT GblTestThread_tlsInitCheck_(GblTestThread* pSelf) {
     GBL_TEST_VERIFY(!((uintptr_t)tlsCharArray_ & 0x1f));
     GBL_TEST_VERIFY(!((uintptr_t)&tlsObject_   & 0x3f));
     GBL_TEST_VERIFY(!((uintptr_t)&tlsDouble_   & 0x7));
-#if 0
+
     GBL_TEST_VERIFY(!((uintptr_t)&tlsBuff4_    & 0x3));
     GBL_TEST_VERIFY(!((uintptr_t)&tlsBuff16_   & 0xf));
-#endif
+
     pSelf->tlsInitAlignPass = GBL_TRUE;
 
     GBL_CTX_END_BLOCK();
@@ -121,39 +121,39 @@ static GBL_RESULT GblTestThread_tlsReadWriteCheck_(GblTestThread* pSelf) {
     tlsInt32_  = pSelf->threadId;
     tlsDouble_ = pSelf->threadId;
 
-#if 0
+
     for(unsigned b = 0; b < 3; ++b)
         tlsBuff4_.inner[b] = pSelf->threadId;
 
     for(unsigned b = 0; b < 3; ++b)
         tlsBuff16_.inner[b] = pSelf->threadId;
-#endif
+
 
     // Now ping-pong increemnting values between threads
     for(unsigned i = 0; i < GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_; ++i) {
         ++tlsUint16_;
         ++tlsInt32_;
         tlsDouble_ += 1.0;
-#if 0
+
         for(unsigned b = 0; b < 3; ++b)
             ++tlsBuff4_.inner[b];
 
         for(unsigned b = 0; b < 3; ++b)
             ++tlsBuff16_.inner[b];
-#endif
+
         GBL_CTX_VERIFY_CALL(GblThread_nanoSleep(10000));
     }
 
     GBL_TEST_COMPARE(tlsUint16_, pSelf->threadId + GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_);
     GBL_TEST_COMPARE(tlsInt32_, pSelf->threadId + GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_);
     GBL_TEST_COMPARE(tlsDouble_, pSelf->threadId + GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_);
-#if 0
+
     for(unsigned b = 0; b < 3; ++b)
         GBL_TEST_COMPARE(tlsBuff4_.inner[b], pSelf->threadId + GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_);
 
     for(unsigned b = 0; b < 3; ++b)
         GBL_TEST_COMPARE(tlsBuff16_.inner[b], pSelf->threadId + GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_);
-#endif
+
     pSelf->tlsReadWritePass = GBL_TRUE;
 
     GBL_CTX_END_BLOCK();
