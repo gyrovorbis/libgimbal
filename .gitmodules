@@ -1,6 +1,3 @@
-[submodule "test/lib/elysian-test"]
-	path = test/lib/elysian-test
-	url = ../../open-source/elysian-test.git
 [submodule "lib/lib/tiny-regex-c"]
 	path = lib/lib/tiny-regex-c
 	url = https://github.com/gyrovorbis/tiny-regex-c.git
