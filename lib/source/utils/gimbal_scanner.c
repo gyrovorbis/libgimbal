@@ -296,7 +296,7 @@ static GblBool GblScanner_readLines_(GblScanner*    pSelf,
         if(GBL_SCANNER_CHAR_(pSelf, c) == '\n') {
             if(!--count) {
                 *pView =
-                    GblStringView_removePrefix(pSelf_->streamBuffer, c);
+                    GblStringView_substr(pSelf_->streamBuffer, 0, c);
                 if(advanceStream)
                     return GblScanner_advance_(pSelf, c);
                 else

@@ -83,11 +83,6 @@ extern GBL_RESULT GblProperty_final_(GblContext* pCtx) {
     GBL_CTX_END();
 }
 
-
-GBL_EXPORT size_t  gblpropertyTableSize(void) {
-    return GblHashSet_size(&propertyRegistry_);
-}
-
 GBL_INLINE const GblPropertyRoot_* propertyRootBase_(GblType objectType) {
     const GblPropertyRoot_* pRoot = NULL;
     const uint8_t depth = GblType_depth(objectType);

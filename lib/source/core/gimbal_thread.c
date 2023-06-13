@@ -47,10 +47,11 @@ GBL_RESULT GblThread_final_(void) {
 
     mtx_lock(&listMtx_);
 
-    size_t retries = 0;
-    GblThread* pCur  = NULL;
-    GblThread* pPrev = NULL;
-    GblDoublyLinkedListNode* pIt = NULL;
+    size_t                   retries = 0;
+    GblThread*               pCur    = NULL;
+    GblThread*               pPrev   = NULL;
+    GblDoublyLinkedListNode* pIt     = NULL;
+
     while((pIt = GblDoublyLinkedList_front(&threadList_))) {
         pCur = GBL_THREAD_ENTRY_PUBLIC_(pIt);
 
@@ -59,13 +60,15 @@ GBL_RESULT GblThread_final_(void) {
             GblThread_yield();
             pPrev = pCur;
             retries = 0;
-        } else if(++retries >= 10) {
+        } else if(++retries >= GBL_THREAD_SHUTDOWN_RETRIES) {
             GblDoublyLinkedList_remove(pIt);
             retries = 0;
             GBL_CTX_RECORD_SET(GBL_RESULT_TIMEOUT,
                                "Timed out waiting for thread to join!");
         }
     }
+
+    GBL_UNREF(pCurThread_);
 
     mtx_unlock(&listMtx_);
     mtx_destroy(&listMtx_);

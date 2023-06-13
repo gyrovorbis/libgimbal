@@ -282,14 +282,14 @@ GBL_TEST_CASE_END
 // Actually kick off test thread
 GBL_TEST_CASE(start)
     GBL_TEST_CALL(GblThread_start(pFixture->pThread1));
-    GBL_TEST_COMPARE(GblThread_count(),
-                     pFixture->thread1Finished?
-                            pFixture->threadCount :
-                            pFixture->threadCount + 1);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(started)
     while(!pFixture->thread1Started);
+    GBL_TEST_COMPARE(GblThread_count(),
+                     pFixture->thread1Finished?
+                         pFixture->threadCount :
+                         pFixture->threadCount + 1);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(finished)
