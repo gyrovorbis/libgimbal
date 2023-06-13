@@ -70,9 +70,10 @@ cmake --build .
 ## Bindings ##
 LibGimbal was specifically written with language interoperability in mind. As such, we will be happy to support and feature bindings to your favorite language. The following is a list of libraries which offer bindings between libGimbal and other languages:
 
-|Library                                                                         | Language |
-|--------------------------------------------------------------------------------|----------|
-|<a href="https://github.com/AaronGlazer/jimbal"><strong>Jimbal</strong></a>     |Jai       |
+|Library                                                                                    | Language  |                           Status                     |
+|-------------------------------------------------------------------------------------------|-----------|------------------------------------------------------|
+|<a href="https://github.com/AaronGlazer/jimbal"><strong>Jimbal</strong></a>                |Jai        |Nearly complete, lacking bindings for inline functions|
+|<a href="https://github.com/andrewapperley/gimbalsaurus"><strong>Gimbalsaurus</strong></a> |Objective-C|Just getting off the ground                           |
 
 ## Modules ##
 The following is a closer look at the contents of each module:
