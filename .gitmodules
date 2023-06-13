@@ -3,4 +3,4 @@
 	url = https://github.com/gyrovorbis/tiny-regex-c.git
 [submodule "lib/lib/tinycthread"]
 	path = lib/lib/tinycthread
-	url = https://github.com:gyrovorbis/tinycthread.git
+	url = https://github.com/gyrovorbis/tinycthread.git
