@@ -32,6 +32,17 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblObject);
 GBL_FORWARD_DECLARE_STRUCT(GblProperty);
 
+/*! \struct  GblObjectClass
+ *  \extends GblBoxClass
+ *  \implements GblITableClass
+ *  \implements GblIEventHandlerClass
+ *  \implements GblIEventFilterClass
+ *  \brief GblClass structure for GblObject
+ *
+ *  GblObjectClass provides the virtual table for all types
+ *  deriving from GblObject. It provides a constructor, event
+ *  handlers, as well as accessors for reading and writing properties.
+ */
 GBL_CLASS_DERIVE(GblObject, GblBox,
                  GblITable, GblIEventHandler, GblIEventFilter)
     GBL_RESULT (*pFnConstructor)(GBL_SELF);
@@ -47,7 +58,7 @@ GBL_CLASS_END
  *  \implements GblITable
  *  \implements GblIEventHandler
  *  \implements GblIEventFilter
- *  \details
+ *
  *  A GblObject is the default, full-blown object-oriented instantiable type.
  *  It is analogous to Qt's "QObject" or GNOME's "GObject" root type. It extends
  *  GblBox to add the following additonal functionality:

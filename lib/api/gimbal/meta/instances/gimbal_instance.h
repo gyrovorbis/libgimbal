@@ -285,5 +285,4 @@ GBL_DECLS_END
 
 #undef GBL_SELF_TYPE
 
-
 #endif // GIMBAL_INSTANCE_H

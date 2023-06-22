@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.10)
 
 SET(ANDROID_NATIVE_API_LEVEL 28)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
 project(LibGimbal 
     VERSION 
         ${GIMBAL_VERSION} 
@@ -128,6 +135,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_module.h
     api/gimbal/core/gimbal_exception.h
     api/gimbal/meta/classes/gimbal_class.h
+    api/gimbal/meta/classes/gimbal_class.hpp
     api/gimbal/meta/classes/gimbal_opaque.h
     api/gimbal/meta/classes/gimbal_enum.h
     api/gimbal/meta/classes/gimbal_flags.h
@@ -181,6 +189,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/utils/gimbal_version.h
     api/gimbal/utils/gimbal_option_group.h
     api/gimbal/utils/gimbal_date_time.h
+    api/gimbal/utils/gimbal_date_time.hpp
     api/gimbal/utils/gimbal_byte_array.h
     api/gimbal/utils/gimbal_bit_view.h
     api/gimbal/utils/gimbal_scanner.h

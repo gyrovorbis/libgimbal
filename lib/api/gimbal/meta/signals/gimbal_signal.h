@@ -15,7 +15,7 @@
 #include "../../preprocessor/gimbal_macro_composition.h"
 #include "gimbal_closure.h"
 
-#define GBL_SIGNALS(instanceStruct, /* signals */...)               GBL_SIGNALS_(instanceStruct, __VA_ARGS__)
+#define GBL_SIGNALS(instanceStruct, /* signals */...)
 #define GBL_SIGNALS_REGISTER(instanceStruct, /* marshals */...)
 #define GBL_EMIT(emitter, ...)                                      (GblSignal_emit(GBL_INSTANCE(emitter), __VA_ARGS__))
 #define GBL_CONNECT(...)                                            (GBL_VA_OVERLOAD_CALL_ARGC(GBL_CONNECT, __VA_ARGS__))

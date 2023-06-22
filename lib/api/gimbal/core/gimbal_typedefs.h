@@ -2,7 +2,7 @@
  *  \brief Basic primtive typedefs and forward declarations
  *  \ingroup core
  *
- *  \author Falco Girgis
+ *  \copyright 2023 Falco Girgis
  */
 #ifndef GIMBAL_TYPEDEFS_H
 #define GIMBAL_TYPEDEFS_H
@@ -17,7 +17,7 @@
 
 // ======== Primitive Types ==========
 
-typedef uint8_t     GblBool;
+typedef uint8_t     GblBool;            //!< Basic boolean type, standardized to sizeof(char)
 typedef char        GblChar;
 typedef uint8_t     GblUint8;
 typedef int8_t      GblInt8;
@@ -27,14 +27,14 @@ typedef uint32_t    GblUint32;
 typedef int32_t     GblInt32;
 typedef uint64_t    GblUint64;
 typedef int64_t     GblInt64;
-typedef size_t      GblSize;
+typedef size_t      size_t;
 typedef float       GblFloat;
 typedef double      GblDouble;
 typedef void*       GblPointer;
 typedef void      (*GblFunction)();
 typedef const char* GblString;
-typedef uint32_t    GblEnum;
-typedef uint32_t    GblFlags;
+typedef uint32_t    GblEnum;        //!< Standard-sized enum type, 32-bits across platforms
+typedef uint32_t    GblFlags;       //!< Standard-sized flags type, 32-bits across platforms
 
 // ==========  Auxiliary Types ==========
 
