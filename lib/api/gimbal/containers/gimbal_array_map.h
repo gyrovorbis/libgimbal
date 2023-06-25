@@ -26,10 +26,13 @@ GBL_FORWARD_DECLARE_STRUCT(GblArrayMap);
 typedef GBL_RESULT  (*GblArrayMapDtorFn)(const GblArrayMap*, uintptr_t key, void* pEntry);      ///< Custom destructor type for userdata values
 typedef int         (*GblArrayMapCmpFn) (const GblArrayMap*, uintptr_t key1, uintptr_t key2);   ///< Custom comparator for nontrivial key types
 
-/*! Represents a single K,V data entry within a GblArrayMap
+/*! \brief Represents a single K,V data entry within a GblArrayMap
+ *
+ *  \note
  *  The destructor field is only used for userdata values, while
  *  GblVariant values have automatic lifetime management.
- *  \sa GblArrayMap
+
+*  \sa GblArrayMap
  */
 typedef struct GblArrayMapEntry {
     uintptr_t               key;   ///< Opaque key value
@@ -37,7 +40,9 @@ typedef struct GblArrayMapEntry {
     GblArrayMapDtorFn       dtor;  ///< Optional custom destructor for userdata types
 } GblArrayMapEntry;
 
-/*! Contiguous array-based associative container with [K,V] pairs.
+/*! \brief Dynamic array-based [K,V] pair associative container
+ *
+ *  Contiguous array-based associative container with [K,V] pairs.
  *  GblArrayMap is essentially a flat map structure with a few specific
  *  properties:
  *
@@ -50,6 +55,7 @@ typedef struct GblArrayMapEntry {
  *  GblArrayMap is a lazily-allocated structure, meaning it isn't actually allocated until it's
  *  needed. This is why the majority of the API takes a pointer to a pointer, so a NULL pointer
  *  value is a valid empty map. You can optionally preconstruct the structure with GblArrayMap_create.
+ *
  *  \ingroup containers
  *  \sa GblArrayMapEntry
  */

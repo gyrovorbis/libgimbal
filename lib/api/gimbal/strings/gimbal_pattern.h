@@ -1,9 +1,12 @@
 /*! \file
  *  \brief   GblPattern RegExp-style pattern matching
  *  \ingroup strings
+ *
  *  \todo
  *      - Refactor GblPattern_matchNot() to be less disgusting
  *      - GblPattern_matchNot() incorrect when more than one match in a row
+ *  \bug
+ *      - GblPattern_match(): multiple back-to-back matches are not counted properly
  *
  *  \author Falco Girgis
  */
@@ -17,8 +20,12 @@
 
 GBL_DECLS_BEGIN
 
-GBL_FORWARD_DECLARE_STRUCT(GblPattern);
 GBL_FORWARD_DECLARE_STRUCT(GblStringView);
+
+/*! Opaque structure representing a compiled regular expression
+ *  \ingroup strings
+ */
+typedef struct GblPattern GblPattern;
 
 // ===== Public API =====
 GBL_EXPORT const GblPattern*

@@ -133,7 +133,7 @@ extern "C" {
 
 #define GBL_FORWARD_DECLARE_STRUCT(S)  \
     struct S;                          \
-    typedef struct S S
+    typedef struct S S;
 
 #define GBL_FORWARD_DECLARE_STRUCT_PRIVATE(S)   \
     struct S##_;                                \

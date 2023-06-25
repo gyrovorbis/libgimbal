@@ -1,6 +1,8 @@
 /*! \file
- *  \brief GblThd, per-thread state and context management
+ *  \brief GblThd, legacy, deprecated thread API
  *  \ingroup core
+ *  \deprecated Use gimbal_thread.h
+ *
  *  \todo
  *      - get rid of me
  *

@@ -2,8 +2,3 @@
 * 	\brief Collection of specialied polymorphic custom allocators
 
 */
-
-/*! \page Allocators Allocators 
-* 	\copydoc allocators
-*/
-

@@ -18,6 +18,7 @@ typedef int (*GblArrayHeapCmpFn)(const void* pEntry1, const void* pEntry2);
 
 
 /*! \brief Array-based binary heap implementing priority queue
+ *
  *  GblArrayHeap is a dynamic array-backed (GblArrayList)
  *  binary heap, providing a priority queue implementation.
  *

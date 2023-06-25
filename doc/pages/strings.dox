@@ -1,5 +1,4 @@
 
-
 /*! \defgroup strings Strings 
 	\ingroup dataTypes
 * 	\brief Collection of specialized string types
@@ -25,8 +24,5 @@
 	GblStringBuffer | Writing or mutable data processing and building	| gimbal_string_buffer.h
 	::GblStringRef	| Storing or managing ownership						| gimbal_string_ref.h
 	::GblQuark		| Hashing or uniquely identifying  					| gimbal_quark.h
-
-
-
 */
 

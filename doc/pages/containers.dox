@@ -33,9 +33,4 @@ STL APIs fairly closely and should be fairly intuitive to work with for any C++ 
 
 */
 
-/*! \page Containers Containers 
-	\copydoc containers
-
-
-*/
 

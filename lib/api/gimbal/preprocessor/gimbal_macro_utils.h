@@ -11,9 +11,6 @@
  *
  */
 
-/*! \page Preprocessor Preprocessor
- *  \copydoc preprocessor
- */
 #ifndef GIMBAL_MACRO_UTILS_H
 #define GIMBAL_MACRO_UTILS_H
 

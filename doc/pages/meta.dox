@@ -7,9 +7,23 @@
 	object-oriented constructs, and the other is to use these constructs to create
 	a common type system for cross-langauge interoperability.  
 
-\tableofcontents
+[TOC]
+\ref meta 
+- \subpage Instances
+- \subpage Classes
+- \subpage Interfaces
+- \subpage TypeTemplate
 
-# Taking C to the Next Level
+\section Overview Overview
+At its core, the LibGimbal Type Framework utilizes a dynamic type system, provided
+by the ::GblType API (within gimbal_type.h). This system provides a runtime type 
+registry maintaining all type information provided by builtin or user-registered 
+types. This registry provides object-oriented concepts such as classes, objects,
+interfaces, poperties, signals, and an inheritance model to both the C programming 
+language, and any langauge which can provide glue code to a C API. 
+
+
+\section Example Example 
 	One of the things libGimabl's type system aims to do is endow C programmers with a powerful 
 	set of tools and constructs from higher-level object-oriented languages. Constructs such as 
 	inheritance, private member variables, virtual functions, interfaces, and even signals and 
@@ -105,41 +119,14 @@
 		#endif // EVMU_BUZZER_H
 	\endcode
 
-# Overview
-	At its core, the LibGimbal Type Framework utilizes a dynamic type system, provided
-	by the ::GblType API (within gimbal_type.h). This system provides a runtime type 
-	registry maintaining all type information provided by builtin or user-registered 
-	types. This registry provides object-oriented concepts such as classes, objects,
-	interfaces, poperties, signals, and an inheritance model to both the C programming 
-	language, and any langauge which can provide glue code to a C API. 
 
-	The type system models OO concepts fundamentally through the following concepts:
-	- ::GblType (gimbal_type.h)
-		-# Runtime type UUIDs 
-	- GblClass (gimbal_class.h)
-		-# virtual/overridable methods
-		-# static members
-		-# private static data
-		-# interface implementations
-	- GblInstance (gimbal_instance.h)
-		-# instanced public/private members
-	- GblInterface (gimbal_interface.h)
-		-# abstract/overridable methods
-		-# default method implementations
 
-\subpage Instances
 
-\subpage Classes
-
-\subpage Interfaces
-
-\subpage TypeTemplate
 */
 
 
 /*! \defgroup meta Meta Type System
 * 	\brief Object-oriented, cross-language runtime type system
-	\copydoc Meta
 
 */
 
@@ -175,22 +162,23 @@
 
 \tableofcontents
 
-# Base Classes
+
+\section Base_Classes Base Classes
 Depending on what functionality your instanced data type needs, it will typically be derived from 1 of 3 builtin types, which form a hierarchy. Each layer of the hierarchy adds functionality but also increases the size of the type instance and type class structures. 
 
-## GblInstance
+\subsection GblInstance
 \copydetails GblInstance
 
-## GblBox
+\subsection GblBox
 \copydetails GblBox
 
-## GblObject
+\subsection GblObject
 \copydetails GblObject
 
-# Private Data
+\section Private_Data Private Data
 All libGimbal type instance and type class structures are capable of encapsulating and hiding private data within them. During type registration, the sizes for additional private structures may be provided to GblTypeInfo::classPrivateSize and GblTypeInfo::instancePrivateSize. Using this approach, private structures may be hidden from the types' public headers, similar to C++'s PIMPL idiom.
 
-# Object Layout 
+\section Object_Layout Object Layout 
 Unlike C++'s PIMPL idiom, which requires a separate heap allocation for private data and additional indirection, libGimbal uses a single, contigous allocation for both an object's public and private data.
 
 Inherited public data grows downwards, as with traditional OO inheritance schemes; however, inherited private data grows *upwards* in the opposite direction. "Casting" between the public and private structures is then a simple matter of the type system adjusting a pointer by a fixed offset.
@@ -210,6 +198,4 @@ Inherited public data grows downwards, as with traditional OO inheritance scheme
 	| C Public  |
 	+-----------+
 \endcode
-
-
 */ 
