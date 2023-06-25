@@ -88,10 +88,10 @@ The following is a closer look at the contents of each module:
 ## Strings ##
 - specialized, optimized custom string types
 - interned strings
-- reference counted strings
+- reference-counted strings
 - string builders
 - implicitly shared string lists
-- pattern matching
+- pattern matching, regular expressions
 
 ## Containers ##
 - STL-style abstract data types with both C and C++ APIs
