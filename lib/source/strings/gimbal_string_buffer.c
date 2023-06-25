@@ -43,6 +43,22 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, cons
     GBL_CTX_END();
 }
 
+GBL_EXPORT const char* GblStringBuffer_printf(GblStringBuffer* pSelf, const char* pFmt, ...) {
+    va_list varArgs;
+    va_start(varArgs, pFmt);
+
+    const char* pRetVal = GblStringBuffer_vPrintf(pSelf, pFmt, varArgs);
+
+    va_end(varArgs);
+    return pRetVal;
+}
+
+GBL_EXPORT const char* GblStringBuffer_vPrintf(GblStringBuffer* pSelf, const char* pFmt, va_list varArgs) {
+    GblStringBuffer_clear(pSelf);
+    GblStringBuffer_appendVPrintf(pSelf, pFmt, varArgs);
+    return GblStringBuffer_cString(pSelf);
+}
+
 GBL_EXPORT GBL_RESULT GblStringBuffer_remove(GblStringBuffer* pSelf, GblStringView view) GBL_NOEXCEPT {
     const char* pNeedle = NULL;
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);

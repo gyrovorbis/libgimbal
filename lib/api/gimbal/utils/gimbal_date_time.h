@@ -72,24 +72,24 @@ typedef int32_t GblHour;
 
 typedef struct timespec GblTimeSpec;
 
-typedef struct GblDate {    // Size (bytes)
-    GblYear  year;          // 4
-    GblMonth month;         // 4
-    GblDay   day;           // 4
-} GblDate;                  // 12 Total
+typedef struct GblDate {     // Size (bytes)
+    GblYear  year;           // 4
+    GblMonth month;          // 4
+    GblDay   day;            // 4
+} GblDate;                   // 12 Total
 
-typedef struct GblTime {    // Size (bytes)
-    GblHour       hours;    // 4
-    GblMinute     minutes;  // 4
-    GblSecond     seconds;  // 8
-    GblNanoSecond nSeconds; // 4
-} GblTime;                  // 20 Total
+typedef struct GblTime {     // Size (bytes)
+    GblHour       hours;     // 4
+    GblMinute     minutes;   // 4
+    GblSecond     seconds;   // 8
+    GblNanoSecond nSeconds;  // 4
+} GblTime;                   // 20 Total
 
-typedef struct GblDateTime {// Size (bytes)
-    GblDate   date;         // 12
-    GblTime   time;         // 20
-    int16_t   utcOffset;    // 2
-} GblDateTime;              // 34 Total
+typedef struct GblDateTime { // Size (bytes)
+    GblDate   date;          // 12
+    GblTime   time;          // 20
+    int16_t   utcOffset;     // 2
+} GblDateTime;               // 34 Total
 
 GBL_INLINE GblBool      GblDate_isLeapYear       (GblYear year)              GBL_NOEXCEPT;
 

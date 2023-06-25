@@ -89,6 +89,8 @@ GBL_INLINE size_t           GblStringBuffer_capacity        (GBL_CSELF)         
 GBL_INLINE GBL_RESULT       GblStringBuffer_set             (GBL_SELF, GblStringView view)                  GBL_NOEXCEPT;
 GBL_INLINE char             GblStringBuffer_char            (GBL_CSELF, size_t index)                       GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_setChar         (GBL_CSELF, size_t index, char value)           GBL_NOEXCEPT;
+GBL_EXPORT const char*      GblStringBuffer_printf          (GBL_SELF, const char* pFmt, ...)               GBL_NOEXCEPT;
+GBL_EXPORT const char*      GblStringBuffer_vPrintf         (GBL_SELF, const char* pFmt, va_list varArgs)   GBL_NOEXCEPT;
 
 GBL_INLINE GBL_RESULT       GblStringBuffer_insert          (GBL_SELF,
                                                              size_t         index,
