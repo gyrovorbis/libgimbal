@@ -99,7 +99,7 @@ The following is a closer look at the contents of each module:
 - sets, trees, hash tables, byte arrays
 - support for custom allocators
 
-###Algorithms ##
+## Algorithms ##
 - hashing algorithms (Murmur, Sip, Fnv1, SuperFast)
 - sorting algorithms, searching algorithms
 - random data generators and utilities
