@@ -74,7 +74,7 @@ LibGimbal was specifically written with language interoperability in mind. As su
 |-------------------------------------------------------------------------------------------|-----------|------------------------------------------------------|
 |<a href="https://github.com/AaronGlazer/jimbal"><strong>Jimbal</strong></a>                |Jai        |Nearly complete, lacking bindings for inline functions|
 |<a href="https://github.com/andrewapperley/gimbalsaurus"><strong>Gimbalsaurus</strong></a> |Objective-C|Just getting off the ground                           |
-|<a href="http://libgimbal.elysianshadows.com"><strong>libGimabl</strong></a>               |C++        |First-party within source-tree. Just starting, WIP.   |
+|<a href="http://libgimbal.elysianshadows.com"><strong>libGimbal</strong></a>               |C++        |First-party within source-tree. Just starting, WIP.   |
 
 # Modules #
 The following is a closer look at the contents of each module:
