@@ -1,5 +1,5 @@
 
-/*! \page Meta Meta Type System
+/*! \page Meta Type System Manual
 
 	The language interop layer of libGimbal is primarily facilitated through its 
 	low-level, C-based meta type system. The type system has two primary goals,
@@ -118,14 +118,10 @@ language, and any langauge which can provide glue code to a C API.
 
 		#endif // EVMU_BUZZER_H
 	\endcode
-
-
-
-
 */
 
 
-/*! \defgroup meta Meta Type System
+/*! \defgroup meta Type System
 * 	\brief Object-oriented, cross-language runtime type system
 
 */

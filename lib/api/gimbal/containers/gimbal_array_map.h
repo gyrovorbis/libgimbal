@@ -31,8 +31,8 @@ typedef int         (*GblArrayMapCmpFn) (const GblArrayMap*, uintptr_t key1, uin
  *  \note
  *  The destructor field is only used for userdata values, while
  *  GblVariant values have automatic lifetime management.
-
-*  \sa GblArrayMap
+ *
+ *  \sa GblArrayMap
  */
 typedef struct GblArrayMapEntry {
     uintptr_t               key;   ///< Opaque key value

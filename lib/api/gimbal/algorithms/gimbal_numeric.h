@@ -1,6 +1,6 @@
 /*! \file
  *  \brief General numeric constants and computations
- *  \ingroup algorithms
+ *  \ingroup numeric
  *
  *  \author Falco Girgis
  */
@@ -23,10 +23,11 @@
 
 GBL_DECLS_BEGIN
 
-/*! \addtogroup algorithms
+/*! \defgroup numeric Numeric
+ *  \ingroup algorithms
+ *  \brief Collection of assorted numeric algorithms.
  * @{
  */
-
 #define           gblPow2Next(X)             GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS_, X)(X)
 GBL_INLINE GBL_CONSTEXPR
     int           gblFibonacci               (int n)                        GBL_NOEXCEPT;
@@ -56,7 +57,6 @@ GBL_INLINE
     GblBool       gblFloatEquals             (double a,
                                               double b,
                                               double e/*=DBL_EPSILON*/)     GBL_NOEXCEPT;
-
 /// @}
 
 // ===== IMPL =====

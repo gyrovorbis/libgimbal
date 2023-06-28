@@ -1,6 +1,6 @@
 /*! \file
  *  \brief Generialized array sorting algorithms
- *  \ingroup algorithms
+ *  \ingroup sorting
  *  \todo
  *      - gblSortRadix()
  *
@@ -17,6 +17,11 @@ GBL_DECLS_BEGIN
 
 // ===== Public API =====
 
+/*! \defgroup sorting Sorting
+ *  \ingroup algorithms
+ *  \brief Collection of sorting algorithms
+ * @{
+ */
 typedef int  (*GblSortComparatorFn) (const void*, const void*);
 typedef void (*GblSortFn)           (void*, size_t , size_t , GblSortComparatorFn);
 
@@ -28,6 +33,7 @@ GBL_INLINE void    gblSortMerge     (void* pArray, size_t  count, size_t  elemSi
 GBL_INLINE void    gblSortBubble    (void* pArray, size_t  count, size_t  elemSize, GblSortComparatorFn pFnCmp)          GBL_NOEXCEPT;
 
 GBL_INLINE size_t  gblSearchBinary  (void* pSrc, size_t  elemSize, int l, int r, void* pDst, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+//! @}
 
 // ======== Inline Implementation ========
 

@@ -985,7 +985,7 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
                 break;
             } else if(ifaceChecks) {
                 // recurse over interfaces checking
-                for(size_t  i = 0; i < pIter->pInfo->interfaceCount; ++i) {
+                for(size_t i = 0; i < pIter->pInfo->interfaceCount; ++i) {
                     if(GblType_typeIsA_(pIter->pInfo->pInterfaceMap[i].interfaceType,
                                         base,
                                         GBL_TRUE,

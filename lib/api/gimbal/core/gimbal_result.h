@@ -64,6 +64,9 @@ GBL_DECLS_BEGIN
         )                                                                                                                                               \
     )
 
+/*! \enum  GBL_RESULT
+ *  \brief Generic status code type
+ */
 GBL_ENUM_TABLE_DECLARE(GBL_META_RESULT_TABLE)
 
 #define GBL_RESULT_UNKNOWN(value) \

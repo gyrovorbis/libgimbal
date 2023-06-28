@@ -300,6 +300,9 @@ GBL_EXPORT size_t  GblObject_eventFilterCount(const GblObject* pSelf) {
 
 static GBL_RESULT GblObjectClass_constructor_(GblObject* pSelf) {
     GBL_CTX_BEGIN(pSelf);
+
+
+
     GBL_CTX_END();
 }
 

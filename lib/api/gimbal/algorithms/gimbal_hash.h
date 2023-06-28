@@ -1,6 +1,6 @@
 /*! \file
  *  \brief Random number generation, hashing, and CRC algorithms
- *  \ingroup algorithms
+ *  \ingroup hashing
  *
  *  \author Falco Girgis
  */
@@ -21,6 +21,11 @@
 
 GBL_DECLS_BEGIN
 
+/*! \defgroup hashing Hashing
+ *  \ingroup algorithms
+ *  \brief Collection of hash algorithms.
+ * @{
+*/
 GBL_EXPORT uint64_t gblSeed          (uint8_t index)                  GBL_NOEXCEPT;
 
 GBL_EXPORT int      gblRand          (void)                           GBL_NOEXCEPT;
@@ -44,6 +49,7 @@ GBL_EXPORT GblHash  gblHashSuperFast (const void* pData, size_t size) GBL_NOEXCE
 GBL_EXPORT GblHash  gblHashPearson   (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHashJenkins   (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashCrc       (const void* pData, size_t size) GBL_NOEXCEPT;
+//! @}
 
 // ===== INLINE IMPLEMENTATIONS =====
 

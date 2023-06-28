@@ -1,6 +1,6 @@
 /*! \file
  *  \brief Utilities module-wide include
- *  \ingroup algorithms
+ *  \ingroup utils
  *
  *  \author Falco Girgis
  */
