@@ -53,7 +53,6 @@
  *  \details Flags control the behavior of a GblType. A type's flags is the combination of its
  *  inherited GblTypeRootFlags OR'd with its own GblTypeFlags.
  */
-///@{
 /// \details Flags controlling behavior of root or fundemental GblTypes. These can only be set on root types and are inherited.
 typedef enum GblTypeRootFlags {
     GBL_TYPE_ROOT_FLAG_DEPENDENT         = (1 << 0),                                     ///< Type is dependent upon other types in dependency list

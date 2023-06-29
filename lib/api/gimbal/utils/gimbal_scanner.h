@@ -25,7 +25,6 @@
 #define GBL_SELF_TYPE GblScanner
 
 GBL_FORWARD_DECLARE_STRUCT(GblScanner);
-GBL_FORWARD_DECLARE_STRUCT(GblArrayList);
 
 GBL_DECLARE_ENUM(GBL_SCANNER_FLAGS) {
     // Builtin Non-error state flags (bit 0)
@@ -77,7 +76,6 @@ GBL_SIGNALS(GblScanner,
     (scanned, (GBL_INSTANCE_TYPE, pReceiver)),
     (raised,  (GBL_INSTANCE_TYPE, pReceiver))
 )
-//skipped?
 
 GBL_EXPORT void          GblScannerClass_setDefaultDelimeters
                                                   (GBL_KLASS,

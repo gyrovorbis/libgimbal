@@ -38,8 +38,8 @@
 GBL_DECLS_BEGIN
 
 /*! \brief Base struct for all instantiable meta types.
- *\ingroup meta
- *\details
+ *  \ingroup meta
+ *
  * An Instance simply represents an object that can be created from a given
  * GblType which shares some data with other instances of the same type,
  * located within their class.
@@ -53,7 +53,7 @@ GBL_DECLS_BEGIN
  * \sa GblClass, GblType, GblObject
  */
 typedef struct GblInstance {
-    GblClass*   pClass; ///< READ-ONLY Pointer to Instance's Class, do not modify directly
+    GblClass*   pClass; //!< READ-ONLY Pointer to Instance's Class, do not modify directly
 } GblInstance;
 
 GBL_EXPORT GblInstance* GblInstance_create             (GblType type)               GBL_NOEXCEPT;

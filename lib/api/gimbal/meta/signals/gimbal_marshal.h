@@ -24,6 +24,19 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblClosure);
 GBL_FORWARD_DECLARE_STRUCT(GblVariant);
 
+/*! Function signature for a generic marshal function
+ *  \ingroup signals
+ *
+ *  Marshal functions form the basis of the closure system,
+ *  and are used by all GblClosure instances. They are the primary
+ *  entry point for generic function invocation, and are the glue
+ *  between a generic GblClosure and an actual language-dependent
+ *  real function call.
+ *
+ *  They take a generic list of arguments, marshal them into an
+ *  actual function (which is typically stored with GblClosure),
+ *  then demarshal out the return type.
+ */
 typedef GBL_RESULT (*GblMarshalFn)  (GblClosure*        pClosure,
                                      GblVariant*        pRetValue,
                                      size_t             argCount,

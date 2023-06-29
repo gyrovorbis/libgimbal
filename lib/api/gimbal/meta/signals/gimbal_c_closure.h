@@ -22,8 +22,25 @@
 
 GBL_DECLS_BEGIN
 
+/*! \struct  GblCClosureClass
+ *  \brief   GblClass VTable for GblCClosure
+ *  \extends GblClosureClass
+ *
+ *  No public members.
+ *
+ *  \sa GblCClosure
+ */
 GBL_CLASS_DERIVE_EMPTY(GblCClosure, GblClosure)
 
+/*! \struct  GblCClosure
+ *  \brief   Clsoure type for invoking C functions
+ *  \extends GblClosure
+ *  \ingroup signals
+ *
+ *  GblCClosure is a GblClosure which is used to
+ *  marshal generic arguments into a C function
+ *  pointer and marshal out the return value.
+ */
 GBL_INSTANCE_DERIVE(GblCClosure, GblClosure)
     GBL_PRIVATE()
         GblFnPtr    pFnCallback;

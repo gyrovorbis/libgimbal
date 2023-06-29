@@ -22,8 +22,21 @@
 
 GBL_DECLS_BEGIN
 
+/*! \struct  GblClassClosureClass
+ *  \extends GblClosureClass
+ *  \brief   GblClass VTable structure for GblClassClosure
+ *  \sa      GblClassClosure
+ */
 GBL_CLASS_DERIVE_EMPTY(GblClassClosure, GblClosure)
 
+/*! \struct  GblClassClosure
+ *  \extends GblClosure
+ *  \ingroup signals
+ *  \brief   GblClosure type for calling into virtual methods
+ *
+ *  GblClassClosure allows for mapping a generic marshal call
+ *  to invoke a virtual method on the GblClass of a GblInstance.
+ */
 GBL_INSTANCE_DERIVE(GblClassClosure, GblClosure)
     GBL_PRIVATE()
         GblType         classType;

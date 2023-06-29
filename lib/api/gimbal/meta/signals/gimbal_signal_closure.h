@@ -21,11 +21,29 @@
 
 GBL_DECLS_BEGIN
 
+/*! \struct  GblSignalClosureClass
+ *  \extends GblClosureClass
+ *  \brief   GblClass type for GblSignalClosure
+ *
+ *  No public members.
+ *
+ *  \sa GblSignalClosure
+ */
 GBL_CLASS_DERIVE_EMPTY(GblSignalClosure, GblClosure)
 
+/*! \struct  GblSignalClosure
+ *  \extends GblClosure
+ *  \ingroup signals
+ *  \brief   Closure type for invoking signals
+ *
+ *  GblSignalClosure is a closure type which marshals its
+ *  arguments into a signal invocation. The first argument
+ *  of the invoke function is expected to be the instance
+ *  which emits the signal.
+ */
 GBL_INSTANCE_DERIVE(GblSignalClosure, GblClosure)
     GBL_PRIVATE()
-        GblQuark        signalName;
+        GblQuark signalName;
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 

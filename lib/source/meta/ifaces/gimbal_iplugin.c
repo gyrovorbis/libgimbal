@@ -14,7 +14,7 @@ GBL_RESULT GblIPlugin_typeInfo_(const GblIPlugin* pSelf, GblType type, GblTypeIn
 static GBL_RESULT GblIPluginClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
     GBL_UNUSED(pData);
     GBL_CTX_BEGIN(pCtx);
-    GblIPluginClass* pSelf = (GblIPluginClass*)pClass;
+    GblIPluginClass* pSelf = GBL_IPLUGIN_CLASS(pClass);
     pSelf->pFnTypeInfo = GblIPlugin_typeInfo_;
     GBL_CTX_END();
 }

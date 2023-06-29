@@ -5,7 +5,6 @@
  *
  *  \author Falco Girgis
  */
-
 #ifndef GIMBAL_CLOSURE_H
 #define GIMBAL_CLOSURE_H
 
@@ -19,23 +18,34 @@
 #define GBL_CLOSURE_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblClosure))
 
 #ifndef __cplusplus
-#   define GBL_CALLBACK(fn)                ((GblFnPtr)fn)
+#   define GBL_CALLBACK(fn)             ((GblFnPtr)fn)
 #else
-    #define GBL_CALLBACK(fn)               ((GblFnPtr)+fn)
+    #define GBL_CALLBACK(fn)            ((GblFnPtr)+fn)
 #endif
 
 #define GBL_SELF_TYPE                   GblClosure
 
 GBL_DECLS_BEGIN
 
+/*! \struct  GblClosureClass
+ *  \brief   GblClass VTable for GblClosure
+ *  \extends GblBoxClass
+ *
+ *  Provides an overridable virtual method for marshalling
+ *  generic arguments to an actual function and marshalling
+ *  its return value into a generic value.
+ *
+ *  \sa GblBox, GblMarshalFn
+ */
 GBL_CLASS_DERIVE(GblClosure, GblBox)
     GblMarshalFn    pFnMetaMarshal;
 GBL_CLASS_END
 
 /*! \struct GblClosure
- * \brief Base instance for all closure types
- *\ingroup meta
- *\details
+ *  \brief Base instance for all closure types
+ *  \ingroup signals
+ *  \extends GblBox
+ *
  * A GblClosure represents an abstract  generic
  * callback object. It is analogous to a stateful C++
  * function object, or functor, in that it can

@@ -423,8 +423,7 @@ static GBL_RESULT GblModule_GblInstance_init_(GblInstance* pInstance, GblContext
 }
 
 static GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
-    GBL_UNUSED(pData);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_UNUSED(pData, pCtx);
 
     if(!GblType_classRefCount(GBL_MODULE_TYPE)) {
         GBL_PROPERTIES_REGISTER(GblModule);
@@ -439,7 +438,7 @@ static GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblC
     GBL_MODULE_CLASS(pClass) ->pFnLoad        = GblModule_load_;
     GBL_MODULE_CLASS(pClass) ->pFnUnload      = GblModule_unload_;
 
-    GBL_CTX_END();
+    return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT GblType GblModule_type(void) {

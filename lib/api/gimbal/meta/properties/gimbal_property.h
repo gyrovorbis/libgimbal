@@ -11,11 +11,11 @@
 #include "../instances/gimbal_box.h"
 
 #define GBL_PROPERTY_TYPE                       (GBL_TYPEOF(GblProperty))
-#define GBL_GENERIC_PROPERTY_TYPE                GBL_PROPERTY_TYPE
-
 #define GBL_PROPERTY(instance)                  (GBL_INSTANCE_CAST(instance, GblProperty))
 #define GBL_PROPERTY_CLASS(klass)               (GBL_CLASS_CAST(klass, GblPropertyClass))
 #define GBL_PROPERTY_GET_CLASS(instance)        (GBL_INSTANCE_GET_CLASS(instance, GblProperty))
+
+#define GBL_GENERIC_PROPERTY_TYPE                GBL_PROPERTY_TYPE
 
 #define GBL_SELF_TYPE GblProperty
 
@@ -38,14 +38,35 @@ GBL_DECLARE_ENUM(GBL_PROPERTY_FLAG) {
     GBL_PROPERTY_FLAG_ALL           = 0xffff
 };
 
+/*! \struct  GblPropertyClass
+ *  \extends GblBoxClass
+ *  \brief   GblClass VTable structure for GblProperty
+ *
+ *  GblPropertyClass provides overridable virtual methods which
+ *  allow for a derived type to implement type-specific functionality
+ *  for a property.
+ *
+ *  \sa GblProperty
+ */
 GBL_CLASS_DERIVE(GblProperty, GblBox)
-    GBL_RESULT (*pFnInitOptionalArgs)(GBL_SELF, size_t  argCount, va_list* pVaList);
+    GBL_RESULT (*pFnInitOptionalArgs)(GBL_SELF, size_t argCount, va_list* pVaList);
     GBL_RESULT (*pFnDefaultValue)    (GBL_CSELF, GblVariant* pValue);
     GBL_RESULT (*pFnCheckValue)      (GBL_CSELF, const GblVariant* pValue);
     GBL_RESULT (*pFnValidateValue)   (GBL_CSELF, GblVariant* pValue);
     GBL_RESULT (*pFnCompareValues)   (GBL_CSELF, const GblVariant* pV1, const GblVariant* pV2, int* pResult);
 GBL_CLASS_END
 
+/*! \struct  GblProperty
+ *  \extends GblBox
+ *  \ingroup meta
+ *  \brief   Represents a string-indexed member of a GblObject
+ *
+ *  GblProperty rerpesents a single GblObject member which can be
+ *  dynamically looked-up by a string key, passed to the Gblobject
+ *  constructor, or which can be programmatically iterated over.
+ *
+ *  \sa GblPropertyClass
+ */
 GBL_INSTANCE_DERIVE(GblProperty, GblBox)
     GBL_PRIVATE()
         GblProperty* pNext;

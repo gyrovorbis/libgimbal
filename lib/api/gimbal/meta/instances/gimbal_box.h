@@ -29,7 +29,7 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblBox);
 
-/*! \class GblBoxClass
+/*! \struct GblBoxClass
  *  \brief Minimally bindable GblClass with reference semantics and opaque userdata.
  *  \ingroup metaBuiltinTypes
  *  \sa GblClass, GblBox
@@ -44,7 +44,7 @@ GBL_CLASS_BASE(GblBox, GblIVariant)
     GBL_RESULT (*pFnDestructor)(GBL_SELF);
 GBL_CLASS_END
 
-/*! \class GblBox
+/*! \struct GblBox
  *  \brief Minimally bindable GblInstance with reference semantics and opaque userdata.
  *  \ingroup metaBuiltinTypes
  *  \extends GblInstance

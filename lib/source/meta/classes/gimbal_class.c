@@ -125,8 +125,9 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_PUSH_VERBOSE("Class::construct(%s)", GblType_name(GBL_TYPE_(pMeta)));
     GBL_CTX_VERBOSE("Type: %p", pMeta);
+    GBL_CTX_VERBOSE("Flags: %x", classFlags);
 
-    // Zero initiailze class - NOPE OVERWRITING IFACE IF WE DO THAT!
+    // Zero initialize class - NOPE OVERWRITING IFACE IF WE DO THAT!
     if(!(classFlags & GBL_CLASS_FLAG_IFACE_IMPL_))
         memset(pClass, 0, pMeta->pInfo->classSize);
     else
@@ -185,8 +186,8 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
 
 
 static GblClass* GblClass_create_(GblMetaClass* pMeta, GblBool floating) {
-    GblClass* pFloatingClass = NULL;
-    GblClass** ppClass       = &pFloatingClass;
+    GblClass*  pFloatingClass = NULL;
+    GblClass** ppClass        = &pFloatingClass;
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_VERIFY_ARG(pMeta);
     //GBL_CTX_PUSH_VERBOSE("Class::create(%s)", GblType_name(GBL_TYPE_(pMeta)));
@@ -418,9 +419,9 @@ GBL_EXPORT GblRefCount GblClass_unrefDefault(GblClass* pSelf) GBL_NOEXCEPT {
     pMeta = GBL_META_CLASS_(GBL_CLASS_TYPEOF(pSelf));
     refCount = GBL_ATOMIC_INT16_LOAD(pMeta->refCount);
 
-    GBL_CTX_PUSH_VERBOSE("Class::unreference(%s): %u",
-                         GblType_name(GblClass_typeOf(pSelf)),
-                         refCount - 1);
+    //GBL_CTX_PUSH_VERBOSE("Class::unreference(%s): %u",
+    //                     GblType_name(GblClass_typeOf(pSelf)),
+    //                     refCount - 1);
 
     GBL_CTX_VERIFY(GblClass_isDefault(pSelf),
                    GBL_RESULT_ERROR_INVALID_OPERATION,
@@ -433,21 +434,22 @@ GBL_EXPORT GblRefCount GblClass_unrefDefault(GblClass* pSelf) GBL_NOEXCEPT {
     refCount = GBL_ATOMIC_INT16_DEC(pMeta->refCount) - 1;
 
     if(refCount) {
-        GBL_CTX_VERBOSE("--[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), refCount);
+        ;//GBL_CTX_VERBOSE("--[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), refCount);
     } else {
         GblRefCount instanceRefCount = 0;
         if((instanceRefCount = GBL_ATOMIC_INT16_LOAD(pMeta->instanceRefCount)))
             GBL_CTX_WARN("0 class references with remaining instance references: %u", instanceRefCount);
 
         if(pMeta->flags & GBL_TYPE_FLAG_CLASS_PINNED)
-            GBL_CTX_VERBOSE("Class::unreference(%s): 0 - Preserving pinned class",
-                            GblType_name(GblClass_typeOf(pSelf)));
+            //GBL_CTX_VERBOSE("Class::unreference(%s): 0 - Preserving pinned class",
+            //                GblType_name(GblClass_typeOf(pSelf)));
+            ;
         else
             GBL_CTX_VERIFY_CALL(GblClass_destruct_(pSelf));
 
     }
 
-    GBL_CTX_POP(1);
+    //GBL_CTX_POP(1);
     GBL_CTX_END_BLOCK();
     return refCount;
 }
@@ -455,7 +457,7 @@ GBL_EXPORT GblRefCount GblClass_unrefDefault(GblClass* pSelf) GBL_NOEXCEPT {
 // Cast a class to the given type, with optional error checking and validation (recurses for interfaces)
 static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check, GblBool recursing) {
     GblClass* pClassStart = pClass;
-    GblClass* pToClass = NULL;
+    GblClass* pToClass    = NULL;
 
     // Casting a NULL pointer or to an invalid type returns NULL
     if(pClass && toType != GBL_INVALID_TYPE) GBL_LIKELY {
@@ -488,12 +490,18 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
                 } else if(toInterface) {
                     for(unsigned i = 0; i < pMeta->pInfo->interfaceCount; ++i) {
 
-                        GblMetaClass* pIFaceMeta    = GBL_META_CLASS_(toType);
-                        GblInterface* pCurIClass = (GblInterface*)((uintptr_t)pClass + pMeta->pInfo->pInterfaceMap[i].classOffset);
+                        GblMetaClass* pIFaceMeta = GBL_META_CLASS_(toType);
+                        GblInterface* pCurIClass = (GblInterface*)((uintptr_t)pClass +
+                                                    pMeta->pInfo->pInterfaceMap[i].classOffset);
+
+                        /* Assume an interface is invalid, because it has yet to be constructed,
+                           so skip using it for further consideration. */
+                        if(GBL_CLASS_TYPEOF(pCurIClass) == GBL_INVALID_TYPE)
+                            continue;
 
                         GBL_ASSERT(GBL_CLASS_FLAG_TEST_(GBL_CLASS(pCurIClass), GBL_CLASS_FLAG_IFACE_IMPL_));
                         GBL_ASSERT(GBL_META_CLASS_(pMeta->pInfo->pInterfaceMap[i].interfaceType)
-                                                  == GBL_META_CLASS_(GBL_CLASS_TYPEOF(pCurIClass)));
+                                                    == GBL_META_CLASS_(GBL_CLASS_TYPEOF(pCurIClass)));
                         GBL_ASSERT(GBL_CLASS_TYPEOF(pCurIClass) != GBL_INVALID_TYPE);
 
                         if(GBL_META_CLASS_(GBL_CLASS_TYPEOF(pCurIClass)) == pIFaceMeta) {
@@ -502,7 +510,7 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
                         } else {
                             pCurIClass = (GblInterface*)GblClass_cast_(GBL_CLASS(pCurIClass), toType, GBL_FALSE, GBL_TRUE);
                             if(pCurIClass) {
-                                GBL_ASSERT(GblType_check(GBL_CLASS_TYPEOF(pCurIClass), toType)); //SLOOOW
+                                GBL_ASSERT(GblType_check(GBL_CLASS_TYPEOF(pCurIClass), toType)); //SLOOOW, but good check for Debug
                                 pToClass = GBL_CLASS(pCurIClass);
                                 break;
                             }

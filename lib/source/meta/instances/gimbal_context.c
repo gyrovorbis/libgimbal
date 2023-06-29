@@ -195,13 +195,14 @@ static GBL_RESULT GblContextClass_init_(GblContextClass* pClass, void* pData, Gb
         GBL_PROPERTIES_REGISTER(GblContext);
     }
 
-    pClass->GblIAllocatorImpl.pFnAlloc    = GblContext_IAllocator_alloc_;
-    pClass->GblIAllocatorImpl.pFnRealloc  = GblContext_IAllocator_realloc_;
-    pClass->GblIAllocatorImpl.pFnFree     = GblContext_IAllocator_free_;
-    pClass->GblILoggerImpl.pFnWrite       = GblContext_ILogger_write_;
-    pClass->GblILoggerImpl.pFnPush        = GblContext_ILogger_push_;
-    pClass->GblILoggerImpl.pFnPop         = GblContext_ILogger_pop_;
-    pClass->base.pFnConstructor           = GblContext_constructor_;
+    GBL_IALLOCATOR_CLASS(pClass)->pFnAlloc       = GblContext_IAllocator_alloc_;
+    GBL_IALLOCATOR_CLASS(pClass)->pFnRealloc     = GblContext_IAllocator_realloc_;
+    GBL_IALLOCATOR_CLASS(pClass)->pFnFree        = GblContext_IAllocator_free_;
+    GBL_ILOGGER_CLASS(pClass)   ->pFnWrite       = GblContext_ILogger_write_;
+    GBL_ILOGGER_CLASS(pClass)   ->pFnPush        = GblContext_ILogger_push_;
+    GBL_ILOGGER_CLASS(pClass)   ->pFnPop         = GblContext_ILogger_pop_;
+    GBL_OBJECT_CLASS(pClass)    ->pFnConstructor = GblContext_constructor_;
+
     GBL_CTX_END();
 }
 

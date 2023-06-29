@@ -39,17 +39,19 @@ GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
     GBL_RESULT  (*pFnUnload)(GBL_SELF);
 GBL_CLASS_END
 
-/*! \brief Dynamically loadable service and associated meta types
- *  \ingroup metaBuiltinTypes
- *  \extends GblContext
+/*! \struct     GblModule
+ *  \ingroup    metaBuiltinTypes
+ *  \extends    GblContext
  *  \implements GblIPlugin
- *  \details
+ *  \brief      Dynamically loadable service and associated meta types
+ *
  *  A Module is a lazily-loaded object which is registered then later
  *  can be queried for by anywhere else in the application. This
  *  behavior lets you implement "services" as global singletons which
  *  can be accessed from anywhere. Modules also maintain their own inner
  *  registry of associated meta types, which is managed through the
  *  implemented GblIPlugin interface.
+ *
  *  \sa GbModuleClass
  */
 GBL_INSTANCE_DERIVE(GblModule, GblContext)

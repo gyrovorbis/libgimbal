@@ -15,7 +15,7 @@
 #include "../properties/gimbal_property.h"
 
 /*! \ingroup metaBuiltinTypes
- * \details  ::GblType UUID of a GblObject
+ *  \details  ::GblType UUID of a GblObject
  */
 #define GBL_OBJECT_TYPE                             (GBL_TYPEOF(GblObject))
 #define GBL_OBJECT(instance)                        (GBL_INSTANCE_CAST(instance, GblObject))
