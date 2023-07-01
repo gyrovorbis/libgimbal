@@ -60,6 +60,7 @@ GBL_INSTANCE_DERIVE(GblScanner, GblObject)
     GBL_SCANNER_FLAGS status;
 GBL_INSTANCE_END
 
+//! \cond
 GBL_PROPERTIES(GblScanner,
     (input,      GBL_GENERIC, (READ, WRITE, CONSTRUCT), GBL_STRING_TYPE),
     (delimeters, GBL_GENERIC, (READ, WRITE, CONSTRUCT), GBL_STRING_TYPE),
@@ -76,6 +77,7 @@ GBL_SIGNALS(GblScanner,
     (scanned, (GBL_INSTANCE_TYPE, pReceiver)),
     (raised,  (GBL_INSTANCE_TYPE, pReceiver))
 )
+//! \endcond
 
 GBL_EXPORT void          GblScannerClass_setDefaultDelimeters
                                                   (GBL_KLASS,

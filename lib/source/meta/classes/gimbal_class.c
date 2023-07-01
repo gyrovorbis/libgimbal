@@ -446,7 +446,6 @@ GBL_EXPORT GblRefCount GblClass_unrefDefault(GblClass* pSelf) GBL_NOEXCEPT {
             ;
         else
             GBL_CTX_VERIFY_CALL(GblClass_destruct_(pSelf));
-
     }
 
     //GBL_CTX_POP(1);

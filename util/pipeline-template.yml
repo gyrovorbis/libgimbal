@@ -16,6 +16,7 @@ variables:
   BUILD_CONFIG: ${BUILD_TYPE}
   DOCS_FTP_PARALLEL_JOBS: 10
   DOCS_DIR: "doc"
+  DOCS_PREREQ_DIRS: ""
   BINARY_PATH: ""
   BINARY_EXTENSION: ""
   DC_BOOT_SLEEP_TIME: 30
@@ -479,6 +480,13 @@ publish-docs:
     variables:
       - $DOCS_FTP_ADDRESS
   script:
+  - cwd=$(pwd)
+  - for d in ${DOCS_PREREQ_DIRS}
+    do 
+        cd "$d" 
+        doxygen 
+        cd "$cwd" 
+    done
   - cd ${DOCS_DIR}
   - doxygen
   - cd html
