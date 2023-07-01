@@ -482,11 +482,12 @@ publish-docs:
   script:
   - cwd=$(pwd)
   - for d in ${DOCS_PREREQ_DIRS}
-    do 
-        cd "$d" 
-        doxygen 
-        cd "$cwd" 
-    done
+  - do 
+  -     cd "$d" 
+  -     doxygen 
+  -     cd "$cwd" 
+  - done
+  - cd "$cwd"
   - cd ${DOCS_DIR}
   - doxygen
   - cd html
