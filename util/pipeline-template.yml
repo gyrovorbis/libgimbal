@@ -481,12 +481,13 @@ publish-docs:
       - $DOCS_FTP_ADDRESS
   script:
   - cwd=$(pwd)
-  - for d in ${DOCS_PREREQ_DIRS}
-  - do 
-  -     cd "$d" 
-  -     doxygen 
-  -     cd "$cwd" 
-  - done
+  - |
+    for d in ${DOCS_PREREQ_DIRS}
+    do 
+      cd "$d" 
+      doxygen 
+      cd "$cwd" 
+    done
   - cd "$cwd"
   - cd ${DOCS_DIR}
   - doxygen
