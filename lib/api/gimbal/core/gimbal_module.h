@@ -7,7 +7,8 @@
  *      - rig up option group parsery
  *      - stop inheriting GblContext
  *
- *  \author Falco Girgis
+ *  \author 2023 Falco Girgis
+ *  \copyright MIT License
  */
 #ifndef GIMBAL_MODULE_H
 #define GIMBAL_MODULE_H
@@ -17,11 +18,15 @@
 #include "../strings/gimbal_string_ref.h"
 #include "../utils/gimbal_version.h"
 
-/// \ingroup metaBuiltinTypes
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
 #define GBL_MODULE_TYPE                 (GBL_TYPEOF(GblModule))
 #define GBL_MODULE(instance)            (GBL_INSTANCE_CAST(instance,  GblModule))
 #define GBL_MODULE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblModule))
 #define GBL_MODULE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblModule))
+//! @}
 
 #define GBL_REQUIRE(...)                GBL_REQUIRE_(__VA_ARGS__)
 
@@ -34,9 +39,21 @@ GBL_FORWARD_DECLARE_STRUCT(GblModule);
 
 typedef GblBool (*GblModuleIterFn)(GblModule* pIt, void* pClosure);
 
+/*! \struct GblModuleClass
+ *  \extends GblContextClass
+ *  \implements GblIPluginClass
+ *  \brief GblClass structure for GblModule
+ *
+ *  Virtual method table for GblModule
+ *  - inherits from GblContext
+ *  - has to implement GblIPlugin's VTable
+ *  - adds pure virtaul methods load/unload
+ *
+ *  \sa GblModule
+ */
 GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
-    GBL_RESULT  (*pFnLoad)  (GBL_SELF);
-    GBL_RESULT  (*pFnUnload)(GBL_SELF);
+    GBL_RESULT  (*pFnLoad)  (GBL_SELF); //!< Called when a GblModule  is first loaded
+    GBL_RESULT  (*pFnUnload)(GBL_SELF); //!< Called after the GblModule is done being referenced
 GBL_CLASS_END
 
 /*! \struct     GblModule

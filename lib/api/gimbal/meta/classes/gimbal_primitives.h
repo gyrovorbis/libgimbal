@@ -46,8 +46,14 @@
 #define GblFloat_type()     GBL_FLOAT_TYPE
 #define GblDouble_type()    GBL_DOUBLE_TYPE
 #define GblString_type()    GBL_STRING_TYPE
-#define size_t_type()      GBL_SIZE_TYPE
+#define size_t_type()       GBL_SIZE_TYPE
 
+/*! \struct GblPrimitiveClass
+ *  \implements GblIVariantClass
+ *  \brief Static GblClass structure for any primitive tyes
+ *
+ *  No public members.
+ */
 GBL_CLASS_BASE_EMPTY(GblPrimitive, GblIVariant)
 
 GBL_EXPORT GblType GblType_type          (void)                                           GBL_NOEXCEPT;

@@ -16,6 +16,10 @@ GBL_EXPORT GblCClosure* GblCClosure_create(GblFnPtr pFnCallback, void* pUserdata
     return pClosure;
 }
 
+GBL_EXPORT void GblCClosure_setCallback(GblCClosure* pSelf, GblFnPtr pFnCallback) {
+    GBL_PRIV_REF(pSelf).pFnCallback = pFnCallback;
+}
+
 GBL_EXPORT GblType GblCClosure_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 

@@ -9,75 +9,102 @@
  *      - GblDateTime_parse() support ms, us, ns
  *      - are we misnaming GMT as UTC anywhere?
  *
- *  \author Falco Girgis
+ *  \author 2023 Falco Girgis
+ *  \copyright MIT License
  */
-
 #ifndef GIMBAL_DATE_TIME_H
 #define GIMBAL_DATE_TIME_H
 
 #include "../gimbal_core.h"
 #include "../platform/gimbal_time_.h"
 
-#define GBL_TIME_MSECS_PER_SEC                          1000
-#define GBL_TIME_USECS_PER_SEC                          1000000
-#define GBL_TIME_NSECS_PER_SEC                          1000000000
+/*! \name Second Conversions
+ *  \brief Defines for second conversion factors
+ *  @{
+ */
+#define GBL_TIME_MSECS_PER_SEC  1000        //!< Number of milliseconds per second
+#define GBL_TIME_USECS_PER_SEC  1000000     //!< Number of microseconds per second
+#define GBL_TIME_NSECS_PER_SEC  1000000000  //!< Number of nanoseconds per second
+//! @}
 
-#define GBL_DATE_GREGORIAN_YEAR_FIRST                   1582
-#define GBL_DATE_UNIX_EPOCH_YEAR                        1970
-#define GBL_DATE_UNIX_EPOCH_MONTH                       GBL_MONTH_JANUARY
-#define GBL_DATE_UNIX_EPOCH_DAY                         1
+/*! \name Start Dates
+ *  \brief Initial dates of epochs
+ *  @{
+ */
+#define GBL_DATE_GREGORIAN_YEAR_FIRST   1582                //!< First year in Gregorian calendar
+#define GBL_DATE_UNIX_EPOCH_YEAR        1970                //!< Year of the Unix epoch
+#define GBL_DATE_UNIX_EPOCH_MONTH       GBL_MONTH_JANUARY   //!< Month of the Unix epoch
+#define GBL_DATE_UNIX_EPOCH_DAY         1                   //!< Day of the unix epoch
+//! @}
 
-#define GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST            1900
-#define GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN              1970
-#define GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET          -1
-#define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_INCREMENT      128
-#define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_MULTIPLIER_MAX 10
-#define GBL_DATE_TIME_ISO8601_STRING_SIZE               29
+/*! \name Broken-down Time
+ *  \brief Defines for working with broken-down time
+ *  @{
+ */
+#define GBL_DATE_TIME_BROKEN_DOWN_YEAR_FIRST    1900    //!< Year offset of a broken-down time's date
+#define GBL_DATE_TIME_BROKEN_DOWN_YEAR_MIN      1970    //!< The oldest year a broken-down time can handle by spec
+#define GBL_DATE_TIME_BROKEN_DOWN_MONTH_OFFSET  -1      //!< Month offset from GblMonth to a broken-down month
+//! @}
+
+/*! \name Formatting
+ *  \brief Defines used when formatting and stringifying
+ *  @{
+ */
+#define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_INCREMENT      128 //!< Size increment when resizing format buffers
+#define GBL_DATE_TIME_FORMAT_BUFFER_SIZE_MULTIPLIER_MAX 10  //!< Maximum number of size increments for format buffers
+//! @}
+
+#define GBL_DATE_TIME_ISO8601_STRING_SIZE   29 //!< Required buffer size for going to an ISO8601-formatted string
 
 GBL_DECLS_BEGIN
 
-GBL_DECLARE_ENUM(GblMonth) {
-    GBL_MONTH_JANUARY = 1,
-    GBL_MONTH_FEBRUARY,
-    GBL_MONTH_MARCH,
-    GBL_MONTH_APRIL,
-    GBL_MONTH_MAY,
-    GBL_MONTH_JUNE,
-    GBL_MONTH_JULY,
-    GBL_MONTH_AUGUST,
-    GBL_MONTH_SEPTEMBER,
-    GBL_MONTH_OCTOBER,
-    GBL_MONTH_NOVEMBER,
-    GBL_MONTH_DECEMBER,
-    GBL_MONTH_COUNT = 12
-};
+//! Represents a month of the 12-month year
+typedef enum GblMonth {
+    GBL_MONTH_JANUARY = 1,  //!< January
+    GBL_MONTH_FEBRUARY,     //!< February
+    GBL_MONTH_MARCH,        //!< March
+    GBL_MONTH_APRIL,        //!< April
+    GBL_MONTH_MAY,          //!< May
+    GBL_MONTH_JUNE,         //!< June
+    GBL_MONTH_JULY,         //!< July
+    GBL_MONTH_AUGUST,       //!< August
+    GBL_MONTH_SEPTEMBER,    //!< September
+    GBL_MONTH_OCTOBER,      //!< October
+    GBL_MONTH_NOVEMBER,     //!< November
+    GBL_MONTH_DECEMBER,     //!< December
+    GBL_MONTH_COUNT = 12    //!< Months/Year
+} GblMonth;
 
-GBL_DECLARE_ENUM(GblWeekDay) {
-    GBL_WEEK_DAY_SUNDAY,
-    GBL_WEEK_DAY_MONDAY,
-    GBL_WEEK_DAY_TUESDAY,
-    GBL_WEEK_DAY_WEDNESDAY,
-    GBL_WEEK_DAY_THURSDAY,
-    GBL_WEEK_DAY_FRIDAY,
-    GBL_WEEK_DAY_SATURDAY,
-    GBL_WEEK_DAY_COUNT
-};
+//! Represents a day of the 7-day week
+typedef enum GblWeekDay {
+    GBL_WEEK_DAY_SUNDAY,    //!< Sunday
+    GBL_WEEK_DAY_MONDAY,    //!< Monday
+    GBL_WEEK_DAY_TUESDAY,   //!< Tuesday
+    GBL_WEEK_DAY_WEDNESDAY, //!< Wednesday
+    GBL_WEEK_DAY_THURSDAY,  //!< Thursday
+    GBL_WEEK_DAY_FRIDAY,    //!< Friday
+    GBL_WEEK_DAY_SATURDAY,  //!< Saturday
+    GBL_WEEK_DAY_COUNT      //!< Days/Week
+} GblWeekDay;
 
-typedef int32_t GblYear;
-typedef int32_t GblDay;
-typedef int32_t GblNanoSecond;
-typedef int64_t GblSecond;
-typedef int32_t GblMinute;
-typedef int32_t GblHour;
+typedef int32_t GblYear;        //!< Represents a calendar year
+typedef int32_t GblDay;         //!< Represents a 24-hour day within a month (0-31)
+typedef int32_t GblNanoSecond;  //!< Represents a nanosecond within a second (0-1000000000
+typedef int64_t GblSecond;      //!< Represents a second in a 60-second minute (0-59)
+typedef int32_t GblMinute;      //!< Represents a minute in a 60-minute hour (0-59)
+typedef int32_t GblHour;        //!< Represents an hour within a 24-hour day (0-23)
 
+//! Represents the difference between two GblTime instances
 typedef struct timespec GblTimeSpec;
 
+//! Represents a calendar date
 typedef struct GblDate {     // Size (bytes)
     GblYear  year;           // 4
     GblMonth month;          // 4
     GblDay   day;            // 4
 } GblDate;                   // 12 Total
 
+//! Represents a time-of-day
 typedef struct GblTime {     // Size (bytes)
     GblHour       hours;     // 4
     GblMinute     minutes;   // 4
@@ -85,6 +112,7 @@ typedef struct GblTime {     // Size (bytes)
     GblNanoSecond nSeconds;  // 4
 } GblTime;                   // 20 Total
 
+//! Represents a combined calendar date with time-of-day
 typedef struct GblDateTime { // Size (bytes)
     GblDate   date;          // 12
     GblTime   time;          // 20

@@ -2,7 +2,8 @@
  *  \brief Random number generation, hashing, and CRC algorithms
  *  \ingroup hashing
  *
- *  \author Falco Girgis
+ *  \author 2023 Falco Girgis
+ *  \copyright MIT License
  */
 
 #ifndef GIMBAL_HASH_H

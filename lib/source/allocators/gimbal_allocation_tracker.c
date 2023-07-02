@@ -6,9 +6,9 @@
 #define GBL_ALLOCATION_TRACKER_INITIAL_CAPACITY_    512
 
 typedef struct GblAllocationTracker_ {
-    GblAllocationTracker    base;
-    GblHashSet              activeSet;
-    GblBool                 recursing;
+    GblAllocationTracker base;
+    GblHashSet           activeSet;
+    GblBool              recursing;
 } GblAllocationTracker_;
 
 typedef struct GblAllocationEntry_ {

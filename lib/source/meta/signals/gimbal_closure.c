@@ -4,6 +4,18 @@
 
 static GBL_THREAD_LOCAL GblClosure* pCurrentClosure_ = NULL;
 
+GBL_EXPORT GblBool GblClosure_hasMarshal(const GblClosure* pSelf) GBL_NOEXCEPT {
+    return GBL_PRIV_REF(pSelf).pFnMarshal? GBL_TRUE : GBL_FALSE;
+}
+
+GBL_EXPORT GblBool GblClosure_hasMetaMarshal(const GblClosure* pSelf) GBL_NOEXCEPT {
+    return GBL_CLOSURE_GET_CLASS(pSelf)->pFnMetaMarshal? GBL_TRUE : GBL_FALSE;
+}
+
+GBL_EXPORT void GblClosure_setMarshal(GblClosure* pSelf, GblMarshalFn pFnMarshal) GBL_NOEXCEPT {
+    GBL_PRIV_REF(pSelf).pFnMarshal = pFnMarshal;
+}
+
 GBL_EXPORT GblClosure* GblClosure_current(void) {
     return pCurrentClosure_;
 }
@@ -34,13 +46,21 @@ GBL_EXPORT GBL_RESULT GblClosure_setMetaMarshal(GblClosure* pSelf,
     if(GblClass_isOwned(GBL_INSTANCE_CLASS(pSelf))) {
         GBL_CLOSURE_GET_CLASS(pSelf)->pFnMetaMarshal = pFnMeta;
     } else {
-        GblClosureClass* pClass = GBL_CLOSURE_CLASS(GblClass_createFloating(GBL_INSTANCE_TYPEOF(pSelf)));
-        pClass->pFnMetaMarshal = pFnMeta;
-        GBL_CTX_VERIFY_CALL(GblInstance_swizzleClass(GBL_INSTANCE(pSelf), GBL_CLASS(pClass)));
-        GBL_CTX_VERIFY_CALL(GblInstance_sinkClass(GBL_INSTANCE(pSelf)));
-    }
-    GBL_CTX_END();
+        GblClosureClass* pClass =
+            GBL_CLOSURE_CLASS(
+                GblClass_createFloating(
+                    GBL_INSTANCE_TYPEOF(pSelf)));
 
+        pClass->pFnMetaMarshal = pFnMeta;
+
+        GBL_CTX_VERIFY_CALL(
+            GblInstance_swizzleClass(GBL_INSTANCE(pSelf),
+                                     GBL_CLASS(pClass)));
+        GBL_CTX_VERIFY_CALL(
+            GblInstance_sinkClass(GBL_INSTANCE(pSelf)));
+    }
+
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblClosure_invoke(GblClosure*     pSelf,

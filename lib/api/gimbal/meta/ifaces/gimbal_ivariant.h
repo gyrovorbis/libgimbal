@@ -2,7 +2,8 @@
  *  \brief GblIVariant interface for GblVariant compatibility
  *  \ingroup interfaces
  *
- *  \author Falco Girgis
+ *  \author 2023 Falco Girgis
+ *  \copyright MIT License
  */
 
 #ifndef GIMBAL_IVARIANT_H
@@ -11,10 +12,15 @@
 #include "gimbal_interface.h"
 #include <stdarg.h>
 
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
 #define GBL_IVARIANT_TYPE                   (GBL_BUILTIN_TYPE(IVARIANT))
 #define GBL_IVARIANT(instance)              ((GblIVariant*)GblInstance_cast(GBL_INSTANCE(instance), GBL_IVARIANT_TYPE))
 #define GBL_IVARIANT_CLASS(klass)           ((GblIVariantClass*)GblClass_cast(GBL_CLASS(klass), GBL_IVARIANT_TYPE))
 #define GBL_IVARIANT_GET_CLASS(instance)    (GBL_IVARIANT_CLASS(GblInstance_class(GBL_INSTANCE(instance))))
+//! @}
 
 #define GBL_IVARIANT_VALUE_VAR_ARG_MAX          4
 
@@ -67,8 +73,19 @@ typedef struct GblIVariantClassVTable {
     GBL_RESULT (*pFnLoad)     (VARIANT,  const GblStringBuffer* pString);
 } GblIVariantClassVTable;
 
+/*! \struct GblIVariantClass
+ *  \inherits GblInterface
+ *  \brief GblInterface for GblVariant type compatibilty
+ *
+ *  GblIVariantClass represents an interface that must
+ *  be implemented by any type wishing to be stored
+ *  within, convertible to/from, or compatible with a
+ *  GblVariant in any way.
+ *
+ *  \sa GblVariant
+ */
 GBL_INTERFACE_DERIVE(GblIVariant)
-    const GblIVariantClassVTable*   pVTable;
+    const GblIVariantClassVTable* pVTable;
 GBL_INTERFACE_END
 
 #define GBL_SELF_TYPE GblIVariantClass
