@@ -9,7 +9,8 @@
  *   - need code for adding and removing to/from vector
  *   - checking for auto invocation upon constructed won't work--hasn't been set yet
  *
- *   \author Falco Girgis
+ *   \author 2023 Falco Girgis
+ *   \copyright MIT License
  */
 #ifndef GIMBAL_THREAD_H
 #define GIMBAL_THREAD_H
@@ -21,10 +22,15 @@
 #include "../allocators/gimbal_scope_allocator.h"
 #include <signal.h>
 
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
 #define GBL_THREAD_TYPE             (GBL_TYPEOF(GblThread))
 #define GBL_THREAD(self)            (GBL_INSTANCE_CAST(self, GblThread))
 #define GBL_THREAD_CLASS(klass)     (GBL_CLASS_CAST(klass, GblThread))
 #define GBL_THREAD_GET_CLASS(self)  (GBL_INSTANCE_GET_CLASS(self, GblThread))
+//! @}
 
 #define GBL_SELF_TYPE GblThread
 
@@ -51,12 +57,23 @@ GBL_DECLARE_ENUM(GBL_THREAD_STATE) {
     GBL_THREAD_STATE_RUNNING,
     GBL_THREAD_STATE_FINISHED
 };
-
+\
+/*! \struct GblThreadClass
+ *  \extends GblObjectClass
+ *  \brief GblClass VTable structure for GblThread
+ *  \sa GblThread
+ */
 GBL_CLASS_DERIVE(GblThread, GblObject)
     GblThreadFn pFnRun;
     GBL_RESULT  (*pFnSignal)(GBL_SELF, int signal);
 GBL_CLASS_END
 
+/*! \struct GblThread
+ *  \extends GblObject
+ *  \ingroup core
+ *  \brief Object representing a thread, its local storage, and logic
+ *  \sa GblThreadClass
+ */
 GBL_INSTANCE_DERIVE(GblThread, GblObject)
     GblCallRecord         returnStatus;
     volatile sig_atomic_t signalStatus;

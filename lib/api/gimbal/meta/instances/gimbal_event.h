@@ -2,7 +2,8 @@
  *  \brief GblEvent base type and basic API
  *  \ingroup meta
  *
- *  \author Falco Girgis
+ *  \author 2023 Falco Girgis
+ *  \copyright MIT License
  */
 
 #ifndef GIMBAL_EVENT_H
@@ -10,10 +11,15 @@
 
 #include "gimbal_box.h"
 
-/// \ingroup metaBuiltinTypes
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
 #define GBL_EVENT_TYPE                  (GBL_TYPEOF(GblEvent))
 #define GBL_EVENT(instance)             (GBL_INSTANCE_CAST(instance, GblEvent))
+#define GBL_EVENT_CLASS(klass)          (GBL_CLASS_CAST(klass, GblEvent))
 #define GBL_EVENT_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS(instance,  GblEvent))
+//! @}
 
 #define GBL_SELF_TYPE GblEvent
 
@@ -25,8 +31,23 @@ GBL_DECLARE_ENUM(GBL_EVENT_STATE) {
     GBL_EVENT_STATE_IGNORED
 };
 
+/*! \struct GblEventClass
+ *  \extends GblBoxClass
+ *  \brief GblClass VTable structure for GblEvent
+ *
+ *  No public virtual methods
+ *
+ *  \sa GblEvent
+ */
 GBL_CLASS_DERIVE_EMPTY(GblEvent, GblBox)
 
+/*! \struct  GblEvent
+ *  \extends GblBox
+ *  \ingroup meta
+ *  \brief   Event base class for use with the event system
+ *
+ *  \sa GblIEventHandler, GblIEventFilter
+ */
 GBL_INSTANCE_DERIVE(GblEvent, GblBox)
     GBL_PRIVATE()
         GBL_EVENT_STATE state;

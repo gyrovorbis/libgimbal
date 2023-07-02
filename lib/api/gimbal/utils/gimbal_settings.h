@@ -7,7 +7,8 @@
  *      - swap GblHashSet out for GblTreeSet
  *      - rig up properties
  *
- *  \author  Falco Girgis
+ *  \author    2023 Falco Girgis
+ *  \copyright MIT License
  */
 
 #ifndef GIMBAL_SETTINGS_H
@@ -16,11 +17,15 @@
 #include "../meta/instances/gimbal_object.h"
 #include "../meta/signals/gimbal_signal.h"
 
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
 #define GBL_SETTINGS_TYPE            (GBL_TYPEOF(GblSettings))
-
 #define GBL_SETTINGS(self)           (GBL_INSTANCE_CAST(self, GblSettings))
 #define GBL_SETTINGS_CLASS(klass)    (GBL_CLASS_CAST(klass, GblSettings))
 #define GBL_SETTINGS_GET_CLASS(self) (GBL_INSTANCE_GET_CLASS(self, GblSettings))
+//! @}
 
 #define GBL_SELF_TYPE GblSettings
 
@@ -32,7 +37,17 @@ GBL_DECLARE_ENUM(GBL_SETTINGS_STATUS) {
     GBL_SETTINGS_STATUS_ERROR_FORMAT
 };
 
-/// Settings class/vtable structure
+/*! \struct  GblSettingsClass
+ *  \extends GblObjectClass
+ *  \brief   GblClass VTable structure for GblSettings
+ *
+ *  Provides a polymorphic virtual table allowing the
+ *  top-level save and load routines to be reimplemented,
+ *  as well as reading and writing values from and to the
+ *  internal data structure.
+ *
+ *  \sa  GblSettings
+ */
 GBL_CLASS_DERIVE(GblSettings, GblObject)
     GBL_RESULT (*pFnSave) (GBL_SELF);
     GBL_RESULT (*pFnLoad) (GBL_SELF);
@@ -40,7 +55,17 @@ GBL_CLASS_DERIVE(GblSettings, GblObject)
     GBL_RESULT (*pFnRead) (GBL_SELF, const char* pKey, GblVariant* pValue);
 GBL_CLASS_END
 
-/// Settings public instance structure
+/*! \struct  GblSettings
+ *  \extends GblObject
+ *  \brief   User-settings data management and persistence
+ *
+ *  GblSettings provides a mechanism through which user
+ *  and application settings can be accessed uniformly
+ *  and serialized and deserialized from some common
+ *  format.
+ *
+ *  \sa GblSettingsClass
+ */
 GBL_INSTANCE_DERIVE(GblSettings, GblObject)
     GblStringRef*       pPath;
     GblStringRef*       pAppName;
@@ -49,6 +74,7 @@ GBL_INSTANCE_DERIVE(GblSettings, GblObject)
     GblBool             dirty;
 GBL_INSTANCE_END
 
+//! \cond
 GBL_PROPERTIES(GblSettings,
    (appName, GBL_GENERIC, (READ, WRITE), GBL_STRING_TYPE),
    (orgName, GBL_GENERIC, (READ, WRITE), GBL_STRING_TYPE),
@@ -65,6 +91,7 @@ GBL_SIGNALS(GblSettings,
     (saved,   (receiver, GBL_INSTANCE_TYPE), (result, GBL_ENUM_TYPE)),
     (loaded,  (receiver, GBL_INSTANCE_TYPE), (result, GBL_ENUM_TYPE))
 )
+//! \endcond
 
 GBL_EXPORT GblType      GblSettings_type          (void)                                                   GBL_NOEXCEPT;
 

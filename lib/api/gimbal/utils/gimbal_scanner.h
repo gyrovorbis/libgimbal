@@ -6,7 +6,8 @@
  *      - write own scanf() implementation that knows how
  *        many characters have been read
  *
- *  \author Falco Girgis
+ *  \author 2023 Falco Girgis
+ *  \copyright MIT License
  */
 #ifndef GIMBAL_SCANNER_H
 #define GIMBAL_SCANNER_H
@@ -15,10 +16,15 @@
 #include "../strings/gimbal_pattern.h"
 #include "../meta/signals/gimbal_signal.h"
 
-#define GBL_SCANNER_TYPE                (GBL_TYPEOF(GblScanner))
-#define GBL_SCANNER(self)               (GBL_INSTANCE_CAST(self, GblScanner))
-#define GBL_SCANNER_CLASS(klass)        (GBL_CLASS_CAST(klass, GblScanner))
-#define GBL_SCANNER_GET_CLASS(self)     (GBL_INSTANCE_GET_CLASS(self, GblScanner))
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
+#define GBL_SCANNER_TYPE            (GBL_TYPEOF(GblScanner))                    //!< Type UUID for GblScanner
+#define GBL_SCANNER(self)           (GBL_INSTANCE_CAST(self, GblScanner))       //!< Function-style cast for GblInstance
+#define GBL_SCANNER_CLASS(klass)    (GBL_CLASS_CAST(klass, GblScanner))         //!< Function-style cast for GblClass
+#define GBL_SCANNER_GET_CLASS(self) (GBL_INSTANCE_GET_CLASS(self, GblScanner))  //!< Get a GblScannerClass from GblInstance
+//! @}
 
 #define GBL_SCANNER_DELIMETERS_DEFAULT  "[ \t\n\r]"
 
@@ -49,15 +55,36 @@ GBL_DECLARE_STRUCT(GblScannerCursor) {
     size_t length;
 };
 
+/*! \struct GblScannerClass
+ *  \extends GblObjectClass
+ *  \brief GblClass VTable structure for GblScanner
+ *
+ *  GblScannerClass provides a virtual function table for
+ *  polymorphically overriding the tokenization logic.
+ *
+ *  \sa GblScanner
+ */
 GBL_CLASS_DERIVE(GblScanner, GblObject)
+//! Called every time the next token is to be extracted from the stream
     GBL_RESULT (*pFnNextToken)(GBL_SELF, GblStringView* pToken);
 GBL_CLASS_END
 
+/*! \struct GblScanner
+ *  \extends GblObject
+ *  \ingroup utils
+ *  \brief Generic text stream scanner object
+ *
+ *  GblScanner offers a generic way to scan through a stream
+ *  of text, parsing its contents into variables of any type
+ *  supported by the type system.
+ *
+ *  \sa GblScannerClass
+ */
 GBL_INSTANCE_DERIVE(GblScanner, GblObject)
-    GblStringView     token;
-    GblStringView     next;
-    GblStringRef*     pError;
-    GBL_SCANNER_FLAGS status;
+    GblStringView     token;    //!< Current token in the stream
+    GblStringView     next;     //!< Peeked-at next token in the stream
+    GblStringRef*     pError;   //!< Pending error message
+    GBL_SCANNER_FLAGS status;   //!< Status after the last operation
 GBL_INSTANCE_END
 
 //! \cond

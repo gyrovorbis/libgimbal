@@ -4,19 +4,24 @@
  *  \todo
  *   - finish me
  *
- *   \author Falco Girgis
+ *   \author 2023 Falco Girgis
+ *   \copyright MIT License
  */
-
 #ifndef GIMBAL_EXCEPTION_H
 #define GIMBAL_EXCEPTION_H
 
 #include "gimbal_thread.h"
 #include "../meta/instances/gimbal_object.h"
 
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
 #define GBL_EXCEPTION_TYPE              (GBL_TYPEOF(GblException))
 #define GBL_EXCEPTION(self)             (GBL_INSTANCE_CAST(self, GblException))
 #define GBL_EXCEPTION_CLASS(klass)      (GBL_CLASS_CAST(klass, GblException))
 #define GBL_EXCEPTION_GET_CLASS(self)   (GBL_INSTANCE_GET_CLASS(self, GblException))
+//! @}
 
 #define GBL_TRY
 #define GBL_THROW(type, ...)
@@ -29,6 +34,12 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblException);
 
+/*! \struct GblExceptionClass
+ *  \extends GblObjectClass
+ *  \brief GblClass VTable structure for GblException
+ *
+ *  \sa GblException
+ */
 GBL_CLASS_DERIVE(GblException, GblObject)
     GBL_RESULT (*pFnResultString)(GBL_CSELF,
                                   GblEnum      result,
@@ -36,6 +47,12 @@ GBL_CLASS_DERIVE(GblException, GblObject)
     GblType     resultType;
 GBL_CLASS_END
 
+/*! \struct GblException
+ *  \extends GblObject
+ *  \ingroup core
+ *  \brief Object containing an application error and its context
+ *  \sa GblExceptionClass
+ */
 GBL_INSTANCE_DERIVE(GblException, GblObject)
     GblEnum       result;
     GblStringRef* pMessage;

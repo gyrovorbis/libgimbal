@@ -60,7 +60,7 @@ GBL_DECLARE_FLAGS(GBL_LOG_FLAGS) {
 
 /*! \struct  GblLoggerClass
  *  \extends GblObjectClass
- *  \brief   GblClsss vtable for GblLogger
+ *  \brief   GblClass vtable for GblLogger
  *
  *  GblLoggerClass provides virtual methods for imlpementing
  *  a logger back-end. These include push/pop operations for

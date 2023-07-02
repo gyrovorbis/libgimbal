@@ -59,7 +59,7 @@
 GBL_DECLS_BEGIN
 
 //! Represents a month of the 12-month year
-typedef enum GblMonth {
+GBL_DECLARE_ENUM(GblMonth) {
     GBL_MONTH_JANUARY = 1,  //!< January
     GBL_MONTH_FEBRUARY,     //!< February
     GBL_MONTH_MARCH,        //!< March
@@ -73,10 +73,10 @@ typedef enum GblMonth {
     GBL_MONTH_NOVEMBER,     //!< November
     GBL_MONTH_DECEMBER,     //!< December
     GBL_MONTH_COUNT = 12    //!< Months/Year
-} GblMonth;
+};
 
 //! Represents a day of the 7-day week
-typedef enum GblWeekDay {
+GBL_DECLARE_ENUM(GblWeekDay) {
     GBL_WEEK_DAY_SUNDAY,    //!< Sunday
     GBL_WEEK_DAY_MONDAY,    //!< Monday
     GBL_WEEK_DAY_TUESDAY,   //!< Tuesday
@@ -85,7 +85,7 @@ typedef enum GblWeekDay {
     GBL_WEEK_DAY_FRIDAY,    //!< Friday
     GBL_WEEK_DAY_SATURDAY,  //!< Saturday
     GBL_WEEK_DAY_COUNT      //!< Days/Week
-} GblWeekDay;
+};
 
 typedef int32_t GblYear;        //!< Represents a calendar year
 typedef int32_t GblDay;         //!< Represents a 24-hour day within a month (0-31)

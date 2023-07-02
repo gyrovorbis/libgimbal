@@ -2,9 +2,9 @@
  *  \brief Grouping of parsable command-line options
  *  \ingroup utils
  *
- *  \author Falco Girgis
+ *  \author 2023 Falco Girgis
+ *  \copyright MIT License
  */
-
 #ifndef GIMBAL_OPTION_GROUP_H
 #define GIMBAL_OPTION_GROUP_H
 
@@ -13,10 +13,15 @@
 #include "../strings/gimbal_string_list.h"
 #include "gimbal_version.h"
 
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
 #define GBL_OPTION_GROUP_TYPE                   (GBL_TYPEOF(GblOptionGroup))
 #define GBL_OPTION_GROUP(instance)              (GBL_INSTANCE_CAST(instance, GblOptionGroup))
 #define GBL_OPTION_GROUP_CLASS(klass)           (GBL_CLASS_CAST(klass, GblOptionGroup))
 #define GBL_OPTION_GROUP_GET_CLASS(instance)    (GBL_INSTANCE_GET_CLASS(instance, GblOptionGroup))
+//! @}
 
 #define GBL_SELF_TYPE GblOptionGroup
 
@@ -68,18 +73,33 @@ GBL_DECLARE_STRUCT(GblOption) {
     GblFlags        flags;
 };
 
+/*! \struct GblOptionGroupClass
+ *  \extends GblObjectClass
+ *  \brief GblClass structure for GblOptionGroup
+ *
+ *  GblOptionGroupClass provides polymorphic virtual
+ *  functions for customizing the overall behavior of the
+ *  parser as well as the behavior for parsing individual
+ *  options.
+ *
+ *  \sa GblOptionGroup
+ */
 GBL_CLASS_DERIVE(GblOptionGroup, GblObject)
     GBL_RESULT (*pFnParse) (GBL_SELF, GblStringList* pList);
     GBL_RESULT (*pFnTry)   (GBL_SELF, GblStringView key, GblStringView value, size_t * pUsed);
 GBL_CLASS_END
 
-/*! \brief Grouping of command-line options
+/*! \struct  GblOptionGroup
+ *  \extends GblObject
+ *  \brief   Grouping of command-line options
  *  \ingroup utils
+ *
  *  GblOptionGroup represents a collection of configurable
  *  command-line options, which may be parsed directly or
  *  added to a top-level GblCmdParser. Options are divided
  *  into groups so that each module within an application
  *  can manage its own options independently.
+ *
  *  \sa GblCmdParser
  */
 GBL_INSTANCE_DERIVE(GblOptionGroup, GblObject)

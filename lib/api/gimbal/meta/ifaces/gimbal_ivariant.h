@@ -74,7 +74,7 @@ typedef struct GblIVariantClassVTable {
 } GblIVariantClassVTable;
 
 /*! \struct GblIVariantClass
- *  \inherits GblInterface
+ *  \extends GblInterface
  *  \brief GblInterface for GblVariant type compatibilty
  *
  *  GblIVariantClass represents an interface that must
