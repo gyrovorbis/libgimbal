@@ -476,7 +476,6 @@ GBL_EXPORT GblType GblContext_type(void) {
         .pInterfaceMap    = ifaceEntries
     };
 
-
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
 

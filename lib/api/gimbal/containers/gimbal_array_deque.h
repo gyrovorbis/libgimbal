@@ -55,6 +55,7 @@ GBL_DECLS_BEGIN
  *  at        |0.004 ms    |0.008 ms
  *  pushBack  |0.030 ms    |0.030 ms
  *  pushFront |0.116 ms    |0.027 ms
+ *
  *  \note
  *  This container can be seen as a slightly more specific,
  *  more optimized version of C++'s std::deque. A std::deque

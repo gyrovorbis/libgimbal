@@ -6,11 +6,6 @@
  *  \author Falco Girgis
  */
 
-/*! \defgroup preprocessor Preprocessor
- *  \brief Platform defines, utility macros, preprocessor generators and primitives
- *
- */
-
 #ifndef GIMBAL_MACRO_UTILS_H
 #define GIMBAL_MACRO_UTILS_H
 

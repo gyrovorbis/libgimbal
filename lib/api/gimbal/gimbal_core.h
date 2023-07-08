@@ -19,4 +19,27 @@
 #include "core/gimbal_module.h"
 #include "core/gimbal_logger.h"
 
+/*! \defgroup core Core
+    \brief Core framework module
+
+    The core module provides:
+    - platform-specific macros and utilities
+    - error and exception handling
+    - debug and verification utilities
+    - structured logging with filtering
+    - object-oriented threading and concurrency model
+
+    Typically this is pulled in by just using `#include <gimbal/core.h>`.
+
+    The following table provides an index of some of the core APIs:
+
+    |Type        | Purpose                  |
+    |------------|--------------------------|
+    |GblException|Unified error handling    |
+    |GblLogger   |Generic logging mechanism |
+    |GblThread   |Low-level concurrency     |
+    |GblModule   |Module system             |
+    |GblApp      |Main application object   |
+*/
+
 #endif // GIMBAL_CORE_H

@@ -1,6 +1,6 @@
 /*! \file
- *  \brief GblLogger filterable log and logging macros
- *  \ingroup core
+ *  \brief      GblLogger filterable log and logging macros
+ *  \ingroup    core
  *
  *  This file provides the public API for creating and
  *  managing custom logger types as well as the utility
@@ -8,7 +8,8 @@
  *
  *  \todo migrate away from GblThd and towards GblThread
  *
- *  \author Falco Girgis
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 
 #ifndef GIMBAL_LOGGER_H
@@ -18,10 +19,15 @@
 #include "../meta/instances/gimbal_object.h"
 #include "../containers/gimbal_linked_list.h"
 
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
 #define GBL_LOGGER_TYPE                   (GBL_TYPEOF(GblLogger))                   //!< Type UUID for GblLogger
 #define GBL_LOGGER(self)                  (GBL_INSTANCE_CAST(self, GblLogger))      //!< Function-style cast to GblLogger
 #define GBL_LOGGER_CLASS(klass)           (GBL_CLASS_CAST(klass, GblLogger))        //!< Function-style cast to GblLoggerClass
 #define GBL_LOGGER_GET_CLASS(self)        (GBL_INSTANCE_GET_CLASS(self, GblLogger)) //!< Get GblLoggerClass from GblLogger
+//! @}
 
 /*! \name Logging Macros
  *  \brief    Top-level macros used with logging system

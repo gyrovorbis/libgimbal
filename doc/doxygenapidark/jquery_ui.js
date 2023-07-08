@@ -103,6 +103,9 @@ $(function() {
         $("#nav-tree").css("height","Calc(100vh - 174px");
         $("#side-nav").css("height","100%");
 
+        // Hide right-side artifact from anonymous unions
+        $(".memItemRight:empty:nth-of-type(3)").hide();
+
         $("body").fadeIn(250,function() {
 
         });

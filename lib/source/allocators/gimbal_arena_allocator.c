@@ -184,3 +184,75 @@ GBL_EXPORT GBL_RESULT GblArenaAllocator_loadState(GblArenaAllocator* pSelf, cons
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblArenaAllocator_IAllocator_alloc_(GblIAllocator*       pIAllocator,
+                                           const GblStackFrame* pFrame,
+                                           size_t               size,
+                                           size_t               align,
+                                           const char*          pDbgStr,
+                                           void**               ppData)
+{
+    GblArenaAllocator* pSelf = GBL_ARENA_ALLOCATOR(pIAllocator);
+
+    *ppData = GblArenaAllocator_alloc(pSelf, size, align);
+
+    return GBL_RESULT_SUCCESS;
+}
+
+static GBL_RESULT GblArenaAllocator_IAllocator_realloc_(GblIAllocator*       pIAllocator,
+                                                        const GblStackFrame* pFrame,
+                                                        void*                pData,
+                                                        size_t               newSize,
+                                                        size_t               newAlign,
+                                                        void**               ppNewData)
+{
+    GblArenaAllocator* pSelf = GBL_ARENA_ALLOCATOR(pIAllocator);
+
+    *ppNewData = GblArenaAllocator_alloc(pSelf, newSize, newAlign);
+
+    return GBL_RESULT_SUCCESS;
+}
+
+static GBL_RESULT GblArenaAllocator_IAllocator_free_(GblIAllocator*       pIAllocator,
+                                                     const GblStackFrame* pFrame,
+                                                     void*                pData)
+{
+    return GBL_RESULT_UNIMPLEMENTED;
+}
+
+static GBL_RESULT GblArenaAllocatorClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
+    GBL_IALLOCATOR_CLASS(pClass)->pFnAlloc   = GblArenaAllocator_IAllocator_alloc_;
+    GBL_IALLOCATOR_CLASS(pClass)->pFnRealloc = GblArenaAllocator_IAllocator_realloc_;
+    GBL_IALLOCATOR_CLASS(pClass)->pFnFree    = GblArenaAllocator_IAllocator_free_;
+    return GBL_RESULT_SUCCESS;
+}
+
+GBL_EXPORT GblType GblArenaAllocator_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    static GblTypeInterfaceMapEntry ifaceEntries[] = {
+        {
+            .classOffset = offsetof(GblArenaAllocatorClass, GblIAllocatorImpl)
+        }
+    };
+
+    const static GblTypeInfo info = {
+        .pFnClassInit   = GblArenaAllocatorClass_init_,
+        .classSize      = sizeof(GblArenaAllocatorClass),
+        .instanceSize   = sizeof(GblArenaAllocator),
+        .interfaceCount = 1,
+        .pInterfaceMap  = ifaceEntries
+    };
+
+    if(type == GBL_INVALID_TYPE) {
+        ifaceEntries[0].interfaceType = GBL_IALLOCATOR_TYPE;
+
+        type = GblType_registerStatic(GblQuark_internStringStatic("GblArenaAllocator"),
+                                      GBL_OBJECT_TYPE,
+                                      &info,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+
+    }
+
+    return type;
+}
+

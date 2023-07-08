@@ -120,24 +120,6 @@ language, and any langauge which can provide glue code to a C API.
 	\endcode
 */
 
-
-/*! \defgroup meta Type System
-* 	\brief Object-oriented, cross-language runtime type system
-
-*/
-
-/*! \defgroup utils Utilities
-	\brief Auxiliary utility types
-	\copydoc Utilities
-
-
-*/ 
-
-/*! \defgroup core Core
-	\brief Core framework module
-	\copydoc Core 
-*/ 
-
 /*! \defgroup metaBuiltinTypes Builtin Types
 	\brief Meta types that are already built into libGimbal
  *  \ingroup meta

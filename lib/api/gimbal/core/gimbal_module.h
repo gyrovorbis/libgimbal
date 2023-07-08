@@ -7,8 +7,8 @@
  *      - rig up option group parsery
  *      - stop inheriting GblContext
  *
- *  \author 2023 Falco Girgis
- *  \copyright MIT License
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 #ifndef GIMBAL_MODULE_H
 #define GIMBAL_MODULE_H
@@ -40,10 +40,10 @@ GBL_FORWARD_DECLARE_STRUCT(GblModule);
 //! Function callback used with GblModule_foreach() for iterating over active modules
 typedef GblBool (*GblModuleIterFn)(GblModule* pIt, void* pClosure);
 
-/*! \struct GblModuleClass
- *  \extends GblContextClass
+/*! \struct     GblModuleClass
+ *  \extends    GblContextClass
  *  \implements GblIPluginClass
- *  \brief GblClass structure for GblModule
+ *  \brief      GblClass structure for GblModule
  *
  *  Virtual method table for GblModule
  *  - inherits from GblContext
@@ -53,12 +53,12 @@ typedef GblBool (*GblModuleIterFn)(GblModule* pIt, void* pClosure);
  *  \sa GblModule
  */
 GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
-    GBL_RESULT (*pFnLoad)  (GBL_SELF); //!< Called when a GblModule  is first loaded
+    GBL_RESULT (*pFnLoad)  (GBL_SELF); //!< Called when a GblModule is first loaded
     GBL_RESULT (*pFnUnload)(GBL_SELF); //!< Called after the GblModule is done being referenced
 GBL_CLASS_END
 
 /*! \struct     GblModule
- *  \ingroup    metaBuiltinTypes
+ *  \ingroup    core
  *  \extends    GblContext
  *  \implements GblIPlugin
  *  \brief      Dynamically loadable service and associated meta types

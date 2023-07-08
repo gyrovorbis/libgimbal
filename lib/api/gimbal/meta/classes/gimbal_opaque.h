@@ -1,15 +1,14 @@
 /*! \file
- *  \brief GblOpaqueClass and API for managing Opaque types
- *  \ingroup meta
+ *  \brief      GblOpaqueClass and API for managing Opaque types
+ *  \ingroup    meta
  *
- *  \author 2023 Falco Girgis
- *  \copyright MIT License
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 #ifndef GIMBAL_OPAQUE_H
 #define GIMBAL_OPAQUE_H
 
 #include "gimbal_primitives.h"
-
 
 /*! \name Type System
  *  \brief Type UUID and cast macros
@@ -40,7 +39,7 @@ typedef struct GblOpaqueClassVTable {
  *  to the implementation details.
  */
 GBL_CLASS_DERIVE(GblOpaque, GblPrimitive)
-    const GblOpaqueClassVTable* pVTable;
+    const GblOpaqueClassVTable* pVTable; //!< Pointer to the virtual table structure
 GBL_CLASS_END
 
 /*! \name Static Methods

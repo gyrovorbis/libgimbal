@@ -5,12 +5,23 @@
  *
  *  \author Falco Girgis
  */
-
 #ifndef GIMBAL_ARENA_ALLOCATOR_H
 #define GIMBAL_ARENA_ALLOCATOR_H
 
 #include "../containers/gimbal_linked_list.h"
+#include "../meta/instances/gimbal_object.h"
+#include "../meta/ifaces/gimbal_iallocator.h"
 #include "../core/gimbal_result.h"
+
+/*! \name  Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
+#define GBL_ARENA_ALLOCATOR_TYPE            (GBL_TYPEOF(GblArenaAllocator))                   //!< Type UUID for GblArenaAllocator
+#define GBL_ARENA_ALLOCATOR(self)           (GBL_INSTANCE_CAST(self, GblArenaAllocator))      //!< Cast a GblInstance to GblArenaAllocator
+#define GBL_ARENA_ALLOCATOR_CLASS(klass)    (GBL_CLASS_CAST(klass, GblArenaAllocator))        //!< Cast a GblClass to GblArenaAllocatorClass
+#define GBL_ARENA_ALLOCATOR_GET_CLASS(self) (GBL_INSTANCE_GET_CLASS(self, GblArenaAllocator)) //!< Get a GblArenaAllocatorClass from a GblInstance
+//! @}
 
 #define GBL_SELF_TYPE GblArenaAllocator
 
@@ -32,7 +43,7 @@ typedef struct GblArenaAllocatorPage {
         GblLinkedListNode             listNode; ///< Linked list node base
     };
     size_t          capacity;                   ///< Page capacity
-    size_t          used;                       ///< # of bytes filled on page
+    size_t          used;                       ///< Number of bytes filled on page
     union {
         GblBool     staticAlloc;                ///< Whether this page is static or heap allocated
         size_t      padding;
@@ -40,7 +51,22 @@ typedef struct GblArenaAllocatorPage {
     unsigned char bytes[1];                     ///< first byte of data segment
 } GblArenaAllocatorPage;
 
-/*! \brief Arena/zone/region/area-based paged allocator
+/*! \struct     GblArenaAllocatorClass
+ *  \extends    GblObjectClass
+ *  \implements GblIAllocatorClass
+ *  \brief      GblClass structure for GblArenaAllocator
+ *
+ *  No public methods.
+ *
+ *  \sa GblArenaAllocator
+ */
+GBL_CLASS_DERIVE_EMPTY(GblArenaAllocator, GblObject, GblIAllocator);
+
+/*! \struct     GblArenaAllocator
+ *  \extends    GblObject
+ *  \implements GblIAllocator
+ *  \ingroup    dataTypes
+ *  \brief      Arena/zone/region/area-based paged allocator
  *
  *  GblArenaAllocator is a custom allocator which is useful
  *  for when you are allocating a bunch of data dynamically
@@ -53,16 +79,17 @@ typedef struct GblArenaAllocatorPage {
  *  can be SUBSTANTIALLY faster than calling malloc() or
  *  new for backing data structures with such allocation
  *  patterns.
+ *
  *  \note
  *  It's often useful to create the first allocation page
  *  as a static buffer somewhere in a source file, so that
  *  heap memory isn't even used until it's necessary. Be sure
  *  to set the GblArenaAllocatorPage::staticAlloc flag to
  *  ensure the allocator does not attempt to free it!
- *  \ingroup dataTypes
+ *
  *  \sa GblArenaAllocatorPage, GblPoolAllocator
  */
-typedef struct GblArenaAllocator {
+GBL_INSTANCE_DERIVE(GblArenaAllocator, GblObject)
     union {
         GblArenaAllocatorPage* pActivePage; ///< Active (unfilled) page at list head
         GblLinkedListNode      listNode;    ///< Linked list node base
@@ -71,7 +98,7 @@ typedef struct GblArenaAllocator {
     size_t      pageSize;                   ///< Default page size for all new pages
     size_t      pageAlign;                  ///< Alignment of each page, also maximum requestable alignment
     size_t      allocCount;                 ///< Total # of allocations across all pages
-} GblArenaAllocator;
+GBL_INSTANCE_END
 
 /*! \brief Represents the current state of a GblArenaAllocator
  *
@@ -84,12 +111,15 @@ typedef struct GblArenaAllocator {
  *  This is useful for wanting to make temporary
  *  use of an arena's resources, allowing you to
  *  free them when you're done.
+ *
  *  \sa GblArenaAllocator GblArenaAllocatorPage
  */
 typedef struct GblArenaAllocatorState {
     GblArenaAllocatorPage* pActivePage;
     size_t                 bytesUsed;
 } GblArenaAllocatorState;
+
+GBL_EXPORT GblType    GblArenaAllocator_type            (void)                                           GBL_NOEXCEPT;
 
 // ===== Public methods =====
 GBL_EXPORT GBL_RESULT GblArenaAllocator_construct       (GBL_SELF,

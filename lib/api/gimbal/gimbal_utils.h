@@ -21,4 +21,8 @@
 #include "utils/gimbal_uri.h"
 #include "utils/gimbal_settings.h"
 
+/*! \defgroup utils Utilities
+    \brief Auxiliary utility types
+*/
+
 #endif // GIMBAL_UTILS_H

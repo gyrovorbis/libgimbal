@@ -43,4 +43,8 @@
 #include "meta/types/gimbal_type.h"
 #include "meta/types/gimbal_variant.h"
 
+/*! \defgroup meta Type System
+ * 	\brief Object-oriented, cross-language runtime type system
+ */
+
 #endif // GIMBAL_META_H

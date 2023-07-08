@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #define GBL_CLASS_IMPL_INTERFACE(iface) \
+    /*! Embedded interface class structure */ \
     iface##Class iface##Impl;
 
 #define GBL_CLASS_DERIVE_N(instance, baseKlass, ...) \
@@ -35,6 +36,7 @@ extern "C" {
     struct instance##Class;                         \
     typedef struct instance##Class instance##Class; \
     struct instance##Class {                        \
+        /*! Inherited base class structure */    \
         baseInstance##Class   base;
 
 #define GBL_CLASS_DERIVE_1(instance) \
@@ -72,6 +74,7 @@ extern "C" {
     struct klass;                                           \
     typedef struct klass klass;                             \
     struct klass {                                          \
+        /*! Inherited base class instance */                \
         baseKlass base;
 
 #define GBL_INTERFACE_DERIVE_2(instance, klass) \
@@ -90,17 +93,21 @@ extern "C" {
     typedef struct derivedInstance derivedInstance;         \
     struct derivedInstance {                                \
         union {                                             \
+            /*! Pointer to class/vtable structure */        \
             derivedInstance##Class* pClass;                 \
+            /*! Inherited base instance structure */        \
             baseInstance            base;                   \
         };
 
-#define GBL_INSTANCE_BASE(instance)     \
-    struct instance;                    \
-    typedef struct instance instance;   \
-    struct instance {                   \
-        union {                         \
-            instance##Class* pClass;    \
-            GblInstance      base;      \
+#define GBL_INSTANCE_BASE(instance)                 \
+    struct instance;                                \
+    typedef struct instance instance;               \
+    struct instance {                               \
+        union {                                     \
+            /*! Pointer to class/vtable structure */\
+            instance##Class* pClass;                \
+            /*! Inherited base instance structure */\
+            GblInstance      base;                  \
         };
 
 #define GBL_INSTANCE_BASE_EMPTY(instance)   \
@@ -172,7 +179,7 @@ extern "C" {
 
 #define GBL_PRIVATE()       struct {
 
-#define GBL_PRIVATE_END }   private_;
+#define GBL_PRIVATE_END     } private_; //!< Private data structure
 
 #define GBL_PRIV(a)         (a).private_
 #define GBL_PRIV_REF(a)     (a)->private_
@@ -228,7 +235,7 @@ extern "C" {
 // === ENUMERATION AUTOGENERATION ===========
 
 #define GBL_ENUM_TABLE_DECL_ENUM(cName, value, name, string) \
-    cName = value,
+    cName = value,  //!< string
 
 
 #define GBL_ENUM_TABLE_DECLARE(table) \
