@@ -22,13 +22,13 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_MODULE_TYPE                 (GBL_TYPEOF(GblModule))
-#define GBL_MODULE(instance)            (GBL_INSTANCE_CAST(instance,  GblModule))
-#define GBL_MODULE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblModule))
-#define GBL_MODULE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblModule))
+#define GBL_MODULE_TYPE                 (GBL_TYPEOF(GblModule))                      //!< Type UUID for GblModule
+#define GBL_MODULE(instance)            (GBL_INSTANCE_CAST(instance,  GblModule))    //!< Function-style GblInstance cast
+#define GBL_MODULE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblModule))           //!< Function-style GblClass cast
+#define GBL_MODULE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblModule))//!< Gets a GblModuleClass from GblInstance
 //! @}
 
-#define GBL_REQUIRE(...)                GBL_REQUIRE_(__VA_ARGS__)
+#define GBL_REQUIRE(...)                GBL_REQUIRE_(__VA_ARGS__)   //!< Returns the module for the given type
 
 #define GBL_SELF_TYPE                   GblModule
 
@@ -37,6 +37,7 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblOptionGroup);
 GBL_FORWARD_DECLARE_STRUCT(GblModule);
 
+//! Function callback used with GblModule_foreach() for iterating over active modules
 typedef GblBool (*GblModuleIterFn)(GblModule* pIt, void* pClosure);
 
 /*! \struct GblModuleClass
@@ -52,8 +53,8 @@ typedef GblBool (*GblModuleIterFn)(GblModule* pIt, void* pClosure);
  *  \sa GblModule
  */
 GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
-    GBL_RESULT  (*pFnLoad)  (GBL_SELF); //!< Called when a GblModule  is first loaded
-    GBL_RESULT  (*pFnUnload)(GBL_SELF); //!< Called after the GblModule is done being referenced
+    GBL_RESULT (*pFnLoad)  (GBL_SELF); //!< Called when a GblModule  is first loaded
+    GBL_RESULT (*pFnUnload)(GBL_SELF); //!< Called after the GblModule is done being referenced
 GBL_CLASS_END
 
 /*! \struct     GblModule
@@ -72,13 +73,15 @@ GBL_CLASS_END
  *  \sa GbModuleClass
  */
 GBL_INSTANCE_DERIVE(GblModule, GblContext)
-    GblVersion      version;
-    GblStringRef*   pPrefix;
-    GblStringRef*   pAuthor;
-    GblStringRef*   pDescription;
-    GblOptionGroup* pOptionGroup;
+    GblVersion      version;        //!< Version of a module
+    GblStringRef*   pPrefix;        //!< Namespace prefix of a module
+    GblStringRef*   pAuthor;        //!< Author(s) of a module
+    GblStringRef*   pDescription;   //!< Description of a module
+    GblOptionGroup* pOptionGroup;   //!< Command-line option handler of a module
 GBL_INSTANCE_END
 
+
+//! \cond
 GBL_PROPERTIES(GblModule,
     (prefix,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
     (version,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_UINT32_TYPE),
@@ -87,6 +90,7 @@ GBL_PROPERTIES(GblModule,
     (useCount,    GBL_GENERIC, (READ),                    GBL_INT16_TYPE),
     (typeCount,   GBL_GENERIC, (READ),                    GBL_SIZE_TYPE)
 )
+//! \cond
 
 // ===== Static/Service API =====
 GBL_EXPORT GblType     GblModule_type         (void)                     GBL_NOEXCEPT;

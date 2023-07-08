@@ -6,8 +6,8 @@
  *      - write own scanf() implementation that knows how
  *        many characters have been read
  *
- *  \author 2023 Falco Girgis
- *  \copyright MIT License
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 #ifndef GIMBAL_SCANNER_H
 #define GIMBAL_SCANNER_H
@@ -26,6 +26,7 @@
 #define GBL_SCANNER_GET_CLASS(self) (GBL_INSTANCE_GET_CLASS(self, GblScanner))  //!< Get a GblScannerClass from GblInstance
 //! @}
 
+//! Default delimeters used with GblScanner for tokenizing the input stream
 #define GBL_SCANNER_DELIMETERS_DEFAULT  "[ \t\n\r]"
 
 #define GBL_SELF_TYPE GblScanner
@@ -48,16 +49,17 @@ GBL_DECLARE_ENUM(GBL_SCANNER_FLAGS) {
     GBL_SCANNER_ERROR      = 0xff000000,
 };
 
-GBL_DECLARE_STRUCT(GblScannerCursor) {
-    size_t position;
-    size_t line;
-    size_t column;
-    size_t length;
-};
+//! Represents the current region of interest for a GblScanner
+typedef struct GblScannerCursor {
+    size_t position;    //!< Current character position
+    size_t line;        //!< Current line number
+    size_t column;      //!< Current column number
+    size_t length;      //!< Length of current region of interest
+} GblScannerCursor;
 
-/*! \struct GblScannerClass
+/*! \struct  GblScannerClass
  *  \extends GblObjectClass
- *  \brief GblClass VTable structure for GblScanner
+ *  \brief   GblClass VTable structure for GblScanner
  *
  *  GblScannerClass provides a virtual function table for
  *  polymorphically overriding the tokenization logic.
@@ -65,14 +67,14 @@ GBL_DECLARE_STRUCT(GblScannerCursor) {
  *  \sa GblScanner
  */
 GBL_CLASS_DERIVE(GblScanner, GblObject)
-//! Called every time the next token is to be extracted from the stream
+    //! Called every time the next token is to be extracted from the stream
     GBL_RESULT (*pFnNextToken)(GBL_SELF, GblStringView* pToken);
 GBL_CLASS_END
 
-/*! \struct GblScanner
+/*! \struct  GblScanner
  *  \extends GblObject
  *  \ingroup utils
- *  \brief Generic text stream scanner object
+ *  \brief   Generic text stream scanner object
  *
  *  GblScanner offers a generic way to scan through a stream
  *  of text, parsing its contents into variables of any type

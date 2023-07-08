@@ -10,10 +10,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define GBL_TRUE                1
-#define GBL_FALSE               0
-#define GBL_INDEX_INVALID       SIZE_MAX
-#define GBL_NPOS                ((size_t )-1)
+#define GBL_TRUE            1
+#define GBL_FALSE           0
+#define GBL_INDEX_INVALID   SIZE_MAX
+#define GBL_NPOS            ((size_t )-1)
 
 // ======== Primitive Types ==========
 
@@ -38,14 +38,15 @@ typedef uint32_t    GblFlags;       //!< Standard-sized flags type, 32-bits acro
 
 // ==========  Auxiliary Types ==========
 
-typedef uint32_t    GblHash;
-typedef uint16_t    GblRefCount;
+typedef uint32_t    GblHash;        //!< Type representing a calculated numeric hash across the codebase
+typedef uint16_t    GblRefCount;    //!< Type able to hold a reference counter across the codebase
 
-typedef void (*GblFnPtr)();
+typedef void (*GblFnPtr)(); //!< Type used for holding an untyped function pointer
 
+//! Union for SAFELY holding untyped data or function pointers
 typedef union GblPtr {
-    void*    pData;
-    GblFnPtr pFunc;
+    void*    pData; //!< Data pointer
+    GblFnPtr pFunc; //!< Function pointer
 } GblPtr;
 
 

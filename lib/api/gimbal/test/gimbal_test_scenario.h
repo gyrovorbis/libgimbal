@@ -2,18 +2,23 @@
  *  \brief GblTestScenario and related functions.
  *  \ingroup testing
  *
- *  \author Falco Girgis
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 #ifndef GIMBAL_TEST_SCENARIO_H
 #define GIMBAL_TEST_SCENARIO_H
 
 #include "../meta/instances/gimbal_context.h"
 
+/*! \name Type System
+ *  \brief Type UUID and cast operators
+ *  @{
+ */
 #define GBL_TEST_SCENARIO_TYPE                (GBL_TYPEOF(GblTestScenario))
-
 #define GBL_TEST_SCENARIO(instance)           (GBL_INSTANCE_CAST(instance, GblTestScenario))
 #define GBL_TEST_SCENARIO_CLASS(klass)        (GBL_CLASS_CAST(klass, GblTestScenario))
 #define GBL_TEST_SCENARIO_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblTestScenario))
+//! @}
 
 #define GBL_SELF_TYPE GblTestScenario
 
@@ -22,16 +27,36 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblTestScenario);
 GBL_FORWARD_DECLARE_STRUCT(GblTestSuite);
 
+/*! \struct  GblTestScenarioClass
+ *  \extends GblContextClass
+ *  \brief   GblClass VTable structure for a GblTestScenario
+ *
+ *  Provides a series of overridable virtual methods for looking
+ *  up into individual GblTestSuites and executing them. This allows
+ *  for mapping to a custom back-end that doesn't use GblTestSuite
+ *  objects.
+ *
+ *  \sa GblTestScenario
+ */
 GBL_CLASS_DERIVE(GblTestScenario, GblContext)
-    GBL_RESULT  (*pFnBegin)     (GBL_SELF);
-    GBL_RESULT  (*pFnEnd)       (GBL_SELF);
-    GBL_RESULT  (*pFnRun)       (GBL_SELF, int argc, char* argv[]);
-    GBL_RESULT  (*pFnSuiteBegin)(GBL_SELF, const GblTestSuite* pSuite);
-    GBL_RESULT  (*pFnSuiteEnd)  (GBL_SELF, const GblTestSuite* pSuite);
+    GBL_RESULT (*pFnBegin)     (GBL_SELF);
+    GBL_RESULT (*pFnEnd)       (GBL_SELF);
+    GBL_RESULT (*pFnRun)       (GBL_SELF, int argc, char* argv[]);
+    GBL_RESULT (*pFnSuiteBegin)(GBL_SELF, const GblTestSuite* pSuite);
+    GBL_RESULT (*pFnSuiteEnd)  (GBL_SELF, const GblTestSuite* pSuite);
 GBL_CLASS_END
 
-/*! \brief Top-level object representing a collection of GblTestSuite objects.
+/*! \struct  GblTestScenario
+ *  \extends GblContext
  *  \ingroup testing
+ *  \brief   Represents a single top-level test object
+ *
+ *  GblTestScenario is the highest-level test object in the
+ *  testing framework, and is logically divided into a series
+ *  of related, yet independently executing GblTestSuite
+ *  objects.
+ *
+ *  \sa GblTestScenarioClass
  */
 GBL_INSTANCE_DERIVE(GblTestScenario, GblContext)
     GBL_RESULT result;

@@ -3,7 +3,7 @@
  *  \ingroup containers
  *
  *  \author Josh Baker
- *  \author Falco Girgis
+ *  \author 2023 Falco Girgis
  */
 
 #ifndef GIMBAL_BTREE_H
@@ -21,23 +21,26 @@ GBL_FORWARD_DECLARE_STRUCT(GblTreeSet);
 typedef int  (*GblTreeSetCompareFn) (GBL_CSELF, const void*, const void*);
 typedef void (*GblTreeSetDestructFn)(GBL_CSELF, void*);
 
+//! Internal structure representing a single node within a GblTreeSet
 typedef struct GblTreeSetNode {
-    uint16_t                    entryCount;
-    GblBool                     leaf;
-    uint8_t                     padding[sizeof(void*)-3];
-    void*                       pEntries;
-    struct GblTreeSetNode*      pChildren[1];
+    uint16_t                entryCount;
+    GblBool                 leaf;
+    uint8_t                 padding[sizeof(void*)-3];
+    void*                   pEntries;
+    struct GblTreeSetNode*  pChildren[1];
 } GblTreeSetNode;
 
+//! Internal structure representing a group of nodes within a GblTreeSet
 typedef struct GblTreeSetGroup {
-    GblTreeSetNode**            ppNodes;
-    size_t                      length;
-    size_t                      capacity;
+    GblTreeSetNode**        ppNodes;
+    size_t                  length;
+    size_t                  capacity;
 } GblTreeSetGroup;
 
+//! Internal structure representing a pool of \ref GblTreeSetGroup items within a GblTreeSet
 typedef struct GblTreeSetPool {
-    GblTreeSetGroup             leaves;
-    GblTreeSetGroup             branches;
+    GblTreeSetGroup         leaves;
+    GblTreeSetGroup         branches;
  } GblTreeSetPool;
 
 /*! \brief Binary tree based abstract associative container with C++-style STL API
@@ -60,6 +63,7 @@ typedef struct GblTreeSet {
     void*                   pUserdata;
 } GblTreeSet;
 
+//! Represents an iterator for iterating over a GblTreeSet
 typedef struct GblTreeSetIterator {
     GblTreeSet*         pContainer;
     GblTreeSetNode*     pNode;

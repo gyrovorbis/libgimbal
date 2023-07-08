@@ -37,14 +37,14 @@ typedef GBL_RESULT (*GblTypeInstanceInitializeFn)   (GblInstance*, GblContext*);
 //! Flags controlling behavior of GblTypes. These can be set at any level in a type heirarchy.
 typedef enum GblTypeFlags {
     GBL_TYPE_FLAGS_NONE             = 0,
-    GBL_TYPE_FLAG_BUILTIN           = (1 << 6),             //!< Type was automatically registered as a builtin type
-    GBL_TYPE_FLAG_TYPEINFO_STATIC   = (1 << 7),             //!< Type's GblTypeInfo specified upon registration is static, so no internal storage has to be allocated for storing a copy
-    GBL_TYPE_FLAG_CLASS_PINNED      = (1 << 8),             //!< Type's GblClass is never destroyed and remains persistent upon construction. The default behavior is to create/destroy as referenced.
-    GBL_TYPE_FLAG_CLASS_PREINIT     = (1 << 9),             //!< Type's GblClass should be constructed immediately, rather than lazily upon use by default. Also implies class pinning.
-    GBL_TYPE_FLAG_UNMAPPABLE        = (1 << 10),            //!< Cannot obtain Type's associated GblInterface from a GblClass it has been mapped to. Disambiguates casting with common interface base classes.
-    GBL_TYPE_FLAG_INCOMPLETE        = (1 << 11),            //!< Incomplete/partial type missing some type dependency
-    GBL_TYPE_FLAG_ABSTRACT          = (1 << 12),            //!< Type cannot be instantiated without being derived
-    GBL_TYPE_FLAG_FINAL             = (1 << 13),            //!< Type cannot be derived from
+    GBL_TYPE_FLAG_BUILTIN           = (1 << 6),     //!< Type was automatically registered as a builtin type
+    GBL_TYPE_FLAG_TYPEINFO_STATIC   = (1 << 7),     //!< Type's GblTypeInfo specified upon registration is static, so no internal storage has to be allocated for storing a copy
+    GBL_TYPE_FLAG_CLASS_PINNED      = (1 << 8),     //!< Type's GblClass is never destroyed and remains persistent upon construction. The default behavior is to create/destroy as referenced.
+    GBL_TYPE_FLAG_CLASS_PREINIT     = (1 << 9),     //!< Type's GblClass should be constructed immediately, rather than lazily upon use by default. Also implies class pinning.
+    GBL_TYPE_FLAG_UNMAPPABLE        = (1 << 10),    //!< Cannot obtain Type's associated GblInterface from a GblClass it has been mapped to. Disambiguates casting with common interface base classes.
+    GBL_TYPE_FLAG_INCOMPLETE        = (1 << 11),    //!< Incomplete/partial type missing some type dependency
+    GBL_TYPE_FLAG_ABSTRACT          = (1 << 12),    //!< Type cannot be instantiated without being derived
+    GBL_TYPE_FLAG_FINAL             = (1 << 13),    //!< Type cannot be derived from
     GBL_TYPE_FLAGS_MASK             = 0xffffffc0
 } GblTypeFlags;
 

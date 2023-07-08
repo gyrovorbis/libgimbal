@@ -58,20 +58,22 @@ GBL_DECLARE_ENUM(GBL_OPTION_TYPE) {
     GBL_OPTION_TYPE_CALLBACK
 };
 
-GBL_DECLARE_UNION(GblOptionPtr) {
-    void*               pData;
-    GblOptionCallbackFn pFn;
-};
+//! Union for SAFELY storing either a data or callback pointer
+typedef union GblOptionPtr {
+    void*               pData;  //!< Data pointer of union
+    GblOptionCallbackFn pFn;    //!< Callback pointer of union
+} GblOptionPtr;
 
-GBL_DECLARE_STRUCT(GblOption) {
-    const char*     pLongName;
-    char            shortName;
-    GBL_OPTION_TYPE type;
-    GblOptionPtr    pOutput;
-    const char*     pDescription;
-    const char*     pValueName;
-    GblFlags        flags;
-};
+//! Describes a single command-line option along with handler info
+typedef struct GblOption {
+    const char*     pLongName;      //!< Long, hyphenated name of option
+    char            shortName;      //!< Shorthanded, single-character name of option (optional)
+    GBL_OPTION_TYPE type;           //!< Data type of the option handler
+    GblOptionPtr    pOutput;        //!< Union for either data or callback pointer
+    const char*     pDescription;   //!< Help description of option
+    const char*     pValueName;     //!< Name of the value associated with the option
+    GblFlags        flags;          //!< Additional flags for the option
+} GblOption;
 
 /*! \struct GblOptionGroupClass
  *  \extends GblObjectClass
@@ -85,8 +87,8 @@ GBL_DECLARE_STRUCT(GblOption) {
  *  \sa GblOptionGroup
  */
 GBL_CLASS_DERIVE(GblOptionGroup, GblObject)
-    GBL_RESULT (*pFnParse) (GBL_SELF, GblStringList* pList);
-    GBL_RESULT (*pFnTry)   (GBL_SELF, GblStringView key, GblStringView value, size_t * pUsed);
+    GBL_RESULT (*pFnParse)(GBL_SELF, GblStringList* pList);
+    GBL_RESULT (*pFnTry)  (GBL_SELF, GblStringView key, GblStringView value, size_t * pUsed);
 GBL_CLASS_END
 
 /*! \struct  GblOptionGroup
