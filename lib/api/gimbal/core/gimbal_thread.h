@@ -63,10 +63,10 @@ GBL_DECLARE_ENUM(GBL_THREAD_STATE) {
     GBL_THREAD_STATE_FINISHED       //!< Finished/Completed
 };
 \
-/*! \struct GblThreadClass
+/*! \struct  GblThreadClass
  *  \extends GblObjectClass
- *  \brief GblClass VTable structure for GblThread
- *  \sa GblThread
+ *  \brief   GblClass VTable structure for GblThread
+ *  \sa      GblThread
  */
 GBL_CLASS_DERIVE(GblThread, GblObject)
 //! Main execution entry point for a given thread, calls callback + closure then signals
@@ -75,11 +75,11 @@ GBL_CLASS_DERIVE(GblThread, GblObject)
     GBL_RESULT  (*pFnSignal)(GBL_SELF, int signal);
 GBL_CLASS_END
 
-/*! \struct GblThread
+/*! \struct  GblThread
  *  \extends GblObject
  *  \ingroup core
- *  \brief Object representing a thread, its local storage, and logic
- *  \sa GblThreadClass
+ *  \brief   Object representing a thread, its local storage, and logic
+ *  \sa      GblThreadClass
  */
 GBL_INSTANCE_DERIVE(GblThread, GblObject)
     GblCallRecord         returnStatus; //!< Return information from a completed thread

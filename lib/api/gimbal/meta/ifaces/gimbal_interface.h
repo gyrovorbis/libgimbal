@@ -143,6 +143,7 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
  */
 
 /*! \page Interfaces Interfaces
+ *  \brief Overview of interfaced types
  *  \tableofcontents
  *
  *  LibGimbal's object model supports the concept of the C# or

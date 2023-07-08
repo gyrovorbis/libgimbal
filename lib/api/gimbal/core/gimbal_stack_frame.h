@@ -17,12 +17,14 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblContext);
 GBL_FORWARD_DECLARE_STRUCT(GblObject);
 
+//! Source code context (file, function, line)
 typedef struct GblSourceLocation {
-    const char*     pFile;
-    const char*     pFunc;
-    size_t          line;
+    const char* pFile;  //!< Current Source file
+    const char* pFunc;  //!< Current function
+    size_t      line;   //!< Current line of code
 } GblSourceLocation;
 
+//! Captures a result, its stringified message, and a source context
 typedef struct GblCallRecord {
     GBL_ALIGNAS(64)
     char                message[GBL_CTX_RESULT_MSG_BUFFER_SIZE];
@@ -30,6 +32,7 @@ typedef struct GblCallRecord {
     GBL_RESULT          result;
 } GblCallRecord;
 
+//! Represents a single function's stack frame, from GBL_CTX_BEGIN() to GBL_CTX_END()
 typedef struct GblStackFrame {
     GBL_ALIGNAS(64)
     GblCallRecord           record;

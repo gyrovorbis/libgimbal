@@ -190,7 +190,7 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
     }
 }
 
-///\cond
+//! \cond
 #define GBL_PROPERTIES_(object, ...)                        \
     GBL_PROPERTIES_IDS_(object, __VA_ARGS__)                \
     GBL_PROPERTIES_REGISTER_DEFINE_(object, __VA_ARGS__)
@@ -272,8 +272,7 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
 
 #define GBL_PROPERTY_FLAGS_MASK__(suffix)  \
     GBL_PROPERTY_FLAG_##suffix |
-
-///\endcond
+//! \endcond
 
 GBL_DECLS_END
 

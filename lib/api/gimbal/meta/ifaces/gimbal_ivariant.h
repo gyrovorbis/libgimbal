@@ -59,6 +59,7 @@ GBL_DECLARE_FLAGS(GBL_IVARIANT_OP_FLAGS) {
 #define VARIANT     GblVariant* pVariant
 #define CVARIANT    const VARIANT
 
+//! Virtual method table for GblIVariantClass
 typedef struct GblIVariantClassVTable {
     GBL_IVARIANT_OP_FLAGS   supportedOps;
     char                    pSetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];

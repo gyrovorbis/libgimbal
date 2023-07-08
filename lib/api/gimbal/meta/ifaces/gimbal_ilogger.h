@@ -39,6 +39,14 @@ GBL_FORWARD_DECLARE_STRUCT(GblStackFrame);
 
 GBL_ENUM_TABLE_DECLARE(GBL_META_LOG_LEVEL_TABLE);
 
+/*! \struct GblILoggerClass
+ *  \extends GblInterface
+ *  \brief GblClass structure for GblILogger
+ *  \deprecated
+ *  \todo
+ *      - replace me with GblLogger
+ *  \sa GblLogger
+ */
 GBL_INTERFACE_DERIVE(GblILogger)
     GBL_RESULT (*pFnWrite)(GBL_SELF, const GblStackFrame* pFrame, GBL_LOG_LEVEL level, const char* pFmt, va_list varArgs);
     GBL_RESULT (*pFnPush) (GBL_SELF, const GblStackFrame* pFrame);

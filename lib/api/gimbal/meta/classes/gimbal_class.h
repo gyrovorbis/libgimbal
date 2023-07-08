@@ -550,6 +550,7 @@ GBL_DECLS_END
 */
 
 /*! \page Classes Classes
+ *  \brief Overview of classed types
  *  \tableofcontents
  *
  * ## GblClass
@@ -679,6 +680,8 @@ GBL_DECLS_END
  *  \endcode
  */
 /*! \page TypeTemplate Type Templates
+ *  \brief Boilerplate macros for type operations
+ *
  *  At the top of the file for most libGimbal derived types, along with the type identifier,
  *  you will find a collection of convenience utility macros implementing function-style
  *  casts for the given type.

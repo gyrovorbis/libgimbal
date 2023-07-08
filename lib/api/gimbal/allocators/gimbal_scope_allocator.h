@@ -17,6 +17,7 @@ GBL_DECLS_BEGIN
 
 typedef GBL_RESULT (*GblScopeAllocatorDtorFn)(void* pPtr);
 
+//! Arena-backed scope-based allocator
 typedef struct GblScopeAllocator {
     GblArenaAllocator*      pArena;
     GblArenaAllocatorState  rewindState;

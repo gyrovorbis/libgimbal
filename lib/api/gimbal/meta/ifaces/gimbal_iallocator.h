@@ -28,6 +28,16 @@
 
 GBL_DECLS_BEGIN
 
+/*! \struct  GblIAllocatorClass
+ *  \extends GblInterface
+ *  \brief   GblClass VTable structure for GblIAllocator
+ *
+ *  GblIAllocatorClass provides polymorphic methods for
+ *  basic memory management operations: alloc, realloc, free.
+ *
+ *  \note
+ *  All operations are required to honor the requested alignment.
+ */
 GBL_INTERFACE_DERIVE(GblIAllocator)
     //! Virtual method invoked when an allocation is requested
     GBL_RESULT (*pFnAlloc)  (GBL_SELF, const GblStackFrame* pFrame, size_t size, size_t align, const char* pDbgStr, void** ppData);

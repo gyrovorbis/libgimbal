@@ -3,7 +3,7 @@
  *  \ingroup    core
  *
  *  This file contains the class and instance definitions
- *  for GblApp,
+ *  for GblApp. Currently a WIP.
  *
  *  \todo
  *      - Finish me
@@ -13,7 +13,6 @@
  *   \author    2023 Falco Girgis
  *   \copyright MIT License
  */
-
 #ifndef GIMBAL_APP_H
 #define GIMBAL_APP_H
 

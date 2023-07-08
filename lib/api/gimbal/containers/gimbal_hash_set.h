@@ -54,8 +54,8 @@ typedef struct GblHashSet {
     GBL_PRIVATE_END
 } GblHashSet;
 
-/*! Iterator structure used for iterating over GblHashSet.
- * \sa GblHashSet
+/*! \brief Iterator structure used for iterating over GblHashSet
+ *  \sa GblHashSet
  */
 typedef struct GblHashSetIter {
     GBL_PRIVATE()

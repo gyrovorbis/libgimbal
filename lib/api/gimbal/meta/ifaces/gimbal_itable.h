@@ -25,6 +25,13 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblVariant);
 
+/*! \struct GblITableClass
+ *  \extends GblInterface
+ *  \brief GblClass structure for GblITable
+ *  \deprecated
+ *  \todo
+ *      - remove me
+ */
 GBL_INTERFACE_DERIVE(GblITable)
     GBL_RESULT (*pFnIndex)    (GBL_CSELF, const GblVariant* pKey, GblVariant* pValue);
     GBL_RESULT (*pFnNewIndex) (GBL_SELF, const GblVariant* pKey, const GblVariant* pValue);

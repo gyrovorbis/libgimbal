@@ -16,7 +16,6 @@
 
 /// \ingroup metaBuiltinTypes
 #define GBL_CONTEXT_TYPE                (GBL_TYPEOF(GblContext))
-
 #define GBL_CONTEXT(instance)           (GBL_INSTANCE_CAST(instance, GblContext))
 #define GBL_CONTEXT_CLASS(klass)        (GBL_CLASS_CAST(klass, GblContext))
 #define GBL_CONTEXT_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblContext))
@@ -25,9 +24,32 @@
 
 GBL_DECLS_BEGIN
 
+/*! \struct GblContextClass
+ *  \extends GblObjectClass
+ *  \implements GblIAllocatorClass
+ *  \implements GblILoggerClass
+ *  \brief GblClass structure for GblContext
+ *
+ *  \deprecated
+ *  \todo
+ *      - remove me
+ *
+ *  \sa GblContext
+ */
 GBL_CLASS_DERIVE_EMPTY(GblContext,
                        GblObject, GblIAllocator, GblILogger)
 
+/*! \struct GblContext
+ *  \extends GblObject
+ *  \implements GblIAllocator
+ *  \implements GblILogger
+ *  \brief      Top-level context object
+ *
+ *  \deprecated
+ *  \todo
+ *      -remove me
+ *  \sa GblContextClass
+ */
 GBL_INSTANCE_DERIVE(GblContext, GblObject)
     GblCallRecord   lastIssue;
     uint32_t        logStackDepth;

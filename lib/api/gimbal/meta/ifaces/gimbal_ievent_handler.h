@@ -25,6 +25,10 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblEvent);
 
+/*! \struct GblIEventHandlerClass
+ *  \extends GblInterface
+ *  \brief GblClass structure for GblIEventHandler
+ */
 GBL_INTERFACE_DERIVE(GblIEventHandler)
     GBL_RESULT (*pFnEvent)(GBL_SELF, GblEvent* pEvent);
 GBL_INTERFACE_END

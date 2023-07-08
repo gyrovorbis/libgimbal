@@ -1,8 +1,9 @@
 /*! \file
  *  \brief GblTask high-level concurrent runnable object
  *  \ingroup core
+ *
  *  \todo
- *   - implement me
+ *   - implement me (designing API currently, unimplemented)
  *
  *   \author Falco Girgis
  */
@@ -21,7 +22,18 @@ GBL_FORWARD_DECLARE_STRUCT(GblTask);
 
 typedef int8_t GblPriority;
 
-// Abstract
+/*! \struct  GblTaskClass
+ *  \extends GblObjectClass
+ *  \brief   GblClass structure for GblTask
+ *
+ *  GblTaskClass provides overridadlbe virtual
+ *  methods for invoking custom logic based on
+ *  different types of scheduling events, as well
+ *  as a method for getting the priority for a
+ *  GblTask.
+ *
+ *  \sa GblTask
+ */
 GBL_CLASS_DERIVE(GblTask, GblObject)
     GBL_RESULT (*pFnExec)    (GBL_SELF);
     GBL_RESULT (*pFnCancel)  (GBL_SELF);
@@ -29,6 +41,14 @@ GBL_CLASS_DERIVE(GblTask, GblObject)
     GBL_RESULT (*pFnPriority)(GBL_CSELF, GblPriority* pPriority);
 GBL_CLASS_END
 
+/*! \struct  GblTask
+ *  \extends GblObject
+ *  \brief   High-level schedulable concurrently-executing operation
+ *
+ *  No public members.
+ *
+ *  \sa GblTaskClass
+ */
 GBL_INSTANCE_DERIVE_EMPTY(GblTask, GblObject);
 
 GBL_EXPORT GblPriority GblTask_priority(GBL_CSELF) GBL_NOEXCEPT;

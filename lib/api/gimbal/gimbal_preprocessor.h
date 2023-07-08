@@ -12,7 +12,6 @@
 #include "preprocessor/gimbal_macro_sequences.h"
 #include "preprocessor/gimbal_macro_utils.h"
 
-
 /*! \defgroup preprocessor Preprocessor
  *  \brief Platform defines, utility macros, preprocessor generators and primitives
  *

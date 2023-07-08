@@ -1,5 +1,6 @@
 
 /*! \page Meta Type System Manual
+	\brief How to use the type system and its features
 
 	The language interop layer of libGimbal is primarily facilitated through its 
 	low-level, C-based meta type system. The type system has two primary goals,
@@ -137,6 +138,7 @@ language, and any langauge which can provide glue code to a C API.
 */ 
 
 /*! \page Instances
+	\brief Overview of instanced types
 
 \tableofcontents
 

@@ -8,7 +8,6 @@
  *
  *  \author Falco Girgis
  */
-
 #ifndef GIMBAL_THD_H
 #define GIMBAL_THD_H
 
@@ -19,6 +18,7 @@
 
 GBL_DECLS_BEGIN
 
+//! Deprecated legacy structure for thread-local storage and context
 typedef struct GblThd {
     GblCallRecord   callRecord;
     const char*     pName;

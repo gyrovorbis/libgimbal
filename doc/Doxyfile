@@ -226,7 +226,7 @@ JAVADOC_BANNER         = NO
 # requiring an explicit \brief command for a brief description.)
 # The default value is: NO.
 
-QT_AUTOBRIEF           = NO
+QT_AUTOBRIEF           = YES
 
 # The MULTILINE_CPP_IS_BRIEF tag can be set to YES to make doxygen treat a
 # multi-line C++ special comment block (i.e. a block of //! or /// comments) as
@@ -659,7 +659,7 @@ INLINE_INFO            = YES
 # name. If set to NO, the members will appear in declaration order.
 # The default value is: YES.
 
-SORT_MEMBER_DOCS       = YES
+SORT_MEMBER_DOCS       = NO
 
 # If the SORT_BRIEF_DOCS tag is set to YES then doxygen will sort the brief
 # descriptions of file, namespace and class members alphabetically by member
@@ -1031,8 +1031,7 @@ EXCLUDE_SYMBOLS        = GBL_SELF_TYPE \
                          GBL_KLASS \
                          GBL_CKLASS \
                          GBL_DECLS_BEGIN \
-                         GBL_DECLS_END \
-                         GBL_PROPERTIES
+                         GBL_DECLS_END 
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include
@@ -1211,7 +1210,7 @@ VERBATIM_HEADERS       = YES
 # generated with the -Duse_libclang=ON option for CMake.
 # The default value is: NO.
 
-CLANG_ASSISTED_PARSING = NO
+CLANG_ASSISTED_PARSING = YES
 
 # If the CLANG_ASSISTED_PARSING tag is set to YES and the CLANG_ADD_INC_PATHS
 # tag is set to YES then doxygen will add the directory of each input to the
@@ -1688,7 +1687,7 @@ TREEVIEW_WIDTH         = 250
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-EXT_LINKS_IN_WINDOW    = NO
+EXT_LINKS_IN_WINDOW    = YES
 
 # If the OBFUSCATE_EMAILS tag is set to YES, doxygen will obfuscate email
 # addresses.

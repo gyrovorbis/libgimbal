@@ -26,6 +26,14 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblTask);
 GBL_FORWARD_DECLARE_STRUCT(GblMainLoop);
 
+/*! \struct  GblMainLoopClass
+ *  \extends GblObjectClass
+ *  \brief   GblClass VTable structure for GblMainLoop
+ *
+ *  WIP
+ *
+ *  \sa GblMainLoop
+ */
 GBL_CLASS_DERIVE(GblMainLoop, GblObject)
     GBL_RESULT (*pFnEnqueueTask)(GBL_SELF, GblTask* pTask);
     GBL_RESULT (*pFnExecTask)   (GBL_SELF, GblTask* pTask);
@@ -34,7 +42,14 @@ GBL_CLASS_DERIVE(GblMainLoop, GblObject)
 GBL_CLASS_END
 
 // Needs a context with queue
-
+/*! \struct  GblMainLoop
+ *  \extends GblObject
+ *  \brief   Sequentially executing priority queue of GblTask objects
+ *
+ *  WIP
+ *
+ *  \sa GblMainLoopClass
+ */
 GBL_INSTANCE_DERIVE(GblMainLoop, GblObject)
     GblBool     pending;
 GBL_INSTANCE_END
