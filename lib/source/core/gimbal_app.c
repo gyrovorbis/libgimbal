@@ -179,18 +179,20 @@ static GBL_RESULT GblAppClass_init_(GblClass* pClass, const void* pUd, GblContex
 GBL_EXPORT GblType GblApp_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
+    static GblTypeInfo info = {
+        .pFnClassInit        = GblAppClass_init_,
+        .classSize           = sizeof(GblAppClass),
+        .instanceSize        = sizeof(GblApp),
+        .instancePrivateSize = sizeof(GblApp_)
+    };
+
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
 
         type = GblType_registerStatic(GblQuark_internStringStatic("GblApp"),
                                       GBL_OBJECT_TYPE,
-                                      &(GblTypeInfo) {
-                                          .pFnClassInit        = GblAppClass_init_,
-                                          .classSize           = sizeof(GblAppClass),
-                                          .instanceSize        = sizeof(GblApp),
-                                          .instancePrivateSize = sizeof(GblApp_)
-                                      },
-                                      GBL_TYPE_FLAGS_NONE);
+                                      &info,
+                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
 
         GBL_CTX_VERIFY_LAST_RECORD();
         GBL_CTX_END_BLOCK();

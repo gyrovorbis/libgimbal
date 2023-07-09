@@ -220,6 +220,7 @@ set(GIMBAL_SOURCES
     source/core/gimbal_module.c
     source/core/gimbal_logger.c
     source/core/gimbal_exception.c
+    source/core/gimbal_main_loop.c
     source/meta/classes/gimbal_class.c
     source/meta/classes/gimbal_opaque.c
     source/meta/classes/gimbal_flags.c

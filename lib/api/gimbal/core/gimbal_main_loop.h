@@ -4,7 +4,8 @@
  *  \todo
  *   - implement me
  *
- *   \author Falco Girgis
+ *   \author    2023 Falco Girgis
+ *   \copyright MIT License
  */
 
 #ifndef GIMBAL_MAIN_LOOP_H
@@ -12,12 +13,7 @@
 
 #include "../meta/instances/gimbal_object.h"
 #include "../meta/signals/gimbal_signal.h"
-
-#define GBL_PRIORITY_HIGH       -100
-#define GBL_PRIORITY_DEFUAULT   0
-#define GBL_PRIORITY_LOW        300
-#define GBL_PRIORITY_HIGH_IDLE  100
-#define GBL_PRIORITY_IDLE       200
+#include "../containers/gimbal_linked_list.h"
 
 #define GBL_SELF_TYPE GblMainLoop
 
@@ -25,6 +21,16 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblTask);
 GBL_FORWARD_DECLARE_STRUCT(GblMainLoop);
+
+//! Enumeration for
+typedef enum GBL_PRIORITY_LEVEL {
+    GBL_PRIORITY_IDLE,
+    GBL_PRIORITY_HIGH_IDLE,
+    GBL_PRIORITY_LOW,
+    GBL_PRIORITY_DEFAULT,
+    GBL_PRIORITY_HIGH,
+    GBL_PRIORITY_COUNT
+} GBL_PRIORITY_LEVEL;
 
 /*! \struct  GblMainLoopClass
  *  \extends GblObjectClass
@@ -51,13 +57,22 @@ GBL_CLASS_END
  *  \sa GblMainLoopClass
  */
 GBL_INSTANCE_DERIVE(GblMainLoop, GblObject)
-    GblBool     pending;
+    union {
+        GblTask*           pHead;
+        GblLinkedListNode  listNode;
+    }                  taskQueue[GBL_PRIORITY_COUNT];
+    size_t             taskCount;
+    uint32_t           taskBitMap;
+    GblTask*           pActiveTask;
+    GBL_PRIORITY_LEVEL prevTaskPriority;
 GBL_INSTANCE_END
 
 GBL_SIGNALS(GblMainLoop,
     (execIdle,     GBL_INSTANCE_TYPE),
     (taskEnqueued, GBL_INSTANCE_TYPE, GBL_INSTANCE_TYPE)
 )
+
+GBL_EXPORT GblType    GblMainLoop_type    (void) GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblMainLoop_enqueue (GBL_SELF, GblTask* pTask) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblMainLoop_cancel  (GBL_SELF, GblTask* pTask) GBL_NOEXCEPT;

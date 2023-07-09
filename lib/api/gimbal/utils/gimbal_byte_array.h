@@ -110,7 +110,7 @@ GBL_INLINE void* GblByteArray_data(GBL_CSELF) GBL_NOEXCEPT {
     return pSelf->pData;
 }
 
-GBL_INLINE GBL_RESULT GblByteArray_set(GBL_SELF, size_t  bytes, const void* pData) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblByteArray_set(GBL_SELF, size_t bytes, const void* pData) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GblByteArray_context(pSelf));
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_CALL(GblByteArray_resize(pSelf, bytes));

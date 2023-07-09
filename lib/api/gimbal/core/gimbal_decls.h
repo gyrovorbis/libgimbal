@@ -235,7 +235,8 @@ extern "C" {
 // === ENUMERATION AUTOGENERATION ===========
 
 #define GBL_ENUM_TABLE_DECL_ENUM(cName, value, name, string) \
-    cName = value,  //!< string
+    /*! string */ \
+    cName = value,
 
 
 #define GBL_ENUM_TABLE_DECLARE(table) \

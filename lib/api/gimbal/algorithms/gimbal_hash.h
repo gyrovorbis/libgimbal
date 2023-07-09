@@ -43,6 +43,11 @@ GBL_INLINE GblHash  gblHash32Bit     (uint32_t value)                 GBL_NOEXCE
 GBL_INLINE uint32_t gblUnhash32Bit   (GblHash hash)                   GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHash16Bit     (uint16_t value)                 GBL_NOEXCEPT;
 
+GBL_INLINE uint16_t gblHashCrc16BitPartial
+                                     (const void* pData,
+                                      size_t      size,
+                                      uint16_t*   pPartial)           GBL_NOEXCEPT;
+
 GBL_EXPORT GblHash  gblHashSip       (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashMurmur    (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_INLINE GblHash  gblHashFnv1      (const void* pData, size_t size) GBL_NOEXCEPT;
@@ -104,6 +109,36 @@ GBL_INLINE GblHash gblHashJenkins(const void* pData, size_t size) GBL_NOEXCEPT {
     hash += hash << 15;
     return hash;
 }
+
+
+GBL_INLINE uint16_t gblHashCrc16BitPartial(const void* pData, size_t size, uint16_t* pPartial) GBL_NOEXCEPT {
+    const unsigned char* pBuff = (const unsigned char*)pData;
+    int i, c, n = pPartial? *pPartial : 0;
+    for (i = 0; i < size; i++) {
+      n ^= (pBuff[i] << 8);
+      for (c = 0; c < 8; c++)
+          if (n & 0x8000)
+              n = (n << 1) ^ 4129;
+          else
+              n = (n << 1);
+    }
+    int dun =  n & 0xffff;
+
+    uint16_t crc = pPartial? *pPartial : 0;
+
+    for(int i = 0; i < size; ++i) {
+      crc ^= (pBuff[i] << 8);
+      for(int j = 0; j < 8; ++j)
+          if(crc & 0x8000)
+              crc = (crc << 1) ^ 4129;
+          else
+              crc <<= 1;
+    }
+
+    GBL_ASSERT(crc == dun);
+    return crc;
+}
+
 
 GBL_DECLS_END
 
