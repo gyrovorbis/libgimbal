@@ -64,7 +64,6 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
 #elif defined(__EMSCRIPTEN__)
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES() \
         (size_t , GBL_TEST_COMPARE_CMP_UINT64_), \
-        (ssize_t, GBL_TEST_COMPARE_CMP_INT64_),  \
         (int8_t, GBL_TEST_COMPARE_CMP_UINT32_),
 #else
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()

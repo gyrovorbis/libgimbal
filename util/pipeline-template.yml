@@ -45,8 +45,12 @@ variables:
       -- ${EXTRA_GENERATOR_ARGS}
   after_script:
     - mkdir -p ${BUILD_DIR}/${ARTIFACT_DIR}
-    - cp ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
-      ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
+    - |
+      for EXT in ${BINARY_EXTENSION}
+      do
+        cp ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${EXT} 
+        ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${EXT}
+      done
     - ${DEPLOY_CMD} ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}  
   artifacts:
     paths:
@@ -252,6 +256,7 @@ build webasm:
     variables:
       - $BUILD_WEBASM_DISABLED
   variables:
+    BINARY_EXTENSION: .js .wasm
     PREFIX_PATH: ${QT_PATH}/wasm_singlethread
     CC: ${EMSDK}/upstream/emscriptgen/emcc
     CXX: ${EMSDK}/upstream/emscriptgen/em++
@@ -326,6 +331,22 @@ test ios-sim:
     - xcrun simctl install ${IOS_SIM_DEVICE_ID} ${BUILD_DIR}/${BINARY_PATH}/${BUILD_TYPE}-iphonesimulator/${BINARY_NAME}${BINARY_EXTENSION}
     - xcrun simctl launch --console ${IOS_SIM_DEVICE_ID} ${BINARY_NAME}
     - xcrun simctl shutdown ${IOS_SIM_DEVICE_ID} 2>&1
+
+test webasm:
+  stage: test
+  needs: ["build webasm"]
+  dependencies:
+    - build webasm
+  only:
+    variables:
+      - $BUILD_WEBASM_DISABLED == null
+  except:
+    variables:
+      - $TEST_WEBASM_DISABLED
+  tags:
+    - webasm
+  script:
+    - node ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}.js
 
 test dreamcast-emu:
   stage: test 
