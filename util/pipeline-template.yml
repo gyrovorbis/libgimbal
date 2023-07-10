@@ -48,8 +48,7 @@ variables:
     - |
       for EXT in ${BINARY_EXTENSION}
       do
-        cp ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${EXT} 
-        ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${EXT}
+        cp ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${EXT} ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${EXT}
       done
     - ${DEPLOY_CMD} ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}  
   artifacts:
