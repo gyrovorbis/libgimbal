@@ -260,7 +260,7 @@ build webasm:
   variables:
     BINARY_EXTENSION: .js
     ARTIFACT_EXTENSIONS: .wasm
-    PREFIX_PATH: ${QT_PATH}/wasm_singlethread
+    PREFIX_PATH: ${QT_PATH}/wasm_multithread
     CC: ${EMSDK}/upstream/emscriptgen/emcc
     CXX: ${EMSDK}/upstream/emscriptgen/em++
     TOOLCHAIN_FILE: ${PREFIX_PATH}/lib/cmake/Qt6/qt.toolchain.cmake
