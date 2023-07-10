@@ -19,6 +19,7 @@ variables:
   DOCS_PREREQ_DIRS: ""
   BINARY_PATH: ""
   BINARY_EXTENSION: ""
+  ARTIFACT_EXTENSIONS: ""
   DC_BOOT_SLEEP_TIME: 30
 
 ############## BUILDS ####################
@@ -45,8 +46,10 @@ variables:
       -- ${EXTRA_GENERATOR_ARGS}
   after_script:
     - mkdir -p ${BUILD_DIR}/${ARTIFACT_DIR}
+    - cp ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
+      ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
     - |
-      for EXT in ${BINARY_EXTENSION}
+      for EXT in ${ARTIFACT_EXTENSIONS}
       do
         cp ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${EXT} ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${EXT}
       done
@@ -255,7 +258,8 @@ build webasm:
     variables:
       - $BUILD_WEBASM_DISABLED
   variables:
-    BINARY_EXTENSION: .js .wasm
+    BINARY_EXTENSION: .js
+    ARTIFACT_EXTENSIONS: .wasm
     PREFIX_PATH: ${QT_PATH}/wasm_singlethread
     CC: ${EMSDK}/upstream/emscriptgen/emcc
     CXX: ${EMSDK}/upstream/emscriptgen/em++
