@@ -878,7 +878,7 @@ static GBL_RESULT stringDestruct_(GblVariant* pVariant) {
 
 static GBL_RESULT stringSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    GBL_CTX_CALL(GblStringBuffer_set(pString, GblStringRef_view(pVariant->pString)));
+    GblStringBuffer_set(pString, GblStringRef_view(pVariant->pString));
     GBL_CTX_END();
 }
 

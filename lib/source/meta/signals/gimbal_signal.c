@@ -115,7 +115,9 @@ GBL_EXPORT GBL_RESULT GblSignal_install(GblType      ownerType,
     void* pExisting = GblHashSet_set(&signalSet_, &pSignal);
 
     if(pExisting) {
-        GBL_CTX_WARN("Overwrote existing signal!");
+        GBL_CTX_WARN("Overwrote existing signal! [%s::%s]",
+                     GblType_name(ownerType),
+                     pName);
     }
 
 

@@ -86,7 +86,7 @@ GBL_INLINE size_t           GblStringBuffer_stackBytes      (GBL_CSELF)         
 GBL_INLINE size_t           GblStringBuffer_length          (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_INLINE size_t           GblStringBuffer_capacity        (GBL_CSELF)                                     GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT       GblStringBuffer_set             (GBL_SELF, GblStringView view)                  GBL_NOEXCEPT;
+GBL_INLINE const char*      GblStringBuffer_set             (GBL_SELF, GblStringView view)                  GBL_NOEXCEPT;
 GBL_INLINE char             GblStringBuffer_char            (GBL_CSELF, size_t index)                       GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_setChar         (GBL_CSELF, size_t index, char value)           GBL_NOEXCEPT;
 GBL_EXPORT const char*      GblStringBuffer_printf          (GBL_SELF, const char* pFmt, ...)               GBL_NOEXCEPT;
@@ -222,12 +222,14 @@ GBL_INLINE GBL_RESULT GblStringBuffer_clear(GBL_SELF) GBL_NOEXCEPT {
     return GblArrayList_clear(&pSelf->data);
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_set(GBL_SELF, GblStringView view) GBL_NOEXCEPT {
+GBL_INLINE const char* GblStringBuffer_set(GBL_SELF, GblStringView view) GBL_NOEXCEPT {
+    const char* pValue = NULL;
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     GBL_CTX_CALL(GblArrayList_assign(&pSelf->data, view.pData, view.length));
-    GBL_CTX_END();
+    pValue = (const char*)GblArrayList_data(&pSelf->data);
+    GBL_CTX_END_BLOCK();
+    return pValue;
 }
-
 
 GBL_INLINE GBL_RESULT GblStringBuffer_construct_4(GBL_SELF,
                                                   GblStringView  view,

@@ -119,6 +119,10 @@ typedef struct GblDateTime { // Size (bytes)
     int16_t   utcOffset;     // 2
 } GblDateTime;               // 34 Total
 
+/*! \name Date Static Methods
+ *  \brief Non-member functions for date management
+ *  @{
+ */
 GBL_INLINE GblBool      GblDate_isLeapYear       (GblYear year)              GBL_NOEXCEPT;
 
 GBL_INLINE GblDay       GblDate_monthDays        (GblMonth month,
@@ -128,7 +132,13 @@ GBL_EXPORT const char*  GblDate_monthStr         (GblMonth month)            GBL
 GBL_EXPORT const char*  GblDate_monthStrShort    (GblMonth month)            GBL_NOEXCEPT;
 GBL_EXPORT const char*  GblDate_weekDayStr       (GblWeekDay weekDay)        GBL_NOEXCEPT;
 GBL_EXPORT const char*  GblDate_weekDayStrShort  (GblWeekDay weekDay)        GBL_NOEXCEPT;
+//! @}
 
+/*! \name Date Methods
+ *  \brief Member functions for GblDate
+ *  \relatesalso GblDate
+ *  @{
+ */
 GBL_INLINE GblBool      GblDate_isValid          (const GblDate* pSelf)      GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblDate_isDst            (const GblDate* pSelf)      GBL_NOEXCEPT;
 GBL_INLINE GblDay       GblDate_toJulian         (const GblDate* pSelf)      GBL_NOEXCEPT;
@@ -147,13 +157,24 @@ GBL_INLINE void         GblDate_set              (GblDate* pSelf,
                                                   GblYear  year,
                                                   GblMonth month,
                                                   GblDay   day)              GBL_NOEXCEPT;
+//! @}
 
+/*! \name Time Static Methods
+ *  \brief Non-member functions for time management
+ *  @{
+ */
 GBL_EXPORT const char*  GblTime_amPmStr          (GblBool isPm)              GBL_NOEXCEPT;
 GBL_EXPORT GblSecond    GblTime_localUtcOffset   (void)                      GBL_NOEXCEPT;
 
 GBL_INLINE GblTimeSpec  GblTime_specDiff         (const GblTimeSpec* pSrc1,
                                                   const GblTimeSpec* pSrc2)  GBL_NOEXCEPT;
+//! @}
 
+/*! \name Time Methods
+ *  \brief Member functions for GblTime
+ *  \relatesalso GblTime
+ *  @{
+ */
 GBL_INLINE GblBool      GblTime_isValid          (const GblTime* pSelf)      GBL_NOEXCEPT;
 
 GBL_INLINE GblBool      GblTime_isPm             (const GblTime* pSelf)      GBL_NOEXCEPT;
@@ -163,11 +184,23 @@ GBL_INLINE void         GblTime_set              (GblTime*      pSelf,
                                                   GblMinute     mins,
                                                   GblSecond     secs,
                                                   GblNanoSecond nsec/*=0*/)  GBL_NOEXCEPT;
+//! @}
 
+/*! \name Read Accessors
+ *  \brief Methods for getting values
+ *  \relatesalso GblDateTime
+ *  @{
+ */
 GBL_INLINE GblBool      GblDateTime_isValid      (const GblDateTime* pSelf)  GBL_NOEXCEPT;
 GBL_INLINE GblBool      GblDateTime_isUtc        (const GblDateTime* pSelf)  GBL_NOEXCEPT;
 GBL_INLINE GblBool      GblDateTime_isLocal      (const GblDateTime* pSelf)  GBL_NOEXCEPT;
+//! @}
 
+/*! \name Construction
+ *  \brief Methods for constructing and populating
+ *  \relatesalso GblDateTime
+ *  @{
+ */
 GBL_EXPORT GblDateTime* GblDateTime_fromUnix     (GblDateTime* pSelf,
                                                   time_t epoch)              GBL_NOEXCEPT;
 
@@ -186,7 +219,13 @@ GBL_EXPORT GblDateTime* GblDateTime_nowUtc       (GblDateTime* pSelf)        GBL
 GBL_EXPORT GblDateTime* GblDateTime_parse        (GblDateTime* pSelf,
                                                   const char* pString,
                                                   const char* pFormat)       GBL_NOEXCEPT; // based on strptime()
+//! @}
 
+/*! \name Conversions
+ *  \brief Methods for converting to another format
+ *  \relatesalso GblDateTime
+ *  @{
+ */
 GBL_EXPORT time_t       GblDateTime_toUnix       (const GblDateTime* pSelf)  GBL_NOEXCEPT;
 
 GBL_EXPORT GblTimeSpec  GblDateTime_toSpecUtc    (const GblDateTime* pSelf)  GBL_NOEXCEPT;
@@ -203,7 +242,13 @@ GBL_EXPORT const char*  GblDateTime_toIso8601    (const GblDateTime* pSelf,
 GBL_EXPORT const char*  GblDateTime_format       (const GblDateTime* pSelf,
                                                   GblStringBuffer*   pBuffer,
                                                   const char*        pFmt)   GBL_NOEXCEPT; // based on strftime()
+//! @}
 
+/*! \name Write Accessors
+ *  \brief Methods for writing values
+ *  \relatesalso GblDateTime
+ *  @{
+ */
 GBL_EXPORT GblDateTime* GblDateTime_normalize    (GblDateTime* pSelf)        GBL_NOEXCEPT;
 
 GBL_INLINE void         GblDateTime_set          (GblDateTime*  pSelf,
@@ -221,7 +266,13 @@ GBL_INLINE void         GblDateTime_setDate      (GblDateTime*   pSelf,
 
 GBL_INLINE void         GblDateTime_setTime      (GblDateTime*   pSelf,
                                                   const GblTime* pTime)      GBL_NOEXCEPT;
+//! @}
 
+/*! \name Operators
+ *  \brief Methods implementing operations
+ *  \relatesalso GblDateTime
+ *  @{
+ */
 GBL_INLINE int          GblDateTime_compare      (const GblDateTime* pSelf,
                                                   const GblDateTime* pRhs)   GBL_NOEXCEPT;
 
@@ -263,6 +314,7 @@ GBL_EXPORT GblDateTime* GblDateTime_addMonths    (GblDateTime* pSelf,
 
 GBL_EXPORT GblDateTime* GblDateTime_addYears     (GblDateTime* pSelf,
                                                   GblYear years)             GBL_NOEXCEPT;
+//! @}
 
 // ===== IMPL =====
 ///\cond

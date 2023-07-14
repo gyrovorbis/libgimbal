@@ -656,7 +656,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList_(GblObject* pSelf, const GblPr
 GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList(GblObject* pSelf, const char* pName, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
     const GblProperty* pProp = GblProperty_find(GBL_INSTANCE_TYPEOF(pSelf), pName);
-    GBL_CTX_VERIFY(pProp->flags & GBL_PROPERTY_FLAG_WRITE,
+    GBL_CTX_VERIFY(pProp && pProp->flags & GBL_PROPERTY_FLAG_WRITE,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unwritable property: [%s]", pName);
     GBL_CTX_VERIFY_CALL(GblObject_setPropertyVaList_(pSelf, pProp, pList));

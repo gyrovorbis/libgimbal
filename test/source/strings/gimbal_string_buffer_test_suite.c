@@ -79,8 +79,9 @@ static GBL_RESULT GblStringBufferTestSuite_charInvalid_(GblTestSuite* pSelf, Gbl
 static GBL_RESULT GblStringBufferTestSuite_set_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_set(&pSelf_->str.buffer,
-                                            GBL_STRV("Dreamcart")));
+    GBL_TEST_COMPARE(GblStringBuffer_set(&pSelf_->str.buffer,
+                                            GBL_STRV("Dreamcart")),
+                     "Dreamcart");
 
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
                                       "Dreamcart",
