@@ -434,7 +434,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_prepend(GBL_SELF, GblStringView view) GBL_
     GBL_CTX_END();
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_overwrite(GBL_SELF, size_t  index, GblStringView view) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_overwrite(GBL_SELF, size_t index, GblStringView view) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     //GBL_CTX_VERIFY_ARG(index < GblStringBuffer_length(pSelf));
     const GblBool resized = (index + view.length > GblStringBuffer_length(pSelf));
@@ -445,7 +445,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_overwrite(GBL_SELF, size_t  index, GblStri
     GBL_CTX_END();
 }
 
-GBL_INLINE GBL_RESULT GblStringBuffer_erase(GBL_SELF, size_t  index, size_t  len) GBL_NOEXCEPT {
+GBL_INLINE GBL_RESULT GblStringBuffer_erase(GBL_SELF, size_t index, size_t len) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     GBL_CTX_CALL(GblArrayList_erase(&pSelf->data, index, len));
     GBL_CTX_END();
@@ -458,7 +458,7 @@ GBL_INLINE GBL_RESULT GblStringBuffer_shrinkToFit(GBL_SELF) GBL_NOEXCEPT {
     GBL_CTX_END();
 }
 
-GBL_INLINE char GblStringBuffer_char(GBL_CSELF, size_t  index) GBL_NOEXCEPT {
+GBL_INLINE char GblStringBuffer_char(GBL_CSELF, size_t index) GBL_NOEXCEPT {
     char result = '\0';
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     const char* pChar = (const char*)GblArrayList_at(&pSelf->data, index);

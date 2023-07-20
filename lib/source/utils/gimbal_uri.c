@@ -290,7 +290,7 @@ GBL_EXPORT GblBool GblUri_isParentOf(const GblUri* pSelf, const GblUri* pUri) {
 }
 
 GBL_EXPORT int GblUri_compare(const GblUri* pSelf, const GblUri* pUri) {
-
+    return 1;
 }
 
 GBL_EXPORT GblBool GblUri_equals(const GblUri* pSelf, const GblUri* pUri, GBL_URI_FLAGS flags) {

@@ -20,6 +20,8 @@ GBL_DECLS_BEGIN
 GBL_INLINE int   gblAsciiDigitValue    (char c)                         GBL_NOEXCEPT;
 GBL_INLINE int   gblAsciiHexDigitValue (char c)                         GBL_NOEXCEPT;
 
+GBL_EXPORT int   gblStrCaseCmp         (const char* pStr1,
+                                        const char* pStr2)              GBL_NOEXCEPT;
 GBL_EXPORT int   gblStrnCaseCmp        (const char* pStr1,
                                         const char* pStr2,
                                         size_t      length)             GBL_NOEXCEPT;

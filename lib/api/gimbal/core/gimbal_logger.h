@@ -7,6 +7,7 @@
  *  macros for actually using the log system.
  *
  *  \todo migrate away from GblThd and towards GblThread
+ *  \todo Spam filter - deduplicate messages within a certain interval
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License
