@@ -141,6 +141,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/classes/gimbal_flags.h
     api/gimbal/meta/classes/gimbal_primitives.h
     api/gimbal/meta/ifaces/gimbal_ivariant.h
+    api/gimbal/meta/ifaces/gimbal_itable_variant.h
     api/gimbal/meta/ifaces/gimbal_ievent_handler.h
     api/gimbal/meta/ifaces/gimbal_ievent_filter.h
     api/gimbal/meta/ifaces/gimbal_itable.h
@@ -234,6 +235,7 @@ set(GIMBAL_SOURCES
     source/meta/ifaces/gimbal_iplugin.c
     source/meta/ifaces/gimbal_interface.c
     source/meta/ifaces/gimbal_ivariant.c
+    source/meta/ifaces/gimbal_itable_variant.c
     source/meta/instances/gimbal_context.c
     source/meta/instances/gimbal_object.c
     source/meta/instances/gimbal_event.c

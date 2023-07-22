@@ -419,7 +419,7 @@ extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
                              GblQuark_internStringStatic("GblIVariant"),
                              &typeInfo,
                              GBL_TYPE_FLAG_ABSTRACT |
-                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);
+                             GBL_TYPE_FLAG_TYPEINFO_STATIC);
     GBL_CTX_END();
 }
 

@@ -117,7 +117,7 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_overwrite       (GBL_SELF,
                                                              size_t         index,
                                                              GblStringView  other)                          GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT       GblStringBuffer_replace         (GBL_SELF,
+GBL_EXPORT size_t           GblStringBuffer_replace         (GBL_SELF,
                                                              GblStringView substr,
                                                              GblStringView replacement,
                                                              size_t        limit)                           GBL_NOEXCEPT;
@@ -139,6 +139,8 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_grow            (GBL_SELF, size_t de
 GBL_INLINE GBL_RESULT       GblStringBuffer_shrink          (GBL_SELF, size_t delta)                        GBL_NOEXCEPT;
 GBL_INLINE GBL_RESULT       GblStringBuffer_shrinkToFit     (GBL_SELF)                                      GBL_NOEXCEPT;
 
+#define                     GblStringBuffer_replace(...)    GblStringBuffer_replaceDefault_(__VA_ARGS__)
+
 #define                     GblStringBuffer_construct(...) \
     GBL_VA_OVERLOAD_CALL_ARGC(GblStringBuffer_construct, __VA_ARGS__)
 
@@ -151,6 +153,7 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_shrinkToFit     (GBL_SELF)          
 //========== IMPL ==========
 
 ///\cond
+
 #define GBL_STRING_BUFFER_ALLOCA_3(size, ctx, view) \
     GblStringBuffer_createInPlace_4(GBL_ALLOCA(sizeof(GblStringBuffer) + size), view, sizeof(GblStringBuffer)+size, ctx)
 
@@ -162,6 +165,12 @@ GBL_INLINE GBL_RESULT       GblStringBuffer_shrinkToFit     (GBL_SELF)          
 
 #define GBL_STRING_BUFFER_ALLOCA_0() \
     GBL_STRING_BUFFER_ALLOCA_1(0)
+
+#define GblStringBuffer_replaceDefault_(...) \
+    GblStringBuffer_replaceDefault__(__VA_ARGS__, 1)
+#define GblStringBuffer_replaceDefault__(buffer, substr, repl, count, ...) \
+    (GblStringBuffer_replace(buffer, substr, repl, count))
+
 ///\endcond
 
 GBL_INLINE char* GblStringBuffer_stackBuffer(GBL_CSELF) GBL_NOEXCEPT {

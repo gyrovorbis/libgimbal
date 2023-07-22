@@ -104,6 +104,7 @@ GBL_EXPORT const GblProperty*
                         GblProperty_next           (GblType            objectType,
                                                     const GblProperty* pPrev,
                                                     GblFlags           mask)               GBL_NOEXCEPT;
+
 GBL_EXPORT GblBool      GblProperty_foreach        (GblType            objectType,
                                                     GBL_PROPERTY_FLAG  flags,
                                                     GblPropertyIterFn  pFnIt,

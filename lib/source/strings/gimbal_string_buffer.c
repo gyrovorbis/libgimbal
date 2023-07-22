@@ -74,9 +74,9 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_remove(GblStringBuffer* pSelf, GblStringVi
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_replace(GblStringBuffer* pSelf, GblStringView substr, GblStringView replacement, size_t  limit) GBL_NOEXCEPT {
+GBL_EXPORT size_t GblStringBuffer_replace(GblStringBuffer* pSelf, GblStringView substr, GblStringView replacement, size_t  limit) GBL_NOEXCEPT {
     const char* pNeedle = NULL;
-    size_t  iterations = 0;
+    size_t iterations = 0;
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     GBL_CTX_VERIFY_POINTER(substr.pData);
     GBL_CTX_VERIFY_POINTER(replacement.pData);
@@ -91,7 +91,8 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_replace(GblStringBuffer* pSelf, GblStringV
           ++iterations;
         } else break;
     }
-    GBL_CTX_END();
+    GBL_CTX_END_BLOCK();
+    return iterations;
 }
 
 

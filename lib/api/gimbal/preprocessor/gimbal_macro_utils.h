@@ -28,11 +28,15 @@ extern "C" {
 #define GBL_BIT_MASK_1(bits)                GBL_BIT_MASK_2(bits, 0)
 #define GBL_BIT_MASK(...)                   GBL_VA_OVERLOAD_CALL_ARGC(GBL_BIT_MASK, __VA_ARGS__)
 
-#define GBL_BCD_BYTE_PACK(n)                (((n/10)<<4)|(n%10))            // 0-99
-#define GBL_BCD_BYTE_UNPACK(n)              (unsigned)(((n>>4)*10)+(n&0xf))
+#define GBL_BCD_BYTE_PACK(n)                (((n / 10) << 4) | (n % 10))            // 0-99
+#define GBL_BCD_BYTE_UNPACK(n)              (unsigned)(((n >> 4) * 10) + (n & 0xf))
 
 #define GBL_CONTAINER_OF(ptr, type, member) ((type*)((char*)(ptr) - offsetof(type, member)))
-#define GBL_COUNT_OF(array)                 (sizeof(array)/sizeof(array[0]))
+#define GBL_COUNT_OF(array)                 (sizeof(array) / sizeof(array[0]))
+
+#define GBL_PTR_OFFSET(...)                 GBL_VA_OVERLOAD_CALL_ARGC(GBL_PTR_OFFSET, __VA_ARGS__)
+#define GBL_PTR_OFFSET_3(type, ptr, bytes)  ((type)(((uintptr_t)ptr) + bytes))
+#define GBL_PTR_OFFSET_2(ptr, bytes)        GBL_PTR_OFFSET_3(void*, ptr, bytes)
 
 #define GBL_SWITCH_CASE_STRINGIFY(s)        case s: return #s
 

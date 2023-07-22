@@ -63,8 +63,8 @@ GBL_EXPORT GBL_RESULT GblUri_parse(GblUri* pUri, const char* pStr, GblBool relax
     return GBL_RESULT_UNIMPLEMENTED;
 }
 
-GBL_EXPORT const char* GblUri_format(const GblUri* pSelf,
-                                     GBL_URI_FLAGS flags,
+GBL_EXPORT const char* GblUri_format(const GblUri*    pSelf,
+                                     GBL_URI_FLAGS    flags,
                                      GblStringBuffer* pStrBuff)
 {
     return NULL;

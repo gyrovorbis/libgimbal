@@ -353,10 +353,10 @@ static GBL_RESULT GblStringBufferTestSuite_overwrite_(GblTestSuite* pSelf, GblCo
 static GBL_RESULT GblStringBufferTestSuite_replace_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_replace(&pSelf_->str.buffer,
+    GBL_TEST_COMPARE(GblStringBuffer_replace(&pSelf_->str.buffer,
                                                 GBL_STRV(" Gay"),
                                                 GBL_STRV("Gas "),
-                                                1));
+                                                1), 1);
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
                                       "Gas station",
                                       pCtx));

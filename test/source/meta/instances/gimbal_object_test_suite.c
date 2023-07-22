@@ -227,10 +227,6 @@ static GBL_RESULT GblObjectTestSuite_newDefault_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIVariantIFace));
     GBL_TEST_COMPARE(pIVariantIFace->pVTable->pGetValueFmt, "p");
 
-    GblITableClass* pITableIFace = GBL_ITABLE_GET_CLASS(pObj);
-    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pITableIFace), GBL_ITABLE_TYPE);
-    GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pITableIFace));
-
     GblIEventHandlerClass* pIEventHandlerIFace = GBL_IEVENT_HANDLER_GET_CLASS(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventHandlerIFace), GBL_IEVENT_HANDLER_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventHandlerIFace));
@@ -240,7 +236,6 @@ static GBL_RESULT GblObjectTestSuite_newDefault_(GblTestSuite* pSelf, GblContext
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventFilterIFace));
 
     // validate sanity of random casts
-    GBL_TEST_COMPARE(pITableIFace, GBL_ITABLE_CLASS(pIEventHandlerIFace));
     GBL_TEST_COMPARE(pIVariantIFace, GBL_IVARIANT_CLASS(pIEventFilterIFace));
 
     //validate some of the compatible checks
@@ -250,7 +245,7 @@ static GBL_RESULT GblObjectTestSuite_newDefault_(GblTestSuite* pSelf, GblContext
     //GBL_TEST_VERIFY(GBL_ITABLE_IFACE_CHECK(GBL_OBJECT_CLASS(pITableIFace)));
 
     //validate insanity
-    GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(GBL_ITABLE_CLASS(GBL_OBJECT_CLASS(GBL_IEVENT_FILTER_CLASS(TEST_OBJECT_GET_CLASS(pObj))))));
+    GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(GBL_OBJECT_CLASS(GBL_IEVENT_FILTER_CLASS(TEST_OBJECT_GET_CLASS(pObj)))));
 
     // validate instance checks and casts
     //GBL_TEST_VERIFY(GBL_IVARIANT_CHECK(pObj));

@@ -4,7 +4,6 @@
  *
  *  \author Falco Girgis
  */
-
 #ifndef GIMBAL_ATOMICS_H
 #define GIMBAL_ATOMICS_H
 

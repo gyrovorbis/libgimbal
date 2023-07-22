@@ -222,6 +222,43 @@ GBL_EXPORT GblObject*    GblVariant_getObjectCopy            (GBL_CSELF)        
 GBL_EXPORT GblObject*    GblVariant_getObjectMove            (GBL_SELF)                      GBL_NOEXCEPT;
 GBL_EXPORT GblObject*    GblVariant_getObjectPeek            (GBL_CSELF)                     GBL_NOEXCEPT;
 
+/*! \name Table Accessors
+ *  \brief Methods for managing and manipulating variants as tables
+ *  \relatesalso GblVariant
+ *  @{
+ */
+//! Looks up the table entry with the given \p pKey, storing its value in \p pValue and also returning it
+GBL_EXPORT GblVariant* GblVariant_index      (GBL_CSELF,
+                                              const GblVariant* pKey,
+                                              GblVariant*       pValue) GBL_NOEXCEPT;
+//! Looks up the talbe entry with the given string key, storing its value in \p pValue and also returning it
+GBL_EXPORT GblVariant* GblVariant_field      (GBL_CSELF,
+                                              const char* pName,
+                                              GblVariant* pValue)       GBL_NOEXCEPT;
+//! Looks up the table entry with the given integral key, storing its value in \p pValue and also returning it
+GBL_EXPORT GblVariant* GblVariant_element    (GBL_CSELF,
+                                              size_t      index,
+                                              GblVariant* pValue)       GBL_NOEXCEPT;
+//! Sets the value of the table entry with the corresponding GblVariant key to \p pValue, returning a status code
+GBL_EXPORT GBL_RESULT  GblVariant_setIndex   (GBL_SELF,
+                                              const GblVariant* pKey,
+                                              GblVariant*       pValue) GBL_NOEXCEPT;
+//! Sets the value of the table entry with the corresponding string key to \p pValue, returning a status code
+GBL_EXPORT GBL_RESULT  GblVariant_setField   (GBL_SELF,
+                                              const char* pName,
+                                              GblVariant* pValue)       GBL_NOEXCEPT;
+//! Sets the value of the table entry with the corresponding integral key to \p pValue, returning a status code
+GBL_EXPORT GBL_RESULT  GblVariant_setElement (GBL_SELF,
+                                              size_t      index,
+                                              GblVariant* pValue)       GBL_NOEXCEPT;
+//! Given the current entry's key (or NIL for the first iteration), sets the next key as well as its value, returning GBL_FALSE after the final entry
+GBL_EXPORT GblBool     GblVariant_next       (GBL_CSELF,
+                                              GblVariant* pKey,
+                                              GblVariant* pValue)       GBL_NOEXCEPT;
+//! Returns the number of table entries within the given GblVariant
+GBL_EXPORT size_t      GblVariant_count      (GBL_CSELF)                GBL_NOEXCEPT;
+//! @}
+
 GBL_EXPORT GblBool       GblVariant_toBool                   (GBL_SELF)                      GBL_NOEXCEPT;
 GBL_EXPORT char          GblVariant_toChar                   (GBL_SELF)                      GBL_NOEXCEPT;
 GBL_EXPORT uint8_t       GblVariant_toUint8                  (GBL_SELF)                      GBL_NOEXCEPT;

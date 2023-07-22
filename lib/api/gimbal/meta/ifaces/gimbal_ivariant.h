@@ -42,17 +42,10 @@ GBL_DECLARE_FLAGS(GBL_IVARIANT_OP_FLAGS) {
     GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY        = 0x00100,
     GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE        = 0x00200,
     GBL_IVARIANT_OP_FLAG_SET_MASK              = 0x003c0,
-    GBL_IVARIANT_OP_FLAG_SET_INDEX_COPY        = 0x00400,
-    GBL_IVARIANT_OP_FLAG_SET_INDEX_MOVE        = 0x00800,
-    GBL_IVARIANT_OP_FLAG_SET_INDEX_MASK        = 0x00c00,
-    GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY        = 0x01000,
-    GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK        = 0x02000,
-    GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE        = 0x04000,
-    GBL_IVARIANT_OP_FLAG_GET_MASK              = 0x07000,
-    GBL_IVARIANT_OP_FLAG_GET_INDEX_COPY        = 0x08000,
-    GBL_IVARIANT_OP_FLAG_GET_INDEX_MOVE        = 0x10000,
-    GBL_IVARIANT_OP_FLAG_GET_INDEX_PEEK        = 0x20000,
-    GBL_IVARIANT_OP_FLAG_GET_INDEX_MASK        = 0x38000,
+    GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY        = 0x00400,
+    GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK        = 0x00800,
+    GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE        = 0x01000,
+    GBL_IVARIANT_OP_FLAG_GET_MASK              = 0x01c00,
     GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE        = 0x40000
 };
 
@@ -65,10 +58,10 @@ typedef struct GblIVariantClassVTable {
     char                    pSetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
     char                    pGetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
 
-    GBL_RESULT (*pFnConstruct)(VARIANT, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
-    GBL_RESULT (*pFnSet)      (VARIANT, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
-    GBL_RESULT (*pFnGet)      (VARIANT, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnConstruct)(VARIANT, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
     GBL_RESULT (*pFnDestruct) (VARIANT);
+    GBL_RESULT (*pFnSet)      (VARIANT, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
+    GBL_RESULT (*pFnGet)      (VARIANT, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op);
     GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, int* pResult);
     GBL_RESULT (*pFnSave)     (CVARIANT, GblStringBuffer* pString);
     GBL_RESULT (*pFnLoad)     (VARIANT,  const GblStringBuffer* pString);
@@ -90,6 +83,8 @@ GBL_INTERFACE_DERIVE(GblIVariant)
 GBL_INTERFACE_END
 
 #define GBL_SELF_TYPE GblIVariantClass
+#define GBL_KEY       const GblVariant* pKey
+#define GBL_VALUE     GblVariant* pValue
 
 GBL_EXPORT GBL_RESULT GblIVariantClass_validate           (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblIVariantClass_constructDefault   (GBL_CSELF, VARIANT)                            GBL_NOEXCEPT;
@@ -121,6 +116,8 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_load               (GBL_CSELF,
 #undef VARIANT
 
 #undef GBL_SELF_TYPE
+#undef GBL_KEY
+#undef GBL_VALUE
 
 GBL_DECLS_END
 

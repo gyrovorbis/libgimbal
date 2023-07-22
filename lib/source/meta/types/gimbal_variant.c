@@ -1,5 +1,6 @@
 #include <gimbal/meta/types/gimbal_variant.h>
 #include <gimbal/meta/ifaces/gimbal_ivariant.h>
+#include <gimbal/meta/ifaces/gimbal_itable_variant.h>
 #include <gimbal/meta/types/gimbal_variant.h>
 #include <gimbal/meta/types/gimbal_type.h>
 #include <gimbal/core/gimbal_ctx.h>
@@ -525,7 +526,7 @@ GBL_EXPORT GblObject* GblVariant_getObjectMove(GblVariant* pSelf)  {
     return pObject;
 }
 
-GBL_EXPORT GblObject* GblVariant_getObjectweakRef(const GblVariant* pSelf)  {
+GBL_EXPORT GblObject* GblVariant_getObjectPeek(const GblVariant* pSelf)  {
     GblObject* pObject = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OBJECT_TYPE);
@@ -813,4 +814,115 @@ GBL_EXPORT GblType GblVariant_toTypeValue(GblVariant* pSelf)  {
 
 GBL_EXPORT GblHash GblVariant_hash(const GblVariant* pSelf) {
     return gblHash(pSelf, sizeof(GblVariant));
+}
+
+GBL_EXPORT GblVariant* GblVariant_index(const GblVariant* pSelf,
+                                        const GblVariant* pKey,
+                                        GblVariant*       pValue)
+{
+    const GblType type = GblVariant_typeOf(pSelf);
+
+    if(!GblType_implements(type, GBL_ITABLE_VARIANT_TYPE)) {
+        GblVariant_setNil(pValue);
+    } else {
+        const GblClass* pClass = GblClass_weakRefDefault(type);
+        GBL_ITABLE_VARIANT_CLASS(pClass)->pFnIndex(pSelf, pKey, pValue);
+    }
+
+    return pValue;
+}
+
+GBL_EXPORT GblVariant* GblVariant_field(const GblVariant* pSelf,
+                                        const char*       pName,
+                                        GblVariant*       pValue)
+{
+    GblVariant k;
+    GblVariant_construct(&k, pName);
+    GblVariant* pRetVal = GblVariant_index(pSelf, &k, pValue);
+    GblVariant_destruct(&k);
+    return pRetVal;
+}
+
+GBL_EXPORT GblVariant* GblVariant_element(const GblVariant* pSelf,
+                                          size_t            index,
+                                          GblVariant*       pValue)
+{
+    GblVariant i;
+    GblVariant_constructSize(&i, index);
+    GblVariant* pRetVal = GblVariant_index(pSelf, &i, pValue);
+    GblVariant_destruct(&i);
+    return pRetVal;
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setIndex(GblVariant*       pSelf,
+                                          const GblVariant* pKey,
+                                          GblVariant*       pValue)
+{
+    GBL_CTX_BEGIN(NULL);
+
+    const GblType type = GblVariant_typeOf(pSelf);
+
+    GBL_CTX_VERIFY(GblType_implements(type, GBL_ITABLE_VARIANT_TYPE),
+                   GBL_RESULT_ERROR_INVALID_OPERATION,
+                   "Attempt to setIndex() on non-GblITableVariant type: [%s]",
+                   GblType_name(type));
+
+    const GblClass* pClass = GblClass_weakRefDefault(type);
+    GBL_CTX_VERIFY_CALL(
+        GBL_ITABLE_VARIANT_CLASS(pClass)->pFnSetIndex(pSelf, pKey, pValue)
+    );
+
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setField(GblVariant* pSelf,
+                                          const char* pName,
+                                          GblVariant* pValue)
+{
+    GblVariant k;
+    GblVariant_construct(&k, pName);
+    const GBL_RESULT result = GblVariant_setIndex(pSelf, &k, pValue);
+    GblVariant_destruct(&k);
+    return result;
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setElement(GblVariant* pSelf,
+                                            size_t            index,
+                                            GblVariant*       pValue)
+{
+    GblVariant i;
+    GblVariant_constructSize(&i, index);
+    const GBL_RESULT result = GblVariant_setIndex(pSelf, &i, pValue);
+    GblVariant_destruct(&i);
+    return result;
+}
+
+GBL_EXPORT GblBool GblVariant_next(const GblVariant* pSelf,
+                                   GblVariant*       pKey,
+                                   GblVariant*       pValue)
+{
+    const GblType type = GblVariant_typeOf(pSelf);
+
+    if(!GblType_implements(type, GBL_ITABLE_VARIANT_TYPE)) {
+        GblVariant_setNil(pKey);
+        GblVariant_setNil(pValue);
+        return GBL_FALSE;
+    } else {
+        const GblClass* pClass = GblClass_weakRefDefault(type);
+        GBL_ITABLE_VARIANT_CLASS(pClass)->pFnNext(pSelf, pKey, pValue);
+        return !GblVariant_isNil(pKey);
+    }
+}
+
+GBL_EXPORT size_t GblVariant_count(const GblVariant* pSelf) {
+    const GblType type = GblVariant_typeOf(pSelf);
+
+    if(!GblType_implements(type, GBL_ITABLE_VARIANT_TYPE))
+        return 0;
+    else {
+        size_t count = 0;
+        const GblClass* pClass = GblClass_weakRefDefault(type);
+        GBL_ITABLE_VARIANT_CLASS(pClass)->pFnCount(pSelf, &count);
+        return count;
+    }
 }
