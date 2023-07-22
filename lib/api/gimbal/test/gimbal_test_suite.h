@@ -108,8 +108,6 @@ GBL_EXPORT GblTestSuite* GblTestSuite_create           (GblType type)           
 GBL_EXPORT GblTestSuite* GblTestSuite_createWithVTable (const char* pName,
                                                         const GblTestSuiteVTable* pVTable)  GBL_NOEXCEPT;
 
-GBL_EXPORT GblTestSuite* GblTestSuite_createExt        (GblType type)                       GBL_NOEXCEPT;
-
 GBL_EXPORT GblRefCount   GblTestSuite_unref            (GBL_SELF)                           GBL_NOEXCEPT;
 
 GBL_EXPORT const char*   GblTestSuite_name             (GBL_CSELF)                          GBL_NOEXCEPT;
