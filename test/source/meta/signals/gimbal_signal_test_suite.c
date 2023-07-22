@@ -1052,7 +1052,7 @@ GBL_EXPORT GblType GblSignalTestSuite_type(void) {
         { NULL,                         NULL                                        }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblSignalTestSuite_init_,
         .pFnSuiteFinal  = GblSignalTestSuite_final_,
         .pCases         = cases

@@ -346,7 +346,7 @@ GBL_EXPORT GblType GblRingBufferTestSuite_type(void) {
         { NULL,                  NULL                                        }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblRingBufferTestSuite_init_,
         .pCases         = cases
     };

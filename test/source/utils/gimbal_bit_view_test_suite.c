@@ -3,7 +3,7 @@
 #include <gimbal/utils/gimbal_bit_view.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 
-#define GBL_TEST_SUITE_SELF GblBitViewTestSuite
+#define GBL_SELF_TYPE GblBitViewTestSuite
 
 GBL_TEST_FIXTURE {
     unsigned dummy;

@@ -4,7 +4,7 @@
 #include <gimbal/core/gimbal_atomics.h>
 #include <tinycthread.h>
 
-#define GBL_TEST_SUITE_SELF GblThreadTestSuite
+#define GBL_SELF_TYPE GblThreadTestSuite
 
 #define GBL_TEST_THREAD_TYPE_                   (GBL_TYPEOF(GblTestThread))
 #define GBL_TEST_THREAD_(self)                  (GBL_INSTANCE_CAST(self, GblTestThread))
@@ -57,8 +57,6 @@ GBL_TEST_FIXTURE {
     GblTestThread*   pTestThreads[GBL_TEST_THREAD_TLS_THREAD_COUNT_];
     volatile GblBool testThreadRan[GBL_TEST_THREAD_TLS_THREAD_COUNT_];
 };
-
-typedef GblThreadTestSuite_ GblFixture;
 
 static GblType GblTestThread_type(void);
 
@@ -237,12 +235,12 @@ static GBL_RESULT threadToggleRun_(GblThread* pSelf) {
 }
 
 static void thread1OnStarted_(GblThread* pSelf) {
-    GblFixture* pFixture = GblClosure_currentUserdata();
+    GblTestFixture* pFixture = GblClosure_currentUserdata();
     pFixture->thread1Started = GBL_TRUE;
 }
 
 static void thread1OnFinished_(GblThread* pSelf) {
-    GblFixture* pFixture = GblClosure_currentUserdata();
+    GblTestFixture* pFixture = GblClosure_currentUserdata();
     pFixture->thread1Finished = GBL_TRUE;
 }
 
@@ -312,7 +310,7 @@ GBL_TEST_CASE_END
 
 static void thread2OnFinished_(GblThread* pSelf) {
     GBL_UNUSED(pSelf);
-    GblFixture* pFixture = GblClosure_currentUserdata();
+    GblTestFixture* pFixture = GblClosure_currentUserdata();
     pFixture->thread2Finished = GBL_TRUE;
 }
 
@@ -331,7 +329,7 @@ GBL_TEST_CASE(detach)
 GBL_TEST_CASE_END
 
 static void _(GblThread* pSelf) {
-    GblFixture* pFixture = GblClosure_currentUserdata();
+    GblTestFixture* pFixture = GblClosure_currentUserdata();
     pFixture->thread1Finished = GBL_TRUE;
 }
 

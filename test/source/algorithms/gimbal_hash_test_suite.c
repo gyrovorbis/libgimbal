@@ -166,7 +166,7 @@ GBL_EXPORT GblType GblHashTestSuite_type(void) {
         { NULL,     NULL                               }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblHashTestSuite_init_,
         .pCases         = cases
     };

@@ -2,7 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_scanner.h>
 
-#define GBL_TEST_SUITE_SELF GblScannerTestSuite
+#define GBL_SELF_TYPE GblScannerTestSuite
 
 GBL_TEST_FIXTURE {
     size_t      refCount;

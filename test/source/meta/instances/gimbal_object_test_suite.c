@@ -707,7 +707,7 @@ static GBL_RESULT GblObjectTestSuite_eventNotify_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(pObj->eventHandlerLastType, GBL_EVENT_TYPE);
     GBL_TEST_COMPARE(GblEvent_state(&event), GBL_EVENT_STATE_ACCEPTED);
 
-    GBL_BOX_UNREF(&event);
+    GBL_UNREF(&event);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
     GBL_CTX_END();
 }
@@ -745,7 +745,7 @@ static GBL_RESULT GblObjectTestSuite_eventNotifyAncestors_(GblTestSuite* pSelf, 
     GBL_TEST_COMPARE(pParent->eventHandlerCount, 2);
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 1);
 
-    GBL_BOX_UNREF(&event);
+    GBL_UNREF(&event);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);
@@ -784,7 +784,7 @@ static GBL_RESULT GblObjectTestSuite_eventSendAncestors_(GblTestSuite* pSelf, Gb
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 1);
     GBL_TEST_COMPARE(GblEvent_state(&event), GBL_EVENT_STATE_ACCEPTED);
 
-    GBL_BOX_UNREF(&event);
+    GBL_UNREF(&event);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);
@@ -838,7 +838,7 @@ static GBL_RESULT GblObjectTestSuite_eventFilters_(GblTestSuite* pSelf, GblConte
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 2);
     GBL_TEST_COMPARE(pChild->eventFilterCount, 2);
 
-    GBL_BOX_UNREF(&event);
+    GBL_UNREF(&event);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);
@@ -874,7 +874,7 @@ GBL_EXPORT GblType GblObjectTestSuite_type(void) {
         { NULL,                                 NULL                                                    }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblObjectTestSuite_init_,
         .pFnSuiteFinal  = GblObjectTestSuite_final_,
         .pCases         = cases

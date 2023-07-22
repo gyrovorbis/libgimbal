@@ -479,7 +479,7 @@ GBL_EXPORT GblRefCount GblTestScenario_unref(GblTestScenario* pSelf) {
 
     GBL_CTX_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
 
-    retVal = GBL_BOX_UNREF(pSelf);
+    retVal = GBL_UNREF(pSelf);
     GBL_CTX_END_BLOCK();
     return retVal;
 }

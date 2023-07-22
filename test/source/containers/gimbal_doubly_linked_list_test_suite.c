@@ -2109,7 +2109,7 @@ GBL_EXPORT GblType GblDoublyLinkedListTestSuite_type(void) {
         { NULL,                   NULL                                               }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblDoublyLinkedListTestSuite_init_,
         .pCases         = cases
     };

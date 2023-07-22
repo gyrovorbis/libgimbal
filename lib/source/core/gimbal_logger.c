@@ -113,8 +113,8 @@ GBL_EXPORT GblBool GblLogger_foreach(GblLoggerIterFn pFnIt,
     return result;
 }
 
-GBL_EXPORT GblLogger* GblLogger_create(GblType derived,
-                                       size_t  allocSize,
+GBL_EXPORT GblLogger* GblLogger_create(GblType         derived,
+                                       size_t          allocSize,
                                        GblLoggerClass* pClass) {
     GblLogger* pSelf = NULL;
     GBL_CTX_BEGIN(NULL);

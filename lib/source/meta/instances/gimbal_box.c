@@ -261,26 +261,26 @@ GBL_EXPORT GBL_RESULT GblBoxClass_setField(GblBoxClass*      pSelf,
 }
 
 
-GBL_EXPORT GblBoxClass* GblBoxClass_createFloatingExt(GblType           derivedType,
-                                                      size_t            totalSize,
-                                                      void*             pUserdata,
-                                                      GblArrayMapDtorFn pFnUdDtor)
+GBL_EXPORT GblBoxClass* GblBoxClass_createFloating(GblType           derivedType,
+                                                   size_t            totalSize,
+                                                   void*             pUserdata,
+                                                   GblArrayMapDtorFn pFnUdDtor)
 {
     GblBoxClass* pClass = NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
     GBL_CTX_VERIFY_ARG(totalSize >= sizeof(GblBoxClass));
     pClass = GBL_CTX_MALLOC(totalSize, 0, GblType_name(derivedType));
-    GBL_CTX_CALL(GblBoxClass_constructFloatingExt(pClass, derivedType, pUserdata, pFnUdDtor));
+    GBL_CTX_CALL(GblBoxClass_constructFloating(pClass, derivedType, pUserdata, pFnUdDtor));
     GBL_CLASS_FLAG_CLEAR_(GBL_CLASS(pClass), GBL_CLASS_FLAG_IN_PLACE_);
     GBL_CTX_END_BLOCK();
     return pClass;
 }
 
-GBL_EXPORT GBL_RESULT GblBoxClass_constructFloatingExt(GblBoxClass*      pSelf,
-                                                       GblType           derivedType,
-                                                       void*             pUserdata,
-                                                       GblArrayMapDtorFn pFnUdDtor)
+GBL_EXPORT GBL_RESULT GblBoxClass_constructFloating(GblBoxClass*      pSelf,
+                                                    GblType           derivedType,
+                                                    void*             pUserdata,
+                                                    GblArrayMapDtorFn pFnUdDtor)
 {
     GBL_CTX_BEGIN(NULL);
     GblClass_constructFloating(GBL_CLASS(pSelf), derivedType);

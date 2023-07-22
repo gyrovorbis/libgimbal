@@ -402,7 +402,7 @@ static GBL_RESULT Signal_connect_(GblInstance*   pEmitter,
 
     GBL_CTX_END_BLOCK();
     if(!GBL_RESULT_SUCCESS(GBL_CTX_RESULT())) {
-        GBL_BOX_UNREF(pClosure);
+        GBL_UNREF(pClosure);
     }
     return GBL_CTX_RESULT();
 }
@@ -476,7 +476,7 @@ GBL_INLINE GBL_RESULT deleteConnection_(Connection_* pConnection) {
 
     GblDoublyLinkedList_remove(&pConnection->emitterList);
     GblDoublyLinkedList_remove(&pConnection->receiverList);
-    GBL_BOX_UNREF(pConnection->pClosure);
+    GBL_UNREF(pConnection->pClosure);
     GBL_CONNECTION_DELETE_(pConnection);
 
     GBL_CTX_END();

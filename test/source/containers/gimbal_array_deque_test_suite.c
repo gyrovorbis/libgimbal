@@ -631,7 +631,7 @@ GBL_EXPORT GblType GblArrayDequeTestSuite_type(void) {
         { NULL,                 NULL                                        }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblArrayDequeTestSuite_init_,
         .pCases         = cases
     };

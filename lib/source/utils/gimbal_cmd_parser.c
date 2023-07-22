@@ -135,14 +135,14 @@ GBL_EXPORT GblCmdParser* GblCmdParser_create(void) {
 }
 
 GBL_EXPORT GblRefCount GblCmdParser_unref(GblCmdParser* pSelf) {
-    return GBL_BOX_UNREF(pSelf);
+    return GBL_UNREF(pSelf);
 }
 
 GBL_EXPORT GBL_RESULT GblCmdParser_setMainOptionGroup(GblCmdParser* pSelf, GblOptionGroup* pGroup) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pGroup);
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
-    GBL_BOX_UNREF(pSelf_->pMainOptionGroup);
+    GBL_UNREF(pSelf_->pMainOptionGroup);
     pSelf_->pMainOptionGroup = pGroup;
     GBL_CTX_END();
 }
@@ -383,7 +383,7 @@ static GBL_RESULT GblCmdParser_Object_setProperty_(GblObject* pObject, const Gbl
         break;
     }
     case GblCmdParser_Property_Id_mainOptionGroup:
-        if(pSelf_->pMainOptionGroup) GBL_BOX_UNREF(pSelf_->pMainOptionGroup);
+        if(pSelf_->pMainOptionGroup) GBL_UNREF(pSelf_->pMainOptionGroup);
         GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &pSelf_->pMainOptionGroup));
         break;
     case GblCmdParser_Property_Id_optionGroups: {

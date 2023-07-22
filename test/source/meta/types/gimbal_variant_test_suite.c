@@ -2472,7 +2472,7 @@ GBL_EXPORT GblType GblVariantTestSuite_type(void) {
         { NULL,                     NULL                                            }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pCases         = cases
     };
 

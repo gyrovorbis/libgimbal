@@ -132,7 +132,7 @@ static GBL_RESULT GblTestSuiteClass_init_(GblClass* pClass, const void* pUd, Gbl
         GBL_PROPERTIES_REGISTER(GblTestSuite);
     }
 
-    const static GblTestSuiteClassVTable defaultVTable = {
+    const static GblTestSuiteVTable defaultVTable = {
         .pFnSuiteInit   = GblTestSuiteClass_vTableDefault_,
         .pFnSuiteFinal  = GblTestSuiteClass_vTableDefault_,
         .pFnCaseInit    = GblTestSuiteClass_vTableDefault_,
@@ -283,19 +283,7 @@ GBL_EXPORT GblType GblTestSuite_type(void) {
     return type;
 }
 
-GBL_EXPORT GblTestSuite* GblTestSuite_create(const char* pName) {
-    GblTestSuite* pSuite = NULL;
-
-    GBL_CTX_BEGIN(NULL);
-    pSuite = GBL_TEST_SUITE(GblObject_create(GBL_TEST_SUITE_TYPE, "name", pName,
-                                                               NULL));
-
-    GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_CTX_END_BLOCK();
-    return pSuite;
-}
-
-GBL_EXPORT GblTestSuite* GblTestSuite_createWithVTable(const char* pName, const GblTestSuiteClassVTable* pVTable) {
+GBL_EXPORT GblTestSuite* GblTestSuite_createWithVTable(const char* pName, const GblTestSuiteVTable* pVTable) {
     GblTestSuite* pSuite = NULL;
     GBL_CTX_BEGIN(NULL);
 
@@ -309,7 +297,7 @@ GBL_EXPORT GblTestSuite* GblTestSuite_createWithVTable(const char* pName, const 
     return pSuite;
 }
 
-GBL_EXPORT GblTestSuite* GblTestSuite_createFromType(GblType type) {
+GBL_EXPORT GblTestSuite* GblTestSuite_create(GblType type) {
     GblTestSuite* pSuite = NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY(GblType_check(type, GBL_TEST_SUITE_TYPE),
@@ -320,7 +308,7 @@ GBL_EXPORT GblTestSuite* GblTestSuite_createFromType(GblType type) {
 }
 
 GBL_EXPORT GblRefCount GblTestSuite_destroy(GblTestSuite* pSelf) {
-    return GBL_BOX_UNREF(pSelf);
+    return GBL_UNREF(pSelf);
 }
 
 GBL_EXPORT GBL_RESULT GblTestSuite_addCase(GblTestSuite* pSelf, const char* pName, GblTestCaseRunFn pFnRun) {
@@ -404,7 +392,7 @@ GBL_EXPORT GblTestScenario* GblTestSuite_scenario(const GblTestSuite* pSelf) {
 
 
 GBL_EXPORT GblType GblTestSuite_register(const char* pName,
-                                         const GblTestSuiteClassVTable* pVTable,
+                                         const GblTestSuiteVTable* pVTable,
                                          size_t  instanceSize,
                                          size_t  instancePrivateSize,
                                          GblFlags typeFlags)

@@ -166,7 +166,7 @@ GBL_EXPORT GblType GblOpaqueTestSuite_type(void) {
         { NULL,             NULL                                }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblOpaqueTestSuite_init_,
         .pFnSuiteFinal  = GblOpaqueTestSuite_final_,
         .pCases         = cases

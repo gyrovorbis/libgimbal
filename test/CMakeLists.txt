@@ -73,6 +73,8 @@ set(GIMBAL_TEST_SOURCES
     source/meta/classes/gimbal_class_test_suite.c
     include/meta/ifaces/gimbal_interface_test_suite.h
     source/meta/ifaces/gimbal_interface_test_suite.c
+    include/meta/ifaces/gimbal_itable_variant_test_suite.h
+    source/meta/ifaces/gimbal_itable_variant_test_suite.c
     include/meta/instances/gimbal_instance_test_suite.h
     source/meta/instances/gimbal_instance_test_suite.c
     include/meta/instances/gimbal_object_test_suite.h

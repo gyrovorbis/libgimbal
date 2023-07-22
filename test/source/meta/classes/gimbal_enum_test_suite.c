@@ -280,7 +280,7 @@ GBL_EXPORT GblType GblEnumTestSuite_type(void) {
         { NULL,                 NULL                                    }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblEnumTestSuite_init_,
         .pFnSuiteFinal  = GblEnumTestSuite_final_,
         .pCases         = cases

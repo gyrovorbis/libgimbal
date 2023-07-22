@@ -20,7 +20,7 @@
 #include "meta/ifaces/gimbal_ilogger.h"
 #include "meta/ifaces/gimbal_interface.h"
 #include "meta/ifaces/gimbal_iplugin.h"
-#include "meta/ifaces/gimbal_itable.h"
+#include "meta/ifaces/gimbal_itable_variant.h"
 #include "meta/ifaces/gimbal_ivariant.h"
 
 #include "meta/instances/gimbal_box.h"

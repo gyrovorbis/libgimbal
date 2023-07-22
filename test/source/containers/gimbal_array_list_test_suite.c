@@ -624,7 +624,7 @@ GBL_EXPORT GblType GblArrayListTestSuite_type(void) {
         { NULL,                     NULL  }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblArrayListTestSuite_init_,
         .pFnSuiteFinal  = GblArrayListTestSuite_final_,
         .pCases         = cases

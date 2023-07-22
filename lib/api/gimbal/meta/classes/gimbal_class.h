@@ -57,6 +57,8 @@ GBL_EXPORT GblRefCount GblClass_unrefDefault       (GBL_SELF)                  G
 GBL_EXPORT GblClass*   GblClass_weakRefDefault     (GblType type)              GBL_NOEXCEPT;
 
 GBL_EXPORT GblClass*   GblClass_createFloating     (GblType type)              GBL_NOEXCEPT;
+//! \todo implement me
+GBL_EXPORT GblClass*   GblClass_createFloatingExt  (GblType type, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblClass_destroyFloating    (GBL_SELF)                  GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT  GblClass_constructFloating  (GBL_SELF, GblType type)    GBL_NOEXCEPT;

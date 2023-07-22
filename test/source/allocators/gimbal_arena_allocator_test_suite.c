@@ -158,7 +158,7 @@ GBL_EXPORT GblType GblArenaAllocatorTestSuite_type(void) {
         { NULL,             NULL                                     }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblArenaAllocatorTestSuite_init_,
         .pCases         = cases
     };

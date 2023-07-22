@@ -252,7 +252,7 @@ GBL_EXPORT GBL_RESULT GblThread_start(GblThread* pSelf) {
        delete it. */
     const int result = thrd_create(&pSelf_->nativeHandle,
                                   GblThread_start_,
-                                  GBL_BOX_REF(pSelf));
+                                  GBL_REF(pSelf));
 
     GBL_CTX_VERIFY(result == thrd_success,
                    GBL_RESULT_ERROR_INVALID_OPERATION,

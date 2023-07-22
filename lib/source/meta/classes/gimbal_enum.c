@@ -291,7 +291,7 @@ GBL_EXPORT GblType GblEnum_type(void) {
     if(enumType == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
 
-        enumType = GblPrimitive_register(GblQuark_internStringStatic("enum"),
+        enumType = GblPrimitive_register(GblQuark_internStringStatic("GblEnum"),
                                          sizeof(GblEnumClass),
                                          sizeof(GblEnumClass_),
                                          &enumIVariantIFace,

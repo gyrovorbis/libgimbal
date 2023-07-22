@@ -13,7 +13,7 @@
 #define TEST_MODULE2_CLASS_(klass)    (GBL_CLASS_CAST(klass, TestModule2))
 #define TEST_MODULE2_GET_CLASS_(self) (GBL_INSTANCE_GET_CLASS(self, TestModule2))
 
-#define GBL_TEST_SUITE_SELF GblModuleTestSuite
+#define GBL_SELF_TYPE GblModuleTestSuite
 
 GBL_CLASS_DERIVE(TestModule1, GblModule)
     const char* pStatic;

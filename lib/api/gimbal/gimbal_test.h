@@ -77,7 +77,7 @@
                 { NULL,                     NULL                                    }
             };
 
-            const static GblTestSuiteClassVTable vTable = {
+            const static GblTestSuiteVTable vTable = {
                 .pCases         = cases
                 .pFnSuiteInit   = GblUuidTestSuite_init_, // any initialization logic before first test case runs
                . pFnSuiteFinal  = GblUuidTestSuite_final_ // any finalization logic after last test case runs

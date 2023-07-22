@@ -35,6 +35,7 @@
 #include "meta/classes/gimbal_opaque_test_suite.h"
 #include "meta/types/gimbal_pointer_test_suite.h"
 #include "meta/instances/gimbal_object_test_suite.h"
+#include "meta/ifaces/gimbal_itable_variant_test_suite.h"
 #include "utils/gimbal_uuid_test_suite.h"
 #include "utils/gimbal_version_test_suite.h"
 #include "utils/gimbal_option_group_test_suite.h"
@@ -124,95 +125,97 @@ int main(int argc, char* pArgv[]) {
                                                     GBL_LOG_LEVEL_ERROR);
 
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_SORT_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_SORT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_HASH_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_HASH_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_LINKED_LIST_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_LINKED_LIST_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_DOUBLY_LINKED_LIST_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_DOUBLY_LINKED_LIST_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_NARY_TREE_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_NARY_TREE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_ARRAY_LIST_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_ARRAY_LIST_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_RING_LIST_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_RING_LIST_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_RING_BUFFER_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_RING_BUFFER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_ARRAY_MAP_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_ARRAY_MAP_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_TREE_SET_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_TREE_SET_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_HASH_SET_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_HASH_SET_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_ARRAY_DEQUE_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_ARRAY_DEQUE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_ARRAY_HEAP_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_ARRAY_HEAP_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_ARENA_ALLOCATOR_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_ARENA_ALLOCATOR_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_POOL_ALLOCATOR_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_POOL_ALLOCATOR_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_SCOPE_ALLOCATOR_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_SCOPE_ALLOCATOR_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_REF_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_REF_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_BYTE_ARRAY_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_BYTE_ARRAY_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_UUID_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_UUID_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_QUARK_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_QUARK_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_STRING_VIEW_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_STRING_VIEW_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_STRING_REF_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_STRING_REF_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_STRING_BUFFER_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_STRING_BUFFER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_PATTERN_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_PATTERN_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_STRING_LIST_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_STRING_LIST_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_TYPE_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_TYPE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_CLASS_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_CLASS_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_INTERFACE_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_INTERFACE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_INSTANCE_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_INSTANCE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_CLOSURE_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_CLOSURE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_SIGNAL_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_SIGNAL_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_VARIANT_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_VARIANT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_ENUM_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_ENUM_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_FLAGS_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_FLAGS_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_POINTER_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_POINTER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_OPAQUE_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_OPAQUE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_OBJECT_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_OBJECT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_VERSION_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_VERSION_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_OPTION_GROUP_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_OPTION_GROUP_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_CMD_PARSER_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_CMD_PARSER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_DATE_TIME_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_DATE_TIME_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_BIT_VIEW_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_BIT_VIEW_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_SCANNER_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_MODULE_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_createFromType(GBL_THREAD_TEST_SUITE_TYPE));
+                                 GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_ITABLE_VARIANT_TEST_SUITE_TYPE));
 
     const GBL_RESULT result = GblTestScenario_run(pScenario, argc, pArgv);
 

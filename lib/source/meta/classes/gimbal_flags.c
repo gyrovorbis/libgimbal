@@ -322,7 +322,7 @@ GBL_EXPORT GblType GblFlags_type(void) {
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
 
-        type = GblPrimitive_register(GblQuark_internStringStatic("flags"),
+        type = GblPrimitive_register(GblQuark_internStringStatic("GblFlags"),
                                      sizeof(GblFlagsClass),
                                      sizeof(GblFlagsClass_),
                                      &flagsIVariantIFace,

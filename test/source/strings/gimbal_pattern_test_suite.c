@@ -2,7 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/strings/gimbal_pattern.h>
 
-#define GBL_TEST_SUITE_SELF GblPatternTestSuite
+#define GBL_SELF_TYPE GblPatternTestSuite
 
 GBL_TEST_FIXTURE {
     const GblPattern* pPattern;

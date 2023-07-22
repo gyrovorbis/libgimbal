@@ -73,7 +73,7 @@ static GBL_RESULT GblModule_arrayMapDtor_(const GblArrayMap* pMap, uintptr_t key
                         uses);
     }
 
-    GBL_BOX_UNREF(pModule);
+    GBL_UNREF(pModule);
     return GBL_RESULT_SUCCESS;
 }
 
@@ -102,7 +102,7 @@ GBL_EXPORT GBL_RESULT GblModule_register(GblModule* pSelf) {
 
     GblArrayMap_setUserdata(&pModules_,
                             quark,
-                            (uintptr_t)GBL_BOX_REF(pSelf),
+                            (uintptr_t)GBL_REF(pSelf),
                             GblModule_arrayMapDtor_);
 
     mtx_unlock(&moduleMtx_);
@@ -291,10 +291,10 @@ GBL_EXPORT GblModule* GblModule_create(GblType     derivedType,
 }
 
 GBL_EXPORT GblRefCount GblModule_unref(GblModule* pSelf) {
-    return GBL_BOX_UNREF(pSelf);
+    return GBL_UNREF(pSelf);
 }
 
-GBL_EXPORT size_t  GblModule_typeCount(const GblModule* pSelf) {
+GBL_EXPORT size_t GblModule_typeCount(const GblModule* pSelf) {
     GBL_UNUSED(pSelf);
     return 0;
 }

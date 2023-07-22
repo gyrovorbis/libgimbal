@@ -120,49 +120,73 @@ GBL_EXPORT GblType GblObject_type(void) GBL_NOEXCEPT;
  *  @{
  */
 //! Creates an object-derived type on the heap, intializing it with a NULL-terminated K,V pair listing of properties
-GBL_EXPORT GblObject* GblObject_create             (GblType type, ...)                      GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_create             (GblType type, ...)                         GBL_NOEXCEPT;
+//! \todo implement
+GBL_EXPORT GblObject* GblObject_createExt          (GblType type , size_t size, ...)           GBL_NOEXCEPT;
 //! Constructs an object-derived type in-place, initializing it with a NULL-terminated K,V pair listing of properties
-GBL_EXPORT GBL_RESULT GblObject_construct          (GBL_SELF, GblType type, ...)            GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblObject_construct          (GBL_SELF, GblType type, ...)               GBL_NOEXCEPT;
 //! Creates an object-derived type on the heap, with the given class, initializing it with a NULL-terminated K,V pair property list
-GBL_EXPORT GblObject* GblObject_createWithClass    (GblObjectClass* pClass, ...)            GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_createWithClass    (GblObjectClass* pClass, ...)               GBL_NOEXCEPT;
+//! \todo implement
+GBL_EXPORT GblObject* GblObject_createExtWithClass (GblObjectClass* pClass, size_t size, ...)  GBL_NOEXCEPT;
 //! Constructs an object-derived type in-place, with the given class, initializing it with a NULL-terminated K,V pair property list
-GBL_EXPORT GBL_RESULT GblObject_constructWithClass (GBL_SELF, GblObjectClass* pClass, ...)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblObject_constructWithClass (GBL_SELF, GblObjectClass* pClass, ...)     GBL_NOEXCEPT;
 //! Variant of GblObject_create(), where the property list is provided as a va_list pointer
-GBL_EXPORT GblObject* GblObject_createVaList       (GblType type, va_list* pList)           GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_createVaList       (GblType type, va_list* pList)              GBL_NOEXCEPT;
+//! \todo implement
+GBL_EXPORT GblObject* GblObject_createExtVaList    (GblType type, size_t size, va_list* pList) GBL_NOEXCEPT;
 //! Variant of GblObject_construct(), where the property list is provided as a va_list pointer
-GBL_EXPORT GBL_RESULT GblObject_constructVaList    (GBL_SELF, GblType type, va_list* pList) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblObject_constructVaList    (GBL_SELF, GblType type, va_list* pList)    GBL_NOEXCEPT;
 //! Variant of GblObject_createWithClass(), where the property list is provided as a va_list pointer
 GBL_EXPORT GblObject* GblObject_createVaListWithClass
-                                                   (GblObjectClass* pClass, va_list* pList) GBL_NOEXCEPT;
+                                                   (GblObjectClass* pClass, va_list* pList)    GBL_NOEXCEPT;
+//! \todo implement
+GBL_EXPORT GblObject* GblObject_createExtVaListWithClass
+                                                   (GblObjectClass* pClass,
+                                                    size_t          size,
+                                                    va_list*        pList)                     GBL_NOEXCEPT;
 //! Variant of GblObjecT_constructWithClass(), where the property list is provided as a va_list pointer
 GBL_EXPORT GBL_RESULT GblObject_constructVaListWithClass
                                                    (GBL_SELF,
                                                     GblObjectClass* pClass,
-                                                    va_list*        pList)                  GBL_NOEXCEPT;
+                                                    va_list*        pList)                     GBL_NOEXCEPT;
 //! Creates an object-derived type on the heap, initializing it with an array of property values and a corresponding array of names
 GBL_EXPORT GblObject* GblObject_createVariants     (GblType     type,
                                                     size_t      propertyCount,
                                                     const char* pNames[],
-                                                    GblVariant* pValues)                    GBL_NOEXCEPT;
+                                                    GblVariant* pValues)                       GBL_NOEXCEPT;
+//! \todo implement
+GBL_EXPORT GblObject* GblObject_createVariantsExt  (GblType     type,
+                                                    size_t      size,
+                                                    size_t      propertyCount,
+                                                    const char* pNames[],
+                                                    GblVariant* pValues)                       GBL_NOEXCEPT;
 //! Creates an object-derived type in-place, initiailzing it with an array of property values and a corresponding array of names
 GBL_EXPORT GBL_RESULT GblObject_constructVariants  (GBL_SELF,
                                                     GblType     type,
                                                     size_t      propertyCount,
                                                     const char* pNames[],
-                                                    GblVariant* pValues)                    GBL_NOEXCEPT;
+                                                    GblVariant* pValues)                       GBL_NOEXCEPT;
 //! Variant of GblObject_createVariants(), where the object is constructed with a weak reference to the given class
 GBL_EXPORT GblObject* GblObject_createVariantsWithClass
                                                    (GblObjectClass* pClass,
                                                     size_t          propertyCount,
                                                     const char*     pNames[],
-                                                    GblVariant*     pValues)                GBL_NOEXCEPT;
+                                                    GblVariant*     pValues)                   GBL_NOEXCEPT;
+//! \todo implement
+GBL_EXPORT GblObject* GblObject_createVariantsExtWithClass
+                                                   (GblObjectClass* pClass,
+                                                    size_t          size,
+                                                    size_t          propertyCount,
+                                                    const char*     pNames[],
+                                                    GblVariant*     pValues)                   GBL_NOEXCEPT;
 //! Variant of GblObject_constructVariants(), where the object is constructed with a weak reference to the given class
 GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass
                                                    (GBL_SELF,
                                                     GblObjectClass* pClass,
                                                     size_t          propertyCount,
                                                     const char*     pNames[],
-                                                    GblVariant*     pValues)                GBL_NOEXCEPT;
+                                                    GblVariant*     pValues)                   GBL_NOEXCEPT;
 //! @}
 
 /*! \name Property Accessors

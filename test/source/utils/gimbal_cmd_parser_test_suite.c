@@ -2,7 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_cmd_parser.h>
 
-#define GBL_TEST_SUITE_SELF GblCmdParserTestSuite
+#define GBL_SELF_TYPE GblCmdParserTestSuite
 
 GBL_TEST_FIXTURE {
     GblCmdParser* pParser;
@@ -434,7 +434,7 @@ GBL_TEST_CASE(positionalArgsAllOptionsDoubleHypen) {
 // process
 
 GBL_TEST_CASE(destroy) {
-    GBL_TEST_COMPARE(GBL_BOX_UNREF(pFixture->pParser), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pFixture->pParser), 0);
     GBL_TEST_CASE_END;
 }
 

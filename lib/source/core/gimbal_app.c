@@ -67,7 +67,7 @@ GBL_EXPORT GblApp* GblApp_create(int argc, const char** ppArgv) {
 }
 
 GBL_EXPORT GblRefCount GblApp_unref(GblApp* pSelf) {
-    return GBL_BOX_UNREF(pSelf);
+    return GBL_UNREF(pSelf);
 }
 
 GBL_EXPORT GBL_RESULT GblApp_exec(GblApp* pSelf) {

@@ -123,6 +123,9 @@ extern "C" {
 #define GBL_TYPEOF(instanceStruct)  \
     GBL_GLUE(instanceStruct, _type())
 
+#define GBL_DECLARE_TYPE(instanceStruct) \
+    GblType GBL_GLUE(instanceStruct, _type(void)) GBL_NOEXCEPT
+
 #define GBL_DECLARE_UNION(S)   \
     union S;                   \
     typedef union S S;         \

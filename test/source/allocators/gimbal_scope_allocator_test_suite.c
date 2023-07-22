@@ -140,7 +140,7 @@ GBL_EXPORT GblType GblScopeAllocatorTestSuite_type(void) {
         { NULL,             NULL                                        }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblScopeAllocatorTestSuite_init_,
         .pFnSuiteFinal  = GblScopeAllocatorTestSuite_final_,
         .pCases         = cases

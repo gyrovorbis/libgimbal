@@ -4,7 +4,7 @@
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <time.h>
 
-#define GBL_TEST_SUITE_SELF GblDateTimeTestSuite
+#define GBL_SELF_TYPE GblDateTimeTestSuite
 
 GBL_TEST_FIXTURE {
     unsigned dummy;

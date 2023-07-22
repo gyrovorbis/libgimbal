@@ -508,6 +508,33 @@ GBL_EXPORT GBL_RESULT GblVariant_getValueCopyVaList(const GblVariant* pSelf, va_
     GBL_VARIANT_END_();
 }
 
+GBL_EXPORT GblBox* GblVariant_getBoxCopy(const GblVariant* pSelf)  {
+    GblBox* pBox = GBL_NULL;
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOX_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_getValueCopy(pSelf, &pBox));
+    GBL_CTX_END_BLOCK();
+    return pBox;
+}
+
+GBL_EXPORT GblBox* GblVariant_getBoxMove(GblVariant* pSelf)  {
+    GblBox* pBox = GBL_NULL;
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOX_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pSelf, &pBox));
+    GBL_CTX_END_BLOCK();
+    return pBox;
+}
+
+GBL_EXPORT GblBox* GblVariant_getBoxPeek(const GblVariant* pSelf)  {
+    GblBox* pBox = GBL_NULL;
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOX_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(pSelf, &pBox));
+    GBL_CTX_END_BLOCK();
+    return pBox;
+}
+
 GBL_EXPORT GblObject* GblVariant_getObjectCopy(const GblVariant* pSelf)  {
     GblObject* pObject = GBL_NULL;
     GBL_CTX_BEGIN(NULL);

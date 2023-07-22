@@ -219,7 +219,7 @@ GBL_EXPORT GblType GblQuarkTestSuite_type(void) {
         { NULL,                 NULL                                    }
     };
 
-    const static GblTestSuiteClassVTable vTable = {
+    const static GblTestSuiteVTable vTable = {
         .pFnSuiteInit   = GblQuarkTestSuite_init_,
         .pFnSuiteFinal  = GblQuarkTestSuite_final_,
         .pCases         = cases

@@ -4,7 +4,7 @@
 #include <gimbal/meta/signals/gimbal_c_closure.h>
 #include <math.h>
 
-#define GBL_TEST_SUITE_SELF GblOptionGroupTestSuite
+#define GBL_SELF_TYPE GblOptionGroupTestSuite
 
 GBL_TEST_FIXTURE {
     GblOptionGroup* pGroup;
@@ -62,7 +62,7 @@ GBL_RESULT parseArg7_(GblOptionGroup* pGroup, const GblOption* pOption, GblStrin
 
 GBL_RESULT parseArg8_(GblOptionGroup* pGroup, const GblOption* pOption, GblStringView value, GblBool* pConsumed) {
     GBL_UNUSED(pOption, value, pConsumed);
-    GblOptionGroupTestSuite_* pFixture = GblBox_userdata(GBL_BOX(pGroup));
+    GblTestFixture* pFixture = GblBox_userdata(GBL_BOX(pGroup));
     pFixture->eighth = GBL_TRUE;
     return GBL_RESULT_SUCCESS;
 }
@@ -454,7 +454,7 @@ GBL_TEST_CASE(parseErrorNotify) {
 
 
 GBL_TEST_CASE(destroy) {
-    GBL_TEST_COMPARE(GBL_BOX_UNREF(pFixture->pGroup), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pFixture->pGroup), 0);
     GBL_TEST_CASE_END;
 }
 

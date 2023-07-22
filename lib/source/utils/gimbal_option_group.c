@@ -31,7 +31,7 @@ GBL_EXPORT GblOptionGroup* GblOptionGroup_create(const char*      pName,
 }
 
 GBL_EXPORT GblRefCount GblOptionGroup_unref(GblOptionGroup* pSelf) {
-    return GBL_BOX_UNREF(pSelf);
+    return GBL_UNREF(pSelf);
 }
 
 GBL_EXPORT GBL_RESULT (GblOptionGroup_parse)(GblOptionGroup* pSelf,
