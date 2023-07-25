@@ -706,7 +706,7 @@ GBL_EXPORT GblDateTime* GblDateTime_addYears(GblDateTime* pSelf, GblYear years) 
 }
 
 
-GBL_EXPORT GblBool GblDate_isLeapYear(GblYear year) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblDate_isLeapYear(GblYear year) {
     GBL_ASSERT(year > GBL_DATE_GREGORIAN_YEAR_FIRST, "Must be a Gregorian year!");
     if (year % 4) {
         return GBL_FALSE;
@@ -719,13 +719,13 @@ GBL_EXPORT GblBool GblDate_isLeapYear(GblYear year) GBL_NOEXCEPT {
     }
 }
 
-GBL_EXPORT GblDay GblDate_monthDays(GblMonth month, GblYear year) GBL_NOEXCEPT {
+GBL_EXPORT GblDay GblDate_monthDays(GblMonth month, GblYear year) {
     if(month == GBL_MONTH_FEBRUARY) {
         return GblDate_isLeapYear(year)? 29 : 28;
     } else return (month > GBL_MONTH_JULY)? ((month&1)? 30: 31) : ((month&1)? 31: 30);
 }
 
-GBL_EXPORT GblBool GblDate_isValid(const GblDate* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblDate_isValid(const GblDate* pSelf) {
     if(pSelf->day <= 0)
         return GBL_FALSE;
     if(pSelf->month <= 0)
@@ -740,7 +740,7 @@ GBL_EXPORT GblBool GblDate_isValid(const GblDate* pSelf) GBL_NOEXCEPT {
 }
 
 // Should work with non-Gregorian times?
-GBL_EXPORT GblDay GblDate_toJulian(const GblDate* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblDay GblDate_toJulian(const GblDate* pSelf) {
     const GblDay a = (14 - pSelf->month) / 12;
     const GblDay y = pSelf->year + 4800 - a;
     const GblDay m = pSelf->month + 12*a - 3;
@@ -758,14 +758,14 @@ GBL_EXPORT GblDay GblDate_toJulian(const GblDate* pSelf) GBL_NOEXCEPT {
     return jdn;
 }
 
-GBL_EXPORT GblWeekDay GblDate_weekDay(const GblDate* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblWeekDay GblDate_weekDay(const GblDate* pSelf) {
     GblDay d = pSelf->day;
     GblDay m = pSelf->month;
     GblDay y = pSelf->year;
     return (GblWeekDay)((d += m < 3 ? y-- : y - 2, 23*m/9 + d + 4 + y/4- y/100 + y/400)%7);
 }
 
-GBL_EXPORT GblDay GblDate_yearDay(const GblDate* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblDay GblDate_yearDay(const GblDate* pSelf) {
     static const GblDay days[2][13] = {
         {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334},
         {0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335}
@@ -775,12 +775,12 @@ GBL_EXPORT GblDay GblDate_yearDay(const GblDate* pSelf) GBL_NOEXCEPT {
             + pSelf->day;
 }
 
-GBL_EXPORT uint8_t GblDate_yearWeek(const GblDate* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT uint8_t GblDate_yearWeek(const GblDate* pSelf) {
     return GblDate_yearDay(pSelf)/7;
 }
 
 // MAYBE works with non-Gregorian times?
-GBL_EXPORT GblDate* GblDate_fromJulian(GblDate* pSelf, GblDay julianDate) GBL_NOEXCEPT {
+GBL_EXPORT GblDate* GblDate_fromJulian(GblDate* pSelf, GblDay julianDate) {
     int i, j, k, n, l;
 
     l = julianDate+68569;
@@ -801,7 +801,7 @@ GBL_EXPORT GblDate* GblDate_fromJulian(GblDate* pSelf, GblDay julianDate) GBL_NO
     return pSelf;
 }
 
-GBL_EXPORT GblBool GblTime_isValid(const GblTime* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblTime_isValid(const GblTime* pSelf) {
     if(pSelf->nSeconds < 0)
         return GBL_FALSE;
     if(pSelf->seconds < 0)
