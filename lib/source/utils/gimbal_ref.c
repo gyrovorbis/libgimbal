@@ -1,6 +1,16 @@
 #include <gimbal/utils/gimbal_ref.h>
+#include <gimbal/core/gimbal_atomics.h>
+
+typedef struct GblRef_ {
+    GblContext*         pCtx;
+    GBL_ATOMIC_INT16    refCount;
+} GblRef_;
 
 static GBL_ATOMIC_INT16 activeCount_ = 0;
+
+GBL_INLINE  GblRef_* GblRef_header_(const void* pData) GBL_NOEXCEPT {
+    return (GblRef_*)(pData? (GblRef_*)pData - 1 : NULL);
+}
 
 GBL_EXPORT GBL_RESULT GblRef_reinit(void) {
     GBL_CTX_BEGIN(NULL);
@@ -65,3 +75,41 @@ GBL_EXPORT GblRefCount GblRef_releaseWithDtor(void* pData,
     }
     return refCount;
 }
+
+GBL_EXPORT void* GblRef_alloc(size_t  size) GBL_NOEXCEPT {
+    return GblRef_allocWithContext(size, NULL);
+}
+
+GBL_EXPORT void* GblRef_acquire(void* pSelf) GBL_NOEXCEPT
+{
+    void* pRetData = NULL;
+    if(pSelf) {
+        GblRef_* pHeader = GblRef_header_(pSelf);
+        GBL_ATOMIC_INT16_INC(pHeader->refCount);
+        pRetData = pSelf;
+    }
+    return pRetData;
+}
+
+GBL_EXPORT GblRefCount GblRef_release(void* pSelf) GBL_NOEXCEPT {
+    return GblRef_releaseWithDtor(pSelf, NULL);
+}
+
+GBL_EXPORT GblRefCount GblRef_refCount(const void* pSelf) GBL_NOEXCEPT {
+    GblRefCount refCount = 0;
+    if(pSelf) {
+        GblRef_* pHeader = GblRef_header_(pSelf);
+        refCount = GBL_ATOMIC_INT16_LOAD(pHeader->refCount);
+    }
+    return refCount;
+}
+
+GBL_EXPORT GblContext* GblRef_context(const void* pSelf) GBL_NOEXCEPT {
+    GblContext* pCtx = NULL;
+    if(pSelf) {
+        GblRef_* pHeader = GblRef_header_(pSelf);
+        pCtx = pHeader->pCtx;
+    }
+    return pCtx;
+}
+

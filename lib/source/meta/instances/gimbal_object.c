@@ -314,7 +314,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVaList_(const GblObject* pSelf, const Gb
 
     GBL_CTX_CALL(GblVariant_constructDefault(&variant, GBL_NIL_TYPE));
     GBL_CTX_CALL(GblObject_propertyVCall_(pSelf, pProp, &variant));
-    GBL_CTX_CALL(GblVariant_getValueCopyVaList(&variant, pList));
+    GBL_CTX_CALL(GblVariant_copyValueVaList(&variant, pList));
     GBL_CTX_CALL(GblVariant_destruct(&variant));
 
     GBL_CTX_END();
@@ -449,7 +449,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertiesVaList(const GblObject* pSelf, va_list
             GblVariant variant;
             GBL_CTX_CALL(GblVariant_constructDefault(&variant, GBL_NIL_TYPE));
             GBL_CTX_CALL(GblObject_propertyVCall_(pSelf, pProp, &variant));
-            GBL_CTX_CALL(GblVariant_getValueCopyVaList(&variant, pVarArgs));
+            GBL_CTX_CALL(GblVariant_copyValueVaList(&variant, pVarArgs));
             if(pProp->flags & GBL_PROPERTY_FLAG_READ) {
                 ;
             } else {
@@ -1402,19 +1402,19 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
     switch(pProp->id) {
     case GblObject_Property_Id_name: {
         const char* pName = NULL;
-        GBL_CTX_CALL(GblVariant_getValueCopy(pValue, &pName));
+        GBL_CTX_CALL(GblVariant_copyValue(pValue, &pName));
         GblObject_setName(pSelf, pName);
         break;
     }
     case GblObject_Property_Id_parent: {
         GblObject* pParent = NULL;
-        GBL_CTX_CALL(GblVariant_getValuePeek(pValue, &pParent));
+        GBL_CTX_CALL(GblVariant_peekValue(pValue, &pParent));
         GblObject_setParent(pSelf, pParent);
         break;
     }
     case GblObject_Property_Id_userdata: {
         void* pUserdata = NULL;
-        GBL_CTX_CALL(GblVariant_getValueCopy(pValue, &pUserdata));
+        GBL_CTX_CALL(GblVariant_copyValue(pValue, &pUserdata));
         GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
         break;
     }
@@ -1431,10 +1431,11 @@ static GBL_RESULT GblObject_constructed_(GblObject* pSelf) {
     return GBL_RESULT_SUCCESS;
 }
 
-
 static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
     GBL_UNUSED(pData);
     GBL_CTX_BEGIN(pCtx);
+
+    static GblIVariantVTable iVariantVTable;
 
     // static constructor for first instance of class
     if(!GblType_classRefCount(GBL_OBJECT_TYPE)) {
@@ -1444,31 +1445,11 @@ static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData, GblC
         objectEventFiltersQuark_    = GblQuark_fromStringStatic("_eventFilters");
 
         GBL_PROPERTIES_REGISTER(GblObject);
-    }
 
-    static const GblIVariantClassVTable iVariantVTable = {
-        .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
-                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
-                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |
-                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY   |
-                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE   |
-                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY         |
-                        GBL_IVARIANT_OP_FLAG_SET_COPY               |
-                        GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE         |
-                        GBL_IVARIANT_OP_FLAG_SET_MOVE               |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY         |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE         |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
-        .pGetValueFmt = "p",
-        .pSetValueFmt = "p",
-        .pFnConstruct =    GblObject_IVariant_construct_,
-        .pFnDestruct  =    GblObject_IVariant_destruct_,
-        .pFnCompare   =    GblObject_IVariant_compare_,
-        .pFnGet       =    GblObject_IVariant_get_,
-        .pFnSet       =    GblObject_IVariant_set_,
-        .pFnLoad      =    GblObject_IVariant_load_,
-        .pFnSave      =    GblObject_IVariant_save_,
-    };
+        memcpy(&iVariantVTable, GBL_IVARIANT_CLASS(pClass)->pVTable, sizeof(GblIVariantVTable));
+        iVariantVTable.pFnLoad = GblObject_IVariant_load_;
+        iVariantVTable.pFnSave = GblObject_IVariant_save_;
+    }
 
     GBL_IVARIANT_CLASS(pClass)      ->pVTable        = &iVariantVTable;
     GBL_BOX_CLASS(pClass)           ->pFnDestructor  = GblObject_Box_destructor_;

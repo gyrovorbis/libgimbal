@@ -42,7 +42,7 @@
             GblUuid uuids[GBL_UUID_TEST_SUITE__V4_COUNT];
 
             for(int u = 0; u < GBL_UUID_TEST_SUITE__V4_COUNT; ++u) {
-                GBL_API_VERIFY_CALL(GblUuid_initV4(&uuids[u]));
+                GBL_API_VERIFY_CALL(GblUuid_genV4(&uuids[u]));
 
                 GBL_TEST_COMPARE(GblUuid_version(&uuids[u]), 4);
                 GBL_TEST_VERIFY(!GblUuid_isNil(&uuids[u]));

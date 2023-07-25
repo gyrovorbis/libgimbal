@@ -163,7 +163,7 @@ static GBL_RESULT GblOpaque_convertFrom_(const GblVariant* pVariant, GblVariant*
 GBL_EXPORT GblType GblOpaque_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    static const GblIVariantClassVTable opaqueIVariantIFace =  {
+    static const GblIVariantVTable opaqueIVariantIFace =  {
         .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
                         GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
                         GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |

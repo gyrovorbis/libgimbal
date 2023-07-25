@@ -3,6 +3,9 @@
  *  \ingroup containers
  *  \copydoc GblArrayMap
  *
+ *  \bug
+ *      - Extracting the last item will still invoke its destructor!
+ *
  *  \author Falco Girgis
  */
 #ifndef GIMBAL_ARRAY_MAP_H
@@ -161,7 +164,7 @@ GBL_INLINE uintptr_t GblArrayMap_valueFromVariant_(GblVariant* pVariant) GBL_NOE
         if(pVariant->type == GBL_INVALID_TYPE)
             value = (uintptr_t)pVariant->pVoid;
         else
-           GblVariant_getValuePeek(pVariant, &value);
+           GblVariant_peekValue(pVariant, &value);
     }
     return value;
 }

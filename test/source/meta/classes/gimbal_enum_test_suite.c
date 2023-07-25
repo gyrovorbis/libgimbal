@@ -158,12 +158,12 @@ static GBL_RESULT GblEnumTestSuite_variant_(GblTestSuite* pSelf, GblContext* pCt
 
     // Value Get Move
     GblEnum color = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &color));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &color));
     GBL_TEST_COMPARE(color, GREEN);
 
     // Value Get Peek
     GblVariant_setEnum(&v, pSelf_->enumType, BLUE);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &color));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &color));
     GBL_TEST_COMPARE(color, BLUE);
 
     // Destructor

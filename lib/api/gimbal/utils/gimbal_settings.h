@@ -10,7 +10,6 @@
  *  \author    2023 Falco Girgis
  *  \copyright MIT License
  */
-
 #ifndef GIMBAL_SETTINGS_H
 #define GIMBAL_SETTINGS_H
 
@@ -31,10 +30,13 @@
 
 GBL_FORWARD_DECLARE_STRUCT(GblSettings);
 
+/* \enum  GBL_SETTINGS_STATUS
+ * \brief Status code for GblSettings state (\ref GblSettings::status)
+ */
 GBL_DECLARE_ENUM(GBL_SETTINGS_STATUS) {
-    GBL_SETTINGS_STATUS_OK,
-    GBL_SETTINGS_STATUS_ERROR_FILE,
-    GBL_SETTINGS_STATUS_ERROR_FORMAT
+    GBL_SETTINGS_STATUS_OK,             //!< OK
+    GBL_SETTINGS_STATUS_ERROR_FILE,     //!< File Error
+    GBL_SETTINGS_STATUS_ERROR_FORMAT    //!< Format Error
 };
 
 /*! \struct  GblSettingsClass
@@ -57,6 +59,7 @@ GBL_CLASS_END
 
 /*! \struct  GblSettings
  *  \extends GblObject
+ *  \ingroup utils
  *  \brief   User-settings data management and persistence
  *
  *  GblSettings provides a mechanism through which user

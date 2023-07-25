@@ -270,6 +270,7 @@ set(GIMBAL_SOURCES
     source/utils/gimbal_uri.c
     source/utils/gimbal_scanner.c
     source/utils/gimbal_settings.c
+    source/utils/gimbal_timer.c
 )
 
 add_library(libGimbal STATIC

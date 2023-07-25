@@ -272,7 +272,7 @@ static GBL_RESULT enumClass_final_(GblClass* pClass,
 GBL_EXPORT GblType GblEnum_type(void) {
     static GblType enumType = GBL_INVALID_TYPE;
 
-    const static GblIVariantClassVTable enumIVariantIFace =  {
+    const static GblIVariantVTable enumIVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE        |
                             GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT  |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY     |

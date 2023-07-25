@@ -135,39 +135,39 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
     } GBL_STMT_END
 
 
-#ifndef GBL_TEST_SUITE_SELF_NAME
-#   define GBL_TEST_SUITE_SELF_NAME pSelf
+#ifndef GBL_SELF_TYPE_NAME
+#   define GBL_SELF_TYPE_NAME pSelf
 #endif
 
 #ifndef GBL_TEST_SUITE_CONTEXT_NAME
 #   define GBL_TEST_SUITE_CONTEXT_NAME pCtx
 #endif
 
-#ifndef GBL_TEST_SUITE_SELF_PRIVATE_NAME
-#   define GBL_TEST_SUITE_SELF_PRIVATE_NAME pFixture
+#ifndef GBL_SELF_TYPE_PRIVATE_NAME
+#   define GBL_SELF_TYPE_PRIVATE_NAME pFixture
 #endif
 
-#ifndef GBL_TEST_SUITE_SELF_PRIVATE
-#   define GBL_TEST_SUITE_SELF_PRIVATE  GBL_GLUE(GBL_SELF_TYPE, _)
+#ifndef GBL_SELF_TYPE_PRIVATE
+#   define GBL_SELF_TYPE_PRIVATE  GBL_GLUE(GBL_SELF_TYPE, _)
 #endif
 
 #define GBL_TEST_CASE(name)                                                         \
     static GBL_RESULT GBL_GLUE(GBL_GLUE(GBL_GLUE(GBL_SELF_TYPE, _), name), _) \
-                               (GblTestSuite* GBL_TEST_SUITE_SELF_NAME,             \
+                               (GblTestSuite* GBL_SELF_TYPE_NAME,             \
                                 GblContext*   GBL_TEST_SUITE_CONTEXT_NAME) {        \
         GBL_CTX_BEGIN(GBL_TEST_SUITE_CONTEXT_NAME);                                 \
-        GBL_TEST_SUITE_SELF_PRIVATE* GBL_TEST_SUITE_SELF_PRIVATE_NAME =             \
-                (GBL_TEST_SUITE_SELF_PRIVATE*)                                      \
+        GBL_SELF_TYPE_PRIVATE* GBL_SELF_TYPE_PRIVATE_NAME =             \
+                (GBL_SELF_TYPE_PRIVATE*)                                      \
                     GBL_INSTANCE_PRIVATE(pSelf, GBL_TYPEOF(GBL_SELF_TYPE));   \
-        GBL_UNUSED(GBL_TEST_SUITE_SELF_NAME,                                        \
+        GBL_UNUSED(GBL_SELF_TYPE_NAME,                                        \
                    GBL_TEST_SUITE_CONTEXT_NAME,                                     \
-                   GBL_TEST_SUITE_SELF_PRIVATE_NAME);
+                   GBL_SELF_TYPE_PRIVATE_NAME);
 
 #define GBL_TEST_CASE_END   \
     GBL_CTX_END(); }
 
 #define GBL_TEST_FIXTURE_TYPE \
-    GBL_TEST_SUITE_SELF_PRIVATE
+    GBL_SELF_TYPE_PRIVATE
 
 #define GBL_TEST_FIXTURE \
     struct GBL_TEST_FIXTURE_TYPE;   \
@@ -191,7 +191,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
         type = GblTestSuite_register(GblQuark_internStringStatic(GBL_STRINGIFY(GBL_SELF_TYPE)), \
                                      &vTable, \
                                      sizeof(GBL_SELF_TYPE), \
-                                     sizeof(GBL_TEST_SUITE_SELF_PRIVATE), \
+                                     sizeof(GBL_SELF_TYPE_PRIVATE), \
                                      GBL_TYPE_FLAGS_NONE); \
         GBL_CTX_VERIFY_LAST_RECORD(); \
         GBL_CTX_END_BLOCK();\

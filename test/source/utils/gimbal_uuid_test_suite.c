@@ -54,7 +54,7 @@ static GBL_RESULT GblUuidTestSuite_initNilInvalid_(GblTestSuite* pSelf, GblConte
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
 
-    GBL_TEST_COMPARE(GblUuid_initNil(NULL), GBL_RESULT_ERROR_INVALID_POINTER);
+    GBL_TEST_COMPARE(GblUuid_setNil(NULL), GBL_RESULT_ERROR_INVALID_POINTER);
     GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_CTX_END();
@@ -66,8 +66,8 @@ static GBL_RESULT GblUuidTestSuite_initNil_(GblTestSuite* pSelf, GblContext* pCt
 
     GblUuid uuid1, uuid2;
 
-    GBL_CTX_VERIFY_CALL(GblUuid_initNil(&uuid1));
-    GBL_CTX_VERIFY_CALL(GblUuid_initNil(&uuid2));
+    GBL_CTX_VERIFY_CALL(GblUuid_setNil(&uuid1));
+    GBL_CTX_VERIFY_CALL(GblUuid_setNil(&uuid2));
 
     GBL_TEST_VERIFY(GblUuid_isNil(&uuid1));
     GBL_TEST_VERIFY(GblUuid_isNil(&uuid2));
@@ -83,7 +83,7 @@ static GBL_RESULT GblUuidTestSuite_initV4Invalid_(GblTestSuite* pSelf, GblContex
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
 
-    GBL_TEST_COMPARE(GblUuid_initV4(NULL), GBL_RESULT_ERROR_INVALID_POINTER);
+    GBL_TEST_COMPARE(GblUuid_genV4(NULL), GBL_RESULT_ERROR_INVALID_POINTER);
     GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_CTX_END();
@@ -96,7 +96,7 @@ static GBL_RESULT GblUuidTestSuite_initV4_(GblTestSuite* pSelf, GblContext* pCtx
     GblUuid uuids[GBL_UUID_TEST_SUITE__V4_COUNT];
 
     for(int u = 0; u < GBL_UUID_TEST_SUITE__V4_COUNT; ++u) {
-        GBL_CTX_VERIFY_CALL(GblUuid_initV4(&uuids[u]));
+        GBL_CTX_VERIFY_CALL(GblUuid_genV4(&uuids[u]));
 
         GBL_TEST_COMPARE(GblUuid_version(&uuids[u]), 4);
         GBL_TEST_VERIFY(!GblUuid_isNil(&uuids[u]));
@@ -119,27 +119,27 @@ static GBL_RESULT GblUuidTestSuite_initFromStringInvalid_(GblTestSuite* pSelf, G
     GblUuid uuid;
 
     // NULL UUID
-    GBL_TEST_COMPARE(GblUuid_initFromString(NULL, NULL), GBL_RESULT_ERROR_INVALID_POINTER);
+    GBL_TEST_COMPARE(GblUuid_parse(NULL, NULL), GBL_RESULT_ERROR_INVALID_POINTER);
     GBL_CTX_CLEAR_LAST_RECORD();
 
     // NULL string
-    GBL_TEST_COMPARE(GblUuid_initFromString(&uuid, NULL), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_TEST_COMPARE(GblUuid_parse(&uuid, NULL), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
 
     // String too small
-    GBL_TEST_COMPARE(GblUuid_initFromString(&uuid, ""), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_TEST_COMPARE(GblUuid_parse(&uuid, ""), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
 
     // String too large
-    GBL_TEST_COMPARE(GblUuid_initFromString(&uuid, "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_TEST_COMPARE(GblUuid_parse(&uuid, "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
 
     // String with bullshit characters
-    GBL_TEST_COMPARE(GblUuid_initFromString(&uuid, "qwrb9644-2b63-4dc3-8017-c191009d6725"), GBL_RESULT_ERROR_INVALID_ARG);
+    GBL_TEST_COMPARE(GblUuid_parse(&uuid, "qwrb9644-2b63-4dc3-8017-c191009d6725"), GBL_RESULT_ERROR_INVALID_ARG);
     GBL_CTX_CLEAR_LAST_RECORD();
 
     // String with incorrect hyphen placement
-    GBL_TEST_COMPARE(GblUuid_initFromString(&uuid, "454b964-42b63-4dc3-8017-c191009d6725"), GBL_RESULT_ERROR_INVALID_ARG);
+    GBL_TEST_COMPARE(GblUuid_parse(&uuid, "454b964-42b63-4dc3-8017-c191009d6725"), GBL_RESULT_ERROR_INVALID_ARG);
     GBL_CTX_CLEAR_LAST_RECORD();
 
     GBL_CTX_END();
@@ -166,7 +166,7 @@ static GBL_RESULT GblUuidTestSuite_initFromString_(GblTestSuite* pSelf, GblConte
     GBL_CTX_BEGIN(pCtx);
 
     for(int u = 0; u < GBL_COUNT_OF(uuidStrings); ++u) {
-        GBL_CTX_VERIFY_CALL(GblUuid_initFromString(&uuids[u], uuidStrings[u]));
+        GBL_CTX_VERIFY_CALL(GblUuid_parse(&uuids[u], uuidStrings[u]));
 
         GBL_TEST_COMPARE(GblUuid_version(&uuids[u]), 4);
         GBL_TEST_VERIFY(!GblUuid_isNil(&uuids[u]));
@@ -176,7 +176,7 @@ static GBL_RESULT GblUuidTestSuite_initFromString_(GblTestSuite* pSelf, GblConte
         }
 
         GblUuid tempUuid;
-        GBL_CTX_VERIFY_CALL(GblUuid_initFromString(&tempUuid, uuidStrings[u]));
+        GBL_CTX_VERIFY_CALL(GblUuid_parse(&tempUuid, uuidStrings[u]));
 
         GBL_TEST_COMPARE(GblUuid_compare(&uuids[u], &tempUuid), 0);
 
@@ -207,14 +207,14 @@ static GBL_RESULT GblUuidTestSuite_toString_(GblTestSuite* pSelf, GblContext* pC
     GBL_CTX_BEGIN(pCtx);
 
     for(int u = 0; u < GBL_COUNT_OF(uuidStrings); ++u) {
-        GBL_CTX_VERIFY_CALL(GblUuid_initFromString(&uuids[u], uuidStrings[u]));
-        GBL_CTX_VERIFY_CALL(GblUuid_toString(&uuids[u], uuidStringBuffer));
+        GBL_CTX_VERIFY_CALL(GblUuid_parse(&uuids[u], uuidStrings[u]));
+        GBL_TEST_COMPARE(GblUuid_string(&uuids[u], uuidStringBuffer),
+                         uuidStringBuffer);
         GBL_TEST_COMPARE(uuidStrings[u], uuidStringBuffer);
 
         GblUuid tempUuid;
-        GBL_CTX_VERIFY_CALL(GblUuid_initFromString(&tempUuid, uuidStringBuffer));
+        GBL_CTX_VERIFY_CALL(GblUuid_parse(&tempUuid, uuidStringBuffer));
         GBL_TEST_COMPARE(GblUuid_compare(&uuids[u], &tempUuid), 0);
-
     }
 
     GBL_CTX_END();

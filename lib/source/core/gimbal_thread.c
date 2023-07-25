@@ -307,11 +307,11 @@ GBL_EXPORT GblThread* GblThread_current(void) {
 }
 
 GBL_EXPORT GblClosure* GblThread_closure(const GblThread* pSelf) {
-    return (GblClosure*)GblBox_getField(GBL_BOX(pSelf), closureQuark_);
+    return (GblClosure*)GblBox_field(GBL_BOX(pSelf), closureQuark_);
 }
 
 GBL_EXPORT GblThreadFn GblThread_callback(const GblThread* pSelf) {
-    return (GblThreadFn)GblBox_getField(GBL_BOX(pSelf), callbackQuark_);
+    return (GblThreadFn)GblBox_field(GBL_BOX(pSelf), callbackQuark_);
 }
 
 static GBL_RESULT GblThread_closureDtor_(const GblArrayMap* pMap, uintptr_t key, void* pUd) {
@@ -438,7 +438,7 @@ static GBL_RESULT GblThread_GblObject_setProperty_(GblObject* pObject, const Gbl
         GblThread_setAffinity(pSelf, GblVariant_toFlags(pValue)); break;
     case GblThread_Property_Id_closure: {
         GblClosure* pClosure = NULL;
-        GblVariant_getValueMove(pValue, &pClosure);
+        GblVariant_moveValue(pValue, &pClosure);
         GblThread_setClosure(pSelf, pClosure);
         break;
     }

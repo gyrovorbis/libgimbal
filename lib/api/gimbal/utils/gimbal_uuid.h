@@ -10,9 +10,9 @@
  *  \todo
  *      - fix reliance on apparently determinsitic random mechanism
  *
- *  \author Falco Girgis
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
-
 #ifndef GIMBAL_UUID_H
 #define GIMBAL_UUID_H
 
@@ -28,9 +28,9 @@
 GBL_DECLS_BEGIN
 
 /*! \brief Universally unique identifier
+ *  \ingroup utils
  *
  *  RFC 4122-based UUID type.
- *  \ingroup utils
  */
 typedef struct GblUuid {
     union {
@@ -46,20 +46,27 @@ typedef struct GblUuid {
     };
 } GblUuid;
 
-/// Initializes the given GblUuid structure to a "nil" UUID, per RFC 4122.
-GBL_EXPORT GBL_RESULT GblUuid_initNil        (GBL_SELF)                         GBL_NOEXCEPT;
-/// Initializes the given GblUuid structure to a new, randomly generated UUID per RFC 4122 (version 4).
-GBL_EXPORT GBL_RESULT GblUuid_initV4         (GBL_SELF)                         GBL_NOEXCEPT;
-/// Initializes the given GblUuid structure by deserializing the string representation given by pStrBuffer.
-GBL_EXPORT GBL_RESULT GblUuid_initFromString (GBL_SELF, const char* pStrBuffer) GBL_NOEXCEPT;
-/// Fills in the given 37-byte string buffer with the standardized string representation of the given UUID.
-GBL_EXPORT GBL_RESULT GblUuid_toString       (GBL_CSELF, char* pStrBuffer)      GBL_NOEXCEPT;
-/// Lexicographically Compares the given UUID to another, returning 0 if equal, -1 if less than, or 1 if greater than/
-GBL_EXPORT int        GblUuid_compare        (GBL_CSELF, const GblUuid* pOther) GBL_NOEXCEPT;
-/// Returns the UUID version type, according to RFC 4122.
-GBL_EXPORT unsigned   GblUuid_version        (GBL_CSELF)                        GBL_NOEXCEPT;
-/// Returns true if the given UUID is equal to the NIL UUID, per RFC 4122 (all zeroes),
-GBL_EXPORT GblBool    GblUuid_isNil          (GBL_CSELF)                        GBL_NOEXCEPT;
+/*! \name Initialization
+ *  \brief Methods for initializing and setting
+ *  \relatesalso GblUuid
+ *  @{
+ */
+//! Initializes the given GblUuid structure to a new, randomly generated UUID per RFC 4122 (version 4).
+GBL_EXPORT GBL_RESULT  GblUuid_genV4   (GBL_SELF)                         GBL_NOEXCEPT;
+//! Initializes the given GblUuid structure by deserializing the string representation given by pStrBuffer.
+GBL_EXPORT GBL_RESULT  GblUuid_parse   (GBL_SELF, const char* pStrBuffer) GBL_NOEXCEPT;
+//! Initializes the given GblUuid structure to a "nil" UUID, per RFC 4122.
+GBL_EXPORT GBL_RESULT  GblUuid_setNil  (GBL_SELF)                         GBL_NOEXCEPT;
+//! @}
+
+//! Fills in the given 37-byte string buffer with the standardized string representation of the given UUID, also returning it
+GBL_EXPORT const char* GblUuid_string  (GBL_CSELF, char* pStrBuffer)      GBL_NOEXCEPT;
+//! Returns true if the given UUID is equal to the NIL UUID, per RFC 4122 (all zeroes),
+GBL_EXPORT GblBool     GblUuid_isNil   (GBL_CSELF)                        GBL_NOEXCEPT;
+//! Lexicographically Compares the given UUID to another, returning 0 if equal, -1 if less than, or 1 if greater than/
+GBL_EXPORT int         GblUuid_compare (GBL_CSELF, const GblUuid* pOther) GBL_NOEXCEPT;
+//! Returns the UUID version type, according to RFC 4122.
+GBL_EXPORT unsigned    GblUuid_version (GBL_CSELF)                        GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
@@ -68,7 +75,7 @@ GBL_DECLS_END
 #endif // GIMBAL_UUID_H
 
 /*!
- * \fn GBL_RESULT GblUuid_initNil(GblUuid* pSelf)
+ * \fn GBL_RESULT GblUuid_setNil(GblUuid* pSelf)
  * Returns GBL_RESULT_SUCCESS upon success, or GBL_RESULT_ERROR_INVALID_POINTER,
  * if a valid pointer was not passed as pSelf.
  * \param pSelf pointer to a GblUuid
@@ -76,7 +83,7 @@ GBL_DECLS_END
  * \relatesalso GblUuid
 */
 /*!
- * \fn GBL_RESULT GblUuid_initV4(GblUuid* pSelf)
+ * \fn GBL_RESULT GblUuid_genV4(GblUuid* pSelf)
  * Returns GBL_RESULT_SUCCESS upon success, or
  * GBL_RESULT_ERROR_INVALID_POINTER, if a valid pointer was not passed as pSelf.
  * \param pSelf pointer to a GblUuid
@@ -84,7 +91,7 @@ GBL_DECLS_END
  * \relatesalso GblUuid
 */
 /*!
- * \fn GBL_RESULT GblUuid_initFromString(GblUuid* pSelf, const char* pStrBuffer)
+ * \fn GBL_RESULT GblUuid_parse(GblUuid* pSelf, const char* pStrBuffer)
  * Returns GBL_RESULT_SUCCESS upon success, or an error if the provided
  * arguments were not valid.
  * \param pSelf pointer to a GblUuid
@@ -93,11 +100,10 @@ GBL_DECLS_END
  * \relatesalso GblUuid
 */
 /*!
- * \fn GBL_RESULT GblUuid_toString(const GblUuid* pSelf, char* pStrBuffer)
- * Returns success or an error code upon failure.
+ * \fn const char* GblUuid_string(const GblUuid* pSelf, char* pStrBuffer)
  * \param pSelf pointer to a GblUuid
  * \param pStrBuffer string buffer of at least 37 bytes (36 plus NULL terminator)
- * \returns success or error message
+ * \returns pStrBuffer or NULL upon failure
  * \relatesalso GblUuid
 */
 /*!

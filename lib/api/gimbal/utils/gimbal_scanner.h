@@ -31,6 +31,8 @@
 
 #define GBL_SELF_TYPE GblScanner
 
+GBL_DECLS_BEGIN
+
 GBL_FORWARD_DECLARE_STRUCT(GblScanner);
 
 GBL_DECLARE_ENUM(GBL_SCANNER_FLAGS) {
@@ -202,28 +204,29 @@ GBL_EXPORT int           GblScanner_vscanf        (GBL_SELF,
                                                    const char* pFmt,
                                                    va_list*    pList)          GBL_NOEXCEPT;
 
-#define                  GblScanner_create(...)   GblScanner_createDefault_(__VA_ARGS__)
-#define                  GblScanner_cursor(...)   GblScanner_cursorDefault_(__VA_ARGS__)
-#define                  GblScanner_setInput(...) GblScanner_setInputDefault_(__VA_ARGS__)
+GBL_DECLS_END
 
-// ========== Implementation ==========
 ///\cond
-
+#define GblScanner_create(...) \
+    GblScanner_createDefault_(__VA_ARGS__)
 #define GblScanner_createDefault_(...) \
     GblScanner_createDefault__(__VA_ARGS__, 0)
 #define GblScanner_createDefault__(string, count, ...) \
     (GblScanner_create)(string, count)
 
+#define GblScanner_cursor(...) \
+    GblScanner_cursorDefault_(__VA_ARGS__)
 #define GblScanner_cursorDefault_(...) \
     GblScanner_cursorDefault__(__VA_ARGS__, 0)
 #define GblScanner_cursorDefault__(self, depth, ...) \
     (GblScanner_cursor)(self, depth)
 
+#define GblScanner_setInput(...) \
+    GblScanner_setInputDefault_(__VA_ARGS__)
 #define GblScanner_setInputDefault_(...) \
     GblScanner_setInputDefault__(__VA_ARGS__, 0)
 #define GblScanner_setInputDefault__(self, string, count, ...) \
     (GblScanner_setInput)(self, string, count)
-
 ///\endcond
 
 #undef GBL_SELF_TYPE

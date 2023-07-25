@@ -25,6 +25,10 @@ GBL_DECLARE_FLAGS(GBL_URI_FLAGS) {
   */
 };
 
+/*! \struct  GblUri
+ *  \ingroup utils
+ *  \brief   Represents a decoded URI
+ */
 GBL_FORWARD_DECLARE_STRUCT(GblUri);
 
 GBL_EXPORT GblUri*       GblUri_create          (void)                         GBL_NOEXCEPT;

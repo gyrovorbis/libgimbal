@@ -102,15 +102,15 @@ static GBL_RESULT GblVariantTestSuite_nil_invalid_(GblTestSuite* pSelf, GblConte
     uintptr_t value;
 
     GblVariant_constructNil(&variant);
-    GBL_TEST_COMPARE(GblVariant_getValueCopy(&variant, &value),
+    GBL_TEST_COMPARE(GblVariant_copyValue(&variant, &value),
                 GBL_RESULT_ERROR_INVALID_OPERATION);
     GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_TEST_COMPARE(GblVariant_getValueMove(&variant, &value),
+    GBL_TEST_COMPARE(GblVariant_moveValue(&variant, &value),
                 GBL_RESULT_ERROR_INVALID_OPERATION);
     GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_TEST_COMPARE(GblVariant_getValuePeek(&variant, &value),
+    GBL_TEST_COMPARE(GblVariant_peekValue(&variant, &value),
                 GBL_RESULT_ERROR_INVALID_OPERATION);
     GBL_CTX_CLEAR_LAST_RECORD();
 
@@ -251,12 +251,12 @@ static GBL_RESULT GblVariantTestSuite_bool_(GblTestSuite* pSelf, GblContext* pCt
 
     // Value Get Move
     GblBool boolVal = GBL_FALSE;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &boolVal));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &boolVal));
     GBL_TEST_COMPARE(boolVal, GBL_TRUE);
 
     // Value Get Peek
     GblVariant_setBool(&v, GBL_FALSE);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &boolVal));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &boolVal));
     GBL_TEST_COMPARE(boolVal, GBL_FALSE);
 
     // Destructor
@@ -383,12 +383,12 @@ static GBL_RESULT GblVariantTestSuite_char_(GblTestSuite* pSelf, GblContext* pCt
 
     // Value Get Move
     char val = '\0';
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 'p');
 
     // Value Get Peek
     GblVariant_setChar(&v, 't');
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 't');
 
     // Destructor
@@ -515,12 +515,12 @@ static GBL_RESULT GblVariantTestSuite_u8_(GblTestSuite* pSelf, GblContext* pCtx)
 
     // Value Get Move
     uint8_t val = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 20);
 
     // Value Get Peek
     GblVariant_setUint8(&v, 21);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 21);
 
     // Destructor
@@ -660,12 +660,12 @@ static GBL_RESULT GblVariantTestSuite_u16_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Value Get Move
     uint16_t val = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 20);
 
     // Value Get Peek
     GblVariant_setUint16(&v, 21);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 21);
 
     // Destructor
@@ -805,12 +805,12 @@ static GBL_RESULT GblVariantTestSuite_i16_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Value Get Move
     int16_t val = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 20);
 
     // Value Get Peek
     GblVariant_setInt16(&v, 21);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 21);
 
     // Destructor
@@ -950,12 +950,12 @@ static GBL_RESULT GblVariantTestSuite_u32_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Value Get Move
     uint32_t val = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 20);
 
     // Value Get Peek
     GblVariant_setUint32(&v, 21);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 21);
 
     // Destructor
@@ -1096,12 +1096,12 @@ static GBL_RESULT GblVariantTestSuite_i32_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Value Get Move
     int32_t val = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 20);
 
     // Value Get Peek
     GblVariant_setInt32(&v, 21);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 21);
 
     // Destructor
@@ -1243,12 +1243,12 @@ static GBL_RESULT GblVariantTestSuite_u64_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Value Get Move
     uint64_t val = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 20);
 
     // Value Get Peek
     GblVariant_setUint64(&v, 21);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 21);
 
     // Destructor
@@ -1388,12 +1388,12 @@ static GBL_RESULT GblVariantTestSuite_i64_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Value Get Move
     int64_t val = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 20);
 
     // Value Get Peek
     GblVariant_setInt64(&v, 21);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 21);
 
     // Destructor
@@ -1532,12 +1532,12 @@ static GBL_RESULT GblVariantTestSuite_f32_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Value Get Move
     float val = 0.0f;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 20.0f);
 
     // Value Get Peek
     GblVariant_setFloat(&v, 21.0f);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 21.0f);
 
     // Destructor
@@ -1672,12 +1672,12 @@ static GBL_RESULT GblVariantTestSuite_f64_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Value Get Move
     double val = 0.0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, 20.0);
 
     // Value Get Peek
     GblVariant_setDouble(&v, 21.0);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, 21.0);
 
     // Destructor
@@ -1812,12 +1812,12 @@ static GBL_RESULT GblVariantTestSuite_ptr_(GblTestSuite* pSelf, GblContext* pCtx
 
     // Value Get Move
     void* pVal = NULL;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &pVal));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &pVal));
     GBL_TEST_COMPARE(pVal, (void*)0xcafebabe);
 
     // Value Get Peek
     GblVariant_setPointer(&v, GBL_POINTER_TYPE, (void*)0xcafebeef);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &pVal));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &pVal));
     GBL_TEST_COMPARE(pVal, (void*)0xcafebeef);
 
     // Destructor
@@ -1911,13 +1911,13 @@ static GBL_RESULT GblVariantTestSuite_string_(GblTestSuite* pSelf, GblContext* p
 
     // Value Get Move
     const char* pVal = NULL;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &pVal));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &pVal));
     GBL_TEST_VERIFY(GblStringView_equals(GBL_STRV(pVal), GBL_STRV("playstation")));
     GblStringRef_release(pVal);
 
     // Value Get Peek
     GblVariant_setString(&v, "gamecube");
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &pVal));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &pVal));
     GBL_TEST_COMPARE(strcmp(pVal, "gamecube"), 0);
 
     GBL_CTX_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -2110,12 +2110,12 @@ static GBL_RESULT GblVariantTestSuite_type_(GblTestSuite* pSelf, GblContext* pCt
 
     // Value Get Move
     GblType val = GBL_INVALID_TYPE;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &val));
     GBL_TEST_COMPARE(val, GBL_CHAR_TYPE);
 
     // Value Get Peek
     GblVariant_setTypeValue(&v, GBL_TYPE_TYPE);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &val));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &val));
     GBL_TEST_COMPARE(val, GBL_TYPE_TYPE);
 
     // Destructor

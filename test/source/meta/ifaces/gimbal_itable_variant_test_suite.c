@@ -46,6 +46,7 @@ GBL_TEST_FIXTURE {
     GblType        testObjectType;
 
     GblTestBox*    pTestBox;
+    GblObject*     pObject;
     GblTestObject* pTestObject;
 };
 
@@ -53,9 +54,13 @@ GBL_TEST_INIT()
     pFixture->refCount    = GblRef_activeCount();
     pFixture->testBoxType = GBL_TEST_BOX_TYPE;
     pFixture->pTestBox    = GBL_TEST_BOX(GblBox_create(GBL_TEST_BOX_TYPE));
+    pFixture->pObject     = GBL_NEW(GblObject,
+                                    "name",     "objy",
+                                    "userdata", 0xdeadbeef);
 GBL_TEST_CASE_END
 
 GBL_TEST_FINAL()
+    GBL_UNREF(pFixture->pObject);
     GBL_UNREF(pFixture->pTestBox);
     GblType_unregister(pFixture->testBoxType);
     GBL_TEST_COMPARE(pFixture->refCount, GblRef_activeCount());
@@ -185,10 +190,10 @@ GBL_TEST_CASE(boxSetIndex)
     GBL_TEST_CALL(GblVariant_setIndex(&t, &k, &v));
     GBL_TEST_COMPARE(pFixture->pTestBox->integer, 12);
 
-    // t["number"] = '7'
-    // NOTE: "number" is a float, so it's automatically converting char => float.
+    // t["number"] = "7"
+    // NOTE: "number" is a float, so it's automatically converting string => float.
     GblVariant_set(&k, "number");
-    GblVariant_setChar(&v, '7');
+    GblVariant_set(&v, "7");
     GBL_TEST_CALL(GblVariant_setIndex(&t, &k, &v));
     GBL_TEST_COMPARE(pFixture->pTestBox->number, 7.0f);
 
@@ -205,13 +210,58 @@ GBL_TEST_CASE(boxSetIndex)
     GblVariant_destruct(&t);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(boxNext)
+    GblVariant t, k, v;
+
+    GblVariant_constructBoxCopy(&t, GBL_BOX(pFixture->pTestBox));
+    GblVariant_construct(&k);
+    GblVariant_construct(&v);
+
+    GBL_TEST_VERIFY(GblVariant_next(&t, &k, &v));
+    GBL_TEST_COMPARE(GblVariant_toString(&k), "integer");
+    GBL_TEST_COMPARE(GblVariant_toInt32(&v), 12);
+
+    GBL_TEST_VERIFY(GblVariant_next(&t, &k, &v));
+    GBL_TEST_COMPARE(GblVariant_toString(&k), "boolean");
+    GBL_TEST_COMPARE(GblVariant_toBool(&v), GBL_FALSE);
+
+    GBL_TEST_VERIFY(GblVariant_next(&t, &k, &v));
+    GBL_TEST_COMPARE(GblVariant_toString(&k), "number");
+    GBL_TEST_COMPARE(GblVariant_toFloat(&v), 7.0f);
+
+    GBL_TEST_VERIFY(GblVariant_next(&t, &k, &v));
+    GBL_TEST_COMPARE(GblVariant_toString(&k), "string");
+    GBL_TEST_COMPARE(GblVariant_toString(&v), "-1.123");
+
+    GBL_TEST_VERIFY(!GblVariant_next(&t, &k, &v));
+    GBL_TEST_VERIFY(GblVariant_isNil(&k));
+    GBL_TEST_VERIFY(GblVariant_isNil(&v));
+
+    GblVariant_destruct(&v);
+    GblVariant_destruct(&k);
+    GblVariant_destruct(&t);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(objectCount)
+    GblVariant t;
+
+    GBL_TEST_SKIP("FIXME");
+
+    GblVariant_constructObjectCopy(&t, pFixture->pObject);
+    GBL_TEST_COMPARE(GblVariant_count(&t), 4);
+
+    GblVariant_destruct(&t);
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(incompatibleCount,
                   incompatibleIndex,
                   incompatibleSetIndexInvalid,
-                  incompatibleNext/*,
+                  incompatibleNext,
                   boxCount,
                   boxIndex,
-                  boxSetIndex*/)
+                  boxSetIndex,
+                  boxNext,
+                  objectCount)
 
 static GBL_RESULT GblTestBox_ITableVariant_index_(const GblVariant* pVariant, const GblVariant* pKey, GblVariant* pValue) {
     GblVariant k = GBL_VARIANT_INIT;
@@ -259,9 +309,11 @@ static GBL_RESULT GblTestBox_ITableVariant_setIndex_(const GblVariant* pVariant,
         pSelf->boolean = GblVariant_toBool(pValue);
     else if(!strcmp(pField, "number"))
         pSelf->number = GblVariant_toFloat(pValue);
-    else if(!strcmp(pField, "string"))
-        GblVariant_getValueMove(pValue, &pSelf->pString);
-    else GBL_CTX_VERIFY(GBL_FALSE,
+    else if(!strcmp(pField, "string")) {
+        GblVariant_toString(pValue);
+        GblStringRef_unref(pSelf->pString);
+        GblVariant_moveValue(pValue, &pSelf->pString);
+    } else GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_KEY,
                        "Failed to set unknown field: %s[%s] = %s",
                        GblVariant_typeName(pVariant),
@@ -297,8 +349,8 @@ static GBL_RESULT GblTestBox_ITableVariant_next_(const GblVariant* pVariant, Gbl
             GblVariant_setStringRef(pValue, GblStringRef_ref(pSelf->pString));
 
         } else if(!strcmp(pField, "string")) {
-            GblVariant_invalidate(pKey);
-            GblVariant_invalidate(pValue);
+            GblVariant_setNil(pKey);
+            GblVariant_setNil(pValue);
 
         } else GBL_CTX_VERIFY(GBL_FALSE,
                               GBL_RESULT_ERROR_INVALID_KEY,

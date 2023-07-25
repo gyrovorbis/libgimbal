@@ -217,7 +217,7 @@ GBL_EXPORT GBL_RESULT GblLogger_setDomainFilters(GblLogger* pSelf,
 }
 
 GBL_EXPORT const char** GblLogger_domainFilters(const GblLogger* pSelf) {
-    return (const char**)GblBox_getField(GBL_BOX(pSelf),
+    return (const char**)GblBox_field(GBL_BOX(pSelf),
                                          domainFilterQuark_);
 }
 
@@ -263,7 +263,7 @@ GBL_EXPORT GBL_RESULT GblLogger_setThreadFilters(GblLogger* pSelf,
 }
 
 GBL_EXPORT const GblThd** GblLogger_threadFilters(const GblLogger* pSelf) {
-    return (const GblThd**)GblBox_getField(GBL_BOX(pSelf),
+    return (const GblThd**)GblBox_field(GBL_BOX(pSelf),
                                               threadFilterQuark_);
 }
 

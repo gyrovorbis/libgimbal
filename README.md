@@ -26,7 +26,7 @@
 libGimbal aims to bring the high-level constructs and niceties of modern languages and their standard libraries to low-level C, where they can be implemented with a focus on performance for embedded devices and game consoles. libGimbal includes features typically found in core application frameworks such as Foundation, QtCore, or GLib, or in languages such as C# or Java. At its core, libGimbal utilizes an object-oriented dynamic type system, which allows C to transcend its own language limitations and provides a flexible avenue for interoperability with other languages. 
 
 # Features #
-libGimbal is split into a series of modules, featuring:
+libGimbal is split into a series of APIs, featuring:
 - Containers and Data Structures
 - Generic Algorithms 
 - Custom Allocators
@@ -81,8 +81,8 @@ LibGimbal was specifically written with language interoperability in mind. As su
 |<a href="https://github.com/andrewapperley/gimbalsaurus"><strong>Gimbalsaurus</strong></a> |Objective-C|Just getting off the ground                           |
 |<a href="http://libgimbal.elysianshadows.com"><strong>libGimbal</strong></a>               |C++        |First-party within source-tree. Just starting, WIP.   |
 
-# Modules #
-The following is a closer look at the contents of each module:
+# APIs #
+The following is a closer look at the contents of each API:
 ## Core Framework ##
 - platform-specific macros and utilities
 - error and exception handling

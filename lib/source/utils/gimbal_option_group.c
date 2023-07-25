@@ -199,7 +199,7 @@ static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, 
                                                                 argToGblType_(pOption->type)));
 
                 GBL_CTX_VERIFY_CALL(GblVariant_convert(&v1, &v2));
-                GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v2, pOption->pOutput.pData));
+                GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v2, pOption->pOutput.pData));
                 // Have to flip an inverted bool
                 if(pOption->type == GBL_OPTION_TYPE_BOOL && (pOption->flags & GBL_OPTION_FLAG_BOOL_INVERTED)) {
                     *(GblBool*)pOption->pOutput.pData =
@@ -254,18 +254,18 @@ static GBL_RESULT GblOptionGroup_Object_setProperty_(GblObject* pObject, const G
     switch(pProp->id) {
     //case GblOptionGroup_Property_Id_name: {
     //    const char* pName = NULL;
-    //   GBL_CTX_VERIFY_CALL(GblVariant_getValueCopy(pValue, &pName));
+    //   GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pValue, &pName));
     //    GblObject_setName(pObject, pName);
     //    break;
     //}
     case GblOptionGroup_Property_Id_prefix:
-        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &pSelf->pPrefix));
+        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &pSelf->pPrefix));
         break;
     case GblOptionGroup_Property_Id_options: {
         GBL_CTX_FREE(pSelf->pOptions);
         pSelf->optionCount = 0;
         const GblOption* pOpt;
-        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &pOpt));
+        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &pOpt));
         const GblOption* pIt = pOpt;
         while(pIt->pLongName || pIt->shortName) {
             ++pSelf->optionCount;
@@ -277,13 +277,13 @@ static GBL_RESULT GblOptionGroup_Object_setProperty_(GblObject* pObject, const G
         break;
     }
     case GblOptionGroup_Property_Id_version:
-        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &pSelf->version));
+        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &pSelf->version));
         break;
     case GblOptionGroup_Property_Id_summary:
-        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &pSelf->pSummary));
+        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &pSelf->pSummary));
         break;
     case GblOptionGroup_Property_Id_description:
-        GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(pValue, &pSelf->pDescription));
+        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &pSelf->pDescription));
         break;
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Writing unhandled property: %s",

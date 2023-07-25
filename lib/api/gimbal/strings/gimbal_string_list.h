@@ -3,9 +3,12 @@
  *  \ingroup strings
  *  \copydoc GblStringList
  *
- *  \author Falco Girgis
+ *  \todo
+ *      - Add pattern matching API
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
-
 #ifndef GIMBAL_STRING_LIST_H
 #define GIMBAL_STRING_LIST_H
 
@@ -123,7 +126,7 @@ GBL_EXPORT GblStringRef*  GblStringList_join            (GBL_CSELF,
 
 GBL_INLINE GblStringRef*  GblStringList_popBack         (GBL_SELF)                                       GBL_NOEXCEPT;
 GBL_INLINE GblStringRef*  GblStringList_popFront        (GBL_SELF)                                       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_erase           (GBL_SELF, intptr_t index, size_t  count)        GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT     GblStringList_erase           (GBL_SELF, intptr_t index, size_t count)         GBL_NOEXCEPT;
 GBL_EXPORT size_t         GblStringList_remove          (GBL_SELF, const char* pStr, GblBool matchCase)  GBL_NOEXCEPT;
 GBL_INLINE GblStringRef*  GblStringList_extract         (GBL_SELF, GblStringList* pNode)                 GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_deduplicate     (GBL_SELF, GblBool matchCase)                    GBL_NOEXCEPT;

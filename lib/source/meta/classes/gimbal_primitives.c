@@ -8,7 +8,7 @@
 #include <inttypes.h>
 #include "../types/gimbal_type_.h"
 
-GBL_RESULT GblPrimitiveClass_init_(GblPrimitiveClass* pClass, GblIVariantClassVTable* pVTable, GblContext* pCtx) {
+GBL_RESULT GblPrimitiveClass_init_(GblPrimitiveClass* pClass, GblIVariantVTable* pVTable, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     pClass->GblIVariantImpl.pVTable = pVTable;
     GBL_CTX_END();
@@ -1048,7 +1048,7 @@ static GBL_RESULT typeConvert_(const GblVariant* pVariant, GblVariant* pOther) {
 GblType GblPrimitive_register(const char*                     pName,
                               size_t                          classSize,
                               size_t                          classPrivateSize,
-                              const GblIVariantClassVTable*   pVTable,
+                              const GblIVariantVTable*   pVTable,
                               GblFlags                        typeFlags)
 {
     GblType type = GBL_INVALID_TYPE;
@@ -1081,7 +1081,7 @@ GblType GblPrimitive_registerBuiltin(size_t                          index,
                                      const char*                     pName,
                                      size_t                          classSize,
                                      size_t                          classPrivateSize,
-                                     const GblIVariantClassVTable*   pVTable,
+                                     const GblIVariantVTable*   pVTable,
                                      GblFlags                        typeFlags)
 {
     GblType type = GBL_INVALID_TYPE;
@@ -1137,7 +1137,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_PUSH_VERBOSE("[GblType] Registering Builtin Types");
 
     // =============== NIL ===============
-    static const GblIVariantClassVTable nilIVariantIFace = {
+    static const GblIVariantVTable nilIVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE |
                         GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE,
         .pFnDestruct = NULL,
@@ -1155,7 +1155,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== BOOL ===============
-    static const GblIVariantClassVTable boolIVariantIFace = {
+    static const GblIVariantVTable boolIVariantIFace = {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1178,7 +1178,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== CHAR ===============
-    static const GblIVariantClassVTable charIVariantIFace = {
+    static const GblIVariantVTable charIVariantIFace = {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1201,7 +1201,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
      // =============== UINT8 ===============
-    static const GblIVariantClassVTable uint8IVariantIFace = {
+    static const GblIVariantVTable uint8IVariantIFace = {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1224,7 +1224,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== INT16 ===============
-    static const GblIVariantClassVTable int16IVariantIFace = {
+    static const GblIVariantVTable int16IVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1247,7 +1247,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== UNT16 ===============
-    static const GblIVariantClassVTable uint16IVariantIFace = {
+    static const GblIVariantVTable uint16IVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1270,7 +1270,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== INT32 ===============
-    const static GblIVariantClassVTable int32IVariantIFace = {
+    const static GblIVariantVTable int32IVariantIFace = {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1293,7 +1293,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== UINT32 ===============
-    const static GblIVariantClassVTable uint32IVariantIFace = {
+    const static GblIVariantVTable uint32IVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1316,7 +1316,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== INT64 ===============
-    const static GblIVariantClassVTable int64IVariantIFace =  {
+    const static GblIVariantVTable int64IVariantIFace =  {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1339,7 +1339,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== UINT64 ===============
-    const static GblIVariantClassVTable uint64IVariantIFace =  {
+    const static GblIVariantVTable uint64IVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1362,7 +1362,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== FLOAT ===============
-    static const GblIVariantClassVTable floatIVariantIFace = {
+    static const GblIVariantVTable floatIVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1385,7 +1385,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== DOUBLE ===============
-    static const GblIVariantClassVTable doubleIVariantIFace =  {
+    static const GblIVariantVTable doubleIVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
@@ -1408,7 +1408,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     GBL_CTX_VERIFY_LAST_RECORD();
 
     // =============== STRING ===============
-    static const GblIVariantClassVTable stringIVariantIFace = {
+    static const GblIVariantVTable stringIVariantIFace = {
         .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
                         GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
                         GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |
@@ -1621,7 +1621,7 @@ GBL_EXPORT GblType GblType_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     // =============== TYPE ===============
-    const static GblIVariantClassVTable typeIVariantIFace =  {
+    const static GblIVariantVTable typeIVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |

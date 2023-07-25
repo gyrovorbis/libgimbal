@@ -4,7 +4,7 @@
 #include <gimbal/strings/gimbal_string_view.h>
 #include <gimbal/strings/gimbal_string.h>
 
-GBL_EXPORT GBL_RESULT GblUuid_initNil(GblUuid* pSelf) {
+GBL_EXPORT GBL_RESULT GblUuid_setNil(GblUuid* pSelf) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf);
     memset(pSelf, 0, sizeof(GblUuid));
@@ -12,7 +12,7 @@ GBL_EXPORT GBL_RESULT GblUuid_initNil(GblUuid* pSelf) {
 }
 
 // Implemented per RFC4122 section 4.4
-GBL_EXPORT GBL_RESULT GblUuid_initV4(GblUuid* pSelf) {
+GBL_EXPORT GBL_RESULT GblUuid_genV4(GblUuid* pSelf) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf);
 
@@ -32,7 +32,8 @@ GBL_EXPORT GBL_RESULT GblUuid_initV4(GblUuid* pSelf) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblUuid_toString(const GblUuid* pSelf, char* pStrBuffer) {
+GBL_EXPORT const char* GblUuid_string(const GblUuid* pSelf, char* pStrBuffer) {
+    const char* pStr = NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY(sprintf(pStrBuffer, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x"
                                        "-%02x%02x%02x%02x%02x%02x",
@@ -42,14 +43,15 @@ GBL_EXPORT GBL_RESULT GblUuid_toString(const GblUuid* pSelf, char* pStrBuffer) {
                                        pSelf->bytes[12], pSelf->bytes[13], pSelf->bytes[14], pSelf->bytes[15])
                    == GBL_UUID_STRING_LENGTH,
                    GBL_RESULT_ERROR_UNDERFLOW);
-    GBL_CTX_END();
-
+    pStr = pStrBuffer;
+    GBL_CTX_END_BLOCK();
+    return pStr;
 }
 
-GBL_EXPORT GBL_RESULT GblUuid_initFromString(GblUuid* pSelf, const char* pStrBuffer) {
+GBL_EXPORT GBL_RESULT GblUuid_parse(GblUuid* pSelf, const char* pStrBuffer) {
     GBL_CTX_BEGIN(NULL);
 
-    GBL_CTX_VERIFY_CALL(GblUuid_initNil(pSelf));
+    GBL_CTX_VERIFY_CALL(GblUuid_setNil(pSelf));
 
     GblStringView strv = GblStringView_fromString(pStrBuffer);
 

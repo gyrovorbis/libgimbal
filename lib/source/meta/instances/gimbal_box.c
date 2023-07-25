@@ -4,8 +4,8 @@
 #define GBL_BOX_FIELD_KEY_DESTRUCTOR   "_dtor"
 #define GBL_BOX_FIELD_KEY_USERDATA     "_ud"
 
-GblQuark fieldKeyDtor_  = GBL_QUARK_INVALID;
-GblQuark fieldKeyUd_    = GBL_QUARK_INVALID;
+GblQuark fieldKeyDtor_ = GBL_QUARK_INVALID;
+GblQuark fieldKeyUd_   = GBL_QUARK_INVALID;
 
 GBL_EXPORT GBL_RESULT GblBox_setUserDestructor(GblBox* pSelf, GblArrayMapDtorFn pFnDtor) {
     if(pFnDtor) {
@@ -19,7 +19,7 @@ GBL_EXPORT GBL_RESULT GblBox_setUserDestructor(GblBox* pSelf, GblArrayMapDtorFn 
     }
 }
 
-GBL_EXPORT uintptr_t GblBox_getField(const GblBox* pSelf, GblQuark key) {
+GBL_EXPORT uintptr_t GblBox_field(const GblBox* pSelf, GblQuark key) {
     return GblArrayMap_getValue(&GBL_PRIV_REF(pSelf).pFields, key);
 }
 
@@ -61,11 +61,19 @@ GBL_EXPORT GBL_RESULT GblBox_setUserdata(GblBox* pSelf, void* pUserdata) {
     }
 }
 
-GBL_EXPORT GblBox* GblBox_create(GblType derivedType) {
+GBL_EXPORT GblBox* (GblBox_create)(GblType           derivedType,
+                                   size_t            size,
+                                   void*             pUserdata,
+                                   GblArrayMapDtorFn pUdDtor,
+                                   GblBoxClass*      pClass)
+{
     GblBox* pRecord = NULL;
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
+
     pRecord = (GblBox*)GblInstance_create(derivedType);
+
     GBL_CTX_END_BLOCK();
     return pRecord;
 }
@@ -73,18 +81,29 @@ GBL_EXPORT GblBox* GblBox_create(GblType derivedType) {
 GBL_EXPORT GblBox* GblBox_createWithClass(GblBoxClass* pClass) {
     GblBox* pRecord = NULL;
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_POINTER(pClass);
     GBL_CTX_VERIFY_TYPE(GBL_CLASS_TYPEOF(pClass), GBL_BOX_TYPE);
+
     pRecord = (GblBox*)GblInstance_createWithClass((GblClass*)pClass);
+
     GBL_CTX_END_BLOCK();
     return pRecord;
 }
 
-GBL_EXPORT GBL_RESULT GblBox_construct(GblBox* pSelf, GblType derivedType) {
+GBL_EXPORT GBL_RESULT (GblBox_construct)(GblBox*           pSelf,
+                                         GblType           derivedType,
+                                         void*             pUserdata,
+                                         GblArrayMapDtorFn pFnUserDtor,
+                                         GblBoxClass*      pClass)
+{
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
+
     GBL_CTX_VERIFY_CALL(GblInstance_construct((GblInstance*)pSelf, derivedType));
     GBL_PRIV_REF(pSelf).constructedInPlace = 1;
+
     GBL_CTX_END();
 }
 
@@ -92,11 +111,14 @@ GBL_EXPORT GBL_RESULT GblBox_constructWithClass(GblBox* pSelf,
                                                 GblBoxClass* pClass)
 {
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_POINTER(pClass);
     GBL_CTX_VERIFY_TYPE(GBL_CLASS_TYPEOF(pClass), GBL_BOX_TYPE);
+
     GBL_CTX_VERIFY_CALL(GblInstance_constructWithClass((GblInstance*)pSelf,
                                                        (GblClass*)pClass));
     GBL_PRIV_REF(pSelf).constructedInPlace = 1;
+
     GBL_CTX_END();
 }
 
@@ -107,10 +129,13 @@ GBL_EXPORT GblBox* GblBox_createExt(GblType           derivedType,
 {
     GblBox* pBox = NULL;
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_ARG(totalSize >= sizeof(GblBox));
+
     pBox = GBL_CTX_MALLOC(totalSize, 0, GblType_name(derivedType));
     GBL_CTX_CALL(GblBox_constructExt(pBox, derivedType, pUserdata, pFnUdDtor));
     GBL_PRIV_REF(pBox).constructedInPlace = 0;
+
     GBL_CTX_END_BLOCK();
     return pBox;
 }
@@ -121,12 +146,15 @@ GBL_EXPORT GBL_RESULT GblBox_constructExt(GblBox*           pSelf,
                                           GblArrayMapDtorFn pFnUdDtor)
 {
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
+
     GBL_CTX_VERIFY_CALL(GblInstance_construct((GblInstance*)pSelf, derivedType));
     if(pFnUdDtor) GBL_CTX_VERIFY_CALL(GblBox_setUserDestructor(pSelf, pFnUdDtor));
     if(pUserdata) GBL_CTX_VERIFY_CALL(GblBox_setUserdata(pSelf, pUserdata));
     GBL_PRIV_REF(pSelf).constructedInPlace = 1;
+
     GBL_CTX_END();
 }
 
@@ -137,10 +165,13 @@ GBL_EXPORT GblBox* GblBox_createExtWithClass(GblBoxClass*      pClass,
 {
     GblBox* pBox = NULL;
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_ARG(totalSize >= sizeof(GblBox));
+
     pBox = GBL_CTX_MALLOC(totalSize, 0, GblType_name(GBL_CLASS_TYPEOF(pClass)));
     GBL_CTX_CALL(GblBox_constructExtWithClass(pBox, pClass, pUserdata, pFnUdDtor));
     GBL_PRIV_REF(pBox).constructedInPlace = 0;
+
     GBL_CTX_END_BLOCK();
     return pBox;
 }
@@ -151,22 +182,28 @@ GBL_EXPORT GBL_RESULT GblBox_constructExtWithClass(GblBox*           pSelf,
                                                    GblArrayMapDtorFn pFnUdDtor)
 {
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_POINTER(pSelf && pClass);
     GBL_CTX_VERIFY_TYPE(GBL_CLASS_TYPEOF(pClass), GBL_BOX_TYPE);
+
     GBL_CTX_VERIFY_CALL(GblInstance_constructWithClass(GBL_INSTANCE(pSelf), GBL_CLASS(pClass)));
     if(pFnUdDtor) GBL_CTX_VERIFY_CALL(GblBox_setUserDestructor(pSelf, pFnUdDtor));
     if(pUserdata) GBL_CTX_VERIFY_CALL(GblBox_setUserdata(pSelf, pUserdata));
     GBL_PRIV_REF(pSelf).constructedInPlace = 1;
+
     GBL_CTX_END();
 }
 
 
 GBL_EXPORT GblBox* GblBox_ref(GblBox* pSelf) {
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_POINTER(pSelf);
+
     if(pSelf) {
        GBL_ATOMIC_INT16_INC(GBL_PRIV_REF(pSelf).refCounter);
     }
+
     GBL_CTX_END_BLOCK();
     return pSelf;
 }
@@ -174,9 +211,11 @@ GBL_EXPORT GblBox* GblBox_ref(GblBox* pSelf) {
 GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
     GblRefCount count = 0;
     GBL_CTX_BEGIN(NULL);
+
     if(pSelf) {
         GBL_CTX_VERIFY_EXPRESSION(GBL_PRIV_REF(pSelf).refCounter);
-        if((count = GBL_ATOMIC_INT16_DEC(GBL_PRIV_REF(pSelf).refCounter)-1) == 0) {
+
+       if((count = GBL_ATOMIC_INT16_DEC(GBL_PRIV_REF(pSelf).refCounter)-1) == 0) {
             GblBoxClass* pClass = GBL_BOX_GET_CLASS(pSelf);
             GBL_CTX_CALL(pClass->pFnDestructor(pSelf));
 
@@ -186,24 +225,13 @@ GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
                 GBL_CTX_CALL(GblInstance_destruct(&pSelf->base));
         }
     }
+
     GBL_CTX_END_BLOCK();
     return count;
 }
 
 GBL_EXPORT GblRefCount GblBox_refCount(const GblBox* pSelf) {
     return GBL_ATOMIC_INT16_LOAD(GBL_PRIV_REF(pSelf).refCounter);
-}
-
-static GBL_RESULT GblBox_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
-    GBL_ATOMIC_INT16_INIT(GBL_PRIV_REF((GblBox*)pInstance).refCounter, 1);
-    GBL_CTX_END();
-}
-
-static GBL_RESULT GblBox_destructor_(GblBox* pSelf) {
-    GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY_CALL(GblArrayMap_destroy(&GBL_PRIV_REF(pSelf).pFields));
-    GBL_CTX_END();
 }
 
 GBL_EXPORT void* GblBoxClass_userdata(const GblBoxClass* pSelf) {
@@ -234,7 +262,7 @@ GBL_EXPORT GBL_RESULT GblBoxClass_setUserdata(GblBoxClass* pSelf, void* pUserdat
     }
 }
 
-GBL_EXPORT uintptr_t GblBoxClass_getField(const GblBoxClass* pSelf, GblQuark key) {
+GBL_EXPORT uintptr_t GblBoxClass_field(const GblBoxClass* pSelf, GblQuark key) {
     return GblArrayMap_getValue(&GBL_PRIV_REF(pSelf).pFields, key);
 }
 
@@ -268,11 +296,20 @@ GBL_EXPORT GblBoxClass* GblBoxClass_createFloating(GblType           derivedType
 {
     GblBoxClass* pClass = NULL;
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
+
+    if(!totalSize) {
+        const GblTypeInfo* pInfo = GblType_info(derivedType);
+        if(pInfo) totalSize = pInfo->classSize;
+    }
+
     GBL_CTX_VERIFY_ARG(totalSize >= sizeof(GblBoxClass));
+
     pClass = GBL_CTX_MALLOC(totalSize, 0, GblType_name(derivedType));
     GBL_CTX_CALL(GblBoxClass_constructFloating(pClass, derivedType, pUserdata, pFnUdDtor));
     GBL_CLASS_FLAG_CLEAR_(GBL_CLASS(pClass), GBL_CLASS_FLAG_IN_PLACE_);
+
     GBL_CTX_END_BLOCK();
     return pClass;
 }
@@ -283,29 +320,144 @@ GBL_EXPORT GBL_RESULT GblBoxClass_constructFloating(GblBoxClass*      pSelf,
                                                     GblArrayMapDtorFn pFnUdDtor)
 {
     GBL_CTX_BEGIN(NULL);
+
+    GBL_CTX_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
+
     GblClass_constructFloating(GBL_CLASS(pSelf), derivedType);
     if(pUserdata) GBL_CTX_VERIFY_CALL(GblBoxClass_setUserdata(pSelf, pUserdata));
     if(pFnUdDtor) GBL_CTX_VERIFY_CALL(GblBoxClass_setUserDestructor(pSelf, pFnUdDtor));
+
+    GBL_CTX_END();
+}
+
+
+static GBL_RESULT GblBox_IVariant_construct_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_UNUSED(argc);
+    GBL_CTX_BEGIN(NULL);
+
+    if(op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT) {
+        pVariant->pBox = GblBox_create(pVariant->type);
+
+    } else if(op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY ||
+              op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY)
+    {
+        pVariant->pBox = pArgs[0].pVoid?
+                         GBL_REF(pArgs[0].pVoid) : NULL;
+    } else {
+        pVariant->pBox = pArgs[0].pVoid;
+    }
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblBox_IVariant_destruct_(GblVariant* pVariant) {
+    GBL_CTX_BEGIN(NULL);
+
+    GBL_UNREF(pVariant->pBox);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblBox_IVariant_compare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
+    GBL_CTX_BEGIN(NULL);
+
+    *pResult = pVariant->pBox - pOther->pBox;
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblBox_IVariant_get_(GblVariant* pSelf, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_UNUSED(argc);
+
+    GBL_CTX_BEGIN(NULL);
+
+    *(GblBox**)pArgs[0].pVoid = pSelf->pBox;
+
+    if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY) {
+        GBL_REF(pSelf->pBox);
+    } else if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE) {
+        GblVariant_invalidate(pSelf);
+    }
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblBox_IVariant_set_(GblVariant* pSelf, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_UNUSED(argc);
+    GBL_CTX_BEGIN(NULL);
+
+    pSelf->pBox = pArgs[0].pVoid;
+
+    if(op == GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY || op == GBL_IVARIANT_OP_FLAG_SET_COPY) {
+        GBL_REF(pSelf->pBox);
+    } else if(op == GBL_IVARIANT_OP_FLAG_SET_MOVE || op == GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE) {
+        GblVariant_invalidate(&pArgs[0]);
+    }
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblBox_destructor_(GblBox* pSelf) {
+    GBL_CTX_BEGIN(NULL);
+
+    GBL_CTX_VERIFY_CALL(GblArrayMap_destroy(&GBL_PRIV_REF(pSelf).pFields));
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblBox_init_(GblInstance* pInstance, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GBL_ATOMIC_INT16_INIT(GBL_PRIV_REF((GblBox*)pInstance).refCounter, 1);
+
     GBL_CTX_END();
 }
 
 static GBL_RESULT GblBoxClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     GBL_UNUSED(pUd);
     GBL_CTX_BEGIN(pCtx);
-    fieldKeyDtor_   = GblQuark_fromStringStatic(GBL_BOX_FIELD_KEY_DESTRUCTOR);
-    fieldKeyUd_     = GblQuark_fromStringStatic(GBL_BOX_FIELD_KEY_USERDATA);
-    GblBoxClass* pSelfClass = (GblBoxClass*)pClass;
-    pSelfClass->pFnDestructor = GblBox_destructor_;
+
+    if(!GblType_classRefCount(GBL_BOX_TYPE)) {
+        fieldKeyDtor_ = GblQuark_fromStringStatic(GBL_BOX_FIELD_KEY_DESTRUCTOR);
+        fieldKeyUd_   = GblQuark_fromStringStatic(GBL_BOX_FIELD_KEY_USERDATA);
+    }
+
+    static const GblIVariantVTable iVariantVTable = {
+        .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY   |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE   |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY         |
+                        GBL_IVARIANT_OP_FLAG_SET_COPY               |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE         |
+                        GBL_IVARIANT_OP_FLAG_SET_MOVE               |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY         |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE         |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
+        .pGetValueFmt = "p",
+        .pSetValueFmt = "p",
+        .pFnConstruct = GblBox_IVariant_construct_,
+        .pFnDestruct  = GblBox_IVariant_destruct_,
+        .pFnCompare   = GblBox_IVariant_compare_,
+        .pFnGet       = GblBox_IVariant_get_,
+        .pFnSet       = GblBox_IVariant_set_,
+    };
+
+    GBL_IVARIANT_CLASS(pClass)->pVTable       = &iVariantVTable;
+    GBL_BOX_CLASS(pClass)     ->pFnDestructor = GblBox_destructor_;
+
     GBL_CTX_END();
 }
 
 static GBL_RESULT GblBoxClass_final_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
     GBL_UNUSED(pUd);
     GBL_CTX_BEGIN(pCtx);
+
     GblBoxClass* pSelfClass = (GblBoxClass*)pClass;
     GBL_CTX_VERIFY_CALL(GblArrayMap_destroy(&GBL_PRIV_REF(pSelfClass).pFields));
-    GBL_CTX_END();
 
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GblType GblBox_type(void) {
@@ -329,17 +481,12 @@ GBL_EXPORT GblType GblBox_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        GBL_CTX_BEGIN(NULL);
-
         ifaceMap[0].interfaceType = GBL_IVARIANT_TYPE;
 
         type = GblType_registerStatic(GblQuark_internStringStatic("GblBox"),
                                       GBL_INSTANCE_TYPE,
                                       &typeInfo,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);
-
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
     }
     return type;
 }

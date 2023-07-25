@@ -61,7 +61,7 @@ GBL_EXPORT GblType GblType_type          (void)                                 
 GBL_EXPORT GblType GblPrimitive_register (const char*                    pName,
                                           size_t                         classSize,
                                           size_t                         classPrivateSize,
-                                          const GblIVariantClassVTable*  pIVTable,
+                                          const GblIVariantVTable*  pIVTable,
                                           GblFlags                       typeFlags)       GBL_NOEXCEPT;
 
 GBL_EXPORT GblType GblPrimitive_registerBuiltin
@@ -69,7 +69,7 @@ GBL_EXPORT GblType GblPrimitive_registerBuiltin
                                           const char*                    pName,
                                           size_t                         classSize,
                                           size_t                         classPrivateSize,
-                                          const GblIVariantClassVTable*  pIVTable,
+                                          const GblIVariantVTable*  pIVTable,
                                           GblFlags                       typeFlags)       GBL_NOEXCEPT;
 
 

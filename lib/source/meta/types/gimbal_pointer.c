@@ -75,7 +75,7 @@ static GBL_RESULT pConvertFrom_(const GblVariant* pVariant, GblVariant* pOther) 
 extern GBL_RESULT GblPointer_typeRegister_(GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
-    static const GblIVariantClassVTable pointerIVariantIFace =  {
+    static const GblIVariantVTable pointerIVariantIFace =  {
         .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
                         GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |

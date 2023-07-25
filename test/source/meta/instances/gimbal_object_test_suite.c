@@ -119,19 +119,19 @@ static GBL_RESULT TestObject_setProperty_(GblObject* pSelf, const GblProperty* p
     switch(pProp->id) {
     case TestObject_Property_Id_floater: {
         float value = NAN;
-        GBL_CTX_CALL(GblVariant_getValueCopy(pValue, &value));
+        GBL_CTX_CALL(GblVariant_copyValue(pValue, &value));
         TEST_OBJECT(pSelf)->floater = value;
         break;
     }
     case TestObject_Property_Id_stringer: {
         const char* pStr = NULL;
-        GBL_CTX_CALL(GblVariant_getValuePeek(pValue, &pStr));
+        GBL_CTX_CALL(GblVariant_peekValue(pValue, &pStr));
         if(pStr) strcpy(TEST_OBJECT(pSelf)->stringer, pStr);
         break;
     }
 /*    case TestObject_Property_Id_userdata: {
         void* pUserdata = NULL;
-        GBL_CTX_CALL(GblVariant_getValueCopy(pValue, &pUserdata));
+        GBL_CTX_CALL(GblVariant_copyValue(pValue, &pUserdata));
         GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
         break;
     }*/

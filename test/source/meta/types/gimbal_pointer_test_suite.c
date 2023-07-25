@@ -75,12 +75,12 @@ static GBL_RESULT GblPointerTestSuite_variant_(GblTestSuite* pSelf, GblContext* 
 
     // Value Get Move
     const char* pValue = NULL;;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &pValue));
     GBL_TEST_COMPARE(strcmp(pValue, "Fly"), 0);
 
     // Value Get Peek
     GblVariant_setPointer(&v, pSelf_->pointerType, "DIE");
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &pValue));
     GBL_TEST_COMPARE(strcmp(pValue, "DIE"), 0);
 
     // Destructor

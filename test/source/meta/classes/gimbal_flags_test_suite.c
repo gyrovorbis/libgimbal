@@ -224,12 +224,12 @@ static GBL_RESULT GblFlagsTestSuite_variant_(GblTestSuite* pSelf, GblContext* pC
 
     // Value Get Move
     PROPERTY_FLAGS flags = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &flags));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &flags));
     GBL_TEST_COMPARE(flags, (LOAD|SAVE));
 
     // Value Get Peek
     GblVariant_setFlags(&v, pSelf_->flagsType, WRITE);
-    GBL_CTX_VERIFY_CALL(GblVariant_getValuePeek(&v, &flags));
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &flags));
     GBL_TEST_COMPARE(flags, WRITE);
 
     // Destructor

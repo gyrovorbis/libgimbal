@@ -10,8 +10,8 @@
  *  * Reference counting/shared pointer semantics
  *  * Arbitrary userdata storage corresponding destructors
  *
- *  \author 2023 Falco Girgis
- *  \copyright MIT License
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 #ifndef GIMBAL_BOX_H
 #define GIMBAL_BOX_H
@@ -30,8 +30,8 @@
 #define GBL_BOX_GET_CLASS(self) (GBL_INSTANCE_GET_CLASS(self, GblBox))  //!< Gets a GblBoxClass from a GblInstance
 //! @}
 
-#define GBL_REF(box)    (GblBox_ref(GBL_BOX(box)))                    //!< Auto-casting convenience macro around GblBox_ref()
-#define GBL_UNREF(box)  (GblBox_unref(GBL_INSTANCE_TRY(box, GblBox))) //!< Auto-casting convenience macro around GblBox_unref()
+#define GBL_REF(box)            (GblBox_ref(GBL_BOX(box)))                    //!< Auto-casting convenience macro around GblBox_ref()
+#define GBL_UNREF(box)          (GblBox_unref(GBL_INSTANCE_TRY(box, GblBox))) //!< Auto-casting convenience macro around GblBox_unref()
 
 #define GBL_SELF_TYPE   GblBox
 
@@ -81,7 +81,7 @@ GBL_CLASS_END
  *
  *  \sa GblBoxClass
  */
-GBL_INSTANCE_BASE(GblBox)                       // Size (32-64 bit)
+GBL_INSTANCE_BASE(GblBox)                       // Size (32/64 bit)
     GBL_PRIVATE()                               // 12/20 Bytes Total
         GblArrayMap* pFields;                   //!< PRIVATE: Storage for extended userdata fields
         GblRefCount  refCounter;                //!< PRIVATE: Atomic reference counter
@@ -95,16 +95,16 @@ GBL_INSTANCE_END
  *  \brief Methods for managing floating classes
  *  @{
  */
-//! Creates an extended floating class, setting its properties to the given values
+//! Creates an extended floating class, setting its properties to the given values. Has default values.
 GBL_EXPORT GblBoxClass* GblBoxClass_createFloating    (GblType           derivedType,
-                                                       size_t            publicSize,
-                                                       void*             pUserdata,
-                                                       GblArrayMapDtorFn pFnUdDtor) GBL_NOEXCEPT;
-//! Constructs an extended floating class in-place, setting its properties to the given values
+                                                       size_t            size     /*=DEFAULT*/,
+                                                       void*             pUserdata/*=NULL*/,
+                                                       GblArrayMapDtorFn pFnUdDtor/*=NULL*/)   GBL_NOEXCEPT;
+//! Constructs an extended floating class in-place, setting its properties to the given values. Has default values.
 GBL_EXPORT GBL_RESULT   GblBoxClass_constructFloating (GBL_KLASS,
                                                        GblType           derivedType,
-                                                       void*             pUserdata,
-                                                       GblArrayMapDtorFn pFnUdDtor) GBL_NOEXCEPT;
+                                                       void*             pUserdata  /*=NULL*/,
+                                                       GblArrayMapDtorFn pFnUdDtor  /*=NULL*/) GBL_NOEXCEPT;
 //! @}
 
 /*! \name Userdata
@@ -127,33 +127,41 @@ GBL_EXPORT GBL_RESULT GblBoxClass_setUserDestructor (GBL_KLASS,
  *  @{
  */
 //! Returns the generic userdata field value associated with the given key on the class, or 0 if there isn't one
-GBL_EXPORT uintptr_t  GblBoxClass_getField   (GBL_CKLASS, GblQuark key)  GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t  GblBoxClass_field      (GBL_CKLASS, GblQuark key)           GBL_NOEXCEPT;
 //! Extracts the generic userdata field value associated with the given key on the class, without destroying it
-GBL_EXPORT uintptr_t  GblBoxClass_takeField  (GBL_KLASS, GblQuark key)   GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t  GblBoxClass_takeField  (GBL_KLASS, GblQuark key)            GBL_NOEXCEPT;
 //! Destroys the generic userdata field value associated with the given key on the class, returning GBL_TRUE upon success
-GBL_EXPORT GblBool    GblBoxClass_clearField (GBL_KLASS, GblQuark key)   GBL_NOEXCEPT;
+GBL_EXPORT GblBool    GblBoxClass_clearField (GBL_KLASS, GblQuark key)            GBL_NOEXCEPT;
 //! Returns GBL_TRUE if the given class has generic userdata field value associated with the given key
-GBL_EXPORT GblBool    GblBoxClass_hasField   (GBL_CKLASS, GblQuark key)  GBL_NOEXCEPT;
+GBL_EXPORT GblBool    GblBoxClass_hasField   (GBL_CKLASS, GblQuark key)           GBL_NOEXCEPT;
 //! Sets the generic userdata value and its optional destructor for the given key on the class, destroying the previous value if there was one
 GBL_EXPORT GBL_RESULT GblBoxClass_setField   (GBL_KLASS,
                                               GblQuark          key,
                                               uintptr_t         ud,
-                                              GblArrayMapDtorFn pFnDtor) GBL_NOEXCEPT;
+                                              GblArrayMapDtorFn pFnDtor/*=NULL*/) GBL_NOEXCEPT;
 //! @}
 
 //! Returns the GblType UUID associated with GblBox
 GBL_EXPORT GblType GblBox_type (void) GBL_NOEXCEPT;
 
 /*! \name Constructors
- *  \brief Overloaded constructor methods for GblBox
+ *  \brief Overloaded constructors for GblBox
  *  @{
  */
-//! Creates a GblBox instance of the derived type and returns a pointer to it
-GBL_EXPORT GblBox*    GblBox_create                (GblType derivedType)           GBL_NOEXCEPT;
+//! Creates a GblBox instance of the derived type and returns a pointer to it. Has default arguments.
+GBL_EXPORT GblBox*    GblBox_create                (GblType           derived,
+                                                    size_t            size     /*=DEFAULT*/,
+                                                    void*             pUserdata/*=NULL*/,
+                                                    GblArrayMapDtorFn pFnUdDtor/*=NULL*/,
+                                                    GblBoxClass*      pClass   /*=NULL*/) GBL_NOEXCEPT;
 //! Creates a GblBox instance, setting its class immediately to \p pClass, but not sinking it to take ownership
 GBL_EXPORT GblBox*    GblBox_createWithClass       (GblBoxClass* pClass)           GBL_NOEXCEPT;
 //! Constructs a GblBox instance of the derived type in-place, returning a result status code
-GBL_EXPORT GBL_RESULT GblBox_construct             (GBL_SELF, GblType derivedType) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblBox_construct             (GBL_SELF,
+                                                    GblType           derived,
+                                                    void*             pUserdata/*=NULL*/,
+                                                    GblArrayMapDtorFn pFnUdDtor/*=NULL*/,
+                                                    GblBoxClass*      pClass   /*=NULL*/) GBL_NOEXCEPT;
 //! Constructs a GblBox instance in-place, setting its class immediately to \p pClass, but not sinking it to take ownership
 GBL_EXPORT GBL_RESULT GblBox_constructWithClass    (GBL_SELF, GblBoxClass* pClass) GBL_NOEXCEPT;
 //! Creates an extended GblBox of the derived type, setting the given attributes, returning a pointer to it
@@ -197,12 +205,11 @@ GBL_EXPORT GblRefCount GblBox_refCount (GBL_CSELF) GBL_NOEXCEPT;
  *  @{
  */
 //! Returns the userdata pointer stored within the given GblBox
-GBL_EXPORT void*      GblBox_userdata          (GBL_CSELF)                   GBL_NOEXCEPT;
+GBL_EXPORT void*      GblBox_userdata          (GBL_CSELF)                             GBL_NOEXCEPT;
 //! Stores the untyped userdata pointer within the GblBox
-GBL_EXPORT GBL_RESULT GblBox_setUserdata       (GBL_SELF, void* pUserdata)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblBox_setUserdata       (GBL_SELF, void* pUserdata)             GBL_NOEXCEPT;
 //! Sets an additional user destructor to be invoked with the GblBox passed back to it when its being destructed
-GBL_EXPORT GBL_RESULT GblBox_setUserDestructor (GBL_SELF,
-                                                GblArrayMapDtorFn pFnUdDtor) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblBox_setUserDestructor (GBL_SELF, GblArrayMapDtorFn pFnUdDtor) GBL_NOEXCEPT;
 //! @}
 
 /*! \name Fields
@@ -211,19 +218,63 @@ GBL_EXPORT GBL_RESULT GblBox_setUserDestructor (GBL_SELF,
  *  @{
  */
 //! Returns the generic userdata field value for the given GblBox associated with the key
-GBL_EXPORT uintptr_t  GblBox_getField   (GBL_CSELF, GblQuark key)   GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t  GblBox_field      (GBL_CSELF, GblQuark key)            GBL_NOEXCEPT;
 //! Extracts the generic userdata field value for the given key, without destroying it
-GBL_EXPORT uintptr_t  GblBox_takeField  (GBL_SELF, GblQuark key)    GBL_NOEXCEPT;
+GBL_EXPORT uintptr_t  GblBox_takeField  (GBL_SELF, GblQuark key)             GBL_NOEXCEPT;
 //! Clears the field value for the given key, if it exists, calling its destructor (if it has one) and returning GBL_TRUE
-GBL_EXPORT GblBool    GblBox_clearField (GBL_SELF, GblQuark key)    GBL_NOEXCEPT;
+GBL_EXPORT GblBool    GblBox_clearField (GBL_SELF, GblQuark key)             GBL_NOEXCEPT;
 //! Returns GBL_TRUE if there is a field value on the given GblBox corresponding to the key
-GBL_EXPORT GblBool    GblBox_hasField   (GBL_CSELF, GblQuark key)   GBL_NOEXCEPT;
+GBL_EXPORT GblBool    GblBox_hasField   (GBL_CSELF, GblQuark key)            GBL_NOEXCEPT;
 //! Inserts \p ud into the the GblBox with the given \p key and optional destructor, destroying any overwritten value
 GBL_EXPORT GBL_RESULT GblBox_setField   (GBL_SELF,
                                          GblQuark          key,
                                          uintptr_t         ud,
-                                         GblArrayMapDtorFn pFnDtor) GBL_NOEXCEPT;
+                                         GblArrayMapDtorFn pFnDtor/*=NULL*/) GBL_NOEXCEPT;
 //! @}
+
+//! \cond
+#define GblBoxClass_createFloating(...) \
+    GblBoxClass_createFloatingDefault_(__VA_ARGS__)
+#define GblBoxClass_createFloatingDefault_(...) \
+    GblBoxClass_createFloatingDefault__(__VA_ARGS__, 0, GBL_NULL, GBL_NULL)
+#define GblBoxClass_createFloatingDefault__(type, size, ud, dtor, ...) \
+    (GblBoxClass_createFloating)(type, size, ud, dtor)
+
+#define GblBoxClass_constructFloating(...) \
+    GblBoxClass_constructFloatingDefault_(__VA_ARGS__)
+#define GblBoxClass_constructFloatingDefault_(...) \
+    GblBoxClass_constructFloatingDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL)
+#define GblBoxClass_constructFloatingDefault__(klass, type, ud, dtor, ...) \
+    (GblBoxClass_constructFloating)(klass, type, ud, dtor)
+
+#define GblBoxClass_setField(...) \
+    GblBoxClass_setFieldDefault_(__VA_ARGS__)
+#define GblBoxClass_setFieldDefault_(...) \
+    GblBoxClass_setFieldDefault__(__VA_ARGS__, GBL_NULL)
+#define GblBoxClass_setFieldDefault__(klass, key, value, dtor, ...) \
+    (GblBoxClass_setField)(klass, key, value, dtor)
+
+#define GblBox_create(...) \
+    GblBox_createDefault_(__VA_ARGS__)
+#define GblBox_createDefault_(...) \
+    GblBox_createDefault__(__VA_ARGS__, 0, GBL_NULL, GBL_NULL, GBL_NULL)
+#define GblBox_createDefault__(type, size, ud, dtor, klass, ...) \
+    (GblBox_create)(type, size, ud, dtor, klass)
+
+#define GblBox_construct(...) \
+    GblBox_constructDefault_(__VA_ARGS__)
+#define GblBox_constructDefault_(...) \
+    GblBox_constructDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL, GBL_NULL)
+#define GblBox_constructDefault__(self, type, ud, dtor, klass, ...) \
+    (GblBox_construct)(self, type, ud, dtor, klass)
+
+#define GblBox_setField(...) \
+    GblBox_setFieldDefault_(__VA_ARGS__)
+#define GblBox_setFieldDefault_(...) \
+    GblBox_setFieldDefault__(__VA_ARGS__, GBL_NULL)
+#define GblBox_setFieldDefault__(self, key, value, dtor, ...) \
+    (GblBox_setField)(self, key, value, dtor)
+//! \endcond
 
 GBL_DECLS_END
 

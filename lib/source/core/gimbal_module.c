@@ -5,6 +5,7 @@
 #include <gimbal/core/gimbal_logger.h>
 #include <gimbal/utils/gimbal_version.h>
 #include <gimbal/utils/gimbal_option_group.h>
+#include <gimbal/core/gimbal_atomics.h>
 #include <tinycthread.h>
 
 #define GBL_MODULE_(self)   ((GblModule_*)GBL_INSTANCE_PRIVATE(self, GBL_MODULE_TYPE))
@@ -380,13 +381,13 @@ static GBL_RESULT GblModule_GblObject_setProperty_(GblObject* pObject, const Gbl
 
     switch(pProperty->id) {
     case GblModule_Property_Id_prefix:
-        GblVariant_getValueMove(pValue, &pSelf->pPrefix);      break;
+        GblVariant_moveValue(pValue, &pSelf->pPrefix);      break;
     case GblModule_Property_Id_version:
         pSelf->version = GblVariant_getUint32(pValue);         break;
     case GblModule_Property_Id_author:
-        GblVariant_getValueMove(pValue, &pSelf->pAuthor);      break;
+        GblVariant_moveValue(pValue, &pSelf->pAuthor);      break;
     case GblModule_Property_Id_description:
-        GblVariant_getValueMove(pValue, &pSelf->pDescription); break;
+        GblVariant_moveValue(pValue, &pSelf->pDescription); break;
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Attemping to write invalid property [%s] on GblModule",

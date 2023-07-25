@@ -114,7 +114,7 @@ GBL_INLINE size_t      GblArrayDeque_elementSize  (GBL_CSELF)                   
 GBL_INLINE GblBool     GblArrayDeque_empty        (GBL_CSELF)                                               GBL_NOEXCEPT;
 GBL_INLINE GblBool     GblArrayDeque_full         (GBL_CSELF)                                               GBL_NOEXCEPT;
 
-GBL_INLINE void*       GblArrayDeque_at           (GBL_CSELF, size_t  index)                                GBL_NOEXCEPT;
+GBL_INLINE void*       GblArrayDeque_at           (GBL_CSELF, size_t index)                                 GBL_NOEXCEPT;
 GBL_INLINE void*       GblArrayDeque_front        (GBL_CSELF)                                               GBL_NOEXCEPT;
 GBL_INLINE void*       GblArrayDeque_back         (GBL_CSELF)                                               GBL_NOEXCEPT;
 
@@ -126,13 +126,13 @@ GBL_EXPORT void*       GblArrayDeque_emplaceFront (GBL_SELF)                    
 GBL_EXPORT void*       GblArrayDeque_popBack      (GBL_SELF)                                                GBL_NOEXCEPT;
 GBL_INLINE void*       GblArrayDeque_popFront     (GBL_SELF)                                                GBL_NOEXCEPT;
 
-GBL_EXPORT void*       GblArrayDeque_insert       (GBL_SELF, size_t  pos, const void* pData, size_t  count) GBL_NOEXCEPT;
-GBL_EXPORT void*       GblArrayDeque_emplace      (GBL_SELF, size_t  pos)                                   GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblArrayDeque_erase        (GBL_SELF, size_t  pos, size_t  count)                    GBL_NOEXCEPT;
+GBL_EXPORT void*       GblArrayDeque_insert       (GBL_SELF, size_t pos, const void* pData, size_t count)   GBL_NOEXCEPT;
+GBL_EXPORT void*       GblArrayDeque_emplace      (GBL_SELF, size_t pos)                                    GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblArrayDeque_erase        (GBL_SELF, size_t pos, size_t count )                     GBL_NOEXCEPT;
 
 GBL_EXPORT void        GblArrayDeque_clear        (GBL_SELF)                                                GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblArrayDeque_reserve      (GBL_SELF, size_t  capacity)                              GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblArrayDeque_resize       (GBL_SELF, size_t  size)                                  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblArrayDeque_reserve      (GBL_SELF, size_t capacity)                               GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblArrayDeque_resize       (GBL_SELF, size_t size)                                   GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblArrayDeque_shrinkToFit  (GBL_SELF)                                                GBL_NOEXCEPT;
 
 // ===== Public macros =====

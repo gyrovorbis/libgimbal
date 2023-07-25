@@ -333,7 +333,7 @@ static GBL_EXPORT GBL_RESULT GblClass_destruct_(GblClass* pClass) {
         // call finalizer if class provides one
         if(pIter->pInfo->pFnClassFinal) {
             GBL_CTX_DEBUG("Calling class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
-            GBL_CTX_CALL(pIter->pInfo->pFnClassFinal(pMeta->pClass, pIter->pInfo->pClassData, pCtx_));
+            GBL_CTX_CALL(pIter->pInfo->pFnClassFinal(pClass, pIter->pInfo->pClassData, pCtx_));
         } else {
             GBL_CTX_DEBUG("No class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
         }

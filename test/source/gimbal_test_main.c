@@ -34,6 +34,7 @@
 #include "meta/classes/gimbal_flags_test_suite.h"
 #include "meta/classes/gimbal_opaque_test_suite.h"
 #include "meta/types/gimbal_pointer_test_suite.h"
+#include "meta/instances/gimbal_box_test_suite.h"
 #include "meta/instances/gimbal_object_test_suite.h"
 #include "meta/ifaces/gimbal_itable_variant_test_suite.h"
 #include "utils/gimbal_uuid_test_suite.h"
@@ -182,6 +183,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_INTERFACE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_INSTANCE_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_BOX_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_CLOSURE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,

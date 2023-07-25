@@ -53,7 +53,7 @@ GBL_DECLARE_FLAGS(GBL_IVARIANT_OP_FLAGS) {
 #define CVARIANT    const VARIANT
 
 //! Virtual method table for GblIVariantClass
-typedef struct GblIVariantClassVTable {
+typedef struct GblIVariantVTable {
     GBL_IVARIANT_OP_FLAGS   supportedOps;
     char                    pSetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
     char                    pGetValueFmt[GBL_IVARIANT_VALUE_VAR_ARG_MAX];
@@ -65,7 +65,7 @@ typedef struct GblIVariantClassVTable {
     GBL_RESULT (*pFnCompare)  (CVARIANT, const GblVariant* pOther, int* pResult);
     GBL_RESULT (*pFnSave)     (CVARIANT, GblStringBuffer* pString);
     GBL_RESULT (*pFnLoad)     (VARIANT,  const GblStringBuffer* pString);
-} GblIVariantClassVTable;
+} GblIVariantVTable;
 
 /*! \struct GblIVariantClass
  *  \extends GblInterface
@@ -79,7 +79,7 @@ typedef struct GblIVariantClassVTable {
  *  \sa GblVariant
  */
 GBL_INTERFACE_DERIVE(GblIVariant)
-    const GblIVariantClassVTable* pVTable;
+    const GblIVariantVTable* pVTable;
 GBL_INTERFACE_END
 
 #define GBL_SELF_TYPE GblIVariantClass

@@ -1,5 +1,5 @@
 /*! \file
- *  \brief Modular command-line argument parser
+ *  \brief   Modular command-line argument parser
  *  \ingroup utils
  *
  *  \todo More descriptive errors, help and version options,
@@ -8,15 +8,15 @@
  *        process(..) top-level method for handling exiting
  *        upon failure, version, or help.
  *
- *  \author 2023 Falco Girgis
- *  \copyright MIT License
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 #ifndef GIMBAL_CMD_PARSER_H
 #define GIMBAL_CMD_PARSER_H
 
 #include "gimbal_option_group.h"
 
-/*! \name Type System
+/*! \name  Type System
  *  \brief Type UUID and cast operators
  *  @{
  */
@@ -38,9 +38,9 @@ typedef struct GblCmdArg {
     GblStringRef* pDesc;    //!< Description of the command-line argument
 } GblCmdArg;
 
-/*! \struct GblCmdParserClass
+/*! \struct  GblCmdParserClass
  *  \extends GblObjectClass
- *  \brief GblClass for GblCmdParser
+ *  \brief   GblClass for GblCmdParser
  *
  *  GblCmdParserClass offers a polymorphic virtual table
  *  for processing command-line arguments.
@@ -48,20 +48,20 @@ typedef struct GblCmdArg {
  *  \sa GblCmdParser
  */
 GBL_CLASS_DERIVE(GblCmdParser, GblObject)
-//! Parses the command given by \p cmd and returns a GBL_RESULT code
+    //! Parses the command given by \p cmd and returns a GBL_RESULT code
     GBL_RESULT (*pFnParse)           (GBL_SELF,
                                       GblStringView cmd);
-//! Checks to see if unknown command-line option values can be used, returning number used
+    //! Checks to see if unknown command-line option values can be used, returning number used
     GBL_RESULT (*pFnTryUnknownOption)(GBL_SELF,
                                       GblStringView key,
                                       GblStringView value,
                                       size_t*       pUsed);
 GBL_CLASS_END
 
-/*! \struct GblCmdParser
+/*! \struct  GblCmdParser
  *  \extends GblObject
- *  \brief General-purpose command-line argument parser
  *  \ingroup utils
+ *  \brief   General-purpose command-line argument parser
  *
  *  GblCmdParser is a configurable, modular, generalized
  *  parser for processing command-line arguments. A
@@ -107,7 +107,7 @@ GBL_SIGNALS(GblCmdParser,
 //! Returns the GblType UUID associated with GblCmdParser
 GBL_EXPORT GblType GblCmdParser_type (void) GBL_NOEXCEPT;
 
-/*! \name Lifetime Management
+/*! \name  Lifetime Management
  *  \brief Methods for controlling lifetime of a GblCmdParser
  *  @{
  */
@@ -117,7 +117,7 @@ GBL_EXPORT GblCmdParser* GblCmdParser_create (void)     GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount   GblCmdParser_unref  (GBL_SELF) GBL_NOEXCEPT;
 //! @}
 
-/*! \name Option Groups
+/*! \name  Option Groups
  *  \brief Methods for managing GblCmdOptionGroup subobjects
  *  \relatesalso GblCmdParser
  *  @{
@@ -129,7 +129,7 @@ GBL_EXPORT GBL_RESULT      GblCmdParser_addOptionGroup     (GBL_SELF,
 GBL_EXPORT GBL_RESULT      GblCmdParser_setOptionGroups    (GBL_SELF,
                                                             GblOptionGroup** ppGroups) GBL_NOEXCEPT;
 //! Returns a pointer to the GblOptionGroup at the given index
-GBL_EXPORT GblOptionGroup* GblCmdParser_optionGroupAt      (GBL_CSELF, size_t idx)     GBL_NOEXCEPT;
+GBL_EXPORT GblOptionGroup* GblCmdParser_optionGroup        (GBL_CSELF, size_t idx)     GBL_NOEXCEPT;
 //! Finds a GblOptionGroup from the internal list by its GblObject::name.
 GBL_EXPORT GblOptionGroup* GblCmdParser_findOptionGroup    (GBL_CSELF,
                                                             const char* pName)         GBL_NOEXCEPT;
@@ -142,7 +142,7 @@ GBL_EXPORT GBL_RESULT      GblCmdParser_setMainOptionGroup (GBL_SELF,
 GBL_EXPORT GblOptionGroup* GblCmdParser_mainOptionGroup    (GBL_CSELF)                 GBL_NOEXCEPT;
 //! @}
 
-/*! \name Positional Arguments
+/*! \name  Positional Arguments
  *  \brief Methods for managing positional arguments
  *  \relatesalso GblCmdParser
  *  @{
@@ -159,19 +159,19 @@ GBL_EXPORT GBL_RESULT           GblCmdParser_clearPositionalArgs     (GBL_SELF) 
 //! Returns the size of the internally managed list of GblCmdArg structures represengin command-line arguments
 GBL_EXPORT size_t               GblCmdParser_positionalArgCount      (GBL_CSELF)               GBL_NOEXCEPT;
 //! Returns a pointer to the GblCmdArg structure in the internally maintained list at the given index
-GBL_EXPORT const GblCmdArg*     GblCmdParser_positionalArgAt         (GBL_CSELF, size_t index) GBL_NOEXCEPT;
+GBL_EXPORT const GblCmdArg*     GblCmdParser_positionalArg           (GBL_CSELF, size_t index) GBL_NOEXCEPT;
 //! After parsing, this function returns the number of positional arguments extracted
 GBL_EXPORT size_t               GblCmdParser_positionalArgValueCount (GBL_CSELF)               GBL_NOEXCEPT;
+//! After parsing, returns the GblStringList maintained internally, containing the extracted positional argument values
+GBL_EXPORT const GblStringList* GblCmdParser_positionalArgValues     (GBL_CSELF)               GBL_NOEXCEPT;
 //! After parsing, this function converts the value of the argument at the given \p index to the desired \p toType, copying its value to \p pData, and returning the result
 GBL_EXPORT GBL_RESULT           GblCmdParser_positionalArgValue      (GBL_CSELF,
                                                                       size_t  index,
                                                                       GblType toType,
                                                                       void*   pData)           GBL_NOEXCEPT;
-//! After parsing, returns the GblStringList maintained internally, containing the extracted positional argument values
-GBL_EXPORT const GblStringList* GblCmdParser_positionalArgValues     (GBL_CSELF)               GBL_NOEXCEPT;
 //! @}
 
-/*! \name Parsing
+/*! \name  Parsing
  *  \brief Methods for parsing arguments or managing parsed values
  *  @{
  */

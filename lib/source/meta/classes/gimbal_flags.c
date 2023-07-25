@@ -304,7 +304,7 @@ static GBL_RESULT flagsClass_final_(GblClass* pClass,
 GBL_EXPORT GblType GblFlags_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    const static GblIVariantClassVTable flagsIVariantIFace =  {
+    const static GblIVariantVTable flagsIVariantIFace =  {
             .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE        |
                             GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY     |
                             GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY     |

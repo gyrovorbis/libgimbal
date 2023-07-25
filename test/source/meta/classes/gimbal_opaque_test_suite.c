@@ -99,7 +99,7 @@ static GBL_RESULT GblOpaqueTestSuite_variant_(GblTestSuite* pSelf, GblContext* p
     GBL_TEST_COMPARE(strcmp(GblVariant_getOpaquePeek(&v), "Fly"), 0); // Utility / Get Value
 
     // Value Get Move
-    GBL_CTX_VERIFY_CALL(GblVariant_getValueMove(&v, &pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &pValue));
     GBL_TEST_COMPARE(strcmp(pValue, "Fly"), 0);
     GblStringRef_release(pValue);
 

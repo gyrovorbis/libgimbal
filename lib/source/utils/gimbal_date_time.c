@@ -704,3 +704,192 @@ GBL_EXPORT GblDateTime* GblDateTime_addYears(GblDateTime* pSelf, GblYear years) 
     };
     return GblDateTime_add(pSelf, &rhs);
 }
+
+
+GBL_EXPORT GblBool GblDate_isLeapYear(GblYear year) GBL_NOEXCEPT {
+    GBL_ASSERT(year > GBL_DATE_GREGORIAN_YEAR_FIRST, "Must be a Gregorian year!");
+    if (year % 4) {
+        return GBL_FALSE;
+    } else if (!(year % 400)) {
+        return GBL_TRUE;
+    } else if (!(year % 100)) {
+        return GBL_FALSE;
+    } else {
+        return GBL_TRUE;
+    }
+}
+
+GBL_EXPORT GblDay GblDate_monthDays(GblMonth month, GblYear year) GBL_NOEXCEPT {
+    if(month == GBL_MONTH_FEBRUARY) {
+        return GblDate_isLeapYear(year)? 29 : 28;
+    } else return (month > GBL_MONTH_JULY)? ((month&1)? 30: 31) : ((month&1)? 31: 30);
+}
+
+GBL_EXPORT GblBool GblDate_isValid(const GblDate* pSelf) GBL_NOEXCEPT {
+    if(pSelf->day <= 0)
+        return GBL_FALSE;
+    if(pSelf->month <= 0)
+        return GBL_FALSE;
+    if(pSelf->year < 0)
+        return GBL_FALSE;
+    if(pSelf->month > GBL_MONTH_COUNT)
+        GBL_FALSE;
+    if(pSelf->day > GblDate_monthDays(pSelf->month, pSelf->year))
+        return GBL_FALSE;
+    return GBL_TRUE;
+}
+
+// Should work with non-Gregorian times?
+GBL_EXPORT GblDay GblDate_toJulian(const GblDate* pSelf) GBL_NOEXCEPT {
+    const GblDay a = (14 - pSelf->month) / 12;
+    const GblDay y = pSelf->year + 4800 - a;
+    const GblDay m = pSelf->month + 12*a - 3;
+
+    GblDay jdn = 0;
+
+    if ((pSelf->year > 1582) || (pSelf->year == 1582 && pSelf->month > 10) ||
+        (pSelf->year == 1582 && pSelf->month == 10 && pSelf->day < 15)) {
+
+        jdn = pSelf->day + (153*m+2)/5 + 365*y + y/4 - y/100 + y/400 - 32045;
+    } else {
+        jdn = pSelf->day + (153*m+2)/5 + 365*y + y/4 - 32045;
+    }
+
+    return jdn;
+}
+
+GBL_EXPORT GblWeekDay GblDate_weekDay(const GblDate* pSelf) GBL_NOEXCEPT {
+    GblDay d = pSelf->day;
+    GblDay m = pSelf->month;
+    GblDay y = pSelf->year;
+    return (GblWeekDay)((d += m < 3 ? y-- : y - 2, 23*m/9 + d + 4 + y/4- y/100 + y/400)%7);
+}
+
+GBL_EXPORT GblDay GblDate_yearDay(const GblDate* pSelf) GBL_NOEXCEPT {
+    static const GblDay days[2][13] = {
+        {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334},
+        {0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335}
+    };
+    return days[GblDate_isLeapYear(pSelf->year)]
+               [pSelf->month]
+            + pSelf->day;
+}
+
+GBL_EXPORT uint8_t GblDate_yearWeek(const GblDate* pSelf) GBL_NOEXCEPT {
+    return GblDate_yearDay(pSelf)/7;
+}
+
+// MAYBE works with non-Gregorian times?
+GBL_EXPORT GblDate* GblDate_fromJulian(GblDate* pSelf, GblDay julianDate) GBL_NOEXCEPT {
+    int i, j, k, n, l;
+
+    l = julianDate+68569;
+    n = 4*l/146097;
+    l = l-(146097*n+3)/4;
+    i = 4000*(l+1)/1461001;
+    l = l-1461*i/4+31;
+    j = 80*l/2447;
+    k = l-2447*j/80;
+    l = j/11;
+    j = j+2-12*l;
+    i = 100*(n-49)+i+l;
+
+    pSelf->year  = (GblYear)i;
+    pSelf->month = (GblMonth)j;
+    pSelf->day   = (GblDay)k;
+
+    return pSelf;
+}
+
+GBL_EXPORT GblBool GblTime_isValid(const GblTime* pSelf) GBL_NOEXCEPT {
+    if(pSelf->nSeconds < 0)
+        return GBL_FALSE;
+    if(pSelf->seconds < 0)
+        return GBL_FALSE;
+    if(pSelf->minutes < 0)
+        return GBL_FALSE;
+    if(pSelf->hours < 0)
+        return GBL_FALSE;
+    if(pSelf->nSeconds > GBL_TIME_NSECS_PER_SEC-1)
+        return GBL_FALSE;
+    if(pSelf->seconds > 59)
+        return GBL_FALSE;
+    if(pSelf->minutes > 59)
+        return GBL_FALSE;
+    if(pSelf->hours > 23)
+        return GBL_FALSE;
+    return GBL_TRUE;
+}
+
+GBL_EXPORT GblTimeSpec GblTime_specDiff(const GblTimeSpec* pSrc1, const GblTimeSpec* pSrc2) {
+    GblTimeSpec temp;
+
+    if((pSrc1->tv_nsec - pSrc2->tv_nsec) < 0) {
+        temp.tv_sec  = pSrc1->tv_sec - pSrc2->tv_sec - 1;
+        temp.tv_nsec = GBL_TIME_NSECS_PER_SEC + pSrc1->tv_nsec - pSrc2->tv_nsec;
+    } else {
+        temp.tv_sec  = pSrc1->tv_sec - pSrc2->tv_sec;
+        temp.tv_nsec = pSrc1->tv_nsec - pSrc2->tv_nsec;
+    }
+
+    return temp;
+}
+
+GBL_EXPORT GblBool GblDateTime_isUtc(const GblDateTime* pSelf) {
+    return pSelf->utcOffset == 0.0;
+}
+
+GBL_EXPORT GblBool GblDateTime_isLocal(const GblDateTime* pSelf) {
+    return pSelf->utcOffset == GblTime_localUtcOffset();
+}
+
+GBL_EXPORT void GblDate_set(GblDate* pSelf, GblYear year, GblMonth month, GblDay day) {
+    pSelf->year = year; pSelf->month = month; pSelf->day = day;
+}
+
+GBL_EXPORT GblBool GblTime_isPm(const GblTime* pSelf) {
+    return pSelf->hours >= 12;
+}
+
+GBL_EXPORT void (GblTime_set)(GblTime* pSelf, GblHour hours, GblMinute mins, GblSecond secs, GblNanoSecond ns) {
+    pSelf->hours = hours; pSelf->minutes = mins; pSelf->seconds = secs; pSelf->nSeconds = ns;
+}
+
+GBL_EXPORT GblBool GblDateTime_isValid(const GblDateTime* pSelf) {
+    return GblDate_isValid(&pSelf->date) && GblTime_isValid(&pSelf->time);
+}
+
+GBL_EXPORT void (GblDateTime_set)(GblDateTime* pSelf, GblYear year, GblMonth month, GblDay day, GblHour hours, GblMinute mins, GblSecond secs, GblNanoSecond ns, GblSecond tzOff) GBL_NOEXCEPT {
+    GblDate_set(&pSelf->date, year, month, day);
+    GblTime_set(&pSelf->time, hours, mins, secs, ns);
+    pSelf->utcOffset = tzOff;
+}
+
+GBL_EXPORT void GblDateTime_setDate(GblDateTime* pSelf, const GblDate* pDate) {
+    memcpy(&pSelf->date, pDate, sizeof(GblDate));
+}
+
+GBL_EXPORT void GblDateTime_setTime(GblDateTime* pSelf, const GblTime* pTime) {
+    memcpy(&pSelf->time, pTime, sizeof(GblTime));
+}
+
+GBL_EXPORT int GblDateTime_compare(const GblDateTime* pSelf, const GblDateTime* pRhs) {
+    GblTimeSpec ts = GblDateTime_diff(pSelf, pRhs);
+    if(ts.tv_sec  > 0) return 1;
+    if(ts.tv_sec  < 0) return -1;
+    if(ts.tv_nsec > 0) return 1;
+    if(ts.tv_nsec < 0) return -1;
+    return 0;
+}
+
+GBL_EXPORT GblBool GblDateTime_equals(const GblDateTime* pSelf, const GblDateTime* pOther) {
+    return GblDateTime_compare(pSelf, pOther) == 0;
+}
+
+GBL_EXPORT GblDateTime* GblDateTime_addMilliSecs(GblDateTime* pSelf, int mSecs) {
+    return GblDateTime_addMicroSecs(pSelf, mSecs * 1000);
+}
+
+GBL_EXPORT GblDateTime* GblDateTime_addMicroSecs(GblDateTime* pSelf, int uSecs) {
+    return GblDateTime_addNanoSecs(pSelf, uSecs * 1000);
+}
