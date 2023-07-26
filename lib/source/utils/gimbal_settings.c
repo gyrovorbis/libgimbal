@@ -202,8 +202,8 @@ static GBL_RESULT GblSettings_Box_destructor_(GblBox* pBox) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblSettings_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblSettings_init_(GblInstance* pInstance) {
+    GBL_CTX_BEGIN(NULL);
 
     GblSettings* pSelf   = GBL_SETTINGS(pInstance);
     GblSettings_* pSelf_ = GBL_SETTINGS_(pInstance);
@@ -214,19 +214,19 @@ static GBL_RESULT GblSettings_init_(GblInstance* pInstance, GblContext* pCtx) {
                                       GblSettings_hashSet_comparator_,
                                       GblSettings_hashSet_destructor_,
                                       GBL_SETTINGS_HASHSET_SIZE_DEFAULT_,
-                                      pCtx,
+                                      NULL,
                                       pSelf));
 
     GBL_CTX_CALL(GblStringBuffer_construct(&pSelf_->scope,
                                            GblStringView_fromEmpty(),
                                            0,
-                                           pCtx));
+                                           NULL));
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblSettingsClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblSettingsClass_init_(GblClass* pClass, const void* pUd) {
+    GBL_CTX_BEGIN(NULL);
 
     GBL_BOX_CLASS(pClass)     ->pFnDestructor  = GblSettings_Box_destructor_;
     GBL_OBJECT_CLASS(pClass)  ->pFnProperty    = GblSettings_Object_property;

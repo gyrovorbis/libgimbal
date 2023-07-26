@@ -151,7 +151,7 @@ static GBL_RESULT classInit_(GblClass* pClass, const void* pUd) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf) {
+static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(NULL);
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblSignalTestSuite_));

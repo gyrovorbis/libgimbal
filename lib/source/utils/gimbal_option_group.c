@@ -307,8 +307,8 @@ static GBL_RESULT GblOptionGroup_Box_destructor_(GblBox* pBox) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblOptionGroup_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+GBL_EXPORT GBL_RESULT GblOptionGroup_init_(GblInstance* pInstance) {
+    GBL_CTX_BEGIN(NULL);
     GBL_OPTION_GROUP(pInstance)->pParsedArgs = GblStringList_createEmpty();
     GBL_CTX_END();
 }

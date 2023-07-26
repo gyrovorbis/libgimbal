@@ -1495,8 +1495,8 @@ static GBL_RESULT GblObjectClass_final_(GblClass* pClass, const void* pClassData
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblObject_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx); {
+static GBL_RESULT GblObject_init_(GblInstance* pInstance) {
+    GBL_CTX_BEGIN(NULL); {
         GblObjectClass* pClass = GBL_OBJECT_GET_CLASS(pInstance);
         GBL_CTX_CALL(pClass->pFnConstructor(GBL_OBJECT(pInstance)));
     } GBL_CTX_END();

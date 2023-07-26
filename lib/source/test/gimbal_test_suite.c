@@ -251,8 +251,8 @@ GBL_EXPORT GBL_RESULT GblTestSuite_runCase(GblTestSuite* pSelf,
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestSuite_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblTestSuite_init_(GblInstance* pInstance) {
+    GBL_CTX_BEGIN(NULL);
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pInstance);
     GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->testCases, sizeof(GblTestCase)));
     GBL_CTX_END();

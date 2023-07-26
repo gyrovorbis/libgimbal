@@ -141,7 +141,7 @@ static GBL_RESULT typeClassInit_(GblClass* pClass, const void* pUd) {
 }
 
 
-static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf) {
+static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(NULL);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblInterfaceTestSuite_));
@@ -357,7 +357,7 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblInterfaceTestSuite_final_(GblTestSuite* pSelf) {
+static GBL_RESULT GblInterfaceTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(NULL);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 

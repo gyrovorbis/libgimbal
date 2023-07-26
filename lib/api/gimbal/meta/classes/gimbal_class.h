@@ -50,8 +50,8 @@
  *  \brief UUID and cast operators for builtin static root class type
  *  @{
  */
-#define GBL_STATIC_CLASS_TYPE       (GBL_BUILTIN_TYPE(STATIC_CLASS)) //!< GblType UUID for builtin static class primitive
-#define GBL_STATIC_CLASS(klass)     GBL_STATIC_CLASS_(klass)         //!< Casts a class to a static class
+#define GBL_STATIC_CLASS_TYPE    (GBL_BUILTIN_TYPE(STATIC_CLASS)) //!< GblType UUID for builtin static class primitive
+#define GBL_STATIC_CLASS(klass)  GBL_STATIC_CLASS_(klass)         //!< Casts a class to a static class
 //! @}
 
 #define GBL_SELF_TYPE GblClass
