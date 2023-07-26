@@ -3,6 +3,181 @@
 
 #include <gimbal/algorithms/gimbal_numeric.h>
 
+GBL_EXPORT uint8_t gblPow2Next_u8(uint8_t n) {
+    GBL_ASSERT(n >= 2);
+    --n;
+    n |= n >> 1; n |= n >> 2; n |= n >> 4;
+    return n + 1;
+}
+
+GBL_EXPORT uint16_t gblPow2Next_u16(uint16_t n) {
+    GBL_ASSERT(n >= 2);
+    --n;
+    n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8;
+    return n + 1;
+}
+
+GBL_EXPORT uint32_t gblPow2Next_u32(uint32_t n) {
+    GBL_ASSERT(n >= 2);
+    --n;
+    n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16;
+    return n + 1;
+}
+
+GBL_EXPORT uint64_t gblPow2Next_u64(uint64_t n) {
+    GBL_ASSERT(n >= 2);
+    --n;
+    n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16; n |= n >> 32;
+    return n + 1;
+}
+
+GBL_EXPORT
+GblBool gblPrimeCheck(int n) {
+    for(int i = 2; i <= n/2; i++)
+        if(n % i == 0) return GBL_FALSE;
+    return GBL_TRUE;
+}
+
+GBL_EXPORT
+int gblFibonacci(int n) {
+    int num1 = 0, num2 = 1, num3 = 0;
+
+    if(!n)
+      return num1;
+    for(int i = 2; i <= n; i++) {
+      num3 = num1 + num2;
+      num1 = num2;
+      num2 = num3;
+    }
+
+    return num2;
+}
+
+GBL_EXPORT
+unsigned long gblBinomialCoeff(unsigned n, unsigned k) {
+    unsigned long int res = 1;
+
+    // Since C(n, k) = C(n, n-k)
+    if (k > n - k)
+        k = n - k;
+
+    // Calculate value of [n*(n-1)*---*(n-k+1)] /
+    // [k*(k-1)*---*1]
+    for (unsigned i = 0; i < k; ++i) {
+        res *= (n - i);
+        res /= (i + 1);
+    }
+
+    return res;
+}
+
+// Find nth catalan number in O(n) time
+GBL_EXPORT unsigned long int gblCatalan(unsigned int n) {
+    // Calculate value of 2nCn
+    unsigned long int c = gblBinomialCoeff(2 * n, n);
+
+    // return 2nCn/(n+1)
+    return c / (n + 1);
+}
+
+GBL_EXPORT size_t  gblAlignedAllocSizeDefault(size_t  bytes) {
+    const size_t  remainder = bytes % GBL_ALLOC_MIN_SIZE;
+    size_t  newSize = bytes;
+    if(remainder) {
+        newSize += GBL_ALLOC_MIN_SIZE - remainder;
+    }
+    return newSize;
+}
+
+GBL_EXPORT size_t  gblAlignedAllocSize(size_t size, size_t align) {
+    if(!align) align = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
+    const size_t  alignRem = size % align;
+    size_t  newSize = size;
+    if(alignRem) {
+        newSize += (align - (alignRem));
+    }
+    return newSize;
+}
+
+// GCD using Euclid's algorithm, only >0 values
+GBL_EXPORT int gblGcd(int u, int v) {
+    int R = 0;
+    //if(!u) return v;
+    //if(!v) return u;
+    while ((u % v) > 0) GBL_LIKELY {
+      R = u % v;
+      u = v;
+      v = R;
+    }
+    return v;
+}
+
+GBL_EXPORT int gblLcm(int u, int v) {
+    if(!u || !v) GBL_UNLIKELY return 0;
+    const int absU      = abs(u);
+    const int absV      = abs(v);
+    const int absHigher = GBL_MAX(absU, absV);
+    const int absLower  = GBL_MIN(absU, absV);
+    int       lcm       = absHigher;
+    while(lcm % absLower) {
+        lcm += absHigher;
+    }
+    return lcm;
+}
+
+GBL_EXPORT int gblParity(uint8_t n) {
+    int p = 0;
+    while(n) GBL_LIKELY {
+        p = !p;
+        n &= (n-1);
+    }
+    return p;
+}
+
+GBL_EXPORT uint32_t gblNtohl(uint32_t n) {
+    unsigned char *np = (unsigned char *)&n;
+    return ((uint32_t)np[0] << 24) |
+           ((uint32_t)np[1] << 16) |
+           ((uint32_t)np[2] << 8)  |
+            (uint32_t)np[3];
+}
+
+GBL_EXPORT uint32_t gblHtonl(uint32_t x) {
+#if GBL_BIG_ENDIAN == 0
+    uint8_t *s = (uint8_t *)&x;
+    return (uint32_t)(s[0] << 24 | s[1] << 16 | s[2] << 8 | s[3]);
+#else
+    return x;
+#endif
+}
+
+GBL_EXPORT GblBool gblFloatEquals(double a, double b, double e) {
+    GBL_ASSERT(e >= DBL_EPSILON, "Epsilon value is smaller than system supports.");
+    GBL_ASSERT(e < 1.0f, "Epsilon must be fractional value.");
+
+#if 0
+    const double diff = fabs(a - b);
+
+    if(a == b)
+        return GBL_TRUE;
+    else if(a == 0 || b == 0 || diff < DBL_MIN)
+        return (diff < (e * DBL_MIN));
+    else
+        return (diff / (fabs(a) + fabs(b)) < e);
+#else
+    // Calculate the difference.
+    const double diff = fabs(a - b);
+    a = fabs(a);
+    b = fabs(b);
+    // Find the largest
+    const double max = GBL_MAX(a, b);
+
+    if (diff <= max * e)
+        return GBL_TRUE;
+    return GBL_FALSE;
+#endif
+}
+
 static uint32_t primes_[] = {
     5,
     11,

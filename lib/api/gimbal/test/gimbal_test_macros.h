@@ -2,9 +2,14 @@
  *  \brief Unit testing macro utilities
  *  \ingroup testing
  *
+ *  \todo
+ *      - need to make an actual exported set of C
+ *        functions as the top-level entry-point into
+ *        GBL_TEST_COMPARE(), so that language bindings
+ *        without macros can use the test framework.
+ *
  *  \author Falco Girgis
  */
-
 #ifndef GIMBAL_TEST_H
 #define GIMBAL_TEST_H
 
@@ -12,7 +17,11 @@
 #include "gimbal_test_scenario.h"
 #include <stdint.h>
 
-#define GBL_TEST_VERIFY(expr)   GBL_CTX_VERIFY_EXPRESSION(expr)
+#define GBL_TEST_VERIFY(expr)                   GBL_CTX_VERIFY_EXPRESSION(expr)
+#define GBL_TEST_COMPARE_FMT_(value)            GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_FMT_TABLE_, value)()
+#define GBL_TEST_COMPARE_CMP_(actual, expected) GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_CMP_TABLE_, actual)(actual, expected)
+
+GBL_DECLS_BEGIN
 
 /// \cond
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_DFLT_(void) { return "Values differed"; }
@@ -41,7 +50,7 @@ GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_ (void) { return "Values differe
             (const void*,   GBL_TEST_COMPARE_FMT_PTR_)      \
         )                                                   \
     )
-#define GBL_TEST_COMPARE_FMT_(value) GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_FMT_TABLE_, value)()
+
 
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_UINTPTR_(uintptr_t actual, uintptr_t expected)       { return actual == expected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_PTR_    (const void* pActual, const void* pExpected) { return pActual == pExpected; }
@@ -53,6 +62,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_DBL_    (double actual, double expected)
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char* pExpected) { return pActual == pExpected ||
                                                                                                      (pActual && pExpected && \
                                                                                                      strcmp(pActual, pExpected) == 0); }
+GBL_DECLS_END
 
 #ifdef __DREAMCAST__
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
@@ -88,7 +98,6 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
             (const void*,   GBL_TEST_COMPARE_CMP_PTR_)      \
         )                                                   \
     )
-#define GBL_TEST_COMPARE_CMP_(actual, expected)      GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_CMP_TABLE_, actual)(actual, expected)
 /// \endcond
 
 #define GBL_TEST_COMPARE(actual, expected)           GBL_CTX_VERIFY_EXPRESSION(GBL_TEST_COMPARE_CMP_(actual, expected),      \

@@ -3,6 +3,11 @@
  *  \ingroup containers
  *  \copydoc GblRingBuffer
  *
+ *  \todo
+ *      - since nothing is public, make it an opaque struct
+ *        with its buffer appended to the end of the same
+ *        allocation
+ *
  *  \author Falco Girgis
  */
 
@@ -62,18 +67,18 @@ GBL_EXPORT GBL_RESULT  GblRingBuffer_construct_6(GBL_SELF,
                                                  const void* pInitialData,
                                                  GblContext* pCtx)                            GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT  GblRingBuffer_construct_5(GBL_SELF,
+GBL_EXPORT GBL_RESULT  GblRingBuffer_construct_5(GBL_SELF,
                                                  uint16_t    elementSize,
                                                  size_t      capacity,
                                                  size_t      initialSize,
                                                  const void* pInitialData)                    GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT  GblRingBuffer_construct_4(GBL_SELF,
+GBL_EXPORT GBL_RESULT  GblRingBuffer_construct_4(GBL_SELF,
                                                  uint16_t   elementSize,
                                                  size_t     capacity,
                                                  size_t     initialSize)                      GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT  GblRingBuffer_construct_3(GBL_SELF,
+GBL_EXPORT GBL_RESULT  GblRingBuffer_construct_3(GBL_SELF,
                                                  uint16_t   elementSize,
                                                  size_t     capacity)                         GBL_NOEXCEPT;
 
@@ -85,147 +90,23 @@ GBL_EXPORT GBL_RESULT  GblRingBuffer_destruct    (GBL_SELF)                     
 GBL_EXPORT GBL_RESULT  GblRingBuffer_copy        (GBL_SELF, const GblRingBuffer* pOther)      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblRingBuffer_move        (GBL_SELF, GblRingBuffer* pOther)            GBL_NOEXCEPT;
 
-GBL_INLINE GblContext* GblRingBuffer_context     (GBL_CSELF)                                  GBL_NOEXCEPT;
-GBL_INLINE size_t      GblRingBuffer_capacity    (GBL_CSELF)                                  GBL_NOEXCEPT;
-GBL_INLINE size_t      GblRingBuffer_size        (GBL_CSELF)                                  GBL_NOEXCEPT;
-GBL_INLINE size_t      GblRingBuffer_elementSize (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_EXPORT GblContext* GblRingBuffer_context     (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblRingBuffer_capacity    (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblRingBuffer_size        (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblRingBuffer_elementSize (GBL_CSELF)                                  GBL_NOEXCEPT;
 
-GBL_INLINE GblBool     GblRingBuffer_empty       (GBL_CSELF)                                  GBL_NOEXCEPT;
-GBL_INLINE GblBool     GblRingBuffer_full        (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblRingBuffer_empty       (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblRingBuffer_full        (GBL_CSELF)                                  GBL_NOEXCEPT;
 
-GBL_INLINE void*       GblRingBuffer_at          (GBL_CSELF, size_t  index)                   GBL_NOEXCEPT;
-GBL_INLINE void*       GblRingBuffer_front       (GBL_CSELF)                                  GBL_NOEXCEPT;
-GBL_INLINE void*       GblRingBuffer_back        (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_EXPORT void*       GblRingBuffer_at          (GBL_CSELF, size_t  index)                   GBL_NOEXCEPT;
+GBL_EXPORT void*       GblRingBuffer_front       (GBL_CSELF)                                  GBL_NOEXCEPT;
+GBL_EXPORT void*       GblRingBuffer_back        (GBL_CSELF)                                  GBL_NOEXCEPT;
 
-GBL_INLINE GBL_RESULT  GblRingBuffer_pushBack    (GBL_SELF, const void* pData)                GBL_NOEXCEPT;
-GBL_INLINE void*       GblRingBuffer_emplaceBack (GBL_SELF)                                   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT  GblRingBuffer_pushBack    (GBL_SELF, const void* pData)                GBL_NOEXCEPT;
+GBL_EXPORT void*       GblRingBuffer_emplaceBack (GBL_SELF)                                   GBL_NOEXCEPT;
 
-GBL_INLINE void*       GblRingBuffer_popFront    (GBL_SELF)                                   GBL_NOEXCEPT;
-GBL_INLINE void        GblRingBuffer_clear       (GBL_SELF)                                   GBL_NOEXCEPT;
-
-// ===== IMPL =====
-
-/// \cond
-
-GBL_INLINE size_t  GblRingBuffer_mappedIndex_(GBL_CSELF, size_t  index) {
-    return (GBL_PRIV_REF(pSelf).frontPos + index) % GBL_PRIV_REF(pSelf).capacity;
-}
-
-GBL_INLINE void GblRingBuffer_advance_(GBL_SELF) GBL_NOEXCEPT {
-    if(GblRingBuffer_full(pSelf)) {
-        ++GBL_PRIV_REF(pSelf).frontPos;
-        GBL_PRIV_REF(pSelf).frontPos %= GBL_PRIV_REF(pSelf).capacity;
-    } else {
-        ++GBL_PRIV_REF(pSelf).size;
-    }
-}
-/// \endcond
-
-GBL_INLINE GBL_RESULT GblRingBuffer_construct_5(GBL_SELF,
-                                                uint16_t    elementSize,
-                                                size_t      capacity,
-                                                size_t      initialSize,
-                                                const void* pInitialData) GBL_NOEXCEPT
-{
-    return GblRingBuffer_construct_6(pSelf, elementSize, capacity, initialSize, pInitialData, GBL_NULL);
-}
-
-GBL_INLINE GBL_RESULT GblRingBuffer_construct_4(GBL_SELF,
-                                                uint16_t   elementSize,
-                                                size_t     capacity,
-                                                size_t     initialSize) GBL_NOEXCEPT
-{
-    return GblRingBuffer_construct_5(pSelf, elementSize, capacity, initialSize, GBL_NULL);
-}
-
-GBL_INLINE GBL_RESULT GblRingBuffer_construct_3(GBL_SELF,
-                                                uint16_t   elementSize,
-                                                size_t     capacity)        GBL_NOEXCEPT
-{
-    return GblRingBuffer_construct_4(pSelf, elementSize, capacity, 0);
-}
-
-GBL_INLINE GblContext* GblRingBuffer_context(GBL_CSELF) GBL_NOEXCEPT {
-    return GBL_PRIV_REF(pSelf).pCtx;
-}
-
-GBL_INLINE size_t  GblRingBuffer_capacity(GBL_CSELF) GBL_NOEXCEPT {
-    return GBL_PRIV_REF(pSelf).capacity;
-}
-
-GBL_INLINE size_t  GblRingBuffer_size(GBL_CSELF) GBL_NOEXCEPT {
-    return GBL_PRIV_REF(pSelf).size;
-}
-
-GBL_INLINE size_t  GblRingBuffer_elementSize(GBL_CSELF) GBL_NOEXCEPT {
-    return GBL_PRIV_REF(pSelf).elementSize;
-}
-
-GBL_INLINE GblBool GblRingBuffer_empty(GBL_CSELF) GBL_NOEXCEPT {
-    return GblRingBuffer_size(pSelf) == 0? GBL_TRUE : GBL_FALSE;
-}
-
-GBL_INLINE GblBool GblRingBuffer_full(GBL_CSELF) GBL_NOEXCEPT {
-    return GblRingBuffer_size(pSelf) == GBL_PRIV_REF(pSelf).capacity? GBL_TRUE : GBL_FALSE;
-}
-
-GBL_INLINE void* GblRingBuffer_at(GBL_CSELF, size_t  index) GBL_NOEXCEPT {
-    const size_t  size = GblRingBuffer_size(pSelf);
-    void* pData = GBL_NULL;
-
-    if(index >= size) GBL_UNLIKELY {
-        GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
-        GBL_CTX_END_BLOCK();
-    } else GBL_LIKELY {
-        pData = &GBL_PRIV_REF(pSelf).pData[GblRingBuffer_mappedIndex_(pSelf, index) *
-                                           GBL_PRIV_REF(pSelf).elementSize];
-    }
-
-    return pData;
-}
-
-GBL_INLINE void* GblRingBuffer_front(GBL_CSELF) GBL_NOEXCEPT {
-    return GblRingBuffer_at(pSelf, 0);
-}
-
-GBL_INLINE void* GblRingBuffer_back(GBL_CSELF) GBL_NOEXCEPT {
-    return GblRingBuffer_at(pSelf, GBL_PRIV_REF(pSelf).size-1);
-}
-
-
-GBL_INLINE void* GblRingBuffer_emplaceBack(GBL_SELF) GBL_NOEXCEPT {
-    GblRingBuffer_advance_(pSelf);
-    return GblRingBuffer_back(pSelf);
-}
-
-GBL_INLINE GBL_RESULT GblRingBuffer_pushBack(GBL_SELF, const void* pData) GBL_NOEXCEPT {
-    GBL_RESULT result = GBL_RESULT_SUCCESS;
-    void* pBuffer = GblRingBuffer_emplaceBack(pSelf);
-    if(pBuffer) GBL_LIKELY memcpy(pBuffer, pData, GBL_PRIV_REF(pSelf).elementSize);
-    else GBL_UNLIKELY result = GblThd_callRecord(GBL_NULL)->result;
-    return result;
-}
-
-GBL_INLINE void* GblRingBuffer_popFront(GBL_SELF) GBL_NOEXCEPT {
-    void* pFront = GblRingBuffer_front(pSelf);
-    if(pFront) {
-        --GBL_PRIV_REF(pSelf).size;
-        ++GBL_PRIV_REF(pSelf).frontPos;
-        if(GBL_PRIV_REF(pSelf).frontPos >= GBL_PRIV_REF(pSelf).capacity)
-            GBL_PRIV_REF(pSelf).frontPos = 0;
-    } else {
-        GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
-        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
-        GBL_CTX_END_BLOCK();
-    }
-    return pFront;
-}
-
-GBL_INLINE void GblRingBuffer_clear(GBL_SELF) GBL_NOEXCEPT {
-    GBL_PRIV_REF(pSelf).frontPos = 0;
-    GBL_PRIV_REF(pSelf).size     = 0;
-}
+GBL_EXPORT void*       GblRingBuffer_popFront    (GBL_SELF)                                   GBL_NOEXCEPT;
+GBL_EXPORT void        GblRingBuffer_clear       (GBL_SELF)                                   GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

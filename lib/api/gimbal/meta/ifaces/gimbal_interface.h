@@ -26,8 +26,10 @@ typedef struct GblInterface {
     size_t      outerClassOffset_;  ///< offset from the interface to the class containing it (private, managed by internals)
 } GblInterface;
 
-GBL_EXPORT GblClass* GblInterface_outerClass     (GBL_SELF)  GBL_NOEXCEPT;
-GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
+GBL_EXPORT GblClass* GblInterface_outerClass     (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF) GBL_NOEXCEPT;
+
+GBL_DECLS_END
 
 /*! \def GBL_INTERFACE_TYPE
  *  Builtin type ID associated with GblInterface
@@ -411,9 +413,6 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
  *      ISerializableIFace* pIFace = (ISerializableIFace*)GblClass_cast(pClass, GBL_ISERIALIZABLE_TYPE);
  * \endcode
  */
-
-
-GBL_DECLS_END
 
 #undef GBL_SELF_TYPE
 

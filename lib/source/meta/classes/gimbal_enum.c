@@ -120,16 +120,118 @@ static GBL_RESULT enumConvertFrom_(const GblVariant* pVariant, GblVariant* pOthe
     GBL_CTX_END();
 }
 
+// ---------- GblEnumClass ----------
 
-GBL_EXPORT GblQuark GblEnumClass_nameQuarkFromIndex(const GblEnumClass* pSelf, uint16_t index) GBL_NOEXCEPT {
+GBL_EXPORT const char* GblEnumClass_nameFromIndex(const GblEnumClass* pSelf, uint16_t index) {
+    return GblQuark_toString(GblEnumClass_nameQuarkFromIndex(pSelf, index));
+}
+
+GBL_EXPORT const char* GblEnumClass_nickFromIndex(const GblEnumClass* pSelf, uint16_t index) {
+    return GblQuark_toString(GblEnumClass_nickQuarkFromIndex(pSelf, index));
+}
+
+GBL_EXPORT const char* GblEnumClass_nameFromValue(const GblEnumClass* pSelf, GblEnum value) {
+    return GblQuark_toString(GblEnumClass_nameQuarkFromValue(pSelf, value));
+}
+
+GBL_EXPORT const char* GblEnumClass_nickFromValue(const GblEnumClass* pSelf, GblEnum value) {
+    return GblQuark_toString(GblEnumClass_nickQuarkFromValue(pSelf, value));
+}
+
+GBL_EXPORT GblEnum GblEnumClass_valueFromName(const GblEnumClass* pSelf, const char* pString) {
+    GblEnum value = 0;
+    GblQuark quark = GblQuark_tryString(pString);
+    if(quark != GBL_QUARK_INVALID) {
+        value = GblEnumClass_valueFromNameQuark(pSelf, quark);
+    }
+    return value;
+}
+
+GBL_EXPORT GblEnum GblEnumClass_valueFromNick(const GblEnumClass* pSelf, const char* pString) {
+    GblEnum value = 0;
+    GblQuark quark = GblQuark_tryString(pString);
+    if(quark != GBL_QUARK_INVALID) {
+        value = GblEnumClass_valueFromNickQuark(pSelf, quark);
+    }
+    return value;
+}
+
+// ---------- GblEnum ----------
+
+GBL_EXPORT GblEnum GblEnum_fromName(const char* pName, GblType type) {
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
+    GblEnum value = GblEnumClass_valueFromName(pClass, pName);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_EXPORT GblEnum GblEnum_fromNameQuark(GblQuark name, GblType type) {
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
+    GblEnum value = GblEnumClass_valueFromNameQuark(pClass, name);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_EXPORT GblEnum GblEnum_fromNick(const char* pNick, GblType type) {
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
+    GblEnum value = GblEnumClass_valueFromNick(pClass, pNick);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_EXPORT GblEnum GblEnum_fromNickQuark(GblQuark nick, GblType type) {
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
+    GblEnum value = GblEnumClass_valueFromNickQuark(pClass, nick);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_EXPORT const char* GblEnum_name(GblEnum value, GblType type) {
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
+    const char* pName = GblEnumClass_nameFromValue(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return pName;
+}
+
+GBL_EXPORT GblQuark GblEnum_nameQuark(GblEnum value, GblType type) {
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
+    GblQuark name = GblEnumClass_nameQuarkFromValue(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return name;
+}
+
+GBL_EXPORT const char* GblEnum_nick(GblEnum value, GblType type) {
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
+    const char* pNick = GblEnumClass_nickFromValue(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return pNick;
+}
+
+GBL_EXPORT GblQuark GblEnum_nickQuark(GblEnum value, GblType type) {
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
+    GblQuark nick = GblEnumClass_nickQuarkFromValue(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return nick;
+}
+
+GBL_EXPORT GblBool GblEnum_check(GblEnum value, GblType type) {
+    GblEnumClass* pClass = GBL_ENUM_CLASS(GblClass_refDefault(type));
+    GblBool result = GblEnumClass_valueCheck(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return result;
+}
+
+GBL_EXPORT GblQuark GblEnumClass_nameQuarkFromIndex(const GblEnumClass* pSelf, uint16_t index) {
     const GblEnumClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_ENUM_TYPE);
     return index < pSelf->entryCount? pSelf_->pEntries[index].name : GBL_QUARK_INVALID;
 }
-GBL_EXPORT GblQuark GblEnumClass_nickQuarkFromIndex(const GblEnumClass* pSelf, uint16_t index) GBL_NOEXCEPT {
+
+GBL_EXPORT GblQuark GblEnumClass_nickQuarkFromIndex(const GblEnumClass* pSelf, uint16_t index) {
     const GblEnumClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_ENUM_TYPE);
     return index < pSelf->entryCount? pSelf_->pEntries[index].nick : GBL_QUARK_INVALID;
 }
-GBL_EXPORT GblEnum  GblEnumClass_valueFromIndex(const GblEnumClass* pSelf, uint16_t index) GBL_NOEXCEPT {
+
+GBL_EXPORT GblEnum  GblEnumClass_valueFromIndex(const GblEnumClass* pSelf, uint16_t index) {
     const GblEnumClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_ENUM_TYPE);
     return index < pSelf->entryCount? pSelf_->pEntries[index].value : 0;
 }

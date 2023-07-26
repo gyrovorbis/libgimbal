@@ -131,17 +131,130 @@ static GBL_RESULT flagsConvertFrom_(const GblVariant* pVariant, GblVariant* pOth
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblQuark GblFlagsClass_nameQuarkFromIndex(const GblFlagsClass* pSelf, uint16_t index) GBL_NOEXCEPT {
+
+// ------ GblFlagsClass ------
+
+GBL_EXPORT const char* GblFlagsClass_nameFromIndex(const GblFlagsClass* pSelf, uint16_t index) {
+    return GblQuark_toString(GblFlagsClass_nameQuarkFromIndex(pSelf, index));
+}
+
+GBL_EXPORT const char* GblFlagsClass_nickFromIndex(const GblFlagsClass* pSelf, uint16_t index) {
+    return GblQuark_toString(GblFlagsClass_nickQuarkFromIndex(pSelf, index));
+}
+
+GBL_EXPORT const char* GblFlagsClass_nameFromValue(const GblFlagsClass* pSelf, GblFlags value) {
+    return GblQuark_toString(GblFlagsClass_nameQuarkFromValue(pSelf, value));
+}
+
+GBL_EXPORT const char* GblFlagsClass_nickFromValue(const GblFlagsClass* pSelf, GblFlags value) {
+    return GblQuark_toString(GblFlagsClass_nickQuarkFromValue(pSelf, value));
+}
+
+GBL_EXPORT GblFlags GblFlagsClass_valueFromName(const GblFlagsClass* pSelf, const char* pString) {
+    GblFlags value = 0;
+    GblQuark quark = GblQuark_tryString(pString);
+    if(quark != GBL_QUARK_INVALID) {
+        value = GblFlagsClass_valueFromNameQuark(pSelf, quark);
+    }
+    return value;
+}
+
+GBL_EXPORT GblFlags GblFlagsClass_valueFromNick(const GblFlagsClass* pSelf, const char* pString) {
+    GblFlags value = 0;
+    GblQuark quark = GblQuark_tryString(pString);
+    if(quark != GBL_QUARK_INVALID) {
+        value = GblFlagsClass_valueFromNickQuark(pSelf, quark);
+    }
+    return value;
+}
+
+GBL_EXPORT GblBool GblFlagsClass_valueCheck(const GblFlagsClass* pSelf, GblFlags value) {
+    return ((value | pSelf->valueMask) == pSelf->valueMask)? GBL_TRUE : GBL_FALSE;
+}
+
+// -------- GblFlags --------
+
+GBL_EXPORT GblFlags GblFlags_fromName(const char* pName, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    GblFlags value = GblFlagsClass_valueFromName(pClass, pName);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_EXPORT GblFlags GblFlags_fromNameQuark(GblQuark name, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    GblFlags value = GblFlagsClass_valueFromNameQuark(pClass, name);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_EXPORT GblFlags GblFlags_fromNick(const char* pNick, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    GblFlags value = GblFlagsClass_valueFromNick(pClass, pNick);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_EXPORT GblFlags GblFlags_fromNickQuark(GblQuark nick, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    GblFlags value = GblFlagsClass_valueFromNickQuark(pClass, nick);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_EXPORT GblFlags GblFlags_fromString(const char* pName, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    GblFlags value = GblFlagsClass_valueFromString(pClass, pName);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return value;
+}
+
+GBL_EXPORT const char* GblFlags_name(GblFlags value, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    const char* pName = GblFlagsClass_nameFromValue(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return pName;
+}
+
+GBL_EXPORT GblQuark GblFlags_nameQuark(GblFlags value, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    GblQuark name = GblFlagsClass_nameQuarkFromValue(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return name;
+}
+
+GBL_EXPORT const char* GblFlags_nick(GblFlags value, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    const char* pNick = GblFlagsClass_nickFromValue(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return pNick;
+}
+
+GBL_EXPORT GblQuark GblFlags_nickQuark(GblFlags value, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    GblQuark nick = GblFlagsClass_nickQuarkFromValue(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return nick;
+}
+
+GBL_EXPORT GblBool GblFlags_check(GblFlags value, GblType type) {
+    GblFlagsClass* pClass = GBL_FLAGS_CLASS(GblClass_refDefault(type));
+    GblBool result = GblFlagsClass_valueCheck(pClass, value);
+    GblClass_unrefDefault(GBL_CLASS(pClass));
+    return result;
+}
+
+GBL_EXPORT GblQuark GblFlagsClass_nameQuarkFromIndex(const GblFlagsClass* pSelf, uint16_t index) {
     const GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_FLAGS_TYPE);
     return index < pSelf->entryCount? pSelf_->pEntries[index].name : GBL_QUARK_INVALID;
 }
 
-GBL_EXPORT GblQuark GblFlagsClass_nickQuarkFromIndex(const GblFlagsClass* pSelf, uint16_t index) GBL_NOEXCEPT {
+GBL_EXPORT GblQuark GblFlagsClass_nickQuarkFromIndex(const GblFlagsClass* pSelf, uint16_t index) {
     const GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_FLAGS_TYPE);
     return index < pSelf->entryCount? pSelf_->pEntries[index].nick : GBL_QUARK_INVALID;
 }
 
-GBL_EXPORT GblFlags  GblFlagsClass_valueFromIndex(const GblFlagsClass* pSelf, uint16_t index) GBL_NOEXCEPT {
+GBL_EXPORT GblFlags  GblFlagsClass_valueFromIndex(const GblFlagsClass* pSelf, uint16_t index) {
     const GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_FLAGS_TYPE);
     return index < pSelf->entryCount? pSelf_->pEntries[index].value : 0;
 }

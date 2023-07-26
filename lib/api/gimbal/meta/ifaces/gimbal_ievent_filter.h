@@ -34,11 +34,11 @@ GBL_INTERFACE_DERIVE(GblIEventFilter)
     GBL_RESULT (*pFnEventFilter)(GBL_SELF, GblIEventHandler* pHandler, GblEvent* pEvent);
 GBL_INTERFACE_END
 
-GBL_EXPORT GblType    GblIEventFilter_type        (void)                        GBL_NOEXCEPT;
+GBL_EXPORT GblType    GblIEventFilter_type        (void)             GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblIEventFilter_eventFilter (GBL_SELF,
                                                    GblIEventHandler* pHandler,
-                                                   GblEvent* pEvent)            GBL_NOEXCEPT;
+                                                   GblEvent* pEvent) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

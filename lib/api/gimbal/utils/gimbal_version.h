@@ -47,9 +47,9 @@
  *  @{
  */
 //! Encodes a GblVersion from its constituents
-#define GBL_VERSION_MAKE(major, minor, patch)   GBL_VERSION_MAKE_(major, minor, patch)
+#define GBL_VERSION_MAKE(major, minor, patch)       GBL_VERSION_MAKE_(major, minor, patch)
 //! Creates a compile-time stringified version from its constituents
-#define GBL_VERSION_STRING(major, minor, patch) GBL_VERSION_STRING_(major, minor, patch)
+#define GBL_VERSION_STRING(major, minor, patch)     GBL_VERSION_STRING_(major, minor, patch)
 //! @}
 
 #define GBL_SELF_TYPE GblVersion

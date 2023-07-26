@@ -953,3 +953,571 @@ GBL_EXPORT size_t GblVariant_count(const GblVariant* pSelf) {
         return count;
     }
 }
+
+GBL_EXPORT GblBool GblVariant_checkTypeCompatible(GblType type) {
+    return type != GBL_INVALID_TYPE? GblType_check(type, GBL_IVARIANT_TYPE) : GBL_TRUE;
+}
+
+GBL_EXPORT GblType GblVariant_typeOf(const GblVariant* pSelf) {
+    return pSelf->type;
+}
+
+GBL_EXPORT const char* GblVariant_typeName(const GblVariant* pSelf) {
+    return GblType_name(GblVariant_typeOf(pSelf));
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructNil(GblVariant* pSelf) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(pSelf, GBL_NIL_TYPE));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructBool(GblVariant* pSelf, GblBool value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_BOOL_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructChar(GblVariant* pSelf, char value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_CHAR_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructUint8(GblVariant* pSelf, uint8_t value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_UINT8_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructUint16(GblVariant* pSelf, uint16_t value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_UINT16_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructInt16(GblVariant* pSelf, int16_t value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INT16_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructUint32(GblVariant* pSelf, uint32_t value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_UINT32_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructInt32(GblVariant* pSelf, int32_t value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INT32_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructUint64(GblVariant* pSelf, uint64_t value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_UINT64_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructInt64(GblVariant* pSelf, int64_t value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INT64_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructSize(GblVariant* pSelf, size_t  value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_SIZE_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructEnum(GblVariant* pSelf, GblType type, GblEnum value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(type, GBL_ENUM_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, type, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructFlags(GblVariant* pSelf, GblType type, GblFlags value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(type, GBL_FLAGS_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, type, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructFloat(GblVariant* pSelf, float value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_FLOAT_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructDouble(GblVariant* pSelf, double value) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_DOUBLE_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructPointer(GblVariant* pSelf, GblType ptrType, void* pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY(GBL_POINTER_TYPE_CHECK(ptrType),
+                   GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, ptrType, pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructString(GblVariant* pSelf, const char* pValue) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_STRING_TYPE, pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructOpaqueCopy(GblVariant* pSelf, GblType opaqueType, void*  pValue) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, opaqueType, pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructOpaqueMove(GblVariant* pSelf, GblType opaqueType, void* pValue) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(pSelf, opaqueType, pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructStringView(GblVariant* pSelf, GblStringView view) {
+    return GblVariant_constructString(pSelf, GBL_STRING_VIEW_CSTR(view));
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructTypeValue(GblVariant* pSelf, GblType type) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_TYPE_TYPE, type));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructInstance(GblVariant* pSelf, GblInstance* pValue) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructBoxCopy(GblVariant* pSelf, GblBox* pValue) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructBoxMove(GblVariant* pSelf, GblBox* pValue) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructObjectCopy(GblVariant* pSelf, GblObject* pValue) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_constructObjectMove(GblVariant* pSelf, GblObject* pValue) {
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GblBool GblVariant_isValid(const GblVariant* pSelf) {
+    return pSelf && GblVariant_typeOf(pSelf) != GBL_INVALID_TYPE;
+}
+
+GBL_EXPORT GblBool GblVariant_isNil(const GblVariant* pSelf) {
+    return pSelf && GblVariant_typeOf(pSelf) == GBL_NIL_TYPE;
+}
+
+GBL_EXPORT GblBool GblVariant_getBool(const GblVariant* pSelf) {
+    GblBool value = GBL_FALSE;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOOL_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT char GblVariant_getChar(const GblVariant* pSelf) {
+    char value = '\0';;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_CHAR_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT uint8_t GblVariant_getUint8(const GblVariant* pSelf) {
+    uint8_t value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_UINT8_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT uint16_t GblVariant_getUint16(const GblVariant* pSelf) {
+    uint16_t value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_UINT16_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT int16_t GblVariant_getInt16(const GblVariant* pSelf) {
+    int16_t value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_INT16_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT uint32_t GblVariant_getUint32(const GblVariant* pSelf) {
+    uint32_t value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_UINT32_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT int32_t GblVariant_getInt32(const GblVariant* pSelf) {
+    int32_t value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_INT32_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT uint64_t GblVariant_getUint64(const GblVariant* pSelf) {
+    uint64_t value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_UINT64_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT int64_t GblVariant_getInt64(const GblVariant* pSelf) {
+    int64_t value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_INT64_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT size_t  GblVariant_getSize(const GblVariant* pSelf) {
+    size_t  value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_SIZE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT GblEnum GblVariant_getEnum(const GblVariant* pSelf) {
+    GblEnum value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_ENUM_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT GblEnum GblVariant_getFlags(const GblVariant* pSelf) {
+    GblFlags value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_FLAGS_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT float GblVariant_getFloat(const GblVariant* pSelf) {
+    float value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_FLOAT_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT double GblVariant_getDouble(const GblVariant* pSelf) {
+    double value = 0;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_DOUBLE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT void* GblVariant_getPointer(const GblVariant* pSelf) {
+    void* pValue = GBL_NULL;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_POINTER_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(pSelf, &pValue));
+    GBL_CTX_END_BLOCK();
+    return pValue;
+}
+
+GBL_EXPORT void* GblVariant_getOpaqueCopy(const GblVariant* pSelf) {
+    void* pValue = GBL_NULL;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OPAQUE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pSelf, &pValue));
+    GBL_CTX_END_BLOCK();
+    return pValue;
+}
+
+GBL_EXPORT void* GblVariant_getOpaqueMove(GblVariant* pSelf) {
+    void* pValue = GBL_NULL;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OPAQUE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pSelf, &pValue));
+    GBL_CTX_END_BLOCK();
+    return pValue;
+}
+
+GBL_EXPORT void* GblVariant_getOpaquePeek(const GblVariant* pSelf) {
+    void* pValue = GBL_NULL;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OPAQUE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(pSelf, &pValue));
+    GBL_CTX_END_BLOCK();
+    return pValue;
+}
+
+GBL_EXPORT const char* GblVariant_getString(const GblVariant* pSelf) {
+    const char* pValue = GBL_NULL;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_STRING_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(pSelf, &pValue));
+    GBL_CTX_END_BLOCK();
+    return pValue;
+}
+
+GBL_EXPORT GblStringRef* GblVariant_getStringRef(const GblVariant* pSelf) {
+    GblStringRef* pValue = GBL_NULL;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_STRING_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(pSelf, &pValue));
+    GBL_CTX_END_BLOCK();
+    return pValue;
+}
+
+GBL_EXPORT GblStringView GblVariant_getStringView(const GblVariant* pSelf) {
+    return GblStringRef_view(GblVariant_getString(pSelf));
+}
+
+GBL_EXPORT GblType GblVariant_getTypeValue(const GblVariant* pSelf) {
+    GblType value = GBL_INVALID_TYPE;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_TYPE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(pSelf, &value));
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+GBL_EXPORT GblInstance* GblVariant_getInstance(const GblVariant* pSelf) {
+    GblInstance* pValue = GBL_NULL;
+    GBL_CTX_BEGIN(GBL_NULL);
+    GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_INSTANCE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(pSelf, &pValue));
+    GBL_CTX_END_BLOCK();
+    return pValue;
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_invalidate(GblVariant* pSelf) {
+    if(GblVariant_typeOf(pSelf) != GBL_INVALID_TYPE)
+        GblClass_unrefDefault(GblClass_weakRefDefault(GblVariant_typeOf(pSelf)));
+    memset(pSelf, 0, sizeof(GblVariant));
+    pSelf->type = GBL_INVALID_TYPE;
+    return GBL_RESULT_SUCCESS;
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setNil(GblVariant* pSelf) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_destruct(pSelf));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(pSelf, GBL_NIL_TYPE));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setBool(GblVariant* pSelf, GblBool value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_BOOL_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setChar(GblVariant* pSelf, char value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_CHAR_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setUint8(GblVariant* pSelf, uint8_t value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_UINT8_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setUint16(GblVariant* pSelf, uint16_t value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_UINT16_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setInt16(GblVariant* pSelf, int16_t value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INT16_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setUint32(GblVariant* pSelf, uint32_t value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_UINT32_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setInt32(GblVariant* pSelf, int32_t value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INT32_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setUint64(GblVariant* pSelf, uint64_t value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_UINT64_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setInt64(GblVariant* pSelf, int64_t value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INT64_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setSize(GblVariant* pSelf, size_t  value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_SIZE_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setEnum(GblVariant* pSelf,
+                                         GblType     enumType,
+                                         GblEnum     value)
+{
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_TYPE(enumType, GBL_ENUM_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, enumType, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setFlags(GblVariant* pSelf,
+                                          GblType     flagsType,
+                                          GblFlags    value)
+{
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_TYPE(flagsType, GBL_FLAGS_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, flagsType, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setFloat(GblVariant* pSelf, float value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_FLOAT_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setDouble(GblVariant* pSelf, double value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_DOUBLE_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setPointer(GblVariant* pSelf,
+                                            GblType ptrType,
+                                            void* pValue) GBL_NOEXCEPT {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_TYPE(ptrType, GBL_POINTER_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, ptrType, pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setOpaqueCopy(GblVariant* pSelf, GblType opaqueType, void*  pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, opaqueType, pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setOpaqueMove(GblVariant* pSelf, GblType opaqueType, void*  pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, opaqueType, pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setString(GblVariant* pSelf, const char* pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_STRING_TYPE, pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setStringView(GblVariant* pSelf, GblStringView value) {
+    return GblVariant_setString(pSelf, GBL_STRING_VIEW_CSTR(value));
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setStringRef(GblVariant* pSelf, GblStringRef* pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_STRING_TYPE, pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setTypeValue(GblVariant* pSelf, GblType value) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_TYPE_TYPE, value));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setInstance(GblVariant* pSelf, GblInstance* pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setBoxCopy(GblVariant* pSelf, GblBox* pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setBoxMove(GblVariant* pSelf, GblBox* pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setObjectCopy(GblVariant* pSelf, GblObject* pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setObjectMove(GblVariant* pSelf, GblObject* pValue) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_TYPEOF(pValue), pValue));
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GblBool GblVariant_equals(const GblVariant* pSelf, const GblVariant* pOther) {
+    return GblVariant_compare(pSelf, pOther) == 0;
+}

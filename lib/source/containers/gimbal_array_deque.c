@@ -51,7 +51,7 @@ GBL_EXPORT GBL_RESULT (GblArrayDeque_construct)(GblArrayDeque* pSelf,
                                                 size_t         capacity,
                                                 size_t         initialSize,
                                                 const void*    pInitialData,
-                                                GblContext*    pCtx) GBL_NOEXCEPT
+                                                GblContext*    pCtx)
 {
     if(capacity < initialSize) capacity = initialSize;
 
@@ -198,7 +198,7 @@ GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, size_t  pos, s
 #endif
 }
 
-GBL_EXPORT void* GblArrayDeque_emplaceBack(GblArrayDeque* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT void* GblArrayDeque_emplaceBack(GblArrayDeque* pSelf)  {
     void* pSlot = GBL_NULL;
     GBL_RESULT result = GblArrayDeque_reserve_(pSelf, GblArrayDeque_size(pSelf) + 1, GBL_FALSE);
     if(GBL_RESULT_SUCCESS(result)) {
@@ -271,13 +271,92 @@ GBL_EXPORT GBL_RESULT GblArrayDeque_shrinkToFit(GblArrayDeque* pSelf) {
     } else return GBL_RESULT_SUCCESS;
 }
 
-GBL_EXPORT void GblArrayDeque_clear(GblArrayDeque* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT void GblArrayDeque_clear(GblArrayDeque* pSelf)  {
     GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
     GblRingBuffer_clear(GBL_RING_SELF_(pSelf));
     GBL_CTX_FREE(GBL_RING_PRIV_REF_(pSelf).pData);
     GBL_RING_PRIV_REF_(pSelf).pData = NULL;
     GBL_RING_PRIV_REF_(pSelf).capacity = 0;
     GBL_CTX_END_BLOCK();
+}
+
+GBL_EXPORT GBL_RESULT GblArrayDeque_destruct(GblArrayDeque* pSelf) {
+    return GblRingBuffer_destruct(GBL_RING_SELF_(pSelf));
+}
+
+GBL_EXPORT GBL_RESULT GblArrayDeque_copy(GblArrayDeque* pSelf, const GblArrayDeque* pOther) {
+    return GblRingBuffer_copy(GBL_RING_SELF_(pSelf), GBL_RING_SELF_(pOther));
+}
+
+GBL_EXPORT GBL_RESULT GblArrayDeque_move(GblArrayDeque* pSelf, GblArrayDeque* pOther) {
+    return GblRingBuffer_move(GBL_RING_SELF_(pSelf), GBL_RING_SELF_(pOther));
+}
+
+GBL_EXPORT GblContext* GblArrayDeque_context(const GblArrayDeque* pSelf) {
+    return GblRingBuffer_context(GBL_RING_SELF_(pSelf));
+}
+
+GBL_EXPORT size_t  GblArrayDeque_capacity(const GblArrayDeque* pSelf) {
+    return GblRingBuffer_capacity(GBL_RING_SELF_(pSelf));
+}
+
+GBL_EXPORT size_t  GblArrayDeque_size(const GblArrayDeque* pSelf) {
+    return GblRingBuffer_size(GBL_RING_SELF_(pSelf));
+}
+
+GBL_EXPORT size_t  GblArrayDeque_elementSize(const GblArrayDeque* pSelf) {
+    return GblRingBuffer_elementSize(GBL_RING_SELF_(pSelf));
+}
+
+GBL_EXPORT GblBool GblArrayDeque_empty(const GblArrayDeque* pSelf) {
+    return GblRingBuffer_empty(GBL_RING_SELF_(pSelf));
+}
+
+GBL_EXPORT GblBool GblArrayDeque_full(const GblArrayDeque* pSelf) {
+    return GblRingBuffer_full(GBL_RING_SELF_(pSelf));
+}
+
+GBL_EXPORT void* GblArrayDeque_at(const GblArrayDeque* pSelf, size_t  index) {
+    void* pData = GBL_NULL;
+
+    if(index >= GBL_RING_PRIV_REF_(pSelf).size) GBL_UNLIKELY {
+        GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
+        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_CTX_END_BLOCK();
+    } else GBL_LIKELY {
+#if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
+        const size_t  slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
+                           & (GBL_RING_PRIV_REF_(pSelf).capacity-1);
+#else
+        const size_t  slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
+                           % (GBL_RING_PRIV_REF_(pSelf).capacity);
+#endif
+        pData = &GBL_RING_PRIV_REF_(pSelf).pData[slot * GBL_RING_PRIV_REF_(pSelf).elementSize];
+    }
+
+    return pData;
+}
+
+GBL_EXPORT void* GblArrayDeque_front(const GblArrayDeque* pSelf) {
+    return GblRingBuffer_front(GBL_RING_SELF_(pSelf));
+}
+
+GBL_EXPORT void* GblArrayDeque_back(const GblArrayDeque* pSelf) {
+    return GblRingBuffer_back(GBL_RING_SELF_(pSelf));
+}
+
+GBL_EXPORT GBL_RESULT GblArrayDeque_pushBack(GblArrayDeque* pSelf, const void* pData) {
+    void* pSlot = GblArrayDeque_emplaceBack(pSelf);
+    if(!pSlot) return GblThd_callRecord(GBL_NULL)->result;
+    else {
+        GBL_ASSERT(pData);
+        memcpy(pSlot, pData, GblArrayDeque_elementSize(pSelf));
+    }
+    return GBL_RESULT_SUCCESS;
+}
+
+GBL_EXPORT void* GblArrayDeque_popFront(GblArrayDeque* pSelf) {
+    return GblRingBuffer_popFront(GBL_RING_SELF_(pSelf));
 }
 
 

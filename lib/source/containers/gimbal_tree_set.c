@@ -707,5 +707,23 @@ GBL_EXPORT GblBool GblTreeSet_erase(GblTreeSet* pSelf, const void* pKey) GBL_NOE
     return pEntry != NULL;
 }
 
+GBL_EXPORT size_t  GblTreeSet_size(const GblTreeSet* pSelf) {
+    return pSelf->count;
+}
 
+GBL_EXPORT size_t  GblTreeSet_height(const GblTreeSet* pSelf) {
+    return pSelf->height;
+}
+
+GBL_EXPORT GblContext* GblTreeSet_context(const GblTreeSet* pSelf) {
+    return pSelf->pCtx;
+}
+
+GBL_EXPORT GblBool GblTreeSet_empty(const GblTreeSet* pSelf) {
+    return pSelf->count ? GBL_FALSE : GBL_TRUE;
+}
+
+GBL_EXPORT void* GblTreeSet_userdata(const GblTreeSet* pSelf) {
+    return pSelf->pUserdata;
+}
 

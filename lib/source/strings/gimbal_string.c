@@ -37,3 +37,15 @@ GBL_EXPORT int gblStrCaseCmp(const char* pStr1, const char* pStr2) {
     const size_t len2 = strlen(pStr2);
     return gblStrnCaseCmp(pStr1, pStr2, len1 < len2? len1 : len2);
 }
+
+GBL_EXPORT int gblAsciiDigitValue(char c) {
+    return isdigit(c)? c-'0' : -1;
+}
+
+GBL_EXPORT int gblAsciiHexDigitValue(char c) {
+    if (c >= 'A' && c <= 'F')
+        return c - 'A' + 10;
+    if (c >= 'a' && c <= 'f')
+        return c - 'a' + 10;
+    return gblAsciiDigitValue(c);
+}

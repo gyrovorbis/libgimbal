@@ -96,9 +96,7 @@ GBL_EXPORT const char*  GblQuark_internString       (const char* pString)       
 GBL_EXPORT const char*  GblQuark_internStringSized  (const char* pString, size_t  length) GBL_NOEXCEPT;
 GBL_EXPORT const char*  GblQuark_internStringStatic (const char* pString)                 GBL_NOEXCEPT;
 
-/// \cond
 GBL_DECLS_END
-/// \endcond
 
 /*!
     \fn GblQuark_init(GblContext* pCtx, size_t  extraPageSize, size_t  initialEntries)

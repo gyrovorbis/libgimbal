@@ -79,10 +79,6 @@ GBL_EXPORT GblContext* GblContext_parentContext    (GBL_CSELF)                  
 GBL_EXPORT void        GblContext_setLogFilter     (GBL_SELF, GblFlags mask)               GBL_NOEXCEPT;
 GBL_EXPORT void        GblContext_logBuildInfo     (GBL_CSELF)                             GBL_NOEXCEPT;
 
-
-
-
-/// \endcond
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

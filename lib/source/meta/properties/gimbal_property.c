@@ -126,6 +126,44 @@ GBL_INLINE const GblProperty* propertyFirstNextBase_(GblType objectType, GblType
     return pRoot;
 }
 
+GBL_EXPORT const char* GblProperty_nameString(const GblProperty* pSelf) {
+    return pSelf? GblQuark_toString(pSelf->name) : NULL;
+}
+
+GBL_EXPORT GblType GblProperty_objectType(const GblProperty* pSelf) {
+    return pSelf? GBL_PRIV_REF(pSelf).objectType : GBL_INVALID_TYPE;
+}
+
+GBL_EXPORT GBL_RESULT GblProperty_createOrConstruct(GblProperty** ppSelf,
+                                                    GblType       derivedType,
+                                                    const char*   pName,
+                                                    size_t        id,
+                                                    GblFlags      flags,
+                                                    size_t        optionalArgCount,
+                                                    ...)
+{
+    va_list varArgs;
+    va_start(varArgs, optionalArgCount);
+    if(ppSelf && *ppSelf) {
+        return GblProperty_constructVaList(*ppSelf,
+                                           derivedType,
+                                           pName,
+                                           id,
+                                           flags,
+                                           optionalArgCount,
+                                           &varArgs);
+    } else {
+        GblProperty* pProp = GblProperty_createVaList(derivedType,
+                                                      pName,
+                                                      id,
+                                                      flags,
+                                                      optionalArgCount,
+                                                      &varArgs);
+        if(ppSelf) *ppSelf = pProp;
+        return pProp? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR_INVALID_POINTER;
+    }
+}
+
 GBL_EXPORT const GblProperty* GblProperty_findQuark(GblType objectType, GblQuark name) {
     const GblProperty* pProperty = NULL;
     GBL_CTX_BEGIN(GblHashSet_context(&propertyRegistry_)); {

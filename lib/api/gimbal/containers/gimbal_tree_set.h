@@ -101,11 +101,11 @@ GBL_EXPORT GBL_RESULT   GblTreeSet_construct_3  (GBL_SELF,
 
 GBL_EXPORT GBL_RESULT   GblTreeSet_destruct     (GBL_SELF)                              GBL_NOEXCEPT;
 
-GBL_INLINE size_t       GblTreeSet_size         (GBL_CSELF)                             GBL_NOEXCEPT;
-GBL_INLINE size_t       GblTreeSet_height       (GBL_CSELF)                             GBL_NOEXCEPT;
-GBL_INLINE GblContext*  GblTreeSet_context      (GBL_CSELF)                             GBL_NOEXCEPT;
-GBL_INLINE GblBool      GblTreeSet_empty        (GBL_CSELF)                             GBL_NOEXCEPT;
-GBL_INLINE void*        GblTreeSet_userdata     (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblTreeSet_size         (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblTreeSet_height       (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT GblContext*  GblTreeSet_context      (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT GblBool      GblTreeSet_empty        (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT void*        GblTreeSet_userdata     (GBL_CSELF)                             GBL_NOEXCEPT;
 
 GBL_EXPORT void*        GblTreeSet_get          (GBL_CSELF, const void* pKey)           GBL_NOEXCEPT;
 GBL_EXPORT void*        GblTreeSet_getHint      (GBL_CSELF,
@@ -137,34 +137,6 @@ GBL_EXPORT void*        GblTreeSet_max          (GBL_CSELF)                     
 GBL_EXPORT GblBool      GblTreeSet_erase        (GBL_SELF,  const void* pKey)           GBL_NOEXCEPT;
 GBL_EXPORT void*        GblTreeSet_extract      (GBL_SELF,  const void* pKey)           GBL_NOEXCEPT;
 GBL_EXPORT void         GblTreeSet_clear        (GBL_SELF)                              GBL_NOEXCEPT;
-
-
-
-// probe, foreach, or next for iteration
-
-
-
-// ======== INLINE IMPLEMENTATION =========
-
-GBL_INLINE size_t  GblTreeSet_size(GBL_CSELF) GBL_NOEXCEPT {
-    return pSelf->count;
-}
-
-GBL_INLINE size_t  GblTreeSet_height(GBL_CSELF) GBL_NOEXCEPT {
-    return pSelf->height;
-}
-
-GBL_INLINE GblContext* GblTreeSet_context(GBL_CSELF) GBL_NOEXCEPT {
-    return pSelf->pCtx;
-}
-
-GBL_INLINE GblBool GblTreeSet_empty(GBL_CSELF) GBL_NOEXCEPT {
-    return pSelf->count ? GBL_FALSE : GBL_TRUE;
-}
-
-GBL_INLINE void* GblTreeSet_userdata(GBL_CSELF) GBL_NOEXCEPT {
-    return pSelf->pUserdata;
-}
 
 GBL_DECLS_END
 

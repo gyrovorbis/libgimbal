@@ -56,21 +56,21 @@
  */
 GBL_CLASS_BASE_EMPTY(GblPrimitive, GblIVariant)
 
-GBL_EXPORT GblType GblType_type          (void)                                           GBL_NOEXCEPT;
+GBL_EXPORT GblType GblType_type          (void)                                GBL_NOEXCEPT;
 
-GBL_EXPORT GblType GblPrimitive_register (const char*                    pName,
-                                          size_t                         classSize,
-                                          size_t                         classPrivateSize,
+GBL_EXPORT GblType GblPrimitive_register (const char*               pName,
+                                          size_t                    classSize,
+                                          size_t                    classPrivateSize,
                                           const GblIVariantVTable*  pIVTable,
-                                          GblFlags                       typeFlags)       GBL_NOEXCEPT;
+                                          GblFlags                  typeFlags) GBL_NOEXCEPT;
 
 GBL_EXPORT GblType GblPrimitive_registerBuiltin
-                                         (size_t                         index,
-                                          const char*                    pName,
-                                          size_t                         classSize,
-                                          size_t                         classPrivateSize,
+                                         (size_t                    index,
+                                          const char*               pName,
+                                          size_t                    classSize,
+                                          size_t                    classPrivateSize,
                                           const GblIVariantVTable*  pIVTable,
-                                          GblFlags                       typeFlags)       GBL_NOEXCEPT;
+                                          GblFlags                  typeFlags) GBL_NOEXCEPT;
 
 
 #endif // GIMBAL_PRIMITIVES_H

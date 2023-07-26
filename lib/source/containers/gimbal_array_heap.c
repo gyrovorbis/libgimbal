@@ -5,8 +5,6 @@
 #define GBL_ARRAY_HEAP_LEFT_(npos)      (((npos) * 2) + 1)
 #define GBL_ARRAY_HEAP_RIGHT_(npos)     (((npos) * 2) + 2)
 
-
-
 GBL_EXPORT GBL_RESULT (GblArrayHeap_construct)(GblArrayHeap*     pSelf,
                                                size_t            elemSize,
                                                GblArrayHeapCmpFn pFnCmp,
@@ -127,3 +125,71 @@ GBL_EXPORT GBL_RESULT GblArrayHeap_pop(GblArrayHeap* pSelf, void* pEntryOut) {
     }
     return result;
 }
+
+
+GBL_EXPORT GblContext* GblArrayHeap_context(const GblArrayHeap* pSelf) {
+    return GblArrayList_context(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT size_t  GblArrayHeap_elementSize(const GblArrayHeap* pSelf) {
+    return GblArrayList_elementSize(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT size_t  GblArrayHeap_size(const GblArrayHeap* pSelf)  {
+    return GblArrayList_size(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT size_t  GblArrayHeap_capacity(const GblArrayHeap* pSelf) {
+    return GblArrayList_capacity(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT GblBool GblArrayHeap_stack(const GblArrayHeap* pSelf) {
+    return GblArrayList_stack(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT GblBool GblArrayHeap_empty(const GblArrayHeap* pSelf) {
+    return GblArrayList_empty(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT void* GblArrayHeap_data(const GblArrayHeap* pSelf) {
+    return GblArrayList_data(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT void* GblArrayHeap_peek(const GblArrayHeap* pSelf) {
+    return GblArrayList_front(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayHeap_clear(GblArrayHeap* pSelf) {
+    return GblArrayList_clear(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayHeap_reserve(GblArrayHeap* pSelf, size_t  capacity) {
+    return GblArrayList_reserve(&GBL_PRIV_REF(pSelf).list, capacity);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayHeap_shrinkToFit(GblArrayHeap* pSelf) {
+    return GblArrayList_shrinkToFit(&GBL_PRIV_REF(pSelf).list);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayHeap_acquire(GblArrayHeap* pSelf,
+                                           void*         pData,
+                                           size_t        size,
+                                           size_t        capacity)
+{
+    return GblArrayList_acquire(&GBL_PRIV_REF(pSelf).list,
+                                pData,
+                                size,
+                                capacity);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayHeap_release(GblArrayHeap* pSelf,
+                                           void**   ppData,
+                                           size_t * pSize,
+                                           size_t * pCapacity)
+{
+    return GblArrayList_release(&GBL_PRIV_REF(pSelf).list,
+                                ppData,
+                                pSize,
+                                pCapacity);
+}
+

@@ -141,8 +141,16 @@ GBL_EXPORT GBL_RESULT   GblProperty_constructVaList(GBL_SELF,
                                                     size_t      optionalArgCount,
                                                     va_list*    pList)                     GBL_NOEXCEPT;
 
-GBL_INLINE GblType      GblProperty_objectType     (GBL_CSELF)                             GBL_NOEXCEPT;
-GBL_INLINE const char*  GblProperty_nameString     (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblProperty_createOrConstruct(GblProperty** ppSelf,
+                                                    GblType       derivedType,
+                                                    const char*   pName,
+                                                    size_t        id,
+                                                    GblFlags      flags,
+                                                    size_t        optionalArgCount,
+                                                    ...)                                   GBL_NOEXCEPT;
+
+GBL_EXPORT GblType      GblProperty_objectType     (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT const char*  GblProperty_nameString     (GBL_CSELF)                             GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblProperty_defaultValue   (GBL_CSELF, GblVariant* pValue)         GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblProperty_checkValue     (GBL_CSELF, const GblVariant* pValue)   GBL_NOEXCEPT;
@@ -151,45 +159,7 @@ GBL_EXPORT GBL_RESULT   GblProperty_validateValue  (GBL_CSELF, GblVariant* pValu
 GBL_EXPORT int          GblProperty_compareValues  (GBL_CSELF,
                                                     const GblVariant* pV1,
                                                     const GblVariant* pV2)                 GBL_NOEXCEPT;
-// ===== IMPL =====
-
-GBL_INLINE const char* GblProperty_nameString(GBL_CSELF) GBL_NOEXCEPT {
-    return pSelf? GblQuark_toString(pSelf->name) : NULL;
-}
-
-GBL_INLINE GblType GblProperty_objectType(GBL_CSELF) GBL_NOEXCEPT {
-    return pSelf? GBL_PRIV_REF(pSelf).objectType : GBL_INVALID_TYPE;
-}
-
-GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
-                                                     GblType       derivedType,
-                                                     const char*   pName,
-                                                     size_t        id,
-                                                     GblFlags      flags,
-                                                     size_t        optionalArgCount,
-                                                     ...)
-{
-    va_list varArgs;
-    va_start(varArgs, optionalArgCount);
-    if(ppSelf && *ppSelf) {
-        return GblProperty_constructVaList(*ppSelf,
-                                           derivedType,
-                                           pName,
-                                           id,
-                                           flags,
-                                           optionalArgCount,
-                                           &varArgs);
-    } else {
-        GblProperty* pProp = GblProperty_createVaList(derivedType,
-                                                      pName,
-                                                      id,
-                                                      flags,
-                                                      optionalArgCount,
-                                                      &varArgs);
-        if(ppSelf) *ppSelf = pProp;
-        return pProp? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR_INVALID_POINTER;
-    }
-}
+GBL_DECLS_END
 
 //! \cond
 #define GBL_PROPERTIES_(object, ...)                        \
@@ -251,7 +221,7 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
 
 #define GBL_PROPERTY_REGISTER___(object, name, type, ...)              \
     case object##_Property_Id_##name:                                  \
-        GBL_CTX_VERIFY_CALL(GblProperty_createOrConstruct_(&pProp,     \
+        GBL_CTX_VERIFY_CALL(GblProperty_createOrConstruct(&pProp,      \
                 type##_PROPERTY_TYPE,                                  \
                 GblQuark_internStringStatic(GBL_STRINGIFY(name)),      \
                 id,                                                    \
@@ -274,8 +244,6 @@ GBL_INLINE GBL_RESULT GblProperty_createOrConstruct_(GblProperty** ppSelf,
 #define GBL_PROPERTY_FLAGS_MASK__(suffix)  \
     GBL_PROPERTY_FLAG_##suffix |
 //! \endcond
-
-GBL_DECLS_END
 
 #undef GBL_SELF_TYPE
 

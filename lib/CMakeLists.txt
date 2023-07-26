@@ -201,6 +201,7 @@ set(GIMBAL_INCLUDES
 set(GIMBAL_SOURCES
     source/algorithms/gimbal_hash.c
     source/algorithms/gimbal_numeric.c
+    source/algorithms/gimbal_sort.c
     source/allocators/gimbal_arena_allocator.c
     source/allocators/gimbal_pool_allocator.c
     source/allocators/gimbal_allocation_tracker.c
@@ -208,6 +209,8 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_hash_set.c
     source/containers/gimbal_tree_set.c
     source/containers/gimbal_linked_list.c
+    source/containers/gimbal_doubly_linked_list.c
+    source/containers/gimbal_nary_tree.c
     source/containers/gimbal_array_map.c
     source/containers/gimbal_array_list.c
     source/containers/gimbal_ring_buffer.c

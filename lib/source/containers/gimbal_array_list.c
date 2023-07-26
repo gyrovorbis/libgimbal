@@ -254,3 +254,135 @@ GBL_EXPORT GBL_RESULT GblArrayList_popBack(GblArrayList* pSelf, void* pOut) {
     GBL_CTX_VERIFY_CALL(GblArrayList_erase(pSelf, index, 1));
     GBL_CTX_END();
 }
+
+GBL_EXPORT void* GblArrayList_stackBuffer(const GblArrayList* pSelf) {
+    return (uint8_t*)((pSelf && GBL_PRIV_REF(pSelf).stackCapacity)? (pSelf + 1) : NULL);
+}
+
+GBL_EXPORT GblBool GblArrayList_empty(const GblArrayList* pSelf) {
+    return (pSelf && GBL_PRIV_REF(pSelf).size)? GBL_FALSE : GBL_TRUE;
+}
+
+GBL_EXPORT GblBool GblArrayList_stack(const GblArrayList* pSelf) {
+    return (pSelf && (GBL_PRIV_REF(pSelf).pData == GblArrayList_stackBuffer(pSelf)))? GBL_TRUE : GBL_FALSE;
+}
+
+GBL_EXPORT GBL_RESULT GblArrayList_construct_6(GblArrayList* pSelf, uint16_t elementSize, size_t  elementCount, const void* pInitialData, size_t  structSize, GblBool zeroTerminated) {
+    return GblArrayList_construct_7(pSelf, elementSize, elementCount, pInitialData, structSize, zeroTerminated, NULL);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayList_construct_5(GblArrayList* pSelf, uint16_t elementSize, size_t  elementCount, const void* pInitialData, size_t  structSize) {
+    return GblArrayList_construct_6(pSelf, elementSize, elementCount, pInitialData, structSize, GBL_FALSE);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayList_construct_4(GblArrayList* pSelf, uint16_t elementSize, size_t  elementCount, const void* pInitialData) {
+    return GblArrayList_construct_5(pSelf, elementSize, elementCount, pInitialData, sizeof(GblArrayList));
+}
+
+GBL_EXPORT GBL_RESULT GblArrayList_construct_3(GblArrayList* pSelf, uint16_t elementSize, size_t  elementCount) {
+    return GblArrayList_construct_4(pSelf, elementSize, elementCount, NULL);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayList_construct_2(GblArrayList* pSelf, uint16_t elementSize) {
+    return GblArrayList_construct_3(pSelf, elementSize, 0);
+}
+
+GBL_EXPORT GblContext* GblArrayList_context(const GblArrayList* pSelf) {
+    return (pSelf)? GBL_PRIV_REF(pSelf).pCtx : NULL;
+}
+
+GBL_EXPORT uint16_t GblArrayList_stackBytes(const GblArrayList* pSelf) {
+    return (pSelf)? GBL_PRIV_REF(pSelf).stackCapacity * GBL_PRIV_REF(pSelf).elementSize : 0;
+}
+
+GBL_EXPORT size_t  GblArrayList_size(const GblArrayList* pSelf) {
+    return (pSelf)? GBL_PRIV_REF(pSelf).size : 0;
+}
+
+GBL_EXPORT size_t  GblArrayList_capacity(const GblArrayList* pSelf) {
+    return (pSelf)? GBL_PRIV_REF(pSelf).capacity : 0;
+}
+
+GBL_EXPORT uint16_t GblArrayList_elementSize(const GblArrayList* pSelf) {
+    return (pSelf)? GBL_PRIV_REF(pSelf).elementSize : 0;
+}
+
+GBL_EXPORT void* GblArrayList_data(const GblArrayList* pSelf) {
+    return (pSelf)? GBL_PRIV_REF(pSelf).pData : NULL;
+}
+
+GBL_EXPORT void* GblArrayList_at(const GblArrayList* pSelf, size_t  index) {
+    void* pData = NULL;
+
+    if(index >= GBL_PRIV_REF(pSelf).size) GBL_UNLIKELY {
+        GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
+        GBL_CTX_VERIFY(GBL_FALSE,
+                       GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_CTX_END_BLOCK();
+
+    } else GBL_LIKELY {
+        pData = &GBL_PRIV_REF(pSelf).pData[index * GBL_PRIV_REF(pSelf).elementSize];
+    }
+
+    return pData;
+}
+
+GBL_EXPORT void* GblArrayList_front(const GblArrayList* pSelf) {
+    return GblArrayList_at(pSelf, 0);
+}
+
+GBL_EXPORT void* GblArrayList_back(const GblArrayList* pSelf) {
+    return GblArrayList_at(pSelf, GBL_PRIV_REF(pSelf).size-1);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayList_pushBack(GblArrayList* pSelf, const void* pData) {
+    return !GblArrayList_insert(pSelf, GblArrayList_size(pSelf), 1, pData)?
+                GblThd_callRecord(NULL)->result :
+                GBL_RESULT_SUCCESS;
+}
+
+GBL_EXPORT void* GblArrayList_emplaceBack(GblArrayList* pSelf) {
+    return GblArrayList_insert(pSelf, GblArrayList_size(pSelf), 1, NULL);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayList_pushFront(GblArrayList* pSelf, const void* pData) {
+    return !GblArrayList_insert(pSelf, 0, 1, pData)?
+                GblThd_callRecord(NULL)->result :
+                GBL_RESULT_SUCCESS;
+}
+
+GBL_EXPORT void* GblArrayList_emplaceFront(GblArrayList* pSelf) {
+    return GblArrayList_insert(pSelf, 0, 1, NULL);
+}
+
+GBL_EXPORT GBL_RESULT GblArrayList_append(GblArrayList* pSelf, const void* pData, size_t  elementCount) {
+    return !GblArrayList_insert(pSelf, GblArrayList_size(pSelf), elementCount, pData)?
+                GblThd_callRecord(NULL)->result :
+                GBL_RESULT_SUCCESS;
+}
+
+GBL_EXPORT GBL_RESULT GblArrayList_prepend(GblArrayList* pSelf, const void* pData, size_t  elementCount) {
+    return !GblArrayList_insert(pSelf, 0, elementCount, pData)?
+                GblThd_callRecord(NULL)->result :
+                GBL_RESULT_SUCCESS;
+}
+
+GBL_EXPORT GblArrayList* GblArrayList_createInPlace(GblArrayList* pSelf,
+                                                    uint16_t    elementSize,
+                                                    size_t      elementCount,
+                                                    const void* pInitialData,
+                                                    size_t      structSize,
+                                                    GblBool     zeroTerminated,
+                                                    GblContext* pCtx)
+{
+    GblArrayList* pOut = NULL;
+    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_VERIFY_CALL(GblArrayList_construct_7(pSelf, elementSize, elementCount, pInitialData, structSize, zeroTerminated, pCtx));
+    pOut = pSelf;
+    GBL_CTX_END_BLOCK();
+    return pOut;
+}
+
+GBL_EXPORT void* GblArrayList_emplace(GblArrayList* pSelf, size_t  index) {
+    return GblArrayList_insert(pSelf, index, 1, NULL);
+}
