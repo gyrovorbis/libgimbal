@@ -107,16 +107,11 @@ extern GBL_RESULT GblPointer_typeRegister_(GblContext* pCtx) {
 }
 
 GblType GblPointer_register(const char* pName) {
-    GblType type = GBL_INVALID_TYPE;
-    GBL_CTX_BEGIN(NULL);
-    type = GblType_register(GblQuark_internString(pName),
-                                  GBL_POINTER_TYPE,
-                                  &(const GblTypeInfo) {
-                                      .classSize = sizeof(GblPrimitiveClass),
-                                  },
-                                  GBL_TYPE_FLAGS_NONE);
-    GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_CTX_END_BLOCK();
-    return type;
+    return GblType_register(GblQuark_internString(pName),
+                            GBL_POINTER_TYPE,
+                            &(const GblTypeInfo) {
+                                .classSize = sizeof(GblPrimitiveClass),
+                            },
+                            GBL_TYPE_FLAGS_NONE);
 }
 

@@ -66,14 +66,14 @@ GBL_EXPORT GblType GblException_type(void) {
         .instanceSize    = sizeof(GblException)
     };
 
-    if(type == GBL_INVALID_TYPE) {
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         type = GblType_register(GblQuark_internStringStatic("GblException"),
-                                      GBL_OBJECT_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC |
-                                      GBL_TYPE_FLAG_CLASS_PINNED    |
-                                      GBL_TYPE_FLAG_CLASS_PREINIT);
-    }
+                                GBL_OBJECT_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC |
+                                GBL_TYPE_FLAG_CLASS_PINNED    |
+                                GBL_TYPE_FLAG_CLASS_PREINIT);
+}
 
     return type;
 }

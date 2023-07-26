@@ -348,19 +348,14 @@ GBL_EXPORT GblType GblFlags_type(void) {
 GBL_EXPORT GblType GblFlags_register(const char* pName,
                                      const GblFlagEntry* pValidEntries)
 {
-    GblType type = GBL_INVALID_TYPE;
-    GBL_CTX_BEGIN(NULL);
-    type = GblType_register(GblQuark_internString(pName),
-                                  GBL_FLAGS_TYPE,
-                                  &(const GblTypeInfo) {
-                                      .pFnClassInit     = flagsClass_init_,
-                                      .pFnClassFinal    = flagsClass_final_,
-                                      .classSize        = sizeof(GblFlagsClass),
-                                      .pClassData       = pValidEntries,
-                                  },
-                                  GBL_TYPE_FLAGS_NONE);
-    GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_CTX_END_BLOCK();
-    return type;
+    return GblType_register(GblQuark_internString(pName),
+                            GBL_FLAGS_TYPE,
+                            &(const GblTypeInfo) {
+                               .pFnClassInit     = flagsClass_init_,
+                               .pFnClassFinal    = flagsClass_final_,
+                               .classSize        = sizeof(GblFlagsClass),
+                               .pClassData       = pValidEntries,
+                            },
+                            GBL_TYPE_FLAGS_NONE);
 }
 

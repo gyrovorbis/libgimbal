@@ -390,22 +390,22 @@ GBL_EXPORT GblTestScenario* GblTestSuite_scenario(const GblTestSuite* pSelf) {
 }
 
 
-GBL_EXPORT GblType GblTestSuite_register(const char* pName,
+GBL_EXPORT GblType GblTestSuite_register(const char*               pName,
                                          const GblTestSuiteVTable* pVTable,
-                                         size_t  instanceSize,
-                                         size_t  instancePrivateSize,
-                                         GblFlags typeFlags)
+                                         size_t                    instanceSize,
+                                         size_t                    instancePrivateSize,
+                                         GblFlags                  typeFlags)
 {
     GblType type = GBL_INVALID_TYPE;
     type = GblType_register(GblQuark_internString(pName),
-                                  GBL_TEST_SUITE_TYPE,
-                                  &(const GblTypeInfo) {
-                                      .pFnClassInit         = GblTestSuiteClass_initDerived_,
-                                      .classSize            = sizeof(GblTestSuiteClass),
-                                      .pClassData           = pVTable,
-                                      .instanceSize         = instanceSize,
-                                      .instancePrivateSize  = instancePrivateSize
-                                  },
-                                  typeFlags);
+                            GBL_TEST_SUITE_TYPE,
+                            &(const GblTypeInfo) {
+                                .pFnClassInit         = GblTestSuiteClass_initDerived_,
+                                .classSize            = sizeof(GblTestSuiteClass),
+                                .pClassData           = pVTable,
+                                .instanceSize         = instanceSize,
+                                .instancePrivateSize  = instancePrivateSize
+                            },
+                            typeFlags);
     return type;
 }

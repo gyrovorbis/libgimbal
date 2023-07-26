@@ -476,7 +476,7 @@ GBL_EXPORT GblType GblContext_type(void) {
         .pInterfaceImpls    = ifaceEntries
     };
 
-    if(type == GBL_INVALID_TYPE) {
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
 
         ifaceEntries[0].interfaceType = GBL_IALLOCATOR_TYPE;
         ifaceEntries[1].interfaceType = GBL_ILOGGER_TYPE;

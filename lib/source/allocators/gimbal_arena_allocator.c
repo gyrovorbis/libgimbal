@@ -243,14 +243,13 @@ GBL_EXPORT GblType GblArenaAllocator_type(void) {
         .pInterfaceImpls  = ifaceEntries
     };
 
-    if(type == GBL_INVALID_TYPE) {
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         ifaceEntries[0].interfaceType = GBL_IALLOCATOR_TYPE;
 
         type = GblType_register(GblQuark_internStringStatic("GblArenaAllocator"),
-                                      GBL_OBJECT_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
-
+                                GBL_OBJECT_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
 
     return type;

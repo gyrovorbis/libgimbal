@@ -1,11 +1,15 @@
 /*! \file
- *  \brief GblSignalClosure base instance and API
- *  \copydoc GblSignalClosure
  *  \ingroup signals
+ *  \brief   GblSignalClosure, signal-emitting closurure, and API
  *
- *  \author Falco Girgis
+ *  This file contains the GblSignalClosure type and its
+ *  associated methods. It is used to forward a generic function
+ *  invocation to a signal emission, which can then be received
+ *  again by any GblClosure instances connected to the signal.
+ *
+ *  \author    2023 Falco Girgis
+ *  \copyright MIT License
  */
-
 #ifndef GIMBAL_SIGNAL_CLOSURE_H
 #define GIMBAL_SIGNAL_CLOSURE_H
 
@@ -43,17 +47,26 @@ GBL_CLASS_DERIVE_EMPTY(GblSignalClosure, GblClosure)
  */
 GBL_INSTANCE_DERIVE(GblSignalClosure, GblClosure)
     GBL_PRIVATE_BEGIN
-        GblQuark signalName;
+        GblQuark signalName; //!< PRIVATE: Name of the signal to forward arguments to
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 
-GBL_EXPORT GblType           GblSignalClosure_type      (void)                     GBL_NOEXCEPT;
+//! Returns the GblType UUID associated with GblSignalClosure
+GBL_EXPORT GblType           GblSignalClosure_type   (void)                    GBL_NOEXCEPT;
 
-GBL_EXPORT GblSignalClosure* GblSignalClosure_create    (const char*  pSignalName,
-                                                         void*        pUserdata)   GBL_NOEXCEPT;
+//! Creates a new GblSignalClosure, with the given \p pSignalName, capturing the given \p pUserdata
+GBL_EXPORT GblSignalClosure* GblSignalClosure_create (const char* pSignalName,
+                                                      void*       pUserdata)   GBL_NOEXCEPT;
 
-GBL_EXPORT GBL_RESULT        GblSignalClosure_setSignal (GBL_SELF,
-                                                         const char*  pSignalName) GBL_NOEXCEPT;
+/*! \name  Accessor Method(s)
+ *  \brief Setter methods for GblSignalClosure
+ *  \relatesalso GblSignalClosure
+ *  @{
+ */
+//! Sets the signal for the closure to invoke to the given \p pSignalName
+GBL_EXPORT GBL_RESULT GblSignalClosure_setSignal (GBL_SELF, const char* pSignalName) GBL_NOEXCEPT;
+//! @}
+
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

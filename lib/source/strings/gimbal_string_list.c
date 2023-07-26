@@ -9,13 +9,70 @@ void*      GblRingList_new_          (void);
 void       GblRingList_delete_       (void* pPtr);
 GBL_RESULT GblRingList_insertVaList_ (GblRingList* pSelf, intptr_t index, va_list* pList);
 
+
+GBL_EXPORT GblStringList* GblStringList_createEmpty(void) {
+    return GblRingList_createEmpty();
+}
+
+GBL_EXPORT size_t  GblStringList_size(const GblStringList* pSelf) {
+    return GblRingList_size(pSelf);
+}
+
+GBL_EXPORT GblBool GblStringList_empty(const GblStringList* pSelf) {
+    return GblRingList_empty(pSelf);
+}
+
+GBL_EXPORT GblStringRef* GblStringList_front(const GblStringList* pSelf) {
+    return (GblStringRef*)GblRingList_front(pSelf);
+}
+
+GBL_EXPORT GblStringRef* GblStringList_back(const GblStringList* pSelf) {
+    return (GblStringRef*)GblRingList_back(pSelf);
+}
+
+GBL_EXPORT GblStringRef* GblStringList_at(const GblStringList* pSelf, intptr_t index) {
+    return (GblStringRef*)GblRingList_at(pSelf, index);
+}
+
+GBL_EXPORT GblBool (GblStringList_contains)(const GblStringList* pSelf, const char* pStr, GblBool matchCase) {
+    return GblStringList_find(pSelf, pStr, matchCase) != GBL_STRING_LIST_NPOS? GBL_TRUE : GBL_FALSE;
+}
+
+GBL_EXPORT GblBool (GblStringList_splice)(GblStringList* pSelf, GblStringList* pOther, intptr_t index) {
+    return GblRingList_splice(pSelf, pOther, index);
+}
+
+GBL_EXPORT GblStringRef* GblStringList_popBack(GblStringList* pSelf) {
+    return (GblStringRef*)GblRingList_popBack(pSelf);
+}
+
+GBL_EXPORT GblStringRef* GblStringList_popFront(GblStringList* pSelf) {
+    return (GblStringRef*)GblRingList_popFront(pSelf);
+}
+
+GBL_EXPORT void GblStringList_rotate(GblStringList* pSelf, intptr_t n) {
+    GblRingList_rotate(pSelf, n);
+}
+
+GBL_EXPORT void GblStringList_reverse(GblStringList* pSelf) {
+    GblRingList_reverse(pSelf);
+}
+
+GBL_EXPORT GblBool (GblStringList_foreach)(GblStringList* pSelf, GblStringListIterFn pFnIt, void* pCl) {
+    return GblRingList_foreach(pSelf, (GblRingListIterFn)pFnIt, pCl);
+}
+
+GBL_EXPORT GblStringRef* GblStringList_extract(GblStringList* pSelf, GblStringList* pNode) {
+    return (GblStringRef*)GblRingList_extract(pSelf, pNode);
+}
+
+
 GBL_EXPORT GblStringList* (GblStringList_create)(const char* pFirst, ...) {
     va_list varArgs;
     GblStringList* pList = GblStringList_createEmpty();
     va_start(varArgs, pFirst);
 
     GblRingList_pushBack(pList, GblStringRef_create(pFirst));
-
 
     const char* pStr;
     while((pStr = va_arg(varArgs, const char*))) {

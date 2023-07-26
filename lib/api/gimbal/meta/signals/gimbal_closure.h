@@ -1,9 +1,15 @@
 /*! \file
- *  \brief GblClosure base instance and API
- *  \copydoc GblClosure
  *  \ingroup signals
+ *  \brief   GblClosure, generic callable instance, and API
  *
- *  \author Falco Girgis
+ *  This file contains the type declaration of GblClosure
+ *  and its associated API. A GblClosure repersents the
+ *  base type for all callable objects, providing:
+ *  - A uniform, generic invocation method (GblMarshal)
+ *  - Any state data that the closure captures
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 #ifndef GIMBAL_CLOSURE_H
 #define GIMBAL_CLOSURE_H
@@ -15,10 +21,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_CLOSURE_TYPE                (GBL_TYPEID(GblClosure))
-#define GBL_CLOSURE(self)               (GBL_CAST(GblClosure, self))
-#define GBL_CLOSURE_CLASS(klass)        (GBL_CLASS_CAST(GblClosure, klass))
-#define GBL_CLOSURE_GET_CLASS(self)     (GBL_CLASSOF(GblClosure, self))
+#define GBL_CLOSURE_TYPE            (GBL_TYPEID(GblClosure))            //!< Type UUID for GblClosure
+#define GBL_CLOSURE(self)           (GBL_CAST(GblClosure, self))        //!< Casts a GblInstance to GblClosure
+#define GBL_CLOSURE_CLASS(klass)    (GBL_CLASS_CAST(GblClosure, klass)) //!< Casts a GblClass to GblClosureClass
+#define GBL_CLOSURE_GET_CLASS(self) (GBL_CLASSOF(GblClosure, self))     //!< Gets a GblClosureClass from GblInstance
 //! @}
 
 //! Casts a C function pointer to a generic callback type
@@ -43,40 +49,41 @@ GBL_DECLS_BEGIN
  *  \sa GblBox, GblMarshalFn
  */
 GBL_CLASS_DERIVE(GblClosure, GblBox)
-    GblMarshalFn pFnMetaMarshal; //!< Primary entry point when marshalling a function call
+    //! Primary entry point when invoking a closure
+    GblMarshalFn pFnMetaMarshal;
 GBL_CLASS_END
 
 /*! \struct GblClosure
- *  \brief Base instance for all closure types
- *  \ingroup signals
  *  \extends GblBox
+ *  \ingroup signals
+ *  \brief Base instance for all closure types
  *
- * A GblClosure represents an abstract  generic
- * callback object. It is analogous to a stateful C++
- * function object, or functor, in that it can
- * contain both a callback method as  well as stateful
- * data to operate upon.
+ *  A GblClosure represents an abstract  generic
+ *  callback object. It is analogous to a stateful C++
+ *  function object, or functor, in that it can
+ *  contain both a callback method as  well as stateful
+ *  data to operate upon.
  *
- * All closures have a single entry-point for
- * having their callback logic called, which is
- * GblClosure_invoke(). This calls the closure's
- * "marshal" function, which is responsible for
- * - validating arguments and return type
- * - converting arguments into expected format for callback
- * - calling actual callback or logic
- * - converting return value back into a GblVariant
+ *  All closures have a single entry-point for
+ *  having their callback logic called, which is
+ *  GblClosure_invoke(). This calls the closure's
+ *  "marshal" function, which is responsible for
+ *  - validating arguments and return type
+ *  - converting arguments into expected format for callback
+ *  - calling actual callback or logic
+ *  - converting return value back into a GblVariant
  *
- * As the abstract base closure, there is no underlying
- * language-specific callback state within this class.
- * For calling back into C function pointers, see
- * GblCClosure.
+ *  As the abstract base closure, there is no underlying
+ *  language-specific callback state within this class.
+ *  For calling back into C function pointers, see
+ *  GblCClosure.
  *
- * \note As GblClosure inherits GblBox, it can
- * contain arbitrary language-specific or
- * binding-specific userdata and has reference
- * count semantics.
+ *  \note As GblClosure inherits GblBox, it can
+ *  contain arbitrary language-specific or
+ *  binding-specific userdata and has reference
+ *  count semantics.
  *
- * \sa GblCClosure, GblMarshalFn, gimbal_signal.h
+ *  \sa GblCClosure, GblMarshalFn, gimbal_signal.h
  */
 GBL_INSTANCE_DERIVE(GblClosure, GblBox)
     GBL_PRIVATE_BEGIN
@@ -87,7 +94,7 @@ GBL_INSTANCE_END
 //! Returns the GblType UUID for GblClosure
 GBL_EXPORT GblType GblClosure_type (void) GBL_NOEXCEPT;
 
-/*! \name Current Closure
+/*! \name  Current Closure
  *  \brief Methods for querying the active GblClosure
  *  @{
  */
@@ -99,11 +106,11 @@ GBL_EXPORT void*       GblClosure_currentUserdata (void) GBL_NOEXCEPT;
 
 //! Creates a GblClosure-derived instance with the given attributes, returning a pointer to it
 GBL_EXPORT GblClosure* GblClosure_create (GblType           derivedType,
-                                          size_t            size,
-                                          void*             pUserdata,
-                                          GblArrayMapDtorFn pFnDtor) GBL_NOEXCEPT;
+                                          size_t            size     /*=DEFAULT*/,
+                                          void*             pUserdata/*=NULL*/,
+                                          GblArrayMapDtorFn pFnDtor  /*=NULL*/) GBL_NOEXCEPT;
 
-/*! \name Accessor Methods
+/*! \name  Accessor Methods
  *  \brief Methods for reading/writing GblClosure fields
  *  \relatesalso GblClosure
  *  @{
@@ -120,7 +127,7 @@ GBL_EXPORT GblBool    GblClosure_hasMarshal     (GBL_CSELF)               GBL_NO
 GBL_EXPORT GblBool    GblClosure_hasMetaMarshal (GBL_CSELF)               GBL_NOEXCEPT;
 //! @}
 
-/*! \name Invocation Method(s)
+/*! \name  Invocation Method(s)
  *  \brief Methods used to invoke the closure
  *  \relatesalso GblClosure
  */
@@ -132,6 +139,13 @@ GBL_EXPORT GBL_RESULT GblClosure_invoke (GBL_SELF,
 //! @}
 
 GBL_DECLS_END
+
+#define GblClosure_create(...) \
+    GblClosure_createDefault_(__VA_ARGS__)
+#define GblClosure_createDefault_(...) \
+    GblClosure_createDefault__(__VA_ARGS__, 0, NULL, NULL)
+#define GblClosure_createDefault__(type, size, ud, dtor, ...) \
+    (GblClosure_create)(type, size, ud, dtor)
 
 #undef GBL_SELF_TYPE
 

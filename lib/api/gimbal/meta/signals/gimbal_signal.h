@@ -89,7 +89,6 @@ GBL_EXPORT GblInstance* GblSignal_receiver        (void)                        
 // ===== IMPLEMENTATION =====
 
 ///\cond
-
 #define GblSignal_connect_3(emitter, signal, callback) \
     (GblSignal_connect_4(emitter, signal, emitter, callback))
 #define GblSignal_connect_4(emitter, signal, receiver, callback) \
@@ -128,7 +127,6 @@ GBL_CTX_VERIFY_CALL(GblSignal_install(GBL_TYPEID(instance), \
 
 #define GBL_SIGNALS_REGISTER_(instance, marshals) \
     instance##_registerSignals_(instance, marshals)
-
 ///\endcond
 
 GBL_DECLS_END

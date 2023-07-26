@@ -416,26 +416,6 @@ static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd) 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblType GblTestScenario_type(void) {
-    static GblType type = GBL_INVALID_TYPE;
-
-    static const GblTypeInfo typeInfo = {
-        .pFnClassInit           = GblTestScenarioClass_init_,
-        .classSize              = sizeof(GblTestScenarioClass),
-        .instanceSize           = sizeof(GblTestScenario),
-        .instancePrivateSize    = sizeof(GblTestScenario_)
-    };
-
-    if(type == GBL_INVALID_TYPE) {
-        type = GblType_register(GblQuark_internStringStatic("GblTestScenario"),
-                                GBL_CONTEXT_TYPE,
-                                &typeInfo,
-                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
-    }
-    return type;
-
-}
-
 GBL_EXPORT GblTestScenario* GblTestScenario_create(const char* pName) {
     GblTestScenario* pScenario = NULL;
     GBL_CTX_BEGIN(NULL);
@@ -525,4 +505,23 @@ GBL_EXPORT GblBool GblTestScenario_passed(const GblTestScenario* pSelf) {
 
 GBL_EXPORT void GblTestScenario_expectError(const GblTestScenario* pSelf) {
     GBL_TEST_SCENARIO_(pSelf)->expectError = GBL_TRUE;
+}
+
+GBL_EXPORT GblType GblTestScenario_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    static const GblTypeInfo typeInfo = {
+        .pFnClassInit           = GblTestScenarioClass_init_,
+        .classSize              = sizeof(GblTestScenarioClass),
+        .instanceSize           = sizeof(GblTestScenario),
+        .instancePrivateSize    = sizeof(GblTestScenario_)
+    };
+
+    if(type == GBL_INVALID_TYPE) {
+        type = GblType_register(GblQuark_internStringStatic("GblTestScenario"),
+                                GBL_CONTEXT_TYPE,
+                                &typeInfo,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
+    }
+    return type;
 }

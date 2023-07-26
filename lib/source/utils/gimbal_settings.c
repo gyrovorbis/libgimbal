@@ -248,11 +248,11 @@ GBL_EXPORT GblType GblSettings_type(void) {
         .instancePrivateSize = sizeof(GblSettings_)
     };
 
-    if(type == GBL_INVALID_TYPE) {
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         type = GblType_register(GblQuark_internStringStatic("GblSettings"),
-                                      GBL_OBJECT_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+                                GBL_OBJECT_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
 
     return type;

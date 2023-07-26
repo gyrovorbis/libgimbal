@@ -62,14 +62,14 @@ GBL_EXPORT GblType GblITableVariant_type(void) {
         .pDependencies   = &dependency
     };
 
-    if(type == GBL_INVALID_TYPE) {
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         dependency = GBL_IVARIANT_TYPE;
 
         type = GblType_register(GblQuark_internStringStatic("GblITableVariant"),
-                                      GBL_INTERFACE_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC |
-                                      GBL_TYPE_FLAG_ABSTRACT);
+                                GBL_INTERFACE_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC |
+                                GBL_TYPE_FLAG_ABSTRACT);
     }
 
     return type;

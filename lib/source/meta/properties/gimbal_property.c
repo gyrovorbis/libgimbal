@@ -529,11 +529,11 @@ GBL_EXPORT GblType GblProperty_type(void) {
         .instanceSize = sizeof(GblProperty)
     };
 
-    if(type == GBL_INVALID_TYPE) {
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         type = GblType_register(GblQuark_internStringStatic("GblProperty"),
-                                      GBL_BOX_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+                                GBL_BOX_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
     return type;
 }

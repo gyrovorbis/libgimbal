@@ -433,3 +433,86 @@ GBL_EXPORT int GblStringView_scanfVa(GblStringView self, const char* pFmt, va_li
     const char* pCString = GBL_STRING_VIEW_CSTR(self);
     return vsscanf(pCString, pFmt, *pVarArgs);
 }
+
+
+GBL_EXPORT GblStringView GblStringView_fromEmpty(void) GBL_NOEXCEPT {
+    return GblStringView_fromString(GBL_NULL);
+}
+
+GBL_EXPORT GblStringView GblStringView_fromString(const char* pString) GBL_NOEXCEPT {
+    GblStringView view = {
+        .pData  = pString
+    };
+    if(pString) {
+        view.nullTerminated = 1;
+        view.length         = strlen(pString);
+    }
+    return view;
+}
+
+GBL_EXPORT GblStringView GblStringView_fromStringSized(const char* pString, size_t length) GBL_NOEXCEPT {
+    GblStringView view = {
+        .pData  = pString,
+        .length = length
+    };
+    if(pString) {
+        if(!length) {
+            view.length = strlen(pString);
+            view.nullTerminated = 1;
+        } else if(pString[length-1] == '\0') {
+            view.length--;
+            view.nullTerminated = 1;
+        }
+    }
+    return view;
+}
+
+GBL_EXPORT char GblStringView_at(GblStringView self, size_t index) GBL_NOEXCEPT {
+    char value = '\0';
+    if(index >= self.length) GBL_UNLIKELY {
+            GBL_CTX_BEGIN(GBL_NULL);
+            GBL_CTX_VERIFY(GBL_FALSE,
+                           GBL_RESULT_ERROR_OUT_OF_RANGE);
+            GBL_CTX_END_BLOCK();
+        } else GBL_LIKELY {
+            value = self.pData[index];
+        }
+    return value;
+}
+
+GBL_EXPORT GblStringView GblStringView_fromQuark(GblQuark quark) {
+    return GblStringView_fromString(GblQuark_toString(quark));
+}
+
+GBL_EXPORT GblBool GblStringView_equals(GblStringView self, GblStringView other) {
+    return GblStringView_compare(self, other) == 0;
+}
+
+GBL_EXPORT GblBool GblStringView_equalsIgnoreCase(GblStringView self, GblStringView other) {
+    return GblStringView_compareIgnoreCase(self, other) == 0;
+}
+
+GBL_EXPORT GblBool GblStringView_empty(GblStringView self) {
+    return self.length == 0;
+}
+
+GBL_EXPORT GblBool GblStringView_blank(GblStringView self) {
+    if(GblStringView_empty(self)) return GBL_TRUE;
+    else return GblStringView_findFirstNotOf(self, GBL_STRING_VIEW(" \t\n\r"), 0) == GBL_STRING_VIEW_NPOS;
+}
+
+GBL_EXPORT GblQuark GblStringView_quark(GblStringView self) {
+    return GblQuark_fromString(GBL_STRING_VIEW_CSTR(self));
+}
+
+GBL_EXPORT GblQuark GblStringView_quarkTry(GblStringView self) {
+    return GblQuark_tryString(GBL_STRING_VIEW_CSTR(self));
+}
+
+GBL_EXPORT const char* GblStringView_intern(GblStringView self) {
+    return GblQuark_internString(GBL_STRING_VIEW_CSTR(self));
+}
+
+GBL_EXPORT GblHash GblStringView_hash(GblStringView self) {
+    return self.length? gblHash(self.pData, self.length) : 0;
+}

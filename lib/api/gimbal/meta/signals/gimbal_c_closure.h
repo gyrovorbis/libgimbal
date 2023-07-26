@@ -1,10 +1,19 @@
 /*! \file
- *  \brief GblCClosure base instance and API
- *  \copydoc GblCClosure
  *  \ingroup signals
+ *  \brief   GblCClosure, C function callback closure, and API
  *
- *  \author 2023 Falco Girgis
- *  \copyright MIT License
+ *  This file contains the definition of and API around
+ *  GblCClosure, which is the plain C function implementation
+ *  of the GblClosure type.
+ *
+ *  It simply stores the value of a generic C function pointer,
+ *  expecting to have either a marshal or meta marshal which
+ *  converts arguments into plain C types, casts the callback
+ *  to its correct type, invokes it, passing the arguments,
+ *  and stores its return value as a GblVariant.
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 #ifndef GIMBAL_C_CLOSURE_H
 #define GIMBAL_C_CLOSURE_H
@@ -43,10 +52,12 @@ GBL_CLASS_DERIVE_EMPTY(GblCClosure, GblClosure)
  *  GblCClosure is a GblClosure which is used to
  *  marshal generic arguments into a C function
  *  pointer and marshal out the return value.
+ *
+ *  \sa GblClosure
  */
 GBL_INSTANCE_DERIVE(GblCClosure, GblClosure)
     GBL_PRIVATE_BEGIN
-        GblFnPtr    pFnCallback;
+        GblFnPtr    pFnCallback; //!< PRIVATE: C Function pointer to invoke as a callback
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 

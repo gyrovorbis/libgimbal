@@ -56,7 +56,7 @@ typedef GblBool (*GblStringListIterFn)(GblStringRef* pRef, void* pClosure);
 typedef GblRingList GblStringList;
 
 // ===== Public API =====
-GBL_INLINE GblStringList* GblStringList_createEmpty     (void)                                           GBL_NOEXCEPT;
+GBL_EXPORT GblStringList* GblStringList_createEmpty     (void)                                           GBL_NOEXCEPT;
 GBL_EXPORT GblStringList* GblStringList_create          (const char* pFirst, ...)                        GBL_NOEXCEPT;
 GBL_EXPORT GblStringList* GblStringList_createWithRefs  (GblStringRef* pFirst, ...)                      GBL_NOEXCEPT;
 GBL_EXPORT GblStringList* GblStringList_createSplit     (const char* pStr, const char* pDelim)           GBL_NOEXCEPT;
@@ -76,12 +76,12 @@ GBL_EXPORT GblBool        GblStringList_equals          (GBL_CSELF,
                                                          const GblStringList* pOther,
                                                          GblBool              matchCase)                 GBL_NOEXCEPT;
 
-GBL_INLINE size_t         GblStringList_size            (GBL_CSELF)                                      GBL_NOEXCEPT;
-GBL_INLINE GblBool        GblStringList_empty           (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t         GblStringList_size            (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT GblBool        GblStringList_empty           (GBL_CSELF)                                      GBL_NOEXCEPT;
 
-GBL_INLINE GblStringRef*  GblStringList_front           (GBL_CSELF)                                      GBL_NOEXCEPT;
-GBL_INLINE GblStringRef*  GblStringList_back            (GBL_CSELF)                                      GBL_NOEXCEPT;
-GBL_INLINE GblStringRef*  GblStringList_at              (GBL_CSELF, intptr_t index)                      GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*  GblStringList_front           (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*  GblStringList_back            (GBL_CSELF)                                      GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*  GblStringList_at              (GBL_CSELF, intptr_t index)                      GBL_NOEXCEPT;
 
 GBL_EXPORT size_t         GblStringList_find            (GBL_CSELF,
                                                          const char* pStr,
@@ -93,7 +93,7 @@ GBL_EXPORT size_t         GblStringList_rfind           (GBL_CSELF,
                                                          GblBool     matchCase,
                                                          size_t      offset)                             GBL_NOEXCEPT;
 
-GBL_INLINE GblBool        GblStringList_contains        (GBL_CSELF, const char* pStr, GblBool matchCase) GBL_NOEXCEPT;
+GBL_EXPORT GblBool        GblStringList_contains        (GBL_CSELF, const char* pStr, GblBool matchCase) GBL_NOEXCEPT;
 GBL_EXPORT size_t         GblStringList_count           (GBL_CSELF, const char* pStr, GblBool matchCase) GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT     GblStringList_set             (GBL_SELF, intptr_t index, const char* pData)    GBL_NOEXCEPT;
@@ -117,51 +117,51 @@ GBL_EXPORT size_t         GblStringList_replaceWithRef  (GBL_SELF,
                                                          GblBool       matchCase,
                                                          size_t        limit)                            GBL_NOEXCEPT;
 
-GBL_INLINE GblBool        GblStringList_splice          (GBL_SELF,
+GBL_EXPORT GblBool        GblStringList_splice          (GBL_SELF,
                                                          GblStringList* pOther,
                                                          intptr_t       index)                           GBL_NOEXCEPT;
 
 GBL_EXPORT GblStringRef*  GblStringList_join            (GBL_CSELF,
                                                          const char* pSeparator)                         GBL_NOEXCEPT;
 
-GBL_INLINE GblStringRef*  GblStringList_popBack         (GBL_SELF)                                       GBL_NOEXCEPT;
-GBL_INLINE GblStringRef*  GblStringList_popFront        (GBL_SELF)                                       GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*  GblStringList_popBack         (GBL_SELF)                                       GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*  GblStringList_popFront        (GBL_SELF)                                       GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_erase           (GBL_SELF, intptr_t index, size_t count)         GBL_NOEXCEPT;
 GBL_EXPORT size_t         GblStringList_remove          (GBL_SELF, const char* pStr, GblBool matchCase)  GBL_NOEXCEPT;
-GBL_INLINE GblStringRef*  GblStringList_extract         (GBL_SELF, GblStringList* pNode)                 GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*  GblStringList_extract         (GBL_SELF, GblStringList* pNode)                 GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_deduplicate     (GBL_SELF, GblBool matchCase)                    GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT     GblStringList_clear           (GBL_SELF)                                       GBL_NOEXCEPT;
 GBL_EXPORT void           GblStringList_sort            (GBL_SELF, GblBool descending)                   GBL_NOEXCEPT;
-GBL_INLINE void           GblStringList_rotate          (GBL_SELF, intptr_t n)                           GBL_NOEXCEPT;
-GBL_INLINE void           GblStringList_reverse         (GBL_SELF)                                       GBL_NOEXCEPT;
-GBL_INLINE GblBool        GblStringList_foreach         (GBL_SELF, GblStringListIterFn pFnIt, void* pCl) GBL_NOEXCEPT;
+GBL_EXPORT void           GblStringList_rotate          (GBL_SELF, intptr_t n)                           GBL_NOEXCEPT;
+GBL_EXPORT void           GblStringList_reverse         (GBL_SELF)                                       GBL_NOEXCEPT;
+GBL_EXPORT GblBool        GblStringList_foreach         (GBL_SELF, GblStringListIterFn pFnIt, void* pCl) GBL_NOEXCEPT;
 
-// Convenience macro overloads with default arguments
-#define                   GblStringList_create(...)             (GblStringList_create)(__VA_ARGS__, GBL_NULL)
-#define                   GblStringList_createWithRefs(...)     (GblStringList_createWithRefs)(__VA_ARGS__, GBL_NULL)
-#define                   GblStringList_createFromArray(...)    GblStringList_createFromArrayDefault_(__VA_ARGS__)
-#define                   GblStringList_equals(...)             GblStringList_equalsDefault_(__VA_ARGS__)
-#define                   GblStringList_find(...)               GblStringList_findDefault_(__VA_ARGS__)
-#define                   GblStringList_rfind(...)              GblStringList_rfindDefault_(__VA_ARGS__)
-#define                   GblStringList_contains(...)           GblStringList_containsDefault_(__VA_ARGS__)
-#define                   GblStringList_count(...)              GblStringList_countDefault_(__VA_ARGS__)
-#define                   GblStringList_pushBack(...)           (GblStringList_pushBack)(__VA_ARGS__, GBL_NULL)
-#define                   GblStringList_pushBackRefs(...)       (GblStringList_pushBackRefs)(__VA_ARGS__, GBL_NULL)
-#define                   GblStringList_pushFront(...)          (GblStringList_pushFront)(__VA_ARGS__, GBL_NULL)
-#define                   GblStringList_pushFrontRefs(...)      (GblStringList_pushFrontRefs)(__VA_ARGS__, GBL_NULL)
-#define                   GblStringList_insert(...)             (GblStringList_insert)(__VA_ARGS__, GBL_NULL)
-#define                   GblStringList_insertRefs(...)         (GblStringList_insertRefs)(__VA_ARGS__, GBL_NULL)
-#define                   GblStringList_replace(...)            GblStringList_replaceDefault_(__VA_ARGS__)
-#define                   GblStringList_replaceWithRef(...)     GblStringList_replaceWithRefDefault_(__VA_ARGS__)
-#define                   GblStringList_splice(...)             GblStringList_spliceDefault_(__VA_ARGS__)
-#define                   GblStringList_erase(...)              GblStringList_eraseDefault_(__VA_ARGS__)
-#define                   GblStringList_remove(...)             GblStringList_removeDefault_(__VA_ARGS__)
-#define                   GblStringList_deduplicate(...)        GblStringList_deduplicateDefault_(__VA_ARGS__)
-#define                   GblStringList_sort(...)               GblStringList_sortDefault_(__VA_ARGS__)
-#define                   GblStringList_foreach(...)            GblStringList_foreachDefault_(__VA_ARGS__)
+GBL_DECLS_END
 
-// ===== Private Implementation =====
 ///\cond
+#define GblStringList_create(...)             (GblStringList_create)(__VA_ARGS__, GBL_NULL)
+#define GblStringList_createWithRefs(...)     (GblStringList_createWithRefs)(__VA_ARGS__, GBL_NULL)
+#define GblStringList_createFromArray(...)    GblStringList_createFromArrayDefault_(__VA_ARGS__)
+#define GblStringList_equals(...)             GblStringList_equalsDefault_(__VA_ARGS__)
+#define GblStringList_find(...)               GblStringList_findDefault_(__VA_ARGS__)
+#define GblStringList_rfind(...)              GblStringList_rfindDefault_(__VA_ARGS__)
+#define GblStringList_contains(...)           GblStringList_containsDefault_(__VA_ARGS__)
+#define GblStringList_count(...)              GblStringList_countDefault_(__VA_ARGS__)
+#define GblStringList_pushBack(...)           (GblStringList_pushBack)(__VA_ARGS__, GBL_NULL)
+#define GblStringList_pushBackRefs(...)       (GblStringList_pushBackRefs)(__VA_ARGS__, GBL_NULL)
+#define GblStringList_pushFront(...)          (GblStringList_pushFront)(__VA_ARGS__, GBL_NULL)
+#define GblStringList_pushFrontRefs(...)      (GblStringList_pushFrontRefs)(__VA_ARGS__, GBL_NULL)
+#define GblStringList_insert(...)             (GblStringList_insert)(__VA_ARGS__, GBL_NULL)
+#define GblStringList_insertRefs(...)         (GblStringList_insertRefs)(__VA_ARGS__, GBL_NULL)
+#define GblStringList_replace(...)            GblStringList_replaceDefault_(__VA_ARGS__)
+#define GblStringList_replaceWithRef(...)     GblStringList_replaceWithRefDefault_(__VA_ARGS__)
+#define GblStringList_splice(...)             GblStringList_spliceDefault_(__VA_ARGS__)
+#define GblStringList_erase(...)              GblStringList_eraseDefault_(__VA_ARGS__)
+#define GblStringList_remove(...)             GblStringList_removeDefault_(__VA_ARGS__)
+#define GblStringList_deduplicate(...)        GblStringList_deduplicateDefault_(__VA_ARGS__)
+#define GblStringList_sort(...)               GblStringList_sortDefault_(__VA_ARGS__)
+#define GblStringList_foreach(...)            GblStringList_foreachDefault_(__VA_ARGS__)
+
 #define GblStringList_createFromArrayDefault_(...) \
     GblStringList_createFromArrayDefault__(__VA_ARGS__, GBL_STRING_LIST_NPOS)
 #define GblStringList_createFromArrayDefault__(array, len, ...) \
@@ -248,65 +248,6 @@ GBL_INLINE GblBool        GblStringList_foreach         (GBL_SELF, GblStringList
 #define GblStringList_foreachDefault__(list, iter, cl, ...) \
     (GblStringList_foreach)(list, iter, cl)
 ///\endcond
-
-GBL_INLINE GblStringList* GblStringList_createEmpty(void) GBL_NOEXCEPT {
-    return GblRingList_createEmpty();
-}
-
-GBL_INLINE size_t  GblStringList_size(GBL_CSELF) GBL_NOEXCEPT {
-    return GblRingList_size(pSelf);
-}
-
-GBL_INLINE GblBool GblStringList_empty(GBL_CSELF) GBL_NOEXCEPT {
-    return GblRingList_empty(pSelf);
-}
-
-GBL_INLINE GblStringRef* GblStringList_front(GBL_CSELF) GBL_NOEXCEPT {
-    return (GblStringRef*)GblRingList_front(pSelf);
-}
-
-GBL_INLINE GblStringRef* GblStringList_back(GBL_CSELF) GBL_NOEXCEPT {
-    return (GblStringRef*)GblRingList_back(pSelf);
-}
-
-GBL_INLINE GblStringRef* GblStringList_at(GBL_CSELF, intptr_t index) GBL_NOEXCEPT {
-    return (GblStringRef*)GblRingList_at(pSelf, index);
-}
-
-GBL_INLINE GblBool (GblStringList_contains)(GBL_CSELF, const char* pStr, GblBool matchCase) GBL_NOEXCEPT {
-    return GblStringList_find(pSelf, pStr, matchCase) != GBL_STRING_LIST_NPOS? GBL_TRUE : GBL_FALSE;
-}
-
-GBL_INLINE GblBool (GblStringList_splice)(GBL_SELF, GblStringList* pOther, intptr_t index) GBL_NOEXCEPT {
-    return GblRingList_splice(pSelf, pOther, index);
-}
-
-GBL_INLINE GblStringRef* GblStringList_popBack(GBL_SELF) GBL_NOEXCEPT {
-    return (GblStringRef*)GblRingList_popBack(pSelf);
-}
-
-GBL_INLINE GblStringRef* GblStringList_popFront(GBL_SELF) GBL_NOEXCEPT {
-    return (GblStringRef*)GblRingList_popFront(pSelf);
-}
-
-GBL_INLINE void GblStringList_rotate(GBL_SELF, intptr_t n) GBL_NOEXCEPT {
-    GblRingList_rotate(pSelf, n);
-}
-
-GBL_INLINE void GblStringList_reverse(GBL_SELF) GBL_NOEXCEPT {
-    GblRingList_reverse(pSelf);
-}
-
-GBL_INLINE GblBool (GblStringList_foreach)(GBL_SELF, GblStringListIterFn pFnIt, void* pCl) GBL_NOEXCEPT {
-    return GblRingList_foreach(pSelf, (GblRingListIterFn)pFnIt, pCl);
-}
-
-GBL_INLINE GblStringRef* GblStringList_extract(GBL_SELF, GblStringList* pNode) GBL_NOEXCEPT {
-    return (GblStringRef*)GblRingList_extract(pSelf, pNode);
-}
-
-
-GBL_DECLS_END
 
 #undef GBL_SELF_TYPE
 

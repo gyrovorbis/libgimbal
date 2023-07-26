@@ -39,28 +39,18 @@
 #define GBL_VERSION_PATCH_MASK      0xff    //!< Bit mask of the PATCH field
 //! @}
 
+//!Size required for a string buffer to hold a version, used with GblVersion_string()
+ #define GBL_VERSION_STRING_SIZE    (2 * 3 + 5 + 2 + 1)
+
 /*! \name Compile-Time Versioning
  *  \brief Macros for compile-time encoding
  *  @{
  */
 //! Encodes a GblVersion from its constituents
-#define GBL_VERSION_MAKE(major, minor, patch)               \
-    ((uint32_t)((major & (uint8_t)GBL_VERSION_MAJOR_MASK)   \
-                << GBL_VERSION_MAJOR_BITPOS) |              \
-    (uint32_t)((minor & (uint16_t)GBL_VERSION_MINOR_MASK)   \
-                << GBL_VERSION_MINOR_BITPOS) |              \
-    (uint32_t)((patch & (uint8_t)GBL_VERSION_PATCH_MASK)    \
-               << GBL_VERSION_PATCH_BITPOS))
-
+#define GBL_VERSION_MAKE(major, minor, patch)   GBL_VERSION_MAKE_(major, minor, patch)
 //! Creates a compile-time stringified version from its constituents
-#define GBL_VERSION_STRING(major, minor, patch) \
-    GBL_STRINGIFY(major) "."                    \
-    GBL_STRINGIFY(minor) "."                    \
-    GBL_STRINGIFY(patch)
+#define GBL_VERSION_STRING(major, minor, patch) GBL_VERSION_STRING_(major, minor, patch)
 //! @}
-
-//! Size required for a string buffer to hold a version, used with GblVersion_string()
-#define GBL_VERSION_STRING_SIZE     (2 * 3 + 5 + 2 + 1)
 
 #define GBL_SELF_TYPE GblVersion
 
@@ -111,6 +101,20 @@ GBL_EXPORT void GblVersion_setPatch (GBL_SELF, uint8_t patch)  GBL_NOEXCEPT;
 //! @}
 
 GBL_DECLS_END
+
+//! \cond
+#define GBL_VERSION_MAKE_(major, minor, patch)              \
+    ((uint32_t)((major & (uint8_t)GBL_VERSION_MAJOR_MASK)   \
+                << GBL_VERSION_MAJOR_BITPOS) |              \
+    (uint32_t)((minor & (uint16_t)GBL_VERSION_MINOR_MASK)   \
+                << GBL_VERSION_MINOR_BITPOS) |              \
+    (uint32_t)((patch & (uint8_t)GBL_VERSION_PATCH_MASK)    \
+               << GBL_VERSION_PATCH_BITPOS))
+#define GBL_VERSION_STRING_(major, minor, patch) \
+    GBL_STRINGIFY(major) "."                     \
+    GBL_STRINGIFY(minor) "."                     \
+    GBL_STRINGIFY(patch)
+//! \endcond
 
 #undef GBL_SELF_TYPE
 

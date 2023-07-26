@@ -315,18 +315,13 @@ GBL_EXPORT GblType GblEnum_type(void) {
 GBL_EXPORT GblType GblEnum_register(const char* pName,
                                     const GblEnumEntry* pValidEntries)
 {
-    GblType type = GBL_INVALID_TYPE;
-    GBL_CTX_BEGIN(NULL);
-    type = GblType_register(GblQuark_internString(pName),
-                                  GBL_ENUM_TYPE,
-                                  &(const GblTypeInfo) {
-                                      .pFnClassInit     = enumClass_init_,
-                                      .pFnClassFinal    = enumClass_final_,
-                                      .classSize        = sizeof(GblEnumClass),
-                                      .pClassData       = pValidEntries,
-                                  },
-                                  GBL_TYPE_FLAGS_NONE);
-    GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_CTX_END_BLOCK();
-    return type;
+    return GblType_register(GblQuark_internString(pName),
+                            GBL_ENUM_TYPE,
+                            &(const GblTypeInfo) {
+                                .pFnClassInit     = enumClass_init_,
+                                .pFnClassFinal    = enumClass_final_,
+                                .classSize        = sizeof(GblEnumClass),
+                                .pClassData       = pValidEntries,
+                            },
+                            GBL_TYPE_FLAGS_NONE);
 }

@@ -10,14 +10,11 @@ GBL_EXPORT GblType GblEvent_type(void) {
         .instanceSize = sizeof(GblEvent)
     };
 
-    if(type == GBL_INVALID_TYPE) {
-        GBL_CTX_BEGIN(NULL);
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         type = GblType_register(GblQuark_internStringStatic("GblEvent"),
-                                      GBL_BOX_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
+                                GBL_BOX_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
 
     return type;

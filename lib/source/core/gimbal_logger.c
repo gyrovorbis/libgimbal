@@ -552,15 +552,11 @@ GBL_EXPORT GblType GblLogger_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        GBL_CTX_BEGIN(NULL);
-
         type = GblType_register(GblQuark_internStringStatic("GblLogger"),
-                                      GBL_OBJECT_TYPE,
-                                      &typeInfo,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+                                GBL_OBJECT_TYPE,
+                                &typeInfo,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
 
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
     }
     return type;
 }

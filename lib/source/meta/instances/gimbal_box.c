@@ -103,24 +103,24 @@ GBL_EXPORT GblBox* (GblBox_create)(GblType           derivedType,
                                    GblArrayMapDtorFn pFnUdDtor,
                                    GblBoxClass*      pClass)
 {
-    GblBox* pRecord = NULL;
+    GblBox* pBox = NULL;
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
 
-    pRecord = (GblBox*)GblInstance_create(derivedType,
+    pBox = (GblBox*)GblInstance_create(derivedType,
                                           size,
                                           GBL_CLASS(pClass));
 
-    if(pRecord) {
+    if(pBox) {
         if(pUserdata)
-            GBL_CTX_VERIFY_CALL(GblBox_setUserdata(pRecord, pUserdata));
+            GBL_CTX_VERIFY_CALL(GblBox_setUserdata(pBox, pUserdata));
         if(pFnUdDtor)
-            GBL_CTX_VERIFY_CALL(GblBox_setUserDestructor(pRecord, pFnUdDtor));
+            GBL_CTX_VERIFY_CALL(GblBox_setUserDestructor(pBox, pFnUdDtor));
     }
 
     GBL_CTX_END_BLOCK();
-    return pRecord;
+    return pBox;
 }
 
 

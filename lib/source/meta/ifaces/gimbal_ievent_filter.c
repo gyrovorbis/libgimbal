@@ -21,14 +21,11 @@ GBL_EXPORT GblType GblIEventFilter_type(void) {
         .classSize = sizeof(GblIEventFilterClass)
     };
 
-    if(type == GBL_INVALID_TYPE) {
-        GBL_CTX_BEGIN(NULL);
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         type = GblType_register(GblQuark_internStringStatic("GblIEventFilter"),
-                                      GBL_INTERFACE_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
+                                GBL_INTERFACE_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
     return type;
 }

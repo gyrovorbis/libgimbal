@@ -32,7 +32,6 @@ GBL_EXPORT GblClosure* GblClosure_create(GblType           derivedType,
     GblClosure* pClosure = NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_CLOSURE_TYPE);
-    GBL_CTX_VERIFY_ARG(size >= sizeof(GblClosure));
     pClosure = GBL_CLOSURE(GblBox_create(derivedType, size, pUserdata, pFnDtor));
     GBL_CTX_END_BLOCK();
     return pClosure;
@@ -107,14 +106,11 @@ GBL_EXPORT GblType GblClosure_type(void) {
         .instanceSize = sizeof(GblClosure)
     };
 
-    if(type == GBL_INVALID_TYPE) {
-        GBL_CTX_BEGIN(NULL);
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         type = GblType_register(GblQuark_internStringStatic("GblClosure"),
-                                      GBL_BOX_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
+                                GBL_BOX_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
     return type;
 

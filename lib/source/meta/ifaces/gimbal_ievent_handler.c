@@ -22,13 +22,10 @@ GBL_EXPORT GblType GblIEventHandler_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        GBL_CTX_BEGIN(NULL);
         type = GblType_register(GblQuark_internStringStatic("GblIEventHandler"),
-                                      GBL_INTERFACE_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
+                                GBL_INTERFACE_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
     return type;
 }

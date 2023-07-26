@@ -1,10 +1,15 @@
 /*! \file
- *  \brief Builtin closure marshals and generator macros
+ *  \brief   Builtin GblMarshalFn functions and generator macros
  *  \ingroup signals
  *
- *  \author Falco Girgis
+ *  This file contains the declarations and utilities for
+ *  GblMarshalFn and various builtin implementations of it.
+ *
+ *  \sa GblMarshalFn
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
-
 #ifndef GIMBAL_MARSHAL_H
 #define GIMBAL_MARSHAL_H
 
@@ -12,12 +17,17 @@
 #include "../types/gimbal_type.h"
 #include <stdarg.h>
 
+/*! \name  Generator Macros
+ *  \brief Macro utilities for autogenerating a  GblMarshalFn
+ *  @{
+ */
+//! Declares a GblMarshalFn for a GblCClosure which returns nothing and has the given name postfix (usually underscore separated arg types)
 #define GBL_DECL_CCLOSURE_MARSHAL_VOID__(postFix) \
-    GBL_EXPORT GBL_RESULT GblMarshal_CClosure_VOID__##postFix(GblClosure* pClosure,     \
-                                                              GblVariant* pRetValue,    \
-                                                              size_t      argCount,     \
-                                                              GblVariant* pArgs,        \
-                                                              GblPtr      pMarshalData) GBL_NOEXCEPT
+            GBL_DECL_CCLOSURE_MARSHAL_VOID___(postFix)
+//! Defines a GblMarshalFn for a GblCClosure autogenerating the implementation with the given info
+#define GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(paramsPostfix, paramCount, paramList, argList) \
+            GBL_DEFINE_CCLOSURE_MARSHAL_VOID___(paramsPostfix, paramCount, paramList, argList)
+//! @}
 
 GBL_DECLS_BEGIN
 
@@ -37,37 +47,51 @@ GBL_FORWARD_DECLARE_STRUCT(GblVariant);
  *  actual function (which is typically stored with GblClosure),
  *  then demarshal out the return type.
  */
-typedef GBL_RESULT (*GblMarshalFn)  (GblClosure*        pClosure,
-                                     GblVariant*        pRetValue,
-                                     size_t             argCount,
-                                     GblVariant*        pArgs,
-                                     GblPtr             pMarshalData);
+typedef GBL_RESULT (*GblMarshalFn)  (GblClosure* pClosure,
+                                     GblVariant* pRetValue,
+                                     size_t      argCount,
+                                     GblVariant* pArgs,
+                                     GblPtr      pMarshalData);
 
-typedef GBL_RESULT (*GblMarshalVaFn)(GblClosure*        pClosure,
-                                     GblVariant*        pRetValue,
-                                     void*              pInstance,
-                                     va_list            args,
-                                     void*              pMarshalData,
-                                     size_t             argCount,
-                                     const GblType*     pParamTypes);
+//! Unimplemented, but mirror of GblMarshalFn using a va_list to hold args instead of GblVariant
+typedef GBL_RESULT (*GblMarshalVaFn)(GblClosure*    pClosure,
+                                     GblVariant*    pRetValue,
+                                     void*          pInstance,
+                                     va_list        args,
+                                     void*          pMarshalData,
+                                     size_t         argCount,
+                                     const GblType* pParamTypes);
 
+/*! \name  Builtin Marshals
+ *  \brief Marshals which come pregenerated with libGimbal
+ *  @{
+ */
+//!< GblMarshalFn which takes nothing and returns nothing
 GBL_EXPORT GBL_RESULT GblMarshal_CClosure_VOID__VOID (GblClosure*        pClosure,
                                                       GblVariant*        pRetValue,
                                                       size_t             argCount,
                                                       GblVariant*        pArgs,
-                                                      GblPtr             pMarshalData)   GBL_NOEXCEPT;
-
+                                                      GblPtr             pMarshalData) GBL_NOEXCEPT;
+//!< GblMarshalFn to be used as the meta marshal for GblClassClosure
 GBL_EXPORT GBL_RESULT GblMarshal_ClassClosureMeta   (GblClosure*        pClosure,
                                                      GblVariant*        pRetValue,
                                                      size_t             argCount,
                                                      GblVariant*        pArgs,
-                                                     GblPtr             pMarshalData)   GBL_NOEXCEPT;
-
+                                                     GblPtr             pMarshalData)  GBL_NOEXCEPT;
+//!< GblMarshalFn to be used as the marshal for GblSignalClosure
 GBL_EXPORT GBL_RESULT GblMarshal_SignalForwarder    (GblClosure*        pClosure,
                                                      GblVariant*        pRetValue,
                                                      size_t             argCount,
                                                      GblVariant*        pArgs,
-                                                     GblPtr             pMarshalData)   GBL_NOEXCEPT;
+                                                     GblPtr             pMarshalData)  GBL_NOEXCEPT;
+
+#define GBL_DECL_CCLOSURE_MARSHAL_VOID___(postFix)                \
+    GBL_EXPORT GBL_RESULT                                         \
+    GblMarshal_CClosure_VOID__##postFix(GblClosure* pClosure,     \
+                                        GblVariant* pRetValue,    \
+                                        size_t      argCount,     \
+                                        GblVariant* pArgs,        \
+                                        GblPtr      pMarshalData) GBL_NOEXCEPT
 
 GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE);
 GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOOL);
@@ -86,10 +110,11 @@ GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_ENUM);
 GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_FLAGS);
 GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_POINTER);
 GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOXED);
-// add event type
+//! @}
 
+GBL_DECLS_END
 
-#define GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(paramsPostfix, paramCount, paramList, argList)       \
+#define GBL_DEFINE_CCLOSURE_MARSHAL_VOID___(paramsPostfix, paramCount, paramList, argList)      \
     GBL_EXPORT GBL_RESULT GblMarshal_CClosure_VOID__##paramsPostfix(GblClosure* pClosure,       \
                                                                     GblVariant* pRetValue,      \
                                                                     size_t      argCount,       \
@@ -106,8 +131,5 @@ GBL_DECL_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOXED);
         pFnPtr(GBL_EVAL argList);                                                               \
         return GBL_RESULT_SUCCESS;                                                              \
     }
-
-GBL_DECLS_END
-
 
 #endif // GIMBAL_MARSHAL_H

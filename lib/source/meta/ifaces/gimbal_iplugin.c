@@ -37,7 +37,7 @@ GBL_EXPORT GBL_RESULT GblIPlugin_typeInfo(const GblIPlugin* pSelf, GblType reque
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblType GblIPlugin_type(void) {
+GBL_EXPORT GblType GblIPlugin_type(void) GBL_UNLIKELY {
     static GblType type = GBL_INVALID_TYPE;
 
     if(type == GBL_INVALID_TYPE) {

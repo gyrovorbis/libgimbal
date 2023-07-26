@@ -610,7 +610,7 @@ GBL_EXPORT GblClass* GblClass_default(const GblClass* pSelf) GBL_NOEXCEPT {
     return pSelf? GblClass_weakRefDefault(GBL_CLASS_TYPEOF(pSelf)) : GBL_NULL;
 }
 
-GBL_EXPORT size_t  GblClass_size(const GblClass* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT size_t GblClass_size(const GblClass* pSelf) GBL_NOEXCEPT {
     size_t  size = 0;
     if(pSelf) {
         const GblTypeInfo* pInfo = GblType_info(GBL_CLASS_TYPEOF(pSelf));

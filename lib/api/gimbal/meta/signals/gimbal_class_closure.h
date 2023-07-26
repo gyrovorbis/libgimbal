@@ -1,22 +1,25 @@
 /*! \file
- *  \brief GblClassClosure base instance and API
- *  \copydoc GblClassClosure
  *  \ingroup signals
+ *  \brief   GblClassClosure, virtual method invoking closure, and API
  *
- *  \author Falco Girgis
+ *  This file contains GblClassClosure and its associated API.
+ *  It is used to invoke a virtual method on given GblInstance
+ *
+ *  \sa GblClassClosure
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
-
-
 #ifndef GIMBAL_CLASS_CLOSURE_H
 #define GIMBAL_CLASS_CLOSURE_H
 
 #include "gimbal_closure.h"
 
-#define GBL_CLASS_CLOSURE_TYPE              (GBL_TYPEID(GblClassClosure))
+#define GBL_CLASS_CLOSURE_TYPE              (GBL_TYPEID(GblClassClosure))           //!< GblType UUID for GblClassClosure
 
-#define GBL_CLASS_CLOSURE(self)             (GBL_CAST(GblClassClosure, self))
-#define GBL_CLASS_CLOSURE_CLASS(klass)      (GBL_CLASS_CAST(GblClassClosure, self))
-#define GBL_CLASS_CLOSURE_GET_CLASS(self)   (GBL_CLASSOF(GblClassClosure, self))
+#define GBL_CLASS_CLOSURE(self)             (GBL_CAST(GblClassClosure, self))       //!< Cast a GblInstance to GblClassClosure
+#define GBL_CLASS_CLOSURE_CLASS(klass)      (GBL_CLASS_CAST(GblClassClosure, self)) //!< Cast a GblClass ot GblClassClosureClass
+#define GBL_CLASS_CLOSURE_GET_CLASS(self)   (GBL_CLASSOF(GblClassClosure, self))    //!< Get a GblClassClosureClass from GblInstance
 
 #define GBL_SELF_TYPE GblClassClosure
 
@@ -39,38 +42,34 @@ GBL_CLASS_DERIVE_EMPTY(GblClassClosure, GblClosure)
  */
 GBL_INSTANCE_DERIVE(GblClassClosure, GblClosure)
     GBL_PRIVATE_BEGIN
-        GblType         classType;
-        size_t          offset;
-        GblInstance*    pInstance;
+        GblType         classType; //!< PRIVATE: Type of class to invoke the method on
+        size_t          offset;    //!< PRIVATE: Offset of the virtual function to invoke
+        GblInstance*    pInstance; //!< PRIVATE: Instance to invoke the class method on
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 
-GBL_EXPORT GblType          GblClassClosure_type        (void)                   GBL_NOEXCEPT;
+//! Returns the GblType UUID associated with GblClassClosure
+GBL_EXPORT GblType          GblClassClosure_type   (void)                   GBL_NOEXCEPT;
 
-GBL_EXPORT GblClassClosure* GblClassClosure_create      (GblType      classType,
-                                                         size_t       offset,
-                                                         GblInstance* pInstance,
-                                                         void*        pUserdata) GBL_NOEXCEPT;
+//! Creates a new GblClassClosure with the given values, returning a pointer to it
+GBL_EXPORT GblClassClosure* GblClassClosure_create (GblType      classType,
+                                                    size_t       offset,
+                                                    GblInstance* pInstance,
+                                                    void*        pUserdata) GBL_NOEXCEPT;
 
-GBL_INLINE void             GblClassClosure_setMethod   (GBL_SELF,
-                                                         GblType classType,
-                                                         size_t  offset)         GBL_NOEXCEPT;
-
-GBL_INLINE void             GblClassClosure_setInstance (GBL_SELF,
-                                                         GblInstance* pInstance) GBL_NOEXCEPT;
-
-// ===== IMPL ======
-
-
-GBL_INLINE void GblClassClosure_setMethod(GBL_SELF, GblType classType, size_t  offset) GBL_NOEXCEPT {
-    GBL_PRIV_REF(pSelf).classType = classType;
-    GBL_PRIV_REF(pSelf).offset = offset;
-}
-
-GBL_INLINE void GblClassClosure_setInstance(GBL_SELF, GblInstance* pInstance) GBL_NOEXCEPT {
-    GBL_PRIV_REF(pSelf).pInstance = pInstance;
-}
-
+/*! \name Accessor Methods
+ *  \brief Setter methods for GblClassClosure values
+ *  \relatesalso GblClassClosure
+ *  @{
+ */
+//! Sets the offset of the virtual method pointer into the GblClass to invoke the closure on
+GBL_EXPORT void GblClassClosure_setMethod   (GBL_SELF,
+                                             GblType classType,
+                                             size_t  offset)         GBL_NOEXCEPT;
+//! Sets the GblInstance to call the GblClass virtual method on
+GBL_EXPORT void GblClassClosure_setInstance (GBL_SELF,
+                                             GblInstance* pInstance) GBL_NOEXCEPT;
+//! @}
 
 GBL_DECLS_END
 

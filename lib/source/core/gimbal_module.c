@@ -459,16 +459,12 @@ GBL_EXPORT GblType GblModule_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        GBL_CTX_BEGIN(NULL);
-
         iface.interfaceType = GBL_IPLUGIN_TYPE;
 
         type = GblType_register(GblQuark_internStringStatic("GblModule"),
-                                      GBL_CONTEXT_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
+                                GBL_CONTEXT_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
 
     return type;

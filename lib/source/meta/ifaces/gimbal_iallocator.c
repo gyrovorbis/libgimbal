@@ -79,7 +79,7 @@ GBL_EXPORT GblType GblIAllocator_type(void) {
         .classSize = sizeof(GblIAllocatorClass)
     };
 
-    if(type == GBL_INVALID_TYPE) {
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         type = GblType_register(GblQuark_internStringStatic("GblIAllocator"),
                                 GBL_INTERFACE_TYPE,
                                 &info,
