@@ -1,96 +1,198 @@
 /*! \file
- *  \brief GblClass structure and related functions
+ *  \brief   GblClass virtual-table structure and APIE
  *  \ingroup meta
- *  \copydoc GblClass
+ *
+ *  This file contains the GblClass structure,
+ *  which is the inherited base type and first
+ *  data member of all derievd class structures.
+ *
+ *  While GblClass itself is empty other than its
+ *  basic type info, a derived class typically
+ *  contains data which is shared by all instances
+ *  of a type, for deduplication and efficiency.
+ *
+ *  This data is typically in the form of:
+ *  - Overridable virtual methods (in the form of function pointers)
+ *  - Static class data
+ *
  *  \sa gimbal_instance.h, gimbal_type.h
  *
- *  \author Falco Girgis
+ *  \author    2023 Falco Girgis
+ *  \copyright MIT License
  */
 #ifndef GIMBAL_CLASS_H
 #define GIMBAL_CLASS_H
 
 #include "../types/gimbal_type.h"
 
-#define GBL_CLASS(klass)                     ((GblClass*)klass)
-#define GBL_CLASS_TYPEOF(klass)              (GblClass_typeOf(GBL_CLASS(klass)))
-#define GBL_CLASS_SUPER(klass)               (GblClass_super(GBL_CLASS(klass)))
-#define GBL_CLASS_DEFAULT(klass)             (GblClass_default(GBL_CLASS(klass)))
-#define GBL_CLASS_PRIVATE(klass, type)       (GblClass_private(GBL_CLASS(klass), type))
-#define GBL_CLASS_PUBLIC(klassPrivate, type) (GblClass_public(klassPriv, type))
+/*! \name  Class Operators
+ *  \brief Builtin operations for class structures
+ *  \relatesalso GblClass
+ *  @{
+ */
+//! Function-style cast to GblClass*: will always pass, here for consistence with other operators
+#define GBL_CLASS(klass)                    ((GblClass*)klass)
+//! Wraps GblClass_typeOf(), returning the type associated with the given class
+#define GBL_CLASS_TYPEOF(klass)             GBL_CLASS_TYPEOF_(klass)
+//! Wraps GblClass_private(), returning the private structure on the class associated with the given type
+#define GBL_CLASS_PRIVATE(cType, klass)     GBL_CLASS_PRIVATE_(cType, klass)
+//! Wraps GblClass_public(), returning the public class structure from the given type's private structure
+#define GBL_CLASS_PUBLIC(cType, priv)       GBL_CLASS_PUBLIC_(cType, privKlass)
+//! Returns GBL_TRUE if the given class is type-compatible with and can be safely casted to the given type
+#define GBL_CLASS_TYPECHECK(cType, klass)   GBL_CLASS_TYPECHECK_(type, klass)
+//! Wraps GblClass_cast(), casting the given class to another type, returning NULL and raising an error upon failure
+#define GBL_CLASS_CAST(cType, klass)        GBL_CLASS_CAST_(cType, klass)
+//! Wraps GblClass_as(), returning the given class as another type or gracefully returning NULL upon failure
+#define GBL_CLASS_AS(cType, klass)          GBL_CLASS_AS_(cType, klass)
+//! @}
 
-#define GBL_CLASS_CHECK(klass, toType)       (GblClass_check((GblClass*)klass, GBL_TYPEOF(toType)))
-#define GBL_CLASS_CAST(klass, cType)         ((GBL_CLASSOF(cType)*)GblClass_cast((GblClass*)klass, GBL_TYPEOF(cType)))
-#define GBL_CLASS_TRY(klass, cType)          ((GBL_CLASSOF(cType)*)GblClass_try((GblClass*)klass, GBL_TYPEOF(cType)))
-
-#define GBL_CLASSOF(cType)                   cType##Class
-
-#define GBL_STATIC_CLASS_TYPE                (GBL_BUILTIN_TYPE(STATIC_CLASS))
-#define GBL_STATIC_CLASS(klass)              (GblClass_cast((GblClass*)klass, GBL_STATIC_CLASS_TYPE))
+/*! \name  Static Class Type UUID and cast operators
+ *  \brief UUID and cast operators for builtin static root class type
+ *  @{
+ */
+#define GBL_STATIC_CLASS_TYPE       (GBL_BUILTIN_TYPE(STATIC_CLASS)) //!< GblType UUID for builtin static class primitive
+#define GBL_STATIC_CLASS(klass)     GBL_STATIC_CLASS_(klass)         //!< Casts a class to a static class
+//! @}
 
 #define GBL_SELF_TYPE GblClass
 
 GBL_DECLS_BEGIN
 
-/*! \brief Base struct for all type classes.
- *\ingroup meta
- *\details
- * A class represents a collection of data that is shared among
- * all instances of a given type. This data is typically in the
- * form of function pointers for modeling overridable methods
- * or regular data for modeling static member variables.
+/*! \brief   Base struct for all type classes.
+ *  \ingroup meta
  *
- * GblClass is the base structure which is to be inherited by all
- * class structures within the meta type system. This means placing
- * it or a type "inheriting" from it as the first member of a
- * class struct, when using C.
- *\sa GblInstance, GblType
+ *  A class represents a collection of data that is shared among
+ *  all instances of a given type. This data is typically in the
+ *  form of function pointers for modeling overridable methods
+ *  or regular data for modeling static member variables.
+ *
+ *  GblClass is the base structure which is to be inherited by all
+ *  class structures within the meta type system. This means placing
+ *  it or a type "inheriting" from it as the first member of a
+ *  class struct, when using C.
+
+ *  \sa GblInstance, GblType
  */
 typedef struct GblClass {
-    GBL_PRIVATE()
-        uintptr_t   metaClassInfo;   ///< pointer-sized private member which is used by the back-end
+    GBL_PRIVATE_BEGIN
+        uintptr_t metaClassInfo;  //!< PRIVATE: Pointer-sized opaque member
     GBL_PRIVATE_END
 } GblClass;
 
-GBL_EXPORT GblClass*   GblClass_refDefault         (GblType type)              GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount GblClass_unrefDefault       (GBL_SELF)                  GBL_NOEXCEPT;
+/*! \name  Default Class Management
+ *  \brief Methods for managing references to internally-managed default class instances
+ *  @{
+ */
+//! Returns a reference to the default class for \p type, instantiating it if necessary
+GBL_EXPORT GblClass*   GblClass_refDefault     (GblType type) GBL_NOEXCEPT;
+//! Releases a reference to the default version of the given class, possibly freeing it
+GBL_EXPORT GblRefCount GblClass_unrefDefault   (GBL_SELF)     GBL_NOEXCEPT;
+//! Returns a reference to the default class for \p type or NULL if it hasn't been created
+GBL_EXPORT GblClass*   GblClass_weakRefDefault (GblType type) GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GblClass*   GblClass_weakRefDefault     (GblType type)              GBL_NOEXCEPT;
+/*! \name  Floating Class Mangement
+ *  \brief Methods for managing lifetime of dynamic override class instances
+ *  @{
+ */
+//! Creates a standalone, unowned, "floating" class for the given type, which can override defaults
+GBL_EXPORT GblClass*  GblClass_createFloating    (GblType type,
+                                                  size_t  size/*=DEFAULT*/) GBL_NOEXCEPT;
+//! Constructs a standalone, unowned, overridable, "floating" class for the given type in-place
+GBL_EXPORT GBL_RESULT GblClass_constructFloating (GBL_SELF, GblType type)   GBL_NOEXCEPT;
+//! Destroys the standalone, "floating" class, releasing its memory allocation
+GBL_EXPORT GBL_RESULT GblClass_destroyFloating   (GBL_SELF)                 GBL_NOEXCEPT;
+//! Destructs the standalone, "floating" class, without releasing any allocated resources
+GBL_EXPORT GBL_RESULT GblClass_destructFloating  (GBL_SELF)                 GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GblClass*   GblClass_createFloating     (GblType type)              GBL_NOEXCEPT;
-//! \todo implement me
-GBL_EXPORT GblClass*   GblClass_createFloatingExt  (GblType type, size_t size) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblClass_destroyFloating    (GBL_SELF)                  GBL_NOEXCEPT;
+/*! \name  Type Conversions
+ *  \brief Methods for type casting and checking
+ *  \relatesalso GblClass
+ *  @{
+ */
+//! Returns GBL_TRUE if the given class can be casted to \p toType
+GBL_EXPORT GblBool   GblClass_check (GBL_CSELF, GblType toType) GBL_NOEXCEPT;
+//! Casts the given class to a \p toType class, or returns NULL and emits an error if unsuccessful
+GBL_EXPORT GblClass* GblClass_cast  (GBL_SELF, GblType toType)  GBL_NOEXCEPT;
+//! Casts the given class to a \p toType class, or gracefully returns NULL without erroring
+GBL_EXPORT GblClass* GblClass_as    (GBL_SELF, GblType toType)  GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GBL_RESULT  GblClass_constructFloating  (GBL_SELF, GblType type)    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT  GblClass_destructFloating   (GBL_SELF)                  GBL_NOEXCEPT;
+/*! \name  Public and Private Data
+ *  \brief Methods for accessing public and private segments
+ *  \relatesalso GblClass
+ *  @{
+ */
+//! Returns the private structure associated with the given \p base type of the class
+GBL_EXPORT void*     GblClass_private (GBL_CSELF, GblType base)            GBL_NOEXCEPT;
+//! Casts back to the class structure from a base type's private data segment structure
+GBL_EXPORT GblClass* GblClass_public  (const void* pPrivate, GblType base) GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GblBool     GblClass_check              (GBL_CSELF, GblType toType) GBL_NOEXCEPT;
-GBL_EXPORT GblClass*   GblClass_cast               (GBL_SELF, GblType toType)  GBL_NOEXCEPT;
-GBL_EXPORT GblClass*   GblClass_try                (GBL_SELF, GblType toType)  GBL_NOEXCEPT;
+/*! \name  Static Type Info
+ *  \brief Methods for getting static class information
+ *  \relatesalso GblClass
+ *  @{
+ */
+//! Returns the GblType UUID associated with the given class
+GBL_EXPORT GblType GblClass_typeOf      (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the size of the given class's public class structrue
+GBL_EXPORT size_t  GblClass_size        (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the combined size of the class's private data segments
+GBL_EXPORT size_t  GblClass_privateSize (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the class's combined DEFAULT size (not extended allocation size)
+GBL_EXPORT size_t  GblClass_totalSize   (GBL_CSELF) GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT void*       GblClass_private            (GBL_CSELF, GblType type)   GBL_NOEXCEPT;
-GBL_EXPORT GblClass*   GblClass_public             (const void* pPrivate,
-                                                    GblType     base)          GBL_NOEXCEPT;
+/*! \name  Dynamic Flags
+ *  \brief Methods for checking dyanmic runtime flags
+ *  \relatesalso GblClass
+ */
+//! Returns GBL_TRUE if the class is the internally-managed default for its type
+GBL_EXPORT GblBool GblClass_isDefault       (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns GBL_TRUE if the class differs from the default class for its type
+GBL_EXPORT GblBool GblClass_isOverridden    (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns GBL_TRUE if the class is an interfaced type
+GBL_EXPORT GblBool GblClass_isInterface     (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns GBL_TRUE if the class is another class's implementation of an interface
+GBL_EXPORT GblBool GblClass_isInterfaceImpl (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns GBL_TRUE if the class is a non-default floating class and is unowned by an instance
+GBL_EXPORT GblBool GblClass_isFloating      (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns GBL_TRUE if the class is a non-default floating class is uowned by an instance
+GBL_EXPORT GblBool GblClass_isOwned         (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns GBL_TRUE if the class was constructed in-place with an existing allocation
+GBL_EXPORT GblBool GblClass_isInPlace       (GBL_CSELF) GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GblType     GblClass_typeOf             (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT size_t      GblClass_size               (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT size_t      GblClass_privateSize        (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT size_t      GblClass_totalSize          (GBL_CSELF)                 GBL_NOEXCEPT;
-
-GBL_EXPORT GblClass*   GblClass_super              (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblClass*   GblClass_default            (GBL_CSELF)                 GBL_NOEXCEPT;
-
-GBL_EXPORT GblBool     GblClass_isDefault          (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isOverridden       (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isFloating         (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isInterface        (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isInterfaceImpl    (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isOwned            (GBL_CSELF)                 GBL_NOEXCEPT;
-GBL_EXPORT GblBool     GblClass_isInPlace          (GBL_CSELF)                 GBL_NOEXCEPT;
+/*! \name  Related Classes
+ *  \brief Methods for fetching associated classes
+ *  \relatesalso GblClass
+ */
+//! Returns the default class of the class's parent type or NULL if it's a root class
+GBL_EXPORT GblClass* GblClass_super   (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the default implementation of the given class
+GBL_EXPORT GblClass* GblClass_default (GBL_CSELF) GBL_NOEXCEPT;
+//! @}
 
 GBL_DECLS_END
 
-#undef GBL_SELF_TYPE
+//! \cond
+#define GblClass_createFloating(...) \
+    GblClass_createFloatingDefault_(__VA_ARGS__)
+#define GblClass_createFloatingDefault_(...) \
+    GblClass_createFloatingDefault__(__VA_ARGS__, 0)
+#define GblClass_createFloatingDefault__(type, size, ...) \
+    (GblClass_createFloating)(type, size)
+
+#define GBL_CLASS_TYPEOF_(klass)           (GblClass_typeOf(GBL_CLASS(klass)))
+#define GBL_CLASS_PRIVATE_(cType, klass)   ((GBL_CLASS_PRIVATE_STRUCT(cType)*)GblClass_private(GBL_CLASS(klass), GBL_TYPEID(cType)))
+#define GBL_CLASS_PUBLIC_(cType, priv)     ((GBL_CLASS_STRUCT(cType)*)GblClass_public(klassPriv, GBL_TYPEID(cType))
+#define GBL_CLASS_TYPECHECK_(cType, klass) (GblClass_check((GblClass*)klass, GBL_TYPEID(cType)))
+#define GBL_CLASS_CAST_(cType, klass)      ((GBL_CLASS_STRUCT(cType)*)GblClass_cast((GblClass*)klass, GBL_TYPEID(cType)))
+#define GBL_CLASS_AS_(cType, klass)        ((GBL_CLASS_STRUCT(cType)*)GblClass_as((GblClass*)klass, GBL_TYPEID(cType)))
+#define GBL_STATIC_CLASS_(klass) )         (GblClass_cast((GblClass*)klass, GBL_STATIC_CLASS_TYPE))
+//! \endcond
 
 /*! \def GBL_STATIC_CLASS_TYPE
  *   Builtin type ID for a class-only types
@@ -147,23 +249,23 @@ GBL_DECLS_END
  * Convenience wrapper around GblClass_public().
  */
 
-/*! \fn GBL_CLASS_CHECK(klass, toType)
+/*! \fn GBL_CLASS_TYPECHECK(klass, toType)
  *  \param klass pointer to a GblClass-compatible
  *  \param toType the desired destination type
  *  \returns true if the given class can be casted to a calss of toType
  *  \relatesalso GblClass
  *
- *  \sa GblClass_check(), GBL_CLASS_CHECK_REFIX()
+ *  \sa GblClass_check(), GBL_CLASS_TYPECHECK_REFIX()
  * Convenience wrapper around GblClass_check() which automatically casts.
  */
-/*! \fn GBL_CLASS_CHECK_PREFIX(klass, typePrefix)
+/*! \fn GBL_CLASS_TYPECHECK_PREFIX(klass, typePrefix)
  *  \param klass pointer to a GblClass-compatible
  *  \param typePrefix prefix of the given type (type name macro identifier minus _TYPE postfix)
  *  \returns true if the given class can be casted to a calss of toType
  *  \relatesalso GblClass
- *  \sa GBL_CLASS_CHECK_PREFIX(), GblClass_check()
+ *  \sa GBL_CLASS_TYPECHECK_PREFIX(), GblClass_check()
  *
- * Convenience wrapper around GBL_CLASS_CHECK() which automatically appends _TYPE suffix.
+ * Convenience wrapper around GBL_CLASS_TYPECHECK() which automatically appends _TYPE suffix.
  *  \note
  * This macro is typically used for definining convenience function-style casting utilities
  * for derived types.
@@ -202,9 +304,9 @@ GBL_DECLS_END
  *  \param cType C structure for the given type's class
  *  \returns klass casted to cType if the cast was successful, otherwise NULL
  *  \relatesalso GblClass
- *  \sa GBL_CLASS_TRY_PREFIX(), GblClass_try(
+ *  \sa GBL_CLASS_TRY_PREFIX(), GblClass_as(
  *
- * Convenience wrapper around GblClass_try() which automatically performs casting.
+ * Convenience wrapper around GblClass_as() which automatically performs casting.
  */
 
 /*! \fn GBL_CLASS_TRY_PREFIX(klass, typePrefix)
@@ -214,7 +316,7 @@ GBL_DECLS_END
  *   appended with _CLASS_STRUCT, which it uses as the destination class type for casting.
  *  \returns klass casted to the formed type identifier upon success, NULL otherwise
  *  \relatesalso GblClass
- *  \sa GBL_CLASS_TRY(), GblClass_try()
+ *  \sa GBL_CLASS_TRY(), GblClass_as()
  *
  * Convenience wrapper around GBL_CLASS_TRY() which automatically deduces class structure
  * and type identifier.
@@ -332,7 +434,7 @@ GBL_DECLS_END
  * \param toType desired destination type
  * \returns true upon success
  * \relatesalso GblClass
- * \sa GblClass_cast, GblClass_try
+ * \sa GblClass_cast, GblClass_as
 */
 
 /*!
@@ -343,11 +445,11 @@ GBL_DECLS_END
  * \param toType desired destination type
  * \returns pointer to GblClass upon success, NULL upon failure
  * \relatesalso GblClass
- * \sa GBL_CLASS_CAST(), GblClass_check, GblClass_try
+ * \sa GBL_CLASS_CAST(), GblClass_check, GblClass_as
 */
 
 /*!
- * \fn GblClass* GblClass_try(GblClass* pSelf, GblType toType)
+ * \fn GblClass* GblClass_as(GblClass* pSelf, GblType toType)
  * Equivalent to GblClass_cast(), except gracefully returning NULL
  * with no errors getting raised if the given class could not be
  * casted to toType.
@@ -689,16 +791,16 @@ GBL_DECLS_END
  *  casts for the given type.
  *  \code{.c}
  *      // type UUID macro (expands to GblObject_type() registration function)
- *      #define GBL_OBJECT_TYPE                     (GBL_TYPEOF(GblObject))
+ *      #define GBL_OBJECT_TYPE                     (GBL_TYPEID(GblObject))
  *
  *      // instance function-style cast macro
- *      #define GBL_OBJECT(instance)                (GBL_INSTANCE_CAST(instance, GblObject))
+ *      #define GBL_OBJECT(instance)                (GBL_CAST(instance, GblObject))
  *
  *      // class cast function-style cast macro
  *      #define GBL_OBJECT_CLASS(klass)             (GBL_CLASS_CAST(klass, GblObject))
  *
  *      // instance-to-class cast macro
- *      #define GBL_OBJECT_GET_CLASS(instance)      (GBL_INSTANCE_GET_CLASS(instance, GblObject))
+ *      #define GBL_OBJECT_GET_CLASS(instance)      (GBL_CLASSOF(instance, GblObject))
  *  \endcode
  *  While these macros are obviously optional, they do add a lot to the codebase in terms of readability
  *  and convenience as well as uniform styling. With these sorts of macros defined, we then gain access to
@@ -719,12 +821,12 @@ GBL_DECLS_END
  *           printf("%s received an Event!", GblObject_name(pSelfObj));
  *
  *
- *           if(GBL_INSTANCE_CHECK(pEvent, MyEventType)) {
+ *           if(GBL_TYPECHECK(pEvent, MyEventType)) {
  *               // easy cast to particular event instance
  *               MyCustomEvent* pEvent = MY_CUSTOM_EVENT(pEvent);
  *
  *               // do something
- *           } else if(GBL_INSTANCE_CHECK(pEvent, MyOtherEventType)) {
+ *           } else if(GBL_TYPECHECK(pEvent, MyOtherEventType)) {
  *               // easy cast to particular event instance
  *               SomeOtherEvent* pEvent = SOME_OTHER_EVENT(pEvent);
  *
@@ -739,5 +841,7 @@ GBL_DECLS_END
  *      GblBox_unref(GBL_BOX(pObject));
  *  \endcode
  */
+
+#undef GBL_SELF_TYPE
 
 #endif // GIMBAL_CLASS_H

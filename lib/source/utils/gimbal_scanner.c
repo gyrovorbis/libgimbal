@@ -5,9 +5,9 @@
 
 #define GBL_SCANNER_ERROR_BUFFER_DEFAULT_SIZE_   256
 
-#define GBL_SCANNER_CLASS_(klass)               ((GblScannerClass_*)GBL_CLASS_PRIVATE(klass, GBL_SCANNER_TYPE))
+#define GBL_SCANNER_CLASS_(klass)               (GBL_CLASS_PRIVATE(GblScanner, klass))
 
-#define GBL_SCANNER_(self)                      ((GblScanner_*)GBL_INSTANCE_PRIVATE(self, GBL_SCANNER_TYPE))
+#define GBL_SCANNER_(self)                      (GBL_PRIVATE(GblScanner, self))
 #define GBL_SCANNER_CURSOR_(self)               ((GblScannerCursor*)(GblScanner_cursor(pSelf)))
 #define GBL_SCANNER_CHAR_(self, idx)            (GblStringView_at(GBL_SCANNER_(self)->streamBuffer, idx))
 
@@ -247,7 +247,7 @@ static GblBool GblScanner_readToken_(GblScanner*    pSelf,
     pSelf->status &= ~GBL_SCANNER_ERROR;
 
     if(!(pSelf->status & GBL_SCANNER_EOF))
-        GBL_INSTANCE_VCALL(GblScanner, pFnNextToken, pSelf, pToken);
+        GBL_VCALL(GblScanner, pFnNextToken, pSelf, pToken);
     else
         *pToken = GblStringView_fromEmpty();
 
@@ -732,13 +732,12 @@ static GBL_RESULT GblScanner_GblBox_destructor_(GblBox* pBox) {
 
     GBL_CTX_CALL(GblArrayList_destruct(&pSelf_->cursorStack));
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
+    GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblScanner_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_UNUSED(pCtx);
+static GBL_RESULT GblScanner_init_(GblInstance* pInstance) {
     GBL_CTX_BEGIN(NULL);
 
     GblScanner*      pSelf  = GBL_SCANNER(pInstance);
@@ -757,8 +756,8 @@ static GBL_RESULT GblScanner_init_(GblInstance* pInstance, GblContext* pCtx) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblScannerClass_final_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_UNUSED(pUd, pCtx);
+static GBL_RESULT GblScannerClass_final_(GblClass* pClass, const void* pUd) {
+    GBL_UNUSED(pUd);
     GBL_CTX_BEGIN(NULL);
 
     GblScannerClass* pSelfClass = GBL_SCANNER_CLASS(pClass);
@@ -767,8 +766,8 @@ static GBL_RESULT GblScannerClass_final_(GblClass* pClass, const void* pUd, GblC
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblScannerClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_UNUSED(pUd, pCtx);
+static GBL_RESULT GblScannerClass_init_(GblClass* pClass, const void* pUd) {
+    GBL_UNUSED(pUd);
     GBL_CTX_BEGIN(NULL);
 
     GblScannerClass* pSelfClass = GBL_SCANNER_CLASS(pClass);
@@ -808,10 +807,10 @@ GBL_EXPORT GblType GblScanner_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblScanner"),
-                                      GBL_OBJECT_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+        type = GblType_register(GblQuark_internStringStatic("GblScanner"),
+                                GBL_OBJECT_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
 
     }
 

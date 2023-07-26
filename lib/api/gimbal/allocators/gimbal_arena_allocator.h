@@ -17,10 +17,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_ARENA_ALLOCATOR_TYPE            (GBL_TYPEOF(GblArenaAllocator))                   //!< Type UUID for GblArenaAllocator
-#define GBL_ARENA_ALLOCATOR(self)           (GBL_INSTANCE_CAST(self, GblArenaAllocator))      //!< Cast a GblInstance to GblArenaAllocator
-#define GBL_ARENA_ALLOCATOR_CLASS(klass)    (GBL_CLASS_CAST(klass, GblArenaAllocator))        //!< Cast a GblClass to GblArenaAllocatorClass
-#define GBL_ARENA_ALLOCATOR_GET_CLASS(self) (GBL_INSTANCE_GET_CLASS(self, GblArenaAllocator)) //!< Get a GblArenaAllocatorClass from a GblInstance
+#define GBL_ARENA_ALLOCATOR_TYPE            (GBL_TYPEID(GblArenaAllocator))            //!< Type UUID for GblArenaAllocator
+#define GBL_ARENA_ALLOCATOR(self)           (GBL_CAST(GblArenaAllocator, self))        //!< Cast a GblInstance to GblArenaAllocator
+#define GBL_ARENA_ALLOCATOR_CLASS(klass)    (GBL_CLASS_CAST(GblArenaAllocator, klass)) //!< Cast a GblClass to GblArenaAllocatorClass
+#define GBL_ARENA_ALLOCATOR_GET_CLASS(self) (GBL_CLASSOF(GblArenaAllocator, self))     //!< Get a GblArenaAllocatorClass from a GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblArenaAllocator

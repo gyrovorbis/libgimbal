@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/containers/gimbal_nary_tree.h>
 
-#define GBL_NARY_TREE_TEST_SUITE_(inst)     ((GblNaryTreeTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_NARY_TREE_TEST_SUITE_TYPE))
+#define GBL_NARY_TREE_TEST_SUITE_(inst)     (GBL_PRIVATE(GblNaryTreeTestSuite, inst))
 #define NARY_OBJECT_(pSelf, index)          (&pSelf_->objects[index])
 #define NARY_OBJECT_NODE_(pSelf_, index)    (&NARY_OBJECT_(pSelf_, index)->node)
 #define NARY_OBJECT_OF_(nodePtr)            GBL_NARY_TREE_ENTRY(nodePtr, NaryObject_, node)

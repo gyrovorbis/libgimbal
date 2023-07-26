@@ -7,10 +7,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_ITABLE_VARIANT_TYPE             (GBL_TYPEOF(GblITableVariant))                   //!< Type UUID for GblITableVariant
-#define GBL_ITABLE_VARIANT(self)            (GBL_INSTANCE_CAST(self, GblITableVariant))      //!< Casts a GblInstance to GblITableVariant
-#define GBL_ITABLE_VARIANT_CLASS(klass)     (GBL_CLASS_CAST(klass, GblITableVariant))        //!< Casts a GblClass to GblITableVariantClass
-#define GBL_ITABLE_VARIANT_GET_CLASS(self)  (GBL_INSTANCE_GET_CLASS(self, GblITableVariant)) //!< Gets a GblITableVariantClass from a GblInstance
+#define GBL_ITABLE_VARIANT_TYPE             (GBL_TYPEID(GblITableVariant))            //!< Type UUID for GblITableVariant
+#define GBL_ITABLE_VARIANT(self)            (GBL_CAST(GblITableVariant, self))        //!< Casts a GblInstance to GblITableVariant
+#define GBL_ITABLE_VARIANT_CLASS(klass)     (GBL_CLASS_CAST(GblITableVariant, klass)) //!< Casts a GblClass to GblITableVariantClass
+#define GBL_ITABLE_VARIANT_GET_CLASS(self)  (GBL_CLASSOF(GblITableVariant, self))     //!< Gets a GblITableVariantClass from a GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblVariant

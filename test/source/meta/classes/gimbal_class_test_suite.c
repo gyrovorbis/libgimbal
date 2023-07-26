@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/meta/classes/gimbal_class.h>
 
-#define GBL_CLASS_TEST_SUITE_(inst)     (GBL_INSTANCE_PRIVATE(inst, GBL_CLASS_TEST_SUITE_TYPE))
+#define GBL_CLASS_TEST_SUITE_(inst)     (GBL_PRIVATE(GblClassTestSuite, inst))
 
 typedef struct GblClassTestSuite_ {
     size_t      initialStaticClassRefCount;
@@ -65,7 +65,7 @@ static GBL_RESULT GblClassTestSuite_castNullInvalid_(GblTestSuite* pSelf, GblCon
 static GBL_RESULT GblClassTestSuite_tryNullInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblClass_try(NULL, GBL_INVALID_TYPE), NULL);
+    GBL_TEST_COMPARE(GblClass_as(NULL, GBL_INVALID_TYPE), NULL);
     GBL_CTX_END();
 }
 
@@ -100,8 +100,8 @@ static GBL_RESULT GblClassTestSuite_propertiesNull_(GblTestSuite* pSelf, GblCont
     GBL_TEST_COMPARE(GblClass_isOwned(NULL), GBL_FALSE);
     GBL_TEST_COMPARE(GblClass_isInPlace(NULL), GBL_FALSE);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(NULL), GBL_INVALID_TYPE);
-    GBL_TEST_COMPARE(GBL_CLASS_SUPER(NULL), NULL);
-    GBL_TEST_COMPARE(GBL_CLASS_DEFAULT(NULL), NULL);
+    GBL_TEST_COMPARE(GblClass_super(NULL), NULL);
+    GBL_TEST_COMPARE(GblClass_default(NULL), NULL);
     GBL_CTX_END();
 }
 
@@ -225,7 +225,7 @@ static GBL_RESULT GblClassTestSuite_try_(GblTestSuite* pSelf, GblContext* pCtx) 
     GBL_CTX_BEGIN(pCtx);
     GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
 
-    GBL_TEST_COMPARE(GblClass_try(pSelf_->pClassRef, GBL_STATIC_CLASS_TYPE),
+    GBL_TEST_COMPARE(GblClass_as(pSelf_->pClassRef, GBL_STATIC_CLASS_TYPE),
                      pSelf_->pClassRef);
 
     GBL_CTX_END();
@@ -235,7 +235,7 @@ static GBL_RESULT GblClassTestSuite_tryInvalid_(GblTestSuite* pSelf, GblContext*
     GBL_CTX_BEGIN(pCtx);
     GblClassTestSuite_* pSelf_ = GBL_CLASS_TEST_SUITE_(pSelf);
 
-    GBL_TEST_COMPARE(GblClass_try(pSelf_->pClassRef, GBL_INTERFACE_TYPE),
+    GBL_TEST_COMPARE(GblClass_as(pSelf_->pClassRef, GBL_INTERFACE_TYPE),
                      NULL);
 
     GBL_CTX_END();
@@ -297,8 +297,8 @@ static GBL_RESULT GblClassTestSuite_properties_(GblTestSuite* pSelf, GblContext*
     GBL_TEST_COMPARE(GblClass_isOwned           (pSelf_->pClassRef), GBL_FALSE);
     GBL_TEST_COMPARE(GblClass_isInPlace         (pSelf_->pClassRef), GBL_FALSE);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pSelf_->pClassRef), GBL_STATIC_CLASS_TYPE);
-    GBL_TEST_COMPARE(GBL_CLASS_SUPER(pSelf_->pClassRef), GBL_NULL);
-    GBL_TEST_COMPARE(GBL_CLASS_DEFAULT(pSelf_->pClassRef), pSelf_->pClassRef);
+    GBL_TEST_COMPARE(GblClass_super(pSelf_->pClassRef), GBL_NULL);
+    GBL_TEST_COMPARE(GblClass_default(pSelf_->pClassRef), pSelf_->pClassRef);
 
     GBL_CTX_END();
 }

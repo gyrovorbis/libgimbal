@@ -3,7 +3,7 @@
 #include <gimbal/containers/gimbal_array_list.h>
 
 #define GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_ 1024
-#define GBL_ARRAY_LIST_TEST_SUITE_(inst)     ((GblArrayListTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_LIST_TEST_SUITE_TYPE))
+#define GBL_ARRAY_LIST_TEST_SUITE_(inst)        (GBL_PRIVATE(GblArrayListTestSuite, inst))
 
 typedef struct GblArrayListTestSuite_ {
     struct {

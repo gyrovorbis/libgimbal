@@ -131,14 +131,14 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
     if(!(classFlags & GBL_CLASS_FLAG_IFACE_IMPL_))
         memset(pClass, 0, pMeta->pInfo->classSize);
     else
-        memset((void*)((uintptr_t)pClass + sizeof(GblInterface)), 0, pMeta->pInfo->classSize-sizeof(GblInterface));
+        memset(GBL_PTR_OFFSET(pClass, sizeof(GblInterface)), 0, pMeta->pInfo->classSize - sizeof(GblInterface));
 
     //IMMEDIATELY initialize its type!!!
     /*
     GBL_CTX_VERIFY_EXPRESSION(pClass == pMeta->pClass || (classFlags & GBL_CLASS_FLAG_FLOATING_),
                               "Floating class detected but not flagged!");
     */
-    GBL_CLASS_PRIVATE_SET_(pClass, pMeta, classFlags);
+    GBL_CLASS_INFO_SET_(pClass, pMeta, classFlags);
 
     if(pMeta->pParent) {
         //GBL_CTX_PUSH_VERBOSE("Adding reference to parent class: ", pMeta->pParent->pName);
@@ -158,11 +158,11 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
             //GBL_CTX_VERBOSE("Interfaces: None");
         } else {
             for(size_t  i = 0; i < pIter->pInfo->interfaceCount; ++i) {
-                const GblTypeInterfaceMapEntry* pIEntry = &pIter->pInfo->pInterfaceMap[i];
+                const GblInterfaceImpl* pIEntry = &pIter->pInfo->pInterfaceImpls[i];
                 GblMetaClass* pIMeta = (GblMetaClass*)pIEntry->interfaceType;
                 GBL_CTX_VERIFY_EXPRESSION(pIMeta);
                 GBL_CTX_PUSH_VERBOSE("Interface[%u]: %s", i, GblType_name(GBL_TYPE_(pIMeta)));
-                GblInterface* pIClass = (GblInterface*)((char*)pClass + pIEntry->classOffset);
+                GblInterface* pIClass = GBL_PTR_OFFSET(GblInterface*, pClass, pIEntry->classOffset);
                 GBL_CTX_CALL(GblClass_constructInterface_(pIClass, pIMeta, -pIEntry->classOffset));
                 GBL_CTX_POP(1);
             }
@@ -171,7 +171,7 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
 
         if(pIter->pInfo->pFnClassInit) {
             //GBL_CTX_VERBOSE("ClassInit(%s)", GblType_name(GBL_TYPE_(pIter)));
-            GBL_CTX_CALL(pIter->pInfo->pFnClassInit(pClass, pIter->pInfo->pClassData, pCtx_));
+            GBL_CTX_CALL(pIter->pInfo->pFnClassInit(pClass, pIter->pInfo->pClassData));
         } else {
             //GBL_CTX_VERBOSE("Ctor: NULL", GblType_name(GBL_TYPE_(pIter)));
         }
@@ -185,7 +185,7 @@ static GBL_RESULT GbClass_construct_(GblClass* pClass, GblMetaClass* pMeta, GblF
 }
 
 
-static GblClass* GblClass_create_(GblMetaClass* pMeta, GblBool floating) {
+static GblClass* GblClass_create_(GblMetaClass* pMeta, size_t size, GblBool floating) {
     GblClass*  pFloatingClass = NULL;
     GblClass** ppClass        = &pFloatingClass;
     GBL_CTX_BEGIN(pCtx_);
@@ -200,13 +200,13 @@ static GblClass* GblClass_create_(GblMetaClass* pMeta, GblBool floating) {
     }
 
     //Allocate a new class structure if one isn't already available
-
     if(!*ppClass) {
         GBL_CTX_VERBOSE("Allocating separate class structure!");
-        uint8_t* pBase = GBL_CTX_MALLOC(gblAlignedAllocSizeDefault(pMeta->pInfo->classSize -
-                                                            pMeta->classPrivateOffset),
-                                        GBL_ALIGNOF(GBL_MAX_ALIGN_T),
-                                        GblType_name(GBL_TYPE_(pMeta)));
+        uint8_t* pBase =
+                GBL_CTX_MALLOC(gblAlignedAllocSizeDefault(size - pMeta->classPrivateOffset),
+                               GBL_ALIGNOF(GBL_MAX_ALIGN_T),
+                               GblType_name(GBL_TYPE_(pMeta)));
+
         if(pMeta->classPrivateOffset != 0)
             memset(pBase, 0, -pMeta->classPrivateOffset);
 
@@ -253,7 +253,7 @@ GBL_EXPORT GblClass* GblClass_refDefault(GblType type) GBL_NOEXCEPT {
 
     // Create a new class structure
     } else {
-        pClass = GblClass_create_(pMeta, GBL_FALSE);
+        pClass = GblClass_create_(pMeta, pMeta->pInfo->classSize, GBL_FALSE);
         GBL_CTX_VERIFY_EXPRESSION(pClass && pClass == pMeta->pClass, "Failed to create class!");
     }
 
@@ -296,11 +296,13 @@ GBL_EXPORT GBL_RESULT GblClass_verifyFloatingConstruction(GblType type, GblBool 
 }
 
 
-GBL_EXPORT GBL_RESULT GblClass_constructFloating(GblClass* pSelf, GblType type) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblClass_constructFloating(GblClass* pSelf, GblType type) {
     GBL_CTX_BEGIN(pCtx_);
+
     GBL_CTX_VERIFY_TYPE(type);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_CALL(GblClass_verifyFloatingConstruction(type, GBL_TRUE));
+
     GblClass_refDefault(type); // have to reference actual type
     GBL_CTX_CALL(GbClass_construct_(pSelf,
                                     GBL_META_CLASS_(type),
@@ -308,13 +310,31 @@ GBL_EXPORT GBL_RESULT GblClass_constructFloating(GblClass* pSelf, GblType type) 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblClass* GblClass_createFloating(GblType type) GBL_NOEXCEPT {
+GBL_EXPORT GblClass* (GblClass_createFloating)(GblType type,
+                                               size_t  size)
+{
     GblClass* pClass = NULL;
     GBL_CTX_BEGIN(pCtx_);
+
     GBL_CTX_VERIFY_TYPE(type);
     GBL_CTX_CALL(GblClass_verifyFloatingConstruction(type, GBL_FALSE));
+
+    GblMetaClass* pMeta    = GBL_META_CLASS_(type);
+    const size_t classSize = pMeta->pInfo->classSize;
+
+    if(!size) size = classSize;
+
+    GBL_CTX_VERIFY(size >= pMeta->pInfo->classSize,
+                   GBL_RESULT_ERROR_INVALID_ARG,
+                   "Cannot create floating class [%s] of insufficient size "
+                   "[%zu requested, %zu required].",
+                   GblType_name(type),
+                   size,
+                   classSize);
+
     GblClass_refDefault(type);
-    pClass = GblClass_create_(GBL_META_CLASS_(type), GBL_TRUE);
+    pClass = GblClass_create_(pMeta, size, GBL_TRUE);
+
     GBL_CTX_END_BLOCK();
     return pClass;
 }
@@ -333,15 +353,16 @@ static GBL_EXPORT GBL_RESULT GblClass_destruct_(GblClass* pClass) {
         // call finalizer if class provides one
         if(pIter->pInfo->pFnClassFinal) {
             GBL_CTX_DEBUG("Calling class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
-            GBL_CTX_CALL(pIter->pInfo->pFnClassFinal(pClass, pIter->pInfo->pClassData, pCtx_));
+            GBL_CTX_CALL(pIter->pInfo->pFnClassFinal(pClass, pIter->pInfo->pClassData));
         } else {
             GBL_CTX_DEBUG("No class dtor: [%s]", GblType_name(GBL_TYPE_(pIter)));
         }
 
         // iterate over all interfaces
         for(size_t  i = 0; i < pIter->pInfo->interfaceCount; ++i) {
-            GblInterface* pInterface = (GblInterface*)((const char*)pClass +
-                                                       pIter->pInfo->pInterfaceMap[i].classOffset);
+            GblInterface* pInterface = GBL_PTR_OFFSET(GblInterface*,
+                                                      pClass,
+                                                      pIter->pInfo->pInterfaceImpls[i].classOffset);
             GblClass* pDefaultIFaceClass = GblClass_weakRefDefault(GBL_CLASS_TYPEOF(pInterface));
 
             // destruct interface implementation
@@ -361,7 +382,7 @@ static GBL_EXPORT GBL_RESULT GblClass_destruct_(GblClass* pClass) {
     if(pParentClass) GblClass_unrefDefault(pParentClass);
 
     // clear the type so it's not looking initialized
-    GBL_CLASS_PRIVATE_SET_(pClass, GBL_INVALID_TYPE, 0);
+    GBL_CLASS_INFO_SET_(pClass, GBL_INVALID_TYPE, 0);
 
     GBL_CTX_POP(1);
     GBL_CTX_END();
@@ -490,8 +511,9 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
                     for(unsigned i = 0; i < pMeta->pInfo->interfaceCount; ++i) {
 
                         GblMetaClass* pIFaceMeta = GBL_META_CLASS_(toType);
-                        GblInterface* pCurIClass = (GblInterface*)((uintptr_t)pClass +
-                                                    pMeta->pInfo->pInterfaceMap[i].classOffset);
+                        GblInterface* pCurIClass = GBL_PTR_OFFSET(GblInterface*,
+                                                                  pClass,
+                                                                  pMeta->pInfo->pInterfaceImpls[i].classOffset);
 
                         /* Assume an interface is invalid, because it has yet to be constructed,
                            so skip using it for further consideration. */
@@ -499,7 +521,7 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
                             continue;
 
                         GBL_ASSERT(GBL_CLASS_FLAG_TEST_(GBL_CLASS(pCurIClass), GBL_CLASS_FLAG_IFACE_IMPL_));
-                        GBL_ASSERT(GBL_META_CLASS_(pMeta->pInfo->pInterfaceMap[i].interfaceType)
+                        GBL_ASSERT(GBL_META_CLASS_(pMeta->pInfo->pInterfaceImpls[i].interfaceType)
                                                     == GBL_META_CLASS_(GBL_CLASS_TYPEOF(pCurIClass)));
                         GBL_ASSERT(GBL_CLASS_TYPEOF(pCurIClass) != GBL_INVALID_TYPE);
 
@@ -556,19 +578,19 @@ GBL_EXPORT GblBool GblClass_check(const GblClass* pSelf, GblType toType) {
 GBL_EXPORT GblClass* GblClass_cast(GblClass* pSelf, GblType toType) GBL_NOEXCEPT {
     return GblClass_cast_(pSelf, toType, GBL_TRUE, GBL_FALSE);
 }
-GBL_EXPORT GblClass* GblClass_try(GblClass* pSelf, GblType toType) GBL_NOEXCEPT {
+GBL_EXPORT GblClass* GblClass_as(GblClass* pSelf, GblType toType) GBL_NOEXCEPT {
     return GblClass_cast_(pSelf, toType, GBL_FALSE, GBL_FALSE);
 }
 
 
 GBL_EXPORT GblBool GblClass_isDefault(const GblClass* pSelf) GBL_NOEXCEPT {
-    return pSelf && pSelf == GBL_CLASS_DEFAULT(pSelf);
+    return pSelf && pSelf == GblClass_default(pSelf);
 }
 
 GBL_EXPORT GblType GblClass_typeOf(const GblClass* pSelf) GBL_NOEXCEPT {
     GblType type = GBL_INVALID_TYPE;
     if(pSelf) {
-        type = GBL_CLASS_TYPEOF_(pSelf);
+        type = GBL_CLASS_TYPE_(pSelf);
     }
     return type;
 }

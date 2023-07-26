@@ -20,10 +20,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_SETTINGS_TYPE            (GBL_TYPEOF(GblSettings))
-#define GBL_SETTINGS(self)           (GBL_INSTANCE_CAST(self, GblSettings))
-#define GBL_SETTINGS_CLASS(klass)    (GBL_CLASS_CAST(klass, GblSettings))
-#define GBL_SETTINGS_GET_CLASS(self) (GBL_INSTANCE_GET_CLASS(self, GblSettings))
+#define GBL_SETTINGS_TYPE            (GBL_TYPEID(GblSettings))
+#define GBL_SETTINGS(self)           (GBL_CAST(GblSettings, self))
+#define GBL_SETTINGS_CLASS(klass)    (GBL_CLASS_CAST(GblSettings, klass))
+#define GBL_SETTINGS_GET_CLASS(self) (GBL_CLASSOF(GblSettings, self))
 //! @}
 
 #define GBL_SELF_TYPE GblSettings

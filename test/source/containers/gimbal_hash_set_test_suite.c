@@ -4,7 +4,7 @@
 
 #define GBL_HASH_SET_TEST_SUITE_STRESS_TEST_ENTRY_COUNT_     2047
 
-#define GBL_HASH_SET_TEST_SUITE_(inst)     ((GblHashSetTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_HASH_SET_TEST_SUITE_TYPE))
+#define GBL_HASH_SET_TEST_SUITE_(inst)     (GBL_PRIVATE(GblHashSetTestSuite, inst))
 
 typedef struct GblHashSetTestSuite_ {
     GblHashSet  hashSet;

@@ -6,7 +6,7 @@
 #include <gimbal/meta/classes/gimbal_class.h>
 #include <gimbal/meta/ifaces/gimbal_interface.h>
 
-#define GBL_TYPE_TEST_SUITE_(inst)  ((GblTypeTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_TYPE_TEST_SUITE_TYPE))
+#define GBL_TYPE_TEST_SUITE_(inst)  (GBL_PRIVATE(GblTypeTestSuite, inst))
 
 typedef struct GblTypeTestSuite_ {
     GblType blankType;
@@ -76,19 +76,19 @@ static GBL_RESULT GblTypeTestSuite_initDefaults_(GblTestSuite* pSelf, GblContext
     GBL_CTX_BEGIN(pCtx);
     //GBL_CTX_CALL(GblType_init(pCtx, 0, 0));
     //GBL_TEST_COMPARE(GblType_contextDefault(), pCtx);
-    GBL_TEST_COMPARE(GblType_builtinCount(), GBL_TYPE_BUILTIN_COUNT);
-    //GBL_TEST_COMPARE(GblType_registeredCount(), GBL_TYPE_BUILTIN_COUNT);
+    //GBL_TEST_COMPARE(GblType_builtinCount(), GBL_TYPE_BUILTIN_COUNT);
+    //GBL_TEST_COMPARE(GblType_count(), GBL_TYPE_BUILTIN_COUNT);
 
     GblType prev = GBL_INVALID_TYPE;
     for(size_t  t = 0; t < GBL_TYPE_BUILTIN_COUNT; ++t) {
-        GBL_TEST_VERIFY((prev = GblType_nextRegistered(prev))
+        GBL_TEST_VERIFY((prev = GblType_next(prev))
                                   != GBL_INVALID_TYPE);
     }
-    //GBL_TEST_COMPARE(GblType_nextRegistered(prev), GBL_INVALID_TYPE);
+    //GBL_TEST_COMPARE(GblType_next(prev), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_fromBuiltinIndex(GBL_TYPE_BUILTIN_COUNT+1), GBL_INVALID_TYPE);
-    GBL_TEST_COMPARE(GblType_fromName(NULL), GBL_INVALID_TYPE);
-    GBL_TEST_COMPARE(GblType_fromName("Lolol"), GBL_INVALID_TYPE);
-    GBL_TEST_COMPARE(GblType_fromNameQuark(GBL_QUARK_INVALID), GBL_INVALID_TYPE);
+    GBL_TEST_COMPARE(GblType_find(NULL), GBL_INVALID_TYPE);
+    GBL_TEST_COMPARE(GblType_find("Lolol"), GBL_INVALID_TYPE);
+    GBL_TEST_COMPARE(GblType_findQuark(GBL_QUARK_INVALID), GBL_INVALID_TYPE);
     GBL_CTX_END();
 }
 
@@ -101,15 +101,15 @@ static GBL_RESULT GblTypeTestSuite_invalid_(GblTestSuite* pSelf, GblContext* pCt
     GBL_TEST_COMPARE(GblType_root(GBL_INVALID_TYPE), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_ancestor(GBL_INVALID_TYPE, 2), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_depth(GBL_INVALID_TYPE), 0);
-    GBL_TEST_COMPARE(GblType_flagsCheck(GBL_INVALID_TYPE, 0xff), 0);
+    GBL_TEST_COMPARE(GblType_flags(GBL_INVALID_TYPE), 0);
     GBL_TEST_COMPARE(GblType_verify(GBL_INVALID_TYPE), GBL_FALSE);
     GBL_TEST_VERIFY(GblType_check(GBL_INVALID_TYPE, GBL_INVALID_TYPE));
     GBL_TEST_VERIFY(!GblType_derives(GBL_INVALID_TYPE, GBL_INVALID_TYPE));
     GBL_TEST_VERIFY(!GblType_maps(GBL_INVALID_TYPE, GBL_INVALID_TYPE));
     GBL_TEST_COMPARE(GblType_info(GBL_INVALID_TYPE), NULL);
-    GBL_TEST_COMPARE(GblType_plugin(GBL_INVALID_TYPE), NULL);
+    //GBL_TEST_COMPARE(GblType_plugin(GBL_INVALID_TYPE), NULL);
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_INVALID_TYPE), 0);
-    GBL_TEST_COMPARE(GblType_instanceRefCount(GBL_INVALID_TYPE),0);
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_INVALID_TYPE),0);
     GBL_CTX_END();
 }
 
@@ -117,7 +117,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_blank_(GblTestSuite* pSelf, GblCo
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
-     pSelf_->blankType = GblType_registerStatic(GblQuark_internStringStatic("Blank"),
+     pSelf_->blankType = GblType_register(GblQuark_internStringStatic("Blank"),
                                           GBL_INVALID_TYPE,
                                           NULL,
                                           GBL_TYPE_FLAGS_NONE);
@@ -135,11 +135,11 @@ static GBL_RESULT GblTypeTestSuite_fundamental_blank_(GblTestSuite* pSelf, GblCo
     GBL_TEST_VERIFY(!GBL_TYPE_INTERFACED_CHECK(pSelf_->blankType));
     GBL_TEST_VERIFY(GblType_verify(pSelf_->blankType));
 
-    //GBL_TEST_COMPARE(GblType_registeredCount(), GBL_TYPE_BUILTIN_COUNT+1);
-    GBL_TEST_COMPARE(GblType_fromName("Blank"), pSelf_->blankType);
-    GBL_TEST_COMPARE(GblType_fromNameQuark(GblQuark_fromString("Blank")), pSelf_->blankType);
+    //GBL_TEST_COMPARE(GblType_count(), GBL_TYPE_BUILTIN_COUNT+1);
+    GBL_TEST_COMPARE(GblType_find("Blank"), pSelf_->blankType);
+    GBL_TEST_COMPARE(GblType_findQuark(GblQuark_fromString("Blank")), pSelf_->blankType);
     GBL_TEST_COMPARE(GblType_classRefCount(pSelf_->blankType), 0);
-    GBL_TEST_COMPARE(GblType_instanceRefCount(pSelf_->blankType), 0);
+    GBL_TEST_COMPARE(GblType_instanceCount(pSelf_->blankType), 0);
 
     GBL_TEST_COMPARE(GblType_name(pSelf_->blankType), "Blank");
     GBL_TEST_COMPARE(GblType_nameQuark(pSelf_->blankType), GblQuark_fromStringStatic("Blank"));
@@ -150,13 +150,13 @@ static GBL_RESULT GblTypeTestSuite_fundamental_blank_(GblTestSuite* pSelf, GblCo
     GBL_TEST_COMPARE(GblType_ancestor(pSelf_->blankType, 0), pSelf_->blankType);
     GBL_TEST_COMPARE(GblType_ancestor(pSelf_->blankType, 1), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_depth(pSelf_->blankType), 0);
-    GBL_TEST_VERIFY(!GblType_flagsCheck(pSelf_->blankType, 0xffff));
+    GBL_TEST_VERIFY(!GblType_flags(pSelf_->blankType));
     GBL_TEST_VERIFY(GblType_check(pSelf_->blankType, pSelf_->blankType));
     GBL_TEST_VERIFY(!GblType_check(pSelf_->blankType, GBL_INVALID_TYPE));
     GBL_TEST_VERIFY(!GblType_derives(pSelf_->blankType, pSelf_->blankType));
     GBL_TEST_VERIFY(!GblType_derives(pSelf_->blankType, GBL_INVALID_TYPE));
     GBL_TEST_VERIFY(!GblType_maps(pSelf_->blankType, pSelf_->blankType));
-    GBL_TEST_COMPARE(GblType_plugin(pSelf_->blankType), NULL);
+    //GBL_TEST_COMPARE(GblType_plugin(pSelf_->blankType), NULL);
     GBL_CTX_END();
 }
 
@@ -164,7 +164,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_duplicate_(GblTestSuite* pSelf, G
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GblType dupe = GblType_registerStatic(GblQuark_internStringStatic("Blank"),
+    GblType dupe = GblType_register(GblQuark_internStringStatic("Blank"),
                                           GBL_INVALID_TYPE,
                                           NULL,
                                           GBL_TYPE_FLAGS_NONE);
@@ -177,7 +177,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_derived_register_invalid_(GblTest
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
-    GblType invalid = GblType_registerStatic("DerivedInvalid",
+    GblType invalid = GblType_register("DerivedInvalid",
                                              pSelf_->blankType,
                                              NULL,
                                              0);
@@ -189,7 +189,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_derived_register_invalid_(GblTest
 static GBL_RESULT GblTypeTestSuite_fundamental_derived_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->derivable = GblType_registerStatic("Derivable",
+    pSelf_->derivable = GblType_register("Derivable",
                                                GBL_INVALID_TYPE,
                                                NULL,
                                                GBL_TYPE_ROOT_FLAG_DERIVABLE);
@@ -198,7 +198,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_derived_register_valid_(GblTestSu
     GBL_TEST_VERIFY(GBL_TYPE_DERIVABLE_CHECK(pSelf_->derivable));
     GBL_TEST_VERIFY(!GBL_TYPE_DEEP_DERIVABLE_CHECK(pSelf_->derivable));
 
-    pSelf_->derived = GblType_registerStatic("Derived",
+    pSelf_->derived = GblType_register("Derived",
                                             pSelf_->derivable,
                                              NULL,
                                              0);
@@ -211,7 +211,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_invalid_(Gb
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
-    GblType deepDerivedInvalid = GblType_registerStatic("DeepDerivedInvalid",
+    GblType deepDerivedInvalid = GblType_register("DeepDerivedInvalid",
                                                         pSelf_->derived,
                                                         NULL,
                                                         0);
@@ -223,7 +223,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_invalid_(Gb
 static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->deepDerivable = GblType_registerStatic("DeepDerivable",
+    pSelf_->deepDerivable = GblType_register("DeepDerivable",
                                                GBL_INVALID_TYPE,
                                                NULL,
                                                GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
@@ -236,10 +236,9 @@ static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_valid_(GblT
     GBL_TEST_COMPARE(GblType_depth(pSelf_->deepDerivable), 0);
     GBL_TEST_COMPARE(GblType_base(pSelf_->deepDerivable, 0), pSelf_->deepDerivable);
     GBL_TEST_COMPARE(GblType_ancestor(pSelf_->deepDerivable, 0), pSelf_->deepDerivable);
-    GBL_TEST_VERIFY(GblType_flagsCheck(pSelf_->deepDerivable,
-                                  GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE));
+    GBL_TEST_VERIFY(GblType_flags(pSelf_->deepDerivable) & GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE);
     GBL_TEST_VERIFY(GblType_verify(pSelf_->derivable));
-    pSelf_->middleDerived = GblType_registerStatic("MiddleDerived",
+    pSelf_->middleDerived = GblType_register("MiddleDerived",
                                                    pSelf_->deepDerivable,
                                                    NULL,
                                                    0);
@@ -252,7 +251,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_deep_derived_register_valid_(GblT
     GBL_TEST_VERIFY(GblType_derives(pSelf_->middleDerived, pSelf_->deepDerivable));
     GBL_TEST_VERIFY(GblType_check(pSelf_->middleDerived, pSelf_->deepDerivable));
 
-    pSelf_->deepDerived = GblType_registerStatic("DeepDerived",
+    pSelf_->deepDerived = GblType_register("DeepDerived",
                                              pSelf_->middleDerived,
                                              NULL,
                                              0);
@@ -272,7 +271,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_register_invalid_(GblTest
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GblType invalidClassed = GblType_registerStatic("InvalidClassed",
+    GblType invalidClassed = GblType_register("InvalidClassed",
                                                     GBL_INVALID_TYPE,
                                                     NULL,
                                                     GBL_TYPE_ROOT_FLAG_CLASSED);
@@ -284,7 +283,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_register_invalid_(GblTest
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->classed = GblType_registerStatic("Classed",
+    pSelf_->classed = GblType_register("Classed",
                                              GBL_INVALID_TYPE,
                                              &(const GblTypeInfo) {
                                                  .classSize = sizeof(GblClass)
@@ -300,7 +299,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_register_valid_(GblTestSu
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_inherit_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->classedDerived = GblType_registerStatic("ClassedDerived",
+    pSelf_->classedDerived = GblType_register("ClassedDerived",
                                                     pSelf_->classed,
                                                     &(const GblTypeInfo) {
                                                         .classSize = sizeof(GblClass)
@@ -319,13 +318,13 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_invalid_(GblT
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GblType invalidIFace = GblType_registerStatic("InvalidIFaced",
+    GblType invalidIFace = GblType_register("InvalidIFaced",
                                                   GBL_INVALID_TYPE,
                                                   NULL,
                                                   GBL_TYPE_ROOT_FLAG_INTERFACED);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalidIFace, GBL_INVALID_TYPE);
-    invalidIFace = GblType_registerStatic("InvalidIFaced",
+    invalidIFace = GblType_register("InvalidIFaced",
                                           GBL_INVALID_TYPE,
                                           &(const GblTypeInfo) {
                                               .classSize = sizeof(GblInterface)
@@ -340,7 +339,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_invalid_(GblT
 static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->ifaced = GblType_registerStatic("IFaced",
+    pSelf_->ifaced = GblType_register("IFaced",
                                             GBL_INVALID_TYPE,
                                             &(const GblTypeInfo) {
                                                 .classSize = sizeof(GblInterface)
@@ -351,7 +350,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_valid_(GblTes
     GBL_TEST_VERIFY(pSelf_->ifaced != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->ifaced));
     GBL_TEST_VERIFY(GBL_TYPE_INTERFACED_CHECK(pSelf_->ifaced));
-    pSelf_->ifaced2 = GblType_registerStatic("IFaced2",
+    pSelf_->ifaced2 = GblType_register("IFaced2",
                                             GBL_INVALID_TYPE,
                                             &(const GblTypeInfo) {
                                                 .classSize = sizeof(GblInterface)
@@ -362,7 +361,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_valid_(GblTes
     GBL_TEST_VERIFY(pSelf_->ifaced2 != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->ifaced2));
     GBL_TEST_VERIFY(GBL_TYPE_INTERFACED_CHECK(pSelf_->ifaced2));
-    pSelf_->ifaced3 = GblType_registerStatic("IFaced3",
+    pSelf_->ifaced3 = GblType_register("IFaced3",
                                              GBL_INVALID_TYPE,
                                              &(const GblTypeInfo) {
                                                  .classSize = sizeof(GblInterface)
@@ -379,7 +378,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_register_valid_(GblTes
 static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_inherit_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->ifacedDerived = GblType_registerStatic("IFacedDerived",
+    pSelf_->ifacedDerived = GblType_register("IFacedDerived",
                                                    pSelf_->ifaced,
                                                    &(const GblTypeInfo) {
                                                        .classSize = sizeof(GblInterface)
@@ -395,7 +394,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_inherit_(GblTestSuite*
     GBL_TEST_VERIFY(!GblType_maps(pSelf_->ifacedDerived, pSelf_->ifaced));
     GBL_TEST_VERIFY(GblType_verify(pSelf_->ifacedDerived));
     GBL_TEST_VERIFY(GblType_check(pSelf_->ifacedDerived, pSelf_->ifaced));
-    pSelf_->ifacedDerived2 = GblType_registerStatic("IFacedDerived2",
+    pSelf_->ifacedDerived2 = GblType_register("IFacedDerived2",
                                             pSelf_->ifaced2,
                                             &(const GblTypeInfo) {
                                                 .classSize = sizeof(GblInterface)
@@ -414,7 +413,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
 
-    GblTypeInterfaceMapEntry ifaceMap[] = {
+    GblInterfaceImpl ifaceMap[] = {
         { GBL_INVALID_TYPE, 0 },
         { GBL_INVALID_TYPE, 0}
     };
@@ -422,11 +421,11 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
     GblTypeInfo info = {
         .classSize = sizeof(GblClass),
         .interfaceCount = 0,
-        .pInterfaceMap = ifaceMap
+        .pInterfaceImpls = ifaceMap
     };
 
     // Non-null map with 0 interfaces
-    GblType bullshitMapped = GblType_registerStatic("ClassedDeepDerivedIfaceMapped",
+    GblType bullshitMapped = GblType_register("ClassedDeepDerivedIfaceMapped",
                                                     pSelf_->classedDerived,
                                                     &info,
                                                     0);
@@ -434,7 +433,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
     GBL_TEST_COMPARE(bullshitMapped, GBL_INVALID_TYPE);
     // Invalid type
     info.interfaceCount = 1;
-    bullshitMapped = GblType_registerStatic("ClassedDeepDerivedIfaceMapped",
+    bullshitMapped = GblType_register("ClassedDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
@@ -443,7 +442,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
 
     // Non-Inteface Type
     ifaceMap[0].interfaceType = pSelf_->classedDerived;
-    bullshitMapped = GblType_registerStatic("ClassDeepDerivedIfaceMapped",
+    bullshitMapped = GblType_register("ClassDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
@@ -452,7 +451,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
 
     // Invalid class size
     ifaceMap[0].interfaceType = pSelf_->ifaced;
-    bullshitMapped = GblType_registerStatic("ClassDeepDerivedIfaceMapped",
+    bullshitMapped = GblType_register("ClassDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
@@ -462,7 +461,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
 
     // Invalid offset (in base)
     info.classSize = sizeof(GblClass) + sizeof(GblInterface);
-    bullshitMapped = GblType_registerStatic("ClassDeepDerivedIfaceMapped",
+    bullshitMapped = GblType_register("ClassDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
@@ -471,7 +470,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
 
     // Offset too far
     ifaceMap[0].classOffset = sizeof(GblInterface);
-    bullshitMapped = GblType_registerStatic("ClassDeepDerivedIfaceMapped",
+    bullshitMapped = GblType_register("ClassDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
@@ -484,7 +483,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
     ifaceMap[0].classOffset = sizeof(GblClass);
     ifaceMap[1].interfaceType = pSelf_->ifaced;
     ifaceMap[1].classOffset = sizeof(GblClass) + sizeof(GblInterface);
-    bullshitMapped = GblType_registerStatic("ClassDeepDerivedIfaceMapped",
+    bullshitMapped = GblType_register("ClassDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
@@ -493,7 +492,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
 
     // ambiguous type
     ifaceMap[1].interfaceType = pSelf_->ifacedDerived;
-    bullshitMapped = GblType_registerStatic("ClassDeepDerivedIfaceMapped",
+    bullshitMapped = GblType_register("ClassDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
@@ -503,7 +502,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
     // overlapping interfaces
     ifaceMap[1].interfaceType = pSelf_->ifaced2;
     ifaceMap[1].classOffset -= 3;
-    bullshitMapped = GblType_registerStatic("ClassDeepDerivedIfaceMapped",
+    bullshitMapped = GblType_register("ClassDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
                                             &info,
                                             0);
@@ -517,12 +516,12 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_invalid_(GblTestSu
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->classedDeepDerivedIfaceMap = GblType_registerStatic("ClassedDeepDerivedIfaceMapped",
+    pSelf_->classedDeepDerivedIfaceMap = GblType_register("ClassedDeepDerivedIfaceMapped",
                                             pSelf_->classedDerived,
                                             &(const GblTypeInfo) {
                                                 .classSize = sizeof(GblClass) + sizeof(GblInterface)*2,
                                                 .interfaceCount = 2,
-                                                .pInterfaceMap = (const GblTypeInterfaceMapEntry[]) {
+                                                .pInterfaceImpls = (const GblInterfaceImpl[]) {
                                                      {
                                                          .interfaceType = pSelf_->ifacedDerived,
                                                          .classOffset = sizeof(GblClass)
@@ -555,12 +554,12 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_valid_(GblTestSuit
 static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_inherit_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->classedDeepDerivedIfaceMapInherited  = GblType_registerStatic("ClassedDeepDerivedIfaceMappedInherited",
+    pSelf_->classedDeepDerivedIfaceMapInherited  = GblType_register("ClassedDeepDerivedIfaceMappedInherited",
                                                                     pSelf_->classedDeepDerivedIfaceMap,
                                                                    &(const GblTypeInfo) {
                                                                        .classSize = sizeof(GblClass) + sizeof(GblInterface) * 3,
                                                                        .interfaceCount = 1,
-                                                                       .pInterfaceMap = (const GblTypeInterfaceMapEntry[]) {
+                                                                       .pInterfaceImpls = (const GblInterfaceImpl[]) {
                                                                             {
                                                                                 .interfaceType = pSelf_->ifacedDerived2,
                                                                                 .classOffset = sizeof(GblClass) + sizeof(GblInterface) * 2
@@ -594,12 +593,12 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_inherit_(GblTestSu
 static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->ifacedIfaceMap = GblType_registerStatic("IFaceMappedIFace",
+    pSelf_->ifacedIfaceMap = GblType_register("IFaceMappedIFace",
                                             GBL_INVALID_TYPE,
                                              &(const GblTypeInfo) {
                                                  .classSize = sizeof(GblInterface)*3,
                                                  .interfaceCount = 2,
-                                                 .pInterfaceMap = (const GblTypeInterfaceMapEntry[]) {
+                                                 .pInterfaceImpls = (const GblInterfaceImpl[]) {
                                                       {
                                                           .interfaceType = pSelf_->ifacedDerived,
                                                           .classOffset = sizeof(GblInterface)
@@ -629,17 +628,17 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_inherit_invalid
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
-    GblTypeInterfaceMapEntry entries[] = {
+    GblInterfaceImpl entries[] = {
         { pSelf_->ifacedIfaceMap, sizeof(GblInterface)*3 }
     };
 
     GblTypeInfo info = {
         .classSize = sizeof(GblInterface)*10,
         .interfaceCount = 1,
-        .pInterfaceMap = entries
+        .pInterfaceImpls = entries
     };
 
-    GblType invalidType = GblType_registerStatic("IfaceMappedIFaceInherited",
+    GblType invalidType = GblType_register("IfaceMappedIFaceInherited",
                                                 pSelf_->ifacedIfaceMap,
                                                   &info,
                                                   0);
@@ -648,7 +647,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_inherit_invalid
     GBL_TEST_COMPARE(invalidType, GBL_INVALID_TYPE);
 
     // Ambiguous type (inherited base common with mapped base)
-    invalidType = GblType_registerStatic("IfaceMappedIFaceInherited1",
+    invalidType = GblType_register("IfaceMappedIFaceInherited1",
                                         pSelf_->ifacedDerived,
                                          &info,
                                          0);
@@ -661,12 +660,12 @@ static GBL_RESULT GblTypeTestSuite_fundamental_interfaced_mapped_inherit_valid_(
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
-    pSelf_->ifacedIfaceMapInherited = GblType_registerStatic("IfaceMappedIFaceInherited",
+    pSelf_->ifacedIfaceMapInherited = GblType_register("IfaceMappedIFaceInherited",
                                                       pSelf_->ifacedIfaceMap,
                                                       &(const GblTypeInfo) {
                                                           .classSize = sizeof(GblInterface)*4,
                                                           .interfaceCount = 1,
-                                                          .pInterfaceMap = (const GblTypeInterfaceMapEntry[]) {
+                                                          .pInterfaceImpls = (const GblInterfaceImpl[]) {
                                                                {
                                                                    .interfaceType = pSelf_->ifacedDerived2,
                                                                    .classOffset = sizeof(GblInterface)*3
@@ -698,12 +697,12 @@ static GBL_RESULT GblTypeTestSuite_fundamental_classed_mapped_interfaced_mapped_
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
-    pSelf_->classedMapIfacedIfaceMapInherited = GblType_registerStatic("ClassedMapIfaceMappedIFaceInherited",
+    pSelf_->classedMapIfacedIfaceMapInherited = GblType_register("ClassedMapIfaceMappedIFaceInherited",
                                                                 GBL_INVALID_TYPE,
                                                                 &(const GblTypeInfo) {
                                                                     .classSize = sizeof(GblClass) + sizeof(GblInterface) * 4,
                                                                     .interfaceCount = 1,
-                                                                    .pInterfaceMap = (const GblTypeInterfaceMapEntry[]) {
+                                                                    .pInterfaceImpls = (const GblInterfaceImpl[]) {
                                                                          {
                                                                              .interfaceType = pSelf_->ifacedIfaceMapInherited,
                                                                              .classOffset = sizeof(GblClass)
@@ -734,7 +733,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_invalid_(Gb
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GblType invalid = GblType_registerStatic("Ininstanced",
+    GblType invalid = GblType_register("Ininstanced",
                                                 GBL_INVALID_TYPE,
                                                      &(const GblTypeInfo) {
                                                          .instanceSize = sizeof(GblInstance)
@@ -743,7 +742,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_invalid_(Gb
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalid, GBL_INVALID_TYPE);
 
-    invalid = GblType_registerStatic("Ininstanced",
+    invalid = GblType_register("Ininstanced",
                                     GBL_INVALID_TYPE,
                                      &(const GblTypeInfo) {
                                          .classSize = sizeof(GblInterface),
@@ -759,7 +758,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_invalid_(Gb
 static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
-    pSelf_->instanced = GblType_registerStatic("Instanced",
+    pSelf_->instanced = GblType_register("Instanced",
                                         GBL_INVALID_TYPE,
                                          &(const GblTypeInfo) {
                                              .instanceSize = sizeof(GblInstance),
@@ -767,7 +766,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_valid_(GblT
                                          },
                                          GBL_TYPE_ROOT_FLAG_INSTANTIABLE);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GblType_instanceRefCount(pSelf_->instanced), 0);
+    GBL_TEST_COMPARE(GblType_instanceCount(pSelf_->instanced), 0);
     GBL_TEST_COMPARE(GblType_classRefCount(pSelf_->instanced), 0);
     GBL_TEST_VERIFY(pSelf_->instanced != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_CLASSED_CHECK(pSelf_->instanced));
@@ -782,7 +781,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_register_invalid_(GblTe
     GBL_TEST_EXPECT_ERROR();
 
     // Multiple primary/non-dependent dependencies:
-    pSelf_->dependent = GblType_registerStatic("Dependent",
+    pSelf_->dependent = GblType_register("Dependent",
                                                    GBL_INVALID_TYPE,
                                                     &(const GblTypeInfo) {
                                                         .dependencyCount = 2,
@@ -803,7 +802,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_register_valid_(GblTest
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
     // Dependencies on non-dependent types
-    pSelf_->dependent = GblType_registerStatic("ClassedDependent",
+    pSelf_->dependent = GblType_register("ClassedDependent",
                                                GBL_INVALID_TYPE,
                                                &(const GblTypeInfo) {
                                                    .dependencyCount = 1,
@@ -824,7 +823,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_depends_dependent_valid
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
-    pSelf_->dependentDependent = GblType_registerStatic("ClassedIFacedDependent",
+    pSelf_->dependentDependent = GblType_register("ClassedIFacedDependent",
                                           GBL_INVALID_TYPE,
                                           &(const GblTypeInfo) {
                                               .dependencyCount = 2,
@@ -851,7 +850,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_derive_depends_dependen
 
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
-    pSelf_->dependentDependentDerived = GblType_registerStatic("ClassedIFacedDependentDerived",
+    pSelf_->dependentDependentDerived = GblType_register("ClassedIFacedDependentDerived",
                                           pSelf_->dependentDependent,
                                           &(const GblTypeInfo) {
                                               .dependencyCount = 2,

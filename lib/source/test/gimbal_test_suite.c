@@ -2,7 +2,7 @@
 #include <gimbal/test/gimbal_test_scenario.h>
 #include <gimbal/containers/gimbal_array_list.h>
 
-#define GBL_TEST_SUITE_(inst)           ((GblTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_TEST_SUITE_TYPE))
+#define GBL_TEST_SUITE_(inst)           (GBL_PRIVATE(GblTestSuite, inst))
 
 typedef struct GblTestSuite_ {
     GblArrayList testCases;
@@ -124,9 +124,9 @@ static GBL_RESULT GblTestSuiteClass_destructor_(GblBox* pSelf) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestSuiteClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
+static GBL_RESULT GblTestSuiteClass_init_(GblClass* pClass, const void* pUd) {
     GBL_UNUSED(pUd);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
 
     if(!GblType_classRefCount(GBL_TEST_SUITE_TYPE)) {
         GBL_PROPERTIES_REGISTER(GblTestSuite);
@@ -155,13 +155,12 @@ static GBL_RESULT GblTestSuiteClass_init_(GblClass* pClass, const void* pUd, Gbl
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestSuiteClass_initDerived_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
+static GBL_RESULT GblTestSuiteClass_initDerived_(GblClass* pClass, const void* pUd) {
     GBL_UNUSED(pUd);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
 
-    GblTestSuiteClass* pSelf        = GBL_TEST_SUITE_CLASS(pClass);
-
-    pSelf->pVTable                  = pUd;
+    GblTestSuiteClass* pSelf = GBL_TEST_SUITE_CLASS(pClass);
+    pSelf->pVTable           = pUd;
 
     GBL_CTX_END();
 }
@@ -170,7 +169,7 @@ static GBL_RESULT GblTestSuiteClass_initDerived_(GblClass* pClass, const void* p
 GBL_EXPORT const char* GblTestSuite_name(const GblTestSuite* pSelf) {
     const char* pName = "";
     GBL_CTX_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL(GblTestSuite, pFnSuiteName, pSelf, &pName);
+    GBL_VCALL(GblTestSuite, pFnSuiteName, pSelf, &pName);
     GBL_CTX_VERIFY_LAST_RECORD();
     if(!pName) pName = "";
     GBL_CTX_END_BLOCK();
@@ -182,7 +181,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_initSuite(GblTestSuite* pSelf, GblContext* pC
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnSuiteInit)
         GBL_CTX_DONE();
-    GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnSuiteInit, pSelf, pCtx);
+    GBL_VCALL(GblTestSuite, pVTable->pFnSuiteInit, pSelf, pCtx);
 
     if(!GBL_RESULT_SUCCESS(GBL_CTX_RESULT())) {
          pSelf->casesSkipped += GblTestSuite_caseCount(pSelf);
@@ -198,7 +197,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_finalSuite(GblTestSuite* pSelf, GblContext* p
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnSuiteFinal)
         GBL_CTX_DONE();
-    GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnSuiteFinal, pSelf, pCtx);
+    GBL_VCALL(GblTestSuite, pVTable->pFnSuiteFinal, pSelf, pCtx);
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END();
 }
@@ -208,7 +207,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_initCase(GblTestSuite* pSelf, GblContext* pCt
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnCaseInit)
         GBL_CTX_DONE();
-    GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnCaseInit, pSelf, pCtx);
+    GBL_VCALL(GblTestSuite, pVTable->pFnCaseInit, pSelf, pCtx);
 
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END();
@@ -219,7 +218,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_finalCase(GblTestSuite* pSelf, GblContext* pC
     GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
     if(!pClass->pVTable || !pClass->pVTable->pFnCaseFinal)
         GBL_CTX_DONE();
-    GBL_INSTANCE_VCALL(GblTestSuite, pVTable->pFnCaseFinal, pSelf, pCtx);
+    GBL_VCALL(GblTestSuite, pVTable->pFnCaseFinal, pSelf, pCtx);
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END();
 }
@@ -227,7 +226,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_finalCase(GblTestSuite* pSelf, GblContext* pC
 GBL_EXPORT size_t  GblTestSuite_caseCount(const GblTestSuite* pSelf) {
     size_t  count = 0;
     GBL_CTX_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL(GblTestSuite, pFnCaseCount, pSelf, &count);
+    GBL_VCALL(GblTestSuite, pFnCaseCount, pSelf, &count);
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END_BLOCK();
     return count;
@@ -236,7 +235,7 @@ GBL_EXPORT size_t  GblTestSuite_caseCount(const GblTestSuite* pSelf) {
 GBL_EXPORT const char* GblTestSuite_caseName(const GblTestSuite* pSelf, size_t  index) {
     const char* pName = NULL;
     GBL_CTX_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL(GblTestSuite, pFnCaseName, pSelf, index, &pName);
+    GBL_VCALL(GblTestSuite, pFnCaseName, pSelf, index, &pName);
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END_BLOCK();
     return pName;
@@ -247,7 +246,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_runCase(GblTestSuite* pSelf,
                                            size_t  index)
 {
     GBL_CTX_BEGIN(pSelf);
-    GBL_INSTANCE_VCALL(GblTestSuite, pFnCaseRun, pSelf, pCtx, index);
+    GBL_VCALL(GblTestSuite, pFnCaseRun, pSelf, pCtx, index);
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END();
 }
@@ -273,7 +272,7 @@ GBL_EXPORT GblType GblTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblTestSuite"),
+        type = GblType_register(GblQuark_internStringStatic("GblTestSuite"),
                                       GBL_OBJECT_TYPE,
                                       &typeInfo,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);
@@ -398,8 +397,7 @@ GBL_EXPORT GblType GblTestSuite_register(const char* pName,
                                          GblFlags typeFlags)
 {
     GblType type = GBL_INVALID_TYPE;
-    GBL_CTX_BEGIN(NULL);
-    type = GblType_registerStatic(GblQuark_internString(pName),
+    type = GblType_register(GblQuark_internString(pName),
                                   GBL_TEST_SUITE_TYPE,
                                   &(const GblTypeInfo) {
                                       .pFnClassInit         = GblTestSuiteClass_initDerived_,
@@ -409,7 +407,5 @@ GBL_EXPORT GblType GblTestSuite_register(const char* pName,
                                       .instancePrivateSize  = instancePrivateSize
                                   },
                                   typeFlags);
-    GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_CTX_END_BLOCK();
     return type;
 }

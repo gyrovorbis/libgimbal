@@ -4,7 +4,7 @@
 #include <gimbal/meta/classes/gimbal_enum.h>
 #include <gimbal/meta/types/gimbal_variant.h>
 
-#define GBL_ENUM_TEST_SUITE_(inst)  ((GblEnumTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ENUM_TEST_SUITE_TYPE))
+#define GBL_ENUM_TEST_SUITE_(inst)  (GBL_PRIVATE(GblEnumTestSuite, inst))
 
 typedef struct GblEnumTestSuite_ {
     GblType         enumType;

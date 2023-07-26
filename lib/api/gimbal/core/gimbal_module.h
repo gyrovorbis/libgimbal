@@ -22,15 +22,15 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_MODULE_TYPE                 (GBL_TYPEOF(GblModule))                      //!< Type UUID for GblModule
-#define GBL_MODULE(instance)            (GBL_INSTANCE_CAST(instance,  GblModule))    //!< Function-style GblInstance cast
-#define GBL_MODULE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblModule))           //!< Function-style GblClass cast
-#define GBL_MODULE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblModule))//!< Gets a GblModuleClass from GblInstance
+#define GBL_MODULE_TYPE             (GBL_TYPEID(GblModule))            //!< Type UUID for GblModule
+#define GBL_MODULE(self)            (GBL_CAST(GblModule, self))        //!< Function-style GblInstance cast
+#define GBL_MODULE_CLASS(klass)     (GBL_CLASS_CAST(GblModule, klass)) //!< Function-style GblClass cast
+#define GBL_MODULE_GET_CLASS(self)  (GBL_CLASSOF(GblModule, self))     //!< Gets a GblModuleClass from GblInstance
 //! @}
 
-#define GBL_REQUIRE(...)                GBL_REQUIRE_(__VA_ARGS__)   //!< Returns the module for the given type
+#define GBL_REQUIRE(...)            GBL_REQUIRE_(__VA_ARGS__)   //!< Returns the module for the given type
 
-#define GBL_SELF_TYPE                   GblModule
+#define GBL_SELF_TYPE   GblModule
 
 GBL_DECLS_BEGIN
 
@@ -155,16 +155,16 @@ size_t      GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT
     GBL_VA_OVERLOAD_CALL(GBL_REQUIRE_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
 #define GBL_REQUIRE__1(type) \
-    GBL_INSTANCE_CAST(GblModule_require(GblType_name(GBL_TYPEOF(type)), \
+    GBL_CAST(type, GblModule_require(GblType_name(GBL_TYPEID(type)), \
                                                      GBL_NULL, __FILE__, __func__, \
-                                                     __LINE__), type)
+                                                     __LINE__))
 #define GBL_REQUIRE__2(type, name) \
-    GBL_INSTANCE_CAST(GblModule_require(name, GBL_NULL, __FILE__, __func__, \
-                                        __LINE__), type)
+    GBL_CAST(type, GblModule_require(name, GBL_NULL, __FILE__, __func__, \
+                                        __LINE__))
 
 #define GBL_REQUIRE__3(type, name, version) \
-    GBL_INSTANCE_CAST(GblModule_require(name, version, __FILE__, __func__, \
-                                        __LINE__), type)
+    GBL_CAST(type, GblModule_require(name, version, __FILE__, __func__, \
+                                        __LINE__))
 
 ///\endcond
 

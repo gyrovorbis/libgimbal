@@ -19,8 +19,8 @@ struct TypeBuiltins_     typeBuiltins_;
 
 
 GBL_MAYBE_UNUSED static int metaClassIFaceEntryComparator_(const void* pA, const void* pB) {
-    const GblTypeInterfaceMapEntry* pIFaceA = pA;
-    const GblTypeInterfaceMapEntry* pIfaceB = pB;
+    const GblInterfaceImpl* pIFaceA = pA;
+    const GblInterfaceImpl* pIfaceB = pB;
     return pIFaceA->interfaceType - pIfaceB->interfaceType;
 }
 
@@ -56,16 +56,20 @@ GblInterface* GblType_extension_(GblType type, GblType ifaceType) {
     return pExt;
 }
 
+static GblIPlugin* GblType_plugin(GblType type) {
+    return type == GBL_INVALID_TYPE? NULL : (GblIPlugin*)GblType_extension_(type, GBL_IPLUGIN_TYPE);
+}
+
 static GblBool GblType_conforms_(GblType type, GblType dependent, GblBool verify) {
     GblBool conforms = GBL_FALSE;
     GBL_CTX_BEGIN(pCtx_);
     if(dependent != GBL_INVALID_TYPE && type != GBL_INVALID_TYPE) {
         GblBool classConforms   = GBL_TRUE;
-        if(GblType_flagsCheck(dependent, GBL_TYPE_ROOT_FLAG_CLASSED)) {
+        if(GblType_flags(dependent) & GBL_TYPE_ROOT_FLAG_CLASSED) {
             classConforms = GblType_check(type, dependent);
         }
 
-        if(classConforms && GblType_flagsCheck(dependent, GBL_TYPE_ROOT_FLAG_DEPENDENT)) {
+        if(classConforms && (GblType_flags(dependent) & GBL_TYPE_ROOT_FLAG_DEPENDENT)) {
             for(int a = (int)GblType_depth(dependent); a >= 0; --a) {
                 GblType ancestor = GblType_ancestor(dependent, a);
                 GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
@@ -139,8 +143,8 @@ static GBL_RESULT typeLog_(GblType parent,
         for(size_t  i = 0; i < pInfo->interfaceCount; ++i) {
             GBL_CTX_VERBOSE("%u: [Type: %s, Class Offset: %u]",
                             i,
-                            GblType_name(pInfo->pInterfaceMap[i].interfaceType),
-                            pInfo->pInterfaceMap[i].classOffset);
+                            GblType_name(pInfo->pInterfaceImpls[i].interfaceType),
+                            pInfo->pInterfaceImpls[i].classOffset);
         }
         GBL_CTX_POP(1);
     }
@@ -214,7 +218,7 @@ static GBL_RESULT typeValidate_(GblType parent,
                        "Cannot register a CLASSED type with a class size < sizeof(GblClass): [%u]!",
                        sizeof(GblClass));
 
-        GBL_CTX_VERIFY(!(pInfo->pInterfaceMap && !pInfo->interfaceCount),
+        GBL_CTX_VERIFY(!(pInfo->pInterfaceImpls && !pInfo->interfaceCount),
                        GBL_RESULT_ERROR_INVALID_TYPE,
                        "Passed non-NULL interface map with an interface count of 0!");
     } else {
@@ -255,7 +259,7 @@ static GBL_RESULT typeValidate_(GblType parent,
         for(size_t  p = 0; p < pInfo->dependencyCount; ++p) {
             // have to check whether other dependencies have concrete type
             // also allowed to specify additional specificity on concrete type
-            if(!GblType_flagsCheck(pInfo->pDependencies[p], GBL_TYPE_ROOT_FLAG_DEPENDENT))
+            if(!(GblType_flags(pInfo->pDependencies[p]) & GBL_TYPE_ROOT_FLAG_DEPENDENT))
                 ++primaryCount;
             else GBL_CTX_VERIFY(GBL_TYPE_DEPENDENT_CHECK(pInfo->pDependencies[p]),
                                 GBL_RESULT_ERROR_INVALID_TYPE,
@@ -267,7 +271,7 @@ static GBL_RESULT typeValidate_(GblType parent,
     }
 
     if(pInfo->interfaceCount) {
-        GBL_CTX_VERIFY(pInfo->pInterfaceMap,
+        GBL_CTX_VERIFY(pInfo->pInterfaceImpls,
                        GBL_RESULT_ERROR_INVALID_TYPE,
                        "NULL pointer passed as interface map!");
 
@@ -277,7 +281,7 @@ static GBL_RESULT typeValidate_(GblType parent,
 
         // Interface pass 1: validate individual entries
         for(size_t  i = 0; i < pInfo->interfaceCount; ++i) {
-            const GblTypeInterfaceMapEntry* pEntry = &pInfo->pInterfaceMap[i];
+            const GblInterfaceImpl* pEntry = &pInfo->pInterfaceImpls[i];
             const GblType ifaceType = pEntry->interfaceType;
 
             GBL_CTX_VERIFY(GblType_verify(ifaceType),
@@ -285,7 +289,7 @@ static GBL_RESULT typeValidate_(GblType parent,
                            "INTERFACE[%u]: Invalid type!",
                            i);
 
-            GBL_CTX_VERIFY(GblType_flagsCheck(ifaceType, GBL_TYPE_ROOT_FLAG_INTERFACED),
+            GBL_CTX_VERIFY(GblType_flags(ifaceType) & GBL_TYPE_ROOT_FLAG_INTERFACED,
                            GBL_RESULT_ERROR_INVALID_TYPE,
                            "INTERFACE[%u: %s]: Not an INTERFACED fundamental type!",
                            i, GblType_name(ifaceType));
@@ -314,11 +318,11 @@ static GBL_RESULT typeValidate_(GblType parent,
 
         // Interfae pass 2: validate relative to each other
         for(size_t  i = 0; i < pInfo->interfaceCount; ++i) {
-            const GblTypeInterfaceMapEntry* pEntry = &pInfo->pInterfaceMap[i];
+            const GblInterfaceImpl* pEntry = &pInfo->pInterfaceImpls[i];
             const GblType ifaceType = pEntry->interfaceType;
             GblMetaClass* pIMeta = GBL_META_CLASS_(ifaceType);
             for(size_t  ii = i+1; ii < pInfo->interfaceCount; ++ii) {
-                const GblTypeInterfaceMapEntry* pOtherEntry = &pInfo->pInterfaceMap[ii];
+                const GblInterfaceImpl* pOtherEntry = &pInfo->pInterfaceImpls[ii];
                 const GblType otherIfaceType = pOtherEntry->interfaceType;
 
                 GblType common = GBL_INVALID_TYPE;
@@ -337,7 +341,7 @@ static GBL_RESULT typeValidate_(GblType parent,
         }
 
         for(size_t  i = 0; i < pInfo->interfaceCount; ++i) {
-            const GblTypeInterfaceMapEntry* pEntry = &pInfo->pInterfaceMap[i];
+            const GblInterfaceImpl* pEntry = &pInfo->pInterfaceImpls[i];
             const GblType ifaceType = pEntry->interfaceType;
             GblMetaClass* pIMeta = GBL_META_CLASS_(ifaceType);
 
@@ -350,7 +354,7 @@ static GBL_RESULT typeValidate_(GblType parent,
                 }
 
                 for(size_t  ii = 0; ii < i; ++ii) {
-                    GblType prevIFaceType = pInfo->pInterfaceMap[ii].interfaceType;
+                    GblType prevIFaceType = pInfo->pInterfaceImpls[ii].interfaceType;
                     if(GblType_check(prevIFaceType, prereqType)) {
                         satisfied = GBL_TRUE;
                         break;
@@ -397,7 +401,7 @@ static GblType typeRegister_(GblType parent,
         .classPrivateSize = 0,
         .pClassData = NULL,
         .interfaceCount = 0,
-        .pInterfaceMap = NULL,
+        .pInterfaceImpls = NULL,
         .dependencyCount = 0,
         .pDependencies = NULL,
         .pFnInstanceInit = NULL,
@@ -411,7 +415,7 @@ static GblType typeRegister_(GblType parent,
 
     GBL_CTX_PUSH_VERBOSE("[GblType] Register Type: %s", pName);
 
-    GBL_CTX_VERIFY(GblType_fromName(pName) == GBL_INVALID_TYPE,
+    GBL_CTX_VERIFY(GblType_find(pName) == GBL_INVALID_TYPE,
                    GBL_RESULT_ERROR_INVALID_TYPE,
                    "An existing entry was found with the same type name!");
     GBL_CTX_CALL(typeLog_(parent, pInfo, flags));
@@ -570,7 +574,7 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
     // Only include typeinfo within the chunk if it isn't statically allocated
     if(!(pMeta->flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)) {
         ifaceOffset  =  chunkSize += sizeof(GblTypeInfo);
-        prereqOffset =  chunkSize += sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount;
+        prereqOffset =  chunkSize += sizeof(GblInterfaceImpl) * pInfo->interfaceCount;
                         chunkSize += sizeof(GblType)                  * pInfo->dependencyCount;
     }
 
@@ -583,7 +587,7 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
     GBL_CTX_PUSH_VERBOSE("TypeInfoClass Chunk Info");
     GBL_CTX_VERBOSE("%-20s: %-100u", "total size",      chunkSize);
     GBL_CTX_VERBOSE("%-20s: %-100u", "TypeInfo size",   sizeof(GblTypeInfo));
-    GBL_CTX_VERBOSE("%-20s: %-100u", "Interface size",  sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount);
+    GBL_CTX_VERBOSE("%-20s: %-100u", "Interface size",  sizeof(GblInterfaceImpl) * pInfo->interfaceCount);
     GBL_CTX_VERBOSE("%-20s: %-100u", "Class size",      classTotalSize);
     GBL_CTX_POP(1);
 
@@ -600,11 +604,11 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
 
         // copy interface tables
         if(pInfo->interfaceCount) {
-            ((GblTypeInfo*)pMeta->pInfo)->pInterfaceMap  =  (GblTypeInterfaceMapEntry*)((char*)pChunk + ifaceOffset);
+            ((GblTypeInfo*)pMeta->pInfo)->pInterfaceImpls  =  (GblInterfaceImpl*)((char*)pChunk + ifaceOffset);
 
-            memcpy((GblTypeInterfaceMapEntry*)pMeta->pInfo->pInterfaceMap,
-                   pInfo->pInterfaceMap,
-                   sizeof(GblTypeInterfaceMapEntry) * pInfo->interfaceCount);
+            memcpy((GblInterfaceImpl*)pMeta->pInfo->pInterfaceImpls,
+                   pInfo->pInterfaceImpls,
+                   sizeof(GblInterfaceImpl) * pInfo->interfaceCount);
         }
 
         // copy dependency tables
@@ -794,7 +798,7 @@ GBL_EXPORT GblType GblType_fromBuiltinIndex(size_t  index) {
     return type;
 }
 
-GBL_EXPORT GblType GblType_fromNameQuark(GblQuark name) {
+GBL_EXPORT GblType GblType_findQuark(GblQuark name) {
     GblType foundType = GBL_INVALID_TYPE;
     GBL_CTX_BEGIN(pCtx_);
     if(name == GBL_QUARK_INVALID) GBL_CTX_DONE();
@@ -814,11 +818,11 @@ GBL_EXPORT GblType GblType_fromNameQuark(GblQuark name) {
     return foundType;
 }
 
-GBL_EXPORT GblType GblType_fromName(const char* pTypeName) {
-    return GblType_fromNameQuark(GblQuark_tryString(pTypeName));
+GBL_EXPORT GblType GblType_find(const char* pTypeName) {
+    return GblType_findQuark(GblQuark_tryString(pTypeName));
 }
 
-GBL_EXPORT size_t  GblType_registeredCount(void) {
+GBL_EXPORT size_t  GblType_count(void) {
     size_t  count = 0;
     GBL_CTX_BEGIN(pCtx_);
     GBL_TYPE_ENSURE_INITIALIZED_();
@@ -840,7 +844,7 @@ GBL_EXPORT size_t  GblType_builtinCount(void) {
     return count;
 }
 
-GBL_EXPORT GblType GblType_nextRegistered(GblType prevType) {
+GBL_EXPORT GblType GblType_next(GblType prevType) {
     GblType next = GBL_INVALID_TYPE;
     GBL_CTX_BEGIN(pCtx_);
 
@@ -897,7 +901,7 @@ GBL_EXPORT GblType GblType_root(GblType type) {
     return base;
 } 
 
-GBL_EXPORT GblType GblType_base(GblType type, size_t  depth) {
+GBL_EXPORT GblType GblType_base(GblType type, size_t depth) {
     GblType base = GBL_INVALID_TYPE;
     GblMetaClass* pMeta =  GBL_META_CLASS_(type);
     //GBL_CTX_BEGIN(pCtx_);
@@ -912,7 +916,7 @@ GBL_EXPORT GblType GblType_base(GblType type, size_t  depth) {
     return base;
 }
 
-GBL_EXPORT GblType GblType_ancestor(GblType type, size_t  level) {
+GBL_EXPORT GblType GblType_ancestor(GblType type, size_t level) {
     GblType ancestor = GBL_INVALID_TYPE;
     GblMetaClass* pMeta =  GBL_META_CLASS_(type);
     GBL_CTX_BEGIN(pCtx_);
@@ -938,28 +942,22 @@ GBL_EXPORT size_t  GblType_depth(GblType type) {
     return depth;
 }
 
-GBL_EXPORT GblBool GblType_flagsCheck(GblType type, GblFlags mask) {
-    GblBool result = GBL_FALSE;
-    {
-        GblMetaClass* pMeta = GBL_META_CLASS_(type);
-        if(pMeta) {
-            result = ((pMeta->flags & mask) != 0);
-        }
-    }
-    return result;
+GBL_EXPORT GblFlags GblType_flags(GblType type) {
+    GblMetaClass* pMeta = GBL_META_CLASS_(type);
+
+    if(pMeta)
+        return pMeta->flags;
+
+    return 0;
 }
 
 GBL_EXPORT const GblTypeInfo* GblType_info(GblType type) {
-    const GblTypeInfo* pInfo      = NULL;
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
-    GBL_CTX_BEGIN(pCtx_);
-    if(pMeta) pInfo = pMeta->pInfo;
-    GBL_CTX_END_BLOCK();
-    return pInfo;
-}
 
-GBL_EXPORT GblIPlugin* GblType_plugin(GblType type) {
-    return type == GBL_INVALID_TYPE? NULL : (GblIPlugin*)GblType_extension_(type, GBL_IPLUGIN_TYPE);
+    if(pMeta)
+        return pMeta->pInfo;
+
+    return NULL;
 }
 
 // If this ever needs to be optimized, make it non-recursive
@@ -986,7 +984,7 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
             } else if(ifaceChecks) {
                 // recurse over interfaces checking
                 for(size_t i = 0; i < pIter->pInfo->interfaceCount; ++i) {
-                    if(GblType_typeIsA_(pIter->pInfo->pInterfaceMap[i].interfaceType,
+                    if(GblType_typeIsA_(pIter->pInfo->pInterfaceImpls[i].interfaceType,
                                         base,
                                         GBL_TRUE,
                                         ifaceChecks,
@@ -1007,7 +1005,7 @@ GBL_EXPORT GblBool GblType_verify(GblType type) {
     GblBool valid = GBL_FALSE;
     if(type != GBL_INVALID_TYPE) {
         const GblQuark nameQuark     = GblType_nameQuark(type);
-        const GblType registeredType = GblType_fromNameQuark(nameQuark);
+        const GblType registeredType = GblType_findQuark(nameQuark);
         if(registeredType != GBL_INVALID_TYPE) {
             valid = GBL_TRUE;
         }
@@ -1038,19 +1036,19 @@ GBL_EXPORT GblType GblType_common(GblType type, GblType other) {
     if(type == GBL_INVALID_TYPE || other == GBL_INVALID_TYPE)
         return GBL_INVALID_TYPE;
 
-    GblBool ifaced = GblType_flagsCheck(other, GBL_TYPE_ROOT_FLAG_INTERFACED);
+    GblBool ifaced = !!(GblType_flags(other) & GBL_TYPE_ROOT_FLAG_INTERFACED);
 
     for(size_t  b = 0; b <= GblType_depth(other); ++b) {
         const GblType otherBase = GblType_base(other, b);
         const GblMetaClass* pOtherBase = GBL_META_CLASS_(otherBase);
         if(GblType_implements(type, otherBase)) {
-            if(ifaced && GblType_flagsCheck(otherBase, GBL_TYPE_FLAG_UNMAPPABLE))
+            if(ifaced && (GblType_flags(otherBase) & GBL_TYPE_FLAG_UNMAPPABLE))
                 return GBL_INVALID_TYPE;
             else
                 return otherBase;
-        } else if(!(pOtherBase->flags & GBL_TYPE_FLAG_UNMAPPABLE)){
+        } else if(!(pOtherBase->flags & GBL_TYPE_FLAG_UNMAPPABLE)) {
             for(size_t  i = 0; i < pOtherBase->pInfo->interfaceCount; ++i) {
-                const GblType otherIface = pOtherBase->pInfo->pInterfaceMap[i].interfaceType;
+                const GblType otherIface = pOtherBase->pInfo->pInterfaceImpls[i].interfaceType;
                 const GblType common = GblType_common(type, otherIface);
                 if(common != GBL_INVALID_TYPE) {
                     return common;
@@ -1066,7 +1064,7 @@ GBL_EXPORT GblBool GblType_depends(GblType dependent, GblType dependency) {
     GblBool result = GBL_FALSE;
     GBL_CTX_BEGIN(pCtx_);
     if(dependent != GBL_INVALID_TYPE && dependency != GBL_INVALID_TYPE) {
-        if(GblType_flagsCheck(dependent, GBL_TYPE_ROOT_FLAG_DEPENDENT)) {
+        if(GblType_flags(dependent) & GBL_TYPE_ROOT_FLAG_DEPENDENT) {
             for(int a = (int)GblType_depth(dependent); a >= 0; --a) {
                 GblType ancestor = GblType_ancestor(dependent, a);
                 GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
@@ -1091,7 +1089,7 @@ GBL_EXPORT GblBool GblType_conforms(GblType type, GblType dependent) {
 }
 
 // ==== MAKE SURE TO ITERATE OVER PARENTS AND CHECK THAT CLASS/INSTANCE SIZE IS VALID =====
-GBL_EXPORT GblType GblType_registerStatic(const char*                  pName,
+GBL_EXPORT GblType GblType_register(const char*                  pName,
                                           GblType                      parent,
                                           const GblTypeInfo*           pInfo,
                                           GblFlags                     flags)
@@ -1103,7 +1101,7 @@ GBL_EXPORT GblType GblType_registerStatic(const char*                  pName,
 
     GBL_CTX_PUSH_VERBOSE("[GblType] Register Static Type: %s", pName);
 
-    GBL_CTX_VERIFY_ARG(GblType_fromName(pName) == GBL_INVALID_TYPE,
+    GBL_CTX_VERIFY_ARG(GblType_find(pName) == GBL_INVALID_TYPE,
                         "Existing entry for the given type name was found!");
 
     GBL_CTX_VERIFY_ARG(!(flags & GBL_TYPE_FLAG_BUILTIN),
@@ -1130,7 +1128,7 @@ GBL_EXPORT GBL_RESULT GblType_unregister(GblType type) {
             GBL_CTX_WARN("Attempting to unregister type with active class references: %u", refCount);
         }
 
-        refCount = GblType_instanceRefCount(type);
+        refCount = GblType_instanceCount(type);
         if(refCount) {
             GBL_CTX_WARN("Attempting to unregister type with active class references: %u", refCount);
         }
@@ -1158,7 +1156,7 @@ GBL_EXPORT GblRefCount GblType_classRefCount(GblType type) {
     return refCount;
 }
 
-GBL_EXPORT GblRefCount GblType_instanceRefCount(GblType type) {
+GBL_EXPORT GblRefCount GblType_instanceCount(GblType type) {
     GblRefCount refCount      = 0;
     if(type != GBL_INVALID_TYPE) {
         GblMetaClass* pMeta = GBL_META_CLASS_(type);

@@ -15,10 +15,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_CLOSURE_TYPE                (GBL_TYPEOF(GblClosure))
-#define GBL_CLOSURE(instance)           (GBL_INSTANCE_CAST(instance, GblClosure))
-#define GBL_CLOSURE_CLASS(klass)        (GBL_CLASS_CAST(klass, GblClosure))
-#define GBL_CLOSURE_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblClosure))
+#define GBL_CLOSURE_TYPE                (GBL_TYPEID(GblClosure))
+#define GBL_CLOSURE(self)               (GBL_CAST(GblClosure, self))
+#define GBL_CLOSURE_CLASS(klass)        (GBL_CLASS_CAST(GblClosure, klass))
+#define GBL_CLOSURE_GET_CLASS(self)     (GBL_CLASSOF(GblClosure, self))
 //! @}
 
 //! Casts a C function pointer to a generic callback type
@@ -79,7 +79,7 @@ GBL_CLASS_END
  * \sa GblCClosure, GblMarshalFn, gimbal_signal.h
  */
 GBL_INSTANCE_DERIVE(GblClosure, GblBox)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblMarshalFn pFnMarshal; //!< Per-instance marshal function, private
     GBL_PRIVATE_END
 GBL_INSTANCE_END

@@ -328,27 +328,27 @@ GBL_EXPORT GblBool GblProperty_uninstallAll(GblType objectType) {
 
 GBL_EXPORT GBL_RESULT GblProperty_defaultValue(const GblProperty* pSelf, GblVariant* pValue) {
     GBL_CTX_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GblProperty, pFnDefaultValue, pSelf, pValue);
+    GBL_VCALL(GblProperty, pFnDefaultValue, pSelf, pValue);
     GBL_CTX_END();
 }
 
 GBL_EXPORT GblBool GblProperty_checkValue(const GblProperty* pSelf, const GblVariant* pValue) {
     GBL_CTX_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GblProperty, pFnCheckValue, pSelf, pValue);
+    GBL_VCALL(GblProperty, pFnCheckValue, pSelf, pValue);
     GBL_CTX_END_BLOCK();
     return GBL_RESULT_SUCCESS(GBL_CTX_RESULT());
 }
 
 GBL_EXPORT GBL_RESULT GblProperty_validateValue(const GblProperty* pSelf, GblVariant* pValue) {
     GBL_CTX_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GblProperty, pFnValidateValue, pSelf, pValue);
+    GBL_VCALL(GblProperty, pFnValidateValue, pSelf, pValue);
     GBL_CTX_END();
 }
 
 GBL_EXPORT int GblProperty_compareValues(const GblProperty* pSelf, const GblVariant* pV1, const GblVariant* pV2) {
     int result = 0;
     GBL_CTX_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GblProperty, pFnCompareValues, pSelf, pV1, pV2, &result);
+    GBL_VCALL(GblProperty, pFnCompareValues, pSelf, pV1, pV2, &result);
     GBL_CTX_END_BLOCK();
     return result;
 }
@@ -386,7 +386,7 @@ static GBL_RESULT GblProperty_initVaList_(GblProperty* pSelf,
     pSelf->flags                   = flags;
 
     if(optionalArgCount) {
-        GBL_INSTANCE_VCALL(GblProperty, pFnInitOptionalArgs, pSelf, optionalArgCount, pList);
+        GBL_VCALL(GblProperty, pFnInitOptionalArgs, pSelf, optionalArgCount, pList);
     }
 
     GBL_CTX_END();
@@ -507,9 +507,9 @@ static GBL_RESULT GblProperty_compareValues_(const GblProperty* pProp, const Gbl
     return GBL_RESULT_SUCCESS;
 }
 
-static GBL_RESULT GblPropertyClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
+static GBL_RESULT GblPropertyClass_init_(GblClass* pClass, const void* pUd) {
     GBL_UNUSED(pUd);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
 
     GblPropertyClass* pSelf     = (GblPropertyClass*)pClass;
     pSelf->pFnInitOptionalArgs  = GblProperty_initOptionalArgs_;
@@ -530,7 +530,7 @@ GBL_EXPORT GblType GblProperty_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblProperty"),
+        type = GblType_register(GblQuark_internStringStatic("GblProperty"),
                                       GBL_BOX_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

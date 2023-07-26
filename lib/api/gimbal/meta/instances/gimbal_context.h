@@ -15,10 +15,10 @@
 #include "../ifaces/gimbal_ilogger.h"
 
 /// \ingroup metaBuiltinTypes
-#define GBL_CONTEXT_TYPE                (GBL_TYPEOF(GblContext))
-#define GBL_CONTEXT(instance)           (GBL_INSTANCE_CAST(instance, GblContext))
-#define GBL_CONTEXT_CLASS(klass)        (GBL_CLASS_CAST(klass, GblContext))
-#define GBL_CONTEXT_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblContext))
+#define GBL_CONTEXT_TYPE                (GBL_TYPEID(GblContext))
+#define GBL_CONTEXT(instance)           (GBL_CAST(GblContext, instance))
+#define GBL_CONTEXT_CLASS(klass)        (GBL_CLASS_CAST(GblContext, klass))
+#define GBL_CONTEXT_GET_CLASS(instance) (GBL_CLASSOF(GblContext, instance))
 
 #define GBL_SELF_TYPE GblContext
 

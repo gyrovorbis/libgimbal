@@ -12,11 +12,11 @@
 
 #include "gimbal_closure.h"
 
-#define GBL_CLASS_CLOSURE_TYPE                  (GBL_TYPEOF(GblClassClosure))
+#define GBL_CLASS_CLOSURE_TYPE              (GBL_TYPEID(GblClassClosure))
 
-#define GBL_CLASS_CLOSURE(instance)             (GBL_INSTANCE_CAST(instance, GblClassClosure))
-#define GBL_CLASS_CLOSURE_CLASS(klass)          (GBL_CLASS_CAST(klass, GblClassClosure))
-#define GBL_CLASS_CLOSURE_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS(instance, GblClassClosure))
+#define GBL_CLASS_CLOSURE(self)             (GBL_CAST(GblClassClosure, self))
+#define GBL_CLASS_CLOSURE_CLASS(klass)      (GBL_CLASS_CAST(GblClassClosure, self))
+#define GBL_CLASS_CLOSURE_GET_CLASS(self)   (GBL_CLASSOF(GblClassClosure, self))
 
 #define GBL_SELF_TYPE GblClassClosure
 
@@ -38,7 +38,7 @@ GBL_CLASS_DERIVE_EMPTY(GblClassClosure, GblClosure)
  *  to invoke a virtual method on the GblClass of a GblInstance.
  */
 GBL_INSTANCE_DERIVE(GblClassClosure, GblClosure)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblType         classType;
         size_t          offset;
         GblInstance*    pInstance;

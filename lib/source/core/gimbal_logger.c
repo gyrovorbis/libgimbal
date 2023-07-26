@@ -137,12 +137,9 @@ GBL_EXPORT GBL_RESULT GblLogger_construct(GblLogger* pSelf,
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(derived, GBL_LOGGER_TYPE);
 
-    if(pClass)
-        GBL_CTX_VERIFY_CALL(GblInstance_constructWithClass(GBL_INSTANCE(pSelf),
-                                                           GBL_CLASS(pClass)));
-    else
-        GBL_CTX_VERIFY_CALL(GblInstance_construct(GBL_INSTANCE(pSelf),
-                                                  derived));
+    GBL_CTX_VERIFY_CALL(GblInstance_construct(GBL_INSTANCE(pSelf),
+                                              derived,
+                                              GBL_CLASS(pClass)));
 
     GBL_CTX_END();
 }
@@ -477,8 +474,7 @@ static GBL_RESULT GblLogger_write_(GblLogger*    pSelf,
     return result;
 }
 
-static GBL_RESULT GblLogger_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_UNUSED(pCtx);
+static GBL_RESULT GblLogger_init_(GblInstance* pInstance) {
     GBL_CTX_BEGIN(NULL);
 
     GBL_LOGGER(pInstance)->flagsFilter = ~(0x0);
@@ -532,8 +528,8 @@ static GBL_RESULT GblLogger_GblObject_property(const GblObject* pObject,
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblLoggerClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_UNUSED(pUd, pCtx);
+static GBL_RESULT GblLoggerClass_init_(GblClass* pClass, const void* pUd) {
+    GBL_UNUSED(pUd);
     GBL_CTX_BEGIN(NULL);
 
     GBL_OBJECT_CLASS(pClass)->pFnProperty    = GblLogger_GblObject_property;
@@ -558,7 +554,7 @@ GBL_EXPORT GblType GblLogger_type(void) {
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         GBL_CTX_BEGIN(NULL);
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblLogger"),
+        type = GblType_register(GblQuark_internStringStatic("GblLogger"),
                                       GBL_OBJECT_TYPE,
                                       &typeInfo,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

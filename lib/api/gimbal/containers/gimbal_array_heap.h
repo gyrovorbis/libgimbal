@@ -31,7 +31,7 @@ typedef int (*GblArrayHeapCmpFn)(const void* pEntry1, const void* pEntry2);
  *  \ingroup containers
  */
 typedef struct GblArrayHeap {           // Size (32-bit / 64-bit)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblArrayHeapCmpFn   pFnCmp;     // 4/8      bytes
         GblArrayList        list;       // 20/36    bytes
     GBL_PRIVATE_END

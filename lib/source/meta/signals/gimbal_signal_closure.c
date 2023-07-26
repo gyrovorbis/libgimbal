@@ -31,8 +31,8 @@ GBL_EXPORT GblSignalClosure* GblSignalClosure_create(const char*  pSignalName,
     return pClosure;
 }
 
-static GBL_RESULT GblSignalClosure_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblSignalClosure_init_(GblInstance* pInstance) {
+    GBL_CTX_BEGIN(NULL);
     GblClosure* pClosure = GBL_CLOSURE(pInstance);
     GblClosure_setMarshal(pClosure, GblMarshal_SignalForwarder);
     GBL_CTX_END();
@@ -50,7 +50,7 @@ GBL_EXPORT GblType GblSignalClosure_type(void) {
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblSignalClosure"),
+        type = GblType_register(GblQuark_internStringStatic("GblSignalClosure"),
                                       GBL_CLOSURE_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

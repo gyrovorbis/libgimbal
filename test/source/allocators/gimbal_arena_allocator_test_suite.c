@@ -2,7 +2,7 @@
 #include <gimbal/allocators/gimbal_arena_allocator.h>
 #include <gimbal/test/gimbal_test_macros.h>
 
-#define GBL_ARENA_ALLOCATOR_TEST_SUITE_(inst)   ((GblArenaAllocatorTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARENA_ALLOCATOR_TEST_SUITE_TYPE))
+#define GBL_ARENA_ALLOCATOR_TEST_SUITE_(inst)   (GBL_PRIVATE(GblArenaAllocatorTestSuite, inst))
 
 typedef struct GblArenaAllocatorTestSuite_ {
     GblArenaAllocator arena;

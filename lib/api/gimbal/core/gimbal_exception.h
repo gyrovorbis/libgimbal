@@ -17,10 +17,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_EXCEPTION_TYPE              (GBL_TYPEOF(GblException))
-#define GBL_EXCEPTION(self)             (GBL_INSTANCE_CAST(self, GblException))
-#define GBL_EXCEPTION_CLASS(klass)      (GBL_CLASS_CAST(klass, GblException))
-#define GBL_EXCEPTION_GET_CLASS(self)   (GBL_INSTANCE_GET_CLASS(self, GblException))
+#define GBL_EXCEPTION_TYPE              (GBL_TYPEID(GblException))
+#define GBL_EXCEPTION(self)             (GBL_CAST(GblException, self))
+#define GBL_EXCEPTION_CLASS(klass)      (GBL_CLASS_CAST(GblException, klass))
+#define GBL_EXCEPTION_GET_CLASS(self)   (GBL_CLASSOF(GblException, self))
 //! @}
 
 #define GBL_TRY

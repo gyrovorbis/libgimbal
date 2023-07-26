@@ -21,7 +21,7 @@
  *  @{
  */
 #define GBL_ENUM_TYPE           (GblEnum_type())                 //!< Type UUID of GblEnumClass
-#define GBL_ENUM_CLASS(klass)   (GBL_CLASS_CAST(klass, GblEnum)) //!< Function-style GblClass cast
+#define GBL_ENUM_CLASS(klass)   (GBL_CLASS_CAST(GblEnum, klass)) //!< Function-style GblClass cast
 //! @}
 
 /*! \name Helper Macros

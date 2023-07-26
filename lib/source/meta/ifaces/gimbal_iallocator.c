@@ -26,9 +26,9 @@ static GBL_RESULT GblIAllocatorClass_free_(GblIAllocator* pIAllocator, const Gbl
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblIAllocatorClass_init_(GblIAllocatorClass* pIFace, void* pData, GblContext* pCtx) GBL_NOEXCEPT {
+static GBL_RESULT GblIAllocatorClass_init_(GblIAllocatorClass* pIFace, void* pData) {
     GBL_UNUSED(pData);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
     pIFace->pFnAlloc    = GblIAllocatorClass_alloc_;
     pIFace->pFnRealloc  = GblIAllocatorClass_realloc_;
     pIFace->pFnFree     = GblIAllocatorClass_free_;
@@ -43,7 +43,7 @@ GBL_RESULT GblIAllocator_alloc  (GblIAllocator* pSelf,
                                  void** ppData)                     GBL_NOEXCEPT
 {
     GBL_CTX_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GblIAllocator, pFnAlloc,
+    GBL_VCALL(GblIAllocator, pFnAlloc,
                        pSelf, pStackFrame, size, alignment, pDebugString, ppData);
     GBL_CTX_END();
 }
@@ -56,7 +56,7 @@ GBL_RESULT GblIAllocator_realloc(GblIAllocator* pSelf,
                                  void** ppNewData)                  GBL_NOEXCEPT
 {
     GBL_CTX_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GblIAllocator, pFnRealloc,
+    GBL_VCALL(GblIAllocator, pFnRealloc,
                        pSelf, pStackFrame, pData, newSize, newAlign, ppNewData);
     GBL_CTX_END();
 }
@@ -66,7 +66,7 @@ GBL_RESULT GblIAllocator_free   (GblIAllocator* pSelf,
                                  void* pData)                       GBL_NOEXCEPT
 {
     GBL_CTX_BEGIN(NULL);
-    GBL_INSTANCE_VCALL(GblIAllocator, pFnFree,
+    GBL_VCALL(GblIAllocator, pFnFree,
                        pSelf, pStackFrame, pData);
     GBL_CTX_END();
 }
@@ -75,18 +75,15 @@ GBL_EXPORT GblType GblIAllocator_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     static const GblTypeInfo info = {
-        .pFnClassInit = (GblTypeClassInitializeFn)GblIAllocatorClass_init_,
+        .pFnClassInit = (GblClassInitFn)GblIAllocatorClass_init_,
         .classSize = sizeof(GblIAllocatorClass)
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_CTX_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblIAllocator"),
-                                      GBL_INTERFACE_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
+        type = GblType_register(GblQuark_internStringStatic("GblIAllocator"),
+                                GBL_INTERFACE_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
     return type;
 }

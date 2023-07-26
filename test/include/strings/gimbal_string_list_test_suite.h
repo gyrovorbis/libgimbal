@@ -5,9 +5,9 @@
 
 #define GBL_STRING_LIST_TEST_SUITE_TYPE                 (GblStringListTestSuite_type())
 
-#define GBL_STRING_LIST_TEST_SUITE(instance)            (GBL_INSTANCE_CAST(instance, GblStringListTestSuite))
+#define GBL_STRING_LIST_TEST_SUITE(instance)            (GBL_CAST(instance, GblStringListTestSuite))
 #define GBL_STRING_LIST_TEST_SUITE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblStringListTestSuite))
-#define GBL_STRING_LIST_TEST_SUITE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblStringListTestSuite))
+#define GBL_STRING_LIST_TEST_SUITE_GET_CLASS(instance)  (GBL_CLASSOF(instance, GblStringListTestSuite))
 
 GBL_DECLS_BEGIN
 

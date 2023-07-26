@@ -173,7 +173,7 @@ static Signal_* Signal_findByQuark_(GblType     ownerType,
         // check interfaces on current type
         const GblMetaClass* pMeta = GBL_META_CLASS_(curType);
         for(uint8_t i = 0; i < pMeta->pInfo->interfaceCount; ++i) {
-            pSignal = Signal_findByQuark_(pMeta->pInfo->pInterfaceMap[i].interfaceType,
+            pSignal = Signal_findByQuark_(pMeta->pInfo->pInterfaceImpls[i].interfaceType,
                                              name);
             if(pSignal) goto done;
         }
@@ -237,7 +237,7 @@ static InstanceConnectionTable_* InstanceConnectionTable_create_(GblInstance* pI
     GBL_CTX_VERIFY(GblHashSet_insert(&instanceConnectionTableSet_, &pTable),
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Failed to create an emitter connection table for type [%s]!",
-                   GblType_name(GBL_INSTANCE_TYPEOF(pInstance)));
+                   GblType_name(GBL_TYPEOF(pInstance)));
     GBL_CTX_END_BLOCK();
     return pTable;
 }
@@ -317,7 +317,7 @@ static EmitterHandler_* EmitterHandler_findOrCreate_(GblInstance*               
 
     if(!pHandler || ppSignalOut) {
         //then check to see if signal is even valid
-        const GblType typeId = GBL_INSTANCE_TYPEOF(pInstance);
+        const GblType typeId = GBL_TYPEOF(pInstance);
         if(!pSignal) pSignal = Signal_findByQuark_(typeId,
                                                    nameQuark);
         GBL_CTX_VERIFY(pSignal,
@@ -453,7 +453,7 @@ GBL_EXPORT GBL_RESULT GblSignal_connectSignal(GblInstance* pEmitter,
     GBL_CTX_VERIFY(quarkName != GBL_QUARK_INVALID,
                    GBL_RESULT_ERROR_INVALID_HANDLE);
 
-    GBL_CTX_VERIFY(Signal_findByQuark_(GBL_INSTANCE_TYPEOF(pDstEmitter), quarkName),
+    GBL_CTX_VERIFY(Signal_findByQuark_(GBL_TYPEOF(pDstEmitter), quarkName),
                    GBL_RESULT_ERROR_INVALID_HANDLE);
 
     GblSignalClosure* pSignalClosure = GblSignalClosure_create(pDstSignalName, NULL);

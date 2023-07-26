@@ -11,11 +11,11 @@
 
 #include "gimbal_closure.h"
 
-#define GBL_SIGNAL_CLOSURE_TYPE                 (GBL_TYPEOF(GblSignalClosure))
+#define GBL_SIGNAL_CLOSURE_TYPE             (GBL_TYPEID(GblSignalClosure))
 
-#define GBL_SIGNAL_CLOSURE(instance)            (GBL_INSTANCE_CAST(instance, GblSignalClosure))
-#define GBL_SIGNAL_CLOSURE_CLASS(klass)         (GBL_CLASS_CAST(klass, GblSignalClosure))
-#define GBL_SIGNAL_CLOSURE_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblSignalClosure))
+#define GBL_SIGNAL_CLOSURE(self)            (GBL_CAST(GblSignalClosure, self))
+#define GBL_SIGNAL_CLOSURE_CLASS(klass)     (GBL_CLASS_CAST(GblSignalClosure, klass))
+#define GBL_SIGNAL_CLOSURE_GET_CLASS(self)  (GBL_CLASSOF(GblSignalClosure, self))
 
 #define GBL_SELF_TYPE GblSignalClosure
 
@@ -42,7 +42,7 @@ GBL_CLASS_DERIVE_EMPTY(GblSignalClosure, GblClosure)
  *  which emits the signal.
  */
 GBL_INSTANCE_DERIVE(GblSignalClosure, GblClosure)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblQuark signalName;
     GBL_PRIVATE_END
 GBL_INSTANCE_END

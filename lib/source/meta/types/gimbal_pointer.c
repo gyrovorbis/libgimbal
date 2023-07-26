@@ -109,7 +109,7 @@ extern GBL_RESULT GblPointer_typeRegister_(GblContext* pCtx) {
 GblType GblPointer_register(const char* pName) {
     GblType type = GBL_INVALID_TYPE;
     GBL_CTX_BEGIN(NULL);
-    type = GblType_registerStatic(GblQuark_internString(pName),
+    type = GblType_register(GblQuark_internString(pName),
                                   GBL_POINTER_TYPE,
                                   &(const GblTypeInfo) {
                                       .classSize = sizeof(GblPrimitiveClass),

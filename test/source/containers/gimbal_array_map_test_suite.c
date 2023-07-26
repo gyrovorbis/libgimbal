@@ -5,7 +5,7 @@
 #include <gimbal/meta/classes/gimbal_primitives.h>
 
 #define GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_ 200
-#define GBL_ARRAY_MAP_TEST_SUITE_(inst)     ((GblArrayMapTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_MAP_TEST_SUITE_TYPE))
+#define GBL_ARRAY_MAP_TEST_SUITE_(inst) (GBL_PRIVATE(GblArrayMapTestSuite, inst))
 
 typedef struct GblArrayMapTestSuite_ {
     GblArrayMap*    pMap1;

@@ -4,7 +4,7 @@
 #include <gimbal/meta/types/gimbal_variant.h>
 
 #define GBL_SETTINGS_HASHSET_SIZE_DEFAULT_  32
-#define GBL_SETTINGS_(self)                 ((GblSettings_*)GBL_INSTANCE_PRIVATE(self, GBL_SETTINGS_TYPE))
+#define GBL_SETTINGS_(self)                 (GBL_PRIVATE(GblSettings, self))
 
 GBL_DECLARE_STRUCT(GblSettings_) {
     GblHashSet      hashSet;
@@ -197,7 +197,7 @@ static GBL_RESULT GblSettings_Box_destructor_(GblBox* pBox) {
     GBL_CTX_CALL(GblStringBuffer_destruct(&pSelf_->scope));
 
     // Call parent's destructor
-    GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
+    GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 
     GBL_CTX_END();
 }
@@ -249,7 +249,7 @@ GBL_EXPORT GblType GblSettings_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblSettings"),
+        type = GblType_register(GblQuark_internStringStatic("GblSettings"),
                                       GBL_OBJECT_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

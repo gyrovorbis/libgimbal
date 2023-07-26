@@ -5,7 +5,7 @@
 #include <gimbal/meta/signals/gimbal_class_closure.h>
 #include <gimbal/utils/gimbal_ref.h>
 
-#define GBL_CLOSURE_TEST_SUITE_(inst)   ((GblClosureTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_CLOSURE_TEST_SUITE_TYPE))
+#define GBL_CLOSURE_TEST_SUITE_(inst)   (GBL_PRIVATE(GblClosureTestSuite, inst))
 
 GBL_FORWARD_DECLARE_STRUCT(TestClosure_);
 
@@ -25,14 +25,14 @@ static GBL_RESULT GblClosureTestSuite_init_(GblTestSuite* pSelf, GblContext* pCt
     GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblClosureTestSuite_));
-    pSelf_->startGlobalRefCount = GblType_instanceRefCount(GBL_BOX_TYPE);
+    pSelf_->startGlobalRefCount = GblType_instanceCount(GBL_BOX_TYPE);
     GBL_CTX_END();
 }
 
 static GBL_RESULT GblClosureTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblClosureTestSuite_* pSelf_ = GBL_CLOSURE_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(GblType_instanceRefCount(GBL_BOX_TYPE), pSelf_->startGlobalRefCount);
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_BOX_TYPE), pSelf_->startGlobalRefCount);
     GBL_CTX_END();
 }
 
@@ -243,7 +243,9 @@ static GBL_RESULT GblClosureTestSuite_classClosure_(GblTestSuite* pSelf, GblCont
     GblClass_constructFloating(GBL_CLASS(&bullshitClass), GBL_INSTANCE_TYPE);
     bullshitClass.pFnMethod = cClosureFunction_;
 
-    GblInstance* pInstance = GblInstance_createWithClass(GBL_CLASS(&bullshitClass));
+    GblInstance* pInstance = GblInstance_create(GBL_INSTANCE_TYPE,
+                                                sizeof(GblInstance),
+                                                GBL_CLASS(&bullshitClass));
     GblInstance_sinkClass(pInstance);
 
 

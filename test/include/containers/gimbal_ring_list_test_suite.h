@@ -3,11 +3,11 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_RING_LIST_TEST_SUITE_TYPE             (GBL_TYPEOF(GblRingListTestSuite))
+#define GBL_RING_LIST_TEST_SUITE_TYPE             (GBL_TYPEID(GblRingListTestSuite))
 
-#define GBL_RING_LIST_TEST_SUITE(inst)            (GBL_INSTANCE_CAST(inst, GblRingListTestSuite))
+#define GBL_RING_LIST_TEST_SUITE(inst)            (GBL_CAST(inst, GblRingListTestSuite))
 #define GBL_RING_LIST_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblRingListTestSuite))
-#define GBL_RING_LIST_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS(inst, GblRingListTestSuite))
+#define GBL_RING_LIST_TEST_SUITE_GET_CLASS(inst)  (GBL_CLASSOF(inst, GblRingListTestSuite))
 
 GBL_DECLS_BEGIN
 

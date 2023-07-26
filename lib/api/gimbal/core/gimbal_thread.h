@@ -26,10 +26,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_THREAD_TYPE             (GBL_TYPEOF(GblThread))                     //!< Type UUID for GblThread
-#define GBL_THREAD(self)            (GBL_INSTANCE_CAST(self, GblThread))        //!< Function-style GblInstance cast
-#define GBL_THREAD_CLASS(klass)     (GBL_CLASS_CAST(klass, GblThread))          //!< Function-style GblClass cast
-#define GBL_THREAD_GET_CLASS(self)  (GBL_INSTANCE_GET_CLASS(self, GblThread))   //!< Get GblThreadClass from GblInstance
+#define GBL_THREAD_TYPE             (GBL_TYPEID(GblThread))            //!< Type UUID for GblThread
+#define GBL_THREAD(self)            (GBL_CAST(GblThread, self))        //!< Function-style GblInstance cast
+#define GBL_THREAD_CLASS(klass)     (GBL_CLASS_CAST(GblThread, klass)) //!< Function-style GblClass cast
+#define GBL_THREAD_GET_CLASS(self)  (GBL_CLASSOF(GblThread, self))     //!< Get GblThreadClass from GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblThread

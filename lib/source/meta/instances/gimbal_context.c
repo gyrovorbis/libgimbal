@@ -187,9 +187,9 @@ static GBL_RESULT GblContext_constructor_(GblObject* pSelf) GBL_NOEXCEPT {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblContextClass_init_(GblContextClass* pClass, void* pData, GblContext* pCtx) GBL_NOEXCEPT {
+static GBL_RESULT GblContextClass_init_(GblContextClass* pClass, void* pData) {
     GBL_UNUSED(pData);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
 
     if(!GblType_classRefCount(GBL_CONTEXT_TYPE)) {
         GBL_PROPERTIES_REGISTER(GblContext);
@@ -460,7 +460,7 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
 GBL_EXPORT GblType GblContext_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    static GblTypeInterfaceMapEntry ifaceEntries[2] = {
+    static GblInterfaceImpl ifaceEntries[2] = {
         {
             .classOffset   = offsetof(GblContextClass, GblIAllocatorImpl)
         }, {
@@ -469,25 +469,23 @@ GBL_EXPORT GblType GblContext_type(void) {
     };
 
     static GblTypeInfo info = {
-        .pFnClassInit     = (GblTypeClassInitializeFn)GblContextClass_init_,
+        .pFnClassInit     = (GblClassInitFn)GblContextClass_init_,
         .classSize        = sizeof(GblContextClass),
         .instanceSize     = sizeof(GblContext),
         .interfaceCount   = 2,
-        .pInterfaceMap    = ifaceEntries
+        .pInterfaceImpls    = ifaceEntries
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_CTX_BEGIN(NULL);
 
         ifaceEntries[0].interfaceType = GBL_IALLOCATOR_TYPE;
         ifaceEntries[1].interfaceType = GBL_ILOGGER_TYPE;
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblContext"),
-                                      GBL_OBJECT_TYPE,
-                                      &info,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
+        type = GblType_register(GblQuark_internStringStatic("GblContext"),
+                                GBL_OBJECT_TYPE,
+                                &info,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
+
     }
     return type;
 }

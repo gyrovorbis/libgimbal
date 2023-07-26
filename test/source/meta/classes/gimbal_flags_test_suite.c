@@ -6,7 +6,7 @@
 #include <gimbal/meta/properties/gimbal_property.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 
-#define GBL_FLAGS_TEST_SUITE_(inst) ((GblFlagsTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_FLAGS_TEST_SUITE_TYPE))
+#define GBL_FLAGS_TEST_SUITE_(inst) (GBL_PRIVATE(GblFlagsTestSuite, inst))
 
 typedef struct GblFlagsTestSuite_ {
     GblType         flagsType;

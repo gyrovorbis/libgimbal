@@ -45,8 +45,8 @@ static GBL_RESULT GblException_GblBox_destructor_(GblBox* pBox) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblExceptionClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_UNUSED(pUd, pCtx);
+static GBL_RESULT GblExceptionClass_init_(GblClass* pClass, const void* pUd) {
+    GBL_UNUSED(pUd);
     GBL_CTX_BEGIN(NULL);
 
     GBL_BOX_CLASS(pClass)      ->pFnDestructor   = GblException_GblBox_destructor_;
@@ -67,7 +67,7 @@ GBL_EXPORT GblType GblException_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblException"),
+        type = GblType_register(GblQuark_internStringStatic("GblException"),
                                       GBL_OBJECT_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC |

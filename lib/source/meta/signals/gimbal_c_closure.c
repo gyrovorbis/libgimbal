@@ -30,7 +30,7 @@ GBL_EXPORT GblType GblCClosure_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblCClosure"),
+        type = GblType_register(GblQuark_internStringStatic("GblCClosure"),
                                       GBL_CLOSURE_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

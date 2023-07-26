@@ -2,7 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/containers/gimbal_array_heap.h>
 
-#define GBL_ARRAY_HEAP_TEST_SUITE_(inst)     ((GblArrayHeapTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_HEAP_TEST_SUITE_TYPE))
+#define GBL_ARRAY_HEAP_TEST_SUITE_(inst)     (GBL_PRIVATE(GblArrayHeapTestSuite, inst))
 
 #define GBL_ARRAY_HEAP_PROFILE_SIZE_     1024
 

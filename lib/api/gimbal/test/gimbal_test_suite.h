@@ -15,10 +15,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_TEST_SUITE_TYPE                (GBL_TYPEOF(GblTestSuite))
-#define GBL_TEST_SUITE(instance)           (GBL_INSTANCE_CAST(instance, GblTestSuite))
-#define GBL_TEST_SUITE_CLASS(klass)        (GBL_CLASS_CAST(klass, GblTestSuite))
-#define GBL_TEST_SUITE_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblTestSuite))
+#define GBL_TEST_SUITE_TYPE            (GBL_TYPEID(GblTestSuite))
+#define GBL_TEST_SUITE(self)           (GBL_CAST(GblTestSuite, self))
+#define GBL_TEST_SUITE_CLASS(klass)    (GBL_CLASS_CAST(GblTestSuite, klass))
+#define GBL_TEST_SUITE_GET_CLASS(self) (GBL_CLASSOF(GblTestSuite, self))
 //! @}
 
 #define GBL_TEST_CASE_LAST  { GBL_NULL, GBL_NULL }

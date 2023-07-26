@@ -1,13 +1,14 @@
 /*! \file
- *  \brief GblInstance structure and related functions
  *  \ingroup meta
- *  \sa gimbal_type.h, gimbal_class.h
+ *  \brief   GblInstance structure and related functions
  *
  *  This file contains the API for the GblInstance type,
  *  which is the most low-level, minimalistic primitive
  *  instantiable type within the type-system. It's the
- *  root of all other instantiables and conatins nothing
+ *  root of all other instantiables and contains nothing
  *  other than a pointer to its GblClass.
+ *
+ *  \sa gimbal_type.h, gimbal_class.h
  *
  *  \author    2023 Falco Girgis
  *  \copyright MIT License
@@ -18,41 +19,41 @@
 #include "../../core/gimbal_ctx.h"
 #include "../classes/gimbal_class.h"
 
-//! Type UUID for GblInstance
-#define GBL_INSTANCE_TYPE                              (GBL_BUILTIN_TYPE(INSTANCE))
+/*! \name Instance Root Type
+ *  \brief UUID and cast operators
+ *  @{
+ */
+#define GBL_INSTANCE_TYPE               (GBL_BUILTIN_TYPE(INSTANCE))            //!< Type UUID for GblInstance
+#define GBL_INSTANCE(self)              ((GblInstance*)self)                    //!< Casts GblInstance-compatible to GblInstance
+#define GBL_INSTANCE_GET_CLASS(self)    (GblInstance_class(GBL_INSTANCE(self))) //!< Extracts the class from a GblInstance
+//! @}
 
-//! Casts GblInstance-compatible to GblInstance
-#define GBL_INSTANCE(instance)                         ((GblInstance*)instance)
-//! Extracts the class from a GblInstance
-#define GBL_INSTANCE_CLASS(instance)                   (GblInstance_class(GBL_INSTANCE(instance)))
+/*! \name  Instance Operators
+ *  \brief Builtin operations for Instance-derived types
+ *  \relatesalso GblInstance
+ *  @{
+ */
 //! Returns the type UUID for a GblInstance
-#define GBL_INSTANCE_TYPEOF(instance)                  (GblInstance_typeOf(GBL_INSTANCE(instance)))
-//! Returns the private data segment on a GblInstance for the corresponding type
-#define GBL_INSTANCE_PRIVATE(instance, type)           (GblInstance_private(GBL_INSTANCE(instance), type))
-//! Return the public GblInstance structure from the private data segment for the corresponding type
-#define GBL_INSTANCE_PUBLIC(instPriv, type)            (GblInstance_public((const void*)instPriv, type))
-//! Returns GBL_TRUE if the instance is compatible with the given type
-#define GBL_INSTANCE_CHECK(instance, cType)            (GblInstance_check((GblInstance*)instance, GBL_TYPEOF(cType)))
-
-//! Casts the GblInstance to the given type, returning NULL and emitting an error upon failure
-#define GBL_INSTANCE_CAST(instance, cType)             ((cType*)GblInstance_cast((GblInstance*)instance, GBL_TYPEOF(cType)))
-//! Casts the GblInstance to the given type, gracefully returning NULL with no errors raised upon failure
-#define GBL_INSTANCE_TRY(instance, cType)              ((cType*)GblInstance_try((GblInstance*)instance, GBL_TYPEOF(cType)))
-//! Extracts the class structure for the given type from a GblInstance, returning NULL and raising an error upon failure
-
-#define GBL_INSTANCE_GET_CLASS(instance, cType)        ((GBL_CLASSOF(cType)*)GblClass_cast(GblInstance_class((GblInstance*)instance), GBL_TYPEOF(cType)))
-//! Extracts the class structure for the given type from a GblInstance, gracefully returning NULl with no errors raised upon failure
-#define GBL_INSTANCE_TRY_CLASS(instance, cType)        ((GBL_CLASSOF(cType)*)GblClass_try(GblInstance_class((GblInstance*)instance), GBL_TYPEOF(cType)))
-
-//! Creates an instance of the given type on the heap, automatically casting the return value
-#define GBL_INSTANCE_CREATE(cType)                     ((cType*)GblInstance_create(GBL_TYPEOF(cType)))
-//! Constructs an instance of the given type in-place
-#define GBL_INSTANCE_CONSTRUCT(cType, instance)        (GblInstance_construct(instance, GBL_TYPEOF(cType)))
-
+#define GBL_TYPEOF(self)                      GBL_TYPEOF_(self)
+//! Wraps GblInstance_private(), passing the given type and returning its private structure
+#define GBL_PRIVATE(cType, self)              GBL_PRIVATE_(cType, self)
+//! Wraps GblInstance_public(), passing the given type, and returning its public struct
+#define GBL_PUBLIC(cType, selfPriv)           GBL_PUBLIC_(cType, selfPriv)
+//! Returns GBL_TRUE if the instance can be casted to the given type safely
+#define GBL_TYPECHECK(cType, self)            GBL_TYPECHECK_(cType, self)
+//! Wraps GblInstance_cast() for the given type, implementing a convenient cast operator
+#define GBL_CAST(cType, self)                 GBL_CAST_(cType, self)
+//! Wraps GblInstance_as() for the given type, providing a gracefull-failing case
+#define GBL_AS(cType, self)                   GBL_AS_(cType, self)
+//! Casts to the given instance type, then returns its class, returning NULL and raising an error upon failure
+#define GBL_CLASSOF(cType, self)              GBL_CLASSOF_(cType, self)
+//! Uses GblInstance_as(), then gets its class (if successful) or returns NULL without raising an error
+#define GBL_CLASSOF_AS(cType, self)           GBL_CLASSOF_AS_(cType, self)
 //! Invokes a virtual method on the given type's class, passing the variadic arguments directly through to it as method arguments
-#define GBL_INSTANCE_VCALL(cType, method, ...)         GBL_INSTANCE_VCALL_(cType, method, __VA_ARGS__)
+#define GBL_VCALL(cType, method, ...)         GBL_VCALL_(cType, method, __VA_ARGS__)
 //! Invokes a virtual method on the default class for a given type, used for calling into parent or default methods
-#define GBL_INSTANCE_VCALL_DEFAULT(cType, method, ...) GBL_INSTANCE_VCALL_DEFAULT_(cType, method, __VA_ARGS__)
+#define GBL_VCALL_DEFAULT(cType, method, ...) GBL_VCALL_DEFAULT_(cType, method, __VA_ARGS__)
+//! @}
 
 #define GBL_SELF_TYPE GblInstance
 
@@ -61,115 +62,143 @@ GBL_DECLS_BEGIN
 /*! \brief Base struct for all instantiable meta types.
  *  \ingroup meta
  *
- * An Instance simply represents an object that can be created from a given
- * GblType which shares some data with other instances of the same type,
- * located within their class.
+ *  An Instance simply represents an object that can be created from a given
+ *  GblType which shares some data with other instances of the same type,
+ *  located within their class.
  *
- * GblInstance is the base structure which is to be inherited by instances of all
- * instantiable types. This means placing it or a type inheriting from it as the
- * first member of an instance struct.
+ *  GblInstance is the base structure which is to be inherited by instances of all
+ *  instantiable types. This means placing it or a type inheriting from it as the
+ *  first member of an instance struct.
  *
- * \note As the root instantiable type, an instance contains nothing but a
- * pointer to its corresponding class. Its as lightweight as possible.
- * \sa GblClass, GblType, GblObject
+ *  \note
+ *  As the root instantiable type, an instance contains nothing but a
+ *  pointer to its corresponding class. Its as lightweight as possible.
+ *
+ *  \sa GblClass, GblType, GblBox, GblObject
  */
 typedef struct GblInstance {
     GblClass*   pClass; //!< READ-ONLY Pointer to Instance's Class, do not modify directly
 } GblInstance;
 
-GBL_EXPORT GblInstance* GblInstance_create             (GblType type)                    GBL_NOEXCEPT;
-//! \todo implement
-GBL_EXPORT GblInstance* GblInstance_createExt          (GblType type, size_t size)       GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_createWithClass    (GblClass* pClass)                GBL_NOEXCEPT;
-//! \todo implement
-GBL_EXPORT GblInstance* GblInstance_createExtWithClass (GblClass* pClass, size_t size)   GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblInstance_destroy            (GBL_SELF)                        GBL_NOEXCEPT;
-
-GBL_EXPORT GBL_RESULT   GblInstance_construct          (GBL_SELF, GblType type)          GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_constructWithClass (GBL_SELF, GblClass* pClass)      GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblInstance_destruct           (GBL_SELF)                        GBL_NOEXCEPT;
-
-GBL_EXPORT GblBool      GblInstance_check              (GBL_CSELF, GblType toType)       GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_cast               (GBL_SELF, GblType toType)        GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_try                (GBL_SELF, GblType toType)        GBL_NOEXCEPT;
-
-GBL_EXPORT void*        GblInstance_private            (GBL_CSELF, GblType base)         GBL_NOEXCEPT;
-GBL_EXPORT GblInstance* GblInstance_public             (const void* pPriv, GblType base) GBL_NOEXCEPT;
-
-GBL_EXPORT GblType      GblInstance_typeOf             (GBL_CSELF)                       GBL_NOEXCEPT;
-GBL_EXPORT size_t       GblInstance_size               (GBL_CSELF)                       GBL_NOEXCEPT;
-GBL_EXPORT size_t       GblInstance_privateSize        (GBL_CSELF)                       GBL_NOEXCEPT;
-GBL_EXPORT size_t       GblInstance_totalSize          (GBL_CSELF)                       GBL_NOEXCEPT;
-
-GBL_EXPORT GblClass*    GblInstance_class              (GBL_CSELF)                       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_swizzleClass       (GBL_SELF, GblClass* pClass)      GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_sinkClass          (GBL_SELF)                        GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblInstance_floatClass         (GBL_SELF)                        GBL_NOEXCEPT;
-
-// ========== IMPL ==========
-
-///\cond
-#define GBL_INSTANCE_VCALL_(cType, method, ...)                                                       \
-    GBL_STMT_START {                                                                                  \
-        GBL_CLASSOF(cType)* pClass = GBL_INSTANCE_GET_CLASS(GBL_TUPLE_FIRST (__VA_ARGS__, 1), cType); \
-        GBL_CTX_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                                \
-        GBL_CTX_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                        \
-        GBL_CTX_CALL(pClass->method(__VA_ARGS__));                                                    \
-    } GBL_STMT_END
-
-#define GBL_INSTANCE_VCALL_DEFAULT_(cType, method, ...)                                               \
-    GBL_STMT_START {                                                                                  \
-        GBL_CLASSOF(cType)* pClass = (GBL_CLASSOF(cType)*)GblClass_weakRefDefault(GBL_TYPEOF(cType)); \
-        GBL_CTX_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                                \
-        GBL_CTX_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                        \
-        GBL_CTX_CALL(pClass->method(__VA_ARGS__));                                                    \
-    } GBL_STMT_END
-///\endcond
-
-/*! \fn GblInstance* GblInstance_create(GblType type)
- * Creates an instance on the heap with a reference to the default class for the given type.
- * \note Only meta types with the GBL_TYPE_ROOT_FLAGS_INSTANTIABLE and without the
- *       GBL_TYPE_FLAG_ABSTRACT type flags set may be instantiated.
- * \relatesalso GblInstance
- * \param type instantiable type ID
- * \returns new, heap-allocated instance
- * \sa GblInstance_construct, GblInstance_createWithClass
+/*! \name  Lifetime Management
+ *  \brief Constructors and Destructors
+ *  @{
  */
+//! Creates and returns an instance, optionally with an extended size and/or non-default class
+GBL_EXPORT GblInstance* GblInstance_create    (GblType   type,
+                                               size_t    publicSize/*=DEFAULT*/,
+                                               GblClass* pClass    /*=NULL*/) GBL_NOEXCEPT;
+//! Constructs an instance, optionally with a non-default class, returning a result code
+GBL_EXPORT GBL_RESULT   GblInstance_construct (GBL_SELF,
+                                               GblType   type,
+                                               GblClass* pClass/*=NULL*/)     GBL_NOEXCEPT;
+//! Destructs and deallocates an instance. It must have been created with GblInstance_create().
+GBL_EXPORT GblRefCount  GblInstance_destroy   (GBL_SELF)                      GBL_NOEXCEPT;
+//! Destructs but doesn't deallocate an instance. It must have been created with GblInstance_construct().
+GBL_EXPORT GblRefCount  GblInstance_destruct  (GBL_SELF)                      GBL_NOEXCEPT;
+//! @}
 
-/*! \fn GblInstance* GblInstance_createWithClass(GblClass* pClass)
-* Creates an instance using the given floating class to override the type's default class.
-* \note The instance does not automatically assume ownership of the class. Use GblInstance_sinkClass
-*       to bind the lifetime of a floating class to an instance.
-* \relatesalso GblInstance
-* \param pClass floating class
-* \returns new, heap-allocated instance
-* \sa GblInstance_constructWithClass
-*/
+/*! \name  Type Conversions
+ *  \brief Methods for type casting and checking
+ *  \relatesalso GblInstance
+ *  @{
+ */
+//! Returns GBL_TRUE if the given instance's type is compatible with \p toType
+GBL_EXPORT GblBool      GblInstance_check (GBL_CSELF, GblType toType) GBL_NOEXCEPT;
+//! Attempts to cast the given instance to \p toType, raising an error and returning NULL upon failure
+GBL_EXPORT GblInstance* GblInstance_cast  (GBL_SELF, GblType toType)  GBL_NOEXCEPT;
+//! Attempts to cast the given instance to \p toType, gracefully returning NULL upon failure
+GBL_EXPORT GblInstance* GblInstance_as    (GBL_SELF, GblType toType)  GBL_NOEXCEPT;
+//! @}
 
-/*! \fn GBL_RESULT GblInstance_construct(GblInstance* pSelf, GblType type)
-* Equivalent to GblInstance_create(), except for using an existing GblInstance* allocation.
-* This is equivalent to a placement new operation in C++.
-* \note Only instances without private data can be constructed in this manner.
-* \relatesalso GblInstance
-* \param pSelf existing allocation
-* \param type instantiable type ID
-* \returns error code
-* \sa GblInstance_create, GblInstance_constructWithClass
-*/
+/*! \name  Public and Private Data
+ *  \brief Methods for accessing public and private segments
+ *  \relatesalso GblInstance
+ *  @{
+ */
+//! Returns the private structure associated with the given \p base type of the instance
+GBL_EXPORT void*        GblInstance_private (GBL_CSELF, GblType base)         GBL_NOEXCEPT;
+//! Casts back to the instance type from a base type's private data segment structure
+GBL_EXPORT GblInstance* GblInstance_public  (const void* pPriv, GblType base) GBL_NOEXCEPT;
+//! @}
 
-/*! \fn GBL_RESULT GblInstance_constructWithClass(GblInstance* pSelf, GblClass* pClass)
-* Equivalent to GblInstance_createWithClass(), except for using an existing GblInstance* allocation.
-* This is equivalent to a placement new operation in C++.
-* \relatesalso GblInstance
-* \param pSelf existing allocation
-* \param pClass floating class
-* \returns error code
-*/
+/*! \name  Type Info
+ *  \brief Methods for getting instance information
+ *  \relatesalso GblInstance
+ *  @{
+ */
+//! Returns the GblType associated with the given GblInstance
+GBL_EXPORT GblType GblInstance_typeOf      (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the size of the given GblInstance's public data segment
+GBL_EXPORT size_t  GblInstance_size        (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the size of the given GblInstance's private data segment
+GBL_EXPORT size_t  GblInstance_privateSize (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the instance's combined DEFAULT size (not extended allocation size)
+GBL_EXPORT size_t  GblInstance_totalSize   (GBL_CSELF) GBL_NOEXCEPT;
+//! @}
+
+/*! \name Classes
+ *  \brief Methods for managing classes
+ *  \relatesalso GblInstance
+ *  @{
+ */
+//! Returns the GblClass associated with the given GblInstance
+GBL_EXPORT GblClass*  GblInstance_class        (GBL_CSELF)                  GBL_NOEXCEPT;
+//! Swaps out the class associated with the instance, without taking ownership of it
+GBL_EXPORT GBL_RESULT GblInstance_swizzleClass (GBL_SELF, GblClass* pClass) GBL_NOEXCEPT;
+//! Takes ownership of the class associated with the instance, deallocating it with the instance
+GBL_EXPORT GBL_RESULT GblInstance_sinkClass    (GBL_SELF)                   GBL_NOEXCEPT;
+//! Relinquishes ownership of the class assosciated with the instance, but maintaining their association
+GBL_EXPORT GBL_RESULT GblInstance_floatClass   (GBL_SELF)                   GBL_NOEXCEPT;
+//! @}
+
+GBL_DECLS_END
+
+//! \cond
+#define GblInstance_create(...) \
+    GblInstance_createDefault_(__VA_ARGS__)
+#define GblInstance_createDefault_(...) \
+    GblInstance_createDefault__(__VA_ARGS__, 0, GBL_NULL)
+#define GblInstance_createDefault__(type, size, klass, ...) \
+    (GblInstance_create)(type, size, klass)
+
+#define GblInstance_construct(...) \
+    GblInstance_constructDefault_(__VA_ARGS__)
+#define GblInstance_constructDefault_(...) \
+    GblInstance_constructDefault__(__VA_ARGS__, GBL_NULL)
+#define GblInstance_constructDefault__(self, type, klass, ...) \
+    (GblInstance_construct)(self, type, klass)
+
+#define GBL_TYPEOF_(self)            (GblInstance_typeOf(GBL_INSTANCE(self)))
+#define GBL_PRIVATE_(cType, self)    ((GBL_INSTANCE_PRIVATE_STRUCT(cType)*) GblInstance_private(GBL_INSTANCE(self), GBL_TYPEID(cType)))
+#define GBL_PUBLIC_(cType, selfPriv) ((cType*)GblInstance_public((const void*)selfPriv, GBL_TYPEID(cType)))
+#define GBL_TYPECHECK_(cType, self)  (GblInstance_check(GBL_INSTANCE(self), GBL_TYPEID(cType)))
+#define GBL_CAST_(cType, self)       ((cType*)GblInstance_cast((GblInstance*)self,GBL_TYPEID(cType)))
+#define GBL_AS_(cType, self)         ((cType*)GblInstance_as((GblInstance*)self, GBL_TYPEID(cType)))
+#define GBL_CLASSOF_(cType, self)    ((GBL_CLASS_STRUCT(cType)*)GblClass_cast(GblInstance_class((GblInstance*)self), GBL_TYPEID(cType)))
+#define GBL_CLASSOF_AS_(cType, self) ((GBL_CLASSOF(cType)*)GblClass_as(GblInstance_class((GblInstance*)self), GBL_TYPEID(cType)))
+
+#define GBL_VCALL_(cType, method, ...)                                                          \
+    GBL_STMT_START {                                                                            \
+        GBL_CLASS_STRUCT(cType)* pClass = GBL_CLASSOF(cType, GBL_TUPLE_FIRST (__VA_ARGS__, 1)); \
+        GBL_CTX_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                          \
+        GBL_CTX_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);                  \
+        GBL_CTX_CALL(pClass->method(__VA_ARGS__));                                              \
+    } GBL_STMT_END
+
+#define GBL_VCALL_DEFAULT_(cType, method, ...)                                      \
+    GBL_STMT_START {                                                                \
+        GBL_CLASS_STRUCT(cType)* pClass =                                           \
+            (GBL_CLASS_STRUCT(cType)*)GblClass_weakRefDefault(GBL_TYPEID(cType));   \
+        GBL_CTX_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);              \
+        GBL_CTX_VERIFY(pClass->method, GBL_RESULT_ERROR_INVALID_VIRTUAL_CALL);      \
+        GBL_CTX_CALL(pClass->method(__VA_ARGS__));                                  \
+    } GBL_STMT_END
+//! \endcond
 
 /*! \fn GblRefCount GblInstance_destroy(GblInstance* pSelf)
 * Finalizes then deletes an instance that was created on the heap, either unreferencing.
 * its class if using the default or destroying it if using a sunk floating class.
-* \relatesalso GblInstance
 * \param pSelf heap-callocated instance
 * \returns remaining number of active instances of the associated type
 * \sa GblInstance_destruct
@@ -178,7 +207,6 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass         (GBL_SELF)               
 /*! \fn GblRefCount GblInstance_destruct(GblInstance* pSelf)
 * Equivalent to GblInstance_destroy(), except that the allocation is not deallocated.
 * This is equivalent to a placement delete operation in C++.
-* \relatesalso GblInstance
 * \param pSelf existing allocation
 * \returns remaining number of active instances of the associated type
 * \sa GblInstance_destroy
@@ -221,7 +249,7 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass         (GBL_SELF)               
 * \param pSelf source instance
 * \param toType casted result type
 * \returns true if cast is valid
-* \sa GblInstance_try
+* \sa GblInstance_as
 */
 
 /*! \fn GblInstance* GblInstance_cast(GblInstance* pSelf, GblType toType)
@@ -230,10 +258,10 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass         (GBL_SELF)               
 * \param pSelf source instance
 * \param toType casted result type
 * \returns pointer to casted instance or NULL upon failure
-* \sa GblInstance_check, GblInstance_try
+* \sa GblInstance_check, GblInstance_as
 */
 
-/*! \fn GblInstance* GblInstance_try(GblInstance* pSelf, GblType toType)
+/*! \fn GblInstance* GblInstance_as(GblInstance* pSelf, GblType toType)
 * Equivalent to GblInstance_cast(), except gracefully returning NULL with no errors upon failure.
 * This is analogous to a dynamic_cast<> operation in C++.
 * \relatesalso GblInstance
@@ -298,8 +326,6 @@ GBL_EXPORT GBL_RESULT   GblInstance_floatClass         (GBL_SELF)               
 * \param pSelf instance pointer
 * \returns class pointer or NULL if instance is NULL
 */
-
-GBL_DECLS_END
 
 #undef GBL_SELF_TYPE
 

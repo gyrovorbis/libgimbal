@@ -3,11 +3,11 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_POOL_ALLOCATOR_TEST_SUITE_TYPE             (GBL_TYPEOF(GblPoolAllocatorTestSuite))
+#define GBL_POOL_ALLOCATOR_TEST_SUITE_TYPE             (GBL_TYPEID(GblPoolAllocatorTestSuite))
 
-#define GBL_POOL_ALLOCATOR_TEST_SUITE(inst)            (GBL_INSTANCE_CAST(inst, GblPoolAllocatorTestSuite))
+#define GBL_POOL_ALLOCATOR_TEST_SUITE(inst)            (GBL_CAST(inst, GblPoolAllocatorTestSuite))
 #define GBL_POOL_ALLOCATOR_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblPoolAllocatorTestSuite))
-#define GBL_POOL_ALLOCATOR_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS(inst, GblPoolAllocatorTestSuite))
+#define GBL_POOL_ALLOCATOR_TEST_SUITE_GET_CLASS(inst)  (GBL_CLASSOF(inst, GblPoolAllocatorTestSuite))
 
 GBL_DECLS_BEGIN
 

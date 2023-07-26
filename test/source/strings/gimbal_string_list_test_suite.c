@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/strings/gimbal_string_list.h>
 
-#define GBL_STRING_LIST_TEST_SUITE_(inst)    ((GblStringListTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_STRING_LIST_TEST_SUITE_TYPE))
+#define GBL_STRING_LIST_TEST_SUITE_(inst)    (GBL_PRIVATE(GblStringListTestSuite, inst))
 
 typedef struct GblStringListTestSuite_ {
     GblRefCount     beginActiveRefCount;

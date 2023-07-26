@@ -2,7 +2,7 @@
 #include <gimbal/algorithms/gimbal_sort.h>
 #include <gimbal/test/gimbal_test_macros.h>
 
-#define GBL_SORT_TEST_SUITE_(inst)   ((GblSortTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_SORT_TEST_SUITE_TYPE))
+#define GBL_SORT_TEST_SUITE_(inst)   (GBL_PRIVATE(GblSortTestSuite, inst))
 
 #define GBL_SORT_TEST_SUITE_WORD_COUNT_     512
 #define GBL_SORT_TEST_SUITE_WORD_SIZE_MAX_  50

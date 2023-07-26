@@ -3,7 +3,7 @@
 #include <gimbal/utils/gimbal_version.h>
 #include <gimbal/strings/gimbal_string_list.h>
 
-#define GBL_APP_(self)  ((GblApp_*)GBL_INSTANCE_PRIVATE(self, GBL_APP_TYPE))
+#define GBL_APP_(self)  (GBL_PRIVATE(GblApp, self))
 
 GBL_DECLARE_STRUCT_PRIVATE(GblApp) {
     GblStringRef*  pOrganization;
@@ -132,7 +132,7 @@ static GBL_RESULT GblApp_Object_setProperty_(GblObject* pObject, const GblProper
 static GBL_RESULT GblApp_Object_constructed_(GblObject* pObject) {
     GBL_CTX_BEGIN(NULL);
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblObject, pFnConstructed, pObject);
+    GBL_VCALL_DEFAULT(GblObject, pFnConstructed, pObject);
 
     GblApp* pSelf = GBL_APP(pObject);
     GblApp_* pSelf_ = GBL_APP_(pSelf);
@@ -159,14 +159,15 @@ static GBL_RESULT GblApp_Box_destructor_(GblBox* pBox) {
     GBL_CTX_VERIFY_CALL(GblStringList_destroy(pSelf_->pArgs));
     GBL_CTX_VERIFY_CALL(GblStringList_destroy(pLibPaths_));
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
+    GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblAppClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblAppClass_init_(GblClass* pClass, const void* pUd) {
     GBL_UNUSED(pUd);
+
+    GBL_CTX_BEGIN(NULL);
 
     GBL_BOX_CLASS(pClass)   ->pFnDestructor  = GblApp_Box_destructor_;
     GBL_OBJECT_CLASS(pClass)->pFnConstructed = GblApp_Object_constructed_;
@@ -189,7 +190,7 @@ GBL_EXPORT GblType GblApp_type(void) {
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblApp"),
+        type = GblType_register(GblQuark_internStringStatic("GblApp"),
                                       GBL_OBJECT_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

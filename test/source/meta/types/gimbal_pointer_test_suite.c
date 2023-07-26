@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/meta/types/gimbal_variant.h>
 
-#define GBL_POINTER_TEST_SUITE_(inst)    ((GblPointerTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_POINTER_TEST_SUITE_TYPE))
+#define GBL_POINTER_TEST_SUITE_(inst)    (GBL_PRIVATE(GblPointerTestSuite, inst))
 
 typedef struct GblPointerTestSuite_ {
     GblType pointerType;

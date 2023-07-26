@@ -4,7 +4,7 @@
 #include <gimbal/meta/signals/gimbal_closure.h>
 #include <gimbal/meta/signals/gimbal_c_closure.h>
 
-#define GBL_SIGNAL_TEST_SUITE_(inst)    ((GblSignalTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_SIGNAL_TEST_SUITE_TYPE))
+#define GBL_SIGNAL_TEST_SUITE_(inst)    (GBL_PRIVATE(GblSignalTestSuite, inst))
 
 typedef enum TYPE_ {
     TYPE_I_A_,
@@ -124,8 +124,8 @@ void s_2_CB_Slot_(SignalInstance_* pReceiver, double arg) {
     pReceiver->pSelf_->pClosureUserdata = GblBox_userdata(GBL_BOX(GblClosure_current()));
 }
 
-static GBL_RESULT classInit_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT classInit_(GblClass* pClass, const void* pUd) {
+    GBL_CTX_BEGIN(NULL);
 
     union {
         GblClass*           pClass;
@@ -151,8 +151,8 @@ static GBL_RESULT classInit_(GblClass* pClass, const void* pUd, GblContext* pCtx
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf) {
+    GBL_CTX_BEGIN(NULL);
     GblSignalTestSuite_* pSelf_ = GBL_SIGNAL_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblSignalTestSuite_));
 
@@ -163,24 +163,24 @@ static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx
     };
 
     info.pClassData = (void*)TYPE_I_A_;
-    pSelf_->types[TYPE_I_A_] = GblType_registerStatic("IA",
+    pSelf_->types[TYPE_I_A_] = GblType_register("IA",
                                                       GBL_INTERFACE_TYPE,
                                                       &info,
                                                       GBL_TYPE_FLAGS_NONE);
 
     info.pClassData = (void*)TYPE_I_B_BASE_;
-    pSelf_->types[TYPE_I_B_BASE_] = GblType_registerStatic("IBBase",
+    pSelf_->types[TYPE_I_B_BASE_] = GblType_register("IBBase",
                                                            GBL_INTERFACE_TYPE,
                                                            &info,
                                                            GBL_TYPE_FLAGS_NONE);
 
     info.pClassData = (void*)TYPE_I_B_1_;
-    pSelf_->types[TYPE_I_B_1_] = GblType_registerStatic("IB_1",
+    pSelf_->types[TYPE_I_B_1_] = GblType_register("IB_1",
                                                         GBL_INTERFACE_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
 
-    GblTypeInterfaceMapEntry entry = {
+    GblInterfaceImpl entry = {
         .interfaceType = pSelf_->types[TYPE_I_A_],
         .classOffset = offsetof(SignalClassA_, iA)
     };
@@ -189,9 +189,9 @@ static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx
     info.classSize = sizeof(SignalClassA_);
     info.instanceSize = sizeof(SignalInstance_);
     info.interfaceCount = 1;
-    info.pInterfaceMap = &entry;
+    info.pInterfaceImpls = &entry;
 
-    pSelf_->types[TYPE_C_A_] = GblType_registerStatic("CA",
+    pSelf_->types[TYPE_C_A_] = GblType_register("CA",
                                                       GBL_INSTANCE_TYPE,
                                                       &info,
                                                       GBL_TYPE_FLAGS_NONE);
@@ -202,7 +202,7 @@ static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx
     entry.interfaceType = pSelf_->types[TYPE_I_B_1_];
     entry.classOffset = offsetof(SignalInterfaceB_, iB_1);
 
-    pSelf_->types[TYPE_I_B_] = GblType_registerStatic("IB",
+    pSelf_->types[TYPE_I_B_] = GblType_register("IB",
                                                       pSelf_->types[TYPE_I_B_BASE_],
                                                       &info,
                                                       GBL_TYPE_FLAGS_NONE);
@@ -213,7 +213,7 @@ static GBL_RESULT GblSignalTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx
     entry.interfaceType = pSelf_->types[TYPE_I_B_];
     entry.classOffset = offsetof(SignalClassB_, iB);
 
-    pSelf_->types[TYPE_C_B_] = GblType_registerStatic("CB",
+    pSelf_->types[TYPE_C_B_] = GblType_register("CB",
                                                       pSelf_->types[TYPE_C_A_],
                                                       &info,
                                                       GBL_TYPE_FLAGS_NONE);

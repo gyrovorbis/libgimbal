@@ -2,7 +2,7 @@
 #include "../types/gimbal_type_.h"
 
 GBL_EXPORT void* GblInstance_basePtr_(const GblInstance* pInstance) {
-    GblMetaClass* pMeta = GBL_META_CLASS_(GBL_INSTANCE_TYPEOF(pInstance));
+    GblMetaClass* pMeta = GBL_META_CLASS_(GBL_TYPEOF(pInstance));
     return pMeta? (void*)((uint8_t*)pInstance + pMeta->instancePrivateOffset) : NULL;
 }
 
@@ -22,7 +22,7 @@ GBL_EXPORT GblInstance* GblInstance_public(const void* pPrivate, GblType base) {
                 NULL;
 }
 
-GBL_RESULT typeInstanceConstructValidate_(GblType type, GblBool inPlace) {
+GBL_RESULT typeInstanceConstructValidate_(GblType type, GblClass* pClass, GblBool inPlace) {
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_VERIFY_TYPE(type);
@@ -38,6 +38,9 @@ GBL_RESULT typeInstanceConstructValidate_(GblType type, GblBool inPlace) {
     GBL_CTX_VERIFY(!(inPlace && pMeta->instancePrivateOffset),
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Cannot PLACEMENT CONSTRUCT an instantiable that has PRIVATE DATA!");
+    GBL_CTX_VERIFY(!pClass || type == GblClass_typeOf(pClass),
+                   GBL_RESULT_ERROR_TYPE_MISMATCH,
+                   "Cannot instantiate type with class of a different type!");
     GBL_CTX_END();
 }
 
@@ -67,7 +70,7 @@ GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, Gb
         GblMetaClass* pIter = GBL_META_CLASS_(GblType_base((GblType)pMeta, idx));
         if(pIter->pInfo->pFnInstanceInit) {
             GBL_CTX_VERBOSE("Calling instance initializers: [%s]", GblType_name(GBL_TYPE_(pIter)));
-            GBL_CTX_CALL(pIter->pInfo->pFnInstanceInit(pInstance, pCtx_));
+            GBL_CTX_CALL(pIter->pInfo->pFnInstanceInit(pInstance));
         } else {
             GBL_CTX_VERBOSE("No instance initializer: [%s]", GblType_name(GBL_TYPE_(pIter)));
         }
@@ -85,41 +88,38 @@ GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, Gb
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblInstance_construct_(GblType type, GblInstance* pInstance, GblClass* pClass) {
+GBL_EXPORT GBL_RESULT (GblInstance_construct)(GblInstance* pSelf, GblType type, GblClass* pClass) {
     GBL_CTX_BEGIN(pCtx_);
-    GBL_CTX_VERIFY_CALL(typeInstanceConstructValidate_(type, GBL_TRUE));
-    GBL_CTX_VERIFY_POINTER(pInstance);
+    GBL_CTX_VERIFY_CALL(typeInstanceConstructValidate_(type, pClass, GBL_TRUE));
+    GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_PUSH_VERBOSE("[GblType] Instance Construct: type %s", GblType_name(type));
-    GBL_CTX_VERIFY_CALL(GblInstance_init_(type, pInstance, pClass));
+    GBL_CTX_VERIFY_CALL(GblInstance_init_(type, pSelf, pClass));
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblInstance_construct(GblInstance* pSelf, GblType type) {
-    GBL_CTX_BEGIN(pCtx_);
-    GBL_CTX_VERIFY_CALL(GblInstance_construct_(type, pSelf, NULL));
-    GBL_CTX_END();
-}
-
-GBL_EXPORT GBL_RESULT GblInstance_constructWithClass(GblInstance* pSelf, GblClass* pClass) {
-    GBL_CTX_BEGIN(pCtx_);
-    GBL_CTX_VERIFY_POINTER(pClass);
-    GBL_CTX_VERIFY_CALL(GblInstance_construct_(GBL_CLASS_TYPEOF(pClass), pSelf, pClass));
-    GBL_CTX_END();
-}
-
-GBL_EXPORT GblInstance* GblInstance_create_(GblType type, GblClass* pClass) {
-    GblInstance* pInstance  = NULL;
+GBL_EXPORT GblInstance* (GblInstance_create)(GblType type, size_t size, GblClass* pClass) {
+    GblInstance*  pInstance = NULL;
     GblMetaClass* pMeta     = GBL_META_CLASS_(type);
+
     GBL_CTX_BEGIN(pCtx_);
+
     GBL_CTX_PUSH_VERBOSE("[GblType] Instance Create: type %s", GblType_name(type));
-    GBL_CTX_VERIFY_CALL(typeInstanceConstructValidate_(type, GBL_FALSE));
+    GBL_CTX_VERIFY_CALL(typeInstanceConstructValidate_(type, pClass, GBL_FALSE));
 
-    GBL_CTX_DEBUG("Allocating %u bytes.", pMeta->pInfo->instanceSize + (-pMeta->instancePrivateOffset));
+    if(!size) size = pMeta->pInfo->instanceSize;
+    GBL_CTX_VERIFY(size >= pMeta->pInfo->instanceSize,
+                   GBL_RESULT_ERROR_INVALID_ARG,
+                   "Attempt to allocate [%s] with insufficient size [given: %zu, required: %zu]",
+                   GblType_name(type),
+                   size,
+                   pMeta->pInfo->instanceSize);
 
-    uint8_t* pBase = GBL_CTX_MALLOC(gblAlignedAllocSizeDefault(pMeta->pInfo->instanceSize
-                                                     + (-pMeta->instancePrivateOffset)),
-                               GBL_ALIGNOF(GBL_MAX_ALIGN_T),
-                               GblType_name(type));
+    GBL_CTX_DEBUG("Allocating %zu bytes.", size + (-pMeta->instancePrivateOffset));
+
+    uint8_t* pBase =
+        GBL_CTX_MALLOC(gblAlignedAllocSizeDefault(size + (-pMeta->instancePrivateOffset)),
+                       GBL_ALIGNOF(GBL_MAX_ALIGN_T),
+                       GblType_name(type));
 
     // initialize just the private portion here, as the public will be initialized later
     if(pMeta->instancePrivateOffset != 0)
@@ -135,26 +135,8 @@ GBL_EXPORT GblInstance* GblInstance_create_(GblType type, GblClass* pClass) {
     return pInstance;
 }
 
-GBL_EXPORT GblInstance* GblInstance_create(GblType type) {
-    GblInstance* pInstance = NULL;
-    GBL_CTX_BEGIN(pCtx_);
-    pInstance = GblInstance_create_(type, NULL);
-    GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_CTX_END_BLOCK();
-    return pInstance;
-}
-
-GBL_EXPORT GblInstance* GblInstance_createWithClass(GblClass* pClass) {
-    GblInstance* pInstance = NULL;
-    GBL_CTX_BEGIN(pCtx_);
-    pInstance = GblInstance_create_(GBL_CLASS_TYPEOF(pClass), pClass);
-    GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_CTX_END_BLOCK();
-    return pInstance;
-}
-
 GBL_EXPORT GBL_RESULT GblInstance_classRelease_(GblInstance* pSelf) {
-    GblClass*       pClass      = GBL_INSTANCE_CLASS(pSelf);
+    GblClass*       pClass      = GBL_INSTANCE_GET_CLASS(pSelf);
     const GblFlags  flags       = GBL_CLASS_FLAGS_(pClass);
     GblType         type        = GBL_CLASS_TYPEOF(pClass);
     GBL_CTX_BEGIN(pCtx_);
@@ -177,7 +159,7 @@ GBL_EXPORT GblRefCount GblInstance_destruct(GblInstance* pSelf) {
     GblRefCount     refCount    = 0;
     GBL_CTX_BEGIN(pCtx_);
     if(pSelf) {
-        GblMetaClass* pMeta     = GBL_META_CLASS_(GBL_INSTANCE_TYPEOF(pSelf));
+        GblMetaClass* pMeta = GBL_META_CLASS_(GBL_TYPEOF(pSelf));
         GBL_CTX_CALL(GblSignal_removeInstance_(pSelf));
         refCount = GBL_ATOMIC_INT16_DEC(pMeta->instanceRefCount) - 1;
         GBL_CTX_VERIFY_CALL(GblInstance_classRelease_(pSelf));
@@ -207,7 +189,7 @@ GBL_EXPORT GBL_RESULT GblInstance_swizzleClass(GblInstance* pSelf, GblClass* pCl
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pClass);
-    GblClass* pClassOld = GBL_INSTANCE_CLASS(pSelf);
+    GblClass* pClassOld = GBL_INSTANCE_GET_CLASS(pSelf);
 
     // If we're replacing an existing class
     if(pClassOld) {
@@ -230,7 +212,7 @@ GBL_EXPORT GBL_RESULT GblInstance_swizzleClass(GblInstance* pSelf, GblClass* pCl
 }
 
 GBL_EXPORT GBL_RESULT GblInstance_sinkClass(GblInstance* pSelf)  {
-    GblClass* pClass = GBL_INSTANCE_CLASS(pSelf);
+    GblClass* pClass = GBL_INSTANCE_GET_CLASS(pSelf);
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_VERIFY_POINTER(pClass);
 
@@ -244,7 +226,7 @@ GBL_EXPORT GBL_RESULT GblInstance_sinkClass(GblInstance* pSelf)  {
 }
 
 GBL_EXPORT GBL_RESULT GblInstance_floatClass(GblInstance* pSelf) {
-    GblClass* pClass = GBL_INSTANCE_CLASS(pSelf);
+    GblClass* pClass = GBL_INSTANCE_GET_CLASS(pSelf);
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_VERIFY_POINTER(pClass);
 
@@ -304,7 +286,7 @@ GBL_EXPORT GblType GblInstance_typeOf(const GblInstance* pSelf) GBL_NOEXCEPT {
 GBL_EXPORT size_t GblInstance_size(const GblInstance* pSelf) GBL_NOEXCEPT {
     size_t  size = 0;
     if(pSelf) {
-        const GblTypeInfo* pInfo = GblType_info(GBL_INSTANCE_TYPEOF(pSelf));
+        const GblTypeInfo* pInfo = GblType_info(GBL_TYPEOF(pSelf));
         if(pInfo) size = pInfo->instanceSize;
     }
     return size;
@@ -313,14 +295,14 @@ GBL_EXPORT size_t GblInstance_size(const GblInstance* pSelf) GBL_NOEXCEPT {
 GBL_EXPORT size_t GblInstance_privateSize(const GblInstance* pSelf) GBL_NOEXCEPT {
     size_t  size = 0;
     if(pSelf) {
-        const GblTypeInfo* pInfo = GblType_info(GBL_INSTANCE_TYPEOF(pSelf));
+        const GblTypeInfo* pInfo = GblType_info(GBL_TYPEOF(pSelf));
         if(pInfo) size = pInfo->instancePrivateSize;
     }
     return size;
 }
 
 GBL_EXPORT size_t GblInstance_totalSize(const GblInstance* pSelf) GBL_NOEXCEPT {
-    GblMetaClass* pMeta = GBL_META_CLASS_(GBL_INSTANCE_TYPEOF(pSelf));
+    GblMetaClass* pMeta = GBL_META_CLASS_(GBL_TYPEOF(pSelf));
     return pMeta? (pMeta->pInfo->instanceSize - pMeta->instancePrivateOffset) : 0;
 }
 
@@ -328,7 +310,7 @@ GBL_EXPORT GblClass* GblInstance_class(const GblInstance* pSelf) GBL_NOEXCEPT {
     return pSelf? pSelf->pClass : NULL;
 }
 
-GBL_EXPORT GblInstance* GblInstance_try(GblInstance* pSelf, GblType type) GBL_NOEXCEPT {
+GBL_EXPORT GblInstance* GblInstance_as(GblInstance* pSelf, GblType type) GBL_NOEXCEPT {
     return GblInstance_convert_(pSelf, type, GBL_FALSE);
 }
 

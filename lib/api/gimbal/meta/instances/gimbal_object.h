@@ -31,10 +31,10 @@
  *  \brief Type UUID and Cast operators
  *  @{
  */
-#define GBL_OBJECT_TYPE             (GBL_TYPEOF(GblObject))                   //!< GblType UUID for GblObject
-#define GBL_OBJECT(self)            (GBL_INSTANCE_CAST(self, GblObject))      //!< Casts a GblInstance to a GblObject
-#define GBL_OBJECT_CLASS(klass)     (GBL_CLASS_CAST(klass, GblObject))        //!< Casts a GblClass to a GblObjectClass
-#define GBL_OBJECT_GET_CLASS(self)  (GBL_INSTANCE_GET_CLASS(self, GblObject)) //!< Gets a GblObjectClass from a GblInstance
+#define GBL_OBJECT_TYPE             (GBL_TYPEID(GblObject))            //!< GblType UUID for GblObject
+#define GBL_OBJECT(self)            (GBL_CAST(GblObject, self))        //!< Casts a GblInstance to a GblObject
+#define GBL_OBJECT_CLASS(klass)     (GBL_CLASS_CAST(GblObject, klass)) //!< Casts a GblClass to a GblObjectClass
+#define GBL_OBJECT_GET_CLASS(self)  (GBL_CLASSOF(GblObject, self))     //!< Gets a GblObjectClass from a GblInstance
 //! @}
 
 /*! \brief DSL macro used to heap-construct a GblObject-derived type.
@@ -189,7 +189,7 @@ GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass
                                                     GblVariant*     pValues)                   GBL_NOEXCEPT;
 //! @}
 
-/*! \name Property Accessors
+/*! \name  Property Accessors
  *  \brief Methods for reading and writing properties
  *  \relatesalso GblObject
  *  @{
@@ -244,7 +244,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants
                                                      GblVariant* pValue)                               GBL_NOEXCEPT;
 //! @}
 
-/*! \name Name Accessors
+/*! \name  Name Accessors
  *  \brief Methods for reading and writing object name
  *  \relatesalso GblObject
  *  @{
@@ -255,7 +255,7 @@ GBL_EXPORT const char* GblObject_name    (GBL_CSELF)                   GBL_NOEXC
 GBL_EXPORT void        GblObject_setName (GBL_SELF, const char* pName) GBL_NOEXCEPT;
 //! @}
 
-/*! \name Hierarchy Management
+/*! \name  Hierarchy Management
  *  \brief Methods for parenting, traversing, or querying object trees
  *  \relatesalso GblObject
  *  @{
@@ -298,7 +298,7 @@ GBL_EXPORT GblObject* GblObject_findSiblingByName    (GBL_CSELF, const char* pNa
 GBL_EXPORT GblObject* GblObject_findSiblingByIndex   (GBL_CSELF, size_t  index)        GBL_NOEXCEPT;
 //! @}
 
-/*! \name Event Management
+/*! \name  Event Management
  *  \brief Methods for sending, notifying, and filtering events
  *  \relatesalso GblObject
  *  @{
@@ -324,11 +324,11 @@ GBL_EXPORT GblContext* GblObject_findContext (GBL_SELF) GBL_NOEXCEPT;
 ///\cond
 #define GBL_OBJECT_NEW(...)                         GBL_VA_OVERLOAD_CALL(GBL_OBJECT_NEW, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
 
-#define GBL_OBJECT_NEW_1(typeName)                  ((typeName*)GblObject_create(GBL_TYPEOF(typeName), GBL_NULL))
-#define GBL_OBJECT_NEW_N(...)                       ((GBL_TUPLE_FIRST(__VA_ARGS__)*)GblObject_create(GBL_TYPEOF(GBL_TUPLE_FIRST(__VA_ARGS__)), \
+#define GBL_OBJECT_NEW_1(typeName)                  ((typeName*)GblObject_create(GBL_TYPEID(typeName), GBL_NULL))
+#define GBL_OBJECT_NEW_N(...)                       ((GBL_TUPLE_FIRST(__VA_ARGS__)*)GblObject_create(GBL_TYPEID(GBL_TUPLE_FIRST(__VA_ARGS__)), \
                                                                                                      GBL_TUPLE_REST(__VA_ARGS__), NULL))
 
-#define GBL_OBJECT_CONTRUCT(instance, cType, ...)   (GblObject_construct(instance, GBL_TYPEOF(cType), __VA_ARGS__, NULL))
+#define GBL_OBJECT_CONTRUCT(instance, cType, ...)   (GblObject_construct(instance,GBL_TYPEID(cType), __VA_ARGS__, NULL))
 ///\endcond
 
 GBL_DECLS_END

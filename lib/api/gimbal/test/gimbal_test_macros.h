@@ -151,16 +151,16 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
 #   define GBL_SELF_TYPE_PRIVATE  GBL_GLUE(GBL_SELF_TYPE, _)
 #endif
 
-#define GBL_TEST_CASE(name)                                                         \
+#define GBL_TEST_CASE(name) \
     static GBL_RESULT GBL_GLUE(GBL_GLUE(GBL_GLUE(GBL_SELF_TYPE, _), name), _) \
-                               (GblTestSuite* GBL_SELF_TYPE_NAME,             \
-                                GblContext*   GBL_TEST_SUITE_CONTEXT_NAME) {        \
-        GBL_CTX_BEGIN(GBL_TEST_SUITE_CONTEXT_NAME);                                 \
-        GBL_SELF_TYPE_PRIVATE* GBL_SELF_TYPE_PRIVATE_NAME =             \
-                (GBL_SELF_TYPE_PRIVATE*)                                      \
-                    GBL_INSTANCE_PRIVATE(pSelf, GBL_TYPEOF(GBL_SELF_TYPE));   \
-        GBL_UNUSED(GBL_SELF_TYPE_NAME,                                        \
-                   GBL_TEST_SUITE_CONTEXT_NAME,                                     \
+                               (GblTestSuite* GBL_SELF_TYPE_NAME, \
+                                GblContext*   GBL_TEST_SUITE_CONTEXT_NAME) { \
+        GBL_CTX_BEGIN(GBL_TEST_SUITE_CONTEXT_NAME); \
+        GBL_SELF_TYPE_PRIVATE* GBL_SELF_TYPE_PRIVATE_NAME = \
+                (GBL_SELF_TYPE_PRIVATE*) \
+                    GBL_PRIVATE(GBL_SELF_TYPE, pSelf); \
+        GBL_UNUSED(GBL_SELF_TYPE_NAME, \
+                   GBL_TEST_SUITE_CONTEXT_NAME, \
                    GBL_SELF_TYPE_PRIVATE_NAME);
 
 #define GBL_TEST_CASE_END   \

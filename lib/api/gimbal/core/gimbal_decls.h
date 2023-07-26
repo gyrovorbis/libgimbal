@@ -120,8 +120,16 @@ extern "C" {
     GBL_INSTANCE_DERIVE(derived, base)           \
     GBL_INSTANCE_END
 
-#define GBL_TYPEOF(instanceStruct)  \
+#define GBL_TYPEID(instanceStruct)  \
     GBL_GLUE(instanceStruct, _type())
+
+#define GBL_CLASS_STRUCT(cType) cType##Class
+
+#define GBL_INSTANCE_PRIVATE_STRUCT(instanceStruct) \
+    GBL_GLUE(instanceStruct, _)
+
+#define GBL_CLASS_PRIVATE_STRUCT(instanceStruct) \
+    GBL_GLUE(GBL_GLUE(instanceStruct, Class), _)
 
 #define GBL_DECLARE_TYPE(instanceStruct) \
     GblType GBL_GLUE(instanceStruct, _type(void)) GBL_NOEXCEPT
@@ -150,7 +158,7 @@ extern "C" {
     typedef struct S##_ S
 
 #define GBL_FORWARD_DECLARE_TYPE(t) \
-    GBL_TYPEOF(t)
+    GBL_TYPEID(t)
 
 #ifndef __cplusplus
 #   define GBL_DECLARE_ENUM(E)    \
@@ -180,7 +188,7 @@ extern "C" {
     struct S##_;                \
     typedef struct S##_* S
 
-#define GBL_PRIVATE()       struct {
+#define GBL_PRIVATE_BEGIN   struct {
 
 #define GBL_PRIVATE_END     } private_; //!< Private data structure
 

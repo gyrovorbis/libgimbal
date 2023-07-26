@@ -2,16 +2,16 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_module.h>
 
-#define TEST_MODULE1_TYPE_            (GBL_TYPEOF(TestModule1))
-#define TEST_MODULE1_(self)           (GBL_INSTANCE_CAST(self, TestModule1))
+#define TEST_MODULE1_TYPE_            (GBL_TYPEID(TestModule1))
+#define TEST_MODULE1_(self)           (GBL_CAST(self, TestModule1))
 #define TEST_MODULE1_CLASS_(klass)    (GBL_CLASS_CAST(klass, TestModule1))
-#define TEST_MODULE1_GET_CLASS_(self) (GBL_INSTANCE_GET_CLASS(self, TestModule1))
+#define TEST_MODULE1_GET_CLASS_(self) (GBL_CLASSOF(self, TestModule1))
 
 
-#define TEST_MODULE2_TYPE_            (GBL_TYPEOF(TestModule2))
-#define TEST_MODULE2_(self)           (GBL_INSTANCE_CAST(self, TestModule2))
+#define TEST_MODULE2_TYPE_            (GBL_TYPEID(TestModule2))
+#define TEST_MODULE2_(self)           (GBL_CAST(self, TestModule2))
 #define TEST_MODULE2_CLASS_(klass)    (GBL_CLASS_CAST(klass, TestModule2))
-#define TEST_MODULE2_GET_CLASS_(self) (GBL_INSTANCE_GET_CLASS(self, TestModule2))
+#define TEST_MODULE2_GET_CLASS_(self) (GBL_CLASSOF(self, TestModule2))
 
 #define GBL_SELF_TYPE GblModuleTestSuite
 
@@ -48,7 +48,7 @@ static GblType TestModule1_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GblQuark_internStringStatic("TestModule1"),
+        type = GblType_register(GblQuark_internStringStatic("TestModule1"),
                                       GBL_MODULE_TYPE,
                                       &(const GblTypeInfo) {
                                           .classSize    = sizeof(TestModule1Class),
@@ -65,7 +65,7 @@ static GblType TestModule2_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GblQuark_internStringStatic("TestModule2"),
+        type = GblType_register(GblQuark_internStringStatic("TestModule2"),
                                       GBL_MODULE_TYPE,
                                       &(const GblTypeInfo) {
                                           .classSize    = sizeof(TestModule2Class),
@@ -80,9 +80,9 @@ static GblType TestModule2_type(void) {
 
 GBL_TEST_INIT() {
     pFixture->classRefCount = GblType_classRefCount(GBL_MODULE_TYPE);
-    pFixture->instances     = GblType_instanceRefCount(GBL_MODULE_TYPE);
+    pFixture->instances     = GblType_instanceCount(GBL_MODULE_TYPE);
     pFixture->refCount      = GblRef_activeCount();
-    pFixture->typeCount     = GblType_registeredCount();
+    pFixture->typeCount     = GblType_count();
     GBL_TEST_CASE_END;
 }
 
@@ -91,9 +91,9 @@ GBL_TEST_FINAL() {
     GblType_unregister(TEST_MODULE2_TYPE_);
 
     GBL_TEST_COMPARE(GblRef_activeCount(), pFixture->refCount);
-    GBL_TEST_COMPARE(GblType_instanceRefCount(GBL_MODULE_TYPE), pFixture->instances);
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_MODULE_TYPE), pFixture->instances);
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_MODULE_TYPE), pFixture->classRefCount);
-    GBL_TEST_COMPARE(GblType_registeredCount(), pFixture->typeCount);
+    GBL_TEST_COMPARE(GblType_count(), pFixture->typeCount);
     GBL_TEST_CASE_END;
 }
 

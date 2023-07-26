@@ -8,7 +8,7 @@
 #include <gimbal/core/gimbal_atomics.h>
 #include <tinycthread.h>
 
-#define GBL_MODULE_(self)   ((GblModule_*)GBL_INSTANCE_PRIVATE(self, GBL_MODULE_TYPE))
+#define GBL_MODULE_(self)   (GBL_PRIVATE(GblModule, self))
 
 #define GBL_MODULE_ENSURE_INITIALIZED_()                \
     GBL_STMT_START {                                    \
@@ -323,7 +323,7 @@ static GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
     GblModule_* pSelf_ = GBL_MODULE_(pSelf);
 
     if(!GBL_ATOMIC_INT16_INC(pSelf_->useCount)) GBL_UNLIKELY {
-        GBL_INSTANCE_VCALL(GblModule, pFnLoad, pSelf);
+        GBL_VCALL(GblModule, pFnLoad, pSelf);
     }
 
     GBL_CTX_END();
@@ -336,7 +336,7 @@ static GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
     GblModule_* pSelf_ = GBL_MODULE_(pSelf);
 
     if(GBL_ATOMIC_INT16_DEC(pSelf_->useCount) == 1) GBL_UNLIKELY {
-        GBL_INSTANCE_VCALL(GblModule, pFnUnload, pSelf);
+        GBL_VCALL(GblModule, pFnUnload, pSelf);
     }
 
     GBL_CTX_END();
@@ -408,23 +408,22 @@ static GBL_RESULT GblModule_GblBox_destructor_(GblBox* pBox) {
     GblStringRef_release(pSelf->pDescription);
     GblOptionGroup_unref(pSelf->pOptionGroup);
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblContext, base.base.pFnDestructor, pBox);
+    GBL_VCALL_DEFAULT(GblContext, base.base.pFnDestructor, pBox);
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblModule_GblInstance_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_UNUSED(pCtx);
+static GBL_RESULT GblModule_GblInstance_init_(GblInstance* pInstance) {
     GBL_CTX_BEGIN(NULL);
 
     GblObject_setName(GBL_OBJECT(pInstance),
-                      GblType_name(GBL_INSTANCE_TYPEOF(pInstance)));
+                      GblType_name(GBL_TYPEOF(pInstance)));
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
-    GBL_UNUSED(pData, pCtx);
+static GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData) {
+    GBL_UNUSED(pData);
 
     if(!GblType_classRefCount(GBL_MODULE_TYPE)) {
         GBL_PROPERTIES_REGISTER(GblModule);
@@ -445,7 +444,7 @@ static GBL_RESULT GblModuleClass_init_(GblClass* pClass, const void* pData, GblC
 GBL_EXPORT GblType GblModule_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    static GblTypeInterfaceMapEntry iface = {
+    static GblInterfaceImpl iface = {
         .classOffset = offsetof(GblModuleClass, GblIPluginImpl)
     };
 
@@ -456,7 +455,7 @@ GBL_EXPORT GblType GblModule_type(void) {
         .instanceSize         = sizeof(GblModule),
         .instancePrivateSize  = sizeof(GblModule_),
         .interfaceCount       = 1,
-        .pInterfaceMap        = &iface
+        .pInterfaceImpls        = &iface
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
@@ -464,7 +463,7 @@ GBL_EXPORT GblType GblModule_type(void) {
 
         iface.interfaceType = GBL_IPLUGIN_TYPE;
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblModule"),
+        type = GblType_register(GblQuark_internStringStatic("GblModule"),
                                       GBL_CONTEXT_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

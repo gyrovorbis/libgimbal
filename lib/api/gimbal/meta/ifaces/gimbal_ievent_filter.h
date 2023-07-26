@@ -14,10 +14,10 @@
 #include "gimbal_interface.h"
 #include "../instances/gimbal_instance.h"
 
-#define GBL_IEVENT_FILTER_TYPE                      (GBL_TYPEOF(GblIEventFilter))
-#define GBL_IEVENT_FILTER(instance)                 (GBL_INSTANCE_CAST(instance, GblIEventFilter))
-#define GBL_IEVENT_FILTER_CLASS(klass)              (GBL_CLASS_CAST(klass, GblIEventFilter))
-#define GBL_IEVENT_FILTER_GET_CLASS(instance)       (GBL_INSTANCE_GET_CLASS(instance, GblIEventFilter))
+#define GBL_IEVENT_FILTER_TYPE                      (GBL_TYPEID(GblIEventFilter))
+#define GBL_IEVENT_FILTER(instance)                 (GBL_CAST(GblIEventFilter, instance))
+#define GBL_IEVENT_FILTER_CLASS(klass)              (GBL_CLASS_CAST(GblIEventFilter, klass))
+#define GBL_IEVENT_FILTER_GET_CLASS(instance)       (GBL_CLASSOF(GblIEventFilter, instance))
 
 #define GBL_SELF_TYPE                               GblIEventFilter
 

@@ -172,14 +172,14 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVariantByQuark(const GblObject* pSelf,
                                                        GblQuark         name,
                                                        GblVariant*      pValue)
 {
-    const GblProperty* pProp = GblProperty_findQuark(GBL_INSTANCE_TYPEOF(pSelf),
+    const GblProperty* pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf),
                                                      name);
     if(!pProp) GBL_UNLIKELY {
         GBL_CTX_BEGIN(NULL);
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_PROPERTY,
                        "[GblObject] Attempt to get unknown property %s on object type %s",
-                       GblQuark_toString(name), GblType_name(GBL_INSTANCE_TYPEOF(pSelf)));
+                       GblQuark_toString(name), GblType_name(GBL_TYPEOF(pSelf)));
         GBL_CTX_END();
     }
 
@@ -197,7 +197,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVariant(const GblObject* pSelf,
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_PROPERTY,
                        "[GblObject] Attempt to get unknown property %s on object type %s",
-                       pName, GblType_name(GBL_INSTANCE_TYPEOF(pSelf)));
+                       pName, GblType_name(GBL_TYPEOF(pSelf)));
         GBL_CTX_END();
     }
 
@@ -235,7 +235,7 @@ static GBL_RESULT GblObject_setPropertyVCall_(GblObject*         pSelf,
                            (flag&GBL_PROPERTY_FLAG_WRITE)?
                                "[GblObject] Attempt to set NON-WRITE property %s[%s]." :
                                "{GblObject] Attempt to construct NON-CONSTRUCT property %s[%s].",
-                           GblType_name(GBL_INSTANCE_TYPEOF(pSelf)),
+                           GblType_name(GBL_TYPEOF(pSelf)),
                            GblProperty_nameString(pProp));
     }
 
@@ -247,14 +247,14 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVariantByQuark(GblObject*  pSelf,
                                                           GblVariant* pValue)
 {
 
-    const GblProperty* pProp = GblProperty_findQuark(GBL_INSTANCE_TYPEOF(pSelf), name);
+    const GblProperty* pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf), name);
 
     if(!pProp) GBL_UNLIKELY {
         GBL_CTX_BEGIN(NULL);
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_PROPERTY,
                        "[GblObject] Attempt to set unknown property %s on object type %s",
-                       GblQuark_toString(name), GblType_name(GBL_INSTANCE_TYPEOF(pSelf)));
+                       GblQuark_toString(name), GblType_name(GBL_TYPEOF(pSelf)));
         GBL_CTX_END();
     }
 
@@ -272,7 +272,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVariant(GblObject* pSelf,
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_PROPERTY,
                        "[GblObject] Attempt to set unknown property %s on object type %s",
-                       pName, GblType_name(GBL_INSTANCE_TYPEOF(pSelf)));
+                       pName, GblType_name(GBL_TYPEOF(pSelf)));
         GBL_CTX_END();
     }
 
@@ -323,11 +323,11 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVaList_(const GblObject* pSelf, const Gb
 GBL_EXPORT GBL_RESULT GblObject_propertyVaList(const GblObject* pSelf, const char* pName, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
-    const GblProperty* pProp = GblProperty_find(GBL_INSTANCE_TYPEOF(pSelf), pName);
+    const GblProperty* pProp = GblProperty_find(GBL_TYPEOF(pSelf), pName);
     GBL_CTX_VERIFY(pProp,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unknown property: %s[%s]",
-                   GblType_name(GBL_INSTANCE_TYPEOF(pSelf)),
+                   GblType_name(GBL_TYPEOF(pSelf)),
                    pName);
 
     GBL_CTX_CALL(GblObject_propertyVaList_(pSelf, pProp, pList));
@@ -338,11 +338,11 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVaList(const GblObject* pSelf, const cha
 GBL_EXPORT GBL_RESULT GblObject_propertyVaListByQuark(const GblObject* pSelf, GblQuark name, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
-    const GblProperty* pProp = GblProperty_findQuark(GBL_INSTANCE_TYPEOF(pSelf), name);
+    const GblProperty* pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf), name);
     GBL_CTX_VERIFY(pProp,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unknown property: %s[%s]",
-                   GblType_name(GBL_INSTANCE_TYPEOF(pSelf)),
+                   GblType_name(GBL_TYPEOF(pSelf)),
                    GblQuark_toString(name));
 
     GBL_CTX_CALL(GblObject_propertyVaList_(pSelf, pProp, pList));
@@ -390,7 +390,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList_(GblObject* pSelf, const GblPr
 GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList(GblObject* pSelf, const char* pName, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
-    const GblProperty* pProp = GblProperty_find(GBL_INSTANCE_TYPEOF(pSelf), pName);
+    const GblProperty* pProp = GblProperty_find(GBL_TYPEOF(pSelf), pName);
     GBL_CTX_VERIFY(pProp && pProp->flags & GBL_PROPERTY_FLAG_WRITE,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unwritable property: [%s]", pName);
@@ -403,7 +403,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList(GblObject* pSelf, const char* 
 GBL_EXPORT GBL_RESULT GblObject_setPropertyVaListByQuark(GblObject* pSelf, GblQuark name, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
-    const GblProperty* pProp = GblProperty_findQuark(GBL_INSTANCE_TYPEOF(pSelf), name);
+    const GblProperty* pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf), name);
     GBL_CTX_VERIFY(pProp->flags & GBL_PROPERTY_FLAG_WRITE,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unwritable property: [%s]", GblQuark_toString(name));
@@ -443,7 +443,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertiesVaList(const GblObject* pSelf, va_list
     while((pKey = va_arg(*pVarArgs, const char*))) {
 
 
-        const GblProperty* pProp = GblProperty_find(GBL_INSTANCE_TYPEOF(pSelf), pKey);
+        const GblProperty* pProp = GblProperty_find(GBL_TYPEOF(pSelf), pKey);
 
         if(pProp) {
             GblVariant variant;
@@ -454,12 +454,12 @@ GBL_EXPORT GBL_RESULT GblObject_propertiesVaList(const GblObject* pSelf, va_list
                 ;
             } else {
                 GBL_CTX_WARN("[GblObject]: Failed to get non-readable property: %s[%s]",
-                             GblType_name(GBL_INSTANCE_TYPEOF(pSelf)), pKey);
+                             GblType_name(GBL_TYPEOF(pSelf)), pKey);
             }
             GBL_CTX_CALL(GblVariant_destruct(&variant));
         } else {
             GBL_CTX_WARN("[GblObject]: Failed to get unknown property: %s[%s]",
-                         GblType_name(GBL_INSTANCE_TYPEOF(pSelf)), pKey);
+                         GblType_name(GBL_TYPEOF(pSelf)), pKey);
         }
     }
     GBL_CTX_END();
@@ -470,7 +470,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVaList(GblObject* pSelf, va_list* p
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pVarArgs);
 
-    size_t  count = GblProperty_count(GBL_INSTANCE_TYPEOF(pSelf));
+    size_t  count = GblProperty_count(GBL_TYPEOF(pSelf));
     GblVariant*  pVariants  = GBL_ALLOCA(sizeof(GblVariant) * count);
     const char** pKeys      = GBL_ALLOCA(sizeof(const char*) * count);
 
@@ -478,18 +478,18 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVaList(GblObject* pSelf, va_list* p
     const char* pKey = NULL;
     while((pKey = va_arg(*pVarArgs, const char*))) {
         pKeys[p] = pKey;
-        const GblProperty* pProp = GblProperty_find(GBL_INSTANCE_TYPEOF(pSelf), pKey);
+        const GblProperty* pProp = GblProperty_find(GBL_TYPEOF(pSelf), pKey);
         if(pProp) {
             GBL_CTX_CALL(GblVariant_constructValueCopyVaList(&pVariants[p], pProp->valueType, pVarArgs));
             if(pProp->flags & GBL_PROPERTY_FLAG_WRITE) {
                 ++p;
             } else {
                 GBL_CTX_WARN("[GblObject]: Failed to set non-writable property: %s[%s]",
-                             GblType_name(GBL_INSTANCE_TYPEOF(pSelf)), pKey);
+                             GblType_name(GBL_TYPEOF(pSelf)), pKey);
             }
         } else {
             GBL_CTX_WARN("[GblObject]: Failed to set unknown property: %s[%s]",
-                         GblType_name(GBL_INSTANCE_TYPEOF(pSelf)), pKey);
+                         GblType_name(GBL_TYPEOF(pSelf)), pKey);
         }
     }
 
@@ -552,7 +552,7 @@ static GblBool GblObject_iterateCtorProperties_(const GblProperty* pProp,
     GBL_CTX_VERIFY(!exitLoop,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Cannot instantiate %s without required CONSTRUCT-only property %s[%s]",
-                   GblType_name(GBL_INSTANCE_TYPEOF(pSelf->pObject)),
+                   GblType_name(GBL_TYPEOF(pSelf->pObject)),
                    GblType_name(GblProperty_objectType(pProp)),
                    GblProperty_nameString(pProp));
 
@@ -567,7 +567,7 @@ static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
 {
     GBL_CTX_BEGIN(NULL);
 
-    const GblType selfType  = GBL_INSTANCE_TYPEOF(pSelf);
+    const GblType selfType  = GBL_TYPEOF(pSelf);
     GblObjectCtorIterClosure_ closure = {
         .pObject      = pSelf,
         .argCount     = argCount,
@@ -664,8 +664,8 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pVarArgs);
 
-    const GblType       selfType       = GBL_INSTANCE_TYPEOF(pSelf);
-    const size_t        totalCount     = GblProperty_count(GBL_INSTANCE_TYPEOF(pSelf));
+    const GblType       selfType       = GBL_TYPEOF(pSelf);
+    const size_t        totalCount     = GblProperty_count(GBL_TYPEOF(pSelf));
     GblVariant*         pVariants      = GBL_ALLOCA(sizeof(GblVariant)   * totalCount);
     const GblProperty** ppProperties   = GBL_ALLOCA(sizeof(GblProperty*) * totalCount);
 
@@ -719,7 +719,12 @@ GBL_EXPORT GblObject* GblObject_createVaListWithClass(GblObjectClass* pClass, va
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
 
-    pObject = GBL_OBJECT(GblBox_createWithClass(GBL_BOX_CLASS(pClass)));
+    pObject = GBL_OBJECT(GblBox_create(GBL_CLASS_TYPEOF(pClass),
+                                       0,
+                                       NULL,
+                                       NULL,
+                                       GBL_BOX_CLASS(pClass)));
+
     GBL_CTX_CALL(GblObject_constructVaList_(pObject, type, pVarArgs));
 
     GBL_CTX_END_BLOCK();
@@ -744,7 +749,11 @@ GBL_EXPORT GBL_RESULT GblObject_constructVaListWithClass(GblObject* pSelf, GblOb
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
 
-    GBL_CTX_CALL(GblBox_constructWithClass((GblBox*)pSelf, GBL_BOX_CLASS(pClass)));
+    GBL_CTX_CALL(GblBox_construct((GblBox*)pSelf,
+                                  GBL_CLASS_TYPEOF(pClass),
+                                  NULL,
+                                  NULL,
+                                  GBL_BOX_CLASS(pClass)));
     GBL_CTX_CALL(GblObject_constructVaList_(pSelf, type, pVarArgs));
 
     GBL_CTX_END();
@@ -763,7 +772,7 @@ static GBL_RESULT GblObject_constructVariants_(GblObject*  pSelf,
     const GblProperty** pProps = GBL_ALLOCA(sizeof(GblProperty*) * propertyCount);
 
     for(size_t  p = 0; p < propertyCount; ++p) {
-        pProps[p] = GblProperty_find(GBL_INSTANCE_TYPEOF(pSelf), pNames[p]);
+        pProps[p] = GblProperty_find(GBL_TYPEOF(pSelf), pNames[p]);
 
         if(!pProps[p]) {
             GBL_CTX_WARN("[GblObject]: Failed to construct with unknown property: %s[%s]",
@@ -802,7 +811,11 @@ GBL_EXPORT GblObject* GblObject_createVariantsWithClass(GblObjectClass* pClass,
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
 
-    pObject = GBL_OBJECT(GblBox_createWithClass(GBL_BOX_CLASS(pClass)));
+    pObject = GBL_OBJECT(GblBox_create(GBL_CLASS_TYPEOF(pClass),
+                                       0,
+                                       NULL,
+                                       NULL,
+                                       GBL_BOX_CLASS(pClass)));
     GBL_CTX_CALL(GblObject_constructVariants_(pObject, type, propertyCount, pNames, pValues));
 
     GBL_CTX_END_BLOCK();
@@ -837,7 +850,11 @@ GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass(GblObject*      pSelf
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
 
-    GBL_CTX_CALL(GblBox_constructWithClass((GblBox*)pSelf, GBL_BOX_CLASS(pClass)));
+    GBL_CTX_CALL(GblBox_construct((GblBox*)pSelf,
+                                  GBL_CLASS_TYPEOF(pClass),
+                                  NULL,
+                                  NULL,
+                                  GBL_BOX_CLASS(pClass)));
     GBL_CTX_CALL(GblObject_constructVariants_(pSelf, type, propertyCount, pNames, pValues));
 
     GBL_CTX_END();
@@ -1342,7 +1359,7 @@ static GBL_RESULT GblObject_ITableVariant_next_(const GblVariant* pSelf,
 static GBL_RESULT GblObject_ITableVariant_count_(const GblVariant* pSelf,
                                                  size_t*           pSize)
 {
-    return GblProperty_count(GBL_INSTANCE_TYPEOF(pSelf));
+    return GblProperty_count(GBL_TYPEOF(pSelf));
 }
 
 
@@ -1431,9 +1448,9 @@ static GBL_RESULT GblObject_constructed_(GblObject* pSelf) {
     return GBL_RESULT_SUCCESS;
 }
 
-static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
+static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData) {
     GBL_UNUSED(pData);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
 
     static GblIVariantVTable iVariantVTable;
 
@@ -1466,9 +1483,9 @@ static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData, GblC
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblObjectClass_final_(GblClass* pClass, const void* pClassData, GblContext* pCtx) {
+static GBL_RESULT GblObjectClass_final_(GblClass* pClass, const void* pClassData) {
     GBL_UNUSED(pClassData);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
 
     if(!GblType_classRefCount(GBL_CLASS_TYPEOF(pClass))) {
         GBL_CTX_CALL(GblProperty_uninstallAll(GBL_CLASS_TYPEOF(pClass)));
@@ -1489,7 +1506,7 @@ static GBL_RESULT GblObject_init_(GblInstance* pInstance, GblContext* pCtx) {
 GBL_EXPORT GblType GblObject_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    static GblTypeInterfaceMapEntry ifaceEntries[] = {
+    static GblInterfaceImpl ifaceEntries[] = {
         {
             .interfaceType = GBL_INVALID_TYPE,
             .classOffset   = offsetof(GblObjectClass, GblITableVariantImpl)
@@ -1509,7 +1526,7 @@ GBL_EXPORT GblType GblObject_type(void) {
         .pFnInstanceInit  = GblObject_init_,
         .instanceSize     = sizeof(GblObject),
         .interfaceCount   = 3,
-        .pInterfaceMap    = ifaceEntries
+        .pInterfaceImpls    = ifaceEntries
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
@@ -1517,7 +1534,7 @@ GBL_EXPORT GblType GblObject_type(void) {
         ifaceEntries[1].interfaceType = GBL_IEVENT_HANDLER_TYPE;
         ifaceEntries[2].interfaceType = GBL_IEVENT_FILTER_TYPE;
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblObject"),
+        type = GblType_register(GblQuark_internStringStatic("GblObject"),
                                       GBL_BOX_TYPE,
                                       &typeInfo,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

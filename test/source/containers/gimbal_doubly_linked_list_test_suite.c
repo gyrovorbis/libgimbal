@@ -4,7 +4,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <string.h>
 
-#define GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(inst)    ((GblDoublyLinkedListTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_DOUBLY_LINKED_LIST_TEST_SUITE_TYPE))
+#define GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(inst)    (GBL_PRIVATE(GblDoublyLinkedListTestSuite, inst))
 
 typedef struct TestStruct_ {
     char* pString;

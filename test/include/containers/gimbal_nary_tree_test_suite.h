@@ -5,9 +5,9 @@
 
 #define GBL_NARY_TREE_TEST_SUITE_TYPE             (GblNaryTreeTestSuite_type())
 
-#define GBL_NARY_TREE_TEST_SUITE(inst)            (GBL_INSTANCE_CAST(inst, GBL_NARY_TREE_TEST_SUITE_TYPE, GblNaryTreeTestSuite))
+#define GBL_NARY_TREE_TEST_SUITE(inst)            (GBL_CAST(inst, GBL_NARY_TREE_TEST_SUITE_TYPE, GblNaryTreeTestSuite))
 #define GBL_NARY_TREE_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GBL_NARY_TREE_TEST_SUITE_TYPE, GblNaryTreeTestSuiteClass))
-#define GBL_NARY_TREE_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_CLASS_CAST(inst, GBL_NARY_TREE_TEST_SUITE_TYPE, GblNaryTreeTestSuite))
+#define GBL_NARY_TREE_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST(inst, GBL_NARY_TREE_TEST_SUITE_TYPE, GblNaryTreeTestSuite))
 
 GBL_DECLS_BEGIN
 

@@ -27,7 +27,7 @@ GBL_DECLS_BEGIN
  *  \sa GblRingBuffer, GblArrayDeque
  */
 typedef struct GblArrayList {               // Size (32-bit / 64-bit)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblContext*     pCtx;               // 4/8      bytes
         uint8_t*        pData;              // 4/8      bytes
         size_t          size;               // 4/8      bytes

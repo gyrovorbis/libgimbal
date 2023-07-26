@@ -26,10 +26,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_APP_TYPE            (GBL_TYPEOF(GblApp))                    //!< Type UUID for GblApp
-#define GBL_APP(self)           (GBL_INSTANCE_CAST(self, GblApp))       //!< Cast GblInstance to GblApp
-#define GBL_APP_CLASS(klass)    (GBL_CLASS_CAST(klass, GblApp))         //!< Cast GblClass to GblAppClass
-#define GBL_APP_GET_CLASS(self) (GBL_INSTANCE_GET_CLASS(self, GblApp))  //!< Get GblAppClass from GblInstance
+#define GBL_APP_TYPE            (GBL_TYPEID(GblApp))            //!< Type UUID for GblApp
+#define GBL_APP(self)           (GBL_CAST(GblApp, self))        //!< Cast GblInstance to GblApp
+#define GBL_APP_CLASS(klass)    (GBL_CLASS_CAST(GblApp, klass)) //!< Cast GblClass to GblAppClass
+#define GBL_APP_GET_CLASS(self) (GBL_CLASSOF(GblApp, self))     //!< Get GblAppClass from GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblApp

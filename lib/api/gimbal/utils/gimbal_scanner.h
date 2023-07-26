@@ -20,10 +20,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_SCANNER_TYPE            (GBL_TYPEOF(GblScanner))                    //!< Type UUID for GblScanner
-#define GBL_SCANNER(self)           (GBL_INSTANCE_CAST(self, GblScanner))       //!< Function-style cast for GblInstance
-#define GBL_SCANNER_CLASS(klass)    (GBL_CLASS_CAST(klass, GblScanner))         //!< Function-style cast for GblClass
-#define GBL_SCANNER_GET_CLASS(self) (GBL_INSTANCE_GET_CLASS(self, GblScanner))  //!< Get a GblScannerClass from GblInstance
+#define GBL_SCANNER_TYPE            (GBL_TYPEID(GblScanner))            //!< Type UUID for GblScanner
+#define GBL_SCANNER(self)           (GBL_CAST(GblScanner, self))        //!< Function-style cast for GblInstance
+#define GBL_SCANNER_CLASS(klass)    (GBL_CLASS_CAST(GblScanner, klass)) //!< Function-style cast for GblClass
+#define GBL_SCANNER_GET_CLASS(self) (GBL_CLASSOF(GblScanner, self))     //!< Get a GblScannerClass from GblInstance
 //! @}
 
 //! Default delimeters used with GblScanner for tokenizing the input stream

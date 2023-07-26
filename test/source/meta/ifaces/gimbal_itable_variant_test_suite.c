@@ -2,15 +2,15 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_ref.h>
 
-#define GBL_SELF_TYPE               GblITableVariantTestSuite
+#define GBL_SELF_TYPE                GblITableVariantTestSuite
 
-#define GBL_TEST_BOX_TYPE           (GBL_TYPEOF(GblTestBox))
-#define GBL_TEST_BOX(self)          (GBL_INSTANCE_CAST(self, GblTestBox))
-#define GBL_TEST_BOX_CLASS(klass)   (GBL_CLASS_CAST(klass, GblTestBox))
+#define GBL_TEST_BOX_TYPE            (GBL_TYPEID(GblTestBox))
+#define GBL_TEST_BOX(self)           (GBL_CAST(GblTestBox, self))
+#define GBL_TEST_BOX_CLASS(klass)    (GBL_CLASS_CAST(GblTestBox, klass))
 
-#define GBL_TEST_OBJECT_TYPE        (GBL_TYPEOF(GblTestObject))
-#define GBL_TEST_OBJECT(self)       (GBL_INSTANCE_CAST(self, GblTestObject))
-#define GBL_TEST_OBJECT_CLASS(klass)(GBL_CLASS_CAST(klass, GblTestObject))
+#define GBL_TEST_OBJECT_TYPE         (GBL_TYPEID(GblTestObject))
+#define GBL_TEST_OBJECT(self)        (GBL_CAST(GblTestObject, self))
+#define GBL_TEST_OBJECT_CLASS(klass) (GBL_CLASS_CAST(GblTestObject, klass))
 
 GBL_FORWARD_DECLARE_STRUCT(GblTestBox);
 GBL_FORWARD_DECLARE_STRUCT(GblTestObject);
@@ -374,13 +374,12 @@ static GBL_RESULT GblTestBox_Box_destructor_(GblBox* pBox) {
     GBL_CTX_BEGIN(NULL);
 
     GblStringRef_unref(GBL_TEST_BOX(pBox)->pString);
-    GBL_INSTANCE_VCALL_DEFAULT(GblBox, pFnDestructor, pBox);
+    GBL_VCALL_DEFAULT(GblBox, pFnDestructor, pBox);
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestBox_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_UNUSED(pCtx);
+static GBL_RESULT GblTestBox_init_(GblInstance* pInstance) {
     GBL_CTX_BEGIN(NULL);
 
     GblTestBox* pSelf = GBL_TEST_BOX(pInstance);
@@ -393,8 +392,8 @@ static GBL_RESULT GblTestBox_init_(GblInstance* pInstance, GblContext* pCtx) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestBoxClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_UNUSED(pUd, pCtx);
+static GBL_RESULT GblTestBoxClass_init_(GblClass* pClass, const void* pUd) {
+    GBL_UNUSED(pUd);
 
     GBL_BOX_CLASS(pClass)           ->pFnDestructor = GblTestBox_Box_destructor_;
     GBL_ITABLE_VARIANT_CLASS(pClass)->pFnIndex      = GblTestBox_ITableVariant_index_;
@@ -408,7 +407,7 @@ static GBL_RESULT GblTestBoxClass_init_(GblClass* pClass, const void* pUd, GblCo
 static GblType GblTestBox_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    static GblTypeInterfaceMapEntry ifaceEntry = {
+    static GblInterfaceImpl ifaceEntry = {
         .classOffset = offsetof(GblTestBoxClass, GblITableVariantImpl)
     };
 
@@ -417,14 +416,14 @@ static GblType GblTestBox_type(void) {
         .pFnClassInit    = GblTestBoxClass_init_,
         .instanceSize    = sizeof(GblTestBox),
         .pFnInstanceInit = GblTestBox_init_,
-        .pInterfaceMap   = &ifaceEntry,
+        .pInterfaceImpls   = &ifaceEntry,
         .interfaceCount  = 1
     };
 
     if(type == GBL_INVALID_TYPE) {
         ifaceEntry.interfaceType = GBL_ITABLE_VARIANT_TYPE;
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblTestBox"),
+        type = GblType_register(GblQuark_internStringStatic("GblTestBox"),
                                       GBL_BOX_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

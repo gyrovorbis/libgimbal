@@ -5,9 +5,9 @@
 
 #define GBL_PATTERN_TEST_SUITE_TYPE             (GblPatternTestSuite_type())
 
-#define GBL_PATTERN_TEST_SUITE(inst)            (GBL_INSTANCE_CAST(inst, GBL_PATTERN_TEST_SUITE_TYPE, GblPatternTestSuite))
+#define GBL_PATTERN_TEST_SUITE(inst)            (GBL_CAST(inst, GBL_PATTERN_TEST_SUITE_TYPE, GblPatternTestSuite))
 #define GBL_PATTERN_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GBL_PATTERN_TEST_SUITE_TYPE, GblPatternTestSuiteClass))
-#define GBL_PATTERN_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_CLASS_CAST(inst, GBL_PATTERN_TEST_SUITE_TYPE, GblPatternTestSuiteClass))
+#define GBL_PATTERN_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST(inst, GBL_PATTERN_TEST_SUITE_TYPE, GblPatternTestSuiteClass))
 
 GBL_DECLS_BEGIN
 

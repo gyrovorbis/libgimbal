@@ -5,7 +5,7 @@
 #include <gimbal/containers/gimbal_doubly_linked_list.h>
 #include <gimbal/algorithms/gimbal_numeric.h>
 
-#define GBL_POOL_ALLOCATOR_TEST_SUITE_(inst)   ((GblPoolAllocatorTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_POOL_ALLOCATOR_TEST_SUITE_TYPE))
+#define GBL_POOL_ALLOCATOR_TEST_SUITE_(inst)   (GBL_PRIVATE(GblPoolAllocatorTestSuite, inst))
 
 
 typedef union GblVariantListNode_ {

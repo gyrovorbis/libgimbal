@@ -14,10 +14,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_TEST_SCENARIO_TYPE                (GBL_TYPEOF(GblTestScenario))
-#define GBL_TEST_SCENARIO(instance)           (GBL_INSTANCE_CAST(instance, GblTestScenario))
-#define GBL_TEST_SCENARIO_CLASS(klass)        (GBL_CLASS_CAST(klass, GblTestScenario))
-#define GBL_TEST_SCENARIO_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, GblTestScenario))
+#define GBL_TEST_SCENARIO_TYPE            (GBL_TYPEID(GblTestScenario))
+#define GBL_TEST_SCENARIO(self)           (GBL_CAST(GblTestScenario, self))
+#define GBL_TEST_SCENARIO_CLASS(klass)    (GBL_CLASS_CAST(GblTestScenario, klass))
+#define GBL_TEST_SCENARIO_GET_CLASS(self) (GBL_CLASSOF(GblTestScenario, self))
 //! @}
 
 #define GBL_SELF_TYPE GblTestScenario

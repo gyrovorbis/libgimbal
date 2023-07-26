@@ -302,7 +302,7 @@ static GBL_RESULT GblOptionGroup_Box_destructor_(GblBox* pBox) {
     GblStringRef_release(pGroup->pSummary);
     GblStringList_destroy(pGroup->pParsedArgs);
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
+    GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 
     GBL_CTX_END();
 }
@@ -313,8 +313,8 @@ GBL_EXPORT GBL_RESULT GblOptionGroup_init_(GblInstance* pInstance, GblContext* p
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblOptionGroupClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblOptionGroupClass_init_(GblClass* pClass, const void* pData) {
+    GBL_CTX_BEGIN(NULL);
 
     GBL_UNUSED(pData);
 
@@ -356,8 +356,8 @@ static GBL_RESULT GblOptionGroupClass_init_(GblClass* pClass, const void* pData,
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblOptionGroupClass_final_(GblClass* pClass, const void* pData, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblOptionGroupClass_final_(GblClass* pClass, const void* pData) {
+    GBL_CTX_BEGIN(NULL);
 
     GBL_UNUSED(pClass, pData);
 
@@ -383,7 +383,7 @@ GBL_EXPORT GblType GblOptionGroup_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblOptionGroup"),
+        type = GblType_register(GblQuark_internStringStatic("GblOptionGroup"),
                                       GBL_OBJECT_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

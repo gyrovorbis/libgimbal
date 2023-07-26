@@ -3,7 +3,7 @@
 #include <gimbal/strings/gimbal_string_view.h>
 #include <gimbal/meta/types/gimbal_variant.h>
 
-#define GBL_CMD_PARSER_(self) ((GblCmdParser_*)GBL_INSTANCE_PRIVATE(self, GBL_CMD_PARSER_TYPE))
+#define GBL_CMD_PARSER_(self) (GBL_PRIVATE(GblCmdParser, self))
 
 GBL_DECLARE_STRUCT_PRIVATE(GblCmdParser) {
     // Configuration values
@@ -428,13 +428,13 @@ static GBL_RESULT GblCmdParser_Box_destructor_(GblBox* pBox) {
     GBL_CTX_VERIFY_CALL(GblCmdParser_clearPositionalArgs(GBL_CMD_PARSER(pBox)));
     GBL_CTX_VERIFY_CALL(GblArrayList_destruct(&pSelf_->posArgs));
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
+    GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblCmdParser_init_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblCmdParser_init_(GblInstance* pInstance) {
+    GBL_CTX_BEGIN(NULL);
     GblCmdParser* pSelf = GBL_CMD_PARSER(pInstance);
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
 
@@ -449,8 +449,8 @@ static GBL_RESULT GblCmdParser_init_(GblInstance* pInstance, GblContext* pCtx) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblCmdParserClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblCmdParserClass_init_(GblClass* pClass, const void* pUd) {
+    GBL_CTX_BEGIN(NULL);
     GBL_UNUSED(pUd);
 
     if(!GblType_classRefCount(GBL_CLASS_TYPEOF(pClass))) {
@@ -478,7 +478,7 @@ GBL_EXPORT GblType GblCmdParser_type(void) {
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblCmdParser"),
+        type = GblType_register(GblQuark_internStringStatic("GblCmdParser"),
                                       GBL_OBJECT_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

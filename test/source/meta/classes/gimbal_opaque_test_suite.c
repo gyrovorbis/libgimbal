@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/meta/types/gimbal_variant.h>
 
-#define GBL_OPAQUE_TEST_SUITE_(inst)     ((GblOpaqueTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_OPAQUE_TEST_SUITE_TYPE))
+#define GBL_OPAQUE_TEST_SUITE_(inst)     (GBL_PRIVATE(GblOpaqueTestSuite, inst))
 
 typedef struct GblOpaqueTestSuite_ {
     GblType opaqueType;

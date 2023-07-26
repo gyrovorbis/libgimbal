@@ -33,7 +33,7 @@ GBL_EXPORT GblClosure* GblClosure_create(GblType           derivedType,
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_CLOSURE_TYPE);
     GBL_CTX_VERIFY_ARG(size >= sizeof(GblClosure));
-    pClosure = GBL_CLOSURE(GblBox_createExt(derivedType, size, pUserdata, pFnDtor));
+    pClosure = GBL_CLOSURE(GblBox_create(derivedType, size, pUserdata, pFnDtor));
     GBL_CTX_END_BLOCK();
     return pClosure;
 }
@@ -43,13 +43,13 @@ GBL_EXPORT GBL_RESULT GblClosure_setMetaMarshal(GblClosure* pSelf,
 {
     GBL_CTX_BEGIN(NULL);
 
-    if(GblClass_isOwned(GBL_INSTANCE_CLASS(pSelf))) {
+    if(GblClass_isOwned(GBL_INSTANCE_GET_CLASS(pSelf))) {
         GBL_CLOSURE_GET_CLASS(pSelf)->pFnMetaMarshal = pFnMeta;
     } else {
         GblClosureClass* pClass =
             GBL_CLOSURE_CLASS(
                 GblClass_createFloating(
-                    GBL_INSTANCE_TYPEOF(pSelf)));
+                    GBL_TYPEOF(pSelf)));
 
         pClass->pFnMetaMarshal = pFnMeta;
 
@@ -109,7 +109,7 @@ GBL_EXPORT GblType GblClosure_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblClosure"),
+        type = GblType_register(GblQuark_internStringStatic("GblClosure"),
                                       GBL_BOX_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

@@ -4,7 +4,7 @@
 #include <gimbal/allocators/gimbal_allocation_tracker.h>
 #include <time.h>
 
-#define GBL_TEST_SCENARIO_(inst)    ((GblTestScenario_*)GBL_INSTANCE_PRIVATE(inst, GBL_TEST_SCENARIO_TYPE))
+#define GBL_TEST_SCENARIO_(inst)    (GBL_PRIVATE(GblTestScenario, inst))
 
 typedef struct GblTestScenario_ {
     GblAllocationTracker*   pAllocTracker;
@@ -29,7 +29,6 @@ static GBL_RESULT GblTestScenarioClass_begin_(GblTestScenario* pSelf) {
     GblContext_logBuildInfo(GBL_CONTEXT(pSelf));
     GBL_CTX_END();
 }
-
 
 static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_CTX_BEGIN(pSelf);
@@ -86,11 +85,9 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
     pSelf->result = GBL_RESULT_SUCCESS;
     GBL_CTX_VERIFY_CALL(pClass->pFnBegin(pSelf));
 
-    for(GblTestSuite* pSuiteIt = GBL_INSTANCE_TRY(GblObject_childFirst(GBL_OBJECT(pSelf)),
-                                                  GblTestSuite);
-        pSuiteIt != NULL;
-        pSuiteIt = GBL_INSTANCE_TRY(GblObject_siblingNext(GBL_OBJECT(pSuiteIt)),
-                                    GblTestSuite))
+    for(GblTestSuite* pSuiteIt = GBL_AS(GblTestSuite, GblObject_childFirst(GBL_OBJECT(pSelf)));
+        pSuiteIt              != NULL;
+        pSuiteIt               = GBL_AS(GblTestSuite, GblObject_siblingNext(GBL_OBJECT(pSuiteIt))))
     {
         pSelf_->pCurSuite = pSuiteIt;
 
@@ -395,9 +392,9 @@ static GBL_RESULT GblTestScenarioClass_ILogger_write_(GblILogger* pILogger, cons
 }
 
 
-static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
+static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd) {
     GBL_UNUSED(pUd);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
 
     if(!GblType_classRefCount(GBL_TEST_SCENARIO_TYPE)) {
         GBL_PROPERTIES_REGISTER(GblTestScenario);
@@ -430,16 +427,10 @@ GBL_EXPORT GblType GblTestScenario_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-
-        GBL_CTX_BEGIN(NULL);
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblTestScenario"),
-                                      GBL_CONTEXT_TYPE,
-                                      &typeInfo,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
-
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
-
+        type = GblType_register(GblQuark_internStringStatic("GblTestScenario"),
+                                GBL_CONTEXT_TYPE,
+                                &typeInfo,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
     return type;
 
@@ -496,8 +487,7 @@ GBL_EXPORT GblTestSuite* GblTestScenario_findSuite(const GblTestScenario* pSelf,
     GblTestSuite* pSuite = NULL;
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pName);
-    pSuite = GBL_INSTANCE_TRY(GblObject_findChildByName(GBL_OBJECT(pSelf), pName),
-                              GblTestSuite);
+    pSuite = GBL_AS(GblTestSuite, GblObject_findChildByName(GBL_OBJECT(pSelf), pName));
     GBL_CTX_END_BLOCK();
     return pSuite;
 }
@@ -516,7 +506,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_run(GblTestScenario* pSelf, int argc, char
     GblContext* pOldGlobalCtx = GblContext_global();
     GblContext_setGlobal(GBL_CONTEXT(pSelf));
 
-    GBL_INSTANCE_VCALL(GblTestScenario, pFnRun, pSelf, argc, argv);
+    GBL_VCALL(GblTestScenario, pFnRun, pSelf, argc, argv);
 
     GblContext_setLogFilter(pOldGlobalCtx, GBL_LOG_LEVEL_WARNING|GBL_LOG_LEVEL_ERROR);
     GblContext_setGlobal(pOldGlobalCtx);

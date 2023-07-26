@@ -24,10 +24,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_LOGGER_TYPE                   (GBL_TYPEOF(GblLogger))                   //!< Type UUID for GblLogger
-#define GBL_LOGGER(self)                  (GBL_INSTANCE_CAST(self, GblLogger))      //!< Function-style cast to GblLogger
-#define GBL_LOGGER_CLASS(klass)           (GBL_CLASS_CAST(klass, GblLogger))        //!< Function-style cast to GblLoggerClass
-#define GBL_LOGGER_GET_CLASS(self)        (GBL_INSTANCE_GET_CLASS(self, GblLogger)) //!< Get GblLoggerClass from GblLogger
+#define GBL_LOGGER_TYPE                   (GBL_TYPEID(GblLogger))            //!< Type UUID for GblLogger
+#define GBL_LOGGER(self)                  (GBL_CAST(GblLogger, self))        //!< Function-style cast to GblLogger
+#define GBL_LOGGER_CLASS(klass)           (GBL_CLASS_CAST(GblLogger, klass)) //!< Function-style cast to GblLoggerClass
+#define GBL_LOGGER_GET_CLASS(self)        (GBL_CLASSOF(GblLogger, self))     //!< Get GblLoggerClass from GblLogger
 //! @}
 
 /*! \name Logging Macros
@@ -109,7 +109,7 @@ GBL_CLASS_END
  *  \sa GblLoggerClass
  */
 GBL_INSTANCE_DERIVE(GblLogger, GblObject)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         union {
             GblLinkedListNode listNode;    //!< Internal generic list node
             GblLogger*        pNext;       //!< Internal pointer to next logger in list

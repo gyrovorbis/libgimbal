@@ -3,8 +3,8 @@
 #include <gimbal/meta/types/gimbal_variant.h>
 #include "../types/gimbal_type_.h"
 
-static GBL_RESULT GblOpaqueClass_init_(GblClass* pClass, const void* pData, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblOpaqueClass_init_(GblClass* pClass, const void* pData) {
+    GBL_CTX_BEGIN(NULL);
     GblOpaqueClass* pSelf = GBL_OPAQUE_CLASS(pClass);
     pSelf->pVTable = (const GblOpaqueClassVTable*)pData;
     GBL_CTX_END();
@@ -217,7 +217,7 @@ GBL_EXPORT GblType GblOpaque_register(const char*                   pName,
     GblType type = GBL_INVALID_TYPE;
     GBL_CTX_BEGIN(NULL);
 
-    type = GblType_registerStatic(GblQuark_internString(pName),
+    type = GblType_register(GblQuark_internString(pName),
                                   GBL_OPAQUE_TYPE,
                                   &(const GblTypeInfo) {
                                       .pFnClassInit     = GblOpaqueClass_init_,

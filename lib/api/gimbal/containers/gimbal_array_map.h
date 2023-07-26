@@ -63,7 +63,7 @@ typedef struct GblArrayMapEntry {
  *  \sa GblArrayMapEntry
  */
 typedef struct GblArrayMap {
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblContext*             pCtx;                   ///< Optional custom context
         GblArrayMapCmpFn        pFnComparator;          ///< Optional custom comparator
         size_t                  binarySearches  : 1;    ///< Optionally sort values and use binary searches

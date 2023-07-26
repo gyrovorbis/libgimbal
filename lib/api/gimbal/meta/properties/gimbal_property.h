@@ -10,12 +10,12 @@
 
 #include "../instances/gimbal_box.h"
 
-#define GBL_PROPERTY_TYPE                       (GBL_TYPEOF(GblProperty))
-#define GBL_PROPERTY(instance)                  (GBL_INSTANCE_CAST(instance, GblProperty))
-#define GBL_PROPERTY_CLASS(klass)               (GBL_CLASS_CAST(klass, GblPropertyClass))
-#define GBL_PROPERTY_GET_CLASS(instance)        (GBL_INSTANCE_GET_CLASS(instance, GblProperty))
+#define GBL_PROPERTY_TYPE               (GBL_TYPEID(GblProperty))
+#define GBL_PROPERTY(self)              (GBL_CAST(GblProperty, self))
+#define GBL_PROPERTY_CLASS(klass)       (GBL_CLASS_CAST(GblPropertyClass, klass))
+#define GBL_PROPERTY_GET_CLASS(self)    (GBL_CLASSOF(GblProperty, self))
 
-#define GBL_GENERIC_PROPERTY_TYPE                GBL_PROPERTY_TYPE
+#define GBL_GENERIC_PROPERTY_TYPE       GBL_PROPERTY_TYPE
 
 #define GBL_SELF_TYPE GblProperty
 
@@ -68,7 +68,7 @@ GBL_CLASS_END
  *  \sa GblPropertyClass
  */
 GBL_INSTANCE_DERIVE(GblProperty, GblBox)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblProperty* pNext;
         GblType      objectType;
     GBL_PRIVATE_END

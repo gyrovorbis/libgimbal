@@ -37,10 +37,9 @@ static GBL_RESULT GblITableVariant_count_(const GblVariant* pSelf,
 }
 
 static GBL_RESULT GblITableVariantClass_init_(GblClass*   pClass,
-                                              const void* pUd,
-                                              GblContext* pCtx)
+                                              const void* pUd)
 {
-    GBL_UNUSED(pUd, pCtx);
+    GBL_UNUSED(pUd);
     GBL_CTX_BEGIN(NULL);
 
     GBL_ITABLE_VARIANT_CLASS(pClass)->pFnIndex    = GblITableVariant_index_;
@@ -66,7 +65,7 @@ GBL_EXPORT GblType GblITableVariant_type(void) {
     if(type == GBL_INVALID_TYPE) {
         dependency = GBL_IVARIANT_TYPE;
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblITableVariant"),
+        type = GblType_register(GblQuark_internStringStatic("GblITableVariant"),
                                       GBL_INTERFACE_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC |

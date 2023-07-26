@@ -2,7 +2,7 @@
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/test/gimbal_test_macros.h>
 
-#define GBL_HASH_TEST_SUITE_(inst)   ((GblHashTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_HASH_TEST_SUITE_TYPE))
+#define GBL_HASH_TEST_SUITE_(inst)   (GBL_PRIVATE(GblHashTestSuite, inst))
 
 #define GBL_HASH_TEST_SUITE_WORD_COUNT_     512
 #define GBL_HASH_TEST_SUITE_WORD_SIZE_MAX_  50

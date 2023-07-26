@@ -5,8 +5,8 @@
 #include <gimbal/meta/signals/gimbal_marshal.h>
 #include <tinycthread.h>
 
-#define GBL_THREAD_(self)               ((GblThread_*)GBL_INSTANCE_PRIVATE(self, GBL_THREAD_TYPE))
-#define GBL_THREAD_PUBLIC_(priv)        ((GblThread*)GBL_INSTANCE_PUBLIC(priv, GBL_THREAD_TYPE))
+#define GBL_THREAD_(self)               (GBL_PRIVATE(GblThread, self))
+#define GBL_THREAD_PUBLIC_(priv)        (GBL_PUBLIC(GblThread, priv))
 #define GBL_THREAD_ENTRY_(node)         (GBL_DOUBLY_LINKED_LIST_ENTRY(node, GblThread_, listNode))
 #define GBL_THREAD_ENTRY_PUBLIC_(node)  (GBL_THREAD_PUBLIC_(GBL_THREAD_ENTRY_(node)))
 #define GBL_THREAD_SHUTDOWN_RETRIES     10
@@ -220,7 +220,7 @@ static int GblThread_start_(void* pThread) {
     // clear thread-local status
     GBL_CTX_BEGIN(NULL);
     // perform actual virtual method dispatch for called logic
-    GBL_INSTANCE_VCALL(GblThread, pFnRun, pSelf);
+    GBL_VCALL(GblThread, pFnRun, pSelf);
     // end capturing thread status
     GBL_CTX_END_BLOCK();
 
@@ -448,7 +448,7 @@ static GBL_RESULT GblThread_GblObject_setProperty_(GblObject* pObject, const Gbl
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Failed to set property %s for type %s",
-                           GblProperty_nameString(pProp), GblType_name(GBL_INSTANCE_TYPEOF(pSelf)));
+                           GblProperty_nameString(pProp), GblType_name(GBL_TYPEOF(pSelf)));
     }
     GBL_CTX_END();
 }
@@ -475,7 +475,7 @@ static GBL_RESULT GblThread_GblObject_property_(const GblObject* pObject, const 
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Failed to get property %s for type %s",
-                           GblProperty_nameString(pProp), GblType_name(GBL_INSTANCE_TYPEOF(pSelf)));
+                           GblProperty_nameString(pProp), GblType_name(GBL_TYPEOF(pSelf)));
     }
 
     GBL_CTX_END();
@@ -497,21 +497,20 @@ static GBL_RESULT GblThread_GblBox_destructor_(GblBox* pBox) {
 
     }
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblObject, base.pFnDestructor, GBL_BOX(pBox));
+    GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, GBL_BOX(pBox));
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblThread_initialize_(GblInstance* pInstance, GblContext* pCtx) {
-    GBL_UNUSED(pCtx);
+static GBL_RESULT GblThread_initialize_(GblInstance* pInstance) {
     GBL_CTX_BEGIN(NULL);
     GblThread*  pThread  = GBL_THREAD(pInstance);
     pThread->state = GBL_THREAD_STATE_INITIALIZING;
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblThreadClass_initialize_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_UNUSED(pUd, pCtx);
+static GBL_RESULT GblThreadClass_initialize_(GblClass* pClass, const void* pUd) {
+    GBL_UNUSED(pUd);
     GBL_CTX_BEGIN(NULL);
 
     if(!GblType_classRefCount(GBL_THREAD_TYPE)) {
@@ -581,7 +580,7 @@ GBL_EXPORT GblType GblThread_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblThread"),
+        type = GblType_register(GblQuark_internStringStatic("GblThread"),
                                       GBL_OBJECT_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

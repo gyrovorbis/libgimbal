@@ -18,10 +18,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_IALLOCATOR_TYPE             (GBL_TYPEOF(GblIAllocator))                     //!< Type UUID for GblIAllocator
-#define GBL_IALLOCATOR(self)            (GBL_INSTANCE_CAST(self,  GblIAllocator))       //!< Casts a GblInstance to GblIAllocator
-#define GBL_IALLOCATOR_CLASS(klass)     (GBL_CLASS_CAST(klass, GblIAllocator))          //!< Casts a GblClass to GblIAllocatorClass
-#define GBL_IALLOCATOR_GET_CLASS(self)  (GBL_INSTANCE_GET_CLASS(self, GblIAllocator))   //!< Gets a GblIAllocatorClass from a GblInstance
+#define GBL_IALLOCATOR_TYPE             (GBL_TYPEID(GblIAllocator))            //!< Type UUID for GblIAllocator
+#define GBL_IALLOCATOR(self)            (GBL_CAST(GblIAllocator, self))        //!< Casts a GblInstance to GblIAllocator
+#define GBL_IALLOCATOR_CLASS(klass)     (GBL_CLASS_CAST(GblIAllocator, klass)) //!< Casts a GblClass to GblIAllocatorClass
+#define GBL_IALLOCATOR_GET_CLASS(self)  (GBL_CLASSOF(GblIAllocator, self))     //!< Gets a GblIAllocatorClass from a GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblIAllocator

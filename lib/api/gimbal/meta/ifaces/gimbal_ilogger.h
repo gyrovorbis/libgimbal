@@ -14,10 +14,10 @@
 #include "gimbal_interface.h"
 #include <stdarg.h>
 
-#define GBL_ILOGGER_TYPE                (GBL_TYPEOF(GblILogger))
-#define GBL_ILOGGER(instance)           (GBL_INSTANCE_CAST(instance, GblILogger))
-#define GBL_ILOGGER_CLASS(klass)        (GBL_CLASS_CAST(klass, GblILogger))
-#define GBL_ILOGGER_GET_IFACE(instance) (GBL_INSTANCE_GET_CLASS(instamce, GblILogger))
+#define GBL_ILOGGER_TYPE                (GBL_TYPEID(GblILogger))
+#define GBL_ILOGGER(instance)           (GBL_CAST(GblILogger, instance))
+#define GBL_ILOGGER_CLASS(klass)        (GBL_CLASS_CAST(GblILogger, klass))
+#define GBL_ILOGGER_GET_CLASS(instance) (GBL_CLASSOF(GblILogger, instance))
 
 #define GBL_SELF_TYPE GblILogger
 

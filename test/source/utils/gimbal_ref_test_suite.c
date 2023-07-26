@@ -3,7 +3,7 @@
 #include <gimbal/utils/gimbal_ref.h>
 #include <gimbal/test/gimbal_test_macros.h>
 
-#define GBL_REF_TEST_SUITE_(inst)   ((GblRefTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_REF_TEST_SUITE_TYPE))
+#define GBL_REF_TEST_SUITE_(inst)   (GBL_PRIVATE(GblRefTestSuite, inst))
 
 typedef struct GblRefTestSuite_ {
     GblRef* pRefs[4];

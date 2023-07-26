@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/strings/gimbal_string_ref.h>
 
-#define GBL_STRING_REF_TEST_SUITE_(inst)    ((GblStringRefTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_STRING_REF_TEST_SUITE_TYPE))
+#define GBL_STRING_REF_TEST_SUITE_(inst)    (GBL_PRIVATE(GblStringRefTestSuite, inst))
 
 typedef struct GblStringRefTestSuite_ {
     GblStringRef*   pRefs[8];

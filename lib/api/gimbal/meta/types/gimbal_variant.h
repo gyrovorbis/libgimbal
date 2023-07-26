@@ -566,31 +566,31 @@ GBL_INLINE GBL_RESULT GblVariant_constructTypeValue(GBL_SELF, GblType type) GBL_
 
 GBL_INLINE GBL_RESULT GblVariant_constructInstance(GBL_SELF, GblInstance* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_constructBoxCopy(GBL_SELF, GblBox* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_constructBoxMove(GBL_SELF, GblBox* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_constructObjectCopy(GBL_SELF, GblObject* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_constructObjectMove(GBL_SELF, GblObject* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 
@@ -956,31 +956,31 @@ GBL_INLINE GBL_RESULT GblVariant_setTypeValue(GBL_SELF, GblType value) GBL_NOEXC
 
 GBL_INLINE GBL_RESULT GblVariant_setInstance(GBL_SELF, GblInstance* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_setBoxCopy(GBL_SELF, GblBox* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_setBoxMove(GBL_SELF, GblBox* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_setObjectCopy(GBL_SELF, GblObject* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 
 GBL_INLINE GBL_RESULT GblVariant_setObjectMove(GBL_SELF, GblObject* pValue) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_INSTANCE_TYPEOF(pValue), pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, GBL_TYPEOF(pValue), pValue));
     GBL_CTX_END();
 }
 

@@ -2,7 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 
-#define GBL_STRING_BUFFER_TEST_SUITE_(inst) ((GblStringBufferTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_STRING_BUFFER_TEST_SUITE_TYPE))
+#define GBL_STRING_BUFFER_TEST_SUITE_(inst) (GBL_PRIVATE(GblStringBufferTestSuite, inst))
 
 typedef struct GblStringBufferTestSuite_ {
     struct {

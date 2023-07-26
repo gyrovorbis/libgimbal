@@ -219,7 +219,7 @@ static GBL_RESULT GblArenaAllocator_IAllocator_free_(GblIAllocator*       pIAllo
     return GBL_RESULT_UNIMPLEMENTED;
 }
 
-static GBL_RESULT GblArenaAllocatorClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
+static GBL_RESULT GblArenaAllocatorClass_init_(GblClass* pClass, const void* pUd) {
     GBL_IALLOCATOR_CLASS(pClass)->pFnAlloc   = GblArenaAllocator_IAllocator_alloc_;
     GBL_IALLOCATOR_CLASS(pClass)->pFnRealloc = GblArenaAllocator_IAllocator_realloc_;
     GBL_IALLOCATOR_CLASS(pClass)->pFnFree    = GblArenaAllocator_IAllocator_free_;
@@ -229,7 +229,7 @@ static GBL_RESULT GblArenaAllocatorClass_init_(GblClass* pClass, const void* pUd
 GBL_EXPORT GblType GblArenaAllocator_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    static GblTypeInterfaceMapEntry ifaceEntries[] = {
+    static GblInterfaceImpl ifaceEntries[] = {
         {
             .classOffset = offsetof(GblArenaAllocatorClass, GblIAllocatorImpl)
         }
@@ -240,13 +240,13 @@ GBL_EXPORT GblType GblArenaAllocator_type(void) {
         .classSize      = sizeof(GblArenaAllocatorClass),
         .instanceSize   = sizeof(GblArenaAllocator),
         .interfaceCount = 1,
-        .pInterfaceMap  = ifaceEntries
+        .pInterfaceImpls  = ifaceEntries
     };
 
     if(type == GBL_INVALID_TYPE) {
         ifaceEntries[0].interfaceType = GBL_IALLOCATOR_TYPE;
 
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblArenaAllocator"),
+        type = GblType_register(GblQuark_internStringStatic("GblArenaAllocator"),
                                       GBL_OBJECT_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

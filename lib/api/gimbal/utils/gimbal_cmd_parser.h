@@ -20,10 +20,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_CMD_PARSER_TYPE                 (GBL_TYPEOF(GblCmdParser))                       //!< Type UUID of GblCmdParser
-#define GBL_CMD_PARSER(instance)            (GBL_INSTANCE_CAST(instance, GblCmdParser))      //!< Function-style GblInstance cast
-#define GBL_CMD_PARSER_CLASS(klass)         (GBL_CLASS_CAST(klass, GblCmdParser))            //!< Function-style GblClass cast
-#define GBL_CMD_PARSER_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblCmdParser)) //!< Get a GblCmdParserClass from GblInstance
+#define GBL_CMD_PARSER_TYPE             (GBL_TYPEID(GblCmdParser))            //!< Type UUID of GblCmdParser
+#define GBL_CMD_PARSER(self)            (GBL_CAST(GblCmdParser, self))        //!< Function-style GblInstance cast
+#define GBL_CMD_PARSER_CLASS(klass)     (GBL_CLASS_CAST(GblCmdParser, klass)) //!< Function-style GblClass cast
+#define GBL_CMD_PARSER_GET_CLASS(self)  (GBL_CLASSOF(GblCmdParser, self))     //!< Get a GblCmdParserClass from GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblCmdParser

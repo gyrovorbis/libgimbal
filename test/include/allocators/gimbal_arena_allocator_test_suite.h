@@ -3,11 +3,11 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_ARENA_ALLOCATOR_TEST_SUITE_TYPE             (GBL_TYPEOF(GblArenaAllocatorTestSuite))
+#define GBL_ARENA_ALLOCATOR_TEST_SUITE_TYPE             (GBL_TYPEID(GblArenaAllocatorTestSuite))
 
-#define GBL_ARENA_ALLOCATOR_TEST_SUITE(inst)            (GBL_INSTANCE_CAST(inst, GblArenaAllocatorTestSuite))
+#define GBL_ARENA_ALLOCATOR_TEST_SUITE(inst)            (GBL_CAST(inst, GblArenaAllocatorTestSuite))
 #define GBL_ARENA_ALLOCATOR_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblArenaAllocatorTestSuite))
-#define GBL_ARENA_ALLOCATOR_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS(inst, GblArenaAllocatorTestSuite))
+#define GBL_ARENA_ALLOCATOR_TEST_SUITE_GET_CLASS(inst)  (GBL_CLASSOF(inst, GblArenaAllocatorTestSuite))
 
 GBL_DECLS_BEGIN
 

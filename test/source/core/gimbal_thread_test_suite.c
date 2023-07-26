@@ -6,10 +6,10 @@
 
 #define GBL_SELF_TYPE GblThreadTestSuite
 
-#define GBL_TEST_THREAD_TYPE_                   (GBL_TYPEOF(GblTestThread))
-#define GBL_TEST_THREAD_(self)                  (GBL_INSTANCE_CAST(self, GblTestThread))
-#define GBL_TEST_THREAD_CLASS_(klass)           (GBL_CLASS_CAST(klass, GblTestThread))
-#define GBL_TEST_THREAD_GET_CLASS_(self)        (GBL_INSTANCE_GET_CLASS(self, GblTestThread))
+#define GBL_TEST_THREAD_TYPE_                   (GBL_TYPEID(GblTestThread))
+#define GBL_TEST_THREAD_(self)                  (GBL_CAST(GblTestThread, self))
+#define GBL_TEST_THREAD_CLASS_(klass)           (GBL_CLASS_CAST(GblTestThread, klass))
+#define GBL_TEST_THREAD_GET_CLASS_(self)        (GBL_CLASSOF(GblTestThread, self))
 
 #define GBL_TEST_THREAD_TLS_THREAD_COUNT_       5
 #define GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_   10
@@ -167,12 +167,12 @@ static GBL_RESULT GblTestThread_GblThread_run_(GblThread* pThread) {
     GBL_CTX_CALL(GblTestThread_tlsInitCheck_(pSelf));
     GBL_CTX_CALL(GblTestThread_tlsReadWriteCheck_(pSelf));
 
-    GBL_INSTANCE_VCALL_DEFAULT(GblThread, pFnRun, pThread);
+    GBL_VCALL_DEFAULT(GblThread, pFnRun, pThread);
 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestThreadClass_init_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
+static GBL_RESULT GblTestThreadClass_init_(GblClass* pClass, const void* pUd) {
     GBL_CTX_BEGIN(NULL);
 
     GBL_THREAD_CLASS(pClass)->pFnRun = GblTestThread_GblThread_run_;
@@ -184,7 +184,7 @@ static GblType GblTestThread_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_registerStatic(GblQuark_internStringStatic("GblTestThread"),
+        type = GblType_register(GblQuark_internStringStatic("GblTestThread"),
                                       GBL_THREAD_TYPE,
                                       &(GblTypeInfo) {
                                           .pFnClassInit = GblTestThreadClass_init_,
@@ -208,7 +208,7 @@ GBL_TEST_INIT()
     // Cache current # of active refs to threads' class
     pFixture->classRefCount = GblType_classRefCount(GBL_THREAD_TYPE);
     // Cache current # of active threads instances
-    pFixture->instanceCount = GblType_instanceRefCount(GBL_THREAD_TYPE);
+    pFixture->instanceCount = GblType_instanceCount(GBL_THREAD_TYPE);
 GBL_TEST_CASE_END
 
 GBL_TEST_FINAL()
@@ -221,7 +221,7 @@ GBL_TEST_FINAL()
     // Ensure no class reference leaks
 //    GBL_TEST_COMPARE(GblType_classRefCount(GBL_THREAD_TYPE), pFixture->classRefCount);
     // Ensure no instance leaks
-//    GBL_TEST_COMPARE(GblType_instanceRefCount(GBL_THREAD_TYPE), pFixture->instanceCount);
+//    GBL_TEST_COMPARE(GblType_instanceCount(GBL_THREAD_TYPE), pFixture->instanceCount);
 GBL_TEST_CASE_END
 
 /* Just toggle a boolean on the test fixture to signal

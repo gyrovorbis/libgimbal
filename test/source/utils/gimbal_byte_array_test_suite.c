@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/utils/gimbal_byte_array.h>
 
-#define GBL_BYTE_ARRAY_TEST_SUITE_(inst)    ((GblByteArrayTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_BYTE_ARRAY_TEST_SUITE_TYPE))
+#define GBL_BYTE_ARRAY_TEST_SUITE_(inst)    (GBL_PRIVATE(GblByteArrayTestSuite, inst))
 
 typedef struct GblByteArrayTestSuite_ {
     size_t          refActiveCount;

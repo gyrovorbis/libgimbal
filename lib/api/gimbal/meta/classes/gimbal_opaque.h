@@ -14,8 +14,8 @@
  *  \brief Type UUID and cast macros
  *  @{
  */
-#define GBL_OPAQUE_TYPE         (GBL_TYPEOF(GblOpaque))             //!< Type UUID for GblOpaque
-#define GBL_OPAQUE_CLASS(klass) (GBL_CLASS_CAST(klass, GblOpaque))  //!< Function-style GblOpaqueClass cast from GblClass
+#define GBL_OPAQUE_TYPE         (GBL_TYPEID(GblOpaque))             //!< Type UUID for GblOpaque
+#define GBL_OPAQUE_CLASS(klass) (GBL_CLASS_CAST(GblOpaque, klass))  //!< Function-style GblOpaqueClass cast from GblClass
 //! @}
 
 GBL_DECLS_BEGIN

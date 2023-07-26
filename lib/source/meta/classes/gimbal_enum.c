@@ -206,10 +206,9 @@ GBL_EXPORT GblBool GblEnumClass_valueCheck(const GblEnumClass* pSelf, GblEnum va
 }
 
 static GBL_RESULT enumClass_init_(GblClass* pClass,
-                                  const void* pUd,
-                                  GblContext* pCtx)
+                                  const void* pUd)
 {
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
     GblEnumClass*       pEnumClass  = GBL_ENUM_CLASS(pClass);
     GblEnumClass_*      pEnumClass_ = GblClass_private(pClass, GBL_ENUM_TYPE);
     const GblEnumEntry* pEntries    = pUd;
@@ -258,11 +257,10 @@ static GBL_RESULT enumClass_init_(GblClass* pClass,
 }
 
 static GBL_RESULT enumClass_final_(GblClass* pClass,
-                                   const void* pUd,
-                                   GblContext* pCtx)
+                                   const void* pUd)
 {
     GBL_UNUSED(pUd);
-    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_BEGIN(NULL);
     // Free up local entry copy
     GblEnumClass_* pClass_ = GblClass_private(pClass, GBL_ENUM_TYPE);
     GBL_CTX_FREE(pClass_->pEntries);
@@ -319,7 +317,7 @@ GBL_EXPORT GblType GblEnum_register(const char* pName,
 {
     GblType type = GBL_INVALID_TYPE;
     GBL_CTX_BEGIN(NULL);
-    type = GblType_registerStatic(GblQuark_internString(pName),
+    type = GblType_register(GblQuark_internString(pName),
                                   GBL_ENUM_TYPE,
                                   &(const GblTypeInfo) {
                                       .pFnClassInit     = enumClass_init_,

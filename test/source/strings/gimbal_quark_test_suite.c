@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/strings/gimbal_quark.h>
 
-#define GBL_QUARK_TEST_SUITE_(inst)     ((GblQuarkTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_QUARK_TEST_SUITE_TYPE))
+#define GBL_QUARK_TEST_SUITE_(inst)     (GBL_PRIVATE(GblQuarkTestSuite, inst))
 
 typedef struct GblQuarkTestSuite_ {
     GblQuark    staticString;

@@ -15,10 +15,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_EVENT_TYPE                  (GBL_TYPEOF(GblEvent))
-#define GBL_EVENT(instance)             (GBL_INSTANCE_CAST(instance, GblEvent))
-#define GBL_EVENT_CLASS(klass)          (GBL_CLASS_CAST(klass, GblEvent))
-#define GBL_EVENT_GET_CLASS(instance)   (GBL_INSTANCE_GET_CLASS(instance,  GblEvent))
+#define GBL_EVENT_TYPE          (GBL_TYPEID(GblEvent))            //!< Returns the GblType for GblEvent
+#define GBL_EVENT(self)         (GBL_CAST(GblEvent, self))        //!< Casts a GblInstance to GblEvent
+#define GBL_EVENT_CLASS(klass)  (GBL_CLASS_CAST(GblEvent, klass)) //!< Casts a GblClass to GblEventClass
+#define GBL_EVENT_CLASSOF(self) (GBL_CLASSOF(GblEvent, self))     //!< Gets a GblEventClass from GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblEvent
@@ -49,7 +49,7 @@ GBL_CLASS_DERIVE_EMPTY(GblEvent, GblBox)
  *  \sa GblIEventHandler, GblIEventFilter
  */
 GBL_INSTANCE_DERIVE(GblEvent, GblBox)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GBL_EVENT_STATE state;
     GBL_PRIVATE_END
 GBL_INSTANCE_END

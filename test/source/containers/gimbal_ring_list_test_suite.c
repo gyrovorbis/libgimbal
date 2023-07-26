@@ -2,7 +2,7 @@
 #include <gimbal/containers/gimbal_ring_list.h>
 #include <gimbal/test/gimbal_test_macros.h>
 
-#define GBL_RING_LIST_TEST_SUITE_(instance)     ((GblRingListTestSuite_*)GBL_INSTANCE_PRIVATE(instance, GBL_RING_LIST_TEST_SUITE_TYPE))
+#define GBL_RING_LIST_TEST_SUITE_(instance)     (GBL_PRIVATE(GblRingListTestSuite, instance))
 
 typedef struct GblRingListTestSuite_ {
     GblRingList* ringLists[5];

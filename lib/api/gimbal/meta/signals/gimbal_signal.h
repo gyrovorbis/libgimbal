@@ -116,7 +116,7 @@ GBL_EXPORT GblInstance* GblSignal_receiver        (void)                        
 #define GBL_SIGNAL_INSTALL_(instance, signal)
 
 #if 0
-GBL_CTX_VERIFY_CALL(GblSignal_install(GBL_TYPEOF(instance), \
+GBL_CTX_VERIFY_CALL(GblSignal_install(GBL_TYPEID(instance), \
                                           GBL_STRINGIFY(GBL_TUPLE_FIRST signal), \
                                           pMarshals++, \
                                           GBL_NARG signal - 1, \

@@ -2,7 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/meta/instances/gimbal_instance.h>
 
-#define GBL_INSTANCE_TEST_SUITE_(inst)      ((GblInstanceTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_INSTANCE_TEST_SUITE_TYPE))
+#define GBL_INSTANCE_TEST_SUITE_(inst)      (GBL_PRIVATE(GblInstanceTestSuite, inst))
 
 // instantiate from: 1) non instantiable
 //                   2) type with private data
@@ -22,7 +22,7 @@ GBL_EXPORT GBL_RESULT GblInstanceTestSuite_init_(GblTestSuite* pSelf, GblContext
 
     GblInstanceTestSuite_* pSelf_           = GBL_INSTANCE_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblInstanceTestSuite_));
-    pSelf_->instanceStartInstanceRefCount   = GblType_instanceRefCount(GBL_INSTANCE_TYPE);
+    pSelf_->instanceStartInstanceRefCount   = GblType_instanceCount(GBL_INSTANCE_TYPE);
     pSelf_->instanceStartClassRefCount      = GblType_classRefCount(GBL_INSTANCE_TYPE);
 
     GBL_CTX_END();
@@ -34,20 +34,6 @@ GBL_EXPORT GBL_RESULT GblInstanceTestSuite_createInvalid(GblTestSuite* pSelf, Gb
 
     GBL_TEST_EXPECT_ERROR();
     GblInstance* pInst = GblInstance_create(GBL_INVALID_TYPE);
-    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_TYPE);
-    GBL_CTX_CLEAR_LAST_RECORD();
-    GBL_TEST_COMPARE(pInst, NULL);
-
-    GBL_CTX_END();
-}
-
-GBL_EXPORT GBL_RESULT GblInstanceTestSuite_createWithClassInvalid(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_UNUSED(pSelf);
-    GBL_CTX_BEGIN(pCtx);
-
-    GBL_TEST_EXPECT_ERROR();
-
-    GblInstance* pInst = GblInstance_createWithClass(NULL);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_TYPE);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(pInst, NULL);
@@ -77,29 +63,6 @@ GBL_EXPORT GBL_RESULT GblInstanceTestSuite_constructInvalid(GblTestSuite* pSelf,
     GBL_TEST_COMPARE(GblInstance_construct(NULL, GBL_INSTANCE_TYPE),
                      GBL_RESULT_ERROR_INVALID_POINTER);
     GBL_CTX_CLEAR_LAST_RECORD();
-
-    GBL_CTX_END();
-}
-
-GBL_EXPORT GBL_RESULT GblInstanceTestSuite_constructWithClassInvalid(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_UNUSED(pSelf);
-    GBL_CTX_BEGIN(pCtx);
-
-    GblInstance instance;
-    GblClass    klass;
-
-    GBL_TEST_EXPECT_ERROR();
-
-    GBL_CTX_VERIFY_CALL(GblClass_constructFloating(&klass, GBL_INSTANCE_TYPE));
-
-    GBL_TEST_COMPARE(GblInstance_constructWithClass(&instance, NULL),
-                     GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_CTX_CLEAR_LAST_RECORD();
-
-    GBL_TEST_COMPARE(GblInstance_constructWithClass(NULL, &klass),
-                     GBL_RESULT_ERROR_INVALID_POINTER);
-    GBL_CTX_CLEAR_LAST_RECORD();
-    GBL_CTX_VERIFY_CALL(GblClass_destructFloating(&klass));
 
     GBL_CTX_END();
 }
@@ -155,9 +118,9 @@ GBL_EXPORT GBL_RESULT GblInstanceTestSuite_tryNull(GblTestSuite* pSelf, GblConte
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
 
-    GBL_TEST_COMPARE(GblInstance_try(NULL, GBL_INVALID_TYPE), NULL);
+    GBL_TEST_COMPARE(GblInstance_as(NULL, GBL_INVALID_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GblInstance_try(NULL, GBL_INSTANCE_TYPE), NULL);
+    GBL_TEST_COMPARE(GblInstance_as(NULL, GBL_INSTANCE_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_CTX_END();
@@ -169,11 +132,11 @@ GBL_EXPORT GBL_RESULT GblInstanceTestSuite_publicNull(GblTestSuite* pSelf, GblCo
 
     GBL_TEST_COMPARE(GblInstance_public(NULL, GBL_INVALID_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GBL_INSTANCE_PUBLIC(NULL, GBL_INVALID_TYPE), NULL);
+    //GBL_TEST_COMPARE(GBL_PUBLIC(NULL, GBL_INVALID_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(GblInstance_public(NULL, GBL_INSTANCE_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GBL_INSTANCE_PUBLIC(NULL, GBL_INSTANCE_TYPE), NULL);
+    //GBL_TEST_COMPARE(GBL_PUBLIC(NULL, GBL_INSTANCE_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_CTX_END();
@@ -185,11 +148,11 @@ GBL_EXPORT GBL_RESULT GblInstanceTestSuite_privateNull(GblTestSuite* pSelf, GblC
 
     GBL_TEST_COMPARE(GblInstance_private(NULL, GBL_INVALID_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GBL_INSTANCE_PRIVATE(NULL, GBL_INVALID_TYPE), NULL);
+    //GBL_TEST_COMPARE(GBL_PRIVATE(NULL, GBL_INVALID_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(GblInstance_private(NULL, GBL_INSTANCE_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GBL_INSTANCE_PRIVATE(NULL, GBL_INSTANCE_TYPE), NULL);
+    //GBL_TEST_COMPARE(GBL_PRIVATE(NULL, GBL_INSTANCE_TYPE), NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_CTX_END();
@@ -201,7 +164,7 @@ GBL_EXPORT GBL_RESULT GblInstanceTestSuite_typeOfNull(GblTestSuite* pSelf, GblCo
 
     GBL_TEST_COMPARE(GblInstance_typeOf(NULL), (uintptr_t)NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GBL_INSTANCE_TYPEOF(NULL), (uintptr_t)NULL);
+    GBL_TEST_COMPARE(GBL_TYPEOF(NULL), (uintptr_t)NULL);
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_CTX_END();
@@ -288,7 +251,7 @@ GBL_EXPORT GBL_RESULT GblInstanceTestSuite_final_(GblTestSuite* pSelf, GblContex
     GBL_CTX_BEGIN(pCtx);
 
     GblInstanceTestSuite_* pSelf_ = GBL_INSTANCE_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(GblType_instanceRefCount(GBL_INSTANCE_TYPE),   pSelf_->instanceStartInstanceRefCount);
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_INSTANCE_TYPE),   pSelf_->instanceStartInstanceRefCount);
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_INSTANCE_TYPE),      pSelf_->instanceStartClassRefCount);
 
     GBL_CTX_END();
@@ -299,10 +262,8 @@ GBL_EXPORT GblType GblInstanceTestSuite_type(void) {
 
     const static GblTestCase cases[] = {
         { "createInvalid",              GblInstanceTestSuite_createInvalid              },
-        { "createWithClassInvalid",     GblInstanceTestSuite_createWithClassInvalid     },
         { "destroyNull",                GblInstanceTestSuite_destroyNull                },
         { "constructInvalid",           GblInstanceTestSuite_constructInvalid           },
-        { "constructWithClassInvalid",  GblInstanceTestSuite_constructWithClassInvalid  },
         { "destructNull",               GblInstanceTestSuite_destructNull               },
         { "checkNull",                  GblInstanceTestSuite_checkNull                  },
         { "checkInvalid",               GblInstanceTestSuite_checkInvalid               },

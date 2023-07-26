@@ -8,8 +8,8 @@
 #include <inttypes.h>
 #include "../types/gimbal_type_.h"
 
-GBL_RESULT GblPrimitiveClass_init_(GblPrimitiveClass* pClass, GblIVariantVTable* pVTable, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+GBL_RESULT GblPrimitiveClass_init_(GblPrimitiveClass* pClass, GblIVariantVTable* pVTable) {
+    GBL_CTX_BEGIN(NULL);
     pClass->GblIVariantImpl.pVTable = pVTable;
     GBL_CTX_END();
 }
@@ -985,7 +985,7 @@ static GBL_RESULT stringConvert_(const GblVariant* pVariant, GblVariant* pOther)
     else if(type == GBL_DOUBLE_TYPE)
         GblVariant_setDouble(pOther, GblStringView_toDouble(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_TYPE_TYPE)
-        GblVariant_setTypeValue(pOther, GblType_fromName(GblVariant_getString(pVariant)));
+        GblVariant_setTypeValue(pOther, GblType_find(GblVariant_getString(pVariant)));
     else
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_CTX_END();
@@ -1000,7 +1000,7 @@ static GBL_RESULT typeSave_(const GblVariant* pVariant, GblStringBuffer* pString
 
 static GBL_RESULT typeLoad_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    pVariant->typeValue = GblType_fromName(GblStringBuffer_cString(pString));
+    pVariant->typeValue = GblType_find(GblStringBuffer_cString(pString));
     GBL_CTX_END();
 }
 
@@ -1056,20 +1056,20 @@ GblType GblPrimitive_register(const char*                     pName,
 
     GBL_CTX_VERIFY_ARG(classSize >= sizeof(GblPrimitiveClass));
 
-    type = GblType_registerStatic(GblQuark_internString(pName),
-                                   GBL_STATIC_CLASS_TYPE,
-                                   &(const GblTypeInfo) {
-                                       .pFnClassInit        = (GblTypeClassInitializeFn)GblPrimitiveClass_init_,
-                                       .classSize           = classSize,
-                                       .classPrivateSize    = classPrivateSize,
-                                       .pClassData          = pVTable,
-                                       .interfaceCount      = 1,
-                                       .pInterfaceMap = &(const GblTypeInterfaceMapEntry) {
-                                           .interfaceType  = GBL_IVARIANT_TYPE,
-                                           .classOffset    = offsetof(GblPrimitiveClass, GblIVariantImpl)
-                                       }
-                                   },
-                                   typeFlags);
+    type = GblType_register(GblQuark_internString(pName),
+                            GBL_STATIC_CLASS_TYPE,
+                            &(const GblTypeInfo) {
+                                .pFnClassInit        = (GblClassInitFn)GblPrimitiveClass_init_,
+                                .classSize           = classSize,
+                                .classPrivateSize    = classPrivateSize,
+                                .pClassData          = pVTable,
+                                .interfaceCount      = 1,
+                                .pInterfaceImpls = &(const GblInterfaceImpl) {
+                                    .interfaceType  = GBL_IVARIANT_TYPE,
+                                    .classOffset    = offsetof(GblPrimitiveClass, GblIVariantImpl)
+                                }
+                            },
+                           typeFlags);
 
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END_BLOCK();
@@ -1093,12 +1093,12 @@ GblType GblPrimitive_registerBuiltin(size_t                          index,
                                    GBL_STATIC_CLASS_TYPE,
                                    GblQuark_internString(pName),
                                    &(const GblTypeInfo) {
-                                       .pFnClassInit        = (GblTypeClassInitializeFn)GblPrimitiveClass_init_,
+                                       .pFnClassInit        = (GblClassInitFn)GblPrimitiveClass_init_,
                                        .classSize           = classSize,
                                        .classPrivateSize    = classPrivateSize,
                                        .pClassData          = pVTable,
                                        .interfaceCount      = 1,
-                                       .pInterfaceMap = &(const GblTypeInterfaceMapEntry) {
+                                       .pInterfaceImpls = &(const GblInterfaceImpl) {
                                            .interfaceType  = GBL_IVARIANT_TYPE,
                                            .classOffset    = offsetof(GblPrimitiveClass, GblIVariantImpl)
                                        }
@@ -1112,19 +1112,19 @@ GblType GblPrimitive_registerBuiltin(size_t                          index,
 
 static GBL_RESULT GblPrimitive_valueTypesRegisterConverters_(GblContext* pCtx);
 
-#define GBL_PRIMITIVE_TYPEINFO_DECL(name, vtable)                                   \
-    static GblTypeInfo name = {                                                     \
-        .pFnClassInit        = (GblTypeClassInitializeFn)GblPrimitiveClass_init_,   \
-        .classSize           = sizeof(GblPrimitiveClass),                           \
-        .classPrivateSize    = 0,                                                   \
-        .pClassData          = &vtable,                                             \
-        .interfaceCount      = 1,                                                   \
-        .pInterfaceMap      = &iVariantMapEntry                                     \
+#define GBL_PRIMITIVE_TYPEINFO_DECL(name, vtable)                       \
+    static GblTypeInfo name = {                                         \
+        .pFnClassInit        = (GblClassInitFn)GblPrimitiveClass_init_, \
+        .classSize           = sizeof(GblPrimitiveClass),               \
+        .classPrivateSize    = 0,                                       \
+        .pClassData          = &vtable,                                 \
+        .interfaceCount      = 1,                                       \
+        .pInterfaceImpls      = &iVariantMapEntry                       \
     }
 
 #define GBL_PRIMITIVE_REGISTER(name, vtable)                    \
     GBL_PRIMITIVE_TYPEINFO_DECL(name##_typeInfo, vtable)        \
-    GblType_registerStatic(GBL_INVALID_TYPE,                    \
+    GblType_register(GBL_INVALID_TYPE,                          \
                            GblQuark_internStringStatic(#name),  \
                            &name##_typeInfo,                    \
                            GBL_TYPE_FLAG_TYPEINFO_STATIC    |   \
@@ -1637,7 +1637,7 @@ GBL_EXPORT GblType GblType_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblPrimitive_register(GblQuark_internStringStatic("type"),
+        type = GblPrimitive_register(GblQuark_internStringStatic("GblType"),
                                      sizeof(GblPrimitiveClass),
                                      0,
                                      &typeIVariantIFace,

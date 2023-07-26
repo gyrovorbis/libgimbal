@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/containers/gimbal_array_deque.h>
 
-#define GBL_ARRAY_DEQUE_TEST_SUITE_(inst)     ((GblArrayDequeTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_ARRAY_DEQUE_TEST_SUITE_TYPE))
+#define GBL_ARRAY_DEQUE_TEST_SUITE_(inst)     (GBL_PRIVATE(GblArrayDequeTestSuite, inst))
 
 #define GBL_ARRAY_DEQUE_PROFILE_SIZE_     1024
 

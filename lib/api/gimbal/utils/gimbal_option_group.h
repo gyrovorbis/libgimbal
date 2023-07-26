@@ -23,10 +23,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_OPTION_GROUP_TYPE               (GBL_TYPEOF(GblOptionGroup))                    //!< Type UUID for GblOptionGroup
-#define GBL_OPTION_GROUP(self)              (GBL_INSTANCE_CAST(self, GblOptionGroup))       //!< Casts a GblInstance to GblOptionGroup
-#define GBL_OPTION_GROUP_CLASS(klass)       (GBL_CLASS_CAST(klass, GblOptionGroup))         //!< Casts a GblClass to GblOptionGroupClass
-#define GBL_OPTION_GROUP_GET_CLASS(self)    (GBL_INSTANCE_GET_CLASS(self, GblOptionGroup))  //!< Gets a GblOptionGroupClass from a GblInstance
+#define GBL_OPTION_GROUP_TYPE               (GBL_TYPEID(GblOptionGroup))            //!< Type UUID for GblOptionGroup
+#define GBL_OPTION_GROUP(self)              (GBL_CAST(GblOptionGroup, self))        //!< Casts a GblInstance to GblOptionGroup
+#define GBL_OPTION_GROUP_CLASS(klass)       (GBL_CLASS_CAST(GblOptionGroup, klass)) //!< Casts a GblClass to GblOptionGroupClass
+#define GBL_OPTION_GROUP_GET_CLASS(self)    (GBL_CLASSOF(GblOptionGroup, self))     //!< Gets a GblOptionGroupClass from a GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblOptionGroup

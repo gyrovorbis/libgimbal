@@ -14,10 +14,10 @@
 #include "gimbal_interface.h"
 #include "../instances/gimbal_instance.h"
 
-#define GBL_IEVENT_HANDLER_TYPE                 (GBL_TYPEOF(GblIEventHandler))
-#define GBL_IEVENT_HANDLER(instance)            (GBL_INSTANCE_CAST(instance, GblIEventHandler))
-#define GBL_IEVENT_HANDLER_CLASS(klass)         (GBL_CLASS_CAST(klass, GblIEventHandler))
-#define GBL_IEVENT_HANDLER_GET_CLASS(instance)  (GBL_INSTANCE_GET_CLASS(instance, GblIEventHandler))
+#define GBL_IEVENT_HANDLER_TYPE                 (GBL_TYPEID(GblIEventHandler))
+#define GBL_IEVENT_HANDLER(instance)            (GBL_CAST(GblIEventHandler, instance))
+#define GBL_IEVENT_HANDLER_CLASS(klass)         (GBL_CLASS_CAST(GblIEventHandler, klass))
+#define GBL_IEVENT_HANDLER_GET_CLASS(instance)  (GBL_CLASSOF(GblIEventHandler, instance))
 
 #define GBL_SELF_TYPE GblIEventHandler
 

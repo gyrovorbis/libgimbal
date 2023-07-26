@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/meta/ifaces/gimbal_interface.h>
 
-#define GBL_INTERFACE_TEST_SUITE_(inst)     (GBL_INSTANCE_PRIVATE(inst, GBL_INTERFACE_TEST_SUITE_TYPE))
+#define GBL_INTERFACE_TEST_SUITE_(inst)     (GBL_PRIVATE(GblInterfaceTestSuite, inst))
 
 typedef enum TYPE_ {
     TYPE_IA_        = 0,
@@ -97,8 +97,8 @@ typedef struct GblInterfaceTestSuite_ {
     const ClassEntry_*  pClassEntries;
 } GblInterfaceTestSuite_;
 
-static GBL_RESULT typeClassInit_(GblClass* pClass, const void* pUd, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT typeClassInit_(GblClass* pClass, const void* pUd) {
+    GBL_CTX_BEGIN(NULL);
 
     struct {
         union {
@@ -141,13 +141,13 @@ static GBL_RESULT typeClassInit_(GblClass* pClass, const void* pUd, GblContext* 
 }
 
 
-static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf) {
+    GBL_CTX_BEGIN(NULL);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
     memset(pSelf_, 0, sizeof(GblInterfaceTestSuite_));
     pSelf_->initialInterfaceRefCount = GblType_classRefCount(GBL_INTERFACE_TYPE);
     pSelf_->initialStaticClassRefCount = GblType_classRefCount(GBL_STATIC_CLASS_TYPE);
-    pSelf_->initialTypeCount = GblType_registeredCount();
+    pSelf_->initialTypeCount = GblType_count();
 
     GblTypeInfo info = {
         .classSize      = sizeof(IDerived_),
@@ -155,48 +155,48 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
     };
 
     info.pClassData = (const void*)(uintptr_t)TYPE_IA_;
-    pSelf_->typeList[TYPE_IA_] = GblType_registerStatic("IA",
+    pSelf_->typeList[TYPE_IA_] = GblType_register("IA",
                                                         GBL_INTERFACE_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
     info.pClassData = (const void*)(uintptr_t)TYPE_IB1_;
-    pSelf_->typeList[TYPE_IB1_] = GblType_registerStatic("IB1",
+    pSelf_->typeList[TYPE_IB1_] = GblType_register("IB1",
                                                         GBL_INTERFACE_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
     info.pClassData = (const void*)(uintptr_t)TYPE_IB2_;
-    pSelf_->typeList[TYPE_IB2_] = GblType_registerStatic("IB2",
+    pSelf_->typeList[TYPE_IB2_] = GblType_register("IB2",
                                                         GBL_INTERFACE_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
     info.pClassData = (const void*)(uintptr_t)TYPE_IC_BASE_;
-    pSelf_->typeList[TYPE_IC_BASE_] = GblType_registerStatic("IC_BASE",
+    pSelf_->typeList[TYPE_IC_BASE_] = GblType_register("IC_BASE",
                                                         GBL_INTERFACE_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
     info.pClassData = (const void*)(uintptr_t)TYPE_ID_MAPPED_;
-    pSelf_->typeList[TYPE_ID_MAPPED_] = GblType_registerStatic("ID_MAPPED",
+    pSelf_->typeList[TYPE_ID_MAPPED_] = GblType_register("ID_MAPPED",
                                                         GBL_INTERFACE_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
     info.pClassData = (const void*)(uintptr_t)TYPE_IE_BASE_;
-    pSelf_->typeList[TYPE_IE_BASE_] = GblType_registerStatic("IE_BASE",
+    pSelf_->typeList[TYPE_IE_BASE_] = GblType_register("IE_BASE",
                                                         GBL_INTERFACE_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
     info.pClassData = (const void*)(uintptr_t)TYPE_IE_MAPPED_;
-    pSelf_->typeList[TYPE_IE_MAPPED_] = GblType_registerStatic("IE_MAPPED",
+    pSelf_->typeList[TYPE_IE_MAPPED_] = GblType_register("IE_MAPPED",
                                                         GBL_INTERFACE_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
     info.classSize = sizeof(IDeepDerived_);
     info.pClassData = (const void*)(uintptr_t)TYPE_IC_;
-    pSelf_->typeList[TYPE_IC_] = GblType_registerStatic("IC",
+    pSelf_->typeList[TYPE_IC_] = GblType_register("IC",
                                                         pSelf_->typeList[TYPE_IC_BASE_],
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
 
-    GblTypeInterfaceMapEntry intMapEntry[2] = {
+    GblInterfaceImpl intMapEntry[2] = {
         {
             .classOffset = offsetof(IMapped_, iDerived),
             .interfaceType = pSelf_->typeList[TYPE_ID_MAPPED_]
@@ -207,9 +207,9 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
 
     info.classSize = sizeof(IMapped_);
     info.interfaceCount = 1;
-    info.pInterfaceMap = intMapEntry;
+    info.pInterfaceImpls = intMapEntry;
     info.pClassData = (const void*)(uintptr_t)TYPE_ID_;
-    pSelf_->typeList[TYPE_ID_] = GblType_registerStatic("ID",
+    pSelf_->typeList[TYPE_ID_] = GblType_register("ID",
                                                         GBL_INTERFACE_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
@@ -218,7 +218,7 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
     intMapEntry[0].classOffset = offsetof(IDeepDerivedMapped_, iMapped);
     intMapEntry[0].interfaceType = pSelf_->typeList[TYPE_IE_MAPPED_];
     info.pClassData = (const void*)(uintptr_t)TYPE_IE_;
-    pSelf_->typeList[TYPE_IE_] = GblType_registerStatic("IE",
+    pSelf_->typeList[TYPE_IE_] = GblType_register("IE",
                                                         pSelf_->typeList[TYPE_IE_BASE_],
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
@@ -226,7 +226,7 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
     intMapEntry[0].classOffset = offsetof(ClassA_, iA);
     intMapEntry[0].interfaceType = pSelf_->typeList[TYPE_IA_];
     info.pClassData = (const void*)(uintptr_t)TYPE_CA_;
-    pSelf_->typeList[TYPE_CA_] = GblType_registerStatic("CA",
+    pSelf_->typeList[TYPE_CA_] = GblType_register("CA",
                                                         GBL_STATIC_CLASS_TYPE,
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
@@ -238,7 +238,7 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
     intMapEntry[1].classOffset = offsetof(ClassB_, iB[1]);
     intMapEntry[1].interfaceType = pSelf_->typeList[TYPE_IB2_];
     info.pClassData = (const void*)(uintptr_t)TYPE_CB_;
-    pSelf_->typeList[TYPE_CB_] = GblType_registerStatic("CB",
+    pSelf_->typeList[TYPE_CB_] = GblType_register("CB",
                                                         pSelf_->typeList[TYPE_CA_],
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
@@ -247,7 +247,7 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
     intMapEntry[0].classOffset = offsetof(ClassC_, iC);
     intMapEntry[0].interfaceType = pSelf_->typeList[TYPE_IC_];
     info.pClassData = (const void*)(uintptr_t)TYPE_CC_;
-    pSelf_->typeList[TYPE_CC_] = GblType_registerStatic("CC",
+    pSelf_->typeList[TYPE_CC_] = GblType_register("CC",
                                                         pSelf_->typeList[TYPE_CB_],
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
@@ -256,7 +256,7 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
     intMapEntry[0].classOffset = offsetof(ClassD_, iD);
     intMapEntry[0].interfaceType = pSelf_->typeList[TYPE_ID_];
     info.pClassData = (const void*)(uintptr_t)TYPE_CD_;
-    pSelf_->typeList[TYPE_CD_] = GblType_registerStatic("CD",
+    pSelf_->typeList[TYPE_CD_] = GblType_register("CD",
                                                         pSelf_->typeList[TYPE_CC_],
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
@@ -266,7 +266,7 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
     intMapEntry[0].classOffset = offsetof(ClassE_, iE);
     intMapEntry[0].interfaceType = pSelf_->typeList[TYPE_IE_];
     info.pClassData = (const void*)(uintptr_t)TYPE_CE_;
-    pSelf_->typeList[TYPE_CE_] = GblType_registerStatic("CE",
+    pSelf_->typeList[TYPE_CE_] = GblType_register("CE",
                                                         pSelf_->typeList[TYPE_CD_],
                                                         &info,
                                                         GBL_TYPE_FLAGS_NONE);
@@ -357,8 +357,8 @@ static GBL_RESULT GblInterfaceTestSuite_init_(GblTestSuite* pSelf, GblContext* p
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblInterfaceTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_CTX_BEGIN(pCtx);
+static GBL_RESULT GblInterfaceTestSuite_final_(GblTestSuite* pSelf) {
+    GBL_CTX_BEGIN(NULL);
     GblInterfaceTestSuite_* pSelf_ = GBL_INTERFACE_TEST_SUITE_(pSelf);
 
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_INTERFACE_TYPE), pSelf_->initialInterfaceRefCount);
@@ -369,7 +369,7 @@ static GBL_RESULT GblInterfaceTestSuite_final_(GblTestSuite* pSelf, GblContext* 
         GBL_CTX_VERIFY_CALL(GblType_unregister(pSelf_->typeList[t]));
     }
 
-    GBL_TEST_COMPARE(GblType_registeredCount(), pSelf_->initialTypeCount);
+    GBL_TEST_COMPARE(GblType_count(), pSelf_->initialTypeCount);
     GBL_CTX_END();
 }
 
@@ -383,7 +383,7 @@ static GBL_RESULT GblInterfaceTestSuite_classRefDefault_(GblTestSuite* pSelf, Gb
     GBL_TEST_VERIFY(!GblClass_isInterfaceImpl(pClass));
     GBL_TEST_VERIFY(GblClass_check(pClass, GBL_INTERFACE_TYPE));
     GBL_TEST_COMPARE(GblClass_cast(pClass, GBL_INTERFACE_TYPE), pClass);
-    GBL_TEST_COMPARE(GblClass_try(pClass, GBL_INTERFACE_TYPE), pClass);
+    GBL_TEST_COMPARE(GblClass_as(pClass, GBL_INTERFACE_TYPE), pClass);
 
     GBL_TEST_COMPARE(GblType_classRefCount(GBL_INTERFACE_TYPE),
                      pSelf_->initialInterfaceRefCount + 1);

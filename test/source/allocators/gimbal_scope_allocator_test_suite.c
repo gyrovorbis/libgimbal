@@ -3,7 +3,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/containers/gimbal_doubly_linked_list.h>
 
-#define GBL_SCOPE_ALLOCATOR_TEST_SUITE_(inst)   ((GblScopeAllocatorTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_SCOPE_ALLOCATOR_TEST_SUITE_TYPE))
+#define GBL_SCOPE_ALLOCATOR_TEST_SUITE_(inst)   (GBL_PRIVATE(GblScopeAllocatorTestSuite, inst))
 
 typedef struct GblScopeAllocatorTestSuite_ {
     GblArenaAllocator   arena;

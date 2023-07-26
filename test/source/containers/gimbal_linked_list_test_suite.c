@@ -4,7 +4,7 @@
 #include <gimbal/containers/gimbal_linked_list.h>
 #include <gimbal/meta/instances/gimbal_instance.h>
 
-#define GBL_LINKED_LIST_TEST_SUITE_(inst)   ((GblLinkedListTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_LINKED_LIST_TEST_SUITE_TYPE))
+#define GBL_LINKED_LIST_TEST_SUITE_(inst)   (GBL_PRIVATE(GblLinkedListTestSuite, inst))
 
 typedef struct TestStruct_ {
     char* pString;

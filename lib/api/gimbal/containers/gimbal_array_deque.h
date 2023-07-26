@@ -89,7 +89,7 @@ GBL_DECLS_BEGIN
  *  \ingroup containers
  */
 typedef struct GblArrayDeque {      // Size (32/64-bit)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblRingBuffer ringBuffer;
     GBL_PRIVATE_END                 // 22/42    total
 } GblArrayDeque;

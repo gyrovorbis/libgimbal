@@ -4,7 +4,6 @@
  *
  *  \author Falco Girgis
  */
-
 #ifndef GIMBAL_INTERFACE_H
 #define GIMBAL_INTERFACE_H
 
@@ -13,7 +12,7 @@
 #define GBL_INTERFACE_TYPE                      GBL_BUILTIN_TYPE(INTERFACE)
 
 #define GBL_INTERFACE(klass)                    ((GblInterface*)GblClass_cast(GBL_CLASS(klass), GBL_INTERFACE_TYPE))
-#define GBL_INTERFACE_TRY(klass)                ((GblInterface*)GblClass_try(GBL_CLASS(klass), GBL_INTERFACE_TYPE))
+#define GBL_INTERFACE_TRY(klass)                ((GblInterface*)GblClass_as(GBL_CLASS(klass), GBL_INTERFACE_TYPE))
 #define GBL_INTERFACE_OUTER_CLASS(iface)        (GblInterface_outerClass(GBL_INTERFACE(iface)))
 #define GBL_INTERFACE_OUTER_MOST_CLASS(iface)   (GblInterface_outerMostClass(GBL_INTERFACE(iface)))
 
@@ -90,7 +89,7 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
  *\note
  * Since a GblInterface inherits from GblClass, it is compatible
  * with all of the methods associated with a GblClass, such as
- * GblClass_check(), GblClass_cast(), and GblClass_try(). These
+ * GblClass_check(), GblClass_cast(), and GblClass_as(). These
  * are used to verify and query for GblInterface objects
  * which are contained within a given GblClass.
  *
@@ -114,7 +113,7 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
  * as a type of mappable "subclass" which is then embedded within a
  * the structure of a GblClass-inheriting structure. When a type
  * which implements an interface is registered, its location within
- * the class is provided to the type system via GblTypeInfo::pInterfaceMap.
+ * the class is provided to the type system via GblTypeInfo::pInterfaceImpls.
  *\sa GblClass, GblInstance, GblType
  */
 
@@ -139,7 +138,7 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
  * \relatesalso GblInterface
  * \param pSelf interface
  * \returns GblClass pointer to the top-most implementing class.
- * \sa GblClass_try
+ * \sa GblClass_as
  */
 
 /*! \page Interfaces Interfaces
@@ -196,16 +195,16 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
  *  For our serializable interface, we will use the following:
  *  \code{.c}
  *      // convenience macro returning type ID from registration
- *      #define ISERIALIZABLE_TYPE                (GBL_TYPEOF(ISerializable))
+ *      #define ISERIALIZABLE_TYPE                (GBL_TYPEID(ISerializable))
  *
  *      // function-style cast operator from an generic instance to our instance type
- *      #define ISERIALIZABLE(instance)           (GBL_INSTANCE_CAST(instance, ISerializable))
+ *      #define ISERIALIZABLE(instance)           (GBL_CAST(instance, ISerializable))
  *
  *      // function-style cast operator from a generic class to our class/interface type
  *      #define ISERIALIZABLE_CLASS(klass)        (GBL_CLASS_CAST(klass, ISerializable))
  *
  *      // convenience macro to extract our interface from a generic instance
- *      #define ISERIALIZABLE_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, ISerializable))
+ *      #define ISERIALIZABLE_GET_CLASS(instance) (GBL_CLASSOF(instance, ISerializable))
  *  \endcode
  *
  * ### Public Methods
@@ -256,7 +255,7 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
  *          if(type == GBL_INVALID_TYPE) {
  *
  *              // register our interface's class, deriving from GBL_INTERFACE_TYPE
- *              type = GblType_registerStatic("ISerializable",
+ *              type = GblType_register("ISerializable",
  *                                            GBL_INTERFACE_TYPE,
  *                                            &(const GblTypeInfo) {
  *                                                .classSize = sizeof(ISerializableClass)
@@ -269,7 +268,7 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
  *  \endcode
  *  \note
  *  If we wish to provide a default implementation of our virtual methods, we would
- *  also set GblTypeInfo::pFnClassInit to a ::GblTypeClassInitializeFn function
+ *  also set GblTypeInfo::pFnClassInit to a ::GblClassInitFn function
  *  where we would initialize our class structure with some default values.
  *
  *  ## Implementing
@@ -333,22 +332,22 @@ GBL_EXPORT GblClass* GblInterface_outerMostClass (GBL_SELF)  GBL_NOEXCEPT;
  *
  *  In order to register a type as having implemented an interface, we have to tell the
  *  meta type system how to "map" between the interface and the class. In order to achieve
- *  this, we pass an array of interface mappings to GblType_registerStatic() via
- *  GblTypeInfo.pInterfaceMap:
+ *  this, we pass an array of interface mappings to GblType_register() via
+ *  GblTypeInfo.pInterfaceImpls:
  *  \code{.c}
  *      GblType IntSerializableType_type(void) {
  *          static GblType type = GBL_INVALID_TYPE;
  *
  *          if(type == GBL_INVALID_TYPE) {
  *
- *              type = GblType_registerStatic("IntSerializable",
+ *              type = GblType_register("IntSerializable",
  *                                     GBL_INSTANCE_TYPE,
  *                                     &(const GblTypeInfo) {
  *                                     .classSize       = sizeof(IntSerializableClass),
  *                                     .pFnClassInit    = IntSerializable_initializeClass,
  *                                     .instanceSize    = sizeof(IntSerializable),
  *                                     .interfaceCount  = 1,
- *                                     .pInterfaceMap   = (const GblTypeInterfaceMapEntry[]) {
+ *                                     .pInterfaceImpls   = (const GblInterfaceImpl[]) {
  *                                         {
  *                                             .interfaceType = ISERIALIZABLE_TYPE,
  *                                             .classOffset   = offsetof(IntSerializableClass, iSerializable)

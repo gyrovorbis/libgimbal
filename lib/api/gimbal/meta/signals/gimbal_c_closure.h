@@ -15,10 +15,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_C_CLOSURE_TYPE               (GBL_TYPEOF(GblCClosure))                       //!< Type UUID of GblCClosure
-#define GBL_C_CLOSURE(instance)          (GBL_INSTANCE_CAST(instance, GblCClosure))      //!< Function-style GblInstance cast
-#define GBL_C_CLOSURE_CLASS(klass)       (GBL_CLASS_CAST(klass, GblCClosure))            //!< Function-style GblClass cast
-#define GBL_C_CLOSURE_GET_CLASS(instance)(GBL_INSTANCE_GET_CLASS(instance, GblCClosure)) //!< Get GblCClosureClass from GblInstance
+#define GBL_C_CLOSURE_TYPE            (GBL_TYPEID(GblCClosure))            //!< Type UUID of GblCClosure
+#define GBL_C_CLOSURE(self)           (GBL_CAST(GblCClosure, self))        //!< Function-style GblInstance cast
+#define GBL_C_CLOSURE_CLASS(klass)    (GBL_CLASS_CAST(GblCClosure, klass)) //!< Function-style GblClass cast
+#define GBL_C_CLOSURE_GET_CLASS(self) (GBL_CLASSOF(GblCClosure, self))     //!< Get GblCClosureClass from GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblCClosure
@@ -45,7 +45,7 @@ GBL_CLASS_DERIVE_EMPTY(GblCClosure, GblClosure)
  *  pointer and marshal out the return value.
  */
 GBL_INSTANCE_DERIVE(GblCClosure, GblClosure)
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblFnPtr    pFnCallback;
     GBL_PRIVATE_END
 GBL_INSTANCE_END

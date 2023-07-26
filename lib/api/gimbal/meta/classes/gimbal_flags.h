@@ -5,7 +5,6 @@
  *  \author 2023 Falco Girgis
  *  \copyright MIT License
  */
-
 #ifndef GIMBAL_FLAGS_H
 #define GIMBAL_FLAGS_H
 
@@ -16,8 +15,8 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_FLAGS_TYPE                      (GblFlags_type())
-#define GBL_FLAGS_CLASS(klass)              (GBL_CLASS_CAST(klass, GblFlags))
+#define GBL_FLAGS_TYPE          (GblFlags_type())                   //!< GblType UUID for flags
+#define GBL_FLAGS_CLASS(klass)  (GBL_CLASS_CAST(GblFlags, klass))   //!< Cast a GblClass to GblFlagsClass
 //! @}
 
 /*! \name Helper Macros
@@ -48,8 +47,8 @@ typedef struct GblFlagEntry {
  *  the valid bits for the flag type.
  */
 GBL_CLASS_DERIVE(GblFlags, GblPrimitive)
-    GblFlags        valueMask;  //!< Mask of all bits which can be set within the value
-    uint16_t        entryCount; //!< Cached number of values in the entry table
+    GblFlags valueMask;  //!< Mask of all bits which can be set within the value
+    uint16_t entryCount; //!< Cached number of values in the entry table
 GBL_CLASS_END
 
 // ========== GblFlagsClass ==========

@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/containers/gimbal_ring_buffer.h>
 
-#define GBL_RING_BUFFER_TEST_SUITE_(inst)     ((GblRingBufferTestSuite_*)GBL_INSTANCE_PRIVATE(inst, GBL_RING_BUFFER_TEST_SUITE_TYPE))
+#define GBL_RING_BUFFER_TEST_SUITE_(inst)     (GBL_PRIVATE(GblRingBufferTestSuite, inst))
 
 typedef struct GblRingBufferTestSuite_ {
     GblRingBuffer ringBuffer[4];

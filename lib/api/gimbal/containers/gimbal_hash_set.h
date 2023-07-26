@@ -37,7 +37,7 @@ typedef GblBool (*GblHashSetIterFn)(GBL_CSELF, void*, void*);             ///< U
  *  \ingroup containers
  */
 typedef struct GblHashSet {
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblContext*        pCtx;
         size_t             entrySize;
         size_t             capacity;
@@ -58,7 +58,7 @@ typedef struct GblHashSet {
  *  \sa GblHashSet
  */
 typedef struct GblHashSetIter {
-    GBL_PRIVATE()
+    GBL_PRIVATE_BEGIN
         GblHashSet*        pSet;
         size_t             bucketIdx;
     GBL_PRIVATE_END
