@@ -177,7 +177,7 @@ GBL_EXPORT void GblUri_setHost(GblUri* pSelf, const char* pStr) {
     GblUri_setHostRef(pSelf, pStr? GblStringRef_create(pStr) : NULL);
 }
 
-GBL_EXPORT void GblHost_setHostRef(GblUri* pSelf, GblStringRef* pRef) {
+GBL_EXPORT void GblUri_setHostRef(GblUri* pSelf, GblStringRef* pRef) {
     GblStringRef_unref(pSelf->pHost);
     pSelf->pHost = pRef;
     GblUri_validate_(pSelf);
@@ -187,11 +187,11 @@ GBL_EXPORT GblStringRef* GblUri_host(const GblUri* pSelf) {
     return pSelf->pHost;
 }
 
-GBL_EXPORT void GblHost_setPort(GblUri* pSelf, int port) {
+GBL_EXPORT void GblUri_setPort(GblUri* pSelf, int port) {
     pSelf->port = port;
 }
 
-GBL_EXPORT int GblHost_port(const GblUri* pSelf) {
+GBL_EXPORT int GblUri_port(const GblUri* pSelf) {
     return pSelf->port;
 }
 
