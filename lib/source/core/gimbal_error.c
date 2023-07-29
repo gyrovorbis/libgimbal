@@ -1,7 +1,7 @@
 #include <gimbal/core/gimbal_error.h>
 #include <tinycthread.h>
 
-GBL_THREAD_LOCAL static GblError* pCurrent_ = NULL;
+static GBL_THREAD_LOCAL GblError* pCurrent_ = NULL;
 
 GBL_EXPORT GblError* GblError_current(void) {
     return pCurrent_;

@@ -116,7 +116,6 @@ GBL_TEST_CASE(name)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(ref)
-
     GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pFixture->pTestObj)), 1);
     GblObject* pObj = GBL_OBJECT(GblBox_ref(GBL_BOX(pFixture->pTestObj)));
     GBL_TEST_COMPARE(GBL_OBJECT(pFixture->pTestObj), pObj);
@@ -663,10 +662,10 @@ GBL_TEST_CASE(variantITableIndex)
                                                 GBL_OBJECT_TYPE,
                                                 GBL_NEW(GblObject,
                                                         "name",     "dynamicChild",
-                                                        "userdata", 0xcafebabe,
+                                                        "userdata", (void*)0xcafebabe,
                                                         "parent",   GBL_NEW(GblObject,
                                                                             "name",    "dynamicParent",
-                                                                            "userdata", 0xdeadbeef))));
+                                                                            "userdata", (void*)0xdeadbeef))));
 
     GBL_TEST_VERIFY(GblVariant_field(&t, "name", &v));
     GBL_TEST_COMPARE(GblVariant_toString(&v), "dynamicChild");
