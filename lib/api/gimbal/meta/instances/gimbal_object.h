@@ -254,7 +254,7 @@ GBL_EXPORT const GblStringRef* GblObject_name       (GBL_CSELF)                 
 //! Sets the name of the given object to \p pName, making a copy of its contents to store internally
 GBL_EXPORT void                GblObject_setName    (GBL_SELF, const char* pName)        GBL_NOEXCEPT;
 //! Sets the name of the given object to \p pRef, taking ownership of the given reference
-GBL_EXPORT void                Gblobject_setNameRef (GBL_SELF, const GblStringRef* pRef) GBL_NOEXCEPT;
+GBL_EXPORT void                GblObject_setNameRef (GBL_SELF, const GblStringRef* pRef) GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Hierarchy Management
