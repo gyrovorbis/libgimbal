@@ -18,6 +18,9 @@
 #include "../gimbal_core.h"
 #include "../platform/gimbal_time_.h"
 
+#define GBL_TIMESTAMP_TYPE          (GBL_TYPEID(GblTimestamp))
+#define GBL_TIMESTAMP_CLASS(klass)  (GBL_CLASS_CAST(GblTimeStamp, klass))
+
 /*! \name Second Conversions
  *  \brief Defines for second conversion factors
  *  @{
@@ -96,6 +99,14 @@ typedef int32_t GblHour;        //!< Represents an hour within a 24-hour day (0-
 
 //! Represents the difference between two GblTime instances
 typedef struct timespec GblTimeSpec;
+
+/*! \name  Type System
+ *  \brief Type declarations for GblVariant time type
+ *  @{
+ */
+GBL_DECLARE_TYPE(GblTimestamp);
+GBL_CLASS_DERIVE_EMPTY(GblTimestamp, GblPrimitive);
+//! @}
 
 /*! Represents a calendar date
  *  \ingroup utils

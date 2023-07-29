@@ -289,8 +289,7 @@ GBL_EXPORT GBL_RESULT GblLogger_push(void) {
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblLogger_pop(size_t  count) {
-
+GBL_EXPORT GBL_RESULT GblLogger_pop(size_t count) {
     GBL_CTX_BEGIN(NULL);
     GBL_LOGGER_ENSURE_INITIALIZED_();
     mtx_lock(&listMtx_);
@@ -315,7 +314,10 @@ GBL_EXPORT GBL_RESULT GblLogger_pop(size_t  count) {
     GBL_CTX_END_BLOCK();
     mtx_unlock(&listMtx_);
     return GBL_CTX_RESULT();
+}
 
+GBL_EXPORT size_t GblLogger_depth(void) {
+    return stackDepth_;
 }
 
 GBL_EXPORT GBL_RESULT GblLogger_write(const char*   pFile,

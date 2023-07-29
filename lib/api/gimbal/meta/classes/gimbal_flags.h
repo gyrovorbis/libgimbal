@@ -94,10 +94,10 @@ GBL_EXPORT GBL_RESULT  GblFlagsClass_valueAppendString  (GBL_CSELF,
 //! @}
 
 // ========== GblFlags ==========
-GBL_EXPORT GblType     GblFlags_type                    (void)                            GBL_NOEXCEPT;
+GBL_EXPORT GblType GblFlags_type     (void)                          GBL_NOEXCEPT;
 
-GBL_EXPORT GblType     GblFlags_register                (const char*          pName,
-                                                         const GblFlagEntry*  pEntries)   GBL_NOEXCEPT;
+GBL_EXPORT GblType GblFlags_register (const char*          pName,
+                                      const GblFlagEntry*  pEntries) GBL_NOEXCEPT;
 /*! \name Flags from Strings
  *  \brief Methods for getting a flags value from string
  *  @{

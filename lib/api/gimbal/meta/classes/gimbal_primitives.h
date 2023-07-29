@@ -46,7 +46,7 @@
 #define GblFloat_type()     GBL_FLOAT_TYPE
 #define GblDouble_type()    GBL_DOUBLE_TYPE
 #define GblString_type()    GBL_STRING_TYPE
-#define size_t_type()       GBL_SIZE_TYPE
+#define GblSize_type()      GBL_SIZE_TYPE
 
 /*! \struct GblPrimitiveClass
  *  \implements GblIVariantClass

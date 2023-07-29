@@ -8,17 +8,10 @@
 #define GBL_TEST_BOX(self)           (GBL_CAST(GblTestBox, self))
 #define GBL_TEST_BOX_CLASS(klass)    (GBL_CLASS_CAST(GblTestBox, klass))
 
-#define GBL_TEST_OBJECT_TYPE         (GBL_TYPEID(GblTestObject))
-#define GBL_TEST_OBJECT(self)        (GBL_CAST(GblTestObject, self))
-#define GBL_TEST_OBJECT_CLASS(klass) (GBL_CLASS_CAST(GblTestObject, klass))
-
 GBL_FORWARD_DECLARE_STRUCT(GblTestBox);
-GBL_FORWARD_DECLARE_STRUCT(GblTestObject);
 static GBL_DECLARE_TYPE(GblTestBox);
-static GBL_DECLARE_TYPE(GblTestObject);
 
 GBL_CLASS_DERIVE_EMPTY(GblTestBox, GblBox, GblITableVariant)
-GBL_CLASS_DERIVE_EMPTY(GblTestObject, GblObject)
 
 GBL_INSTANCE_DERIVE(GblTestBox, GblBox)
     int32_t       integer;
@@ -27,43 +20,30 @@ GBL_INSTANCE_DERIVE(GblTestBox, GblBox)
     GblStringRef* pString;
 GBL_INSTANCE_END
 
-GBL_INSTANCE_DERIVE(GblTestObject, GblObject)
-    void*       pPointer;
-    GblTestBox  testBox;
-    char        character;
-GBL_INSTANCE_END
-
-GBL_PROPERTIES(GblTestObject,
-   (pointer,   GBL_GENERIC, (READ, WRITE), GBL_POINTER_TYPE),
-   (testBox,   GBL_GENERIC, (READ, WRITE), GBL_TEST_BOX_TYPE),
-   (character, GBL_GENERIC, (READ, WRITE), GBL_CHAR_TYPE)
-)
-
 GBL_TEST_FIXTURE {
+    size_t         classRefCount;
+    size_t         instanceCount;
     size_t         refCount;
-
     GblType        testBoxType;
-    GblType        testObjectType;
-
     GblTestBox*    pTestBox;
-    GblObject*     pObject;
-    GblTestObject* pTestObject;
 };
 
 GBL_TEST_INIT()
-    pFixture->refCount    = GblRef_activeCount();
-    pFixture->testBoxType = GBL_TEST_BOX_TYPE;
-    pFixture->pTestBox    = GBL_TEST_BOX(GblBox_create(GBL_TEST_BOX_TYPE));
-    pFixture->pObject     = GBL_NEW(GblObject,
-                                    "name",     "objy",
-                                    "userdata", 0xdeadbeef);
+    pFixture->refCount      = GblRef_activeCount();
+    pFixture->classRefCount = GblType_classRefCount(GBL_OBJECT_TYPE);
+    pFixture->instanceCount = GblType_instanceCount(GBL_TEST_BOX_TYPE);
+    pFixture->testBoxType   = GBL_TEST_BOX_TYPE;
+    pFixture->pTestBox      = GBL_TEST_BOX(GblBox_create(GBL_TEST_BOX_TYPE));
 GBL_TEST_CASE_END
 
 GBL_TEST_FINAL()
-    GBL_UNREF(pFixture->pObject);
-    GBL_UNREF(pFixture->pTestBox);
+    GBL_TEST_COMPARE(GBL_UNREF(pFixture->pTestBox), 0);
+    GBL_TEST_COMPARE(GblType_classRefCount(GBL_OBJECT_TYPE),
+                     pFixture->classRefCount);
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_TEST_BOX_TYPE),
+                     pFixture->instanceCount);
     GblType_unregister(pFixture->testBoxType);
-    GBL_TEST_COMPARE(pFixture->refCount, GblRef_activeCount());
+    GBL_TEST_COMPARE(GblRef_activeCount(), pFixture->refCount);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(incompatibleCount)
@@ -113,15 +93,15 @@ GBL_TEST_CASE(incompatibleNext)
     GblVariant_construct(&v, 'a');
 
     GBL_TEST_COMPARE(GblVariant_next(&t, &k, &v), GBL_FALSE);
-    GBL_TEST_VERIFY(GblVariant_isNil(&v));
-    GBL_TEST_VERIFY(GblVariant_isNil(&k));
+    GBL_TEST_VERIFY(!GblVariant_isValid(&v));
+    GBL_TEST_VERIFY(!GblVariant_isValid(&k));
 
     GblVariant_set(&v, 'a');
     GblVariant_set(&k, "key");
 
     GBL_TEST_COMPARE(GblVariant_next(&t, &k, &v), GBL_FALSE);
-    GBL_TEST_VERIFY(GblVariant_isNil(&v));
-    GBL_TEST_VERIFY(GblVariant_isNil(&k));
+    GBL_TEST_VERIFY(!GblVariant_isValid(&v));
+    GBL_TEST_VERIFY(!GblVariant_isValid(&k));
 
     GblVariant_destruct(&v);
     GblVariant_destruct(&k);
@@ -234,22 +214,11 @@ GBL_TEST_CASE(boxNext)
     GBL_TEST_COMPARE(GblVariant_toString(&v), "-1.123");
 
     GBL_TEST_VERIFY(!GblVariant_next(&t, &k, &v));
-    GBL_TEST_VERIFY(GblVariant_isNil(&k));
-    GBL_TEST_VERIFY(GblVariant_isNil(&v));
+    GBL_TEST_VERIFY(!GblVariant_isValid(&k));
+    GBL_TEST_VERIFY(!GblVariant_isValid(&v));
 
     GblVariant_destruct(&v);
     GblVariant_destruct(&k);
-    GblVariant_destruct(&t);
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(objectCount)
-    GblVariant t;
-
-    GBL_TEST_SKIP("FIXME");
-
-    GblVariant_constructObjectCopy(&t, pFixture->pObject);
-    GBL_TEST_COMPARE(GblVariant_count(&t), 4);
-
     GblVariant_destruct(&t);
 GBL_TEST_CASE_END
 
@@ -260,8 +229,7 @@ GBL_TEST_REGISTER(incompatibleCount,
                   boxCount,
                   boxIndex,
                   boxSetIndex,
-                  boxNext,
-                  objectCount)
+                  boxNext)
 
 static GBL_RESULT GblTestBox_ITableVariant_index_(const GblVariant* pVariant, const GblVariant* pKey, GblVariant* pValue) {
     GblVariant k = GBL_VARIANT_INIT;
@@ -349,8 +317,8 @@ static GBL_RESULT GblTestBox_ITableVariant_next_(const GblVariant* pVariant, Gbl
             GblVariant_setStringRef(pValue, GblStringRef_ref(pSelf->pString));
 
         } else if(!strcmp(pField, "string")) {
-            GblVariant_setNil(pKey);
-            GblVariant_setNil(pValue);
+            GblVariant_destruct(pKey);
+            GblVariant_destruct(pValue);
 
         } else GBL_CTX_VERIFY(GBL_FALSE,
                               GBL_RESULT_ERROR_INVALID_KEY,

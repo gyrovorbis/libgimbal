@@ -893,3 +893,115 @@ GBL_EXPORT GblDateTime* GblDateTime_addMilliSecs(GblDateTime* pSelf, int mSecs) 
 GBL_EXPORT GblDateTime* GblDateTime_addMicroSecs(GblDateTime* pSelf, int uSecs) {
     return GblDateTime_addNanoSecs(pSelf, uSecs * 1000);
 }
+
+static GBL_RESULT stringConstruct_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_ASSERT(!argc);
+
+    pVariant->time = time(NULL);
+
+    return GBL_RESULT_SUCCESS;
+}
+
+
+static GBL_RESULT GblTimestamp_save_(const GblVariant* pVariant, GblStringBuffer* pString) {
+    GBL_CTX_BEGIN(NULL);
+    GblStringBuffer_appendPrintf(pString, "%u", pVariant->u64);
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblTimestamp_load_(GblVariant* pVariant, const GblStringBuffer* pString) {
+    GBL_CTX_BEGIN(NULL);
+    int integer = GblStringView_toUint64(GblStringBuffer_view(pString));
+    pVariant->u64 = (uint64_t)integer;
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblTimestamp_set_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_UNUSED(argc);
+    GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
+    GBL_CTX_VERIFY_TYPE(pArgs->type, GBL_UINT64_TYPE);
+    pVariant->time = pArgs->u64;
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblTimestamp_get_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_UNUSED(argc);
+    GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
+    GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
+    *((uint64_t*)pArgs->pVoid) = pVariant->u64;
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblTimestamp_compare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
+    GBL_CTX_BEGIN(NULL);
+    if(pVariant->time > pOther->time)       *pResult = 1;
+    else if (pVariant->time < pOther->time) *pResult = -1;
+    else                                    *pResult = 0;
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblTimestamp_convert_(const GblVariant* pVariant, GblVariant* pOther) {
+    const GblType typeSrc = GblVariant_typeOf(pVariant);
+    const GblType typeDst = GblVariant_typeOf(pOther);
+
+    if(typeSrc == GBL_TIMESTAMP_TYPE) {
+        GBL_ASSERT(typeDst == GBL_STRING_TYPE);
+
+        struct {
+            GblStringBuffer buff;
+            char            stack[GBL_DATE_TIME_ISO8601_STRING_SIZE];
+        } str;
+        GblDateTime dt;
+
+        GblStringBuffer_construct(&str.buff, GBL_STRV(""), sizeof(str));
+        GblDateTime_fromUnix(&dt, pVariant->time);
+        GblDateTime_toIso8601(&dt, &str.buff);
+        GblVariant_setString(pOther, GblStringBuffer_cString(&str.buff));
+        GblStringBuffer_destruct(&str.buff);
+
+    } else if(typeSrc == GBL_STRING_TYPE) {
+        GBL_ASSERT(typeDst == GBL_TIMESTAMP_TYPE);
+
+        GblDateTime dt;
+
+
+    } else GBL_ASSERT(GBL_FALSE);
+
+    return GBL_TRUE;
+}
+
+GBL_EXPORT GblType GblTimestamp_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    const static GblIVariantVTable timestampIVariantIFace =  {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE       |
+                            GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY    |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY    |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
+            .pSetValueFmt   = { "z"},
+            .pGetValueFmt   = { "p" },
+            .pFnSet         = GblTimestamp_set_,
+            .pFnGet         = GblTimestamp_get_,
+            .pFnCompare     = GblTimestamp_compare_,
+            .pFnSave        = GblTimestamp_save_,
+            .pFnLoad        = GblTimestamp_load_
+      };
+
+    if(type == GBL_INVALID_TYPE) {
+        type = GblPrimitive_register("GblTimestamp",
+                                     sizeof(GblTimestampClass),
+                                     0,
+                                     &timestampIVariantIFace,
+                                     GBL_TYPE_FLAGS_NONE);
+
+        GblVariant_registerConverter(type, GBL_STRING_TYPE, GblTimestamp_convert_);
+        GblVariant_registerConverter(GBL_STRING_TYPE, type, GblTimestamp_convert_);
+    }
+
+    return type;
+
+}
+

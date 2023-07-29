@@ -2,6 +2,9 @@
  *  \brief GblIVariant interface for GblVariant compatibility
  *  \ingroup interfaces
  *
+ *  \todo
+ *  - Shouldn't the RHS variant automatically be invalidated after a "move" operation?
+ *
  *  \author 2023 Falco Girgis
  *  \copyright MIT License
  */

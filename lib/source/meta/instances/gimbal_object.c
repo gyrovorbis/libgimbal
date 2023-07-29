@@ -863,21 +863,29 @@ GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass(GblObject*      pSelf
 
 static GBL_RESULT GblObject_nameDestruct_(const GblArrayMap* pMap, uintptr_t key, void* pName) {
     GBL_UNUSED(key, pMap);
+
     GblStringRef_release(pName);
+
     return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT void GblObject_setName(GblObject* pSelf, const char* pName) {
-
     GblArrayMap_setUserdata(&GBL_PRIV(pSelf->base).pFields,
                             objectNameQuark_,
                             (uintptr_t)GblStringRef_create(pName),
                             GblObject_nameDestruct_);
 }
 
-GBL_EXPORT const char* GblObject_name(const GblObject* pSelf) {
-    return (const char*)GblArrayMap_getValue(&GBL_PRIV(pSelf->base).pFields,
-                                             objectNameQuark_);
+GBL_EXPORT void GblObject_setNameRef(GblObject* pSelf, const GblStringRef* pRef) {
+    GblArrayMap_setUserdata(&GBL_PRIV(pSelf->base).pFields,
+                            objectNameQuark_,
+                            (uintptr_t)pRef,
+                            GblObject_nameDestruct_);
+}
+
+GBL_EXPORT const GblStringRef* GblObject_name(const GblObject* pSelf) {
+    return (GblStringRef*)GblArrayMap_getValue(&GBL_PRIV(pSelf->base).pFields,
+                                               objectNameQuark_);
 }
 
 #define GBL_OBJECT_FAMILY_ENTRY_(node) (!node? GBL_NULL : GBL_NARY_TREE_ENTRY(node, GblObjectFamily_, treeNode)->pSelf)
@@ -1302,7 +1310,7 @@ static GBL_RESULT GblObject_ITableVariant_index_(const GblVariant* pSelf,
     GblVariant_constructCopy(&k, pKey);
 
     const GBL_RESULT retValue =
-        GblObject_propertyVariant(GblVariant_getOpaquePeek(pSelf),
+        GblObject_propertyVariant(GblVariant_getObjectPeek(pSelf),
                                   GblVariant_toString(&k),
                                   pValue);
 
@@ -1319,13 +1327,36 @@ static GBL_RESULT GblObject_ITableVariant_setIndex_(const GblVariant* pSelf,
     GblVariant_constructCopy(&k, pKey);
 
     const GBL_RESULT retValue =
-        GblObject_setPropertyVariant(GblVariant_getOpaquePeek(pSelf),
+        GblObject_setPropertyVariant(GblVariant_getObjectPeek(pSelf),
                                      GblVariant_toString(&k),
                                      pValue);
 
     GblVariant_destruct(&k);
 
     return retValue;
+}
+
+typedef struct PropertyIterClosure_ {
+    const GblProperty* pPrev;
+    const GblProperty* pNext;
+    GblBool            nextOne;
+} PropertyIterClosure_;
+
+static GblBool GblObject_ITableVariant_next_propertyIterator_(const GblProperty* pProp,
+                                                              void*              pClosure)
+{
+    PropertyIterClosure_* pCl = pClosure;
+
+    if(!pCl->pPrev) {
+        pCl->pNext = pProp;
+        return GBL_TRUE;
+    } else if(pCl->nextOne) {
+        pCl->pNext = pProp;
+        return GBL_TRUE;
+    } else if(pProp == pCl->pPrev)
+        pCl->nextOne = GBL_TRUE;
+
+    return GBL_FALSE;
 }
 
 static GBL_RESULT GblObject_ITableVariant_next_(const GblVariant* pSelf,
@@ -1335,31 +1366,37 @@ static GBL_RESULT GblObject_ITableVariant_next_(const GblVariant* pSelf,
     const GblProperty* pPrev = NULL;
     const GblType      type  = GblVariant_typeOf(pSelf);
 
-    if(!GblVariant_isNil(pKey))
+    if(GblVariant_isValid(pKey))
         pPrev = GblProperty_find(type, GblVariant_toString(pKey));
 
-    const GblProperty* pNext =
-        GblProperty_next(type, pPrev, GBL_PROPERTY_FLAG_READ);
+    PropertyIterClosure_ cl = {
+        .pPrev = pPrev
+    };
 
-    if(!pNext) {
-        GblVariant_setNil(pKey);
-        GblVariant_setNil(pValue);
+    GblProperty_foreach(type,
+                        GBL_PROPERTY_FLAG_READ,
+                        GblObject_ITableVariant_next_propertyIterator_,
+                        &cl);
 
-        return GBL_FALSE;
+    if(!cl.pNext) {
+        GblVariant_destruct(pKey);
+        GblVariant_destruct(pValue);
+
+        return cl.nextOne? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR_INVALID_PROPERTY;
     } else {
-        GblVariant_set(pKey, GblProperty_nameString(pNext));
-        GblObject_propertyVCall_(GblVariant_getObjectPeek(pSelf),
-                                 pNext,
-                                 pValue);
-
-        return GBL_TRUE;
+        GblVariant_set(pKey, GblProperty_nameString(cl.pNext));
+        return GblObject_propertyVCall_(GblVariant_getObjectPeek(pSelf),
+                                        cl.pNext,
+                                        pValue);
     }
+
 }
 
 static GBL_RESULT GblObject_ITableVariant_count_(const GblVariant* pSelf,
                                                  size_t*           pSize)
 {
-    return GblProperty_count(GBL_TYPEOF(pSelf));
+    *pSize = GblProperty_count(GblVariant_typeOf(pSelf));
+    return GBL_RESULT_SUCCESS;
 }
 
 
@@ -1400,10 +1437,26 @@ static GBL_RESULT GblObject_property_(const GblObject* pSelf, const GblProperty*
     GBL_CTX_BEGIN(NULL);
 
     switch(pProp->id) {
-    case GblObject_Property_Id_name:      GblVariant_setValueCopy(pValue, pProp->valueType, GblObject_name(pSelf));           break;
-    case GblObject_Property_Id_parent:    GblVariant_setValueMove(pValue, pProp->valueType, GblObject_parent(pSelf));         break;
-    case GblObject_Property_Id_refCount:  GblVariant_setValueCopy(pValue, pProp->valueType, GblBox_refCount(GBL_BOX(pSelf))); break;
-    case GblObject_Property_Id_userdata:  GblVariant_setValueCopy(pValue, pProp->valueType, GblBox_userdata(GBL_BOX(pSelf))); break;
+    case GblObject_Property_Id_name:
+        GblVariant_setValueMove(pValue,
+                                pProp->valueType,
+                                GblStringRef_ref(GblObject_name(pSelf)));
+        break;
+    case GblObject_Property_Id_parent:
+        GblVariant_setValueMove(pValue,
+                                pProp->valueType,
+                                GblObject_parent(pSelf));
+        break;
+    case GblObject_Property_Id_refCount:
+        GblVariant_setValueCopy(pValue,
+                                pProp->valueType,
+                                GblBox_refCount(GBL_BOX(pSelf)));
+        break;
+    case GblObject_Property_Id_userdata:
+        GblVariant_setValueCopy(pValue,
+                                pProp->valueType,
+                                GblBox_userdata(GBL_BOX(pSelf)));
+        break;
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Reading unhandled property: %s",
                                 GblProperty_nameString(pProp));
@@ -1418,9 +1471,9 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
 
     switch(pProp->id) {
     case GblObject_Property_Id_name: {
-        const char* pName = NULL;
-        GBL_CTX_CALL(GblVariant_copyValue(pValue, &pName));
-        GblObject_setName(pSelf, pName);
+        const GblStringRef* pName = NULL;
+        GBL_CTX_CALL(GblVariant_moveValue(pValue, &pName));
+        GblObject_setNameRef(pSelf, pName);
         break;
     }
     case GblObject_Property_Id_parent: {
@@ -1535,9 +1588,9 @@ GBL_EXPORT GblType GblObject_type(void) {
         ifaceEntries[2].interfaceType = GBL_IEVENT_FILTER_TYPE;
 
         type = GblType_register(GblQuark_internStringStatic("GblObject"),
-                                      GBL_BOX_TYPE,
-                                      &typeInfo,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+                                GBL_BOX_TYPE,
+                                &typeInfo,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
     return type;
 }

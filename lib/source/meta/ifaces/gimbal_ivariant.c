@@ -133,6 +133,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_constructMove(const GblIVariantClass* pSe
                           "[GblIVariant] Cannot move construct type: %s",
                           GblType_name(pVariant->type));
    }
+   //GBL_CTX_CALL(GblVariant_invalidate(pOther));
    GBL_CTX_END();
 }
 

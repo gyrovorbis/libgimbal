@@ -30,7 +30,7 @@ GBL_EXPORT uint64_t gblSeed          (uint8_t index)                  GBL_NOEXCE
 GBL_EXPORT int      gblRand          (void)                           GBL_NOEXCEPT;
 GBL_EXPORT int      gblRandRange     (int min, int max)               GBL_NOEXCEPT;
 GBL_EXPORT float    gblRandFloat     (float min, float max)           GBL_NOEXCEPT;
-GBL_EXPORT void     gblRandBuffer    (void* pData,  size_t size)      GBL_NOEXCEPT;
+GBL_EXPORT void     gblRandBuffer    (void* pData, size_t size)       GBL_NOEXCEPT;
 
 GBL_EXPORT int      gblRandString    (char*       pBuffer,
                                       int         minSize,

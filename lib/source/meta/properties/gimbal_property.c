@@ -33,7 +33,7 @@ static void propertyDestructor_(const GblHashSet* pSet, GblProperty** pProperty)
     GBL_CTX_END_BLOCK();
 }
 
-GBL_EXPORT size_t  GblProperty_totalCount(void) {
+GBL_EXPORT size_t GblProperty_totalCount(void) {
     return GblHashSet_size(&propertyRegistry_);
 }
 

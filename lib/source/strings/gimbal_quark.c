@@ -159,7 +159,7 @@ GBL_EXPORT GBL_RESULT GblQuark_init(GblContext* pCtx, size_t  pageSize, size_t  
     GBL_CTX_END();
 }
 
-GBL_EXPORT size_t  GblQuark_pageCount(void) {
+GBL_EXPORT size_t GblQuark_pageCount(void) {
     size_t  count = 1;
     if(initialized_) {
         count = GblArenaAllocator_pageCount(&arena_);
@@ -167,7 +167,7 @@ GBL_EXPORT size_t  GblQuark_pageCount(void) {
     return count;
 }
 
-GBL_EXPORT size_t  GblQuark_pageSize(void) {
+GBL_EXPORT size_t GblQuark_pageSize(void) {
     size_t  size = GBL_QUARK_PAGE_SIZE_DEFAULT_;
     if(initialized_) {
         size = arena_.pageSize;
@@ -175,7 +175,7 @@ GBL_EXPORT size_t  GblQuark_pageSize(void) {
     return size;
 }
 
-GBL_EXPORT size_t  GblQuark_bytesUsed(void) {
+GBL_EXPORT size_t GblQuark_bytesUsed(void) {
     size_t  bytes = 0;
     if(initialized_) {
         bytes = GblArenaAllocator_bytesUsed(&arena_);
@@ -183,7 +183,7 @@ GBL_EXPORT size_t  GblQuark_bytesUsed(void) {
     return bytes;
 }
 
-GBL_EXPORT size_t  GblQuark_bytesAvailable(void) {
+GBL_EXPORT size_t GblQuark_bytesAvailable(void) {
     size_t  bytes = 0;
     if(initialized_) {
         bytes = GblArenaAllocator_bytesAvailable(&arena_);
@@ -191,7 +191,7 @@ GBL_EXPORT size_t  GblQuark_bytesAvailable(void) {
     return bytes;
 }
 
-GBL_EXPORT size_t  GblQuark_totalCapacity(void) {
+GBL_EXPORT size_t GblQuark_totalCapacity(void) {
     size_t  bytes = 0;
     if(initialized_) {
         bytes = GblArenaAllocator_totalCapacity(&arena_);
@@ -199,7 +199,7 @@ GBL_EXPORT size_t  GblQuark_totalCapacity(void) {
     return bytes;
 }
 
-GBL_EXPORT size_t  GblQuark_fragmentedBytes(void) {
+GBL_EXPORT size_t GblQuark_fragmentedBytes(void) {
     size_t  bytes = 0;
     if(initialized_) {
         bytes = GblArenaAllocator_fragmentedBytes(&arena_);

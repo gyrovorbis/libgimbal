@@ -2,6 +2,12 @@
  *  \brief GblEvent base type and basic API
  *  \ingroup meta
  *
+ *  \todo
+ *      - maybe give them timestamps?
+ *      - maybe give them virtuals for onAccept/onReject/onReset?
+ *      - maybe give them source objects?
+ *      - extra extended creation args + default values
+ *
  *  \author 2023 Falco Girgis
  *  \copyright MIT License
  */

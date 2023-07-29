@@ -931,13 +931,13 @@ GBL_EXPORT GblBool GblVariant_next(const GblVariant* pSelf,
     const GblType type = GblVariant_typeOf(pSelf);
 
     if(!GblType_implements(type, GBL_ITABLE_VARIANT_TYPE)) {
-        GblVariant_setNil(pKey);
-        GblVariant_setNil(pValue);
+        GblVariant_destruct(pKey);
+        GblVariant_destruct(pValue);
         return GBL_FALSE;
     } else {
         const GblClass* pClass = GblClass_weakRefDefault(type);
         GBL_ITABLE_VARIANT_CLASS(pClass)->pFnNext(pSelf, pKey, pValue);
-        return !GblVariant_isNil(pKey);
+        return GblVariant_isValid(pKey);
     }
 }
 
@@ -1337,7 +1337,8 @@ GBL_EXPORT GblInstance* GblVariant_getInstance(const GblVariant* pSelf) {
 }
 
 GBL_EXPORT GBL_RESULT GblVariant_invalidate(GblVariant* pSelf) {
-    if(GblVariant_typeOf(pSelf) != GBL_INVALID_TYPE)
+    if(GblVariant_typeOf(pSelf) != GBL_INVALID_TYPE &&
+       GblVariant_typeOf(pSelf) != GBL_POINTER_TYPE) // Cheap hack because we use this type to denote Va_list read things, even though we don't actually instantiate the type itself
         GblClass_unrefDefault(GblClass_weakRefDefault(GblVariant_typeOf(pSelf)));
     memset(pSelf, 0, sizeof(GblVariant));
     pSelf->type = GBL_INVALID_TYPE;
@@ -1444,8 +1445,9 @@ GBL_EXPORT GBL_RESULT GblVariant_setDouble(GblVariant* pSelf, double value) {
 }
 
 GBL_EXPORT GBL_RESULT GblVariant_setPointer(GblVariant* pSelf,
-                                            GblType ptrType,
-                                            void* pValue) GBL_NOEXCEPT {
+                                            GblType     ptrType,
+                                            void*       pValue)
+{
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(ptrType, GBL_POINTER_TYPE);
     GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, ptrType, pValue));

@@ -255,6 +255,8 @@ static GBL_RESULT GblBox_IVariant_construct_(GblVariant* pVariant, size_t argc, 
                          GBL_REF(pArgs[0].pVoid) : NULL;
     } else {
         pVariant->pBox = pArgs[0].pVoid;
+        if(op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE)
+            GblVariant_invalidate(&pArgs[0]);
     }
 
     GBL_CTX_END();
@@ -292,10 +294,11 @@ static GBL_RESULT GblBox_IVariant_get_(GblVariant* pSelf, size_t  argc, GblVaria
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblBox_IVariant_set_(GblVariant* pSelf, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblBox_IVariant_set_(GblVariant* pSelf, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
     GBL_CTX_BEGIN(NULL);
 
+    GBL_UNREF(pSelf->pBox);
     pSelf->pBox = pArgs[0].pVoid;
 
     if(op == GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY || op == GBL_IVARIANT_OP_FLAG_SET_COPY) {

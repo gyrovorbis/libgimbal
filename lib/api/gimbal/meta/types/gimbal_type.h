@@ -15,6 +15,7 @@
  *
  *  \todo
  *      - GblType_next does not iterate over builtin types
+ *          - GblType_foreach() is probably better!
  *      - GBL_PROTCOL_TYPE solidification and testing
  *
  *  \author    2023 Falco Girgis

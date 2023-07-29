@@ -1,21 +1,41 @@
 /*! \file
- *  \brief GblProperty instance, DSL, and management API
  *  \ingroup meta
+ *  \brief  GblProperty instance, DSL, and management API
  *
- *  \author Falco Girgis
+ *  This file contains the type declarations and methods
+ *  for GblProperty, the root property instance from
+ *  which all other properties are derived.
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
-
 #ifndef GIMBAL_PROPERTY_H
 #define GIMBAL_PROPERTY_H
 
 #include "../instances/gimbal_box.h"
 
-#define GBL_PROPERTY_TYPE               (GBL_TYPEID(GblProperty))
-#define GBL_PROPERTY(self)              (GBL_CAST(GblProperty, self))
-#define GBL_PROPERTY_CLASS(klass)       (GBL_CLASS_CAST(GblPropertyClass, klass))
-#define GBL_PROPERTY_GET_CLASS(self)    (GBL_CLASSOF(GblProperty, self))
+/*! \name  Type System
+ *  \brief UUID and Cast Operators
+ *  @{
+ */
+#define GBL_PROPERTY_TYPE               (GBL_TYPEID(GblProperty))            //!< Type UUID for GblProperty
+#define GBL_PROPERTY(self)              (GBL_CAST(GblProperty, self))        //!< Casts a GblInstance to GblProperty
+#define GBL_PROPERTY_CLASS(klass)       (GBL_CLASS_CAST(GblProperty, klass)) //!< Casts a GblClass to GblPropertyClass
+#define GBL_PROPERTY_GET_CLASS(self)    (GBL_CLASSOF(GblProperty, self))     //!< Gets a GblPropertyClass from GblInstance
+//! @}
 
+//! Alternate type identifier for GblProperty
 #define GBL_GENERIC_PROPERTY_TYPE       GBL_PROPERTY_TYPE
+
+/*! \name  Helper DSL
+ *  \brief Helper macros for declaration and registration
+ *  @{
+ */
+//! Declares a list of properties for the given object/instance structure
+#define GBL_PROPERTIES(object, ...)              GBL_PROPERTIES_(object, __VA_ARGS__)
+//! Registeres the list of properties which were declared with GBL_PROPERTIES()
+#define GBL_PROPERTIES_REGISTER(/*object,*/ ...) GBL_PROPERTIES_REGISTER_(__VA_ARGS__)
+//! @}
 
 #define GBL_SELF_TYPE GblProperty
 
@@ -23,19 +43,23 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblProperty);
 
+//! Function signature used as an iterator with GblProperty_foreach()
 typedef GblBool (*GblPropertyIterFn)(const GblProperty* pProp, void* pClosure);
 
+/*! \enum  GBL_PROPERTY_FLAG
+ *  \brief Flags used to denote property attributes
+ */
 GBL_DECLARE_ENUM(GBL_PROPERTY_FLAG) {
-    GBL_PROPERTY_FLAG_CONSTRUCT     = 0x1,
-    GBL_PROPERTY_FLAG_READ          = 0x2,
-    GBL_PROPERTY_FLAG_WRITE         = 0x4,
-    GBL_PROPERTY_FLAG_SAVE          = 0x8,
-    GBL_PROPERTY_FLAG_LOAD          = 0x10,
-    GBL_PROPERTY_FLAG_ABSTRACT      = 0x20,
-    GBL_PROPERTY_FLAG_OVERRIDE      = 0x40,
-    GBL_PROPERTY_FLAG_READ_WRITE    = 0x6,
-    GBL_PROPERTY_FLAG_SAVE_LOAD     = 0x18,
-    GBL_PROPERTY_FLAG_ALL           = 0xffff
+    GBL_PROPERTY_FLAG_CONSTRUCT     = 0x1,   //!< Property must be given to the constructor
+    GBL_PROPERTY_FLAG_READ          = 0x2,   //!< Property value can be read
+    GBL_PROPERTY_FLAG_WRITE         = 0x4,   //!< Property value can be modified
+    GBL_PROPERTY_FLAG_SAVE          = 0x8,   //!< Property is serialized when saving
+    GBL_PROPERTY_FLAG_LOAD          = 0x10,  //!< Property is deserialized when loading
+    GBL_PROPERTY_FLAG_ABSTRACT      = 0x20,  //!< Property must be implemented by deriving type
+    GBL_PROPERTY_FLAG_OVERRIDE      = 0x40,  //!< Property overrides an existing property
+    GBL_PROPERTY_FLAG_READ_WRITE    = 0x6,   //!< Property is both readable and writable
+    GBL_PROPERTY_FLAG_SAVE_LOAD     = 0x18,  //!< Property is both savable and loadable
+    GBL_PROPERTY_FLAG_ALL           = 0xffff //!< Mask for all property flags
 };
 
 /*! \struct  GblPropertyClass
@@ -44,15 +68,25 @@ GBL_DECLARE_ENUM(GBL_PROPERTY_FLAG) {
  *
  *  GblPropertyClass provides overridable virtual methods which
  *  allow for a derived type to implement type-specific functionality
- *  for a property.
+ *  for a property. This functionality includes:
+ *      - additional constructor argument handling
+ *      - default value handling
+ *      - type checking
+ *      - value validation
+ *      - (fuzzy) comparisons
  *
  *  \sa GblProperty
  */
 GBL_CLASS_DERIVE(GblProperty, GblBox)
+    //! Virtual method invoked during constructor to manage additional, non-default arguments
     GBL_RESULT (*pFnInitOptionalArgs)(GBL_SELF, size_t argCount, va_list* pVaList);
+    //! Virtual method returning the default value for the property
     GBL_RESULT (*pFnDefaultValue)    (GBL_CSELF, GblVariant* pValue);
+    //! Checks whether a variant is of the right type or can even be accepted as the new property value
     GBL_RESULT (*pFnCheckValue)      (GBL_CSELF, const GblVariant* pValue);
+    //! Updates the variant's value to be within range and a valid value for the given property
     GBL_RESULT (*pFnValidateValue)   (GBL_CSELF, GblVariant* pValue);
+    //! Compares the values of the two given variants to see if they're even different
     GBL_RESULT (*pFnCompareValues)   (GBL_CSELF, const GblVariant* pV1, const GblVariant* pV2, int* pResult);
 GBL_CLASS_END
 
@@ -77,13 +111,6 @@ GBL_INSTANCE_DERIVE(GblProperty, GblBox)
     GblFlags    flags;
     GblType     valueType;
 GBL_INSTANCE_END
-
-// ===== MACRO DSL ====
-
-#define GBL_PROPERTIES(object, ...)              GBL_PROPERTIES_(object, __VA_ARGS__)
-#define GBL_PROPERTIES_REGISTER(/*object,*/ ...) GBL_PROPERTIES_REGISTER_(__VA_ARGS__)
-
-// ===== STATICS =====
 
 GBL_EXPORT GblType      GblProperty_type           (void)                                  GBL_NOEXCEPT;
 GBL_EXPORT size_t       GblProperty_totalCount     (void)                                  GBL_NOEXCEPT;

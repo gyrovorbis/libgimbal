@@ -6,8 +6,10 @@
  *  managing custom logger types as well as the utility
  *  macros for actually using the log system.
  *
- *  \todo migrate away from GblThd and towards GblThread
- *  \todo Spam filter - deduplicate messages within a certain interval
+ *  \todo
+ *      - migrate away from GblThd and towards GblThread
+ *      - Spam filter: deduplicate messages within a certain interval
+ *      - Default constructor values
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License
@@ -24,10 +26,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_LOGGER_TYPE                   (GBL_TYPEID(GblLogger))            //!< Type UUID for GblLogger
-#define GBL_LOGGER(self)                  (GBL_CAST(GblLogger, self))        //!< Function-style cast to GblLogger
-#define GBL_LOGGER_CLASS(klass)           (GBL_CLASS_CAST(GblLogger, klass)) //!< Function-style cast to GblLoggerClass
-#define GBL_LOGGER_GET_CLASS(self)        (GBL_CLASSOF(GblLogger, self))     //!< Get GblLoggerClass from GblLogger
+#define GBL_LOGGER_TYPE             (GBL_TYPEID(GblLogger))            //!< Type UUID for GblLogger
+#define GBL_LOGGER(self)            (GBL_CAST(GblLogger, self))        //!< Function-style cast to GblLogger
+#define GBL_LOGGER_CLASS(klass)     (GBL_CLASS_CAST(GblLogger, klass)) //!< Function-style cast to GblLoggerClass
+#define GBL_LOGGER_GET_CLASS(self)  (GBL_CLASSOF(GblLogger, self))     //!< Get GblLoggerClass from GblLogger
 //! @}
 
 /*! \name Logging Macros
@@ -133,10 +135,11 @@ GBL_EXPORT GBL_RESULT   GblLogger_register         (GblLogger* pLogger)       GB
 GBL_EXPORT GBL_RESULT   GblLogger_unregister       (GblLogger* pLogger)       GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool      GblLogger_foreach          (GblLoggerIterFn pIt,
-                                                    void* pClosure)           GBL_NOEXCEPT;
+                                                    void*           pClosure) GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblLogger_push             (void)                     GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT   GblLogger_pop              (size_t  count)            GBL_NOEXCEPT;
+GBL_EXPORT size_t       GblLogger_depth            (void)                     GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblLogger_write            (const char*   pFile,
                                                     const char*   pFunction,

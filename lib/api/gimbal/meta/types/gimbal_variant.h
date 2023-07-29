@@ -12,6 +12,7 @@
  *      - function call operator()? Or call into a Closure?
  *      - serializing/deserializing
  *      - Ensure unregistering a type also removes its converters
+ *      - when you have an instance/box/object type, have to propagate inner type to box's outer type
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License
@@ -28,6 +29,7 @@
 #include "../classes/gimbal_flags.h"
 #include "../classes/gimbal_opaque.h"
 #include "../instances/gimbal_instance.h"
+#include <time.h>
 
 #define GBL_VARIANT_INIT    { .type = GBL_INVALID_TYPE }
 #define GBL_VARIANT(name)   GblVariant name = GBL_VARIANT_INIT
@@ -79,6 +81,8 @@ typedef struct GblVariant {
         float           f32;
         double          f64;
         void*           pVoid;
+        GBL_RESULT      result;
+        time_t          time;
         GblFnPtr        pFnPtr;
         GblStringRef*   pString;
         GblType         typeValue;

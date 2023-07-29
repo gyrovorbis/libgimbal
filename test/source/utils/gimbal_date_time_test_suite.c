@@ -684,6 +684,13 @@ GBL_TEST_CASE(dateTimeToIso8601) {
     GBL_TEST_CASE_END;
 }
 
+GBL_TEST_CASE(variantConstructDefault)
+    GblVariant v;
+    GblVariant_constructDefault(&v, GBL_TIMESTAMP_TYPE);
+
+    GblVariant_destruct(&v);
+GBL_TEST_CASE_END
+
 
 GBL_TEST_REGISTER(dateIsLeapYear,
                   dateMonthDays,

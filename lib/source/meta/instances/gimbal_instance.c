@@ -201,7 +201,7 @@ GBL_EXPORT GBL_RESULT GblInstance_swizzleClass(GblInstance* pSelf, GblClass* pCl
                        GblType_name(GblClass_typeOf(pClassOld)),
                        GblType_name(GblClass_typeOf(pClass)));
 
-        // destroy or unreferencec
+        // destroy or unreference
         GBL_CTX_CALL(GblInstance_classRelease_(pSelf));
     }
 

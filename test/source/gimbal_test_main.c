@@ -184,13 +184,15 @@ int main(int argc, char* pArgv[]) {
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_INSTANCE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_VARIANT_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_BOX_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_ITABLE_VARIANT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_CLOSURE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_SIGNAL_TEST_SUITE_TYPE));
-    GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_create(GBL_VARIANT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_ENUM_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
@@ -217,8 +219,6 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
-    GblTestScenario_enqueueSuite(pScenario,
-                                 GblTestSuite_create(GBL_ITABLE_VARIANT_TEST_SUITE_TYPE));
 
     const GBL_RESULT result = GblTestScenario_run(pScenario, argc, pArgv);
 

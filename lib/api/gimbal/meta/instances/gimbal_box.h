@@ -30,7 +30,7 @@
 #define GBL_BOX_GET_CLASS(self) (GBL_CLASSOF(GblBox, self))     //!< Gets a GblBoxClass from a GblInstance
 //! @}
 
-#define GBL_REF(box)            (GblBox_ref(GBL_BOX(box)))                    //!< Auto-casting convenience macro around GblBox_ref()
+#define GBL_REF(box)            (GblBox_ref(GBL_BOX(box)))          //!< Auto-casting convenience macro around GblBox_ref()
 #define GBL_UNREF(box)          (GblBox_unref(GBL_AS(GblBox, box))) //!< Auto-casting convenience macro around GblBox_unref()
 
 #define GBL_SELF_TYPE   GblBox
@@ -53,8 +53,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblBox);
  */
 GBL_CLASS_BASE(GblBox, GblIVariant)
     GBL_PRIVATE_BEGIN
-        //! PRIVATE: Internal storage for userdata fields
-        GblArrayMap* pFields;
+        GblArrayMap* pFields; //!< PRIVATE: Internal storage for userdata fields
     GBL_PRIVATE_END
 
     //! Virtual method invoked when a GblBox is being destroyed
