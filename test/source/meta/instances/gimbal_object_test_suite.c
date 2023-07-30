@@ -555,8 +555,7 @@ GBL_TEST_CASE(eventNotifyAncestors)
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pGrand)), 0);
-    GBL_CTX_END();
-}
+ GBL_TEST_CASE_END
 
 static GBL_RESULT GblObjectTestSuite_eventSendAncestorsEmit(TestObject* pObj, GblEvent* pEvent) {
     GBL_CTX_BEGIN(pObj);

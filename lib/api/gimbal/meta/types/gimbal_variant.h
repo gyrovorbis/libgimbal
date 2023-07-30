@@ -29,7 +29,6 @@
 #include "../classes/gimbal_flags.h"
 #include "../classes/gimbal_opaque.h"
 #include "../instances/gimbal_instance.h"
-#include <time.h>
 
 #define GBL_VARIANT_INIT    { .type = GBL_INVALID_TYPE }
 #define GBL_VARIANT(name)   GblVariant name = GBL_VARIANT_INIT
@@ -39,6 +38,7 @@
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblBox)
+GBL_FORWARD_DECLARE_STRUCT(GblDateTime)
 
 typedef GBL_RESULT (*GblVariantConverterFn)(GBL_CSELF, GblVariant* pOther);
 
@@ -82,10 +82,11 @@ typedef struct GblVariant {
         double          f64;
         void*           pVoid;
         GBL_RESULT      result;
-        time_t          time;
         GblFnPtr        pFnPtr;
         GblStringRef*   pString;
         GblType         typeValue;
+        GblBitmask      bitmask;
+        GblDateTime*    pDateTime;
         GblInstance*    pInstance;
         GblBox*         pBox;
         GblObject*      pObject;
@@ -135,6 +136,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructString          (GBL_SELF, const char*
 GBL_EXPORT GBL_RESULT GblVariant_constructStringView      (GBL_SELF, GblStringView value) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblVariant_constructTypeValue       (GBL_SELF, GblType type)        GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblVariant_constructSize            (GBL_SELF, size_t  value)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblVariant_constructDateTime        (GBL_SELF, const GblDateTime* pDt) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblVariant_constructEnum            (GBL_SELF,
                                                            GblType type,
                                                            GblEnum value)                 GBL_NOEXCEPT;
@@ -160,6 +162,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructBoxCopy         (GBL_SELF, GblBox* pVa
 GBL_EXPORT GBL_RESULT GblVariant_constructBoxMove         (GBL_SELF, GblBox* pValue)      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblVariant_constructObjectCopy      (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblVariant_constructObjectMove      (GBL_SELF, GblObject* pValue)   GBL_NOEXCEPT;
+
 GBL_EXPORT GBL_RESULT GblVariant_destruct                 (GBL_SELF)                      GBL_NOEXCEPT;
 //! @}
 
@@ -204,6 +207,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setStringView       (GBL_SELF, GblStringView va
 GBL_EXPORT GBL_RESULT GblVariant_setStringRef        (GBL_SELF, GblStringRef* pRef)  GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblVariant_setTypeValue        (GBL_SELF, GblType value)       GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT GblVariant_setSize             (GBL_SELF, size_t  value)       GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblVariant_setDateTime         (GBL_SELF, const GblDateTime* pDt) GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblVariant_setEnum             (GBL_SELF,
                                                       GblType enumType,
@@ -264,6 +268,7 @@ GBL_EXPORT GblStringRef* GblVariant_getStringRef             (GBL_CSELF)        
 GBL_EXPORT GblType       GblVariant_getTypeValue             (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_EXPORT void*         GblVariant_getPointer               (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_EXPORT size_t        GblVariant_getSize                  (GBL_CSELF)                     GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime*  GblVariant_getDateTime              (GBL_CSELF)                     GBL_NOEXCEPT;
 
 GBL_EXPORT void*         GblVariant_getOpaqueCopy            (GBL_CSELF)                     GBL_NOEXCEPT;
 GBL_EXPORT void*         GblVariant_getOpaqueMove            (GBL_SELF)                      GBL_NOEXCEPT;
@@ -336,6 +341,7 @@ GBL_EXPORT const char*   GblVariant_toString            (GBL_SELF)              
 GBL_EXPORT GblStringView GblVariant_toStringView        (GBL_SELF)                      GBL_NOEXCEPT;
 GBL_EXPORT GblType       GblVariant_toTypeValue         (GBL_SELF)                      GBL_NOEXCEPT;
 GBL_EXPORT size_t        GblVariant_toSize              (GBL_SELF)                      GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime*  GblVariant_toDateTime          (GBL_SELF)                      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT    GblVariant_registerConverter   (GblType               fromType,
                                                          GblType               toType,

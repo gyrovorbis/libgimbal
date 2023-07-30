@@ -70,7 +70,7 @@ GBL_EXPORT GblBool (GblPattern_match)(const GblPattern* pSelf,
 GBL_EXPORT GblBool (GblPattern_matchStr)(const char*    pRegExp,
                                          const char*    pString,
                                          GblStringView* pMatch,
-                                         int*       pCount)
+                                         int*           pCount)
 {
     return GblPattern_match(GblPattern_compile(pRegExp),
                             pString,
@@ -133,11 +133,13 @@ GBL_EXPORT GblBool (GblPattern_matchNot)(const GblPattern* pSelf,
           token.pData + token.length < pString + length &&
           GblPattern_match(pSelf, token.pData += token.length, &token, &count))
     {
-        *pMatch = GblStringView_fromStringSized(prevToken.pData + prevToken.length,
-                                                token.pData - prevToken.pData);
-
+        const size_t gapLength = token.pData - (prevToken.pData + prevToken.length);
+        if(gapLength > 0) {
+            ++totalCount;
+            *pMatch = GblStringView_fromStringSized(prevToken.pData + prevToken.length,
+                                                    gapLength);
+        }
         prevToken = token;
-        ++totalCount;
     }
 
     // check if we still have one last token remaining

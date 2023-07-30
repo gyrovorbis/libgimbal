@@ -20,16 +20,16 @@
 
 GBL_DECLS_BEGIN
 
-//! Function signature for for an opaque copy operation, see \ref GblOpaqueClassVTable::pFnCopy
+//! Function signature for for an opaque copy operation, see \ref GblOpaqueVTable::pFnCopy
 typedef GBL_RESULT (*GblOpaqueCopyFn)(void* pOpaque, void** ppNewOpaque);
-//! Function signature for an opaque free operation, see \ref GblOpaqueClassVTable::pFnFree
+//! Function signature for an opaque free operation, see \ref GblOpaqueVTable::pFnFree
 typedef GBL_RESULT (*GblOpaqueFreeFn)(void* pOpaque);
 
 //! Virtual table structure for a GblOpaqueClass
-typedef struct GblOpaqueClassVTable {
+typedef struct GblOpaqueVTable {
     GblOpaqueCopyFn pFnCopy;    //!< Copy method
     GblOpaqueFreeFn pFnFree;    //!< Free method
-} GblOpaqueClassVTable;
+} GblOpaqueVTable;
 
 /*! \struct GblOpaqueClass
  *  \extends GblPrimitiveClass
@@ -39,7 +39,7 @@ typedef struct GblOpaqueClassVTable {
  *  to the implementation details.
  */
 GBL_CLASS_DERIVE(GblOpaque, GblPrimitive)
-    const GblOpaqueClassVTable* pVTable; //!< Pointer to the virtual table structure
+    const GblOpaqueVTable* pVTable; //!< Pointer to the virtual table structure
 GBL_CLASS_END
 
 /*! \name Static Methods
@@ -47,10 +47,12 @@ GBL_CLASS_END
  *  @{
  */
 //! Returns the GblType UUID for GblOpaque
-GBL_EXPORT GblType GblOpaque_type     (void)                                GBL_NOEXCEPT;
+GBL_EXPORT GblType GblOpaque_type     (void)                           GBL_NOEXCEPT;
 //! Registers an opaque subtype with the virtual table given by \p pVTable
-GBL_EXPORT GblType GblOpaque_register (const char*                 pName,
-                                       const GblOpaqueClassVTable* pVTable) GBL_NOEXCEPT;
+GBL_EXPORT GblType GblOpaque_register (const char*            pName,
+                                       const GblOpaqueVTable* pVTable) GBL_NOEXCEPT;
+
+GBL_EXPORT GblType GblOpaque_registerRef (const char* pName) GBL_NOEXCEPT;
 //! @}
 
 /*! \name Instance Methods

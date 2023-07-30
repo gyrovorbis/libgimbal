@@ -597,12 +597,15 @@ GBL_EXPORT GblType GblClass_typeOf(const GblClass* pSelf) GBL_NOEXCEPT {
 
 GBL_EXPORT GblClass* GblClass_super(const GblClass* pSelf) GBL_NOEXCEPT {
     GblClass* pClass = NULL;
+
     if(pSelf) {
         const GblType parent = GblType_parent(GBL_CLASS_TYPEOF(pSelf));
-        if(GblType_verify(parent)) {
+
+        if(GblType_verify(parent))
             pClass = GblClass_weakRefDefault(parent);
-        }
+
     }
+
     return pClass;
 }
 

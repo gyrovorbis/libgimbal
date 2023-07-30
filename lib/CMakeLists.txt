@@ -134,6 +134,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_logger.h
     api/gimbal/core/gimbal_module.h
     api/gimbal/core/gimbal_error.h
+    api/gimbal/meta/classes/gimbal_bit_struct.h
     api/gimbal/meta/classes/gimbal_class.h
     api/gimbal/meta/classes/gimbal_class.hpp
     api/gimbal/meta/classes/gimbal_opaque.h

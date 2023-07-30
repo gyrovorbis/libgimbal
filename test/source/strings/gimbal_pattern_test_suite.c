@@ -100,6 +100,19 @@ GBL_TEST_CASE(matchLast)
     GBL_TEST_COMPARE(count, 2);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(matchMultipleInARow)
+    GblStringView view;
+    int count = -1;
+    GBL_TEST_SKIP("Fixme!!!");
+    GBL_TEST_VERIFY(GblPattern_match(pFixture->pPattern,
+                                     "1111111122222222",
+                                     &view,
+                                     &count));
+
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("22222222")));
+    GBL_TEST_COMPARE(count, 2);
+GBL_TEST_CASE_END
+
 GBL_TEST_CASE(matchNotInvalid)
     GBL_TEST_EXPECT_ERROR();
 
@@ -190,6 +203,21 @@ GBL_TEST_CASE(matchNotLast)
     GBL_TEST_COMPARE(count, 3);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(matchNotFirstMultiInARow)
+    GblStringView match;
+    int count;
+
+    count = 1;
+    GBL_TEST_VERIFY(GblPattern_matchNotStr("[ \n]",
+                                           "  \ntoken",
+                                           &match,
+                                           &count));
+
+    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("token")));
+    GBL_TEST_COMPARE(count, 1);
+
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(compileInvalid,
                   compile,
                   matchInvalid,
@@ -198,12 +226,14 @@ GBL_TEST_REGISTER(compileInvalid,
                   matchDefaultCount,
                   match,
                   matchLast,
+                  matchMultipleInARow,
                   matchNotInvalid,
                   matchNotNone,
                   matchNotDefaultMatchDefaultCount,
                   matchNotDefaultCount,
                   matchNot,
-                  matchNotLast)
+                  matchNotLast,
+                  matchNotFirstMultiInARow)
 #if 0
 
 GBL_TEST_CASE(iso8601BasicDate)

@@ -379,6 +379,17 @@ GBL_TEST_CASE(scanBytes)
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_EOF);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(scanMatchMultiContiguous)
+    GblScanner_setInput(pFixture->pScanner, "\n\nHello\n\tWorld\n \t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t]");
+    GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV("Hello")));
+    GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV("World")));
+    GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV("G'day")));
+GBL_TEST_CASE_END
+
 GBL_TEST_CASE(unref)
     GblScanner_unref(pFixture->pEmptyScanner);
     GBL_UNREF(pFixture->pScanner);
@@ -420,4 +431,5 @@ GBL_TEST_REGISTER(createEmpty,
                   scanLines,
                   peekBytesInvalid,
                   scanBytesInvalid,
+                  scanMatchMultiContiguous,
                   unref)

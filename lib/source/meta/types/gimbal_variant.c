@@ -7,6 +7,7 @@
 #include <gimbal/meta/instances/gimbal_object.h>
 #include <gimbal/containers/gimbal_tree_set.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
+#include <gimbal/utils/gimbal_date_time.h>
 
 #define GBL_VARIANT_BEGIN_(type, classGetterSuffix)                                         \
     GBL_CTX_BEGIN(NULL); {                                                                  \
@@ -1522,4 +1523,36 @@ GBL_EXPORT GBL_RESULT GblVariant_setObjectMove(GblVariant* pSelf, GblObject* pVa
 
 GBL_EXPORT GblBool GblVariant_equals(const GblVariant* pSelf, const GblVariant* pOther) {
     return GblVariant_compare(pSelf, pOther) == 0;
+}
+
+
+GBL_EXPORT GBL_RESULT GblVariant_constructDateTime(GblVariant* pSelf, const GblDateTime* pDt) {
+   return GblVariant_constructValueCopy(pSelf, GBL_DATE_TIME_TYPE, pDt);
+}
+
+GBL_EXPORT GBL_RESULT GblVariant_setDateTime(GblVariant* pSelf, const GblDateTime* pDt) {
+    return GblVariant_setValueCopy(pSelf, GBL_DATE_TIME_TYPE, pDt);
+}
+
+GBL_EXPORT GblDateTime* GblVariant_getDateTime(const GblVariant* pSelf) {
+    GblDateTime* pDt = NULL;
+    if(GBL_RESULT_SUCCESS(GblVariant_peekValue(pSelf, &pDt)))
+        return pDt;
+    else return NULL;
+}
+
+GBL_EXPORT GblDateTime* GblVariant_toDateTime(GblVariant* pSelf) {
+    GblDateTime* pValue = NULL;
+    GBL_CTX_BEGIN(NULL);
+    if(GblVariant_typeOf(pSelf) != GBL_DATE_TIME_TYPE) {
+        GBL_VARIANT(v);
+        GBL_CTX_VERIFY_CALL(GblVariant_constructDateTime(&v, NULL));
+        GBL_CTX_VERIFY_CALL(GblVariant_convert(pSelf, &v));
+        GBL_CTX_VERIFY_CALL(GblVariant_setMove(pSelf, &v));
+        GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
+    }
+    pValue = GblVariant_getDateTime(pSelf);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_CTX_END_BLOCK();
+    return pValue;
 }

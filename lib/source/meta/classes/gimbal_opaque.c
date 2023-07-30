@@ -6,7 +6,7 @@
 static GBL_RESULT GblOpaqueClass_init_(GblClass* pClass, const void* pData) {
     GBL_CTX_BEGIN(NULL);
     GblOpaqueClass* pSelf = GBL_OPAQUE_CLASS(pClass);
-    pSelf->pVTable = (const GblOpaqueClassVTable*)pData;
+    pSelf->pVTable = (const GblOpaqueVTable*)pData;
     GBL_CTX_END();
 }
 
@@ -88,7 +88,7 @@ static GBL_RESULT GblOpaque_set_(GblVariant* pVariant, size_t  argc, GblVariant*
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblOpaque_get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblOpaque_get_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_ARG(argc == 1);
     GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
@@ -160,6 +160,18 @@ static GBL_RESULT GblOpaque_convertFrom_(const GblVariant* pVariant, GblVariant*
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblOpaque_ref_copy_(void* pOpaque, void** ppNewOpaque) {
+    *ppNewOpaque = GblRef_ref(pOpaque);
+
+    return GBL_RESULT_SUCCESS;
+}
+
+static GBL_RESULT GblOpaque_ref_free_(void* pOpaque) {
+    GblRef_unref(pOpaque);
+
+    return GBL_RESULT_SUCCESS;
+}
+
 GBL_EXPORT GblType GblOpaque_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
@@ -198,12 +210,12 @@ GBL_EXPORT GblType GblOpaque_type(void) {
 
         GBL_CTX_VERIFY_LAST_RECORD();
 
-        GBL_CTX_CALL(GblVariant_registerConverter(type, GBL_BOOL_TYPE,       GblOpaque_convertTo_));
-        GBL_CTX_CALL(GblVariant_registerConverter(type, GBL_STRING_TYPE,     GblOpaque_convertTo_));
-        GBL_CTX_CALL(GblVariant_registerConverter(type, GBL_POINTER_TYPE,    GblOpaque_convertTo_));
+        GBL_CTX_CALL(GblVariant_registerConverter(type, GBL_BOOL_TYPE,    GblOpaque_convertTo_));
+        GBL_CTX_CALL(GblVariant_registerConverter(type, GBL_STRING_TYPE,  GblOpaque_convertTo_));
+        GBL_CTX_CALL(GblVariant_registerConverter(type, GBL_POINTER_TYPE, GblOpaque_convertTo_));
 
-        GBL_CTX_CALL(GblVariant_registerConverter(GBL_NIL_TYPE,     type,    GblOpaque_convertFrom_));
-        GBL_CTX_CALL(GblVariant_registerConverter(GBL_POINTER_TYPE, type,    GblOpaque_convertFrom_));
+        GBL_CTX_CALL(GblVariant_registerConverter(GBL_NIL_TYPE,     type, GblOpaque_convertFrom_));
+        GBL_CTX_CALL(GblVariant_registerConverter(GBL_POINTER_TYPE, type, GblOpaque_convertFrom_));
 
         GBL_CTX_END_BLOCK();
 
@@ -211,8 +223,8 @@ GBL_EXPORT GblType GblOpaque_type(void) {
     return type;
 }
 
-GBL_EXPORT GblType GblOpaque_register(const char*                   pName,
-                                      const GblOpaqueClassVTable*   pVTable)
+GBL_EXPORT GblType GblOpaque_register(const char*            pName,
+                                      const GblOpaqueVTable* pVTable)
 {
     GblType type = GBL_INVALID_TYPE;
     GBL_CTX_BEGIN(NULL);
@@ -235,9 +247,18 @@ GBL_EXPORT GblType GblOpaque_register(const char*                   pName,
     return type;
 }
 
+GBL_EXPORT GblType GblOpaque_registerRef(const char* pName) {
+    const static GblOpaqueVTable vtbl = {
+        GblOpaque_ref_copy_,
+        GblOpaque_ref_free_
+    };
+
+    return GblOpaque_register(pName, &vtbl);
+}
+
 GBL_EXPORT GBL_RESULT GblOpaque_copy(void*     pOpaque,
-                                    GblType    type,
-                                    void**     ppNewOpaque)
+                                     GblType    type,
+                                     void**     ppNewOpaque)
 {
     GBL_CTX_BEGIN(NULL);
     GblOpaqueClass* pClass = GBL_OPAQUE_CLASS(GblClass_weakRefDefault(type));

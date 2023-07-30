@@ -9,6 +9,7 @@
  *
  *  \todo
  *      - fix reliance on apparently determinsitic random mechanism
+ *      - GblVariant support, stored as a GblRef*?
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License
@@ -52,15 +53,15 @@ typedef struct GblUuid {
  *  @{
  */
 //! Initializes the given GblUuid structure to a new, randomly generated UUID per RFC 4122 (version 4).
-GBL_EXPORT GBL_RESULT  GblUuid_genV4   (GBL_SELF)                         GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblUuid_genV4  (GBL_SELF)                      GBL_NOEXCEPT;
 //! Initializes the given GblUuid structure by deserializing the string representation given by pStrBuffer.
-GBL_EXPORT GBL_RESULT  GblUuid_parse   (GBL_SELF, const char* pStrBuffer) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblUuid_parse  (GBL_SELF, const char* pBuffer) GBL_NOEXCEPT;
 //! Initializes the given GblUuid structure to a "nil" UUID, per RFC 4122.
-GBL_EXPORT GBL_RESULT  GblUuid_setNil  (GBL_SELF)                         GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblUuid_setNil (GBL_SELF)                      GBL_NOEXCEPT;
 //! @}
 
 //! Fills in the given 37-byte string buffer with the standardized string representation of the given UUID, also returning it
-GBL_EXPORT const char* GblUuid_string  (GBL_CSELF, char* pStrBuffer)      GBL_NOEXCEPT;
+GBL_EXPORT const char* GblUuid_string  (GBL_CSELF, char* pBuffer)         GBL_NOEXCEPT;
 //! Returns true if the given UUID is equal to the NIL UUID, per RFC 4122 (all zeroes),
 GBL_EXPORT GblBool     GblUuid_isNil   (GBL_CSELF)                        GBL_NOEXCEPT;
 //! Lexicographically Compares the given UUID to another, returning 0 if equal, -1 if less than, or 1 if greater than/

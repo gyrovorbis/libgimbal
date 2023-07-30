@@ -39,7 +39,7 @@ static GBL_RESULT GblOpaqueTestSuite_final_(GblTestSuite* pSelf, GblContext* pCt
 static GBL_RESULT GblOpaqueTestSuite_register_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblOpaqueTestSuite_* pSelf_ = GBL_OPAQUE_TEST_SUITE_(pSelf);
-    static const GblOpaqueClassVTable vTable = {
+    static const GblOpaqueVTable vTable = {
         GblOpaque_copy_,
         GblOpaque_free_
     };

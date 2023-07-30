@@ -1,6 +1,7 @@
 #include <gimbal/utils/gimbal_date_time.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/strings/gimbal_string.h>
+#include <gimbal/meta/classes/gimbal_opaque.h>
 #include <wchar.h>
 #include <math.h>
 
@@ -810,7 +811,7 @@ GBL_EXPORT GblBool GblTime_isValid(const GblTime* pSelf) {
         return GBL_FALSE;
     if(pSelf->hours < 0)
         return GBL_FALSE;
-    if(pSelf->nSeconds > GBL_TIME_NSECS_PER_SEC-1)
+    if(pSelf->nSeconds > GBL_TIME_NSECS_PER_SEC - 1)
         return GBL_FALSE;
     if(pSelf->seconds > 59)
         return GBL_FALSE;
@@ -859,10 +860,11 @@ GBL_EXPORT GblBool GblDateTime_isValid(const GblDateTime* pSelf) {
     return GblDate_isValid(&pSelf->date) && GblTime_isValid(&pSelf->time);
 }
 
-GBL_EXPORT void (GblDateTime_set)(GblDateTime* pSelf, GblYear year, GblMonth month, GblDay day, GblHour hours, GblMinute mins, GblSecond secs, GblNanoSecond ns, GblSecond tzOff) GBL_NOEXCEPT {
+GBL_EXPORT GblDateTime* (GblDateTime_set)(GblDateTime* pSelf, GblYear year, GblMonth month, GblDay day, GblHour hours, GblMinute mins, GblSecond secs, GblNanoSecond ns, GblSecond tzOff) GBL_NOEXCEPT {
     GblDate_set(&pSelf->date, year, month, day);
     GblTime_set(&pSelf->time, hours, mins, secs, ns);
     pSelf->utcOffset = tzOff;
+    return pSelf;
 }
 
 GBL_EXPORT void GblDateTime_setDate(GblDateTime* pSelf, const GblDate* pDate) {
@@ -894,111 +896,78 @@ GBL_EXPORT GblDateTime* GblDateTime_addMicroSecs(GblDateTime* pSelf, int uSecs) 
     return GblDateTime_addNanoSecs(pSelf, uSecs * 1000);
 }
 
-static GBL_RESULT stringConstruct_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
-    GBL_ASSERT(!argc);
+GBL_EXPORT GblDateTime* (GblDateTime_create)(GblYear       year,
+                                             GblMonth      month/*=1*/,
+                                             GblDay        day  /*=1*/,
+                                             GblHour       hours/*=0*/,
+                                             GblMinute     mins /*=0*/,
+                                             GblSecond     secs /*=0*/,
+                                             GblNanoSecond ns   /*=0*/,
+                                             GblSecond     tzOff/*=0*/)
+{
+    GblDateTime* pDt = GblRef_create(sizeof(GblDateTime));
+    return GblDateTime_set(pDt,
+                          year,
+                          month,
+                          day,
+                          hours,
+                          mins,
+                          secs,
+                          ns,
+                          tzOff);
 
-    pVariant->time = time(NULL);
-
-    return GBL_RESULT_SUCCESS;
 }
 
-
-static GBL_RESULT GblTimestamp_save_(const GblVariant* pVariant, GblStringBuffer* pString) {
-    GBL_CTX_BEGIN(NULL);
-    GblStringBuffer_appendPrintf(pString, "%u", pVariant->u64);
-    GBL_CTX_END();
+GBL_EXPORT GblDateTime* GblDateTime_ref(GblDateTime* pDt) {
+    return GblRef_ref(pDt);
 }
 
-static GBL_RESULT GblTimestamp_load_(GblVariant* pVariant, const GblStringBuffer* pString) {
-    GBL_CTX_BEGIN(NULL);
-    int integer = GblStringView_toUint64(GblStringBuffer_view(pString));
-    pVariant->u64 = (uint64_t)integer;
-    GBL_CTX_END();
+GBL_EXPORT GblRefCount GblDateTime_unref(GblDateTime* pDt) {
+    return GblRef_unref(pDt);
 }
 
-static GBL_RESULT GblTimestamp_set_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
-    GBL_CTX_BEGIN(NULL);
-    GBL_UNUSED(argc);
-    GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
-    GBL_CTX_VERIFY_TYPE(pArgs->type, GBL_UINT64_TYPE);
-    pVariant->time = pArgs->u64;
-    GBL_CTX_END();
-}
-
-static GBL_RESULT GblTimestamp_get_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
-    GBL_CTX_BEGIN(NULL);
-    GBL_UNUSED(argc);
-    GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
-    GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
-    *((uint64_t*)pArgs->pVoid) = pVariant->u64;
-    GBL_CTX_END();
-}
-
-static GBL_RESULT GblTimestamp_compare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
-    GBL_CTX_BEGIN(NULL);
-    if(pVariant->time > pOther->time)       *pResult = 1;
-    else if (pVariant->time < pOther->time) *pResult = -1;
-    else                                    *pResult = 0;
-    GBL_CTX_END();
-}
-
-static GBL_RESULT GblTimestamp_convert_(const GblVariant* pVariant, GblVariant* pOther) {
+static GBL_RESULT GblDateTime_convert_(const GblVariant* pVariant, GblVariant* pOther) {
     const GblType typeSrc = GblVariant_typeOf(pVariant);
     const GblType typeDst = GblVariant_typeOf(pOther);
 
-    if(typeSrc == GBL_TIMESTAMP_TYPE) {
-        GBL_ASSERT(typeDst == GBL_STRING_TYPE);
+    if(typeSrc == GBL_DATE_TIME_TYPE) {
 
-        struct {
-            GblStringBuffer buff;
-            char            stack[GBL_DATE_TIME_ISO8601_STRING_SIZE];
-        } str;
-        GblDateTime dt;
+        if(typeDst == GBL_STRING_TYPE) {
+            struct {
+                GblStringBuffer buff;
+                char            stack[GBL_DATE_TIME_ISO8601_STRING_SIZE];
+            } str;
 
-        GblStringBuffer_construct(&str.buff, GBL_STRV(""), sizeof(str));
-        GblDateTime_fromUnix(&dt, pVariant->time);
-        GblDateTime_toIso8601(&dt, &str.buff);
-        GblVariant_setString(pOther, GblStringBuffer_cString(&str.buff));
-        GblStringBuffer_destruct(&str.buff);
+            GblStringBuffer_construct(&str.buff, GBL_STRV(""), sizeof(str));
+            //GblDateTime_fromUnix(&dt, pVariant->time);
+            GblDateTime_toIso8601(pVariant->pDateTime, &str.buff);
+            GblVariant_setString(pOther, GblStringBuffer_cString(&str.buff));
+            GblStringBuffer_destruct(&str.buff);
+        } else if(typeDst == GBL_UINT64_TYPE) {
+            GblVariant_setUint64(pOther, GblDateTime_toUnix(pVariant->pDateTime));
+        }
 
     } else if(typeSrc == GBL_STRING_TYPE) {
-        GBL_ASSERT(typeDst == GBL_TIMESTAMP_TYPE);
+        GBL_ASSERT(typeDst == GBL_DATE_TIME_TYPE);
 
         GblDateTime dt;
 
 
-    } else GBL_ASSERT(GBL_FALSE);
+    } else if(typeSrc == GBL_UINT64_TYPE) {
+        GblDateTime_fromUnix(pOther->pDateTime, pVariant->u64);
+    }
 
     return GBL_TRUE;
 }
 
-GBL_EXPORT GblType GblTimestamp_type(void) {
+GBL_EXPORT GblType GblDateTime_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
-    const static GblIVariantVTable timestampIVariantIFace =  {
-            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE       |
-                            GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT |
-                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY    |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY    |
-                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
-            .pSetValueFmt   = { "z"},
-            .pGetValueFmt   = { "p" },
-            .pFnSet         = GblTimestamp_set_,
-            .pFnGet         = GblTimestamp_get_,
-            .pFnCompare     = GblTimestamp_compare_,
-            .pFnSave        = GblTimestamp_save_,
-            .pFnLoad        = GblTimestamp_load_
-      };
-
     if(type == GBL_INVALID_TYPE) {
-        type = GblPrimitive_register("GblTimestamp",
-                                     sizeof(GblTimestampClass),
-                                     0,
-                                     &timestampIVariantIFace,
-                                     GBL_TYPE_FLAGS_NONE);
+        type = GblOpaque_registerRef("GblDateTime");
 
-        GblVariant_registerConverter(type, GBL_STRING_TYPE, GblTimestamp_convert_);
-        GblVariant_registerConverter(GBL_STRING_TYPE, type, GblTimestamp_convert_);
+        GblVariant_registerConverter(type, GBL_STRING_TYPE, GblDateTime_convert_);
+        GblVariant_registerConverter(type, GBL_UINT64_TYPE, GblDateTime_convert_);
     }
 
     return type;

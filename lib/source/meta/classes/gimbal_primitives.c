@@ -1044,12 +1044,57 @@ static GBL_RESULT typeConvert_(const GblVariant* pVariant, GblVariant* pOther) {
     GBL_CTX_END();
 }
 
+static GBL_RESULT bitmaskSet_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_UNUSED(argc);
+    GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY);
+    GBL_CTX_VERIFY_TYPE(pArgs->type, GBL_UINT64_TYPE);
+    pVariant->bitmask = (GblType)pArgs->u64;
+    GBL_CTX_END();
+}
 
-GblType GblPrimitive_register(const char*                     pName,
-                              size_t                          classSize,
-                              size_t                          classPrivateSize,
-                              const GblIVariantVTable*   pVTable,
-                              GblFlags                        typeFlags)
+static GBL_RESULT bitmaskGet_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+    GBL_CTX_BEGIN(NULL);
+    GBL_UNUSED(argc);
+    GBL_CTX_VERIFY_EXPRESSION(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY | GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK);
+    GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
+    *((GblBitmask*)pArgs->pVoid) = pVariant->bitmask;
+    GBL_CTX_END();
+}
+
+
+static GBL_RESULT bitmaskCompare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
+    GBL_CTX_BEGIN(NULL);
+    if(pVariant->bitmask > pOther->bitmask)         *pResult = 1;
+    else if (pVariant->bitmask < pOther->bitmask)   *pResult = -1;
+    else                                            *pResult = 0;
+    GBL_CTX_END();
+}
+
+static GBL_RESULT bitmaskConvert_(const GblVariant* pVariant, GblVariant* pOther) {
+    GBL_CTX_BEGIN(NULL);
+    const GblType type = GblVariant_typeOf(pOther);
+    if(type == GBL_UINT64_TYPE) {
+        GblVariant_setUint64(pOther, pOther->bitmask);
+    } else if(type == GBL_UINT32_TYPE) {
+        //check mask pos + size
+    } else if(type == GBL_UINT16_TYPE) {
+
+    } else if(type == GBL_UINT8_TYPE) {
+
+    } else if(type == GBL_STRING_TYPE) {
+        // hexadecimal
+    }
+    else
+        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
+    GBL_CTX_END();
+}
+
+GblType GblPrimitive_register(const char*              pName,
+                              size_t                   classSize,
+                              size_t                   classPrivateSize,
+                              const GblIVariantVTable* pVTable,
+                              GblFlags                 typeFlags)
 {
     GblType type = GBL_INVALID_TYPE;
     GBL_CTX_BEGIN(NULL);
@@ -1657,3 +1702,37 @@ GBL_EXPORT GblType GblType_type(void) {
 
     return type;
 }
+
+GBL_EXPORT GblType GblBitmask_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    // =============== TYPE ===============
+    const static GblIVariantVTable typeIVariantIFace =  {
+            .supportedOps = GBL_IVARIANT_OP_FLAG_RELOCATABLE    |
+                            GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY |
+                            GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
+            .pSetValueFmt   = { "z"},
+            .pGetValueFmt   = { "p" },
+            .pFnSet         = bitmaskSet_,
+            .pFnGet         = bitmaskGet_,
+            .pFnCompare     = bitmaskCompare_
+      };
+
+    if(type == GBL_INVALID_TYPE) {
+        type = GblPrimitive_register(GblQuark_internStringStatic("GblBitmask"),
+                                     sizeof(GblPrimitiveClass),
+                                     0,
+                                     &typeIVariantIFace,
+                                     GBL_TYPE_FLAGS_NONE);
+
+        // =============== TYPE ===============
+        GblVariant_registerConverter(type, GBL_STRING_TYPE, bitmaskConvert_);
+
+        GblVariant_registerConverter(GBL_STRING_TYPE, type, bitmaskConvert_);
+
+    }
+
+    return type;
+}
+

@@ -12,17 +12,17 @@
 #define GBL_SCANNER_CHAR_(self, idx)            (GblStringView_at(GBL_SCANNER_(self)->streamBuffer, idx))
 
 GBL_DECLARE_STRUCT(GblScannerClass_) {
-    GblStringRef* pDefaultDelimeters;
+    const GblStringRef* pDefaultDelimeters;
 };
 
 GBL_DECLARE_STRUCT(GblScanner_) {
-    GblArrayList  cursorStack;
-    GblStringView streamBuffer;
-    GblStringRef* pInputString;
-    GblStringRef* pDelimeters;
+    GblArrayList        cursorStack;
+    GblStringView       streamBuffer;
+    const GblStringRef* pInputString;
+    const GblStringRef* pDelimeters;
 };
 
-GBL_EXPORT GblStringRef* GblScannerClass_defaultDelimeters(const GblScannerClass* pClass) {
+GBL_EXPORT const GblStringRef* GblScannerClass_defaultDelimeters(const GblScannerClass* pClass) {
     return GBL_SCANNER_CLASS_(pClass)->pDefaultDelimeters;
 }
 
@@ -33,7 +33,7 @@ GBL_EXPORT void GblScannerClass_setDefaultDelimeters(GblScannerClass* pClass, co
     if(pStr) pClass_->pDefaultDelimeters = GblStringRef_create(pStr);
 }
 
-GBL_EXPORT void GblScannerClass_setDefaultDelimetersRef(GblScannerClass* pClass, GblStringRef* pRef) {
+GBL_EXPORT void GblScannerClass_setDefaultDelimetersRef(GblScannerClass* pClass, const GblStringRef* pRef) {
     GblScannerClass_* pClass_ = GBL_SCANNER_CLASS_(pClass);
 
     GblStringRef_unref(pClass_->pDefaultDelimeters);
@@ -69,20 +69,28 @@ GBL_EXPORT GblScanner* GblScanner_create(const char* pStr,
     return pScanner;
 }
 
+GBL_EXPORT GblScanner* GblScanner_ref(GblScanner* pSelf) {
+    return GBL_SCANNER(GBL_REF(pSelf));
+}
+
 GBL_EXPORT GblRefCount GblScanner_unref(GblScanner* pSelf) {
     return GBL_UNREF(pSelf);
 }
 
-GBL_EXPORT GblStringRef* GblScanner_input(const GblScanner* pSelf) {
+GBL_EXPORT const GblStringRef* GblScanner_input(const GblScanner* pSelf) {
     return GBL_SCANNER_(pSelf)->pInputString;
 }
 
-GBL_EXPORT void GblScanner_setInput(GblScanner* pSelf, const char* pStr, size_t length) {
+GBL_EXPORT void GblScanner_setInputRef(GblScanner* pSelf, const GblStringRef* pRef) {
     GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
     GblStringRef_unref(pSelf_->pInputString);
-    pSelf_->pInputString = GblStringRef_create(pStr, length);
+    pSelf_->pInputString = pRef;
     GblScanner_reset(pSelf);
+}
+
+GBL_EXPORT void GblScanner_setInput(GblScanner* pSelf, const char* pStr, size_t length) {
+    GblScanner_setInputRef(pSelf, GblStringRef_create(pStr, length));
 }
 
 void GblScanner_reset(GblScanner* pSelf) {
@@ -105,7 +113,7 @@ void GblScanner_reset(GblScanner* pSelf) {
                        GBL_SCANNER_OK;
 }
 
-GBL_EXPORT GblStringRef* GblScanner_delimeters(const GblScanner* pSelf) {
+GBL_EXPORT const GblStringRef* GblScanner_delimeters(const GblScanner* pSelf) {
     return GBL_SCANNER_(pSelf)->pDelimeters;
 }
 
@@ -501,6 +509,15 @@ GBL_EXPORT GblBool GblScanner_peekType(GblScanner* pSelf, GblType type, ...) {
     return success;
 }
 
+GBL_EXPORT GblBool GblScanner_peekTypeVa(GblScanner* pSelf, GblType t, va_list* pVa) {
+    return GblScanner_readType_(pSelf,
+                                t,
+                                &pSelf->next,
+                                GBL_SCANNER_PEEK_ERROR,
+                                GBL_FALSE,
+                                pVa);
+}
+
 GBL_EXPORT GblBool GblScanner_scanType(GblScanner* pSelf, GblType type, ...) {
     va_list varArgs;
     va_start(varArgs, type);
@@ -516,6 +533,15 @@ GBL_EXPORT GblBool GblScanner_scanType(GblScanner* pSelf, GblType type, ...) {
     va_end(varArgs);
 
     return success;
+}
+
+GBL_EXPORT GblBool GblScanner_scanTypeVa(GblScanner* pSelf, GblType t, va_list* pVa) {
+    return GblScanner_readType_(pSelf,
+                                t,
+                                &pSelf->token,
+                                GBL_SCANNER_SCAN_ERROR,
+                                GBL_TRUE,
+                                pVa);
 }
 
 static GblBool GblScanner_readMatch_(GblScanner*    pSelf,
@@ -556,12 +582,22 @@ GBL_EXPORT GblBool GblScanner_peekMatch(GblScanner* pSelf, const char* pPattern)
                                  GBL_FALSE);
 }
 
+GBL_EXPORT GblBool GblScanner_peekPattern(GblScanner* pSelf, const GblPattern* pPat) {
+    GBL_ASSERT(GBL_FALSE);
+    return GBL_FALSE;
+}
+
 GBL_EXPORT GblBool GblScanner_scanMatch(GblScanner* pSelf, const char* pPattern) {
     return GblScanner_readMatch_(pSelf,
                                  pPattern,
                                  &pSelf->token,
                                  GBL_SCANNER_SCAN_ERROR,
                                  GBL_TRUE);
+}
+
+GBL_EXPORT GblBool GblScanner_scanPattern(GblScanner* pSelf, const GblPattern* pPat) {
+    GBL_ASSERT(GBL_FALSE);
+    return GBL_FALSE;
 }
 
 GBL_EXPORT GblBool GblScanner_skipMatch(GblScanner* pSelf, const char* pStr) {
@@ -579,6 +615,11 @@ GBL_EXPORT GblBool GblScanner_skipMatch(GblScanner* pSelf, const char* pStr) {
     return GblScanner_advance_(pSelf, pSelf->token.pData - pStreamBuffer + pSelf->token.length);
 }
 
+GBL_EXPORT GblBool GblScanner_skipPattern(GblScanner* pSelf, const GblPattern* pPattern) {
+    GBL_ASSERT(GBL_FALSE);
+    return GBL_FALSE;
+}
+
 GBL_EXPORT GblBool GblScanner_skipToMatch(GblScanner* pSelf, const char* pStr) {
     GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
@@ -592,6 +633,11 @@ GBL_EXPORT GblBool GblScanner_skipToMatch(GblScanner* pSelf, const char* pStr) {
     }
 
     return GblScanner_advance_(pSelf, pSelf->token.pData - pStreamBuffer);
+}
+
+GBL_EXPORT GblBool GblScanner_skipToPattern(GblScanner* pSelf, const GblPattern* pPattern) {
+    GBL_ASSERT(GBL_FALSE);
+    return GBL_FALSE;
 }
 
 GBL_EXPORT GblBool GblScanner_skipBytes(GblScanner* pSelf, size_t count) {

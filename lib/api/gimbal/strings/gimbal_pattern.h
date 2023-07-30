@@ -1,20 +1,25 @@
 /*! \file
- *  \brief   GblPattern RegExp-style pattern matching
+ *  \brief   GblPattern: RegExp-style pattern matching
  *  \ingroup strings
  *
- *  \todo
- *      - Refactor GblPattern_matchNot() to be less disgusting
- *      - GblPattern_matchNot() incorrect when more than one match in a row
+ *  This file contains the API and opaque structure declaration
+ *  for GblPattern, which represents a compiled regular expression,
+ *  used for string matching operations.
+ *
+ *  \note
+ *  LibGimbal uses a fork of the the Tiny C RegEx library for its
+ *  back-end lowest-level regular expression pattern matching.
+ *
  *  \bug
  *      - GblPattern_match(): multiple back-to-back matches are not counted properly
  *
- *  \author Falco Girgis
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
-
 #ifndef GIMBAL_PATTERN_H
 #define GIMBAL_PATTERN_H
 
-#include "../core/gimbal_ctx.h"
+#include "../core/gimbal_decls.h"
 
 #define GBL_SELF_TYPE GblPattern
 
@@ -22,75 +27,137 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblStringView);
 
-/*! Opaque structure representing a compiled regular expression
+/*! Opaque structure containing a compiled regular expression
+ *
+ *  GblPattern is the compiled version of a regular expression
+ *  string, produced by GblPattern_compile(). It is faster
+ *  than working with raw regular expression strings, since
+ *  preprocessing has already been done.
+ *
+ *  It is advised that when you are repeatedly using the same
+ *  regular expression, you store it and use it as a GblPattern.
+ *
  *  \ingroup strings
  */
 typedef struct GblPattern GblPattern;
 
-// ===== Public API =====
-GBL_EXPORT const GblPattern*
-                   GblPattern_compile       (const char* pRegExp)            GBL_NOEXCEPT;
+//! Compiles the given regular expression into a pre-processed GblPattern
+GBL_EXPORT const GblPattern* GblPattern_compile (const char* pRegExp) GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool GblPattern_match         (GBL_CSELF,
-                                             const char*    pString,
-                                             GblStringView* pMatch/*=NULL*/,
-                                             int*           pCount/*=NULL*/) GBL_NOEXCEPT;
+/*! \name Matching
+ *  \brief Methods for generic pattern matching
+ *  @{
+ */
+/*! Finds the numbered match given by \p pCount, or 1 if NULL.
+ *
+ *  GblPattern_match() searches through \p pString for substrings
+ *  which match the pattern given by \p pSelf. When it has found
+ *  the number of matches equal to the value given by \p pCount
+ *  (or 1 if \p pCount is NULL), \p pMatch is set to the substring
+ *  of the final match (or ignored when NULL) and GBL_TRUE is
+ *  returned. If the match could not be found, GBL_FALSE is returned.
+ *
+ *  \note
+ *  When \p pCount points to a value of 0, no matches are expected
+ *  to be found. If a match is found, GBL_FALSE is returned, otherwise
+ *  GBL_TRUE is returned (inverted from normal).
+ *
+ *  \note
+ *  When \p pCount points to a value of -1, all matches are searched,
+ *  with \p pMatch being updated to point to the final one and \p pCount
+ *  being updated to store the final number of matches.
+ *
+ *  \param pSelf        The precompiled regular expression pattern
+ *  \param pString      The input string to search for matches within
+ *  \param pMatch       (Optional) Output used to hold the final match substring
+ *  \param pCount       (Optional, defaults to 1) Number of matches to find
+ *
+ *  \retval GBL_FALSE   The requested match number wasn't found.
+ *  \retval GBL_TRUE    The requested match number was found.
+ *
+ *  \sa GblPattern_matchNot()
+ */
+GBL_EXPORT GblBool GblPattern_match    (GBL_CSELF,
+                                        const char*    pString,
+                                        GblStringView* pMatch/*=NULL*/,
+                                        int*           pCount/*=NULL*/) GBL_NOEXCEPT;
+//! Dynamically-compiled string-based version of GblPattern_match()
+GBL_EXPORT GblBool GblPattern_matchStr (const char*    pRegExp,
+                                        const char*    pString,
+                                        GblStringView* pMatch/*=NULL*/,
+                                        int*           pCount/*=NULL*/) GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GblBool GblPattern_matchStr      (const char*    pRegExp,
-                                             const char*    pString,
-                                             GblStringView* pMatch/*=NULL*/,
-                                             int*           pCount/*=NULL*/) GBL_NOEXCEPT;
+/*! \name Inverse Matching
+ *  \brief Methods for returning non matches
+ *  @{
+ */
+//! Behaves like GblPattern_match() except searching for NON-MATCHES
+GBL_EXPORT GblBool GblPattern_matchNot    (GBL_CSELF,
+                                           const char*    pString,
+                                           GblStringView* pMatch/*=NULL*/,
+                                           int*           pCount/*=NULL*/) GBL_NOEXCEPT;
+//! Dynamically-compiled string-based version of GblPattern_matchNot()
+GBL_EXPORT GblBool GblPattern_matchNotStr (const char*    pRegExp,
+                                           const char*    pString,
+                                           GblStringView* pMatch/*=NULL*/,
+                                           int*           pCount/*=NULL*/) GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GblBool GblPattern_matchNot      (GBL_CSELF,
-                                             const char*    pString,
-                                             GblStringView* pMatch/*=NULL*/,
-                                             int*           pCount/*=NULL*/) GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool GblPattern_matchNotStr   (const char*    pRegExp,
-                                             const char*    pString,
-                                             GblStringView* pMatch/*=NULL*/,
-                                             int*           pCount/*=NULL*/) GBL_NOEXCEPT;
-
+/*! \name Exact Matching
+ *  \brief Methods for checking exact matches
+ *  @{
+ */
+ //! Returns GBL_TRUE if the given string EXACTLY matches the given pattern or GBL_FALSE otherwise
 GBL_EXPORT GblBool GblPattern_matchExact    (GBL_CSELF, const char* pString) GBL_NOEXCEPT;
-
+//! Dynamically compiled string-based version of GblPattern_matchExact()
 GBL_EXPORT GblBool GblPattern_matchExactStr (const char* pRegExp,
                                              const char* pString)            GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT size_t  GblPattern_matchCount    (GBL_CSELF, const char* pString) GBL_NOEXCEPT;
+/*! \name Match Counting
+ *  \brief Methods used for counting matches
+ *  @{
+ */
+//! Returns the number of pattern matches found in \p pString
+GBL_EXPORT size_t GblPattern_matchCount    (GBL_CSELF, const char* pString) GBL_NOEXCEPT;
+//! Dynamically compiled, string-based version of GblPattern_matchExact()
+GBL_EXPORT size_t GblPattern_matchCountStr (const char* pRegExp,
+                                            const char* pString)            GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT size_t  GblPattern_matchCountStr (const char* pRegExp,
-                                             const char* pString)            GBL_NOEXCEPT;
+GBL_DECLS_END
 
-// ===== Default Argument Wrapper Macros ====-
-#define GblPattern_match(...)               (GblPattern_matchDefault_(__VA_ARGS__))
-#define GblPattern_matchStr(...)            (GblPattern_matchStrDefault_(__VA_ARGS__))
-#define GblPattern_matchNot(...)            (GblPattern_matchNotDefault_(__VA_ARGS__))
-#define GblPattern_matchNotStr(...)         (GblPattern_matchNotStrDefault_(__VA_ARGS__))
-
-// ===== Implementation =====
-///\cond
+//! \cond
+#define GblPattern_match(...) \
+    (GblPattern_matchDefault_(__VA_ARGS__))
 #define GblPattern_matchDefault_(...) \
     (GblPattern_matchDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL))
 #define GblPattern_matchDefault__(pat, str, match, count, ...) \
     ((GblPattern_match)(pat, str, match, count))
 
+#define GblPattern_matchStr(...) \
+    (GblPattern_matchStrDefault_(__VA_ARGS__))
 #define GblPattern_matchStrDefault_(...) \
     (GblPattern_matchStrDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL))
 #define GblPattern_matchStrDefault__(exp, str, match, count, ...) \
     ((GblPattern_matchStr)(exp, str, match, count))
 
+#define GblPattern_matchNot(...) \
+    (GblPattern_matchNotDefault_(__VA_ARGS__))
 #define GblPattern_matchNotDefault_(...) \
     (GblPattern_matchNotDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL))
 #define GblPattern_matchNotDefault__(pat, str, match, count, ...) \
     ((GblPattern_matchNot)(pat, str, match, count))
 
+#define GblPattern_matchNotStr(...) \
+    (GblPattern_matchNotStrDefault_(__VA_ARGS__))
 #define GblPattern_matchNotStrDefault_(...) \
     (GblPattern_matchNotStrDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL))
 #define GblPattern_matchNotStrDefault__(exp, str, match, count, ...) \
     ((GblPattern_matchNotStr)(exp, str, match, count))
-///\endcond
-
-GBL_DECLS_END
+//! \endcond
 
 #undef GBL_SELF_TYPE
 

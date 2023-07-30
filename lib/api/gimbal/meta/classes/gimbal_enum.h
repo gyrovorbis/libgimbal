@@ -19,7 +19,7 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_ENUM_TYPE           (GblEnum_type())                 //!< Type UUID of GblEnumClass
+#define GBL_ENUM_TYPE           (GBL_TYPEID(GblEnum))            //!< Type UUID of GblEnumClass
 #define GBL_ENUM_CLASS(klass)   (GBL_CLASS_CAST(GblEnum, klass)) //!< Function-style GblClass cast
 //! @}
 
@@ -51,9 +51,9 @@ typedef struct GblEnumEntry {
  *  the valid values for the enumerated type.
  */
 GBL_CLASS_DERIVE(GblEnum, GblPrimitive)
-    GblEnum   valueMax;     //!< Cached maximum value of the enum (used for validation)
-    GblEnum   valueMin;     //!< Cached minimum value of the enum (used for validation)
-    uint16_t  entryCount;   //!< Cached number of values in the entry table
+    GblEnum  valueMax;     //!< Cached maximum value of the enum (used for validation)
+    GblEnum  valueMin;     //!< Cached minimum value of the enum (used for validation)
+    uint16_t entryCount;   //!< Cached number of values in the entry table
 GBL_CLASS_END
 
 // ========== GblEnumClass ==========

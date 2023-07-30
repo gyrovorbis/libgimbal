@@ -686,11 +686,68 @@ GBL_TEST_CASE(dateTimeToIso8601) {
 
 GBL_TEST_CASE(variantConstructDefault)
     GblVariant v;
-    GblVariant_constructDefault(&v, GBL_TIMESTAMP_TYPE);
+    GblDateTime* pDt, now;
+    GblVariant_constructDefault(&v, GBL_DATE_TIME_TYPE);
+    GblVariant_peekValue(&v, &pDt);
+
+    //GBL_TEST_VERIFY(GblDateTime_compare(GblDateTime_nowUtc(&now),
+     //                                   &pDt) >= 0);
 
     GblVariant_destruct(&v);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(variantCompare)
+    GblVariant v[2];
+    GblVariant_constructValueMove(&v[0], GBL_DATE_TIME_TYPE,
+                                  GblDateTime_create(1999));
+    GblVariant_constructCopy(&v[1], &v[0]);
+
+    GBL_TEST_VERIFY(GblVariant_equals(&v[1], &v[0]));
+
+    GblDateTime dt = {
+        .date = {
+            .year = 1999,
+            .month = 1,
+            .day = 1
+        }
+    };
+
+    GblDateTime dt2;
+
+    GBL_TEST_VERIFY(GblDateTime_compare(GblVariant_getDateTime(&v[1]),
+                                        &dt) == 0);
+
+    GblVariant_destruct(&v[0]);
+    GblVariant_destruct(&v[1]);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(variantString)
+    GblVariant v;
+
+    GblVariant_constructValueMove(&v, GBL_DATE_TIME_TYPE,
+                                  GblDateTime_create(2041, GBL_MONTH_APRIL, 20,
+                                                     14, 1, 55));
+
+    GBL_TEST_COMPARE(GblVariant_toString(&v),
+                     "2041-04-20T14:01:55+0000");
+
+    GblVariant_destruct(&v);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(variantUnixTime)
+    GblVariant v;
+
+    GBL_TEST_SKIP("Fixme");
+
+   // GblVariant_constructValueMove(&v, GBL_DATE_TIME_TYPE,
+    //                          GblDateTime_create(2041, GBL_MONTH_APRIL, 20,
+                                           //      14, 1, 55, 0, -GblTime_localUtcOffset()));
+
+    const time_t unix = GblVariant_toUint64(&v);
+
+    GBL_TEST_COMPARE(unix, 2250097315);
+    GblVariant_destruct(&v);
+GBL_TEST_CASE_END
 
 GBL_TEST_REGISTER(dateIsLeapYear,
                   dateMonthDays,
@@ -729,4 +786,8 @@ GBL_TEST_REGISTER(dateIsLeapYear,
                   dateTimeAddNanoSecs,
                   dateTimeAddMicroSecs,
                   dateTimeAddMilliSecs,
-                  dateTimeToIso8601)
+                  dateTimeToIso8601,
+                  variantConstructDefault,
+                  variantCompare,
+                  variantString,
+                  variantUnixTime)
