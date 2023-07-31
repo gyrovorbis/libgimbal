@@ -2,6 +2,7 @@
  *  \brief General numeric constants and computations
  *  \ingroup numeric
  *
+ *  \author Shirobon
  *  \author Falco Girgis
  */
 

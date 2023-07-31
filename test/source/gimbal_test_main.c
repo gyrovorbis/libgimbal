@@ -1,6 +1,7 @@
 #include <gimbal/test/gimbal_test_scenario.h>
 #include "algorithms/gimbal_sort_test_suite.h"
 #include "algorithms/gimbal_hash_test_suite.h"
+#include "algorithms/gimbal_sha1_test_suite.h"
 #include "containers/gimbal_linked_list_test_suite.h"
 #include "containers/gimbal_doubly_linked_list_test_suite.h"
 #include "containers/gimbal_nary_tree_test_suite.h"
@@ -129,6 +130,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_SORT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_HASH_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_SHA1_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_LINKED_LIST_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,

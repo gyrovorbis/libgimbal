@@ -31,6 +31,8 @@ set(GIMBAL_TEST_SOURCES
     source/algorithms/gimbal_sort_test_suite.c
     include/algorithms/gimbal_hash_test_suite.h
     source/algorithms/gimbal_hash_test_suite.c
+    include/algorithms/gimbal_sha1_test_suite.h
+    source/algorithms/gimbal_sha1_test_suite.c
     include/allocators/gimbal_arena_allocator_test_suite.h
     source/allocators/gimbal_arena_allocator_test_suite.c
     include/allocators/gimbal_pool_allocator_test_suite.h

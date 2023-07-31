@@ -5,7 +5,6 @@
  *  \author 2023 Falco Girgis
  *  \copyright MIT License
  */
-
 #ifndef GIMBAL_HASH_H
 #define GIMBAL_HASH_H
 
