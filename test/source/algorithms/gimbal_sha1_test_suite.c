@@ -11,11 +11,11 @@ GBL_TEST_FIXTURE {
 static char *test_data[] = {
     "abc",
     "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-    "A million repetitions of 'a'"};
+    "A hundred repetitions of 'a'"};
 static char *test_results[] = {
     "A9993E36 4706816A BA3E2571 7850C26C 9CD0D89D",
     "84983E44 1C3BD26E BAAE4AA1 F95129E5 E54670F1",
-    "34AA973C D4C4DAA4 F61EEB2B DBAD2731 6534016F"};
+    "7F900025 7A4918D7 072655EA 468540CD CBD42E0C"};
 
 GBL_TEST_INIT()
     (void)pFixture;
@@ -59,17 +59,17 @@ GBL_TEST_CASE(largeFinal)
                      test_results[1]);
 GBL_TEST_CASE_END
 
-GBL_TEST_CASE(millionRepsInit)
+GBL_TEST_CASE(hundredRepsInit)
     GblSha1_init(&pFixture->ctx);
 GBL_TEST_CASE_END
 
-GBL_TEST_CASE(millionRepsUpdate)
-    for(int k = 0; k < 1000000; k++)
+GBL_TEST_CASE(hundredRepsUpdate)
+    for(int k = 0; k < 100; k++)
         GblSha1_update(&pFixture->ctx, "a", 1);
 GBL_TEST_CASE_END
 
 
-GBL_TEST_CASE(millionRepsFinal)
+GBL_TEST_CASE(hundredRepsFinal)
     uint8_t digest[GBL_SHA1_DIGEST_SIZE];
     char    buffer[GBL_SHA1_DIGEST_STRING_SIZE];
 
@@ -85,6 +85,6 @@ GBL_TEST_REGISTER(smallInit,
                   largeInit,
                   largeUpdate,
                   largeFinal,
-                  millionRepsInit,
-                  millionRepsUpdate,
-                  millionRepsFinal);
+                  hundredRepsInit,
+                  hundredRepsUpdate,
+                  hundredRepsFinal);

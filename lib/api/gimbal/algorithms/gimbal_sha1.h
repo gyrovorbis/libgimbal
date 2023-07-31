@@ -46,26 +46,26 @@ typedef struct GblSha1Context {
  *  @{
  */
 //! Initializes the given SHA1 context
-GBL_EXPORT void GblSha1_init   (GBL_SELF);
+GBL_EXPORT void GblSha1_init   (GBL_SELF) GBL_NOEXCEPT;
 
 //! Adds the data in \p pData of \p length bytes to the running SHA1 hash context
 GBL_EXPORT void GblSha1_update (GBL_SELF,
                                 const void* pData,
-                                size_t      length);
+                                size_t      length) GBL_NOEXCEPT;
 //! Finalizes the running SHA1 hash context, returning its digest
 GBL_EXPORT void GblSha1_final  (GBL_SELF,
-                                uint8_t digest[GBL_SHA1_DIGEST_SIZE]);
+                                uint8_t digest[GBL_SHA1_DIGEST_SIZE]) GBL_NOEXCEPT;
 //! @}
 
 //! Returns the display-friendly hexadecimal form of the given digest, with each 32-bit word separated by a space
 GBL_EXPORT const char*
                 GblSha1_string (const uint8_t digest[GBL_SHA1_DIGEST_SIZE],
-                                char          buffer[GBL_SHA1_DIGEST_STRING_SIZE]);
+                                char          buffer[GBL_SHA1_DIGEST_STRING_SIZE]) GBL_NOEXCEPT;
 
 /*! Standalone convenience function for generating a 32-bit SHA1 hash from the given bytes
  * \ingroup hashing
 */
-GBL_EXPORT GblHash gblHashSha1 (const void* pData, size_t size);
+GBL_EXPORT GblHash gblHashSha1 (const void* pData, size_t size) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

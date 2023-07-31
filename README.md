@@ -164,4 +164,5 @@ Falco Girgis
   - https://git.musl-libc.org/cgit/musl/tree/src/time/strptime.c
 - GblPattern engine back-end: tiny-regex-c 
   - https://github.com/kokke/tiny-regex-c
-
+- GblSha1 SHA1 hashing back-end: Steve Reid (Public Domain)
+- GblMd5 MD5 hashing back-end: RSA Data Security, Inc.
