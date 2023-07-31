@@ -236,7 +236,7 @@ static GBL_RESULT GblTestBox_ITableVariant_index_(const GblVariant* pVariant, co
 
     GBL_CTX_BEGIN(NULL);
 
-    GblTestBox* pSelf  = GBL_TEST_BOX(GblVariant_getBoxPeek(pVariant));
+    GblTestBox* pSelf  = GBL_TEST_BOX(GblVariant_boxPeek(pVariant));
 
     GblVariant_constructCopy(&k, pKey);
     const char* pField = GblVariant_toString(&k);
@@ -266,7 +266,7 @@ static GBL_RESULT GblTestBox_ITableVariant_setIndex_(const GblVariant* pVariant,
 
     GBL_CTX_BEGIN(NULL);
 
-    GblTestBox* pSelf  = GBL_TEST_BOX(GblVariant_getBoxPeek(pVariant));
+    GblTestBox* pSelf  = GBL_TEST_BOX(GblVariant_boxPeek(pVariant));
 
     GblVariant_constructCopy(&k, pKey);
     const char* pField = GblVariant_toString(&k);
@@ -280,7 +280,7 @@ static GBL_RESULT GblTestBox_ITableVariant_setIndex_(const GblVariant* pVariant,
     else if(!strcmp(pField, "string")) {
         GblVariant_toString(pValue);
         GblStringRef_unref(pSelf->pString);
-        GblVariant_moveValue(pValue, &pSelf->pString);
+        GblVariant_valueMove(pValue, &pSelf->pString);
     } else GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_KEY,
                        "Failed to set unknown field: %s[%s] = %s",
@@ -296,7 +296,7 @@ static GBL_RESULT GblTestBox_ITableVariant_setIndex_(const GblVariant* pVariant,
 static GBL_RESULT GblTestBox_ITableVariant_next_(const GblVariant* pVariant, GblVariant* pKey, GblVariant* pValue) {
     GBL_CTX_BEGIN(NULL);
 
-    GblTestBox* pSelf = GBL_TEST_BOX(GblVariant_getBoxPeek(pVariant));
+    GblTestBox* pSelf = GBL_TEST_BOX(GblVariant_boxPeek(pVariant));
 
     if(GblVariant_isNil(pKey)) {
         GblVariant_set(pKey, "integer");

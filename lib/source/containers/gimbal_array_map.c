@@ -19,7 +19,7 @@ static uintptr_t GblArrayMap_valueFromVariant_(GblVariant* pVariant) {
         if(pVariant->type == GBL_INVALID_TYPE)
             value = (uintptr_t)pVariant->pVoid;
         else
-           GblVariant_peekValue(pVariant, &value);
+           GblVariant_valuePeek(pVariant, &value);
     }
     return value;
 }

@@ -114,7 +114,7 @@ static GBL_RESULT enumConvertFrom_(const GblVariant* pVariant, GblVariant* pOthe
         GBL_CTX_CALL(GblVariant_setValueCopy(pOther,
                                              GblVariant_typeOf(pOther),
                                              GblEnumClass_valueFromName(pEnumClass,
-                                                                        GblVariant_getString(pVariant))));
+                                                                        GblVariant_string(pVariant))));
     else
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_CTX_END();

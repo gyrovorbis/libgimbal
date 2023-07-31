@@ -198,7 +198,7 @@ static GBL_RESULT GblArrayMapTestSuite_validate_variant_(GblTestSuite* pSelf, Gb
     pVariant = GblArrayMap_getVariant(&pMap, key);
     GBL_TEST_VERIFY(pVariant);
     uintptr_t val = 0;
-    GBL_TEST_COMPARE(GblVariant_peekValue(pVariant, &val), GBL_RESULT_SUCCESS);
+    GBL_TEST_COMPARE(GblVariant_valuePeek(pVariant, &val), GBL_RESULT_SUCCESS);
     GBL_TEST_COMPARE(val, value);
     GBL_TEST_COMPARE(GblArrayMap_atValue(&pMap, key), value);
     GBL_TEST_COMPARE(GblArrayMap_atVariant(&pMap, key), pVariant);
@@ -299,7 +299,7 @@ static GBL_RESULT GblArrayMapTestSuite_extractVariant_(GblTestSuite* pSelf, GblC
     GblVariant variant = GBL_VARIANT_INIT;
     GBL_CTX_VERIFY_CALL(GblArrayMap_extractVariant(&pSelf_->pMap1, (uintptr_t)"key4", &variant));
     uintptr_t value = 0;
-    GblVariant_peekValue(&variant, &value);
+    GblVariant_valuePeek(&variant, &value);
     GBL_TEST_COMPARE(value, 0xdeadbeef);
     GBL_TEST_COMPARE(GblArrayMap_size(&pSelf_->pMap1), 1);
     GBL_TEST_COMPARE(dtorCalls_, 2);

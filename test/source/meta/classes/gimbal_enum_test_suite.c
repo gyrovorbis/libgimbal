@@ -126,7 +126,7 @@ static GBL_RESULT GblEnumTestSuite_variant_(GblTestSuite* pSelf, GblContext* pCt
     // Default constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&v, pSelf_->enumType));
     GBL_TEST_VERIFY(GblVariant_typeOf(&v) == pSelf_->enumType);
-    GBL_TEST_COMPARE(GblVariant_getEnum(&v), RED);
+    GBL_TEST_COMPARE(GblVariant_enum(&v), RED);
 
     // Copy Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -141,29 +141,29 @@ static GBL_RESULT GblEnumTestSuite_variant_(GblTestSuite* pSelf, GblContext* pCt
 
     // Utility / Value Copy Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructEnum(&v, pSelf_->enumType, GREEN));
-    GBL_TEST_COMPARE(GblVariant_getEnum(&v), GREEN); // Utility / Get Value
+    GBL_TEST_COMPARE(GblVariant_enum(&v), GREEN); // Utility / Get Value
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
 
     // Value Move Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v, pSelf_->enumType, BLUE));
-    GBL_TEST_COMPARE(GblVariant_getEnum(&v), BLUE);
+    GBL_TEST_COMPARE(GblVariant_enum(&v), BLUE);
 
     // Utility / Value Set Copy
     GBL_CTX_VERIFY_CALL(GblVariant_setEnum(&v, pSelf_->enumType, RED));
-    GBL_TEST_COMPARE(GblVariant_getEnum(&v), RED);
+    GBL_TEST_COMPARE(GblVariant_enum(&v), RED);
 
     // Value Set Move
     GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(&v, pSelf_->enumType, GREEN));
-    GBL_TEST_COMPARE(GblVariant_getEnum(&v), GREEN);
+    GBL_TEST_COMPARE(GblVariant_enum(&v), GREEN);
 
     // Value Get Move
     GblEnum color = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &color));
+    GBL_CTX_VERIFY_CALL(GblVariant_valueMove(&v, &color));
     GBL_TEST_COMPARE(color, GREEN);
 
     // Value Get Peek
     GblVariant_setEnum(&v, pSelf_->enumType, BLUE);
-    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &color));
+    GBL_CTX_VERIFY_CALL(GblVariant_valuePeek(&v, &color));
     GBL_TEST_COMPARE(color, BLUE);
 
     // Destructor
@@ -202,49 +202,49 @@ static GBL_RESULT GblEnumTestSuite_variant_conversions_(GblTestSuite* pSelf, Gbl
     // Bool
     GBL_CTX_VERIFY_CALL(GblVariant_constructBool(&tVariant, GBL_FALSE));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getBool(&tVariant), GBL_TRUE);
+    GBL_TEST_COMPARE(GblVariant_bool(&tVariant), GBL_TRUE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint8
     GBL_CTX_VERIFY_CALL(GblVariant_setUint8(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getUint8(&tVariant), BLUE);
+    GBL_TEST_COMPARE(GblVariant_uint8(&tVariant), BLUE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint16
     GBL_CTX_VERIFY_CALL(GblVariant_setUint16(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getUint16(&tVariant), BLUE);
+    GBL_TEST_COMPARE(GblVariant_uint16(&tVariant), BLUE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Int16
     GBL_CTX_VERIFY_CALL(GblVariant_setInt16(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getInt16(&tVariant), BLUE);
+    GBL_TEST_COMPARE(GblVariant_int16(&tVariant), BLUE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint32
     GBL_CTX_VERIFY_CALL(GblVariant_setUint32(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getUint32(&tVariant), BLUE);
+    GBL_TEST_COMPARE(GblVariant_uint32(&tVariant), BLUE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Int32
     GBL_CTX_VERIFY_CALL(GblVariant_setInt32(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getInt32(&tVariant), BLUE);
+    GBL_TEST_COMPARE(GblVariant_int32(&tVariant), BLUE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint64
     GBL_CTX_VERIFY_CALL(GblVariant_setUint64(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getUint64(&tVariant), BLUE);
+    GBL_TEST_COMPARE(GblVariant_uint64(&tVariant), BLUE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_getStringView(&tVariant), GBL_STRV("BLUE")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("BLUE")));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // FROM String
@@ -252,7 +252,7 @@ static GBL_RESULT GblEnumTestSuite_variant_conversions_(GblTestSuite* pSelf, Gbl
     GBL_TEST_VERIFY(GblVariant_canConvert(GblVariant_typeOf(&tVariant), GblVariant_typeOf(&variant)));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&tVariant, &variant));
     GBL_CTX_VERIFY_CALL(GblVariant_equals(&tVariant, &variant));
-    GBL_TEST_COMPARE(GblVariant_getEnum(&variant), BLUE);
+    GBL_TEST_COMPARE(GblVariant_enum(&variant), BLUE);
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&variant));

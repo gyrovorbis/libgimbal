@@ -687,7 +687,7 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
                 GBL_CTX_VERIFY_CALL(GblVariant_constructPointer(&pArgValues[0], GBL_POINTER_TYPE, pConnection->pReceiver));
                 if(pVarArgs) {
                     for(size_t  a = 1; a < argCount; ++a) {
-                        GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopyVaList(&pArgValues[a],
+                        GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopyVa(&pArgValues[a],
                                                                                 pConnection->pSignal->argTypes[a-1],
                                                                                 pVarArgs));
                     }

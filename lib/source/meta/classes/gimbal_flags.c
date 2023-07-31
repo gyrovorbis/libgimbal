@@ -125,7 +125,7 @@ static GBL_RESULT flagsConvertFrom_(const GblVariant* pVariant, GblVariant* pOth
         GBL_CTX_CALL(GblVariant_setValueCopy(pOther,
                                              GblVariant_typeOf(pOther),
                                              GblFlagsClass_valueFromString(pFlagsClass,
-                                                                           GblVariant_getString(pVariant))));
+                                                                           GblVariant_string(pVariant))));
     else
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_CTX_END();

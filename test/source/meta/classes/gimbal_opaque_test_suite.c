@@ -62,7 +62,7 @@ static GBL_RESULT GblOpaqueTestSuite_variant_(GblTestSuite* pSelf, GblContext* p
     // Default constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&v, pSelf_->opaqueType));
     GBL_TEST_VERIFY(GblVariant_typeOf(&v) == pSelf_->opaqueType);
-    GBL_TEST_COMPARE(GblVariant_getOpaquePeek(&v), NULL);
+    GBL_TEST_COMPARE(GblVariant_opaquePeek(&v), NULL);
 
     // Copy Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -80,32 +80,32 @@ static GBL_RESULT GblOpaqueTestSuite_variant_(GblTestSuite* pSelf, GblContext* p
     // Utility / Value Copy Constructor
     const char* pValue = GblStringRef_create("Hi");
     GBL_CTX_VERIFY_CALL(GblVariant_constructOpaqueCopy(&v, pSelf_->opaqueType, (void*)pValue));
-    GBL_TEST_COMPARE(strcmp(GblVariant_getOpaquePeek(&v), "Hi"), 0); // Utility / Get Value
+    GBL_TEST_COMPARE(strcmp(GblVariant_opaquePeek(&v), "Hi"), 0); // Utility / Get Value
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
     GblStringRef_release(pValue);
 
     // Value Move Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v, pSelf_->opaqueType, (void*)GblStringRef_create("Bye")));
-    GBL_TEST_COMPARE(strcmp(GblVariant_getOpaquePeek(&v), "Bye"), 0); // Utility / Get Value
+    GBL_TEST_COMPARE(strcmp(GblVariant_opaquePeek(&v), "Bye"), 0); // Utility / Get Value
 
     // Utility / Value Set Copy
     pValue = GblStringRef_create("Shy");
     GBL_CTX_VERIFY_CALL(GblVariant_setOpaqueCopy(&v, pSelf_->opaqueType, (void*)pValue));
-    GBL_TEST_COMPARE(strcmp(GblVariant_getOpaquePeek(&v), "Shy"), 0); // Utility / Get Value
+    GBL_TEST_COMPARE(strcmp(GblVariant_opaquePeek(&v), "Shy"), 0); // Utility / Get Value
     GblStringRef_release(pValue);
 
     // Value Set Move
     GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(&v, pSelf_->opaqueType, (void*)GblStringRef_create("Fly")));
-    GBL_TEST_COMPARE(strcmp(GblVariant_getOpaquePeek(&v), "Fly"), 0); // Utility / Get Value
+    GBL_TEST_COMPARE(strcmp(GblVariant_opaquePeek(&v), "Fly"), 0); // Utility / Get Value
 
     // Value Get Move
-    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_valueMove(&v, &pValue));
     GBL_TEST_COMPARE(strcmp(pValue, "Fly"), 0);
     GblStringRef_release(pValue);
 
     // Value Get Copy
     GblVariant_setOpaqueMove(&v, pSelf_->opaqueType, (void*)GblStringRef_create("DIE"));
-    pValue = GblVariant_getOpaqueCopy(&v);
+    pValue = GblVariant_opaqueCopy(&v);
     GBL_TEST_COMPARE(strcmp(pValue, "DIE"), 0);
     GblStringRef_release(pValue);
 
@@ -129,7 +129,7 @@ static GBL_RESULT GblOpaqueTestSuite_conversions_(GblTestSuite* pSelf, GblContex
 
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&v1, &v2));
 
-    GBL_TEST_COMPARE(strcmp(GblVariant_getPointer(&v2), "Test"), 0);
+    GBL_TEST_COMPARE(strcmp(GblVariant_pointer(&v2), "Test"), 0);
 
     GBL_TEST_VERIFY(GblVariant_equals(&v1, &v2));
 
@@ -140,13 +140,13 @@ static GBL_RESULT GblOpaqueTestSuite_conversions_(GblTestSuite* pSelf, GblContex
     GBL_CTX_VERIFY_CALL(GblVariant_constructBool(&v3, GBL_FALSE));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&v1, &v3));
     GBL_TEST_VERIFY(GblVariant_equals(&v1, &v3));
-    GBL_TEST_VERIFY(GblVariant_getBool(&v3) == GBL_TRUE);
+    GBL_TEST_VERIFY(GblVariant_bool(&v3) == GBL_TRUE);
 
     GBL_CTX_VERIFY_CALL(GblVariant_constructNil(&v4));
 
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&v4, &v1));
     GBL_CTX_VERIFY_CALL(GblVariant_equals(&v1, &v4));
-    GBL_TEST_COMPARE(GblVariant_getOpaquePeek(&v1), NULL);
+    GBL_TEST_COMPARE(GblVariant_opaquePeek(&v1), NULL);
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v1));
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v2));

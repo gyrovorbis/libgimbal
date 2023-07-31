@@ -314,7 +314,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVaList_(const GblObject* pSelf, const Gb
 
     GBL_CTX_CALL(GblVariant_constructDefault(&variant, GBL_NIL_TYPE));
     GBL_CTX_CALL(GblObject_propertyVCall_(pSelf, pProp, &variant));
-    GBL_CTX_CALL(GblVariant_copyValueVaList(&variant, pList));
+    GBL_CTX_CALL(GblVariant_valueCopyVa(&variant, pList));
     GBL_CTX_CALL(GblVariant_destruct(&variant));
 
     GBL_CTX_END();
@@ -379,7 +379,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList_(GblObject* pSelf, const GblPr
                    "[GblObject] Tried to get unwritable property: [%s]", GblProperty_nameString(pProp));
 
 
-    GBL_CTX_CALL(GblVariant_constructValueCopyVaList(&variant, pProp->valueType, pList));
+    GBL_CTX_CALL(GblVariant_constructValueCopyVa(&variant, pProp->valueType, pList));
     GBL_CTX_CALL(GblObject_setPropertyVCall_(pSelf, pProp, &variant, GBL_PROPERTY_FLAG_WRITE));
     GBL_CTX_CALL(GblVariant_destruct(&variant));
 
@@ -449,7 +449,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertiesVaList(const GblObject* pSelf, va_list
             GblVariant variant;
             GBL_CTX_CALL(GblVariant_constructDefault(&variant, GBL_NIL_TYPE));
             GBL_CTX_CALL(GblObject_propertyVCall_(pSelf, pProp, &variant));
-            GBL_CTX_CALL(GblVariant_copyValueVaList(&variant, pVarArgs));
+            GBL_CTX_CALL(GblVariant_valueCopyVa(&variant, pVarArgs));
             if(pProp->flags & GBL_PROPERTY_FLAG_READ) {
                 ;
             } else {
@@ -480,7 +480,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVaList(GblObject* pSelf, va_list* p
         pKeys[p] = pKey;
         const GblProperty* pProp = GblProperty_find(GBL_TYPEOF(pSelf), pKey);
         if(pProp) {
-            GBL_CTX_CALL(GblVariant_constructValueCopyVaList(&pVariants[p], pProp->valueType, pVarArgs));
+            GBL_CTX_CALL(GblVariant_constructValueCopyVa(&pVariants[p], pProp->valueType, pVarArgs));
             if(pProp->flags & GBL_PROPERTY_FLAG_WRITE) {
                 ++p;
             } else {
@@ -682,7 +682,7 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
                                GblType_name(type), pKey);
         }
 
-        GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopyVaList(&pVariants[count],
+        GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopyVa(&pVariants[count],
                                                                 ppProperties[count]->valueType,
                                                                 pVarArgs));
         ++count;
@@ -1310,7 +1310,7 @@ static GBL_RESULT GblObject_ITableVariant_index_(const GblVariant* pSelf,
     GblVariant_constructCopy(&k, pKey);
 
     const GBL_RESULT retValue =
-        GblObject_propertyVariant(GblVariant_getObjectPeek(pSelf),
+        GblObject_propertyVariant(GblVariant_objectPeek(pSelf),
                                   GblVariant_toString(&k),
                                   pValue);
 
@@ -1327,7 +1327,7 @@ static GBL_RESULT GblObject_ITableVariant_setIndex_(const GblVariant* pSelf,
     GblVariant_constructCopy(&k, pKey);
 
     const GBL_RESULT retValue =
-        GblObject_setPropertyVariant(GblVariant_getObjectPeek(pSelf),
+        GblObject_setPropertyVariant(GblVariant_objectPeek(pSelf),
                                      GblVariant_toString(&k),
                                      pValue);
 
@@ -1385,7 +1385,7 @@ static GBL_RESULT GblObject_ITableVariant_next_(const GblVariant* pSelf,
         return cl.nextOne? GBL_RESULT_SUCCESS : GBL_RESULT_ERROR_INVALID_PROPERTY;
     } else {
         GblVariant_set(pKey, GblProperty_nameString(cl.pNext));
-        return GblObject_propertyVCall_(GblVariant_getObjectPeek(pSelf),
+        return GblObject_propertyVCall_(GblVariant_objectPeek(pSelf),
                                         cl.pNext,
                                         pValue);
     }
@@ -1472,19 +1472,19 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
     switch(pProp->id) {
     case GblObject_Property_Id_name: {
         const GblStringRef* pName = NULL;
-        GBL_CTX_CALL(GblVariant_moveValue(pValue, &pName));
+        GBL_CTX_CALL(GblVariant_valueMove(pValue, &pName));
         GblObject_setNameRef(pSelf, pName);
         break;
     }
     case GblObject_Property_Id_parent: {
         GblObject* pParent = NULL;
-        GBL_CTX_CALL(GblVariant_peekValue(pValue, &pParent));
+        GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pParent));
         GblObject_setParent(pSelf, pParent);
         break;
     }
     case GblObject_Property_Id_userdata: {
         void* pUserdata = NULL;
-        GBL_CTX_CALL(GblVariant_copyValue(pValue, &pUserdata));
+        GBL_CTX_CALL(GblVariant_valueCopy(pValue, &pUserdata));
         GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
         break;
     }

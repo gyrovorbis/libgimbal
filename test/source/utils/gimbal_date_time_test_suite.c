@@ -688,7 +688,7 @@ GBL_TEST_CASE(variantConstructDefault)
     GblVariant v;
     GblDateTime* pDt, now;
     GblVariant_constructDefault(&v, GBL_DATE_TIME_TYPE);
-    GblVariant_peekValue(&v, &pDt);
+    GblVariant_valuePeek(&v, &pDt);
 
     //GBL_TEST_VERIFY(GblDateTime_compare(GblDateTime_nowUtc(&now),
      //                                   &pDt) >= 0);
@@ -714,7 +714,7 @@ GBL_TEST_CASE(variantCompare)
 
     GblDateTime dt2;
 
-    GBL_TEST_VERIFY(GblDateTime_compare(GblVariant_getDateTime(&v[1]),
+    GBL_TEST_VERIFY(GblDateTime_compare(GblVariant_dateTime(&v[1]),
                                         &dt) == 0);
 
     GblVariant_destruct(&v[0]);

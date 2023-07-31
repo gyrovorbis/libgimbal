@@ -472,7 +472,7 @@ static GblBool GblScanner_readType_(GblScanner*    pSelf,
     }
 
     // Extract value from result variant and validate result
-    const GBL_RESULT moveResult = GblVariant_moveValueVaList(&tVar, pVarArgs);
+    const GBL_RESULT moveResult = GblVariant_valueMoveVa(&tVar, pVarArgs);
     if(!GBL_RESULT_SUCCESS(moveResult)) {
         GblScanner_raiseError(pSelf,
                               errorFlag,
@@ -712,7 +712,7 @@ static GBL_RESULT GblScanner_GblObject_setProperty_(GblObject*         pObject,
     switch(pProp->id) {
     case GblScanner_Property_Id_input: {
         GblStringRef* pStr = NULL;
-        GblVariant_moveValue(pValue, &pStr);
+        GblVariant_valueMove(pValue, &pStr);
         GblStringRef_unref(pSelf_->pInputString);
         pSelf_->pInputString = pStr;
         GblScanner_reset(pSelf);
@@ -720,7 +720,7 @@ static GBL_RESULT GblScanner_GblObject_setProperty_(GblObject*         pObject,
     }
     case GblScanner_Property_Id_delimeters: {
         GblStringRef* pStr = NULL;
-        GblVariant_moveValue(pValue, &pStr);
+        GblVariant_valueMove(pValue, &pStr);
         GblStringRef_unref(pSelf_->pDelimeters);
         pSelf_->pDelimeters = pStr;
         break;

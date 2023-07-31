@@ -493,13 +493,13 @@ static GBL_RESULT GblLogger_GblObject_setProperty(GblObject* pObject,
 
     switch(pProp->id) {
     case GblLogger_Property_Id_domainFilters:
-        GblLogger_setDomainFilters(pSelf, GblVariant_getPointer(pValue));
+        GblLogger_setDomainFilters(pSelf, GblVariant_pointer(pValue));
         break;
     case GblLogger_Property_Id_flagsFilter:
-        pSelf->flagsFilter = GblVariant_getFlags(pValue);
+        pSelf->flagsFilter = GblVariant_flags(pValue);
         break;
     case GblLogger_Property_Id_threadFilters:
-        GblLogger_setThreadFilters(pSelf, GblVariant_getPointer(pValue));
+        GblLogger_setThreadFilters(pSelf, GblVariant_pointer(pValue));
         break;
     default: break;
     }

@@ -414,7 +414,7 @@ GBL_TEST_CASE(variantConstructDefault)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(variantValuePeek)
-    GblBox* pBox = GblVariant_getBoxPeek(pFixture->pVariant);
+    GblBox* pBox = GblVariant_boxPeek(pFixture->pVariant);
 
     GBL_TEST_VERIFY(pBox);
     GBL_TEST_VERIFY(GBL_TYPECHECK(GblBox, pBox));
@@ -422,7 +422,7 @@ GBL_TEST_CASE(variantValuePeek)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(variantValueCopy)
-    GblBox* pBox = GblVariant_getBoxCopy(pFixture->pVariant);
+    GblBox* pBox = GblVariant_boxCopy(pFixture->pVariant);
 
     GBL_TEST_VERIFY(pBox);
     GBL_TEST_VERIFY(GBL_TYPECHECK(GblBox, pBox));
@@ -432,7 +432,7 @@ GBL_TEST_CASE(variantValueCopy)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(variantValueMove)
-    pFixture->pBox = GblVariant_getBoxMove(pFixture->pVariant);
+    pFixture->pBox = GblVariant_boxMove(pFixture->pVariant);
 
     GBL_TEST_VERIFY(pFixture->pBox);
     GBL_TEST_VERIFY(GBL_TYPECHECK(GblBox, pFixture->pBox));

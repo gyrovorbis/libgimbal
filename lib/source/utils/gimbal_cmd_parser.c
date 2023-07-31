@@ -291,7 +291,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_positionalArgValue(const GblCmdParser* pSelf,
     GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&dest, toType));
 
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&src, &dest));
-    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&dest, pData));
+    GBL_CTX_VERIFY_CALL(GblVariant_valuePeek(&dest, pData));
 
     GBL_CTX_END_BLOCK();
     GblVariant_destruct(&src);
@@ -354,47 +354,47 @@ static GBL_RESULT GblCmdParser_Object_setProperty_(GblObject* pObject, const Gbl
     switch(pProp->id) {
     case GblCmdParser_Property_Id_allowExtraArgs: {
         GblBool value = GBL_FALSE;
-        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &value));
+        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &value));
         pSelf->allowExtraArgs = value;
         break;
     }
     case GblCmdParser_Property_Id_allowUnknownOptions: {
         GblBool value = GBL_FALSE;
-        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &value));
+        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &value));
         pSelf->allowUnknownOptions = value;
         break;
     }
     case GblCmdParser_Property_Id_firstArgAsExecutable: {
         GblBool value = GBL_FALSE;
-        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &value));
+        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &value));
         pSelf->firstArgAsExecutable = value;
         break;
     }
     case GblCmdParser_Property_Id_enableVersionOption: {
         GblBool value = GBL_FALSE;
-        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &value));
+        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &value));
         pSelf->enableVersionOption = value;
         break;
     }
     case GblCmdParser_Property_Id_enableHelpOption: {
         GblBool value = GBL_FALSE;
-        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &value));
+        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &value));
         pSelf->enableHelpOption = value;
         break;
     }
     case GblCmdParser_Property_Id_mainOptionGroup:
         if(pSelf_->pMainOptionGroup) GBL_UNREF(pSelf_->pMainOptionGroup);
-        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &pSelf_->pMainOptionGroup));
+        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &pSelf_->pMainOptionGroup));
         break;
     case GblCmdParser_Property_Id_optionGroups: {
         GblOptionGroup** ppGroups = NULL;
-        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &ppGroups));
+        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &ppGroups));
         GBL_CTX_VERIFY_CALL(GblCmdParser_setOptionGroups(pSelf, ppGroups));
         break;
     }
     case GblCmdParser_Property_Id_positionalArgs: {
         GblCmdArg* pArgs = NULL;
-        GBL_CTX_VERIFY_CALL(GblVariant_moveValue(pValue, &pArgs));
+        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &pArgs));
         GBL_CTX_VERIFY_CALL(GblCmdParser_setPositionalArgs(pSelf, pArgs));
         break;
     }

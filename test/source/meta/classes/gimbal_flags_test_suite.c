@@ -192,7 +192,7 @@ static GBL_RESULT GblFlagsTestSuite_variant_(GblTestSuite* pSelf, GblContext* pC
     // Default constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&v, pSelf_->flagsType));
     GBL_TEST_VERIFY(GblVariant_typeOf(&v) == pSelf_->flagsType);
-    GBL_TEST_COMPARE(GblVariant_getFlags(&v), 0);
+    GBL_TEST_COMPARE(GblVariant_flags(&v), 0);
 
     // Copy Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -207,29 +207,29 @@ static GBL_RESULT GblFlagsTestSuite_variant_(GblTestSuite* pSelf, GblContext* pC
 
     // Utility / Value Copy Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructFlags(&v, pSelf_->flagsType, READ|WRITE));
-    GBL_TEST_COMPARE(GblVariant_getFlags(&v), (READ|WRITE)); // Utility / Get Value
+    GBL_TEST_COMPARE(GblVariant_flags(&v), (READ|WRITE)); // Utility / Get Value
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
 
     // Value Move Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v, pSelf_->flagsType, SAVE|LOAD));
-    GBL_TEST_COMPARE(GblVariant_getFlags(&v), (SAVE|LOAD));
+    GBL_TEST_COMPARE(GblVariant_flags(&v), (SAVE|LOAD));
 
     // Utility / Value Set Copy
     GBL_CTX_VERIFY_CALL(GblVariant_setFlags(&v, pSelf_->flagsType, WRITE|LOAD));
-    GBL_TEST_COMPARE(GblVariant_getFlags(&v), (WRITE|LOAD));
+    GBL_TEST_COMPARE(GblVariant_flags(&v), (WRITE|LOAD));
 
     // Value Set Move
     GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(&v, pSelf_->flagsType, LOAD|SAVE));
-    GBL_TEST_COMPARE(GblVariant_getFlags(&v), (LOAD|SAVE));
+    GBL_TEST_COMPARE(GblVariant_flags(&v), (LOAD|SAVE));
 
     // Value Get Move
     PROPERTY_FLAGS flags = 0;
-    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &flags));
+    GBL_CTX_VERIFY_CALL(GblVariant_valueMove(&v, &flags));
     GBL_TEST_COMPARE(flags, (LOAD|SAVE));
 
     // Value Get Peek
     GblVariant_setFlags(&v, pSelf_->flagsType, WRITE);
-    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &flags));
+    GBL_CTX_VERIFY_CALL(GblVariant_valuePeek(&v, &flags));
     GBL_TEST_COMPARE(flags, WRITE);
 
     // Destructor
@@ -271,49 +271,49 @@ static GBL_RESULT GblFlagsTestSuite_variant_conversions_(GblTestSuite* pSelf, Gb
     // Bool
     GBL_CTX_VERIFY_CALL(GblVariant_constructBool(&tVariant, GBL_FALSE));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getBool(&tVariant), GBL_TRUE);
+    GBL_TEST_COMPARE(GblVariant_bool(&tVariant), GBL_TRUE);
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint8
     GBL_CTX_VERIFY_CALL(GblVariant_setUint8(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getUint8(&tVariant), (READ|WRITE));
+    GBL_TEST_COMPARE(GblVariant_uint8(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint16
     GBL_CTX_VERIFY_CALL(GblVariant_setUint16(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getUint16(&tVariant), (READ|WRITE));
+    GBL_TEST_COMPARE(GblVariant_uint16(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Int16
     GBL_CTX_VERIFY_CALL(GblVariant_setInt16(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getInt16(&tVariant), (READ|WRITE));
+    GBL_TEST_COMPARE(GblVariant_int16(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint32
     GBL_CTX_VERIFY_CALL(GblVariant_setUint32(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getUint32(&tVariant), (READ|WRITE));
+    GBL_TEST_COMPARE(GblVariant_uint32(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Int32
     GBL_CTX_VERIFY_CALL(GblVariant_setInt32(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getInt32(&tVariant), (READ|WRITE));
+    GBL_TEST_COMPARE(GblVariant_int32(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // Uint64
     GBL_CTX_VERIFY_CALL(GblVariant_setUint64(&tVariant, 255));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_getUint64(&tVariant), (READ|WRITE));
+    GBL_TEST_COMPARE(GblVariant_uint64(&tVariant), (READ|WRITE));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_getStringView(&tVariant), GBL_STRV("READ|WRITE")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("READ|WRITE")));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // FROM String
@@ -321,7 +321,7 @@ static GBL_RESULT GblFlagsTestSuite_variant_conversions_(GblTestSuite* pSelf, Gb
     GBL_TEST_VERIFY(GblVariant_canConvert(GblVariant_typeOf(&tVariant), GblVariant_typeOf(&variant)));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&tVariant, &variant));
     GBL_CTX_VERIFY_CALL(GblVariant_equals(&tVariant, &variant));
-    GBL_TEST_COMPARE(GblVariant_getFlags(&variant), (READ|WRITE|LOAD|SAVE));
+    GBL_TEST_COMPARE(GblVariant_flags(&variant), (READ|WRITE|LOAD|SAVE));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&variant));

@@ -43,7 +43,7 @@ static GBL_RESULT GblPointerTestSuite_variant_(GblTestSuite* pSelf, GblContext* 
     // Default constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&v, pSelf_->pointerType));
     GBL_TEST_VERIFY(GblVariant_typeOf(&v) == pSelf_->pointerType);
-    GBL_TEST_COMPARE(GblVariant_getPointer(&v), NULL);
+    GBL_TEST_COMPARE(GblVariant_pointer(&v), NULL);
 
     // Copy Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructCopy(&v2, &v));
@@ -58,29 +58,29 @@ static GBL_RESULT GblPointerTestSuite_variant_(GblTestSuite* pSelf, GblContext* 
 
     // Utility / Value Copy Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructPointer(&v, pSelf_->pointerType, "Hi"));
-    GBL_TEST_COMPARE(strcmp(GblVariant_getPointer(&v), "Hi"), 0); // Utility / Get Value
+    GBL_TEST_COMPARE(strcmp(GblVariant_pointer(&v), "Hi"), 0); // Utility / Get Value
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
 
     // Value Move Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v, pSelf_->pointerType, "Bye"));
-    GBL_TEST_COMPARE(strcmp(GblVariant_getPointer(&v), "Bye"), 0); // Utility / Get Value
+    GBL_TEST_COMPARE(strcmp(GblVariant_pointer(&v), "Bye"), 0); // Utility / Get Value
 
     // Utility / Value Set Copy
     GBL_CTX_VERIFY_CALL(GblVariant_setPointer(&v, pSelf_->pointerType, "Shy"));
-    GBL_TEST_COMPARE(strcmp(GblVariant_getPointer(&v), "Shy"), 0); // Utility / Get Value
+    GBL_TEST_COMPARE(strcmp(GblVariant_pointer(&v), "Shy"), 0); // Utility / Get Value
 
     // Value Set Move
     GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(&v, pSelf_->pointerType, "Fly"));
-    GBL_TEST_COMPARE(strcmp(GblVariant_getPointer(&v), "Fly"), 0); // Utility / Get Value
+    GBL_TEST_COMPARE(strcmp(GblVariant_pointer(&v), "Fly"), 0); // Utility / Get Value
 
     // Value Get Move
     const char* pValue = NULL;;
-    GBL_CTX_VERIFY_CALL(GblVariant_moveValue(&v, &pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_valueMove(&v, &pValue));
     GBL_TEST_COMPARE(strcmp(pValue, "Fly"), 0);
 
     // Value Get Peek
     GblVariant_setPointer(&v, pSelf_->pointerType, "DIE");
-    GBL_CTX_VERIFY_CALL(GblVariant_peekValue(&v, &pValue));
+    GBL_CTX_VERIFY_CALL(GblVariant_valuePeek(&v, &pValue));
     GBL_TEST_COMPARE(strcmp(pValue, "DIE"), 0);
 
     // Destructor
@@ -104,7 +104,7 @@ static GBL_RESULT GblPointerTestSuite_conversions_(GblTestSuite* pSelf, GblConte
 
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&v1, &v2));
 
-    GBL_TEST_COMPARE(strcmp(GblVariant_getPointer(&v2), "Test"), 0);
+    GBL_TEST_COMPARE(strcmp(GblVariant_pointer(&v2), "Test"), 0);
 
     GBL_TEST_VERIFY(GblVariant_equals(&v1, &v2));
 

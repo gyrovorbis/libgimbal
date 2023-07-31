@@ -438,7 +438,7 @@ static GBL_RESULT GblThread_GblObject_setProperty_(GblObject* pObject, const Gbl
         GblThread_setAffinity(pSelf, GblVariant_toFlags(pValue)); break;
     case GblThread_Property_Id_closure: {
         GblClosure* pClosure = NULL;
-        GblVariant_moveValue(pValue, &pClosure);
+        GblVariant_valueMove(pValue, &pClosure);
         GblThread_setClosure(pSelf, pClosure);
         break;
     }

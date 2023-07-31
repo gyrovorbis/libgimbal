@@ -985,7 +985,7 @@ static GBL_RESULT stringConvert_(const GblVariant* pVariant, GblVariant* pOther)
     else if(type == GBL_DOUBLE_TYPE)
         GblVariant_setDouble(pOther, GblStringView_toDouble(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_TYPE_TYPE)
-        GblVariant_setTypeValue(pOther, GblType_find(GblVariant_getString(pVariant)));
+        GblVariant_setTypeValue(pOther, GblType_find(GblVariant_string(pVariant)));
     else
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_CTX_END();

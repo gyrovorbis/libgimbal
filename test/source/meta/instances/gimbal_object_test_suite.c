@@ -672,7 +672,7 @@ GBL_TEST_CASE(variantITableIndex)
     GBL_TEST_VERIFY(GblVariant_field(&t, "userdata", &v));
     GBL_TEST_COMPARE(GblVariant_toPointer(&v), (const void*)0xcafebabe);
 
-    GblObject* pParent = GblVariant_getObjectPeek(GblVariant_field(&t, "parent", &v));
+    GblObject* pParent = GblVariant_objectPeek(GblVariant_field(&t, "parent", &v));
     GBL_TEST_VERIFY(pParent);
     GBL_TEST_COMPARE(GblObject_name(pParent), "dynamicParent");
     //GBL_TEST_COMPARE(GBL_UNREF(pParent), 0);
@@ -696,11 +696,11 @@ GBL_TEST_CASE(variantITableSetIndex)
     GblVariant_construct(&v, "staticChild");
 
     GBL_TEST_CALL(GblVariant_setIndex(&t, &k, &v));
-    GBL_TEST_COMPARE(GblObject_name(GblVariant_getObjectPeek(&t)), "staticChild");
+    GBL_TEST_COMPARE(GblObject_name(GblVariant_objectPeek(&t)), "staticChild");
 
     GblVariant_setPointer(&v, GBL_POINTER_TYPE, (void*)0xdeadbeef);
     GBL_TEST_CALL(GblVariant_setField(&t, "userdata", &v));
-    GBL_TEST_COMPARE(GblBox_userdata(GblVariant_getBoxPeek(&t)), (const void*)0xdeadbeef);
+    GBL_TEST_COMPARE(GblBox_userdata(GblVariant_boxPeek(&t)), (const void*)0xdeadbeef);
 
     GblVariant_destruct(&t);
     GblVariant_destruct(&k);
@@ -724,32 +724,32 @@ GBL_TEST_CASE(variantITableNext)
     while(GblVariant_next(&t, &k, &v)) {
         switch(i) {
         case 0:
-            GBL_TEST_COMPARE(GblVariant_getString(&k), "name");
-            GBL_TEST_COMPARE(GblVariant_getString(&v), "Bulbasaur");
+            GBL_TEST_COMPARE(GblVariant_string(&k), "name");
+            GBL_TEST_COMPARE(GblVariant_string(&v), "Bulbasaur");
             break;
         case 1:
-            GBL_TEST_COMPARE(GblVariant_getString(&k), "parent");
-            GBL_TEST_COMPARE(GblVariant_getObjectPeek(&v), NULL);
+            GBL_TEST_COMPARE(GblVariant_string(&k), "parent");
+            GBL_TEST_COMPARE(GblVariant_objectPeek(&v), NULL);
             break;
         case 2:
-            GBL_TEST_COMPARE(GblVariant_getString(&k), "userdata");
-            GBL_TEST_COMPARE(GblVariant_getPointer(&v), (void*)0xdeadbeef);
+            GBL_TEST_COMPARE(GblVariant_string(&k), "userdata");
+            GBL_TEST_COMPARE(GblVariant_pointer(&v), (void*)0xdeadbeef);
             break;
         case 3:
-            GBL_TEST_COMPARE(GblVariant_getString(&k), "refCount");
-            GBL_TEST_COMPARE(GblVariant_getUint16(&v), 1);
+            GBL_TEST_COMPARE(GblVariant_string(&k), "refCount");
+            GBL_TEST_COMPARE(GblVariant_uint16(&v), 1);
             break;
         case 4:
-            GBL_TEST_COMPARE(GblVariant_getString(&k), "floater");
-            GBL_TEST_COMPARE(GblVariant_getFloat(&v), -77.7f);
+            GBL_TEST_COMPARE(GblVariant_string(&k), "floater");
+            GBL_TEST_COMPARE(GblVariant_float(&v), -77.7f);
             break;
         case 5:
-            GBL_TEST_COMPARE(GblVariant_getString(&k), "stringer");
-            GBL_TEST_COMPARE(GblVariant_getString(&v), "Charmander");
+            GBL_TEST_COMPARE(GblVariant_string(&k), "stringer");
+            GBL_TEST_COMPARE(GblVariant_string(&v), "Charmander");
             break;
         case 6:
-            GBL_TEST_COMPARE(GblVariant_getString(&k), "staticInt32");
-            GBL_TEST_COMPARE(GblVariant_getInt32(&v), 77);
+            GBL_TEST_COMPARE(GblVariant_string(&k), "staticInt32");
+            GBL_TEST_COMPARE(GblVariant_int32(&v), 77);
             break;
         default: GBL_TEST_VERIFY(GBL_FALSE);
         }
@@ -861,19 +861,19 @@ static GBL_RESULT TestObject_setProperty_(GblObject* pSelf, const GblProperty* p
     switch(pProp->id) {
     case TestObject_Property_Id_floater: {
         float value = NAN;
-        GBL_CTX_CALL(GblVariant_copyValue(pValue, &value));
+        GBL_CTX_CALL(GblVariant_valueCopy(pValue, &value));
         TEST_OBJECT(pSelf)->floater = value;
         break;
     }
     case TestObject_Property_Id_stringer: {
         const char* pStr = NULL;
-        GBL_CTX_CALL(GblVariant_peekValue(pValue, &pStr));
+        GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pStr));
         if(pStr) strcpy(TEST_OBJECT(pSelf)->stringer, pStr);
         break;
     }
 /*    case TestObject_Property_Id_userdata: {
         void* pUserdata = NULL;
-        GBL_CTX_CALL(GblVariant_copyValue(pValue, &pUserdata));
+        GBL_CTX_CALL(GblVariant_valueCopy(pValue, &pUserdata));
         GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
         break;
     }*/

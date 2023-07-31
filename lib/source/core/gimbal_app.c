@@ -118,7 +118,7 @@ static GBL_RESULT GblApp_Object_setProperty_(GblObject* pObject, const GblProper
     switch(pProp->id) {
     //case GblOptionGroup_Property_Id_name: {
     //    const char* pName = NULL;
-    //   GBL_CTX_VERIFY_CALL(GblVariant_copyValue(pValue, &pName));
+    //   GBL_CTX_VERIFY_CALL(GblVariant_valueCopy(pValue, &pName));
     //    GblObject_setName(pObject, pName);
     //    break;
     //}
