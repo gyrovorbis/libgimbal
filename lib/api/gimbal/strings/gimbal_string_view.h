@@ -86,6 +86,7 @@ GBL_EXPORT int           GblStringView_scanfVa           (GBL_VSELF, const char*
 GBL_EXPORT char*         GblStringView_toCString         (GBL_VSELF, char* pDest, size_t destSize)            GBL_NOEXCEPT;
 GBL_EXPORT GblBool       GblStringView_toNil             (GBL_VSELF)                                          GBL_NOEXCEPT;
 GBL_EXPORT GblBool       GblStringView_toBool            (GBL_VSELF, GblBool* pSuccess)                       GBL_NOEXCEPT;
+GBL_EXPORT char          GblStringView_toChar            (GBL_VSELF, GblBool* pSuccess)                       GBL_NOEXCEPT;
 GBL_EXPORT uint8_t       GblStringView_toUint8           (GBL_VSELF, GblBool* pSuccess)                       GBL_NOEXCEPT;
 GBL_EXPORT uint16_t      GblStringView_toUint16          (GBL_VSELF, GblBool* pSuccess)                       GBL_NOEXCEPT;
 GBL_EXPORT int16_t       GblStringView_toInt16           (GBL_VSELF, GblBool* pSuccess)                       GBL_NOEXCEPT;
@@ -101,6 +102,7 @@ GBL_DECLS_END
 
 ///\cond
 #define GblStringView_toBool(...)       GblStringView_toBoolDefault_(__VA_ARGS__)
+#define GblStringView_toChar(...)       GblStringView_toCharDefault_(__VA_ARGS__)
 #define GblStringView_toUint8(...)      GblStringView_toUint8Default_(__VA_ARGS__)
 #define GblStringView_toUint16(...)     GblStringView_toUint16Default_(__VA_ARGS__)
 #define GblStringView_toInt16(...)      GblStringView_toInt16Default_(__VA_ARGS__)
@@ -120,6 +122,11 @@ GBL_DECLS_END
     GblStringView_toBoolDefault__(__VA_ARGS__, NULL)
 #define GblStringView_toBoolDefault__(self, success, ...) \
     ((GblStringView_toBool)(self, success))
+
+#define GblStringView_toCharDefault_(...) \
+    GblStringView_toCharDefault__(__VA_ARGS__, NULL)
+#define GblStringView_toCharDefault__(self, success, ...) \
+    ((GblStringView_toChar)(self, success))
 
 #define GblStringView_toUint8Default_(...) \
     GblStringView_toUint8Default__(__VA_ARGS__, NULL)

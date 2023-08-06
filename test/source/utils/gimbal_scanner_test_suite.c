@@ -390,6 +390,371 @@ GBL_TEST_CASE(scanMatchMultiContiguous)
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV("G'day")));
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(peekBoolInvalid)
+    GblScanner_setInput(pFixture->pScanner, "\n\ntH\n1 false,0\t312,1024 \n \t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t,]");
+
+    GBL_TEST_EXPECT_ERROR();
+
+    GblBool boolean = GBL_TRUE;
+    GBL_TEST_VERIFY(!GblScanner_peekBool(pFixture->pScanner, &boolean));
+    GBL_TEST_COMPARE(boolean, GBL_FALSE);
+
+    GBL_CTX_CLEAR_LAST_RECORD();
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekBool)
+    GblScanner_reset(pFixture->pScanner);
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GblBool boolean = GBL_FALSE;
+
+    GBL_TEST_VERIFY(GblScanner_peekBool(pFixture->pScanner, &boolean));
+    GBL_TEST_VERIFY(boolean);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peekBool(pFixture->pScanner, &boolean));
+    GBL_TEST_VERIFY(!boolean);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    boolean = GBL_TRUE;
+
+    GBL_TEST_VERIFY(GblScanner_peekBool(pFixture->pScanner, &boolean));
+    GBL_TEST_VERIFY(!boolean);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    GBL_TEST_VERIFY(GblScanner_peekBool(pFixture->pScanner, &boolean));
+    GBL_TEST_VERIFY(boolean);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekCharInvalid)
+    GblScanner_setInput(pFixture->pScanner, "\n\ntH\nH y,23\t312,1024 \n \t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t,]");
+
+    GBL_TEST_EXPECT_ERROR();
+
+    char character = '\0';
+    GBL_TEST_VERIFY(!GblScanner_peekChar(pFixture->pScanner, &character));
+    GBL_TEST_COMPARE(character, '\0');
+    GBL_CTX_CLEAR_LAST_RECORD();
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekChar)
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    char character = '\0';
+    GBL_TEST_VERIFY(GblScanner_peekChar(pFixture->pScanner, &character));
+    GBL_TEST_COMPARE(character, 'H');
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &character));
+    GBL_TEST_COMPARE(character, 'y');
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekUint8Invalid)
+    GblScanner_setInput(pFixture->pScanner, "\n\ntH\n -12,265\t12,255 \n 0xa\t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t,]");
+
+    GBL_TEST_EXPECT_ERROR();
+
+    uint8_t value = 0xff;
+    GBL_TEST_VERIFY(!GblScanner_peekUint8(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+    GBL_CTX_CLEAR_LAST_RECORD();
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekUint8)
+    GblScanner_reset(pFixture->pScanner);
+    GblScanner_skipTokens(pFixture->pScanner, 3);
+
+    uint8_t value = 17;
+    GBL_TEST_VERIFY(GblScanner_peekUint8(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 12);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 255);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 10);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekUint16Invalid)
+    GblScanner_setInput(pFixture->pScanner, "\n\ntH\n -12,999999\t12,255 \n 0xffb\t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t,]");
+
+    GBL_TEST_EXPECT_ERROR();
+
+    uint16_t value = 0xff;
+    GBL_TEST_VERIFY(!GblScanner_peekUint16(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+    GBL_CTX_CLEAR_LAST_RECORD();
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekUint16)
+    GblScanner_reset(pFixture->pScanner);
+    GblScanner_skipTokens(pFixture->pScanner, 3);
+
+    uint16_t value = 17;
+    GBL_TEST_VERIFY(GblScanner_peekUint16(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 12);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 255);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0xffb);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekInt16Invalid)
+    GblScanner_setInput(pFixture->pScanner, "\n\ntH\n -129999,999999\t12,-257 \n 0xffb\t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t,]");
+
+    GBL_TEST_EXPECT_ERROR();
+
+    int16_t value = 0xff;
+    GBL_TEST_VERIFY(!GblScanner_peekInt16(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+    GBL_CTX_CLEAR_LAST_RECORD();
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekInt16)
+    GblScanner_reset(pFixture->pScanner);
+    GblScanner_skipTokens(pFixture->pScanner, 3);
+
+    int16_t value = 17;
+    GBL_TEST_VERIFY(GblScanner_peekInt16(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 12);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, -257);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0xffb);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekUint32Invalid)
+    GblScanner_setInput(pFixture->pScanner, "\n\ntH\n -12,99999999999\t12,65536 \n 0xffffb\t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t,]");
+
+    GBL_TEST_EXPECT_ERROR();
+
+    uint32_t value = 0xff;
+    GBL_TEST_VERIFY(!GblScanner_peekUint32(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+    GBL_CTX_CLEAR_LAST_RECORD();
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekUint32)
+    GblScanner_reset(pFixture->pScanner);
+    GblScanner_skipTokens(pFixture->pScanner, 3);
+
+    uint32_t value = 17;
+    GBL_TEST_VERIFY(GblScanner_peekUint32(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 12);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 65536);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0xffffb);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekInt32Invalid)
+    GblScanner_setInput(pFixture->pScanner, "\n\ntH\n -129999999999,99999999999\t12,-32769 \n 0xFFFFB\t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t,]");
+
+    GBL_TEST_EXPECT_ERROR();
+
+    int32_t value = 0xff;
+    GBL_TEST_VERIFY(!GblScanner_peekInt32(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+    GBL_CTX_CLEAR_LAST_RECORD();
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekInt32)
+    GblScanner_reset(pFixture->pScanner);
+    GblScanner_skipTokens(pFixture->pScanner, 3);
+
+    int32_t value = 17;
+    GBL_TEST_VERIFY(GblScanner_peekInt32(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 12);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, -32769);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0xFFFFB);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekUint64Invalid)
+    GblScanner_setInput(pFixture->pScanner, "\n\ntH\n -12,999999999999999999999999999999\t12,4294967297  \n 0xFFFFFFFFFFFFFFFF\t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t,]");
+
+    GBL_TEST_EXPECT_ERROR();
+
+    uint64_t value = 0xff;
+    GBL_TEST_VERIFY(!GblScanner_peekUint64(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_SKIP("This should NOT be valid when starting with '-'!!");
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+    GBL_CTX_CLEAR_LAST_RECORD();
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekUint64)
+    GblScanner_reset(pFixture->pScanner);
+    GblScanner_skipTokens(pFixture->pScanner, 3);
+
+    uint64_t value = 17;
+    GBL_TEST_VERIFY(GblScanner_peekUint64(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 12);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 4294967297);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0xffffffffffffffff);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekInt64Invalid)
+    GblScanner_setInput(pFixture->pScanner, "\n\ntH\n -1299999999999999999999,99999999999999999999999\t12,-2147483650 \n 0xFFFFFFFFFFBB\t\nG'day");
+    GblScanner_setDelimeters(pFixture->pScanner, "[\n \t,]");
+
+    GBL_TEST_EXPECT_ERROR();
+
+    int64_t value = 0xff;
+    GBL_TEST_VERIFY(!GblScanner_peekInt64(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+    value = 0xff;
+
+    GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0);
+    GBL_CTX_CLEAR_LAST_RECORD();
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(peekInt64)
+    GblScanner_reset(pFixture->pScanner);
+    GblScanner_skipTokens(pFixture->pScanner, 3);
+
+    int64_t value = 17;
+    GBL_TEST_VERIFY(GblScanner_peekInt64(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 12);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, -2147483650);
+
+    GblScanner_skipTokens(pFixture->pScanner, 1);
+
+    GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
+    GBL_TEST_COMPARE(value, 0xFFFFFFFFFFBB);
+GBL_TEST_CASE_END
+
 GBL_TEST_CASE(unref)
     GblScanner_unref(pFixture->pEmptyScanner);
     GBL_UNREF(pFixture->pScanner);
@@ -432,4 +797,22 @@ GBL_TEST_REGISTER(createEmpty,
                   peekBytesInvalid,
                   scanBytesInvalid,
                   scanMatchMultiContiguous,
+                  peekBoolInvalid,
+                  peekBool,
+                  peekCharInvalid,
+                  peekChar,
+                  peekUint8Invalid,
+                  peekUint8,
+                  peekUint16Invalid,
+                  peekUint16,
+                  peekInt16Invalid,
+                  peekInt16,
+                  peekUint32Invalid,
+                  peekUint32,
+                  peekInt32Invalid,
+                  peekInt32,
+                  peekUint64Invalid,
+                  peekUint64,
+                  peekInt64Invalid,
+                  peekInt64,
                   unref)

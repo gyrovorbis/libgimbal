@@ -58,9 +58,8 @@ GBL_EXPORT void GblSha1_final  (GBL_SELF,
 //! @}
 
 //! Returns the display-friendly hexadecimal form of the given digest, with each 32-bit word separated by a space
-GBL_EXPORT const char*
-                GblSha1_string (const uint8_t digest[GBL_SHA1_DIGEST_SIZE],
-                                char          buffer[GBL_SHA1_DIGEST_STRING_SIZE]) GBL_NOEXCEPT;
+GBL_EXPORT const char* GblSha1_string (const uint8_t digest[GBL_SHA1_DIGEST_SIZE],
+                                       char          buffer[GBL_SHA1_DIGEST_STRING_SIZE]) GBL_NOEXCEPT;
 
 /*! Standalone convenience function for generating a 32-bit SHA1 hash from the given bytes
  * \ingroup hashing

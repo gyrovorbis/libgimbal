@@ -1,10 +1,18 @@
 /*! \file
- *  \brief Generialized array sorting algorithms
  *  \ingroup sorting
+ *  \brief Generialized array sorting algorithms
+ *
+ *  This file contains a collection of sorting algorithms,
+ *  each with the same function prototype so that they can
+ *  be passed around generically. Each is expected to
+ *  operate on an array of data, accepting a custom
+ *  comparator callback.
+ *
  *  \todo
  *      - gblSortRadix()
  *
- *  \author Falco Girgis
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 
 #ifndef GIMBAL_SORT_H
@@ -27,6 +35,7 @@ GBL_EXPORT void gblSortQuick     (void* pArray, size_t count, size_t elemSize, G
 GBL_EXPORT void gblSortInsertion (void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_EXPORT void gblSortShell     (void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_EXPORT void gblSortMerge     (void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_EXPORT void gblSortComb      (void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_EXPORT void gblSortBubble    (void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 //! @}
 

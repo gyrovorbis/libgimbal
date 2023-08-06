@@ -32,7 +32,6 @@ typedef struct GblMd5Context {
   uint8_t   in[64];   //!< Input buffer
 } GblMd5Context;
 
-
 /*! \name Incremental hashing
  *  \brief Methods for operating on an MD5 context
  *  \relatesalso GblMd5context

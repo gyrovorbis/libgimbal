@@ -196,7 +196,8 @@ GBL_EXPORT GBL_RESULT GblThread_exit      (GBL_RESULT  result,
 #define GblThread_foreach(...)   GBL_VA_OVERLOAD_CALL_ARGC(GblThread_foreach_, __VA_ARGS__)
 //! @}
 
-// ===== Implementation =====
+GBL_DECLS_END
+
 ///\cond
 #define GblThread_create__3(cb, ud, start)   ((GblThread_create)(cb, ud, start))
 #define GblThread_create__2(cb, ud)          (GblThread_create__3(cb, ud, GBL_TRUE))
@@ -217,8 +218,6 @@ GBL_EXPORT GBL_RESULT GblThread_exit      (GBL_RESULT  result,
 #define GblThread_foreach__1(it) \
     (GblThread_foreach__2(it, GBL_NULL))
 ///\endcond
-
-GBL_DECLS_END
 
 #undef GBL_SELF_TYPE
 

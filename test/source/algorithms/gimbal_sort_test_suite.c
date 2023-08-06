@@ -2,7 +2,7 @@
 #include <gimbal/algorithms/gimbal_sort.h>
 #include <gimbal/test/gimbal_test_macros.h>
 
-#define GBL_SORT_TEST_SUITE_(inst)   (GBL_PRIVATE(GblSortTestSuite, inst))
+#define GBL_SORT_TEST_SUITE_(inst)          (GBL_PRIVATE(GblSortTestSuite, inst))
 
 #define GBL_SORT_TEST_SUITE_WORD_COUNT_     512
 #define GBL_SORT_TEST_SUITE_WORD_SIZE_MAX_  50
@@ -51,6 +51,12 @@ static GBL_RESULT GblSortTestSuite_bubbleSort_(GblTestSuite* pSelf, GblContext* 
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblSortTestSuite_combSort_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GBL_CTX_VERIFY_CALL(GblSortTestSuite_testSort_(pSelf, gblSortComb));
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblSortTestSuite_selectionSort_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GBL_CTX_VERIFY_CALL(GblSortTestSuite_testSort_(pSelf, gblSortSelection));
@@ -86,6 +92,7 @@ GBL_EXPORT GblType GblSortTestSuite_type(void) {
 
     const static GblTestCase cases[] = {
         { "bubbleSort",         GblSortTestSuite_bubbleSort_       },
+        { "combSort",           GblSortTestSuite_combSort_         },
         { "selectionSort",      GblSortTestSuite_selectionSort_    },
         { "insertionSort",      GblSortTestSuite_insertionSort_    },
         { "shellSort",          GblSortTestSuite_shellSort_        },

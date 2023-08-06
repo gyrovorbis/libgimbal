@@ -386,7 +386,7 @@ GBL_EXPORT GblBool GblScanner_scanBytes(GblScanner* pSelf, size_t bytes) {
             return GBL_FALSE; \
          \
         GblBool success; \
-        *pValue = GblStringView_toBool(*pView, &success); \
+        *pValue = GblStringView_to##postfix(*pView, &success); \
          \
         if(success) \
             return GBL_TRUE; \

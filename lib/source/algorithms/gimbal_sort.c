@@ -6,7 +6,7 @@ GBL_EXPORT void gblSortMerge(void* pArray, size_t  count, size_t  elemSize, GblS
     uint8_t* pSecondHalf;
     uint8_t* pEofSecondHalf;
     uint8_t* pResultBuffer, *pResult;
-    size_t  halfSize;
+    size_t   halfSize;
 
     if(count <= 1) return;
 
@@ -47,7 +47,6 @@ GBL_EXPORT void gblSortMerge(void* pArray, size_t  count, size_t  elemSize, GblS
 
     memcpy(pArray, pResultBuffer, count * elemSize);
 }
-
 
 
 GBL_EXPORT void gblSortSelection(void* pArray, size_t  count, size_t  elemSize, GblSortComparatorFn pFnCmp) {
@@ -113,7 +112,48 @@ GBL_EXPORT void gblSortBubble(void* pArray, size_t  count, size_t  elemSize, Gbl
     }
 }
 
-GBL_EXPORT size_t  gblSearchBinary(void* pArray, size_t  elemSize, int l, int r, void* pTarget, GblSortComparatorFn pFnCmp) {
+GBL_EXPORT void gblSortComb(void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) {
+    // Initialize gap
+    int gap = count;
+
+    // Initialize swapped as true to make sure that
+    // loop runs
+    GblBool swapped = GBL_TRUE;
+
+    uint8_t* pTemp = GBL_ALLOCA(elemSize);
+
+    // Keep running while gap is more than 1 and last
+    // iteration caused a swap
+    while (gap != 1 || swapped == GBL_TRUE)
+    {
+        // Find next gap
+        // To find gap between elements
+        gap = (gap * 10) / 13;
+
+        if(gap < 1)
+            gap = 1;
+
+        // Initialize swapped as false so that we can
+        // check if swap happened or not
+        swapped = GBL_FALSE;
+
+        // Compare all elements with current gap
+        for (int i = 0; i < count - gap; ++i)
+        {
+            uint8_t* pA = GBL_PTR_OFFSET(pArray, i * elemSize);
+            uint8_t* pB = GBL_PTR_OFFSET(pArray, (i + gap) * elemSize);
+
+            if(pFnCmp(pA, pB) > 0) {
+                memcpy(pTemp, pA, elemSize);
+                memcpy(pA, pB, elemSize);
+                memcpy(pB, pTemp, elemSize);
+                swapped = GBL_TRUE;
+            }
+        }
+    }
+}
+
+GBL_EXPORT size_t gblSearchBinary(void* pArray, size_t  elemSize, int l, int r, void* pTarget, GblSortComparatorFn pFnCmp) {
     if(r >= l) {
         int mid = l + (r - l) / 2;
         void* pMid = (char*)pArray + elemSize*mid;

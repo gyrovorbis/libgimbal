@@ -35,6 +35,20 @@ GblStringView_toInt_(Int32, int32_t, INT32_MIN, INT32_MAX, strtol, long)
 GblStringView_toInt_(Uint64, uint64_t, 0, UINT64_MAX, strtoul, unsigned long)
 GblStringView_toInt_(Int64, int64_t, INT64_MIN, INT64_MAX, strtol, long)
 
+GBL_EXPORT char GblStringView_toChar(GblStringView self, GblBool* pSuccess) {
+    if(self.length != 1) {
+        if(pSuccess)
+            *pSuccess = GBL_FALSE;
+
+        return '\0';
+    } else {
+        if(pSuccess)
+            *pSuccess = GBL_TRUE;
+
+        return GblStringView_at(self, 0);
+    }
+}
+
 GBL_EXPORT float GblStringView_toFloat(GblStringView self, GblBool* pSuccess) {
     float       retVal      = 0.0f;
     GblBool     valid       = GBL_TRUE;
@@ -89,7 +103,17 @@ GBL_EXPORT GblBool GblStringView_toBool(GblStringView self, GblBool* pSuccess) {
     const char* pCStr = GBL_STRING_VIEW_CSTR(self);
     if(gblStrnCaseCmp(pCStr, "true", sizeof("true")) == 0 ||
        gblStrnCaseCmp(pCStr, "yes",  sizeof("yes"))  == 0) {
+        if(pSuccess)
+            *pSuccess = GBL_TRUE;
+
         return GBL_TRUE;
+    } else if(gblStrnCaseCmp(pCStr, "false", sizeof("false")) == 0 ||
+              gblStrnCaseCmp(pCStr, "no", sizeof("no")) == 0) {
+        if(pSuccess)
+            *pSuccess = GBL_TRUE;
+
+        return GBL_FALSE;
+
     } else {
         return (GblStringView_toUint32(self, pSuccess) != 0)?
                    GBL_TRUE : GBL_FALSE;

@@ -80,22 +80,20 @@ GBL_EXPORT unsigned long int gblCatalan(unsigned int n) {
     return c / (n + 1);
 }
 
-GBL_EXPORT size_t  gblAlignedAllocSizeDefault(size_t  bytes) {
-    const size_t  remainder = bytes % GBL_ALLOC_MIN_SIZE;
-    size_t  newSize = bytes;
-    if(remainder) {
-        newSize += GBL_ALLOC_MIN_SIZE - remainder;
-    }
-    return newSize;
+
+GBL_EXPORT size_t gblAlignedAllocSizeDefault(size_t bytes) {
+    return gblAlignedAllocSize(bytes, 0);
 }
 
-GBL_EXPORT size_t  gblAlignedAllocSize(size_t size, size_t align) {
+GBL_EXPORT size_t (gblAlignedAllocSize)(size_t size, size_t align) {
     if(!align) align = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
-    const size_t  alignRem = size % align;
-    size_t  newSize = size;
+    const size_t alignRem = size % align;
+    size_t newSize = size;
+
     if(alignRem) {
         newSize += (align - (alignRem));
     }
+
     return newSize;
 }
 

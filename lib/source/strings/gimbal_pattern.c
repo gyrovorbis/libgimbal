@@ -2,7 +2,6 @@
 #include <gimbal/strings/gimbal_string_view.h>
 #include <re.h>
 
-
 GBL_EXPORT const GblPattern* GblPattern_compile(const char* pRegExp) {
     return pRegExp? (GblPattern*)re_compile(pRegExp) : NULL;
 }

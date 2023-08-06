@@ -16,8 +16,8 @@
 #include "gimbal_primitives.h"
 #include "../ifaces/gimbal_itable_variant.h"
 
-#define GBL_BIT_STRUCT_TYPE             (GBL_TYPEID(GblBitStruct))
-#define GBL_BIT_STRUCT_CLASS(klass)     (GBL_CLASS_CAST(GblBitStruct, klass))
+#define GBL_BIT_STRUCT_TYPE                     (GBL_TYPEID(GblBitStruct))
+#define GBL_BIT_STRUCT_CLASS(klass)             (GBL_CLASS_CAST(GblBitStruct, klass))
 
 #define GBL_BIT_STRUCT_ENTRY(name, mask, type)  { name, mask, type }
 #define GBL_BIT_STRUCT_LAST()                   { 0, 0x00, GBL_INVALID_TYPE }
@@ -42,22 +42,41 @@ GBL_CLASS_DERIVE(GblBitStruct, GblPrimitive, GblITableVariant)
     size_t     fieldCount;
 GBL_CLASS_END
 
-#if 0
-GBL_DECLARE_TYPE(GblBitStruct);
+GBL_EXPORT GBL_DECLARE_TYPE(GblBitStruct);
 
-GBL_EXPORT const char* GblBitStructClass_nameFromIndex      (GBL_CSELF, size_t index) GBL_NOEXCEPT;
-GBL_EXPORT const char* GblBitStructClass_nameFromBitmask       (GBL_CSELF, GblBitmask msk) GBL_NOEXCEPT;
-GBL_EXPORT GblQuark    GblBitStructClass_nameQuarkFromIndex (GBL_CSELF, size_t index) GBL_NOEXCEPT;
-GBL_EXPORT GblQuark    GblBitStructClass_nameQuarkFromBitmask  (GBL_CSELF, GblBitmask msk) GBL_NOEXCEPT;
+/*! \name Field Name
+ *  \brief Methods for retrieving field name
+ *  \relatesalso GblBitStructClass
+ *  @{
+ */
+GBL_EXPORT const char* GblBitStructClass_nameFromIndex        (GBL_CSELF, size_t index)   GBL_NOEXCEPT;
+GBL_EXPORT const char* GblBitStructClass_nameFromBitmask      (GBL_CSELF, GblBitmask msk) GBL_NOEXCEPT;
+GBL_EXPORT GblQuark    GblBitStructClass_nameQuarkFromIndex   (GBL_CSELF, size_t index)   GBL_NOEXCEPT;
+GBL_EXPORT GblQuark    GblBitStructClass_nameQuarkFromBitmask (GBL_CSELF, GblBitmask msk) GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT uint64_t GblBitStructClass_maskFromIndex     (GBL_CSELF, size_t index)      GBL_NOEXCEPT;
-GBL_EXPORT uint64_t GblBitStructClass_maskFromName      (GBL_CSELF, const char* pName) GBL_NOEXCEPT;
-GBL_EXPORT uint64_t GblBitStructClass_maskFromNameQuark (GBL_CSELF, GblQuark quark)    GBL_NOEXCEPT;
+/*! \name Field Mask
+ *  \brief Methods for retrieving field mask
+ *  \relatesalso GblBitStructClass
+ *  @{
+ */
+GBL_EXPORT GblBitmask GblBitStructClass_maskFromIndex     (GBL_CSELF, size_t index)      GBL_NOEXCEPT;
+GBL_EXPORT GblBitmask GblBitStructClass_maskFromName      (GBL_CSELF, const char* pName) GBL_NOEXCEPT;
+GBL_EXPORT GblBitmask GblBitStructClass_maskFromNameQuark (GBL_CSELF, GblQuark quark)    GBL_NOEXCEPT;
+//! @}
 
+/*! \name Field Type
+ *  \brief Methods for retrieving field type
+ *  \relatesalso GblBitStructClass
+ *  @{
+ */
 GBL_EXPORT GblType GblBitStructClass_typeFromIndex     (GBL_CSELF, size_t index)      GBL_NOEXCEPT;
 GBL_EXPORT GblType GblBitStructClass_typeFromName      (GBL_CSELF, const char* pName) GBL_NOEXCEPT;
 GBL_EXPORT GblType GblBitStructClass_typeFromNameQuark (GBL_CSELF, GblQuark quark)    GBL_NOEXCEPT;
-GBL_EXPORT GblType GblBitStructClass_typeFromBitmask   (GBL_CSELF, GblBitmask msk) GBL_NOEXCEPT;
+GBL_EXPORT GblType GblBitStructClass_typeFromBitmask   (GBL_CSELF, GblBitmask msk)    GBL_NOEXCEPT;
+//! @}
+
+#if 0
 
 GBL_EXPORT GblBool GblBitStructClass_checkValueForIndex     (GBL_CSELF, size_t index, GblVariant* pValue)      GBL_NOEXCEPT;
 GBL_EXPORT GblBool GblBitStructClass_checkValueForName      (GBL_CSELF, const char* pName, GblVariant* pValue) GBL_NOEXCEPT;
@@ -87,9 +106,9 @@ GBL_EXPORT GBL_RESULT GblBitStruct_setIndices(GblBitStruct* pValue, GblType type
 // Returns key type based on type of empty value first passed in?
 GBL_EXPORT GBL_RESULT GblBitStruct_next(GblBitStruct value, GblType type, GblVariant* pkey, GblVariant* pValue);
 
+#endif
 GBL_EXPORT GblType GblBitStruct_register(const char* pName, const GblBitStructField* pFields) GBL_NOEXCEPT;
 
 GBL_DECLS_END
-#endif
 
 #endif // GIMBAL_BIT_STRUCT_H

@@ -2,6 +2,9 @@
  *  \brief Random number generation, hashing, and CRC algorithms
  *  \ingroup hashing
  *
+ *  \todo
+ *      - gblRandBool
+ *
  *  \author 2023 Falco Girgis
  *  \copyright MIT License
  */

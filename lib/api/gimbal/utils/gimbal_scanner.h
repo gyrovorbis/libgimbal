@@ -22,7 +22,7 @@
  *  automatically.
  *
  *  \todo
- *      - _Generic()/type-deduced peek/scanPrimitive()s
+ *      - continue testing type-specific peek/scan functions
  *      - write own scanf() implementation that knows how
  *        many characters have been read
  *
@@ -275,6 +275,9 @@ GBL_EXPORT GblBool GblScanner_scanDouble  (GBL_SELF, double* pDouble)         GB
 GBL_EXPORT GblBool GblScanner_scanType    (GBL_SELF, GblType t, ...)          GBL_NOEXCEPT;
 //! Same as GblScanner_scanType(), except taking a va_list* rather than (a) variadic argument(s)
 GBL_EXPORT GblBool GblScanner_scanTypeVa  (GBL_SELF, GblType t, va_list* pVa) GBL_NOEXCEPT;
+//! Generic overload macro which automatically calls the respective scan function for the type of \p ptr
+#define            GblScanner_scan(self, ptr) \
+    GBL_META_GENERIC_MACRO_GENERATE(GBL_SCANNER_SCAN_TABLE_, ptr)(self, ptr)
 //! @}
 
 /*! \name Peeking
@@ -318,6 +321,9 @@ GBL_EXPORT GblBool GblScanner_peekDouble  (GBL_SELF, double* pDouble)         GB
 GBL_EXPORT GblBool GblScanner_peekType    (GBL_SELF, GblType t, ...)          GBL_NOEXCEPT;
 //! Same as GblScanner_peekType(), except taking a va_list* rather than (a) variadic argument(s)
 GBL_EXPORT GblBool GblScanner_peekTypeVa  (GBL_SELF, GblType t, va_list* pVa) GBL_NOEXCEPT;
+//! Generic overload macro which automatically calls the respective peek function for the type of \p ptr
+#define            GblScanner_peek(self, ptr) \
+    GBL_META_GENERIC_MACRO_GENERATE(GBL_SCANNER_PEEK_TABLE_, ptr)(self, ptr)
 //! @}
 
 /*! \name Skipping
@@ -355,6 +361,38 @@ GBL_EXPORT int GblScanner_vscanf (GBL_SELF, const char* pFmt, va_list* pList) GB
 GBL_DECLS_END
 
 ///\cond
+#define GBL_SCANNER_PEEK_TABLE_ (           \
+    GBL_META_GENERIC_MACRO_NO_DEFAULT,      \
+    (                                       \
+        (char*,     GblScanner_peekChar),   \
+        (uint8_t*,  GblScanner_peekUint8),  \
+        (uint16_t*, GblScanner_peekUint16), \
+        (int16_t*,  GblScanner_peekInt16),  \
+        (uint32_t*, GblScanner_peekUint32), \
+        (int32_t*,  GblScanner_peekInt32),  \
+        (uint64_t*, GblScanner_peekUint64), \
+        (int64_t*,  GblScanner_peekInt64),  \
+        (float*,    GblScanner_peekFloat),  \
+        (double*,   GblScanner_peekDouble)  \
+    )                                       \
+)
+
+#define GBL_SCANNER_SCAN_TABLE_ (           \
+    GBL_META_GENERIC_MACRO_NO_DEFAULT,      \
+    (                                       \
+        (char*,     GblScanner_scanChar),   \
+        (uint8_t*,  GblScanner_scanUint8),  \
+        (uint16_t*, GblScanner_scanUint16), \
+        (int16_t*,  GblScanner_scanInt16),  \
+        (uint32_t*, GblScanner_scanUint32), \
+        (int32_t*,  GblScanner_scanInt32),  \
+        (uint64_t*, GblScanner_scanUint64), \
+        (int64_t*,  GblScanner_scanInt64),  \
+        (float*,    GblScanner_scanFloat),  \
+        (double*,   GblScanner_scanDouble)  \
+    )                                       \
+)
+
 #define GblScanner_create(...) \
     GblScanner_createDefault_(__VA_ARGS__)
 #define GblScanner_createDefault_(...) \

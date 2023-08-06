@@ -228,6 +228,7 @@ set(GIMBAL_SOURCES
     source/core/gimbal_logger.c
     source/core/gimbal_error.c
     source/core/gimbal_main_loop.c
+    source/meta/classes/gimbal_bit_struct.c
     source/meta/classes/gimbal_class.c
     source/meta/classes/gimbal_opaque.c
     source/meta/classes/gimbal_flags.c

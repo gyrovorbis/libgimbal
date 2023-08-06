@@ -13,6 +13,7 @@
 #include "meta/classes/gimbal_flags.h"
 #include "meta/classes/gimbal_opaque.h"
 #include "meta/classes/gimbal_primitives.h"
+#include "meta/classes/gimbal_bit_struct.h"
 
 #include "meta/ifaces/gimbal_iallocator.h"
 #include "meta/ifaces/gimbal_ievent_filter.h"
