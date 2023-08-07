@@ -1,6 +1,7 @@
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/algorithms/gimbal_md5.h>
 #include <gimbal/algorithms/gimbal_sha1.h>
+#include <gimbal/algorithms/gimbal_random.h>
 
 GBL_EXPORT GblHash gblHash32Bit(uint32_t value) {
     value ^= value >> 16;
