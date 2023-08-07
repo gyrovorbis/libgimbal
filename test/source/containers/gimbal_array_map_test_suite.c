@@ -3,6 +3,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/meta/classes/gimbal_primitives.h>
+#include <gimbal/algorithms/gimbal_random.h>
 
 #define GBL_ARRAY_MAP_TEST_SUITE_BINARY_SEARCHABLE_ENTRIES_ 200
 #define GBL_ARRAY_MAP_TEST_SUITE_(inst) (GBL_PRIVATE(GblArrayMapTestSuite, inst))
