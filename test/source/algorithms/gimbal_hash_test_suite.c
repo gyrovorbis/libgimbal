@@ -1,6 +1,7 @@
 #include "algorithms/gimbal_hash_test_suite.h"
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/test/gimbal_test_macros.h>
+#include <gimbal/algorithms/gimbal_random.h>
 
 #define GBL_HASH_TEST_SUITE_(inst)   (GBL_PRIVATE(GblHashTestSuite, inst))
 

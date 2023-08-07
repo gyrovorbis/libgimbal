@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_date_time.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
+#include <gimbal/algorithms/gimbal_random.h>
 #include <time.h>
 
 #define GBL_SELF_TYPE GblDateTimeTestSuite
