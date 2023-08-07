@@ -186,7 +186,7 @@ GBL_EXPORT void gblSortHeap(void* pArray, size_t count, size_t elemSize, GblSort
         // Heap sort
         for(int i = count - 1; i >= 0; i--) {
             memcpy(pTemp, pArray, elemSize);
-            memcpy(&pArray[0], GBL_PTR_OFFSET(pArray, i * elemSize), elemSize);
+            memcpy(pArray, GBL_PTR_OFFSET(pArray, i * elemSize), elemSize);
             memcpy(GBL_PTR_OFFSET(pArray, i * elemSize), pTemp, elemSize);
 
           // Heapify root element to get highest element at root again
