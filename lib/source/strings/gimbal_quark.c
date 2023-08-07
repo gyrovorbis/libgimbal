@@ -32,9 +32,8 @@ static GblBool           initialized_    = GBL_FALSE;
 static GblBool           inittedOnce_    = GBL_FALSE;
 static once_flag         initOnce_       = ONCE_FLAG_INIT;
 static mtx_t             registryMtx_;
-
-GBL_THREAD_LOCAL
-static GblBool           initializing_   = GBL_FALSE;
+static
+GBL_THREAD_LOCAL GblBool initializing_   = GBL_FALSE;
 
 static GblContext*       pCtx_           = NULL;
 static size_t            pageSize_       = GBL_QUARK_PAGE_SIZE_DEFAULT_;

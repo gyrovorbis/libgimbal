@@ -1,6 +1,7 @@
 #include <gimbal/test/gimbal_test_scenario.h>
 #include <gimbal/test/gimbal_test_suite.h>
 #include <gimbal/utils/gimbal_timer.h>
+#include <gimbal/algorithms/gimbal_random.h>
 #include <gimbal/allocators/gimbal_allocation_tracker.h>
 #include <time.h>
 

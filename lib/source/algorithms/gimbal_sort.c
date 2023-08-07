@@ -185,14 +185,13 @@ GBL_EXPORT void gblSortHeap(void* pArray, size_t count, size_t elemSize, GblSort
 
         // Heap sort
         for(int i = count - 1; i >= 0; i--) {
-            memcpy(pTemp, &pArray[0], elemSize);
+            memcpy(pTemp, pArray, elemSize);
             memcpy(&pArray[0], GBL_PTR_OFFSET(pArray, i * elemSize), elemSize);
             memcpy(GBL_PTR_OFFSET(pArray, i * elemSize), pTemp, elemSize);
 
           // Heapify root element to get highest element at root again
           heapify_(pArray, i, 0, elemSize, pFnCmp);
         }
-
 }
 
 GBL_EXPORT size_t gblSearchBinary(void* pArray, size_t  elemSize, int l, int r, void* pTarget, GblSortComparatorFn pFnCmp) {
