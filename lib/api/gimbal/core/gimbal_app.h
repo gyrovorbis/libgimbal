@@ -107,7 +107,7 @@ GBL_EXPORT const GblStringList*
  *  @{
  */
 //! Creates a GblApp instance with the given command-line arguments, returning a pointer to it
-GBL_EXPORT GblApp*     GblApp_create       (int argc,
+GBL_EXPORT GblApp*     GblApp_create       (int          argc,
                                             const char** ppArgv)  GBL_NOEXCEPT;
 //! Decrements the refcount of a GblApp instance, destroying it if it is the last one
 GBL_EXPORT GblRefCount GblApp_unref        (GBL_SELF)             GBL_NOEXCEPT;

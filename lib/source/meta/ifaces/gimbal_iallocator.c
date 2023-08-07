@@ -1,5 +1,5 @@
 #include <gimbal/meta/ifaces/gimbal_iallocator.h>
-#include <gimbal/meta/instances/gimbal_instance.h>
+#include <gimbal/meta/instances/gimbal_object.h>
 #include <gimbal/strings/gimbal_quark.h>
 #include "../types/gimbal_type_.h"
 
@@ -24,6 +24,17 @@ static GBL_RESULT GblIAllocatorClass_free_(GblIAllocator* pIAllocator, const Gbl
     GBL_CTX_BEGIN(NULL);
     GBL_ALIGNED_FREE(pData);
     GBL_CTX_END();
+}
+
+static GBL_RESULT GblIAllocator_parent_(const GblIAllocator* pSelf, GblIAllocator** ppParent) {
+    *ppParent = NULL;
+
+    if(GBL_TYPECHECK(GblObject, pSelf)) {
+        GblObject* pObject = GBL_OBJECT(pSelf);
+        *ppParent = GBL_IALLOCATOR(GblObject_findAncestorByType(pObject, GBL_IALLOCATOR_TYPE));
+    }
+
+    return GBL_RESULT_SUCCESS;
 }
 
 static GBL_RESULT GblIAllocatorClass_init_(GblIAllocatorClass* pIFace, void* pData) {
@@ -69,6 +80,15 @@ GBL_RESULT GblIAllocator_free   (GblIAllocator* pSelf,
     GBL_VCALL(GblIAllocator, pFnFree,
                        pSelf, pStackFrame, pData);
     GBL_CTX_END();
+}
+
+GBL_EXPORT GblIAllocator* GblIAllocator_parent(const GblIAllocator* pSelf) {
+    GblIAllocator* pParent = NULL;
+
+    GBL_CTX_BEGIN(NULL);
+    GBL_VCALL(GblIAllocator, pFnParent, pSelf, &pParent);
+    GBL_CTX_END_BLOCK();
+    return pParent;
 }
 
 GBL_EXPORT GblType GblIAllocator_type(void) {

@@ -10,8 +10,8 @@
  *
  *  \author Falco Girgis
  */
-#ifndef GIMBAL_TEST_H
-#define GIMBAL_TEST_H
+#ifndef GIMBAL_TEST_MACROS_H
+#define GIMBAL_TEST_MACROS_H
 
 #include "../preprocessor/gimbal_macro_utils.h"
 #include "gimbal_test_scenario.h"
@@ -185,8 +185,16 @@ GBL_DECLS_END
     typedef struct GBL_TEST_FIXTURE_TYPE GblTestFixture; \
     GBL_DECLARE_STRUCT(GBL_TEST_FIXTURE_TYPE)
 
-#define GBL_TEST_REGISTER(...) \
-    GBL_EXPORT GblType GBL_GLUE(GBL_GLUE(GBL_SELF_TYPE, _), type)(void) { \
+#ifdef __cplusplus
+#   define GBL_TEST_REGISTER(...) \
+        extern "C" GBL_TEST_REGISTER_(__VA_ARGS__)
+#else
+#   define GBL_TEST_REGISTER(...) \
+        GBL_TEST_REGISTER_(__VA_ARGS__)
+#endif
+
+#define GBL_TEST_REGISTER_(...) \
+    GBL_EXPORT GblType GBL_GLUE(GBL_GLUE(GBL_SELF_TYPE, _), type)(void) GBL_NOEXCEPT { \
     static GblType type = GBL_INVALID_TYPE;                                   \
     const static GblTestCase cases[] = { \
         GBL_TUPLE_FOREACH(GBL_TEST_CASE_PAIR, GBL_GLUE(GBL_SELF_TYPE,_), (__VA_ARGS__)) \
@@ -224,4 +232,4 @@ GBL_DECLS_END
 #define GBL_TEST_INIT_END  GBL_TEST_CASE_END
 #define GBL_TEST_FINAL_END GBL_TEST_CASE_END
 
-#endif // GIMBAL_TEST_H
+#endif // GIMBAL_TEST_MACROS_H

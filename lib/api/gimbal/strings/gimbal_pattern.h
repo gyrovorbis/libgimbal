@@ -13,6 +13,8 @@
  *  \bug
  *      - GblPattern_match(): multiple back-to-back matches are
  *        counted as a single match
+ *      - GblPattern_toString()
+ *      - Wrap Tiny C Regex tests in gimbal Unit tests
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License
@@ -42,8 +44,17 @@ GBL_FORWARD_DECLARE_STRUCT(GblStringView);
  */
 typedef struct GblPattern GblPattern;
 
+/*! \name Lifetime Management
+ *  \brief Methods for creating, referencing, and unreferencing patterns
+ *  @{
+ */
 //! Compiles the given regular expression into a pre-processed GblPattern
-GBL_EXPORT const GblPattern* GblPattern_compile (const char* pRegExp) GBL_NOEXCEPT;
+GBL_EXPORT const GblPattern* GblPattern_create (const char* pRegExp) GBL_NOEXCEPT;
+//! Returns a new reference to an existing pattern, incrementing its refcount
+GBL_EXPORT const GblPattern* GblPattern_ref    (GBL_CSELF)           GBL_NOEXCEPT;
+//! Releases a reference to a pattern, deallocating it upon reaching zero
+GBL_EXPORT GblRefCount       GblPattern_unref  (GBL_CSELF)           GBL_NOEXCEPT;
+//! @}
 
 /*! \name Matching
  *  \brief Methods for generic pattern matching

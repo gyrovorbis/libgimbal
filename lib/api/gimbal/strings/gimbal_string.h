@@ -5,6 +5,7 @@
  *      - gblStrdupa()
  *      - gblStrndupa()
  *      - Unit tests
+ *      - everything GblStringView has can be done in-place?
  *
  *  \author Falco Girgis
  */
@@ -22,6 +23,7 @@ GBL_EXPORT int   gblAsciiHexDigitValue (char c)                        GBL_NOEXC
 
 GBL_EXPORT int   gblStrCaseCmp         (const char* pStr1,
                                         const char* pStr2)             GBL_NOEXCEPT;
+
 GBL_EXPORT int   gblStrnCaseCmp        (const char* pStr1,
                                         const char* pStr2,
                                         size_t      length)            GBL_NOEXCEPT;
@@ -35,10 +37,7 @@ GBL_EXPORT char* gblStrnReverse        (char* pString, size_t  length) GBL_NOEXC
 GBL_EXPORT char* gblStrnUpper          (char* pString)                 GBL_NOEXCEPT;
 GBL_EXPORT char* gblStrnLower          (char* pString)                 GBL_NOEXCEPT;
 GBL_EXPORT char* gblStpcpy             (char* pString)                 GBL_NOEXCEPT;
-// everything string view has
-// everything that can be done in-place
 
 GBL_DECLS_END
-
 
 #endif // GIMBAL_STRING_H

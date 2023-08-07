@@ -13,6 +13,7 @@
 #include "algorithms/gimbal_sort.h"
 #include "algorithms/gimbal_sha1.h"
 #include "algorithms/gimbal_md5.h"
+#include "algorithms/gimbal_random.h"
 
 /*! \defgroup algorithms Algorithms
 * 	\brief Collection of common algorithms

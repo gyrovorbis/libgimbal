@@ -67,16 +67,17 @@ GBL_EXPORT void gblSortQuick(void* pArray, size_t  count, size_t  elemSize, GblS
     qsort(pArray, count, elemSize, pFnCmp);
 }
 
-GBL_EXPORT void gblSortInsertion(void* pArray, size_t  count, size_t  elemSize, GblSortComparatorFn pFnCmp) {
+GBL_EXPORT void gblSortInsertion(void* pArray, size_t count, size_t  elemSize, GblSortComparatorFn pFnCmp) {
     void* pTemp = GBL_ALLOCA(elemSize);
-    for(size_t  i = 2; i < count; ++i) {
+
+    for(int i = 1; i < count; ++i) {
         memcpy(pTemp, (char*)pArray + i*elemSize, elemSize);
-        size_t  j = i;
-        while(j && pFnCmp(((char*)pArray + (j-1)*elemSize), pTemp) > 0) {
-            memcpy((char*)pArray + j*elemSize, (char*)pArray + (j-1)*elemSize, elemSize);
+        int  j = i - 1;
+        while(j >= 0 && pFnCmp(((char*)pArray + j*elemSize), pTemp) > 0) {
+            memcpy((char*)pArray + (j+1)*elemSize, (char*)pArray + j*elemSize, elemSize);
             --j;
         }
-        memcpy((char*)pArray + j*elemSize, pTemp, elemSize);
+        memcpy((char*)pArray + (j+1)*elemSize, pTemp, elemSize);
     }
 }
 
@@ -151,6 +152,47 @@ GBL_EXPORT void gblSortComb(void* pArray, size_t count, size_t elemSize, GblSort
             }
         }
     }
+}
+
+GBL_INLINE void heapify_(void* pArray, size_t n, int i, size_t elemSize, GblSortComparatorFn pFnCmp) {
+    // Find largest among root, left child and right child
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && pFnCmp(GBL_PTR_OFFSET(pArray, left * elemSize), GBL_PTR_OFFSET(pArray, largest * elemSize)) > 0)
+      largest = left;
+
+    if (right < n && pFnCmp(GBL_PTR_OFFSET(pArray, right * elemSize), GBL_PTR_OFFSET(pArray, largest * elemSize)) > 0)
+      largest = right;
+
+    // Swap and continue heapifying if root is not largest
+    if (largest != i) {
+        void* pTemp = GBL_ALLOCA(elemSize);
+        memcpy(pTemp, GBL_PTR_OFFSET(pArray, i * elemSize), elemSize);
+        memcpy(GBL_PTR_OFFSET(pArray, i * elemSize), GBL_PTR_OFFSET(pArray, largest * elemSize), elemSize);
+        memcpy(GBL_PTR_OFFSET(pArray, largest * elemSize), pTemp, elemSize);
+        heapify_(pArray, n, largest, elemSize, pFnCmp);
+    }
+  }
+
+GBL_EXPORT void gblSortHeap(void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) {
+        // Build max heap
+        for(int i = count / 2 - 1; i >= 0; i--)
+          heapify_(pArray, count, i, elemSize, pFnCmp);
+
+        void* pTemp = GBL_ALLOCA(elemSize);
+
+        // Heap sort
+        for(int i = count - 1; i >= 0; i--) {
+            memcpy(pTemp, &pArray[0], elemSize);
+            memcpy(&pArray[0], GBL_PTR_OFFSET(pArray, i * elemSize), elemSize);
+            memcpy(GBL_PTR_OFFSET(pArray, i * elemSize), pTemp, elemSize);
+
+          // Heapify root element to get highest element at root again
+          heapify_(pArray, i, 0, elemSize, pFnCmp);
+        }
+
 }
 
 GBL_EXPORT size_t gblSearchBinary(void* pArray, size_t  elemSize, int l, int r, void* pTarget, GblSortComparatorFn pFnCmp) {

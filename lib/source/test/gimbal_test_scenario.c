@@ -421,8 +421,8 @@ GBL_EXPORT GblTestScenario* GblTestScenario_create(const char* pName) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pName);
     pScenario = GBL_TEST_SCENARIO(GblObject_create(GBL_TEST_SCENARIO_TYPE,
-                                                "name", pName,
-                                                NULL));
+                                                   "name", pName,
+                                                   NULL));
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END_BLOCK();
     return pScenario;

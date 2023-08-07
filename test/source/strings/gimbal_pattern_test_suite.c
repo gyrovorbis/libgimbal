@@ -15,11 +15,11 @@ GBL_TEST_FINAL()
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(compileInvalid)
-    GBL_TEST_COMPARE(GblPattern_compile(NULL), NULL);
+    GBL_TEST_COMPARE(GblPattern_create(NULL), NULL);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(compile)
-    pFixture->pPattern = GblPattern_compile("[0-9]{8}");
+    pFixture->pPattern = GblPattern_create("[0-9]{8}");
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(matchInvalid)
@@ -215,7 +215,10 @@ GBL_TEST_CASE(matchNotFirstMultiInARow)
 
     GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("token")));
     GBL_TEST_COMPARE(count, 1);
+GBL_TEST_CASE_END
 
+GBL_TEST_CASE(unref)
+    GblPattern_unref(pFixture->pPattern);
 GBL_TEST_CASE_END
 
 GBL_TEST_REGISTER(compileInvalid,
@@ -233,7 +236,8 @@ GBL_TEST_REGISTER(compileInvalid,
                   matchNotDefaultCount,
                   matchNot,
                   matchNotLast,
-                  matchNotFirstMultiInARow)
+                  matchNotFirstMultiInARow,
+                  unref)
 #if 0
 
 GBL_TEST_CASE(iso8601BasicDate)

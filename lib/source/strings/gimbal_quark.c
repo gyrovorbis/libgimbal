@@ -8,10 +8,12 @@
 
 #define GBL_QUARK_PAGE_SIZE_DEFAULT_            1024
 #define GBL_QUARK_REGISTRY_CAPACITY_DEFAULT_    64
-#define GBL_QUARK_ENSURE_INITIALIZED_()                         \
-    GBL_STMT_START {                                            \
-        if(!inittedOnce_) call_once(&initOnce_, gblQuarkInit_); \
-        else if(!initialized_) gblQuarkInit_();                 \
+#define GBL_QUARK_ENSURE_INITIALIZED_() \
+    GBL_STMT_START {   \
+        if(!initializing_) { \
+            if(!inittedOnce_) call_once(&initOnce_, gblQuarkInit_); \
+            else if(!initialized_) gblQuarkInit_(); \
+        } \
     } GBL_STMT_END
 
 static struct {
@@ -30,6 +32,9 @@ static GblBool           initialized_    = GBL_FALSE;
 static GblBool           inittedOnce_    = GBL_FALSE;
 static once_flag         initOnce_       = ONCE_FLAG_INIT;
 static mtx_t             registryMtx_;
+
+GBL_THREAD_LOCAL
+static GblBool           initializing_   = GBL_FALSE;
 
 static GblContext*       pCtx_           = NULL;
 static size_t            pageSize_       = GBL_QUARK_PAGE_SIZE_DEFAULT_;
@@ -63,11 +68,12 @@ static void GblQuark_final_(void) {
 }
 
 static void gblQuarkInit_(void) {
+    initializing_ = GBL_TRUE;
     GblBool mtxLocked = GBL_FALSE;
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_PUSH_VERBOSE("[GblQuark]: Initializing");
     GBL_CTX_VERIFY_EXPRESSION(!initialized_);
-    mtx_init(&registryMtx_, mtx_plain);
+    mtx_init(&registryMtx_, mtx_recursive);
     mtx_lock(&registryMtx_);
     mtxLocked = GBL_TRUE;
     GBL_CTX_CALL(GblHashSet_construct(&registry_,
@@ -88,6 +94,7 @@ static void gblQuarkInit_(void) {
     atexit(GblQuark_final_);
     GBL_CTX_POP(1);
     GBL_CTX_END_BLOCK();
+    initializing_ = GBL_FALSE;
     if(mtxLocked) mtx_unlock(&registryMtx_);
 }
 
@@ -104,7 +111,7 @@ static  GblQuark quarkFromString_(const char* pString, GblBool alloc) {
                 GblBool inserted = GblHashSet_insert(&registry_, &pString);
                 mtx_unlock(&registryMtx_);
                 GBL_UNUSED(inserted);
-                GBL_ASSERT(inserted);
+                //GBL_ASSERT(inserted);
             }
             quark = (GblQuark)pString;
         }

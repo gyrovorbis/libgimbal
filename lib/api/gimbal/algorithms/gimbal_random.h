@@ -1,6 +1,6 @@
 /*! \file
  *  \brief Random number generators and utilities
- *  \ingroup numeric
+ *  \ingroup algorithms
  *
  *  This file contains the API and utilties surrounding
  *  random number generation. A series of utilities are
@@ -37,8 +37,6 @@ GBL_EXPORT int      gblRandString    (char*       pBuffer,
                                       int         minSize,
                                       int         maxSize,
                                       const char* pCharList)    GBL_NOEXCEPT;
-
-//GBL_EXPORT int      gblRandLehmer    (void)                     GBL_NOEXCEPT;
 
 GBL_EXPORT int gblRandBernoulli (float p)        GBL_NOEXCEPT;
 GBL_EXPORT int gblRandBinomial  (int n, float p) GBL_NOEXCEPT;

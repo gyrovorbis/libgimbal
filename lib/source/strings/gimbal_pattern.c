@@ -1,9 +1,41 @@
 #include <gimbal/strings/gimbal_pattern.h>
 #include <gimbal/strings/gimbal_string_view.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include <re.h>
 
-GBL_EXPORT const GblPattern* GblPattern_compile(const char* pRegExp) {
-    return pRegExp? (GblPattern*)re_compile(pRegExp) : NULL;
+#define GBL_PATTERN_COMPILE_BUFFER_SIZE_ 1024
+
+static const GblPattern* GblPattern_compileStatic_(const char* pRegExp) {
+    if(!pRegExp) return NULL;
+
+    return (const GblPattern*)re_compile(pRegExp);
+}
+
+GBL_EXPORT const GblPattern* GblPattern_create(const char* pRegExp) {
+    GblPattern* pPattern = NULL;
+
+    if(pRegExp) {
+        void* pBuffer = GBL_ALLOCA(GBL_PATTERN_COMPILE_BUFFER_SIZE_);
+        unsigned size = GBL_PATTERN_COMPILE_BUFFER_SIZE_;
+
+
+        if(re_compile_to(pRegExp, pBuffer, &size)) {
+            GBL_ASSERT(size);
+
+            pPattern = GblRef_create(size);
+            memcpy(pPattern, pBuffer, size);
+        }
+    }
+
+    return pPattern;
+}
+
+GBL_EXPORT GblRefCount GblPattern_unref(const GblPattern* pSelf) {
+    return GblRef_unref((void*)pSelf);
+}
+
+GBL_EXPORT const GblPattern* GblPattern_ref(const GblPattern* pSelf) {
+    return GblRef_ref((void*)pSelf);
 }
 
 GBL_EXPORT GblBool (GblPattern_match)(const GblPattern* pSelf,
@@ -71,7 +103,7 @@ GBL_EXPORT GblBool (GblPattern_matchStr)(const char*    pRegExp,
                                          GblStringView* pMatch,
                                          int*           pCount)
 {
-    return GblPattern_match(GblPattern_compile(pRegExp),
+    return GblPattern_match(GblPattern_compileStatic_(pRegExp),
                             pString,
                             pMatch,
                             pCount);
@@ -120,7 +152,7 @@ GBL_EXPORT GblBool (GblPattern_matchNot)(const GblPattern* pSelf,
     }
 
     // If there's a non-match before the first token
-    if(token.pData != pString) {
+    if(token.pData && token.pData != pString) {
         *pMatch = GblStringView_fromStringSized(pString, token.pData - pString);
         ++totalCount;
     }
@@ -174,7 +206,7 @@ GBL_EXPORT GblBool GblPattern_matchNotStr(const char*    pRegExp,
                                           GblStringView* pMatch,
                                           int*       pCount)
 {
-    return GblPattern_matchNot(GblPattern_compile(pRegExp),
+    return GblPattern_matchNot(GblPattern_compileStatic_(pRegExp),
                                pString,
                                pMatch,
                                pCount);
@@ -199,7 +231,7 @@ GBL_EXPORT GblBool GblPattern_matchExact(const GblPattern* pSelf, const char* pS
 GBL_EXPORT GblBool GblPattern_matchExactStr(const char* pRegExp,
                                             const char* pString)
 {
-    return GblPattern_matchExact(GblPattern_compile(pRegExp), pString);
+    return GblPattern_matchExact(GblPattern_compileStatic_(pRegExp), pString);
 }
 
 
@@ -210,5 +242,5 @@ GBL_EXPORT size_t GblPattern_matchCount(const GblPattern* pSelf, const char* pSt
 }
 
 GBL_EXPORT size_t GblPattern_matchCountStr(const char* pRegExp, const char* pString) {
-    return GblPattern_matchCount(GblPattern_compile(pRegExp), pString);
+    return GblPattern_matchCount(GblPattern_compileStatic_(pRegExp), pString);
 }

@@ -37,6 +37,7 @@ GBL_EXPORT void gblSortShell     (void* pArray, size_t count, size_t elemSize, G
 GBL_EXPORT void gblSortMerge     (void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_EXPORT void gblSortComb      (void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 GBL_EXPORT void gblSortBubble    (void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
+GBL_EXPORT void gblSortHeap      (void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;
 //! @}
 
 GBL_EXPORT size_t gblSearchBinary (void* pSrc, size_t  elemSize, int l, int r, void* pDst, GblSortComparatorFn pFnCmp) GBL_NOEXCEPT;

@@ -131,7 +131,15 @@ extern "C" {
 #define GBL_CLASS_PRIVATE_STRUCT(instanceStruct) \
     GBL_GLUE(GBL_GLUE(instanceStruct, Class), _)
 
-#define GBL_DECLARE_TYPE(instanceStruct) \
+#ifdef __cplusplus
+#   define GBL_DECLARE_TYPE(instanceStruct) \
+        extern "C" GBL_DECLARE_TYPE_(instanceStruct)
+#else
+#   define GBL_DECLARE_TYPE(instanceStruct) \
+        GBL_DECLARE_TYPE_(instanceStruct)
+#endif
+
+#define GBL_DECLARE_TYPE_(instanceStruct) \
     GblType GBL_GLUE(instanceStruct, _type(void)) GBL_NOEXCEPT
 
 #define GBL_DECLARE_UNION(S)   \

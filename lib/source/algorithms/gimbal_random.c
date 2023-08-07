@@ -13,7 +13,7 @@
 static uint64_t seeds_[GBL_SEED_COUNT] = { LEHMER_DEFAULT };
 static GblBool  init_ = GBL_FALSE;
 
-GBL_EXPORT int gblRandLehmer(void) {
+GBL_EXPORT double gblRandLehmer(void) {
 
     const int Q = LEHMER_MODULUS / LEHMER_MULTIPLIER;
     const int R = LEHMER_MODULUS % LEHMER_MULTIPLIER;
@@ -90,7 +90,7 @@ GBL_EXPORT void gblRandBuffer(void* pData, size_t  size) {
     }
 }
 
-#define gblRandf() (gblRandFloat(0.0f, 1.0f))
+#define gblRandf() (gblRandLehmer())
 
 GBL_EXPORT int gblRandBernoulli(float p) {
     return ((gblRandf() < (1.0f - p)) ? 0 : 1);

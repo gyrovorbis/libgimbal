@@ -40,11 +40,13 @@ GBL_DECLS_BEGIN
  */
 GBL_INTERFACE_DERIVE(GblIAllocator)
     //! Virtual method invoked when an allocation is requested
-    GBL_RESULT (*pFnAlloc)  (GBL_SELF, const GblStackFrame* pFrame, size_t size, size_t align, const char* pDbgStr, void** ppData);
+    GBL_RESULT (*pFnAlloc)   (GBL_SELF, const GblStackFrame* pFrame, size_t size, size_t align, const char* pDbgStr, void** ppData);
     //! Virtual method invoked when a reallocation is requested
-    GBL_RESULT (*pFnRealloc)(GBL_SELF, const GblStackFrame* pFrame, void* pData, size_t newSize, size_t newAlign, void** ppNewData);
+    GBL_RESULT (*pFnRealloc) (GBL_SELF, const GblStackFrame* pFrame, void* pData, size_t newSize, size_t newAlign, void** ppNewData);
     //! Virtual method invoked when a free is requested
-    GBL_RESULT (*pFnFree)   (GBL_SELF, const GblStackFrame* pFrame, void* pData);
+    GBL_RESULT (*pFnFree)    (GBL_SELF, const GblStackFrame* pFrame, void* pData);
+    //! Virtual method for retrieving the upstream parent fallback allocator
+    GBL_RESULT (*pFnParent)  (GBL_CSELF, GblIAllocator** ppParent);
 GBL_INTERFACE_END
 
 //! Returns the GblType UUID associated with the GblIAllocator type
@@ -72,6 +74,8 @@ GBL_EXPORT GBL_RESULT GblIAllocator_free    (GBL_SELF,
                                              const GblStackFrame* pFrame,
                                              void*                pData)     GBL_NOEXCEPT;
 //! @}
+
+GBL_EXPORT GblIAllocator* GblIAllocator_parent(GBL_CSELF) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

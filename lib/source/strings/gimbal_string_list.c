@@ -415,7 +415,7 @@ GBL_EXPORT GblStringList* GblStringList_createFilter(const GblStringList* pOther
                                                      const char*          pPattern) {
     GblStringList* pList = GblStringList_createEmpty();
 
-    const GblPattern* pCompiled = GblPattern_compile(pPattern);
+    const GblPattern* pCompiled = GblPattern_create(pPattern);
 
     for(GblStringList* pNode = pOther->ringNode.pNext;
         pNode != pOther;
@@ -425,6 +425,8 @@ GBL_EXPORT GblStringList* GblStringList_createFilter(const GblStringList* pOther
             GblRingList_pushBack(pList, GblStringRef_ref(pNode->pData));
         }
     }
+
+    GblPattern_unref(pCompiled);
 
     return pList;
 }

@@ -11,7 +11,7 @@
         GblBool     valid       = GBL_TRUE; \
         char*       pEnd        = NULL; \
         const char* pCString    = GBL_STRING_VIEW_CSTR(self); \
-     \
+        \
         if(min == 0 && GblStringView_startsWith(self, GBL_STRV("-"))) { \
             result = 0; \
             valid = GBL_FALSE; \
@@ -188,7 +188,7 @@ GBL_EXPORT GBL_RESULT GblStringView_copy(GblStringView self, void* pDst, size_t 
     GBL_CTX_VERIFY(offset + bytes < self.length,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
     if(bytes) {
-        memcpy(pDst, self.pData+offset, bytes);
+        memcpy(pDst, self.pData + offset, bytes);
     }
     GBL_CTX_END();
 }

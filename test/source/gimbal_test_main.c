@@ -49,6 +49,10 @@
 #include "core/gimbal_thread_test_suite.h"
 #include "utils/gimbal_scanner_test_suite.h"
 
+#ifdef GBL_ENABLE_CPP
+#   include "strings/gimbal_quark_test_suite.hpp"
+#endif
+
 #include <math.h>
 
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
@@ -225,6 +229,10 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
+#ifdef GBL_ENABLE_CPP
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_QUARK_TEST_SUITE_CPP_TYPE));
+#endif
 
     const GBL_RESULT result = GblTestScenario_run(pScenario, argc, pArgv);
 

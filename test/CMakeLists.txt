@@ -131,6 +131,8 @@ set(GIMBAL_TEST_SOURCES
 if(GBL_ENABLE_CPP)
     list(APPEND
          GIMBAL_TEST_SOURCES
+         include/strings/gimbal_quark_test_suite.hpp
+         source/strings/gimbal_quark_test_suite.cpp
          source/gimbal_test_cpp.cpp)
 endif(GBL_ENABLE_CPP)
 

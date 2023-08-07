@@ -201,6 +201,16 @@ set(GIMBAL_INCLUDES
     api/gimbal/utils/gimbal_settings.h
 )
 
+if(GBL_ENABLE_CPP)
+    list(APPEND
+         GBL_DEFINES
+         GBL_ENABLE_CPP)
+
+    list(APPEND
+         GIMBAL_INCLUDES
+         api/gimbal/strings/gimbal_quark.hpp)
+endif()
+
 set(GIMBAL_SOURCES
     source/algorithms/gimbal_hash.c
     source/algorithms/gimbal_md5.c

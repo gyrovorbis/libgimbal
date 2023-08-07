@@ -25,6 +25,7 @@
  *      - continue testing type-specific peek/scan functions
  *      - write own scanf() implementation that knows how
  *        many characters have been read
+ *      - store GblPattern now instead of GblStringRef
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License
