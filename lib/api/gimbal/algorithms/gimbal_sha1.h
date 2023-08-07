@@ -61,11 +61,6 @@ GBL_EXPORT void GblSha1_final  (GBL_SELF,
 GBL_EXPORT const char* GblSha1_string (const uint8_t digest[GBL_SHA1_DIGEST_SIZE],
                                        char          buffer[GBL_SHA1_DIGEST_STRING_SIZE]) GBL_NOEXCEPT;
 
-/*! Standalone convenience function for generating a 32-bit SHA1 hash from the given bytes
- * \ingroup hashing
-*/
-GBL_EXPORT GblHash gblHashSha1 (const void* pData, size_t size) GBL_NOEXCEPT;
-
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

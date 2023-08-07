@@ -41,7 +41,7 @@ GBL_EXPORT GblType GblIPlugin_type(void) GBL_UNLIKELY {
     static GblType type = GBL_INVALID_TYPE;
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_register(GblQuark_internStringStatic("GblIPlugin"),
+        type = GblType_register(GblQuark_internStatic("GblIPlugin"),
                                 GBL_INTERFACE_TYPE,
                                 &(const GblTypeInfo) {
                                     .pFnClassInit     = GblIPluginClass_init_,

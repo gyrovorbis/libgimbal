@@ -51,8 +51,8 @@ static void GblLogger_initialize_(void) {
     initializing_ = GBL_TRUE;
 
     stackDepth_        = 0;
-    domainFilterQuark_ = GblQuark_fromStringStatic(GBL_LOGGER_DOMAIN_FILTER_FIELD_NAME_);
-    threadFilterQuark_ = GblQuark_fromStringStatic(GBL_LOGGER_THREAD_FILTER_FIELD_NAME_);
+    domainFilterQuark_ = GblQuark_fromStatic(GBL_LOGGER_DOMAIN_FILTER_FIELD_NAME_);
+    threadFilterQuark_ = GblQuark_fromStatic(GBL_LOGGER_THREAD_FILTER_FIELD_NAME_);
 
     initializing_ = GBL_FALSE;
     initialized_ = GBL_TRUE;
@@ -554,7 +554,7 @@ GBL_EXPORT GblType GblLogger_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        type = GblType_register(GblQuark_internStringStatic("GblLogger"),
+        type = GblType_register(GblQuark_internStatic("GblLogger"),
                                 GBL_OBJECT_TYPE,
                                 &typeInfo,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

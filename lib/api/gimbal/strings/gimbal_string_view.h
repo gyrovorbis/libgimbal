@@ -4,6 +4,8 @@
  *
  *  \todo
  *      - ignore case variants/default arguments
+ *      - optional/default arguments
+ *      - overloads for secondary GblStringView or const char*
  *
  *  \author Falco Girgis
  */

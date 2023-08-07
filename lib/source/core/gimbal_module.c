@@ -461,7 +461,7 @@ GBL_EXPORT GblType GblModule_type(void) {
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         iface.interfaceType = GBL_IPLUGIN_TYPE;
 
-        type = GblType_register(GblQuark_internStringStatic("GblModule"),
+        type = GblType_register(GblQuark_internStatic("GblModule"),
                                 GBL_CONTEXT_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

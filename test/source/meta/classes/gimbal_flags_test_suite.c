@@ -359,7 +359,7 @@ GBL_EXPORT GblType GblFlagsTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("FlagsTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("FlagsTestSuite"),
                                      &vTable,
                                      sizeof(GblFlagsTestSuite),
                                      sizeof(GblFlagsTestSuite_),

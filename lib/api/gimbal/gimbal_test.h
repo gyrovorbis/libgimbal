@@ -84,7 +84,7 @@
             };
 
             if(type == GBL_INVALID_TYPE) {
-                type = GblTestSuite_register(GblQuark_internStringStatic("UuidTestSuite"),
+                type = GblTestSuite_register(GblQuark_internStatic("UuidTestSuite"),
                                              &vTable,
                                              sizeof(GblUuidTestSuite),
                                              0,

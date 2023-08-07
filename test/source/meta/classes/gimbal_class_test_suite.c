@@ -479,7 +479,7 @@ GBL_EXPORT GblType GblClassTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("ClassTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("ClassTestSuite"),
                                      &vTable,
                                      sizeof(GblClassTestSuite),
                                      sizeof(GblClassTestSuite_),

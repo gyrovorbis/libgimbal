@@ -174,7 +174,7 @@ GBL_EXPORT GblType GblOpaqueTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblOpaqueTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblOpaqueTestSuite"),
                                      &vTable,
                                      sizeof(GblOpaqueTestSuite),
                                      sizeof(GblOpaqueTestSuite_),

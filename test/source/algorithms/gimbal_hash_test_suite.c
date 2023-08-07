@@ -134,7 +134,6 @@ static GBL_RESULT GblHashTestSuite_sip_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_END();
 }
 
-
 static GBL_RESULT GblHashTestSuite_crc_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
@@ -144,6 +143,39 @@ static GBL_RESULT GblHashTestSuite_crc_(GblTestSuite* pSelf, GblContext* pCtx) {
     for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
         total += gblHashCrc(pSelf_->words[w],
                             strlen(pSelf_->words[w]));
+    }
+
+    pSelf_->total = total;
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblHashTestSuite_md5_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
+
+    volatile size_t  total = 0;
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+        total += gblHashMd5(pSelf_->words[w],
+                            strlen(pSelf_->words[w]));
+    }
+
+    pSelf_->total = total;
+
+    GBL_CTX_END();
+}
+
+
+static GBL_RESULT GblHashTestSuite_sha1_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
+
+    volatile size_t  total = 0;
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+        total += gblHashSha1(pSelf_->words[w],
+                             strlen(pSelf_->words[w]));
     }
 
     pSelf_->total = total;
@@ -163,6 +195,8 @@ GBL_EXPORT GblType GblHashTestSuite_type(void) {
         { "jenkins",    GblHashTestSuite_jenkins_      },
         { "sip",        GblHashTestSuite_sip_          },
         { "crc",        GblHashTestSuite_crc_          },
+        { "md5",        GblHashTestSuite_md5_          },
+        { "sha1",       GblHashTestSuite_sha1_         },
         { NULL,     NULL                               }
     };
 
@@ -173,7 +207,7 @@ GBL_EXPORT GblType GblHashTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblHashTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblHashTestSuite"),
                                      &vTable,
                                      sizeof(GblHashTestSuite),
                                      sizeof(GblHashTestSuite_),

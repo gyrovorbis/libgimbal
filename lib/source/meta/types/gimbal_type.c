@@ -633,7 +633,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
 
     GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_PROTOCOL,
                              GBL_INVALID_TYPE,
-                             GblQuark_internStringStatic("Protocol"),
+                             GblQuark_internStatic("Protocol"),
                              &protocolInfo,
                              GBL_TYPE_ROOT_FLAG_DEPENDENT |
                              GBL_TYPE_ROOT_FLAG_DERIVABLE |
@@ -646,7 +646,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
 
     GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_STATIC_CLASS,
                              GBL_INVALID_TYPE,
-                             GblQuark_internStringStatic("StaticClass"),
+                             GblQuark_internStatic("StaticClass"),
                              &classInfo,
                              GBL_TYPE_ROOT_FLAG_CLASSED         |
                              GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE  |
@@ -660,7 +660,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
 
     GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_INTERFACE,
                             GBL_INVALID_TYPE,
-                            GblQuark_internStringStatic("Interface"),
+                            GblQuark_internStatic("Interface"),
                             &ifaceInfo,
                             GBL_TYPE_ROOT_FLAG_DEPENDENT        |
                             GBL_TYPE_ROOT_FLAG_INTERFACED       |
@@ -678,7 +678,7 @@ static GBL_RESULT GblType_registerBuiltins_(void) {
 
     GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_INSTANCE,
                              GBL_INVALID_TYPE,
-                             GblQuark_internStringStatic("Instance"),
+                             GblQuark_internStatic("Instance"),
                              &instanceInfo,
                              GBL_TYPE_ROOT_FLAG_DEEP_DERIVABLE  |
                              GBL_TYPE_ROOT_FLAG_INSTANTIABLE    |

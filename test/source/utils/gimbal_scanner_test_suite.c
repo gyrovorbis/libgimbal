@@ -595,8 +595,6 @@ GBL_TEST_CASE(peekUint32Invalid)
     GblScanner_skipTokens(pFixture->pScanner, 1);
     value = 0xff;
 
-    GBL_TEST_SKIP("This needs to be fixed to not allow overflow here!");
-
     GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
     GBL_TEST_COMPARE(value, 0);
 
@@ -683,7 +681,6 @@ GBL_TEST_CASE(peekUint64Invalid)
     GblScanner_skipTokens(pFixture->pScanner, 1);
     value = 0xff;
 
-    GBL_TEST_SKIP("This should NOT be valid when starting with '-'!!");
     GBL_TEST_VERIFY(!GblScanner_peek(pFixture->pScanner, &value));
     GBL_TEST_COMPARE(value, 0);
 

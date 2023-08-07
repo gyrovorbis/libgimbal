@@ -151,7 +151,7 @@ GBL_EXPORT GblType GblError_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        type = GblType_register(GblQuark_internStringStatic("GblError"),
+        type = GblType_register(GblQuark_internStatic("GblError"),
                                 GBL_OBJECT_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC |

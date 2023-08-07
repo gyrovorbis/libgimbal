@@ -518,7 +518,7 @@ GBL_EXPORT GblType GblTestScenario_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_register(GblQuark_internStringStatic("GblTestScenario"),
+        type = GblType_register(GblQuark_internStatic("GblTestScenario"),
                                 GBL_CONTEXT_TYPE,
                                 &typeInfo,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

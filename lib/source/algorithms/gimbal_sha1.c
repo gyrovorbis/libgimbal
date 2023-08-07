@@ -214,17 +214,6 @@ GBL_EXPORT void GblSha1_final(GblSha1Context* context, uint8_t digest[GBL_SHA1_D
     memset(finalcount, 0, 8);	/* SWR */
 }
 //-----------------------------------------------------------------------------
-GBL_EXPORT GblHash gblHashSha1 (const void * key, size_t len)
-{
-  GblHash out = 0;
-  GblSha1Context context;
-  uint8_t digest[20];
-  GblSha1_init(&context);
-  GblSha1_update(&context, (uint8_t*)key, len);
-  GblSha1_final(&context, digest);
-  memcpy(&out,&digest[0],4);
-  return out;
-}
 
 GBL_EXPORT const char* GblSha1_string(const uint8_t digest[GBL_SHA1_DIGEST_SIZE], char output[GBL_SHA1_DIGEST_STRING_SIZE])
 {

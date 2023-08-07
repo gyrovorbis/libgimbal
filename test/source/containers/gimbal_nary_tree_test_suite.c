@@ -669,7 +669,7 @@ GBL_EXPORT GblType GblNaryTreeTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblNaryTreeTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblNaryTreeTestSuite"),
                                      &vTable,
                                      sizeof(GblNaryTreeTestSuite),
                                      sizeof(GblNaryTreeTestSuite_),

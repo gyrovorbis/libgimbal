@@ -567,7 +567,7 @@ GBL_EXPORT GblType GblStringBufferTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("StringBufferTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("StringBufferTestSuite"),
                                      &vTable,
                                      sizeof(GblStringBufferTestSuite),
                                      sizeof(GblStringBufferTestSuite_),

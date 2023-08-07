@@ -476,7 +476,7 @@ GBL_EXPORT GblType GblCmdParser_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        type = GblType_register(GblQuark_internStringStatic("GblCmdParser"),
+        type = GblType_register(GblQuark_internStatic("GblCmdParser"),
                                 GBL_OBJECT_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

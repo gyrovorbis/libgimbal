@@ -331,8 +331,8 @@ static GBL_RESULT GblBoxClass_init_(GblClass* pClass, const void* pUd) {
     GBL_CTX_BEGIN(NULL);
 
     if(!GblType_classRefCount(GBL_BOX_TYPE)) {
-        fieldKeyDtor_ = GblQuark_fromStringStatic(GBL_BOX_FIELD_KEY_DESTRUCTOR);
-        fieldKeyUd_   = GblQuark_fromStringStatic(GBL_BOX_FIELD_KEY_USERDATA);
+        fieldKeyDtor_ = GblQuark_fromStatic(GBL_BOX_FIELD_KEY_DESTRUCTOR);
+        fieldKeyUd_   = GblQuark_fromStatic(GBL_BOX_FIELD_KEY_USERDATA);
     }
 
     static const GblIVariantVTable iVariantVTable = {
@@ -396,7 +396,7 @@ GBL_EXPORT GblType GblBox_type(void) {
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         ifaceMap[0].interfaceType = GBL_IVARIANT_TYPE;
 
-        type = GblType_register(GblQuark_internStringStatic("GblBox"),
+        type = GblType_register(GblQuark_internStatic("GblBox"),
                                       GBL_INSTANCE_TYPE,
                                       &typeInfo,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

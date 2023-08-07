@@ -1,10 +1,17 @@
 /*! \file
  *  \brief GblStringList structure and related functions
  *  \ingroup strings
- *  \copydoc GblStringList
+ *
+ *  This file contains the definition of GblStringList
+ *  and its related API. A GblStringList is a container
+ *  for conveniently working with multiple separate
+ *  strings.
+ *
+ *  \sa GblStringList
  *
  *  \todo
- *      - Add pattern matching API
+ *  - Add pattern matching API
+ *      - replaceInStrings
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License
@@ -22,7 +29,8 @@ GBL_DECLS_BEGIN
 
 typedef GblBool (*GblStringListIterFn)(GblStringRef* pRef, void* pClosure);
 
-/*! \brief List of strings with array-like API
+/*! List of strings with array-like API
+ *  \ingroup strings
  *
  *  GblStringList is a dynamically resizable list of immutable
  *  strings. It is implemented as a GblRingBuffer where each entry
@@ -50,7 +58,6 @@ typedef GblBool (*GblStringListIterFn)(GblStringRef* pRef, void* pClosure);
  *  are already GblStringRefs. Favor the methods ending with "Ref" for
  *  when you already have a reference type, and this will ellide copying.
  *
- *  \ingroup strings
  *  \sa GblStringRef, GblRingBuffer
  */
 typedef GblRingList GblStringList;

@@ -22,7 +22,7 @@ GBL_EXPORT GblType GblIEventHandler_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        type = GblType_register(GblQuark_internStringStatic("GblIEventHandler"),
+        type = GblType_register(GblQuark_internStatic("GblIEventHandler"),
                                 GBL_INTERFACE_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

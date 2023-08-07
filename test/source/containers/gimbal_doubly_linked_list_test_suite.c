@@ -2116,7 +2116,7 @@ GBL_EXPORT GblType GblDoublyLinkedListTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblDoublyLinkedListTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblDoublyLinkedListTestSuite"),
                                      &vTable,
                                      sizeof(GblDoublyLinkedListTestSuite),
                                      sizeof(GblDoublyLinkedListTestSuite_),

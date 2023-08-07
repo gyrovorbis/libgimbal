@@ -481,7 +481,7 @@ GBL_EXPORT GblType GblContext_type(void) {
         ifaceEntries[0].interfaceType = GBL_IALLOCATOR_TYPE;
         ifaceEntries[1].interfaceType = GBL_ILOGGER_TYPE;
 
-        type = GblType_register(GblQuark_internStringStatic("GblContext"),
+        type = GblType_register(GblQuark_internStatic("GblContext"),
                                 GBL_OBJECT_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

@@ -322,7 +322,8 @@ GBL_EXPORT GblIEventFilter* GblObject_eventFilter          (GBL_CSELF, size_t in
 //! \deprecated
 GBL_EXPORT GblContext* GblObject_findContext (GBL_SELF) GBL_NOEXCEPT;
 
-// ========== Implementation ==========
+GBL_DECLS_END
+
 ///\cond
 #define GBL_OBJECT_NEW(...)                         GBL_VA_OVERLOAD_CALL(GBL_OBJECT_NEW, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
 
@@ -332,8 +333,6 @@ GBL_EXPORT GblContext* GblObject_findContext (GBL_SELF) GBL_NOEXCEPT;
 
 #define GBL_OBJECT_CONTRUCT(instance, cType, ...)   (GblObject_construct(instance,GBL_TYPEID(cType), __VA_ARGS__, NULL))
 ///\endcond
-
-GBL_DECLS_END
 
 #undef GBL_SELF_TYPE
 

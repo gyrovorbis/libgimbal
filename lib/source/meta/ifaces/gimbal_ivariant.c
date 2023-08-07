@@ -417,7 +417,7 @@ extern GBL_RESULT GblIVariant_typeRegister_(GblContext* pCtx) {
 
     GblType_registerBuiltin_(GBL_TYPE_BUILTIN_INDEX_IVARIANT,
                              GBL_INTERFACE_TYPE,
-                             GblQuark_internStringStatic("GblIVariant"),
+                             GblQuark_internStatic("GblIVariant"),
                              &typeInfo,
                              GBL_TYPE_FLAG_ABSTRACT |
                              GBL_TYPE_FLAG_TYPEINFO_STATIC);

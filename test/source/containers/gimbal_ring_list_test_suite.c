@@ -778,7 +778,7 @@ GBL_EXPORT GblType GblRingListTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblRingListTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblRingListTestSuite"),
                                      &vTable,
                                      sizeof(GblRingListTestSuite),
                                      sizeof(GblRingListTestSuite_),

@@ -1,5 +1,6 @@
 #include <gimbal/algorithms/gimbal_hash.h>
-#include <time.h>
+#include <gimbal/algorithms/gimbal_md5.h>
+#include <gimbal/algorithms/gimbal_sha1.h>
 
 GBL_EXPORT GblHash gblHash32Bit(uint32_t value) {
     value ^= value >> 16;
@@ -157,60 +158,6 @@ GBL_EXPORT GblHash gblHashMurmur(const void* pData, size_t  size) {
     uint32_t out;
     gblMurmurHash3_x86_32_(pData, size, gblSeed(0), &out);
     return out;
-}
-
-GBL_EXPORT uint64_t gblSeed(uint8_t index) {
-    static uint64_t seed[GBL_SEED_COUNT] = {0};
-    static GblBool  init = GBL_FALSE;
-    if(!init) GBL_UNLIKELY {
-        seed[0] = (uint64_t)time(NULL);
-        for(unsigned i = 1; i < GBL_SEED_COUNT; ++i) {
-            seed[i] = gblHashCrc(&seed[i-1], sizeof(uint64_t));
-        }
-        init = GBL_TRUE;
-    }
-    return seed[index];
-}
-
-GBL_EXPORT int gblRand(void) {
-    return gblRandRange(0, RAND_MAX);
-}
-
-GBL_EXPORT int gblRandRange(int min, int max)  {
-    GBL_ASSERT(max <= RAND_MAX);
-    static GblBool seeded = GBL_FALSE;
-    if(!seeded) GBL_UNLIKELY {
-        srand((unsigned)gblSeed(0));
-        seeded = GBL_TRUE;
-    }
-    return (rand() % (max - min + 1)) + min;
-}
-
-GBL_EXPORT float gblRandFloat(float min, float max) {
-    return min + (float)(gblRand()) / ((float)RAND_MAX/(max-min));
-}
-
-GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char* pCharList) {
-    static const char* pWordChars = "abcdefghijklmnopqrstuvwxyz "
-                                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                    "1234567890";
-
-    if(!pCharList) pCharList = pWordChars;
-    const int size = gblRandRange(minSize, maxSize);
-    const int listLength = strlen(pCharList);
-
-    for(size_t  c = 0; c < (size_t )size; ++c) {
-        pBuffer[c] = pCharList[gblRandRange(0, listLength-1)];
-    }
-
-    pBuffer[size] = '\0';
-    return size;
-}
-
-GBL_EXPORT void gblRandBuffer(void* pData, size_t  size) {
-    for(size_t  i = 0; i < size; ++i) {
-        (((uint8_t*)pData)[i]) = (uint8_t)gblRandRange(0, 255);
-    }
 }
 
 GBL_MAYBE_UNUSED GBL_INLINE GblHash gblCrc32LittleEndian(const void* pData, size_t  size) {
@@ -415,3 +362,32 @@ GBL_EXPORT GblHash gblHashPearson(const void* pData, size_t size) {
 
     return hash;
 }
+
+GBL_EXPORT GblHash gblHashMd5(const void* pData, size_t bytes) {
+    GblMd5Context ctx;
+    uint8_t digest[GBL_MD5_DIGEST_SIZE];
+    GblHash hash;
+
+    GblMd5_init(&ctx);
+    GblMd5_update(&ctx, pData, bytes);
+    GblMd5_final(&ctx, digest);
+
+    memcpy(&hash, digest, sizeof(GblHash));
+    return hash;
+}
+
+GBL_EXPORT GblHash gblHashSha1 (const void *pData, size_t len) {
+    GblHash out = 0;
+    GblSha1Context context;
+    uint8_t digest[20];
+
+    GblSha1_init(&context);
+    GblSha1_update(&context, pData, len);
+    GblSha1_final(&context, digest);
+
+    memcpy(&out, &digest[0], 4);
+    return out;
+}
+
+
+

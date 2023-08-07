@@ -176,6 +176,16 @@ GBL_EXPORT GblBool gblFloatEquals(double a, double b, double e) {
 #endif
 }
 
+GBL_EXPORT float gblDegToRadf(float degrees) {
+    return degrees * (M_PI / 180.0f);
+}
+
+GBL_EXPORT float gblRadToDegf(float radians) {
+    return radians * (180.0f / M_PI);
+}
+
+
+
 static uint32_t primes_[] = {
     5,
     11,

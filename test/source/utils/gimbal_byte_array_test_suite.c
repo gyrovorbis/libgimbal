@@ -354,7 +354,7 @@ GBL_EXPORT GblType GblByteArrayTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("ByteArrayTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("ByteArrayTestSuite"),
                                      &vTable,
                                      sizeof(GblByteArrayTestSuite),
                                      sizeof(GblByteArrayTestSuite_),

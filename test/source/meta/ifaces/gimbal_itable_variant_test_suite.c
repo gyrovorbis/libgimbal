@@ -391,7 +391,7 @@ static GblType GblTestBox_type(void) {
     if(type == GBL_INVALID_TYPE) {
         ifaceEntry.interfaceType = GBL_ITABLE_VARIANT_TYPE;
 
-        type = GblType_register(GblQuark_internStringStatic("GblTestBox"),
+        type = GblType_register(GblQuark_internStatic("GblTestBox"),
                                       GBL_BOX_TYPE,
                                       &info,
                                       GBL_TYPE_FLAG_TYPEINFO_STATIC);

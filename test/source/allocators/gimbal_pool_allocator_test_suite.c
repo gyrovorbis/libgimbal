@@ -235,7 +235,7 @@ GBL_EXPORT GblType GblPoolAllocatorTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblPoolAllocatorTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblPoolAllocatorTestSuite"),
                                      &vTable,
                                      sizeof(GblPoolAllocatorTestSuite),
                                      sizeof(GblPoolAllocatorTestSuite_),

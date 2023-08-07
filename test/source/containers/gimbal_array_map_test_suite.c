@@ -426,7 +426,7 @@ GBL_EXPORT GblType GblArrayMapTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("ArrayMapTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("ArrayMapTestSuite"),
                                      &vTable,
                                      sizeof(GblArrayMapTestSuite),
                                      sizeof(GblArrayMapTestSuite_),

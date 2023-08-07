@@ -199,7 +199,7 @@ GBL_DECLS_END
     };  \
     if(type == GBL_INVALID_TYPE) {  \
         GBL_CTX_BEGIN(NULL);    \
-        type = GblTestSuite_register(GblQuark_internStringStatic(GBL_STRINGIFY(GBL_SELF_TYPE)), \
+        type = GblTestSuite_register(GblQuark_internStatic(GBL_STRINGIFY(GBL_SELF_TYPE)), \
                                      &vTable, \
                                      sizeof(GBL_SELF_TYPE), \
                                      sizeof(GBL_SELF_TYPE_PRIVATE), \

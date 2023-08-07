@@ -382,7 +382,7 @@ GBL_EXPORT GblType GblOptionGroup_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        type = GblType_register(GblQuark_internStringStatic("GblOptionGroup"),
+        type = GblType_register(GblQuark_internStatic("GblOptionGroup"),
                                 GBL_OBJECT_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

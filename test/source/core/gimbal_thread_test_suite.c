@@ -184,7 +184,7 @@ static GblType GblTestThread_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_register(GblQuark_internStringStatic("GblTestThread"),
+        type = GblType_register(GblQuark_internStatic("GblTestThread"),
                                       GBL_THREAD_TYPE,
                                       &(GblTypeInfo) {
                                           .pFnClassInit = GblTestThreadClass_init_,

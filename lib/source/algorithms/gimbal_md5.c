@@ -306,17 +306,3 @@ GBL_EXPORT const char* GblMd5_string(const uint8_t digest[GBL_MD5_DIGEST_SIZE], 
     *(c - 1) = '\0';
     return output;
 }
-
-GBL_EXPORT GblHash gblHashMd5 (const void* pData, size_t bytes) {
-    GblMd5Context ctx;
-    uint8_t digest[GBL_MD5_DIGEST_SIZE];
-    GblHash hash;
-
-    GblMd5_init(&ctx);
-    GblMd5_update(&ctx, pData, bytes);
-    GblMd5_final(&ctx, digest);
-
-    memcpy(&hash, digest, sizeof(GblHash));
-    return hash;
-}
-

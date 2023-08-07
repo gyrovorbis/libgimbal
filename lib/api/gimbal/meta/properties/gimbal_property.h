@@ -250,7 +250,7 @@ GBL_DECLS_END
     case object##_Property_Id_##name:                                  \
         GBL_CTX_VERIFY_CALL(GblProperty_createOrConstruct(&pProp,      \
                 type##_PROPERTY_TYPE,                                  \
-                GblQuark_internStringStatic(GBL_STRINGIFY(name)),      \
+                GblQuark_internStatic(GBL_STRINGIFY(name)),      \
                 id,                                                    \
                 GBL_PROPERTY_FLAGS_MASK_ GBL_TUPLE_FIRST(__VA_ARGS__), \
                 GBL_PROPERTY_VARARGS_((__VA_ARGS__))));                \

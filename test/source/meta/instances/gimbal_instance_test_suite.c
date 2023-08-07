@@ -291,7 +291,7 @@ GBL_EXPORT GblType GblInstanceTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("InstanceTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("InstanceTestSuite"),
                                      &vTable,
                                      sizeof(GblInstanceTestSuite),
                                      sizeof(GblInstanceTestSuite_),

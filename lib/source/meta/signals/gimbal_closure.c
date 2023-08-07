@@ -107,7 +107,7 @@ GBL_EXPORT GblType GblClosure_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        type = GblType_register(GblQuark_internStringStatic("GblClosure"),
+        type = GblType_register(GblQuark_internStatic("GblClosure"),
                                 GBL_BOX_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

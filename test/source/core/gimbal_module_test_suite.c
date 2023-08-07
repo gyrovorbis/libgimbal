@@ -48,7 +48,7 @@ static GblType TestModule1_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_register(GblQuark_internStringStatic("TestModule1"),
+        type = GblType_register(GblQuark_internStatic("TestModule1"),
                                       GBL_MODULE_TYPE,
                                       &(const GblTypeInfo) {
                                           .classSize    = sizeof(TestModule1Class),
@@ -65,7 +65,7 @@ static GblType TestModule2_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblType_register(GblQuark_internStringStatic("TestModule2"),
+        type = GblType_register(GblQuark_internStatic("TestModule2"),
                                       GBL_MODULE_TYPE,
                                       &(const GblTypeInfo) {
                                           .classSize    = sizeof(TestModule2Class),
@@ -111,7 +111,7 @@ GBL_TEST_CASE(findQuarkFail) {
     GBL_TEST_COMPARE(GblModule_findQuark(GBL_QUARK_INVALID),
                      NULL);
 
-    GBL_TEST_COMPARE(GblModule_findQuark(GblQuark_fromStringStatic("trololo")),
+    GBL_TEST_COMPARE(GblModule_findQuark(GblQuark_fromStatic("trololo")),
                      NULL);
 
     GBL_TEST_CASE_END;

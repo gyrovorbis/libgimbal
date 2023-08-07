@@ -638,7 +638,7 @@ GBL_EXPORT GblType GblArrayDequeTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblArrayDequeTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblArrayDequeTestSuite"),
                                      &vTable,
                                      sizeof(GblArrayDequeTestSuite),
                                      sizeof(GblArrayDequeTestSuite_),

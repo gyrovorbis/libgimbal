@@ -533,8 +533,8 @@ static GBL_RESULT GblThreadClass_initialize_(GblClass* pClass, const void* pUd) 
                           1,
                           GBL_ENUM_TYPE);
 
-        closureQuark_  = GblQuark_fromStringStatic("_GblThread_closure");
-        callbackQuark_ = GblQuark_fromStringStatic("_GblThread_callback");
+        closureQuark_  = GblQuark_fromStatic("_GblThread_closure");
+        callbackQuark_ = GblQuark_fromStatic("_GblThread_callback");
     }
 
     GBL_BOX_CLASS(pClass)   ->pFnDestructor  = GblThread_GblBox_destructor_;
@@ -580,7 +580,7 @@ GBL_EXPORT GblType GblThread_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
-        type = GblType_register(GblQuark_internStringStatic("GblThread"),
+        type = GblType_register(GblQuark_internStatic("GblThread"),
                                 GBL_OBJECT_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

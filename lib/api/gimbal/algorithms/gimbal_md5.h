@@ -49,9 +49,6 @@ GBL_EXPORT void GblMd5_final  (GBL_SELF, uint8_t digest[GBL_MD5_DIGEST_SIZE]) GB
 GBL_EXPORT const char* GblMd5_string (const uint8_t digest[GBL_MD5_DIGEST_SIZE],
                                       char          buffer[GBL_MD5_DIGEST_STRING_SIZE]) GBL_NOEXCEPT;
 
-//! Convenience function for generating a 32-bit MD5 hash from the given bytes
-GBL_EXPORT GblHash gblHashMd5 (const void* pData, size_t bytes) GBL_NOEXCEPT;
-
 GBL_DECLS_END
 
 #undef GBL_SELF_TYPE

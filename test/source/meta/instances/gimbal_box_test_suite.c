@@ -17,7 +17,7 @@ GBL_TEST_FIXTURE {
 };
 
 GBL_TEST_INIT()
-    pFixture->testQuark     = GblQuark_fromStringStatic("test");
+    pFixture->testQuark     = GblQuark_fromStatic("test");
     pFixture->refCount      = GblRef_activeCount();
     pFixture->instanceCount = GblType_instanceCount(GBL_BOX_TYPE);
     pFixture->classRefCount = GblType_classRefCount(GBL_BOX_TYPE);
@@ -126,7 +126,7 @@ static GBL_RESULT fieldDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntr
     // This is a horrible thing to do, but this is a test, so whatever.
     GblTestFixture* pFixture = (GblTestFixture*)
                                GblArrayMap_getValue((GblArrayMap**)&pMap,
-                                                    GblQuark_fromStringStatic("_ud"));
+                                                    GblQuark_fromStatic("_ud"));
 
     GBL_TEST_VERIFY(pFixture && key == pFixture->testQuark);
 

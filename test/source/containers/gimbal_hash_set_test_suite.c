@@ -690,7 +690,7 @@ GBL_EXPORT GblType GblHashSetTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblHashSetTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblHashSetTestSuite"),
                                      &vTable,
                                      sizeof(GblHashSetTestSuite),
                                      sizeof(GblHashSetTestSuite_),

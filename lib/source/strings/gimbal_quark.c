@@ -160,7 +160,7 @@ GBL_EXPORT GBL_RESULT GblQuark_init(GblContext* pCtx, size_t  pageSize, size_t  
 }
 
 GBL_EXPORT size_t GblQuark_pageCount(void) {
-    size_t  count = 1;
+    size_t count = 1;
     if(initialized_) {
         count = GblArenaAllocator_pageCount(&arena_);
     }
@@ -168,7 +168,7 @@ GBL_EXPORT size_t GblQuark_pageCount(void) {
 }
 
 GBL_EXPORT size_t GblQuark_pageSize(void) {
-    size_t  size = GBL_QUARK_PAGE_SIZE_DEFAULT_;
+    size_t size = GBL_QUARK_PAGE_SIZE_DEFAULT_;
     if(initialized_) {
         size = arena_.pageSize;
     }
@@ -184,7 +184,7 @@ GBL_EXPORT size_t GblQuark_bytesUsed(void) {
 }
 
 GBL_EXPORT size_t GblQuark_bytesAvailable(void) {
-    size_t  bytes = 0;
+    size_t bytes = 0;
     if(initialized_) {
         bytes = GblArenaAllocator_bytesAvailable(&arena_);
     }
@@ -192,7 +192,7 @@ GBL_EXPORT size_t GblQuark_bytesAvailable(void) {
 }
 
 GBL_EXPORT size_t GblQuark_totalCapacity(void) {
-    size_t  bytes = 0;
+    size_t bytes = 0;
     if(initialized_) {
         bytes = GblArenaAllocator_totalCapacity(&arena_);
     }
@@ -200,7 +200,7 @@ GBL_EXPORT size_t GblQuark_totalCapacity(void) {
 }
 
 GBL_EXPORT size_t GblQuark_fragmentedBytes(void) {
-    size_t  bytes = 0;
+    size_t bytes = 0;
     if(initialized_) {
         bytes = GblArenaAllocator_fragmentedBytes(&arena_);
     }
@@ -227,43 +227,40 @@ GBL_EXPORT GblContext* GblQuark_context(void) {
     return pCtx_;
 }
 
-GBL_EXPORT GblQuark GblQuark_tryStringSized(const char* pString, size_t  length) {
+GBL_EXPORT GblQuark (GblQuark_tryString)(const char* pString, size_t length) {
     GblQuark quark = GBL_QUARK_INVALID;
-    if(initialized_ && pString && length) {
-        char* pCString = GBL_ALLOCA(length + 1);
-        strncpy(pCString, pString, length);
-        pCString[length] = '\0';
-        GblQuark* pQuark = GblQuark_tryString_(pCString);
-        if(pQuark) quark = *pQuark;
-    }
-    return quark;
-}
 
-GBL_EXPORT GblQuark GblQuark_tryString(const char* pString) {
-    GblQuark quark = GBL_QUARK_INVALID;
     if(initialized_ && pString) {
+        if(length) {
+            char* pTempStr = GBL_ALLOCA(length + 1);
+            strncpy(pTempStr, pString, length);
+            pTempStr[length] = '\0';
+            pString = pTempStr;
+        }
+
         GblQuark* pQuark = GblQuark_tryString_(pString);
         if(pQuark) quark = *pQuark;
     }
     return quark;
 }
 
-GBL_EXPORT GblQuark GblQuark_fromString(const char* pString) {
-    return quarkFromString_(pString, GBL_TRUE);
-}
-
-GBL_EXPORT GblQuark GblQuark_fromStringSized(const char* pString, size_t  length) {
+GBL_EXPORT GblQuark (GblQuark_fromString)(const char* pString, size_t length) {
     GblQuark quark = GBL_QUARK_INVALID;
-    if(pString && length) { //maybe we're interning an empty string!?
-        char* pCString = GBL_ALLOCA(length + 1);
-        strncpy(pCString, pString, length);
-        pCString[length] = '\0';
-        quark = GblQuark_fromString(pCString);
+
+    if(pString) {
+        if(length) {
+            char* pTempStr = GBL_ALLOCA(length + 1);
+            strncpy(pTempStr, pString, length);
+            pTempStr[length] = '\0';
+            pString = pTempStr;
+        }
+
+        quark = quarkFromString_(pString, GBL_TRUE);
     }
     return quark;
 }
 
-GBL_EXPORT GblQuark GblQuark_fromStringStatic(const char* pString) {
+GBL_EXPORT GblQuark GblQuark_fromStatic(const char* pString) {
     return quarkFromString_(pString, GBL_FALSE);
 }
 
@@ -271,14 +268,10 @@ GBL_EXPORT const char* GblQuark_toString(GblQuark quark) {
     return (const char*)quark;
 }
 
-GBL_EXPORT const char* GblQuark_internString(const char* pString) {
-    return GblQuark_toString(GblQuark_fromString(pString));
+GBL_EXPORT const char* GblQuark_internString(const char* pString, size_t len) {
+    return GblQuark_toString(GblQuark_fromString(pString, len));
 }
 
-GBL_EXPORT const char* GblQuark_internStringSized(const char* pString, size_t  length) {
-    return GblQuark_toString(GblQuark_fromStringSized(pString, length));
-}
-
-GBL_EXPORT const char* GblQuark_internStringStatic(const char* pString) {
-    return GblQuark_toString(GblQuark_fromStringStatic(pString));
+GBL_EXPORT const char* GblQuark_internStatic(const char* pString) {
+    return GblQuark_toString(GblQuark_fromStatic(pString));
 }

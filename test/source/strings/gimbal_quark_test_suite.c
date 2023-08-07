@@ -50,7 +50,7 @@ static GBL_RESULT GblQuarkTestSuite_fromStringStatic_(GblTestSuite* pSelf, GblCo
     GBL_CTX_BEGIN(pCtx);
 
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
-    pSelf_->staticString = GblQuark_fromStringStatic("StaticString");
+    pSelf_->staticString = GblQuark_fromStatic("StaticString");
     GBL_TEST_VERIFY(pSelf_->staticString != GBL_QUARK_INVALID);
     GBL_TEST_COMPARE(GblQuark_count(),       pSelf_->quarkStartCount + 1);
     GBL_TEST_COMPARE(GblQuark_bytesUsed(),   pSelf_->quarkStartBytes + 0);
@@ -74,7 +74,7 @@ static GBL_RESULT GblQuarkTestSuite_fromStringSized_(GblTestSuite* pSelf, GblCon
     GBL_CTX_BEGIN(pCtx);
 
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
-    pSelf_->sizedString = GblQuark_fromStringSized("SizedStringxx", 11);
+    pSelf_->sizedString = GblQuark_fromString("SizedStringxx", 11);
     GBL_TEST_VERIFY(pSelf_->sizedString != GBL_QUARK_INVALID);
     GBL_TEST_COMPARE(GblQuark_count(), pSelf_->quarkStartCount + 3);
     GBL_TEST_COMPARE(GblQuark_bytesUsed(), pSelf_->quarkStartBytes + 19);
@@ -107,28 +107,28 @@ static GBL_RESULT GblQuarkTestSuite_tryStringSized_(GblTestSuite* pSelf, GblCont
     GBL_CTX_BEGIN(pCtx);
 
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
-    GblQuark quark = GblQuark_tryStringSized(NULL, 0);
+    GblQuark quark = GblQuark_tryString(NULL, 0);
     GBL_TEST_COMPARE(quark, GBL_QUARK_INVALID);
 
-    quark = GblQuark_tryStringSized("", 0);
+    quark = GblQuark_tryString("", 0);
     GBL_TEST_COMPARE(quark, GBL_QUARK_INVALID);
 
-    quark = GblQuark_tryStringSized(NULL, 128);
+    quark = GblQuark_tryString(NULL, 128);
     GBL_TEST_COMPARE(quark, GBL_QUARK_INVALID);
 
-    quark = GblQuark_tryStringSized("FakeNewsString", 1);
+    quark = GblQuark_tryString("FakeNewsString", 1);
     GBL_TEST_COMPARE(quark, GBL_QUARK_INVALID);
 
-    quark = GblQuark_tryStringSized("StaticString", 12);
+    quark = GblQuark_tryString("StaticString", 12);
     GBL_TEST_COMPARE(quark, pSelf_->staticString);
 
-    quark = GblQuark_tryStringSized("Stringr", 6);
+    quark = GblQuark_tryString("Stringr", 6);
     GBL_TEST_COMPARE(quark, pSelf_->string);
 
-    quark = GblQuark_tryStringSized("SizedStringxxyz", 11);
+    quark = GblQuark_tryString("SizedStringxxyz", 11);
     GBL_TEST_COMPARE(quark, pSelf_->sizedString);
 
-    quark = GblQuark_tryStringSized("SizedString", 2);
+    quark = GblQuark_tryString("SizedString", 2);
     GBL_TEST_COMPARE(quark, GBL_QUARK_INVALID);
 
     GBL_CTX_END();
@@ -143,7 +143,7 @@ static GBL_RESULT GblQuarkTestSuite_extraPage_(GblTestSuite* pSelf, GblContext* 
     const size_t  pageFreeBytes = GblQuark_pageSize() - oldBytesUsed - 1;
     char* pBuffer = GBL_ALLOCA(pageFreeBytes);
     for(size_t  i = 0; i < pageFreeBytes; ++i) pBuffer[i] = 'a';
-    const GblQuark wasterQuark = GblQuark_fromStringSized(pBuffer, pageFreeBytes);
+    const GblQuark wasterQuark = GblQuark_fromString(pBuffer, pageFreeBytes);
 
     GBL_TEST_VERIFY(wasterQuark != GBL_QUARK_INVALID);
 
@@ -182,23 +182,23 @@ static GBL_RESULT GblQuarkTestSuite_internString_(GblTestSuite* pSelf, GblContex
 static GBL_RESULT GblQuarkTestSuite_internStringSized_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(GblQuark_internStringSized(NULL, 0), NULL);
-    GBL_TEST_COMPARE(GblQuark_internStringSized("", 0), NULL);
-    GBL_TEST_COMPARE(GblQuark_internStringSized(NULL, 1), NULL);
+    GBL_TEST_COMPARE(GblQuark_internString(NULL, 0), NULL);
+    GBL_TEST_COMPARE(GblQuark_internString("", 0), "");
+    GBL_TEST_COMPARE(GblQuark_internString(NULL, 1), NULL);
 
-    GBL_TEST_COMPARE(GblQuark_internStringSized("InternStringSizedabc", 15), "InternStringSiz");
+    GBL_TEST_COMPARE(GblQuark_internString("InternStringSizedabc", 15), "InternStringSiz");
     const GblQuark tryQuark = GblQuark_tryString("InternStringSiz");
     GBL_TEST_COMPARE(GblQuark_toString(tryQuark), "InternStringSiz");
-    GBL_TEST_COMPARE(GblQuark_count(), pSelf_->quarkStartCount + 7);
+    GBL_TEST_COMPARE(GblQuark_count(), pSelf_->quarkStartCount + 8);
     GBL_CTX_END();
 }
 
 static GBL_RESULT GblQuarkTestSuite_internStringStatic_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblQuarkTestSuite_* pSelf_  = GBL_QUARK_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(GblQuark_internStringStatic(NULL), NULL);
-    GBL_TEST_COMPARE(GblQuark_internStringStatic("InternStatic"), "InternStatic");
-    GBL_TEST_COMPARE(GblQuark_count(), pSelf_->quarkStartCount + 8);
+    GBL_TEST_COMPARE(GblQuark_internStatic(NULL), NULL);
+    GBL_TEST_COMPARE(GblQuark_internStatic("InternStatic"), "InternStatic");
+    GBL_TEST_COMPARE(GblQuark_count(), pSelf_->quarkStartCount + 9);
     GBL_CTX_END();
 }
 
@@ -226,14 +226,11 @@ GBL_EXPORT GblType GblQuarkTestSuite_type(void) {
     };
 
     if(type == GBL_INVALID_TYPE) {
-        GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("QuarkTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblQuarkTestSuite"),
                                      &vTable,
                                      sizeof(GblQuarkTestSuite),
                                      sizeof(GblQuarkTestSuite_),
                                      GBL_TYPE_FLAGS_NONE);
-        GBL_CTX_VERIFY_LAST_RECORD();
-        GBL_CTX_END_BLOCK();
     }
     return type;
 }

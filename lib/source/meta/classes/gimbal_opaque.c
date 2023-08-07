@@ -202,7 +202,7 @@ GBL_EXPORT GblType GblOpaque_type(void) {
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
 
-        type = GblPrimitive_register(GblQuark_internStringStatic("GblOpaque"),
+        type = GblPrimitive_register(GblQuark_internStatic("GblOpaque"),
                                      sizeof(GblOpaqueClass),
                                      0,
                                      &opaqueIVariantIFace,

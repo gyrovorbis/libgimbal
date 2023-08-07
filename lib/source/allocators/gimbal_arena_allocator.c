@@ -150,7 +150,7 @@ GBL_EXPORT float GblArenaAllocator_utilization(const GblArenaAllocator* pSelf) {
 }
 
 GBL_EXPORT size_t  GblArenaAllocator_fragmentedBytes(const GblArenaAllocator* pSelf) {
-    size_t  bytes = 0;
+    size_t bytes = 0;
     for(GblLinkedListNode* pIt = pSelf->listNode.pNext;
         pIt != &pSelf->listNode;
         pIt = pIt->pNext)
@@ -162,7 +162,7 @@ GBL_EXPORT size_t  GblArenaAllocator_fragmentedBytes(const GblArenaAllocator* pS
 }
 
 GBL_EXPORT size_t  GblArenaAllocator_bytesAvailable(const GblArenaAllocator* pSelf) {
-    size_t  bytes = 0;
+    size_t bytes = 0;
     if(pSelf->pActivePage) {
         bytes = pSelf->pActivePage->capacity - pSelf->pActivePage->used;
     }
@@ -246,7 +246,7 @@ GBL_EXPORT GblType GblArenaAllocator_type(void) {
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         ifaceEntries[0].interfaceType = GBL_IALLOCATOR_TYPE;
 
-        type = GblType_register(GblQuark_internStringStatic("GblArenaAllocator"),
+        type = GblType_register(GblQuark_internStatic("GblArenaAllocator"),
                                 GBL_OBJECT_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

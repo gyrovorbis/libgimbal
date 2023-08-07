@@ -1170,7 +1170,7 @@ static GBL_RESULT GblPrimitive_valueTypesRegisterConverters_(GblContext* pCtx);
 #define GBL_PRIMITIVE_REGISTER(name, vtable)                    \
     GBL_PRIMITIVE_TYPEINFO_DECL(name##_typeInfo, vtable)        \
     GblType_register(GBL_INVALID_TYPE,                          \
-                           GblQuark_internStringStatic(#name),  \
+                           GblQuark_internStatic(#name),  \
                            &name##_typeInfo,                    \
                            GBL_TYPE_FLAG_TYPEINFO_STATIC    |   \
                            GBL_TYPE_FLAG_CLASS_PINNED)          \
@@ -1191,7 +1191,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_NIL,
-                                 GblQuark_internStringStatic("nil"),
+                                 GblQuark_internStatic("nil"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &nilIVariantIFace,
@@ -1215,7 +1215,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
       };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_BOOL,
-                                 GblQuark_internStringStatic("bool"),
+                                 GblQuark_internStatic("bool"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &boolIVariantIFace,
@@ -1238,7 +1238,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
       };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_CHAR,
-                                 GblQuark_internStringStatic("char"),
+                                 GblQuark_internStatic("char"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &charIVariantIFace,
@@ -1261,7 +1261,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_UINT8,
-                                 GblQuark_internStringStatic("uint8"),
+                                 GblQuark_internStatic("uint8"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &uint8IVariantIFace,
@@ -1284,7 +1284,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INT16,
-                                 GblQuark_internStringStatic("int16"),
+                                 GblQuark_internStatic("int16"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &int16IVariantIFace,
@@ -1307,7 +1307,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_UINT16,
-                                 GblQuark_internStringStatic("uint16"),
+                                 GblQuark_internStatic("uint16"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &uint16IVariantIFace,
@@ -1330,7 +1330,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
       };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INT32,
-                                 GblQuark_internStringStatic("int32"),
+                                 GblQuark_internStatic("int32"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &int32IVariantIFace,
@@ -1353,7 +1353,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_UINT32,
-                                 GblQuark_internStringStatic("uint32"),
+                                 GblQuark_internStatic("uint32"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &uint32IVariantIFace,
@@ -1376,7 +1376,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_INT64,
-                                 GblQuark_internStringStatic("int64"),
+                                 GblQuark_internStatic("int64"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &int64IVariantIFace,
@@ -1399,7 +1399,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
       };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_UINT64,
-                                 GblQuark_internStringStatic("uint64"),
+                                 GblQuark_internStatic("uint64"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &uint64IVariantIFace,
@@ -1422,7 +1422,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_FLOAT,
-                                 GblQuark_internStringStatic("float"),
+                                 GblQuark_internStatic("float"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &floatIVariantIFace,
@@ -1445,7 +1445,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
       };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_DOUBLE,
-                                 GblQuark_internStringStatic("double"),
+                                 GblQuark_internStatic("double"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &doubleIVariantIFace,
@@ -1478,7 +1478,7 @@ extern GBL_RESULT GblPrimitive_valueTypesRegister_(GblContext* pCtx) {
     };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_STRING,
-                                 GblQuark_internStringStatic("string"),
+                                 GblQuark_internStatic("string"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &stringIVariantIFace,
@@ -1682,7 +1682,7 @@ GBL_EXPORT GblType GblType_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblPrimitive_register(GblQuark_internStringStatic("GblType"),
+        type = GblPrimitive_register(GblQuark_internStatic("GblType"),
                                      sizeof(GblPrimitiveClass),
                                      0,
                                      &typeIVariantIFace,
@@ -1720,7 +1720,7 @@ GBL_EXPORT GblType GblBitmask_type(void) {
       };
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblPrimitive_register(GblQuark_internStringStatic("GblBitmask"),
+        type = GblPrimitive_register(GblQuark_internStatic("GblBitmask"),
                                      sizeof(GblPrimitiveClass),
                                      0,
                                      &typeIVariantIFace,

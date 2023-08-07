@@ -394,7 +394,7 @@ GBL_EXPORT GblType GblClosureTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("ClosureTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("ClosureTestSuite"),
                                      &vTable,
                                      sizeof(GblClosureTestSuite),
                                      sizeof(GblClosureTestSuite_),

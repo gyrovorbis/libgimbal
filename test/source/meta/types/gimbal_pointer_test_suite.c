@@ -136,7 +136,7 @@ GBL_EXPORT GblType GblPointerTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblPointerTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblPointerTestSuite"),
                                      &vTable,
                                      sizeof(GblPointerTestSuite),
                                      sizeof(GblPointerTestSuite_),

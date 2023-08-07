@@ -51,9 +51,10 @@ GBL_EXPORT unsigned long gblCatalan                 (unsigned n)                
 GBL_EXPORT GblBool       gblFloatEquals             (double a,
                                                      double b,
                                                      double e/*=DBL_EPSILON*/)  GBL_NOEXCEPT;
-#if 0
 GBL_EXPORT float         gblDegToRadf (float degrees) GBL_NOEXCEPT;
 GBL_EXPORT float         gblRadToDegf (float radians) GBL_NOEXCEPT;
+
+#if 0
 GBL_EXPORT void          gblCartesianToPolarf (float x, float y, float* pRad, float* pAng) GBL_NOEXCEPT;
 GBL_EXPORT void          gblPolarToCartesianf (float rad, float ang, float* pX, float* pY) GBL_NOEXCEPT;
 GBL_EXPORT float         gblLerpf (float v1, float v2, float frac) GBL_NOEXCEPT;

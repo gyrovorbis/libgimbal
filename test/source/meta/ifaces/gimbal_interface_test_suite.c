@@ -641,7 +641,7 @@ GBL_EXPORT GblType GblInterfaceTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("InterfaceTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("InterfaceTestSuite"),
                                      &vTable,
                                      sizeof(GblInterfaceTestSuite),
                                      sizeof(GblInterfaceTestSuite_),

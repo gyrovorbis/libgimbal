@@ -12,14 +12,20 @@
         char*       pEnd        = NULL; \
         const char* pCString    = GBL_STRING_VIEW_CSTR(self); \
      \
-        errno = 0; \
-        tempType retVal = func(pCString, &pEnd, 0); \
-     \
-        if(pEnd != pCString + self.length || retVal > max || retVal < min || errno != 0) { \
+        if(min == 0 && GblStringView_startsWith(self, GBL_STRV("-"))) { \
             result = 0; \
             valid = GBL_FALSE; \
-        } else result = retVal; \
-     \
+        } else { \
+        \
+            errno = 0; \
+            tempType retVal = func(pCString, &pEnd, 0); \
+         \
+            if(pEnd != pCString + self.length || retVal > max || retVal < min || errno != 0) { \
+                result = 0; \
+                valid = GBL_FALSE; \
+            } else result = retVal; \
+        } \
+        \
         if(pSuccess) \
             *pSuccess = valid; \
      \

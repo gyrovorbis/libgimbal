@@ -18,8 +18,6 @@
 #   define gblHash  gblHashFnv1
 #endif
 
-#define GBL_SEED_COUNT      2
-
 GBL_DECLS_BEGIN
 
 /*! \defgroup hashing Hashing
@@ -27,17 +25,7 @@ GBL_DECLS_BEGIN
  *  \brief Collection of hash algorithms.
  * @{
 */
-GBL_EXPORT uint64_t gblSeed          (uint8_t index)                  GBL_NOEXCEPT;
 
-GBL_EXPORT int      gblRand          (void)                           GBL_NOEXCEPT;
-GBL_EXPORT int      gblRandRange     (int min, int max)               GBL_NOEXCEPT;
-GBL_EXPORT float    gblRandFloat     (float min, float max)           GBL_NOEXCEPT;
-GBL_EXPORT void     gblRandBuffer    (void* pData, size_t size)       GBL_NOEXCEPT;
-
-GBL_EXPORT int      gblRandString    (char*       pBuffer,
-                                      int         minSize,
-                                      int         maxSize,
-                                      const char* pCharList)          GBL_NOEXCEPT;
 
 GBL_EXPORT GblHash  gblHash32Bit     (uint32_t value)                 GBL_NOEXCEPT;
 GBL_EXPORT uint32_t gblUnhash32Bit   (GblHash hash)                   GBL_NOEXCEPT;
@@ -55,6 +43,8 @@ GBL_EXPORT GblHash  gblHashSuperFast (const void* pData, size_t size) GBL_NOEXCE
 GBL_EXPORT GblHash  gblHashPearson   (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashJenkins   (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashCrc       (const void* pData, size_t size) GBL_NOEXCEPT;
+GBL_EXPORT GblHash  gblHashSha1      (const void* pData, size_t size) GBL_NOEXCEPT;
+GBL_EXPORT GblHash  gblHashMd5       (const void* pData, size_t size) GBL_NOEXCEPT;
 //! @}
 
 GBL_DECLS_END

@@ -165,7 +165,7 @@ GBL_EXPORT GblType GblArenaAllocatorTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblArenaAllocatorTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblArenaAllocatorTestSuite"),
                                      &vTable,
                                      sizeof(GblArenaAllocatorTestSuite),
                                      sizeof(GblArenaAllocatorTestSuite_),

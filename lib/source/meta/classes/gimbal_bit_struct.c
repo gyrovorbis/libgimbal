@@ -280,7 +280,7 @@ GBL_EXPORT GblType GblBitStruct_type(void) {
       };
 
     if(type == GBL_INVALID_TYPE) {
-        type = GblPrimitive_register(GblQuark_internStringStatic("GblBitStruct"),
+        type = GblPrimitive_register(GblQuark_internStatic("GblBitStruct"),
                                      sizeof(GblBitStructClass),
                                      sizeof(GblBitStructClass_),
                                      &iVariantIFace,

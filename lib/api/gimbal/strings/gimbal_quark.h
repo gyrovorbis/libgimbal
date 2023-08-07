@@ -1,5 +1,5 @@
 /*! \file
- *  \brief ::GblQuark and related functions.
+ *  \brief ::GblQuark and string interning API
  *  \ingroup strings
  *
  *  A GblQuark is an integral unique identifier associated with a given string.
@@ -18,7 +18,7 @@
  *
  *  \note
  *  When working with string literals, the internal allocations can be
- *  elided by using GblQuark_fromStringStatic() or GblQuark_internStringStatic(),
+ *  elided by using GblQuark_fromStatic() or GblQuark_internStatic(),
  *  since a string literal's lifetime is global.
  *
  *  \note
@@ -27,7 +27,7 @@
  *  ### Example Usage
  *
  *      // create a quark from a string literal
- *      GblQuark quark1 = GblQuark_fromStringStatic("String");
+ *      GblQuark quark1 = GblQuark_fromStatic("String");
  *
  *      // create a quark from a regular string buffer
  *      char buffer[] = "String";
@@ -40,63 +40,110 @@
  *      GBL_ASSERT(strcmp(GblQuark_toString(quark1),
  *                        GblQuark_toString(quark2) == 0);
  *
- *  \author Falco Girgis
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
-
 #ifndef GIMBAL_QUARK_H
 #define GIMBAL_QUARK_H
 
 #include "../core/gimbal_result.h"
 
-/// \details Value of an invalid or NULL ::GblQuark
+//! Value of an invalid or NULL ::GblQuark
 #define GBL_QUARK_INVALID ((GblQuark)0)
 
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblContext);
 
-/*! \brief Uniquely identifiable interned string type
+/*! Uniquely identifiable interned string type
+ *  \ingroup strings
  *
  *  Two quarks may be directly compared to one another for equality.
  *
  *  \note
  *  To test whether a given GblQuark is valid or not, it can be
  *  compared to #GBL_QUARK_INVALID.
- *  \ingroup strings
  */
-typedef uintptr_t       GblQuark;
+typedef uintptr_t GblQuark;
 
-GBL_EXPORT GBL_RESULT   GblQuark_init               (GblContext* pCtx,
-                                                     size_t  extraPageSize,
-                                                     size_t  initialEntries)              GBL_NOEXCEPT;
+/*! \name Static State
+ *  \brief Methods for static initialization, finalization, and state
+ *  @{
+ */
+//! Initializes the GblQuark registry with the given capacities (called automatically with defaults)
+GBL_EXPORT GBL_RESULT  GblQuark_init    (GblContext* pCtx,
+                                         size_t      extraPageSize,
+                                         size_t      initialEntries) GBL_NOEXCEPT;
+//! Finalizes the GblQuark registry, releasing all resources (called automatically upon shutdown)
+GBL_EXPORT GBL_RESULT  GblQuark_final   (void)                       GBL_NOEXCEPT;
+//! Returns a pointer to the GblContext object associated with the GblQuark registry
+GBL_EXPORT GblContext* GblQuark_context (void)                       GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GBL_RESULT   GblQuark_final              (void)                                GBL_NOEXCEPT;
+/*! \name Statistics
+ *  \brief Methods for querying and reporting usage stats
+ *  @{
+ */
+//! Returns the total number of quarks maintained within the registry
+GBL_EXPORT size_t GblQuark_count           (void) GBL_NOEXCEPT;
+//! Returns the total number of allocation pages used by the registry
+GBL_EXPORT size_t GblQuark_pageCount       (void) GBL_NOEXCEPT;
+//! Returns the size of each dynamically allocated page used by the registry
+GBL_EXPORT size_t GblQuark_pageSize        (void) GBL_NOEXCEPT;
+//! Returns the total number of bytes used for string allocations by the registry
+GBL_EXPORT size_t GblQuark_bytesUsed       (void) GBL_NOEXCEPT;
+//! Returns the total number of bytes remaining available on the current allocation page
+GBL_EXPORT size_t GblQuark_bytesAvailable  (void) GBL_NOEXCEPT;
+//! Returns the total number of bytes allocated (used or unused) for string storage
+GBL_EXPORT size_t GblQuark_totalCapacity   (void) GBL_NOEXCEPT;
+//! Returns the total number of unused, unavailable, but allocated bytes for string storage
+GBL_EXPORT size_t GblQuark_fragmentedBytes (void) GBL_NOEXCEPT;
+//! Returns the utilization factor of total capacity vs bytes used (ranging 0.0-1.0)
+GBL_EXPORT float  GblQuark_utilization     (void) GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT size_t       GblQuark_pageCount          (void)                                GBL_NOEXCEPT;
-GBL_EXPORT size_t       GblQuark_pageSize           (void)                                GBL_NOEXCEPT;
-GBL_EXPORT size_t       GblQuark_bytesUsed          (void)                                GBL_NOEXCEPT;
-GBL_EXPORT size_t       GblQuark_bytesAvailable     (void)                                GBL_NOEXCEPT;
-GBL_EXPORT size_t       GblQuark_totalCapacity      (void)                                GBL_NOEXCEPT;
-GBL_EXPORT size_t       GblQuark_fragmentedBytes    (void)                                GBL_NOEXCEPT;
-GBL_EXPORT float        GblQuark_utilization        (void)                                GBL_NOEXCEPT;
-
-GBL_EXPORT size_t       GblQuark_count              (void)                                GBL_NOEXCEPT;
-GBL_EXPORT GblContext*  GblQuark_context            (void)                                GBL_NOEXCEPT;
-
-GBL_EXPORT GblQuark     GblQuark_fromString         (const char* pString)                 GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblQuark_fromStringSized    (const char* pString, size_t  length) GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblQuark_fromStringStatic   (const char* pSstring)                GBL_NOEXCEPT;
-
-GBL_EXPORT GblQuark     GblQuark_tryString          (const char* pString)                 GBL_NOEXCEPT;
-GBL_EXPORT GblQuark     GblQuark_tryStringSized     (const char* pString, size_t  length) GBL_NOEXCEPT;
-
-GBL_EXPORT const char*  GblQuark_toString           (GblQuark quark)                      GBL_NOEXCEPT;
-
-GBL_EXPORT const char*  GblQuark_internString       (const char* pString)                 GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblQuark_internStringSized  (const char* pString, size_t  length) GBL_NOEXCEPT;
-GBL_EXPORT const char*  GblQuark_internStringStatic (const char* pString)                 GBL_NOEXCEPT;
+/*! \name String Interning
+ *  \brief Methods for creating, retrieving, and converting GblQuarks
+ *  @{
+ */
+//! Returns the GblQuark associated with the given string, adding a new entry to the registry if necessary
+GBL_EXPORT GblQuark    GblQuark_fromString   (const char* pStr, size_t len/*=0*/) GBL_NOEXCEPT;
+//! Returns the GblQuark associated with the given STATIC string, which can save an allocation when initially registering
+GBL_EXPORT GblQuark    GblQuark_fromStatic   (const char* pSstring)               GBL_NOEXCEPT;
+//! Returns the GblQuark associated with the given string, returning GBL_QUARK_INVALID if it was not previously registered
+GBL_EXPORT GblQuark    GblQuark_tryString    (const char* pStr, size_t len/*=0*/) GBL_NOEXCEPT;
+//! Returns the NULL-terminated interned C string associated with a given GblQuark
+GBL_EXPORT const char* GblQuark_toString     (GblQuark quark)                     GBL_NOEXCEPT;
+//! Creates a GblQuark from the given string (if necessary), also returning its interned string
+GBL_EXPORT const char* GblQuark_internString (const char* pStr, size_t len/*=0*/) GBL_NOEXCEPT;
+//! Creates a GblQuark from the given STATIC string (if necessary, saving on allocating), also returning its interned string
+GBL_EXPORT const char* GblQuark_internStatic (const char* pString)                GBL_NOEXCEPT;
+//! @}
 
 GBL_DECLS_END
+
+//! \cond
+#define GblQuark_fromString(...) \
+    GblQuark_fromStringDefault_(__VA_ARGS__)
+#define GblQuark_fromStringDefault_(...) \
+    GblQuark_fromStringDefault__(__VA_ARGS__, 0)
+#define GblQuark_fromStringDefault__(str, len, ...) \
+    (GblQuark_fromString)(str, len)
+
+#define GblQuark_internString(...) \
+    GblQuark_internStringDefault_(__VA_ARGS__)
+#define GblQuark_internStringDefault_(...) \
+    GblQuark_internStringDefault__(__VA_ARGS__, 0)
+#define GblQuark_internStringDefault__(str, len, ...) \
+    (GblQuark_internString)(str, len)
+
+#define GblQuark_tryString(...) \
+    GblQuark_tryStringDefault_(__VA_ARGS__)
+#define GblQuark_tryStringDefault_(...) \
+    GblQuark_tryStringDefault__(__VA_ARGS__, 0)
+#define GblQuark_tryStringDefault__(str, len, ...) \
+    (GblQuark_tryString)(str, len)
+//! \endcond
 
 /*!
     \fn GblQuark_init(GblContext* pCtx, size_t  extraPageSize, size_t  initialEntries)
@@ -172,55 +219,13 @@ GBL_DECLS_END
 */
 
 /*!
-    \fn GblQuark_fromString(const char* pString)
-    \details
-        Returns a ::GblQuark value associated with the given string.
-    \param pString NULL-terminated C string
-    \returns quark value or #GBL_QUARK_INVALID if the string is NULL
-    \sa GblQuark_fromStringSized, GblQuark_fromStringStatic
-*/
-
-/*!
-    \fn GblQuark_fromStringSized(const char* pString, size_t  length)
-    \details
-        Equivalent to GblQuark_fromString(), except for only the specified
-        length of the string. This is useful for either substrings, or
-        for non NULL-teriminated strings.
-    \param pString array of characters
-    \param length of array
-    \returns quark value or #GBL_QUARK_INVALID if the string is NULL or length is 0
-    \sa GblQuark_fromString
-*/
-
-/*!
-    \fn GblQuark_fromStringStatic(const char* pString)
+    \fn GblQuark_fromStatic(const char* pString)
     \details
         Equivalent to GblQuark_fromString(), except for no internal storage
         is allocated for the string, since its lifetime is known to be global.
     \param pString string literal
     \returns quark value or #GBL_QUARK_INVALID if the string is NULL
     \sa GblQuark_fromString
-*/
-
-
-/*!
-    \fn GblQuark_tryString(const char* pString)
-    \details
-        Returns the ::GblQuark value corresponding to the given string only
-        if it has already been created, otherwise returning #GBL_QUARK_INVALID.
-    \param pString NULL-terminated C string
-    \returns quark value or #GBL_QUARK_INVALID
-    \sa GblQuark_tryStringSized
-*/
-
-/*!
-    \fn GblQuark_tryStringSized(const char* pString, size_t  length)
-    \details
-        Equivalent to GblQuark_tryString() with a substring.
-    \param pString array of characters
-    \param length length of array
-    \returns quark value or #GBL_QUARK_INVALID
-    \sa GblQuark_tryStringSized
 */
 
 /*!
@@ -233,31 +238,7 @@ GBL_DECLS_END
 */
 
 /*!
-    \fn GblQuark_internString(const char* pString)
-    \details
-        Retrieves the internal C string representation of the given C string
-        or NULL if the C string is NULL.
-    \note
-        This is useful for when you want the string's lifetime to be static
-        or when it will be used as a GblQuark later, but is currently needed
-        as a C string.
-    \param pString NULL-teriminated C string or NULL
-    \returns NULL-terminated C string or NULL
-    \sa GblQuark_internStringSized, GblQuark_internStringStatic
-*/
-
-/*!
-    \fn GblQuark_internStringSized(const char* pString, size_t  length)
-    \details
-        Equivalent to GblQuark_internString() with a substring.
-    \param pString NULL-teriminated C string or NULL
-    \param length number of characters from pString to use
-    \returns NULL-terminated C string or NULL
-    \sa GblQuark_internString
-*/
-
-/*!
-    \fn GblQuark_internStringStatic(const char* pString)
+    \fn GblQuark_internStatic(const char* pString)
     \details
         Equivalent to GblQuark_internString() except that the
         internal allocation of the string is ellided, because the string's

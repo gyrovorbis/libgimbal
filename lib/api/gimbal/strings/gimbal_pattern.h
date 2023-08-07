@@ -11,7 +11,8 @@
  *  back-end lowest-level regular expression pattern matching.
  *
  *  \bug
- *      - GblPattern_match(): multiple back-to-back matches are not counted properly
+ *      - GblPattern_match(): multiple back-to-back matches are
+ *        counted as a single match
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License

@@ -632,7 +632,7 @@ GBL_EXPORT GblType GblArrayListTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("ArrayListTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("ArrayListTestSuite"),
                                      &vTable,
                                      sizeof(GblArrayListTestSuite),
                                      sizeof(GblArrayListTestSuite_),

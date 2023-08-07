@@ -90,7 +90,7 @@ extern GBL_RESULT GblPointer_typeRegister_(GblContext* pCtx) {
     };
 
     GblPrimitive_registerBuiltin(GBL_TYPE_BUILTIN_INDEX_POINTER,
-                                 GblQuark_internStringStatic("pointer"),
+                                 GblQuark_internStatic("pointer"),
                                  sizeof(GblPrimitiveClass),
                                  0,
                                  &pointerIVariantIFace,

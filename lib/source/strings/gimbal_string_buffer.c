@@ -216,8 +216,7 @@ GBL_EXPORT GblStringView GblStringBuffer_view(const GblStringBuffer* pSelf) {
 }
 
 GBL_EXPORT GblQuark GblStringBuffer_quark(const GblStringBuffer* pSelf) {
-    const GblStringView view = GblStringBuffer_view(pSelf);
-    return GblQuark_fromStringSized(view.pData, view.length);
+    return GblQuark_fromString(GblStringBuffer_cString(pSelf));
 }
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_destruct(GblStringBuffer* pSelf) {

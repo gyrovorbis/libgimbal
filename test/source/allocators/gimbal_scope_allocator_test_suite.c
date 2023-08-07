@@ -148,7 +148,7 @@ GBL_EXPORT GblType GblScopeAllocatorTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblScopeAllocatorTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblScopeAllocatorTestSuite"),
                                      &vTable,
                                      sizeof(GblScopeAllocatorTestSuite),
                                      sizeof(GblScopeAllocatorTestSuite_),

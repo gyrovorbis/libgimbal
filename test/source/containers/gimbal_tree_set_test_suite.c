@@ -228,7 +228,7 @@ GBL_EXPORT GblType GblTreeSetTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("TreeSetTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("TreeSetTestSuite"),
                                      &vTable,
                                      sizeof(GblTreeSetTestSuite),
                                      sizeof(GblTreeSetTestSuite_),

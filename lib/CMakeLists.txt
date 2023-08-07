@@ -106,6 +106,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/algorithms/gimbal_numeric.h
     api/gimbal/algorithms/gimbal_hash.h
     api/gimbal/algorithms/gimbal_md5.h
+    api/gimbal/algorithms/gimbal_random.h
     api/gimbal/algorithms/gimbal_sha1.h
     api/gimbal/allocators/gimbal_allocation_tracker.h
     api/gimbal/allocators/gimbal_arena_allocator.h
@@ -204,6 +205,7 @@ set(GIMBAL_SOURCES
     source/algorithms/gimbal_hash.c
     source/algorithms/gimbal_md5.c
     source/algorithms/gimbal_numeric.c
+    source/algorithms/gimbal_random.c
     source/algorithms/gimbal_sort.c
     source/algorithms/gimbal_sha1.c
     source/allocators/gimbal_arena_allocator.c

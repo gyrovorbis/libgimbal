@@ -1509,10 +1509,10 @@ static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData) {
 
     // static constructor for first instance of class
     if(!GblType_classRefCount(GBL_OBJECT_TYPE)) {
-        objectNameQuark_            = GblQuark_fromStringStatic("_name");
-        objectParentQuark_          = GblQuark_fromStringStatic("_parent");
-        objectFamilyQuark_          = GblQuark_fromStringStatic("_family");
-        objectEventFiltersQuark_    = GblQuark_fromStringStatic("_eventFilters");
+        objectNameQuark_            = GblQuark_fromStatic("_name");
+        objectParentQuark_          = GblQuark_fromStatic("_parent");
+        objectFamilyQuark_          = GblQuark_fromStatic("_family");
+        objectEventFiltersQuark_    = GblQuark_fromStatic("_eventFilters");
 
         GBL_PROPERTIES_REGISTER(GblObject);
 
@@ -1587,7 +1587,7 @@ GBL_EXPORT GblType GblObject_type(void) {
         ifaceEntries[1].interfaceType = GBL_IEVENT_HANDLER_TYPE;
         ifaceEntries[2].interfaceType = GBL_IEVENT_FILTER_TYPE;
 
-        type = GblType_register(GblQuark_internStringStatic("GblObject"),
+        type = GblType_register(GblQuark_internStatic("GblObject"),
                                 GBL_BOX_TYPE,
                                 &typeInfo,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);

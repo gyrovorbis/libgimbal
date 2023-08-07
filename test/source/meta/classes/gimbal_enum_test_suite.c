@@ -288,7 +288,7 @@ GBL_EXPORT GblType GblEnumTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("EnumTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("EnumTestSuite"),
                                      &vTable,
                                      sizeof(GblEnumTestSuite),
                                      sizeof(GblEnumTestSuite_),

@@ -117,7 +117,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_blank_(GblTestSuite* pSelf, GblCo
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
 
-     pSelf_->blankType = GblType_register(GblQuark_internStringStatic("Blank"),
+     pSelf_->blankType = GblType_register(GblQuark_internStatic("Blank"),
                                           GBL_INVALID_TYPE,
                                           NULL,
                                           GBL_TYPE_FLAGS_NONE);
@@ -142,7 +142,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_blank_(GblTestSuite* pSelf, GblCo
     GBL_TEST_COMPARE(GblType_instanceCount(pSelf_->blankType), 0);
 
     GBL_TEST_COMPARE(GblType_name(pSelf_->blankType), "Blank");
-    GBL_TEST_COMPARE(GblType_nameQuark(pSelf_->blankType), GblQuark_fromStringStatic("Blank"));
+    GBL_TEST_COMPARE(GblType_nameQuark(pSelf_->blankType), GblQuark_fromStatic("Blank"));
     GBL_TEST_COMPARE(GblType_parent(pSelf_->blankType), GBL_INVALID_TYPE);
     GBL_TEST_COMPARE(GblType_root(pSelf_->blankType), pSelf_->blankType);
     GBL_TEST_COMPARE(GblType_base(pSelf_->blankType, 0), pSelf_->blankType);
@@ -164,7 +164,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_duplicate_(GblTestSuite* pSelf, G
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GblType dupe = GblType_register(GblQuark_internStringStatic("Blank"),
+    GblType dupe = GblType_register(GblQuark_internStatic("Blank"),
                                           GBL_INVALID_TYPE,
                                           NULL,
                                           GBL_TYPE_FLAGS_NONE);
@@ -921,7 +921,7 @@ GBL_EXPORT GblType GblTypeTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("TypeTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("TypeTestSuite"),
                                      &vTable,
                                      sizeof(GblTypeTestSuite),
                                      sizeof(GblTypeTestSuite_),

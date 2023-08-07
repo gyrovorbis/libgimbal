@@ -108,7 +108,7 @@ GBL_EXPORT GblType GblSortTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStringStatic("GblSortTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblSortTestSuite"),
                                      &vTable,
                                      sizeof(GblSortTestSuite),
                                      sizeof(GblSortTestSuite_),
