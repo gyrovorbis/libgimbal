@@ -3,6 +3,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/strings/gimbal_string_view.h>
 #include <gimbal/strings/gimbal_string.h>
+#include <gimbal/algorithms/gimbal_random.h>
 
 GBL_EXPORT GBL_RESULT GblUuid_setNil(GblUuid* pSelf) {
     GBL_CTX_BEGIN(NULL);
