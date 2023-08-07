@@ -16,6 +16,7 @@
 #include "../preprocessor/gimbal_macro_utils.h"
 #include "gimbal_test_scenario.h"
 #include <stdint.h>
+#include <inttypes.h>
 
 #define GBL_TEST_VERIFY(expr)                   GBL_CTX_VERIFY_EXPRESSION(expr)
 #define GBL_TEST_COMPARE_FMT_(value)            GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_FMT_TABLE_, value)()
@@ -28,8 +29,8 @@ GBL_INLINE const char* GBL_TEST_COMPARE_FMT_DFLT_ (void) { return "Values differ
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_CHAR_ (void) { return "Values differed [actual: %c, expected: %c]"; }
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_INT_  (void) { return "Values differed [actual: %d, expected: %d]"; }
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_UINT_ (void) { return "Values differed [actual: %u, expected: %u]"; }
-GBL_INLINE const char* GBL_TEST_COMPARE_FMT_LINT_ (void) { return "Values differed [actual: %ld, expected: %ld]"; }
-GBL_INLINE const char* GBL_TEST_COMPARE_FMT_LUINT_(void) { return "Values differed [actual: %lu, expected: %lu]"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_LINT_ (void) { return "Values differed [actual: %" PRId64 ", expected: %" PRId64 "]"; }
+GBL_INLINE const char* GBL_TEST_COMPARE_FMT_LUINT_(void) { return "Values differed [actual: %" PRIu64 ", expected: %" PRIu64 "]"; }
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_STR_  (void) { return "Values differed [actual: %s, expected: %s]"; }
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_FLT_  (void) { return "Values differed [actual: %f, expected: %f]"; }
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_  (void) { return "Values differed [actual: %p, expected: %p]"; }
@@ -40,11 +41,11 @@ GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_  (void) { return "Values differ
             (char,          GBL_TEST_COMPARE_FMT_CHAR_),    \
             (int16_t,       GBL_TEST_COMPARE_FMT_INT_),     \
             (int32_t,       GBL_TEST_COMPARE_FMT_INT_),     \
-            (int64_t,       GBL_TEST_COMPARE_FMT_INT_),     \
+            (int64_t,       GBL_TEST_COMPARE_FMT_LINT_),    \
             (uint8_t,       GBL_TEST_COMPARE_FMT_UINT_),    \
             (uint16_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
             (uint32_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
-            (uint64_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
+            (uint64_t,      GBL_TEST_COMPARE_FMT_LUINT_),   \
             (const char*,   GBL_TEST_COMPARE_FMT_STR_),     \
             (char*,         GBL_TEST_COMPARE_FMT_STR_),     \
             (float,         GBL_TEST_COMPARE_FMT_FLT_),     \
