@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #define GblStringView_toInt_(postfix, type, min, max, func, tempType) \
     GBL_EXPORT type GblStringView_to##postfix(GblStringView self, GblBool* pSuccess) { \
@@ -23,7 +24,7 @@
             if(pEnd != pCString + self.length || retVal > max || retVal < min || errno != 0) { \
                 result = 0; \
                 valid = GBL_FALSE; \
-            } else result = retVal; \
+            } else result = (type)retVal; \
         } \
         \
         if(pSuccess) \
@@ -38,8 +39,8 @@ GblStringView_toInt_(Uint16, uint16_t, 0, UINT16_MAX, strtoul, unsigned long)
 GblStringView_toInt_(Int16, int16_t, INT16_MIN, INT16_MAX, strtol, long)
 GblStringView_toInt_(Uint32, uint32_t, 0, UINT32_MAX, strtoul, unsigned long)
 GblStringView_toInt_(Int32, int32_t, INT32_MIN, INT32_MAX, strtol, long)
-GblStringView_toInt_(Uint64, uint64_t, 0, UINT64_MAX, strtoul, unsigned long)
-GblStringView_toInt_(Int64, int64_t, INT64_MIN, INT64_MAX, strtol, long)
+GblStringView_toInt_(Uint64, uint64_t, 0, UINT64_MAX, strtoumax, uintmax_t)
+GblStringView_toInt_(Int64, int64_t, INT64_MIN, INT64_MAX, strtoimax, intmax_t)
 
 GBL_EXPORT char GblStringView_toChar(GblStringView self, GblBool* pSuccess) {
     if(self.length != 1) {

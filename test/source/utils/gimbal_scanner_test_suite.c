@@ -746,7 +746,7 @@ GBL_TEST_CASE(peekInt64)
     GblScanner_skipTokens(pFixture->pScanner, 1);
 
     GBL_TEST_VERIFY(GblScanner_peek(pFixture->pScanner, &value));
-    GBL_TEST_COMPARE(value, -2147483650);
+    GBL_TEST_COMPARE(value, -2147483650ll);
 
     GblScanner_skipTokens(pFixture->pScanner, 1);
 
