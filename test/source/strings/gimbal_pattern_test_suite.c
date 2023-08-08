@@ -24,16 +24,13 @@ GBL_TEST_CASE(compile)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(stringify)
-    struct {
-        GblStringBuffer buff;
-        char            stackSpace[128];
-    } str;
-    GblStringBuffer_construct(&str.buff, GBL_STRV(""), sizeof(str));
+    GblStringBuffer buff;
 
-    GBL_TEST_COMPARE(GblPattern_string(pFixture->pPattern, &str.buff),
-                     "[0-9]{8}");
+    GblStringBuffer_construct(&buff);
 
-    GblStringBuffer_destruct(&str.buff);
+    GBL_TEST_COMPARE(GblPattern_string(pFixture->pPattern, &buff), "[0-9]{8}");
+
+    GblStringBuffer_destruct(&buff);
 
 GBL_TEST_CASE_END
 
@@ -303,7 +300,6 @@ GBL_TEST_CASE_END
 
 GBL_TEST_REGISTER(compileInvalid,
                   compile,
-                  unref,
                   stringify,
                   matchInvalid,
                   matchNone,
@@ -322,7 +318,8 @@ GBL_TEST_REGISTER(compileInvalid,
                   matchLiteral,
                   matchLiteralBegin,
                   matchLiteralEnd,
-                  matchDateTime)
+                  matchDateTime,
+                  unref)
 #if 0
 
 GBL_TEST_CASE(iso8601BasicDate)
