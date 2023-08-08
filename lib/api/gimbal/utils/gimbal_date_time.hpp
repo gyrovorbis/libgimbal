@@ -3,7 +3,7 @@
 
 #include "gimbal_date_time.h"
 
-namespace gimbal {
+namespace gbl {
 
 enum class Month: GblEnum {
     January   = GBL_MONTH_JANUARY = 1,
@@ -90,8 +90,8 @@ struct DateTime: public GblDateTime {
     TimeSpec    toSpecUtc() const;
     void        toLocal(std::tm* pBrokenDown) const;
     void        toUtc(std::tm* pBrokenDown) const;
-    const char* toIso8601(GblStringBuffer& buff) const;
-    const char* format(GblStringBuffer& buff, const char* pFmt) const;
+    std::string toIso8601(void) const;
+    std::string format(const char* pFmt) const;
 
     bool        normalize();
 
@@ -110,7 +110,6 @@ struct DateTime: public GblDateTime {
     bool        isValid() const;
     bool        isUtc() const;
     bool        isLocal() const;
-
 
 };
 

@@ -29,6 +29,7 @@
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblStringView);
+GBL_FORWARD_DECLARE_STRUCT(GblStringBuffer);
 
 /*! Opaque structure containing a compiled regular expression
  *
@@ -49,11 +50,14 @@ typedef struct GblPattern GblPattern;
  *  @{
  */
 //! Compiles the given regular expression into a pre-processed GblPattern
-GBL_EXPORT const GblPattern* GblPattern_create (const char* pRegExp) GBL_NOEXCEPT;
+GBL_EXPORT const GblPattern* GblPattern_create (const char* pRegExp)    GBL_NOEXCEPT;
 //! Returns a new reference to an existing pattern, incrementing its refcount
-GBL_EXPORT const GblPattern* GblPattern_ref    (GBL_CSELF)           GBL_NOEXCEPT;
+GBL_EXPORT const GblPattern* GblPattern_ref    (GBL_CSELF)              GBL_NOEXCEPT;
 //! Releases a reference to a pattern, deallocating it upon reaching zero
-GBL_EXPORT GblRefCount       GblPattern_unref  (GBL_CSELF)           GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount       GblPattern_unref  (GBL_CSELF)              GBL_NOEXCEPT;
+
+GBL_EXPORT const char*       GblPattern_string (GBL_CSELF,
+                                                GblStringBuffer* pBuff) GBL_NOEXCEPT;
 //! @}
 
 /*! \name Matching

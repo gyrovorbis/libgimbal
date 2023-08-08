@@ -1,9 +1,11 @@
 #include <gimbal/strings/gimbal_pattern.h>
 #include <gimbal/strings/gimbal_string_view.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/utils/gimbal_ref.h>
 #include <re.h>
 
-#define GBL_PATTERN_COMPILE_BUFFER_SIZE_ 1024
+#define GBL_PATTERN_COMPILE_BUFFER_SIZE_    1024
+#define GBL_PATTERN_STRING_BUFFER_SIZE_     128
 
 static const GblPattern* GblPattern_compileStatic_(const char* pRegExp) {
     if(!pRegExp) return NULL;
@@ -17,7 +19,6 @@ GBL_EXPORT const GblPattern* GblPattern_create(const char* pRegExp) {
     if(pRegExp) {
         void* pBuffer = GBL_ALLOCA(GBL_PATTERN_COMPILE_BUFFER_SIZE_);
         unsigned size = GBL_PATTERN_COMPILE_BUFFER_SIZE_;
-
 
         if(re_compile_to(pRegExp, pBuffer, &size)) {
             GBL_ASSERT(size);
@@ -243,4 +244,13 @@ GBL_EXPORT size_t GblPattern_matchCount(const GblPattern* pSelf, const char* pSt
 
 GBL_EXPORT size_t GblPattern_matchCountStr(const char* pRegExp, const char* pString) {
     return GblPattern_matchCount(GblPattern_compileStatic_(pRegExp), pString);
+}
+
+GBL_EXPORT const char* GblPattern_string(const GblPattern* pSelf,
+                                         GblStringBuffer*  pBuff) {
+    GblStringBuffer_resize(pBuff, GBL_PATTERN_STRING_BUFFER_SIZE_);
+    unsigned size = GblStringBuffer_capacity(pBuff);
+    re_string((re_t)pSelf, GblStringBuffer_data(pBuff), &size);
+    GblStringBuffer_resize(pBuff, size);
+    return GblStringBuffer_cString(pBuff);
 }

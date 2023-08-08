@@ -1,6 +1,7 @@
 #include "strings/gimbal_pattern_test_suite.h"
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/strings/gimbal_pattern.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 
 #define GBL_SELF_TYPE GblPatternTestSuite
 
@@ -20,6 +21,20 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(compile)
     pFixture->pPattern = GblPattern_create("[0-9]{8}");
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(stringify)
+    struct {
+        GblStringBuffer buff;
+        char            stackSpace[128];
+    } str;
+    GblStringBuffer_construct(&str.buff, GBL_STRV(""), sizeof(str));
+
+    GBL_TEST_COMPARE(GblPattern_string(pFixture->pPattern, &str.buff),
+                     "[0-9]{8}");
+
+    GblStringBuffer_destruct(&str.buff);
+
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(matchInvalid)
@@ -103,7 +118,7 @@ GBL_TEST_CASE_END
 GBL_TEST_CASE(matchMultipleInARow)
     GblStringView view;
     int count = -1;
-    GBL_TEST_SKIP("Fixme!!!");
+
     GBL_TEST_VERIFY(GblPattern_match(pFixture->pPattern,
                                      "1111111122222222",
                                      &view,
@@ -221,8 +236,75 @@ GBL_TEST_CASE(unref)
     GblPattern_unref(pFixture->pPattern);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(matchLiteral)
+    GblStringView view;
+    int count = -1;
+    GBL_TEST_VERIFY(GblPattern_matchStr("lol", "ablolcd", &view, &count));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_COMPARE(count, 1);
+
+    count = -1;
+    GBL_TEST_VERIFY(GblPattern_matchStr("lol", "lolablolcdlol", &view, &count));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_COMPARE(count, 3);
+
+    count = 1;
+    GBL_TEST_VERIFY(GblPattern_matchStr("lol", "lolablolcdlol", &view, &count));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_COMPARE(count, 1);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(matchLiteralBegin)
+    GblStringView view;
+    int count = -1;
+    GBL_TEST_VERIFY(!GblPattern_matchStr("^lol", "ablolcd", &view, &count));
+    GBL_TEST_VERIFY(GblStringView_empty(view));
+    GBL_TEST_COMPARE(count, 0);
+
+    count = -1;
+    GBL_TEST_VERIFY(GblPattern_matchStr("^lol", "lolablolcdlol", &view, &count));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_COMPARE(count, 1);
+
+    count = 1;
+    GBL_TEST_VERIFY(GblPattern_matchStr("^lol", "lolablolcdlol", &view, &count));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_COMPARE(count, 1);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(matchLiteralEnd)
+    GblStringView view;
+    int count = -1;
+    GBL_TEST_VERIFY(!GblPattern_matchStr("lol$", "ablolcd", &view, &count));
+    GBL_TEST_VERIFY(GblStringView_empty(view));
+    GBL_TEST_COMPARE(count, 0);
+
+    count = -1;
+    GBL_TEST_VERIFY(GblPattern_matchStr("lol$", "lolablolcdlol", &view, &count));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_COMPARE(count, 1);
+
+    count = 1;
+    GBL_TEST_VERIFY(GblPattern_matchStr("lol$", "lolablolcdlol", &view, &count));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_COMPARE(count, 1);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(matchDateTime)
+    GblStringView view;
+    int count = -1;
+    GBL_TEST_VERIFY(GblPattern_matchStr("\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d",
+                                        "2018-10-04T05:52:20",
+                                        &view,
+                                        &count));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("2018-10-04T05:52:20")));
+    GBL_TEST_COMPARE(count, 1);
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(compileInvalid,
                   compile,
+                  unref,
+                  stringify,
                   matchInvalid,
                   matchNone,
                   matchDefaultMatchDefaultCount,
@@ -237,7 +319,10 @@ GBL_TEST_REGISTER(compileInvalid,
                   matchNot,
                   matchNotLast,
                   matchNotFirstMultiInARow,
-                  unref)
+                  matchLiteral,
+                  matchLiteralBegin,
+                  matchLiteralEnd,
+                  matchDateTime)
 #if 0
 
 GBL_TEST_CASE(iso8601BasicDate)

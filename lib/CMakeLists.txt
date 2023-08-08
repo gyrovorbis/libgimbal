@@ -193,7 +193,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/utils/gimbal_version.h
     api/gimbal/utils/gimbal_option_group.h
     api/gimbal/utils/gimbal_date_time.h
-    api/gimbal/utils/gimbal_date_time.hpp
     api/gimbal/utils/gimbal_byte_array.h
     api/gimbal/utils/gimbal_bit_view.h
     api/gimbal/utils/gimbal_scanner.h
@@ -208,7 +207,8 @@ if(GBL_ENABLE_CPP)
 
     list(APPEND
          GIMBAL_INCLUDES
-         api/gimbal/strings/gimbal_quark.hpp)
+         api/gimbal/strings/gimbal_quark.hpp
+         api/gimbal/utils/gimbal_date_time.hpp)
 endif()
 
 set(GIMBAL_SOURCES

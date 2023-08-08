@@ -1,6 +1,6 @@
 /*! \file
  *  \brief Random number generators and utilities
- *  \ingroup algorithms
+ *  \ingroup random
  *
  *  This file contains the API and utilties surrounding
  *  random number generation. A series of utilities are
@@ -26,6 +26,12 @@
 
 GBL_DECLS_BEGIN
 
+/*! \defgroup random Random
+ *  \ingroup algorithms
+ *  \brief Random number generators and utilities
+ * @{
+*/
+
 GBL_EXPORT uint64_t gblSeed          (uint8_t index)            GBL_NOEXCEPT;
 
 GBL_EXPORT int      gblRand          (void)                     GBL_NOEXCEPT;
@@ -50,6 +56,8 @@ GBL_EXPORT float gblRandNormal      (float m, float s) GBL_NOEXCEPT;
 GBL_EXPORT float gblRandLogNormal   (float a, float b) GBL_NOEXCEPT;
 GBL_EXPORT float gblRandChisquare   (int n)            GBL_NOEXCEPT;
 GBL_EXPORT float gblRandStudent     (int n)            GBL_NOEXCEPT;
+
+//! @}
 
 GBL_DECLS_END
 
