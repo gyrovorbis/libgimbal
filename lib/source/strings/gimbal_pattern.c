@@ -2,10 +2,13 @@
 #include <gimbal/strings/gimbal_string_view.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/utils/gimbal_ref.h>
+#include <gimbal/core/gimbal_atomics.h>
 #include <re.h>
 
 #define GBL_PATTERN_COMPILE_BUFFER_SIZE_    1024
 #define GBL_PATTERN_STRING_BUFFER_SIZE_     128
+
+static GBL_ATOMIC_INT16 activePatterns_ = 0;
 
 static const GblPattern* GblPattern_compileStatic_(const char* pRegExp) {
     if(!pRegExp) return NULL;
@@ -25,6 +28,8 @@ GBL_EXPORT const GblPattern* GblPattern_create(const char* pRegExp) {
 
             pPattern = GblRef_create(size);
             memcpy(pPattern, pBuffer, size);
+
+            GBL_ATOMIC_INT16_INC(activePatterns_);
         }
     }
 
@@ -32,7 +37,20 @@ GBL_EXPORT const GblPattern* GblPattern_create(const char* pRegExp) {
 }
 
 GBL_EXPORT GblRefCount GblPattern_unref(const GblPattern* pSelf) {
-    return GblRef_unref((void*)pSelf);
+    const GblRefCount refCount =  GblRef_unref((void*)pSelf);
+
+    if(!refCount)
+        GBL_ATOMIC_INT16_DEC(activePatterns_);
+
+    return refCount;
+}
+
+GBL_EXPORT GblRefCount GblPattern_refCount(const GblPattern* pSelf) {
+    return GblRef_refCount(pSelf);
+}
+
+GBL_EXPORT GblRefCount GblPattern_totalCount(void) {
+    return GBL_ATOMIC_INT16_LOAD(activePatterns_);
 }
 
 GBL_EXPORT const GblPattern* GblPattern_ref(const GblPattern* pSelf) {

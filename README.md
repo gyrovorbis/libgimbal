@@ -77,7 +77,7 @@ LibGimbal was specifically written with language interoperability in mind. As su
 
 |Library                                                                                    | Language  |                           Status                     |
 |-------------------------------------------------------------------------------------------|-----------|------------------------------------------------------|
-|<a href="https://github.com/AaronGlazer/jimbal"><strong>Jimbal</strong></a>                |Jai        |Nearly complete, lacking bindings for inline functions|
+|<a href="https://github.com/AaronGlazer/jimbal"><strong>Jimbal</strong></a>                |Jai        |Complete support for the C API|
 |<a href="https://github.com/andrewapperley/gimbalsaurus"><strong>Gimbalsaurus</strong></a> |Objective-C|Just getting off the ground                           |
 |<a href="http://libgimbal.elysianshadows.com"><strong>libGimbal</strong></a>               |C++        |First-party within source-tree. Just starting, WIP.   |
 
@@ -105,10 +105,11 @@ The following is a closer look at the contents of each API:
 - support for custom allocators
 
 ## Algorithms ##
-- hashing algorithms (Murmur, Sip, Fnv1, SuperFast)
+- hashing algorithms (Murmur, Sip, Fnv1, SuperFast, Jenkins, etc)
 - sorting algorithms, searching algorithms
 - random data generators and utilities
 - CRC, parity, LCM, GCD, prime numbers
+- SHA1 and MD5 (semi)cryptographic hashing
 
 ## Allocators ##
 - allocation trackers with leak detection
@@ -138,6 +139,7 @@ The following is a closer look at the contents of each API:
 - generic reference-counted types
 - command-line option and argument parsing
 - version, UUID, date-time utilities
+- user-settings management
 
 ## Unit Testing Framework ##
 - cross-platform object-oriented C-based unit test framework
@@ -149,20 +151,24 @@ The following is a closer look at the contents of each API:
 
 # Credits #
 ## Author ##
-Falco Girgis
+Falco Girgis (gyrovorbis@gmail.com)
 ## Dependencies ##
-- Original HashSet and BTree back-ends: Josh Baker (tidwall) 
+- GblHashSet and GblTreeSet original back-ends: Josh Baker (tidwall) 
   - https://github.com/tidwall/hashmap.c
   - https://github.com/tidwall/btree.c
-- Original TinyCThreads: Marcus Geelnard, Evan Nemerson
+- GblThread TinyCThreads back-end: Marcus Geelnard, Evan Nemerson
   - https://tinycthread.github.io/
-- SipHash: Jean-Philippe Amasson, Daniel J. Bernstein 
+- gblHashSip(..): Jean-Philippe Amasson, Daniel J. Bernstein 
   - http://creativecommons.org/publicdomain/zero/1.0/
-- MurmurHash3: Austin Appleby
+- gblHashMurmur(..): Austin Appleby
   - https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
-- Original strptime: Based on musl C Standard Library Implementation
+- GblDateTime_parse(..) strptime back-end: Based on musl C stdlib Implementation
   - https://git.musl-libc.org/cgit/musl/tree/src/time/strptime.c
-- GblPattern engine back-end: tiny-regex-c 
+- GblPattern matching engine back-end: tiny-regex-c 
   - https://github.com/kokke/tiny-regex-c
 - GblSha1 SHA1 hashing back-end: Steve Reid (Public Domain)
+  - https://github.com/clibs/sha1/blob/master/sha1.h
 - GblMd5 MD5 hashing back-end: RSA Data Security, Inc.
+  - https://opensource.apple.com/source/ppp/ppp-37/ppp/pppd/md5.c.auto.html
+- gblRandom LRG generator and statistical distributions: Steve Park, Keith Miller
+  - https://www.cs.wm.edu/~va/software/park/park.html

@@ -7,13 +7,11 @@
  *  used for string matching operations.
  *
  *  \note
- *  LibGimbal uses a fork of the the Tiny C RegEx library for its
- *  back-end lowest-level regular expression pattern matching.
+ *  LibGimbal uses a highly modified fork of the the Tiny C RegEx
+ *  library for its back-end, lowest-level regular expression
+ *  pattern matching.
  *
- *  \bug
- *      - GblPattern_match(): multiple back-to-back matches are
- *        counted as a single match
- *      - GblPattern_toString()
+ *  \todo
  *      - Wrap Tiny C Regex tests in gimbal Unit tests
  *
  *  \author     2023 Falco Girgis
@@ -31,37 +29,60 @@ GBL_DECLS_BEGIN
 GBL_FORWARD_DECLARE_STRUCT(GblStringView);
 GBL_FORWARD_DECLARE_STRUCT(GblStringBuffer);
 
-/*! Opaque structure containing a compiled regular expression
+/*! \struct GblPattern
+ *  \brief Opaque structure containing a compiled regular expression
  *
  *  GblPattern is the compiled version of a regular expression
- *  string, produced by GblPattern_compile(). It is faster
+ *  string, produced by GblPattern_create(). It is faster
  *  than working with raw regular expression strings, since
  *  preprocessing has already been done.
  *
  *  It is advised that when you are repeatedly using the same
  *  regular expression, you store it and use it as a GblPattern.
  *
+ *  \note
+ *  GblPattern is a reference-counted shared pointer type.
+ *
  *  \ingroup strings
  */
+struct GblPattern;
 typedef struct GblPattern GblPattern;
 
 /*! \name Lifetime Management
  *  \brief Methods for creating, referencing, and unreferencing patterns
+ *  \relatesalso GblPattern
  *  @{
  */
 //! Compiles the given regular expression into a pre-processed GblPattern
-GBL_EXPORT const GblPattern* GblPattern_create (const char* pRegExp)    GBL_NOEXCEPT;
+GBL_EXPORT const GblPattern* GblPattern_create     (const char* pRegExp) GBL_NOEXCEPT;
 //! Returns a new reference to an existing pattern, incrementing its refcount
-GBL_EXPORT const GblPattern* GblPattern_ref    (GBL_CSELF)              GBL_NOEXCEPT;
+GBL_EXPORT const GblPattern* GblPattern_ref        (GBL_CSELF)           GBL_NOEXCEPT;
 //! Releases a reference to a pattern, deallocating it upon reaching zero
-GBL_EXPORT GblRefCount       GblPattern_unref  (GBL_CSELF)              GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount       GblPattern_unref      (GBL_CSELF)           GBL_NOEXCEPT;
+//! Returns the number of active references held to the given compiled pattern
+GBL_EXPORT GblRefCount       GblPattern_refCount   (GBL_CSELF)           GBL_NOEXCEPT;
+//! Returns the total number of active, allocated, compiled regex patterns
+GBL_EXPORT GblRefCount       GblPattern_totalCount (void)                GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT const char*       GblPattern_string (GBL_CSELF,
-                                                GblStringBuffer* pBuff) GBL_NOEXCEPT;
+/*! \name Properties and Operators
+ *  \brief Methods for getters and basic operations
+ *  \relatesalso GblPattern
+ *  @{
+ */
+//! Compares two different compiled patterns to see if they are equivalent regexes
+GBL_EXPORT int         GblPattern_compare  (GBL_CSELF, const GblPattern* pRhs) GBL_NOEXCEPT;
+//! Compares two different compiled patterns for exact value equality of their regexes
+GBL_EXPORT GblBool     GblPattern_equals   (GBL_CSELF, const GblPattern* pRhs) GBL_NOEXCEPT;
+//! Counts the total size of a compiled pattern and returns it in bytes
+GBL_EXPORT size_t      GblPattern_bytes    (GBL_CSELF)                         GBL_NOEXCEPT;
+//! Reconstructs an approximate string representation of the compiled pattern
+GBL_EXPORT const char* GblPattern_string   (GBL_CSELF, GblStringBuffer* pBuff) GBL_NOEXCEPT;
 //! @}
 
 /*! \name Matching
  *  \brief Methods for generic pattern matching
+ *  \relatesalso GblPattern
  *  @{
  */
 /*! Finds the numbered match given by \p pCount, or 1 if NULL.
@@ -106,6 +127,7 @@ GBL_EXPORT GblBool GblPattern_matchStr (const char*    pRegExp,
 
 /*! \name Inverse Matching
  *  \brief Methods for returning non matches
+ *  \relatesalso GblPattern
  *  @{
  */
 //! Behaves like GblPattern_match() except searching for NON-MATCHES
@@ -123,6 +145,7 @@ GBL_EXPORT GblBool GblPattern_matchNotStr (const char*    pRegExp,
 
 /*! \name Exact Matching
  *  \brief Methods for checking exact matches
+ *  \relatesalso GblPattern
  *  @{
  */
  //! Returns GBL_TRUE if the given string EXACTLY matches the given pattern or GBL_FALSE otherwise
@@ -134,6 +157,7 @@ GBL_EXPORT GblBool GblPattern_matchExactStr (const char* pRegExp,
 
 /*! \name Match Counting
  *  \brief Methods used for counting matches
+ *  \relatesalso GblPattern
  *  @{
  */
 //! Returns the number of pattern matches found in \p pString
