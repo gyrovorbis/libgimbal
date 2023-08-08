@@ -13,6 +13,7 @@
  *
  *  \todo
  *      - Wrap Tiny C Regex tests in gimbal Unit tests
+ *      - `\b` word-boundary character class
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License

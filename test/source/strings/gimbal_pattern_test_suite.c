@@ -7,20 +7,35 @@
 
 GBL_TEST_FIXTURE {
     const GblPattern* pPattern;
+    const GblPattern* pPhoneNumber;
+    GblRefCount totalCount;
 };
 
 GBL_TEST_INIT()
+    pFixture->totalCount = GblPattern_totalCount();
 GBL_TEST_CASE_END
 
 GBL_TEST_FINAL()
+    GBL_TEST_COMPARE(GblPattern_totalCount(), pFixture->totalCount);
 GBL_TEST_CASE_END
 
-GBL_TEST_CASE(compileInvalid)
+GBL_TEST_CASE(createInvalid)
     GBL_TEST_COMPARE(GblPattern_create(NULL), NULL);
 GBL_TEST_CASE_END
 
-GBL_TEST_CASE(compile)
+GBL_TEST_CASE(create)
     pFixture->pPattern = GblPattern_create("[0-9]{8}");
+    GBL_TEST_COMPARE(GblPattern_totalCount(), pFixture->totalCount + 1);
+
+    pFixture->pPhoneNumber = GblPattern_create("^\\d{3}[-.]?\\d{3}[-.]?\\d{4}$");
+    GBL_TEST_COMPARE(GblPattern_totalCount(), pFixture->totalCount + 2);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(ref)
+    const GblPattern* pRef2 = GblPattern_ref(pFixture->pPattern);
+    GBL_TEST_COMPARE(pRef2, pFixture->pPattern);
+    GBL_TEST_COMPARE(GblPattern_refCount(pRef2), 2);
+    GBL_TEST_COMPARE(GblPattern_unref(pRef2), 1);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(stringify)
@@ -30,8 +45,32 @@ GBL_TEST_CASE(stringify)
 
     GBL_TEST_COMPARE(GblPattern_string(pFixture->pPattern, &buff), "[0-9]{8}");
 
-    GblStringBuffer_destruct(&buff);
+    GBL_TEST_COMPARE(GblPattern_string(pFixture->pPhoneNumber, &buff),
+                     "^\\d{3}[-.]?\\d{3}[-.]?\\d{4}$");
 
+    GblStringBuffer_destruct(&buff);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(bytes)
+    size_t byteSize = GblPattern_bytes(pFixture->pPattern);
+    GBL_TEST_VERIFY(byteSize > strlen("[0-9]{8}"));
+    GBL_TEST_COMPARE(GblPattern_bytes(pFixture->pPattern), byteSize);
+
+    byteSize = GblPattern_bytes(pFixture->pPhoneNumber);
+    GBL_TEST_VERIFY(byteSize > strlen("^\\d{3}[-.]?\\d{3}[-.]?\\d{4}$"));
+    GBL_TEST_COMPARE(GblPattern_bytes(pFixture->pPhoneNumber), byteSize);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(compareSelf)
+    GBL_TEST_COMPARE(GblPattern_compare(pFixture->pPattern, pFixture->pPattern), 0);
+    GBL_TEST_VERIFY(GblPattern_equals(pFixture->pPattern, pFixture->pPattern));
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(compare)
+    GBL_TEST_VERIFY(GblPattern_compare(pFixture->pPattern,
+                                       pFixture->pPhoneNumber) < 0);
+    GBL_TEST_VERIFY(!GblPattern_equals(pFixture->pPhoneNumber,
+                                       pFixture->pPattern));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(matchInvalid)
@@ -229,10 +268,6 @@ GBL_TEST_CASE(matchNotFirstMultiInARow)
     GBL_TEST_COMPARE(count, 1);
 GBL_TEST_CASE_END
 
-GBL_TEST_CASE(unref)
-    GblPattern_unref(pFixture->pPattern);
-GBL_TEST_CASE_END
-
 GBL_TEST_CASE(matchLiteral)
     GblStringView view;
     int count = -1;
@@ -298,9 +333,31 @@ GBL_TEST_CASE(matchDateTime)
     GBL_TEST_COMPARE(count, 1);
 GBL_TEST_CASE_END
 
-GBL_TEST_REGISTER(compileInvalid,
-                  compile,
+GBL_TEST_CASE(matchPhoneNumber)
+    GblStringView view;
+    int count = -1;
+
+    GBL_TEST_SKIP("FIXME");
+
+    GBL_TEST_VERIFY(GblPattern_match(pFixture->pPhoneNumber,
+                                     "256-721-1534",
+                                     &view,
+                                     &count));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("256-721-1534")));
+    GBL_TEST_COMPARE(count, 1);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(unref)
+    GblPattern_unref(pFixture->pPattern);
+    GblPattern_unref(pFixture->pPhoneNumber);
+GBL_TEST_CASE_END
+
+GBL_TEST_REGISTER(createInvalid,
+                  create,
                   stringify,
+                  bytes,
+                  compareSelf,
+                  compare,
                   matchInvalid,
                   matchNone,
                   matchDefaultMatchDefaultCount,
@@ -319,6 +376,7 @@ GBL_TEST_REGISTER(compileInvalid,
                   matchLiteralBegin,
                   matchLiteralEnd,
                   matchDateTime,
+                  matchPhoneNumber,
                   unref)
 #if 0
 

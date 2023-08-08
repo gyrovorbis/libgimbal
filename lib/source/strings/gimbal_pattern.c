@@ -57,6 +57,18 @@ GBL_EXPORT const GblPattern* GblPattern_ref(const GblPattern* pSelf) {
     return GblRef_ref((void*)pSelf);
 }
 
+GBL_EXPORT int GblPattern_compare(const GblPattern* pSelf, const GblPattern* pRhs) {
+    return re_compare((re_t)pSelf, (re_t)pRhs);
+}
+
+GBL_EXPORT GblBool GblPattern_equals(const GblPattern* pSelf, const GblPattern* pRhs) {
+    return GblPattern_compare(pSelf, pRhs) == 0;
+}
+
+GBL_EXPORT size_t GblPattern_bytes(const GblPattern* pSelf) {
+    return re_size((re_t)pSelf);
+}
+
 GBL_EXPORT GblBool (GblPattern_match)(const GblPattern* pSelf,
                                       const char*       pString,
                                       GblStringView*    pMatch,
