@@ -161,7 +161,7 @@ GBL_EXPORT GblHash gblHashMurmur(const void* pData, size_t  size) {
     return out;
 }
 
-GBL_MAYBE_UNUSED GBL_INLINE GblHash gblCrc32LittleEndian(const void* pData, size_t  size) {
+GBL_MAYBE_UNUSED GBL_INLINE GblHash gblCrc32LittleEndian(const void* pData, size_t size) {
     size_t  i;
     uint32_t rv = 0xFFFFFFFF;
 

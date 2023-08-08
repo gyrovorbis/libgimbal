@@ -267,8 +267,8 @@ GBL_EXPORT size_t GblPattern_matchCountStr(const char* pRegExp, const char* pStr
 GBL_EXPORT const char* GblPattern_string(const GblPattern* pSelf,
                                          GblStringBuffer*  pBuff) {
     GblStringBuffer_resize(pBuff, GBL_PATTERN_STRING_BUFFER_SIZE_);
-    unsigned size = GblStringBuffer_capacity(pBuff);
+    unsigned size = GblStringBuffer_capacity(pBuff) - 1;
     re_string((re_t)pSelf, GblStringBuffer_data(pBuff), &size);
-    GblStringBuffer_resize(pBuff, size);
+    //GblStringBuffer_resize(pBuff, size);
     return GblStringBuffer_cString(pBuff);
 }
