@@ -49,7 +49,7 @@ GBL_CLASS_DERIVE(GblError, GblObject)
                                   GblEnum      result,
                                   const char** ppString);
 //! onHandle/onUnHandle/onRaised
-    GblType     resultType;
+    GblType       resultType;
 GBL_CLASS_END
 
 /*! \struct GblError

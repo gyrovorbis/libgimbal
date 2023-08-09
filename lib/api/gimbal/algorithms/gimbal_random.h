@@ -36,7 +36,6 @@ typedef int (*GblRandomGeneratorFn)(void);
 /*! \defgroup random Random
  *  \ingroup algorithms
  *  \brief Random number generators and utilities
- * @{
 */
 
 GBL_EXPORT uint64_t gblSeed          (uint8_t index)                GBL_NOEXCEPT;
@@ -47,9 +46,7 @@ GBL_EXPORT void     gblSetRand       (GblRandomGeneratorFn pGen)    GBL_NOEXCEPT
 GBL_EXPORT int      gblRandLibc     (void) GBL_NOEXCEPT;
 GBL_EXPORT int      gblRandLehmer   (void) GBL_NOEXCEPT;
 
-GBL_EXPORT int      gblRandRange     (int min, int max)         GBL_NOEXCEPT;
 GBL_EXPORT GblBool  gblRandBool      (void)                     GBL_NOEXCEPT;
-GBL_EXPORT float    gblRandFloat     (float min, float max)     GBL_NOEXCEPT;
 GBL_EXPORT void     gblRandBuffer    (void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT int      gblRandString    (char*       pBuffer,
                                       int         minSize,
@@ -70,8 +67,6 @@ GBL_EXPORT float gblRandNormal      (float m, float s) GBL_NOEXCEPT;
 GBL_EXPORT float gblRandLogNormal   (float a, float b) GBL_NOEXCEPT;
 GBL_EXPORT float gblRandChisquare   (int n)            GBL_NOEXCEPT;
 GBL_EXPORT float gblRandStudent     (int n)            GBL_NOEXCEPT;
-
-//! @}
 
 GBL_DECLS_END
 

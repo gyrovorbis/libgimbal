@@ -117,8 +117,6 @@ static GBL_RESULT GblHashTestSuite_jenkins_(GblTestSuite* pSelf, GblContext* pCt
     GBL_CTX_END();
 }
 
-
-
 static GBL_RESULT GblHashTestSuite_sip_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
@@ -167,7 +165,6 @@ static GBL_RESULT GblHashTestSuite_md5_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_END();
 }
 
-
 static GBL_RESULT GblHashTestSuite_sha1_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
@@ -184,6 +181,22 @@ static GBL_RESULT GblHashTestSuite_sha1_(GblTestSuite* pSelf, GblContext* pCtx) 
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblHashTestSuite_xx_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblHashTestSuite_* pSelf_ = GBL_HASH_TEST_SUITE_(pSelf);
+
+    volatile size_t  total = 0;
+    for(size_t  w = 0; w < GBL_HASH_TEST_SUITE_WORD_COUNT_; ++w) {
+        total += gblHashXx(pSelf_->words[w],
+                           strlen(pSelf_->words[w]));
+    }
+
+    pSelf_->total = total;
+
+    GBL_CTX_END();
+}
+
 
 GBL_EXPORT GblType GblHashTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
@@ -191,6 +204,7 @@ GBL_EXPORT GblType GblHashTestSuite_type(void) {
     const static GblTestCase cases[] = {
         { "fnv1",       GblHashTestSuite_fnv1_         },
         { "murmur",     GblHashTestSuite_murmur_       },
+        { "xx",         GblHashTestSuite_xx_           },
         { "superFast",  GblHashTestSuite_superFast_    },
         { "pearson",    GblHashTestSuite_pearson_      },
         { "jenkins",    GblHashTestSuite_jenkins_      },

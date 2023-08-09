@@ -95,6 +95,7 @@ set(GIMBAL_INCLUDES
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH}
     api/gimbal/gimbal_allocators.h
     api/gimbal/gimbal_algorithms.h
+    api/gimbal/algorithms/gimbal_compression.h
     api/gimbal/gimbal_containers.h
     api/gimbal/gimbal_core.h
     api/gimbal/gimbal_meta.h
@@ -213,6 +214,7 @@ if(GBL_ENABLE_CPP)
 endif()
 
 set(GIMBAL_SOURCES
+    source/algorithms/gimbal_compression.c
     source/algorithms/gimbal_hash.c
     source/algorithms/gimbal_md5.c
     source/algorithms/gimbal_numeric.c
@@ -306,11 +308,13 @@ add_library(libGimbal STATIC
 
 add_subdirectory(lib/tinycthread)
 add_subdirectory(lib/tiny-regex-c)
+add_subdirectory(lib/lz4/build/cmake)
 
 list(APPEND
      GBL_TARGET_LINK_LIBS
      tinycthread
-     TinyRegexC)
+     TinyRegexC
+     lz4_static)
 
 if (NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA)
 

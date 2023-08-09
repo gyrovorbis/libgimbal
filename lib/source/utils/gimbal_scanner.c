@@ -616,8 +616,28 @@ GBL_EXPORT GblBool GblScanner_skipMatch(GblScanner* pSelf, const char* pStr) {
 }
 
 GBL_EXPORT GblBool GblScanner_skipPattern(GblScanner* pSelf, const GblPattern* pPattern) {
-    GBL_ASSERT(GBL_FALSE);
-    return GBL_FALSE;
+    GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
+
+    const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+    if(!GblPattern_match(pPattern, pStreamBuffer, &pSelf->token)) {
+        struct {
+            GblStringBuffer buff;
+            char            stackBytes[128];
+        } str;
+
+        GblStringBuffer_construct(&str.buff, GBL_STRV(""), sizeof(str));
+
+        GblScanner_raiseError(pSelf,
+                              GBL_SCANNER_SKIP_ERROR,
+                              "skipMatch() failed, could not find pattern: [%s]",
+                              GblPattern_string(pPattern, &str.buff));
+
+        GblStringBuffer_destruct(&str.buff);
+
+        return GBL_FALSE;
+    }
+
+    return GblScanner_advance_(pSelf, pSelf->token.pData - pStreamBuffer + pSelf->token.length);
 }
 
 GBL_EXPORT GblBool GblScanner_skipToMatch(GblScanner* pSelf, const char* pStr) {

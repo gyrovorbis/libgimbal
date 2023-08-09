@@ -539,7 +539,7 @@ static GBL_RESULT GblArrayListTestSuite_atProfile_(GblTestSuite* pSelf, GblConte
 
     for(size_t  i = 0; i < GBL_ARRAY_LIST_TEST_SUITE_PROFILE_SIZE_; ++i) {
         pLiteral = GblArrayList_at(&pSelf_->stringList.vector,
-                                   gblRandRange(0, GblArrayList_size(&pSelf_->stringList.vector)-1));
+                                   gblRandEquilikely(0, GblArrayList_size(&pSelf_->stringList.vector)-1));
         pLiteral[0] = 'l';
     }
 

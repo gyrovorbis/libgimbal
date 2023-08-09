@@ -26,6 +26,7 @@
  *      - write own scanf() implementation that knows how
  *        many characters have been read
  *      - store GblPattern now instead of GblStringRef
+ *      - peekPattern(), scanPattern()
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License

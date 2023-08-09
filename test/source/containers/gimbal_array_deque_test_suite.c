@@ -546,7 +546,7 @@ static GBL_RESULT GblArrayDequeTestSuite_atProfile_(GblTestSuite* pSelf, GblCont
 
     for(size_t  i = 0; i < GBL_ARRAY_DEQUE_PROFILE_SIZE_; ++i) {
         pLiteral = GblArrayDeque_at(&pSelf_->deques[0],
-                                    gblRandRange(0, GblArrayDeque_size(&pSelf_->deques[0])-1));
+                                    gblRandEquilikely(0, GblArrayDeque_size(&pSelf_->deques[0])-1));
         pLiteral[0] = 'l';
     }
 

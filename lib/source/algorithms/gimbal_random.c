@@ -65,30 +65,8 @@ GBL_EXPORT void gblSeedRand(uint8_t index, uint64_t seed) {
     seeds_[index] = seed;
 }
 
-GBL_EXPORT int gblRandRange(int min, int max)  {
-#if 0
-    GBL_ASSERT(max <= RAND_MAX);
-    static GblBool seeded = GBL_FALSE;
-    if(!seeded) GBL_UNLIKELY {
-        srand((unsigned)gblSeed(0));
-        seeded = GBL_TRUE;
-    }
-    return (rand() % (max - min + 1)) + min;
-#else
-    return gblRandEquilikely(min, max);
-#endif
-}
-
 GBL_EXPORT GblBool gblRandBool(void) {
     return gblRand() & 0x1;
-}
-
-GBL_EXPORT float gblRandFloat(float min, float max) {
-#if 0
-    return min + (float)(gblRand()) / ((float)RAND_MAX / (max - min));
-#else
-    return gblRandUniform(min, max);
-#endif
 }
 
 GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char* pCharList) {
@@ -99,11 +77,11 @@ GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char
     if(!pCharList)
         pCharList = pWordChars;
 
-    const int size       = gblRandRange(minSize, maxSize);
+    const int size       = gblRandEquilikely(minSize, maxSize);
     const int listLength = strlen(pCharList);
 
     for(size_t  c = 0; c < (size_t )size; ++c)
-        pBuffer[c] = pCharList[gblRandRange(0, listLength-1)];
+        pBuffer[c] = pCharList[gblRandEquilikely(0, listLength-1)];
 
     pBuffer[size] = '\0';
 
@@ -112,7 +90,7 @@ GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char
 
 GBL_EXPORT void gblRandBuffer(void* pData, size_t  size) {
     for(size_t  i = 0; i < size; ++i) {
-        (((uint8_t*)pData)[i]) = (uint8_t)gblRandRange(0, 255);
+        (((uint8_t*)pData)[i]) = (uint8_t)gblRandEquilikely(0, 255);
     }
 }
 

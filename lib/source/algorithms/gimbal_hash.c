@@ -2,6 +2,7 @@
 #include <gimbal/algorithms/gimbal_md5.h>
 #include <gimbal/algorithms/gimbal_sha1.h>
 #include <gimbal/algorithms/gimbal_random.h>
+#include <xxhash.h>
 
 GBL_EXPORT GblHash gblHash32Bit(uint32_t value) {
     value ^= value >> 16;
@@ -377,7 +378,7 @@ GBL_EXPORT GblHash gblHashMd5(const void* pData, size_t bytes) {
     return hash;
 }
 
-GBL_EXPORT GblHash gblHashSha1 (const void *pData, size_t len) {
+GBL_EXPORT GblHash gblHashSha1(const void *pData, size_t len) {
     GblHash out = 0;
     GblSha1Context context;
     uint8_t digest[20];
@@ -388,6 +389,10 @@ GBL_EXPORT GblHash gblHashSha1 (const void *pData, size_t len) {
 
     memcpy(&out, &digest[0], 4);
     return out;
+}
+
+GBL_EXPORT GblHash gblHashXx(const void* pData, size_t size) {
+    return XXH32(pData, size, gblSeed(0));
 }
 
 

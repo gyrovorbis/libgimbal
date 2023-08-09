@@ -19,7 +19,7 @@ GBL_EXPORT GBL_RESULT GblUuid_genV4(GblUuid* pSelf) {
 
     // First initialize all bytes to random/psuedo-random numbers
     for(unsigned b = 0; b < GBL_UUID_BYTE_COUNT; ++b) {
-        pSelf->bytes[b] = gblRandRange(0, 255);
+        pSelf->bytes[b] = gblRandEquilikely(0, 255);
     }
 
     // clear and set version number, per RFC 4122 section 4.1.3

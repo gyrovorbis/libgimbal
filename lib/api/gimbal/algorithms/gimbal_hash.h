@@ -39,6 +39,7 @@ GBL_EXPORT uint16_t gblHashCrc16BitPartial
 GBL_EXPORT GblHash  gblHashSip       (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashMurmur    (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashFnv1      (const void* pData, size_t size) GBL_NOEXCEPT;
+GBL_EXPORT GblHash  gblHashXx        (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashSuperFast (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashPearson   (const void* pData, size_t size) GBL_NOEXCEPT;
 GBL_EXPORT GblHash  gblHashJenkins   (const void* pData, size_t size) GBL_NOEXCEPT;
