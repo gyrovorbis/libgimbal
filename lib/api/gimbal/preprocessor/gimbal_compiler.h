@@ -18,41 +18,165 @@
 
 // C Version
 #ifdef __STDC_VERSION__
-#   define GBL_C_89
+#   define GBL_C89      1
 #   if (__STDC_VERSION__ >= 199409L)
-#       define GBL_C_95
+#       define GBL_C95  1
 #   endif
 #   if (__STDC_VERSION__ >= 199901L)
-#       define GBL_C_99
+#       define GBL_C99  1
 #   endif
 #   if (__STDC_VERSION__ >= 201112L)
-#       define GBL_C_11
+#       define GBL_C11  1
 #   endif
 #   if (__STDC_VERSION__ >= 201710L)
-#       define GBL_C_17
+#       define GBL_C17  1
+#   endif
+#   if (__STDC_VERSION__ >= 202311L)
+#       define GBL_C23  1
 #   endif
 #endif
 
 //C++ Version
 #ifdef __cplusplus
 #   if (__cplusplus >= 199711L)
-#       define GBL_CPP_98
+#       define GBL_CPP98    1
 #   endif
 #   if (__cplusplus >= 201103L)
-#       define GBL_CPP_11
+#       define GBL_CPP11    1
 #   endif
 #   if (__cplusplus >= 201402L)
-#       define GBL_CPP_14
+#       define GBL_CPP14    1
 #   endif
 #   if (__cplusplus >= 201703L)
-#       define GBL_CPP_17
+#       define GBL_CPP17    1
 #   endif
 #   if (__cplusplus >= 202002L)
-#       define GBL_CPP_20
+#       define GBL_CPP20    1
+#   endif
+#   if (__cplusplus >= 202302L)
+#       define GBL_CPP23    1
 #   endif
 #endif
 
-#ifdef GBL_CPP_11
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    // Common for all Windows platforms
+#   define GBL_WIN  1
+#   ifdef _WIN64
+        // 64-bit Windows only
+#       define GBL_WIN64    1
+#   else
+        // 32-bit Windows only
+#       define GBL_WIN32    1
+#   endif
+#elif __APPLE__
+    // Common to all Apple platforms
+#   define GBL_APPLE
+#   include <TargetConditionals.h>
+#   if TARGET_IPHONE_SIMULATOR
+        // iOS, tvOS, or watchOS Simulator
+#       define GBL_IOS_SIMULATOR     1
+#   elif TARGET_OS_MACCATALYST
+         // Mac's Catalyst (ports iOS API into Mac, like UIKit).
+#       define GBL_MACCATALYST  1
+#   elif TARGET_OS_IPHONE
+        // iOS, tvOS, or watchOS device
+#       define GBL_IOS  1
+#   elif TARGET_OS_MAC
+        // Other kinds of Apple platforms
+#       define GBL_MACOS    1
+#   else
+#       error "Unknown Apple platform"
+#   endif
+#elif __ANDROID__
+    // Below __linux__ check should be enough to handle Android,
+    // but something may be unique to Android.
+#   define GBL_ANDROID  1
+#elif defined(__DREAMCAST__)
+#   define GBL_DREAMCAST    1
+#elif defined(__VITA__)
+#   define GBL_PSVITA   1
+#elif __linux__
+#   define GBL_LINUX    1
+#elif __unix__ // all unices not caught above
+    // Unix
+#   define GBL_UNUX 1
+#elif defined(_POSIX_VERSION)
+    // POSIX
+#   define GBL_POSIX
+#else
+#   error "Unknown compiler"
+#endif
+
+#ifdef _MSC_VER
+#   define GBL_MSVC 1
+#elif defined(__ICC)
+#   define GBL_ICC 1
+#elif defined(__clang__)
+#   define GBL_CLANG 1
+#elif defined(__MINGW32__)
+#   define GBL_MINGW32  1
+#elif defined(__MINGW64__)
+#   define GBL_MINGW64  1
+#elif defined(__EMSCRIPTEN_)
+#   define GBL_EMSCRIPTEN 1
+#elif defined(__GNUC__)
+#   define GBL_GCC  1
+#elif defined(__ghs__)
+#   define GBL_GREENHILL    1
+#elif defined(__CC_ARM)
+#   define GBL_ARMCC    1
+#elif defined(__IAR_SYSTEMS__ICC__)
+#   define GBL_IAR  1
+#else
+#   warn "Unknown compiler detected!"
+#endif
+
+#if defined(__x86_64__) || defined(_M_X64)
+#   define GBL_X86_64   1
+#elif defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
+#   define GBL_X86_32       1
+#elif defined(__ARM_ARCH_2__)
+#   define GBL_ARM2         1
+#elif defined(__ARM_ARCH_3__) || defined(__ARM_ARCH_3M__)
+#   define GBL_ARM3         1
+#elif defined(__ARM_ARCH_4T__) || defined(__TARGET_ARM_4T)
+#   define GBL_ARM4T        1
+#elif defined(__ARM_ARCH_5_) || defined(__ARM_ARCH_5E_)
+#   define GBL_ARM5         1
+#elif defined(__ARM_ARCH_6T2_) || defined(__ARM_ARCH_6T2_)
+#   define GBL_ARM6T2       1
+#elif defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6Z__) || defined(__ARM_ARCH_6ZK__)
+#   define GBL_ARM6         1
+#elif defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__)
+#   define GBL_ARM7         1
+#elif defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__)
+#   define GBL_ARM7A        1
+#elif defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__)
+#   define GBL_ARM7R        1
+#elif defined(__ARM_ARCH_7M__)
+#   define GBL_ARM7M        1
+#elif defined(__ARM_ARCH_7S__)
+#   define GBL_ARM7S        1
+#elif defined(__aarch64__) || defined(_M_ARM64)
+#   define GBL_ARM64        1
+#elif defined(mips) || defined(__mips__) || defined(__mips)
+#   define GBL_MIPS         1
+#elif defined(__sh__)
+#   define GBL_SUPERH       1
+#elif defined(__powerpc) || defined(__powerpc__) || defined(__powerpc64__) || defined(__POWERPC__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC)
+#   define GBL_POWERPC      1
+#elif defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+#   define GBL_POWERPC64    1
+#elif defined(__sparc__) || defined(__sparc)
+#   define GBL_SPARC        1
+#elif defined(__m68k__)
+#   define GBL_M68K         1
+#else
+#   warn "Unknown architecture!"
+#endif
+
+#ifdef GBL_CPP11
 #   define GBL_NULL nullptr
 #else
 #   define GBL_NULL NULL
@@ -142,9 +266,9 @@
 #   define GBL_NOEXCEPT
 #endif
 
-#ifdef GBL_CPP_11
+#ifdef GBL_CPP11
 #   define GBL_CONSTEXPR        constexpr
-#   ifdef GBL_CPP_20
+#   ifdef GBL_CPP20
 #       define GBL_CONSTEVAL    consteval
 #   else
 #       define GBL_CONSTEVAL    constexpr
@@ -246,7 +370,7 @@
 #       define GBL_NORETURN
 #   endif
 # else
-#   ifdef GBL_C_11
+#   ifdef GBL_C11
 #       define GBL_NORETURN _Noreturn
 #   else
 #       define GBL_NORETURN
@@ -271,21 +395,21 @@
 #       define GBL_STATIC_ASSERT(cond)      static_assert(cond, #cond)
 #   endif
 #   define GBL_STATIC_ASSERT_MSG(cond, msg) static_assert(cond, msg)
-#elif defined(GBL_C_STD_11)
-#   define GBL_STATIC_ASSERT(cond)          _Static_assert(cond, #cond)
-#   define GBL_STATIC_ASSERT_MSG(cond, msg) _Static_assert(cond, msg)
+#elif defined(GBL_C11)
+#   define GBL_STATIC_ASSERT(cond)          _Static_assert(cond, #cond);
+#   define GBL_STATIC_ASSERT_MSG(cond, msg) _Static_assert(cond, msg);
 #else
 #   define GBL_STATIC_ASSERT(cond)
 #   define GBL_STATIC_ASSERT_MSG(cond, msg)
 #endif
 
-#ifdef GBL_C_99
+#ifdef GBL_C99
 #   define GBL_RESTRICT restrict
 #else
 #   define GBL_RESTRICT
 #endif
 
-#ifdef GBL_C_99
+#ifdef GBL_C99
 #   define GBL_STATIC_ARRAY(idx) static idx
 #else
 #   define GBL_STATIC_ARRAY(idx) idx
@@ -300,7 +424,7 @@
 #ifdef __cplusplus
 #   define GBL_ALIGNAS(e) alignas(e)
 #   define GBL_ALIGNOF(e) alignof(e)
-#elif defined(GBL_C_11)
+#elif defined(GBL_C11)
 #   define GBL_ALIGNAS(e) _Alignas(e)
 #   define GBL_ALIGNOF(e) _Alignof(e)
 #endif
@@ -313,7 +437,7 @@
 #   define GBL_ALIGNED_ALLOC(a, s)      __mingw_aligned_malloc(s, a)
 #   define GBL_ALIGNED_REALLOC(p, a, s) __mingw_aligned_realloc(p, s, a)
 #   define GBL_ALIGNED_FREE(p)          __mingw_aligned_free(p)
-#elif defined(GBL_C_11) || defined(GBL_CPP_17)
+#elif defined(GBL_C11) || defined(GBL_CPP17)
 #   include <stdlib.h>
 #   define GBL_ALIGNED_ALLOC(a, s)      aligned_alloc(a, s)
 #   define GBL_ALIGNED_REALLOC(p, a, s) realloc(p, s)
@@ -397,9 +521,9 @@
 
 #if __APPLE__  // at very least fucking MacOS headers are missing it!
 #   define GBL_QUICK_EXIT(c) exit(c)
-#elif defined(GBL_CPP_11)
+#elif defined(GBL_CPP11)
 #   define GBL_QUICK_EXIT(c) quick_exit(c)
-#elif defined(GBL_C_11) 
+#elif defined(GBL_C11)
 #   define GBL_QUICK_EXIT(c) quick_exit(c)
 #else
 #   define GBL_QUICK_EXIT(c) exit(c)
@@ -457,7 +581,7 @@
 #define GBL_NULL_TERMINATED
 
 // Low-Level BitMask Operations
-#ifdef GBL_CPP_20
+#ifdef GBL_CPP20
 #   include <bit>
 #   define GBL_BITMASK_CLZ(mask) std::countl_zero(mask)
 #   define GBL_BITMASK_CTZ(mask) std::countr_zero(mask)

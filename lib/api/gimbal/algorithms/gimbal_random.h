@@ -24,7 +24,14 @@
 
 #define GBL_SEED_COUNT      2
 
+#ifndef GBL_RAND_GENERATOR_DEFAULT
+#   define GBL_RAND_GENERATOR_DEFAULT gblRandLehmer
+#endif
+
 GBL_DECLS_BEGIN
+
+//! Function prototype for a custom random generator to be set with gblSetRand()
+typedef int (*GblRandomGeneratorFn)(void);
 
 /*! \defgroup random Random
  *  \ingroup algorithms
@@ -32,9 +39,14 @@ GBL_DECLS_BEGIN
  * @{
 */
 
-GBL_EXPORT uint64_t gblSeed          (uint8_t index)            GBL_NOEXCEPT;
+GBL_EXPORT uint64_t gblSeed          (uint8_t index)                GBL_NOEXCEPT;
+GBL_EXPORT void     gblSeedRand      (uint8_t index, uint64_t seed) GBL_NOEXCEPT;
+GBL_EXPORT int      gblRand          (void)                         GBL_NOEXCEPT;
+GBL_EXPORT void     gblSetRand       (GblRandomGeneratorFn pGen)    GBL_NOEXCEPT;
 
-GBL_EXPORT int      gblRand          (void)                     GBL_NOEXCEPT;
+GBL_EXPORT int      gblRandLibc     (void) GBL_NOEXCEPT;
+GBL_EXPORT int      gblRandLehmer   (void) GBL_NOEXCEPT;
+
 GBL_EXPORT int      gblRandRange     (int min, int max)         GBL_NOEXCEPT;
 GBL_EXPORT GblBool  gblRandBool      (void)                     GBL_NOEXCEPT;
 GBL_EXPORT float    gblRandFloat     (float min, float max)     GBL_NOEXCEPT;
@@ -44,12 +56,14 @@ GBL_EXPORT int      gblRandString    (char*       pBuffer,
                                       int         maxSize,
                                       const char* pCharList)    GBL_NOEXCEPT;
 
-GBL_EXPORT int gblRandBernoulli (float p)        GBL_NOEXCEPT;
-GBL_EXPORT int gblRandBinomial  (int n, float p) GBL_NOEXCEPT;
-GBL_EXPORT int gblRandGeometric (float p)        GBL_NOEXCEPT;
-GBL_EXPORT int gblRandPascal    (int n, float p) GBL_NOEXCEPT;
-GBL_EXPORT int gblRandPoisson   (float m)        GBL_NOEXCEPT;
+GBL_EXPORT int gblRandBernoulli  (float p)        GBL_NOEXCEPT;
+GBL_EXPORT int gblRandBinomial   (int n, float p) GBL_NOEXCEPT;
+GBL_EXPORT int gblRandEquilikely (int a, int b)   GBL_NOEXCEPT;
+GBL_EXPORT int gblRandGeometric  (float p)        GBL_NOEXCEPT;
+GBL_EXPORT int gblRandPascal     (int n, float p) GBL_NOEXCEPT;
+GBL_EXPORT int gblRandPoisson    (float m)        GBL_NOEXCEPT;
 
+GBL_EXPORT float gblRandUniform     (float a, float b) GBL_NOEXCEPT;
 GBL_EXPORT float gblRandExponential (float m)          GBL_NOEXCEPT;
 GBL_EXPORT float gblRandErlang      (int n, float b)   GBL_NOEXCEPT;
 GBL_EXPORT float gblRandNormal      (float m, float s) GBL_NOEXCEPT;

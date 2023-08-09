@@ -129,9 +129,10 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, ch
 
                 pSelf_->pCurCase = GblTestSuite_caseName(pSuiteIt, idx);
 
-
+                GBL_CTX_PUSH();
                 GBL_CTX_CALL(GblTestSuite_initCase(pSuiteIt, pCtx));
                 GBL_CTX_CLEAR_LAST_RECORD();
+                GBL_CTX_POP(1);
 
                 if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) {
                     GBL_CTX_ERROR("[GblTestSuite] Failed to initialize test case[%s]: SKIPPING",

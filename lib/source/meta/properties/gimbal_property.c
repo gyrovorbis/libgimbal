@@ -72,6 +72,7 @@ extern GBL_RESULT GblProperty_init_(GblContext* pCtx) {
     GBL_CTX_END();
 }
 
+#if 0
 static GblBool GblProperty_final_iterator_(const GblHashSet* pHash, void* pEntry, void* pClosure) {
     GblProperty* pProp = pEntry;
 
@@ -81,11 +82,13 @@ static GblBool GblProperty_final_iterator_(const GblHashSet* pHash, void* pEntry
 
     return GBL_FALSE;
 }
+#endif
 
 extern GBL_RESULT GblProperty_final_(GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     size_t  count = GblHashSet_size(&propertyRegistry_);
     if(count) {
+#if 0
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_MEM_FREE,
                            "[GblProperty]: Cannot finalize nonempty table! [%u remaining]",
                            count);
@@ -94,7 +97,7 @@ extern GBL_RESULT GblProperty_final_(GblContext* pCtx) {
         //GblHashSet_foreach(&propertyRegistry_,
         //                   GblProperty_final_iterator_,
         //                   NULL);
-
+#endif
     } else GblHashSet_destruct(&propertyRegistry_);
     GBL_CTX_END();
 }

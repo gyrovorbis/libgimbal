@@ -11,23 +11,33 @@
 #define LEHMER_DEFAULT    123456789  /* initial seed, use 0 < DEFAULT < MODULUS  */
 
 static uint64_t seeds_[GBL_SEED_COUNT] = { LEHMER_DEFAULT };
+static uint64_t lehmerSeed_ = LEHMER_DEFAULT;
 static GblBool  init_ = GBL_FALSE;
+static GblRandomGeneratorFn generator_ = GBL_RAND_GENERATOR_DEFAULT;
 
-GBL_EXPORT double gblRandLehmer(void) {
+static double gblRandLehmer_(void) {
 
-    const int Q = LEHMER_MODULUS / LEHMER_MULTIPLIER;
-    const int R = LEHMER_MODULUS % LEHMER_MULTIPLIER;
-          int t;
+    const long Q = LEHMER_MODULUS / LEHMER_MULTIPLIER;
+    const long R = LEHMER_MODULUS % LEHMER_MULTIPLIER;
+          long t;
 
-    t = LEHMER_MULTIPLIER * (gblSeed(0) % Q) - R * (gblSeed(0) / Q);
+    t = LEHMER_MULTIPLIER * (lehmerSeed_ % Q) - R * (lehmerSeed_ / Q);
 
     if (t > 0)
-      seeds_[0] = t;
+      lehmerSeed_ = t;
     else
-      seeds_[0] = t + LEHMER_MODULUS;
+      lehmerSeed_ = t + LEHMER_MODULUS;
 
     // returns a number between 0.0f and 1.0f
-    return ((double) seeds_[0] / LEHMER_MODULUS);
+    return ((double) lehmerSeed_ / (double)LEHMER_MODULUS);
+}
+
+GBL_EXPORT int gblRandLibc(void) {
+    return rand();
+}
+
+GBL_EXPORT int gblRandLehmer(void) {
+    return gblRandLehmer_() * RAND_MAX;
 }
 
 GBL_EXPORT uint64_t gblSeed(uint8_t index) {
@@ -42,12 +52,21 @@ GBL_EXPORT uint64_t gblSeed(uint8_t index) {
     return seeds_[index];
 }
 
-
 GBL_EXPORT int gblRand(void) {
-    return gblRandRange(0, RAND_MAX);
+    return generator_();
+}
+
+GBL_EXPORT void gblSetRand(GblRandomGeneratorFn pGen) {
+    generator_ = pGen;
+}
+
+GBL_EXPORT void gblSeedRand(uint8_t index, uint64_t seed) {
+    GBL_ASSERT(index < GBL_COUNT_OF(seeds_));
+    seeds_[index] = seed;
 }
 
 GBL_EXPORT int gblRandRange(int min, int max)  {
+#if 0
     GBL_ASSERT(max <= RAND_MAX);
     static GblBool seeded = GBL_FALSE;
     if(!seeded) GBL_UNLIKELY {
@@ -55,6 +74,9 @@ GBL_EXPORT int gblRandRange(int min, int max)  {
         seeded = GBL_TRUE;
     }
     return (rand() % (max - min + 1)) + min;
+#else
+    return gblRandEquilikely(min, max);
+#endif
 }
 
 GBL_EXPORT GblBool gblRandBool(void) {
@@ -62,7 +84,11 @@ GBL_EXPORT GblBool gblRandBool(void) {
 }
 
 GBL_EXPORT float gblRandFloat(float min, float max) {
+#if 0
     return min + (float)(gblRand()) / ((float)RAND_MAX / (max - min));
+#else
+    return gblRandUniform(min, max);
+#endif
 }
 
 GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char* pCharList) {
@@ -90,10 +116,14 @@ GBL_EXPORT void gblRandBuffer(void* pData, size_t  size) {
     }
 }
 
-#define gblRandf() (gblRandLehmer())
+#define gblRandf() (gblRand() / (float)RAND_MAX)
 
 GBL_EXPORT int gblRandBernoulli(float p) {
     return ((gblRandf() < (1.0f - p)) ? 0 : 1);
+}
+
+GBL_EXPORT int gblRandEquilikely(int a, int b) {
+    return (a + (int)((b - a + 1) * gblRandf()));
 }
 
 GBL_EXPORT int gblRandBinomial(int n, float p) {
@@ -127,6 +157,10 @@ GBL_EXPORT int gblRandPoisson(float m) {
       x++;
     }
     return (x - 1);
+}
+
+GBL_EXPORT float gblRandUniform(float a, float b) {
+    return (a + (b - a) * gblRandf());
 }
 
 GBL_EXPORT float gblRandExponential(float m) {

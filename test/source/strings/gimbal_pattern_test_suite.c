@@ -347,6 +347,33 @@ GBL_TEST_CASE(matchPhoneNumber)
     GBL_TEST_COMPARE(count, 1);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(matchAlternation)
+    GblStringView view;
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("h|w",
+                                        "h",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("h")));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("h|w",
+                                        "w",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("w")));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("hello|world",
+                                        "hello",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("hello")));
+
+    GBL_TEST_SKIP("Todo: fix in tiny-regex-c");
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("hello|world",
+                                        "worldzy",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("world")));
+
+GBL_TEST_CASE_END
+
 GBL_TEST_CASE(unref)
     GblPattern_unref(pFixture->pPattern);
     GblPattern_unref(pFixture->pPhoneNumber);
@@ -377,6 +404,7 @@ GBL_TEST_REGISTER(createInvalid,
                   matchLiteralEnd,
                   matchDateTime,
                   matchPhoneNumber,
+                  matchAlternation,
                   unref)
 #if 0
 

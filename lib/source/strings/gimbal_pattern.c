@@ -39,7 +39,7 @@ GBL_EXPORT const GblPattern* GblPattern_create(const char* pRegExp) {
 GBL_EXPORT GblRefCount GblPattern_unref(const GblPattern* pSelf) {
     const GblRefCount refCount =  GblRef_unref((void*)pSelf);
 
-    if(!refCount)
+    if(pSelf && !refCount)
         GBL_ATOMIC_INT16_DEC(activePatterns_);
 
     return refCount;

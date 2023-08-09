@@ -208,7 +208,8 @@ if(GBL_ENABLE_CPP)
     list(APPEND
          GIMBAL_INCLUDES
          api/gimbal/strings/gimbal_quark.hpp
-         api/gimbal/utils/gimbal_date_time.hpp)
+         api/gimbal/utils/gimbal_date_time.hpp
+         api/gimbal/strings/gimbal_pattern.hpp)
 endif()
 
 set(GIMBAL_SOURCES
@@ -292,6 +293,12 @@ set(GIMBAL_SOURCES
     source/utils/gimbal_settings.c
     source/utils/gimbal_timer.c
 )
+
+if(GBL_ENABLE_CPP)
+    list(APPEND
+         GIMBAL_SOURCES
+         source/strings/gimbal_pattern.cpp)
+endif()
 
 add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}

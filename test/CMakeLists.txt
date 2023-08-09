@@ -33,6 +33,8 @@ set(GIMBAL_TEST_SOURCES
     source/algorithms/gimbal_hash_test_suite.c
     include/algorithms/gimbal_md5_test_suite.h
     source/algorithms/gimbal_md5_test_suite.c
+    include/algorithms/gimbal_random_test_suite.h
+    source/algorithms/gimbal_random_test_suite.c
     include/algorithms/gimbal_sha1_test_suite.h
     source/algorithms/gimbal_sha1_test_suite.c
     include/allocators/gimbal_arena_allocator_test_suite.h
@@ -133,6 +135,8 @@ if(GBL_ENABLE_CPP)
          GIMBAL_TEST_SOURCES
          include/strings/gimbal_quark_test_suite.hpp
          source/strings/gimbal_quark_test_suite.cpp
+         include/strings/gimbal_pattern_test_suite.hpp
+         source/strings/gimbal_pattern_test_suite.cpp
          source/gimbal_test_cpp.cpp)
 endif(GBL_ENABLE_CPP)
 
