@@ -4,6 +4,7 @@
 #include "gimbal_pattern.h"
 #include <string>
 #include <iostream>
+#include <compare>
 
 namespace gbl {
 
