@@ -94,7 +94,7 @@
 #   define GBL_ANDROID  1
 #elif defined(__DREAMCAST__)
 #   define GBL_DREAMCAST    1
-#elif defined(__VITA__)
+#elif defined(VITA)
 #   define GBL_PSVITA   1
 #elif __linux__
 #   define GBL_LINUX    1
@@ -105,7 +105,7 @@
     // POSIX
 #   define GBL_POSIX
 #else
-#   error "Unknown compiler"
+#   warning "Unknown platform"
 #endif
 
 #ifdef _MSC_VER
