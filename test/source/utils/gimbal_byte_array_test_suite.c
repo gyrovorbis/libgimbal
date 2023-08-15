@@ -53,7 +53,7 @@ static GBL_RESULT GblByteArray_verify_(GblContext* pCtx,
 
         GBL_TEST_COMPARE(strcmp(GblByteArray_cString(pByteArray), pData), 0);
 
-        GBL_TEST_VERIFY(GblStringView_equals(GblByteArray_stringView(pByteArray), GBL_STRV(pData)));
+        GBL_TEST_VERIFY(GblStringView_equals(GblByteArray_stringView(pByteArray), pData));
 
         // Byte array includes null terminator in hash!
         //GBL_TEST_COMPARE(GblByteArray_hash(pByteArray), GblStringView_hash(GblByteArray_stringView(pByteArray)));

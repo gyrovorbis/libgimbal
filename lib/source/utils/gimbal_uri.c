@@ -220,7 +220,7 @@ GBL_EXPORT GblStringView GblUri_directory(const GblUri* pSelf) {
     else if(startPos == 0)
         return GblStringView_fromString("/");
     else
-        return GblStringView_fromStringSized(pSelf->pPath, startPos - 1);
+        return GblStringView_fromString(pSelf->pPath, startPos - 1);
 }
 
 GBL_EXPORT GblStringView GblUri_fileName(const GblUri* pSelf) {

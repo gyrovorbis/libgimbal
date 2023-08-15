@@ -31,6 +31,10 @@ GBL_EXPORT uint64_t gblPow2Next_u64(uint64_t n) {
     return n + 1;
 }
 
+GBL_EXPORT GblBool gblPow2Check(size_t n) {
+    return (n & (n - 1)) == 0;
+}
+
 GBL_EXPORT
 GblBool gblPrimeCheck(int n) {
     for(int i = 2; i <= n/2; i++)

@@ -62,7 +62,7 @@ GBL_EXPORT GBL_RESULT (GblOptionGroup_parse)(GblOptionGroup* pSelf,
         key = GblStringView_removePrefix(key, begin);
 
         // remove 'prefix-' characters (requires --prefix-option with two hyphens)
-        if(begin == 2 && GblStringView_startsWith(key, GBL_STRV(pSelf->pPrefix))) {
+        if(begin == 2 && GblStringView_startsWith(key, pSelf->pPrefix)) {
             if(key.pData[GblStringRef_length(pSelf->pPrefix)] == '-') {
                 key = GblStringView_removePrefix(key, GblStringRef_length(pSelf->pPrefix)+1);
                 // don't support short prefixed commands like "-prefix-h"
@@ -96,8 +96,8 @@ GBL_EXPORT GBL_RESULT (GblOptionGroup_parse)(GblOptionGroup* pSelf,
             if(pNext != pList) {
                 value = GblStringRef_view(pNext->pData);
                 // ignore the next "value" if it's actually an option
-                if(GblStringView_startsWith(value, GBL_STRV("-")) ||
-                   GblStringView_startsWith(value, GBL_STRV("--")))
+                if(GblStringView_startsWith(value, "-") ||
+                   GblStringView_startsWith(value, "--"))
                 {
                     // Don't consider a negative number an option
                     double testNum = GblStringView_toDouble(value);
@@ -159,7 +159,7 @@ static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, 
         const GblOption* pOption = &pSelf->pOptions[o];
 
         // Ensure that there's either a long or short name matching
-        if((pOption->pLongName && GblStringView_equals(key, GBL_STRV(pOption->pLongName))) ||
+        if((pOption->pLongName && GblStringView_equals(key, pOption->pLongName)) ||
            (pOption->shortName && (key.length == 1 && key.pData[0] == pOption->shortName)))
         {
 

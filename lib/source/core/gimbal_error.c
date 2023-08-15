@@ -25,15 +25,22 @@ GBL_EXPORT GblError* GblError_catch(GblType type) {
     return pReturn;
 }
 
-GBL_EXPORT void GblError_clear(void) {
+GBL_EXPORT GblBool GblError_clear(void) {
+    GblBool retVal = GBL_FALSE;
+
     GBL_UNREF(pCurrent_);
+
+    if(pCurrent_) retVal = GBL_TRUE;
+
     pCurrent_ = NULL;
+    return retVal;
 }
 
 GBL_EXPORT GblError* (GblError_create)(GblType     derived,
                                        const char* pFile,
                                        const char* pFunc,
                                        size_t      line,
+                                       GblType     resultType,
                                        GblEnum     result,
                                        const char* pFmt,
                                        ...)
@@ -42,15 +49,17 @@ GBL_EXPORT GblError* (GblError_create)(GblType     derived,
 
     GblError* pSelf = GBL_ERROR(GblBox_create(derived));
 
-    pSelf->pFile     = pFile;
-    pSelf->pFunction = pFunc;
-    pSelf->line      = line;
-    pSelf->pThread   = GblThread_current();
-    pSelf->result    = result;
+    pSelf->pFile      = pFile;
+    pSelf->pFunction  = pFunc;
+    pSelf->line       = line;
+    pSelf->pThread    = GblThread_current();
+    pSelf->resultType = resultType;
+    pSelf->result     = result;
 
     va_list varArgs;
     va_start(varArgs, pFmt);
-    GblStringRef_createFormatVaList(pFmt, &varArgs);
+    //GblStringRef_createFormatVaList(pFmt, &varArgs);
+    pSelf->pMessage = GblStringRef_create(pFmt);
     va_end(varArgs);
 
     return pSelf;
@@ -155,8 +164,7 @@ GBL_EXPORT GblType GblError_type(void) {
                                 GBL_OBJECT_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC |
-                                GBL_TYPE_FLAG_CLASS_PINNED    |
-                                GBL_TYPE_FLAG_CLASS_PREINIT);
+                                GBL_TYPE_FLAG_CLASS_PINNED);
 }
 
     return type;

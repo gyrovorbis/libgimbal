@@ -18,7 +18,7 @@ static GBL_RESULT verifyBuffer_(const GblStringBuffer* pBuffer, const char* pStr
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_COMPARE(GblStringBuffer_length(pBuffer), strlen(pString));
     GBL_TEST_COMPARE(GblStringBuffer_cString(pBuffer), pString);
-    GBL_TEST_VERIFY(GblStringView_equals(GblStringBuffer_view(pBuffer), GBL_STRV(pString)));
+    GBL_TEST_VERIFY(GblStringView_equals(GblStringBuffer_view(pBuffer), pString));
     GBL_TEST_COMPARE(GblStringBuffer_context(pBuffer), pCtx);
     if(!strlen(pString)) GBL_TEST_VERIFY(GblStringBuffer_empty(pBuffer));
 

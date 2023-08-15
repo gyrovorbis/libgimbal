@@ -104,8 +104,8 @@ GBL_DECLS_END
 #define GblStringRef_unref(str)  GblStringRef_release(str)
 
 #define GblStringRef_create__1(str)             (GblStringRef_create)(str)
-#define GblStringRef_create__2(str, len)        GblStringRef_createFromView(GblStringView_fromStringSized(str, len))
-#define GblStringRef_create__3(str, len, ctx)   GblStringRef_createFromViewWithContext(GblStringView_fromStringSized(str, len), ctx)
+#define GblStringRef_create__2(str, len)        GblStringRef_createFromView(GblStringView_fromString(str, len))
+#define GblStringRef_create__3(str, len, ctx)   GblStringRef_createFromViewWithContext(GblStringView_fromString(str, len), ctx)
 //! \endcond
 
 #undef GBL_SELF_TYPE

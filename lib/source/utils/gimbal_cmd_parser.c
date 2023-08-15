@@ -63,12 +63,12 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
         // Check for options or "--" specifier
         if(!parseAsPositionals) {
             // check whether we should consider all remaining args as positional
-            if(GblStringView_equals(argView, GBL_STRV("--"))) {
+            if(GblStringView_equals(argView, "--")) {
                 parseAsPositionals = GBL_TRUE;
                 pIt = pNext;
                 continue;
             // check whether we've encountered an unknown remaining optional
-            } else if(GblStringView_startsWith(argView, GBL_STRV("-"))) {
+            } else if(GblStringView_startsWith(argView, "-")) {
                 // Add option key to unknown option list
                 GblDoublyLinkedList_remove(&pIt->listNode);
                 --pArgs->size;

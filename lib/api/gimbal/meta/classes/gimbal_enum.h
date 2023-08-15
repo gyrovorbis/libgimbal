@@ -31,6 +31,8 @@
 #define GBL_ENUM_ENTRY_LAST()           { 0, NULL, NULL }               //!< Utility GblEnumEntry initializer for end list designator
 //! @}
 
+#define GBL_ENUM(name, ...)     GBL_ENUM_(name, __VA_ARGS__)
+
 #define GBL_SELF_TYPE GblEnumClass
 
 GBL_DECLS_BEGIN
@@ -120,6 +122,17 @@ GBL_EXPORT GblQuark    GblEnum_nickQuark (GblEnum value, GblType type) GBL_NOEXC
 GBL_EXPORT GblBool     GblEnum_check     (GblEnum value, GblType type) GBL_NOEXCEPT;
 
 GBL_DECLS_END
+
+#if 0
+#define GBL_ENUM_ENTRY_(name, ...) \
+    GBL_ENUM_ENTRY(__VA_ARGS__)
+
+#define GBL_ENUM_(name, ...) \
+    GBL_DECLARE_ENUM(name) { \
+        GBL_TUPLE_FOREACH(GBL_ENUM_ENTRY_, name, __VA_ARGS__) \
+        GBL_ENUM_ENTRY_LAST()
+    };
+#endif
 
 #undef GBL_SELF_TYPE
 

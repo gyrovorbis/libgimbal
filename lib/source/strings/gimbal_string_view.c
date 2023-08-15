@@ -13,7 +13,7 @@
         char*       pEnd        = NULL; \
         const char* pCString    = GBL_STRING_VIEW_CSTR(self); \
         \
-        if(min == 0 && GblStringView_startsWith(self, GBL_STRV("-"))) { \
+        if(min == 0 && GblStringView_startsWith(self, "-")) { \
             result = 0; \
             valid = GBL_FALSE; \
         } else { \
@@ -194,7 +194,8 @@ GBL_EXPORT GBL_RESULT GblStringView_copy(GblStringView self, void* pDst, size_t 
     GBL_CTX_END();
 }
 
-GBL_EXPORT int GblStringView_compare(GblStringView self, GblStringView other) {
+GBL_EXPORT int (GblStringView_compare)(GblStringView self, const char* pString, size_t len) {
+    GblStringView other = GblStringView_fromString(pString, len);
     if(!self.length && !other.length)   return 0;
     else if(self.length > other.length) return INT_MAX;
     else if(self.length < other.length) return INT_MIN;
@@ -203,7 +204,9 @@ GBL_EXPORT int GblStringView_compare(GblStringView self, GblStringView other) {
         }
 }
 
-GBL_EXPORT int GblStringView_compareIgnoreCase(GblStringView self, GblStringView other) {
+GBL_EXPORT int (GblStringView_compareIgnoreCase)(GblStringView self, const char* pString, size_t len) {
+    GblStringView other = GblStringView_fromString(pString, len);
+
     if(!self.length && other.length) return INT_MIN;
     else if(self.length && !other.length) return INT_MAX;
     else if(!self.length && !other.length) return 0;
@@ -322,7 +325,8 @@ GBL_EXPORT GblStringView GblStringView_substr(GblStringView self, size_t  offset
     return view;
 }
 
-GBL_EXPORT GblBool GblStringView_contains(GblStringView self, GblStringView substr) {
+GBL_EXPORT GblBool (GblStringView_contains)(GblStringView self, const char* pStr, size_t len) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
     GblBool result = GBL_FALSE;
     if(!self.length && !substr.length) {
         result = GBL_TRUE;
@@ -334,7 +338,21 @@ GBL_EXPORT GblBool GblStringView_contains(GblStringView self, GblStringView subs
     return result;
 }
 
-GBL_EXPORT size_t  GblStringView_count(GblStringView self, GblStringView substr) {
+GBL_EXPORT GblBool (GblStringView_containsIgnoreCase)(GblStringView self, const char* pStr, size_t len) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
+    GblBool result = GBL_FALSE;
+    if(!self.length && !substr.length) {
+        result = GBL_TRUE;
+    } else if(self.length && substr.length) {
+        const char* pCStr1 = GBL_STRING_VIEW_CSTR(self);
+        const char* pCStr2 = GBL_STRING_VIEW_CSTR(substr);
+        result = (gblStrCaseStr(pCStr1, pCStr2) != GBL_NULL);
+    }
+    return result;
+}
+
+GBL_EXPORT size_t (GblStringView_count)(GblStringView self, const char* pStr, size_t len) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
     size_t  count = 0;
     size_t  offset = 0;
     while((offset = GblStringView_find(self, substr, offset)) != GBL_STRING_VIEW_NPOS) {
@@ -344,6 +362,20 @@ GBL_EXPORT size_t  GblStringView_count(GblStringView self, GblStringView substr)
     }
     return count;
 }
+
+#if 0
+GBL_EXPORT size_t (GblStringView_countIgnoreCase)(GblStringView self, const char* pStr, size_t len) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
+    size_t  count = 0;
+    size_t  offset = 0;
+    while((offset = GblStringView_find(self, substr, offset)) != GBL_STRING_VIEW_NPOS) {
+        ++count;
+        offset += substr.length;
+        if(offset >= self.length) break;
+    }
+    return count;
+}
+#endif
 
 GBL_EXPORT size_t  GblStringView_find(GblStringView self, GblStringView substr, size_t  offset) {
     size_t  pos = GBL_STRING_VIEW_NPOS;
@@ -394,7 +426,9 @@ GBL_EXPORT size_t  GblStringView_rfind(GblStringView self, GblStringView substr,
     return pos;
 }
 
-GBL_EXPORT GblBool GblStringView_startsWith(GblStringView self, GblStringView substr) {
+GBL_EXPORT GblBool (GblStringView_startsWith)(GblStringView self, const char* pStr, size_t len) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
+
     if(substr.length > self.length)
         return GBL_FALSE;
     for(size_t  i = 0; i < substr.length; ++i) {
@@ -404,7 +438,9 @@ GBL_EXPORT GblBool GblStringView_startsWith(GblStringView self, GblStringView su
     return GBL_TRUE;
 }
 
-GBL_EXPORT GblBool GblStringView_endsWith(GblStringView self, GblStringView substr) {
+GBL_EXPORT GblBool (GblStringView_endsWith)(GblStringView self, const char* pStr, size_t len) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
+
     if(substr.length > self.length)
         return GBL_FALSE;
     for(size_t  i = 0; i < substr.length; ++i) {
@@ -470,18 +506,7 @@ GBL_EXPORT GblStringView GblStringView_fromEmpty(void) GBL_NOEXCEPT {
     return GblStringView_fromString(GBL_NULL);
 }
 
-GBL_EXPORT GblStringView GblStringView_fromString(const char* pString) GBL_NOEXCEPT {
-    GblStringView view = {
-        .pData  = pString
-    };
-    if(pString) {
-        view.nullTerminated = 1;
-        view.length         = strlen(pString);
-    }
-    return view;
-}
-
-GBL_EXPORT GblStringView GblStringView_fromStringSized(const char* pString, size_t length) GBL_NOEXCEPT {
+GBL_EXPORT GblStringView (GblStringView_fromString)(const char* pString, size_t length) GBL_NOEXCEPT {
     GblStringView view = {
         .pData  = pString,
         .length = length
@@ -515,12 +540,12 @@ GBL_EXPORT GblStringView GblStringView_fromQuark(GblQuark quark) {
     return GblStringView_fromString(GblQuark_toString(quark));
 }
 
-GBL_EXPORT GblBool GblStringView_equals(GblStringView self, GblStringView other) {
-    return GblStringView_compare(self, other) == 0;
+GBL_EXPORT GblBool (GblStringView_equals)(GblStringView self, const char* pString, size_t len) {
+    return GblStringView_compare(self, pString, len) == 0;
 }
 
-GBL_EXPORT GblBool GblStringView_equalsIgnoreCase(GblStringView self, GblStringView other) {
-    return GblStringView_compareIgnoreCase(self, other) == 0;
+GBL_EXPORT GblBool (GblStringView_equalsIgnoreCase)(GblStringView self, const char* pString, size_t len) {
+    return GblStringView_compareIgnoreCase(self, pString, len) == 0;
 }
 
 GBL_EXPORT GblBool GblStringView_empty(GblStringView self) {
@@ -536,7 +561,7 @@ GBL_EXPORT GblQuark GblStringView_quark(GblStringView self) {
     return GblQuark_fromString(GBL_STRING_VIEW_CSTR(self));
 }
 
-GBL_EXPORT GblQuark GblStringView_quarkTry(GblStringView self) {
+GBL_EXPORT GblQuark GblStringView_tryQuark(GblStringView self) {
     return GblQuark_tryString(GBL_STRING_VIEW_CSTR(self));
 }
 

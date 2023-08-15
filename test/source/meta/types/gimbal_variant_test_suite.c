@@ -195,7 +195,7 @@ static GBL_RESULT GblVariantTestSuite_nil_conversions_(GblTestSuite* pSelf, GblC
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&toVariant, "lolol"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&nilVariant, &toVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&toVariant), GBL_STRV("nil")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&toVariant), "nil"));
     GBL_TEST_VERIFY(GblVariant_equals(&nilVariant, &toVariant));
     GBL_CTX_VERIFY_LAST_RECORD();
 
@@ -329,7 +329,7 @@ static GBL_RESULT GblVariantTestSuite_bool_conversions_(GblTestSuite* pSelf, Gbl
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&bVariant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("true")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "true"));
     GBL_TEST_VERIFY(GblVariant_equals(&bVariant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -461,7 +461,7 @@ static GBL_RESULT GblVariantTestSuite_char_conversions_(GblTestSuite* pSelf, Gbl
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("a")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "a"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -606,7 +606,7 @@ static GBL_RESULT GblVariantTestSuite_u8_conversions_(GblTestSuite* pSelf, GblCo
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("97")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -751,7 +751,7 @@ static GBL_RESULT GblVariantTestSuite_u16_conversions_(GblTestSuite* pSelf, GblC
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("97")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -896,7 +896,7 @@ static GBL_RESULT GblVariantTestSuite_i16_conversions_(GblTestSuite* pSelf, GblC
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("97")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -1041,7 +1041,7 @@ static GBL_RESULT GblVariantTestSuite_u32_conversions_(GblTestSuite* pSelf, GblC
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("97")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -1187,7 +1187,7 @@ static GBL_RESULT GblVariantTestSuite_i32_conversions_(GblTestSuite* pSelf, GblC
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("97")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -1334,7 +1334,7 @@ static GBL_RESULT GblVariantTestSuite_u64_conversions_(GblTestSuite* pSelf, GblC
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("97")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -1478,7 +1478,7 @@ static GBL_RESULT GblVariantTestSuite_i64_conversions_(GblTestSuite* pSelf, GblC
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("97")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -1617,7 +1617,7 @@ static GBL_RESULT GblVariantTestSuite_f32_conversions_(GblTestSuite* pSelf, GblC
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("97.000")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97.000"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -1757,7 +1757,7 @@ static GBL_RESULT GblVariantTestSuite_f64_conversions_(GblTestSuite* pSelf, GblC
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("97.000")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97.000"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
@@ -1898,7 +1898,7 @@ static GBL_RESULT GblVariantTestSuite_string_(GblTestSuite* pSelf, GblContext* p
     // Value Move Constructor
     GblStringRef* pRef = GblStringRef_create("xbox");
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v, GBL_STRING_TYPE, pRef));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&v), GBL_STRV("xbox")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&v), "xbox"));
 
     // Utility / Value Set Copy
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&v, "dreamcast"));
@@ -1907,12 +1907,12 @@ static GBL_RESULT GblVariantTestSuite_string_(GblTestSuite* pSelf, GblContext* p
     // Value Set Move
     pRef = GblStringRef_create("playstation");
     GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(&v, GBL_STRING_TYPE, pRef));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&v), GBL_STRV("playstation")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&v), "playstation"));
 
     // Value Get Move
     const char* pVal = NULL;
     GBL_CTX_VERIFY_CALL(GblVariant_valueMove(&v, &pVal));
-    GBL_TEST_VERIFY(GblStringView_equals(GBL_STRV(pVal), GBL_STRV("playstation")));
+    GBL_TEST_VERIFY(GblStringView_equals(GBL_STRV(pVal), "playstation"));
     GblStringRef_release(pVal);
 
     // Value Get Peek
@@ -2147,7 +2147,7 @@ static GBL_RESULT GblVariantTestSuite_type_conversions_(GblTestSuite* pSelf, Gbl
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, ""));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("uint8")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "uint8"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));

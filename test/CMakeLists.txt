@@ -27,8 +27,8 @@ endif()
 
 
 set(GIMBAL_TEST_SOURCES
-    include/algorithms/gimbal_sort_test_suite.h
-    source/algorithms/gimbal_sort_test_suite.c
+    include/algorithms/gimbal_compression_test_suite.h
+    source/algorithms/gimbal_compression_test_suite.c
     include/algorithms/gimbal_hash_test_suite.h
     source/algorithms/gimbal_hash_test_suite.c
     include/algorithms/gimbal_md5_test_suite.h
@@ -37,6 +37,8 @@ set(GIMBAL_TEST_SOURCES
     source/algorithms/gimbal_random_test_suite.c
     include/algorithms/gimbal_sha1_test_suite.h
     source/algorithms/gimbal_sha1_test_suite.c
+    include/algorithms/gimbal_sort_test_suite.h
+    source/algorithms/gimbal_sort_test_suite.c
     include/allocators/gimbal_arena_allocator_test_suite.h
     source/allocators/gimbal_arena_allocator_test_suite.c
     include/allocators/gimbal_pool_allocator_test_suite.h
@@ -69,6 +71,8 @@ set(GIMBAL_TEST_SOURCES
     source/core/gimbal_module_test_suite.c
     include/core/gimbal_thread_test_suite.h
     source/core/gimbal_thread_test_suite.c
+    include/core/gimbal_error_test_suite.h
+    source/core/gimbal_error_test_suite.c
     include/meta/classes/gimbal_enum_test_suite.h
     source/meta/classes/gimbal_enum_test_suite.c
     include/meta/classes/gimbal_flags_test_suite.h
@@ -137,6 +141,8 @@ if(GBL_ENABLE_CPP)
          source/strings/gimbal_quark_test_suite.cpp
          include/strings/gimbal_pattern_test_suite.hpp
          source/strings/gimbal_pattern_test_suite.cpp
+         include/strings/gimbal_string_view_test_suite.hpp
+         source/strings/gimbal_string_view_test_suite.cpp
          source/gimbal_test_cpp.cpp)
 endif(GBL_ENABLE_CPP)
 

@@ -313,7 +313,7 @@ static GBL_RESULT GblFlagsTestSuite_variant_conversions_(GblTestSuite* pSelf, Gb
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("READ|WRITE")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "READ|WRITE"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // FROM String

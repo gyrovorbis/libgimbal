@@ -59,6 +59,7 @@ GBL_CLASS_END
  *  \sa GblErrorClass
  */
 GBL_INSTANCE_DERIVE(GblError, GblObject)
+    GblType       resultType;
     GblEnum       result;
     GblStringRef* pMessage;
     GblThread*    pThread;
@@ -79,7 +80,7 @@ GBL_PROPERTIES(GblError,
 GBL_EXPORT GblType    GblError_type         (void)           GBL_NOEXCEPT;
 
 GBL_EXPORT GblError*  GblError_current      (void)           GBL_NOEXCEPT;
-GBL_EXPORT void       GblError_clear        (void)           GBL_NOEXCEPT;
+GBL_EXPORT GblBool    GblError_clear        (void)           GBL_NOEXCEPT;
 GBL_EXPORT GblError*  GblError_catch        (GblType type)   GBL_NOEXCEPT;
 GBL_EXPORT void       GblError_throw        (GblError* pErr) GBL_NOEXCEPT;
 
@@ -87,6 +88,7 @@ GBL_EXPORT GblError*  GblError_create       (GblType     derived,
                                              const char* pFile,
                                              const char* pFunc,
                                              size_t      line,
+                                             GblType     resultType,
                                              GblEnum     result,
                                              const char* pFmt,
                                              ...)        GBL_NOEXCEPT;
@@ -103,8 +105,8 @@ GBL_EXPORT size_t      GblError_line         (GBL_CSELF) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
-#define GblError_create(derived, result, ...) \
-    (GblError_create)(derived, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, result, __VA_ARGS__))
+#define GblError_create(derived, result, /*resultType,*/ ...) \
+    (GblError_create)(derived, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, result, __VA_ARGS__)
 
 #undef GBL_SELF_TYPE
 

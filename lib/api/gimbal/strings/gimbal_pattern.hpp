@@ -63,6 +63,11 @@ public:
     bool matchCount(const char* pString) const noexcept {
         return GblPattern_matchCount(*this, pString);
     }
+
+    friend std::ostream& operator<<(std::ostream &os, const Pattern& pat) {
+        os << pat.string();
+        return os;
+    }
 };
 
 inline auto operator<=>(const Pattern& lhs, const GblPattern* pRhs) noexcept {

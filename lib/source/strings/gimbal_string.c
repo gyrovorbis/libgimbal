@@ -16,6 +16,24 @@ GBL_EXPORT char* gblStrndup(const char* pStr, size_t  length) {
     return pNew;
 }
 
+GBL_EXPORT char* gblStrCaseStr(const char* pStr, const char* pSub) {
+    char c, sc;
+    size_t len;
+
+    if ((c = *pSub++) != 0) {
+        c = tolower((unsigned char)c);
+        len = strlen(pSub);
+        do {
+            do {
+                if ((sc = *pStr++) == 0)
+                    return (NULL);
+            } while ((char)tolower((unsigned char)sc) != c);
+        } while (gblStrnCaseCmp(pStr, pSub, len) != 0);
+        pStr--;
+    }
+    return ((char *)pStr);
+}
+
 GBL_EXPORT int gblStrnCaseCmp(const char* pStr1, const char* pStr2, size_t length) {
     GBL_ASSERT(pStr1 && pStr2, "NULL string!");
     int result;

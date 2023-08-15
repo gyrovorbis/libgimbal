@@ -35,6 +35,7 @@ GBL_EXPORT uint8_t       gblPow2Next_u8             (uint8_t n)                 
 GBL_EXPORT uint16_t      gblPow2Next_u16            (uint16_t n)                GBL_NOEXCEPT;
 GBL_EXPORT uint32_t      gblPow2Next_u32            (uint32_t n)                GBL_NOEXCEPT;
 GBL_EXPORT uint64_t      gblPow2Next_u64            (uint64_t n)                GBL_NOEXCEPT;
+GBL_EXPORT GblBool       gblPow2Check               (size_t n)                  GBL_NOEXCEPT;
 GBL_EXPORT int           gblFibonacci               (int n)                     GBL_NOEXCEPT;
 GBL_EXPORT int           gblGcd                     (int u, int v)              GBL_NOEXCEPT;
 GBL_EXPORT int           gblLcm                     (int u, int v)              GBL_NOEXCEPT;

@@ -184,7 +184,7 @@ GBL_EXPORT GblBool (GblPattern_matchNot)(const GblPattern* pSelf,
 
     // If there's a non-match before the first token
     if(token.pData && token.pData != pString) {
-        *pMatch = GblStringView_fromStringSized(pString, token.pData - pString);
+        *pMatch = GblStringView_fromString(pString, token.pData - pString);
         ++totalCount;
     }
 
@@ -198,8 +198,8 @@ GBL_EXPORT GblBool (GblPattern_matchNot)(const GblPattern* pSelf,
         const size_t gapLength = token.pData - (prevToken.pData + prevToken.length);
         if(gapLength > 0) {
             ++totalCount;
-            *pMatch = GblStringView_fromStringSized(prevToken.pData + prevToken.length,
-                                                    gapLength);
+            *pMatch = GblStringView_fromString(prevToken.pData + prevToken.length,
+                                               gapLength);
         }
         prevToken = token;
     }
@@ -208,8 +208,8 @@ GBL_EXPORT GblBool (GblPattern_matchNot)(const GblPattern* pSelf,
     if((*pCount == -1 || totalCount < *pCount) &&
        token.pData + token.length < pString + length) {
         const char* pNewHead = prevToken.pData + prevToken.length;
-        *pMatch = GblStringView_fromStringSized(pNewHead,
-                                                pString + length - pNewHead);
+        *pMatch = GblStringView_fromString(pNewHead,
+                                           pString + length - pNewHead);
 
         ++totalCount;
     }

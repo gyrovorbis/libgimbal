@@ -316,7 +316,7 @@ GBL_EXPORT GblFlags GblFlagsClass_valueFromString(const GblFlagsClass* pClass, c
     GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pClass), GBL_FLAGS_TYPE);
 
     for(uint16_t f = 0; f < pSelf->entryCount; ++f) {
-        if(GblStringView_contains(view, GBL_STRV(GblQuark_toString(pSelf_->pEntries[f].name)))) {
+        if(GblStringView_contains(view, GblQuark_toString(pSelf_->pEntries[f].name))) {
             value |= pSelf_->pEntries[f].value;
         }
     }

@@ -244,7 +244,7 @@ static GBL_RESULT GblEnumTestSuite_variant_conversions_(GblTestSuite* pSelf, Gbl
     // String
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&tVariant, "trololo"));
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), GBL_STRV("BLUE")));
+    GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "BLUE"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
     // FROM String

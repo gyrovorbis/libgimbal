@@ -64,12 +64,12 @@ GBL_TEST_CASE(peekToken)
     GBL_TEST_VERIFY(GblScanner_peekToken(pFixture->pScanner));
 
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next,
-                                         GBL_STRV("someshit")));
+                                         "someshit"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
 
     GBL_TEST_VERIFY(GblScanner_peekToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next,
-                                         GBL_STRV("someshit")));
+                                         "someshit"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
 GBL_TEST_CASE_END
 
@@ -77,12 +77,12 @@ GBL_TEST_CASE(scanToken)
     GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
 
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token,
-                                         GBL_STRV("someshit")));
+                                         "someshit"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
 
     GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token,
-                                         GBL_STRV("1283")));
+                                         "1283"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_EOF);
 GBL_TEST_CASE_END
 
@@ -113,7 +113,7 @@ GBL_TEST_CASE(setInput)
 
     GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token,
-                                         GBL_STRV("1234")));
+                                         "1234"));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(setDelimeters)
@@ -121,7 +121,7 @@ GBL_TEST_CASE(setDelimeters)
 
     GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token,
-                                         GBL_STRV(" hello world")));
+                                         " hello world"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
 GBL_TEST_CASE_END
 
@@ -146,13 +146,13 @@ GBL_TEST_CASE(seek)
 
     GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token,
-                                         GBL_STRV(":)")));
+                                         ":)"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_EOF);
 
     GBL_TEST_VERIFY(GblScanner_seek(pFixture->pScanner, -2));
     GBL_TEST_VERIFY(GblScanner_peekToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next,
-                                         GBL_STRV(":)")));
+                                         ":)"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
 GBL_TEST_CASE_END
 
@@ -189,7 +189,7 @@ GBL_TEST_CASE(skipTokens)
     GBL_TEST_VERIFY(GblScanner_skipTokens(pFixture->pScanner, 3));
     GBL_TEST_VERIFY(GblScanner_peekToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next,
-                                         GBL_STRV("gamecube")));
+                                         "gamecube"));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(skipMatchInvalid)
@@ -207,7 +207,7 @@ GBL_TEST_CASE(skipMatch)
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
     GBL_TEST_VERIFY(GblScanner_peekToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next,
-                                         GBL_STRV("xbox")));
+                                         "xbox"));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(skipToMatchInvalid)
@@ -225,7 +225,7 @@ GBL_TEST_CASE(skipToMatch)
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
     GBL_TEST_VERIFY(GblScanner_peekToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next,
-                                         GBL_STRV("playstation")));
+                                         "playstation"));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(skipLinesInvalid)
@@ -244,7 +244,7 @@ GBL_TEST_CASE(skipLines)
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
     GBL_TEST_VERIFY(GblScanner_peekToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next,
-                                         GBL_STRV("vmu")));
+                                         "vmu"));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(skipBytesInvalid)
@@ -263,7 +263,7 @@ GBL_TEST_CASE(skipBytes)
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
     GBL_TEST_VERIFY(GblScanner_peekToken(pFixture->pScanner));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next,
-                                         GBL_STRV("cast")));
+                                         "cast"));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(scanf)
@@ -313,13 +313,13 @@ GBL_TEST_CASE(peekMatch)
     GblScanner_skipTokens(pFixture->pScanner, 1);
 
     GBL_TEST_VERIFY(GblScanner_peekMatch(pFixture->pScanner, "^:\\)$"));
-    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next, GBL_STRV(":)")));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next, ":)"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(scanMatch)
     GBL_TEST_VERIFY(GblScanner_scanMatch(pFixture->pScanner, "^:\\)$"));
-    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV(":)")));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, ":)"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_EOF);
 GBL_TEST_CASE_END
 
@@ -341,13 +341,13 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(peekLines)
     GBL_TEST_VERIFY(GblScanner_peekLines(pFixture->pScanner, 3));
-    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next, GBL_STRV("\n\nHello")));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next, "\n\nHello"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(scanLines)
     GBL_TEST_VERIFY(GblScanner_scanLines(pFixture->pScanner, 5));
-    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV("\n\nHello\nWorld\n")));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, "\n\nHello\nWorld\n"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
 GBL_TEST_CASE_END
 
@@ -369,13 +369,13 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(peekBytes)
     GBL_TEST_VERIFY(GblScanner_peekBytes(pFixture->pScanner, 10));
-    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next, GBL_STRV("123456789\n")));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->next, "123456789\n"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_OK);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(scanBytes)
     GBL_TEST_VERIFY(GblScanner_scanBytes(pFixture->pScanner, 28));
-    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV("123456789\nabcdefghijklmnop\nqrstuvyxyz\n")));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, "123456789\nabcdefghijklmnop\nqrstuvyxyz\n"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_EOF);
 GBL_TEST_CASE_END
 
@@ -383,11 +383,11 @@ GBL_TEST_CASE(scanMatchMultiContiguous)
     GblScanner_setInput(pFixture->pScanner, "\n\nHello\n\tWorld\n \t\nG'day");
     GblScanner_setDelimeters(pFixture->pScanner, "[\n \t]");
     GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
-    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV("Hello")));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, "Hello"));
     GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
-    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV("World")));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, "World"));
     GBL_TEST_VERIFY(GblScanner_scanToken(pFixture->pScanner));
-    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, GBL_STRV("G'day")));
+    GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, "G'day"));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(peekBoolInvalid)

@@ -49,10 +49,13 @@
 #include "core/gimbal_thread_test_suite.h"
 #include "utils/gimbal_scanner_test_suite.h"
 #include "algorithms/gimbal_random_test_suite.h"
+#include "algorithms/gimbal_compression_test_suite.h"
+#include "core/gimbal_error_test_suite.h"
 
 #ifdef GBL_ENABLE_CPP
 #   include "strings/gimbal_quark_test_suite.hpp"
 #   include "strings/gimbal_pattern_test_suite.hpp"
+#   include "strings/gimbal_string_view_test_suite.hpp"
 #endif
 
 #include <math.h>
@@ -236,9 +239,15 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_QUARK_TEST_SUITE_CPP_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_PATTERN_TEST_SUITE_CPP_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_STRING_VIEW_TEST_SUITE_CPP_TYPE));
 #endif
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_RANDOM_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_COMPRESSION_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_ERROR_TEST_SUITE_TYPE));
 
     const GBL_RESULT result = GblTestScenario_run(pScenario, argc, pArgv);
 

@@ -111,4 +111,6 @@ GBL_EXPORT GblType GblBitStruct_register(const char* pName, const GblBitStructFi
 
 GBL_DECLS_END
 
+#undef GBL_SELF_TYPE
+
 #endif // GIMBAL_BIT_STRUCT_H

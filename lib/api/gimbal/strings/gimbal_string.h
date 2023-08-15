@@ -28,6 +28,9 @@ GBL_EXPORT int   gblStrnCaseCmp        (const char* pStr1,
                                         const char* pStr2,
                                         size_t      length)            GBL_NOEXCEPT;
 
+GBL_EXPORT char* gblStrCaseStr         (const char* pStr,
+                                        const char* pSub)              GBL_NOEXCEPT;
+
 GBL_EXPORT char* gblStrdup             (const char* pString)           GBL_NOEXCEPT;
 
 GBL_EXPORT char* gblStrndup            (const char* pString,

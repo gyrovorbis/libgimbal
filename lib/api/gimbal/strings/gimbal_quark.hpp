@@ -106,7 +106,7 @@ public:
     }
 };
 
-Quark operator""_qrk(const char* pString, std::size_t size) {
+inline Quark operator""_qrk(const char* pString, std::size_t size) noexcept {
     return GblQuark_fromStatic(pString);
 }
 

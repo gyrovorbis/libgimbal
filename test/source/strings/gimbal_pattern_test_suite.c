@@ -120,7 +120,7 @@ GBL_TEST_CASE(matchDefaultCount)
                                      "12345678",
                                      &view));
 
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("12345678")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "12345678"));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(match)
@@ -132,7 +132,7 @@ GBL_TEST_CASE(match)
                                      &view,
                                      &count));
 
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("12345678")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "12345678"));
 
     GBL_TEST_COMPARE(count, 2);
 GBL_TEST_CASE_END
@@ -146,7 +146,7 @@ GBL_TEST_CASE(matchLast)
                                      &view,
                                      &count));
 
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("12345678")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "12345678"));
 
     GBL_TEST_COMPARE(count, 2);
 GBL_TEST_CASE_END
@@ -160,7 +160,7 @@ GBL_TEST_CASE(matchMultipleInARow)
                                      &view,
                                      &count));
 
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("22222222")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "22222222"));
     GBL_TEST_COMPARE(count, 2);
 GBL_TEST_CASE_END
 
@@ -215,7 +215,7 @@ GBL_TEST_CASE(matchNotDefaultCount)
     GBL_TEST_VERIFY(GblPattern_matchNot(pFixture->pPattern,
                                         "amd12345678",
                                         &match));
-    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("amd")));
+    GBL_TEST_VERIFY(GblStringView_equals(match, "amd"));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(matchNot)
@@ -227,7 +227,7 @@ GBL_TEST_CASE(matchNot)
                                         "12345678amd12345678nvidia12345678",
                                         &match,
                                         &count));
-    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("nvidia")));
+    GBL_TEST_VERIFY(GblStringView_equals(match, "nvidia"));
     GBL_TEST_COMPARE(count, 2);
 GBL_TEST_CASE_END
 
@@ -241,7 +241,7 @@ GBL_TEST_CASE(matchNotLast)
                                         "intel",
                                         &match,
                                         &count));
-    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("intel")));
+    GBL_TEST_VERIFY(GblStringView_equals(match, "intel"));
     GBL_TEST_COMPARE(count, 1);
 
     // Find last match
@@ -250,7 +250,7 @@ GBL_TEST_CASE(matchNotLast)
                                         "12345678amd12345678nvidia12345678intel",
                                         &match,
                                         &count));
-    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("intel")));
+    GBL_TEST_VERIFY(GblStringView_equals(match, "intel"));
     GBL_TEST_COMPARE(count, 3);
 GBL_TEST_CASE_END
 
@@ -264,7 +264,7 @@ GBL_TEST_CASE(matchNotFirstMultiInARow)
                                            &match,
                                            &count));
 
-    GBL_TEST_VERIFY(GblStringView_equals(match, GBL_STRV("token")));
+    GBL_TEST_VERIFY(GblStringView_equals(match, "token"));
     GBL_TEST_COMPARE(count, 1);
 GBL_TEST_CASE_END
 
@@ -272,17 +272,17 @@ GBL_TEST_CASE(matchLiteral)
     GblStringView view;
     int count = -1;
     GBL_TEST_VERIFY(GblPattern_matchStr("lol", "ablolcd", &view, &count));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "lol"));
     GBL_TEST_COMPARE(count, 1);
 
     count = -1;
     GBL_TEST_VERIFY(GblPattern_matchStr("lol", "lolablolcdlol", &view, &count));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "lol"));
     GBL_TEST_COMPARE(count, 3);
 
     count = 1;
     GBL_TEST_VERIFY(GblPattern_matchStr("lol", "lolablolcdlol", &view, &count));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "lol"));
     GBL_TEST_COMPARE(count, 1);
 GBL_TEST_CASE_END
 
@@ -295,12 +295,12 @@ GBL_TEST_CASE(matchLiteralBegin)
 
     count = -1;
     GBL_TEST_VERIFY(GblPattern_matchStr("^lol", "lolablolcdlol", &view, &count));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "lol"));
     GBL_TEST_COMPARE(count, 1);
 
     count = 1;
     GBL_TEST_VERIFY(GblPattern_matchStr("^lol", "lolablolcdlol", &view, &count));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "lol"));
     GBL_TEST_COMPARE(count, 1);
 GBL_TEST_CASE_END
 
@@ -313,12 +313,12 @@ GBL_TEST_CASE(matchLiteralEnd)
 
     count = -1;
     GBL_TEST_VERIFY(GblPattern_matchStr("lol$", "lolablolcdlol", &view, &count));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "lol"));
     GBL_TEST_COMPARE(count, 1);
 
     count = 1;
     GBL_TEST_VERIFY(GblPattern_matchStr("lol$", "lolablolcdlol", &view, &count));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("lol")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "lol"));
     GBL_TEST_COMPARE(count, 1);
 GBL_TEST_CASE_END
 
@@ -329,7 +329,7 @@ GBL_TEST_CASE(matchDateTime)
                                         "2018-10-04T05:52:20",
                                         &view,
                                         &count));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("2018-10-04T05:52:20")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "2018-10-04T05:52:20"));
     GBL_TEST_COMPARE(count, 1);
 GBL_TEST_CASE_END
 
@@ -343,7 +343,7 @@ GBL_TEST_CASE(matchPhoneNumber)
                                      "256-721-1534",
                                      &view,
                                      &count));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("256-721-1534")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "256-721-1534"));
     GBL_TEST_COMPARE(count, 1);
 GBL_TEST_CASE_END
 
@@ -353,24 +353,24 @@ GBL_TEST_CASE(matchAlternation)
     GBL_TEST_VERIFY(GblPattern_matchStr("h|w",
                                         "h",
                                         &view));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("h")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "h"));
 
     GBL_TEST_VERIFY(GblPattern_matchStr("h|w",
                                         "w",
                                         &view));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("w")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "w"));
 
     GBL_TEST_VERIFY(GblPattern_matchStr("hello|world",
                                         "hello",
                                         &view));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("hello")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "hello"));
 
     GBL_TEST_SKIP("Todo: fix in tiny-regex-c");
 
     GBL_TEST_VERIFY(GblPattern_matchStr("hello|world",
                                         "worldzy",
                                         &view));
-    GBL_TEST_VERIFY(GblStringView_equals(view, GBL_STRV("world")));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "world"));
 
 GBL_TEST_CASE_END
 

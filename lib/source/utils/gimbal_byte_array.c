@@ -260,7 +260,7 @@ GBL_EXPORT GBL_RESULT GblByteArray_write(GblByteArray* pSelf, size_t  offset, si
 }
 
 GBL_EXPORT GblStringView GblByteArray_stringView(const GblByteArray* pSelf) {
-    return GblStringView_fromStringSized((const char*)pSelf->pData, pSelf->size);
+    return GblStringView_fromString((const char*)pSelf->pData, pSelf->size);
 }
 
 GBL_EXPORT const char* GblByteArray_cString(const GblByteArray* pSelf) {

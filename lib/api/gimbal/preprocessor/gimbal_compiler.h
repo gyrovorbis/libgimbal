@@ -104,8 +104,6 @@
 #elif defined(_POSIX_VERSION)
     // POSIX
 #   define GBL_POSIX
-#else
-#   warning "Unknown platform"
 #endif
 
 #ifdef _MSC_VER
@@ -128,8 +126,6 @@
 #   define GBL_ARMCC    1
 #elif defined(__IAR_SYSTEMS__ICC__)
 #   define GBL_IAR  1
-#else
-#   warn "Unknown compiler detected!"
 #endif
 
 #if defined(__x86_64__) || defined(_M_X64)
@@ -172,8 +168,6 @@
 #   define GBL_SPARC        1
 #elif defined(__m68k__)
 #   define GBL_M68K         1
-#else
-#   warn "Unknown architecture!"
 #endif
 
 #ifdef GBL_CPP11

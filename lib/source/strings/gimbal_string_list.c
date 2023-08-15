@@ -119,8 +119,8 @@ GBL_EXPORT GblStringList* GblStringList_createSplit(const char* pStr, const char
         const size_t  length = stop-start;
 
         if(length) {
-            GblStringView subView = GblStringView_fromStringSized(srcView.pData + start,
-                                                                  length);
+            GblStringView subView = GblStringView_fromString(srcView.pData + start,
+                                                             length);
             GblStringRef* pRef = GblStringRef_createFromView(subView);
             GblStringList_pushBackRefs(pList, pRef);
             GblStringRef_release(pRef);
@@ -214,7 +214,7 @@ GBL_EXPORT GblBool (GblStringList_equals)(const GblStringList* pSelf, const GblS
                 return GBL_FALSE;
         } else {
             if(!GblStringView_equalsIgnoreCase(GBL_STRV(pIt1->pData),
-                                               GBL_STRV(pIt2->pData)))
+                                               pIt2->pData))
                 return GBL_FALSE;
         }
 
@@ -243,7 +243,7 @@ GBL_EXPORT size_t  (GblStringList_rfind)(const GblStringList* pSelf, const char*
                 break;
             } else if(!matchCase &&
                       GblStringView_equalsIgnoreCase(GBL_STRV(pNode->pData),
-                                                     strView))
+                                                     strView.pData, strView.length))
             {
                 pos = i;
                 break;
@@ -271,7 +271,7 @@ GBL_EXPORT size_t  (GblStringList_find)(const GblStringList* pSelf, const char* 
                 break;
             } else if(!matchCase &&
                       GblStringView_equalsIgnoreCase(GBL_STRV(pNode->pData),
-                                                     strView))
+                                                     strView.pData, strView.length))
             {
                 pos = i;
                 break;
@@ -545,7 +545,7 @@ GBL_EXPORT size_t  (GblStringList_remove)(GblStringList* pSelf, const char* pStr
     {
         if((matchCase && strcmp(pNode->pData, pStr) == 0) ||
            (!matchCase && GblStringView_equalsIgnoreCase(GBL_STRV(pNode->pData),
-                                                         GBL_STRV(pStr))))
+                                                         pStr)))
         {
             GblStringList* pPrev = pNode->ringNode.pPrev;
             GblDoublyLinkedList_remove(&pNode->listNode);
@@ -571,7 +571,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_deduplicate)(GblStringList* pSelf, GblBool 
 
             if((matchCase && strcmp(pNode->pData, pNode2->pData) == 0) ||
                (!matchCase && GblStringView_equalsIgnoreCase(GBL_STRV(pNode->pData),
-                                                             GBL_STRV(pNode2->pData))))
+                                                             pNode2->pData)))
             {
                 GblStringList* pPrev = pNode2->ringNode.pPrev;
                 GblDoublyLinkedList_remove(&pNode2->listNode);

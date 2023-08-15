@@ -32,7 +32,7 @@ static double gblRandLehmer_(void) {
     return ((double) lehmerSeed_ / (double)LEHMER_MODULUS);
 }
 
-GBL_EXPORT int gblRandLibc(void) {
+GBL_EXPORT int gblRandLibC(void) {
     return rand();
 }
 

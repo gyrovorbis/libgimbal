@@ -949,7 +949,7 @@ static GBL_RESULT stringCompare_(const GblVariant* pVariant, const GblVariant* p
     GBL_CTX_VERIFY_POINTER(pResult);
     GBL_CTX_VERIFY_TYPE(pVariant->type, GBL_STRING_TYPE);
     GBL_CTX_VERIFY_TYPE(pOther->type, GBL_STRING_TYPE);
-    *pResult = GblStringView_compare(GBL_STRV(pVariant->pString), GBL_STRV(pOther->pString));
+    *pResult = GblStringView_compare(GBL_STRV(pVariant->pString), pOther->pString);
     GBL_CTX_END();
 }
 

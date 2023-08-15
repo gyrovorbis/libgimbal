@@ -80,7 +80,7 @@ void benchmark_(GblRandomGeneratorFn pGen, GblTestFixture* pFixture, int index) 
 }
 
 GBL_TEST_CASE(libCDuplicate)
-    findDuplicates_(gblRandLibc);
+    findDuplicates_(gblRandLibC);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(lehmerDuplicate)
@@ -88,7 +88,7 @@ GBL_TEST_CASE(lehmerDuplicate)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(libCBenchmark)
-    benchmark_(gblRandLibc, pFixture, 0);
+    benchmark_(gblRandLibC, pFixture, 0);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(lehmerBenchmark)
