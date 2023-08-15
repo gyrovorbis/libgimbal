@@ -42,7 +42,7 @@ struct StringView: public GblStringView {
         GblStringView(gblStrv) {}
 
     constexpr StringView(std::string_view view) noexcept:
-        GblStringView(GblStringView_fromString(view.data(), view.length())) {}
+        StringView(view.data(), view.length()) {}
 
     constexpr const char* data() const noexcept { return pData; }
     constexpr std::size_t length() const noexcept { return static_cast<const GblStringView*>(this)->length; }
