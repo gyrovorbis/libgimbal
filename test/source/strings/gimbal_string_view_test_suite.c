@@ -13,7 +13,7 @@ static GBL_RESULT GblStringViewTestSuite_fromEmpty_(GblTestSuite* pSelf, GblCont
     GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
     GBL_TEST_COMPARE_UINT(view.length, 0);
 
-    view = GBL_STRING_VIEW(NULL);
+    view = GBL_STRV(NULL);
     GBL_TEST_COMPARE(view.pData, NULL);
     GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
     GBL_TEST_COMPARE_UINT(view.length, 0);
@@ -34,7 +34,7 @@ static GBL_RESULT GblStringViewTestSuite_fromString_(GblTestSuite* pSelf, GblCon
     GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
 
-    view = GBL_STRING_VIEW("lulz");
+    view = GBL_STRV("lulz");
     GBL_TEST_COMPARE_UINT(view.length, 4);
     GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
@@ -66,7 +66,7 @@ static GBL_RESULT GblStringViewTestSuite_fromStringSized_(GblTestSuite* pSelf, G
     GBL_TEST_COMPARE_UINT(view.nullTerminated, 1);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
 
-    view = GBL_STRING_VIEW("lulz", 2);
+    view = GBL_STRV("lulz", 2);
     GBL_TEST_COMPARE_UINT(view.length, 2);
     GBL_TEST_COMPARE_UINT(view.nullTerminated, 0);
     GBL_TEST_COMPARE(strcmp(view.pData, "lulz"), 0);
@@ -511,6 +511,17 @@ static GBL_RESULT GblStringViewTestSuite_startsWith_(GblTestSuite* pSelf, GblCon
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblStringViewTestSuite_startsWithIgnoreCase_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+    GBL_TEST_VERIFY(GblStringView_startsWithIgnoreCase(GBL_STRV("LOlz"), "lo"));
+    GBL_TEST_VERIFY(GblStringView_startsWithIgnoreCase(GBL_STRV("loLz"), "lOlZ"));
+    GBL_TEST_VERIFY(!GblStringView_startsWithIgnoreCase(GBL_STRV("lolz"), "Z"));
+    GBL_TEST_VERIFY(GblStringView_startsWithIgnoreCase(GBL_STRV(NULL), NULL));
+    GBL_TEST_VERIFY(GblStringView_startsWithIgnoreCase(GBL_STRV(""), NULL));
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblStringViewTestSuite_endsWith_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
@@ -519,6 +530,17 @@ static GBL_RESULT GblStringViewTestSuite_endsWith_(GblTestSuite* pSelf, GblConte
     GBL_TEST_VERIFY(!GblStringView_endsWith(GBL_STRV("lolz"), " lolz"));
     GBL_TEST_VERIFY(GblStringView_endsWith(GBL_STRV(NULL), NULL));
     GBL_TEST_VERIFY(GblStringView_endsWith(GBL_STRV(""), NULL));
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblStringViewTestSuite_endsWithIgnoreCase_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+    GBL_TEST_VERIFY(GblStringView_endsWithIgnoreCase(GBL_STRV("loLZ"), "lz"));
+    GBL_TEST_VERIFY(GblStringView_endsWithIgnoreCase(GBL_STRV("lOlz"), "Lolz"));
+    GBL_TEST_VERIFY(!GblStringView_endsWithIgnoreCase(GBL_STRV("LOLZ"), " lolz"));
+    GBL_TEST_VERIFY(GblStringView_endsWithIgnoreCase(GBL_STRV(NULL), NULL));
+    GBL_TEST_VERIFY(GblStringView_endsWithIgnoreCase(GBL_STRV(""), NULL));
     GBL_CTX_END();
 }
 
@@ -562,11 +584,11 @@ static GBL_RESULT GblStringViewTestSuite_find_invalid_(GblTestSuite* pSelf, GblC
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
 
-    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV(NULL), GBL_STRV("lol"), 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV(NULL), "lol", 0, 1), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), GBL_STRV("lol"), 4), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), "lol", 0, 4), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_CTX_END();
@@ -575,26 +597,56 @@ static GBL_RESULT GblStringViewTestSuite_find_invalid_(GblTestSuite* pSelf, GblC
 static GBL_RESULT GblStringViewTestSuite_find_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV(NULL), GBL_STRV("lol"), 0), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), GBL_STRV("l"), 0), 0);
-    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), GBL_STRV("lol"), 0), 0);
-    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), GBL_STRV("ol"), 0), 1);
-    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), GBL_STRV("l"), 1), 2);
-    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), GBL_STRV("lz"), 0), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), GBL_STRV(NULL), 0), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV(NULL), "lol"), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), "l"), 0);
+    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), "lol"), 0);
+    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), "ol"), 1);
+    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), "l", 0, 1), 2);
+    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), "lz"), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_find(GBL_STRV("lol"), NULL), GBL_STRING_VIEW_NPOS);
     GBL_CTX_END();
 }
+
+
+static GBL_RESULT GblStringViewTestSuite_findIgnoreCase_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_COMPARE(GblStringView_findIgnoreCase(GBL_STRV(NULL), "lol", 0, 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+
+    GBL_TEST_COMPARE(GblStringView_findIgnoreCase(GBL_STRV("lol"), "lol", 0, 4), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblStringViewTestSuite_findIgnoreCase_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+    GBL_TEST_COMPARE(GblStringView_findIgnoreCase(GBL_STRV(NULL), "lol"), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findIgnoreCase(GBL_STRV("lol"), "L"), 0);
+    GBL_TEST_COMPARE(GblStringView_findIgnoreCase(GBL_STRV("lol"), "LOL"), 0);
+    GBL_TEST_COMPARE(GblStringView_findIgnoreCase(GBL_STRV("lOl"), "oL"), 1);
+    GBL_TEST_COMPARE(GblStringView_findIgnoreCase(GBL_STRV("LoL"), "l", 0, 1), 2);
+    GBL_TEST_COMPARE(GblStringView_findIgnoreCase(GBL_STRV("loL"), "lz"), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findIgnoreCase(GBL_STRV("lOl"), NULL), GBL_STRING_VIEW_NPOS);
+    GBL_CTX_END();
+}
+
 
 static GBL_RESULT GblStringViewTestSuite_rfind_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
 
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV(NULL), GBL_STRV("lol"), 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV(NULL), "lol", 0, 1), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), GBL_STRV("lol"), 4), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), "lol", 0, 4), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_CTX_END();
@@ -603,14 +655,43 @@ static GBL_RESULT GblStringViewTestSuite_rfind_invalid_(GblTestSuite* pSelf, Gbl
 static GBL_RESULT GblStringViewTestSuite_rfind_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV(NULL), GBL_STRV("lol"), GBL_STRING_VIEW_NPOS), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), GBL_STRV(""), GBL_STRING_VIEW_NPOS), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lolz"), GBL_STRV("lol"), GBL_STRING_VIEW_NPOS), 0);
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), GBL_STRV("lol"), 2), 0);
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("zlol lol"), GBL_STRV("lol"), 4), 1);
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), GBL_STRV("lo"), 1), 0);
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), GBL_STRV("zl"), 1), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lolol"), GBL_STRV("lol"), GBL_STRING_VIEW_NPOS), 2);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV(NULL), "lol"), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), "", 0), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lolz"), "lol"), 0);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), "lol", 0, 2), 0);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("zlol lol"), "lol", 0, 4), 1);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), "lo", 0, 1), 0);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lol"), "zl", 0, 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_rfind(GBL_STRV("lolol"), "lol"), 2);
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblStringViewTestSuite_rfindIgnoreCase_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV(NULL), "lol", 0, 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV("lol"), "loL", 0, 4), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblStringViewTestSuite_rfindIgnoreCase_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV(NULL), "lol"), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV("loL"), "", 0), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV("Lolz"), "lOl"), 0);
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV("lol"), "LOL", 0, 2), 0);
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV("zlOl lol"), "LoL", 0, 4), 1);
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV("lol"), "LO", 0, 1), 0);
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV("lol"), "zL", 0, 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_rfindIgnoreCase(GBL_STRV("loLOL"), "lol"), 2);
     GBL_CTX_END();
 }
 
@@ -618,11 +699,11 @@ static GBL_RESULT GblStringViewTestSuite_findFirstOf_invalid_(GblTestSuite* pSel
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), GBL_STRV(NULL), 5), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), NULL, 0, 5), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV(""), GBL_STRV("lolz"), 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV(""), "lolz", 0, 1), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_CTX_END();
@@ -631,12 +712,12 @@ static GBL_RESULT GblStringViewTestSuite_findFirstOf_invalid_(GblTestSuite* pSel
 static GBL_RESULT GblStringViewTestSuite_findFirstOf_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), GBL_STRV("o"), 0), 1);
-    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), GBL_STRV("abcl"), 1), 2);
-    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), GBL_STRV("zlo"), 0), 0);
-    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), GBL_STRV("a"), 0), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), GBL_STRV(NULL), 0), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV(""), GBL_STRV(NULL), 0), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), "o", 0, 0), 1);
+    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), "abcl", 0, 1), 2);
+    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), "zlo"), 0);
+    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), "a"), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV("lolz"), NULL), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findFirstOf(GBL_STRV(""), NULL), GBL_STRING_VIEW_NPOS);
     GBL_CTX_END();
 }
 
@@ -644,11 +725,11 @@ static GBL_RESULT GblStringViewTestSuite_findFirstNotOf_invalid_(GblTestSuite* p
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), GBL_STRV(NULL), 5), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), NULL, 0, 5), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV(""), GBL_STRV("lolz"), 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV(""), "lolz", 0, 1), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_CTX_END();
@@ -657,12 +738,12 @@ static GBL_RESULT GblStringViewTestSuite_findFirstNotOf_invalid_(GblTestSuite* p
 static GBL_RESULT GblStringViewTestSuite_findFirstNotOf_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), GBL_STRV("lz"), 0), 1);
-    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), GBL_STRV("abcl"), 1), 1);
-    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), GBL_STRV("alo"), 0), 3);
-    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), GBL_STRV("zol"), 0), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), GBL_STRV(NULL), 0), 0);
-    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV(""), GBL_STRV(NULL), 0), 0);
+    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), "lz"), 1);
+    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), "abcl", 0, 1), 1);
+    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), "alo", 0, 0), 3);
+    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), "zol"), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV("lolz"), NULL), 0);
+    GBL_TEST_COMPARE(GblStringView_findFirstNotOf(GBL_STRV(""), NULL), 0);
     GBL_CTX_END();
 }
 
@@ -670,11 +751,11 @@ static GBL_RESULT GblStringViewTestSuite_findLastOf_invalid_(GblTestSuite* pSelf
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), GBL_STRV(NULL), 5), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), NULL, 0, 5), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV(""), GBL_STRV("lolz"), 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV(""), "lolz", 0, 1), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_CTX_END();
@@ -683,13 +764,13 @@ static GBL_RESULT GblStringViewTestSuite_findLastOf_invalid_(GblTestSuite* pSelf
 static GBL_RESULT GblStringViewTestSuite_findLastOf_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), GBL_STRV("o"), 0), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), GBL_STRV("o"), GBL_STRING_VIEW_NPOS), 1);
-    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), GBL_STRV("abcl"), 3), 2);
-    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), GBL_STRV("zlo"), 1), 1);
-    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), GBL_STRV("a"), 0), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), GBL_STRV(NULL), 3), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV(""), GBL_STRV(NULL), 0), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), "o", 0, 0), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), "o"), 1);
+    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), "abcl", 0, 3), 2);
+    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), "zlo", 0, 1), 1);
+    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), "a", 0, 0), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV("lolz"), NULL, 0, 3), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastOf(GBL_STRV(""), NULL, 0, 0), GBL_STRING_VIEW_NPOS);
     GBL_CTX_END();
 }
 
@@ -698,11 +779,11 @@ static GBL_RESULT GblStringViewTestSuite_findLastNotOf_invalid_(GblTestSuite* pS
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
-    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), GBL_STRV(NULL), 5), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), NULL, 0, 5), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
 
-    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV(""), GBL_STRV("lolz"), 1), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV(""), "lolz", 0, 1), GBL_STRING_VIEW_NPOS);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_CTX_END();
@@ -711,13 +792,13 @@ static GBL_RESULT GblStringViewTestSuite_findLastNotOf_invalid_(GblTestSuite* pS
 static GBL_RESULT GblStringViewTestSuite_findLastNotOf_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
-    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), GBL_STRV("ozl"), 0), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), GBL_STRV("oz"), 0), 0);
-    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), GBL_STRV("abcl"), 2), 1);
-    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), GBL_STRV("alz"), GBL_STRING_VIEW_NPOS), 1);
-    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), GBL_STRV("zol"), 3), GBL_STRING_VIEW_NPOS);
-    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), GBL_STRV(NULL), 3), 3);
-    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV(""), GBL_STRV(NULL), 0), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), "ozl", 0, 0), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), "oz", 0, 0), 0);
+    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), "abcl", 0, 2), 1);
+    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), "alz"), 1);
+    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), "zol", 0, 3), GBL_STRING_VIEW_NPOS);
+    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV("lolz"), NULL, 0, 3), 3);
+    GBL_TEST_COMPARE(GblStringView_findLastNotOf(GBL_STRV(""), NULL, 0, 0), GBL_STRING_VIEW_NPOS);
     GBL_CTX_END();
 }
 
@@ -921,14 +1002,20 @@ GBL_EXPORT GblType GblStringViewTestSuite_type(void) {
         { "substrInvalid",          GblStringViewTestSuite_substr_invalid_          },
         { "substr",                 GblStringViewTestSuite_substr_                  },
         { "startsWith",             GblStringViewTestSuite_startsWith_              },
+        { "startsWithIgnoreCase",   GblStringViewTestSuite_startsWithIgnoreCase_    },
         { "endsWith",               GblStringViewTestSuite_endsWith_                },
+        { "endsWithIgnoreCase",     GblStringViewTestSuite_endsWithIgnoreCase_      },
         { "contains",               GblStringViewTestSuite_contains_                },
         { "containsIgnoreCase",     GblStringViewTestSuite_containsIgnoreCase_      },
         { "count",                  GblStringViewTestSuite_count_                   },
         { "findInvalid",            GblStringViewTestSuite_find_invalid_            },
         { "find",                   GblStringViewTestSuite_find_                    },
+        { "findIgnoreCaseInvalid",  GblStringViewTestSuite_findIgnoreCase_invalid_  },
+        { "findIgnoreCase",         GblStringViewTestSuite_findIgnoreCase_          },
         { "rfindInvalid",           GblStringViewTestSuite_rfind_invalid_           },
         { "rfind",                  GblStringViewTestSuite_rfind_                   },
+        { "rfindIgnoreCaseInvalid", GblStringViewTestSuite_rfindIgnoreCase_invalid_ },
+        { "rfindIgnoreCase",        GblStringViewTestSuite_rfindIgnoreCase_         },
         { "findFirstOfInvalid",     GblStringViewTestSuite_findFirstOf_invalid_     },
         { "findFirstOf",            GblStringViewTestSuite_findFirstOf_             },
         { "findFirstNotOfInvalid",  GblStringViewTestSuite_findFirstNotOf_invalid_  },

@@ -7,7 +7,7 @@
 //#include "../containers/gimbal_generics.hpp"
 
 
-namespace gimbal {
+namespace gbl {
 
 class SourceLocation: public GblSourceLocation {
 public:

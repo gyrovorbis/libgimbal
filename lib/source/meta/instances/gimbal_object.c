@@ -1276,18 +1276,18 @@ static GBL_RESULT GblObject_IVariant_save_(const GblVariant* pVariant, GblString
     GblBool first = GBL_TRUE;
 
     GBL_CTX_BEGIN(NULL);
-    GblStringBuffer_append(pString, GBL_STRING_VIEW("{\n"));
+    GblStringBuffer_append(pString, GBL_STRV("{\n"));
 
     for(const GblProperty* pIt = GblProperty_next(GblVariant_typeOf(pVariant), NULL, GBL_PROPERTY_FLAG_SAVE);
          pIt != NULL;
          pIt = GblProperty_next(GblVariant_typeOf(pVariant), pIt, GBL_PROPERTY_FLAG_SAVE))
     {
-        if(!first) GblStringBuffer_append(pString, GBL_STRING_VIEW(",\n"));
+        if(!first) GblStringBuffer_append(pString, GBL_STRV(",\n"));
         const char* pKey = GblProperty_nameString(pIt);
 
-        GblStringBuffer_append(pString, GBL_STRING_VIEW("\t"));
-        GblStringBuffer_append(pString, GBL_STRING_VIEW(pKey));
-        GblStringBuffer_append(pString, GBL_STRING_VIEW(" = "));
+        GblStringBuffer_append(pString, GBL_STRV("\t"));
+        GblStringBuffer_append(pString, GBL_STRV(pKey));
+        GblStringBuffer_append(pString, GBL_STRV(" = "));
         GblObject_propertyVariant(pVariant->pVoid, pKey, &variant);
 
         GblVariant_save(&variant, pString);
@@ -1295,7 +1295,7 @@ static GBL_RESULT GblObject_IVariant_save_(const GblVariant* pVariant, GblString
 
     }
 
-    GblStringBuffer_append(pString, GBL_STRING_VIEW("}\n"));
+    GblStringBuffer_append(pString, GBL_STRV("}\n"));
 
     GBL_CTX_END();
 }

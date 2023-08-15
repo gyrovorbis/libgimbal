@@ -8,7 +8,7 @@
 #include "../types/gimbal_result.hpp"
 #include "../core/gimbal_api_frame.h"
 
-namespace gimbal {
+namespace gbl {
 
 class Exception: public CallRecord {
 public:

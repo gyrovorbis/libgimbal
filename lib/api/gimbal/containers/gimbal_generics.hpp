@@ -5,7 +5,7 @@
 #include "../types/gimbal_exception.hpp"
 #include "../core/gimbal_api_generators.hpp"
 
-namespace gimbal {
+namespace gbl {
 
 template<typename CRTP, typename Key, typename Value, bool Writable>
 class ReadWriteIndexable {

@@ -131,7 +131,7 @@ static GBL_RESULT GblStringRefTestSuite_createWithContext_(GblTestSuite* pSelf, 
 static GBL_RESULT GblStringRefTestSuite_createFromViewEmpty_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
-    pSelf_->pRefs[3] = GblStringRef_createFromView(GBL_STRING_VIEW(NULL));
+    pSelf_->pRefs[3] = GblStringRef_createFromView(GBL_STRV(NULL));
     GBL_CTX_VERIFY_CALL(verifyEmpty_(pCtx, pSelf_->pRefs[3], 1, NULL));
     GBL_CTX_END();
 }
@@ -139,7 +139,7 @@ static GBL_RESULT GblStringRefTestSuite_createFromViewEmpty_(GblTestSuite* pSelf
 static GBL_RESULT GblStringRefTestSuite_createFromView_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
-    pSelf_->pRefs[4] = GblStringRef_createFromView(GBL_STRING_VIEW("viewz"));
+    pSelf_->pRefs[4] = GblStringRef_createFromView(GBL_STRV("viewz"));
     GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[4], "viewz", 1, NULL));
     GBL_CTX_END();
 }
@@ -147,7 +147,7 @@ static GBL_RESULT GblStringRefTestSuite_createFromView_(GblTestSuite* pSelf, Gbl
 static GBL_RESULT GblStringRefTestSuite_createFromViewWithContext_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
-    pSelf_->pRefs[5] = GblStringRef_createFromViewWithContext(GBL_STRING_VIEW("contextual_viewz"), pCtx);
+    pSelf_->pRefs[5] = GblStringRef_createFromViewWithContext(GBL_STRV("contextual_viewz"), pCtx);
     GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[5], "contextual_viewz", 1, pCtx));
     GBL_CTX_END();
 }

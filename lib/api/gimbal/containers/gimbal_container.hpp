@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <compare>
 
-namespace gimbal {
+namespace gbl {
 
 class Context;
 

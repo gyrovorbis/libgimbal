@@ -49,6 +49,18 @@ GBL_TEST_CASE(customLiteral)
     static_assert("lolzer"_strv[2] == 'l', "lolwtf");
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(stdString)
+    auto strv = gbl::StringView { "lolzercopter" };
+    auto str = strv.toStdString();
+    auto strv2 = gbl::StringView { "lulz" };
+
+    GBL_TEST_VERIFY(strv == str);
+
+    std::swap(strv, strv2);
+    GBL_TEST_VERIFY(strv == "lulz");
+    GBL_TEST_VERIFY(strv2 == std::string("lolzercopter"));
+GBL_TEST_CASE_END
+
 struct DummyType {
     int val = 0;
 };
@@ -86,4 +98,5 @@ GBL_TEST_REGISTER(constructDefault,
                   constructCString,
                   constructGblStringView,
                   customLiteral,
+                  stdString,
                   conversions);

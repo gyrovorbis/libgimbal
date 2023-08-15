@@ -123,11 +123,13 @@ GBL_EXPORT float gblRandStudent     (int n)            GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
+//! \cond
 #define gblRandString(...) \
     gblRandStringDefault_(__VA_ARGS__)
 #define gblRandStringDefault_(...) \
     gblRandStringDefault__(__VA_ARGS__, GBL_NULL)
 #define gblRandStringDefault__(buffer, min, max, chars, ...) \
     (gblRandString)(buffer, min, max, chars)
+//! \endcond
 
 #endif // GIMBAL_RANDOM_H

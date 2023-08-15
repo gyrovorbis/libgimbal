@@ -259,7 +259,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_construct_2(GblStringBuffer* pSelf,
 }
 GBL_EXPORT GBL_RESULT GblStringBuffer_construct_1(GblStringBuffer* pSelf)
 {
-    return GblStringBuffer_construct_2(pSelf, GBL_STRING_VIEW(GBL_NULL));
+    return GblStringBuffer_construct_2(pSelf, GBL_STRV(GBL_NULL));
 }
 
 GBL_EXPORT GblStringBuffer* GblStringBuffer_createInPlace_4 (GblStringBuffer* pSelf,
@@ -385,7 +385,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendPrintf(GblStringBuffer* pSelf, const
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_appendNil(GblStringBuffer* pSelf) {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GBL_CTX_CALL(GblStringBuffer_append(pSelf, GBL_STRING_VIEW("nil")));
+    GBL_CTX_CALL(GblStringBuffer_append(pSelf, GBL_STRV("nil")));
     GBL_CTX_END();
 }
 
@@ -393,7 +393,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendBool(GblStringBuffer* pSelf, GblBool
     const char* pStr = NULL;
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     pStr = value ? "true" : "false";
-    GBL_CTX_CALL(GblStringBuffer_append(pSelf, GBL_STRING_VIEW(pStr)));
+    GBL_CTX_CALL(GblStringBuffer_append(pSelf, GBL_STRV(pStr)));
     GBL_CTX_END();
 }
 

@@ -3,7 +3,7 @@
 
 #include "gimbal_hash_set.hpp"
 
-namespace gimbal {
+namespace gbl {
 
 
 namespace impl {

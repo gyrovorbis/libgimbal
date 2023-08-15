@@ -11,7 +11,7 @@
 #include <string>
 
 
-namespace gimbal {
+namespace gbl {
 
     namespace tags { };
 

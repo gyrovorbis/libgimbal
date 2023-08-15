@@ -16,7 +16,7 @@ GBL_EXPORT GblStringRef* GblStringRef_create(const char* pString) GBL_NOEXCEPT {
 }
 
 GBL_EXPORT GblStringRef* GblStringRef_createWithContext(const char* pString, GblContext* pCtx) GBL_NOEXCEPT {
-    return GblStringRef_createFromViewWithContext(GBL_STRING_VIEW(pString), pCtx);
+    return GblStringRef_createFromViewWithContext(GBL_STRV(pString), pCtx);
 }
 
 GBL_EXPORT GblStringRef* GblStringRef_createFromView(GblStringView view) GBL_NOEXCEPT {
@@ -59,7 +59,7 @@ GBL_EXPORT GblBool GblStringRef_valid(const GblStringRef* pSelf) GBL_NOEXCEPT {
 }
 
 GBL_EXPORT GblStringView GblStringRef_view(const GblStringRef* pSelf) GBL_NOEXCEPT {
-    GblStringView view = GBL_STRING_VIEW(pSelf, GblStringRef_length(pSelf));
+    GblStringView view = GBL_STRV(pSelf, GblStringRef_length(pSelf));
     view.nullTerminated = 1;
     return view;
 }

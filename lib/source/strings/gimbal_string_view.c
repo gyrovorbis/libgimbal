@@ -157,7 +157,9 @@ GBL_EXPORT char* GblStringView_toCString(GblStringView self, char* pDst, size_t 
     return pDst;
 }
 
-GBL_EXPORT size_t  GblStringView_findLastNotOf(GblStringView self, GblStringView chars, size_t  end) {
+GBL_EXPORT size_t (GblStringView_findLastNotOf)(GblStringView self, const char* pChars, size_t len, size_t end) {
+    GblStringView chars = GblStringView_fromString(pChars, len);
+
     size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(GBL_NULL);
     if(!self.length && (!end || end == GBL_STRING_VIEW_NPOS)) {
@@ -223,7 +225,9 @@ GBL_EXPORT int (GblStringView_compareIgnoreCase)(GblStringView self, const char*
         }
 }
 
-GBL_EXPORT size_t GblStringView_findFirstNotOf(GblStringView self, GblStringView chars, size_t  offset) {
+GBL_EXPORT size_t (GblStringView_findFirstNotOf)(GblStringView self, const char* pChars, size_t len, size_t offset) {
+    GblStringView chars = GblStringView_fromString(pChars, len);
+
     size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(GBL_NULL);
     GBL_CTX_VERIFY(offset < self.length || (!self.length && !offset),
@@ -355,7 +359,7 @@ GBL_EXPORT size_t (GblStringView_count)(GblStringView self, const char* pStr, si
     GblStringView substr = GblStringView_fromString(pStr, len);
     size_t  count = 0;
     size_t  offset = 0;
-    while((offset = GblStringView_find(self, substr, offset)) != GBL_STRING_VIEW_NPOS) {
+    while((offset = GblStringView_find(self, substr.pData, substr.length, offset)) != GBL_STRING_VIEW_NPOS) {
         ++count;
         offset += substr.length;
         if(offset >= self.length) break;
@@ -377,7 +381,9 @@ GBL_EXPORT size_t (GblStringView_countIgnoreCase)(GblStringView self, const char
 }
 #endif
 
-GBL_EXPORT size_t  GblStringView_find(GblStringView self, GblStringView substr, size_t  offset) {
+GBL_EXPORT size_t (GblStringView_find)(GblStringView self, const char* pStr, size_t len, size_t offset) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
+
     size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(NULL);
     if(!self.length && !offset) GBL_CTX_DONE();
@@ -386,7 +392,7 @@ GBL_EXPORT size_t  GblStringView_find(GblStringView self, GblStringView substr, 
     if(self.length && substr.length) {
         const char* pCStr1  = GBL_STRING_VIEW_CSTR(self);
         const char* pCStr2  = GBL_STRING_VIEW_CSTR(substr);
-        const char* pSubstr = strstr(pCStr1+offset, pCStr2);
+        const char* pSubstr = strstr(pCStr1 + offset, pCStr2);
         if(pSubstr) {
             pos = (size_t )(pSubstr - pCStr1);
         }
@@ -395,7 +401,29 @@ GBL_EXPORT size_t  GblStringView_find(GblStringView self, GblStringView substr, 
     return pos;
 }
 
-GBL_EXPORT size_t  GblStringView_rfind(GblStringView self, GblStringView substr, size_t  end) {
+GBL_EXPORT size_t (GblStringView_findIgnoreCase)(GblStringView self, const char* pStr, size_t len, size_t offset) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
+
+    size_t  pos = GBL_STRING_VIEW_NPOS;
+    GBL_CTX_BEGIN(NULL);
+    if(!self.length && !offset) GBL_CTX_DONE();
+    GBL_CTX_VERIFY(offset < self.length,
+                   GBL_RESULT_ERROR_OUT_OF_RANGE);
+    if(self.length && substr.length) {
+        const char* pCStr1  = GBL_STRING_VIEW_CSTR(self);
+        const char* pCStr2  = GBL_STRING_VIEW_CSTR(substr);
+        const char* pSubstr = gblStrCaseStr(pCStr1 + offset, pCStr2);
+        if(pSubstr) {
+            pos = (size_t )(pSubstr - pCStr1);
+        }
+    }
+    GBL_CTX_END_BLOCK();
+    return pos;
+}
+
+GBL_EXPORT size_t GblStringView_rfind_(GblStringView self, const char* pStr, size_t len, size_t end, GblBool caseSensitive) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
+
     size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(NULL);
     if(!self.length && end == GBL_STRING_VIEW_NPOS)
@@ -417,13 +445,22 @@ GBL_EXPORT size_t  GblStringView_rfind(GblStringView self, GblStringView substr,
         }
         pCStr2[substr.length] = '\0';
 
-        const char* pSubstr = strstr(pCStr1, pCStr2);
+        const char* pSubstr = caseSensitive? strstr(pCStr1, pCStr2):
+                                             gblStrCaseStr(pCStr1, pCStr2);
         if(pSubstr) {
             pos = end-(size_t )(pSubstr - pCStr1)-(substr.length-1);
         }
     }
     GBL_CTX_END_BLOCK();
     return pos;
+}
+
+GBL_EXPORT size_t (GblStringView_rfind)(GblStringView self, const char* pStr, size_t len, size_t end) {
+    return GblStringView_rfind_(self, pStr, len, end, GBL_TRUE);
+}
+
+GBL_EXPORT size_t (GblStringView_rfindIgnoreCase)(GblStringView self, const char* pStr, size_t len, size_t end) {
+    return GblStringView_rfind_(self, pStr, len, end, GBL_FALSE);
 }
 
 GBL_EXPORT GblBool (GblStringView_startsWith)(GblStringView self, const char* pStr, size_t len) {
@@ -438,19 +475,46 @@ GBL_EXPORT GblBool (GblStringView_startsWith)(GblStringView self, const char* pS
     return GBL_TRUE;
 }
 
+GBL_EXPORT GblBool (GblStringView_startsWithIgnoreCase)(GblStringView self, const char* pStr, size_t len) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
+
+    if(substr.length > self.length)
+        return GBL_FALSE;
+    for(size_t  i = 0; i < substr.length; ++i) {
+        if((int)tolower((int)self.pData[i]) != (int)tolower((int)substr.pData[i]))
+            return GBL_FALSE;
+    }
+    return GBL_TRUE;
+}
+
 GBL_EXPORT GblBool (GblStringView_endsWith)(GblStringView self, const char* pStr, size_t len) {
     GblStringView substr = GblStringView_fromString(pStr, len);
 
     if(substr.length > self.length)
         return GBL_FALSE;
     for(size_t  i = 0; i < substr.length; ++i) {
-        if(self.pData[self.length-substr.length+i] != substr.pData[i])
+        if(self.pData[self.length-substr.length + i] != substr.pData[i])
             return GBL_FALSE;
     }
     return GBL_TRUE;
 }
 
-GBL_EXPORT size_t GblStringView_findFirstOf(GblStringView self, GblStringView chars, size_t offset) {
+GBL_EXPORT GblBool (GblStringView_endsWithIgnoreCase)(GblStringView self, const char* pStr, size_t len) {
+    GblStringView substr = GblStringView_fromString(pStr, len);
+
+    if(substr.length > self.length)
+        return GBL_FALSE;
+    for(size_t  i = 0; i < substr.length; ++i) {
+        if((int)tolower((int)self.pData[self.length - substr.length + i]) !=
+           (int)tolower((int)substr.pData[i]))
+            return GBL_FALSE;
+    }
+    return GBL_TRUE;
+}
+
+GBL_EXPORT size_t (GblStringView_findFirstOf)(GblStringView self, const char* pChars, size_t len, size_t offset) {
+    GblStringView chars = GblStringView_fromString(pChars, len);
+
     size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(GBL_NULL);
     GBL_CTX_VERIFY(offset < self.length || (!self.length && !offset),
@@ -467,7 +531,9 @@ GBL_EXPORT size_t GblStringView_findFirstOf(GblStringView self, GblStringView ch
     return pos;
 }
 
-GBL_EXPORT size_t GblStringView_findLastOf(GblStringView self, GblStringView chars, size_t end) {
+GBL_EXPORT size_t (GblStringView_findLastOf)(GblStringView self, const char* pChars, size_t len, size_t end) {
+    GblStringView chars = GblStringView_fromString(pChars, len);
+
     size_t  pos = GBL_STRING_VIEW_NPOS;
     GBL_CTX_BEGIN(GBL_NULL);
     if(!self.length && (!end || end == GBL_STRING_VIEW_NPOS)) {
@@ -554,7 +620,7 @@ GBL_EXPORT GblBool GblStringView_empty(GblStringView self) {
 
 GBL_EXPORT GblBool GblStringView_blank(GblStringView self) {
     if(GblStringView_empty(self)) return GBL_TRUE;
-    else return GblStringView_findFirstNotOf(self, GBL_STRING_VIEW(" \t\n\r"), 0) == GBL_STRING_VIEW_NPOS;
+    else return GblStringView_findFirstNotOf(self, " \t\n\r") == GBL_STRING_VIEW_NPOS;
 }
 
 GBL_EXPORT GblQuark GblStringView_quark(GblStringView self) {

@@ -5,7 +5,7 @@
 #include "gimbal_hash_set.h"
 #include "../objects/gimbal_context.hpp"
 
-namespace gimbal {
+namespace gbl {
 
 namespace tags {
     struct HashSet {};

@@ -211,9 +211,7 @@ GBL_EXPORT GblStringRef* GblUri_path(const GblUri* pSelf) {
 
 GBL_EXPORT GblStringView GblUri_directory(const GblUri* pSelf) {
     const size_t startPos =
-        GblStringView_findLastOf(GBL_STRV(pSelf->pPath),
-                                 GBL_STRV("/"),
-                                 GBL_STRING_VIEW_NPOS);
+        GblStringView_findLastOf(GBL_STRV(pSelf->pPath), "/");
 
     if(startPos == GBL_STRING_VIEW_NPOS)
         return GblStringView_fromEmpty();
@@ -225,9 +223,7 @@ GBL_EXPORT GblStringView GblUri_directory(const GblUri* pSelf) {
 
 GBL_EXPORT GblStringView GblUri_fileName(const GblUri* pSelf) {
     const size_t startPos =
-        GblStringView_findLastOf(GBL_STRV(pSelf->pPath),
-                                 GBL_STRV("/"),
-                                 GBL_STRING_VIEW_NPOS);
+        GblStringView_findLastOf(GBL_STRV(pSelf->pPath), "/");
 
     if(startPos == GBL_STRING_VIEW_NPOS)
         return GblStringRef_view(pSelf->pPath);
@@ -241,9 +237,7 @@ GBL_EXPORT GblStringView GblUri_extension(const GblUri* pSelf) {
     const GblStringView fileName = GblUri_fileName(pSelf);
 
     const size_t startPos =
-        GblStringView_findLastOf(fileName,
-                                 GBL_STRV("."),
-                                 GBL_STRING_VIEW_NPOS);
+        GblStringView_findLastOf(fileName, ".");
 
     if(startPos == GBL_STRING_VIEW_NPOS)
         return GblStringView_fromEmpty();

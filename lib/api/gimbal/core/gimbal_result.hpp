@@ -4,7 +4,7 @@
 #include "gimbal_result.h"
 #include "../core/gimbal_api_generators.hpp"
 
-namespace gimbal {
+namespace gbl {
 
 GBL_ENUM_TABLE_DECLARE_CPP_BEGIN(GBL_META_RESULT_TABLE)
 public:

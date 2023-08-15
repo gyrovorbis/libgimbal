@@ -3,6 +3,7 @@
 
 #include "gimbal_string_view.h"
 #include "gimbal_quark.hpp"
+#include <string>
 #include <string_view>
 #include <functional>
 #include <compare>
@@ -19,6 +20,8 @@ std::optional<T> string_view_to_value(const StringView& view) {
 }
 
 struct StringView: public GblStringView {
+
+    static constinit const std::size_t npos = GBL_STRING_VIEW_NPOS;
 
     constexpr StringView() noexcept:
         GblStringView({0}) {}
@@ -131,6 +134,61 @@ struct StringView: public GblStringView {
         return GblStringView_countIgnoreCase(*this, pStr, len);
     }
 
+    std::size_t find(const char* pStr, std::size_t len=0) const noexcept {
+        return GblStringView_find(*this, pStr, len);
+    }
+
+    std::size_t findIgnoreCase(const char* pStr, std::size_t len=0) const noexcept {
+        return GblStringView_findIgnoreCase(*this, pStr, len);
+    }
+
+    std::size_t rfind(const char* pStr, std::size_t len=0) const noexcept {
+        return GblStringView_rfind(*this, pStr, len);
+    }
+
+    std::size_t rfindIgnoreCase(const char* pStr, std::size_t len=0) const noexcept {
+        return GblStringView_rfindIgnoreCase(*this, pStr, len);
+    }
+
+    bool startsWith(const char* pStr, std::size_t len=0) const noexcept {
+        return GblStringView_startsWith(*this, pStr, len);
+    }
+
+    bool startsWithIgnoreCase(const char* pStr, std::size_t len=0) const noexcept {
+        return GblStringView_startsWithIgnoreCase(*this, pStr, len);
+    }
+
+    bool endsWith(const char* pStr, std::size_t len=0) const noexcept {
+        return GblStringView_endsWith(*this, pStr, len);
+    }
+
+    bool endsWithIgnoreCase(const char* pStr, std::size_t len=0) const noexcept {
+        return GblStringView_endsWithIgnoreCase(*this, pStr, len);
+    }
+
+    std::size_t findFirstOf(const char* pChars, std::size_t len=0, std::size_t offset=0) const noexcept {
+        return GblStringView_findFirstOf(*this, pChars, len, offset);
+    }
+
+    std::size_t findLastOf(const char* pChars, std::size_t len=0, std::size_t offset=npos) const noexcept {
+        return GblStringView_findLastOf(*this, pChars, len, offset);
+    }
+
+    std::size_t findFirstNotOf(const char* pChars, std::size_t len=0, std::size_t offset=0) const noexcept {
+        return GblStringView_findFirstNotOf(*this, pChars, len, offset);
+    }
+
+    std::size_t findLastNotOf(const char* pChars, std::size_t len=0, std::size_t offset=npos) const noexcept {
+        return GblStringView_findLastNotOf(*this, pChars, len, offset);
+    }
+
+    std::string toStdString() const {
+        std::string str;
+        str.resize(length());
+        GblStringView_toCString(*this, str.data(), str.capacity());
+        return str;
+    }
+
     Quark quark() const noexcept {
         return GblStringView_quark(*this);
     }
@@ -143,6 +201,8 @@ struct StringView: public GblStringView {
         return GblStringView_intern(*this);
     }
 
+    bool toNil() const noexcept { return GblStringView_toNil(*this); }
+
     template<typename T>
     auto toValue() const noexcept{ return string_view_to_value<T>(*this); }
 
@@ -151,12 +211,10 @@ struct StringView: public GblStringView {
         return os;
     }
 
-    bool operator==(StringView rhs) const noexcept {
-        return GblStringView_equals(*this, rhs.data(), rhs.length());
-    }
-
-    auto operator<=>(StringView rhs) const noexcept {
-        const auto result = GblStringView_compare(*this, rhs.data(), rhs.length());
+private:
+    template<typename... Args>
+    auto compare_(Args&&... args) const noexcept {
+        const auto result = GblStringView_compare(*this, (... + std::forward<Args>(args)));
 
         if(result < 0)
             return std::strong_ordering::less;
@@ -165,7 +223,36 @@ struct StringView: public GblStringView {
         else
             return std::strong_ordering::equal;
     }
+public:
 
+    bool operator==(const char* pStr) const noexcept {
+        return GblStringView_equals(*this, pStr);
+    }
+
+    auto operator<=>(const char* pStr) const noexcept {
+        return compare_(pStr);
+    }
+
+    bool operator==(StringView rhs) const noexcept {
+        return GblStringView_equals(*this, rhs.data(), rhs.length());
+    }
+
+    auto operator<=>(StringView rhs) const noexcept {
+        return compare_(rhs.data(), rhs.length());
+    }
+
+    bool operator==(const std::string& rhs) const noexcept {
+        return GblStringView_equals(*this, rhs.data(), rhs.length());
+    }
+
+    auto operator<=>(const std::string& rhs) const noexcept {
+        return compare_(rhs.data(), rhs.length());
+    }
+
+    friend void swap(StringView& lhs, StringView& rhs) noexcept {
+        std::swap(static_cast<GblStringView&>(lhs),
+                  static_cast<GblStringView&>(rhs));
+    }
 };
 
 #define GBL_STRING_VIEW_TO_VALUE_(type, postfix) \

@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <functional>
 
-namespace gimbal {
+namespace gbl {
 
 #define GBL_CHECK_C_CPP_TYPE_COMPAT(CppType, CType) \
     GBL_STATIC_ASSERT_MSG(sizeof(CppType) == sizeof(CType), "sizeof(" #CppType ") != sizeof(" #CType")")

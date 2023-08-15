@@ -111,7 +111,7 @@ GBL_EXPORT GblStringList* GblStringList_createSplit(const char* pStr, const char
     size_t  start = 0;
 
     while(start < srcView.length) {
-        stop = GblStringView_findFirstOf(srcView, delimView, start);
+        stop = GblStringView_findFirstOf(srcView, delimView.pData, delimView.length, start);
         if(stop == GBL_STRING_LIST_NPOS) {
             stop = srcView.length;
         }

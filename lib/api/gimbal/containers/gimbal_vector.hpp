@@ -7,7 +7,7 @@
 #include <algorithm>
 
 
-namespace gimbal {
+namespace gbl {
 
 class Context;
 

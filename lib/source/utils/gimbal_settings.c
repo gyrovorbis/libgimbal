@@ -71,7 +71,7 @@ GBL_EXPORT const char* GblSettings_pop(GblSettings* pSelf) {
                    GBL_RESULT_ERROR_OUT_OF_RANGE,
                    "Cannot pop from empty scope!");
 
-    const size_t cutOff = GblStringView_findLastOf(view, GBL_STRV("/"), GBL_STRING_VIEW_NPOS);
+    const size_t cutOff = GblStringView_findLastOf(view, "/");
 
     if(cutOff != GBL_STRING_VIEW_NPOS)
         GblStringBuffer_shrink(&pSelf_->scope, view.length - cutOff);
