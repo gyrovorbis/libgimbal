@@ -54,6 +54,8 @@ extern "C" {
 #define GBL_ASSERT(...)  \
     GBL_VA_OVERLOAD_SELECT(GBL_ASSERT, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 
+
+
 #ifndef __cplusplus
 #   define GBL_META_GENERIC_MACRO_GENERATE(traits, X)                                                       \
     _Generic((X),                                                                                           \

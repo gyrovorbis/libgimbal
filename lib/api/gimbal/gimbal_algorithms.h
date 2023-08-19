@@ -14,6 +14,7 @@
 #include "algorithms/gimbal_sha1.h"
 #include "algorithms/gimbal_md5.h"
 #include "algorithms/gimbal_random.h"
+#include "algorithms/gimbal_compression.h"
 
 /*! \defgroup algorithms Algorithms
 * 	\brief Collection of common algorithms

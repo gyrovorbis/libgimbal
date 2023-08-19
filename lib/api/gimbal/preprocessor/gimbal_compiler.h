@@ -116,7 +116,7 @@
 #   define GBL_MINGW32  1
 #elif defined(__MINGW64__)
 #   define GBL_MINGW64  1
-#elif defined(__EMSCRIPTEN_)
+#elif defined(__EMSCRIPTEN__)
 #   define GBL_EMSCRIPTEN 1
 #elif defined(__GNUC__)
 #   define GBL_GCC  1
@@ -226,7 +226,7 @@
 #   define GBL_THREAD_LOCAL __declspec(thread)
 #else
 #   if defined(__DREAMCAST__)
-#       define GBL_THREAD_LOCAL _Thread_local
+#       define GBL_THREAD_LOCAL
 #   else
 #       define GBL_THREAD_LOCAL __thread
 #   endif
