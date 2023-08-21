@@ -119,7 +119,6 @@ static GBL_RESULT GblTestThread_tlsReadWriteCheck_(GblTestThread* pSelf) {
     tlsInt32_  = pSelf->threadId;
     tlsDouble_ = pSelf->threadId;
 
-
     for(unsigned b = 0; b < 3; ++b)
         tlsBuff4_.inner[b] = pSelf->threadId;
 

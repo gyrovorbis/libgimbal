@@ -1,8 +1,15 @@
 /*! \file
- *  \brief GblStringBuffer structure and related functions
+ *  \brief   GblStringBuffer mutable string builder API
  *  \ingroup strings
  *
- *  \author Falco Girgis
+ *  This file contains the structure and C API around the
+ *  GblStringBuffer data type, a mutable container that
+ *  specializes in building and constructing strings,
+ *  equivalent to a C++/Rust string or a C#/Java string
+ *  builder.
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
  */
 
 #ifndef GIMBAL_STRING_BUFFER_H
@@ -22,7 +29,7 @@ GBL_DECLS_BEGIN
  *
  *  GblStringBuffer is a type of string which is optimized for efficient
  *  piece-wise construction, appending, and writing. It's equivalent to
- *  a "String Builder" type in other languages, such as Java.
+ *  a "String Builder" type in other languages, such as C# and  Java.
  *
  *  It is typically used temporarily to construct a string, afterwards
  *  it is usually converted to another type for storage, such as a
@@ -32,21 +39,26 @@ GBL_DECLS_BEGIN
  *  Internally it is implemented similarly to a C++-vector, with both a
  *  size and a capacity, growing when needed, but not immediatley shrinking.
  *
- *  \note GblStringBuffer supports being created with additional trailing storage,
+ *  \note
+ *  The API around GblStringBuffer is based around modifying strings. For
+ *  read-only operations on them, such as searching or match counting, use
+ *  GblStringBuffer_view() and the GblStringView API.
+ *
+ *  \note
+ *  GblStringBuffer supports being created with additional trailing storage,
  *  allowing it to be over-allocated with malloc() or GBL_ALLOCA(). This means
  *  it will not create a separate heap allocation until necessary, and will
  *  instead useits trailing allocation region as its internal buffer. This can
  *  be very efficient when building temporary strings.
  *
  *  \ingroup strings
- *  \sa GblStringRef, GblStringView, GblQuark
+ *  \sa      GblStringRef, GblStringView, GblQuark
  */
 typedef struct GblStringBuffer {
-    //GBL_PRIVATE(GblStringBuffer)
-        GblArrayList data;
-    //GBL_PRIVATE_END
+    GblArrayList data;
 } GblStringBuffer;
 
+// no strv, total size first arg
 GBL_EXPORT GBL_RESULT       GblStringBuffer_construct_4     (GBL_SELF,
                                                              GblStringView  view,
                                                              size_t         extraStackSize,
@@ -74,34 +86,42 @@ GBL_EXPORT GBL_RESULT       GblStringBuffer_destruct        (GBL_SELF)          
 GBL_EXPORT GBL_RESULT       GblStringBuffer_acquire         (GBL_SELF, char* pData, size_t  capacity)       GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_release         (GBL_SELF, char** ppStrPtr, size_t * pCapacity) GBL_NOEXCEPT;
 
+// swap?
+
 GBL_EXPORT char*            GblStringBuffer_stackBuffer     (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_EXPORT GblBool          GblStringBuffer_empty           (GBL_CSELF)                                     GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblStringBuffer_valid           (GBL_CSELF)                                     GBL_NOEXCEPT;
+// valid
+// blank
 GBL_EXPORT GblBool          GblStringBuffer_stack           (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_EXPORT char*            GblStringBuffer_data            (GBL_SELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT const char*      GblStringBuffer_cString         (GBL_CSELF)                                     GBL_NOEXCEPT;
-GBL_EXPORT GblStringView    GblStringBuffer_view            (GBL_CSELF)                                     GBL_NOEXCEPT;
+GBL_EXPORT GblStringView    GblStringBuffer_view            (GBL_CSELF)                                     GBL_NOEXCEPT; // optional range
 GBL_EXPORT GblQuark         GblStringBuffer_quark           (GBL_CSELF)                                     GBL_NOEXCEPT;
+//try quark
+//ref
 GBL_EXPORT GblContext*      GblStringBuffer_context         (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_EXPORT size_t           GblStringBuffer_stackBytes      (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_EXPORT size_t           GblStringBuffer_length          (GBL_CSELF)                                     GBL_NOEXCEPT;
 GBL_EXPORT size_t           GblStringBuffer_capacity        (GBL_CSELF)                                     GBL_NOEXCEPT;
 
-GBL_EXPORT const char*      GblStringBuffer_set             (GBL_SELF, GblStringView view)                  GBL_NOEXCEPT;
-GBL_EXPORT char             GblStringBuffer_char            (GBL_CSELF, size_t index)                       GBL_NOEXCEPT;
+GBL_EXPORT const char*      GblStringBuffer_set             (GBL_SELF, GblStringView view)                  GBL_NOEXCEPT; // no strv
+GBL_EXPORT char             GblStringBuffer_char            (GBL_CSELF, size_t index)                       GBL_NOEXCEPT; // at
 GBL_EXPORT GBL_RESULT       GblStringBuffer_setChar         (GBL_CSELF, size_t index, char value)           GBL_NOEXCEPT;
 GBL_EXPORT const char*      GblStringBuffer_printf          (GBL_SELF, const char* pFmt, ...)               GBL_NOEXCEPT;
 GBL_EXPORT const char*      GblStringBuffer_vPrintf         (GBL_SELF, const char* pFmt, va_list varArgs)   GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT       GblStringBuffer_insert          (GBL_SELF,
                                                              size_t         index,
-                                                             GblStringView  view)                           GBL_NOEXCEPT;
+                                                             GblStringView  view)                           GBL_NOEXCEPT; //no strv
 
-GBL_EXPORT GBL_RESULT       GblStringBuffer_append          (GBL_SELF, GblStringView other)                 GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblStringBuffer_prepend         (GBL_SELF, GblStringView other)                 GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblStringBuffer_append          (GBL_SELF, GblStringView other)                 GBL_NOEXCEPT; //no strv
+GBL_EXPORT GBL_RESULT       GblStringBuffer_prepend         (GBL_SELF, GblStringView other)                 GBL_NOEXCEPT; //no strv
 
 GBL_EXPORT GBL_RESULT       GblStringBuffer_appendVPrintf   (GBL_SELF, const char* pFmt, va_list varArgs)   GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_appendPrintf    (GBL_SELF, const char* pFmt, ...)               GBL_NOEXCEPT;
 
+//insert/prepend variations
 GBL_EXPORT GBL_RESULT       GblStringBuffer_appendNil       (GBL_SELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_appendBool      (GBL_SELF, GblBool value)                       GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_appendInt       (GBL_SELF, int value)                           GBL_NOEXCEPT;
@@ -115,19 +135,19 @@ GBL_EXPORT GBL_RESULT       GblStringBuffer_clear           (GBL_SELF)          
 
 GBL_EXPORT GBL_RESULT       GblStringBuffer_overwrite       (GBL_SELF,
                                                              size_t         index,
-                                                             GblStringView  other)                          GBL_NOEXCEPT;
+                                                             GblStringView  other)                          GBL_NOEXCEPT; // no strv
 
 GBL_EXPORT size_t           GblStringBuffer_replace         (GBL_SELF,
                                                              GblStringView substr,
                                                              GblStringView replacement,
-                                                             size_t        limit)                           GBL_NOEXCEPT;
+                                                             size_t        limit)                           GBL_NOEXCEPT; // no strv?
 
-GBL_EXPORT GBL_RESULT       GblStringBuffer_remove          (GBL_SELF, GblStringView substr)                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblStringBuffer_remove          (GBL_SELF, GblStringView substr)                GBL_NOEXCEPT; // no strv
 GBL_EXPORT GBL_RESULT       GblStringBuffer_chop            (GBL_SELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_chomp           (GBL_SELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_lower           (GBL_SELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_upper           (GBL_SELF)                                      GBL_NOEXCEPT;
-
+//reverse
 GBL_EXPORT GBL_RESULT       GblStringBuffer_padLeft         (GBL_SELF, char value, size_t count)            GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_padRight        (GBL_SELF, char value, size_t count)            GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblStringBuffer_trimStart       (GBL_SELF, char value)                          GBL_NOEXCEPT;

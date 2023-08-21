@@ -72,13 +72,13 @@ GBL_EXPORT GblRefCount       GblPattern_totalCount (void)                GBL_NOE
  *  @{
  */
 //! Compares two different compiled patterns to see if they are equivalent regexes
-GBL_EXPORT int         GblPattern_compare  (GBL_CSELF, const GblPattern* pRhs) GBL_NOEXCEPT;
+GBL_EXPORT int         GblPattern_compare (GBL_CSELF, const GblPattern* pRhs) GBL_NOEXCEPT;
 //! Compares two different compiled patterns for exact value equality of their regexes
-GBL_EXPORT GblBool     GblPattern_equals   (GBL_CSELF, const GblPattern* pRhs) GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblPattern_equals  (GBL_CSELF, const GblPattern* pRhs) GBL_NOEXCEPT;
 //! Counts the total size of a compiled pattern and returns it in bytes
-GBL_EXPORT size_t      GblPattern_bytes    (GBL_CSELF)                         GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblPattern_bytes   (GBL_CSELF)                         GBL_NOEXCEPT;
 //! Reconstructs an approximate string representation of the compiled pattern
-GBL_EXPORT const char* GblPattern_string   (GBL_CSELF, GblStringBuffer* pBuff) GBL_NOEXCEPT;
+GBL_EXPORT const char* GblPattern_string  (GBL_CSELF, GblStringBuffer* pBuff) GBL_NOEXCEPT;
 //! @}
 
 /*! \name Matching

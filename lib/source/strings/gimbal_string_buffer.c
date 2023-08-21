@@ -175,8 +175,19 @@ GBL_EXPORT char* GblStringBuffer_stackBuffer(const GblStringBuffer* pSelf) {
 }
 
 GBL_EXPORT GblBool GblStringBuffer_empty(const GblStringBuffer* pSelf) {
-    return pSelf? GblArrayList_empty(&pSelf->data) : GBL_TRUE;
+    GblBool empty = GBL_FALSE;
+
+    if(!pSelf)
+        empty = GBL_TRUE;
+    else if(GblArrayList_size(&pSelf->data) == 0)
+        empty = GBL_TRUE;
+    else if(GblStringView_equals(GblStringBuffer_view(pSelf), ""))
+        empty = GBL_TRUE;
+
+    return empty;
 }
+
+
 
 GBL_EXPORT GblBool GblStringBuffer_stack(const GblStringBuffer* pSelf) {
     return pSelf? GblArrayList_stack(&pSelf->data) : GBL_FALSE;
