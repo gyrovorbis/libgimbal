@@ -1,6 +1,7 @@
 #include "utils/gimbal_cmd_parser_test_suite.h"
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_cmd_parser.h>
+#include <gimbal/utils/gimbal_ref.h>
 
 #define GBL_SELF_TYPE GblCmdParserTestSuite
 

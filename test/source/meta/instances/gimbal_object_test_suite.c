@@ -3,6 +3,7 @@
 #include <gimbal/meta/instances/gimbal_event.h>
 #include <gimbal/meta/types/gimbal_variant.h>
 #include <gimbal/test/gimbal_test_macros.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include <math.h>
 
 #define GBL_SELF_TYPE GblObjectTestSuite

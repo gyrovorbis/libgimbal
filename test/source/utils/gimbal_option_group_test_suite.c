@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_option_group.h>
 #include <gimbal/meta/signals/gimbal_c_closure.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include <math.h>
 
 #define GBL_SELF_TYPE GblOptionGroupTestSuite

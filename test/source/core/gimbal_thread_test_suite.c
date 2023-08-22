@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_thread.h>
 #include <gimbal/core/gimbal_atomics.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include <tinycthread.h>
 
 #define GBL_SELF_TYPE GblThreadTestSuite

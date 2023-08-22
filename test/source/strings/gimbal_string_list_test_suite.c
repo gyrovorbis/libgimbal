@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/strings/gimbal_string_list.h>
+#include <gimbal/utils/gimbal_ref.h>
 
 #define GBL_STRING_LIST_TEST_SUITE_(inst)    (GBL_PRIVATE(GblStringListTestSuite, inst))
 

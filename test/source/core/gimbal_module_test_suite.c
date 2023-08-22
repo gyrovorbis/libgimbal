@@ -1,6 +1,7 @@
 #include "core/gimbal_module_test_suite.h"
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_module.h>
+#include <gimbal/utils/gimbal_ref.h>
 
 #define TEST_MODULE1_TYPE_            (GBL_TYPEID(TestModule1))
 #define TEST_MODULE1_(self)           (GBL_CAST(self, TestModule1))
