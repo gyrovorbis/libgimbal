@@ -283,9 +283,9 @@ GBL_EXPORT const char* GblStringBuffer_intern(const GblStringBuffer* pSelf) {
 }
 
 GBL_EXPORT const GblStringRef* GblStringBuffer_createRef(const GblStringBuffer* pSelf) {
-    return GblStringRef_createFromViewWithContext(GBL_STRV(GblStringBuffer_cString(pSelf),
-                                                           GblStringBuffer_length(pSelf)),
-                                                  GblStringBuffer_context(pSelf));
+    return GblStringRef_create(GblStringBuffer_cString(pSelf),
+                               GblStringBuffer_length(pSelf),
+                               GblStringBuffer_context(pSelf));
 }
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_destruct(GblStringBuffer* pSelf) {

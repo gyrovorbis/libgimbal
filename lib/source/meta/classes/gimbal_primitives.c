@@ -842,7 +842,7 @@ static GBL_RESULT stringConstruct_(GblVariant* pVariant, size_t  argc, GblVarian
         GBL_CTX_VERIFY_ARG(argc == 1);
         GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(&pArgs[0]), GBL_STRING_TYPE);
         if(pArgs[0].pString)
-            pVariant->pString = GblStringRef_acquire(pArgs[0].pString);
+            pVariant->pString = GblStringRef_ref(pArgs[0].pString);
     // Move constructor
     } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE) {
         GBL_CTX_VERIFY_ARG(argc == 1);
@@ -863,7 +863,7 @@ static GBL_RESULT stringConstruct_(GblVariant* pVariant, size_t  argc, GblVarian
         GBL_CTX_VERIFY_ARG(argc == 1);
         GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
         GBL_CTX_VERIFY_POINTER(pArgs[0].pVoid);
-        GblStringRef_release(pVariant->pString);
+        GblStringRef_unref(pVariant->pString);
         pVariant->pString = pArgs[0].pVoid;
     }
     GBL_CTX_END();
@@ -872,7 +872,7 @@ static GBL_RESULT stringConstruct_(GblVariant* pVariant, size_t  argc, GblVarian
 static GBL_RESULT stringDestruct_(GblVariant* pVariant) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(pVariant->type, GBL_STRING_TYPE);
-    GblStringRef_release(pVariant->pString);
+    GblStringRef_unref(pVariant->pString);
     GBL_CTX_END();
 }
 
@@ -884,9 +884,10 @@ static GBL_RESULT stringSave_(const GblVariant* pVariant, GblStringBuffer* pStri
 
 static GBL_RESULT stringLoad_(GblVariant* pVariant, const GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    GblStringRef_release(pVariant->pString);
-    pVariant->pString = GblStringRef_createFromViewWithContext(GblStringBuffer_view(pString),
-                                                               GblStringBuffer_context(pString));
+    GblStringRef_unref(pVariant->pString);
+    pVariant->pString = GblStringRef_create(GblStringBuffer_cString(pString),
+                                            GblStringBuffer_length(pString),
+                                            GblStringBuffer_context(pString));
     GBL_CTX_END();
 }
 
@@ -896,27 +897,27 @@ static GBL_RESULT stringSet_(GblVariant* pVariant, size_t  argc, GblVariant* pAr
     if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY) {
         GBL_CTX_VERIFY_ARG(argc == 1);
         GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
-        GblStringRef_release(pVariant->pString);
+        GblStringRef_unref(pVariant->pString);
         pVariant->pString = pArgs[0].pVoid? GblStringRef_create(pArgs[0].pVoid) :
                                             NULL;
     } else if(op & GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE) {
         GBL_CTX_VERIFY_ARG(argc == 1);
         GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
-        GblStringRef_release(pVariant->pString);
+        GblStringRef_unref(pVariant->pString);
         pVariant->pString = pArgs[0].pVoid? pArgs[0].pVoid :
                                             NULL;
 
     } else if(op & GBL_IVARIANT_OP_FLAG_SET_COPY) {
         GBL_CTX_VERIFY_ARG(argc == 1);
         GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_STRING_TYPE);
-        GblStringRef_release(pVariant->pString);
-        pVariant->pString = pArgs[0].pString? GblStringRef_acquire(pArgs[0].pString) :
+        GblStringRef_unref(pVariant->pString);
+        pVariant->pString = pArgs[0].pString? GblStringRef_ref(pArgs[0].pString) :
                                               NULL;
 
     } else if(op & GBL_IVARIANT_OP_FLAG_SET_MOVE) {
         GBL_CTX_VERIFY_ARG(argc == 1);
         GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_STRING_TYPE);
-        GblStringRef_release(pVariant->pString);
+        GblStringRef_unref(pVariant->pString);
         if(pArgs[0].pString) {
             pVariant->pString = pArgs[0].pString;
             GBL_CTX_CALL(GblVariant_invalidate(&pArgs[0]));

@@ -131,7 +131,7 @@ static GBL_RESULT fieldDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntr
     GBL_TEST_VERIFY(pFixture && key == pFixture->testQuark);
 
     ++pFixture->fieldDtorsCalled;
-    GblStringRef_release(pEntry);
+    GblStringRef_unref(pEntry);
 
     GBL_CTX_END();
 }

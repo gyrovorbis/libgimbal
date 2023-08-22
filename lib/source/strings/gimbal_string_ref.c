@@ -78,7 +78,7 @@ GBL_EXPORT GblBool GblStringRef_blank(const GblStringRef* pSelf) {
 }
 
 GBL_EXPORT GblBool GblStringRef_empty(const GblStringRef* pSelf) {
-    return GblStringRef_length(pSelf);
+    return !GblStringRef_length(pSelf);
 }
 
 GBL_EXPORT GblBool GblStringRef_valid(const GblStringRef* pSelf) {

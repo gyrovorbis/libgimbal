@@ -864,7 +864,7 @@ GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass(GblObject*      pSelf
 static GBL_RESULT GblObject_nameDestruct_(const GblArrayMap* pMap, uintptr_t key, void* pName) {
     GBL_UNUSED(key, pMap);
 
-    GblStringRef_release(pName);
+    GblStringRef_unref(pName);
 
     return GBL_RESULT_SUCCESS;
 }

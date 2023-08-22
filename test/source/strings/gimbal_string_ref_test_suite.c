@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/strings/gimbal_string_ref.h>
+#include <gimbal/utils/gimbal_ref.h>
 
 #define GBL_STRING_REF_TEST_SUITE_(inst)    (GBL_PRIVATE(GblStringRefTestSuite, inst))
 
@@ -62,8 +63,8 @@ static GBL_RESULT GblStringRefTestSuite_final_(GblTestSuite* pSelf, GblContext* 
 static GBL_RESULT GblStringRefTestSuite_null_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
-    GBL_TEST_COMPARE(GblStringRef_acquire(NULL), NULL);
-    GBL_TEST_COMPARE(GblStringRef_release(NULL), 0);
+    GBL_TEST_COMPARE(GblStringRef_ref(NULL), NULL);
+    GBL_TEST_COMPARE(GblStringRef_unref(NULL), 0);
     //GBL_TEST_COMPARE(GblStringRef_at(NULL, 0), '\0');
     GBL_TEST_COMPARE(GblStringRef_context(NULL), NULL);
     GBL_TEST_COMPARE(GblStringRef_refCount(NULL), 0);
@@ -123,7 +124,7 @@ static GBL_RESULT GblStringRefTestSuite_create_(GblTestSuite* pSelf, GblContext*
 static GBL_RESULT GblStringRefTestSuite_createWithContext_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
-    pSelf_->pRefs[2] = GblStringRef_createWithContext("contextual", pCtx);
+    pSelf_->pRefs[2] = GblStringRef_create("contextual", 0, pCtx);
     GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[2], "contextual", 1, pCtx));
     GBL_CTX_END();
 }
@@ -131,7 +132,7 @@ static GBL_RESULT GblStringRefTestSuite_createWithContext_(GblTestSuite* pSelf, 
 static GBL_RESULT GblStringRefTestSuite_createFromViewEmpty_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
-    pSelf_->pRefs[3] = GblStringRef_createFromView(GBL_STRV(NULL));
+    pSelf_->pRefs[3] = GblStringRef_create(NULL, 0);
     GBL_CTX_VERIFY_CALL(verifyEmpty_(pCtx, pSelf_->pRefs[3], 1, NULL));
     GBL_CTX_END();
 }
@@ -139,7 +140,8 @@ static GBL_RESULT GblStringRefTestSuite_createFromViewEmpty_(GblTestSuite* pSelf
 static GBL_RESULT GblStringRefTestSuite_createFromView_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
-    pSelf_->pRefs[4] = GblStringRef_createFromView(GBL_STRV("viewz"));
+    GblStringView view = GBL_STRV("viewz");
+    pSelf_->pRefs[4] = GblStringRef_create(view.pData, view.length);
     GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[4], "viewz", 1, NULL));
     GBL_CTX_END();
 }
@@ -147,7 +149,8 @@ static GBL_RESULT GblStringRefTestSuite_createFromView_(GblTestSuite* pSelf, Gbl
 static GBL_RESULT GblStringRefTestSuite_createFromViewWithContext_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
-    pSelf_->pRefs[5] = GblStringRef_createFromViewWithContext(GBL_STRV("contextual_viewz"), pCtx);
+    GblStringView view = GBL_STRV("contextual_viewz");
+    pSelf_->pRefs[5] = GblStringRef_create(view.pData, view.length, pCtx);
     GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[5], "contextual_viewz", 1, pCtx));
     GBL_CTX_END();
 }
@@ -155,7 +158,7 @@ static GBL_RESULT GblStringRefTestSuite_createFromViewWithContext_(GblTestSuite*
 static GBL_RESULT GblStringRefTestSuite_acquire_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
-    pSelf_->pRefs[6] = GblStringRef_acquire(pSelf_->pRefs[5]);
+    pSelf_->pRefs[6] = GblStringRef_ref(pSelf_->pRefs[5]);
     GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[6], "contextual_viewz", 2, pCtx));
     GBL_TEST_COMPARE(pSelf_->pRefs[6], pSelf_->pRefs[5]);
     GBL_CTX_END();
@@ -165,26 +168,26 @@ static GBL_RESULT GblStringRefTestSuite_release_(GblTestSuite* pSelf, GblContext
     GBL_CTX_BEGIN(pCtx);
     GblStringRefTestSuite_* pSelf_ = GBL_STRING_REF_TEST_SUITE_(pSelf);
     GblRefCount refCount = GblRef_activeCount();
-    GblStringRef_release(pSelf_->pRefs[6]);
+    GblStringRef_unref(pSelf_->pRefs[6]);
     GBL_CTX_VERIFY_CALL(verifyString_(pCtx, pSelf_->pRefs[5], "contextual_viewz", 1, pCtx));
     GBL_TEST_COMPARE(GblRef_activeCount(), refCount);
 
-    GblStringRef_release(pSelf_->pRefs[5]);
+    GblStringRef_unref(pSelf_->pRefs[5]);
     GBL_TEST_COMPARE(GblRef_activeCount(), --refCount);
 
-    GblStringRef_release(pSelf_->pRefs[4]);
+    GblStringRef_unref(pSelf_->pRefs[4]);
     GBL_TEST_COMPARE(GblRef_activeCount(), --refCount);
 
-    GblStringRef_release(pSelf_->pRefs[3]);
+    GblStringRef_unref(pSelf_->pRefs[3]);
     GBL_TEST_COMPARE(GblRef_activeCount(), --refCount);
 
-    GblStringRef_release(pSelf_->pRefs[2]);
+    GblStringRef_unref(pSelf_->pRefs[2]);
     GBL_TEST_COMPARE(GblRef_activeCount(), --refCount);
 
-    GblStringRef_release(pSelf_->pRefs[1]);
+    GblStringRef_unref(pSelf_->pRefs[1]);
     GBL_TEST_COMPARE(GblRef_activeCount(), --refCount);
 
-    GblStringRef_release(pSelf_->pRefs[0]);
+    GblStringRef_unref(pSelf_->pRefs[0]);
     GBL_TEST_COMPARE(GblRef_activeCount(), --refCount);
     GBL_CTX_END();
 }

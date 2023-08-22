@@ -90,12 +90,12 @@ GBL_EXPORT GblStringList* (GblStringList_createWithRefs)(GblStringRef* pFirst, .
     GblStringList* pList = GblStringList_createEmpty();
     va_start(varArgs, pFirst);
 
-    GblRingList_pushBack(pList, GblStringRef_acquire(pFirst));
+    GblRingList_pushBack(pList, GblStringRef_ref(pFirst));
 
     GblStringRef* pRef;
     while((pRef = va_arg(varArgs, GblStringRef*))) {
         GblRingList_pushBack(pList,
-                             GblStringRef_acquire(pRef));
+                             GblStringRef_ref(pRef));
 
     }
 
@@ -121,9 +121,9 @@ GBL_EXPORT GblStringList* GblStringList_createSplit(const char* pStr, const char
         if(length) {
             GblStringView subView = GblStringView_fromString(srcView.pData + start,
                                                              length);
-            GblStringRef* pRef = GblStringRef_createFromView(subView);
+            GblStringRef* pRef = GblStringRef_create(subView.pData, subView.length);
             GblStringList_pushBackRefs(pList, pRef);
-            GblStringRef_release(pRef);
+            GblStringRef_unref(pRef);
         }
 
         start = stop + 1;
@@ -167,7 +167,7 @@ GBL_EXPORT GblStringList* GblStringList_createSubList(const GblStringList* pOthe
     GblStringList* pNode = GBL_STRING_LIST_(GblDoublyLinkedList_at(&pOther->listNode, index));
     while(pNode && count) {
         GblRingList_pushBack(pList,
-                             GblStringRef_acquire(pNode->pData));
+                             GblStringRef_ref(pNode->pData));
         pNode = (index >= 0)? pNode->ringNode.pNext : pNode->ringNode.pPrev;
         --count;
     }
@@ -183,7 +183,7 @@ GBL_EXPORT GblStringList* GblStringList_copy(const GblStringList* pOther) {
         pNode != pOther;
         pNode = pNode->ringNode.pNext)
     {
-        GblRingList_pushBack(pList, GblStringRef_acquire(pNode->pData));
+        GblRingList_pushBack(pList, GblStringRef_ref(pNode->pData));
     }
 
     return pList;
@@ -195,7 +195,7 @@ GBL_EXPORT GBL_RESULT GblStringList_destroy(GblStringList* pSelf) {
             pNode != pSelf;
             pNode = pNode->ringNode.pNext)
         {
-            GblStringRef_release(pNode->pData);
+            GblStringRef_unref(pNode->pData);
         }
         return GblRingList_destroy(pSelf);
     } else return GBL_RESULT_SUCCESS;
@@ -301,7 +301,7 @@ GBL_EXPORT GBL_RESULT GblStringList_clear(GblStringList* pSelf) {
         pNode != pSelf;
         pNode = pNode->ringNode.pNext)
     {
-        GblStringRef_release(pNode->pData);
+        GblStringRef_unref(pNode->pData);
     }
     return GblRingList_clear(pSelf);
 }
@@ -362,7 +362,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushBackRefs)(GblStringList* pSelf, ...) {
 
     GblStringRef* pStr;
     while((pStr = va_arg(varArgs, GblStringRef*))) {
-        result = GblRingList_pushBack(pSelf, GblStringRef_acquire(pStr));
+        result = GblRingList_pushBack(pSelf, GblStringRef_ref(pStr));
         if(!GBL_RESULT_SUCCESS(result))
             break;
     }
@@ -401,7 +401,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushFrontRefs)(GblStringList* pSelf, ...) {
     size_t  index = 0;
     GblStringRef* pStr;
     while((pStr = va_arg(varArgs, GblStringRef*))) {
-        result = GblRingList_insert(pSelf, index++, GblStringRef_acquire(pStr));
+        result = GblRingList_insert(pSelf, index++, GblStringRef_ref(pStr));
         if(!GBL_RESULT_SUCCESS(result))
             break;
     }
@@ -455,7 +455,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_insert)(GblStringList* pSelf, intptr_t inde
                 GblRingList* pNewEntry = GblRingList_new_();
                 GblDoublyLinkedList_init(&pNewEntry->listNode);
                 GblDoublyLinkedList_insertBefore(&pEntry->listNode, &pNewEntry->listNode);
-                pNewEntry->pData = GblStringRef_create(pArg);;
+                pNewEntry->pData = (void*)GblStringRef_create(pArg);
                 ++pSelf->size;
             }
 
@@ -464,7 +464,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_insert)(GblStringList* pSelf, intptr_t inde
                 GblRingList* pNewEntry = GblRingList_new_();
                 GblDoublyLinkedList_init(&pNewEntry->listNode);
                 GblDoublyLinkedList_insertAfter(&pEntry->listNode, &pNewEntry->listNode);
-                pNewEntry->pData = GblStringRef_create(pArg);
+                pNewEntry->pData = (void*)GblStringRef_create(pArg);
                 ++pSelf->size;
                 pEntry = pNewEntry;
             }
@@ -490,7 +490,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_insertRefs)(GblStringList* pSelf, intptr_t 
     if(GBL_RESULT_SUCCESS(result)) {
         GblStringRef* pRef;
         while((pRef = va_arg(varArgs2, GblStringRef*))) {
-            GblStringRef_acquire(pRef);
+            GblStringRef_ref(pRef);
         }
     }
 
@@ -515,7 +515,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_erase)(GblStringList* pSelf, intptr_t index
     while(pNode && count && pSelf->size) {
         pNext = (index >= 0)? pNode->ringNode.pNext : pNode->ringNode.pPrev;
         GblDoublyLinkedList_remove(&pNode->listNode);
-        GblStringRef_release(pNode->pData);
+        GblStringRef_unref(pNode->pData);
         GblRingList_delete_(pNode);
         --count;
         --pSelf->size;
@@ -549,7 +549,7 @@ GBL_EXPORT size_t  (GblStringList_remove)(GblStringList* pSelf, const char* pStr
         {
             GblStringList* pPrev = pNode->ringNode.pPrev;
             GblDoublyLinkedList_remove(&pNode->listNode);
-            GblStringRef_release(pNode->pData);
+            GblStringRef_unref(pNode->pData);
             GblRingList_delete_(pNode);
             pNode = pPrev;
             --pSelf->size;
@@ -575,7 +575,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_deduplicate)(GblStringList* pSelf, GblBool 
             {
                 GblStringList* pPrev = pNode2->ringNode.pPrev;
                 GblDoublyLinkedList_remove(&pNode2->listNode);
-                GblStringRef_release(pNode2->pData);
+                GblStringRef_unref(pNode2->pData);
                 GblRingList_delete_(pNode2);
                 pNode2 = pPrev;
                 --pSelf->size;
@@ -587,28 +587,28 @@ GBL_EXPORT GBL_RESULT (GblStringList_deduplicate)(GblStringList* pSelf, GblBool 
 
 GBL_EXPORT GBL_RESULT (GblStringList_set)(GblStringList* pSelf, intptr_t index, const char* pData) {
     GblStringRef* pRef = GblStringRef_create(pData);
-    GblStringRef* pOld = GblRingList_replace(pSelf, index, pRef);
+    GblStringRef* pOld = GblRingList_replace(pSelf, index, (void*)pRef);
     GBL_RESULT result = GBL_RESULT_SUCCESS;
 
     if(pOld) {
-        GblStringRef_release(pOld);
+        GblStringRef_unref(pOld);
     } else {
         result = GBL_CTX_LAST_RESULT();
-        GblStringRef_release(pRef);
+        GblStringRef_unref(pRef);
     }
 
     return result;
 }
 
 GBL_EXPORT GBL_RESULT (GblStringList_setRef)(GblStringList* pSelf, intptr_t index, GblStringRef* pRef) {
-    GblStringRef* pOld = GblRingList_replace(pSelf, index, GblStringRef_acquire(pRef));
+    GblStringRef* pOld = GblRingList_replace(pSelf, index, (void*)GblStringRef_ref(pRef));
     GBL_RESULT result = GBL_RESULT_SUCCESS;
 
     if(pOld) {
-        GblStringRef_release(pOld);
+        GblStringRef_unref(pOld);
     } else {
         result = GBL_CTX_LAST_RESULT();
-        GblStringRef_release(pRef);
+        GblStringRef_unref(pRef);
     }
     return result;
 }

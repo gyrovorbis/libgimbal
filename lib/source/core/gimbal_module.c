@@ -403,9 +403,9 @@ static GBL_RESULT GblModule_GblBox_destructor_(GblBox* pBox) {
 
     // Unload first!?
 
-    GblStringRef_release(pSelf->pAuthor);
-    GblStringRef_release(pSelf->pPrefix);
-    GblStringRef_release(pSelf->pDescription);
+    GblStringRef_unref(pSelf->pAuthor);
+    GblStringRef_unref(pSelf->pPrefix);
+    GblStringRef_unref(pSelf->pDescription);
     GblOptionGroup_unref(pSelf->pOptionGroup);
 
     GBL_VCALL_DEFAULT(GblContext, base.base.pFnDestructor, pBox);

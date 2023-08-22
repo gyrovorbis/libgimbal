@@ -2,6 +2,7 @@
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/strings/gimbal_string.h>
 #include <gimbal/meta/classes/gimbal_opaque.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include <wchar.h>
 #include <math.h>
 

@@ -194,7 +194,8 @@ static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, 
                 *pConsumed = 2;
                 GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v1,
                                                                   GBL_STRING_TYPE,
-                                                                  GblStringRef_createFromView(value)));
+                                                                  GblStringRef_create(value.pData,
+                                                                                      value.length)));
                 GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&v2,
                                                                 argToGblType_(pOption->type)));
 
@@ -224,10 +225,10 @@ static GBL_RESULT GblOptionGroup_Object_property_(const GblObject* pObject, cons
     GblOptionGroup* pSelf = GBL_OPTION_GROUP(pObject);
     switch(pProp->id) {
     //case GblOptionGroup_Property_Id_name:
-    //    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_acquire(GblObject_name(pObject))));
+    //    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_ref(GblObject_name(pObject))));
     //    break;
     case GblOptionGroup_Property_Id_prefix:
-        GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_acquire(pSelf->pPrefix)));
+        GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_ref(pSelf->pPrefix)));
         break;
     case GblOptionGroup_Property_Id_options:
         GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pValue, pProp->valueType, pSelf->pOptions));
@@ -236,10 +237,10 @@ static GBL_RESULT GblOptionGroup_Object_property_(const GblObject* pObject, cons
         GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pValue, pProp->valueType, pSelf->version));
         break;
     case GblOptionGroup_Property_Id_summary:
-        GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_acquire(pSelf->pSummary)));
+        GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_ref(pSelf->pSummary)));
         break;
     case GblOptionGroup_Property_Id_description:
-        GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_acquire(pSelf->pDescription)));
+        GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_ref(pSelf->pDescription)));
         break;
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY, "Reading unhandled property: %s", GblProperty_nameString(pProp));
     }
@@ -297,9 +298,9 @@ static GBL_RESULT GblOptionGroup_Box_destructor_(GblBox* pBox) {
 
     GblOptionGroup* pGroup = GBL_OPTION_GROUP(pBox);
     GBL_CTX_FREE(pGroup->pOptions);
-    GblStringRef_release(pGroup->pPrefix);
-    GblStringRef_release(pGroup->pDescription);
-    GblStringRef_release(pGroup->pSummary);
+    GblStringRef_unref(pGroup->pPrefix);
+    GblStringRef_unref(pGroup->pDescription);
+    GblStringRef_unref(pGroup->pSummary);
     GblStringList_destroy(pGroup->pParsedArgs);
 
     GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
