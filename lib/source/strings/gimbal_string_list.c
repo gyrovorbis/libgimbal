@@ -314,15 +314,15 @@ GBL_EXPORT GblStringRef* GblStringList_join(const GblStringList* pSelf, const ch
     } buff;
 
     GblStringRef* pRef = NULL;
-    GblStringBuffer_construct(&buff.str, GBL_STRV(""), sizeof(buff));
+    GblStringBuffer_construct(&buff.str, NULL, 0, sizeof(buff));
 
     for(GblStringList* pNode = pSelf->ringNode.pNext;
         pNode != pSelf;
         pNode = pNode->ringNode.pNext)
     {
-        GblStringBuffer_append(&buff.str, GBL_STRV(pNode->pData));
+        GblStringBuffer_append(&buff.str, pNode->pData);
         if(pNode->ringNode.pNext != pSelf)
-            GblStringBuffer_append(&buff.str, GBL_STRV(pSeparator));
+            GblStringBuffer_append(&buff.str, pSeparator);
     }
 
     pRef = GblStringRef_create(GblStringBuffer_cString(&buff.str));

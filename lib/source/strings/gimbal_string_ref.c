@@ -3,7 +3,7 @@
 
 typedef struct GblStringRef_ {
     size_t      length;
-    char        data[];
+    char        data[1];
 } GblStringRef_;
 
 GBL_INLINE GblStringRef_* GblStringRef_header_(const GblStringRef* pString) GBL_NOEXCEPT {

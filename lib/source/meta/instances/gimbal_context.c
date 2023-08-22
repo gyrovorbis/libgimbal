@@ -336,7 +336,7 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
         GblStringBuffer buffer;
         char ext[256];
     } str;
-    GblStringBuffer_construct(&str.buffer, GBL_STRV(""), sizeof(str));
+    GblStringBuffer_construct(&str.buffer, NULL, 0, sizeof(str));
     GBL_CTX_INFO("%-20s: %-100.100s", "Local Time",
                  GblDateTime_format(GblDateTime_nowLocal(&dt),
                                     &str.buffer,

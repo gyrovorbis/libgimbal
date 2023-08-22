@@ -21,6 +21,8 @@ GBL_DECLS_BEGIN
 GBL_EXPORT int   gblAsciiDigitValue    (char c)                        GBL_NOEXCEPT;
 GBL_EXPORT int   gblAsciiHexDigitValue (char c)                        GBL_NOEXCEPT;
 
+GBL_EXPORT size_t gblStrnlen           (const char* pStr1, size_t len) GBL_NOEXCEPT;
+
 GBL_EXPORT int   gblStrCaseCmp         (const char* pStr1,
                                         const char* pStr2)             GBL_NOEXCEPT;
 
@@ -36,10 +38,10 @@ GBL_EXPORT char* gblStrdup             (const char* pString)           GBL_NOEXC
 GBL_EXPORT char* gblStrndup            (const char* pString,
                                         size_t      length)            GBL_NOEXCEPT;
 
-GBL_EXPORT char* gblStrnReverse        (char* pString, size_t  length) GBL_NOEXCEPT;
-GBL_EXPORT char* gblStrnUpper          (char* pString)                 GBL_NOEXCEPT;
-GBL_EXPORT char* gblStrnLower          (char* pString)                 GBL_NOEXCEPT;
-GBL_EXPORT char* gblStpcpy             (char* pString)                 GBL_NOEXCEPT;
+GBL_EXPORT char* gblStrnReverse        (char* pString, size_t length)  GBL_NOEXCEPT;
+//GBL_EXPORT char* gblStrnUpper          (char* pString)                 GBL_NOEXCEPT;
+//GBL_EXPORT char* gblStrnLower          (char* pString)                 GBL_NOEXCEPT;
+//GBL_EXPORT char* gblStpcpy             (char* pString)                 GBL_NOEXCEPT;
 
 GBL_DECLS_END
 

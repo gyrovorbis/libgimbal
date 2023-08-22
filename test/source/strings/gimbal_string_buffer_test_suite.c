@@ -30,7 +30,8 @@ static GBL_RESULT GblStringBufferTestSuite_construct_(GblTestSuite* pSelf, GblCo
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
 
     GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&pSelf_->str.buffer,
-                                                  GBL_STRV(""),
+                                                  "",
+                                                  0,
                                                   sizeof(pSelf_->str),
                                                   pCtx));
 
@@ -42,7 +43,8 @@ static GBL_RESULT GblStringBufferTestSuite_constructString_(GblTestSuite* pSelf,
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
     GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&pSelf_->heapOnlyStr,
-                                                  GBL_STRV("Heap Allocation"),
+                                                  "Heap Allocation",
+                                                  0,
                                                   sizeof(GblStringBuffer), pCtx));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->heapOnlyStr, "Heap Allocation", pCtx));
     GBL_CTX_END();
@@ -55,21 +57,11 @@ static GBL_RESULT GblStringBufferTestSuite_destruct_(GblTestSuite* pSelf, GblCon
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblStringBufferTestSuite_constructAlloca_(GblTestSuite* pSelf, GblContext* pCtx) {
-    GBL_UNUSED(pSelf);
-    GBL_CTX_BEGIN(pCtx);
-    GblStringBuffer* pBuffer = GBL_STRING_BUFFER_ALLOCA(0, pCtx, GBL_STRV("Alloca String"));
-    GBL_CTX_VERIFY_CALL(verifyBuffer_(pBuffer, "Alloca String", pCtx));
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_destruct(pBuffer));
-    GBL_CTX_END();
-}
-
-
 static GBL_RESULT GblStringBufferTestSuite_charInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
     GBL_TEST_EXPECT_ERROR();
-    const char value = GblStringBuffer_char(&pSelf_->str.buffer, 0);
+    const char value = GblStringBuffer_at(&pSelf_->str.buffer, 0);
     GBL_TEST_COMPARE(value, (char)'\0');
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     GBL_CTX_CLEAR_LAST_RECORD();
@@ -80,7 +72,7 @@ static GBL_RESULT GblStringBufferTestSuite_set_(GblTestSuite* pSelf, GblContext*
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblStringBuffer_set(&pSelf_->str.buffer,
-                                            GBL_STRV("Dreamcart")),
+                                         "Dreamcart"),
                      "Dreamcart");
 
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
@@ -123,7 +115,7 @@ static GBL_RESULT GblStringBufferTestSuite_append_(GblTestSuite* pSelf, GblConte
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
     GBL_CTX_VERIFY_CALL(GblStringBuffer_append(&pSelf_->str.buffer,
-                                               GBL_STRV("er")));
+                                               "er"));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer, "Dreamcaster", pCtx));
     GBL_CTX_END();
 }
@@ -132,7 +124,7 @@ static GBL_RESULT GblStringBufferTestSuite_prepend_(GblTestSuite* pSelf, GblCont
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
     GBL_CTX_VERIFY_CALL(GblStringBuffer_prepend(&pSelf_->str.buffer,
-                                                GBL_STRV("Sayga ")));
+                                                "Sayga "));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer, "Sayga Dreamcaster", pCtx));
     GBL_CTX_END();
 }
@@ -154,7 +146,7 @@ static GBL_RESULT GblStringBufferTestSuite_appendVPrintf_(GblTestSuite* pSelf, G
     GBL_CTX_BEGIN(pCtx);
     GblStringBuffer buffer;
 
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, GBL_STRV(""), sizeof(GblStringBuffer), pCtx));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, NULL, 0, sizeof(GblStringBuffer), pCtx));
     GBL_CTX_VERIFY_CALL(appendVaArgs_(&buffer, pCtx, "Hi %s %c %d", "Dude", 'b', 12));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&buffer, "Hi Dude b 12", pCtx));
     GBL_CTX_VERIFY_CALL(GblStringBuffer_destruct(&buffer));
@@ -166,7 +158,7 @@ static GBL_RESULT GblStringBufferTestSuite_appendPrintf_(GblTestSuite* pSelf, Gb
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GblStringBuffer buffer;
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, GBL_STRV(""), sizeof(GblStringBuffer), pCtx));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, "", 0, sizeof(GblStringBuffer), pCtx));
 
     GBL_CTX_VERIFY_CALL(GblStringBuffer_appendPrintf(&buffer,
                                                      "Hello %s %.0f %d",
@@ -185,7 +177,7 @@ static GBL_RESULT GblStringBufferTestSuite_appendNil_(GblTestSuite* pSelf, GblCo
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GblStringBuffer buffer;
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, GBL_STRV(""), sizeof(GblStringBuffer), pCtx));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, "", 0, sizeof(GblStringBuffer), pCtx));
 
     GBL_CTX_VERIFY_CALL(GblStringBuffer_appendNil(&buffer));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&buffer,
@@ -200,7 +192,7 @@ static GBL_RESULT GblStringBufferTestSuite_appendBool_(GblTestSuite* pSelf, GblC
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GblStringBuffer buffer;
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, GBL_STRV(""), sizeof(GblStringBuffer), pCtx));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, NULL, 0, sizeof(GblStringBuffer), pCtx));
 
     GBL_CTX_VERIFY_CALL(GblStringBuffer_appendBool(&buffer, GBL_TRUE));
     GBL_CTX_VERIFY_CALL(GblStringBuffer_appendBool(&buffer, GBL_FALSE));
@@ -216,7 +208,7 @@ static GBL_RESULT GblStringBufferTestSuite_appendInt_(GblTestSuite* pSelf, GblCo
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GblStringBuffer buffer;
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, GBL_STRV(""), sizeof(GblStringBuffer), pCtx));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, NULL, 0, sizeof(GblStringBuffer), pCtx));
 
     GBL_CTX_VERIFY_CALL(GblStringBuffer_appendInt(&buffer, -32));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&buffer,
@@ -232,7 +224,7 @@ static GBL_RESULT GblStringBufferTestSuite_appendUint_(GblTestSuite* pSelf, GblC
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GblStringBuffer buffer;
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, GBL_STRV(""), sizeof(GblStringBuffer), pCtx));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, "", 0, sizeof(GblStringBuffer), pCtx));
 
     GBL_CTX_VERIFY_CALL(GblStringBuffer_appendInt(&buffer, 27));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&buffer,
@@ -248,7 +240,7 @@ static GBL_RESULT GblStringBufferTestSuite_appendFloat_(GblTestSuite* pSelf, Gbl
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GblStringBuffer buffer;
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, GBL_STRV(""), sizeof(GblStringBuffer), pCtx));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, "", 0, sizeof(GblStringBuffer), pCtx));
 
     GBL_CTX_VERIFY_CALL(GblStringBuffer_appendFloat(&buffer, 27.3f));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&buffer,
@@ -264,7 +256,7 @@ static GBL_RESULT GblStringBufferTestSuite_appendDouble_(GblTestSuite* pSelf, Gb
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GblStringBuffer buffer;
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, GBL_STRV(""), sizeof(GblStringBuffer), pCtx));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, "", 0, sizeof(GblStringBuffer), pCtx));
 
     GBL_CTX_VERIFY_CALL(GblStringBuffer_appendDouble(&buffer, 4.7));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&buffer,
@@ -280,7 +272,7 @@ static GBL_RESULT GblStringBufferTestSuite_appendPointer_(GblTestSuite* pSelf, G
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
     GblStringBuffer buffer;
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, GBL_STRV(""), sizeof(GblStringBuffer), pCtx));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_construct(&buffer, "", 0, sizeof(GblStringBuffer), pCtx));
 
     GBL_CTX_VERIFY_CALL(GblStringBuffer_appendPointer(&buffer, (void*)0xdeadbabe));
 
@@ -337,13 +329,13 @@ static GBL_RESULT GblStringBufferTestSuite_overwrite_(GblTestSuite* pSelf, GblCo
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
     GBL_CTX_VERIFY_CALL(GblStringBuffer_overwrite(&pSelf_->str.buffer,
                                                   0,
-                                                  GBL_STRV("Playstation")));
+                                                  "Playstation"));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
                                       "Playstation",
                                       pCtx));
     GBL_CTX_VERIFY_CALL(GblStringBuffer_overwrite(&pSelf_->str.buffer,
                                                   0,
-                                                  GBL_STRV(" G")));
+                                                  " G"));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
                                       " Gaystation",
                                       pCtx));
@@ -354,9 +346,9 @@ static GBL_RESULT GblStringBufferTestSuite_replace_(GblTestSuite* pSelf, GblCont
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
     GBL_TEST_COMPARE(GblStringBuffer_replace(&pSelf_->str.buffer,
-                                                GBL_STRV(" Gay"),
-                                                GBL_STRV("Gas "),
-                                                1), 1);
+                                             " Gay",
+                                             "Gas "),
+                                              1);
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
                                       "Gas station",
                                       pCtx));
@@ -367,7 +359,7 @@ static GBL_RESULT GblStringBufferTestSuite_remove_(GblTestSuite* pSelf, GblConte
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
     GBL_CTX_VERIFY_CALL(GblStringBuffer_remove(&pSelf_->str.buffer,
-                                               GBL_STRV("station")));
+                                               "station"));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
                                       "Gas ",
                                       pCtx));
@@ -387,7 +379,7 @@ static GBL_RESULT GblStringBufferTestSuite_chop_(GblTestSuite* pSelf, GblContext
 static GBL_RESULT GblStringBufferTestSuite_chomp_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_append(&pSelf_->str.buffer, GBL_STRV("\n")));
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_append(&pSelf_->str.buffer, "\n"));
     GBL_CTX_VERIFY_CALL(GblStringBuffer_chomp(&pSelf_->str.buffer));
     GBL_CTX_VERIFY_CALL(GblStringBuffer_chomp(&pSelf_->str.buffer));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
@@ -419,7 +411,7 @@ static GBL_RESULT GblStringBufferTestSuite_upper_(GblTestSuite* pSelf, GblContex
 static GBL_RESULT GblStringBufferTestSuite_padLeft_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_padLeft(&pSelf_->str.buffer,
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_prependPadding(&pSelf_->str.buffer,
                                                 ' ',
                                                 4));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
@@ -431,7 +423,7 @@ static GBL_RESULT GblStringBufferTestSuite_padLeft_(GblTestSuite* pSelf, GblCont
 static GBL_RESULT GblStringBufferTestSuite_padRight_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringBufferTestSuite_* pSelf_ = GBL_STRING_BUFFER_TEST_SUITE_(pSelf);
-    GBL_CTX_VERIFY_CALL(GblStringBuffer_padRight(&pSelf_->str.buffer,
+    GBL_CTX_VERIFY_CALL(GblStringBuffer_appendPadding(&pSelf_->str.buffer,
                                                  'Y',
                                                  3));
     GBL_CTX_VERIFY_CALL(verifyBuffer_(&pSelf_->str.buffer,
@@ -521,7 +513,6 @@ GBL_EXPORT GblType GblStringBufferTestSuite_type(void) {
         { "construct",          GblStringBufferTestSuite_construct_         },
         { "constructString",    GblStringBufferTestSuite_constructString_   },
         { "destruct",           GblStringBufferTestSuite_destruct_          },
-        { "constructAlloca",    GblStringBufferTestSuite_constructAlloca_   },
         { "charInvalid",        GblStringBufferTestSuite_charInvalid_       },
         { "set",                GblStringBufferTestSuite_set_               },
         { "setChar",            GblStringBufferTestSuite_setChar_           },
@@ -567,7 +558,7 @@ GBL_EXPORT GblType GblStringBufferTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStatic("StringBufferTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblStringBufferTestSuite"),
                                      &vTable,
                                      sizeof(GblStringBufferTestSuite),
                                      sizeof(GblStringBufferTestSuite_),

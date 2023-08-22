@@ -110,10 +110,10 @@ GBL_CLASS_END
  *  \sa GblScannerClass
  */
 GBL_INSTANCE_DERIVE(GblScanner, GblObject)
-    GblStringView     token;    //!< Current token in the stream
-    GblStringView     next;     //!< Peeked-at next token in the stream
-    GblStringRef*     pError;   //!< Pending error message
-    GBL_SCANNER_FLAGS status;   //!< Status after the last operation
+    GblStringView       token;    //!< Current token in the stream
+    GblStringView       next;     //!< Peeked-at next token in the stream
+    const GblStringRef* pError;   //!< Pending error message
+    GBL_SCANNER_FLAGS   status;   //!< Status after the last operation
 GBL_INSTANCE_END
 
 //! \cond

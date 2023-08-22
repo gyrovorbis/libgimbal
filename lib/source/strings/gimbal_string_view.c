@@ -577,6 +577,7 @@ GBL_EXPORT GblStringView (GblStringView_fromString)(const char* pString, size_t 
         .pData  = pString,
         .length = length
     };
+
     if(pString) {
         if(!length) {
             view.length = strlen(pString);
@@ -586,6 +587,7 @@ GBL_EXPORT GblStringView (GblStringView_fromString)(const char* pString, size_t 
             view.nullTerminated = 1;
         }
     }
+
     return view;
 }
 

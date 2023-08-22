@@ -145,7 +145,7 @@ GBL_EXPORT void GblScanner_raiseError(GblScanner* pSelf,
     const size_t bufferSize = sizeof(GblStringBuffer) +
                               GBL_SCANNER_ERROR_BUFFER_DEFAULT_SIZE_;
     GblStringBuffer* pStrBuff = GBL_ALLOCA(bufferSize);
-    GblStringBuffer_construct(pStrBuff, GBL_STRV(""), bufferSize);
+    GblStringBuffer_construct(pStrBuff, NULL, 0, bufferSize);
 
     GblStringBuffer_appendPrintf(pStrBuff,
                                  "[line: %zu, column: %zu]: ",
@@ -156,9 +156,7 @@ GBL_EXPORT void GblScanner_raiseError(GblScanner* pSelf,
                                   pFmt,
                                   varArgs);
 
-    pSelf->pError =
-        GblStringRef_create(GblStringBuffer_cString(pStrBuff),
-                            GblStringBuffer_length(pStrBuff));
+    pSelf->pError = GblStringBuffer_createRef(pStrBuff);
 
     GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_TOKEN,
                        pSelf->pError);
@@ -625,7 +623,7 @@ GBL_EXPORT GblBool GblScanner_skipPattern(GblScanner* pSelf, const GblPattern* p
             char            stackBytes[128];
         } str;
 
-        GblStringBuffer_construct(&str.buff, GBL_STRV(""), sizeof(str));
+        GblStringBuffer_construct(&str.buff, NULL, 0, sizeof(str));
 
         GblScanner_raiseError(pSelf,
                               GBL_SCANNER_SKIP_ERROR,

@@ -1,4 +1,8 @@
 #include <gimbal/strings/gimbal_string_buffer.h>
+#include <gimbal/strings/gimbal_string.h>
+
+#include <math.h>
+#include <ctype.h>
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, const char* pFmt, va_list varArgs) GBL_NOEXCEPT {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
@@ -59,38 +63,64 @@ GBL_EXPORT const char* GblStringBuffer_vPrintf(GblStringBuffer* pSelf, const cha
     return GblStringBuffer_cString(pSelf);
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_remove(GblStringBuffer* pSelf, GblStringView view) {
+GBL_EXPORT size_t (GblStringBuffer_remove)(GblStringBuffer* pSelf, const char* pString, size_t length) {
     const char* pNeedle = NULL;
+    size_t count = 0;
+
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GBL_CTX_VERIFY_POINTER(view.pData);
-    pNeedle = GBL_STRING_VIEW_CSTR(view);
+    GBL_CTX_VERIFY_POINTER(pString);
+
+    if(!length)
+        length = strlen(pString);
+
+    pNeedle = GBL_STRING_VIEW_CSTR(GBL_STRV(pString, length));
+
     while(1) {
         const char* pLoc = strstr(GblStringBuffer_cString(pSelf), pNeedle);
+
         if(pLoc) {
-            size_t  offset = pLoc - GblStringBuffer_cString(pSelf);
-            GBL_CTX_CALL(GblStringBuffer_erase(pSelf, offset, view.length));
+            size_t offset = pLoc - GblStringBuffer_cString(pSelf);
+            GBL_CTX_CALL(GblStringBuffer_erase(pSelf, offset, length));
+            ++count;
         } else break;
     }
-    GBL_CTX_END();
+
+    GBL_CTX_END_BLOCK();
+    return count;
 }
 
-GBL_EXPORT size_t GblStringBuffer_replace(GblStringBuffer* pSelf, GblStringView substr, GblStringView replacement, size_t  limit) {
+GBL_EXPORT size_t (GblStringBuffer_replace)(GblStringBuffer* pSelf,
+                                            const char*      pSubstr,
+                                            const char*      pReplacement,
+                                            size_t           limit,
+                                            size_t           substrLen,
+                                            size_t           replacementLen)
+{
     const char* pNeedle = NULL;
     size_t iterations = 0;
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GBL_CTX_VERIFY_POINTER(substr.pData);
-    GBL_CTX_VERIFY_POINTER(replacement.pData);
-    GBL_CTX_VERIFY_ARG(limit);
-    pNeedle = GBL_STRING_VIEW_CSTR(substr);
+
+    GBL_CTX_VERIFY_POINTER(pSubstr);
+    GBL_CTX_VERIFY_POINTER(pReplacement);
+
+    if(!limit)
+        limit = SIZE_MAX;
+    if(!substrLen)
+        substrLen = strlen(pSubstr);
+
+    pNeedle = GBL_STRING_VIEW_CSTR(GBL_STRV(pSubstr, substrLen));
+
     while(iterations < limit) {
         const char* pLoc = strstr(GblStringBuffer_cString(pSelf), pNeedle);
+
         if(pLoc) {
           size_t  offset = pLoc - GblStringBuffer_cString(pSelf);
-          GBL_CTX_CALL(GblStringBuffer_erase(pSelf, offset, substr.length));
-          GBL_CTX_CALL(GblStringBuffer_insert(pSelf, offset, replacement));
+          GBL_CTX_CALL(GblStringBuffer_erase(pSelf, offset, substrLen));
+          GBL_CTX_CALL(GblStringBuffer_insert(pSelf, offset, pReplacement, replacementLen));
           ++iterations;
         } else break;
     }
+
     GBL_CTX_END_BLOCK();
     return iterations;
 }
@@ -113,7 +143,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_chomp(GblStringBuffer* pSelf) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_padLeft(GblStringBuffer* pSelf, char value, size_t  count) {
+GBL_EXPORT GBL_RESULT GblStringBuffer_prependPadding(GblStringBuffer* pSelf, char value, size_t count) {
     const GblStringView view = {
         .pData          = &value,
         .nullTerminated = 0,
@@ -121,11 +151,11 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_padLeft(GblStringBuffer* pSelf, char value
     };
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     for(size_t  i = 0; i < count; ++i)
-        GBL_CTX_VERIFY_CALL(GblStringBuffer_prepend(pSelf, view));
+        GBL_CTX_VERIFY_CALL(GblStringBuffer_prepend(pSelf, view.pData, view.length));
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_padRight(GblStringBuffer* pSelf, char value, size_t  count) {
+GBL_EXPORT GBL_RESULT GblStringBuffer_appendPadding(GblStringBuffer* pSelf, char value, size_t count) {
     const GblStringView view = {
         .pData          = &value,
         .nullTerminated = 0,
@@ -133,7 +163,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_padRight(GblStringBuffer* pSelf, char valu
     };
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     for(size_t  i = 0; i < count; ++i)
-        GBL_CTX_VERIFY_CALL(GblStringBuffer_append(pSelf, view));
+        GBL_CTX_VERIFY_CALL(GblStringBuffer_append(pSelf, view.pData, view.length));
     GBL_CTX_END();
 }
 
@@ -142,7 +172,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_trimStart(GblStringBuffer* pSelf, char val
     size_t  count = 0;
 
     while(GblStringBuffer_length(pSelf) > count &&
-          GblStringBuffer_char(pSelf, count) == value) {
+          GblStringBuffer_at(pSelf, count) == value) {
         ++count;
     }
 
@@ -157,7 +187,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_trimEnd(GblStringBuffer* pSelf, char value
     size_t  count = 0;
 
     while(GblStringBuffer_length(pSelf) > count &&
-          GblStringBuffer_char(pSelf, GblStringBuffer_length(pSelf)-1-count) == value) {
+          GblStringBuffer_at(pSelf, GblStringBuffer_length(pSelf)-1-count) == value) {
         ++count;
     }
 
@@ -187,7 +217,16 @@ GBL_EXPORT GblBool GblStringBuffer_empty(const GblStringBuffer* pSelf) {
     return empty;
 }
 
+GBL_EXPORT GblBool GblStringBuffer_valid(const GblStringBuffer* pSelf) {
+    if(!pSelf || !GblStringBuffer_length(pSelf))
+        return GBL_FALSE;
 
+    return GBL_TRUE;
+}
+
+GBL_EXPORT GblBool GblStringBuffer_blank(const GblStringBuffer* pSelf) {
+    return GblStringView_blank(GblStringBuffer_view(pSelf));
+}
 
 GBL_EXPORT GblBool GblStringBuffer_stack(const GblStringBuffer* pSelf) {
     return pSelf? GblArrayList_stack(&pSelf->data) : GBL_FALSE;
@@ -212,22 +251,41 @@ GBL_EXPORT const char* GblStringBuffer_cString(const GblStringBuffer* pSelf) {
     return pStr;
 }
 
-GBL_EXPORT GblStringView GblStringBuffer_view(const GblStringBuffer* pSelf) {
+GBL_EXPORT GblStringView (GblStringBuffer_view)(const GblStringBuffer* pSelf, size_t offset, size_t length) {
     GblStringView view = {
         .pData          = NULL,
         .nullTerminated = 0,
         .length         = 0
     };
-    if(pSelf) {
-        view.pData          = (const char*)GBL_PRIV(pSelf->data).pData;
-        view.nullTerminated = 1;
-        view.length         = GBL_PRIV(pSelf->data).size;
+
+    if(length == 0)
+        length = GblStringBuffer_length(pSelf) - offset;
+
+    if(pSelf && offset + length <= GblStringBuffer_length(pSelf)) {
+        view.pData          = (const char*)GBL_PRIV(pSelf->data).pData + offset;
+        view.nullTerminated = (GblStringBuffer_cString(pSelf)[offset + length] == '\0');
+        view.length         = length;
     }
+
     return view;
 }
 
 GBL_EXPORT GblQuark GblStringBuffer_quark(const GblStringBuffer* pSelf) {
     return GblQuark_fromString(GblStringBuffer_cString(pSelf));
+}
+
+GBL_EXPORT GblQuark GblStringBuffer_tryQuark(const GblStringBuffer* pSelf) {
+    return GblQuark_tryString(GblStringBuffer_cString(pSelf));
+}
+
+GBL_EXPORT const char* GblStringBuffer_intern(const GblStringBuffer* pSelf) {
+    return GblQuark_internString(GblStringBuffer_cString(pSelf));
+}
+
+GBL_EXPORT const GblStringRef* GblStringBuffer_createRef(const GblStringBuffer* pSelf) {
+    return GblStringRef_createFromViewWithContext(GBL_STRV(GblStringBuffer_cString(pSelf),
+                                                           GblStringBuffer_length(pSelf)),
+                                                  GblStringBuffer_context(pSelf));
 }
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_destruct(GblStringBuffer* pSelf) {
@@ -238,71 +296,41 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_clear(GblStringBuffer* pSelf) {
     return GblArrayList_clear(&pSelf->data);
 }
 
-GBL_EXPORT const char* GblStringBuffer_set(GblStringBuffer* pSelf, GblStringView view) {
+GBL_EXPORT const char* (GblStringBuffer_set)(GblStringBuffer* pSelf, const char* pString, size_t length) {
     const char* pValue = NULL;
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GBL_CTX_CALL(GblArrayList_assign(&pSelf->data, view.pData, view.length));
+
+    if(!length)
+        length = strlen(pString);
+
+    GBL_CTX_CALL(GblArrayList_assign(&pSelf->data, pString, length));
     pValue = (const char*)GblArrayList_data(&pSelf->data);
+
     GBL_CTX_END_BLOCK();
     return pValue;
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_construct_4(GblStringBuffer* pSelf,
-                                                  GblStringView  view,
-                                                  size_t         structSize,
-                                                  GblContext*    pCtx)
+GBL_EXPORT GBL_RESULT (GblStringBuffer_construct)(GblStringBuffer* pSelf,
+                                                  const char*      pString,
+                                                  size_t           length,
+                                                  size_t           structSize,
+                                                  GblContext*      pCtx)
 {
     GBL_CTX_BEGIN(pCtx);
     GBL_CTX_VERIFY_ARG(structSize >= sizeof(GblStringBuffer));
-    GBL_CTX_CALL(GblArrayList_construct(&pSelf->data, 1, view.length, view.pData, structSize, GBL_TRUE, pCtx));
+
+    if(!length && pString)
+        length = strlen(pString);
+
+    GBL_CTX_CALL(GblArrayList_construct(&pSelf->data,
+                                        1,
+                                        length,
+                                        pString,
+                                        structSize,
+                                        GBL_TRUE,
+                                        pCtx));
     GBL_CTX_END();
 }
-GBL_EXPORT GBL_RESULT GblStringBuffer_construct_3(GblStringBuffer* pSelf,
-                                                  GblStringView   view,
-                                                  size_t         structSize)
-{
-    return GblStringBuffer_construct_4(pSelf, view, structSize, NULL);
-}
-GBL_EXPORT GBL_RESULT GblStringBuffer_construct_2(GblStringBuffer* pSelf,
-                                                  GblStringView  view)
-{
-    return GblStringBuffer_construct_3(pSelf, view, sizeof(GblStringBuffer));
-}
-GBL_EXPORT GBL_RESULT GblStringBuffer_construct_1(GblStringBuffer* pSelf)
-{
-    return GblStringBuffer_construct_2(pSelf, GBL_STRV(GBL_NULL));
-}
-
-GBL_EXPORT GblStringBuffer* GblStringBuffer_createInPlace_4 (GblStringBuffer* pSelf,
-                                                             GblStringView    view,
-                                                             size_t           extraStackSize,
-                                                             GblContext*      pCtx)
-{
-    GblStringBuffer_construct_4(pSelf, view, extraStackSize, pCtx);
-    return pSelf;
-}
-
-GBL_EXPORT GblStringBuffer* GblStringBuffer_createInPlace_3 (GblStringBuffer* pSelf,
-                                                             GblStringView    view,
-                                                             size_t           extraStackSize)
-{
-    GblStringBuffer_construct_3(pSelf, view, extraStackSize);
-    return pSelf;
-}
-
-GBL_EXPORT GblStringBuffer* GblStringBuffer_createInPlace_2 (GblStringBuffer* pSelf,
-                                                             GblStringView   view)
-{
-    GblStringBuffer_construct_2(pSelf, view);
-    return pSelf;
-}
-
-GBL_EXPORT GblStringBuffer* GblStringBuffer_createInPlace_1 (GblStringBuffer* pSelf)
-{
-    GblStringBuffer_construct_1(pSelf);
-    return pSelf;
-}
-
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_release(GblStringBuffer* pSelf, char** ppStrPtr, size_t * pCapacity) {
     size_t  size = 0;
@@ -376,11 +404,16 @@ GBL_EXPORT int GblStringBuffer_compare(const GblStringBuffer* pSelf, const GblSt
     return result;
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_insert(GblStringBuffer* pSelf, size_t  index, GblStringView view) {
+GBL_EXPORT GBL_RESULT (GblStringBuffer_insert)(GblStringBuffer* pSelf, size_t  index, const char* pString, size_t length) {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GBL_CTX_VERIFY_POINTER(view.pData);
-    GBL_CTX_VERIFY_EXPRESSION(view.length);
-    GblArrayList_insert(&pSelf->data, index, view.length, view.pData);
+    GBL_CTX_VERIFY_POINTER(pString);
+    if(!length)
+        length = strlen(pString);
+
+    GBL_CTX_VERIFY_ARG(length);
+
+    GblArrayList_insert(&pSelf->data, index, length, pString);
+
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END();
 }
@@ -396,7 +429,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendPrintf(GblStringBuffer* pSelf, const
 
 GBL_EXPORT GBL_RESULT GblStringBuffer_appendNil(GblStringBuffer* pSelf) {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GBL_CTX_CALL(GblStringBuffer_append(pSelf, GBL_STRV("nil")));
+    GBL_CTX_CALL(GblStringBuffer_append(pSelf, "nil"));
     GBL_CTX_END();
 }
 
@@ -404,7 +437,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendBool(GblStringBuffer* pSelf, GblBool
     const char* pStr = NULL;
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     pStr = value ? "true" : "false";
-    GBL_CTX_CALL(GblStringBuffer_append(pSelf, GBL_STRV(pStr)));
+    GBL_CTX_CALL(GblStringBuffer_append(pSelf, pStr));
     GBL_CTX_END();
 }
 
@@ -438,26 +471,33 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendPointer(GblStringBuffer* pSelf, cons
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_append(GblStringBuffer* pSelf, GblStringView view) {
+GBL_EXPORT GBL_RESULT (GblStringBuffer_append)(GblStringBuffer* pSelf, const char* pStr, size_t length) {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GBL_CTX_CALL(GblArrayList_append(&pSelf->data, view.pData, view.length));
+    GBL_CTX_CALL(GblStringBuffer_insert(pSelf, GblStringBuffer_length(pSelf), pStr, length));
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_prepend(GblStringBuffer* pSelf, GblStringView view) {
+GBL_EXPORT GBL_RESULT (GblStringBuffer_prepend)(GblStringBuffer* pSelf, const char* pStr, size_t length) {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
-    GBL_CTX_CALL(GblArrayList_prepend(&pSelf->data, view.pData, view.length));
+    GBL_CTX_CALL(GblStringBuffer_insert(pSelf, 0, pStr, length));
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblStringBuffer_overwrite(GblStringBuffer* pSelf, size_t index, GblStringView view) {
+GBL_EXPORT GBL_RESULT (GblStringBuffer_overwrite)(GblStringBuffer* pSelf, size_t index, const char* pString, size_t length) {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     //GBL_CTX_VERIFY_ARG(index < GblStringBuffer_length(pSelf));
-    const GblBool resized = (index + view.length > GblStringBuffer_length(pSelf));
-    GBL_CTX_CALL(GblStringBuffer_reserve(pSelf, index + view.length));
-    memcpy(GBL_PRIV(pSelf->data).pData+index, view.pData, view.length);
-    if(resized) GBL_PRIV(pSelf->data).pData[index + view.length] = '\0';
+    if(!length)
+        length = strlen(pString);
+
+    const GblBool resized = (index + length > GblStringBuffer_length(pSelf));
+    GBL_CTX_CALL(GblStringBuffer_reserve(pSelf, index + length));
+    memcpy(GBL_PRIV(pSelf->data).pData+index, pString, length);
+
+    if(resized)
+        GBL_PRIV(pSelf->data).pData[index + length] = '\0';
+
     GBL_PRIV(pSelf->data).size = strlen((const char*)GBL_PRIV(pSelf->data).pData);
+
     GBL_CTX_END();
 }
 
@@ -474,7 +514,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_shrinkToFit(GblStringBuffer* pSelf) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT char GblStringBuffer_char(const GblStringBuffer* pSelf, size_t index) {
+GBL_EXPORT char GblStringBuffer_at(const GblStringBuffer* pSelf, size_t index) {
     char result = '\0';
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     const char* pChar = (const char*)GblArrayList_at(&pSelf->data, index);
@@ -498,7 +538,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_chop(GblStringBuffer* pSelf) {
 GBL_EXPORT GBL_RESULT GblStringBuffer_lower(GblStringBuffer* pSelf) {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     for(size_t  c = 0; c < GblStringBuffer_length(pSelf); ++c) {
-        GblStringBuffer_setChar(pSelf, c, tolower(GblStringBuffer_char(pSelf, c)));
+        GblStringBuffer_setChar(pSelf, c, tolower(GblStringBuffer_at(pSelf, c)));
     }
     GBL_CTX_END();
 }
@@ -506,7 +546,15 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_lower(GblStringBuffer* pSelf) {
 GBL_EXPORT GBL_RESULT GblStringBuffer_upper(GblStringBuffer* pSelf) {
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     for(size_t  c = 0; c < GblStringBuffer_length(pSelf); ++c) {
-        GblStringBuffer_setChar(pSelf, c, toupper(GblStringBuffer_char(pSelf, c)));
+        GblStringBuffer_setChar(pSelf, c, toupper(GblStringBuffer_at(pSelf, c)));
     }
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblStringBuffer_reverse(GblStringBuffer* pSelf) {
+    GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
+
+    gblStrnReverse(GblStringBuffer_data(pSelf), GblStringBuffer_length(pSelf));
+
     GBL_CTX_END();
 }

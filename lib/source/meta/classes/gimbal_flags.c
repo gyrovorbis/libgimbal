@@ -26,8 +26,8 @@ static GBL_RESULT flagsSave_(const GblVariant* pVariant, GblStringBuffer* pStrin
     GBL_CTX_BEGIN(NULL);
     GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     GBL_CTX_CALL(GblStringBuffer_append(pString,
-                                        GBL_STRV(GblFlagsClass_nameFromValue(pFlagsClass,
-                                                                            pVariant->flags))));
+                                        GblFlagsClass_nameFromValue(pFlagsClass,
+                                                                    pVariant->flags)));
     GBL_CTX_END();
 }
 
@@ -103,7 +103,7 @@ static GBL_RESULT flagsConvertTo_(const GblVariant* pVariant, GblVariant* pOther
             char extraSpace[512];
         } buffer;
 
-        GBL_CTX_CALL(GblStringBuffer_construct(&buffer.str, GBL_STRV(""), sizeof(buffer)));
+        GBL_CTX_CALL(GblStringBuffer_construct(&buffer.str, NULL, 0, sizeof(buffer)));
         GBL_CTX_CALL(GblFlagsClass_valueAppendString(pFlagsClass, pVariant->flags, &buffer.str));
 
         GBL_CTX_CALL(GblVariant_setString(pOther, GblStringBuffer_cString(&buffer.str)));
@@ -337,8 +337,8 @@ GBL_EXPORT GBL_RESULT GblFlagsClass_valueAppendString(const GblFlagsClass* pClas
     size_t  count = 0;
     for(uint16_t f = 0; f < pSelf->entryCount; ++f) {
         if(flags & pSelf_->pEntries[f].value) {
-            if(count++) GBL_CTX_CALL(GblStringBuffer_append(pStr, GBL_STRV("|")));
-            GBL_CTX_CALL(GblStringBuffer_append(pStr, GBL_STRV(GblQuark_toString(pSelf_->pEntries[f].name))));
+            if(count++) GBL_CTX_CALL(GblStringBuffer_append(pStr, "|"));
+            GBL_CTX_CALL(GblStringBuffer_append(pStr, GblQuark_toString(pSelf_->pEntries[f].name)));
         }
     }
 

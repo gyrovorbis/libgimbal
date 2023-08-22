@@ -878,7 +878,7 @@ static GBL_RESULT stringDestruct_(GblVariant* pVariant) {
 
 static GBL_RESULT stringSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
-    GblStringBuffer_set(pString, GblStringRef_view(pVariant->pString));
+    GblStringBuffer_set(pString, pVariant->pString);
     GBL_CTX_END();
 }
 
@@ -994,7 +994,7 @@ static GBL_RESULT stringConvert_(const GblVariant* pVariant, GblVariant* pOther)
 static GBL_RESULT typeSave_(const GblVariant* pVariant, GblStringBuffer* pString) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_CALL(GblStringBuffer_append(pString,
-                                        GBL_STRV(GblType_name(pVariant->typeValue))));
+                                        GblType_name(pVariant->typeValue)));
     GBL_CTX_END();
 }
 

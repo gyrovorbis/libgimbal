@@ -72,6 +72,26 @@ GBL_EXPORT int gblStrCaseCmp(const char* pStr1, const char* pStr2) {
     return gblStrnCaseCmp(pStr1, pStr2, len1 < len2? len1 : len2);
 }
 
+
+GBL_EXPORT size_t gblStrnlen(const char* pStr1, size_t len) {
+    for(size_t i = 0; i < len; ++i) {
+        if(*pStr1++ == '\0')
+            return i;
+    }
+
+    return len;
+}
+
+GBL_EXPORT char* gblStrnReverse(char* pString, size_t length) {
+    length = gblStrnlen(pString, length);
+
+    for(size_t i = 0; i < length / 2; ++i) {
+        GBL_SWAP(pString[i], pString[length - i - 1]);
+    }
+
+    return pString;
+}
+
 GBL_EXPORT int gblAsciiDigitValue(char c) {
     return isdigit(c)? c-'0' : -1;
 }

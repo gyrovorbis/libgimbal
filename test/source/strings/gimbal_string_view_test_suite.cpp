@@ -67,7 +67,8 @@ struct DummyType {
 
 template<>
 std::optional<DummyType> gbl::string_view_to_value<DummyType>(const StringView& view) {
-    auto result = view.toValue<uint32_t>();
+    auto result = view.toValue<int32_t>();
+
     if(result.has_value())
         return std::optional {DummyType{result.value()}};
     else

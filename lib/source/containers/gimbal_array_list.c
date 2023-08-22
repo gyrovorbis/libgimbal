@@ -355,13 +355,13 @@ GBL_EXPORT void* GblArrayList_emplaceFront(GblArrayList* pSelf) {
     return GblArrayList_insert(pSelf, 0, 1, NULL);
 }
 
-GBL_EXPORT GBL_RESULT GblArrayList_append(GblArrayList* pSelf, const void* pData, size_t  elementCount) {
+GBL_EXPORT GBL_RESULT GblArrayList_append(GblArrayList* pSelf, const void* pData, size_t elementCount) {
     return !GblArrayList_insert(pSelf, GblArrayList_size(pSelf), elementCount, pData)?
                 GblThd_callRecord(NULL)->result :
                 GBL_RESULT_SUCCESS;
 }
 
-GBL_EXPORT GBL_RESULT GblArrayList_prepend(GblArrayList* pSelf, const void* pData, size_t  elementCount) {
+GBL_EXPORT GBL_RESULT GblArrayList_prepend(GblArrayList* pSelf, const void* pData, size_t elementCount) {
     return !GblArrayList_insert(pSelf, 0, elementCount, pData)?
                 GblThd_callRecord(NULL)->result :
                 GBL_RESULT_SUCCESS;

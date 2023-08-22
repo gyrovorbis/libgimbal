@@ -51,7 +51,7 @@ GBL_EXPORT const char* GblSettings_pushScope(GblSettings* pSelf, const char* pKe
     if(!GblStringBuffer_empty(&pSelf_->scope))
         GblStringBuffer_appendPrintf(&pSelf_->scope, "/%s", pKey);
     else
-        GblStringBuffer_append(&pSelf_->scope, GBL_STRV(pKey));
+        GblStringBuffer_append(&pSelf_->scope, pKey);
 
     return GblStringBuffer_cString(&pSelf_->scope);
 }
@@ -217,10 +217,7 @@ static GBL_RESULT GblSettings_init_(GblInstance* pInstance) {
                                       NULL,
                                       pSelf));
 
-    GBL_CTX_CALL(GblStringBuffer_construct(&pSelf_->scope,
-                                           GblStringView_fromEmpty(),
-                                           0,
-                                           NULL));
+    GBL_CTX_CALL(GblStringBuffer_construct(&pSelf_->scope));
 
     GBL_CTX_END();
 }
