@@ -342,6 +342,9 @@ endif()
 
 add_subdirectory(lib/tinycthread)
 add_subdirectory(lib/tiny-regex-c)
+
+SET(LZ4_BUILD_LEGACY_LZ4C OFF CACHE BOOL "Build LZ4 Legacy")
+SET(LZ4_BUILD_CLI OFF CACHE BOOL "Build LZ4 CLI")
 add_subdirectory(lib/lz4/build/cmake)
 
 list(APPEND
