@@ -220,3 +220,13 @@ if(ANDROID)
     qt_android_generate_deployment_settings(GimbalTests)
     qt_finalize_executable(GimbalTests)
 endif()
+
+
+# Emscripten flags and support
+if (EMSCRIPTEN)
+    # Set compile and link flags for the WASM build
+    set_target_properties(GimbalTests PROPERTIES
+        COMPILE_FLAGS "-pthread -s USE_PTHREADS=1"
+        LINK_FLAGS "-pthread -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8"
+    )
+endif()

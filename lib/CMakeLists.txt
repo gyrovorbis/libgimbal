@@ -22,6 +22,13 @@ project(LibGimbal
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# NOTE: have to set here instead of emscripten check below so *all* code is compiled with -fPIC
+if (EMSCRIPTEN)
+add_compile_options(-w -fPIC)
+else()
+add_compile_options(-w)
+endif()
+
 if(VITA)
 #    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA")
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVITA")
@@ -307,8 +314,37 @@ add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}
     ${GIMBAL_INCLUDES})
 
+# Emscripten flags and support
+if (EMSCRIPTEN)
+    # Make sure LZ4 doesnt fuck the build
+    set(LZ4_BUILD_LEGACY_LZ4C OFF)
+    set(LZ4_BUILD_CLI OFF)
+
+    # Set compile and link flags for the WASM build
+    set_target_properties(libGimbal PROPERTIES
+        COMPILE_FLAGS "-pthread -s WASM=1 -mbulk-memory -matomics"
+        LINK_FLAGS "-pthread -s WASM=1"
+    )
+
+    # Create an executable that will be compiled to WASM for browser/nodejs
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/emscripten.c" "int main() { return 0; }")
+
+    # This essentially acts as a wrapper/entry point to use your static library in a WebAssembly context.
+    add_executable(libGimbalWASM "${CMAKE_CURRENT_BINARY_DIR}/emscripten.c")
+    target_link_libraries(libGimbalWASM libGimbal)
+
+    # Set compile and link flags for the WASM build
+    set_target_properties(libGimbalWASM PROPERTIES
+        COMPILE_FLAGS "-pthread -s SIDE_MODULE=1 -s WASM=1 -s USE_PTHREADS=1"
+        LINK_FLAGS "-pthread -s SIDE_MODULE=1 -s WASM=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8  -s EXPORT_ALL=1 -o libGimbalWASM"
+    )
+endif()
+
 add_subdirectory(lib/tinycthread)
 add_subdirectory(lib/tiny-regex-c)
+
+SET(LZ4_BUILD_LEGACY_LZ4C OFF CACHE BOOL "Build LZ4 Legacy")
+SET(LZ4_BUILD_CLI OFF CACHE BOOL "Build LZ4 CLI")
 add_subdirectory(lib/lz4/build/cmake)
 
 list(APPEND
@@ -384,5 +420,3 @@ target_compile_definitions(libGimbal
 
 configure_file(${GBL_CONFIGURATION_INPUT_PATH}
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH})
-
-

@@ -239,7 +239,7 @@ static void thread1OnStarted_(GblThread* pSelf) {
     pFixture->thread1Started = GBL_TRUE;
 }
 
-static void thread1OnFinished_(GblThread* pSelf) {
+static void thread1OnFinished_(GblThread* pSelf, GblEnum result) {
     GblTestFixture* pFixture = GblClosure_currentUserdata();
     pFixture->thread1Finished = GBL_TRUE;
 }
@@ -308,7 +308,7 @@ GBL_TEST_CASE(join)
     GBL_TEST_COMPARE(pFixture->pThread1->state, GBL_THREAD_STATE_FINISHED);
 GBL_TEST_CASE_END
 
-static void thread2OnFinished_(GblThread* pSelf) {
+static void thread2OnFinished_(GblThread* pSelf, GblEnum result) {
     GBL_UNUSED(pSelf);
     GblTestFixture* pFixture = GblClosure_currentUserdata();
     pFixture->thread2Finished = GBL_TRUE;
