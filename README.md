@@ -72,6 +72,14 @@ cmake -DGBL_ENABLE_TESTS=ON ..
 cmake --build . 
 ```
 
+To build for Emscripten:
+```
+mkdir build
+cd build
+emcmake cmake -DGBL_ENABLE_TESTS=ON ..
+cmake --build . 
+```
+
 # Bindings #
 LibGimbal was specifically written with language interoperability in mind. As such, we will be happy to support and feature bindings to your favorite language. The following is a list of libraries which offer bindings between libGimbal and other languages:
 
