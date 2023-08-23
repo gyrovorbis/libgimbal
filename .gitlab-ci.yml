@@ -8,4 +8,3 @@ variables:
   DOCS_FTP_ADDRESS: libgimbal.elysianshadows.com
   BUILD_DREAMCAST_DISABLED: "YES"
   TEST_ANDROID_SIM_DISABLED: "YES"
-  TEST_WEBASM_DISABLED: "YES"
