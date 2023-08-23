@@ -259,7 +259,9 @@ build webasm:
       - $BUILD_WEBASM_DISABLED
   variables:
     BINARY_EXTENSION: .js
-    ARTIFACT_EXTENSIONS: .wasm
+    ARTIFACT_EXTENSIONS: >
+      .wasm
+      .worker.js
     PREFIX_PATH: ${QT_PATH}/wasm_multithread
     CC: ${EMSDK}/upstream/emscriptgen/emcc
     CXX: ${EMSDK}/upstream/emscriptgen/em++
