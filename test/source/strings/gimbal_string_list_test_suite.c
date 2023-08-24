@@ -544,7 +544,8 @@ static GBL_RESULT GblStringListTestSuite_spliceInvalid_(GblTestSuite* pSelf, Gbl
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
     //GBL_TEST_EXPECT_ERROR();
-    GBL_TEST_COMPARE(GblStringList_splice(pSelf_->lists[0], pSelf_->lists[1], 22), GBL_FALSE);
+    GBL_TEST_COMPARE(GblStringList_splice(pSelf_->lists[0], pSelf_->lists[1], 22),
+                     GBL_RESULT_ERROR_INVALID_OPERATION);
     //GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
     //GBL_CTX_CLEAR_LAST_RECORD();
 
@@ -555,7 +556,7 @@ static GBL_RESULT GblStringListTestSuite_splice_(GblTestSuite* pSelf, GblContext
     GBL_CTX_BEGIN(pCtx);
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
-    GBL_TEST_VERIFY(GblStringList_splice(pSelf_->lists[3], pSelf_->lists[4], -2));
+    GBL_TEST_CALL(GblStringList_splice(pSelf_->lists[3], pSelf_->lists[4], -2));
     GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf, 3, "one", "home", "usr", "local",
                                                                  "bin", "lol", "png", "two", NULL));
 

@@ -13,6 +13,9 @@
  *      - Add pattern matching API
  *      - replaceInStrings
  *      - GblStringList_createSplitPattern()
+ *      - test any "view" method
+ *      - make splice take a range
+ *      - GblStringList_compare()
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License
@@ -74,11 +77,6 @@ typedef GblBool (*GblStringListIterFn)(GblStringRef* pRef, void* pClosure);
  */
 typedef GblRingList GblStringList;
 
-/* 1) createWithViews
- * 2) pushBackViews
- * 3) pushFrontViews
- */
-
 /*! \name Lifetime Management
  *  \brief Methods for creating, referencing, and unreferencing lists
  *  \relatesalso GblStringList
@@ -124,10 +122,16 @@ GBL_EXPORT GblStringList* GblStringList_ref               (GBL_CSELF)           
 GBL_EXPORT GblRefCount    GblStringList_unref             (GBL_SELF)                            GBL_NOEXCEPT;
 //! @}
 
-// compare
-GBL_EXPORT GblBool         GblStringList_equals          (GBL_CSELF,
-                                                         const GblStringList* pOther,
-                                                         GblBool              matchCase/*=GBL_TRUE*/)    GBL_NOEXCEPT;
+/*! \name Operators
+ *  \brief Methods implementing basic operations
+ *  \relatesalso GblStringList
+ *  @{
+ */
+//! Returns GBL_TRUE if the given list is lexicographically equal to the \p pOther list, optionally ignoring case
+GBL_EXPORT GblBool GblStringList_equals (GBL_CSELF,
+                                         const GblStringList* pOther,
+                                         GblBool              matchCase/*=GBL_TRUE*/) GBL_NOEXCEPT;
+//! @}
 
 /*! \name Properties
  *  \brief Methods for accessing properties and derived data
@@ -193,50 +197,144 @@ GBL_EXPORT GBL_RESULT GblStringList_setRef (GBL_SELF,
                                             GblStringRef* pRef)       GBL_NOEXCEPT;
 //! @}
 
-GBL_EXPORT GBL_RESULT     GblStringList_pushBack        (GBL_SELF, .../*, NULL*/)                                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_pushBackRefs    (GBL_SELF, .../*, NULL*/)                                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_pushBackViews   (GBL_SELF, /*const char* pStr, size_t strLen,*/ .../*, NULL*/) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_pushFront       (GBL_SELF, .../*, NULL*/)                                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_pushFrontRefs   (GBL_SELF, .../*, NULL*/)                                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_pushFrontViews  (GBL_SELF, /*const char* pStr, size_t strLen,*/ .../*, NULL*/) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_insert          (GBL_SELF, intptr_t index, .../*, NULL*/)                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_insertRefs      (GBL_SELF, intptr_t index, .../*, NULL*/)                  GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_insertViews     (GBL_SELF, intptr_t index, /*const char* pStr, size_t strLen,*/ .../*, NULL*/) GBL_NOEXCEPT;
+/*! \name Adding
+ *  \brief Methods for appending and inserting strings
+ *  \relatesalso GblStringList
+ *  @{
+ */
+//! Appends the given (auto) NULL-terminated list of C strings to the back of the list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_pushBack         (GBL_SELF, .../*, NULL*/) GBL_NOEXCEPT;
+//! Equivalent to GblStringList_pushBack(), except the C strings are passed through a va_list pointer
+GBL_EXPORT GBL_RESULT GblStringList_pushBackVa       (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+//! Appends <i>new references</i> to a list of (auto) NULL-terminated GblStringRefs to the end of the given list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_pushBackRefs     (GBL_SELF, .../*, NULL*/) GBL_NOEXCEPT;
+//! Equivalent to GblStringList_pushBackRefs(), except the GblStringRefs are passed through a va_list pointer
+GBL_EXPORT GBL_RESULT GblStringList_pushBackRefsVa   (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+//! Appends the given (auto) NULL-terminated list of (string, length) pairs to the back of the list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_pushBackViews    (GBL_SELF,
+                                                      /* const char* pStr, */
+                                                      /* size_t      strLen,*/
+                                                      ...
+                                                      /*, NULL*/)              GBL_NOEXCEPT;
+//! Equivalent to GblStringList_pushBackViews(), except the (string, length) pairs are passed through a va_list pointer
+GBL_EXPORT GBL_RESULT GblStringList_pushBackViewsVa  (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
 
-GBL_EXPORT size_t         GblStringList_replace         (GBL_SELF,
-                                                         const char* pOld,
-                                                         const char* pNew,
-                                                         GblBool     matchCase/*=GBL_TRUE*/,
-                                                         size_t      limit/*=0*/,
-                                                         size_t      oldLen/*=0*/,
-                                                         size_t      newLen/*=0*/)                              GBL_NOEXCEPT;
+//! Prepends the given (auto) NULL-terminated list of C strings to the front of the list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_pushFront        (GBL_SELF, .../*, NULL*/) GBL_NOEXCEPT;
+//! Equivalent to GblStringList_pushFront(), except the C strings are passed through a va_list pointer
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontVa      (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+//! Prepends <i>new references</i> to a list of (auto) NULL-terminated GblStringRefs to the front of the given list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontRefs    (GBL_SELF, .../*, NULL*/) GBL_NOEXCEPT;
+//! Equivalent to GblStringList_pushFrontRefs(), except the GblStringRefs are passed through a va_list pointer
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontRefsVa  (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+//! Prepends the given (auto) NULL-terminated list of (string, length) pairs to the front of the list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontViews   (GBL_SELF,
+                                                      /* const char* pStr, */
+                                                      /* size_t      strLen,*/
+                                                      ...
+                                                      /*, NULL*/)              GBL_NOEXCEPT;
+//! Equivalent to GblStringList_pushFrontViews(), except the (string, length) pairs are passed through a va_list pointer
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontViewsVa (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
 
-GBL_EXPORT size_t         GblStringList_replaceWithRef  (GBL_SELF,
-                                                         const char*   pOld,
-                                                         GblStringRef* pNew,
-                                                         GblBool       matchCase/*=GBL_TRUE*/,
-                                                         size_t        limit/*=0*/,
-                                                         size_t        oldLen/*=0*/)            GBL_NOEXCEPT;
+//! Inserts a(n auto) NULL-terminated list of C strings to the signed \p index of the list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_insert           (GBL_SELF,
+                                                      intptr_t index,
+                                                      ...
+                                                      /*, NULL*/)              GBL_NOEXCEPT;
+//! Equivalent to GblStringList_insert(), except the list of C strings is passed through a va_list pointer
+GBL_EXPORT GBL_RESULT GblStringList_insertVa         (GBL_SELF,
+                                                      intptr_t index,
+                                                      va_list* pVa)            GBL_NOEXCEPT;
+//! Inserts <i>new references</i> to a(n auto) NULL-terminated list of GblStringRefs to \p index, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_insertRefs       (GBL_SELF,
+                                                      intptr_t index,
+                                                      ...
+                                                      /*, NULL*/)              GBL_NOEXCEPT;
+//! Equivalent to GblStringList_insertRefs(), except the list of GblStringRefs is passed through a va_list pointer
+GBL_EXPORT GBL_RESULT GblStringList_insertRefsVa     (GBL_SELF,
+                                                      intptr_t index,
+                                                      va_list* pVa)            GBL_NOEXCEPT;
+//! Inserts the given (auto) NULL-terminated list of (string, length) pairs into \p index in the list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_insertViews      (GBL_SELF,
+                                                      intptr_t      index,
+                                                      /*const char* pStr, */
+                                                      /* size_t     strLen, */
+                                                      ...
+                                                      /*, NULL*/)              GBL_NOEXCEPT;
+//! Equivalent to GblStringList_insertViews(), except the list of pairs is provided through a va_list pointer
+GBL_EXPORT GBL_RESULT GblStringList_insertViewsVa    (GBL_SELF,
+                                                      intptr_t index,
+                                                      va_list* pVa)            GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GblBool        GblStringList_splice          (GBL_SELF,
-                                                         GblStringList* pOther,
-                                                         intptr_t       index/*=-1*/)                     GBL_NOEXCEPT;
+/*! \name Removing
+ *  \brief Methods for popping and erasing strings
+ *  \relatesalso GblStringList
+ *  @{
+ */
+//! Pops a reference to the last string in the list off of the end, returning it or NULL if empty
+GBL_EXPORT GblStringRef* GblStringList_popBack     (GBL_SELF)                       GBL_NOEXCEPT;
+//! Pops a reference to the first string in the list off the front, returning it or NULL if empty
+GBL_EXPORT GblStringRef* GblStringList_popFront    (GBL_SELF)                       GBL_NOEXCEPT;
+//! Erases \p count (default 1) entries from the list, starting at \p index, returning a status code
+GBL_EXPORT GBL_RESULT    GblStringList_erase       (GBL_SELF,
+                                                    intptr_t index,
+                                                    size_t   count/*=1*/)           GBL_NOEXCEPT;
+//! Removes all instances of \p pStr, optionally ignoring case, from the given list, returning the number removed
+GBL_EXPORT size_t        GblStringList_remove      (GBL_SELF,
+                                                    const char* pStr,
+                                                    GblBool     matchCase/*=GBL_TRUE*/,
+                                                    size_t      strLen/*=0*/)       GBL_NOEXCEPT;
+//! Extracts the given node from the given list, returning its internally contained GblStringRef
+GBL_EXPORT GblStringRef* GblStringList_extract     (GBL_SELF,
+                                                    GblStringList* pNode)           GBL_NOEXCEPT;
+//! Removes all duplicate copies of any strings contained within the given list, returning a status code
+GBL_EXPORT GBL_RESULT    GblStringList_deduplicate (GBL_SELF,
+                                                    GblBool matchCase/*=GBL_TRUE*/) GBL_NOEXCEPT;
+//! Clears the given list, removing all string elements it contains, and returning a status code
+GBL_EXPORT GBL_RESULT    GblStringList_clear       (GBL_SELF)                       GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GblStringRef*  GblStringList_join            (GBL_CSELF,
-                                                         const char* pSeparator,
-                                                         size_t      sepLen/*=0*/)                       GBL_NOEXCEPT;
-
-GBL_EXPORT GblStringRef*  GblStringList_popBack         (GBL_SELF)                                       GBL_NOEXCEPT;
-GBL_EXPORT GblStringRef*  GblStringList_popFront        (GBL_SELF)                                       GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_erase           (GBL_SELF, intptr_t index, size_t count/*=1*/)         GBL_NOEXCEPT;
-GBL_EXPORT size_t         GblStringList_remove          (GBL_SELF, const char* pStr, GblBool matchCase/*=GBL_TRUE*/, size_t strLen/*=0*/)  GBL_NOEXCEPT;
-GBL_EXPORT GblStringRef*  GblStringList_extract         (GBL_SELF, GblStringList* pNode)                 GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_deduplicate     (GBL_SELF, GblBool matchCase/*=GBL_TRUE*/)                    GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT     GblStringList_clear           (GBL_SELF)                                       GBL_NOEXCEPT;
-GBL_EXPORT void           GblStringList_sort            (GBL_SELF, GblBool descending/*=GBL_TRUE*/)                   GBL_NOEXCEPT;
-GBL_EXPORT void           GblStringList_rotate          (GBL_SELF, intptr_t n)                           GBL_NOEXCEPT;
-GBL_EXPORT void           GblStringList_reverse         (GBL_SELF)                                       GBL_NOEXCEPT;
-GBL_EXPORT GblBool        GblStringList_foreach         (GBL_SELF, GblStringListIterFn pFnIt, void* pCl/*=NULL*/) GBL_NOEXCEPT;
+/*! \name  Miscellaneous
+ *  \brief Methods for replacing, sorting, and other utilities
+ *  \relatesalso GblStringList
+ *  @{
+ */
+//! Replaces \p limit instances of \p pOld with \p pNew found within the list, returning the number found
+GBL_EXPORT size_t        GblStringList_replace         (GBL_SELF,
+                                                        const char* pOld,
+                                                        const char* pNew,
+                                                        GblBool     matchCase/*=TRUE*/,
+                                                        size_t      limit/*=0*/,
+                                                        size_t      oldLen/*=0*/,
+                                                        size_t      newLen/*=0*/)    GBL_NOEXCEPT;
+//! Equivalent to GblStringList_replace(), except the replacement is a <i>new reference</i> to the given GblStringRef
+GBL_EXPORT size_t        GblStringList_replaceWithRef  (GBL_SELF,
+                                                        const char*   pOld,
+                                                        GblStringRef* pNew,
+                                                        GblBool       matchCase/*=TRUE*/,
+                                                        size_t        limit/*=0*/,
+                                                        size_t        oldLen/*=0*/)  GBL_NOEXCEPT;
+//! Splices the contents of \p pOther into \p pSelf at \p index, returning a result code
+GBL_EXPORT GBL_RESULT    GblStringList_splice          (GBL_SELF,
+                                                        GblStringList* pOther,
+                                                        intptr_t       index/*=-1*/) GBL_NOEXCEPT;
+//! Joins together all strings within the list into a single string, separated by \p pSeparator, returning a new reference
+GBL_EXPORT GblStringRef* GblStringList_join            (GBL_CSELF,
+                                                        const char* pSeparator,
+                                                        size_t      sepLen/*=0*/)    GBL_NOEXCEPT;
+//! Sorts the given list alphabetically in ascending order (by default) or descending order
+GBL_EXPORT void          GblStringList_sort            (GBL_SELF,
+                                                        GblBool descending/*=TRUE*/) GBL_NOEXCEPT;
+//! Rotates entries of the given list either forward or backwards, wrapping them back around as necessary
+GBL_EXPORT void          GblStringList_rotate          (GBL_SELF, intptr_t n)        GBL_NOEXCEPT;
+//! Reverses the order of all entries within the given list, so that the old front is back and vice versa
+GBL_EXPORT void          GblStringList_reverse         (GBL_SELF)                    GBL_NOEXCEPT;
+//! Iterates over every string within the list, passing it and \p pCl (optional) to \p pFnInit, see \sa GblStringListIterFn
+GBL_EXPORT GblBool       GblStringList_foreach         (GBL_SELF,
+                                                        GblStringListIterFn pFnIt,
+                                                        void* pCl/*=NULL*/)          GBL_NOEXCEPT;
+//! @}
 
 GBL_DECLS_END
 

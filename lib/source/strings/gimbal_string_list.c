@@ -252,8 +252,9 @@ GBL_EXPORT GblBool (GblStringList_contains)(const GblStringList* pSelf,
             != GBL_STRING_LIST_NPOS? GBL_TRUE : GBL_FALSE;
 }
 
-GBL_EXPORT GblBool (GblStringList_splice)(GblStringList* pSelf, GblStringList* pOther, intptr_t index) {
-    return GblRingList_splice(pSelf, pOther, index);
+GBL_EXPORT GBL_RESULT (GblStringList_splice)(GblStringList* pSelf, GblStringList* pOther, intptr_t index) {
+    return GblRingList_splice(pSelf, pOther, index)?
+                GBL_RESULT_SUCCESS : GBL_RESULT_ERROR_INVALID_OPERATION;
 }
 
 GBL_EXPORT GblStringRef* GblStringList_popBack(GblStringList* pSelf) {
@@ -405,7 +406,7 @@ GBL_EXPORT GblStringRef* GblStringList_join(const GblStringList* pSelf,
     return pRef;
 }
 
-static GBL_RESULT GblStringList_pushBackVaList_(GblStringList* pSelf, va_list * pList) {
+GBL_EXPORT GBL_RESULT GblStringList_pushBackVa(GblStringList* pSelf, va_list* pList) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
 
     const char* pStr;
@@ -423,30 +424,37 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushBack)(GblStringList* pSelf, ...) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
     va_list varArgs;
     va_start(varArgs, pSelf);
-    result = GblStringList_pushBackVaList_(pSelf, &varArgs);
+    result = GblStringList_pushBackVa(pSelf, &varArgs);
     va_end(varArgs);
     return result;
 }
 
-GBL_EXPORT GBL_RESULT (GblStringList_pushBackRefs)(GblStringList* pSelf, ...) {
+GBL_EXPORT GBL_RESULT GblStringList_pushBackRefsVa(GblStringList* pSelf, va_list* pVa) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
 
-    va_list varArgs;
-    va_start(varArgs, pSelf);
-
     GblStringRef* pStr;
-    while((pStr = va_arg(varArgs, GblStringRef*))) {
+    while((pStr = va_arg(*pVa, GblStringRef*))) {
         result = GblRingList_pushBack(pSelf, GblStringRef_ref(pStr));
         if(!GBL_RESULT_SUCCESS(result))
             break;
     }
 
+    return result;
+}
+
+GBL_EXPORT GBL_RESULT (GblStringList_pushBackRefs)(GblStringList* pSelf, ...) {
+    va_list varArgs;
+    va_start(varArgs, pSelf);
+
+    const GBL_RESULT result =
+            GblStringList_pushBackRefsVa(pSelf, &varArgs);
+
     va_end(varArgs);
     return result;
 }
 
-static GBL_RESULT GblStringList_pushBackViewsVa(GblStringList* pSelf,
-                                                va_list*       pVarArgs)
+GBL_EXPORT GBL_RESULT GblStringList_pushBackViewsVa(GblStringList* pSelf,
+                                                    va_list*       pVarArgs)
 {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
 
@@ -470,21 +478,25 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushBackViews)(GblStringList* pSelf,...)
     va_start(varArgs, pSelf);
 
     if(GBL_RESULT_SUCCESS(result))
-        result = GblStringList_pushBackVaList_(pSelf, &varArgs);
+        result = GblStringList_pushBackViewsVa(pSelf, &varArgs);
 
     va_end(varArgs);
     return result;
 }
 
-static GBL_RESULT GblStringList_pushFrontVaList_(GblStringList* pSelf, va_list* pList) {
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontVa(GblStringList* pSelf, va_list* pList) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
+
     size_t  index = 0;
     const char* pStr;
+
     while((pStr = va_arg(*pList, const char*))) {
         result = GblRingList_insert(pSelf, index++, GblStringRef_create(pStr));
+
         if(!GBL_RESULT_SUCCESS(result))
             break;
     }
+
     return result;
 }
 
@@ -492,31 +504,37 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushFront)(GblStringList* pSelf, ...) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
     va_list varArgs;
     va_start(varArgs, pSelf);
-    result = GblStringList_pushFrontVaList_(pSelf, &varArgs);
+    result = GblStringList_pushFrontVa(pSelf, &varArgs);
     va_end(varArgs);
+    return result;
+}
+
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontRefsVa(GblStringList* pSelf, va_list* pVa) {
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+    size_t  index = 0;
+    GblStringRef* pStr;
+
+    while((pStr = va_arg(*pVa, GblStringRef*))) {
+        result = GblRingList_insert(pSelf, index++, GblStringRef_ref(pStr));
+
+        if(!GBL_RESULT_SUCCESS(result))
+            break;
+    }
+
     return result;
 }
 
 GBL_EXPORT GBL_RESULT (GblStringList_pushFrontRefs)(GblStringList* pSelf, ...) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
-
     va_list varArgs;
     va_start(varArgs, pSelf);
-
-    size_t  index = 0;
-    GblStringRef* pStr;
-    while((pStr = va_arg(varArgs, GblStringRef*))) {
-        result = GblRingList_insert(pSelf, index++, GblStringRef_ref(pStr));
-        if(!GBL_RESULT_SUCCESS(result))
-            break;
-    }
-
+    result = GblStringList_pushFrontRefsVa(pSelf, &varArgs);
     va_end(varArgs);
     return result;
 }
 
-static GBL_RESULT GblStringList_pushFrontViewsVa_(GblStringList* pSelf,
-                                                  va_list*       pVarArgs)
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontViewsVa(GblStringList* pSelf,
+                                                     va_list*       pVarArgs)
 {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
 
@@ -543,7 +561,7 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushFrontViews)(GblStringList* pSelf,  ...)
     va_start(varArgs, pSelf);
 
     if(GBL_RESULT_SUCCESS(result))
-        result = GblStringList_pushFrontViewsVa_(pSelf, &varArgs);
+        result = GblStringList_pushFrontViewsVa(pSelf, &varArgs);
 
     va_end(varArgs);
     return result;
@@ -579,13 +597,13 @@ GBL_EXPORT GBL_RESULT GblStringList_insertVa_(GblStringList* pSelf,
 
     if(index == 0 || index == -((intmax_t)pSelf->size + 1)) {
         if(!view)
-            GBL_CTX_VERIFY_CALL(GblStringList_pushFrontVaList_(pSelf, pVarArgs));
+            GBL_CTX_VERIFY_CALL(GblStringList_pushFrontVa(pSelf, pVarArgs));
         else
-            GBL_CTX_VERIFY_CALL(GblStringList_pushFrontViewsVa_(pSelf, pVarArgs));
+            GBL_CTX_VERIFY_CALL(GblStringList_pushFrontViewsVa(pSelf, pVarArgs));
 
     } else if(index == (intmax_t)pSelf->size) {
         if(!view)
-            GBL_CTX_VERIFY_CALL(GblStringList_pushBackVaList_(pSelf, pVarArgs));
+            GBL_CTX_VERIFY_CALL(GblStringList_pushBackVa(pSelf, pVarArgs));
         else
             GBL_CTX_VERIFY_CALL(GblStringList_pushBackViewsVa(pSelf, pVarArgs));
 
@@ -623,32 +641,33 @@ GBL_EXPORT GBL_RESULT GblStringList_insertVa_(GblStringList* pSelf,
     GBL_CTX_END();
 }
 
+GBL_EXPORT GBL_RESULT GblStringList_insertVa(GblStringList* pSelf, intptr_t index, va_list* pVa) {
+    return GblStringList_insertVa_(pSelf, index, GBL_FALSE, pVa);
+}
 
 GBL_EXPORT GBL_RESULT (GblStringList_insert)(GblStringList* pSelf, intptr_t index, ...) {
     va_list varArgs;
     va_start(varArgs, index);
 
     const GBL_RESULT result =
-            GblStringList_insertVa_(pSelf,
-                                    index,
-                                    GBL_FALSE,
-                                    &varArgs);
+            GblStringList_insertVa(pSelf,
+                                   index,
+                                   &varArgs);
 
     va_end(varArgs);
     return result;
 }
 
-GBL_EXPORT GBL_RESULT (GblStringList_insertRefs)(GblStringList* pSelf, intptr_t index, ...) {
-    va_list varArgs;
+
+GBL_EXPORT GBL_RESULT GblStringList_insertRefsVa(GblStringList* pSelf, intptr_t index, va_list* pVa) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
-    va_start(varArgs, index);
 
     // store a copy of va args for later
     va_list varArgs2;
-    va_copy(varArgs2, varArgs);
+    va_copy(varArgs2, *pVa);
 
     // insert pointers into RingList regularly
-    result = GblRingList_insertVaList(pSelf, index, &varArgs);
+    result = GblRingList_insertVaList(pSelf, index, pVa);
 
     // ONLY if insertion was successful, add reference to va arg strings
     if(GBL_RESULT_SUCCESS(result)) {
@@ -659,8 +678,22 @@ GBL_EXPORT GBL_RESULT (GblStringList_insertRefs)(GblStringList* pSelf, intptr_t 
     }
 
     va_end(varArgs2);
+    return result;
+}
+
+GBL_EXPORT GBL_RESULT (GblStringList_insertRefs)(GblStringList* pSelf, intptr_t index, ...) {
+    va_list varArgs;
+    va_start(varArgs, index);
+
+    GBL_RESULT result =
+            GblStringList_insertRefsVa(pSelf, index, &varArgs);
+
     va_end(varArgs);
     return result;
+}
+
+GBL_EXPORT GBL_RESULT GblStringList_insertViewsVa(GblStringList* pSelf, intptr_t index, va_list* pVa) {
+    return GblStringList_insertVa_(pSelf, index, GBL_TRUE, pVa);
 }
 
 GBL_EXPORT GBL_RESULT (GblStringList_insertViews)(GblStringList* pSelf, intptr_t index, ...) {
@@ -668,10 +701,9 @@ GBL_EXPORT GBL_RESULT (GblStringList_insertViews)(GblStringList* pSelf, intptr_t
     va_start(varArgs, index);
 
     const GBL_RESULT result =
-            GblStringList_insertVa_(pSelf,
-                                    index,
-                                    GBL_FALSE,
-                                    &varArgs);
+            GblStringList_insertViewsVa(pSelf,
+                                        index,
+                                        &varArgs);
 
     va_end(varArgs);
     return result;
