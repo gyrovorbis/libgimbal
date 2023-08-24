@@ -62,7 +62,6 @@ typedef const char GblStringRef;
 
 /*! \name  Lifetime Management
  *  \brief Methods for managing GblStringRef references
- *  \relatesalso GblStringRef
  *  @{
  */
 //! Creates and returns a reference containing \p pString, with optional length and context
@@ -77,7 +76,6 @@ GBL_EXPORT GblRefCount   GblStringRef_unref  (const GblStringRef* pRef)  GBL_NOE
 
 /*! \name  Properties
  *  \brief Methods for reading stored and derived data
- *  \relatesalso GblStringRef
  *  @{
  */
 //! Returns the GblContext that was created with the given GblStringRef
@@ -98,7 +96,6 @@ GBL_EXPORT GblHash     GblStringRef_hash     (GBL_CSELF) GBL_NOEXCEPT;
 
 /*! \name  Accessors
  *  \brief Methods for accessing character and substrings
- *  \relatesalso GblStringRef
  *  @{
  */
 //! Returns the character located at position \p idx, raising an error upon out-of-range

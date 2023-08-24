@@ -79,7 +79,6 @@ typedef GblRingList GblStringList;
 
 /*! \name Lifetime Management
  *  \brief Methods for creating, referencing, and unreferencing lists
- *  \relatesalso GblStringList
  *  @{
  */
 //! Creates and returns a new, empty GblStringList reference with a size of 0
@@ -124,7 +123,6 @@ GBL_EXPORT GblRefCount    GblStringList_unref             (GBL_SELF)            
 
 /*! \name Operators
  *  \brief Methods implementing basic operations
- *  \relatesalso GblStringList
  *  @{
  */
 //! Returns GBL_TRUE if the given list is lexicographically equal to the \p pOther list, optionally ignoring case
@@ -135,7 +133,6 @@ GBL_EXPORT GblBool GblStringList_equals (GBL_CSELF,
 
 /*! \name Properties
  *  \brief Methods for accessing properties and derived data
- *  \relatesalso GblStringList
  *  @{
  */
 //! Returns the number of active references to the given GblStringList
@@ -154,7 +151,6 @@ GBL_EXPORT GblStringRef* GblStringList_at       (GBL_CSELF, intptr_t index) GBL_
 
 /*! \name Searching
  *  \brief Methods for finding, counting, and replacing strings
- *  \relatesalso GblStringList
  *  @{
  */
 //! Searches the list for \p pStr, starting at \p offset, returning its index if found, or GBL_RING_LIST_NPOS otherwise
@@ -183,7 +179,6 @@ GBL_EXPORT size_t  GblStringList_count    (GBL_CSELF,
 
 /*! \name  Assigning
  *  \brief Methods for setting elements
- *  \relatesalso GblStringList
  *  @{
  */
 //! Sets the string contained at the given signed \p index to \p pStr, returning a result code
@@ -199,7 +194,6 @@ GBL_EXPORT GBL_RESULT GblStringList_setRef (GBL_SELF,
 
 /*! \name Adding
  *  \brief Methods for appending and inserting strings
- *  \relatesalso GblStringList
  *  @{
  */
 //! Appends the given (auto) NULL-terminated list of C strings to the back of the list, returning a status code
@@ -269,7 +263,6 @@ GBL_EXPORT GBL_RESULT GblStringList_insertViewsVa    (GBL_SELF,
 
 /*! \name Removing
  *  \brief Methods for popping and erasing strings
- *  \relatesalso GblStringList
  *  @{
  */
 //! Pops a reference to the last string in the list off of the end, returning it or NULL if empty
@@ -297,7 +290,6 @@ GBL_EXPORT GBL_RESULT    GblStringList_clear       (GBL_SELF)                   
 
 /*! \name  Miscellaneous
  *  \brief Methods for replacing, sorting, and other utilities
- *  \relatesalso GblStringList
  *  @{
  */
 //! Replaces \p limit instances of \p pOld with \p pNew found within the list, returning the number found
