@@ -66,7 +66,7 @@ static GBL_RESULT pConvertFrom_(const GblVariant* pVariant, GblVariant* pOther) 
         if(srcType == GBL_NIL_TYPE)
             GblVariant_setPointer(pOther, GBL_POINTER_TYPE, NULL);
         else if(srcType == GBL_STRING_TYPE)
-            GblVariant_setPointer(pOther, GBL_POINTER_TYPE, pVariant->pString);
+            GblVariant_setPointer(pOther, GBL_POINTER_TYPE, (void*)pVariant->pString);
     } else
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_CTX_END();

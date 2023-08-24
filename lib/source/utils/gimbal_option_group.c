@@ -301,7 +301,7 @@ static GBL_RESULT GblOptionGroup_Box_destructor_(GblBox* pBox) {
     GblStringRef_unref(pGroup->pPrefix);
     GblStringRef_unref(pGroup->pDescription);
     GblStringRef_unref(pGroup->pSummary);
-    GblStringList_destroy(pGroup->pParsedArgs);
+    GblStringList_unref(pGroup->pParsedArgs);
 
     GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 

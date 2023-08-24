@@ -120,7 +120,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
 
     // 7. Free source list, store result code + message, and return
     GBL_CTX_END_BLOCK();
-    GblStringList_destroy(pArgs);
+    GblStringList_unref(pArgs);
 
     pSelf->parseResult = GBL_CTX_RESULT();
     if(!GBL_RESULT_SUCCESS(pSelf->parseResult)) {
@@ -414,8 +414,8 @@ static GBL_RESULT GblCmdParser_Box_destructor_(GblBox* pBox) {
     GblStringRef_unref(pSelf->pErrorMsg);
 
     GblStringRef_unref(pSelf_->pExecutable);
-    GblStringList_destroy(pSelf_->pArgValues);
-    GblStringList_destroy(pSelf_->pUnknownOptions);
+    GblStringList_unref(pSelf_->pArgValues);
+    GblStringList_unref(pSelf_->pUnknownOptions);
 
     GblOptionGroup_unref(pSelf_->pMainOptionGroup);
 

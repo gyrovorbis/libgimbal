@@ -400,7 +400,6 @@ list(APPEND
     ${GBL_CONFIGURATION_DEFINES}
     ${GBL_BUILD_DEFINES})
 
-
 target_include_directories(libGimbal
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>

@@ -11,7 +11,6 @@ typedef struct GblStringListTestSuite_ {
     GblStringList*  lists[12];
 } GblStringListTestSuite_;
 
-
 static GBL_RESULT GblStringListTestSuite_verify_(GblTestSuite* pSelf, size_t  index, ...) {
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
@@ -66,7 +65,6 @@ static GBL_RESULT GblStringListTestSuite_createEmpty_(GblTestSuite* pSelf, GblCo
     GBL_CTX_END();
 }
 
-
 static GBL_RESULT GblStringListTestSuite_create_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
@@ -95,7 +93,7 @@ static GBL_RESULT GblStringListTestSuite_createWithRefs_(GblTestSuite* pSelf, Gb
 
     GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf, 3, "one", "two", NULL));
 
-    GBL_TEST_COMPARE(refs + 2, GblRef_activeCount());
+    GBL_TEST_COMPARE(GblRef_activeCount(), refs + 3);
 
     GBL_CTX_END();
 }
@@ -139,7 +137,7 @@ static GBL_RESULT GblStringListTestSuite_createSubList_(GblTestSuite* pSelf, Gbl
 
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
-    pSelf_->lists[7] = GblStringList_createSubList(pSelf_->lists[6], 1, 3);
+    pSelf_->lists[7] = GblStringList_createCopy(pSelf_->lists[6], 1, 3);
 
     GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf, 7, "Dreamcast", "is", "best", NULL));
     GBL_CTX_END();
@@ -161,7 +159,7 @@ static GBL_RESULT GblStringListTestSuite_copy_(GblTestSuite* pSelf, GblContext* 
 
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
-    pSelf_->lists[9] = GblStringList_copy(pSelf_->lists[7]);
+    pSelf_->lists[9] = GblStringList_createCopy(pSelf_->lists[7]);
 
     GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf, 9, "Dreamcast", "is", "best", NULL));
     GBL_CTX_END();
@@ -180,6 +178,7 @@ static GBL_RESULT GblStringListTestSuite_count_(GblTestSuite* pSelf, GblContext*
     GBL_TEST_COMPARE(GblStringList_count(pSelf_->lists[11], "3"), 3);
     GBL_TEST_COMPARE(GblStringList_count(pSelf_->lists[11], "a"), 1);
     GBL_TEST_COMPARE(GblStringList_count(pSelf_->lists[11], "a", GBL_FALSE), 2);
+
     GBL_CTX_END();
 }
 
@@ -779,7 +778,6 @@ static GBL_RESULT GblStringListTestSuite_extract_(GblTestSuite* pSelf, GblContex
     GBL_TEST_COMPARE(pRef, "A");
     GblStringRef_unref(pRef);
 
-
     GBL_CTX_END();
 }
 
@@ -801,8 +799,8 @@ static GBL_RESULT GblStringListTestSuite_destroy_(GblTestSuite* pSelf, GblContex
     GBL_CTX_BEGIN(pCtx);
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
-    for(size_t  l = 0; l < GBL_COUNT_OF(pSelf_->lists); ++l) {
-        GBL_CTX_VERIFY_CALL(GblStringList_destroy(pSelf_->lists[l]));
+    for(size_t l = 0; l < GBL_COUNT_OF(pSelf_->lists); ++l) {
+        GblStringList_unref(pSelf_->lists[l]);
     }
 
     GBL_CTX_END();
@@ -871,7 +869,7 @@ GBL_EXPORT GblType GblStringListTestSuite_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         GBL_CTX_BEGIN(NULL);
-        type = GblTestSuite_register(GblQuark_internStatic("StringListTestSuite"),
+        type = GblTestSuite_register(GblQuark_internStatic("GblStringListTestSuite"),
                                      &vTable,
                                      sizeof(GblStringListTestSuite),
                                      sizeof(GblStringListTestSuite_),

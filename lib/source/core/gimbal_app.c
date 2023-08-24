@@ -156,8 +156,8 @@ static GBL_RESULT GblApp_Box_destructor_(GblBox* pBox) {
 
     GBL_CTX_VERIFY_CALL(GblStringRef_unref(pSelf_->pOrganization));
     GBL_CTX_VERIFY_CALL(GblStringRef_unref(pSelf_->pDomain));
-    GBL_CTX_VERIFY_CALL(GblStringList_destroy(pSelf_->pArgs));
-    GBL_CTX_VERIFY_CALL(GblStringList_destroy(pLibPaths_));
+    GBL_CTX_VERIFY_CALL(GblStringList_unref(pSelf_->pArgs));
+    GBL_CTX_VERIFY_CALL(GblStringList_unref(pLibPaths_));
 
     GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 

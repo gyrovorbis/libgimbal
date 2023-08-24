@@ -48,7 +48,7 @@ GBL_EXPORT void* GblRef_allocWithContext(size_t      size,
     return pPtr;
 }
 
-GBL_EXPORT GblRefCount GblRef_releaseWithDtor(void* pData,
+GBL_EXPORT GblRefCount GblRef_releaseWithDtor(const void* pData,
                                               GblRefDestructFn pFnDtor)
 {
     GblRefCount refCount = 0;
@@ -80,7 +80,7 @@ GBL_EXPORT void* GblRef_alloc(size_t  size) GBL_NOEXCEPT {
     return GblRef_allocWithContext(size, NULL);
 }
 
-GBL_EXPORT void* GblRef_acquire(void* pSelf) GBL_NOEXCEPT
+GBL_EXPORT void* GblRef_acquire(const void* pSelf) GBL_NOEXCEPT
 {
     void* pRetData = NULL;
     if(pSelf) {
@@ -91,7 +91,7 @@ GBL_EXPORT void* GblRef_acquire(void* pSelf) GBL_NOEXCEPT
     return pRetData;
 }
 
-GBL_EXPORT GblRefCount GblRef_release(void* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblRefCount GblRef_release(const void* pSelf) GBL_NOEXCEPT {
     return GblRef_releaseWithDtor(pSelf, NULL);
 }
 
