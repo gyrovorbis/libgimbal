@@ -135,16 +135,9 @@ GBL_EXPORT GblStringList* (GblStringList_createSplit)(const char* pStr,
     return pList;
 }
 
-GBL_EXPORT GblStringList* (GblStringList_createFromArray)(const char** ppStrs, size_t  size) {
-    size_t  pos = 0;
-
+GBL_EXPORT GblStringList* (GblStringList_createWithArray)(const char** ppStrs, size_t size) {
     GblStringList* pList = GblStringList_createEmpty();
-
-    const char* pStr;
-    while(pos < size && (pStr = ppStrs[pos])) {
-        GblRingList_pushBack(pList, GblStringRef_create(pStr));
-        ++pos;
-    }
+    GblStringList_pushBackArray(pList, ppStrs, size);
 
     return pList;
 }
@@ -190,28 +183,44 @@ GBL_EXPORT GblRefCount GblStringList_unref(GblStringList* pSelf) {
     return GblRingList_unref(pSelf, GblStringList_destructor_);
 }
 
-GBL_EXPORT GblBool (GblStringList_equals)(const GblStringList* pSelf, const GblStringList* pOther, GblBool matchCase) {
-    if(GblRingList_size(pSelf) != GblRingList_size(pOther)) return GBL_FALSE;
-
+GBL_EXPORT int (GblStringList_compare)(const GblStringList* pSelf,
+                                       const GblStringList* pOther,
+                                       GblBool              matchCase)
+{
     GblRingList* pIt1 = pSelf->ringNode.pNext;
     GblRingList* pIt2 = pOther->ringNode.pNext;
 
     while(pIt1 != pSelf && pIt2 != pOther) {
+        int result;
 
         if(matchCase) {
-            if(strcmp(pIt1->pData, pIt2->pData) != 0)
-                return GBL_FALSE;
+            if((result = strcmp(pIt1->pData, pIt2->pData)) != 0)
+                return result;
         } else {
-            if(!GblStringView_equalsIgnoreCase(GBL_STRV(pIt1->pData),
-                                               pIt2->pData))
-                return GBL_FALSE;
+            if((result = GblStringView_compareIgnoreCase(
+                            GBL_STRV(pIt1->pData, GblStringRef_length(pIt1->pData)),
+                            pIt2->pData,
+                            GblStringRef_length(pIt2->pData))
+                         ) != 0)
+                return result;
         }
 
         pIt1 = pIt1->ringNode.pNext;
         pIt2 = pIt2->ringNode.pNext;
     }
 
-    return GBL_TRUE;
+    if(pIt1 != pSelf && pIt2 == pOther)
+        return INT_MAX;
+    else if(pIt1 == pSelf && pIt2 != pOther)
+        return INT_MIN;
+    else if(pIt1 == pSelf && pIt2 == pOther)
+        return 0;
+    else
+        GBL_ASSERT(GBL_FALSE, "Something is wrong with our comparison algorithm...");
+}
+
+GBL_EXPORT GblBool (GblStringList_equals)(const GblStringList* pSelf, const GblStringList* pOther, GblBool matchCase) {
+    return GblStringList_compare(pSelf, pOther, matchCase) == 0;
 }
 
 
@@ -417,7 +426,6 @@ GBL_EXPORT GBL_RESULT GblStringList_pushBackVa(GblStringList* pSelf, va_list* pL
     }
 
     return result;
-
 }
 
 GBL_EXPORT GBL_RESULT (GblStringList_pushBack)(GblStringList* pSelf, ...) {
@@ -482,6 +490,20 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushBackViews)(GblStringList* pSelf,...)
 
     va_end(varArgs);
     return result;
+}
+
+GBL_EXPORT GBL_RESULT (GblStringList_pushBackArray)(GblStringList* pSelf,
+                                                    const char**   ppStrs,
+                                                    size_t         size)
+{
+    size_t pos = 0;
+    const char* pStr;
+    while(pos < size && (pStr = ppStrs[pos])) {
+        GblRingList_pushBack(pSelf, GblStringRef_create(pStr));
+        ++pos;
+    }
+
+    return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT GBL_RESULT GblStringList_pushFrontVa(GblStringList* pSelf, va_list* pList) {
@@ -567,6 +589,24 @@ GBL_EXPORT GBL_RESULT (GblStringList_pushFrontViews)(GblStringList* pSelf,  ...)
     return result;
 }
 
+GBL_EXPORT GBL_RESULT (GblStringList_pushFrontArray)(GblStringList* pSelf,
+                                                     const char**   ppStrs,
+                                                     size_t         size)
+{
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+
+    size_t pos = 0;
+    const char* pStr;
+    while(pos < size && (pStr = ppStrs[pos])) {
+        result = GblRingList_insert(pSelf, pos++, GblStringRef_create(pStr));
+
+        if(!GBL_RESULT_SUCCESS(result))
+            break;
+    }
+
+    return result;
+}
+
 // Should this only put the matched portion in the filtered list?
 GBL_EXPORT GblStringList* GblStringList_createFilter(const GblStringList* pOther,
                                                      const char*          pPattern) {
@@ -588,10 +628,10 @@ GBL_EXPORT GblStringList* GblStringList_createFilter(const GblStringList* pOther
     return pList;
 }
 
-GBL_EXPORT GBL_RESULT GblStringList_insertVa_(GblStringList* pSelf,
-                                              intptr_t       index,
-                                              GblBool        view,
-                                              va_list*       pVarArgs)
+static  GBL_RESULT GblStringList_insertVa_(GblStringList* pSelf,
+                                           intptr_t       index,
+                                           GblBool        view,
+                                           va_list*       pVarArgs)
 {
     GBL_CTX_BEGIN(NULL);
 
@@ -707,7 +747,65 @@ GBL_EXPORT GBL_RESULT (GblStringList_insertViews)(GblStringList* pSelf, intptr_t
 
     va_end(varArgs);
     return result;
+}
 
+/*
+ *
+    size_t pos = 0;
+    const char* pStr;
+    while(pos < size && (pStr = ppStrs[pos])) {
+        result = GblRingList_insert(pSelf, pos++, GblStringRef_create(pStr));
+
+        if(!GBL_RESULT_SUCCESS(result))
+            break;
+    }*/
+GBL_EXPORT GBL_RESULT GblStringList_insertArray(GblStringList* pSelf,
+                                                intptr_t       index,
+                                                const char**   ppStrs,
+                                                size_t         size)
+{
+    GBL_CTX_BEGIN(NULL);
+
+    if(index == 0 || index == -((intmax_t)pSelf->size + 1)) {
+        GBL_CTX_VERIFY_CALL(
+            GblStringList_pushFrontArray(pSelf, ppStrs, size)
+        );
+
+    } else if(index == (intmax_t)pSelf->size) {
+        GBL_CTX_VERIFY_CALL(
+            GblStringList_pushBackArray(pSelf, ppStrs, size)
+        );
+
+    } else {
+        GblRingList* pEntry =
+            GBL_DOUBLY_LINKED_LIST_ENTRY(
+                GblDoublyLinkedList_at(&pSelf->listNode, index),
+                GblRingList,
+                listNode);
+
+        GBL_CTX_VERIFY_LAST_RECORD();
+        GBL_CTX_VERIFY(pEntry, GBL_RESULT_ERROR_OUT_OF_RANGE);
+
+        size_t pos = 0;
+        const char* pStr;
+
+        while(pos < size && (pStr = ppStrs[pos])) {
+            GblRingList* pNewEntry = GblRingList_new_();
+            GblDoublyLinkedList_init(&pNewEntry->listNode);
+
+            if(index > 0)
+                GblDoublyLinkedList_insertBefore(&pEntry->listNode, &pNewEntry->listNode);
+            else {
+                GblDoublyLinkedList_insertAfter(&pEntry->listNode, &pNewEntry->listNode);
+                pEntry = pNewEntry;
+            }
+
+            pNewEntry->pData = (void*)GblStringRef_create(pStr);
+            ++pSelf->size;
+        }
+    }
+
+    GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT (GblStringList_erase)(GblStringList* pSelf, intptr_t index, size_t  count) GBL_NOEXCEPT {
@@ -788,8 +886,9 @@ GBL_EXPORT GBL_RESULT (GblStringList_deduplicate)(GblStringList* pSelf, GblBool 
         {
 
             if((matchCase && strcmp(pNode->pData, pNode2->pData) == 0) ||
-               (!matchCase && GblStringView_equalsIgnoreCase(GBL_STRV(pNode->pData),
-                                                             pNode2->pData)))
+               (!matchCase && GblStringView_equalsIgnoreCase(GBL_STRV(pNode->pData, GblStringRef_length(pNode->pData)),
+                                                             pNode2->pData,
+                                                             GblStringRef_length(pNode2->pData))))
             {
                 GblStringList* pPrev = pNode2->ringNode.pPrev;
                 GblDoublyLinkedList_remove(&pNode2->listNode);

@@ -139,7 +139,7 @@ static GBL_RESULT GblApp_Object_constructed_(GblObject* pObject) {
 
     startingUp_ = GBL_FALSE;
 
-    pSelf_->pArgs = GblStringList_createFromArray(pSelf->ppArgv, pSelf->argc);
+    pSelf_->pArgs = GblStringList_createWithArray(pSelf->ppArgv, pSelf->argc);
 
     GblApp_logInfo_(GBL_APP(pObject));
 

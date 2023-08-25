@@ -1,6 +1,9 @@
 /*! \file
- *  \brief C char and char array manipulation
+ *  \brief Low-level C string and character-based functions
  *  \ingroup strings
+ *
+ *
+ *
  *  \todo
  *      - gblStrdupa()
  *      - gblStrndupa()

@@ -15,7 +15,9 @@
  *      - GblStringList_createSplitPattern()
  *      - test any "view" method
  *      - make splice take a range
- *      - GblStringList_compare()
+ *      - compare/equals strings/arrays/views
+ *      - pushBack/pushFront arrays
+ *      - insert arrays
  *
  *  \author     2023 Falco Girgis
  *  \copyright  MIT License
@@ -100,14 +102,14 @@ GBL_EXPORT GblStringList* GblStringList_createWithViews   (const char* pFirst,
 GBL_EXPORT GblStringList* GblStringList_createWithViewsVa (const char* pFirst,
                                                            size_t      firstLen,
                                                            va_list*    pVa)                     GBL_NOEXCEPT;
+//! Creates and returns a new GblStringList, populated by an array of const char* pointers, with either a size or NULL terminator (default)
+GBL_EXPORT GblStringList* GblStringList_createWithArray   (const char** ppStr,
+                                                           size_t       size/*=NPOS*/)          GBL_NOEXCEPT;
 //! Creates and returns a new GblStringList, populating it with \p pStr split up by every occurence of \p pDelim
 GBL_EXPORT GblStringList* GblStringList_createSplit       (const char* pStr,
                                                            const char* pDelim,
                                                            size_t      strLen/*=0*/,
                                                            size_t      delimLen/*=0*/)          GBL_NOEXCEPT;
-//! Creates and returns a new GblStringList, populated by an array of const char* pointers, with either a size or NULL terminator (default)
-GBL_EXPORT GblStringList* GblStringList_createFromArray   (const char** ppStr,
-                                                           size_t       size/*=NPOS*/)          GBL_NOEXCEPT;
 //! Deep copies an existing GblStringList, creating a duplicated list populated by references to the values held by \p pSrc
 GBL_EXPORT GblStringList* GblStringList_createCopy        (const GblStringList* pSrc,
                                                            intptr_t             startIdx/*=0*/,
@@ -121,14 +123,20 @@ GBL_EXPORT GblStringList* GblStringList_ref               (GBL_CSELF)           
 GBL_EXPORT GblRefCount    GblStringList_unref             (GBL_SELF)                            GBL_NOEXCEPT;
 //! @}
 
-/*! \name Operators
+/*! \name  Operators
  *  \brief Methods implementing basic operations
  *  @{
  */
+//! Returns the lexicographical difference between the two lists, optionally doing so case insensitively
+GBL_EXPORT int     GblStringList_compare (GBL_CSELF,
+                                          const GblStringList* pOther,
+                                          GblBool              matchCase/*=GBL_TRUE*/) GBL_NOEXCEPT;
 //! Returns GBL_TRUE if the given list is lexicographically equal to the \p pOther list, optionally ignoring case
-GBL_EXPORT GblBool GblStringList_equals (GBL_CSELF,
-                                         const GblStringList* pOther,
-                                         GblBool              matchCase/*=GBL_TRUE*/) GBL_NOEXCEPT;
+GBL_EXPORT GblBool GblStringList_equals  (GBL_CSELF,
+                                          const GblStringList* pOther,
+                                          GblBool              matchCase/*=GBL_TRUE*/) GBL_NOEXCEPT;
+
+// compare/equals strings, views, arrays
 //! @}
 
 /*! \name Properties
@@ -197,68 +205,81 @@ GBL_EXPORT GBL_RESULT GblStringList_setRef (GBL_SELF,
  *  @{
  */
 //! Appends the given (auto) NULL-terminated list of C strings to the back of the list, returning a status code
-GBL_EXPORT GBL_RESULT GblStringList_pushBack         (GBL_SELF, .../*, NULL*/) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushBack         (GBL_SELF, .../*, NULL*/)   GBL_NOEXCEPT;
 //! Equivalent to GblStringList_pushBack(), except the C strings are passed through a va_list pointer
-GBL_EXPORT GBL_RESULT GblStringList_pushBackVa       (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushBackVa       (GBL_SELF, va_list* pVa)    GBL_NOEXCEPT;
 //! Appends <i>new references</i> to a list of (auto) NULL-terminated GblStringRefs to the end of the given list, returning a status code
-GBL_EXPORT GBL_RESULT GblStringList_pushBackRefs     (GBL_SELF, .../*, NULL*/) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushBackRefs     (GBL_SELF, .../*, NULL*/)   GBL_NOEXCEPT;
 //! Equivalent to GblStringList_pushBackRefs(), except the GblStringRefs are passed through a va_list pointer
-GBL_EXPORT GBL_RESULT GblStringList_pushBackRefsVa   (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushBackRefsVa   (GBL_SELF, va_list* pVa)    GBL_NOEXCEPT;
 //! Appends the given (auto) NULL-terminated list of (string, length) pairs to the back of the list, returning a status code
 GBL_EXPORT GBL_RESULT GblStringList_pushBackViews    (GBL_SELF,
                                                       /* const char* pStr, */
                                                       /* size_t      strLen,*/
                                                       ...
-                                                      /*, NULL*/)              GBL_NOEXCEPT;
+                                                      /*, NULL*/)                GBL_NOEXCEPT;
 //! Equivalent to GblStringList_pushBackViews(), except the (string, length) pairs are passed through a va_list pointer
-GBL_EXPORT GBL_RESULT GblStringList_pushBackViewsVa  (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushBackViewsVa  (GBL_SELF, va_list* pVa)    GBL_NOEXCEPT;
+//! Appends the given optionally NULL-terminated array of C strings to the back of the given list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_pushBackArray    (GBL_SELF,
+                                                      const char** ppStrArray,
+                                                      size_t       len/*=NPOS*/) GBL_NOEXCEPT;
 
 //! Prepends the given (auto) NULL-terminated list of C strings to the front of the list, returning a status code
-GBL_EXPORT GBL_RESULT GblStringList_pushFront        (GBL_SELF, .../*, NULL*/) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushFront        (GBL_SELF, .../*, NULL*/)   GBL_NOEXCEPT;
 //! Equivalent to GblStringList_pushFront(), except the C strings are passed through a va_list pointer
-GBL_EXPORT GBL_RESULT GblStringList_pushFrontVa      (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontVa      (GBL_SELF, va_list* pVa)    GBL_NOEXCEPT;
 //! Prepends <i>new references</i> to a list of (auto) NULL-terminated GblStringRefs to the front of the given list, returning a status code
-GBL_EXPORT GBL_RESULT GblStringList_pushFrontRefs    (GBL_SELF, .../*, NULL*/) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontRefs    (GBL_SELF, .../*, NULL*/)   GBL_NOEXCEPT;
 //! Equivalent to GblStringList_pushFrontRefs(), except the GblStringRefs are passed through a va_list pointer
-GBL_EXPORT GBL_RESULT GblStringList_pushFrontRefsVa  (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontRefsVa  (GBL_SELF, va_list* pVa)    GBL_NOEXCEPT;
 //! Prepends the given (auto) NULL-terminated list of (string, length) pairs to the front of the list, returning a status code
 GBL_EXPORT GBL_RESULT GblStringList_pushFrontViews   (GBL_SELF,
                                                       /* const char* pStr, */
                                                       /* size_t      strLen,*/
                                                       ...
-                                                      /*, NULL*/)              GBL_NOEXCEPT;
+                                                      /*, NULL*/)                GBL_NOEXCEPT;
 //! Equivalent to GblStringList_pushFrontViews(), except the (string, length) pairs are passed through a va_list pointer
-GBL_EXPORT GBL_RESULT GblStringList_pushFrontViewsVa (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontViewsVa (GBL_SELF, va_list* pVa)    GBL_NOEXCEPT;
+//! Prepends the given optionally NULL-terminated array of C strings to the front of the given list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_pushFrontArray   (GBL_SELF,
+                                                      const char** ppStrArray,
+                                                      size_t       len/*=NPOS*/) GBL_NOEXCEPT;
 
 //! Inserts a(n auto) NULL-terminated list of C strings to the signed \p index of the list, returning a status code
 GBL_EXPORT GBL_RESULT GblStringList_insert           (GBL_SELF,
                                                       intptr_t index,
                                                       ...
-                                                      /*, NULL*/)              GBL_NOEXCEPT;
+                                                      /*, NULL*/)                GBL_NOEXCEPT;
 //! Equivalent to GblStringList_insert(), except the list of C strings is passed through a va_list pointer
 GBL_EXPORT GBL_RESULT GblStringList_insertVa         (GBL_SELF,
                                                       intptr_t index,
-                                                      va_list* pVa)            GBL_NOEXCEPT;
+                                                      va_list* pVa)              GBL_NOEXCEPT;
 //! Inserts <i>new references</i> to a(n auto) NULL-terminated list of GblStringRefs to \p index, returning a status code
 GBL_EXPORT GBL_RESULT GblStringList_insertRefs       (GBL_SELF,
                                                       intptr_t index,
                                                       ...
-                                                      /*, NULL*/)              GBL_NOEXCEPT;
+                                                      /*, NULL*/)                GBL_NOEXCEPT;
 //! Equivalent to GblStringList_insertRefs(), except the list of GblStringRefs is passed through a va_list pointer
 GBL_EXPORT GBL_RESULT GblStringList_insertRefsVa     (GBL_SELF,
                                                       intptr_t index,
-                                                      va_list* pVa)            GBL_NOEXCEPT;
+                                                      va_list* pVa)              GBL_NOEXCEPT;
 //! Inserts the given (auto) NULL-terminated list of (string, length) pairs into \p index in the list, returning a status code
 GBL_EXPORT GBL_RESULT GblStringList_insertViews      (GBL_SELF,
                                                       intptr_t      index,
                                                       /*const char* pStr, */
                                                       /* size_t     strLen, */
                                                       ...
-                                                      /*, NULL*/)              GBL_NOEXCEPT;
+                                                      /*, NULL*/)                GBL_NOEXCEPT;
 //! Equivalent to GblStringList_insertViews(), except the list of pairs is provided through a va_list pointer
 GBL_EXPORT GBL_RESULT GblStringList_insertViewsVa    (GBL_SELF,
                                                       intptr_t index,
-                                                      va_list* pVa)            GBL_NOEXCEPT;
+                                                      va_list* pVa)              GBL_NOEXCEPT;
+//! Inserts the given optionally NULL-terminated list of C strings at into \p index in the list, returning a status code
+GBL_EXPORT GBL_RESULT GblStringList_insertArray      (GBL_SELF,
+                                                      intptr_t index,
+                                                      const char** ppStrArray,
+                                                      size_t       len/*=NPOS*/) GBL_NOEXCEPT;
 //! @}
 
 /*! \name Removing
@@ -347,12 +368,12 @@ GBL_DECLS_END
 #define GblStringList_createSplitDefault__(str, del, strLen, delLen, ...) \
     ((GblStringList_createSplit)(str, del, strLen, delLen))
 
-#define GblStringList_createFromArray(...) \
-    GblStringList_createFromArrayDefault_(__VA_ARGS__)
-#define GblStringList_createFromArrayDefault_(...) \
-    GblStringList_createFromArrayDefault__(__VA_ARGS__, GBL_STRING_LIST_NPOS)
-#define GblStringList_createFromArrayDefault__(array, len, ...) \
-    (GblStringList_createFromArray)(array, len)
+#define GblStringList_createWithArray(...) \
+    GblStringList_createWithArrayDefault_(__VA_ARGS__)
+#define GblStringList_createWithArrayDefault_(...) \
+    GblStringList_createWithArrayDefault__(__VA_ARGS__, GBL_STRING_LIST_NPOS)
+#define GblStringList_createWithArrayDefault__(array, len, ...) \
+    (GblStringList_createWithArray)(array, len)
 
 #define GblStringList_createCopy(...) \
     GBL_VA_OVERLOAD_CALL_ARGC(GblStringList_createCopyDefault, __VA_ARGS__)
@@ -372,6 +393,13 @@ GBL_DECLS_END
 #define GblStringList_pushBackViews(...) \
     (GblStringList_pushBackViews)(__VA_ARGS__, GBL_NULL)
 
+#define GblStringList_pushBackArray(...) \
+    GblStringList_pushBackArrayDefault_(__VA_ARGS__)
+#define GblStringList_pushBackArrayDefault_(...) \
+    GblStringList_pushBackArrayDefault__(__VA_ARGS__, GBL_STRING_LIST_NPOS)
+#define GblStringList_pushBackArrayDefault__(list, array, size, ...) \
+    ((GblStringList_pushBackArray)(list, array, size))
+
 #define GblStringList_pushFront(...) \
     (GblStringList_pushFront)(__VA_ARGS__, GBL_NULL)
 
@@ -381,6 +409,13 @@ GBL_DECLS_END
 #define GblStringList_pushFrontViews(...) \
     (GblStringList_pushFrontViews)(__VA_ARGS__, GBL_NULL)
 
+#define GblStringList_pushFrontArray(...) \
+    GblStringList_pushFrontArrayDefault_(__VA_ARGS__)
+#define GblStringList_pushFrontArrayDefault_(...) \
+    GblStringList_pushFrontArrayDefault__(__VA_ARGS__, GBL_STRING_LIST_NPOS)
+#define GblStringList_pushFrontArrayDefault__(list, array, size, ...) \
+    ((GblStringList_pushFrontArray(list, array, size)))
+
 #define GblStringList_insert(...) \
     (GblStringList_insert)(__VA_ARGS__, GBL_NULL)
 
@@ -389,6 +424,20 @@ GBL_DECLS_END
 
 #define GblStringList_insertViews(...) \
     (GblStringList_insertViews)(__VA_ARGS__, GBL_NULL)
+
+#define GblStringList_insertArray(...) \
+    GblStringList_insertArrayDefault_(__VA_ARGS__)
+#define GblStringList_insertArrayDefault_(...) \
+    GblStringList_insertArrayDefault__(__VA_ARGS__, GBL_STRING_LIST_NPOS)
+#define GblStringList_insertArrayDefault__(list, idx, array, size, ...) \
+    ((GblStringList_insertArray(list, idx, array, size)))
+
+#define GblStringList_compare(...) \
+    GblStringList_compareDefault_(__VA_ARGS__)
+#define GblStringList_compareDefault_(...) \
+    GblStringList_compareDefault__(__VA_ARGS__, GBL_TRUE)
+#define GblStringList_compareDefault__(list1, list2, match, ...) \
+    (GblStringList_compare(list1, list2, match))
 
 #define GblStringList_equals(...) \
     GblStringList_equalsDefault_(__VA_ARGS__)

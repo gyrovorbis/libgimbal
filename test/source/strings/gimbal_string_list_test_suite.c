@@ -8,7 +8,7 @@
 
 typedef struct GblStringListTestSuite_ {
     GblRefCount     beginActiveRefCount;
-    GblStringList*  lists[12];
+    GblStringList*  lists[16];
 } GblStringListTestSuite_;
 
 static GBL_RESULT GblStringListTestSuite_verify_(GblTestSuite* pSelf, size_t  index, ...) {
@@ -81,7 +81,7 @@ static GBL_RESULT GblStringListTestSuite_createWithRefs_(GblTestSuite* pSelf, Gb
     GBL_CTX_BEGIN(pCtx);
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
-    const size_t  refs = GblRef_activeCount();
+    const size_t refs = GblRef_activeCount();
 
     GblStringRef* pRef1 = GblStringRef_create("one");
     GblStringRef* pRef2 = GblStringRef_create("two");
@@ -97,6 +97,35 @@ static GBL_RESULT GblStringListTestSuite_createWithRefs_(GblTestSuite* pSelf, Gb
 
     GBL_CTX_END();
 }
+
+static GBL_RESULT GblStringListTestSuite_createWithViews_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    const size_t refs = GblRef_activeCount();
+
+    pSelf_->lists[12] = GblStringList_createWithViews("hello", 5,
+                                                      "world", 5,
+                                                      "Dreamcast", 0,
+                                                      "Gamecube", 4,
+                                                      "Xbox", 1,
+                                                      "Playstation 2", 4);
+
+    GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf,
+                                                       12,
+                                                       "hello",
+                                                       "world",
+                                                       "Dreamcast",
+                                                       "Game",
+                                                       "X",
+                                                       "Play",
+                                                       NULL));
+
+    GBL_TEST_COMPARE(GblRef_activeCount(), refs + 7);
+
+    GBL_CTX_END();
+}
+
 
 static GBL_RESULT GblStringListTestSuite_createSplit_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
@@ -123,8 +152,8 @@ static GBL_RESULT GblStringListTestSuite_createFromArray_(GblTestSuite* pSelf, G
         NULL
     };
 
-    pSelf_->lists[5] = GblStringList_createFromArray(pStringList, GBL_COUNT_OF(pStringList));
-    pSelf_->lists[6] = GblStringList_createFromArray(pStringList);
+    pSelf_->lists[5] = GblStringList_createWithArray(pStringList, GBL_COUNT_OF(pStringList));
+    pSelf_->lists[6] = GblStringList_createWithArray(pStringList);
 
     GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf, 5, "lolol", "Dreamcast", "is", "best", NULL));
     GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf, 6, "lolol", "Dreamcast", "is", "best", NULL));
@@ -154,7 +183,7 @@ static GBL_RESULT GblStringListTestSuite_createFilter_(GblTestSuite* pSelf, GblC
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblStringListTestSuite_copy_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblStringListTestSuite_createCopy_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
@@ -162,6 +191,31 @@ static GBL_RESULT GblStringListTestSuite_copy_(GblTestSuite* pSelf, GblContext* 
     pSelf_->lists[9] = GblStringList_createCopy(pSelf_->lists[7]);
 
     GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf, 9, "Dreamcast", "is", "best", NULL));
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblStringListTestSuite_ref_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    const size_t refs = GblRef_activeCount();
+
+    pSelf_->lists[13] = GblStringList_ref(pSelf_->lists[12]);
+    GBL_TEST_COMPARE(pSelf_->lists[13], pSelf_->lists[12]);
+    GBL_TEST_COMPARE(GblStringList_refCount(pSelf_->lists[12]), 2);
+    GBL_TEST_COMPARE(GblRef_activeCount(), refs);
+
+    GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf,
+                                                       13,
+                                                       "hello",
+                                                       "world",
+                                                       "Dreamcast",
+                                                       "Game",
+                                                       "X",
+                                                       "Play",
+                                                       NULL));
+
     GBL_CTX_END();
 }
 
@@ -178,6 +232,38 @@ static GBL_RESULT GblStringListTestSuite_count_(GblTestSuite* pSelf, GblContext*
     GBL_TEST_COMPARE(GblStringList_count(pSelf_->lists[11], "3"), 3);
     GBL_TEST_COMPARE(GblStringList_count(pSelf_->lists[11], "a"), 1);
     GBL_TEST_COMPARE(GblStringList_count(pSelf_->lists[11], "a", GBL_FALSE), 2);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblStringListTestSuite_compare_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_COMPARE(GblStringList_compare(pSelf_->lists[5], pSelf_->lists[6]), 0);
+    GBL_TEST_COMPARE(GblStringList_compare(pSelf_->lists[7], pSelf_->lists[9]), 0);
+    GBL_TEST_COMPARE(GblStringList_compare(pSelf_->lists[12], pSelf_->lists[12]), 0);
+
+    const char* pStringList[] = {
+        "loLoL",
+        "DrEAMcasT",
+        "IS",
+        "beSt",
+        "yep",
+        NULL
+    };
+
+    pSelf_->lists[14] = GblStringList_createWithArray(pStringList, 4);
+
+    GBL_TEST_VERIFY(GblStringList_compare(pSelf_->lists[6], pSelf_->lists[14]) > 0);
+    GBL_TEST_COMPARE(GblStringList_compare(pSelf_->lists[6], pSelf_->lists[14], GBL_FALSE), 0);
+
+    pSelf_->lists[15] = GblStringList_createWithArray(pStringList);
+
+    GBL_TEST_VERIFY(GblStringList_compare(pSelf_->lists[15], pSelf_->lists[6]) < 0);
+    GBL_TEST_VERIFY(GblStringList_compare(pSelf_->lists[15], pSelf_->lists[6], GBL_FALSE) > 0);
+    GBL_TEST_VERIFY(GblStringList_compare(pSelf_->lists[15], pSelf_->lists[14]) > 0);
 
     GBL_CTX_END();
 }
@@ -200,7 +286,7 @@ static GBL_RESULT GblStringListTestSuite_equals_(GblTestSuite* pSelf, GblContext
         NULL
     };
 
-    pSelf_->lists[10] = GblStringList_createFromArray(pStringList);
+    pSelf_->lists[10] = GblStringList_createWithArray(pStringList);
 
     GBL_TEST_VERIFY(!GblStringList_equals(pSelf_->lists[6], pSelf_->lists[10]));
     GBL_TEST_VERIFY(GblStringList_equals(pSelf_->lists[6], pSelf_->lists[10], GBL_FALSE));
@@ -319,6 +405,54 @@ static GBL_RESULT GblStringListTestSuite_pushBackRefs_(GblTestSuite* pSelf, GblC
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblStringListTestSuite_pushBackArray_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_CALL(GblStringList_pushBackArray(pSelf_->lists[13],
+                                              ((const char*[]) {
+                                                  "Sega Saturn",
+                                                  "Game Gear"
+                                              }),
+                                              2));
+
+    GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf,
+                                                       13,
+                                                       "hello",
+                                                       "world",
+                                                       "Dreamcast",
+                                                       "Game",
+                                                       "X",
+                                                       "Play",
+                                                       "Sega Saturn",
+                                                       "Game Gear",
+                                                       NULL));
+
+    GBL_TEST_CALL(GblStringList_pushBackArray(pSelf_->lists[13],
+                                              ((const char*[]) {
+                                                  "Super Nintendo",
+                                                  "Virtual Boy",
+                                                  NULL
+                                              })));
+
+    GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf,
+                                                       13,
+                                                       "hello",
+                                                       "world",
+                                                       "Dreamcast",
+                                                       "Game",
+                                                       "X",
+                                                       "Play",
+                                                       "Sega Saturn",
+                                                       "Game Gear",
+                                                       "Super Nintendo",
+                                                       "Virtual Boy",
+                                                       NULL));
+
+
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblStringListTestSuite_pushFront_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
@@ -350,6 +484,62 @@ static GBL_RESULT GblStringListTestSuite_pushFrontRefs_(GblTestSuite* pSelf, Gbl
     GblStringRef_unref(pRef1);
     GblStringRef_unref(pRef2);
     GblStringRef_unref(pRef3);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblStringListTestSuite_pushFrontArray_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_CALL(GblStringList_pushFrontArray(pSelf_->lists[13],
+                                              ((const char*[]) {
+                                                  "Nintendo 64",
+                                                  "Gameboy Color"
+                                              }),
+                                              2));
+
+    GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf,
+                                                       13,
+                                                       "Nintendo 64",
+                                                       "Gameboy Color",
+                                                       "hello",
+                                                       "world",
+                                                       "Dreamcast",
+                                                       "Game",
+                                                       "X",
+                                                       "Play",
+                                                       "Sega Saturn",
+                                                       "Game Gear",
+                                                       "Super Nintendo",
+                                                       "Virtual Boy",
+                                                       NULL));
+
+    GBL_TEST_CALL(GblStringList_pushFrontArray(pSelf_->lists[13],
+                                              ((const char*[]) {
+                                                  "Colecovision",
+                                                  "Atari 2600",
+                                                  NULL
+                                              })));
+
+    GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf,
+                                                       13,
+                                                       "Colecovision",
+                                                       "Atari 2600",
+                                                       "Nintendo 64",
+                                                       "Gameboy Color",
+                                                       "hello",
+                                                       "world",
+                                                       "Dreamcast",
+                                                       "Game",
+                                                       "X",
+                                                       "Play",
+                                                       "Sega Saturn",
+                                                       "Game Gear",
+                                                       "Super Nintendo",
+                                                       "Virtual Boy",
+                                                       NULL));
+
 
     GBL_CTX_END();
 }
@@ -814,12 +1004,15 @@ GBL_EXPORT GblType GblStringListTestSuite_type(void) {
         { "createEmpty",           GblStringListTestSuite_createEmpty_       },
         { "create",                GblStringListTestSuite_create_            },
         { "createWithRefs",        GblStringListTestSuite_createWithRefs_    },
+        { "createWithViews",       GblStringListTestSuite_createWithViews_   },
         { "createSplit",           GblStringListTestSuite_createSplit_       },
         { "createFromArray",       GblStringListTestSuite_createFromArray_   },
         { "createSubList",         GblStringListTestSuite_createSubList_     },
         { "createFilter",          GblStringListTestSuite_createFilter_      },
-        { "copy",                  GblStringListTestSuite_copy_              },
+        { "createCopy",            GblStringListTestSuite_createCopy_        },
+        { "ref",                   GblStringListTestSuite_ref_               },
         { "count",                 GblStringListTestSuite_count_             },
+        { "compare",               GblStringListTestSuite_compare_           },
         { "equals",                GblStringListTestSuite_equals_            },
         { "frontInvalid",          GblStringListTestSuite_frontInvalid_      },
         { "backInvalid",           GblStringListTestSuite_backInvalid_       },
@@ -829,8 +1022,10 @@ GBL_EXPORT GblType GblStringListTestSuite_type(void) {
         { "contains",              GblStringListTestSuite_contains_          },
         { "pushBack",              GblStringListTestSuite_pushBack_          },
         { "pushBackRefs",          GblStringListTestSuite_pushBackRefs_      },
+        { "pushBackArray",         GblStringListTestSuite_pushBackArray_     },
         { "pushFront",             GblStringListTestSuite_pushFront_         },
         { "pushFrontRefs",         GblStringListTestSuite_pushFrontRefs_     },
+        { "pushFrontArray",        GblStringListTestSuite_pushFrontArray_    },
         { "insertInvalid",         GblStringListTestSuite_insertInvalid_     },
         { "insert",                GblStringListTestSuite_insert_            },
         { "insertRefsInvalid",     GblStringListTestSuite_insertRefsInvalid_ },
