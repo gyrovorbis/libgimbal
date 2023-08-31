@@ -148,11 +148,11 @@ GBL_EXPORT GblBool GblStringList_equalsStrs    (GBL_CSELF,
 //! Equivalent to GblStringList_compareStrs(), except the NULL-terminated list of C strings is passed through a va_list pointer
 GBL_EXPORT int     GblStringList_compareStrsVa (GBL_CSELF,
                                                 int      matchCase,
-                                                va_list* pVa);
+                                                va_list* pVa)                                GBL_NOEXCEPT;
 //! Equivalent to GblStringList_equalsStrs(), except the NULL-terminated list of C strings is passed through a va_list pointer
 GBL_EXPORT GblBool GblStringList_equalsStrsVa  (GBL_CSELF,
                                                 int      matchCase,
-                                                va_list* pVa);
+                                                va_list* pVa)                                GBL_NOEXCEPT;
 
 //! @}
 
