@@ -219,6 +219,75 @@ GBL_EXPORT int (GblStringList_compare)(const GblStringList* pSelf,
         GBL_ASSERT(GBL_FALSE, "Something is wrong with our comparison algorithm...");
 }
 
+GBL_EXPORT int (GblStringList_compareStrsVa)(const GblStringList* pSelf,
+                                             int                  matchCase,
+                                             va_list*             pVa)
+{
+    GblRingList* pIt1 = pSelf->ringNode.pNext;
+    const char* pStr = va_arg(*pVa, const char*);
+
+    while(pIt1 != pSelf && pStr) {
+        int result;
+
+        if(matchCase) {
+            if((result = strcmp(pIt1->pData, pStr)) != 0)
+                return result;
+        } else {
+            if((result = GblStringView_compareIgnoreCase(
+                            GBL_STRV(pIt1->pData, GblStringRef_length(pIt1->pData)),
+                            pStr)
+                         ) != 0)
+                return result;
+        }
+
+        pIt1 = pIt1->ringNode.pNext;
+        pStr = va_arg(*pVa, const char*);
+    }
+
+    if(pIt1 != pSelf && !pStr)
+        return INT_MAX;
+    else if(pIt1 == pSelf && pStr)
+        return INT_MIN;
+    else if(pIt1 == pSelf && !pStr)
+        return 0;
+    else
+        GBL_ASSERT(GBL_FALSE, "Something is wrong with our comparison algorithm...");
+
+}
+
+GBL_EXPORT int (GblStringList_compareStrs)(const GblStringList* pSelf,
+                                           int                  matchCase,
+                                           ...)
+{
+    va_list varArgs;
+    va_start(varArgs, matchCase);
+
+    const int retVal = GblStringList_compareStrsVa(pSelf, matchCase, &varArgs);
+
+    va_end(varArgs);
+    return retVal;
+}
+
+GBL_EXPORT GblBool GblStringList_equalsStrsVa(const GblStringList* pSelf,
+                                              int                  matchCase,
+                                              va_list*             pVa)
+{
+    return GblStringList_compareStrsVa(pSelf, matchCase, pVa) == 0;
+}
+
+GBL_EXPORT GblBool (GblStringList_equalsStrs)(const GblStringList* pSelf,
+                                              int                  matchCase,
+                                              ...)
+{
+    va_list varArgs;
+    va_start(varArgs, matchCase);
+
+    const GblBool retVal = GblStringList_equalsStrsVa(pSelf, matchCase, &varArgs);
+
+    va_end(varArgs);
+    return retVal;
+}
+
 GBL_EXPORT GblBool (GblStringList_equals)(const GblStringList* pSelf, const GblStringList* pOther, GblBool matchCase) {
     return GblStringList_compare(pSelf, pOther, matchCase) == 0;
 }

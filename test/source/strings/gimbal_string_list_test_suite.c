@@ -11,16 +11,20 @@ typedef struct GblStringListTestSuite_ {
     GblStringList*  lists[16];
 } GblStringListTestSuite_;
 
-static GBL_RESULT GblStringListTestSuite_verify_(GblTestSuite* pSelf, size_t  index, ...) {
+static GBL_RESULT GblStringListTestSuite_verify_(GblTestSuite* pSelf, size_t index, ...) {
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
 
-    va_list varArgs;
+    va_list varArgs, varArgs2;
     va_start(varArgs, index);
+    va_copy(varArgs2, varArgs);
+
     GBL_CTX_BEGIN(pSelf);
 
-    size_t  size = 0;
-    const char* pCurStr = NULL;
-    GblStringList* pList = pSelf_->lists[index];
+    size_t         size    = 0;
+    const char*    pCurStr = NULL;
+    GblStringList* pList   = pSelf_->lists[index];
+
+    GBL_TEST_VERIFY(GblStringList_equalsStrsVa(pList, GBL_TRUE, &varArgs2));
 
     while((pCurStr = va_arg(varArgs, const char*))) {
         GBL_TEST_COMPARE(GblStringList_at(pList, size), pCurStr);
@@ -39,6 +43,7 @@ static GBL_RESULT GblStringListTestSuite_verify_(GblTestSuite* pSelf, size_t  in
     GBL_TEST_COMPARE(GblStringList_size(pList), size);
 
     GBL_CTX_END_BLOCK();
+    va_end(varArgs2);
     va_end(varArgs);
     return GBL_CTX_RESULT();
 }
@@ -268,6 +273,34 @@ static GBL_RESULT GblStringListTestSuite_compare_(GblTestSuite* pSelf, GblContex
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblStringListTestSuite_compareStrs_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_VERIFY(GblStringList_compareStrs(pSelf_->lists[14],
+                                              GBL_TRUE,
+                                              "abc") > 0);
+
+    GBL_TEST_COMPARE(GblStringList_compareStrs(pSelf_->lists[14],
+                                               GBL_FALSE,
+                                               "loLol",
+                                               "Dreamcast",
+                                               "is",
+                                               "best"), 0);
+
+    GBL_TEST_COMPARE(GblStringList_compareStrs(pSelf_->lists[15],
+                                               GBL_TRUE,
+                                               "loLoL",
+                                               "DrEAMcasT",
+                                               "IS",
+                                               "beSt",
+                                               "yep"), 0);
+
+
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblStringListTestSuite_equals_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
@@ -290,6 +323,33 @@ static GBL_RESULT GblStringListTestSuite_equals_(GblTestSuite* pSelf, GblContext
 
     GBL_TEST_VERIFY(!GblStringList_equals(pSelf_->lists[6], pSelf_->lists[10]));
     GBL_TEST_VERIFY(GblStringList_equals(pSelf_->lists[6], pSelf_->lists[10], GBL_FALSE));
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblStringListTestSuite_equalsStrs_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_VERIFY(!GblStringList_equalsStrs(pSelf_->lists[14],
+                                              GBL_FALSE,
+                                              "abc"));
+
+    GBL_TEST_VERIFY(GblStringList_equalsStrs(pSelf_->lists[14],
+                                               GBL_FALSE,
+                                               "loLol",
+                                               "Dreamcast",
+                                               "is",
+                                               "best"));
+
+    GBL_TEST_VERIFY(GblStringList_equalsStrs(pSelf_->lists[15],
+                                               GBL_TRUE,
+                                               "loLoL",
+                                               "DrEAMcasT",
+                                               "IS",
+                                               "beSt",
+                                               "yep"));
 
     GBL_CTX_END();
 }
@@ -610,6 +670,51 @@ static GBL_RESULT GblStringListTestSuite_insertRefs_(GblTestSuite* pSelf, GblCon
 
     GBL_CTX_END();
 }
+
+static GBL_RESULT GblStringListTestSuite_insertViews_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_CALL(GblStringList_insertViews(pSelf_->lists[13],
+                                            -3,
+                                            "Sega Nomad", 0,
+                                            "Sega Pico", 4,
+                                            "GameBoy Advance", 7));
+
+
+    GBL_TEST_CALL(GblStringList_insertViews(pSelf_->lists[13],
+                                            3,
+                                            "Wii", 0,
+                                            "WiiU", 4,
+                                            "Nintendo Switch", 8));
+
+    GBL_CTX_VERIFY_CALL(GblStringListTestSuite_verify_(pSelf,
+                                                       13,
+                                                       "Colecovision",
+                                                       "Atari 2600",
+                                                       "Nintendo 64",
+                                                       "Wii",
+                                                       "WiiU",
+                                                       "Nintendo",
+                                                       "Gameboy Color",
+                                                       "hello",
+                                                       "world",
+                                                       "Dreamcast",
+                                                       "Game",
+                                                       "X",
+                                                       "Play",
+                                                       "Sega Saturn",
+                                                       "Game Gear",
+                                                       "Sega Nomad",
+                                                       "Sega",
+                                                       "GameBoy",
+                                                       "Super Nintendo",
+                                                       "Virtual Boy",
+                                                       NULL));
+
+    GBL_CTX_END();
+}
+
 
 static GBL_RESULT GblStringListTestSuite_setInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
@@ -1013,7 +1118,9 @@ GBL_EXPORT GblType GblStringListTestSuite_type(void) {
         { "ref",                   GblStringListTestSuite_ref_               },
         { "count",                 GblStringListTestSuite_count_             },
         { "compare",               GblStringListTestSuite_compare_           },
+        { "compareStrs",           GblStringListTestSuite_compareStrs_       },
         { "equals",                GblStringListTestSuite_equals_            },
+        { "equalsStrs",            GblStringListTestSuite_equalsStrs_        },
         { "frontInvalid",          GblStringListTestSuite_frontInvalid_      },
         { "backInvalid",           GblStringListTestSuite_backInvalid_       },
         { "atInvalid",             GblStringListTestSuite_atInvalid_         },
@@ -1030,6 +1137,7 @@ GBL_EXPORT GblType GblStringListTestSuite_type(void) {
         { "insert",                GblStringListTestSuite_insert_            },
         { "insertRefsInvalid",     GblStringListTestSuite_insertRefsInvalid_ },
         { "insertRefs",            GblStringListTestSuite_insertRefs_        },
+        { "insertViews",           GblStringListTestSuite_insertViews_       },
         { "setInvalid",            GblStringListTestSuite_setInvalid_        },
         { "set",                   GblStringListTestSuite_set_               },
         { "setRefInvalid",         GblStringListTestSuite_setRefInvalid_     },

@@ -128,15 +128,32 @@ GBL_EXPORT GblRefCount    GblStringList_unref             (GBL_SELF)            
  *  @{
  */
 //! Returns the lexicographical difference between the two lists, optionally doing so case insensitively
-GBL_EXPORT int     GblStringList_compare (GBL_CSELF,
-                                          const GblStringList* pOther,
-                                          GblBool              matchCase/*=GBL_TRUE*/) GBL_NOEXCEPT;
+GBL_EXPORT int     GblStringList_compare       (GBL_CSELF,
+                                                const GblStringList* pOther,
+                                                GblBool              matchCase/*=GBL_TRUE*/) GBL_NOEXCEPT;
 //! Returns GBL_TRUE if the given list is lexicographically equal to the \p pOther list, optionally ignoring case
-GBL_EXPORT GblBool GblStringList_equals  (GBL_CSELF,
-                                          const GblStringList* pOther,
-                                          GblBool              matchCase/*=GBL_TRUE*/) GBL_NOEXCEPT;
+GBL_EXPORT GblBool GblStringList_equals        (GBL_CSELF,
+                                                const GblStringList* pOther,
+                                                GblBool              matchCase/*=GBL_TRUE*/) GBL_NOEXCEPT;
+//! Equivalent to GblStringList_compare(), except that an (auto) NULL-terminated list of C strings is the other value being compared
+GBL_EXPORT int     GblStringList_compareStrs   (GBL_CSELF,
+                                                int matchCase,
+                                                ...
+                                                /*,NULL*/)                                   GBL_NOEXCEPT;
+//! Equivalent to GblStringList_equals(), except that an (auto) NULL-terminated list of C strings is the value being compared
+GBL_EXPORT GblBool GblStringList_equalsStrs    (GBL_CSELF,
+                                                int matchCase,
+                                                ...
+                                                /*,NULL*/)                                   GBL_NOEXCEPT;
+//! Equivalent to GblStringList_compareStrs(), except the NULL-terminated list of C strings is passed through a va_list pointer
+GBL_EXPORT int     GblStringList_compareStrsVa (GBL_CSELF,
+                                                int      matchCase,
+                                                va_list* pVa);
+//! Equivalent to GblStringList_equalsStrs(), except the NULL-terminated list of C strings is passed through a va_list pointer
+GBL_EXPORT GblBool GblStringList_equalsStrsVa  (GBL_CSELF,
+                                                int      matchCase,
+                                                va_list* pVa);
 
-// compare/equals strings, views, arrays
 //! @}
 
 /*! \name Properties
@@ -437,14 +454,20 @@ GBL_DECLS_END
 #define GblStringList_compareDefault_(...) \
     GblStringList_compareDefault__(__VA_ARGS__, GBL_TRUE)
 #define GblStringList_compareDefault__(list1, list2, match, ...) \
-    (GblStringList_compare(list1, list2, match))
+    ((GblStringList_compare)(list1, list2, match))
 
 #define GblStringList_equals(...) \
     GblStringList_equalsDefault_(__VA_ARGS__)
 #define GblStringList_equalsDefault_(...) \
     GblStringList_equalsDefault__(__VA_ARGS__, GBL_TRUE)
 #define GblStringList_equalsDefault__(list1, list2, match, ...) \
-    (GblStringList_equals(list1, list2, match))
+    ((GblStringList_equals)(list1, list2, match))
+
+#define GblStringList_compareStrs(...) \
+    ((GblStringList_compareStrs)(__VA_ARGS__, GBL_NULL))
+
+#define GblStringList_equalsStrs(...) \
+    ((GblStringList_equalsStrs)(__VA_ARGS__, GBL_NULL))
 
 #define GblStringList_find(...) \
     GBL_VA_OVERLOAD_CALL_ARGC(GblStringList_findDefault, __VA_ARGS__)
