@@ -343,6 +343,18 @@ endif()
 add_subdirectory(lib/tinycthread)
 add_subdirectory(lib/tiny-regex-c)
 
+# PSP SDK flags and support
+if (PSP)
+    # Make sure LZ4 doesnt fuck the build
+    # No Position Independent Lib for PSP.
+    set(LZ4_BUILD_LEGACY_LZ4C OFF)
+    set(LZ4_BUILD_CLI OFF)
+    set(LZ4_POSITION_INDEPENDENT_LIB OFF)
+
+    # No Position Independent Lib for PSP on tinycthread either.
+    set_property( TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE OFF )
+endif()
+
 SET(LZ4_BUILD_LEGACY_LZ4C OFF CACHE BOOL "Build LZ4 Legacy")
 SET(LZ4_BUILD_CLI OFF CACHE BOOL "Build LZ4 CLI")
 add_subdirectory(lib/lz4/build/cmake)
