@@ -533,7 +533,7 @@ GBL_EXPORT GblHash    GblVariant_hash    (GBL_CSELF)                   GBL_NOEXC
 
 GBL_DECLS_END
 
-#ifndef GBL_DREAMCAST
+#if !defined(GBL_DREAMCAST) && !defined(GBL_PSP)
 #   define GBL_VARIANT_CONSTRUCT_GENERIC_PLATFORM_ENTRIES()
 #else
 #   define GBL_VARIANT_CONSTRUCT_GENERIC_PLATFORM_ENTRIES() \

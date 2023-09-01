@@ -94,6 +94,8 @@
 #   define GBL_ANDROID  1
 #elif defined(__DREAMCAST__)
 #   define GBL_DREAMCAST    1
+#elif defined(__PSP__)
+#   define GBL_PSP  1
 #elif defined(VITA)
 #   define GBL_PSVITA   1
 #elif __linux__

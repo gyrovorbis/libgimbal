@@ -20,7 +20,7 @@ public:
         pRef_(GblStringRef_create(pStr, len)) { }
 
     StringRef(const StringRef& rhs) noexcept:
-        pRef_(GblStringRef_ref(rhs.pRef)) { }
+        pRef_(GblStringRef_ref(rhs.pRef_)) { }
 
     StringRef(StringRef&& rhs) noexcept:
         pRef_(rhs.pRef_)
@@ -29,7 +29,9 @@ public:
     }
 
     StringRef fromGblRef(GblStringRef* pRef) noexcept {
-        return GblStringRef { .pRef_ = pRef };
+        StringRef ref;
+        ref.pRef_ = pRef;
+        return ref;
     }
 
     GblStringRef* toGblRef() noexcept {
@@ -44,7 +46,7 @@ public:
 
     StringRef& operator=(const char* pCStr) noexcept {
         GblStringRef_unref(pRef_);
-        GblStringRef_create(pCstr);
+        GblStringRef_create(pCStr);
         return *this;
     }
 
@@ -58,6 +60,7 @@ public:
         GblStringRef_unref(pRef_);
         pRef_ = rhs.pRef_;
         rhs.pRef_ = nullptr;
+        return *this;
     }
 
     operator const char*() const noexcept {
@@ -85,8 +88,8 @@ public:
 
         return GblStringView {
             .pData = pRef_ + offset,
+            .nullTerminated = (offset + len == length()),
             .length = len
-            .nullTerminated = (offset + len == length())
         };
     }
 

@@ -185,6 +185,16 @@ if(VITA)
     )
 endif()
 
+if(PSP)
+    message("LOLOL")
+    create_pbp_file(TARGET GimbalTests # CMake executable target
+      TITLE "${CMAKE_PROJECT_NAME}" # displayed in game selection
+      # ICON_PATH
+      # BACKGROUND_PATH
+      # PREVIEW_PATH
+      )
+endif()
+
 target_include_directories(GimbalTests
     PRIVATE include)
 

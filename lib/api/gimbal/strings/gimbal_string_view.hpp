@@ -257,7 +257,7 @@ public:
 
 #define GBL_STRING_VIEW_TO_VALUE_(type, postfix) \
     template<> \
-    std::optional<type> string_view_to_value<type>(const StringView& view) { \
+    inline std::optional<type> string_view_to_value<type>(const StringView& view) { \
         GblBool ok; \
         type value = GblStringView_##postfix(view, &ok); \
         return ok? std::optional{value} : std::nullopt; \

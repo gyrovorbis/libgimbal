@@ -64,6 +64,14 @@
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
 #   include <arch/gdb.h>
 #endif
+\
+#ifdef GBL_PSP
+#include <pspkernel.h>
+
+PSP_MODULE_INFO("Hello World", 0, 1, 0);
+PSP_MAIN_THREAD_ATTR( THREAD_ATTR_USER | THREAD_ATTR_VFPU );
+PSP_HEAP_SIZE_MAX();
+#endif
 
 #ifdef __ANDROID__
 #include <android/log.h>
@@ -233,8 +241,10 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
+#ifndef GBL_PSP
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
+#endif
 #ifdef GBL_ENABLE_CPP
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_QUARK_TEST_SUITE_CPP_TYPE));

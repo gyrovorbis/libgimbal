@@ -169,6 +169,20 @@ build dreamcast:
   tags: 
     - dreamcast
 
+# Top-level PSP build job
+build psvita:
+  extends: .build_cmake
+  except:
+    variables:
+      - $BUILD_PSP_DISABLED
+  variables:
+    TOOLCHAIN_FILE: ${PSPDEV}/psp/share/pspdev.cmake
+    GENERATOR: "Unix Makefiles"
+    EXTRA_GENERATOR_ARGS: -j32
+  tags: 
+    - psp, pspsdk
+
+
 # Top-level PSVita build job
 build psvita:
   extends: .build_cmake
