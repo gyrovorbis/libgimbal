@@ -5,7 +5,7 @@
 
 
 #if !defined(GBL_NO_TIMESPEC_)
-#   if defined(ANDROID) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA)
+#   if defined(ANDROID) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA) || defined(PSP)
 #       define GBL_NO_TIMESPEC_
 #   endif
 #endif
