@@ -217,6 +217,8 @@ if(GBL_ENABLE_CPP)
          GIMBAL_INCLUDES
          api/gimbal/strings/gimbal_quark.hpp
          api/gimbal/strings/gimbal_pattern.hpp
+         api/gimbal/strings/gimbal_string_list.hpp
+         api/gimbal/strings/gimbal_string_ref.hpp
          api/gimbal/strings/gimbal_string_view.hpp
          api/gimbal/utils/gimbal_date_time.hpp)
 endif()

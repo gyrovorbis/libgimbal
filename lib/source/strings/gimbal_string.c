@@ -1,5 +1,6 @@
 #include <gimbal/strings/gimbal_string.h>
 #include <gimbal/core/gimbal_ctx.h>
+#include <ctype.h>
 
 GBL_EXPORT char* gblStrdup(const char* pStr) {
     return gblStrndup(pStr, strlen(pStr));

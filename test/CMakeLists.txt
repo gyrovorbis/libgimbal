@@ -141,6 +141,8 @@ if(GBL_ENABLE_CPP)
          source/strings/gimbal_quark_test_suite.cpp
          include/strings/gimbal_pattern_test_suite.hpp
          source/strings/gimbal_pattern_test_suite.cpp
+         include/strings/gimbal_string_ref_test_suite.hpp
+         source/strings/gimbal_string_ref_test_suite.cpp
          include/strings/gimbal_string_view_test_suite.hpp
          source/strings/gimbal_string_view_test_suite.cpp
          source/gimbal_test_cpp.cpp)
