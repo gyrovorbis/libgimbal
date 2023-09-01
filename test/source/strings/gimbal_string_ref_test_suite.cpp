@@ -18,7 +18,18 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(constructDefault)
     auto ref = gbl::StringRef{};
-
+    GBL_TEST_VERIFY(ref.blank());
+    GBL_TEST_VERIFY(ref.empty());
+    GBL_TEST_VERIFY(!ref.valid());
 GBL_TEST_CASE_END
 
-GBL_TEST_REGISTER(constructDefault)
+GBL_TEST_CASE(construct)
+    auto ref = gbl::StringRef{"Dreamcast"};
+    GBL_TEST_VERIFY(ref.length() == strlen(ref));
+    GBL_TEST_VERIFY(strcmp(ref, "Dreamcast") == 0);
+    GBL_TEST_VERIFY(ref[3] == 'a');
+GBL_TEST_CASE_END
+
+
+GBL_TEST_REGISTER(constructDefault,
+                  construct)

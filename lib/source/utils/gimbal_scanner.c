@@ -148,9 +148,9 @@ GBL_EXPORT void GblScanner_raiseError(GblScanner* pSelf,
     GblStringBuffer_construct(pStrBuff, NULL, 0, bufferSize);
 
     GblStringBuffer_appendPrintf(pStrBuff,
-                                 "[line: %zu, column: %zu]: ",
-                                 GBL_SCANNER_CURSOR_(pSelf)->line   + 1,
-                                 GBL_SCANNER_CURSOR_(pSelf)->column + 1);
+                                 "[line: %lu, column: %lu]: ",
+                                 (unsigned long)GBL_SCANNER_CURSOR_(pSelf)->line   + 1,
+                                 (unsigned long)GBL_SCANNER_CURSOR_(pSelf)->column + 1);
 
     GblStringBuffer_appendVPrintf(pStrBuff,
                                   pFmt,

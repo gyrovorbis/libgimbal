@@ -169,6 +169,17 @@ if(ANDROID)
          Qt6::Svg)
 endif()
 
+if(PSP)
+    list(APPEND
+         GBL_TEST_LINK_LIBS
+         -lpspdebug
+         -lpspdisplay
+         -lpspge
+         -lpspctrl
+         -lpspnet
+         -lpspnet_apctl)
+endif()
+
 target_link_libraries(GimbalTests
     PRIVATE
     ${GBL_TEST_LINK_LIBS})
@@ -186,7 +197,7 @@ if(VITA)
 endif()
 
 if(PSP)
-    message("LOLOL")
+
     create_pbp_file(TARGET GimbalTests # CMake executable target
       TITLE "${CMAKE_PROJECT_NAME}" # displayed in game selection
       # ICON_PATH

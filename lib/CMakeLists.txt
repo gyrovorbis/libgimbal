@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
-SET(ANDROID_NATIVE_API_LEVEL 28)
+
+SET(ANDROID_PLATFORM 33)
+SET(ANDROID_NATIVE_API_LEVEL 33)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -94,7 +96,7 @@ GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_UNKNOWN_ENABLED "Assert on all unknown resul
 set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/core/gimbal_config.h")
 
 if ((CMAKE_COMPILER_IS_GNUCC))
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Os -g")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Og -g")
 endif()
 
 set(GIMBAL_INCLUDES
@@ -345,16 +347,17 @@ endif()
 add_subdirectory(lib/tinycthread)
 add_subdirectory(lib/tiny-regex-c)
 
+set(LZ4_BUILD_LEGACY_LZ4C OFF)
+set(LZ4_BUILD_CLI OFF)
+set(LZ4_POSITION_INDEPENDENT_LIB OFF)
+
+# No Position Independent Lib for PSP on tinycthread either.
+set_property( TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE OFF )
+
 # PSP SDK flags and support
 if (PSP)
     # Make sure LZ4 doesnt fuck the build
     # No Position Independent Lib for PSP.
-    set(LZ4_BUILD_LEGACY_LZ4C OFF)
-    set(LZ4_BUILD_CLI OFF)
-    set(LZ4_POSITION_INDEPENDENT_LIB OFF)
-
-    # No Position Independent Lib for PSP on tinycthread either.
-    set_property( TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE OFF )
 endif()
 
 SET(LZ4_BUILD_LEGACY_LZ4C OFF CACHE BOOL "Build LZ4 Legacy")

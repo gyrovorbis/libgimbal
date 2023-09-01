@@ -139,7 +139,7 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
     case GBL_LOG_LEVEL_WARNING:
     case GBL_LOG_LEVEL_ERROR: {
 
-        if((fprintf(pFile, "%s%s%s\n%s        @ %s(..): %s:%zu\n",
+        if((fprintf(pFile, "%s%s%s\n%s        @ %s(..): %s:%u\n",
                             tabBuff, pPrefix, buffer, tabBuff,
                             pFrame->record.srcLocation.pFunc,
                             pFrame->record.srcLocation.pFile,

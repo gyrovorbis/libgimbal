@@ -68,9 +68,8 @@
 #ifdef GBL_PSP
 #include <pspkernel.h>
 
-PSP_MODULE_INFO("Hello World", 0, 1, 0);
+PSP_MODULE_INFO("GimbalTests", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR( THREAD_ATTR_USER | THREAD_ATTR_VFPU );
-PSP_HEAP_SIZE_MAX();
 #endif
 
 #ifdef __ANDROID__
@@ -139,11 +138,14 @@ int main(int argc, char* pArgv[]) {
 #elif defined(__ANDROID__)
     start_logger("");
 #endif
+
     GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
 
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO    |
                                                     GBL_LOG_LEVEL_WARNING |
                                                     GBL_LOG_LEVEL_ERROR);
+
+
 
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_SORT_TEST_SUITE_TYPE));
@@ -241,7 +243,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
-#ifndef GBL_PSP
+
+#if !defined(GBL_PSP) && !defined(GBL_DREAMCAST)
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
 #endif
