@@ -170,7 +170,7 @@ build dreamcast:
     - dreamcast
 
 # Top-level PSP build job
-build psvita:
+build psp:
   extends: .build_cmake
   except:
     variables:
