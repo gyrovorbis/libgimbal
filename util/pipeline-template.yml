@@ -182,7 +182,6 @@ build psvita:
   tags: 
     - psp, pspsdk
 
-
 # Top-level PSVita build job
 build psvita:
   extends: .build_cmake
