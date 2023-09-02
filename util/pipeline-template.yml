@@ -443,15 +443,16 @@ test psp:
     BINARY_NAME: EBOOT
   tags:
     - psp
-  before_script: >
-    killall ppsspp || true
-    if [[ -n ${XDISPLAY-} ]]; then
-      if [[ "$OSTYPE" != "darwin"* ]]; then
-        coproc Xvfb ${XDISPLAY} -screen 0 1024x768x16
-        VIRT_FB_PID=$!
-        sleep 4
+  before_script:
+    - killall ppsspp || true
+    - |
+      if [[ -n ${XDISPLAY-} ]]; then
+        if [[ "$OSTYPE" != "darwin"* ]]; then
+          coproc Xvfb ${XDISPLAY} -screen 0 1024x768x16
+          VIRT_FB_PID=$!
+          sleep 4
+        fi
       fi
-    fi
   script:
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
@@ -459,13 +460,14 @@ test psp:
     - ppsspp ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
-  after_script: >
-    killall ppsspp || true
-    if [[ -n ${XDISPLAY-} ]]; then
-      if [[ "$OSTYPE" != "darwin"* ]]; then
-        kill -SIGINT $VIRT_FB_PID
+  after_script:
+    - killall ppsspp || true
+    - |
+      if [[ -n ${XDISPLAY-} ]]; then
+        if [[ "$OSTYPE" != "darwin"* ]]; then
+          kill -SIGINT $VIRT_FB_PID
+        fi
       fi
-    fi
   timeout: 2m
 
 test debian-gcc:
