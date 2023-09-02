@@ -50,7 +50,7 @@ GBL_EXPORT GblStringList* GblStringList_createWithViewsVa(const char* pFirst,
     const char* pStr;
     size_t      size;
     while((pStr = va_arg(*pVa, const char*))) {
-        size = va_arg(*pVa, size_t);
+        size = va_arg(*pVa, unsigned);
         GblRingList_pushBack(pList,
                              GblStringRef_create(pStr, size));
     }
@@ -538,7 +538,7 @@ GBL_EXPORT GBL_RESULT GblStringList_pushBackViewsVa(GblStringList* pSelf,
     const char* pStr;
     size_t      strLen;
     while((pStr = va_arg(*pVarArgs, const char*))) {
-        strLen = va_arg(*pVarArgs, size_t);
+        strLen = va_arg(*pVarArgs, unsigned);
 
         result = GblRingList_pushBack(pSelf, GblStringRef_create(pStr, strLen));
         if(!GBL_RESULT_SUCCESS(result))
@@ -634,7 +634,7 @@ GBL_EXPORT GBL_RESULT GblStringList_pushFrontViewsVa(GblStringList* pSelf,
     size_t      strLen;
 
     while((pStr = va_arg(*pVarArgs, const char*))) {
-        strLen = va_arg(*pVarArgs, size_t);
+        strLen = va_arg(*pVarArgs, unsigned);
 
         result = GblRingList_insert(pSelf, index++, GblStringRef_create(pStr, strLen));
 
@@ -730,7 +730,7 @@ static  GBL_RESULT GblStringList_insertVa_(GblStringList* pSelf,
         size_t      length;
 
         while((pArg = va_arg(*pVarArgs, const char*))) {
-            length = view? va_arg(*pVarArgs, size_t) : 0;
+            length = view? va_arg(*pVarArgs, unsigned) : 0;
 
             GblRingList* pNewEntry = GblRingList_new_();
             GblDoublyLinkedList_init(&pNewEntry->listNode);
