@@ -8,7 +8,7 @@
 
 typedef struct GblStringListTestSuite_ {
     GblRefCount     beginActiveRefCount;
-    GblStringList*  lists[16];
+    GblStringList*  lists[17];
 } GblStringListTestSuite_;
 
 static GBL_RESULT GblStringListTestSuite_verify_(GblTestSuite* pSelf, size_t index, ...) {
@@ -465,6 +465,23 @@ static GBL_RESULT GblStringListTestSuite_pushBackRefs_(GblTestSuite* pSelf, GblC
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblStringListTestSuite_pushBackViews_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    pSelf_->lists[16] = GblStringList_createEmpty();
+    GBL_TEST_CALL(GblStringList_pushBackViews(pSelf_->lists[16],
+                                              "hello", 0,
+                                              "my",    2,
+                                              "little", 3,
+                                              "ladybug", 4));
+
+    GBL_TEST_CALL(GblStringListTestSuite_verify_(pSelf, 16, "hello", "my", "lit", "lady", NULL));
+
+
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblStringListTestSuite_pushBackArray_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
@@ -544,6 +561,23 @@ static GBL_RESULT GblStringListTestSuite_pushFrontRefs_(GblTestSuite* pSelf, Gbl
     GblStringRef_unref(pRef1);
     GblStringRef_unref(pRef2);
     GblStringRef_unref(pRef3);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblStringListTestSuite_pushFrontViews_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblStringListTestSuite_* pSelf_ = GBL_STRING_LIST_TEST_SUITE_(pSelf);
+
+    GBL_TEST_CALL(GblStringList_pushFrontViews(pSelf_->lists[16],
+                                              "bug", 0,
+                                              "is",    2,
+                                              "maddie", 3,
+                                              "rose", 4));
+
+    GBL_TEST_CALL(GblStringListTestSuite_verify_(pSelf, 16, "bug", "is", "mad", "rose",
+                                                 "hello", "my", "lit", "lady", NULL));
+
 
     GBL_CTX_END();
 }
@@ -1129,9 +1163,11 @@ GBL_EXPORT GblType GblStringListTestSuite_type(void) {
         { "contains",              GblStringListTestSuite_contains_          },
         { "pushBack",              GblStringListTestSuite_pushBack_          },
         { "pushBackRefs",          GblStringListTestSuite_pushBackRefs_      },
+        { "pushBackViews",         GblStringListTestSuite_pushBackViews_     },
         { "pushBackArray",         GblStringListTestSuite_pushBackArray_     },
         { "pushFront",             GblStringListTestSuite_pushFront_         },
         { "pushFrontRefs",         GblStringListTestSuite_pushFrontRefs_     },
+        { "pushFrontViews",        GblStringListTestSuite_pushFrontViews_    },
         { "pushFrontArray",        GblStringListTestSuite_pushFrontArray_    },
         { "insertInvalid",         GblStringListTestSuite_insertInvalid_     },
         { "insert",                GblStringListTestSuite_insert_            },
