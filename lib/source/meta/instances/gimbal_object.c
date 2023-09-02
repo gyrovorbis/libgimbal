@@ -657,17 +657,17 @@ GBL_EXPORT GBL_RESULT GblObject_constructWithClass(GblObject* pSelf, GblObjectCl
 }
 
 static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va_list* pVarArgs) {
-    size_t  count = 0;
+    size_t count = 0;
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pVarArgs);
 
-    const GblType       selfType       = GBL_TYPEOF(pSelf);
-    const size_t        totalCount     = GblProperty_count(GBL_TYPEOF(pSelf));
-    GblVariant*         pVariants      = GBL_ALLOCA(sizeof(GblVariant)   * totalCount);
-    const GblProperty** ppProperties   = GBL_ALLOCA(sizeof(GblProperty*) * totalCount);
+    const GblType       selfType     = GBL_TYPEOF(pSelf);
+    const size_t        totalCount   = GblProperty_count(selfType);
+    GblVariant*         pVariants    = GBL_ALLOCA(sizeof(GblVariant)   * totalCount);
+    const GblProperty** ppProperties = GBL_ALLOCA(sizeof(GblProperty*) * totalCount);
 
     // check whether there are even constructable properties or not
     const char* pKey = NULL;
@@ -682,14 +682,19 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
                                GblType_name(type), pKey);
         }
 
-        GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopyVa(&pVariants[count],
-                                                                ppProperties[count]->valueType,
-                                                                pVarArgs));
+        GBL_CTX_VERIFY_CALL(
+            GblVariant_constructValueCopyVa(&pVariants[count],
+                                            ppProperties[count]->valueType,
+                                            pVarArgs)
+        );
+
         ++count;
 
     }
 
-    GBL_CTX_VERIFY_CALL(GblObject_construct_(pSelf, count, ppProperties, pVariants));
+    GBL_CTX_VERIFY_CALL(
+        GblObject_construct_(pSelf, count, ppProperties, pVariants)
+    );
 
     GBL_CTX_END_BLOCK();
     for(size_t  v = 0; v < count; ++v)

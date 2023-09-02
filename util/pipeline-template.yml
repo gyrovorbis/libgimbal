@@ -176,6 +176,8 @@ build psp:
     variables:
       - $BUILD_PSP_DISABLED
   variables:
+    BINARY_NAME: EBOOT
+    BINARY_EXTENSION: .PBP
     TOOLCHAIN_FILE: ${PSPDEV}/psp/share/pspdev.cmake
     GENERATOR: "Unix Makefiles"
     EXTRA_GENERATOR_ARGS: -j32
@@ -420,10 +422,38 @@ test dreamcast-physical:
   after_script:
     - killall dc-tool-ip || true
     - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
-  timeout: 2m
+  timeout: 5m
   retry:
     max: 2
     when: job_execution_timeout
+
+test psp:
+  stage: test 
+  needs: ["build psp"]
+  dependencies:
+    - build psp 
+  only:
+    variables:
+      - $BUILD_PSP_DISABLED == null
+  except:
+    variables:
+      - $TEST_PSP_DISABLED   
+  variables:
+    BINARY_EXTENSION: .PBP
+    BINARY_NAME: EBOOT
+  tags:
+    - psp
+  before_script:
+    - killall ppsspp || true
+  script:
+    - exec > >(tee -a "${BUILD_DIR}/results.txt" )
+    - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
+    - ppsspp ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
+    - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
+    - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
+  after_script:
+    - killall ppsspp || true
+  timeout: 2m
 
 test debian-gcc:
   extends: .test_common
