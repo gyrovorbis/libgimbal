@@ -145,8 +145,6 @@ int main(int argc, char* pArgv[]) {
                                                     GBL_LOG_LEVEL_WARNING |
                                                     GBL_LOG_LEVEL_ERROR);
 
-
-
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_SORT_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
