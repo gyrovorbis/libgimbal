@@ -447,10 +447,9 @@ test psp:
     killall ppsspp || true
     if [[ -n ${XDISPLAY-} ]]; then
       if [[ "$OSTYPE" != "darwin"* ]]; then
-        # 'coproc' so that SIGINT will still work (https://unix.stackexchange.com/a/478697/11592)
         coproc Xvfb ${XDISPLAY} -screen 0 1024x768x16
         VIRT_FB_PID=$!
-        sleep 4 # time to (probabilistically) ensure that Xvfb has started
+        sleep 4
       fi
     fi
   script:
@@ -460,13 +459,13 @@ test psp:
     - ppsspp ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
-  after_script:
-    - killall ppsspp || true
-    - if [[ -n ${XDISPLAY-} ]]; then
-    -   if [[ "$OSTYPE" != "darwin"* ]]; then
-    -     kill -SIGINT $VIRT_FB_PID
-    -   fi
-    - fi
+  after_script: >
+    killall ppsspp || true
+    if [[ -n ${XDISPLAY-} ]]; then
+      if [[ "$OSTYPE" != "darwin"* ]]; then
+        kill -SIGINT $VIRT_FB_PID
+      fi
+    fi
   timeout: 2m
 
 test debian-gcc:
