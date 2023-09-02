@@ -444,7 +444,7 @@ test psp:
   tags:
     - psp
   before_script:
-    - killall ppsspp || true
+    - pkill -9 ppsspp || true
   script:
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
@@ -458,11 +458,11 @@ test psp:
         fi
       fi
     - export DISPLAY=:0.0 
-    - ppsspp ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
+    - nohup ppsspp ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION} || true </dev/null &
+    - sleep 20
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
-  after_script:
-    - killall ppsspp || true
+    - pkill -9 ppsspp || true
     - |
       if [[ -n ${XDISPLAY-} ]]; then
         if [[ "$OSTYPE" != "darwin"* ]]; then
