@@ -458,7 +458,7 @@ test psp:
         fi
       fi
     - export DISPLAY=:0.0 
-    - nohup ppsspp ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION} || true </dev/null &
+    - nohup ppsspp -v ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION} || true </dev/null &
     - sleep 20
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
