@@ -445,7 +445,11 @@ test psp:
     - psp
   before_script:
     - killall ppsspp || true
-    - |
+  script:
+    - exec > >(tee -a "${BUILD_DIR}/results.txt" )
+    - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
+    -
+    |
       if [[ -n ${XDISPLAY-} ]]; then
         if [[ "$OSTYPE" != "darwin"* ]]; then
           coproc Xvfb ${XDISPLAY} -screen 0 1024x768x16
@@ -453,9 +457,6 @@ test psp:
           sleep 4
         fi
       fi
-  script:
-    - exec > >(tee -a "${BUILD_DIR}/results.txt" )
-    - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
     - export DISPLAY=:0.0 
     - ppsspp ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION}
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
