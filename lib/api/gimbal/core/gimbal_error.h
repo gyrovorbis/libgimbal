@@ -11,7 +11,7 @@
 #ifndef GIMBAL_ERROR_H
 #define GIMBAL_ERROR_H
 
-#include "gimbal_stack_frame.h"
+#include "gimbal_thd.h"
 #include "../strings/gimbal_quark.h"
 
 #define GBL_ERROR_DOMAIN        gblErrorDomain()    //!< Builtin standard error domain
