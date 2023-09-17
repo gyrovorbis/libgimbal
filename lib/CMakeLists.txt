@@ -367,8 +367,13 @@ list(APPEND
      GBL_TARGET_LINK_LIBS
      tinycthread
      TinyRegexC
-     lz4_static
-     m)
+     lz4_static)
+
+ if(NOT (MSVC))
+     list(APPEND
+          GBL_TARGET_LINK_LIBS
+          m)
+ endif()
 
 if (NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA)
 
