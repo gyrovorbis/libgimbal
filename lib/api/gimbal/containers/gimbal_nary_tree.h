@@ -122,7 +122,7 @@ GBL_EXPORT size_t           GblNaryTree_siblingIndex        (GBL_CSELF, const Gb
 
 GBL_EXPORT void             GblNaryTree_disconnect          (GBL_SELF)                                                     GBL_NOEXCEPT;
 
-//GBL_EXPORT GblNaryTreeNode* GblNaryTree_lowestCommonAncestor(GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_lowestCommonAncestor(GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 //GBL_EXPORT size_t           GblNaryTree_distance            (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
 GBL_EXPORT GblBool          GblNaryTree_traverse            (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIt, void* pUd) GBL_NOEXCEPT;
 GBL_EXPORT GblBool          GblNaryTree_traverseInOrder     (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;

@@ -208,8 +208,11 @@ GBL_EXPORT GblBox* GblBox_ref(GblBox* pSelf) {
     GBL_CTX_VERIFY_POINTER(pSelf);
 
     if(pSelf)
+#if 0
        atomic_fetch_add(&GBL_PRIV_REF(pSelf).refCounter, 1);
-
+#else
+        ++GBL_PRIV_REF(pSelf).refCounter;
+#endif
 
     GBL_CTX_END_BLOCK();
     return pSelf;
@@ -221,8 +224,11 @@ GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
 
     if(pSelf) {
         GBL_CTX_VERIFY_EXPRESSION(GBL_PRIV_REF(pSelf).refCounter);
-
+#if 0
        if((count = atomic_fetch_sub(&GBL_PRIV_REF(pSelf).refCounter, 1) - 1) == 0) {
+#else
+        if((count = GBL_PRIV_REF(pSelf).refCounter-- - 1) == 0) {
+#endif
             GblBoxClass* pClass = GBL_BOX_GET_CLASS(pSelf);
             GBL_CTX_CALL(pClass->pFnDestructor(pSelf));
 
@@ -238,7 +244,11 @@ GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
 }
 
 GBL_EXPORT GblRefCount GblBox_refCount(const GblBox* pSelf) {
+#if 0
     return atomic_load(&GBL_PRIV_REF(pSelf).refCounter);
+#else
+    return GBL_PRIV_REF(pSelf).refCounter;
+#endif
 }
 
 static GBL_RESULT GblBox_IVariant_construct_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
@@ -321,7 +331,11 @@ static GBL_RESULT GblBox_destructor_(GblBox* pSelf) {
 static GBL_RESULT GblBox_init_(GblInstance* pInstance) {
     GBL_CTX_BEGIN(NULL);
 
+#if 0
     atomic_store(&GBL_PRIV_REF((GblBox*)pInstance).refCounter, 1);
+#else
+    GBL_PRIV_REF((GblBox*)pInstance).refCounter = 1;
+#endif
 
     GBL_CTX_END();
 }
