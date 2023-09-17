@@ -20,8 +20,6 @@
 #include "../ifaces/gimbal_ivariant.h"
 #include "../../containers/gimbal_array_map.h"
 
-#include <stdatomic.h>
-
 /*! \name Type System
  *  \brief Type UUID and Cast operators
  *  @{
