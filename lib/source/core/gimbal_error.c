@@ -2,6 +2,7 @@
 #include <gimbal/core/gimbal_error.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 static GBL_TLS(GblError, currentError_, { 0 });
 

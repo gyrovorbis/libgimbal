@@ -398,7 +398,7 @@ GBL_TARGET_PROPERTY_DEFINE(GBL_BUILD_CPP_EXTENSIONS libGimbal CXX_EXTENSIONS)
 # CMake's ${MSVC_VERSION} is equivalent to _MSC_VER
 # (according to https://cmake.org/cmake/help/latest/variable/MSVC_VERSION.html#variable:MSVC_VERSION)
 if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
-        target_compile_options(libGimbal PUBLIC "/Zc:preprocessor")
+        target_compile_options(libGimbal PUBLIC "/Zc:preprocessor /experimental:c11atomics")
 endif()
 
 if ((CMAKE_COMPILER_IS_GNUCC) OR CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
