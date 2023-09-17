@@ -1,112 +1,110 @@
 /*! \file
- *  \brief GblError extensible OO error type
+ *  \brief GblError thread-local generic error code
  *  \ingroup core
- *  \todo
- *   - finish me
- *   - consider making it a GblEvent and using event
- *     propagation to implement error filtering?
- *   - consider supporting child errors which become
- *     the children of a rethrown parent error
  *
- *   \author 2023 Falco Girgis
+ *  This file contains the public API for GblError, which is a structure
+ *  used to represent a single pending error status for a single thread.
+ *
+ *   \author    2023 Falco Girgis
  *   \copyright MIT License
  */
 #ifndef GIMBAL_ERROR_H
 #define GIMBAL_ERROR_H
 
-#include "gimbal_thread.h"
-#include "../meta/instances/gimbal_object.h"
+#include "gimbal_stack_frame.h"
+#include "../strings/gimbal_quark.h"
 
-/*! \name Type System
- *  \brief Type UUID and cast operators
- *  @{
- */
-#define GBL_ERROR_TYPE              (GBL_TYPEID(GblError))
-#define GBL_ERROR(self)             (GBL_CAST(GblError, self))
-#define GBL_ERROR_CLASS(klass)      (GBL_CLASS_CAST(GblError, klass))
-#define GBL_ERROR_GET_CLASS(self)   (GBL_CLASSOF(GblError, self))
-//! @}
-
-#define GBL_TRY
-#define GBL_THROW(type, ...)
-#define GBL_CATCH
-#define GBL_CATCH_AS(type, name)
+#define GBL_ERROR_DOMAIN        gblErrorDomain()    //!< Builtin standard error domain
+#define GBL_ERROR_MESSAGE_SIZE  128                 //!< Size of the GblError::message string
 
 #define GBL_SELF_TYPE GblError
 
 GBL_DECLS_BEGIN
 
-GBL_FORWARD_DECLARE_STRUCT(GblError);
-
-/*! \struct GblErrorClass
- *  \extends GblObjectClass
- *  \brief GblClass VTable structure for GblError
+/*! Defines a GblError category
+ *
+ *  GblErrorDomain is a user-definable structure which represents a
+ *  grouping of error codes. It provides both a domain name and a method
+ *  for converting an error code to its string representation.
  *
  *  \sa GblError
  */
-GBL_CLASS_DERIVE(GblError, GblObject)
-    GBL_RESULT (*pFnResultString)(GBL_CSELF,
-                                  GblEnum      result,
-                                  const char** ppString);
-//! onHandle/onUnHandle/onRaised
-    GblType       resultType;
-GBL_CLASS_END
+typedef struct GblErrorDomain {
+    GblQuark name;                              //!< Name of the error domain or category
+    const char* (*pFnCodeString)(GblEnum code); //!< Returns a string describing an error code
+} GblErrorDomain;
 
-/*! \struct GblError
- *  \extends GblObject
- *  \ingroup core
- *  \brief Object containing an application error and its context
- *  \sa GblErrorClass
+/*! Low-level error structure
+ *
+ *  GblError is a low-level error structure which represents a particular
+ *  error code, a message, a source location, and a "domain" for the error,
+ *  which is what is used to distinguish different categories or enum codes.
+ *
+ *  GblError uses thread-local storage so that every thread has its own unique
+ *  pending error, which can be assigned and manipulated independently.
+ *
+ * \sa GblErrorDomain
  */
-GBL_INSTANCE_DERIVE(GblError, GblObject)
-    GblType       resultType;
-    GblEnum       result;
-    GblStringRef* pMessage;
-    GblThread*    pThread;
-    const char*   pFile;
-    const char*   pFunction;
-    size_t        line;
-GBL_INSTANCE_END
+typedef struct GblError {
+    char                  message[GBL_ERROR_MESSAGE_SIZE];  //!< Custom detailed error string
+    GblSourceLocation     srcLocation;                      //!< C/C++ source code location
+    const GblErrorDomain* pDomain;                          //!< Pointer to the code's domain
+    GblEnum               code;                             //!< Actual raw error code returned
+} GblError;
 
-GBL_PROPERTIES(GblError,
-    (result,   GBL_GENERIC, (READ, CONSTRUCT), GBL_ENUM_TYPE),
-    (thread,   GBL_GENERIC, (READ, CONSTRUCT), GBL_THREAD_TYPE),
-    (message,  GBL_GENERIC, (READ, WRITE    ), GBL_STRING_TYPE),
-    (file,     GBL_GENERIC, (READ, WRITE    ), GBL_STRING_TYPE),
-    (function, GBL_GENERIC, (READ, WRITE    ), GBL_STRING_TYPE),
-    (line,     GBL_GENERIC, (READ, WRITE    ), GBL_SIZE_TYPE)
-)
+/*! \name Accessors
+ *  \brief Methods for accessing errors and their state
+ *  @{
+ */
+//! Returns a pointer to the current thread's pending error or NULL
+GBL_EXPORT const GblError* GblError_pending (void) GBL_NOEXCEPT;
+//! Returns GblQuark of the name of the current thread's pending error domain
+GBL_EXPORT GblQuark        GblError_domain  (void) GBL_NOEXCEPT;
+//! Returns the stringified version of the current thread's pending error code
+GBL_EXPORT const char*     GblError_string  (void) GBL_NOEXCEPT;
 
-GBL_EXPORT GblType    GblError_type         (void)           GBL_NOEXCEPT;
+/*! \name Management
+ *  \brief Methods for managing pending errors
+ *  @{
+ */
+//! Clears the current thread's pending error
+GBL_EXPORT GblBool         GblError_clear   (void)                          GBL_NOEXCEPT;
+//! Raises an error on the current thread with the given domain, code, and message
+GBL_EXPORT const GblError* GblError_raise   (const char*           pFile/*=NULL*/,
+                                             const char*           pFunction/*=NULL*/,
+                                             size_t                line/*=0*/,
+                                             const GblErrorDomain* pDomain,
+                                             GblEnum               code,
+                                             const char*           pFmt/*=NULL*/,
+                                             ...)                           GBL_NOEXCEPT;
+//! Equivalent to GblError_raise(), except the additional args are passed via a va_list
+GBL_EXPORT const GblError* GblError_raisev  (const char*           pFile/*=NULL*/,
+                                             const char*           pFunction/*=NULL*/,
+                                             size_t                line/*=0*/,
+                                             const GblErrorDomain* pDomain,
+                                             GblEnum               code,
+                                             const char*           pFmt,
+                                             va_list               varArgs) GBL_NOEXCEPT;
+//! Reraises the current thread's pending error, updating its source context
+GBL_EXPORT const GblError* GblError_reraise (const char* pFile/*=NULL*/,
+                                             const char* pFunction/*=NULL*/,
+                                             size_t      line/*=0*/)        GBL_NOEXCEPT;
+//! @}
 
-GBL_EXPORT GblError*  GblError_current      (void)           GBL_NOEXCEPT;
-GBL_EXPORT GblBool    GblError_clear        (void)           GBL_NOEXCEPT;
-GBL_EXPORT GblError*  GblError_catch        (GblType type)   GBL_NOEXCEPT;
-GBL_EXPORT void       GblError_throw        (GblError* pErr) GBL_NOEXCEPT;
-
-GBL_EXPORT GblError*  GblError_create       (GblType     derived,
-                                             const char* pFile,
-                                             const char* pFunc,
-                                             size_t      line,
-                                             GblType     resultType,
-                                             GblEnum     result,
-                                             const char* pFmt,
-                                             ...)        GBL_NOEXCEPT;
-
-GBL_EXPORT GblRefCount GblError_unref        (GBL_SELF)  GBL_NOEXCEPT;
-
-GBL_EXPORT const char* GblError_resultString (GBL_CSELF) GBL_NOEXCEPT;
-GBL_EXPORT GblType     GblError_resultType   (GBL_CSELF) GBL_NOEXCEPT;
-
-GBL_EXPORT GblBool     GblError_hasSource    (GBL_CSELF) GBL_NOEXCEPT;
-GBL_EXPORT const char* GblError_file         (GBL_CSELF) GBL_NOEXCEPT;
-GBL_EXPORT const char* GblError_function     (GBL_CSELF) GBL_NOEXCEPT;
-GBL_EXPORT size_t      GblError_line         (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the builtin error domain used by GBL_RESULT
+GBL_EXPORT const GblErrorDomain* gblErrorDomain(void) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
-#define GblError_create(derived, result, /*resultType,*/ ...) \
-    (GblError_create)(derived, GBL_SRC_FILE, GBL_SRC_FN, GBL_SRC_LN, result, __VA_ARGS__)
+#define GblError_raise(...) \
+    GblError_raiseDefault_(__VA_ARGS__)
+#define GblError_raiseDefault_(...) \
+    GblError_raiseDefault__(__FILE__, __FUNCTION__, __LINE__, __VA_ARGS__, GBL_NULL)
+#define GblError_raiseDefault__(file, func, line, domain, code, ...) \
+    ((GblError_raise)(file, func, line, domain, code, __VA_ARGS__))
+
+#define GblError_reraise() \
+    ((GblError_reraise)(__FILE__, __FUNCTION__, __LINE__))
 
 #undef GBL_SELF_TYPE
 

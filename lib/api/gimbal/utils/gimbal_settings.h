@@ -99,6 +99,7 @@ GBL_SIGNALS(GblSettings,
 GBL_EXPORT GblType      GblSettings_type          (void)                                                   GBL_NOEXCEPT;
 
 GBL_EXPORT GblSettings* GblSettings_create        (void)                                                   GBL_NOEXCEPT;
+GBL_EXPORT GblSettings* GblSettings_ref           (GBL_CSELF)                                              GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount  GblSettings_unref         (GBL_SELF)                                               GBL_NOEXCEPT;
 
 GBL_EXPORT const char*  GblSettings_scope         (GBL_CSELF)                                              GBL_NOEXCEPT;

@@ -50,6 +50,7 @@
 #include "utils/gimbal_scanner_test_suite.h"
 #include "algorithms/gimbal_random_test_suite.h"
 #include "algorithms/gimbal_compression_test_suite.h"
+#include "core/gimbal_exception_test_suite.h"
 #include "core/gimbal_error_test_suite.h"
 
 #ifdef GBL_ENABLE_CPP
@@ -241,8 +242,7 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
-
-#if !defined(GBL_PSP) && !defined(GBL_DREAMCAST)
+#if !defined(GBL_PSP)
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
 #endif
@@ -260,6 +260,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_RANDOM_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_COMPRESSION_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_EXCEPTION_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_ERROR_TEST_SUITE_TYPE));
 

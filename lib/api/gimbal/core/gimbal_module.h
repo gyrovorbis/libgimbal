@@ -80,7 +80,6 @@ GBL_INSTANCE_DERIVE(GblModule, GblContext)
     GblOptionGroup* pOptionGroup;   //!< Command-line option handler of a module
 GBL_INSTANCE_END
 
-
 //! \cond
 GBL_PROPERTIES(GblModule,
     (prefix,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),

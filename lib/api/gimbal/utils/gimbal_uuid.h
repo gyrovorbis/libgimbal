@@ -19,10 +19,10 @@
 
 #include "../core/gimbal_ctx.h"
 
-#define GBL_UUID_BYTE_COUNT     16  ///< Total number of bytes to representa a UUID, per RFC 4122.
-#define GBL_UUID_NODE_COUNT     6   ///< Number of node bytes in a UUID, per RFC 4122.
-#define GBL_UUID_STRING_SIZE    37  ///< Byte size of a string needed to represent a UUID, including NULL terminator.
-#define GBL_UUID_STRING_LENGTH  36  ///< Length of string needed to represent a UUID, excluding NULL terminator.
+#define GBL_UUID_BYTE_COUNT     16  //!< Total number of bytes to representa a UUID, per RFC 4122.
+#define GBL_UUID_NODE_COUNT     6   //!< Number of node bytes in a UUID, per RFC 4122.
+#define GBL_UUID_STRING_SIZE    37  //!< Byte size of a string needed to represent a UUID, including NULL terminator.
+#define GBL_UUID_STRING_LENGTH  36  //!< Length of string needed to represent a UUID, excluding NULL terminator.
 
 #define GBL_SELF_TYPE GblUuid
 

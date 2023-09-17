@@ -2,6 +2,7 @@
 #include "../types/gimbal_type_.h"
 #include <gimbal/utils/gimbal_date_time.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
+#include <stdlib.h>
 
 static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, size_t  size, size_t  align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);

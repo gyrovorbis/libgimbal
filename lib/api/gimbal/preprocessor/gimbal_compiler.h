@@ -228,11 +228,11 @@
 #   define GBL_THREAD_LOCAL __declspec(thread)
 #else
 #   if defined(__DREAMCAST__)
-#       define GBL_THREAD_LOCAL     //_Thread_local
+#       define GBL_THREAD_LOCAL     _Thread_local
 #   elif defined(__PSP__)
 #       define GBL_THREAD_LOCAL
 #   else
-#       define GBL_THREAD_LOCAL __thread
+#       define GBL_THREAD_LOCAL     __thread
 #   endif
 #endif
 

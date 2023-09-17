@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
-
-SET(ANDROID_PLATFORM 33)
-SET(ANDROID_NATIVE_API_LEVEL 33)
+SET(ANDROID_PLATFORM 34)
+SET(ANDROID_NATIVE_API_LEVEL 34)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -135,6 +134,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_array_heap.h
     api/gimbal/core/gimbal_decls.h
     api/gimbal/core/gimbal_ctx.h
+    api/gimbal/core/gimbal_error.h
     api/gimbal/core/gimbal_stack_frame.h
     api/gimbal/core/gimbal_result.h
     api/gimbal/core/gimbal_typedefs.h
@@ -146,7 +146,8 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_task.h
     api/gimbal/core/gimbal_logger.h
     api/gimbal/core/gimbal_module.h
-    api/gimbal/core/gimbal_error.h
+    api/gimbal/core/gimbal_exception.h
+    api/gimbal/core/gimbal_tls.h
     api/gimbal/meta/classes/gimbal_bit_struct.h
     api/gimbal/meta/classes/gimbal_class.h
     api/gimbal/meta/classes/gimbal_class.hpp
@@ -253,6 +254,7 @@ set(GIMBAL_SOURCES
     source/core/gimbal_app.c
     source/core/gimbal_module.c
     source/core/gimbal_logger.c
+    source/core/gimbal_exception.c
     source/core/gimbal_error.c
     source/core/gimbal_main_loop.c
     source/meta/classes/gimbal_bit_struct.c
@@ -372,7 +374,6 @@ if (NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA)
 
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-
     list(APPEND
          GBL_TARGET_LINK_LIBS
          Threads::Threads)

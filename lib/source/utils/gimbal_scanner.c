@@ -22,7 +22,7 @@ GBL_DECLARE_STRUCT(GblScanner_) {
     const GblStringRef* pDelimeters;
 };
 
-GBL_EXPORT const GblStringRef* GblScannerClass_defaultDelimeters(const GblScannerClass* pClass) {
+GBL_EXPORT GblStringRef* GblScannerClass_defaultDelimeters(const GblScannerClass* pClass) {
     return GBL_SCANNER_CLASS_(pClass)->pDefaultDelimeters;
 }
 
@@ -77,7 +77,7 @@ GBL_EXPORT GblRefCount GblScanner_unref(GblScanner* pSelf) {
     return GBL_UNREF(pSelf);
 }
 
-GBL_EXPORT const GblStringRef* GblScanner_input(const GblScanner* pSelf) {
+GBL_EXPORT GblStringRef* GblScanner_input(const GblScanner* pSelf) {
     return GBL_SCANNER_(pSelf)->pInputString;
 }
 
@@ -113,7 +113,7 @@ void GblScanner_reset(GblScanner* pSelf) {
                        GBL_SCANNER_OK;
 }
 
-GBL_EXPORT const GblStringRef* GblScanner_delimeters(const GblScanner* pSelf) {
+GBL_EXPORT GblStringRef* GblScanner_delimeters(const GblScanner* pSelf) {
     return GBL_SCANNER_(pSelf)->pDelimeters;
 }
 

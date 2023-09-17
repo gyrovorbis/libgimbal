@@ -332,14 +332,17 @@ GBL_EXPORT GblThread* (GblThread_create)(GblThreadFn pCallback,
                                          void*       pUserdata,
                                          GblBool     autoStart)
 {
-    GblThread* pThread =
-            GBL_THREAD(GBL_NEW(GblThread,
-                               "callback",  pCallback,
-                               "userdata",  pUserdata));
+    GblThread* pThread = GBL_NEW(GblThread,
+                                 "callback", pCallback,
+                                 "userdata", pUserdata);
 
     if(autoStart) GblThread_start(pThread);
 
     return pThread;
+}
+
+GBL_EXPORT GblThread* GblThread_ref(const GblThread* pSelf) {
+    return GBL_THREAD(GBL_REF(pSelf));
 }
 
 GBL_EXPORT GblRefCount GblThread_unref(GblThread* pSelf) {

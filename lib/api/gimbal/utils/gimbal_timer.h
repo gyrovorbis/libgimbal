@@ -32,6 +32,10 @@ GBL_DECLS_BEGIN
 
 /*! Represents a stopwatch-like nanosecond timer
  *  \ingroup utils
+ *
+ *  GblTimer is a nanosecond-resolution stopwatch-like
+ *  timing API which is used for measuring elapsed time
+ *  between a start and stop point.
  */
 typedef struct GblTimer {
     GblTimeSpec startTime;   //!< Initial starting timestamp
@@ -45,8 +49,11 @@ typedef struct GblTimer {
  *  \brief       Methods used for capturing timing data
  *  @{
  */
+//! Starts the timer, which will continue running until GblTimer_stop() is called
 GBL_EXPORT void GblTimer_start    (GBL_SELF) GBL_NOEXCEPT;
+//! Stops the timer, recording the amount of time elapsed within GblTimer::elapsedTime
 GBL_EXPORT void GblTimer_stop     (GBL_SELF) GBL_NOEXCEPT;
+//! Continues the timer, recording elapsed time where it left off
 GBL_EXPORT void GblTimer_continue (GBL_SELF) GBL_NOEXCEPT;
 //! @}
 
@@ -55,10 +62,15 @@ GBL_EXPORT void GblTimer_continue (GBL_SELF) GBL_NOEXCEPT;
  *  \brief       Methods for measuring elapsed time
  *  @{
  */
+//! Returns GBL_TRUE if the timer contains a valid elapsed time measurement
 GBL_EXPORT GblBool  GblTimer_isValid     (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the amount of time elapsed in seconds
 GBL_EXPORT double   GblTimer_elapsedSecs (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the amount of time elapsed in milliseconds
 GBL_EXPORT double   GblTimer_elapsedMs   (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the amount of time elapsed in microseconds
 GBL_EXPORT double   GblTimer_elapsedUs   (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns the amount of time elapsed in nanoseconds
 GBL_EXPORT uint64_t GblTimer_elapsedNs   (GBL_CSELF) GBL_NOEXCEPT;
 //! @}
 

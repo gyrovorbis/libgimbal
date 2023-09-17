@@ -73,6 +73,8 @@ set(GIMBAL_TEST_SOURCES
     source/core/gimbal_thread_test_suite.c
     include/core/gimbal_error_test_suite.h
     source/core/gimbal_error_test_suite.c
+    include/core/gimbal_exception_test_suite.h
+    source/core/gimbal_exception_test_suite.c
     include/meta/classes/gimbal_enum_test_suite.h
     source/meta/classes/gimbal_enum_test_suite.c
     include/meta/classes/gimbal_flags_test_suite.h

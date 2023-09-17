@@ -1,6 +1,6 @@
 #include <gimbal/algorithms/gimbal_sort.h>
 
-GBL_EXPORT void gblSortMerge(void* pArray, size_t  count, size_t  elemSize, GblSortComparatorFn pFnCmp) {
+GBL_EXPORT void gblSortMerge(void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) {
     uint8_t* pFirstHalf;
     uint8_t* pEofFirstHalf;
     uint8_t* pSecondHalf;
