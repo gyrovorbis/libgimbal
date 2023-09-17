@@ -70,8 +70,7 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(raiseCode)
     const GblError* pError =
-        GblError_raise(GBL_ERROR_DOMAIN,
-                       GBL_RESULT_ERROR_INVALID_EXPRESSION);
+        GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_EXPRESSION);
 
     GBL_TEST_VERIFY(pError);
     GBL_TEST_COMPARE(pError->code, GBL_RESULT_ERROR_INVALID_EXPRESSION);
@@ -106,7 +105,7 @@ GBL_TEST_CASE(reraise)
     GBL_TEST_COMPARE(pError->message, "");
     GBL_TEST_VERIFY(pError->srcLocation.pFile);
     GBL_TEST_COMPARE(pError->srcLocation.pFunc, "GblErrorTestSuite_reraise_");
-    GBL_TEST_COMPARE(pError->srcLocation.line, 100);
+    GBL_TEST_COMPARE(pError->srcLocation.line, 99);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(clear)

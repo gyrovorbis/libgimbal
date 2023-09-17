@@ -20,6 +20,8 @@
 #include "../ifaces/gimbal_ivariant.h"
 #include "../../containers/gimbal_array_map.h"
 
+#include <stdatomic.h>
+
 /*! \name Type System
  *  \brief Type UUID and Cast operators
  *  @{
@@ -83,7 +85,7 @@ GBL_CLASS_END
 GBL_INSTANCE_BASE(GblBox)                       // Size (32/64 bit)
     GBL_PRIVATE_BEGIN                           // 12/20 Bytes Total
         GblArrayMap* pFields;                   //!< PRIVATE: Storage for extended userdata fields
-        GblRefCount  refCounter;                //!< PRIVATE: Atomic reference counter
+        atomic_short refCounter;                //!< PRIVATE: Atomic reference counter
         uint16_t     contextType         : 1;   //!< PRIVATE: GblContext type flag \deprecated
         uint16_t     constructedInPlace  : 1;   //!< PRIVATE: Flag for whether memory is deallocated upon destruction
         uint16_t     derivedFlags        : 14;  //!< PRIVATE: Extra flags for use in derived classes

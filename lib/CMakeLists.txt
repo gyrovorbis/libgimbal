@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
-SET(ANDROID_PLATFORM 34)
-SET(ANDROID_NATIVE_API_LEVEL 34)
+SET(ANDROID_PLATFORM 33)
+SET(ANDROID_NATIVE_API_LEVEL 33)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_C_STANDARD 17)
@@ -140,7 +140,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_typedefs.h
     api/gimbal/core/gimbal_thd.h
     api/gimbal/core/gimbal_thread.h
-    api/gimbal/core/gimbal_atomics.h
     api/gimbal/core/gimbal_app.h
     api/gimbal/core/gimbal_main_loop.h
     api/gimbal/core/gimbal_task.h
@@ -368,7 +367,8 @@ list(APPEND
      GBL_TARGET_LINK_LIBS
      tinycthread
      TinyRegexC
-     lz4_static)
+     lz4_static
+     m)
 
 if (NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA)
 

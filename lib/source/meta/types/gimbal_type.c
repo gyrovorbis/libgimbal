@@ -451,8 +451,8 @@ static GblType typeRegister_(GblType parent,
 
         memset(pMeta, 0, metaSize);
 
-        GBL_ATOMIC_INT16_INIT(pMeta->refCount, 0);
-        GBL_ATOMIC_INT16_INIT(pMeta->instanceRefCount, 0);
+        atomic_store(&pMeta->refCount, 0);
+        atomic_store(&pMeta->instanceRefCount, 0);
         pMeta->flags                = flags;
         if(parent != GBL_INVALID_TYPE)
             pMeta->flags |= (GBL_META_CLASS_(GblType_root(parent))->flags & GBL_TYPE_ROOT_FLAGS_MASK);
@@ -1151,7 +1151,7 @@ GBL_EXPORT GblRefCount GblType_classRefCount(GblType type) {
     GblRefCount refCount      = 0;
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
     GBL_CTX_BEGIN(pCtx_);
-    if(pMeta) refCount = GBL_ATOMIC_INT16_LOAD(pMeta->refCount);
+    if(pMeta) refCount = atomic_load(&pMeta->refCount);
     GBL_CTX_END_BLOCK();
     return refCount;
 }
@@ -1162,7 +1162,7 @@ GBL_EXPORT GblRefCount GblType_instanceCount(GblType type) {
         GblMetaClass* pMeta = GBL_META_CLASS_(type);
         GBL_CTX_BEGIN(pCtx_);
         GBL_CTX_VERIFY_ARG(pMeta != NULL);
-        refCount = GBL_ATOMIC_INT16_LOAD(pMeta->instanceRefCount);
+        refCount = atomic_load(&pMeta->instanceRefCount);
         GBL_CTX_END_BLOCK();
     }
     return refCount;

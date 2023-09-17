@@ -1,12 +1,13 @@
 #include <gimbal/utils/gimbal_ref.h>
-#include <gimbal/core/gimbal_atomics.h>
+
+#include <stdatomic.h>
 
 typedef struct GblRef_ {
-    GblContext*         pCtx;
-    GBL_ATOMIC_INT16    refCount;
+    GblContext*   pCtx;
+    atomic_short  refCount;
 } GblRef_;
 
-static GBL_ATOMIC_INT16 activeCount_ = 0;
+static atomic_short activeCount_ = 0;
 
 GBL_INLINE  GblRef_* GblRef_header_(const void* pData) GBL_NOEXCEPT {
     return (GblRef_*)(pData? (GblRef_*)pData - 1 : NULL);
@@ -20,12 +21,13 @@ GBL_EXPORT GBL_RESULT GblRef_reinit(void) {
                            "GblRef_reinit(): %u remaining references!",
                            refCount);
     }
-    GBL_ATOMIC_INT16_STORE(activeCount_, 0);
+
+    atomic_store(&activeCount_, 0);
     GBL_CTX_END();
 }
 
 GBL_EXPORT GblRefCount GblRef_activeCount(void) {
-    return (GblRefCount)GBL_ATOMIC_INT16_LOAD(activeCount_);
+    return (GblRefCount)atomic_load(&activeCount_);
 }
 
 GBL_EXPORT void* GblRef_allocWithContext(size_t      size,
@@ -40,8 +42,8 @@ GBL_EXPORT void* GblRef_allocWithContext(size_t      size,
     if(pMemory) {
         memset(pMemory, 0, totalSize);
         pMemory->pCtx = pCtx;
-        GBL_ATOMIC_INT16_INIT(pMemory->refCount, 1);
-        GBL_ATOMIC_INT16_INC(activeCount_);
+        atomic_store(&pMemory->refCount, 1);
+        atomic_fetch_add(&activeCount_, 1);
         pPtr = (pMemory + 1);
     }
     GBL_CTX_END_BLOCK();
@@ -55,7 +57,7 @@ GBL_EXPORT GblRefCount GblRef_releaseWithDtor(const void* pData,
     if(pData) {
         GblRef_* pHeader = GblRef_header_(pData);
         GBL_CTX_BEGIN(pHeader->pCtx);
-        if(!(refCount = (GBL_ATOMIC_INT16_DEC(pHeader->refCount) - 1))) {
+        if(!(refCount = (atomic_fetch_sub(&pHeader->refCount, 1) - 1))) {
             GBL_CTX_VERIFY(GblRef_activeCount(),
                            GBL_RESULT_ERROR_INVALID_HANDLE,
                            "Attempting to release a reference with 0 active refs!");
@@ -63,13 +65,13 @@ GBL_EXPORT GblRefCount GblRef_releaseWithDtor(const void* pData,
                 GBL_RESULT dtorResult = pFnDtor(pData);
                 if(!GBL_RESULT_SUCCESS(dtorResult)) {
                     GBL_CTX_WARN("Failed to destruct last reference, leaking!");
-                    refCount = GBL_ATOMIC_INT16_INC(pHeader->refCount) + 1;
+                    refCount = atomic_fetch_add(&pHeader->refCount, 1) + 1;
                     GBL_CTX_RECORD_SET(dtorResult, "GblRef_release(): Destructor failed!");
                     GBL_CTX_DONE();
                 }
             }
             GBL_CTX_FREE(pHeader);
-            GBL_ATOMIC_INT16_DEC(activeCount_);
+            atomic_fetch_sub(&activeCount_, 1);
         }
         GBL_CTX_END_BLOCK();
     }
@@ -85,8 +87,8 @@ GBL_EXPORT void* GblRef_acquire(const void* pSelf) GBL_NOEXCEPT
     void* pRetData = NULL;
     if(pSelf) {
         GblRef_* pHeader = GblRef_header_(pSelf);
-        GBL_ATOMIC_INT16_INC(pHeader->refCount);
-        pRetData = pSelf;
+        atomic_fetch_add(&pHeader->refCount, 1);
+        pRetData = (void*)pSelf;
     }
     return pRetData;
 }
@@ -99,7 +101,7 @@ GBL_EXPORT GblRefCount GblRef_refCount(const void* pSelf) GBL_NOEXCEPT {
     GblRefCount refCount = 0;
     if(pSelf) {
         GblRef_* pHeader = GblRef_header_(pSelf);
-        refCount = GBL_ATOMIC_INT16_LOAD(pHeader->refCount);
+        refCount = atomic_load(&pHeader->refCount);
     }
     return refCount;
 }

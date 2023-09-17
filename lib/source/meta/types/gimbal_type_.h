@@ -6,7 +6,7 @@
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/containers/gimbal_nary_tree.h>
 #include <gimbal/strings/gimbal_quark.h>
-#include <gimbal/core/gimbal_atomics.h>
+#include <stdatomic.h>
 
 #include <tinycthread.h>
 
@@ -59,8 +59,8 @@ typedef struct GblMetaClass {
         GblNaryTreeNode         treeNode;
     };
     GblQuark                    name;
-    GBL_ATOMIC_INT16            refCount;
-    GBL_ATOMIC_INT16            instanceRefCount;
+    atomic_short                refCount;
+    atomic_short                instanceRefCount;
     const GblTypeInfo*          pInfo;
     GblFlags                    flags;
     GblArrayMap*                pExtensions;
@@ -80,7 +80,7 @@ extern mtx_t                    typeRegMtx_;
 extern GblHashSet               typeRegistry_;
 extern struct TypeBuiltins_ {
     GblArrayList   vector;
-    uint8_t        stackBuffer[sizeof(GblType)*GBL_TYPE_BUILTIN_COUNT];
+    uint8_t        stackBuffer[sizeof(GblType) * GBL_TYPE_BUILTIN_COUNT];
 } typeBuiltins_;
 
 

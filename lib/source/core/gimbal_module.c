@@ -5,8 +5,9 @@
 #include <gimbal/core/gimbal_logger.h>
 #include <gimbal/utils/gimbal_version.h>
 #include <gimbal/utils/gimbal_option_group.h>
-#include <gimbal/core/gimbal_atomics.h>
+
 #include <tinycthread.h>
+#include <stdatomic.h>
 
 #define GBL_MODULE_(self)   (GBL_PRIVATE(GblModule, self))
 
@@ -22,8 +23,8 @@
 
 
 typedef struct GblModule_ {
-    GblHashSet       typeRegistry;
-    GBL_ATOMIC_INT16 useCount;
+    GblHashSet   typeRegistry;
+    atomic_short useCount;
 } GblModule_;
 
 static mtx_t        moduleMtx_;
@@ -253,7 +254,7 @@ GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
 }
 
 GBL_EXPORT GblRefCount GblModule_useCount(const GblModule* pSelf) {
-    return GBL_ATOMIC_INT16_LOAD(GBL_MODULE_(pSelf)->useCount);
+    return atomic_load(&GBL_MODULE_(pSelf)->useCount);
 }
 
 GBL_EXPORT GblBool GblModule_isLoaded(const GblModule* pSelf) {
@@ -322,7 +323,7 @@ static GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
     GblModule* pSelf = GBL_MODULE(pPlugin);
     GblModule_* pSelf_ = GBL_MODULE_(pSelf);
 
-    if(!GBL_ATOMIC_INT16_INC(pSelf_->useCount)) GBL_UNLIKELY {
+    if(!atomic_fetch_add(&pSelf_->useCount, 1)) GBL_UNLIKELY {
         GBL_VCALL(GblModule, pFnLoad, pSelf);
     }
 
@@ -335,7 +336,7 @@ static GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
     GblModule* pSelf = GBL_MODULE(pPlugin);
     GblModule_* pSelf_ = GBL_MODULE_(pSelf);
 
-    if(GBL_ATOMIC_INT16_DEC(pSelf_->useCount) == 1) GBL_UNLIKELY {
+    if(atomic_fetch_sub(&pSelf_->useCount, 1) == 1) GBL_UNLIKELY {
         GBL_VCALL(GblModule, pFnUnload, pSelf);
     }
 

@@ -9,9 +9,6 @@
 
 typedef union GblSettingsNode {
     GblNaryTreeNode treeNode;
-    struct {
-
-    }
 } GblSettingsNode;
 
 GBL_DECLARE_STRUCT(GblSettings_) {

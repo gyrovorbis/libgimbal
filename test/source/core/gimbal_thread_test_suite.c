@@ -1,9 +1,10 @@
 #include "core/gimbal_thread_test_suite.h"
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_thread.h>
-#include <gimbal/core/gimbal_atomics.h>
 #include <gimbal/utils/gimbal_ref.h>
+
 #include <tinycthread.h>
+#include <stdatomic.h>
 
 #define GBL_SELF_TYPE GblThreadTestSuite
 
@@ -16,7 +17,7 @@
 #define GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_   10
 
 GBL_CLASS_DERIVE(GblTestThread, GblThread)
-    GBL_ATOMIC_INT16 runningCount;
+    atomic_short runningCount;
 GBL_CLASS_END
 
 GBL_INSTANCE_DERIVE(GblTestThread, GblThread)
@@ -61,7 +62,7 @@ GBL_TEST_FIXTURE {
 
 static GblType GblTestThread_type(void);
 
-static GBL_ATOMIC_INT16 threadActiveCount_ = 0;
+static atomic_short threadActiveCount_ = 0;
 
 static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(4)  Align4_       tlsBuff4_       = {.inner = {2, 2, 2}};
 static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(16) Align16_      tlsBuff16_      = {.inner = {1, 1, 1}};

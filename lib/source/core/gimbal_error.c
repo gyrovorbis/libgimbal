@@ -1,6 +1,8 @@
 #include <gimbal/core/gimbal_tls.h>
 #include <gimbal/core/gimbal_error.h>
 
+#include <stdio.h>
+
 static GBL_TLS(GblError, currentError_, { 0 });
 
 static const char* gblErrorCodeStr_(GblEnum code) {

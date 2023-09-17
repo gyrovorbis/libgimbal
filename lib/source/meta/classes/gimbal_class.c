@@ -193,7 +193,7 @@ static GblClass* GblClass_create_(GblMetaClass* pMeta, size_t size, GblBool floa
     //GBL_CTX_PUSH_VERBOSE("Class::create(%s)", GblType_name(GBL_TYPE_(pMeta)));
 
     if(!floating) {
-        GBL_CTX_VERIFY_EXPRESSION(!GBL_ATOMIC_INT16_LOAD(pMeta->refCount),
+        GBL_CTX_VERIFY_EXPRESSION(!atomic_load(&pMeta->refCount),
                                   "Already have a reference to an invalid class object!");
 
         ppClass = &pMeta->pClass;
@@ -240,12 +240,12 @@ GBL_EXPORT GblClass* GblClass_refDefault(GblType type) GBL_NOEXCEPT {
     //GBL_CTX_PUSH_VERBOSE("Class::reference(%s)", GblType_name(GBL_TYPE_(pMeta)));
     GBL_TYPE_ENSURE_INITIALIZED_();
 
-    if(!GBL_ATOMIC_INT16_LOAD(pMeta->refCount))
+    if(!atomic_load(&pMeta->refCount))
        GBL_CTX_VERIFY_CALL(GblType_refresh_(type));
 
     // Return existing reference to class data
     if(pMeta->pClass && GBL_CLASS_TYPEOF(pMeta->pClass) != GBL_INVALID_TYPE) {
-        GBL_CTX_VERIFY_EXPRESSION(GBL_ATOMIC_INT16_LOAD(pMeta->refCount) ||
+        GBL_CTX_VERIFY_EXPRESSION(atomic_load(&pMeta->refCount) ||
                                   (pMeta->flags & GBL_TYPE_FLAG_CLASS_PINNED),
                                   "No references to an initialized unpinned class!?");
         //GBL_CTX_VERBOSE("Using existing class data");
@@ -258,9 +258,9 @@ GBL_EXPORT GblClass* GblClass_refDefault(GblType type) GBL_NOEXCEPT {
     }
 
     // Either way, we're returning a new reference, add refcount
-    GblRefCount oldCount = GBL_ATOMIC_INT16_INC(pMeta->refCount);
+    GblRefCount oldCount = atomic_fetch_add(&pMeta->refCount, 1);
     if(oldCount)
-        GBL_CTX_VERBOSE("++[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), oldCount+1);
+        GBL_CTX_VERBOSE("++[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), oldCount + 1);
 
     //GBL_CTX_POP(1);
     GBL_CTX_END_BLOCK();
@@ -438,7 +438,7 @@ GBL_EXPORT GblRefCount GblClass_unrefDefault(GblClass* pSelf) GBL_NOEXCEPT {
                    "Class::unreference(): The specified class has an invalid ID!");
 
     pMeta = GBL_META_CLASS_(GBL_CLASS_TYPEOF(pSelf));
-    refCount = GBL_ATOMIC_INT16_LOAD(pMeta->refCount);
+    refCount = atomic_load(&pMeta->refCount);
 
     //GBL_CTX_PUSH_VERBOSE("Class::unreference(%s): %u",
     //                     GblType_name(GblClass_typeOf(pSelf)),
@@ -452,13 +452,13 @@ GBL_EXPORT GblRefCount GblClass_unrefDefault(GblClass* pSelf) GBL_NOEXCEPT {
                    GBL_RESULT_ERROR_INTERNAL,
                    "The refcount for the given class was already at 0!");
 
-    refCount = GBL_ATOMIC_INT16_DEC(pMeta->refCount) - 1;
+    refCount = atomic_fetch_sub(&pMeta->refCount, 1) - 1;
 
     if(refCount) {
         ;//GBL_CTX_VERBOSE("--[%s].refCount: %u", GblType_name(GBL_TYPE_(pMeta)), refCount);
     } else {
         GblRefCount instanceRefCount = 0;
-        if((instanceRefCount = GBL_ATOMIC_INT16_LOAD(pMeta->instanceRefCount)))
+        if((instanceRefCount = atomic_load(&pMeta->instanceRefCount)))
             GBL_CTX_WARN("0 class references with remaining instance references: %u", instanceRefCount);
 
         if(pMeta->flags & GBL_TYPE_FLAG_CLASS_PINNED)
