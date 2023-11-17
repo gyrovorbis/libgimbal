@@ -81,41 +81,6 @@ GBL_TEST_CASE(benchmarkGbl)
         GBL_TEST_VERIFY(pat.match("abcde"));
 GBL_TEST_CASE_END
 
-GBL_RESULT ctxCall_() {
-    GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY(GBL_FALSE,
-                   GBL_RESULT_ERROR_INTERNAL,
-                   "Test");
-    GBL_CTX_END();
-}
-
-GBL_TEST_CASE(ctxBenchmark)
-    GBL_TEST_EXPECT_ERROR();
-
-    for(size_t i = 0; i < BENCHMARK_ITERATIONS_; ++i)
-        ctxCall_();
-
-    GBL_CTX_CLEAR_LAST_RECORD();
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(errorBenchmark)
-    for(size_t i = 0; i < BENCHMARK_ITERATIONS_; ++i) {
-        GblError* pError = GblError_create(GBL_ERROR_TYPE, GBL_ENUM_TYPE, GBL_RESULT_ERROR_INTERNAL, "Test");
-        GblError_throw(pError);
-    }
-    GblError_clear();
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(exceptionBenchmark)
-    for(size_t i = 0; i < BENCHMARK_ITERATIONS_; ++i) {
-        try {
-            throw std::out_of_range("Test");
-        } catch(std::exception& except) {
-            ;
-        }
-    }
-GBL_TEST_CASE_END
-
 GBL_TEST_REGISTER(constructString,
                   constructGblPattern,
                   constructCopy,
@@ -123,7 +88,4 @@ GBL_TEST_REGISTER(constructString,
                   bytes,
                   string,
                   benchmarkCpp,
-                  benchmarkGbl,
-                  ctxBenchmark,
-                  errorBenchmark,
-                  exceptionBenchmark)
+                  benchmarkGbl)
