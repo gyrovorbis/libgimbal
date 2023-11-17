@@ -11,13 +11,13 @@ typedef struct GblOpaqueTestSuite_ {
 
 static GBL_RESULT GblOpaque_copy_(void* pOpaque, void** ppNewOpaque) {
     GBL_CTX_BEGIN(NULL);
-    *ppNewOpaque = (void*)GblStringRef_acquire(pOpaque);
+    *ppNewOpaque = (void*)GblStringRef_ref(pOpaque);
     GBL_CTX_END();
 }
 
 static GBL_RESULT GblOpaque_free_(void* pOpaque) {
     GBL_CTX_BEGIN(NULL);
-    GblStringRef_release(pOpaque);
+    GblStringRef_unref(pOpaque);
     GBL_CTX_END();
 }
 
@@ -82,7 +82,7 @@ static GBL_RESULT GblOpaqueTestSuite_variant_(GblTestSuite* pSelf, GblContext* p
     GBL_CTX_VERIFY_CALL(GblVariant_constructOpaqueCopy(&v, pSelf_->opaqueType, (void*)pValue));
     GBL_TEST_COMPARE(strcmp(GblVariant_opaquePeek(&v), "Hi"), 0); // Utility / Get Value
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
-    GblStringRef_release(pValue);
+    GblStringRef_unref(pValue);
 
     // Value Move Constructor
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v, pSelf_->opaqueType, (void*)GblStringRef_create("Bye")));
@@ -92,7 +92,7 @@ static GBL_RESULT GblOpaqueTestSuite_variant_(GblTestSuite* pSelf, GblContext* p
     pValue = GblStringRef_create("Shy");
     GBL_CTX_VERIFY_CALL(GblVariant_setOpaqueCopy(&v, pSelf_->opaqueType, (void*)pValue));
     GBL_TEST_COMPARE(strcmp(GblVariant_opaquePeek(&v), "Shy"), 0); // Utility / Get Value
-    GblStringRef_release(pValue);
+    GblStringRef_unref(pValue);
 
     // Value Set Move
     GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(&v, pSelf_->opaqueType, (void*)GblStringRef_create("Fly")));
@@ -101,13 +101,13 @@ static GBL_RESULT GblOpaqueTestSuite_variant_(GblTestSuite* pSelf, GblContext* p
     // Value Get Move
     GBL_CTX_VERIFY_CALL(GblVariant_valueMove(&v, &pValue));
     GBL_TEST_COMPARE(strcmp(pValue, "Fly"), 0);
-    GblStringRef_release(pValue);
+    GblStringRef_unref(pValue);
 
     // Value Get Copy
     GblVariant_setOpaqueMove(&v, pSelf_->opaqueType, (void*)GblStringRef_create("DIE"));
     pValue = GblVariant_opaqueCopy(&v);
     GBL_TEST_COMPARE(strcmp(pValue, "DIE"), 0);
-    GblStringRef_release(pValue);
+    GblStringRef_unref(pValue);
 
     // Destructor
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));

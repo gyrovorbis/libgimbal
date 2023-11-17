@@ -4,13 +4,13 @@
 namespace gbl {
 
 std::string Pattern::string() const noexcept {
-    GblStringBuffer* pBuff = reinterpret_cast<GblStringBuffer*>(GBL_ALLOCA(sizeof(GblStringBuffer)));
+    GblStringBuffer buff;
 
-    GblStringBuffer_construct(pBuff, GBL_STRV(""), sizeof(GblStringBuffer));
+    GblStringBuffer_construct(&buff);
 
-    std::string cppStr (GblPattern_string(*this, pBuff));
+    std::string cppStr (GblPattern_string(*this, &buff));
 
-    GblStringBuffer_destruct(pBuff);
+    GblStringBuffer_destruct(&buff);
 
     return cppStr;
 }

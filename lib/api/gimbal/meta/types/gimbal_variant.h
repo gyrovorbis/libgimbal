@@ -533,6 +533,13 @@ GBL_EXPORT GblHash    GblVariant_hash    (GBL_CSELF)                   GBL_NOEXC
 
 GBL_DECLS_END
 
+#if !defined(GBL_DREAMCAST) && !defined(GBL_PSP)
+#   define GBL_VARIANT_CONSTRUCT_GENERIC_PLATFORM_ENTRIES()
+#else
+#   define GBL_VARIANT_CONSTRUCT_GENERIC_PLATFORM_ENTRIES() \
+    (int, GblVariant_constructInt32),
+#endif
+
 //! \cond
 #define GBL_VARIANT_CONSTRUCT_TABLE  (                                  \
         GBL_META_GENERIC_MACRO_NO_DEFAULT,                              \
@@ -542,6 +549,7 @@ GBL_DECLS_END
             (uint16_t,               GblVariant_constructUint16),       \
             (int16_t,                GblVariant_constructInt16),        \
             (uint32_t,               GblVariant_constructUint32),       \
+            GBL_VARIANT_CONSTRUCT_GENERIC_PLATFORM_ENTRIES()            \
             (int32_t,                GblVariant_constructInt32),        \
             (uint64_t,               GblVariant_constructUint64),       \
             (int64_t,                GblVariant_constructInt64),        \

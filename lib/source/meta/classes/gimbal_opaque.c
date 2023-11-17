@@ -1,6 +1,7 @@
 #include <gimbal/meta/classes/gimbal_opaque.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/meta/types/gimbal_variant.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include "../types/gimbal_type_.h"
 
 static GBL_RESULT GblOpaqueClass_init_(GblClass* pClass, const void* pData) {

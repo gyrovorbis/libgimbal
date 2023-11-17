@@ -22,7 +22,7 @@ GBL_DECLARE_STRUCT(GblScanner_) {
     const GblStringRef* pDelimeters;
 };
 
-GBL_EXPORT const GblStringRef* GblScannerClass_defaultDelimeters(const GblScannerClass* pClass) {
+GBL_EXPORT GblStringRef* GblScannerClass_defaultDelimeters(const GblScannerClass* pClass) {
     return GBL_SCANNER_CLASS_(pClass)->pDefaultDelimeters;
 }
 
@@ -77,7 +77,7 @@ GBL_EXPORT GblRefCount GblScanner_unref(GblScanner* pSelf) {
     return GBL_UNREF(pSelf);
 }
 
-GBL_EXPORT const GblStringRef* GblScanner_input(const GblScanner* pSelf) {
+GBL_EXPORT GblStringRef* GblScanner_input(const GblScanner* pSelf) {
     return GBL_SCANNER_(pSelf)->pInputString;
 }
 
@@ -113,7 +113,7 @@ void GblScanner_reset(GblScanner* pSelf) {
                        GBL_SCANNER_OK;
 }
 
-GBL_EXPORT const GblStringRef* GblScanner_delimeters(const GblScanner* pSelf) {
+GBL_EXPORT GblStringRef* GblScanner_delimeters(const GblScanner* pSelf) {
     return GBL_SCANNER_(pSelf)->pDelimeters;
 }
 
@@ -145,20 +145,18 @@ GBL_EXPORT void GblScanner_raiseError(GblScanner* pSelf,
     const size_t bufferSize = sizeof(GblStringBuffer) +
                               GBL_SCANNER_ERROR_BUFFER_DEFAULT_SIZE_;
     GblStringBuffer* pStrBuff = GBL_ALLOCA(bufferSize);
-    GblStringBuffer_construct(pStrBuff, GBL_STRV(""), bufferSize);
+    GblStringBuffer_construct(pStrBuff, NULL, 0, bufferSize);
 
     GblStringBuffer_appendPrintf(pStrBuff,
-                                 "[line: %zu, column: %zu]: ",
-                                 GBL_SCANNER_CURSOR_(pSelf)->line   + 1,
-                                 GBL_SCANNER_CURSOR_(pSelf)->column + 1);
+                                 "[line: %lu, column: %lu]: ",
+                                 (unsigned long)GBL_SCANNER_CURSOR_(pSelf)->line   + 1,
+                                 (unsigned long)GBL_SCANNER_CURSOR_(pSelf)->column + 1);
 
     GblStringBuffer_appendVPrintf(pStrBuff,
                                   pFmt,
                                   varArgs);
 
-    pSelf->pError =
-        GblStringRef_create(GblStringBuffer_cString(pStrBuff),
-                            GblStringBuffer_length(pStrBuff));
+    pSelf->pError = GblStringBuffer_createRef(pStrBuff);
 
     GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_TOKEN,
                        pSelf->pError);
@@ -625,7 +623,7 @@ GBL_EXPORT GblBool GblScanner_skipPattern(GblScanner* pSelf, const GblPattern* p
             char            stackBytes[128];
         } str;
 
-        GblStringBuffer_construct(&str.buff, GBL_STRV(""), sizeof(str));
+        GblStringBuffer_construct(&str.buff, NULL, 0, sizeof(str));
 
         GblScanner_raiseError(pSelf,
                               GBL_SCANNER_SKIP_ERROR,

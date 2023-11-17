@@ -23,7 +23,7 @@
 </div>
 
 # Overview #
-libGimbal aims to bring the high-level constructs and niceties of modern languages and their standard libraries to low-level C, where they can be implemented with a focus on performance for embedded devices and game consoles. libGimbal includes features typically found in core application frameworks such as Foundation, QtCore, or GLib, or in languages such as C# or Java. At its core, libGimbal utilizes an object-oriented dynamic type system, which allows C to transcend its own language limitations and provides a flexible avenue for interoperability with other languages. 
+libGimbal aims to bring the high-level constructs and niceties of modern languages and their standard libraries to low-level C and C++, where they can be implemented with a focus on performance for embedded devices and game consoles. libGimbal includes features typically found in core application frameworks such as Foundation, QtCore, or GLib, or in languages such as C# or Java. At its core, libGimbal utilizes an object-oriented dynamic type system, which allows C to transcend its own language limitations and provides a flexible avenue for interoperability with other languages. An idiomatic modern C++20-based API built around the core is also currently under development. 
 
 # Features #
 libGimbal is split into a series of APIs, featuring:
@@ -43,6 +43,7 @@ libGimbal is being actively tested in CI on the following targets:
 - MacOS 
 - Linux 
 - Sega Dreamcast
+- Sony PSP
 - Sony PSVita
 - WebAssembly
 - iOS
@@ -69,6 +70,14 @@ To build the project and its unit tests from the command-line, you can do the fo
 mkdir build
 cd build
 cmake -DGBL_ENABLE_TESTS=ON ..
+cmake --build . 
+```
+
+To build for Emscripten:
+```
+mkdir build
+cd build
+emcmake cmake -DGBL_ENABLE_TESTS=ON ..
 cmake --build . 
 ```
 

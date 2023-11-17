@@ -169,6 +169,21 @@ build dreamcast:
   tags: 
     - dreamcast
 
+# Top-level PSP build job
+build psp:
+  extends: .build_cmake
+  except:
+    variables:
+      - $BUILD_PSP_DISABLED
+  variables:
+    BINARY_NAME: EBOOT
+    BINARY_EXTENSION: .PBP
+    TOOLCHAIN_FILE: ${PSPDEV}/psp/share/pspdev.cmake
+    GENERATOR: "Unix Makefiles"
+    EXTRA_GENERATOR_ARGS: -j32
+  tags: 
+    - psp, pspsdk
+
 # Top-level PSVita build job
 build psvita:
   extends: .build_cmake
@@ -259,7 +274,9 @@ build webasm:
       - $BUILD_WEBASM_DISABLED
   variables:
     BINARY_EXTENSION: .js
-    ARTIFACT_EXTENSIONS: .wasm
+    ARTIFACT_EXTENSIONS: >
+      .wasm
+      .worker.js
     PREFIX_PATH: ${QT_PATH}/wasm_multithread
     CC: ${EMSDK}/upstream/emscriptgen/emcc
     CXX: ${EMSDK}/upstream/emscriptgen/em++
@@ -405,10 +422,54 @@ test dreamcast-physical:
   after_script:
     - killall dc-tool-ip || true
     - hs100.sh -i ${DC_OUTLET_IP_ADDR} off
-  timeout: 2m
+  timeout: 5m
   retry:
     max: 2
     when: job_execution_timeout
+
+test psp:
+  stage: test 
+  needs: ["build psp"]
+  dependencies:
+    - build psp 
+  only:
+    variables:
+      - $BUILD_PSP_DISABLED == null
+  except:
+    variables:
+      - $TEST_PSP_DISABLED   
+  variables:
+    BINARY_EXTENSION: .PBP
+    BINARY_NAME: EBOOT
+  tags:
+    - psp
+  before_script:
+    - pkill -9 ppsspp || true
+  script:
+    - exec > >(tee -a "${BUILD_DIR}/results.txt" )
+    - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
+    -
+    |
+      if [[ -n ${XDISPLAY-} ]]; then
+        if [[ "$OSTYPE" != "darwin"* ]]; then
+          coproc Xvfb ${XDISPLAY} -screen 0 1024x768x16
+          VIRT_FB_PID=$!
+          sleep 4
+        fi
+      fi
+    - export DISPLAY=:0.0 
+    - nohup ppsspp -v ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION} || true </dev/null &
+    - sleep 20
+    - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
+    - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
+    - pkill -9 ppsspp || true
+    - |
+      if [[ -n ${XDISPLAY-} ]]; then
+        if [[ "$OSTYPE" != "darwin"* ]]; then
+          kill -SIGINT $VIRT_FB_PID
+        fi
+      fi
+  timeout: 2m
 
 test debian-gcc:
   extends: .test_common

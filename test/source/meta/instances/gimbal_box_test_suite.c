@@ -1,5 +1,6 @@
 #include "meta/instances/gimbal_box_test_suite.h"
 #include <gimbal/test/gimbal_test_macros.h>
+#include <gimbal/utils/gimbal_ref.h>
 
 #define GBL_SELF_TYPE GblBoxTestSuite
 
@@ -131,7 +132,7 @@ static GBL_RESULT fieldDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntr
     GBL_TEST_VERIFY(pFixture && key == pFixture->testQuark);
 
     ++pFixture->fieldDtorsCalled;
-    GblStringRef_release(pEntry);
+    GblStringRef_unref(pEntry);
 
     GBL_CTX_END();
 }

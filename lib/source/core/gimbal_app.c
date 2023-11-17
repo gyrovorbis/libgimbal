@@ -103,7 +103,7 @@ static GBL_RESULT GblApp_Object_property_(const GblObject* pObject, const GblPro
     GBL_UNUSED(pSelf, pValue);
     switch(pProp->id) {
     //case GblOptionGroup_Property_Id_name:
-    //    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_acquire(GblObject_name(pObject))));
+    //    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_ref(GblObject_name(pObject))));
     //    break;
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY, "Reading unhandled property: %s", GblProperty_nameString(pProp));
     }
@@ -139,7 +139,7 @@ static GBL_RESULT GblApp_Object_constructed_(GblObject* pObject) {
 
     startingUp_ = GBL_FALSE;
 
-    pSelf_->pArgs = GblStringList_createFromArray(pSelf->ppArgv, pSelf->argc);
+    pSelf_->pArgs = GblStringList_createWithArray(pSelf->ppArgv, pSelf->argc);
 
     GblApp_logInfo_(GBL_APP(pObject));
 
@@ -154,10 +154,10 @@ static GBL_RESULT GblApp_Box_destructor_(GblBox* pBox) {
 
     closingDown_ = GBL_TRUE;
 
-    GBL_CTX_VERIFY_CALL(GblStringRef_release(pSelf_->pOrganization));
-    GBL_CTX_VERIFY_CALL(GblStringRef_release(pSelf_->pDomain));
-    GBL_CTX_VERIFY_CALL(GblStringList_destroy(pSelf_->pArgs));
-    GBL_CTX_VERIFY_CALL(GblStringList_destroy(pLibPaths_));
+    GBL_CTX_VERIFY_CALL(GblStringRef_unref(pSelf_->pOrganization));
+    GBL_CTX_VERIFY_CALL(GblStringRef_unref(pSelf_->pDomain));
+    GBL_CTX_VERIFY_CALL(GblStringList_unref(pSelf_->pArgs));
+    GBL_CTX_VERIFY_CALL(GblStringList_unref(pLibPaths_));
 
     GBL_VCALL_DEFAULT(GblObject, base.pFnDestructor, pBox);
 

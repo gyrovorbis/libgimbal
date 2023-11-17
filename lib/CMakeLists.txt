@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
-SET(ANDROID_NATIVE_API_LEVEL 28)
+SET(ANDROID_PLATFORM 33)
+SET(ANDROID_NATIVE_API_LEVEL 33)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -21,6 +22,13 @@ project(LibGimbal
 #set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum OS X Deployment Version")
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# NOTE: have to set here instead of emscripten check below so *all* code is compiled with -fPIC
+if (EMSCRIPTEN)
+add_compile_options(-w -fPIC)
+else()
+add_compile_options(-w)
+endif()
 
 if(VITA)
 #    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA")
@@ -87,7 +95,7 @@ GBL_CONFIG_OPTION(GBL_CONFIG_ASSERT_UNKNOWN_ENABLED "Assert on all unknown resul
 set(GIMBAL_CONFIGURATION_OUTPUT_PATH "${PROJECT_BINARY_DIR}/api/gimbal/core/gimbal_config.h")
 
 if ((CMAKE_COMPILER_IS_GNUCC))
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Os -g")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Og -g")
 endif()
 
 set(GIMBAL_INCLUDES
@@ -126,18 +134,19 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_array_heap.h
     api/gimbal/core/gimbal_decls.h
     api/gimbal/core/gimbal_ctx.h
+    api/gimbal/core/gimbal_error.h
     api/gimbal/core/gimbal_stack_frame.h
     api/gimbal/core/gimbal_result.h
     api/gimbal/core/gimbal_typedefs.h
     api/gimbal/core/gimbal_thd.h
     api/gimbal/core/gimbal_thread.h
-    api/gimbal/core/gimbal_atomics.h
     api/gimbal/core/gimbal_app.h
     api/gimbal/core/gimbal_main_loop.h
     api/gimbal/core/gimbal_task.h
     api/gimbal/core/gimbal_logger.h
     api/gimbal/core/gimbal_module.h
-    api/gimbal/core/gimbal_error.h
+    api/gimbal/core/gimbal_exception.h
+    api/gimbal/core/gimbal_tls.h
     api/gimbal/meta/classes/gimbal_bit_struct.h
     api/gimbal/meta/classes/gimbal_class.h
     api/gimbal/meta/classes/gimbal_class.hpp
@@ -212,6 +221,8 @@ if(GBL_ENABLE_CPP)
          api/gimbal/containers/gimbal_container.hpp
          api/gimbal/strings/gimbal_quark.hpp
          api/gimbal/strings/gimbal_pattern.hpp
+         api/gimbal/strings/gimbal_string_list.hpp
+         api/gimbal/strings/gimbal_string_ref.hpp
          api/gimbal/strings/gimbal_string_view.hpp
          api/gimbal/utils/gimbal_date_time.hpp
          api/gimbal/utils/gimbal_version.hpp)
@@ -245,6 +256,7 @@ set(GIMBAL_SOURCES
     source/core/gimbal_app.c
     source/core/gimbal_module.c
     source/core/gimbal_logger.c
+    source/core/gimbal_exception.c
     source/core/gimbal_error.c
     source/core/gimbal_main_loop.c
     source/meta/classes/gimbal_bit_struct.c
@@ -310,8 +322,48 @@ add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}
     ${GIMBAL_INCLUDES})
 
+# Emscripten flags and support
+if (EMSCRIPTEN)
+    # Make sure LZ4 doesnt fuck the build
+    set(LZ4_BUILD_LEGACY_LZ4C OFF)
+    set(LZ4_BUILD_CLI OFF)
+
+    # Set compile and link flags for the WASM build
+    set_target_properties(libGimbal PROPERTIES
+        COMPILE_FLAGS "-pthread -s WASM=1 -mbulk-memory -matomics"
+        LINK_FLAGS "-pthread -s WASM=1"
+    )
+
+    # Create an executable that will be compiled to WASM for browser/nodejs
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/emscripten.c" "int main() { return 0; }")
+
+    # This essentially acts as a wrapper/entry point to use your static library in a WebAssembly context.
+    add_executable(libGimbalWASM "${CMAKE_CURRENT_BINARY_DIR}/emscripten.c")
+    target_link_libraries(libGimbalWASM libGimbal)
+
+    # Set compile and link flags for the WASM build
+    set_target_properties(libGimbalWASM PROPERTIES
+        COMPILE_FLAGS "-pthread -s SIDE_MODULE=1 -s WASM=1 -s USE_PTHREADS=1"
+        LINK_FLAGS "-pthread -s SIDE_MODULE=1 -s WASM=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8  -s EXPORT_ALL=1 -o libGimbalWASM"
+    )
+endif()
+
 add_subdirectory(lib/tinycthread)
 add_subdirectory(lib/tiny-regex-c)
+
+
+# No Position Independent Lib for PSP on tinycthread either.
+set_property( TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE OFF )
+
+# PSP SDK flags and support
+if (PSP)
+    # Make sure LZ4 doesnt fuck the build
+    # No Position Independent Lib for PSP.
+endif()
+
+SET(LZ4_BUILD_LEGACY_LZ4C OFF CACHE BOOL "Build LZ4 Legacy")
+SET(LZ4_BUILD_CLI OFF CACHE BOOL "Build LZ4 CLI")
+set(LZ4_POSITION_INDEPENDENT_LIB OFF CACHE BOOL "Build LZ4 as a position-independent lib")
 add_subdirectory(lib/lz4/build/cmake)
 
 list(APPEND
@@ -320,11 +372,16 @@ list(APPEND
      TinyRegexC
      lz4_static)
 
+ if(NOT (MSVC))
+     list(APPEND
+          GBL_TARGET_LINK_LIBS
+          m)
+ endif()
+
 if (NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA)
 
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-
     list(APPEND
          GBL_TARGET_LINK_LIBS
          Threads::Threads)
@@ -349,7 +406,7 @@ GBL_TARGET_PROPERTY_DEFINE(GBL_BUILD_CPP_EXTENSIONS libGimbal CXX_EXTENSIONS)
 # CMake's ${MSVC_VERSION} is equivalent to _MSC_VER
 # (according to https://cmake.org/cmake/help/latest/variable/MSVC_VERSION.html#variable:MSVC_VERSION)
 if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
-        target_compile_options(libGimbal PUBLIC "/Zc:preprocessor")
+        target_compile_options(libGimbal PUBLIC "/Zc:preprocessor" "/experimental:c11atomics")
 endif()
 
 if ((CMAKE_COMPILER_IS_GNUCC) OR CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
@@ -366,7 +423,6 @@ list(APPEND
     GBL_DEFINES
     ${GBL_CONFIGURATION_DEFINES}
     ${GBL_BUILD_DEFINES})
-
 
 target_include_directories(libGimbal
     PUBLIC
@@ -387,5 +443,3 @@ target_compile_definitions(libGimbal
 
 configure_file(${GBL_CONFIGURATION_INPUT_PATH}
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH})
-
-

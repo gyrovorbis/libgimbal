@@ -73,6 +73,8 @@ set(GIMBAL_TEST_SOURCES
     source/core/gimbal_thread_test_suite.c
     include/core/gimbal_error_test_suite.h
     source/core/gimbal_error_test_suite.c
+    include/core/gimbal_exception_test_suite.h
+    source/core/gimbal_exception_test_suite.c
     include/meta/classes/gimbal_enum_test_suite.h
     source/meta/classes/gimbal_enum_test_suite.c
     include/meta/classes/gimbal_flags_test_suite.h
@@ -141,6 +143,8 @@ if(GBL_ENABLE_CPP)
          source/strings/gimbal_quark_test_suite.cpp
          include/strings/gimbal_pattern_test_suite.hpp
          source/strings/gimbal_pattern_test_suite.cpp
+         include/strings/gimbal_string_ref_test_suite.hpp
+         source/strings/gimbal_string_ref_test_suite.cpp
          include/strings/gimbal_string_view_test_suite.hpp
          source/strings/gimbal_string_view_test_suite.cpp
          include/utils/gimbal_version_test_suite.hpp
@@ -169,6 +173,17 @@ if(ANDROID)
          Qt6::Svg)
 endif()
 
+if(PSP)
+    list(APPEND
+         GBL_TEST_LINK_LIBS
+         -lpspdebug
+         -lpspdisplay
+         -lpspge
+         -lpspctrl
+         -lpspnet
+         -lpspnet_apctl)
+endif()
+
 target_link_libraries(GimbalTests
     PRIVATE
     ${GBL_TEST_LINK_LIBS})
@@ -183,6 +198,16 @@ if(VITA)
         VERSION "01.00"
         NAME "Gimbal Tests v${GIMBAL_VERSION}"
     )
+endif()
+
+if(PSP)
+
+    create_pbp_file(TARGET GimbalTests # CMake executable target
+      TITLE "${CMAKE_PROJECT_NAME}" # displayed in game selection
+      # ICON_PATH
+      # BACKGROUND_PATH
+      # PREVIEW_PATH
+      )
 endif()
 
 target_include_directories(GimbalTests
@@ -221,4 +246,14 @@ if(ANDROID)
 
     qt_android_generate_deployment_settings(GimbalTests)
     qt_finalize_executable(GimbalTests)
+endif()
+
+
+# Emscripten flags and support
+if (EMSCRIPTEN)
+    # Set compile and link flags for the WASM build
+    set_target_properties(GimbalTests PROPERTIES
+        COMPILE_FLAGS "-pthread -s USE_PTHREADS=1"
+        LINK_FLAGS "-pthread -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8"
+    )
 endif()

@@ -9,7 +9,6 @@ GBL_TEST_FIXTURE {
 };
 
 GBL_TEST_INIT()
-
 GBL_TEST_CASE_END
 
 GBL_TEST_FINAL()
@@ -70,8 +69,9 @@ struct DummyType {
 };
 
 template<>
-std::optional<DummyType> gbl::string_view_to_value<DummyType>(const StringView& view) {
-    auto result = view.toValue<int>();
+inline std::optional<DummyType> gbl::string_view_to_value<DummyType>(const StringView& view) {
+    auto result = view.toValue<int32_t>();
+
     if(result.has_value())
         return std::optional {DummyType{result.value()}};
     else

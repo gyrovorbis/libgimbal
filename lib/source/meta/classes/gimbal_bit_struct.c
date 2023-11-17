@@ -102,8 +102,8 @@ static GBL_RESULT GblBitStruct_IVariant_save_(const GblVariant* pVariant, GblStr
     GBL_CTX_BEGIN(NULL);
     GblFlagsClass* pFlagsClass = GBL_FLAGS_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     GBL_CTX_CALL(GblStringBuffer_append(pString,
-                                        GBL_STRV(GblFlagsClass_nameFromValue(pFlagsClass,
-                                                                            pVariant->flags))));
+                                        GblFlagsClass_nameFromValue(pFlagsClass,
+                                                                            pVariant->flags)));
     GBL_CTX_END();
 }
 
@@ -178,7 +178,7 @@ static GBL_RESULT GblBitStruct_IVariant_convertTo_(const GblVariant* pVariant, G
             char extraSpace[512];
         } buffer;
 
-        GBL_CTX_CALL(GblStringBuffer_construct(&buffer.str, GBL_STRV(""), sizeof(buffer)));
+        GBL_CTX_CALL(GblStringBuffer_construct(&buffer.str, NULL, 0, sizeof(buffer)));
         GBL_CTX_CALL(GblFlagsClass_valueAppendString(pFlagsClass, pVariant->flags, &buffer.str));
 
         GBL_CTX_CALL(GblVariant_setString(pOther, GblStringBuffer_cString(&buffer.str)));

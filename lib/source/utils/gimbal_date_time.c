@@ -2,6 +2,7 @@
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/strings/gimbal_string.h>
 #include <gimbal/meta/classes/gimbal_opaque.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include <wchar.h>
 #include <math.h>
 
@@ -505,9 +506,9 @@ GBL_EXPORT const char* GblDateTime_toIso8601(const GblDateTime* pSelf, GblString
         GblStringBuffer_appendPrintf(pBuffer, ".%.3u", ms);
 
     if(pSelf->utcOffset >= 0)
-        GblStringBuffer_append(pBuffer, GBL_STRV("+"));
+        GblStringBuffer_append(pBuffer, "+");
     else
-        GblStringBuffer_append(pBuffer, GBL_STRV("-"));
+        GblStringBuffer_append(pBuffer, "-");
 
     const int mins = abs(pSelf->utcOffset) / 60;
     GblStringBuffer_appendPrintf(pBuffer, "%02d%02d", mins / 60, mins % 60);
@@ -938,7 +939,7 @@ static GBL_RESULT GblDateTime_convert_(const GblVariant* pVariant, GblVariant* p
                 char            stack[GBL_DATE_TIME_ISO8601_STRING_SIZE];
             } str;
 
-            GblStringBuffer_construct(&str.buff, GBL_STRV(""), sizeof(str));
+            GblStringBuffer_construct(&str.buff, NULL, 0, sizeof(str));
             //GblDateTime_fromUnix(&dt, pVariant->time);
             GblDateTime_toIso8601(pVariant->pDateTime, &str.buff);
             GblVariant_setString(pOther, GblStringBuffer_cString(&str.buff));

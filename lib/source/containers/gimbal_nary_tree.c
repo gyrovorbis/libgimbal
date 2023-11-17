@@ -514,3 +514,31 @@ GBL_EXPORT GblBool GblNaryTree_traverse(const GblNaryTreeNode* pSelf, GblFlags m
         return GBL_FALSE;
     }
 }
+
+#if 0
+static GblBool GblNaryTree_lcaRecurse_(const GblNaryTreeNode* pNode,
+                                       const GblNaryTreeNode* pA,
+                                       const GblNaryTreeNode* pB,
+                                       GblNaryTreeNode**      ppOut)
+{
+    if(!pNode) {
+        *ppOut = NULL;
+        return GBL_FALSE;
+    }
+
+    // count matches for this node
+    int cnt = (pNode == pA) + (pNode == pB);
+
+    GblNaryTreeNode* pLeft;
+    GblNaryTreeNode* pRight;
+
+    cnt += GblNaryTree_lcaRecurse_()
+
+
+}
+
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_lowestCommonAncestor(const GblNaryTreeNode* pSelf, const GblNaryTreeNode* pOther) {
+
+}
+
+#endif

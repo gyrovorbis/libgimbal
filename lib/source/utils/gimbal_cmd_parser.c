@@ -24,9 +24,9 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
 
     // 0. Destroy any existing cached/parsed values in case we've already made a pass
-    GblStringRef_release(pSelf->pErrorMsg);
+    GblStringRef_unref(pSelf->pErrorMsg);
     pSelf->pErrorMsg = NULL;
-    GblStringRef_release(pSelf_->pExecutable);
+    GblStringRef_unref(pSelf_->pExecutable);
     pSelf_->pExecutable = NULL;
     GblStringList_clear(pSelf_->pArgValues);
     GblStringList_clear(pSelf_->pUnknownOptions);
@@ -120,7 +120,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
 
     // 7. Free source list, store result code + message, and return
     GBL_CTX_END_BLOCK();
-    GblStringList_destroy(pArgs);
+    GblStringList_unref(pArgs);
 
     pSelf->parseResult = GBL_CTX_RESULT();
     if(!GBL_RESULT_SUCCESS(pSelf->parseResult)) {
@@ -243,8 +243,8 @@ GBL_EXPORT GBL_RESULT GblCmdParser_clearPositionalArgs(GblCmdParser* pSelf) {
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
     for(size_t  p = 0; p < GblArrayList_size(&pSelf_->posArgs); ++p) {
         GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, p);
-        GblStringRef_release(pArg->pName);
-        GblStringRef_release(pArg->pDesc);
+        GblStringRef_unref(pArg->pName);
+        GblStringRef_unref(pArg->pDesc);
     }
     GBL_CTX_VERIFY_CALL(GblArrayList_clear(&pSelf_->posArgs));
 
@@ -286,7 +286,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_positionalArgValue(const GblCmdParser* pSelf,
     GblVariant src = GBL_VARIANT_INIT;
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&src,
                                                       GBL_STRING_TYPE,
-                                                      GblStringRef_acquire(GblStringList_at(pSelf_->pArgValues, index))));
+                                                      GblStringRef_ref(GblStringList_at(pSelf_->pArgValues, index))));
     GblVariant dest = GBL_VARIANT_INIT;
     GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&dest, toType));
 
@@ -411,11 +411,11 @@ static GBL_RESULT GblCmdParser_Box_destructor_(GblBox* pBox) {
     GblCmdParser* pSelf = GBL_CMD_PARSER(pBox);
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
 
-    GblStringRef_release(pSelf->pErrorMsg);
+    GblStringRef_unref(pSelf->pErrorMsg);
 
-    GblStringRef_release(pSelf_->pExecutable);
-    GblStringList_destroy(pSelf_->pArgValues);
-    GblStringList_destroy(pSelf_->pUnknownOptions);
+    GblStringRef_unref(pSelf_->pExecutable);
+    GblStringList_unref(pSelf_->pArgValues);
+    GblStringList_unref(pSelf_->pUnknownOptions);
 
     GblOptionGroup_unref(pSelf_->pMainOptionGroup);
 

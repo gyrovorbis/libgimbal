@@ -7,7 +7,6 @@
 
 #define GBL_POOL_ALLOCATOR_TEST_SUITE_(inst)   (GBL_PRIVATE(GblPoolAllocatorTestSuite, inst))
 
-
 typedef union GblVariantListNode_ {
     struct {
         struct GblVariantList_* pNext;
@@ -32,7 +31,6 @@ typedef struct GblPoolAllocatorTestSuite_ {
 } GblPoolAllocatorTestSuite_;
 
 
-
 static GBL_RESULT GblPoolAllocatorTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblPoolAllocatorTestSuite_* pSelf_ = GBL_POOL_ALLOCATOR_TEST_SUITE_(pSelf);
@@ -45,7 +43,6 @@ static GBL_RESULT GblPoolAllocatorTestSuite_init_(GblTestSuite* pSelf, GblContex
 
     GBL_CTX_END();
 }
-
 
 static GBL_RESULT GblPoolAllocatorTestSuite_construct_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);

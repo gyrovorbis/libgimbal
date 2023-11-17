@@ -1,8 +1,10 @@
 #include "core/gimbal_thread_test_suite.h"
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_thread.h>
-#include <gimbal/core/gimbal_atomics.h>
+#include <gimbal/utils/gimbal_ref.h>
+
 #include <tinycthread.h>
+#include <stdatomic.h>
 
 #define GBL_SELF_TYPE GblThreadTestSuite
 
@@ -15,7 +17,7 @@
 #define GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_   10
 
 GBL_CLASS_DERIVE(GblTestThread, GblThread)
-    GBL_ATOMIC_INT16 runningCount;
+    atomic_short runningCount;
 GBL_CLASS_END
 
 GBL_INSTANCE_DERIVE(GblTestThread, GblThread)
@@ -60,7 +62,7 @@ GBL_TEST_FIXTURE {
 
 static GblType GblTestThread_type(void);
 
-static GBL_ATOMIC_INT16 threadActiveCount_ = 0;
+static atomic_short threadActiveCount_ = 0;
 
 static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(4)  Align4_       tlsBuff4_       = {.inner = {2, 2, 2}};
 static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(16) Align16_      tlsBuff16_      = {.inner = {1, 1, 1}};
@@ -118,7 +120,6 @@ static GBL_RESULT GblTestThread_tlsReadWriteCheck_(GblTestThread* pSelf) {
     tlsUint16_ = pSelf->threadId;
     tlsInt32_  = pSelf->threadId;
     tlsDouble_ = pSelf->threadId;
-
 
     for(unsigned b = 0; b < 3; ++b)
         tlsBuff4_.inner[b] = pSelf->threadId;
@@ -239,7 +240,7 @@ static void thread1OnStarted_(GblThread* pSelf) {
     pFixture->thread1Started = GBL_TRUE;
 }
 
-static void thread1OnFinished_(GblThread* pSelf) {
+static void thread1OnFinished_(GblThread* pSelf, GblEnum result) {
     GblTestFixture* pFixture = GblClosure_currentUserdata();
     pFixture->thread1Finished = GBL_TRUE;
 }
@@ -308,7 +309,7 @@ GBL_TEST_CASE(join)
     GBL_TEST_COMPARE(pFixture->pThread1->state, GBL_THREAD_STATE_FINISHED);
 GBL_TEST_CASE_END
 
-static void thread2OnFinished_(GblThread* pSelf) {
+static void thread2OnFinished_(GblThread* pSelf, GblEnum result) {
     GBL_UNUSED(pSelf);
     GblTestFixture* pFixture = GblClosure_currentUserdata();
     pFixture->thread2Finished = GBL_TRUE;

@@ -1913,7 +1913,7 @@ static GBL_RESULT GblVariantTestSuite_string_(GblTestSuite* pSelf, GblContext* p
     const char* pVal = NULL;
     GBL_CTX_VERIFY_CALL(GblVariant_valueMove(&v, &pVal));
     GBL_TEST_VERIFY(GblStringView_equals(GBL_STRV(pVal), "playstation"));
-    GblStringRef_release(pVal);
+    GblStringRef_unref(pVal);
 
     // Value Get Peek
     GblVariant_setString(&v, "gamecube");

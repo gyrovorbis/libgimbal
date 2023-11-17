@@ -75,7 +75,7 @@ GBL_TEST_CASE(incompatibleSetIndexInvalid)
     GblVariant t, k, v;
     GblVariant_construct(&t, 12);
     GblVariant_construct(&k, "key");
-    GblVariant_construct(&v, 'a');
+    GblVariant_construct(&v, (char)'a');
 
     GBL_TEST_COMPARE(GblVariant_setIndex(&t, &k, &v),
                      GBL_RESULT_ERROR_INVALID_OPERATION);
@@ -96,7 +96,7 @@ GBL_TEST_CASE(incompatibleNext)
     GBL_TEST_VERIFY(!GblVariant_isValid(&v));
     GBL_TEST_VERIFY(!GblVariant_isValid(&k));
 
-    GblVariant_set(&v, 'a');
+    GblVariant_set(&v, (char)'a');
     GblVariant_set(&k, "key");
 
     GBL_TEST_COMPARE(GblVariant_next(&t, &k, &v), GBL_FALSE);

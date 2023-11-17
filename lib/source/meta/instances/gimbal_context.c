@@ -2,7 +2,7 @@
 #include "../types/gimbal_type_.h"
 #include <gimbal/utils/gimbal_date_time.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
-#include <gimbal/core/gimbal_error.h>
+#include <stdlib.h>
 
 static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, size_t  size, size_t  align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
@@ -140,7 +140,7 @@ static GBL_RESULT GblContext_ILogger_write_(GblILogger* pILogger, const GblStack
     case GBL_LOG_LEVEL_WARNING:
     case GBL_LOG_LEVEL_ERROR: {
 
-        if((fprintf(pFile, "%s%s%s\n%s        @ %s(..): %s:%zu\n",
+        if((fprintf(pFile, "%s%s%s\n%s        @ %s(..): %s:%u\n",
                             tabBuff, pPrefix, buffer, tabBuff,
                             pFrame->record.srcLocation.pFunc,
                             pFrame->record.srcLocation.pFile,
@@ -340,7 +340,7 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
         GblStringBuffer buffer;
         char ext[256];
     } str;
-    GblStringBuffer_construct(&str.buffer, GBL_STRV(""), sizeof(str));
+    GblStringBuffer_construct(&str.buffer, NULL, 0, sizeof(str));
     GBL_CTX_INFO("%-20s: %-100.100s", "Local Time",
                  GblDateTime_format(GblDateTime_nowLocal(&dt),
                                     &str.buffer,

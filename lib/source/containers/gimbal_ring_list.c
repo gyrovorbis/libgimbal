@@ -2,6 +2,7 @@
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/allocators/gimbal_pool_allocator.h>
 #include <gimbal/meta/ifaces/gimbal_ilogger.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include <stdarg.h>
 
 #define GBL_RING_LIST_(node) GBL_DOUBLY_LINKED_LIST_ENTRY(node, GblRingList, listNode)
@@ -121,7 +122,7 @@ GBL_EXPORT GblRingList* GblRingList_createEmpty(void) {
     }
 #endif
 
-    pList = GBL_RING_LIST_NEW_();
+    pList = GblRef_create(sizeof(GblRingList));//GBL_RING_LIST_NEW_();
     GblDoublyLinkedList_init(&pList->listNode);
     pList->size = 0;
     GBL_CTX_END_BLOCK();
@@ -174,29 +175,47 @@ GBL_EXPORT GblRingList* (GblRingList_copy)(const GblRingList* pSelf,
     return pList;
 }
 
-GBL_EXPORT GBL_RESULT (GblRingList_destroy)(GblRingList*      pSelf,
-                                            GblRingListDtorFn pFnDtor,
-                                            void*             pCapture)
-{
-    GBL_CTX_BEGIN(NULL);
-
-    GblRingList* pNext = NULL;
-    for(GblRingList* pIt = pSelf->ringNode.pNext;
-        pIt != pSelf;
-        pIt = pNext)
-    {
-        pNext = pIt->ringNode.pNext;
-        if(pFnDtor) GBL_CTX_VERIFY_CALL(pFnDtor(pIt->pData, pCapture));
-        GBL_RING_LIST_DELETE_(pIt);
-    }
-
-    GBL_RING_LIST_DELETE_(pSelf);
-
-    GBL_CTX_END();
+GBL_EXPORT GblRingList* GblRingList_ref(const GblRingList* pSelf) {
+    return GblRef_ref(pSelf);
 }
 
+GBL_EXPORT GblRefCount (GblRingList_unref)(const GblRingList* pSelf,
+                                           GblRingListDtorFn  pFnDtor,
+                                           void*              pCapture)
+{
+    GblRefCount refCount = 0;
+    GBL_CTX_BEGIN(NULL);
 
-GBL_EXPORT size_t  GblRingList_size(const GblRingList* pSelf) {
+    if(pSelf) {
+        GblRingList temp;
+        memcpy(&temp, pSelf, sizeof(GblRingList));
+
+        refCount = GblRef_release(pSelf);
+
+        if(!refCount) {
+            GblRingList* pNext = NULL;
+
+            for(GblRingList* pIt = temp.ringNode.pNext;
+                pIt != pSelf;
+                pIt = pNext)
+            {
+                pNext = pIt->ringNode.pNext;
+                if(pFnDtor) GBL_CTX_VERIFY_CALL(pFnDtor(pIt->pData, pCapture));
+                GBL_RING_LIST_DELETE_(pIt);
+            }
+        }
+    }
+
+    GBL_CTX_END_BLOCK();
+
+    return refCount;
+}
+
+GBL_EXPORT GblRefCount GblRingList_refCount(const GblRingList* pSelf) {
+    return GblRef_refCount(pSelf);
+}
+
+GBL_EXPORT size_t GblRingList_size(const GblRingList* pSelf) {
     return pSelf->size;
 }
 

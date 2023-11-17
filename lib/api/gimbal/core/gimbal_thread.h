@@ -84,7 +84,7 @@ GBL_CLASS_END
 GBL_INSTANCE_DERIVE(GblThread, GblObject)
     GblCallRecord         returnStatus; //!< Return information from a completed thread
     volatile sig_atomic_t signalStatus; //!< Pending signal state for a given thread
-    GBL_THREAD_STATE      state;        //!< Current state for a given thread
+    GBL_THREAD_STATE      state;        //!< Current state for a given thread MAKE ME ATOMIC
 GBL_INSTANCE_END
 
 //! \cond
@@ -131,6 +131,8 @@ GBL_EXPORT GblBool    GblThread_foreach (GblThreadIterFn pIt,
 GBL_EXPORT GblThread*  GblThread_create      (GblThreadFn pCallback,
                                               void*       pUserdata/*=NULL*/,
                                               GblBool     autoStart/*=0*/)    GBL_NOEXCEPT;
+//! Returns a new reference to an existing thread, incrementing its reference count by 1
+GBL_EXPORT GblThread*  GblThread_ref         (GBL_CSELF)                      GBL_NOEXCEPT;
 //! Decrements the reference count of a GblThread instance, deleting it if it's the last one
 GBL_EXPORT GblRefCount GblThread_unref       (GBL_SELF)                       GBL_NOEXCEPT;
 //! Returns GBL_TRUE if the given thread has been joined with its parent and is done executing, GBL_FALSE otherwise

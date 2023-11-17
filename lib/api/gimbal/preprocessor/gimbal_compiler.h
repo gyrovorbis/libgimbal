@@ -94,6 +94,8 @@
 #   define GBL_ANDROID  1
 #elif defined(__DREAMCAST__)
 #   define GBL_DREAMCAST    1
+#elif defined(__PSP__)
+#   define GBL_PSP  1
 #elif defined(VITA)
 #   define GBL_PSVITA   1
 #elif __linux__
@@ -116,7 +118,7 @@
 #   define GBL_MINGW32  1
 #elif defined(__MINGW64__)
 #   define GBL_MINGW64  1
-#elif defined(__EMSCRIPTEN_)
+#elif defined(__EMSCRIPTEN__)
 #   define GBL_EMSCRIPTEN 1
 #elif defined(__GNUC__)
 #   define GBL_GCC  1
@@ -226,9 +228,11 @@
 #   define GBL_THREAD_LOCAL __declspec(thread)
 #else
 #   if defined(__DREAMCAST__)
-#       define GBL_THREAD_LOCAL _Thread_local
+#       define GBL_THREAD_LOCAL     _Thread_local
+#   elif defined(__PSP__)
+#       define GBL_THREAD_LOCAL
 #   else
-#       define GBL_THREAD_LOCAL __thread
+#       define GBL_THREAD_LOCAL     __thread
 #   endif
 #endif
 
@@ -499,7 +503,7 @@
 // alloca()
 #ifndef GBL_ALLOCA
 //#   ifndef alloca
-#       if defined(__APPLE__) || defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__) || defined(__EMSCRIPTEN__) || defined(VITA) || defined(__DREAMCAST__)
+#       if defined(__APPLE__) || defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__) || defined(__EMSCRIPTEN__) || defined(VITA) || defined(__DREAMCAST__) || defined(PSP)
 #           include <alloca.h>     // alloca
 #       elif defined(_WIN32)
 #           include <malloc.h>     // alloca

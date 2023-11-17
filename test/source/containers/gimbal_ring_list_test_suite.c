@@ -685,7 +685,7 @@ static GBL_RESULT GblRingListTestSuite_destroyShallow_(GblTestSuite* pSelf, GblC
     GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
 
     for(size_t  l = 0; l < 4; ++l)
-        GBL_CTX_VERIFY_CALL(GblRingList_destroy(pSelf_->ringLists[l]));
+        GBL_CTX_VERIFY_CALL(GblRingList_unref(pSelf_->ringLists[l]));
 
     GBL_CTX_END();
 }
@@ -702,7 +702,7 @@ static GBL_RESULT GblRingListTestSuite_destroyDeep_(GblTestSuite* pSelf, GblCont
 
     GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
 
-    GBL_CTX_VERIFY_CALL(GblRingList_destroy(pSelf_->ringLists[4], listDtor_));
+    GBL_CTX_VERIFY_CALL(GblRingList_unref(pSelf_->ringLists[4], listDtor_));
 
     GBL_CTX_END();
 }
@@ -715,7 +715,7 @@ static GBL_RESULT GblRingListTestSuite_stressTest_(GblTestSuite* pSelf, GblConte
     for(size_t  i = 0; i < 2000; ++i) {
         GblRingList* pList = GblRingList_create("a", "b", "c", "d", "e", "f", "g");
         GblRingList_remove(pList, 0, 3);
-        GblRingList_destroy(pList);
+        GblRingList_unref(pList);
     }
 
     GBL_CTX_END();

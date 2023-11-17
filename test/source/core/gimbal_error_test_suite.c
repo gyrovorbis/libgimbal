@@ -1,138 +1,168 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_error.h>
 #include "core/gimbal_error_test_suite.h"
-#include <gimbal/core/gimbal_logger.h>
 
-#define BENCHMARK_ITERATIONS_ 200
+#define TEST_DOMAIN_            (gblTestDomain_())
+#define BENCHMARK_ITERATIONS_   4096
 
 #define GBL_SELF_TYPE GblErrorTestSuite
 
 GBL_TEST_FIXTURE {
-    size_t classCount;
-    size_t instanceCount;
-    GblError* pError;
+    const GblError* pPending;
 };
 
-GBL_TEST_INIT()
-    if(GblError_pending()) {
-        GBL_CTX_INFO("Clearing pending error: [%s]",
-                     GblError_pending()->message);
-        GblError_clear();
+typedef enum STATUS_ {
+    STATUS_OK,
+    STATUS_ERROR,
+    STATUS_FAILURE,
+    STATUS_DEAD,
+    STATUS_MANGLED,
+    STATUS_COUNT
+} STATUS_;
+
+static const char* statusCodeString_(GblEnum code) {
+    switch(code) {
+    GBL_SWITCH_CASE_STRINGIFY(STATUS_OK);
+    GBL_SWITCH_CASE_STRINGIFY(STATUS_ERROR);
+    GBL_SWITCH_CASE_STRINGIFY(STATUS_FAILURE);
+    GBL_SWITCH_CASE_STRINGIFY(STATUS_DEAD);
+    GBL_SWITCH_CASE_STRINGIFY(STATUS_MANGLED);
+    default: return "UNKNOWN";
     }
-
-    pFixture->classCount    = GblType_classRefCount(GBL_ERROR_TYPE);
-    pFixture->instanceCount = GblType_instanceCount(GBL_ERROR_TYPE);
-GBL_TEST_CASE_END
-
-GBL_TEST_FINAL()
-    GBL_UNREF(pFixture->pError);
-    GBL_TEST_COMPARE(GblType_classRefCount(GBL_ERROR_TYPE),
-                     pFixture->classCount);
-    GBL_TEST_COMPARE(GblType_instanceCount(GBL_ERROR_TYPE),
-                     pFixture->instanceCount);
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(emptyCurrent)
-    GBL_TEST_VERIFY(!GblError_pending());
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(emptyClear)
-    GBL_TEST_VERIFY(!GblError_clear());
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(emptyCatch)
-    GBL_TEST_VERIFY(!GblError_catch(GBL_INVALID_TYPE));
-    GBL_TEST_VERIFY(!GblError_catch(GBL_ERROR_TYPE));
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(create)
-    pFixture->pError = GblError_create(GBL_ERROR_TYPE,
-                                       GBL_ENUM_TYPE,
-                                       GBL_RESULT_ERROR_INVALID_EXPRESSION,
-                                       "Invalid expression: [%s]",
-                                       "expressors");
-
-    GBL_TEST_VERIFY(GblError_hasSource(pFixture->pError));
-    GBL_TEST_COMPARE(pFixture->pError->resultType, GBL_ENUM_TYPE);
-    GBL_TEST_COMPARE(pFixture->pError->result, GBL_RESULT_ERROR_INVALID_EXPRESSION);
-//    GBL_TEST_COMPARE(pFixture->pError->pMessage, "Invalid expression: [expressors]");
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(throw)
-    GBL_TEST_VERIFY(!GblError_throw(pFixture->pError));
-    GBL_TEST_COMPARE(GblError_pending(), pFixture->pError);
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(catchInvalid)
-    GblError* pError = GblError_catch(GBL_PROPERTY_TYPE);
-    GBL_TEST_VERIFY(!pError);
-    GBL_TEST_COMPARE(GblError_pending(), pFixture->pError);
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(catch)
-    GblError* pError = GblError_catch(GBL_ERROR_TYPE);
-    GBL_TEST_COMPARE(pError, pFixture->pError);
-    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pError)), 1);
-    GBL_TEST_VERIFY(!GblError_pending());
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(unref)
-    GBL_TEST_COMPARE(GblError_unref(pFixture->pError), 0);
-    pFixture->pError = NULL;
-GBL_TEST_CASE_END
-
-GBL_RESULT ctxCall_() {
-    GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY(GBL_FALSE,
-                   GBL_RESULT_ERROR_INTERNAL,
-                   "Test");
-    GBL_CTX_END();
 }
 
-GBL_TEST_CASE(ctxBenchmark)
-    GBL_TEST_EXPECT_ERROR();
+static const GblErrorDomain* gblTestDomain_(void) {
+    static GblErrorDomain domain;
+    static GblBool once = GBL_FALSE;
 
-    for(size_t i = 0; i < BENCHMARK_ITERATIONS_; ++i)
-        ctxCall_();
-
-    GBL_CTX_CLEAR_LAST_RECORD();
-GBL_TEST_CASE_END
-
-GBL_TEST_CASE(errorBenchmark)
-    for(size_t i = 0; i < BENCHMARK_ITERATIONS_; ++i) {
-        GblError* pError = GblError_create(GBL_ERROR_TYPE, GBL_ENUM_TYPE, GBL_RESULT_ERROR_INTERNAL, "Test");
-        GblError_throw(pError);
+    if(!once) {
+        domain.name          = GblQuark_fromStatic("STATUS");
+        domain.pFnCodeString = statusCodeString_;
+        once                 = GBL_TRUE;
     }
+
+    return &domain;
+}
+
+GBL_TEST_INIT()
     GblError_clear();
 GBL_TEST_CASE_END
 
-GBL_TEST_REGISTER(emptyCurrent,
-                  emptyClear,
-                  emptyCatch,
-                  create,
-                  throw,
-                  catchInvalid,
-                  catch,
-                  unref,
-                  ctxBenchmark,
-                  errorBenchmark);
+GBL_TEST_FINAL()
+    GblError_clear();
+GBL_TEST_CASE_END
 
-// emptyCurrent
-// emptyClear
-// emptyCatch
-// create derived
-// rethrow
-//
+GBL_TEST_CASE(pendingEmpty)
+    GBL_TEST_VERIFY(!GblError_pending());
+GBL_TEST_CASE_END
 
+GBL_TEST_CASE(domainEmpty)
+    GBL_TEST_COMPARE(GblError_domain(), GBL_QUARK_INVALID);
+GBL_TEST_CASE_END
 
+GBL_TEST_CASE(stringEmpty)
+    GBL_TEST_COMPARE(GblError_string(), "");
+GBL_TEST_CASE_END
 
-#if 0
-GBL_TRY {
-    GblArrayList_at(pSelf, 99999);
-} GBL_CATCH(EvmuError, pError) {
+GBL_TEST_CASE(clearEmpty)
+    GBL_TEST_VERIFY(!GblError_clear());
+GBL_TEST_CASE_END
 
-} GBL_CATCH_MORE(GblError, pError) {
+GBL_TEST_CASE(raiseCode)
+    const GblError* pError =
+        GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_EXPRESSION);
 
-} GBL_CATCH_END;
+    GBL_TEST_VERIFY(pError);
+    GBL_TEST_COMPARE(pError->code, GBL_RESULT_ERROR_INVALID_EXPRESSION);
+    GBL_TEST_COMPARE(pError->pDomain, GBL_ERROR_DOMAIN);
+    GBL_TEST_COMPARE(pError->message, "");
+    GBL_TEST_VERIFY(pError->srcLocation.pFile);
+    GBL_TEST_COMPARE(pError->srcLocation.pFunc, "GblErrorTestSuite_raiseCode_");
+    GBL_TEST_COMPARE(pError->srcLocation.line, 73);
 
-#endif
+    pFixture->pPending = pError;
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(pending)
+    GBL_TEST_COMPARE(GblError_pending(), pFixture->pPending);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(domain)
+    GBL_TEST_COMPARE(GblError_domain(), GblQuark_fromStatic("GblError"));
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(string)
+    GBL_TEST_COMPARE(GblError_string(), "Invalid Expression");
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(reraise)
+    const GblError* pError = GblError_reraise();
+
+    GBL_TEST_VERIFY(pError);
+    GBL_TEST_VERIFY(pError);
+    GBL_TEST_COMPARE(pError->code, GBL_RESULT_ERROR_INVALID_EXPRESSION);
+    GBL_TEST_COMPARE(pError->pDomain, GBL_ERROR_DOMAIN);
+    GBL_TEST_COMPARE(pError->message, "");
+    GBL_TEST_VERIFY(pError->srcLocation.pFile);
+    GBL_TEST_COMPARE(pError->srcLocation.pFunc, "GblErrorTestSuite_reraise_");
+    GBL_TEST_COMPARE(pError->srcLocation.line, 99);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(clear)
+    GBL_TEST_VERIFY(GblError_clear());
+    GBL_TEST_VERIFY(!GblError_pending());
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(raiseCustomMessage)
+    const GblError* pError =
+        GblError_raise(TEST_DOMAIN_,
+                       STATUS_DEAD,
+                       "She's dead, bro!");
+
+    GBL_TEST_VERIFY(pError);
+    GBL_TEST_COMPARE(GblError_pending(), pError);
+    GBL_TEST_COMPARE(GblError_domain(), GblQuark_fromStatic("STATUS"));
+    GBL_TEST_COMPARE(GblError_string(), "STATUS_DEAD");
+    GBL_TEST_COMPARE(pError->code, STATUS_DEAD);
+    GBL_TEST_COMPARE(pError->message, "She's dead, bro!");
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(raiseCustomMessageVa)
+    const GblError* pError =
+        GblError_raise(TEST_DOMAIN_,
+                       STATUS_MANGLED,
+                       "Sega %s is %u times better.",
+                       "Dreamcast",
+                       9999);
+
+    GBL_TEST_VERIFY(pError);
+    GBL_TEST_COMPARE(GblError_pending(), pError);
+    GBL_TEST_COMPARE(GblError_domain(), GblQuark_fromStatic("STATUS"));
+    GBL_TEST_COMPARE(GblError_string(), "STATUS_MANGLED");
+    GBL_TEST_COMPARE(pError->code, STATUS_MANGLED);
+    GBL_TEST_COMPARE(pError->message, "Sega Dreamcast is 9999 times better.");
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(benchmark)
+    for(size_t i = 0; i < BENCHMARK_ITERATIONS_; ++i) {
+        GblError_raise(TEST_DOMAIN_,
+                       (STATUS_)i % STATUS_COUNT,
+                       "Raising the %zuth error!",
+                       i);
+    }
+GBL_TEST_CASE_END
+
+GBL_TEST_REGISTER(pendingEmpty,
+                  domainEmpty,
+                  stringEmpty,
+                  clearEmpty,
+                  raiseCode,
+                  pending,
+                  domain,
+                  string,
+                  reraise,
+                  clear,
+                  raiseCustomMessage,
+                  raiseCustomMessageVa,
+                  benchmark)
+

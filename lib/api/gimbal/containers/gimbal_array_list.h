@@ -74,6 +74,7 @@ GBL_EXPORT GBL_RESULT  GblArrayList_destruct     (GBL_SELF)                     
 GBL_EXPORT GBL_RESULT  GblArrayList_assign       (GBL_SELF, const void* pData, size_t  elementCount)           GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblArrayList_release      (GBL_SELF, void** ppData, size_t * pSize, size_t * pCapacity) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblArrayList_acquire      (GBL_SELF, void* pData, size_t  size, size_t  capacity)       GBL_NOEXCEPT;
+//GBL_EXPORT GBL_RESULT GblArrayList_swap(GBL_SELF, GblArrayList* pOther) GBL_NOEXCEPT;
 
 GBL_EXPORT GblContext* GblArrayList_context      (GBL_CSELF)                                                   GBL_NOEXCEPT;
 GBL_EXPORT uint16_t    GblArrayList_stackBytes   (GBL_CSELF)                                                   GBL_NOEXCEPT;

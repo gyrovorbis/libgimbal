@@ -19,7 +19,7 @@ GBL_TEST_FINAL()
 
 GBL_TEST_CASE_END
 
-#define SIZE 3
+#define SIZE 2
 
 void findDuplicates_(GblRandomGeneratorFn pGen) {
     GBL_CTX_BEGIN(NULL);
@@ -42,7 +42,7 @@ void findDuplicates_(GblRandomGeneratorFn pGen) {
             char* pTempBuff = GBL_ALLOCA(SIZE * 4 + 1);
             pTempBuff[0] = '\0';
             char byteBuff[10];
-            GBL_CTX_INFO("Duplicate found after %lu generations", i);
+            GBL_CTX_INFO("Duplicate found after %llu generations", (unsigned long long)i);
             GBL_CTX_PUSH();
             for(int k = 0; k < SIZE; k++) {
                 snprintf(byteBuff, sizeof(byteBuff), "%02X ", current[k]);

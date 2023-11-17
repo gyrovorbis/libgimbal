@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/utils/gimbal_byte_array.h>
+#include <gimbal/utils/gimbal_ref.h>
 
 #define GBL_BYTE_ARRAY_TEST_SUITE_(inst)    (GBL_PRIVATE(GblByteArrayTestSuite, inst))
 

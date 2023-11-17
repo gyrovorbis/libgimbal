@@ -80,8 +80,8 @@ GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, Gb
 
 //#ifdef GBL_TYPE_DEBUG
     {
-        int16_t count = GBL_ATOMIC_INT16_INC(pMeta->instanceRefCount);
-        GBL_CTX_DEBUG("Instance RefCount: %u", count+1);
+        int16_t count = atomic_fetch_add(&pMeta->instanceRefCount, 1);
+        GBL_CTX_DEBUG("Instance RefCount: %u", count + 1);
     }
 //#endif
 
@@ -161,7 +161,7 @@ GBL_EXPORT GblRefCount GblInstance_destruct(GblInstance* pSelf) {
     if(pSelf) {
         GblMetaClass* pMeta = GBL_META_CLASS_(GBL_TYPEOF(pSelf));
         GBL_CTX_CALL(GblSignal_removeInstance_(pSelf));
-        refCount = GBL_ATOMIC_INT16_DEC(pMeta->instanceRefCount) - 1;
+        refCount = atomic_fetch_sub(&pMeta->instanceRefCount, 1) - 1;
         GBL_CTX_VERIFY_CALL(GblInstance_classRelease_(pSelf));
     }
     GBL_CTX_END_BLOCK();

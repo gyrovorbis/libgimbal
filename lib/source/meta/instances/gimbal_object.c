@@ -657,17 +657,17 @@ GBL_EXPORT GBL_RESULT GblObject_constructWithClass(GblObject* pSelf, GblObjectCl
 }
 
 static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va_list* pVarArgs) {
-    size_t  count = 0;
+    size_t count = 0;
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pVarArgs);
 
-    const GblType       selfType       = GBL_TYPEOF(pSelf);
-    const size_t        totalCount     = GblProperty_count(GBL_TYPEOF(pSelf));
-    GblVariant*         pVariants      = GBL_ALLOCA(sizeof(GblVariant)   * totalCount);
-    const GblProperty** ppProperties   = GBL_ALLOCA(sizeof(GblProperty*) * totalCount);
+    const GblType       selfType     = GBL_TYPEOF(pSelf);
+    const size_t        totalCount   = GblProperty_count(selfType);
+    GblVariant*         pVariants    = GBL_ALLOCA(sizeof(GblVariant)   * totalCount);
+    const GblProperty** ppProperties = GBL_ALLOCA(sizeof(GblProperty*) * totalCount);
 
     // check whether there are even constructable properties or not
     const char* pKey = NULL;
@@ -682,14 +682,19 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
                                GblType_name(type), pKey);
         }
 
-        GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopyVa(&pVariants[count],
-                                                                ppProperties[count]->valueType,
-                                                                pVarArgs));
+        GBL_CTX_VERIFY_CALL(
+            GblVariant_constructValueCopyVa(&pVariants[count],
+                                            ppProperties[count]->valueType,
+                                            pVarArgs)
+        );
+
         ++count;
 
     }
 
-    GBL_CTX_VERIFY_CALL(GblObject_construct_(pSelf, count, ppProperties, pVariants));
+    GBL_CTX_VERIFY_CALL(
+        GblObject_construct_(pSelf, count, ppProperties, pVariants)
+    );
 
     GBL_CTX_END_BLOCK();
     for(size_t  v = 0; v < count; ++v)
@@ -864,7 +869,7 @@ GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass(GblObject*      pSelf
 static GBL_RESULT GblObject_nameDestruct_(const GblArrayMap* pMap, uintptr_t key, void* pName) {
     GBL_UNUSED(key, pMap);
 
-    GblStringRef_release(pName);
+    GblStringRef_unref(pName);
 
     return GBL_RESULT_SUCCESS;
 }
@@ -1276,18 +1281,18 @@ static GBL_RESULT GblObject_IVariant_save_(const GblVariant* pVariant, GblString
     GblBool first = GBL_TRUE;
 
     GBL_CTX_BEGIN(NULL);
-    GblStringBuffer_append(pString, GBL_STRV("{\n"));
+    GblStringBuffer_append(pString, "{\n");
 
     for(const GblProperty* pIt = GblProperty_next(GblVariant_typeOf(pVariant), NULL, GBL_PROPERTY_FLAG_SAVE);
          pIt != NULL;
          pIt = GblProperty_next(GblVariant_typeOf(pVariant), pIt, GBL_PROPERTY_FLAG_SAVE))
     {
-        if(!first) GblStringBuffer_append(pString, GBL_STRV(",\n"));
+        if(!first) GblStringBuffer_append(pString, ",\n");
         const char* pKey = GblProperty_nameString(pIt);
 
-        GblStringBuffer_append(pString, GBL_STRV("\t"));
-        GblStringBuffer_append(pString, GBL_STRV(pKey));
-        GblStringBuffer_append(pString, GBL_STRV(" = "));
+        GblStringBuffer_append(pString, "\t");
+        GblStringBuffer_append(pString, pKey);
+        GblStringBuffer_append(pString, " = ");
         GblObject_propertyVariant(pVariant->pVoid, pKey, &variant);
 
         GblVariant_save(&variant, pString);
@@ -1295,7 +1300,7 @@ static GBL_RESULT GblObject_IVariant_save_(const GblVariant* pVariant, GblString
 
     }
 
-    GblStringBuffer_append(pString, GBL_STRV("}\n"));
+    GblStringBuffer_append(pString, "}\n");
 
     GBL_CTX_END();
 }

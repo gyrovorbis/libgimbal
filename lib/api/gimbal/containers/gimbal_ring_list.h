@@ -84,9 +84,11 @@ typedef struct GblRingList {
 // === Regular Methods ====
 GBL_EXPORT GblRingList* GblRingList_createEmpty     (void)                                           GBL_NOEXCEPT;
 GBL_EXPORT GblRingList* GblRingList_create          (void* pData, ...)                               GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblRingList_unref           (GBL_CSELF, GblRingListDtorFn pFnDtor, void* pCl)GBL_NOEXCEPT;
+GBL_EXPORT GblRingList* GblRingList_ref             (GBL_CSELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT GblRingList* GblRingList_copy            (GBL_CSELF, GblRingListCopyFn pFnCpy, void* pCl) GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT   GblRingList_destroy         (GBL_SELF, GblRingListDtorFn pFnDtor, void* pCl) GBL_NOEXCEPT;
 
+GBL_EXPORT GblRefCount  GblRingList_refCount        (GBL_CSELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT size_t       GblRingList_size            (GBL_CSELF)                                      GBL_NOEXCEPT;
 GBL_EXPORT GblBool      GblRingList_empty           (GBL_CSELF)                                      GBL_NOEXCEPT;
 
@@ -130,7 +132,7 @@ GBL_EXPORT size_t       GblRingList_find            (GBL_CSELF,
 // ==== Macro Overrides (for default arguments) ====
 #define GblRingList_create(...)                 (GblRingList_create)(__VA_ARGS__, GBL_NULL)
 #define GblRingList_copy(...)                   GblRingList_copyDefault_(__VA_ARGS__)
-#define GblRingList_destroy(...)                GblRingList_destroyDefault_(__VA_ARGS__)
+#define GblRingList_unref(...)                  GblRingList_unrefDefault_(__VA_ARGS__)
 #define GblRingList_pushBack(self, ...)         (GblRingList_pushBack)(self, __VA_ARGS__, GBL_NULL)
 #define GblRingList_pushFront(self, ...)        (GblRingList_pushFront)(self, __VA_ARGS__, GBL_NULL)
 #define GblRingList_insert(self, ...)           (GblRingList_insert)(self, __VA_ARGS__, GBL_NULL)
@@ -151,10 +153,10 @@ GBL_EXPORT size_t       GblRingList_find            (GBL_CSELF,
 #define GblRingList_copyDefault__(list, cpFn, cl, ...) \
     (GblRingList_copy)(list, cpFn, cl)
 
-#define GblRingList_destroyDefault_(...) \
-    GblRingList_destroyDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL)
-#define GblRingList_destroyDefault__(list, dtor, cl, ...)  \
-    (GblRingList_destroy)(list, dtor, cl)
+#define GblRingList_unrefDefault_(...) \
+    GblRingList_unrefDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL)
+#define GblRingList_unrefDefault__(list, dtor, cl, ...)  \
+    (GblRingList_unref)(list, dtor, cl)
 
 #define GblRingList_insertSortedDefault_(...) \
     GblRingList_insertSortedDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL)

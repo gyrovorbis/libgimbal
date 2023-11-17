@@ -1,10 +1,15 @@
 #include <gimbal/utils/gimbal_settings.h>
 #include <gimbal/containers/gimbal_hash_set.h>
+#include <gimbal/containers/gimbal_nary_tree.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/meta/types/gimbal_variant.h>
 
 #define GBL_SETTINGS_HASHSET_SIZE_DEFAULT_  32
 #define GBL_SETTINGS_(self)                 (GBL_PRIVATE(GblSettings, self))
+
+typedef union GblSettingsNode {
+    GblNaryTreeNode treeNode;
+} GblSettingsNode;
 
 GBL_DECLARE_STRUCT(GblSettings_) {
     GblHashSet      hashSet;
@@ -37,6 +42,10 @@ GBL_EXPORT GblSettings* GblSettings_create(void) {
     return GBL_NEW(GblSettings);
 }
 
+GBL_EXPORT GblSettings* GblSettings_ref(const GblSettings* pSelf) {
+    return GBL_SETTINGS(GBL_REF(pSelf));
+}
+
 GBL_EXPORT GblRefCount GblSettings_unref(GblSettings* pSelf) {
     return GBL_UNREF(pSelf);
 }
@@ -51,7 +60,7 @@ GBL_EXPORT const char* GblSettings_pushScope(GblSettings* pSelf, const char* pKe
     if(!GblStringBuffer_empty(&pSelf_->scope))
         GblStringBuffer_appendPrintf(&pSelf_->scope, "/%s", pKey);
     else
-        GblStringBuffer_append(&pSelf_->scope, GBL_STRV(pKey));
+        GblStringBuffer_append(&pSelf_->scope, pKey);
 
     return GblStringBuffer_cString(&pSelf_->scope);
 }
@@ -217,10 +226,7 @@ static GBL_RESULT GblSettings_init_(GblInstance* pInstance) {
                                       NULL,
                                       pSelf));
 
-    GBL_CTX_CALL(GblStringBuffer_construct(&pSelf_->scope,
-                                           GblStringView_fromEmpty(),
-                                           0,
-                                           NULL));
+    GBL_CTX_CALL(GblStringBuffer_construct(&pSelf_->scope));
 
     GBL_CTX_END();
 }

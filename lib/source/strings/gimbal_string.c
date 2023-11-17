@@ -1,5 +1,6 @@
 #include <gimbal/strings/gimbal_string.h>
 #include <gimbal/core/gimbal_ctx.h>
+#include <ctype.h>
 
 GBL_EXPORT char* gblStrdup(const char* pStr) {
     return gblStrndup(pStr, strlen(pStr));
@@ -70,6 +71,26 @@ GBL_EXPORT int gblStrCaseCmp(const char* pStr1, const char* pStr2) {
     const size_t len1 = strlen(pStr1);
     const size_t len2 = strlen(pStr2);
     return gblStrnCaseCmp(pStr1, pStr2, len1 < len2? len1 : len2);
+}
+
+
+GBL_EXPORT size_t gblStrnlen(const char* pStr1, size_t len) {
+    for(size_t i = 0; i < len; ++i) {
+        if(*pStr1++ == '\0')
+            return i;
+    }
+
+    return len;
+}
+
+GBL_EXPORT char* gblStrnReverse(char* pString, size_t length) {
+    length = gblStrnlen(pString, length);
+
+    for(size_t i = 0; i < length / 2; ++i) {
+        GBL_SWAP(pString[i], pString[length - i - 1]);
+    }
+
+    return pString;
 }
 
 GBL_EXPORT int gblAsciiDigitValue(char c) {

@@ -19,7 +19,7 @@ GBL_EXPORT const char* (GblBitView_string)(const GblBitView* pSelf, GblStringBuf
     GblStringBuffer_reserve(pBuffer, count);
     for(size_t  i = 0; i < count; ++i) {
        const GblBool value = GblBitView_at(pSelf, index + i);
-       GblStringBuffer_append(pBuffer, value? GBL_STRV("1") : GBL_STRV("0"));
+       GblStringBuffer_append(pBuffer, value? "1" :"0");
     }
 
     return GblStringBuffer_data(pBuffer);

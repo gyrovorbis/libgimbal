@@ -50,19 +50,26 @@
 #include "utils/gimbal_scanner_test_suite.h"
 #include "algorithms/gimbal_random_test_suite.h"
 #include "algorithms/gimbal_compression_test_suite.h"
+#include "core/gimbal_exception_test_suite.h"
 #include "core/gimbal_error_test_suite.h"
 
 #ifdef GBL_ENABLE_CPP
 #   include "strings/gimbal_quark_test_suite.hpp"
 #   include "strings/gimbal_pattern_test_suite.hpp"
 #   include "strings/gimbal_string_view_test_suite.hpp"
+#   include "strings/gimbal_string_ref_test_suite.hpp"
 #   include "utils/gimbal_version_test_suite.hpp"
 #endif
 
-#include <math.h>
-
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
 #   include <arch/gdb.h>
+#endif
+\
+#ifdef GBL_PSP
+#include <pspkernel.h>
+
+PSP_MODULE_INFO("GimbalTests", 0, 1, 0);
+PSP_MAIN_THREAD_ATTR( THREAD_ATTR_USER | THREAD_ATTR_VFPU );
 #endif
 
 #ifdef __ANDROID__
@@ -131,6 +138,7 @@ int main(int argc, char* pArgv[]) {
 #elif defined(__ANDROID__)
     start_logger("");
 #endif
+
     GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
 
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO    |
@@ -233,8 +241,10 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
+#if !defined(GBL_PSP)
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
+#endif
 #ifdef GBL_ENABLE_CPP
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_QUARK_TEST_SUITE_CPP_TYPE));
@@ -243,12 +253,16 @@ int main(int argc, char* pArgv[]) {
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_STRING_VIEW_TEST_SUITE_CPP_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_STRING_REF_TEST_SUITE_CPP_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_VERSION_TEST_SUITE_CPP_TYPE));
 #endif
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_RANDOM_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_COMPRESSION_TEST_SUITE_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_EXCEPTION_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_ERROR_TEST_SUITE_TYPE));
 

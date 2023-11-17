@@ -26,8 +26,8 @@ static GBL_RESULT enumSave_(const GblVariant* pVariant, GblStringBuffer* pString
     GBL_CTX_BEGIN(NULL);
     GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(GblVariant_typeOf(pVariant)));
     GBL_CTX_CALL(GblStringBuffer_append(pString,
-                                        GBL_STRV(GblEnumClass_nameFromValue(pEnumClass,
-                                                                            pVariant->enumeration))));
+                                        GblEnumClass_nameFromValue(pEnumClass,
+                                                                   pVariant->enumeration)));
     GBL_CTX_END();
 }
 

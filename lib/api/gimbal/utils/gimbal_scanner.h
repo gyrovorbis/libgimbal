@@ -110,10 +110,10 @@ GBL_CLASS_END
  *  \sa GblScannerClass
  */
 GBL_INSTANCE_DERIVE(GblScanner, GblObject)
-    GblStringView     token;    //!< Current token in the stream
-    GblStringView     next;     //!< Peeked-at next token in the stream
-    GblStringRef*     pError;   //!< Pending error message
-    GBL_SCANNER_FLAGS status;   //!< Status after the last operation
+    GblStringView       token;    //!< Current token in the stream
+    GblStringView       next;     //!< Peeked-at next token in the stream
+    const GblStringRef* pError;   //!< Pending error message
+    GBL_SCANNER_FLAGS   status;   //!< Status after the last operation
 GBL_INSTANCE_END
 
 //! \cond
@@ -141,7 +141,7 @@ GBL_SIGNALS(GblScanner,
  * @{
  */
 //! Returns a string reference to the current default delimeter pattern on the given class
-GBL_EXPORT const GblStringRef*
+GBL_EXPORT GblStringRef*
                  GblScannerClass_defaultDelimeters
                                         (GBL_CKLASS)                   GBL_NOEXCEPT;
 //! Sets the default delimeter pattern on the given class to a copy of \p pStr
@@ -176,7 +176,7 @@ GBL_EXPORT GblRefCount GblScanner_unref  (GBL_SELF)              GBL_NOEXCEPT;
  *  @{
  */
 //! Returns a string reference to the string current being used as the input stream
-GBL_EXPORT const GblStringRef*
+GBL_EXPORT GblStringRef*
                  GblScanner_input         (GBL_CSELF)                GBL_NOEXCEPT;
 //! Sets the input stream to the given string, optionally taking its size, and resetting the stream
 GBL_EXPORT void  GblScanner_setInput      (GBL_SELF,
@@ -186,7 +186,7 @@ GBL_EXPORT void  GblScanner_setInput      (GBL_SELF,
 GBL_EXPORT void  GblScanner_setInputRef   (GBL_SELF,
                                            const GblStringRef* pRef) GBL_NOEXCEPT;
 //! Returns a reference to the string used as the delimeter regular expression pattern
-GBL_EXPORT const GblStringRef*
+GBL_EXPORT GblStringRef*
                  GblScanner_delimeters    (GBL_CSELF)                GBL_NOEXCEPT;
 //! Sets the stream's delimeter regular expression pattern to \p pPattern
 GBL_EXPORT void  GblScanner_setDelimeters (GBL_SELF,
@@ -279,7 +279,7 @@ GBL_EXPORT GblBool GblScanner_scanType    (GBL_SELF, GblType t, ...)          GB
 GBL_EXPORT GblBool GblScanner_scanTypeVa  (GBL_SELF, GblType t, va_list* pVa) GBL_NOEXCEPT;
 //! Generic overload macro which automatically calls the respective scan function for the type of \p ptr
 #define            GblScanner_scan(self, ptr) \
-    GBL_META_GENERIC_MACRO_GENERATE(GBL_SCANNER_SCAN_TABLE_, ptr)(self, ptr)
+                        GBL_META_GENERIC_MACRO_GENERATE(GBL_SCANNER_SCAN_TABLE_, ptr)(self, ptr)
 //! @}
 
 /*! \name Peeking
@@ -325,7 +325,7 @@ GBL_EXPORT GblBool GblScanner_peekType    (GBL_SELF, GblType t, ...)          GB
 GBL_EXPORT GblBool GblScanner_peekTypeVa  (GBL_SELF, GblType t, va_list* pVa) GBL_NOEXCEPT;
 //! Generic overload macro which automatically calls the respective peek function for the type of \p ptr
 #define            GblScanner_peek(self, ptr) \
-    GBL_META_GENERIC_MACRO_GENERATE(GBL_SCANNER_PEEK_TABLE_, ptr)(self, ptr)
+                        GBL_META_GENERIC_MACRO_GENERATE(GBL_SCANNER_PEEK_TABLE_, ptr)(self, ptr)
 //! @}
 
 /*! \name Skipping

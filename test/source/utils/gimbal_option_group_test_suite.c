@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_option_group.h>
 #include <gimbal/meta/signals/gimbal_c_closure.h>
+#include <gimbal/utils/gimbal_ref.h>
 #include <math.h>
 
 #define GBL_SELF_TYPE GblOptionGroupTestSuite
@@ -106,7 +107,7 @@ GBL_TEST_CASE(parseLong) {
     GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(pFixture->pGroup, pList));
     GBL_TEST_VERIFY(GblStringList_empty(pList));
     GBL_TEST_COMPARE(pFixture->pFirst, "Firsty");
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -115,7 +116,7 @@ GBL_TEST_CASE(parseShort) {
     GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(pFixture->pGroup, pList));
     GBL_TEST_VERIFY(GblStringList_empty(pList));
     GBL_TEST_COMPARE(pFixture->third, GBL_TRUE);
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -134,7 +135,7 @@ GBL_TEST_CASE(parseMultiMixed) {
     GBL_TEST_COMPARE(pFixture->fifth, 'X');
     GBL_TEST_COMPARE(pFixture->sixth, -7123);
 
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -148,7 +149,7 @@ GBL_TEST_CASE(parseBoolNoValueFailure) {
     GBL_TEST_COMPARE(GblStringList_size(pList), 1);
     GBL_TEST_COMPARE(pFixture->third, GBL_FALSE);
 
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -160,7 +161,7 @@ GBL_TEST_CASE(parseUnknown) {
 
     GBL_TEST_COMPARE(GblStringList_size(pList), 2);
 
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -170,7 +171,7 @@ GBL_TEST_CASE(parseNonOptionMatch) {
     GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(pFixture->pGroup, pList));
     GBL_TEST_COMPARE(pFixture->pFirst, "Bowie");
     GBL_TEST_COMPARE(GblStringList_size(pList), 2);
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -180,7 +181,7 @@ GBL_TEST_CASE(parseDoubleHyphenExtras) {
     GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(pFixture->pGroup, pList));
     GBL_TEST_COMPARE(GblStringList_size(pList), 3);
     GBL_TEST_COMPARE(pFixture->pFirst, "Ziggy");
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -189,7 +190,7 @@ GBL_TEST_CASE(parsePrefixedWrong) {
 
     GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(pFixture->pGroup, pList));
     GBL_TEST_COMPARE(GblStringList_size(pList), 4);
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -207,7 +208,7 @@ GBL_TEST_CASE(parsePrefixedLong) {
     GBL_TEST_COMPARE(pFixture->fifth, 'Z');
     GBL_TEST_COMPARE(pFixture->sixth, -6123);
 
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -225,7 +226,7 @@ GBL_TEST_CASE(parsePrefixedShort) {
     GBL_TEST_COMPARE(pFixture->fifth, 'Z');
     GBL_TEST_COMPARE(pFixture->sixth, -6123);
 
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -236,7 +237,7 @@ GBL_TEST_CASE(parseCallback) {
     GBL_TEST_COMPARE(GblStringList_size(pList), 2);
     GBL_TEST_COMPARE(pFixture->seventh, 3.14f);
 
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -247,7 +248,7 @@ GBL_TEST_CASE(parseCallbackNoArg) {
     GBL_TEST_COMPARE(GblStringList_size(pList), 3);
     GBL_TEST_COMPARE(pFixture->eighth, GBL_TRUE);
 
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -259,7 +260,7 @@ GBL_TEST_CASE(parseEquals) {
     GBL_TEST_COMPARE(pFixture->second, 8);
     GBL_TEST_COMPARE(pFixture->seventh, 4.14f);
 
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -271,7 +272,7 @@ GBL_TEST_CASE(parseEqualsShort) {
     GBL_TEST_COMPARE(pFixture->fourth, 21.5f);
     GBL_TEST_COMPARE(pFixture->fifth, 'K');
 
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -281,7 +282,7 @@ GBL_TEST_CASE(parseEqualsOption) {
     GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(pFixture->pGroup, pList));
     GBL_TEST_COMPARE(GblStringList_size(pList), 0);
     GBL_TEST_COMPARE(pFixture->pFirst, "--fourth");
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -292,7 +293,7 @@ GBL_TEST_CASE(parseOptionToStringFailure) {
     GBL_TEST_VERIFY(!GBL_RESULT_SUCCESS(GblOptionGroup_parse(pFixture->pGroup, pList)));
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(GblStringList_size(pList), 2);
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -302,7 +303,7 @@ GBL_TEST_CASE(parseBoolInvertedNoValue) {
     GBL_TEST_VERIFY(GBL_RESULT_SUCCESS(GblOptionGroup_parse(pFixture->pGroup, pList)));
     GBL_TEST_COMPARE(GblStringList_size(pList), 0);
     GBL_TEST_VERIFY(!pFixture->tenth);
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -312,7 +313,7 @@ GBL_TEST_CASE(parseBoolInverted) {
     GBL_TEST_VERIFY(GBL_RESULT_SUCCESS(GblOptionGroup_parse(pFixture->pGroup, pList)));
     GBL_TEST_COMPARE(GblStringList_size(pList), 0);
     GBL_TEST_VERIFY(!pFixture->eleventh);
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -331,7 +332,7 @@ GBL_TEST_CASE(parsePrePassTake) {
                                           GBL_CALLBACK(parsePrePass_)));
     GBL_CTX_VERIFY_CALL(GblOptionGroup_parse(pFixture->pGroup, pList));
     GBL_TEST_VERIFY(GblStringList_empty(pList));
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -353,7 +354,7 @@ GBL_TEST_CASE(parsePrePassError) {
                      GBL_RESULT_ERROR_INVALID_CMDLINE_ARG);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_VERIFY(GblStringList_empty(pList));
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_COMPARE(GblSignal_disconnect(GBL_INSTANCE(pFixture->pGroup),
                                           "parsePrePass",
                                            GBL_INSTANCE(pFixture->pGroup),
@@ -394,7 +395,7 @@ GBL_TEST_CASE(parsePostPassTake) {
     GBL_TEST_COMPARE(pFixture->sixth, -2125);
 
     // destroy argument list
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -416,7 +417,7 @@ GBL_TEST_CASE(parsePostPassError) {
                      GBL_RESULT_ERROR_INVALID_CMDLINE_ARG);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_VERIFY(!GblStringList_empty(pList));
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 
@@ -448,7 +449,7 @@ GBL_TEST_CASE(parseErrorNotify) {
 
     GBL_TEST_VERIFY(notified);
     GBL_TEST_VERIFY(!GblStringList_empty(pList));
-    GblStringList_destroy(pList);
+    GblStringList_unref(pList);
     GBL_TEST_CASE_END;
 }
 

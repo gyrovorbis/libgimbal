@@ -36,9 +36,9 @@ GBL_EXPORT GblRefCount  GblRef_activeCount      (void)                          
 GBL_EXPORT void*        GblRef_alloc            (size_t size)                       GBL_NOEXCEPT;
 GBL_EXPORT void*        GblRef_allocWithContext (size_t size, GblContext* pCtx)     GBL_NOEXCEPT;
 
-GBL_EXPORT void*        GblRef_acquire          (GBL_SELF)                           GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblRef_release          (GBL_SELF)                           GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount  GblRef_releaseWithDtor  (GBL_SELF, GblRefDestructFn pFnDtor) GBL_NOEXCEPT;
+GBL_EXPORT void*        GblRef_acquire          (GBL_CSELF)                           GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblRef_release          (GBL_CSELF)                          GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount  GblRef_releaseWithDtor  (GBL_CSELF, GblRefDestructFn pFnDtor) GBL_NOEXCEPT;
 
 GBL_EXPORT GblRefCount  GblRef_refCount         (GBL_CSELF)                          GBL_NOEXCEPT;
 GBL_EXPORT GblContext*  GblRef_context          (GBL_CSELF)                          GBL_NOEXCEPT;
