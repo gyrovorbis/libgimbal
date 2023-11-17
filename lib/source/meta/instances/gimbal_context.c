@@ -2,6 +2,7 @@
 #include "../types/gimbal_type_.h"
 #include <gimbal/utils/gimbal_date_time.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
+#include <gimbal/core/gimbal_error.h>
 
 static GBL_RESULT GblContext_IAllocator_alloc_(GblIAllocator* pIAllocator, const GblStackFrame* pFrame, size_t  size, size_t  align, const char* pDbgStr, void** ppData) GBL_NOEXCEPT {
     GblContext* pParentCtx = GblContext_parentContext((GblContext*)pIAllocator);
@@ -246,6 +247,9 @@ GBL_EXPORT GBL_RESULT GblContext_setLastIssue(GblContext* pSelf, const GblCallRe
     if(pRecord) memcpy(&pSelf->lastIssue, pRecord, sizeof(GblCallRecord));
     else memset(&pSelf->lastIssue, 0, sizeof(GblCallRecord));
     //GBL_CTX_END();
+
+    //GblError* pError = GblError_create(GBL_ERROR_TYPE, GBL_ENUM_TYPE, pRecord->result, pRecord->message);
+    //GblError_throw(pError);
     return GBL_RESULT_SUCCESS;
 }
 

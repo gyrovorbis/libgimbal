@@ -13,7 +13,7 @@ GBL_EXPORT GblRefCount GblByteArray_unref(GblByteArray* pSelf) {
     return GblRef_releaseWithDtor(pSelf, GblByteArray_destruct);
 }
 
-GBL_EXPORT GblByteArray* (GblByteArray_create)(size_t bytes, const void* pData, GblContext* pCtx) GBL_NOEXCEPT {
+GBL_EXPORT GblByteArray* (GblByteArray_create)(size_t bytes, const void* pData, GblContext* pCtx) {
     GblByteArray* pSelf = NULL;
     GBL_CTX_BEGIN(pCtx);
     GBL_CTX_VERIFY_ARG(!(bytes == 0 && pData != NULL),
@@ -33,7 +33,7 @@ GBL_EXPORT GblByteArray* (GblByteArray_create)(size_t bytes, const void* pData, 
     return pSelf;
 }
 
-GBL_EXPORT GBL_RESULT GblByteArray_resize(GblByteArray* pSelf, size_t  bytes) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblByteArray_resize(GblByteArray* pSelf, size_t  bytes) {
     GBL_CTX_BEGIN(GblByteArray_context(pSelf));
     GBL_CTX_VERIFY_POINTER(pSelf);
     if(!bytes) GBL_CTX_CALL(GblByteArray_clear(pSelf));
@@ -53,7 +53,7 @@ GBL_EXPORT GBL_RESULT GblByteArray_resize(GblByteArray* pSelf, size_t  bytes) GB
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblByteArray_insert(GblByteArray* pSelf, size_t  offset, size_t  bytes, const void* pDataIn) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblByteArray_insert(GblByteArray* pSelf, size_t  offset, size_t  bytes, const void* pDataIn) {
     uintptr_t insertionPoint = 0;
     GBL_CTX_BEGIN(GblByteArray_context(pSelf));
     GBL_CTX_VERIFY_POINTER(pSelf);
@@ -69,7 +69,7 @@ GBL_EXPORT GBL_RESULT GblByteArray_insert(GblByteArray* pSelf, size_t  offset, s
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblByteArray_erase(GblByteArray* pSelf, size_t  offset, size_t  bytes) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblByteArray_erase(GblByteArray* pSelf, size_t  offset, size_t  bytes) {
     size_t  lastPos = 0;
     size_t  remainderSize  = 0;
     GBL_CTX_BEGIN(GblByteArray_context(pSelf));
@@ -87,7 +87,7 @@ GBL_EXPORT GBL_RESULT GblByteArray_erase(GblByteArray* pSelf, size_t  offset, si
     GBL_CTX_END();
 }
 
-GBL_EXPORT int GblByteArray_compare(const GblByteArray* pSelf, const GblByteArray* pOther) GBL_NOEXCEPT {
+GBL_EXPORT int GblByteArray_compare(const GblByteArray* pSelf, const GblByteArray* pOther) {
     int result = INT_MAX;
     int* pResult = &result;
     GBL_CTX_BEGIN(GblByteArray_context(pSelf));

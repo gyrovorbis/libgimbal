@@ -2,8 +2,6 @@
 #define GIMBAL_GENERICS_HPP
 
 #include <iterator>
-#include "../types/gimbal_exception.hpp"
-#include "../core/gimbal_api_generators.hpp"
 
 namespace gbl {
 
@@ -52,18 +50,17 @@ public:
 };
 
 
-
-template<typename CRTP, typename Index, typename Value>
+template<typename CRTP, typename Index, typename Value, bool Writable>
 class ReadWriteContiguousIndexable:
-    public ReadWriteIndexable<CRTP, Index, Value, true>
+    public ReadWriteIndexable<CRTP, Index, Value, Writable>
 {
 private:
 
-    using IndexableProxy = typename ReadWriteIndexable<CRTP, Index, Value, true>::SubscriptProxy;
+    using IndexableProxy = typename ReadWriteIndexable<CRTP, Index, Value, Writable>::SubscriptProxy;
 
 public:
     void checkBounds(Index index) const {
-       if(index >= size()) Exception::checkThrow({Result::ErrorOutOfRange, "index > size"});
+       if(index >= size()) throw std::out_of_range{"index > size"};
     }
 
     Index size(void) const {
@@ -108,9 +105,8 @@ public:
     }
 
     template<typename O, typename Index, typename Value, bool Reverse>
-    struct RandomAccessIterator:
-            public tags::RandomAccessIteratorBase /*,
-            public std::iterator<std::random_access_iterator_tag, Value>*/ {
+    struct RandomAccessIterator
+    {
         constexpr static inline bool
               reverse               = Reverse;
         using object_type           = O;
@@ -127,16 +123,19 @@ public:
                                         std::add_pointer_t<std::add_const_t<Value>>,
                                         std::add_pointer_t<Value>>;
         using difference_type       = std::ptrdiff_t;
-        using iterator_category     = std::random_access_iterator_tag;
+        using iterator_concept      = std::contiguous_iterator_tag;
+        using iterator_category     = std::contiguous_iterator_tag;
 
         void checkBounds(Index index) const {
-           if(index >= pObj_->getElementCount_()) Exception::checkThrow({Result::ErrorOutOfRange, "Index >= obj.elementCount"});
+           if(index >= pObj_->getElementCount_()) throw std::out_of_range{"Index >= obj.elementCount"};
         }
 #if 0
         template<typename T = reference>
         std::enable_if_t<!std::is_const_v<object_type>, T> operator* () {
             checkBounds(index_);
             return pObj_->getElement_(index_);
+        }
+
         }
 #else
         reference operator* () {
@@ -222,8 +221,6 @@ public:
     using const_iterator            = RandomAccessIterator<std::add_const_t<CRTP>, Index, Value, false>;
     using reverse_const_iterator    = RandomAccessIterator<std::add_const_t<CRTP>, Index, Value, true>;
 
-    //static_assert(std::random_access_iterator<iterator>,                "iterator_not STL-compatible!");
-    //static_assert(std::random_access_iterator<reverse_iterator>,        "reverse_iterator not STL-compatible!");
     static_assert(std::random_access_iterator<const_iterator>,          "const_iterator not STL-compatible!");
     static_assert(std::random_access_iterator<reverse_const_iterator>,  "reverse_const_iterator not STL-compatible!");
 
@@ -231,19 +228,15 @@ public:
     //return revierse iterators
    iterator                 begin(void) { return {*static_cast<CRTP*>(this), 0}; }
    auto                     begin(void) const { return cbegin(); }
-   //reverse_iterator         rbegin(void) { return {*static_cast<CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()-1 }; }
    auto         rbegin(void) { return std::make_reverse_iterator(end()); }
    auto                     rbegin(void) const { return crbegin(); }
    iterator                 end(void) { return iterator(*static_cast<CRTP*>(this), (Index)static_cast<const CRTP*>(this)->getElementCount_()); }
    auto                     end(void) const { return cend(); }
-   //reverse_iterator         rend(void) { return {*static_cast<CRTP*>(this), -1}; }
    auto         rend(void) { return std::make_reverse_iterator(begin()); }
    auto                     rend(void) const { return crend(); }
    const_iterator           cbegin(void) const { return {*static_cast<const CRTP*>(this), 0}; }
-   //reverse_const_iterator   crbegin(void) const { return {*static_cast<const CRTP*>(this), (int64_t)static_cast<const CRTP*>(this)->getElementCount_()-1}; }
    auto   crbegin(void) const { return std::make_reverse_iterator(cend()); }
    const_iterator           cend(void) const { return const_iterator(*static_cast<const CRTP*>(this), (Index)static_cast<const CRTP*>(this)->getElementCount_()); }
-   //reverse_const_iterator   crend(void) const { return {*static_cast<const CRTP*>(this), -1}; }
    auto crend(void) const { return std::make_reverse_iterator(cbegin()); }
 };
 

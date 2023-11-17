@@ -1,3 +1,17 @@
+/*! \file
+ *  \brief gbl::Quark C++ bindings for GblQuark
+ *  \ingroup strings
+ *
+ *  This file contains the gbl::Quark wrapper around
+ *  the GblQuark C API. It provides a high-level object-
+ *  oriented string wrapper around interned strings.
+ *
+ *  \sa gimbal_quark.h
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
+ */
+
 #ifndef GIMBAL_QUARK_HPP
 #define GIMBAL_QUARK_HPP
 
@@ -8,6 +22,14 @@
 
 namespace gbl {
 
+/*! OO C++ wrapper object around GblQuark
+ *  \ingroup strings
+ *
+ *  gbl::Quark is the high-level C++ wrapper around
+ *  GblQuark, which represents an interned string.
+ *
+ *  \sa GblQuark
+ */
 class Quark {
 private:
     GblQuark value_ = GBL_QUARK_INVALID;

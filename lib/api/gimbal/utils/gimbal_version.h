@@ -110,6 +110,7 @@ GBL_DECLS_END
                 << GBL_VERSION_MINOR_BITPOS) |              \
     (uint32_t)((patch & (uint8_t)GBL_VERSION_PATCH_MASK)    \
                << GBL_VERSION_PATCH_BITPOS))
+
 #define GBL_VERSION_STRING_(major, minor, patch) \
     GBL_STRINGIFY(major) "."                     \
     GBL_STRINGIFY(minor) "."                     \

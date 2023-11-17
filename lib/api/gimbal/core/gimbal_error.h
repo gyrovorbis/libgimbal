@@ -61,7 +61,7 @@ GBL_CLASS_END
 GBL_INSTANCE_DERIVE(GblError, GblObject)
     GblType       resultType;
     GblEnum       result;
-    GblStringRef* pMessage;
+    char          message[128];
     GblThread*    pThread;
     const char*   pFile;
     const char*   pFunction;
@@ -79,10 +79,10 @@ GBL_PROPERTIES(GblError,
 
 GBL_EXPORT GblType    GblError_type         (void)           GBL_NOEXCEPT;
 
-GBL_EXPORT GblError*  GblError_current      (void)           GBL_NOEXCEPT;
+GBL_EXPORT GblError*  GblError_pending      (void)           GBL_NOEXCEPT;
 GBL_EXPORT GblBool    GblError_clear        (void)           GBL_NOEXCEPT;
 GBL_EXPORT GblError*  GblError_catch        (GblType type)   GBL_NOEXCEPT;
-GBL_EXPORT void       GblError_throw        (GblError* pErr) GBL_NOEXCEPT;
+GBL_EXPORT GblBool    GblError_throw        (GblError* pErr) GBL_NOEXCEPT;
 
 GBL_EXPORT GblError*  GblError_create       (GblType     derived,
                                              const char* pFile,
@@ -92,11 +92,10 @@ GBL_EXPORT GblError*  GblError_create       (GblType     derived,
                                              GblEnum     result,
                                              const char* pFmt,
                                              ...)        GBL_NOEXCEPT;
-
+GBL_EXPORT GblError*   GblError_ref          (GBL_CSELF) GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount GblError_unref        (GBL_SELF)  GBL_NOEXCEPT;
 
 GBL_EXPORT const char* GblError_resultString (GBL_CSELF) GBL_NOEXCEPT;
-GBL_EXPORT GblType     GblError_resultType   (GBL_CSELF) GBL_NOEXCEPT;
 
 GBL_EXPORT GblBool     GblError_hasSource    (GBL_CSELF) GBL_NOEXCEPT;
 GBL_EXPORT const char* GblError_file         (GBL_CSELF) GBL_NOEXCEPT;

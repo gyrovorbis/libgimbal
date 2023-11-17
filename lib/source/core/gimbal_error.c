@@ -1,25 +1,27 @@
 #include <gimbal/core/gimbal_error.h>
 #include <tinycthread.h>
 
-static GBL_THREAD_LOCAL GblError* pCurrent_ = NULL;
+static GBL_THREAD_LOCAL GblError* pPending_ = NULL;
 
-GBL_EXPORT GblError* GblError_current(void) {
-    return pCurrent_;
+GBL_EXPORT GblError* GblError_pending(void) {
+    return pPending_;
 }
 
-GBL_EXPORT void GblError_throw(GblError* pSelf) {
+GBL_EXPORT GblBool GblError_throw(GblError* pSelf) {
     GBL_ASSERT(pSelf);
 
-    GblError_clear();
-    pCurrent_ = pSelf;
+    const GblBool retValue = GblError_clear();
+    pPending_ = pSelf;
+
+    return retValue;
 }
 
 GBL_EXPORT GblError* GblError_catch(GblType type) {
     GblError* pReturn = NULL;
 
-    if(GblType_check(GBL_TYPEOF(pCurrent_), type)) {
-        pReturn   = pCurrent_;
-        pCurrent_ = NULL;
+    if(GblType_check(GBL_TYPEOF(pPending_), type)) {
+        pReturn   = pPending_;
+        pPending_ = NULL;
     }
 
     return pReturn;
@@ -28,11 +30,11 @@ GBL_EXPORT GblError* GblError_catch(GblType type) {
 GBL_EXPORT GblBool GblError_clear(void) {
     GblBool retVal = GBL_FALSE;
 
-    GBL_UNREF(pCurrent_);
+    GBL_UNREF(pPending_);
 
-    if(pCurrent_) retVal = GBL_TRUE;
+    if(pPending_) retVal = GBL_TRUE;
 
-    pCurrent_ = NULL;
+    pPending_ = NULL;
     return retVal;
 }
 
@@ -47,7 +49,18 @@ GBL_EXPORT GblError* (GblError_create)(GblType     derived,
 {
     GBL_ASSERT(GblType_check(derived, GBL_ERROR_TYPE));
 
-    GblError* pSelf = GBL_ERROR(GblBox_create(derived));
+    GblError* pSelf = NULL;
+#if 1
+    if((pPending_ && GBL_TYPEOF(pPending_) == derived)) {
+        pSelf = pPending_;
+        pPending_ = NULL;
+       // GblStringRef_unref(pSelf->pMessage);
+    } else {
+#endif
+        pSelf = (GblError*)GblObject_create(derived, NULL);
+#if 1
+    }
+#endif
 
     pSelf->pFile      = pFile;
     pSelf->pFunction  = pFunc;
@@ -58,19 +71,20 @@ GBL_EXPORT GblError* (GblError_create)(GblType     derived,
 
     va_list varArgs;
     va_start(varArgs, pFmt);
+    vsnprintf(pSelf->message, sizeof(pSelf->message), pFmt, varArgs);
     //GblStringRef_createFormatVaList(pFmt, &varArgs);
-    pSelf->pMessage = GblStringRef_create(pFmt);
+    //pSelf->pMessage = GblStringRef_create(pFmt);
     va_end(varArgs);
 
     return pSelf;
 }
 
-GBL_EXPORT GblRefCount GblError_unref(GblError* pSelf) {
-    return GBL_UNREF(pSelf);
+GBL_EXPORT GblError* GblError_ref(const GblError* pSelf) {
+    return GBL_ERROR(GBL_REF(pSelf));
 }
 
-GBL_EXPORT GblType GblError_resultType(const GblError* pError) {
-    return GBL_ERROR_GET_CLASS(pError)->resultType;
+GBL_EXPORT GblRefCount GblError_unref(GblError* pSelf) {
+    return GBL_UNREF(pSelf);
 }
 
 GBL_EXPORT const char* GblError_resultString(const GblError* pError) {
@@ -134,7 +148,7 @@ static GBL_RESULT GblError_GblBox_destructor_(GblBox* pBox) {
 
     GblError* pSelf = GBL_ERROR(pBox);
 
-    GblStringRef_unref(pSelf->pMessage);
+//    GblStringRef_unref(pSelf->pMessage);
 
     GBL_CTX_END();
 }
@@ -143,8 +157,8 @@ static GBL_RESULT GblErrorClass_init_(GblClass* pClass, const void* pUd) {
     GBL_UNUSED(pUd);
 
     GBL_BOX_CLASS(pClass)   ->pFnDestructor   = GblError_GblBox_destructor_;
-    GBL_OBJECT_CLASS(pClass)->pFnProperty     = GblError_GblObject_property_;
-    GBL_OBJECT_CLASS(pClass)->pFnSetProperty  = GblError_GblObject_setProperty_;
+    //GBL_OBJECT_CLASS(pClass)->pFnProperty     = GblError_GblObject_property_;
+    //GBL_OBJECT_CLASS(pClass)->pFnSetProperty  = GblError_GblObject_setProperty_;
     GBL_ERROR_CLASS(pClass) ->pFnResultString = GblError_resultString_;
 
     return GBL_RESULT_SUCCESS;

@@ -56,6 +56,7 @@
 #   include "strings/gimbal_quark_test_suite.hpp"
 #   include "strings/gimbal_pattern_test_suite.hpp"
 #   include "strings/gimbal_string_view_test_suite.hpp"
+#   include "utils/gimbal_version_test_suite.hpp"
 #endif
 
 #include <math.h>
@@ -241,6 +242,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_PATTERN_TEST_SUITE_CPP_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_STRING_VIEW_TEST_SUITE_CPP_TYPE));
+    GblTestScenario_enqueueSuite(pScenario,
+                                 GblTestSuite_create(GBL_VERSION_TEST_SUITE_CPP_TYPE));
 #endif
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_RANDOM_TEST_SUITE_TYPE));

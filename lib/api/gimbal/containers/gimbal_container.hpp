@@ -12,8 +12,6 @@
 
 namespace gbl {
 
-class Context;
-
 template<typename It, typename T>
 concept type_compatible_iterator_readable =
         std::input_iterator<It> &&
@@ -119,9 +117,6 @@ struct iterator_value {
 template<typename C>
 using iterator_value_t = typename iterator_value<C>::type;
 
-
 }
-
-
 
 #endif // GIMBAL_CONTAINER_HPP

@@ -371,7 +371,38 @@ GBL_TEST_CASE(matchAlternation)
                                         "worldzy",
                                         &view));
     GBL_TEST_VERIFY(GblStringView_equals(view, "world"));
+GBL_TEST_CASE_END
 
+GBL_TEST_CASE(matchGroup)
+    GblStringView view;
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(abc)",
+                                        "abc",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "abc"));
+
+
+    GBL_TEST_VERIFY(!GblPattern_matchStr("a(b)c(de)",
+                                        "adcde",
+                                        &view));
+
+    GBL_TEST_VERIFY(!GblPattern_matchStr("a(b)c(de)",
+                                        "abcdd",
+                                        &view));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("a(b)c(de)",
+                                        "abcde",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "abcde"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(a(b(cd))e)",
+                                        "abcde",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "abcde"));
+
+    GBL_TEST_VERIFY(!GblPattern_matchStr("(a(b(ce))e)",
+                                        "abcde",
+                                        &view));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(unref)
@@ -405,6 +436,7 @@ GBL_TEST_REGISTER(createInvalid,
                   matchDateTime,
                   matchPhoneNumber,
                   matchAlternation,
+                  matchGroup,
                   unref)
 #if 0
 

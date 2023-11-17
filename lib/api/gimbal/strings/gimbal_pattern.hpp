@@ -1,3 +1,14 @@
+/*! \file
+ *  \brief gbl::Pattern C++ bindings for GblPattern
+ *  \ingroup strings
+ *
+ *  This file contains the type and OO API for gbl::Pattern,
+ *  the C++ binding layer around GblPattern.
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
+ */
+
 #ifndef GIMBAL_PATTERN_HPP
 #define GIMBAL_PATTERN_HPP
 
@@ -8,6 +19,15 @@
 
 namespace gbl {
 
+/*! OO C++ binding object around GblPattern
+ *  \ingroup strings
+ *
+ *  gbl::Pattern represents a compiled regular
+ *  expression string, providing an API around
+ *  the pattern matching/regex engine.
+ *
+ *  \sa GblPattern
+ */
 class Pattern {
 private:
     const GblPattern* pPattern_ = nullptr;
@@ -41,6 +61,31 @@ public:
     std::string string() const noexcept;
 
     operator const GblPattern*() const noexcept { return pPattern_; }
+
+    Pattern& operator=(const char* pPattern) noexcept {
+        GblPattern_unref(pPattern_);
+        pPattern_ = GblPattern_create(pPattern);
+        return *this;
+    }
+
+    Pattern& operator=(const GblPattern* pPattern) noexcept {
+        GblPattern_unref(pPattern_);
+        pPattern_ = pPattern;
+        return *this;
+    }
+
+    Pattern& operator=(const Pattern& rhs) noexcept {
+        GblPattern_unref(pPattern_);
+        pPattern_ = GblPattern_ref(rhs.pPattern_);
+        return *this;
+    }
+
+    Pattern& operator=(Pattern&& rhs) noexcept {
+        GblPattern_unref(pPattern_);
+        pPattern_ = rhs.pPattern_;
+        rhs.pPattern_ = nullptr;
+        return *this;
+    }
 
     bool match(const char*    pString,
                GblStringView* pView=nullptr,
