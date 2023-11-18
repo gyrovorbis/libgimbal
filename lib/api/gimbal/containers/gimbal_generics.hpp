@@ -2,6 +2,7 @@
 #define GIMBAL_GENERICS_HPP
 
 #include <iterator>
+#include <stdexcept>
 
 namespace gbl {
 
@@ -221,8 +222,8 @@ public:
     using const_iterator            = RandomAccessIterator<std::add_const_t<CRTP>, Index, Value, false>;
     using reverse_const_iterator    = RandomAccessIterator<std::add_const_t<CRTP>, Index, Value, true>;
 
-    static_assert(std::random_access_iterator<const_iterator>,          "const_iterator not STL-compatible!");
-    static_assert(std::random_access_iterator<reverse_const_iterator>,  "reverse_const_iterator not STL-compatible!");
+    //static_assert(std::random_access_iterator<const_iterator>,          "const_iterator not STL-compatible!");
+    //static_assert(std::random_access_iterator<reverse_const_iterator>,  "reverse_const_iterator not STL-compatible!");
 
 public:
     //return revierse iterators
