@@ -444,31 +444,15 @@ test psp:
   tags:
     - psp
   before_script:
-    - pkill -9 ppsspp || true
+    - pkill -9 Xvfb || true
   script:
     - exec > >(tee -a "${BUILD_DIR}/results.txt" )
     - exec 2> >(tee -a "${BUILD_DIR}/results.txt" >&2)
-    -
-    |
-      if [[ -n ${XDISPLAY-} ]]; then
-        if [[ "$OSTYPE" != "darwin"* ]]; then
-          coproc Xvfb ${XDISPLAY} -screen 0 1024x768x16
-          VIRT_FB_PID=$!
-          sleep 4
-        fi
-      fi
-    - export DISPLAY=:0.0 
-    - nohup ppsspp -v ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION} || true </dev/null &
+    - nohup xvfb-run ppsspp -v ${BUILD_DIR}/${ARTIFACT_DIR}/${BINARY_NAME}${BINARY_EXTENSION} || true </dev/null &
     - sleep 20
     - cp ${BUILD_DIR}/results.txt ${BUILD_DIR}/results2.txt
     - grep "********************* [   PASS   ] *********************" ${BUILD_DIR}/results2.txt
-    - pkill -9 ppsspp || true
-    - |
-      if [[ -n ${XDISPLAY-} ]]; then
-        if [[ "$OSTYPE" != "darwin"* ]]; then
-          kill -SIGINT $VIRT_FB_PID
-        fi
-      fi
+    - pkill -9 Xvfb || true
   timeout: 2m
 
 test debian-gcc:
