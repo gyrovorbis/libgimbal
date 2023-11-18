@@ -201,6 +201,7 @@ if(VITA)
 endif()
 
 if(PSP)
+    add_compile_definitions(GimbalTests PUBLIC BUILD_PRX=1)
 
     create_pbp_file(TARGET GimbalTests # CMake executable target
       TITLE "${CMAKE_PROJECT_NAME}" # displayed in game selection

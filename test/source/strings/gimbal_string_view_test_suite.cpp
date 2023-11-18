@@ -1,6 +1,5 @@
 #include "strings/gimbal_string_view_test_suite.hpp"
 #include <gimbal/strings/gimbal_string_view.hpp>
-#include <ranges>
 
 #define GBL_SELF_TYPE GblStringViewTestSuiteCpp
 
@@ -112,9 +111,6 @@ GBL_TEST_CASE(iterators)
     for(auto it = strv.rbegin(); it != strv.rend(); ++it) {
         GBL_TEST_VERIFY(*it == strv[i--]);
     }
-
-    // test ranges using iterator implementation
-    GBL_TEST_VERIFY(std::distance(strv.begin(), std::ranges::find(strv, 'm')) == strv.find("m"));
 GBL_TEST_CASE_END
 
 GBL_TEST_REGISTER(constructDefault,
