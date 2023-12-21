@@ -45,7 +45,7 @@ GBL_RESULT typeInstanceConstructValidate_(GblType type, GblClass* pClass, GblBoo
 }
 
 GBL_EXPORT GBL_RESULT GblInstance_init_(GblType type, GblInstance* pInstance, GblClass* pClass) {
-    GblMetaClass*   pMeta = GBL_META_CLASS_(type);
+    GblMetaClass* pMeta = GBL_META_CLASS_(type);
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_PUSH_VERBOSE("[GblType] Instance Init: type %s", GblType_name(type));
 

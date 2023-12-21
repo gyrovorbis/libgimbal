@@ -67,8 +67,10 @@ GBL_EXPORT const char*     GblError_string  (void) GBL_NOEXCEPT;
  *  \brief Methods for managing pending errors
  *  @{
  */
-//! Clears the current thread's pending error
+//! Clears the current thread's pending error, returning GBL_TRUE if there was a pending error
 GBL_EXPORT GblBool         GblError_clear   (void)                          GBL_NOEXCEPT;
+//! Equivalent to GblError_clear(), except the pending error is copied into the destination buffer
+GBL_EXPORT GblBool         GblError_lower   (GBL_SELF)                      GBL_NOEXCEPT;
 //! Raises an error on the current thread with the given domain, code, and message
 GBL_EXPORT const GblError* GblError_raise   (const char*           pFile/*=NULL*/,
                                              const char*           pFunction/*=NULL*/,
@@ -96,6 +98,7 @@ GBL_EXPORT const GblErrorDomain* gblErrorDomain(void) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
+//! \cond
 #define GblError_raise(...) \
     GblError_raiseDefault_(__VA_ARGS__)
 #define GblError_raiseDefault_(...) \
@@ -105,6 +108,7 @@ GBL_DECLS_END
 
 #define GblError_reraise() \
     ((GblError_reraise)(__FILE__, __FUNCTION__, __LINE__))
+//! \endcond
 
 #undef GBL_SELF_TYPE
 

@@ -37,7 +37,7 @@
  *
  *  \sa GBL_TLS_LOAD()
  */
-#if !defined(GBL_PSP) && !defined(GBL_TLS_EMULATED)
+#if !defined(GBL_PSP) && !GBL_TLS_EMULATED
 #   define GBL_TLS(type, name, init) GBL_THREAD_LOCAL type name = init
 #else
 #   define GBL_TLS(type, name, init) \
@@ -73,7 +73,7 @@
  *
  *  \sa GBL_TLS()
  */
-#if !defined(GBL_PSP) && !defined(GBL_TLS_EMULATED)
+#if !defined(GBL_PSP) && !GBL_TLS_EMULATED
 #   define GBL_TLS_LOAD(name)    &name
 #else
 #   define GBL_TLS_LOAD(name)   tls_##name##_load_()

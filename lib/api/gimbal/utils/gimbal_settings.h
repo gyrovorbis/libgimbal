@@ -30,8 +30,8 @@
 
 GBL_FORWARD_DECLARE_STRUCT(GblSettings);
 
-/* \enum  GBL_SETTINGS_STATUS
- * \brief Status code for GblSettings state (\ref GblSettings::status)
+/*! \enum  GBL_SETTINGS_STATUS
+ *  \brief Status code for GblSettings state (\ref GblSettings::status)
  */
 GBL_DECLARE_ENUM(GBL_SETTINGS_STATUS) {
     GBL_SETTINGS_STATUS_OK,             //!< OK

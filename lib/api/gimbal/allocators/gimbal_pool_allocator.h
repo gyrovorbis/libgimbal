@@ -1,7 +1,9 @@
 /*! \file
- *  \brief GblPoolAllocator chunked/paged pool based allocator + API
+ *  \brief GblPoolAllocator arena-backed, pool-based allocator
  *  \ingroup allocators
  *  \copydoc GblPoolAllocator
+ *
+ *
  *
  *  \author Falco Girgis
  */
@@ -38,11 +40,11 @@ GBL_DECLS_BEGIN
  *  \sa GblArenaAllocator
  */
 typedef struct GblPoolAllocator {
-    GblArenaAllocator arena;            ///< Arena allocator instance providing backing allocations
-    GblLinkedListNode freeList;         ///< Link list of deleted entries for efficient recycling
-    size_t            entrySize;        ///< Base struct size of each entry
-    size_t            entryAlign;       ///< Alignment requirement for each entry
-    size_t            activeEntries;    ///< Number of allocated, used entries
+    GblArenaAllocator arena;            //!< Arena allocator instance providing backing allocations
+    GblLinkedListNode freeList;         //!< Link list of deleted entries for efficient recycling
+    size_t            entrySize;        //!< Base struct size of each entry
+    size_t            entryAlign;       //!< Alignment requirement for each entry
+    size_t            activeEntries;    //!< Number of allocated, used entries
 } GblPoolAllocator;
 
 // ===== Public methods =====

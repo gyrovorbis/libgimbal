@@ -18,13 +18,13 @@ GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblHashSet);
 
-typedef GblHash (*GblHashSetHashFn)(GBL_CSELF, const void*);              ///< User-defined hasher function, hashing two entries
-typedef GblBool (*GblHashSetCmpFn) (GBL_CSELF, const void*, const void*); ///< User-defined comparator function, comparing two entries
-typedef void    (*GblHashSetDtorFn)(GBL_CSELF, void*);                    ///< User-defined destructor function, destroying an entry
-typedef GblBool (*GblHashSetIterFn)(GBL_CSELF, void*, void*);             ///< User-defined iterator function for traversal
+typedef GblHash (*GblHashSetHashFn)(GBL_CSELF, const void*);              //!< User-defined hasher function, hashing two entries
+typedef GblBool (*GblHashSetCmpFn) (GBL_CSELF, const void*, const void*); //!< User-defined comparator function, comparing two entries
+typedef void    (*GblHashSetDtorFn)(GBL_CSELF, void*);                    //!< User-defined destructor function, destroying an entry
+typedef GblBool (*GblHashSetIterFn)(GBL_CSELF, void*, void*);             //!< User-defined iterator function for traversal
 
-/*! \brief Hash-table based abstract associative container with C++-style STL std::unoredered_set API
- *  \details
+/*! Hash-table based abstract associative container with C++-style STL std::unoredered_set API
+ *
  *  GblHashSet uses open-addressing ans is implemented using a Robin Hood hashing algorithm.
  *  Using it requires providing a custom hasher function (which typically uses one of
  *  the libGimbal hashing algorithms such as gblHashMurmur()) as well as a custom comparator function.

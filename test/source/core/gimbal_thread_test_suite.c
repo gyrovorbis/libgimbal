@@ -335,6 +335,10 @@ static void _(GblThread* pSelf) {
 }
 
 GBL_TEST_CASE(tlsSpawnThreads)
+#ifdef GBL_PSP
+    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
+#endif
+
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         char nameBuff[64];
 
@@ -351,6 +355,10 @@ GBL_TEST_CASE(tlsSpawnThreads)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsInitBss)
+#ifdef GBL_PSP
+    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
+#endif
+
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         while(!pFixture->pTestThreads[t]->tlsInitRan);
 
@@ -359,18 +367,30 @@ GBL_TEST_CASE(tlsInitBss)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsInitData)
+#ifdef GBL_PSP
+    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
+#endif
+
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         GBL_TEST_VERIFY(pFixture->pTestThreads[t]->tlsInitDataPass);
     }
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsInitAlignment)
+#ifdef GBL_PSP
+    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
+#endif
+
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         GBL_TEST_VERIFY(pFixture->pTestThreads[t]->tlsInitAlignPass);
     }
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsReadWrite)
+#ifdef GBL_PSP
+    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
+#endif
+
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         while(!pFixture->pTestThreads[t]->tlsReadWriteRan);
         GBL_TEST_VERIFY(pFixture->pTestThreads[t]->tlsReadWritePass);
@@ -378,6 +398,10 @@ GBL_TEST_CASE(tlsReadWrite)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsJoinThreads)
+#ifdef GBL_PSP
+    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
+#endif
+
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         GBL_TEST_CALL(GblThread_join(GBL_THREAD(pFixture->pTestThreads[t])));
     }

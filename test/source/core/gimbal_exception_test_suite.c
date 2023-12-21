@@ -2,7 +2,8 @@
 #include <gimbal/core/gimbal_exception.h>
 #include "core/gimbal_exception_test_suite.h"
 
-#define GBL_SELF_TYPE GblExceptionTestSuite
+#define GBL_SELF_TYPE           GblExceptionTestSuite
+#define BENCHMARK_ITERATIONS_   4096
 
 GBL_TEST_FIXTURE {
     size_t classCount;
@@ -45,10 +46,22 @@ GBL_TEST_CASE(create)
     GBL_TEST_VERIFY(GblException_hasSource(pFixture->pError));
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(benchmark)
+    for(size_t i = 0; i < BENCHMARK_ITERATIONS_; ++i)
+        GblException_throw(
+            GblException_create(GBL_EXCEPTION_TYPE,
+                                GBL_ENUM_TYPE,
+                                GBL_RESULT_ERROR_TYPE_MISMATCH,
+                                "Raising the %zuth exception!",
+                                i));
+    GblException_clear();
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(emptyCurrent,
                   emptyClear,
                   emptyCatch,
-                  create);
+                  create,
+                  benchmark);
 
 // emptyCurrent
 // emptyClear

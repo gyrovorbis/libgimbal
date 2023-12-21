@@ -107,27 +107,25 @@ GBL_EXPORT const GblStringList*
  *  @{
  */
 //! Creates a GblApp instance with the given command-line arguments, returning a pointer to it
-GBL_EXPORT GblApp*     GblApp_create       (int          argc,
-                                            const char** ppArgv)  GBL_NOEXCEPT;
+GBL_EXPORT GblApp*       GblApp_create       (int argc,
+                                              const char** ppArgv)  GBL_NOEXCEPT;
 //! Decrements the refcount of a GblApp instance, destroying it if it is the last one
-GBL_EXPORT GblRefCount GblApp_unref        (GBL_SELF)             GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount   GblApp_unref        (GBL_SELF)             GBL_NOEXCEPT;
 //! Returns the version associated with the GblApp instance
-GBL_EXPORT GblVersion  GblApp_version      (GBL_CSELF)            GBL_NOEXCEPT;
+GBL_EXPORT GblVersion    GblApp_version      (GBL_CSELF)            GBL_NOEXCEPT;
 //! Returns the organization string associated with the GblApp instance
-GBL_EXPORT const GblStringRef*
-                       GblApp_organization (GBL_CSELF)            GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblApp_organization (GBL_CSELF)            GBL_NOEXCEPT;
 //! Returns the domain string associated with the GblApp instance
-GBL_EXPORT const GblStringRef*
-                       GblApp_domain       (GBL_CSELF)            GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblApp_domain       (GBL_CSELF)            GBL_NOEXCEPT;
 //! Returns a GblStringList containing all command-line arguments as individual strings
 GBL_EXPORT const GblStringList*
-                       GblApp_argList      (GBL_CSELF)            GBL_NOEXCEPT;
+                         GblApp_argList      (GBL_CSELF)            GBL_NOEXCEPT;
 //! Top-level execution function for a GblApp--blocks until execution is complete, returning a result code
-GBL_EXPORT GBL_RESULT  GblApp_exec         (GBL_SELF)             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblApp_exec         (GBL_SELF)             GBL_NOEXCEPT;
 //! Terminates an application abruptly, without signalling "quitting"
-GBL_EXPORT GBL_RESULT  GblApp_exit         (GBL_SELF, int retVal) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblApp_exit         (GBL_SELF, int retVal) GBL_NOEXCEPT;
 //! Terminates an application gracefully, emitting the "quitting" signal and doing any cleanup
-GBL_EXPORT GBL_RESULT  GblApp_quit         (GBL_SELF, int retVal) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblApp_quit         (GBL_SELF, int retVal) GBL_NOEXCEPT;
 //! @}
 
 GBL_DECLS_END

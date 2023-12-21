@@ -3,6 +3,8 @@
 #include <gimbal/utils/gimbal_date_time.h>
 #include <gimbal/containers/gimbal_linked_list.h>
 #include <gimbal/meta/signals/gimbal_marshal.h>
+#include <gimbal/core/gimbal_tls.h>
+
 #include <tinycthread.h>
 
 #define GBL_THREAD_(self)               (GBL_PRIVATE(GblThread, self))
@@ -33,8 +35,7 @@ static GblDoublyLinkedListNode
 static GblQuark     closureQuark_   = GBL_QUARK_INVALID;
 static GblQuark     callbackQuark_  = GBL_QUARK_INVALID;
 
-static GBL_THREAD_LOCAL
-GblThread*          pCurThread_     = NULL;
+GBL_TLS(GblThread*, pCurThread_, NULL);
 
 static void GblThread_init_(void) {
     mtx_init(&listMtx_, mtx_recursive);
@@ -68,7 +69,7 @@ GBL_RESULT GblThread_final_(void) {
         }
     }
 
-    GBL_UNREF(pCurThread_);
+    GBL_UNREF(*GBL_TLS_LOAD(pCurThread_));
 
     mtx_unlock(&listMtx_);
     mtx_destroy(&listMtx_);
@@ -98,8 +99,9 @@ static void GblThread_unregister_(GblThread* pSelf) {
 }
 
 static void GblThread_initSelf_(GblThread* pSelf, GblBool mainThread) {
-    pCurThread_  = pSelf;
-    GblThread_* pSelf_ = GBL_THREAD_(pSelf);
+    *GBL_TLS_LOAD(pCurThread_) = pSelf;
+    GblThread_* pSelf_         = GBL_THREAD_(pSelf);
+
     if(mainThread)
         pSelf_->nativeHandle = thrd_current();
     // set up thread priority
@@ -130,12 +132,13 @@ static GblThread* GblThread_initUnknown_(GblBool mainThread) {
         signal(SIGTERM, GblThread_signalHandler_);
     }
 
-    pCurThread_ = GBL_NEW(GblThread,
-                          "name", buffer);
+    *GBL_TLS_LOAD(pCurThread_)
+            = GBL_NEW(GblThread,
+                      "name", buffer);
 
-    GblThread_initSelf_(pCurThread_, mainThread);
+    GblThread_initSelf_(*GBL_TLS_LOAD(pCurThread_), mainThread);
 
-    return pCurThread_;
+    return *GBL_TLS_LOAD(pCurThread_);
 }
 
 static GBL_RESULT GblThread_signal_(GblThread* pSelf, int signal) {
@@ -185,7 +188,7 @@ static GBL_RESULT GblThread_run_(GblThread* pSelf) {
 // Low-level thread exit point
 static GBL_RESULT GblThread_exit_(GblThread* pSelf) {
     // update status for finished
-    pCurThread_->state = GBL_THREAD_STATE_FINISHED;
+    (*GBL_TLS_LOAD(pCurThread_))->state = GBL_THREAD_STATE_FINISHED;
 
     // copy thread-local status into this thread's return status
     memcpy(&pSelf->returnStatus, GblThd_callRecord(NULL), sizeof(GblCallRecord));
@@ -212,7 +215,7 @@ static int GblThread_start_(void* pThread) {
     GblThread_initSelf_(pSelf, GBL_FALSE);
 
     // update status
-    pCurThread_->state = GBL_THREAD_STATE_RUNNING;
+    (*GBL_TLS_LOAD(pCurThread_))->state = GBL_THREAD_STATE_RUNNING;
 
     // inform connected slots that thread has started
     GBL_EMIT(pSelf, "started");
@@ -300,10 +303,10 @@ GBL_EXPORT GblBool GblThread_isJoined(const GblThread* pSelf) {
 }
 
 GBL_EXPORT GblThread* GblThread_current(void) {
-    if(!pCurThread_) {
+    if(!*GBL_TLS_LOAD(pCurThread_))
         GblThread_initUnknown_(!GblThread_count()? GBL_TRUE : GBL_FALSE);
-    }
-    return pCurThread_;
+
+    return *GBL_TLS_LOAD(pCurThread_);
 }
 
 GBL_EXPORT GblClosure* GblThread_closure(const GblThread* pSelf) {
@@ -460,7 +463,7 @@ static GBL_RESULT GblThread_GblObject_property_(const GblObject* pObject, const 
     GBL_CTX_BEGIN(NULL);
 
     GblThread*  pSelf  = GBL_THREAD(pObject);
-    GblThread_* pSelf_ = GBL_THREAD_(pSelf);
+    //GblThread_* pSelf_ = GBL_THREAD_(pSelf);
 
     switch(pProp->id) {
     case GblThread_Property_Id_result:

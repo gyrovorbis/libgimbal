@@ -22,7 +22,8 @@
 
 GBL_DECLS_BEGIN
 
-/*! \brief Circular array-based double-ended queue container
+/*! Circular array-based double-ended queue container
+ *  \ingroup containers
  *
  *  GblArrayDeque is a very flexible container type which
  *  combines the fast random access and cache coherency
@@ -35,15 +36,15 @@ GBL_DECLS_BEGIN
  *  grow or shrink from either end, but which are typically
  *  accessed as an array.
  *
- *  Operation                         |Time Complexity
- *  ----------------------------------|------------------
- *  iteration                         | O(N)
- *  insertion (back or front)         | O(1)
- *  insertion (middle)                | O(N)
- *  removal (back or front)           | O(1)
- *  removal (middle) (WIP)            | O(N)
- *  access (front or back)            | O(1)
- *  random access (middle)            | O(1)
+ *  Operation                 |Time Complexity
+ *  --------------------------|------------------
+ *  iteration                 | O(N)
+ *  insertion (back or front) | O(1)
+ *  insertion (middle)        | O(N)
+ *  removal (back or front)   | O(1)
+ *  removal (middle) (WIP)    | O(N)
+ *  access (front or back)    | O(1)
+ *  random access (middle)    | O(1)
  *
  *  For reference, the following are the results of the
  *  profiler unit tests for some common operations shared
@@ -70,11 +71,13 @@ GBL_DECLS_BEGIN
  *  this trade-off is worth it, since we still support
  *  the operation, but fast lookups and lower memory
  *  utilization are much higher priorities.
+ *
  *  \note
  *  Internally this structure is implemented as an extension
  *  of the GblRingBuffer container, which is able to push
  *  from the front, pop from the back, and dynamically resize
  *  itself as it reaches its capacity.
+ *
  *  \note
  *  When the GBL_ARRAY_DEQUE_FORCE_POW2 macro is defined as 1
  *  (default) behavior), the capacity of the deque will always
@@ -86,7 +89,6 @@ GBL_DECLS_BEGIN
  *  a modulo operation to a decrement + bitmask.
  *
  *  \sa GblRingBuffer, GblArrayList
- *  \ingroup containers
  */
 typedef struct GblArrayDeque {      // Size (32/64-bit)
     GBL_PRIVATE_BEGIN

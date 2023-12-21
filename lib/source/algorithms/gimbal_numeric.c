@@ -216,12 +216,11 @@ static uint32_t primes_[] = {
 };
 
 GBL_EXPORT uint32_t gblPrimeNextDouble(uint32_t number) {
-    const static size_t  entries = GBL_COUNT_OF(primes_);
+    const static size_t entries = GBL_COUNT_OF(primes_);
 
-    for(size_t  p = 0; p < entries; ++p) {
+    for(size_t p = 0; p < entries; ++p)
         if(number < primes_[p])
             return primes_[p];
-    }
 
     return primes_[entries-1];
 }

@@ -24,7 +24,8 @@ GBL_DECLS_BEGIN
 
 typedef GblLinkedListCmpFn GblDoublyLinkedListCmpFn;
 
-/*! \brief Intrustive doubly linked list structure with vector-style API.
+/*! Intrustive doubly linked list structure with vector-style API.
+ *  \ingroup containers
  *
  *  GblDoublyLinkedListNode is the low-level API around managing manually
  *  allocated, intrusive linked list structures with the list nodes
@@ -38,11 +39,12 @@ typedef GblLinkedListCmpFn GblDoublyLinkedListCmpFn;
  *  access (front or back)            | O(1)
  *  random access (middle)            | O(N)
  *
- *  \note For more a more user-friendly, high-level, abstract,
+ *  \note
+ *  For more a more user-friendly, high-level, abstract,
  *  non-intrusive circularly linked list structure which can be
  *  filled with arbitrary data and whose allocations are managed
  *  automatically, see the GblRingList API, built upon this one.
- *  \ingroup containers
+ *
  *  \sa GblRingList
  */
 typedef struct GblDoublyLinkedListNode {                // Size (32-bit / 64-bit)

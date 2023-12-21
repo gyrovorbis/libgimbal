@@ -1,6 +1,12 @@
 /*! \file
- *  \brief GblThread and lowest-level concurrency managment
+ *  \brief   GblThread and lowest-level concurrency managment
  *  \ingroup core
+ *
+ *  This file contains the API and public structures for GblThread, the lowest-level
+ *  construct for concurrent task execution, directly mapping to an OS-level thread.
+ *  The API is backed by either C11 threads, POSIX pthreads, or Win32 threads,
+ *  depending on the platform.
+ *
  *  \todo
  *   - properties
  *   - GblThread_setCallback() has to store within GblBox field
@@ -9,7 +15,7 @@
  *   - need code for adding and removing to/from vector
  *   - checking for auto invocation upon constructed won't work--hasn't been set yet
  *
- *   \author 2023 Falco Girgis
+ *   \author    2023 Falco Girgis
  *   \copyright MIT License
  */
 #ifndef GIMBAL_THREAD_H
@@ -66,12 +72,17 @@ GBL_DECLARE_ENUM(GBL_THREAD_STATE) {
 /*! \struct  GblThreadClass
  *  \extends GblObjectClass
  *  \brief   GblClass VTable structure for GblThread
+ *
+ *  GblThreadClass is the class providing the virtual-table for
+ *  GblThread. Its methods provide the logic that will be executed
+ *  on the other thread.
+ *
  *  \sa      GblThread
  */
 GBL_CLASS_DERIVE(GblThread, GblObject)
-//! Main execution entry point for a given thread, calls callback + closure then signals
+    //! Main execution entry point for a given thread, calls callback + closure then signals
     GblThreadFn pFnRun;
-//! Standard C signal handler for a given thread
+    //! Standard C signal handler for a given thread
     GBL_RESULT  (*pFnSignal)(GBL_SELF, int signal);
 GBL_CLASS_END
 
@@ -79,6 +90,10 @@ GBL_CLASS_END
  *  \extends GblObject
  *  \ingroup core
  *  \brief   Object representing a thread, its local storage, and logic
+ *
+ *  GblThread encapsulates an operating system thread, its local storage,
+ *  and the logic that is run within it.
+ *
  *  \sa      GblThreadClass
  */
 GBL_INSTANCE_DERIVE(GblThread, GblObject)
@@ -107,7 +122,7 @@ GBL_SIGNALS(GblThread,
 )
 //! \endcond
 
-/*! \name Static Methods
+/*! \name  Static Methods
  *  \brief Searching, iterating, counting, etc.
  *  @{
  */

@@ -1,6 +1,7 @@
 #include <gimbal/core/gimbal_thd.h>
 #include <gimbal/meta/instances/gimbal_context.h>
 #include <gimbal/core/gimbal_stack_frame.h>
+#include <gimbal/core/gimbal_tls.h>
 
 extern GblContext GblContext_default_;
 
@@ -8,7 +9,7 @@ static GblStackFrame defaultStackFrame_ = {
     .pContext = &GblContext_default_
 };
 
-static GBL_THREAD_LOCAL GblThd GblThd_current_ = {
+static GBL_TLS(GblThd, GblThd_current_, ((GblThd) {
     .callRecord = {
         .message        = { '\0' },
         .srcLocation    = {
@@ -21,10 +22,10 @@ static GBL_THREAD_LOCAL GblThd GblThd_current_ = {
     .pName              = "Untitled",
     .logStackDepth      = 0,
     .pStackFrameTop     = &defaultStackFrame_
-};
+}));
 
 GBL_EXPORT GblThd* GblThd_current(void) {
-    return &GblThd_current_;
+    return GBL_TLS_LOAD(GblThd_current_);
 }
 
 GblContext* GblThd_context(const GblThd* pThread) {

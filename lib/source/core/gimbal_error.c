@@ -1,7 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <gimbal/core/gimbal_tls.h>
 #include <gimbal/core/gimbal_error.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 static GBL_TLS(GblError, currentError_, { 0 });
 
@@ -51,16 +52,23 @@ GBL_EXPORT const char* GblError_string(void) {
     return pStr;
 }
 
-GBL_EXPORT GblBool GblError_clear(void) {
-    GblBool   cleared = GBL_FALSE;
-    GblError* pError  = GBL_TLS_LOAD(currentError_);
+GBL_EXPORT GblBool GblError_lower(GblError* pError) {
+    GblBool   cleared  = GBL_FALSE;
+    GblError* pCurrent = GBL_TLS_LOAD(currentError_);
 
-    if(pError && pError->pDomain) {
-        pError->pDomain = NULL;
-        cleared         = GBL_TRUE;
+    if(pCurrent && pCurrent->pDomain) {
+        if(pError)
+            memcpy(pError, pCurrent, sizeof(GblError));
+
+        pCurrent->pDomain = NULL;
+        cleared           = GBL_TRUE;
     }
 
     return cleared;
+}
+
+GBL_EXPORT GblBool GblError_clear(void) {
+    return GblError_lower(NULL);
 }
 
 GBL_EXPORT const GblError* GblError_raisev(const char*           pFile,
@@ -117,7 +125,7 @@ GBL_EXPORT const GblError* (GblError_reraise)(const char* pFile,
 {
     GblError* pError = GBL_TLS_LOAD(currentError_);
 
-    GBL_ASSERT(pError->pDomain, "Cannot reraise without existing raised GblError!");
+    GBL_ASSERT(pError->pDomain, "Cannot reraise without pending GblError!");
 
     pError->srcLocation.pFile = pFile;
     pError->srcLocation.pFunc = pFunction;

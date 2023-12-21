@@ -180,11 +180,12 @@ GBL_EXPORT GblRefCount GblBox_refCount (GBL_CSELF) GBL_NOEXCEPT;
  *  @{
  */
 //! Returns the userdata pointer stored within the given GblBox
-GBL_EXPORT void*      GblBox_userdata          (GBL_CSELF)                             GBL_NOEXCEPT;
+GBL_EXPORT void*      GblBox_userdata          (GBL_CSELF)                   GBL_NOEXCEPT;
 //! Stores the untyped userdata pointer within the GblBox
-GBL_EXPORT GBL_RESULT GblBox_setUserdata       (GBL_SELF, void* pUserdata)             GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblBox_setUserdata       (GBL_SELF, void* pUserdata)   GBL_NOEXCEPT;
 //! Sets an additional user destructor to be invoked with the GblBox passed back to it when its being destructed
-GBL_EXPORT GBL_RESULT GblBox_setUserDestructor (GBL_SELF, GblArrayMapDtorFn pFnUdDtor) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblBox_setUserDestructor (GBL_SELF,
+                                                GblArrayMapDtorFn pFnUdDtor) GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Fields

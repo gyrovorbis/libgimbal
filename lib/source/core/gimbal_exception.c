@@ -1,25 +1,27 @@
 #include <gimbal/core/gimbal_exception.h>
+#include <gimbal/core/gimbal_tls.h>
+
 #include <tinycthread.h>
 
-static GBL_THREAD_LOCAL GblException* pCurrent_ = NULL;
+static GBL_TLS(GblException*, pCurrent_, NULL);
 
 GBL_EXPORT GblException* GblException_current(void) {
-    return pCurrent_;
+    return *GBL_TLS_LOAD(pCurrent_);
 }
 
 GBL_EXPORT void GblException_throw(GblException* pSelf) {
     GBL_ASSERT(pSelf);
 
     GblException_clear();
-    pCurrent_ = pSelf;
+    *GBL_TLS_LOAD(pCurrent_) = pSelf;
 }
 
 GBL_EXPORT GblException* GblException_catch(GblType type) {
     GblException* pReturn = NULL;
 
-    if(GblType_check(GBL_TYPEOF(pCurrent_), type)) {
-        pReturn   = pCurrent_;
-        pCurrent_ = NULL;
+    if(GblType_check(GBL_TYPEOF(*GBL_TLS_LOAD(pCurrent_)), type)) {
+        pReturn = *GBL_TLS_LOAD(pCurrent_);
+        *GBL_TLS_LOAD(pCurrent_) = NULL;
     }
 
     return pReturn;
@@ -28,11 +30,13 @@ GBL_EXPORT GblException* GblException_catch(GblType type) {
 GBL_EXPORT GblBool GblException_clear(void) {
     GblBool retVal = GBL_FALSE;
 
-    GBL_UNREF(pCurrent_);
+    GBL_UNREF(*GBL_TLS_LOAD(pCurrent_));
 
-    if(pCurrent_) retVal = GBL_TRUE;
+    if(*GBL_TLS_LOAD(pCurrent_))
+        retVal = GBL_TRUE;
 
-    pCurrent_ = NULL;
+    *GBL_TLS_LOAD(pCurrent_) = NULL;
+
     return retVal;
 }
 
@@ -63,6 +67,10 @@ GBL_EXPORT GblException* (GblException_create)(GblType     derived,
     va_end(varArgs);
 
     return pSelf;
+}
+
+GBL_EXPORT GblException* GblException_ref(const GblException* pSelf) {
+    return GBL_EXCEPTION(GBL_REF(pSelf));
 }
 
 GBL_EXPORT GblRefCount GblException_unref(GblException* pSelf) {
@@ -142,10 +150,10 @@ static GBL_RESULT GblException_GblBox_destructor_(GblBox* pBox) {
 static GBL_RESULT GblExceptionClass_init_(GblClass* pClass, const void* pUd) {
     GBL_UNUSED(pUd);
 
-    GBL_BOX_CLASS(pClass)   ->pFnDestructor   = GblException_GblBox_destructor_;
-    GBL_OBJECT_CLASS(pClass)->pFnProperty     = GblException_GblObject_property_;
-    GBL_OBJECT_CLASS(pClass)->pFnSetProperty  = GblException_GblObject_setProperty_;
-    GBL_EXCEPTION_CLASS(pClass) ->pFnResultString = GblException_resultString_;
+    GBL_BOX_CLASS(pClass)      ->pFnDestructor   = GblException_GblBox_destructor_;
+    GBL_OBJECT_CLASS(pClass)   ->pFnProperty     = GblException_GblObject_property_;
+    GBL_OBJECT_CLASS(pClass)   ->pFnSetProperty  = GblException_GblObject_setProperty_;
+    GBL_EXCEPTION_CLASS(pClass)->pFnResultString = GblException_resultString_;
 
     return GBL_RESULT_SUCCESS;
 }

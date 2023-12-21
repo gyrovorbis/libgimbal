@@ -81,6 +81,7 @@ GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL    GBL_LOG_LEVEL_WARNING STRING
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL      GBL_LOG_LEVEL_ERROR STRING     "Log level for reporting error results")
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL    GBL_LOG_LEVEL_ERROR STRING     "Log level for reporting unknown results")
 
+GBL_CONFIG_OPTION(GBL_TLS_EMULATED                  "Emulate thread_local keyword with OS-level TLS"       OFF)
 GBL_CONFIG_OPTION(GBL_CONFIG_PREFETCH_ENABLED       "Enable prefetching macro"                             ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS           "Enable C errno verification macros"                   ON)
 
@@ -133,6 +134,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_array_deque.h
     api/gimbal/containers/gimbal_array_heap.h
     api/gimbal/core/gimbal_decls.h
+    api/gimbal/core/gimbal_control_flow.h
     api/gimbal/core/gimbal_ctx.h
     api/gimbal/core/gimbal_error.h
     api/gimbal/core/gimbal_stack_frame.h
@@ -147,6 +149,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/core/gimbal_module.h
     api/gimbal/core/gimbal_exception.h
     api/gimbal/core/gimbal_tls.h
+    api/gimbal/core/gimbal_library.h
     api/gimbal/meta/classes/gimbal_bit_struct.h
     api/gimbal/meta/classes/gimbal_class.h
     api/gimbal/meta/classes/gimbal_class.hpp
@@ -249,6 +252,7 @@ set(GIMBAL_SOURCES
     source/containers/gimbal_array_deque.c
     source/containers/gimbal_array_heap.c
     source/core/gimbal_thd.c
+    source/core/gimbal_library.c
     source/core/gimbal_thread.c
     source/core/gimbal_app.c
     source/core/gimbal_module.c

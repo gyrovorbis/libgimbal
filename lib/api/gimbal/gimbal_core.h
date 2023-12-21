@@ -17,6 +17,8 @@
 #include "core/gimbal_app.h"
 #include "core/gimbal_module.h"
 #include "core/gimbal_logger.h"
+#include "core/gimbal_exception.h"
+#include "core/gimbal_error.h"
 
 /*! \defgroup core Core
     \brief Core framework module

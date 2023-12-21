@@ -109,8 +109,8 @@ GBL_EXPORT GblBox* (GblBox_create)(GblType           derivedType,
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_BOX_TYPE);
 
     pBox = (GblBox*)GblInstance_create(derivedType,
-                                          size,
-                                          GBL_CLASS(pClass));
+                                       size,
+                                       GBL_CLASS(pClass));
 
     if(pBox) {
         if(pUserdata)
@@ -404,16 +404,16 @@ GBL_EXPORT GblType GblBox_type(void) {
         .instanceSize       = sizeof(GblBox),
         .pFnInstanceInit    = GblBox_init_,
         .interfaceCount     = 1,
-        .pInterfaceImpls      = ifaceMap
+        .pInterfaceImpls    = ifaceMap
     };
 
     if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         ifaceMap[0].interfaceType = GBL_IVARIANT_TYPE;
 
         type = GblType_register(GblQuark_internStatic("GblBox"),
-                                      GBL_INSTANCE_TYPE,
-                                      &typeInfo,
-                                      GBL_TYPE_FLAG_TYPEINFO_STATIC);
+                                GBL_INSTANCE_TYPE,
+                                &typeInfo,
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
     return type;
 }

@@ -21,7 +21,6 @@
         }                                               \
     } GBL_STMT_END
 
-
 typedef struct GblModule_ {
     GblHashSet   typeRegistry;
     atomic_short useCount;
@@ -47,7 +46,6 @@ static void GblModule_init_(void) {
     GBL_CTX_END_BLOCK();
 }
 
-
 GBL_RESULT GblModule_final_(void) {
     GBL_MODULE_ENSURE_INITIALIZED_();
     GBL_CTX_BEGIN(NULL);
@@ -63,28 +61,34 @@ GBL_RESULT GblModule_final_(void) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblModule_arrayMapDtor_(const GblArrayMap* pMap, uintptr_t key, void* pEntry) {
+static GBL_RESULT GblModule_arrayMapDtor_(const GblArrayMap* pMap,
+                                          uintptr_t          key,
+                                          void*              pEntry)
+{
     GBL_UNUSED(pMap, key);
+
     GblModule* pModule = GBL_MODULE(pEntry);
     const size_t  uses = GblModule_useCount(pModule);
 
     if(uses) GBL_UNLIKELY {
         GBL_LOG_WARN("gimbal",
-                        "[Module] Unregistering %s which still has %u uses!",
-                        GblQuark_toString(key),
-                        uses);
+                     "[Module] Unregistering %s which still has %u uses!",
+                     GblQuark_toString(key),
+                     uses);
     }
 
     GBL_UNREF(pModule);
+
     return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT GBL_RESULT GblModule_register(GblModule* pSelf) {
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_MODULE_ENSURE_INITIALIZED_();
 
-    const char* pName = GblObject_name(GBL_OBJECT(pSelf));
+    const char* pName    = GblObject_name(GBL_OBJECT(pSelf));
     const GblQuark quark = GblQuark_fromString(pName);
 
     GBL_LOG_INFO("gimbal", "Registering Module: [%s]", pName);
@@ -96,8 +100,9 @@ GBL_EXPORT GBL_RESULT GblModule_register(GblModule* pSelf) {
 
     if(prevPos != GBL_ARRAY_MAP_NPOS) GBL_UNLIKELY {
         GblModule* pOld = GBL_MODULE(GblArrayMap_probeValue(&pModules_, prevPos));
+
         GBL_LOG_WARN("gimbal",
-                     "Orphaning existing module [refCount: %u, useCount: %u].",
+                     "Orphaning existing module: [refCount: %u, useCount: %u].",
                      GblBox_refCount(GBL_BOX(pOld)),
                      GblModule_useCount(pOld));
     }
@@ -108,8 +113,8 @@ GBL_EXPORT GBL_RESULT GblModule_register(GblModule* pSelf) {
                             GblModule_arrayMapDtor_);
 
     mtx_unlock(&moduleMtx_);
-
     GBL_LOG_POP(1);
+
     GBL_CTX_END();
 }
 
@@ -131,9 +136,8 @@ GBL_EXPORT GBL_RESULT GblModule_unregister(GblModule* pSelf) {
     const GblBool erased = GblArrayMap_erase(&pModules_, quark);
     mtx_unlock(&moduleMtx_);
 
-    if(!erased) {
+    if(!erased)
         GBL_LOG_WARN("gimbal", "No registry entry found!");
-    }
 
     GBL_LOG_POP(1);
     GBL_CTX_END();
@@ -169,7 +173,7 @@ GBL_EXPORT GblModule* GblModule_findQuark(GblQuark quark) {
     return pModule;
 }
 
-GBL_EXPORT GblModule* GblModule_at(size_t  index) {
+GBL_EXPORT GblModule* GblModule_at(size_t index) {
     GblModule* pModule = NULL;
     GBL_MODULE_ENSURE_INITIALIZED_();
 
@@ -185,7 +189,9 @@ GBL_EXPORT GblModule* GblModule_at(size_t  index) {
 GBL_EXPORT size_t  GblModule_count(void) {
     GBL_MODULE_ENSURE_INITIALIZED_();
     mtx_lock(&moduleMtx_);
-    size_t  count = GblArrayMap_size(&pModules_);
+
+    size_t count = GblArrayMap_size(&pModules_);
+
     mtx_unlock(&moduleMtx_);
     return count;
 }
@@ -196,13 +202,17 @@ GBL_EXPORT GblBool GblModule_foreach(GblModuleIterFn pFnIter,
 
     GBL_MODULE_ENSURE_INITIALIZED_();
     mtx_lock(&moduleMtx_);
-    size_t  count = GblArrayMap_size(&pModules_);
-    for(size_t  m = 0; m < count; ++m) GBL_LIKELY {
+
+    size_t count = GblArrayMap_size(&pModules_);
+
+    for(size_t m = 0; m < count; ++m) GBL_LIKELY {
         GblModule* pModule = GBL_MODULE(GblArrayMap_probeValue(&pModules_, m));
+
         if((retVal = pFnIter(pModule, pUserdata))) GBL_UNLIKELY {
             break;
         }
     }
+
     mtx_unlock(&moduleMtx_);
 
     return retVal;
@@ -235,7 +245,9 @@ GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
                         "Module [%s] could not be imported: Not Found",
                         GblQuark_toString(quark));
 
-    } else if(pVersion && GblVersion_parse(pVersion) != pModule->version) GBL_UNLIKELY {
+    } else if(pVersion &&
+              GblVersion_parse(pVersion) != pModule->version) GBL_UNLIKELY
+    {
         char versionBuffer[GBL_VERSION_STRING_SIZE];
 
         GblLogger_write(pFile, pFunc, line, "gimbal", GBL_LOG_ERROR,
@@ -246,6 +258,7 @@ GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
                         pVersion);
 
         pModule = NULL;
+
     } else GBL_LIKELY {
         GblModule_use(pModule);
     }
@@ -277,6 +290,7 @@ GBL_EXPORT GblModule* GblModule_create(GblType     derivedType,
                                        const char* pPrefix)
 {
     GblModule* pModule = NULL;
+
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(derivedType, GBL_MODULE_TYPE);
 
@@ -289,6 +303,7 @@ GBL_EXPORT GblModule* GblModule_create(GblType     derivedType,
                                           NULL));
 
     GBL_CTX_END_BLOCK();
+
     return pModule;
 }
 
@@ -303,24 +318,30 @@ GBL_EXPORT size_t GblModule_typeCount(const GblModule* pSelf) {
 
 static GBL_RESULT GblModule_load_(GblModule* pModule) {
     GBL_UNUSED(pModule);
+
     GBL_CTX_BEGIN(NULL);
+
     GBL_LOG_WARN("gimbal", "[GblModule: %s] Load: UNIMPLEMENTED!");
     GBL_CTX_RESULT() = GBL_RESULT_UNIMPLEMENTED;
+
     GBL_CTX_END();
 }
 
 static GBL_RESULT GblModule_unload_(GblModule* pModule) {
     GBL_UNUSED(pModule);
+
     GBL_CTX_BEGIN(NULL);
+
     GBL_LOG_WARN("gimbal", "[GblModule: %s] Unload: UNIMPLEMENTED!");
     GBL_CTX_RESULT() = GBL_RESULT_UNIMPLEMENTED;
+
     GBL_CTX_END();
 }
 
 static GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
     GBL_CTX_BEGIN(NULL);
 
-    GblModule* pSelf = GBL_MODULE(pPlugin);
+    GblModule*  pSelf  = GBL_MODULE(pPlugin);
     GblModule_* pSelf_ = GBL_MODULE_(pSelf);
 
     if(!atomic_fetch_add(&pSelf_->useCount, 1)) GBL_UNLIKELY {
@@ -333,7 +354,7 @@ static GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
 static GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
     GBL_CTX_BEGIN(NULL);
 
-    GblModule* pSelf = GBL_MODULE(pPlugin);
+    GblModule*  pSelf  = GBL_MODULE(pPlugin);
     GblModule_* pSelf_ = GBL_MODULE_(pSelf);
 
     if(atomic_fetch_sub(&pSelf_->useCount, 1) == 1) GBL_UNLIKELY {
@@ -343,15 +364,22 @@ static GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblModule_IPlugin_typeInfo_(const GblIPlugin* pPlugin, GblType type, GblTypeInfo* pInfo) {
+static GBL_RESULT GblModule_IPlugin_typeInfo_(const GblIPlugin* pPlugin,
+                                              GblType           type,
+                                              GblTypeInfo*      pInfo)
+{
     GBL_UNUSED(pPlugin, type, pInfo);
+
     return GBL_RESULT_UNIMPLEMENTED;
 }
 
-static GBL_RESULT GblModule_GblObject_property_(const GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
+static GBL_RESULT GblModule_GblObject_property_(const GblObject*   pObject,
+                                                const GblProperty* pProperty,
+                                                GblVariant*        pValue)
+{
     GBL_CTX_BEGIN(NULL);
 
-    GblModule*  pSelf  = GBL_MODULE(pObject);
+    GblModule* pSelf  = GBL_MODULE(pObject);
 
     switch(pProperty->id) {
     case GblModule_Property_Id_prefix:
@@ -375,18 +403,21 @@ static GBL_RESULT GblModule_GblObject_property_(const GblObject* pObject, const 
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblModule_GblObject_setProperty_(GblObject* pObject, const GblProperty* pProperty, GblVariant* pValue) {
+static GBL_RESULT GblModule_GblObject_setProperty_(GblObject*         pObject,
+                                                   const GblProperty* pProperty,
+                                                   GblVariant*        pValue)
+{
     GBL_CTX_BEGIN(NULL);
 
-    GblModule*  pSelf  = GBL_MODULE(pObject);
+    GblModule* pSelf  = GBL_MODULE(pObject);
 
     switch(pProperty->id) {
     case GblModule_Property_Id_prefix:
-        GblVariant_valueMove(pValue, &pSelf->pPrefix);      break;
+        GblVariant_valueMove(pValue, &pSelf->pPrefix); break;
     case GblModule_Property_Id_version:
-        pSelf->version = GblVariant_uint32(pValue);         break;
+        pSelf->version = GblVariant_uint32(pValue); break;
     case GblModule_Property_Id_author:
-        GblVariant_valueMove(pValue, &pSelf->pAuthor);      break;
+        GblVariant_valueMove(pValue, &pSelf->pAuthor); break;
     case GblModule_Property_Id_description:
         GblVariant_valueMove(pValue, &pSelf->pDescription); break;
     default:
@@ -400,6 +431,7 @@ static GBL_RESULT GblModule_GblObject_setProperty_(GblObject* pObject, const Gbl
 
 static GBL_RESULT GblModule_GblBox_destructor_(GblBox* pBox) {
     GBL_CTX_BEGIN(pBox);
+
     GblModule* pSelf = GBL_MODULE(pBox);
 
     // Unload first!?

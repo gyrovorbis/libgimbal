@@ -146,10 +146,10 @@ GblType     GblModule_typeFromName  (GBL_CSELF, const char* pName)  GBL_NOEXCEPT
 GblType     GblModule_typeFromIndex (GBL_CSELF, size_t      index)  GBL_NOEXCEPT;
 size_t      GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT;
 
+GBL_DECLS_END
 
 // ====== IMPLEMENTATION =====
 ///\cond
-
 #define GBL_REQUIRE_(...) \
     GBL_VA_OVERLOAD_CALL(GBL_REQUIRE_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
@@ -164,10 +164,7 @@ size_t      GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT
 #define GBL_REQUIRE__3(type, name, version) \
     GBL_CAST(type, GblModule_require(name, version, __FILE__, __func__, \
                                         __LINE__))
-
 ///\endcond
-
-GBL_DECLS_END
 
 #undef GBL_SELF_TYPE
 

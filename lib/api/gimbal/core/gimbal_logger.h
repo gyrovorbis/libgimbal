@@ -22,7 +22,7 @@
 #include "../meta/instances/gimbal_object.h"
 #include "../containers/gimbal_linked_list.h"
 
-/*! \name Type System
+/*! \name  Type System
  *  \brief Type UUID and cast operators
  *  @{
  */
@@ -32,8 +32,8 @@
 #define GBL_LOGGER_GET_CLASS(self)  (GBL_CLASSOF(GblLogger, self))     //!< Get GblLoggerClass from GblLogger
 //! @}
 
-/*! \name Logging Macros
- *  \brief    Top-level macros used with logging system
+/*! \name  Logging Macros
+ *  \brief Top-level macros used with logging system
  * @{
  */
 #define GBL_LOG_WRITE(flags, domain, ...) GblLogger_write(__FILE__, __func__, __LINE__, \
@@ -71,7 +71,7 @@ GBL_DECLARE_FLAGS(GBL_LOG_FLAGS) {
  *  \extends GblObjectClass
  *  \brief   GblClass vtable for GblLogger
  *
- *  GblLoggerClass provides virtual methods for imlpementing
+ *  GblLoggerClass provides virtual methods for implementing
  *  a logger back-end. These include push/pop operations for
  *  the stack-based structured logging as well as a generic
  *  write method for doing the actual message logging.

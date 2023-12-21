@@ -135,7 +135,7 @@ int start_logger(const char *app_name)
 
 int main(int argc, char* pArgv[]) {
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
-    gdb_init();
+  //  gdb_init();
 #elif defined(__ANDROID__)
     start_logger("");
 #endif
@@ -242,10 +242,8 @@ int main(int argc, char* pArgv[]) {
                                  GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
-#if !defined(GBL_PSP)
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
-#endif
 #ifdef GBL_ENABLE_CPP
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_QUARK_TEST_SUITE_CPP_TYPE));

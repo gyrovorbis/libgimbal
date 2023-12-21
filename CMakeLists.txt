@@ -23,6 +23,9 @@ project(LibGimbal
     HOMEPAGE_URL "libgimbal.elysianshadows.com"
     LANGUAGES C CXX)
 
+
+kos_enable_sh4_math()
+
 option(GBL_ENABLE_TESTS "Enable LibGimbal unit tests" OFF)
 option(GBL_ENABLE_CPP   "Enable C++ libGimbal API"    OFF)
 

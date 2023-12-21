@@ -902,9 +902,9 @@ GBL_EXPORT GblType GblType_root(GblType type) {
 } 
 
 GBL_EXPORT GblType GblType_base(GblType type, size_t depth) {
-    GblType base = GBL_INVALID_TYPE;
-    GblMetaClass* pMeta =  GBL_META_CLASS_(type);
-    //GBL_CTX_BEGIN(pCtx_);
+    GblType base        = GBL_INVALID_TYPE;
+    GblMetaClass* pMeta = GBL_META_CLASS_(type);
+
     if(pMeta) {
         if(depth < pMeta->depth) {
             base = (GblType)pMeta->pBases[depth];
@@ -912,7 +912,7 @@ GBL_EXPORT GblType GblType_base(GblType type, size_t depth) {
             base = (GblType)pMeta;
         }
     }
-    //GBL_CTX_END_BLOCK();
+
     return base;
 }
 
