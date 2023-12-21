@@ -9,7 +9,7 @@ static GblStackFrame defaultStackFrame_ = {
     .pContext = &GblContext_default_
 };
 
-static GBL_TLS(GblThd, GblThd_current_, ((GblThd) {
+static GBL_TLS(GblThd, GblThd_current_, ((const GblThd) {
     .callRecord = {
         .message        = { '\0' },
         .srcLocation    = {

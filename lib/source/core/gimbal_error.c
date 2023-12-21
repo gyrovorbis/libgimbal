@@ -1,8 +1,8 @@
-#include <gimbal/core/gimbal_tls.h>
-#include <gimbal/core/gimbal_error.h>
-
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <gimbal/core/gimbal_tls.h>
+#include <gimbal/core/gimbal_error.h>
 
 static GBL_TLS(GblError, currentError_, { 0 });
 
