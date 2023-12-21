@@ -147,6 +147,8 @@ if(GBL_ENABLE_CPP)
          source/strings/gimbal_string_ref_test_suite.cpp
          include/strings/gimbal_string_view_test_suite.hpp
          source/strings/gimbal_string_view_test_suite.cpp
+         include/utils/gimbal_version_test_suite.hpp
+         source/utils/gimbal_version_test_suite.cpp
          source/gimbal_test_cpp.cpp)
 endif(GBL_ENABLE_CPP)
 
@@ -199,6 +201,7 @@ if(VITA)
 endif()
 
 if(PSP)
+    add_compile_definitions(GimbalTests PUBLIC BUILD_PRX=1)
 
     create_pbp_file(TARGET GimbalTests # CMake executable target
       TITLE "${CMAKE_PROJECT_NAME}" # displayed in game selection

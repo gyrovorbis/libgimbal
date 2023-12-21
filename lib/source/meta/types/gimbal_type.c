@@ -747,6 +747,7 @@ void GblType_init_(void) {
     GBL_CTX_CALL(GblSignal_init_(pCtx_));
     GBL_CTX_CALL(GblVariant_init_(pCtx_));
     GBL_CTX_CALL(GblType_registerBuiltins_());
+
     GBL_CTX_POP(1);
     initialized_    = GBL_TRUE;
     initializing_   = GBL_FALSE;
@@ -769,6 +770,8 @@ GblType GblType_registerBuiltin_(size_t             expectedIndex,
     GBL_CTX_BEGIN(pCtx_);
     GBL_TYPE_ENSURE_INITIALIZED_();
     GBL_CTX_PUSH_VERBOSE("[GblType] Registering Builtin Type: %s", pName);
+
+
     flags |= GBL_TYPE_FLAG_BUILTIN;
     type = typeRegister_(parentType, pName, pTypeInfo, flags);
     size = GblArrayList_size(&typeBuiltins_.vector);
@@ -1090,9 +1093,9 @@ GBL_EXPORT GblBool GblType_conforms(GblType type, GblType dependent) {
 
 // ==== MAKE SURE TO ITERATE OVER PARENTS AND CHECK THAT CLASS/INSTANCE SIZE IS VALID =====
 GBL_EXPORT GblType GblType_register(const char*                  pName,
-                                          GblType                      parent,
-                                          const GblTypeInfo*           pInfo,
-                                          GblFlags                     flags)
+                                    GblType                      parent,
+                                    const GblTypeInfo*           pInfo,
+                                    GblFlags                     flags)
 {
     GblType newType = GBL_INVALID_TYPE;
     GBL_CTX_BEGIN(pCtx_);

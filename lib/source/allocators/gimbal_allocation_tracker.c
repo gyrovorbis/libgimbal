@@ -174,9 +174,10 @@ GBL_EXPORT GBL_RESULT GblAllocationTracker_freeEvent(GblAllocationTracker* pSelf
     pSelf_->recursing = GBL_TRUE;
     GblAllocationEntry_* pExisting = GblHashSet_extract(&pSelf_->activeSet, &entry);
 
-    GBL_CTX_VERIFY(pExisting,
-                   GBL_RESULT_ERROR_MEM_FREE,
-                   "[Allocation Tracker] Attempt to free unknown pointer: [%p]", pPtr);
+    if(!pExisting) {
+        GBL_CTX_WARN("[Allocation Tracker] Attempt to free unknown pointer: [%p]", pPtr);
+        GBL_CTX_DONE();
+    }
 
     pSelf_->base.counters.bytesActive -= pExisting->size;
     pSelf_->base.counters.bytesFreed += pExisting->size;

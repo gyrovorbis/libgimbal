@@ -247,6 +247,9 @@ GBL_EXPORT GBL_RESULT GblContext_setLastIssue(GblContext* pSelf, const GblCallRe
     if(pRecord) memcpy(&pSelf->lastIssue, pRecord, sizeof(GblCallRecord));
     else memset(&pSelf->lastIssue, 0, sizeof(GblCallRecord));
     //GBL_CTX_END();
+
+    //GblError* pError = GblError_create(GBL_ERROR_TYPE, GBL_ENUM_TYPE, pRecord->result, pRecord->message);
+    //GblError_throw(pError);
     return GBL_RESULT_SUCCESS;
 }
 

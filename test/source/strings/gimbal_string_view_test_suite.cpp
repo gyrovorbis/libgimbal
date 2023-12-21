@@ -15,7 +15,7 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(constructDefault)
     auto strv = gbl::StringView{};
-    GBL_TEST_VERIFY(strv.isEmpty());
+    GBL_TEST_VERIFY(strv.empty());
     GBL_TEST_VERIFY(strv.data() == nullptr);
     GBL_TEST_VERIFY(strv.length() == 0);
     GBL_TEST_VERIFY(GblStringView_empty(strv));
@@ -24,7 +24,7 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(constructCString)
     auto strv = gbl::StringView { "lolzer" };
-    GBL_TEST_VERIFY(!strv.isEmpty());
+    GBL_TEST_VERIFY(!strv.empty());
     GBL_TEST_VERIFY(strv.length() == 6);
     GBL_TEST_VERIFY(strv.isNullTerminated());
     GBL_TEST_VERIFY(strv.first() == 'l');
@@ -58,6 +58,9 @@ GBL_TEST_CASE(stdString)
     std::swap(strv, strv2);
     GBL_TEST_VERIFY(strv == "lulz");
     GBL_TEST_VERIFY(strv2 == std::string("lolzercopter"));
+
+    strv = strv2;
+    GBL_TEST_VERIFY(strv >= strv2);
 GBL_TEST_CASE_END
 
 struct DummyType {
@@ -94,9 +97,26 @@ GBL_TEST_CASE(conversions)
     GBL_TEST_VERIFY(gbl::StringView("77").toValue<DummyType>()->val == 77);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(iterators)
+    auto strv = gbl::StringView {"Lehmer"};
+
+    // Test range-based for using standard iterators
+    size_t i = 0;
+    for(auto c : strv) {
+        GBL_TEST_VERIFY(c == strv[i++]);
+    }
+
+    // test reverse iterators
+    i = strv.length() - 1;
+    for(auto it = strv.rbegin(); it != strv.rend(); ++it) {
+        GBL_TEST_VERIFY(*it == strv[i--]);
+    }
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(constructDefault,
                   constructCString,
                   constructGblStringView,
                   customLiteral,
                   stdString,
-                  conversions);
+                  conversions,
+                  iterators);

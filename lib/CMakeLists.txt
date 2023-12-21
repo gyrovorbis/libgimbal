@@ -220,12 +220,15 @@ if(GBL_ENABLE_CPP)
 
     list(APPEND
          GIMBAL_INCLUDES
+         api/gimbal/containers/gimbal_generics.hpp
+         api/gimbal/containers/gimbal_container.hpp
          api/gimbal/strings/gimbal_quark.hpp
          api/gimbal/strings/gimbal_pattern.hpp
          api/gimbal/strings/gimbal_string_list.hpp
          api/gimbal/strings/gimbal_string_ref.hpp
          api/gimbal/strings/gimbal_string_view.hpp
-         api/gimbal/utils/gimbal_date_time.hpp)
+         api/gimbal/utils/gimbal_date_time.hpp
+         api/gimbal/utils/gimbal_version.hpp)
 endif()
 
 set(GIMBAL_SOURCES

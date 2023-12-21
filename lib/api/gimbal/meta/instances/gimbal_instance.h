@@ -43,7 +43,7 @@
 #define GBL_TYPECHECK(cType, self)            GBL_TYPECHECK_(cType, self)
 //! Wraps GblInstance_cast() for the given type, implementing a convenient cast operator
 #define GBL_CAST(cType, self)                 GBL_CAST_(cType, self)
-//! Wraps GblInstance_as() for the given type, providing a gracefull-failing case
+//! Wraps GblInstance_as() for the given type, providing a gracefully-failing case
 #define GBL_AS(cType, self)                   GBL_AS_(cType, self)
 //! Casts to the given instance type, then returns its class, returning NULL and raising an error upon failure
 #define GBL_CLASSOF(cType, self)              GBL_CLASSOF_(cType, self)

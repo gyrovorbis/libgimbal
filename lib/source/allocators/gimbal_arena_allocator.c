@@ -11,6 +11,7 @@ GBL_EXPORT GBL_RESULT (GblArenaAllocator_construct)(GblArenaAllocator*     pSelf
                                                     GblContext*            pCtx)
 {
     GBL_CTX_BEGIN(pCtx);
+    //GblInstance_construct(GBL_INSTANCE(&pSelf), GBL_ARENA_ALLOCATOR_TYPE);
     memset(pSelf, 0, sizeof(GblArenaAllocator));
     pSelf->pCtx = pCtx;
     GblLinkedList_init(&pSelf->listNode);

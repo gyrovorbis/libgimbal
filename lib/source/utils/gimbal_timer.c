@@ -1,6 +1,5 @@
 #include <gimbal/utils/gimbal_timer.h>
 
-
 GBL_EXPORT void GblTimer_start(GblTimer* pSelf) {
     timespec_get(&pSelf->startTime, TIME_UTC);
 

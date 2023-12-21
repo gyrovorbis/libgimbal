@@ -1,43 +1,53 @@
 #ifndef GIMBAL_VERSION_HPP
 #define GIMBAL_VERSION_HPP
 
-#include <string>
 #include "gimbal_version.h"
-#include "../core/gimbal_api_generators.hpp"
 
-namespace gimbal {
+namespace gbl {
 
-class Version: public PrimitiveBase<GblVersion> {
+class Version {
+private:
+    GblVersion version_ = 0;
+
 public:
-    Version(void) = default;
-    Version(GblVersion version): PrimitiveBase(version) {}
-    Version(GblVersionInfo info): Version(GBL_VERSION_MAKE(info.major, info.minor, info.patch)) {}
-    Version(uint8_t major, uint16_t minor, uint8_t patch): Version(GblVersionInfo{ major, minor, patch }) {}
-    Version(std::string_view string);
+    constexpr Version(uint8_t  major = 0,
+                      uint16_t minor = 0,
+                      uint8_t  patch = 0) noexcept:
+        version_(GBL_VERSION_MAKE_(major, minor, patch)) {}
 
-    constexpr uint8_t   getMajor(void) const { return GBL_VERSION_EXTRACT_MAJOR(*this); }
-    constexpr uint16_t  getMinor(void) const { return GBL_VERSION_EXTRACT_MINOR(*this); }
-    constexpr uint8_t   getPatch(void) const { return GBL_VERSION_EXTRACT_PATCH(*this); }
+    constexpr Version(GblVersion version) noexcept:
+        version_(version) {}
 
-    constexpr GblVersion getValue(void) const { return getPrimitiveValue(); }
-    constexpr GblVersionInfo getInfo(void) const {
-        return { getMajor(), getMinor(), getPatch() };
+    Version(const char* pString) {
+        // check for errors, throw exception
+        version_ = GblVersion_parse(pString);
     }
 
-    std::string toString(void) const {
-        char buffer[GBL_VERSION_STRING_SIZE_MAX] = { 0 };
-        const auto info = getInfo();
-        const GBL_RESULT result = gblVersionInfoString(&info, buffer, sizeof(buffer));
-       // GBL_ASSERT(GBL_RESULT_SUCCESS(result));
-        return buffer;
+    constexpr uint8_t  major() const noexcept { return (version_ >> GBL_VERSION_MAJOR_BITPOS) & GBL_VERSION_MAJOR_MASK; }
+    constexpr uint16_t minor() const noexcept { return (version_ >> GBL_VERSION_MINOR_BITPOS) & GBL_VERSION_MINOR_MASK; }
+    constexpr uint8_t  patch() const noexcept { return (version_ >> GBL_VERSION_PATCH_BITPOS) & GBL_VERSION_PATCH_MASK; }
+
+    constexpr void setMajor(uint8_t major) noexcept {
+        version_ &= ~(GBL_VERSION_MAJOR_MASK << GBL_VERSION_MAJOR_BITPOS);
+        version_ |= (major << GBL_VERSION_MAJOR_BITPOS);
     }
 
+    constexpr void setMinor(uint16_t minor) noexcept {
+        version_ &= ~(GBL_VERSION_MINOR_MASK << GBL_VERSION_MINOR_BITPOS);
+        version_ |= (minor << GBL_VERSION_MINOR_BITPOS);
+    }
 
-    //overload spaceship operator
+    constexpr void setPatch(uint16_t patch) noexcept {
+        version_ &= ~(GBL_VERSION_PATCH_MASK << GBL_VERSION_PATCH_BITPOS);
+        version_ |= (patch << GBL_VERSION_PATCH_BITPOS);
+    }
+
+    constexpr operator GblVersion() const noexcept { return version_; }
+
 };
 
-GBL_CHECK_C_CPP_TYPE_COMPAT(Version, GblVersion);
-
+static_assert(sizeof(Version) == sizeof(GblVersion),
+              "C++ Version incompatiblly sized with C version!");
 }
 
 #endif // GIMBAL_VERSION_HPP

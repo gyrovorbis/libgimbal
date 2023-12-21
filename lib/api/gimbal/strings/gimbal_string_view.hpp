@@ -1,7 +1,25 @@
+/*! \file
+ *  \brief StringView C++ bindings for GblStringView
+ *  \ingroup strings
+ *
+ *  This file contains the gbl::StringView C++ bindings
+ *  around the GblStringView structure and C API. Along
+ *  with fully supporting both the C and C++ APIs,
+ *  gbl::StringView is type-compatible with std::string
+ *  and std::string_view.
+ *
+ *  \todo
+ *      - return iterators from searches
+ *      - implement forward/reverse iteration
+ *
+ *  \author     2023 Falco Girgis
+ *  \copyright  MIT License
+ */
 #ifndef GIMBAL_STRING_VIEW_HPP
 #define GIMBAL_STRING_VIEW_HPP
 
 #include "gimbal_string_view.h"
+#include "../containers/gimbal_generics.hpp"
 #include "gimbal_quark.hpp"
 #include <string>
 #include <string_view>
@@ -19,9 +37,31 @@ std::optional<T> string_view_to_value(const StringView& view) {
     return std::nullopt;
 }
 
-struct StringView: public GblStringView {
-
+/*! OO C++ binding object around GblStringView
+ *  \ingroup strings
+ *
+ *  gbl::StringView is intended to be a complete all-in-one
+ *  replacement for the builtin std::string_view, including
+ *  all of its functionality and more.
+ */
+struct StringView:
+        public GblStringView,
+        public ReadWriteContiguousIndexable<const StringView, std::size_t, char, false>,
+        public RandomAccessIterable<const StringView, std::size_t, char>
+{
     static constinit const std::size_t npos = GBL_STRING_VIEW_NPOS;
+
+    const char& getElement_(std::size_t idx) const { return data()[idx]; }
+    std::size_t getElementCount_() const noexcept { return length(); }
+
+    auto spaceShip_(int result) const noexcept {
+        if(result < 0)
+            return std::strong_ordering::less;
+        else if(result > 0)
+            return std::strong_ordering::greater;
+        else
+            return std::strong_ordering::equal;
+    }
 
     constexpr StringView() noexcept:
         GblStringView({0}) {}
@@ -64,7 +104,7 @@ struct StringView: public GblStringView {
         GblStringView_copy(*this, pDst, offset, bytes);
     }
 
-    bool isEmpty() const noexcept {
+    bool empty() const noexcept {
         return GblStringView_empty(*this);
     }
 
@@ -83,14 +123,14 @@ struct StringView: public GblStringView {
     }
 
     char first() const {
-        if(isEmpty())
+        if(empty())
             throw std::out_of_range("Cannot get first char of empty StringView!");
 
         return GblStringView_first(*this);
     }
 
     char last() const {
-        if(isEmpty())
+        if(empty())
             throw std::out_of_range("Cannot get last char of empty StringView!");
 
         return GblStringView_last(*this);
@@ -211,26 +251,12 @@ struct StringView: public GblStringView {
         return os;
     }
 
-private:
-    template<typename... Args>
-    auto compare_(Args&&... args) const noexcept {
-        const auto result = GblStringView_compare(*this, (... + std::forward<Args>(args)));
-
-        if(result < 0)
-            return std::strong_ordering::less;
-        else if(result > 0)
-            return std::strong_ordering::greater;
-        else
-            return std::strong_ordering::equal;
-    }
-public:
-
     bool operator==(const char* pStr) const noexcept {
         return GblStringView_equals(*this, pStr);
     }
 
     auto operator<=>(const char* pStr) const noexcept {
-        return compare_(pStr);
+        return spaceShip_(GblStringView_compare(*this, pStr));
     }
 
     bool operator==(StringView rhs) const noexcept {
@@ -238,7 +264,7 @@ public:
     }
 
     auto operator<=>(StringView rhs) const noexcept {
-        return compare_(rhs.data(), rhs.length());
+        return spaceShip_(GblStringView_compare(*this, rhs.data(), rhs.length()));
     }
 
     bool operator==(const std::string& rhs) const noexcept {
@@ -246,7 +272,7 @@ public:
     }
 
     auto operator<=>(const std::string& rhs) const noexcept {
-        return compare_(rhs.data(), rhs.length());
+        return spaceShip_(GblStringView_compare(*this, rhs.data(), rhs.length()));
     }
 
     friend void swap(StringView& lhs, StringView& rhs) noexcept {
