@@ -134,7 +134,6 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_array_deque.h
     api/gimbal/containers/gimbal_array_heap.h
     api/gimbal/core/gimbal_decls.h
-    api/gimbal/core/gimbal_control_flow.h
     api/gimbal/core/gimbal_ctx.h
     api/gimbal/core/gimbal_error.h
     api/gimbal/core/gimbal_stack_frame.h
