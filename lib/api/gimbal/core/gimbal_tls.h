@@ -38,9 +38,9 @@
  *  \sa GBL_TLS_LOAD()
  */
 #if !defined(GBL_PSP) && !GBL_TLS_EMULATED
-#   define GBL_TLS(type, name, init) GBL_THREAD_LOCAL type name = init
+#   define GBL_TLS(type, name, ...) GBL_THREAD_LOCAL type name = __VA_ARGS__
 #else
-#   define GBL_TLS(type, name, init) \
+#   define GBL_TLS(type, name, ...) \
         tss_t name; \
         static void tls_##name##_init_(void) { \
             int res = tss_create(&name, free); \
@@ -53,7 +53,7 @@
             type* pPtr = tss_get(name); \
             if(!pPtr) { \
                 pPtr = malloc(sizeof(type)); \
-                type temp = init; \
+                type temp = __VA_ARGS__; \
                 memcpy(pPtr, &temp, sizeof(type)); \
                 const int res = tss_set(name, pPtr); \
                 GBL_ASSERT(res == thrd_success, \
