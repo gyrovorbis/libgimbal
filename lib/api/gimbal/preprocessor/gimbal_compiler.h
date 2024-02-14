@@ -445,7 +445,11 @@
 #if GBL_CONFIG_PREFETCH_ENABLED
 #   ifndef GBL_PREFETCH
 #       if defined(_MSC_VER) || defined(__MINGW64__)
-#           include <immintrin.h>
+#           if defined(_M_ARM64) || defined(_M_ARM64EC)
+#               include <intrin.h>
+#           else
+#               include <immintrin.h>
+#           endif
 #           define GBL_PREFETCH(addr) _mm_prefetch(addr, _MM_HINT_T0)
 #       elif defined(__GNUC__)
 #           define GBL_PREFETCH __builtin_prefetch
