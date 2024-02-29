@@ -311,7 +311,9 @@ GBL_EXPORT GblRefCount GblModule_unref(GblModule* pSelf) {
     return GBL_UNREF(pSelf);
 }
 
-GBL_EXPORT size_t GblModule_typeCount(const GblModule* pSelf) {
+// Fix for Windows: "Redefinition with different linkage"
+// Removed GBL_EXPORT from here and added to declaration in gimbal_module.h
+size_t GblModule_typeCount(const GblModule* pSelf) {
     GBL_UNUSED(pSelf);
     return 0;
 }

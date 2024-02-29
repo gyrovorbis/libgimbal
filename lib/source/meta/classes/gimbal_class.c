@@ -339,7 +339,9 @@ GBL_EXPORT GblClass* (GblClass_createFloating)(GblType type,
     return pClass;
 }
 
-static GBL_EXPORT GBL_RESULT GblClass_destruct_(GblClass* pClass) {
+// Fix for Windows: "Function must have external linkage to be exported"
+// Removed GBL_EXPORT from this static function.
+static GBL_RESULT GblClass_destruct_(GblClass* pClass) {
     GblMetaClass* pMeta = GBL_META_CLASS_(GBL_CLASS_TYPEOF(pClass));
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_DEBUG("Destroying %s class!", GblType_name(GBL_TYPE_(pMeta)));

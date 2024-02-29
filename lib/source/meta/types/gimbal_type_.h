@@ -100,9 +100,11 @@ extern GBL_RESULT    GblModule_final_                  (void);
 extern GBL_RESULT    GblProperty_init_                 (GblContext* pCtx);
 extern GBL_RESULT    GblProperty_final_                (GblContext* pCtx);
 
-extern GBL_RESULT    GblSignal_init_                   (GblContext* pCtx);
-extern GBL_RESULT    GblSignal_final_                  (GblContext* pCtx);
-extern GBL_RESULT    GblSignal_removeInstance_         (GblInstance* pInstance);
+// Fix for Windows: "Redefinition with different linkage"
+// Added GBL_EXPORT to all 3 and removed in implementation file gimbal_signal.c
+GBL_EXPORT extern GBL_RESULT    GblSignal_init_                   (GblContext* pCtx);
+GBL_EXPORT extern GBL_RESULT    GblSignal_final_                  (GblContext* pCtx);
+GBL_EXPORT extern GBL_RESULT    GblSignal_removeInstance_         (GblInstance* pInstance);
 
 extern GBL_RESULT    GblVariant_init_                  (GblContext* pCtx);
 extern GBL_RESULT    GblVariant_final_                 (GblContext* pCtx);

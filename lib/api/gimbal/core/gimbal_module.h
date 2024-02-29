@@ -144,7 +144,10 @@ GblType     GblModule_registerType  (GBL_SELF,
 
 GblType     GblModule_typeFromName  (GBL_CSELF, const char* pName)  GBL_NOEXCEPT;
 GblType     GblModule_typeFromIndex (GBL_CSELF, size_t      index)  GBL_NOEXCEPT;
-size_t      GblModule_typeCount     (GBL_CSELF)                     GBL_NOEXCEPT;
+
+// Fix for Windows: "Redefinition with different linkage"
+// Added GBL_EXPORT here and removed from implementation in gimbal_module.c
+GBL_EXPORT size_t GblModule_typeCount     (GBL_CSELF)               GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
