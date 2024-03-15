@@ -961,7 +961,9 @@ static GBL_RESULT GblDateTime_convert_(const GblVariant* pVariant, GblVariant* p
     return GBL_TRUE;
 }
 
-GBL_EXPORT GblType GblDateTime_type(void) {
+// Fix Windows error as shared library: "Redefinition with different linkage"
+// Removed GBL_EXPORT
+GblType GblDateTime_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     if(type == GBL_INVALID_TYPE) {

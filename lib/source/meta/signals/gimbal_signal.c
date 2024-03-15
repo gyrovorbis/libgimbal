@@ -582,7 +582,9 @@ GBL_EXPORT size_t  GblSignal_disconnect(GblInstance* pEmitter,
     return GblSignal_disconnect_(pEmitter, pSignalName, pReceiver, pClosure, NULL, NULL);
 }
 
-GBL_EXPORT GBL_RESULT GblSignal_removeInstance_(GblInstance* pInstance) {
+// Fix for Windows: "Redefinition with different linkage".
+// GBL_EXPORT moved to declaration in gimbal_type_.h
+GBL_RESULT GblSignal_removeInstance_(GblInstance* pInstance) {
     GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
 
     InstanceConnectionTable_* pTable = InstanceConnectionTable_find_(pInstance);
@@ -768,7 +770,9 @@ GBL_EXPORT GblInstance* GblSignal_receiver(void) {
     return pActiveConnection_? pActiveConnection_->pReceiver : NULL;
 }
 
-GBL_EXPORT GBL_RESULT GblSignal_init_(GblContext* pCtx) {
+// Fix for Windows: "Redefinition with different linkage".
+// GBL_EXPORT moved to declaration in gimbal_type_.h
+GBL_RESULT GblSignal_init_(GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GBL_CTX_VERIFY_CALL(GblHashSet_construct(&signalSet_,
                                              sizeof(Signal_*),
@@ -795,7 +799,9 @@ GBL_EXPORT GBL_RESULT GblSignal_init_(GblContext* pCtx) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblSignal_final_(GblContext* pCtx) {
+// Fix for Windows: "Redefinition with different linkage".
+// GBL_EXPORT moved to declaration in gimbal_type_.h
+GBL_RESULT GblSignal_final_(GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GBL_CTX_CALL(GblHashSet_destruct(&signalSet_));
     GBL_CTX_CALL(GblHashSet_destruct(&instanceConnectionTableSet_));
