@@ -1,3 +1,69 @@
+
+
+
+function(GBL_CREATE_APP target)
+    if(VITA)
+        add_compile_definitions(ElysianVmuTests PUBLIC VITA=1)
+        include("${VITASDK}/share/vita.cmake" REQUIRED)
+
+        vita_create_self(eboot.bin ElysianVmuTests UNSAFE)
+
+        vita_create_vpk("EvmuTests_v${EVMU_CORE_VERSION}.vpk" EVMUTESTS0 eboot.bin
+            VERSION "01.00"
+            NAME "ElysianVMU Tests v${EVMU_CORE_VERSION}"
+        )
+    elseif(PSP)
+        add_compile_definitions(GimbalTests PUBLIC BUILD_PRX=1)
+
+        create_pbp_file(TARGET GimbalTests # CMake executable target
+          TITLE "${CMAKE_PROJECT_NAME}" # displayed in game selection
+          # ICON_PATH
+          # BACKGROUND_PATH
+          # PREVIEW_PATH
+          )
+    elseif(EMSCRIPTEN)
+        # Set compile and link flags for the WASM build
+        set_target_properties(GimbalTests PROPERTIES
+            COMPILE_FLAGS "-pthread -s USE_PTHREADS=1"
+            LINK_FLAGS "-pthread -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8"
+        )
+    elseif(ANDROID)
+        set(CMAKE_AUTOMOC ON)
+        find_package(Qt6 COMPONENTS Core Svg REQUIRED)
+
+        qt_add_executable(GimbalTests
+            MANUAL_FINALIZATION
+            ${GIMBAL_TEST_SOURCES}
+        )
+
+        list(APPEND
+             GBL_TEST_LINK_LIBS
+             Qt6::Core
+             Qt6::Svg)
+
+         # Figure ou the platform & architecture code we need
+         set(ANDROID_PLATFORM_ARCHITECTURE_CODE "xxx")
+         if (${ANDROID_ABI} STREQUAL "armeabi-v7a")
+           set(ANDROID_PLATFORM_ARCHITECTURE_CODE "032")
+         elseif (${ANDROID_ABI} STREQUAL "arm64-v8a")
+           set(ANDROID_PLATFORM_ARCHITECTURE_CODE "064")
+         elseif (${ANDROID_ABI} STREQUAL "x86")
+           set(ANDROID_PLATFORM_ARCHITECTURE_CODE "132")
+         elseif (${ANDROID_ABI} STREQUAL "x86_64")
+           set(ANDROID_PLATFORM_ARCHITECTURE_CODE "164")
+         endif()
+
+         # Slap the above together with a version code (major and minor only)
+         set(ANDROID_VERSION_CODE "${ANDROID_PLATFORM_ARCHITECTURE_CODE}${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}")
+         set_property(TARGET GimbalTests APPEND PROPERTY QT_ANDROID_VERSION_CODE ${ANDROID_VERSION_CODE})
+         message(STATUS ${ANDROID_VERSION_CODE})
+
+         qt_android_generate_deployment_settings(GimbalTests)
+         qt_finalize_executable(GimbalTests)
+
+    endif()
+endfunction()
+
 function(GBL_ESCAPE_REGEX OUT_NAME INPUT)
     foreach(CHAR "^$[]()\"\\")
         string(REPLACE "${CHAR}" "\\${CHAR}" INPUT ${INPUT})

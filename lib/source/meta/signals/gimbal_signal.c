@@ -150,6 +150,17 @@ GBL_EXPORT GBL_RESULT GblSignal_uninstall(GblType     ownerType,
     GBL_CTX_END();
 }
 
+GBL_EXPORT GBL_RESULT GblSignal_uninstallAll(GblType ownerType) {
+    GBL_CTX_BEGIN(GblHashSet_context(&signalSet_));
+    GBL_CTX_PUSH_VERBOSE("[GblSignal] Uninstalling all signals: [%s]",
+                         GblType_name(ownerType));
+
+    GBL_CTX_WARN("UNIMPLEMENTED!!\n");
+
+    GBL_CTX_POP(1);
+    GBL_CTX_END();
+}
+
 static Signal_* Signal_findByQuark_(GblType     ownerType,
                                     GblQuark    name)
 {

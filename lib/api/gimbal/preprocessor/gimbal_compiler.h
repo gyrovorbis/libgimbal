@@ -506,18 +506,19 @@
 
 // alloca()
 #ifndef GBL_ALLOCA
-//#   ifndef alloca
-#       if defined(__APPLE__) || defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__) || defined(__EMSCRIPTEN__) || defined(VITA) || defined(__DREAMCAST__) || defined(PSP)
-#           include <alloca.h>     // alloca
-#       elif defined(_WIN32)
-#           include <malloc.h>     // alloca
-#           ifndef alloca
-#               define alloca _alloca  // for clang with MS Codegen
-#           endif
-#       else
-#           include <stdlib.h>     // alloca
+#   if defined(__APPLE__)      || defined(__GLIBC__)  || \
+       defined(__sun)          || defined(__CYGWIN__) || \
+       defined(__EMSCRIPTEN__) || defined(VITA)       || \
+       defined(__DREAMCAST__)  || defined(PSP)
+#       include <alloca.h>        // Sane platforms
+#   elif defined(_WIN32)
+#       include <malloc.h>        // Windoez
+#       ifndef alloca
+#           define alloca _alloca // Clang with MS Codegen
 #       endif
-//#   endif
+#   else
+#       include <stdlib.h>        // BSD extension
+#   endif
 #   define GBL_ALLOCA alloca
 #endif
 

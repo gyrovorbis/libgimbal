@@ -51,12 +51,15 @@ GBL_EXPORT void gblSortMerge(void* pArray, size_t count, size_t elemSize, GblSor
 
 GBL_EXPORT void gblSortSelection(void* pArray, size_t  count, size_t  elemSize, GblSortComparatorFn pFnCmp) {
     void* pTemp = GBL_ALLOCA(elemSize);
+
     for(size_t  i = 0; i < count; ++i) {
         size_t  min = i;
+
         for(size_t  j = i+1; j < count; ++j) {
             if(pFnCmp((char*)pArray + elemSize*j, (char*)pArray + elemSize*min) < 0)
                 min = j;
-         }
+        }
+
         memcpy(pTemp, (char*)pArray + min*elemSize, elemSize);
         memcpy((char*)pArray + min*elemSize, (char*)pArray + i*elemSize, elemSize);
         memcpy((char*)pArray + i*elemSize, pTemp, elemSize);
@@ -81,7 +84,7 @@ GBL_EXPORT void gblSortInsertion(void* pArray, size_t count, size_t  elemSize, G
     }
 }
 
-GBL_EXPORT void gblSortShell(void* pArray, size_t  count, size_t  elemSize, GblSortComparatorFn pFnCmp) {
+GBL_EXPORT void gblSortShell(void* pArray, size_t  count, size_t elemSize, GblSortComparatorFn pFnCmp) {
     void* pTemp     = GBL_ALLOCA(elemSize);
     char* pItems    = (char*)pArray;
     for (int i = (int)count / 2; i > 0; i = i / 2) {

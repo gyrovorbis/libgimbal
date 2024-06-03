@@ -15,7 +15,7 @@
  *  - implement class property
  *  - Get rid of GblObject_findContext()
  *
- *  \author    2023 Falco Girgis
+ *  \author    2023, 2024  Falco Girgis
  *  \copyright MIT License
  */
 #ifndef GIMBAL_OBJECT_H
@@ -121,26 +121,26 @@ GBL_EXPORT GblType GblObject_type(void) GBL_NOEXCEPT;
  */
 //! Creates an object-derived type on the heap, intializing it with a NULL-terminated K,V pair listing of properties
 GBL_EXPORT GblObject* GblObject_create             (GblType type, ...)                         GBL_NOEXCEPT;
-//! \todo implement
-GBL_EXPORT GblObject* GblObject_createExt          (GblType type , size_t size, ...)           GBL_NOEXCEPT;
+//! Variant of GblObject_create(), where the object is created with an extended size
+GBL_EXPORT GblObject* GblObject_createExt          (GblType type, size_t size, ...)           GBL_NOEXCEPT;
 //! Constructs an object-derived type in-place, initializing it with a NULL-terminated K,V pair listing of properties
 GBL_EXPORT GBL_RESULT GblObject_construct          (GBL_SELF, GblType type, ...)               GBL_NOEXCEPT;
 //! Creates an object-derived type on the heap, with the given class, initializing it with a NULL-terminated K,V pair property list
 GBL_EXPORT GblObject* GblObject_createWithClass    (GblObjectClass* pClass, ...)               GBL_NOEXCEPT;
-//! \todo implement
+//! Variant of GblObject_createWithClass(), where the object is created with an extended size
 GBL_EXPORT GblObject* GblObject_createExtWithClass (GblObjectClass* pClass, size_t size, ...)  GBL_NOEXCEPT;
 //! Constructs an object-derived type in-place, with the given class, initializing it with a NULL-terminated K,V pair property list
 GBL_EXPORT GBL_RESULT GblObject_constructWithClass (GBL_SELF, GblObjectClass* pClass, ...)     GBL_NOEXCEPT;
 //! Variant of GblObject_create(), where the property list is provided as a va_list pointer
 GBL_EXPORT GblObject* GblObject_createVaList       (GblType type, va_list* pList)              GBL_NOEXCEPT;
-//! \todo implement
+//! Variant of GblObject_createVaList(), where the object is created with an extended size
 GBL_EXPORT GblObject* GblObject_createExtVaList    (GblType type, size_t size, va_list* pList) GBL_NOEXCEPT;
 //! Variant of GblObject_construct(), where the property list is provided as a va_list pointer
 GBL_EXPORT GBL_RESULT GblObject_constructVaList    (GBL_SELF, GblType type, va_list* pList)    GBL_NOEXCEPT;
 //! Variant of GblObject_createWithClass(), where the property list is provided as a va_list pointer
 GBL_EXPORT GblObject* GblObject_createVaListWithClass
                                                    (GblObjectClass* pClass, va_list* pList)    GBL_NOEXCEPT;
-//! \todo implement
+//! Variant of GblObject_createVaListWithClass(), where the object is allocated with an extended size
 GBL_EXPORT GblObject* GblObject_createExtVaListWithClass
                                                    (GblObjectClass* pClass,
                                                     size_t          size,
@@ -155,7 +155,7 @@ GBL_EXPORT GblObject* GblObject_createVariants     (GblType     type,
                                                     size_t      propertyCount,
                                                     const char* pNames[],
                                                     GblVariant* pValues)                       GBL_NOEXCEPT;
-//! \todo implement
+//! Variant of GblObject_createVariants(), where the object is allocated with an extended size
 GBL_EXPORT GblObject* GblObject_createVariantsExt  (GblType     type,
                                                     size_t      size,
                                                     size_t      propertyCount,
@@ -173,7 +173,7 @@ GBL_EXPORT GblObject* GblObject_createVariantsWithClass
                                                     size_t          propertyCount,
                                                     const char*     pNames[],
                                                     GblVariant*     pValues)                   GBL_NOEXCEPT;
-//! \todo implement
+//! Variant of GblObject_createVariantsWithClass(), where the object is allocated with an extended size
 GBL_EXPORT GblObject* GblObject_createVariantsExtWithClass
                                                    (GblObjectClass* pClass,
                                                     size_t          size,

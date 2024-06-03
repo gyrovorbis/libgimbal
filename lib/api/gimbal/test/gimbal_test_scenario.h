@@ -2,13 +2,14 @@
  *  \brief GblTestScenario and related functions.
  *  \ingroup testing
  *
- *  \author     2023 Falco Girgis
+ *  \author     2023, 2024 Falco Girgis
  *  \copyright  MIT License
  */
 #ifndef GIMBAL_TEST_SCENARIO_H
 #define GIMBAL_TEST_SCENARIO_H
 
 #include "../meta/instances/gimbal_context.h"
+#include "../meta/signals/gimbal_signal.h"
 
 /*! \name Type System
  *  \brief Type UUID and cast operators
@@ -86,13 +87,22 @@ GBL_PROPERTIES(GblTestScenario,
     (casesSkipped,  GBL_GENERIC, (READ, SAVE), GBL_UINT32_TYPE)
 )
 
+GBL_SIGNALS(GblTestScenario,
+    (began),
+    (ended),
+    (suiteBegan, (GBL_INSTANCE_TYPE, pSuite)),
+    (suiteEnded, (GBL_INSTANCE_TYPE, pSuite)),
+    (caseBegan,  (GBL_INSTANCE_TYPE, pSuite), (GBL_SIZE_TYPE, caseIndex)),
+    (caseEnded,  (GBL_INSTANCE_TYPE, pSuite), (GBL_SIZE_TYPE, caseIndex))
+)
+
 GBL_EXPORT GblType          GblTestScenario_type         (void)                                 GBL_NOEXCEPT;
 GBL_EXPORT GblTestScenario* GblTestScenario_create       (const char* pName)                    GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount      GblTestScenario_unref        (GBL_SELF)                             GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblTestScenario_enqueueSuite (GBL_SELF, const GblTestSuite* pSuite) GBL_NOEXCEPT;
 GBL_EXPORT GblTestSuite*    GblTestScenario_currentSuite (GBL_CSELF)                            GBL_NOEXCEPT;
 GBL_EXPORT GblTestSuite*    GblTestScenario_findSuite    (GBL_CSELF, const char* pName)         GBL_NOEXCEPT;
-GBL_EXPORT const char*      GblTestScenario_currentCase  (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblTestScenario_currentCase  (GBL_CSELF)                            GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT       GblTestScenario_run          (GBL_SELF, int argc, char* argv[])     GBL_NOEXCEPT;
 GBL_EXPORT GblBool          GblTestScenario_ran          (GBL_CSELF)                            GBL_NOEXCEPT;
 GBL_EXPORT GblBool          GblTestScenario_passed       (GBL_CSELF)                            GBL_NOEXCEPT;

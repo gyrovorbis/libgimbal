@@ -26,21 +26,24 @@ typedef struct GblSourceLocation {
 
 //! Captures a result, its stringified message, and a source context
 typedef struct GblCallRecord {
-    GBL_ALIGNAS(64)
-    char                message[GBL_CTX_RESULT_MSG_BUFFER_SIZE];
-    GblSourceLocation   srcLocation;
-    GBL_RESULT          result;
+    GBL_ALIGNAS(8)
+    //! Error or result message from a previous GblStackFrame.
+    char              message[GBL_CTX_RESULT_MSG_BUFFER_SIZE];
+    //! Source location where the result + message had been set.
+    GblSourceLocation srcLocation;
+    //! Result code from a previous stack frame
+    GBL_RESULT        result;
 } GblCallRecord;
 
 //! Represents a single function's stack frame, from GBL_CTX_BEGIN() to GBL_CTX_END()
 typedef struct GblStackFrame {
-    GBL_ALIGNAS(64)
-    GblCallRecord           record;
-    uint32_t                sourceCurrentCaptureDepth;
-    GblObject*              pObject;
-    GblContext*             pContext;
-    uint32_t                stackDepth;
-    struct GblStackFrame*   pPrevFrame;
+    GBL_ALIGNAS(8)
+    GblCallRecord         record;
+    uint32_t              sourceCurrentCaptureDepth;
+    GblObject*            pObject;
+    GblContext*           pContext;
+    uint32_t              stackDepth;
+    struct GblStackFrame* pPrevFrame;
 } GblStackFrame;
 
 // ===== Public API =====

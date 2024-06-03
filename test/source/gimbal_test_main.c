@@ -118,7 +118,7 @@ int start_logger(const char *app_name)
 
 //    assert_msg(false, "exec call failed");
 
-    KOS_INIT_FLAGS(INIT_DEFAULT | INIT_MALLOCSTATS);
+    KOS_INIT_FLAGS(INIT_DEFAULT | INIT_MALLOCSTATS | INIT_FS_ROMDISK);
 
     /* This function will override the default stack protector handler that is
        defined in Newlib. This is not necessary to enable the stack protector,
@@ -138,7 +138,6 @@ int main(int argc, char* pArgv[]) {
 #elif defined(__ANDROID__)
     start_logger("");
 #endif
-
     GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
 
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO    |

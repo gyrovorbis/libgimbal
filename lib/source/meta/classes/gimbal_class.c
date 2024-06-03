@@ -584,7 +584,6 @@ GBL_EXPORT GblClass* GblClass_as(GblClass* pSelf, GblType toType) GBL_NOEXCEPT {
     return GblClass_cast_(pSelf, toType, GBL_FALSE, GBL_FALSE);
 }
 
-
 GBL_EXPORT GblBool GblClass_isDefault(const GblClass* pSelf) GBL_NOEXCEPT {
     return pSelf && pSelf == GblClass_default(pSelf);
 }

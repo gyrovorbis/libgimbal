@@ -615,6 +615,20 @@ GBL_EXPORT GblObject* GblObject_create(GblType type, ...) {
     return pObject;
 }
 
+GBL_EXPORT GblObject* GblObject_createExt(GblType type, size_t size, ...) {
+    GblObject* pObject = NULL;
+    va_list    varArgs;
+    va_start(varArgs, size);
+
+    GBL_CTX_BEGIN(NULL);
+
+    pObject = GblObject_createExtVaList(type, size, &varArgs);
+
+    GBL_CTX_END_BLOCK();
+    va_end(varArgs);
+    return pObject;
+}
+
 GBL_EXPORT GblObject* GblObject_createWithClass(GblObjectClass* pClass, ...)
 {
     GblObject* pObject = NULL;
@@ -628,7 +642,20 @@ GBL_EXPORT GblObject* GblObject_createWithClass(GblObjectClass* pClass, ...)
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
     return pObject;
+}
 
+GBL_EXPORT GblObject* GblObject_createExtWithClass(GblObjectClass* pClass, size_t size, ...) {
+    GblObject* pObject = NULL;
+    va_list    varArgs;
+    va_start(varArgs, size);
+
+    GBL_CTX_BEGIN(NULL);
+
+    pObject = GblObject_createExtVaListWithClass(pClass, size, &varArgs);
+
+    GBL_CTX_END_BLOCK();
+    va_end(varArgs);
+    return pObject;
 }
 
 GBL_EXPORT GBL_RESULT GblObject_construct(GblObject* pSelf, GblType type, ...) {
@@ -704,12 +731,16 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
 }
 
 GBL_EXPORT GblObject* GblObject_createVaList(GblType type, va_list* pVarArgs) {
+    return GblObject_createExtVaList(type, 0, pVarArgs);
+}
+
+GBL_EXPORT GblObject* GblObject_createExtVaList(GblType type, size_t size, va_list* pVarArgs) {
     GblObject* pObject = NULL;
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
 
-    pObject = GBL_OBJECT(GblBox_create(type));
+    pObject = GBL_OBJECT(GblBox_create(type, size));
     GBL_CTX_CALL(GblObject_constructVaList_(pObject, type, pVarArgs));
 
     GBL_CTX_END_BLOCK();
@@ -717,20 +748,22 @@ GBL_EXPORT GblObject* GblObject_createVaList(GblType type, va_list* pVarArgs) {
 }
 
 GBL_EXPORT GblObject* GblObject_createVaListWithClass(GblObjectClass* pClass, va_list* pVarArgs) {
-    GblObject* pObject = NULL;
-    const GblType type = GBL_CLASS_TYPEOF(pClass);
+    return GblObject_createExtVaListWithClass(pClass, 0, pVarArgs);
+}
 
+GBL_EXPORT GblObject* GblObject_createExtVaListWithClass(GblObjectClass* pClass, size_t size, va_list* pVarArgs) {
+    GblObject* pObject = NULL;
     GBL_CTX_BEGIN(NULL);
 
-    GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
+    GBL_CTX_VERIFY_TYPE(GBL_CLASS_TYPEOF(pClass), GBL_OBJECT_TYPE);
 
     pObject = GBL_OBJECT(GblBox_create(GBL_CLASS_TYPEOF(pClass),
-                                       0,
+                                       size,
                                        NULL,
                                        NULL,
                                        GBL_BOX_CLASS(pClass)));
 
-    GBL_CTX_CALL(GblObject_constructVaList_(pObject, type, pVarArgs));
+    GBL_CTX_CALL(GblObject_constructVaList_(pObject, GBL_CLASS_TYPEOF(pClass), pVarArgs));
 
     GBL_CTX_END_BLOCK();
     return pObject;
@@ -790,14 +823,18 @@ static GBL_RESULT GblObject_constructVariants_(GblObject*  pSelf,
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblObject* GblObject_createVariants(GblType type, size_t  propertyCount, const char* pNames[], GblVariant* pValues) {
+GBL_EXPORT GblObject* GblObject_createVariants(GblType type, size_t propertyCount, const char* pNames[], GblVariant* pValues) {
+    return GblObject_createVariantsExt(type, 0, propertyCount, pNames, pValues);
+}
+
+GBL_EXPORT GblObject* GblObject_createVariantsExt(GblType type, size_t size, size_t propertyCount, const char* pNames[], GblVariant* pValues) {
     GblObject* pObject = NULL;
 
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
 
-    pObject = GBL_OBJECT(GblBox_create(type));
+    pObject = GBL_OBJECT(GblBox_create(type, size));
     GBL_CTX_CALL(GblObject_constructVariants_(pObject, type, propertyCount, pNames, pValues));
 
     GBL_CTX_END_BLOCK();
@@ -809,6 +846,19 @@ GBL_EXPORT GblObject* GblObject_createVariantsWithClass(GblObjectClass* pClass,
                                                         const char*     pNames[],
                                                         GblVariant*     pValues)
 {
+    return GblObject_createVariantsExtWithClass(pClass,
+                                                0,
+                                                propertyCount,
+                                                pNames,
+                                                pValues);
+}
+
+GBL_EXPORT GblObject* GblObject_createVariantsExtWithClass(GblObjectClass* pClass,
+                                                           size_t          size,
+                                                           size_t          propertyCount,
+                                                           const char*     pNames[],
+                                                           GblVariant*     pValues)
+{
     const GblType type = GBL_CLASS_TYPEOF(pClass);
     GblObject* pObject = NULL;
 
@@ -817,10 +867,11 @@ GBL_EXPORT GblObject* GblObject_createVariantsWithClass(GblObjectClass* pClass,
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
 
     pObject = GBL_OBJECT(GblBox_create(GBL_CLASS_TYPEOF(pClass),
-                                       0,
+                                       size,
                                        NULL,
                                        NULL,
                                        GBL_BOX_CLASS(pClass)));
+
     GBL_CTX_CALL(GblObject_constructVariants_(pObject, type, propertyCount, pNames, pValues));
 
     GBL_CTX_END_BLOCK();

@@ -1,10 +1,13 @@
 /*! \file
- *  \brief Signals, connections, and related API
- *  \ingroup signals
- *  \todo
- *      - GblSignal_next() for iteration
+ *  \brief     Signals, connections, and related API
+ *  \ingroup   signals
+ *  \author    Falco Girgis
+ *  \copyright MIT License
  *
- *  \author Falco Girgis
+ *  \todo
+ *      - GBL_SIGNALS() DSL
+ *      - GblSignal_next() for iteration
+ *      - GblSignal_uninstallAll(GblType type)
  */
 
 #ifndef GIMBAL_SIGNAL_H
@@ -30,6 +33,8 @@ GBL_EXPORT GBL_RESULT   GblSignal_install         (GblType        ownerType,
 
 GBL_EXPORT GBL_RESULT   GblSignal_uninstall       (GblType        ownerType,
                                                    const char*    pName)          GBL_NOEXCEPT;
+
+GBL_EXPORT GBL_RESULT   GblSignal_uninstallAll    (GblType        ownerType)      GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT   GblSignal_connect         (GblInstance*   pEmitter,
                                                    const char*    pSignalName,

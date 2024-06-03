@@ -75,6 +75,11 @@ GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_INT64,
                                    (GblInstance*, int64_t),
                                    (GblVariant_toPointer(&pArgs[0]), GblVariant_toInt64(&pArgs[1])))
 
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_SIZE,
+                                   2,
+                                   (GblInstance*, size_t),
+                                   (GblVariant_toPointer(&pArgs[0]), GblVariant_toSize(&pArgs[1])))
+
 GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_FLOAT,
                                    2,
                                    (GblInstance*, float),
@@ -105,10 +110,20 @@ GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_POINTER,
                                    (GblInstance*, void*),
                                    (GblVariant_toPointer(&pArgs[0]), GblVariant_toPointer(&pArgs[1])))
 
-GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOXED,
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_OPAQUE,
                                    2,
                                    (GblInstance*, void*),
                                    (GblVariant_toPointer(&pArgs[0]), GblVariant_toPointer(&pArgs[1])))
+
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_INSTANCE,
+                                   2,
+                                   (GblInstance*, GblInstance*),
+                                   (GblVariant_toPointer(&pArgs[0]), GblVariant_toPointer(&pArgs[1])))
+
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_INSTANCE_SIZE,
+                                   3,
+                                   (GblInstance*, GblInstance*, size_t),
+                                   (GblVariant_toPointer(&pArgs[0]), GblVariant_toPointer(&pArgs[1]), GblVariant_toSize(&pArgs[2])));
 
 
 GBL_EXPORT GBL_RESULT GblMarshal_ClassClosureMeta(GblClosure*        pClosure,
