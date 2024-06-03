@@ -116,6 +116,8 @@ GBL_EXPORT GBL_RESULT GblTestSuite_caseResult(const GblTestSuite* pSelf, size_t 
     GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
 
     GblTestCase_* pCase = GblArrayList_at(&pSelf_->testCases, index);
+    GBL_CTX_VERIFY_LAST_RECORD();
+
     if(pCase)
         result = pCase->result;
 
@@ -132,6 +134,21 @@ GBL_EXPORT GBL_RESULT GblTestSuite_runCase(GblTestSuite* pSelf,
     GBL_VCALL(GblTestSuite, pFnCaseRun, pSelf, pCtx, index);
     GBL_CTX_VERIFY_LAST_RECORD();
 
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblTestSuite_skipCase(GblTestSuite* pSelf,
+                                            GblContext*   pCtx,
+                                            size_t        index)
+{
+    GBL_CTX_BEGIN(pSelf);
+
+    GblTestSuite_* pSelf_ = GBL_TEST_SUITE_(pSelf);
+
+    GblTestCase_* pCase = GblArrayList_at(&pSelf_->testCases, index);
+    GBL_CTX_VERIFY_LAST_RECORD();
+
+    pCase->result = GBL_RESULT_SKIPPED;
     GBL_CTX_END();
 }
 

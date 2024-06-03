@@ -213,10 +213,10 @@ GBL_EXPORT GBL_RESULT GblTestSuite_finalCase  (GBL_SELF, GblContext* pCtx) GBL_N
 GBL_EXPORT GBL_RESULT GblTestSuite_runCase    (GBL_SELF,
                                                GblContext* pCtx,
                                                size_t      index)          GBL_NOEXCEPT;
-//! Runs the entire test suite, iterating over all test-cases and running them as well.
-GBL_EXPORT GBL_RESULT GblTestSuite_run        (GBL_SELF, GblContext* pCtx) GBL_NOEXCEPT;
-//! Equivalent to GblTestSuite_run(), except that it returns a standard main() return code.
-GBL_EXPORT int        GblTestSuite_exec       (GBL_SELF, GblContext* pCtx) GBL_NOEXCEPT;
+//! Skips the test case at \p index within the given suite.
+GBL_EXPORT GBL_RESULT GblTestSuite_skipCase   (GBL_SELF,
+                                               GblContext* pCtx,
+                                               size_t      index)          GBL_NOEXCEPT;
 //! @}
 
 //! \cond
