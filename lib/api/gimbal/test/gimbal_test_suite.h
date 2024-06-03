@@ -104,7 +104,7 @@ GBL_CLASS_END
  *  \sa GblTestSuiteClass
  */
 GBL_INSTANCE_DERIVE(GblTestSuite, GblObject)
-    GblCallRecord lastRecord; //!< Call record of the failing test case
+    GblCallRecord lastRecord;   //!< Call record of the failing test case
     size_t        failingCase;  //!< Failing test case index
     size_t        casesRun;     //!< Number of test cases which have run
     size_t        casesPassed;  //!< Number of test cases which have passed
@@ -126,25 +126,27 @@ GBL_PROPERTIES(GblTestSuite,
 //! \endcond
 
 //! Returns the GblType UUID associated with GblTestSuite
-GBL_EXPORT GblType GblTestSuite_type(void) GBL_NOEXCEPT;
+GBL_EXPORT GblType GblTestSuite_type     (void) GBL_NOEXCEPT;
+//! Registers a new GblType deriving from GBL_TEST_SUITE_TYPE
+GBL_EXPORT GblType GblTestSuite_register (const char*               pName,
+                                          const GblTestSuiteVTable* pVTable,
+                                          size_t                    instanceSize,
+                                          size_t                    instancePrivateSize,
+                                          GblFlags                  typeFlags) GBL_NOEXCEPT;
 
 /** \name Test Suite Creation
- *  \brief Methods for managing and registering test suites.
+ *  \brief Methods for managing test suite lifetimes.
  *  @{
  */
-GBL_EXPORT GblType       GblTestSuite_register (const char*               pName,
-                                                const GblTestSuiteVTable* pVTable,
-                                                size_t                    instanceSize,
-                                                size_t                    instancePrivateSize,
-                                                GblFlags                  typeFlags)        GBL_NOEXCEPT;
-
+//! Creates a new GblTestSuite instance with the given properties (or defaults if not specified).
 GBL_EXPORT GblTestSuite* GblTestSuite_create   (GblType                   type,
                                                 const char*               pName  /*=NULL*/,
                                                 const GblTestSuiteVTable* pVTable/*=NULL*/,
                                                 size_t                    size   /*=0*/,
                                                 GblTestSuiteClass*        pClass /*=NULL*/) GBL_NOEXCEPT;
-
+//! Returns a new reference to the GblTestSuite, incrementing its reference count by 1.
 GBL_EXPORT GblTestSuite* GblTestSuite_ref      (GBL_SELF) GBL_NOEXCEPT;
+//! Decrements the refcount of the given GblTestSuite by 1, destroying it if it reaches 0.
 GBL_EXPORT GblRefCount   GblTestSuite_unref    (GBL_SELF) GBL_NOEXCEPT;
 //! @}
 

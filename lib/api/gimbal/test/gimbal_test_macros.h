@@ -67,17 +67,23 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
                                                                                                      strcmp(pActual, pExpected) == 0); }
 GBL_DECLS_END
 
-#if defined(GBL_DREAMCAST) || defined(GBL_PSP)
+#if defined(GBL_DREAMCAST)
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
         (size_t , GBL_TEST_COMPARE_CMP_UINT32_), \
         (int,     GBL_TEST_COMPARE_CMP_INT32_),
+#elif defined(GBL_PSP)
+#    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
+        (size_t , GBL_TEST_COMPARE_CMP_UINT32_), \
+        (int,     GBL_TEST_COMPARE_CMP_INT32_),  \
+        (long,    GBL_TEST_COMPARE_CMP_UINT64_),
 #elif (defined(__APPLE__) && defined(GBL_64BIT))
-#    define GBL_TEST_CMP_PLATFORM_ENTRIES() \
-        (size_t , GBL_TEST_COMPARE_CMP_UINT64_),
-#elif defined(__EMSCRIPTEN__)
-#    define GBL_TEST_CMP_PLATFORM_ENTRIES() \
+#    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
         (size_t , GBL_TEST_COMPARE_CMP_UINT64_), \
-        (int8_t, GBL_TEST_COMPARE_CMP_UINT32_),
+        (long,    GBL_TEST_COMPARE_CMP_INT64_),
+#elif defined(__EMSCRIPTEN__)
+#    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
+        (size_t , GBL_TEST_COMPARE_CMP_UINT64_), \
+        (int8_t,  GBL_TEST_COMPARE_CMP_UINT32_),
 #else
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()
 #endif

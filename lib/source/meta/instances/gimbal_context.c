@@ -455,7 +455,7 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
     GBL_CTX_PUSH();
     GBL_CTX_INFO("%-20s: %-100.100s", "Operating System", GBL_BUILD_TARGET_OS);
     GBL_CTX_INFO("%-20s: %-100.100s", "Architecture", GBL_BUILD_TARGET_ARCH);
-    GBL_CTX_INFO("%-20s: %-100u", "Word Size", GBL_PTR_SIZE * 8);
+//    GBL_CTX_INFO("%-20s: %-100u", "Word Size", GBL_PTR_SIZE * 8);
     GBL_CTX_INFO("%-20s: %-100.100s", "Endianness", GBL_BIG_ENDIAN? "Big" : "Little");
     GBL_CTX_POP(2);
 

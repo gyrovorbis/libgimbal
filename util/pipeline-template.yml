@@ -150,8 +150,8 @@ build macos-gcc:
   tags:
     - macos, gcc
   variables:
-    CC: gcc-12
-    CXX: g++-12
+    CC: gcc-14
+    CXX: g++-14
 
 # Top-Level Dreamcast build job
 build dreamcast:
