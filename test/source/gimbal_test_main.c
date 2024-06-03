@@ -132,7 +132,7 @@ int start_logger(const char *app_name)
 
 #endif
 
-int main(int argc, char* pArgv[]) {
+int main(int argc, const char* pArgv[]) {
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
   //  gdb_init();
 #elif defined(__ANDROID__)
@@ -263,9 +263,5 @@ int main(int argc, char* pArgv[]) {
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_ERROR_TEST_SUITE_TYPE));
 
-    const GBL_RESULT result = GblTestScenario_run(pScenario, argc, pArgv);
-
-    GblTestScenario_unref(pScenario);
-
-    return GBL_RESULT_SUCCESS(result)? EXIT_SUCCESS : EXIT_FAILURE;
+    return GblTestScenario_exec(pScenario, argc, pArgv);
 }

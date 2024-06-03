@@ -81,7 +81,7 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, char* argv[]) {
+static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, const char* argv[]) {
     GBL_UNUSED(argc, argv);
     GBL_CTX_BEGIN(pSelf);
 
@@ -482,6 +482,10 @@ GBL_EXPORT GblTestScenario* GblTestScenario_create(const char* pName) {
     return pScenario;
 }
 
+GBL_EXPORT GblTestScenario* GblTestScenario_ref(GblTestScenario* pSelf) {
+    return GBL_TEST_SCENARIO(GBL_REF(pSelf));
+}
+
 GBL_EXPORT GblRefCount GblTestScenario_unref(GblTestScenario* pSelf) {
     GblRefCount retVal = 0;
 
@@ -534,7 +538,7 @@ GBL_EXPORT size_t GblTestScenario_currentCase(const GblTestScenario* pSelf) {
     return pSelf? GBL_TEST_SCENARIO_(pSelf)->curCase : GBL_NPOS;
 }
 
-GBL_EXPORT GBL_RESULT GblTestScenario_run(GblTestScenario* pSelf, int argc, char* argv[]) {
+GBL_EXPORT GBL_RESULT GblTestScenario_run(GblTestScenario* pSelf, int argc, const char* argv[]) {
     GBL_CTX_BEGIN(pSelf);
 
     GblContext* pOldGlobalCtx = GblContext_global();
@@ -547,6 +551,12 @@ GBL_EXPORT GBL_RESULT GblTestScenario_run(GblTestScenario* pSelf, int argc, char
 
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_CTX_END();
+}
+
+GBL_EXPORT int GblTestScenario_exec(GblTestScenario* pSelf, int argc, const char* argv[]) {
+    const GBL_RESULT result = GblTestScenario_run(pSelf, argc, argv);
+    GblTestScenario_unref(pSelf);
+    return GBL_RESULT_ERROR(result)? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
 GBL_EXPORT GblBool GblTestScenario_ran(const GblTestScenario* pSelf) {
@@ -571,7 +581,7 @@ GBL_EXPORT GblType GblTestScenario_type(void) {
         .instancePrivateSize    = sizeof(GblTestScenario_)
     };
 
-    if(type == GBL_INVALID_TYPE) {
+    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
         type = GblType_register(GblQuark_internStatic("GblTestScenario"),
                                 GBL_CONTEXT_TYPE,
                                 &typeInfo,

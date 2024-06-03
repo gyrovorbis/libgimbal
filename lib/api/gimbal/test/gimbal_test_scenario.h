@@ -42,7 +42,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblTestSuite);
 GBL_CLASS_DERIVE(GblTestScenario, GblContext)
     GBL_RESULT (*pFnBegin)     (GBL_SELF);
     GBL_RESULT (*pFnEnd)       (GBL_SELF);
-    GBL_RESULT (*pFnRun)       (GBL_SELF, int argc, char* argv[]);
+    GBL_RESULT (*pFnRun)       (GBL_SELF, int argc, const char* argv[]);
     GBL_RESULT (*pFnSuiteBegin)(GBL_SELF, const GblTestSuite* pSuite);
     GBL_RESULT (*pFnSuiteEnd)  (GBL_SELF, const GblTestSuite* pSuite);
 GBL_CLASS_END
@@ -96,17 +96,19 @@ GBL_SIGNALS(GblTestScenario,
     (caseEnded,  (GBL_INSTANCE_TYPE, pSuite), (GBL_SIZE_TYPE, caseIndex))
 )
 
-GBL_EXPORT GblType          GblTestScenario_type         (void)                                 GBL_NOEXCEPT;
-GBL_EXPORT GblTestScenario* GblTestScenario_create       (const char* pName)                    GBL_NOEXCEPT;
-GBL_EXPORT GblRefCount      GblTestScenario_unref        (GBL_SELF)                             GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblTestScenario_enqueueSuite (GBL_SELF, const GblTestSuite* pSuite) GBL_NOEXCEPT;
-GBL_EXPORT GblTestSuite*    GblTestScenario_currentSuite (GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT GblTestSuite*    GblTestScenario_findSuite    (GBL_CSELF, const char* pName)         GBL_NOEXCEPT;
-GBL_EXPORT size_t           GblTestScenario_currentCase  (GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT GBL_RESULT       GblTestScenario_run          (GBL_SELF, int argc, char* argv[])     GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblTestScenario_ran          (GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblTestScenario_passed       (GBL_CSELF)                            GBL_NOEXCEPT;
-GBL_EXPORT void             GblTestScenario_expectError  (GBL_CSELF)                            GBL_NOEXCEPT;
+GBL_EXPORT GblType          GblTestScenario_type         (void)                                   GBL_NOEXCEPT;
+GBL_EXPORT GblTestScenario* GblTestScenario_create       (const char* pName)                      GBL_NOEXCEPT;
+GBL_EXPORT GblTestScenario* GblTestScenario_ref          (GBL_SELF)                               GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount      GblTestScenario_unref        (GBL_SELF)                               GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestScenario_enqueueSuite (GBL_SELF, const GblTestSuite* pSuite)   GBL_NOEXCEPT;
+GBL_EXPORT GblTestSuite*    GblTestScenario_currentSuite (GBL_CSELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GblTestSuite*    GblTestScenario_findSuite    (GBL_CSELF, const char* pName)           GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblTestScenario_currentCase  (GBL_CSELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT       GblTestScenario_run          (GBL_SELF, int argc, const char* argv[]) GBL_NOEXCEPT;
+GBL_EXPORT int              GblTestScenario_exec         (GBL_SELF, int argc, const char* argv[]) GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblTestScenario_ran          (GBL_CSELF)                              GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblTestScenario_passed       (GBL_CSELF)                              GBL_NOEXCEPT;
+GBL_EXPORT void             GblTestScenario_expectError  (GBL_CSELF)                              GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
