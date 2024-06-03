@@ -75,7 +75,7 @@ GBL_DECLS_END
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
         (size_t , GBL_TEST_COMPARE_CMP_UINT32_), \
         (int,     GBL_TEST_COMPARE_CMP_INT32_),  \
-        (long,    GBL_TEST_COMPARE_CMP_UINT64_),
+        (long,    GBL_TEST_COMPARE_CMP_INT64_),
 #elif (defined(__APPLE__) && defined(GBL_64BIT))
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
         (size_t , GBL_TEST_COMPARE_CMP_UINT64_), \
