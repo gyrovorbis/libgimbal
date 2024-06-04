@@ -2035,7 +2035,6 @@ static int testComp_(const void* p1, const void* p2, void* pCl) {
 
 static GBL_RESULT GblDoublyLinkedListTestSuite_mergeSort2_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    GblDoublyLinkedListTestSuite_* pSelf_ = GBL_DOUBLY_LINKED_LIST_TEST_SUITE_(pSelf);
 
     GBL_DOUBLY_LINKED_LIST_NODE(list1);
     TestLiteral_ nodes[4] = {

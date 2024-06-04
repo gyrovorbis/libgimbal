@@ -710,8 +710,6 @@ static GBL_RESULT GblRingListTestSuite_destroyDeep_(GblTestSuite* pSelf, GblCont
 static GBL_RESULT GblRingListTestSuite_stressTest_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
-    GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
-
     for(size_t  i = 0; i < 2000; ++i) {
         GblRingList* pList = GblRingList_create("a", "b", "c", "d", "e", "f", "g");
         GblRingList_remove(pList, 0, 3);

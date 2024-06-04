@@ -38,8 +38,9 @@ GBL_TEST_CASE_END
 
 GBL_TEST_CASE(constructFromString)
     auto quark = gbl::Quark("Quarkificater", 12);
-
+    GBL_TEST_VERIFY(quark.length() == 12);
 GBL_TEST_CASE_END
 
 GBL_TEST_REGISTER(constructDefault,
-                  customLiteral)
+                  customLiteral,
+                  constructFromString)

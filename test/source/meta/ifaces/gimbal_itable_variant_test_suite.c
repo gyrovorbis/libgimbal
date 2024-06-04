@@ -401,7 +401,3 @@ static GblType GblTestBox_type(void) {
     return type;
 }
 
-static GblType GblTestObject_type(void) {
-    return GBL_INVALID_TYPE;
-}
-

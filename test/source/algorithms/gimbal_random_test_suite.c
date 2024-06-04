@@ -65,7 +65,7 @@ void benchmark_(GblRandomGeneratorFn pGen, GblTestFixture* pFixture, int index) 
     for(size_t i = 0; i < BENCHMARK_ITERATIONS_; ++i) {
         pFixture->randomNumbers[index][i] = gblRand();
 
-#if 0
+#if 1
         for(size_t j = 0; j < i; ++j) {
             if(pFixture->randomNumbers[index][i] ==
                pFixture->randomNumbers[index][j]) {

@@ -412,6 +412,7 @@ GBL_TEST_CASE_END
 
 GBL_TEST_REGISTER(createInvalid,
                   create,
+                  ref,
                   stringify,
                   bytes,
                   compareSelf,

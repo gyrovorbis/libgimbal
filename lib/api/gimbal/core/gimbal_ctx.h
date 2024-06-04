@@ -317,7 +317,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(REALLOC, void*, void* pData, size_t  newSize, si
 #define GBL_CTX_PUSH_(srcLoc, ...)                                  \
     GBL_STMT_START {                                                \
         GBL_CTX_SOURCE_LOC_PUSH(srcLoc);                            \
-        GBL_RESULT_SUCCESS(GblThd_logPush(NULL));                \
+        GblThd_logPush(NULL);                                       \
         GBL_CTX_EXT(logPush_);                                      \
         GBL_CTX_SOURCE_POP();                                       \
         ++GBL_CTX_FRAME()->stackDepth;                              \
@@ -549,7 +549,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GblFlags level, const char* pFm
 #define GBL_CTX_BEGIN_FRAME(file, func, line, pObject, frame)                               \
     GBL_CTX_FRAME_DECLARE = frame;                                                          \
     GblStackFrame_construct(GBL_CTX_FRAME_NAME, (GblObject*)pObject, GBL_RESULT_SUCCESS);   \
-    GBL_RESULT_SUCCESS(GblThd_stackFramePush(NULL, GBL_CTX_FRAME_NAME))
+    GblThd_stackFramePush(NULL, GBL_CTX_FRAME_NAME)
 
 #define GBL_CTX_BEGIN_LOG_4(file, func, line, hHandle)  \
     GBL_CTX_BEGIN_FRAME(file, func, line, hHandle, ((GblStackFrame*)GBL_ALLOCA(sizeof(GblStackFrame))))
@@ -569,7 +569,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GblFlags level, const char* pFm
     GBL_LABEL_EMPTY(GBL_CTX_END_LABEL);                     \
         if(GBL_CTX_FRAME_NAME->stackDepth)                  \
             GBL_CTX_POP(GBL_CTX_FRAME_NAME->stackDepth);    \
-            GblThd_stackFramePop(NULL)
+        GblThd_stackFramePop(NULL)
 
 #define GBL_CTX_END()               \
         GBL_CTX_END_BLOCK();        \

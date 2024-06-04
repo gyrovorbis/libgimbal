@@ -62,8 +62,6 @@ GBL_TEST_FIXTURE {
 
 static GblType GblTestThread_type(void);
 
-static atomic_short threadActiveCount_ = 0;
-
 static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(4)  Align4_       tlsBuff4_       = {.inner = {2, 2, 2}};
 static volatile GBL_THREAD_LOCAL GBL_ALIGNAS(16) Align16_      tlsBuff16_      = {.inner = {1, 1, 1}};
 static volatile GBL_THREAD_LOCAL                 uint16_t      tlsUint16_      = 0;
@@ -328,11 +326,6 @@ GBL_TEST_CASE(detach)
     while(!pFixture->thread2Ran);
     while(!pFixture->thread2Finished);
 GBL_TEST_CASE_END
-
-static void _(GblThread* pSelf) {
-    GblTestFixture* pFixture = GblClosure_currentUserdata();
-    pFixture->thread1Finished = GBL_TRUE;
-}
 
 GBL_TEST_CASE(tlsSpawnThreads)
 #ifdef GBL_PSP
