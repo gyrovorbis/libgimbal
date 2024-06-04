@@ -16,6 +16,18 @@ GBL_EXPORT GblCClosure* GblCClosure_create(GblFnPtr pFnCallback, void* pUserdata
     return pClosure;
 }
 
+GBL_EXPORT GblCClosure* GblCClosure_ref(GblCClosure* pSelf) {
+    return (GblCClosure*)GBL_REF(pSelf);
+}
+
+GBL_EXPORT GblRefCount GblCClosure_unref(GblCClosure* pSelf) {
+    return GBL_UNREF(pSelf);
+}
+
+GBL_EXPORT GblFnPtr GblCClosure_callback(const GblCClosure* pSelf) {
+    return GBL_PRIV_REF(pSelf).pFnCallback;
+}
+
 GBL_EXPORT void GblCClosure_setCallback(GblCClosure* pSelf, GblFnPtr pFnCallback) {
     GBL_PRIV_REF(pSelf).pFnCallback = pFnCallback;
 }

@@ -37,6 +37,14 @@ GBL_EXPORT GblClosure* GblClosure_create(GblType           derivedType,
     return pClosure;
 }
 
+GBL_EXPORT GblClosure* GblClosure_ref(GblClosure* pSelf) {
+    return (GblClosure*)GBL_REF(pSelf);
+}
+
+GBL_EXPORT GblRefCount GblClosure_unref(GblClosure* pSelf) {
+    return GBL_UNREF(pSelf);
+}
+
 GBL_EXPORT GBL_RESULT GblClosure_setMetaMarshal(GblClosure* pSelf,
                                                 GblMarshalFn pFnMeta)
 {
@@ -62,10 +70,10 @@ GBL_EXPORT GBL_RESULT GblClosure_setMetaMarshal(GblClosure* pSelf,
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblClosure_invoke(GblClosure*     pSelf,
-                                        GblVariant*     pRetValue,
-                                        size_t          argCount,
-                                        GblVariant*     pArgValues)
+GBL_EXPORT GBL_RESULT GblClosure_invoke(GblClosure* pSelf,
+                                        GblVariant* pRetValue,
+                                        size_t      argCount,
+                                        GblVariant* pArgValues)
 {
     GBL_CTX_BEGIN(NULL);
 
@@ -102,7 +110,7 @@ GBL_EXPORT GblType GblClosure_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     static GblTypeInfo info = {
-        .classSize = sizeof(GblClosureClass),
+        .classSize    = sizeof(GblClosureClass),
         .instanceSize = sizeof(GblClosure)
     };
 

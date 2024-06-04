@@ -31,7 +31,7 @@
 #ifndef __cplusplus
 #   define GBL_CALLBACK(fn)  ((GblFnPtr)fn)
 #else
-    #define GBL_CALLBACK(fn) ((GblFnPtr)+fn)
+#   define GBL_CALLBACK(fn)  ((GblFnPtr)+fn)
 #endif
 
 #define GBL_SELF_TYPE GblClosure
@@ -109,6 +109,10 @@ GBL_EXPORT GblClosure* GblClosure_create (GblType           derivedType,
                                           size_t            size     /*=DEFAULT*/,
                                           void*             pUserdata/*=NULL*/,
                                           GblArrayMapDtorFn pFnDtor  /*=NULL*/) GBL_NOEXCEPT;
+//! Returns a new reference to the given GblClosure instance, increasing its reference count.
+GBL_EXPORT GblClosure* GblClosure_ref    (GBL_SELF);
+//! Removes a reference to the given GblClosure, destroying it upon reaching zero.
+GBL_EXPORT GblRefCount GblClosure_unref  (GBL_SELF);
 
 /*! \name  Accessor Methods
  *  \brief Methods for reading/writing GblClosure fields

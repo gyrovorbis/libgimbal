@@ -57,24 +57,37 @@ GBL_CLASS_DERIVE_EMPTY(GblCClosure, GblClosure)
  */
 GBL_INSTANCE_DERIVE(GblCClosure, GblClosure)
     GBL_PRIVATE_BEGIN
-        GblFnPtr    pFnCallback; //!< PRIVATE: C Function pointer to invoke as a callback
+        GblFnPtr pFnCallback; //!< PRIVATE: C Function pointer to invoke as a callback
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 
 //! Returns the GblType UUID for GblCClosure
 GBL_EXPORT GblType GblCClosure_type (void) GBL_NOEXCEPT;
 
-/*! \name Methods
- *  \brief General methods for GblCClosure
+/*! \name Lifetime Management
+ *  \brief Methods for managing GblCClosure lifetime
  *  \relatesalso GblCClosure
  *  @{
  */
 //! Creates a GblCClosure instance with the given callback and userdata, returning a pointer to it
-GBL_EXPORT GblCClosure* GblCClosure_create      (GblFnPtr pFnCallback,
-                                                 void*    pUserdata)   GBL_NOEXCEPT;
-//! Sets the C callback function of the given GblCClosure instance
+GBL_EXPORT GblCClosure* GblCClosure_create (GblFnPtr pFnCallback,
+                                            void*    pUserdata) GBL_NOEXCEPT;
+//! Creates and returns a new reference to the given GblCClosure, incrementing its refcount.
+GBL_EXPORT GblCClosure* GblCClosure_ref    (GBL_SELF)           GBL_NOEXCEPT;
+//! Releases the reference to the given GblCClosure, destroying it upon hitting zero.
+GBL_EXPORT GblRefCount  GblCClosure_unref  (GBL_SELF)           GBL_NOEXCEPT;
+//! @}
+
+/*! \name Accessors
+ *  \brief Get/Set methods for GblCClosure
+ *  \relatesalso GblCClosure
+ *  @{
+ */
+//! Sets the C callback function of the given GblCClosure instance.
 GBL_EXPORT void         GblCClosure_setCallback (GBL_SELF,
                                                  GblFnPtr pFnCallback) GBL_NOEXCEPT;
+//! Returns the C callback function of the given GblClosure instance.
+GBL_EXPORT GblFnPtr     GblCClosure_callback    (GBL_CSELF)            GBL_NOEXCEPT;
 //! @}
 
 GBL_DECLS_END
