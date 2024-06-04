@@ -190,7 +190,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
                         suiteFailed = GBL_TRUE;
                         pSelf->casesSkipped += caseCount - idx - 1;
 
-                        GBL_EMIT(pSelf, "caseEnded", pSuiteIt, pCtx, idx);
+                        GBL_EMIT(pSelf, "caseEnded", pSuiteIt, idx);
 
                         // Manually skip remaining cases in suite + fire signals for them all
                         for(size_t rem_idx = idx + 1; rem_idx < caseCount; ++rem_idx) {
