@@ -121,7 +121,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_caseResult(const GblTestSuite* pSelf, size_t 
     if(pCase)
         result = pCase->result;
 
-    GBL_CTX_END();
+    GBL_CTX_END_BLOCK();
     return result;
 }
 

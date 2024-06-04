@@ -109,7 +109,6 @@ GBL_TEST_CASE(reraise)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(clear)
-    GBL_TEST_VERIFY(0);
     GBL_TEST_VERIFY(GblError_clear());
     GBL_TEST_VERIFY(!GblError_pending());
 GBL_TEST_CASE_END
