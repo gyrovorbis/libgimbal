@@ -142,6 +142,14 @@ extern "C" {
 #define GBL_DECLARE_TYPE_(instanceStruct) \
     GblType GBL_GLUE(instanceStruct, _type(void)) GBL_NOEXCEPT
 
+#define GBL_DERIVE_EMPTY_TYPE(derivedInstance, baseInstance) \
+    GBL_CLASS_DERIVE(derivedInstance, baseInstance) \
+    GBL_CLASS_END \
+    GBL_INSTANCE_DERIVE(derivedInstance, baseInstance) \
+    GBL_INSTANCE_END \
+    GBL_DECLARE_TYPE(derivedInstance);
+
+
 #define GBL_DECLARE_UNION(S)   \
     union S;                   \
     typedef union S S;         \
