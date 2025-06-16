@@ -17,6 +17,8 @@
 #ifndef GIMBAL_BUILTIN_TYPES_H
 #define GIMBAL_BUILTIN_TYPES_H
 
+GBL_DECLS_BEGIN
+
 /*! \name  Builtin Indices
  *  \brief Definitions providing each builtin type's index
  *  @{
@@ -83,5 +85,7 @@ typedef enum GblTypeRootFlags {
 
 //! Retrieves the GblType UUID associated with the given \p index of a builtin type
 GBL_EXPORT uintptr_t GblType_fromBuiltinIndex (size_t index) GBL_NOEXCEPT;
+
+GBL_DECLS_END
 
 #endif // GIMBAL_BUILTIN_TYPES_H
