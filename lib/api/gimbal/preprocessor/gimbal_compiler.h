@@ -102,7 +102,7 @@
 #   define GBL_LINUX    1
 #elif __unix__ // all unices not caught above
     // Unix
-#   define GBL_UNUX 1
+#   define GBL_UNIX 1
 #elif defined(_POSIX_VERSION)
     // POSIX
 #   define GBL_POSIX
