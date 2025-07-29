@@ -236,6 +236,22 @@
 #   endif
 #endif
 
+// Floating-point precision directives
+#ifdef _MSC_VER
+#   define GBL_FP_FAST \
+        _Pragma("float_control(except, off)") \  // disable environment sensitivity
+        _Pragma("fenv_access(off)") \            // disable exception semantics
+        _Pragma("float_control(precise, off)") \ // disable precise semantics
+        _Pragma("fp_contract(on)")               // enable contractions
+#   define GBL_FP_PRECISE \
+        _Pragma("float_control(precise, on)") \  // enable precise semantics
+        _Pragma("fenv_access(on)")            \  // enable environment sensitivity
+        _Pragma("float_control(except, on)")     // enable exception semantics
+#else
+#   define GBL_FP_FAST      __attribute__((optimize("-ffast-math")))
+#   define GBL_FP_PRECISE   __attribute__((optimize("-fno-fast-math")))
+#endif
+
 //====== C++ FEATURE SUPPORT ==============
 
 // RTTI
@@ -479,6 +495,14 @@
 #   define GBL_FORCE_INLINE __forceinline
 #else
 #   define GBL_FORCE_INLINE GBL_INLINE
+#endif
+
+#ifdef __GNUC__
+#   define GBL_NO_INLINE __attribute__((noinline))
+#elif defined(_MSC_VER)
+#   define GBL_NO_INLINE __declspec(noinline)
+#else
+#   define GBL_NO_INLINE
 #endif
 
 // ====== NONSTANDARD COMPILER-SPECIFIC C FUNCTIONS ==========

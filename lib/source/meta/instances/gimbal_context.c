@@ -364,7 +364,7 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
     GBL_CTX_PUSH();
     GBL_CTX_INFO("%-20s: %-100.100s", "Timestamp", GBL_BUILD_TIMESTAMP);
     GBL_CTX_INFO("%-20s: %-100.100s", "Type", GBL_BUILD_TYPE);
-    GBL_CTX_INFO("%-20s: %-100.100s", "Config", GBL_BUILD_CONFIG);
+    //GBL_CTX_INFO("%-20s: %-100.100s", "Config", GBL_BUILD_CONFIG);
     GBL_CTX_POP(1);
 
 

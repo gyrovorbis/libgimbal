@@ -18,8 +18,10 @@
 #   define M_PI (3.14159265358979323846264338327950288)
 #endif
 
+#define GBL_F_PI    (float)M_PI
+
 #ifndef M_E
-#   define M_E (2.71828182845904523536)
+#   define M_E  (2.71828182845904523536)
 #endif
 
 #define gblPow2Next(X)  GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS_, X)(X)
@@ -43,15 +45,21 @@ GBL_EXPORT uint32_t      gblNtohl                   (uint32_t n)                
 GBL_EXPORT uint32_t      gblHtonl                   (uint32_t x)                GBL_NOEXCEPT;
 GBL_EXPORT int           gblParity                  (uint8_t n)                 GBL_NOEXCEPT;
 GBL_EXPORT size_t        gblAlignedAllocSizeDefault (size_t bytes)              GBL_NOEXCEPT;
-GBL_EXPORT size_t        gblAlignedAllocSize        (size_t size, size_t align/*=0*/) GBL_NOEXCEPT;
+GBL_EXPORT size_t        gblAlignedAllocSize        (size_t size,
+                                                     size_t align/*=0*/)        GBL_NOEXCEPT;
 GBL_EXPORT uint32_t      gblPrimeNextDouble         (uint32_t number)           GBL_NOEXCEPT;
 GBL_EXPORT GblBool       gblPrimeCheck              (int n)                     GBL_NOEXCEPT;
 GBL_EXPORT unsigned long gblBinomialCoeff           (unsigned n, unsigned k)    GBL_NOEXCEPT;
 GBL_EXPORT unsigned long gblCatalan                 (unsigned n)                GBL_NOEXCEPT;
-//! \todo rename me gblEqualsf
 GBL_EXPORT GblBool       gblFloatEquals             (double a,
                                                      double b,
                                                      double e/*=DBL_EPSILON*/)  GBL_NOEXCEPT;
+GBL_EXPORT double        gblAbsoluteError           (double approximate,
+                                                     double exact)              GBL_NOEXCEPT;
+GBL_EXPORT double        gblRelativeError           (double approximate,
+                                                     double exact)              GBL_NOEXCEPT;
+
+
 GBL_EXPORT float         gblDegToRadf (float degrees) GBL_NOEXCEPT;
 GBL_EXPORT float         gblRadToDegf (float radians) GBL_NOEXCEPT;
 

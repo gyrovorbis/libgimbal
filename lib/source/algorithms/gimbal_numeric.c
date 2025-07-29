@@ -180,15 +180,28 @@ GBL_EXPORT GblBool gblFloatEquals(double a, double b, double e) {
 #endif
 }
 
+GBL_FP_PRECISE
+GBL_EXPORT double gblAbsoluteError(double approximate, double exact) {
+    return fabs(exact - approximate);
+}
+
+GBL_FP_PRECISE
+GBL_EXPORT double gblRelativeError(double approximate, double exact) {
+    if(fabs(exact) > DBL_EPSILON)
+        return gblAbsoluteError(approximate, exact) / fabs(exact);
+    else if(gblAbsoluteError(approximate, exact) < 0.0001)
+        return 0.0f;
+    else
+        return INFINITY;
+}
+
 GBL_EXPORT float gblDegToRadf(float degrees) {
-    return degrees * (M_PI / 180.0f);
+    return degrees * (F_PI / 180.0f);
 }
 
 GBL_EXPORT float gblRadToDegf(float radians) {
-    return radians * (180.0f / M_PI);
+    return radians * (180.0f / F_PI);
 }
-
-
 
 static uint32_t primes_[] = {
     5,

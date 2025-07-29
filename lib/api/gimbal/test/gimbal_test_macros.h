@@ -132,15 +132,34 @@ GBL_DECLS_END
                                                                           "Values differed [exptected: %p, actual: %p]",     \
                                                                           actual, expected)
 
+typedef enum GBL_TEST_ERROR_COMPARISON {
+    GBL_TEST_ERROR_ABSOLUTE,
+    GBL_TEST_ERROR_RELATIVE,
+    GBL_TEST_ERROR_FUZZY
+} GBL_TEST_ERROR_COMPARISON;
+
+#define GBL_TEST_ERROR(actual, precise, epsilon, cmp)                           \
+    GBL_STMT_START {                                                            \
+        double relative = gblRelativeError((actual), (precise));                \
+        double absolute = gblAbsoluteError((actual), (precise));                \
+        if(((cmp) == GBL_TEST_ERROR_ABSOLUTE && absolute > (epsilon)) ||        \
+           ((cmp) == GBL_TEST_ERROR_RELATIVE && relative > (epsilon)) ||        \
+           (absolute > (epsilon) && relative > (epsilon)))                      \
+            GBL_TEST_FAIL("(actual == %.9f) != (expected == %.9f)\n"            \
+                          "\t    ERROR: Rel == %.9f, Abs == %.9f, Max == %.9f", \
+                          (actual), (precise), relative, absolute, (epsilon));  \
+    } GBL_STMT_END
+
+
 #define GBL_TEST_CALL                                GBL_CTX_VERIFY_CALL
 
 #define GBL_TEST_SKIP(reason)                        GBL_CTX_VERIFY(GBL_FALSE,                                               \
                                                                     GBL_RESULT_SKIPPED,                                      \
                                                                     reason)
 
-#define GBL_TEST_FAIL(reason)                        GBL_CTX_VERIFY(GBL_FALSE,                                               \
+#define GBL_TEST_FAIL(...)                           GBL_CTX_VERIFY(GBL_FALSE,                                               \
                                                                     GBL_RESULT_ERROR,                                        \
-                                                                    reason)
+                                                                    __VA_ARGS__)
 
 #define GBL_TEST_EXPECT_ERROR()                                                         \
     GBL_STMT_START {                                                                    \
