@@ -392,7 +392,7 @@ GBL_EXPORT GblHash gblHashSha1(const void *pData, size_t len) {
 }
 
 GBL_EXPORT GblHash gblHashXx(const void* pData, size_t size) {
-    return XXH32(pData, size, gblSeed(0));
+    return LZ4_XXH32(pData, size, gblSeed(0));
 }
 
 
