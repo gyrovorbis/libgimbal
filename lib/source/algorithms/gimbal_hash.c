@@ -30,7 +30,7 @@ GBL_EXPORT GblHash gblHash16Bit(uint16_t value) {
     return value;
 }
 
-GBL_EXPORT GblHash gblHashFnv1(const void* pData, size_t  size) {
+GBL_EXPORT GblHash gblHashFnv1(const void* pData, size_t size) {
     uint32_t prime = 0x01000193;
     uint32_t hash = 0x811C9DC5;
     const unsigned char* p = (const unsigned char*)pData;
@@ -288,11 +288,9 @@ static uint64_t SIP64(const uint8_t *in, const size_t inlen,
     return out;
 }
 
-
 GBL_EXPORT GblHash gblHashSip(const void* pData, size_t  size) {
     return SIP64((uint8_t*)pData, size, gblSeed(0), gblSeed(1));
 }
-
 
 //
 // super hash function by Paul Hsieh
@@ -392,7 +390,7 @@ GBL_EXPORT GblHash gblHashSha1(const void *pData, size_t len) {
 }
 
 GBL_EXPORT GblHash gblHashXx(const void* pData, size_t size) {
-    return LZ4_XXH32(pData, size, gblSeed(0));
+    return XXH32(pData, size, gblSeed(0));
 }
 
 
