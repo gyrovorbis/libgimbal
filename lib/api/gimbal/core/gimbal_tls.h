@@ -37,7 +37,7 @@
  *
  *  \sa GBL_TLS_LOAD()
  */
-#if !defined(GBL_PSP) && !GBL_TLS_EMULATED
+#if !defined(GBL_GAMECUBE) && !defined(GBL_PSP) && !GBL_TLS_EMULATED
 #   define GBL_TLS(type, name, ...) GBL_THREAD_LOCAL type name = __VA_ARGS__
 #else
 #   define GBL_TLS(type, name, ...) \
@@ -73,7 +73,7 @@
  *
  *  \sa GBL_TLS()
  */
-#if !defined(GBL_PSP) && !GBL_TLS_EMULATED
+#if !defined(GBL_GAMECUBE) && !defined(GBL_PSP) && !GBL_TLS_EMULATED
 #   define GBL_TLS_LOAD(name)    &name
 #else
 #   define GBL_TLS_LOAD(name)   tls_##name##_load_()

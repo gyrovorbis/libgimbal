@@ -94,7 +94,7 @@ GBL_INLINE void gblMurmurHash3_x86_32_(const void* key,
 #define	GBL_MURMUR_HASH_ROTL32_(x, r) ((x << r) | (x >> (32 - r)))
 #define GBL_MURMUR_HASH_FMIX32_(h) h^=h>>16; h*=0x85ebca6b; h^=h>>13; h*=0xc2b2ae35; h^=h>>16;
 // DO NOT DO UNALIGNED WORD ACCESSES ON THE RISC/EMBEDDED CPUS
-#if !defined(__DREAMCAST__) && !defined(__VITA__)
+#if !defined(__DREAMCAST__) && !defined(__GAMECUBE__) && !defined(__VITA__)
 #   define GBL_MURMUR_HASH_GET_BLOCK_(k, p, i) (k = p[i])
 #else
 #   define GBL_MURMUR_HASH_GET_BLOCK_(k, p, i) memcpy(&k, p + i, sizeof(uint32_t))
