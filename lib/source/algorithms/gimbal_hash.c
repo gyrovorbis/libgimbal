@@ -2,6 +2,7 @@
 #include <gimbal/algorithms/gimbal_md5.h>
 #include <gimbal/algorithms/gimbal_sha1.h>
 #include <gimbal/algorithms/gimbal_random.h>
+#define XXH_INLINE_ALL
 #include <xxhash.h>
 
 GBL_EXPORT GblHash gblHash32Bit(uint32_t value) {
