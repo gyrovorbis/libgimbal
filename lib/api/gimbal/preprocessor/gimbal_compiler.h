@@ -94,6 +94,8 @@
 #   define GBL_ANDROID  1
 #elif defined(__DREAMCAST__)
 #   define GBL_DREAMCAST    1
+#elif defined(__GAMECUBE__)
+#   define GBL_GAMECUBE 1
 #elif defined(__PSP__)
 #   define GBL_PSP  1
 #elif defined(VITA)
@@ -229,7 +231,7 @@
 #else
 #   if defined(__DREAMCAST__)
 #       define GBL_THREAD_LOCAL     _Thread_local
-#   elif defined(__PSP__)
+#   elif defined(__GAMECUBE__) || defined(__PSP__)
 #       define GBL_THREAD_LOCAL
 #   else
 #       define GBL_THREAD_LOCAL     __thread
@@ -533,7 +535,8 @@
 #   if defined(__APPLE__)      || defined(__GLIBC__)  || \
        defined(__sun)          || defined(__CYGWIN__) || \
        defined(__EMSCRIPTEN__) || defined(VITA)       || \
-       defined(__DREAMCAST__)  || defined(PSP)
+       defined(__DREAMCAST__)  || defined(PSP)        || \
+       defined(__GAMECUBE__)
 #       include <alloca.h>        // Sane platforms
 #   elif defined(_WIN32)
 #       include <malloc.h>        // Windoez
