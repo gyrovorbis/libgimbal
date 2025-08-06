@@ -88,8 +88,8 @@ static void gblQuarkInit_(void) {
                                              0,
                                              &pageStatic_.page,
                                              pCtx_));
-    initialized_            = GBL_TRUE;
-    inittedOnce_            = GBL_TRUE;
+    initialized_ = GBL_TRUE;
+    inittedOnce_ = GBL_TRUE;
     atexit(GblQuark_final_);
     GBL_CTX_POP(1);
     GBL_CTX_END_BLOCK();
@@ -97,7 +97,7 @@ static void gblQuarkInit_(void) {
     if(mtxLocked) mtx_unlock(&registryMtx_);
 }
 
-static  GblQuark quarkFromString_(const char* pString, GblBool alloc) {
+static GblQuark quarkFromString_(const char* pString, GblBool alloc) {
     GblQuark quark = 0;
     if(pString) {
         GBL_QUARK_ENSURE_INITIALIZED_();

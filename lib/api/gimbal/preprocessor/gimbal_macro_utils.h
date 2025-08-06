@@ -54,7 +54,9 @@ extern "C" {
 #define GBL_ASSERT(...)  \
     GBL_VA_OVERLOAD_SELECT(GBL_ASSERT, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)(__VA_ARGS__)
 
-
+//! Used to declare an endian-independent group of bitfields.
+#define GBL_BIT_FIELDS(...) \
+    GBL_TUPLE_FOREACH(GBL_BIT_FIELDS_ENTRY_, GBL_PHONY, GBL_BIT_FIELDS_ENDIAN_XFORM_ (__VA_ARGS__))
 
 #ifndef __cplusplus
 #   define GBL_META_GENERIC_MACRO_GENERATE(traits, X)                                                       \
@@ -81,6 +83,14 @@ extern "C" {
 
 // ===== Implementation ======
 ///\cond
+#define GBL_BIT_FIELDS_ENTRY_(a, b) b;
+
+#if GBL_BIG_ENDIAN
+#   define GBL_BIT_FIELDS_ENDIAN_XFORM_(...) (__VA_ARGS__)
+#else
+#   define GBL_BIT_FIELDS_ENDIAN_XFORM_(...) (GBL_REVERSE(__VA_ARGS__))
+#endif
+
 #define GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_OVERLOADS_(defaultFunc, overloads)     overloads
 #define GBL_META_GENERIC_MACRO_TRAIT_OVERLOADS_PROPERTY_TYPE_(type, function)        type
 #define GBL_META_GENERIC_MACRO_TRAIT_OVERLOADS_PROPERTY_FUNCTION_(type, function)    function

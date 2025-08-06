@@ -80,13 +80,15 @@ GBL_CLASS_END
  *
  *  \sa GblBoxClass
  */
-GBL_INSTANCE_BASE(GblBox)                            // Size (32/64 bit)
-    GBL_PRIVATE_BEGIN                                // 12/20 Bytes Total
-        GblArrayMap*      pFields;                   //!< PRIVATE: Storage for extended userdata fields
-        volatile uint16_t refCounter;                //!< PRIVATE: Atomic reference counter
-        uint16_t          contextType         : 1;   //!< PRIVATE: GblContext type flag \deprecated
-        uint16_t          constructedInPlace  : 1;   //!< PRIVATE: Flag for whether memory is deallocated upon destruction
-        uint16_t          derivedFlags        : 14;  //!< PRIVATE: Extra flags for use in derived classes
+GBL_INSTANCE_BASE(GblBox)                          // Size (32/64 bit)
+    GBL_PRIVATE_BEGIN                              // 12/20 Bytes Total
+        GblArrayMap*      pFields;                 //!< PRIVATE: Storage for extended userdata fields
+        volatile uint16_t refCounter;              //!< PRIVATE: Atomic reference counter
+        GBL_BIT_FIELDS (
+            uint16_t      contextType         : 1, //!< PRIVATE: GblContext type flag \deprecated
+            uint16_t      constructedInPlace  : 1, //!< PRIVATE: Flag for whether memory is deallocated upon destruction
+            uint16_t      derivedFlags        : 14 //!< PRIVATE: Extra flags for use in derived classes
+        )
     GBL_PRIVATE_END
 GBL_INSTANCE_END
 

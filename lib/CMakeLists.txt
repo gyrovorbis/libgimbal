@@ -448,9 +448,9 @@ configure_file(${GBL_CONFIGURATION_INPUT_PATH}
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH})
 
 
-install(TARGETS libGimbal
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
+#install(TARGETS libGimbal
+#        LIBRARY DESTINATION lib
+#        ARCHIVE DESTINATION lib)
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal"
-        DESTINATION "include")
+        DESTINATION "${CMAKE_INSTALL_INDLUDEDIR}")

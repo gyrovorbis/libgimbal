@@ -26,7 +26,7 @@
 #include "../core/gimbal_ctx.h"
 #include "../algorithms/gimbal_hash.h"
 #include "../preprocessor/gimbal_compiler.h"
-#include "../preprocessor/gimbal_macro_composition.h"
+#include "../preprocessor/gimbal_macro_utils.h"
 #include "gimbal_quark.h"
 #include <ctype.h>
 #include <stdint.h>
@@ -55,13 +55,11 @@ GBL_DECLS_BEGIN
  *  to be a well-formed standalone C string.
  */
 typedef struct GblStringView {
-    const char* pData;                  //!< Start address of the string being viewed
-    size_t      nullTerminated  : 1;    //!< Reserved bit for maintaining whether the string is NULL terminated or not
-#ifdef GBL_64BIT
-    size_t      length          : 63;   //!< Length (bytes) of the substring being viewed
-#elif defined(GBL_32BIT)
-    size_t      length          : 31;
-#endif
+    const char* pData;                                   //!< Start address of the string being viewed
+    GBL_BIT_FIELDS (
+        size_t  nullTerminated : 1,                      //!< Whether the string is NULL-terminated or not
+        size_t  length         : sizeof(size_t) * 8 - 1  //!< Length of the string in bytes
+    )
 } GblStringView;
 
 /*! \name Construction
