@@ -328,7 +328,7 @@ GBL_TEST_CASE(detach)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsSpawnThreads)
-#ifdef GBL_PSP
+#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
     GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
 #endif
 
@@ -348,7 +348,7 @@ GBL_TEST_CASE(tlsSpawnThreads)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsInitBss)
-#ifdef GBL_PSP
+#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
     GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
 #endif
 
@@ -360,7 +360,7 @@ GBL_TEST_CASE(tlsInitBss)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsInitData)
-#ifdef GBL_PSP
+#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
     GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
 #endif
 
@@ -370,7 +370,7 @@ GBL_TEST_CASE(tlsInitData)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsInitAlignment)
-#ifdef GBL_PSP
+#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
     GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
 #endif
 
@@ -380,7 +380,7 @@ GBL_TEST_CASE(tlsInitAlignment)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsReadWrite)
-#ifdef GBL_PSP
+#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
     GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
 #endif
 
@@ -391,7 +391,7 @@ GBL_TEST_CASE(tlsReadWrite)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsJoinThreads)
-#ifdef GBL_PSP
+#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
     GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
 #endif
 

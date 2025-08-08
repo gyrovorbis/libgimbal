@@ -33,6 +33,7 @@ GBL_EXPORT GBL_RESULT GblUuid_genV4(GblUuid* pSelf) {
     GBL_CTX_END();
 }
 
+/*
 GBL_EXPORT const char* GblUuid_string(const GblUuid* pSelf, char* pStrBuffer) {
     const char* pStr = NULL;
     GBL_CTX_BEGIN(NULL);
@@ -48,7 +49,26 @@ GBL_EXPORT const char* GblUuid_string(const GblUuid* pSelf, char* pStrBuffer) {
     GBL_CTX_END_BLOCK();
     return pStr;
 }
+*/
 
+GBL_EXPORT const char* GblUuid_string(const GblUuid* pSelf, char* pStrBuffer) {
+    const char* pStr = NULL;
+    GBL_CTX_BEGIN(NULL);
+GBL_CTX_VERIFY(sprintf(pStrBuffer, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x"
+                                   "-%02x%02x%02x%02x%02x%02x",
+                                   pSelf->bytes[ 3], pSelf->bytes[ 2], pSelf->bytes[ 1], pSelf->bytes[ 0],  // time_low reversed
+                                   pSelf->bytes[ 5], pSelf->bytes[ 4],                                      // time_mid reversed
+                                   pSelf->bytes[ 7], pSelf->bytes[ 6],                                      // time_hi_and_version reversed
+                                   pSelf->bytes[ 8], pSelf->bytes[ 9],                                      // clock_seq (unchanged)
+                                   pSelf->bytes[10], pSelf->bytes[11], pSelf->bytes[12], pSelf->bytes[13], pSelf->bytes[14], pSelf->bytes[15]) // node (unchanged)
+                   == GBL_UUID_STRING_LENGTH,
+                   GBL_RESULT_ERROR_UNDERFLOW);
+    pStr = pStrBuffer;
+    GBL_CTX_END_BLOCK();
+    return pStr;
+}
+
+/*
 GBL_EXPORT GBL_RESULT GblUuid_parse(GblUuid* pSelf, const char* pStrBuffer) {
     GBL_CTX_BEGIN(NULL);
 
@@ -80,6 +100,48 @@ GBL_EXPORT GBL_RESULT GblUuid_parse(GblUuid* pSelf, const char* pStrBuffer) {
         pSelf->bytes[b++] = (high << 4) | low;
 
     }
+
+    GBL_CTX_END();
+} */
+
+#include <sys/endian.h>
+GBL_EXPORT GBL_RESULT GblUuid_parse(GblUuid* pSelf, const char* pStrBuffer) {
+    GBL_CTX_BEGIN(NULL);
+
+    GBL_CTX_VERIFY_CALL(GblUuid_setNil(pSelf));
+
+    GblStringView strv = GblStringView_fromString(pStrBuffer);
+
+    GBL_CTX_VERIFY(strv.length == GBL_UUID_STRING_LENGTH,
+                   GBL_RESULT_ERROR_OUT_OF_RANGE);
+
+    for(size_t  b = 0, c = 0;
+        b < GBL_UUID_BYTE_COUNT && c < strv.length;)
+    {
+        if(c == 8 || c == 13 || c == 18 || c == 23) {
+            GBL_CTX_VERIFY(GblStringView_at(strv, c++) == '-',
+                           GBL_RESULT_ERROR_INVALID_ARG);
+            continue;
+        }
+
+        const int high = gblAsciiHexDigitValue(GblStringView_at(strv, c++));
+        const int low  = gblAsciiHexDigitValue(GblStringView_at(strv, c++));
+
+        GBL_CTX_VERIFY(high != -1,
+                       GBL_RESULT_ERROR_INVALID_ARG);
+
+        GBL_CTX_VERIFY(low != -1,
+                       GBL_RESULT_ERROR_INVALID_ARG);
+
+        pSelf->bytes[b++] = (high << 4) | low;
+
+    }
+
+#if GBL_BIG_ENDIAN
+    pSelf->private_.time_low = bswap32(pSelf->private_.time_low);
+    pSelf->private_.time_mid = bswap16(pSelf->private_.time_mid);
+    pSelf->private_.time_hi_and_version = bswap16(pSelf->private_.time_hi_and_version);
+#endif
 
     GBL_CTX_END();
 }
