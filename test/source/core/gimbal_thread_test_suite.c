@@ -327,10 +327,15 @@ GBL_TEST_CASE(detach)
     while(!pFixture->thread2Finished);
 GBL_TEST_CASE_END
 
-GBL_TEST_CASE(tlsSpawnThreads)
-#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
-    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
+#ifdef GBL_TLS_EMULATED
+#   define GBL_TEST_REQUIRE_TLS()
+#else
+#   define GBL_TEST_REQUIRE_TLS() \
+        GBL_TEST_SKIP("Unimplemented for platforms requiring emulated TLS.")
 #endif
+
+GBL_TEST_CASE(tlsSpawnThreads)
+    GBL_TEST_REQUIRE_TLS();
 
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         char nameBuff[64];
@@ -348,9 +353,7 @@ GBL_TEST_CASE(tlsSpawnThreads)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsInitBss)
-#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
-    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
-#endif
+    GBL_TEST_REQUIRE_TLS();
 
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         while(!pFixture->pTestThreads[t]->tlsInitRan);
@@ -360,9 +363,7 @@ GBL_TEST_CASE(tlsInitBss)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsInitData)
-#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
-    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
-#endif
+    GBL_TEST_REQUIRE_TLS();
 
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         GBL_TEST_VERIFY(pFixture->pTestThreads[t]->tlsInitDataPass);
@@ -370,9 +371,7 @@ GBL_TEST_CASE(tlsInitData)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsInitAlignment)
-#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
-    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
-#endif
+    GBL_TEST_REQUIRE_TLS();
 
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         GBL_TEST_VERIFY(pFixture->pTestThreads[t]->tlsInitAlignPass);
@@ -380,9 +379,7 @@ GBL_TEST_CASE(tlsInitAlignment)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsReadWrite)
-#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
-    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
-#endif
+    GBL_TEST_REQUIRE_TLS();
 
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         while(!pFixture->pTestThreads[t]->tlsReadWriteRan);
@@ -391,9 +388,7 @@ GBL_TEST_CASE(tlsReadWrite)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(tlsJoinThreads)
-#if defined(GBL_PSP) || defined(GBL_GAMECUBE)
-    GBL_TEST_SKIP("Unimplemented on PSP without `thread_local` support!");
-#endif
+    GBL_TEST_REQUIRE_TLS();
 
     for(unsigned t = 0; t < GBL_TEST_THREAD_TLS_THREAD_COUNT_; ++t) {
         GBL_TEST_CALL(GblThread_join(GBL_THREAD(pFixture->pTestThreads[t])));

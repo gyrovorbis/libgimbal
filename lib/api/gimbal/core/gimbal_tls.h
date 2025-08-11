@@ -25,6 +25,10 @@
 #include <tinycthread.h>
 #include "../preprocessor/gimbal_compiler.h"
 
+#if defined(GBL_GAMECUBE) || defined(GBL_PSP)
+#   define GBL_TLS_EMULATED 1
+#endif
+
 /*! \def GBL_TLS(type, name, init)
  *
  *  Defines a thread-local variable using the given information,
@@ -37,7 +41,7 @@
  *
  *  \sa GBL_TLS_LOAD()
  */
-#if !defined(GBL_GAMECUBE) && !defined(GBL_PSP) && !GBL_TLS_EMULATED
+#if !GBL_TLS_EMULATED
 #   define GBL_TLS(type, name, ...) GBL_THREAD_LOCAL type name = __VA_ARGS__
 #else
 #   define GBL_TLS(type, name, ...) \
@@ -73,7 +77,7 @@
  *
  *  \sa GBL_TLS()
  */
-#if !defined(GBL_GAMECUBE) && !defined(GBL_PSP) && !GBL_TLS_EMULATED
+#if !GBL_TLS_EMULATED
 #   define GBL_TLS_LOAD(name)    &name
 #else
 #   define GBL_TLS_LOAD(name)   tls_##name##_load_()
