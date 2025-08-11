@@ -11,8 +11,8 @@
 #define GBL_HASH_TEST_SUITE_WORD_CHARS_     NULL
 
 typedef struct GblHashTestSuite_ {
-    char words[GBL_HASH_TEST_SUITE_WORD_COUNT_][GBL_HASH_TEST_SUITE_WORD_SIZE_MAX_+1];
-    size_t  total;
+    char   words[GBL_HASH_TEST_SUITE_WORD_COUNT_][GBL_HASH_TEST_SUITE_WORD_SIZE_MAX_+1];
+    size_t total;
 } GblHashTestSuite_;
 
 static void* GblHashTestSuite_randomizeWords_(GblTestSuite* pSelf) {

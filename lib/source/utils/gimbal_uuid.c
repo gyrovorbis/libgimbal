@@ -36,12 +36,20 @@ GBL_EXPORT GBL_RESULT GblUuid_genV4(GblUuid* pSelf) {
 GBL_EXPORT const char* GblUuid_string(const GblUuid* pSelf, char* pStrBuffer) {
     const char* pStr = NULL;
     GBL_CTX_BEGIN(NULL);
+
     GBL_CTX_VERIFY(sprintf(pStrBuffer, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x"
                                        "-%02x%02x%02x%02x%02x%02x",
+#if GBL_BIG_ENDIAN
+                                       pSelf->bytes[ 3], pSelf->bytes[ 2], pSelf->bytes[ 1], pSelf->bytes[ 0],
+                                       pSelf->bytes[ 5], pSelf->bytes[ 4], pSelf->bytes[ 7], pSelf->bytes[ 6],
+                                       pSelf->bytes[ 8], pSelf->bytes[ 9], pSelf->bytes[10], pSelf->bytes[11],
+                                       pSelf->bytes[12], pSelf->bytes[13], pSelf->bytes[14], pSelf->bytes[15])
+#else
                                        pSelf->bytes[ 0], pSelf->bytes[ 1], pSelf->bytes[ 2], pSelf->bytes[ 3],
                                        pSelf->bytes[ 4], pSelf->bytes[ 5], pSelf->bytes[ 6], pSelf->bytes[ 7],
                                        pSelf->bytes[ 8], pSelf->bytes[ 9], pSelf->bytes[10], pSelf->bytes[11],
                                        pSelf->bytes[12], pSelf->bytes[13], pSelf->bytes[14], pSelf->bytes[15])
+#endif
                    == GBL_UUID_STRING_LENGTH,
                    GBL_RESULT_ERROR_UNDERFLOW);
     pStr = pStrBuffer;
@@ -80,6 +88,15 @@ GBL_EXPORT GBL_RESULT GblUuid_parse(GblUuid* pSelf, const char* pStrBuffer) {
         pSelf->bytes[b++] = (high << 4) | low;
 
     }
+
+#if GBL_BIG_ENDIAN
+    pSelf->private_.time_low
+        = GBL_BSWAP_U32(pSelf->private_.time_low);
+    pSelf->private_.time_mid
+        = GBL_BSWAP_U16(pSelf->private_.time_mid);
+    pSelf->private_.time_hi_and_version
+        = GBL_BSWAP_U16(pSelf->private_.time_hi_and_version);
+#endif
 
     GBL_CTX_END();
 }

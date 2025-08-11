@@ -358,7 +358,7 @@ GBL_TEST_CASE(propertyGet)
                                     NULL);
     GBL_TEST_VERIFY(pObj1);
 
-    uint32_t    refCount    = 0;
+    uint16_t    refCount    = 0;
     void*       pUserdata   = NULL;
     const char* pName       = NULL;
     GblObject*  pParent     = NULL;

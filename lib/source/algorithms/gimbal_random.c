@@ -88,7 +88,7 @@ GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char
     return size;
 }
 
-GBL_EXPORT void gblRandBuffer(void* pData, size_t  size) {
+GBL_EXPORT void gblRandBuffer(void* pData, size_t size) {
     for(size_t  i = 0; i < size; ++i) {
         (((uint8_t*)pData)[i]) = (uint8_t)gblRandEquilikely(0, 255);
     }
