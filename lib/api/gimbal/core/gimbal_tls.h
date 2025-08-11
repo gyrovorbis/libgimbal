@@ -78,7 +78,7 @@
  *  \sa GBL_TLS()
  */
 #if !GBL_TLS_EMULATED
-#   define GBL_TLS_LOAD(name)    &name
+#   define GBL_TLS_LOAD(name)   &name
 #else
 #   define GBL_TLS_LOAD(name)   tls_##name##_load_()
 #endif
