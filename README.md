@@ -38,11 +38,12 @@ libGimbal is split into a series of APIs, featuring:
 - Unit Test Framework
 
 # Platforms #
-libGimbal is being actively tested in CI on the following targets:
+libGimbal is being actively tested on the following targets:
 - Windows 
 - MacOS 
 - Linux 
 - Sega Dreamcast
+- Nintendo Gamecube
 - Sony PSP
 - Sony PSVita
 - WebAssembly

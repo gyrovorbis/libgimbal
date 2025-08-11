@@ -611,6 +611,7 @@
 #define GBL_NULL_TERMINATED
 
 #if GBL_MSVC
+#   include <stdlib.h>
 #   define GBL_BSWAP_U16(v) _byteswap_ushort(v)
 #   define GBL_BSWAP_U32(v) _byteswap_ulong(v)
 #   define GBL_BSWAP_U64(v) _byteswap_uint64(v)

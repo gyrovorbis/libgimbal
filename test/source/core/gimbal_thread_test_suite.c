@@ -184,13 +184,13 @@ static GblType GblTestThread_type(void) {
 
     if(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblTestThread"),
-                                      GBL_THREAD_TYPE,
-                                      &(GblTypeInfo) {
-                                          .pFnClassInit = GblTestThreadClass_init_,
-                                          .classSize    = sizeof(GblTestThreadClass),
-                                          .instanceSize = sizeof(GblTestThread)
-                                      },
-                                      GBL_TYPE_FLAGS_NONE);
+                                GBL_THREAD_TYPE,
+                                &(GblTypeInfo) {
+                                    .pFnClassInit = GblTestThreadClass_init_,
+                                    .classSize    = sizeof(GblTestThreadClass),
+                                    .instanceSize = sizeof(GblTestThread)
+                                },
+                                GBL_TYPE_FLAGS_NONE);
     }
 
     return type;
@@ -327,7 +327,7 @@ GBL_TEST_CASE(detach)
     while(!pFixture->thread2Finished);
 GBL_TEST_CASE_END
 
-#ifdef GBL_TLS_EMULATED
+#if GBL_TLS_EMULATED
 #   define GBL_TEST_REQUIRE_TLS()
 #else
 #   define GBL_TEST_REQUIRE_TLS() \
