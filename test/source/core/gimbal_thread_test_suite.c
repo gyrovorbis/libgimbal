@@ -327,11 +327,11 @@ GBL_TEST_CASE(detach)
     while(!pFixture->thread2Finished);
 GBL_TEST_CASE_END
 
-#if GBL_TLS_EMULATED
-#   define GBL_TEST_REQUIRE_TLS()
-#else
+#ifdef GBL_TLS_EMULATED
 #   define GBL_TEST_REQUIRE_TLS() \
         GBL_TEST_SKIP("Unimplemented for platforms requiring emulated TLS.")
+#else
+#   define GBL_TEST_REQUIRE_TLS()
 #endif
 
 GBL_TEST_CASE(tlsSpawnThreads)
