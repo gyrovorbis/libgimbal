@@ -184,6 +184,11 @@ if(PSP)
          -lpspnet_apctl)
 endif()
 
+if(PLATFORM_DREAMCAST)
+    include(kallistios REQUIRED)
+    kos_run_target(GimbalTests run-gimbal-tests)
+endif()
+
 target_link_libraries(GimbalTests
     PRIVATE
     ${GBL_TEST_LINK_LIBS})
