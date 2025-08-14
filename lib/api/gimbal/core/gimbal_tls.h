@@ -25,7 +25,7 @@
 #include <tinycthread.h>
 #include "../preprocessor/gimbal_compiler.h"
 
-#if defined(GBL_GAMECUBE) || defined(GBL_PSP)
+#if defined(GBL_PSP)
 #   define GBL_TLS_EMULATED 1
 #endif
 
