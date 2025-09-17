@@ -229,9 +229,9 @@
 #ifdef _MSC_VER
 #   define GBL_THREAD_LOCAL __declspec(thread)
 #else
-#   if defined(__DREAMCAST__)
+#   if defined(__DREAMCAST__) || defined(__GAMECUBE__)
 #       define GBL_THREAD_LOCAL     _Thread_local
-#   elif defined(__GAMECUBE__) || defined(__PSP__)
+#   elif defined(__PSP__)
 #       define GBL_THREAD_LOCAL
 #   else
 #       define GBL_THREAD_LOCAL     __thread
