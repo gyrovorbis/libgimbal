@@ -11,7 +11,7 @@
   <p align="center">
     C17-Based Extended Standard Library and Object-Oriented Type System
     <br />
-    <a href="http://libgimbal.elysianshadows.com"><strong>Explore the docs »</strong></a>
+    <a href="http://libgimbal.falcogirgis.net"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     Cross-Platform

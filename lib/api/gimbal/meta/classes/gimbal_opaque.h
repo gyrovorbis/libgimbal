@@ -2,7 +2,22 @@
  *  \brief      GblOpaqueClass and API for managing Opaque types
  *  \ingroup    meta
  *
- *  \author     2023 Falco Girgis
+ *  This file contains the API for registering and managing the lifetime of "opaque"
+ *  user data types. This is an intermediate libGimbal type, which inherits from
+ *  GBL_POINTER_TYPE, adding additional functionality. Rather than simple pointer
+ *  assignments for copy semantics with no lifetime management, a type which derives
+ *  from GBL_OPAQUE_TYPE adds the bare minimum virtual functions required to implement
+ *  lifetime management.
+ *
+ *  When assigning the value of a GBL_OPAQUE_TYPE to another, the "copy" virtual method
+ *  is called, which may implement value-based copying via something like memcpy(), or
+ *  reference-based copying via something like incrementing a reference counter.
+ *
+ *  When the GBL_OPAQUE_TYPE is destroyed, the "free" virtual method is called, which
+ *  may opt to actually deallocate the object for value-based copied objects OR it may
+ *  simply decrement a reference counter for reference-based semantics. 
+ *
+ *  \author     2023, 2025 Falco Girgis
  *  \copyright  MIT License
  */
 #ifndef GIMBAL_OPAQUE_H
@@ -35,8 +50,7 @@ typedef struct GblOpaqueVTable {
  *  \extends GblPrimitiveClass
  *  \brief GblClass structure for opaque types
  *
- *  Simply contains a virtual table pointer
- *  to the implementation details.
+ *  Simply contains a virtual table pointer to the implementation details.
  */
 GBL_CLASS_DERIVE(GblOpaque, GblPrimitive)
     const GblOpaqueVTable* pVTable; //!< Pointer to the virtual table structure
@@ -46,13 +60,13 @@ GBL_CLASS_END
  *  \brief Miscellaenous and Utility methods
  *  @{
  */
-//! Returns the GblType UUID for GblOpaque
-GBL_EXPORT GblType GblOpaque_type     (void)                           GBL_NOEXCEPT;
-//! Registers an opaque subtype with the virtual table given by \p pVTable
-GBL_EXPORT GblType GblOpaque_register (const char*            pName,
-                                       const GblOpaqueVTable* pVTable) GBL_NOEXCEPT;
-
-GBL_EXPORT GblType GblOpaque_registerRef (const char* pName) GBL_NOEXCEPT;
+//! Returns the GblType UUID for GblOpaque.
+GBL_EXPORT GblType GblOpaque_type        (void)                           GBL_NOEXCEPT;
+//! Registers a new opaque subtype with the virtual table given by \p pVTable.
+GBL_EXPORT GblType GblOpaque_register    (const char*            pName,
+                                          const GblOpaqueVTable* pVTable) GBL_NOEXCEPT;
+//! Convenience function which registers a new type meta type which is used with GblRef to manage its lifetime.
+GBL_EXPORT GblType GblOpaque_registerRef (const char* pName)              GBL_NOEXCEPT;
 //! @}
 
 /*! \name Instance Methods

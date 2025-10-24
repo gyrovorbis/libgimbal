@@ -37,21 +37,27 @@ GBL_EXPORT const char* GblUuid_string(const GblUuid* pSelf, char* pStrBuffer) {
     const char* pStr = NULL;
     GBL_CTX_BEGIN(NULL);
 
-    GBL_CTX_VERIFY(sprintf(pStrBuffer, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x"
+    size_t printedBytes =
+        sprintf(pStrBuffer, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x"
                                        "-%02x%02x%02x%02x%02x%02x",
 #if GBL_BIG_ENDIAN
+
                                        pSelf->bytes[ 3], pSelf->bytes[ 2], pSelf->bytes[ 1], pSelf->bytes[ 0],
                                        pSelf->bytes[ 5], pSelf->bytes[ 4], pSelf->bytes[ 7], pSelf->bytes[ 6],
                                        pSelf->bytes[ 8], pSelf->bytes[ 9], pSelf->bytes[10], pSelf->bytes[11],
                                        pSelf->bytes[12], pSelf->bytes[13], pSelf->bytes[14], pSelf->bytes[15])
+
 #else
+
                                        pSelf->bytes[ 0], pSelf->bytes[ 1], pSelf->bytes[ 2], pSelf->bytes[ 3],
                                        pSelf->bytes[ 4], pSelf->bytes[ 5], pSelf->bytes[ 6], pSelf->bytes[ 7],
                                        pSelf->bytes[ 8], pSelf->bytes[ 9], pSelf->bytes[10], pSelf->bytes[11],
                                        pSelf->bytes[12], pSelf->bytes[13], pSelf->bytes[14], pSelf->bytes[15])
+
 #endif
-                   == GBL_UUID_STRING_LENGTH,
-                   GBL_RESULT_ERROR_UNDERFLOW);
+        ;
+
+    GBL_CTX_VERIFY(printedBytes == GBL_UUID_STRING_LENGTH, GBL_RESULT_ERROR_UNDERFLOW);
     pStr = pStrBuffer;
     GBL_CTX_END_BLOCK();
     return pStr;
