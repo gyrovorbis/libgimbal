@@ -1013,6 +1013,7 @@ GBL_EXPORT GblObject* GblObject_childFirst(const GblObject* pSelf) {
 
     return pChild;
 }
+
 GBL_EXPORT GblObject* GblObject_siblingNext(const GblObject* pSelf) {
     GblObject* pSibling = NULL;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
@@ -1022,6 +1023,45 @@ GBL_EXPORT GblObject* GblObject_siblingNext(const GblObject* pSelf) {
     }
 
     return pSibling;
+}
+
+GBL_EXPORT GblObject *GblObject_siblingNextByType(const GblObject *pSelf, GblType type) {
+    do pSelf = GblObject_siblingNext(pSelf);
+    while (pSelf != NULL && GBL_TYPEOF(pSelf) != type);
+    return pSelf;
+}
+
+GBL_EXPORT GblObject *GblObject_siblingNextByName(const GblObject *pSelf, const char *name) {
+    do pSelf = GblObject_siblingNext(pSelf);
+    while (pSelf != NULL && strcmp(GblObject_name(pSelf), name) != 0);
+    return pSelf;
+}
+
+GBL_EXPORT GblObject *GblObject_siblingPrevious(const GblObject *pSelf) {
+    GblObject *pParent = GblObject_parent(pSelf);
+    if(!pParent) return NULL;
+
+    size_t childCount = GblObject_childCount(pParent);
+    for (size_t i = 0; i < childCount; i++) {
+        GblObject *childObj = GblObject_findChildByIndex(pParent, i);
+        if (childObj == pSelf && i != 0) {
+            return GblObject_findChildByIndex(pParent, i - 1);
+        }
+    }
+
+    return NULL;
+}
+
+GBL_EXPORT GblObject *GblObject_siblingPreviousByType(const GblObject *pSelf, GblType type) {
+    do pSelf = GblObject_siblingPrevious(pSelf);
+    while (pSelf != NULL && GBL_TYPEOF(pSelf) != type);
+    return pSelf;
+}
+
+GBL_EXPORT GblObject *GblObject_siblingPreviousByName(const GblObject *pSelf, const char *name) {
+    do pSelf = GblObject_siblingPrevious(pSelf);
+    while (pSelf != NULL && strcmp(GblObject_name(pSelf), name) != 0);
+    return pSelf;
 }
 
 GBL_EXPORT void GblObject_addChild(GblObject* pSelf, GblObject* pChild) {
@@ -1135,6 +1175,21 @@ GBL_EXPORT size_t  GblObject_childCount(const GblObject* pSelf) {
 
     GBL_CTX_END_BLOCK();
     return count;
+}
+
+GBL_EXPORT size_t GblObject_childIndex(const GblObject *pSelf) {
+    GblObject *pParent = GblObject_parent(pSelf);
+    if (!pParent) return GBL_INDEX_INVALID;
+
+    size_t childCount = GblObject_childCount(pParent);
+    for (size_t i = 0; i < childCount; i++) {
+        GblObject *childObj = GblObject_findChildByIndex(pParent, i);
+        if (childObj == pSelf) {
+            return i;
+        }
+    }
+
+    return GBL_INDEX_INVALID;
 }
 
 GBL_EXPORT size_t  GblObject_depth(const GblObject* pSelf) {

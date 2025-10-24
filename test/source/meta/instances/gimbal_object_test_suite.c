@@ -765,6 +765,197 @@ GBL_TEST_CASE(variantITableNext)
     GblVariant_destruct(&v);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(siblingNextByType)
+    GblObject* pChild1 = GblObject_create(GBL_OBJECT_TYPE,  NULL);
+    GblObject* pChild2 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pChild3 = GblObject_create(GBL_OBJECT_TYPE,  NULL);
+    GblObject* pChild4 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pParent = GblObject_create(TEST_OBJECT_TYPE, NULL);
+
+    GblObject_setParent(pChild1, pParent);
+    GblObject_setParent(pChild2, pParent);
+    GblObject_setParent(pChild3, pParent);
+    GblObject_setParent(pChild4, pParent);
+
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pChild1, TEST_OBJECT_TYPE), pChild2);
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pChild2, TEST_OBJECT_TYPE), pChild4);
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pChild3, TEST_OBJECT_TYPE), pChild4);
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pChild4, TEST_OBJECT_TYPE), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pParent, TEST_OBJECT_TYPE), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pChild1, GBL_OBJECT_TYPE),  pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pChild2, GBL_OBJECT_TYPE),  pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pChild3, GBL_OBJECT_TYPE),  NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pChild4, GBL_OBJECT_TYPE),  NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByType(pParent, GBL_OBJECT_TYPE),  NULL);
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(siblingNextByName)
+    GblObject* pChild1 = GblObject_create(GBL_OBJECT_TYPE,
+                                    "name",     "Child1",
+                                    NULL);
+    GblObject* pChild2 = GblObject_create(TEST_OBJECT_TYPE,
+                                    "name",     "Child2",
+                                    NULL);
+    GblObject* pChild3 = GblObject_create(GBL_OBJECT_TYPE,
+                                    "name",     "Child3",
+                                    NULL);
+    GblObject* pChild4 = GblObject_create(GBL_OBJECT_TYPE,
+                                    "name",     "Child4",
+                                    NULL);
+    GblObject* pParent = GblObject_create(TEST_OBJECT_TYPE,
+                                    "name",     "Parent",
+                                    NULL);
+
+    GblObject_setParent(pChild1, pParent);
+    GblObject_setParent(pChild2, pParent);
+    GblObject_setParent(pChild3, pParent);
+    GblObject_setParent(pChild4, pParent);
+
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pChild1, "Child3"),         pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pChild2, "Child3"),         pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pChild3, "Child3"),         NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pChild4, "Child3"),         NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pChild1, "Child2"),         pChild2);
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pChild2, "Child2"),         NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pChild3, "hello!"),         NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pChild4, "libGimbal"),      NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pParent, "Child4"),         NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByName(pParent, "no siblings :("), NULL);
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+
+GBL_TEST_CASE(siblingPrevious)
+    GblObject* pChild1 = GblObject_create(GBL_OBJECT_TYPE,  NULL);
+    GblObject* pChild2 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pChild3 = GblObject_create(GBL_OBJECT_TYPE,  NULL);
+    GblObject* pChild4 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pParent = GblObject_create(TEST_OBJECT_TYPE, NULL);
+
+    GblObject_setParent(pChild1, pParent);
+    GblObject_setParent(pChild2, pParent);
+    GblObject_setParent(pChild3, pParent);
+    GblObject_setParent(pChild4, pParent);
+
+    GBL_TEST_COMPARE(GblObject_siblingPrevious(pChild1), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPrevious(pChild2), pChild1);
+    GBL_TEST_COMPARE(GblObject_siblingPrevious(pChild3), pChild2);
+    GBL_TEST_COMPARE(GblObject_siblingPrevious(pChild4), pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingPrevious(pParent), NULL);
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(siblingPreviousByType)
+    GblObject* pChild1 = GblObject_create(GBL_OBJECT_TYPE,  NULL);
+    GblObject* pChild2 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pChild3 = GblObject_create(GBL_OBJECT_TYPE,  NULL);
+    GblObject* pChild4 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pParent = GblObject_create(TEST_OBJECT_TYPE, NULL);
+
+    GblObject_setParent(pChild1, pParent);
+    GblObject_setParent(pChild2, pParent);
+    GblObject_setParent(pChild3, pParent);
+    GblObject_setParent(pChild4, pParent);
+
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pChild1, TEST_OBJECT_TYPE), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pChild2, TEST_OBJECT_TYPE), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pChild3, TEST_OBJECT_TYPE), pChild2);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pChild4, TEST_OBJECT_TYPE), pChild2);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pParent, TEST_OBJECT_TYPE), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pChild1, GBL_OBJECT_TYPE), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pChild2, GBL_OBJECT_TYPE), pChild1);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pChild3, GBL_OBJECT_TYPE), pChild1);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pChild4, GBL_OBJECT_TYPE), pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByType(pParent, GBL_OBJECT_TYPE), NULL);
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(siblingPreviousByName)
+    GblObject* pChild1 = GblObject_create(GBL_OBJECT_TYPE,
+                                    "name",     "Child1",
+                                    NULL);
+    GblObject* pChild2 = GblObject_create(TEST_OBJECT_TYPE,
+                                    "name",     "Child2",
+                                    NULL);
+    GblObject* pChild3 = GblObject_create(GBL_OBJECT_TYPE,
+                                    "name",     "Child3",
+                                    NULL);
+    GblObject* pChild4 = GblObject_create(GBL_OBJECT_TYPE,
+                                    "name",     "Child4",
+                                    NULL);
+    GblObject* pParent = GblObject_create(TEST_OBJECT_TYPE,
+                                    "name",     "Parent",
+                                    NULL);
+
+    GblObject_setParent(pChild1, pParent);
+    GblObject_setParent(pChild2, pParent);
+    GblObject_setParent(pChild3, pParent);
+    GblObject_setParent(pChild4, pParent);
+
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pChild1, "Child3"),    NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pChild2, "Child3"),    NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pChild3, "Child3"),    NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pChild4, "Child3"),    pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pParent, "Child4"),    NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pChild1, "something"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pChild2, "Child1"),    pChild1);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pChild3, "Child1"),    pChild1);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pChild4, "Child1"),    pChild1);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByName(pParent, "something"), NULL);
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(childIndex)
+    GblObject* pChild1 = GblObject_create(GBL_OBJECT_TYPE,  NULL);
+    GblObject* pChild2 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pChild3 = GblObject_create(GBL_OBJECT_TYPE,  NULL);
+    GblObject* pChild4 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pParent = GblObject_create(TEST_OBJECT_TYPE, NULL);
+
+    GblObject_setParent(pChild1, pParent);
+    GblObject_setParent(pChild2, pParent);
+    GblObject_setParent(pChild3, pParent);
+    GblObject_setParent(pChild4, pParent);
+
+    GBL_TEST_COMPARE(GblObject_childIndex(pChild1), 0);
+    GBL_TEST_COMPARE(GblObject_childIndex(pChild2), 1);
+    GBL_TEST_COMPARE(GblObject_childIndex(pChild3), 2);
+    GBL_TEST_COMPARE(GblObject_childIndex(pChild4), 3);
+    GBL_TEST_COMPARE(GblObject_childIndex(pParent), GBL_INDEX_INVALID);
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(newDefault,
                   name,
                   ref,
@@ -790,7 +981,14 @@ GBL_TEST_REGISTER(newDefault,
                   variantITableCount,
                   variantITableIndex,
                   variantITableSetIndex,
-                  variantITableNext)
+                  variantITableNext,
+                  siblingNextByType,
+                  siblingNextByName,
+                  siblingPrevious,
+                  siblingPreviousByType,
+                  siblingPreviousByName,
+                  childIndex
+                )
 
 static GBL_RESULT TestObject_IEventHandler_handleEvent(GblIEventHandler* pHandler, GblEvent* pEvent) {
     GBL_CTX_BEGIN(pHandler);
