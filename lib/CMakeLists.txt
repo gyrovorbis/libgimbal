@@ -102,6 +102,7 @@ endif()
 set(GIMBAL_INCLUDES
     ${GBL_CONFIGURATION_INPUT_PATH}
     ${GIMBAL_CONFIGURATION_OUTPUT_PATH}
+    api/gimbal/gimbal.h
     api/gimbal/gimbal_allocators.h
     api/gimbal/gimbal_algorithms.h
     api/gimbal/algorithms/gimbal_compression.h
