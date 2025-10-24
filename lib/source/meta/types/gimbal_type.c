@@ -791,7 +791,7 @@ GblType GblType_registerBuiltin_(size_t             expectedIndex,
     return type;
 }
 
-GBL_EXPORT GblType GblType_fromBuiltinIndex(size_t  index) {
+GBL_EXPORT GblType GblType_fromBuiltinIndex(size_t index) {
     GblType type = GBL_INVALID_TYPE;
     GBL_TYPE_ENSURE_INITIALIZED_();
     {
