@@ -4,6 +4,8 @@
  *
  *  \author Shirobon
  *  \author Falco Girgis
+ *
+ *  \copyright MIT License
  */
 
 #ifndef GIMBAL_NUMERIC_H
@@ -14,17 +16,7 @@
 #include <float.h>
 #include <math.h>
 
-#ifndef M_PI
-#   define M_PI (3.14159265358979323846264338327950288)
-#endif
-
-#ifndef F_PI
-#   define F_PI    (float)M_PI
-#endif
-
-#ifndef M_E
-#   define M_E  (2.71828182845904523536)
-#endif
+#define GBL_F_PI    3.1415926f
 
 #define gblPow2Next(X)  GBL_META_GENERIC_MACRO_GENERATE(GBL_POW2_NEXT_TRAITS_, X)(X)
 

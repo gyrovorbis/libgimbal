@@ -15,7 +15,7 @@
  *  - implement class property
  *  - Get rid of GblObject_findContext()
  *
- *  \author    2023, 2024  Falco Girgis
+ *  \author    2023, 2024 Falco Girgis
  *  \copyright MIT License
  */
 #ifndef GIMBAL_OBJECT_H

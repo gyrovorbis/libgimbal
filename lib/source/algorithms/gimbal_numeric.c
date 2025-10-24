@@ -196,11 +196,11 @@ GBL_EXPORT double gblRelativeError(double approximate, double exact) {
 }
 
 GBL_EXPORT float gblDegToRadf(float degrees) {
-    return degrees * (F_PI / 180.0f);
+    return degrees * (GBL_F_PI / 180.0f);
 }
 
 GBL_EXPORT float gblRadToDegf(float radians) {
-    return radians * (180.0f / F_PI);
+    return radians * (180.0f / GBL_F_PI);
 }
 
 static uint32_t primes_[] = {

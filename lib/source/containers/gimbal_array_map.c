@@ -58,11 +58,11 @@ static GBL_RESULT GblArrayMap_entrySetVariant_(GblArrayMap*const* ppSelf, GblArr
 static GblArrayMapEntry* GblArrayMap_entryAdd_(GblArrayMap** ppSelf, uintptr_t key) {
     GblArrayMapEntry* pEntry = NULL;
     GBL_CTX_BEGIN(NULL);
-    const size_t  size = GblArrayMap_size(ppSelf);
+    const size_t size = GblArrayMap_size(ppSelf);
 
     // Have to insert in sorted order for Nth entry when binary searchable
     if(*ppSelf && size && GblArrayMap_binarySearches(ppSelf)) {
-        size_t  insertionIdx = size;
+        size_t insertionIdx = size;
 
         // If we have a little array that's fast linearly
         if(size < GBL_ARRAY_MAP_BINARY_SEARCH_CUTOFF_SIZE) {
@@ -77,7 +77,7 @@ static GblArrayMapEntry* GblArrayMap_entryAdd_(GblArrayMap** ppSelf, uintptr_t k
         // Time to bust out the big guns and search intelligently
         } else {
 
-            ptrdiff_t upper = size-1;
+            ptrdiff_t upper = size - 1;
             ptrdiff_t lower = 0;
             GblArrayMap* pSelf = *ppSelf;
             GblBool found = GBL_FALSE;
@@ -105,12 +105,12 @@ static GblArrayMapEntry* GblArrayMap_entryAdd_(GblArrayMap** ppSelf, uintptr_t k
         }
 
         // resize array and initialize entry to point to new position
-        *ppSelf = (GblArrayMap*)GBL_CTX_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(size+1));
+        *ppSelf = (GblArrayMap*)GBL_CTX_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(size + 1));
         ++GBL_PRIV_REF(*ppSelf).size;
         pEntry = GblArrayMap_entry_(ppSelf, insertionIdx);
 
         // calculate slide adjustments for the rest of the items
-        const size_t  slideSize = (size - insertionIdx);
+        const size_t slideSize = (size - insertionIdx);
         if(slideSize) {
             // scooch the bitches over by one
             memmove(pEntry + 1,
@@ -133,8 +133,11 @@ static GblArrayMapEntry* GblArrayMap_entryAdd_(GblArrayMap** ppSelf, uintptr_t k
     }
 
     // initialize new entry
-    memset(pEntry, 0, sizeof(GblArrayMapEntry));
-    pEntry->key = key;
+    assert(pEntry);
+    if(pEntry) {
+        memset(pEntry, 0, sizeof(GblArrayMapEntry));
+        pEntry->key = key;
+    }
 
     // return new entry
     GBL_CTX_END_BLOCK();
