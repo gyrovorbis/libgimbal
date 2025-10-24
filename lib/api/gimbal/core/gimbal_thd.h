@@ -3,8 +3,7 @@
  *  \ingroup core
  *  \deprecated Use gimbal_thread.h
  *
- *  \todo
- *      - get rid of me
+ *  \deprecated Deprecated in favor of GblThread. Soon to be removed.
  *
  *  \author Falco Girgis
  */

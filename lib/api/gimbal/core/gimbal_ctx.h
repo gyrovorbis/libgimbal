@@ -2,6 +2,8 @@
  *  \brief GblContext top-level debug and control-flow macros
  *  \ingroup core
  *
+ *  \deprecated Internal helper macros which will soon be removed.
+ *
  *  \author Falco Girgis
  */
 #ifndef GIMBAL_CTX_H

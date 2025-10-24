@@ -1,8 +1,8 @@
 /*! \file
  *  \brief GblContext API management instance type
  *  \ingroup meta
- *  \todo
- *      - get the eff rid of me
+ *
+ *  \deprecated This whole construct will soon be removed!
  *
  *  \author Falco Girgis
  */
