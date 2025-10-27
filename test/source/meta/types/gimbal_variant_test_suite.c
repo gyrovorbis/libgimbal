@@ -1337,6 +1337,10 @@ static GBL_RESULT GblVariantTestSuite_u64_conversions_(GblTestSuite* pSelf, GblC
     GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
+    // U64 max value to string; tests issue #25
+    GBL_CTX_VERIFY_CALL( GblVariant_setUint64(&tVariant, UINT64_MAX) );
+    GBL_TEST_VERIFY( GblStringView_equals( GBL_STRV(GblVariant_toString(&tVariant)), "18446744073709551615" ) );
+
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&variant));
 
@@ -1480,6 +1484,10 @@ static GBL_RESULT GblVariantTestSuite_i64_conversions_(GblTestSuite* pSelf, GblC
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
     GBL_TEST_VERIFY(GblStringView_equals(GblVariant_stringView(&tVariant), "97"));
     GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
+
+    // I64 min value to string; tests issue #25
+    GBL_CTX_VERIFY_CALL( GblVariant_setInt64(&tVariant, INT64_MIN) );
+    GBL_TEST_VERIFY( GblStringView_equals( GBL_STRV(GblVariant_toString(&tVariant)), "-9223372036854775808" ) );
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&variant));

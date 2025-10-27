@@ -610,7 +610,7 @@ static GBL_RESULT i64Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     else if(type == GBL_DOUBLE_TYPE)
         GblVariant_setDouble(pOther, pVariant->i64);
     else if(type == GBL_STRING_TYPE) {
-        char buffer[10];
+        char buffer[21];
         snprintf(buffer, sizeof(buffer), "%" SCNd64, pVariant->i64);
         GblVariant_setString(pOther, buffer);
     }
@@ -682,7 +682,7 @@ static GBL_RESULT u64Convert_(const GblVariant* pVariant, GblVariant* pOther) {
     else if(type == GBL_DOUBLE_TYPE)
         GblVariant_setDouble(pOther, pVariant->u64);
     else if(type == GBL_STRING_TYPE) {
-        char buffer[10];
+        char buffer[21];
         snprintf(buffer, sizeof(buffer), "%" SCNu64, pVariant->i64);
         GblVariant_setString(pOther, buffer);
     }
