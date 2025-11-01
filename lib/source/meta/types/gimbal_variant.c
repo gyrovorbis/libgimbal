@@ -1073,7 +1073,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructString(GblVariant* pSelf, const char* 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_constructStringRef(GblVariant* pSelf, const GblStringRef* pRef) {
+GBL_EXPORT GBL_RESULT GblVariant_constructStringRef(GblVariant* pSelf, GblStringRef* pRef) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(pSelf, GBL_STRING_TYPE, pRef));
     GBL_CTX_END();

@@ -250,11 +250,11 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants
  *  @{
  */
 //! Retrieves the name of the given object or returns an empty string if it doesn't have one
-GBL_EXPORT const GblStringRef* GblObject_name       (GBL_CSELF)                          GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblObject_name       (GBL_CSELF)                          GBL_NOEXCEPT;
 //! Sets the name of the given object to \p pName, making a copy of its contents to store internally
-GBL_EXPORT void                GblObject_setName    (GBL_SELF, const char* pName)        GBL_NOEXCEPT;
+GBL_EXPORT void          GblObject_setName    (GBL_SELF, const char* pName)        GBL_NOEXCEPT;
 //! Sets the name of the given object to \p pRef, taking ownership of the given reference
-GBL_EXPORT void                GblObject_setNameRef (GBL_SELF, const GblStringRef* pRef) GBL_NOEXCEPT;
+GBL_EXPORT void          GblObject_setNameRef (GBL_SELF, GblStringRef* pRef) GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Hierarchy Management

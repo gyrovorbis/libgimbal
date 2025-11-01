@@ -69,9 +69,9 @@ GBL_EXPORT GblStringRef* GblStringRef_create (const char* pString,
                                               size_t      len/*=0*/,
                                               GblContext* pCtx/*=NULL*/) GBL_NOEXCEPT;
 //! Returns a new reference to \p pRef, incrementing its internal reference count rather than actually copying
-GBL_EXPORT GblStringRef* GblStringRef_ref    (const GblStringRef* pRef)  GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblStringRef_ref    (GblStringRef* pRef)        GBL_NOEXCEPT;
 //! Releases a reference to \p pRef, freeing the allocation if it was the last, returning the new refCount
-GBL_EXPORT GblRefCount   GblStringRef_unref  (const GblStringRef* pRef)  GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount   GblStringRef_unref  (GblStringRef* pRef)        GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Properties

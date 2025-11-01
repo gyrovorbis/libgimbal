@@ -95,7 +95,7 @@ GBL_CLASS_END
  *  \ingroup meta
  *  \brief   Represents a string-indexed member of a GblObject
  *
- *  GblProperty rerpesents a single GblObject member which can be
+ *  GblProperty represents a single GblObject member which can be
  *  dynamically looked-up by a string key, passed to the Gblobject
  *  constructor, or which can be programmatically iterated over.
  *

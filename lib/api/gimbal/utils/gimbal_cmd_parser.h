@@ -176,7 +176,7 @@ GBL_EXPORT GBL_RESULT           GblCmdParser_positionalArgValue      (GBL_CSELF,
  *  @{
  */
 //! After parsing, returns a GblStringRef to the name of the current executable (first positional argument)
-GBL_EXPORT const GblStringRef*  GblCmdParser_executable     (GBL_CSELF)            GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*        GblCmdParser_executable     (GBL_CSELF)            GBL_NOEXCEPT;
 //! After parsing, retuns a GblStringList to the internally maintained list of unknown command-line options
 GBL_EXPORT const GblStringList* GblCmdParser_unknownOptions (GBL_CSELF)            GBL_NOEXCEPT;
 //! Parses the list of arguments given by \p pArgs, populating internal structures, and returning the result

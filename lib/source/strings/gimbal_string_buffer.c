@@ -282,7 +282,7 @@ GBL_EXPORT const char* GblStringBuffer_intern(const GblStringBuffer* pSelf) {
     return GblQuark_internString(GblStringBuffer_cString(pSelf));
 }
 
-GBL_EXPORT const GblStringRef* GblStringBuffer_createRef(const GblStringBuffer* pSelf) {
+GBL_EXPORT GblStringRef* GblStringBuffer_createRef(const GblStringBuffer* pSelf) {
     return GblStringRef_create(GblStringBuffer_cString(pSelf),
                                GblStringBuffer_length(pSelf),
                                GblStringBuffer_context(pSelf));

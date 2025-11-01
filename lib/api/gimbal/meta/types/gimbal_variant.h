@@ -176,8 +176,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructDouble      (GBL_SELF, double value)  
 //! Convenience wrapper for value copy constructing a variant with a const char*
 GBL_EXPORT GBL_RESULT GblVariant_constructString      (GBL_SELF, const char* pValue)  GBL_NOEXCEPT;
 //! Convenience wrapper for value move constructing a variant with a GblStringRef (transferring ownership)
-GBL_EXPORT GBL_RESULT GblVariant_constructStringRef   (GBL_SELF,
-                                                       const GblStringRef* pStrRef)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblVariant_constructStringRef   (GBL_SELF, GblStringRef* pRef)  GBL_NOEXCEPT;
 //! Convenience wrapper for value copy constructing a string variant from a string view
 GBL_EXPORT GBL_RESULT GblVariant_constructStringView  (GBL_SELF, GblStringView value) GBL_NOEXCEPT;
 //! Convenience wrapper for value constructing a variant from a GblType
@@ -325,85 +324,79 @@ GBL_EXPORT const char* GblVariant_typeName (GBL_CSELF) GBL_NOEXCEPT;
  *  @{
  */
 //! Attempts to retrieve a copy of the variant's value and store it into the provided pointer
-GBL_EXPORT GBL_RESULT          GblVariant_valueCopy   (GBL_CSELF,
-                                                      ...)          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_valueCopy   (GBL_CSELF, ...)          GBL_NOEXCEPT;
 //! va_list* variant of GblVariant_valueCopy(), where the destination pointer comes from a va_list*
-GBL_EXPORT GBL_RESULT          GblVariant_valueCopyVa (GBL_CSELF,
-                                                       va_list* pVa) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_valueCopyVa (GBL_CSELF, va_list* pVa) GBL_NOEXCEPT;
 //! Attempts to retrieve the actual value stored within the variant and store it into the provided pointer (no movement or copying)
-GBL_EXPORT GBL_RESULT          GblVariant_valuePeek   (GBL_CSELF,
-                                                       ...)          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_valuePeek   (GBL_CSELF, ...)          GBL_NOEXCEPT;
 //! va_list* variant of GblVariant_valuePeek(), where destination pointer comes from a va_list*
-GBL_EXPORT GBL_RESULT          GblVariant_valuePeekVa (GBL_SELF,
-                                                       va_list* pVa) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_valuePeekVa (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
 //! Attempts to move the value stored within the variant out of it and into the provided pointer
-GBL_EXPORT GBL_RESULT          GblVariant_valueMove   (GBL_SELF,
-                                                      ...)          GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_valueMove   (GBL_SELF, ...)           GBL_NOEXCEPT;
 //! va_list* variant of GblVariant_valueMove(), where destination pointer comes from a va_list*
-GBL_EXPORT GBL_RESULT          GblVariant_valueMoveVa (GBL_SELF,
-                                                       va_list* pVa) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT    GblVariant_valueMoveVa (GBL_SELF, va_list* pVa)  GBL_NOEXCEPT;
 //! Returns GBL_TRUE if the value held by the given variant is not of GBL_INVALID_TYPE
-GBL_EXPORT GblBool             GblVariant_isValid     (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblBool       GblVariant_isValid     (GBL_CSELF)               GBL_NOEXCEPT;
 //! Returns GBL_TRUE if the value held by the variant is not of type GBL_NIL_TYPE
-GBL_EXPORT GblBool             GblVariant_isNil       (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblBool       GblVariant_isNil       (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a bool, raising an error upon type mismatch
-GBL_EXPORT GblBool             GblVariant_bool        (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblBool       GblVariant_bool        (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a char, raising an error upon type mismatch
-GBL_EXPORT char                GblVariant_char        (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT char          GblVariant_char        (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a uint8, raising an error upon type mismatch
-GBL_EXPORT uint8_t             GblVariant_uint8       (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT uint8_t       GblVariant_uint8       (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a uint16, raising an error upon type mismatch
-GBL_EXPORT uint16_t            GblVariant_uint16      (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT uint16_t      GblVariant_uint16      (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as an int16, raising an error upon type mismatch
-GBL_EXPORT int16_t             GblVariant_int16       (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT int16_t       GblVariant_int16       (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a uint32, raising an error upon type mismatch
-GBL_EXPORT uint32_t            GblVariant_uint32      (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT uint32_t      GblVariant_uint32      (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as an int32, raising an error upon type mismatch
-GBL_EXPORT int32_t             GblVariant_int32       (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT int32_t       GblVariant_int32       (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a uint64, raising an error upon type mismatch
-GBL_EXPORT uint64_t            GblVariant_uint64      (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT uint64_t      GblVariant_uint64      (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as an int64, raising an error upon type mismatch
-GBL_EXPORT int64_t             GblVariant_int64       (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT int64_t       GblVariant_int64       (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a generic enum value, raising an error upon type mismatch
-GBL_EXPORT GblEnum             GblVariant_enum        (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblEnum       GblVariant_enum        (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a generic GblFlags value, raising an error upon type mismatch
-GBL_EXPORT GblFlags            GblVariant_flags       (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblFlags      GblVariant_flags       (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a float, raising an error upon type mismatch
-GBL_EXPORT float               GblVariant_float       (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT float         GblVariant_float       (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a double, raising an error upon type mismatch
-GBL_EXPORT double              GblVariant_double      (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT double        GblVariant_double      (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a string, raising an error upon type mismatch
-GBL_EXPORT const GblStringRef* GblVariant_string      (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblVariant_string      (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a string, returning it within a view, raising an error upon type mismatch
-GBL_EXPORT GblStringView       GblVariant_stringView  (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblStringView GblVariant_stringView  (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a GblType, raising an error upon type mismatch
-GBL_EXPORT GblType             GblVariant_typeValue   (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblType       GblVariant_typeValue   (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a generic pointer, raising an error upon type mismatch
-GBL_EXPORT void*               GblVariant_pointer     (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT void*         GblVariant_pointer     (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a size_t, raising an error upon type mismatch
-GBL_EXPORT size_t              GblVariant_size        (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT size_t        GblVariant_size        (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a GblDateTime, raising an error upon type mismatch
-GBL_EXPORT GblDateTime*        GblVariant_dateTime    (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime*  GblVariant_dateTime    (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to fetch a copy of the value of the variant as a generic opaque pointer, raising an error upon type mismatch
-GBL_EXPORT void*               GblVariant_opaqueCopy  (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT void*         GblVariant_opaqueCopy  (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempst to take the value of the variant (claiming ownerships) as a generic opaque pointer, raising an error upon type mismatch
-GBL_EXPORT void*               GblVariant_opaqueMove  (GBL_SELF)     GBL_NOEXCEPT;
+GBL_EXPORT void*         GblVariant_opaqueMove  (GBL_SELF)                GBL_NOEXCEPT;
 //! Attempst to fetch the value of the variant as a generic opaque pointer, raising an error upon type mismatch
-GBL_EXPORT void*               GblVariant_opaquePeek  (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT void*         GblVariant_opaquePeek  (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempts to fetch the value of the variant as a GblInstance derived type, returning a pointer to it
-GBL_EXPORT GblInstance*        GblVariant_instance    (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblInstance*  GblVariant_instance    (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempts to fetch a copy of the value of the variant by making a new generic GblBox reference, raising an error upon type mismatch
-GBL_EXPORT GblBox*             GblVariant_boxCopy     (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblBox*       GblVariant_boxCopy     (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempts to take the value stored within the variant as generic GblBox pointer, claiming ownerships of it
-GBL_EXPORT GblBox*             GblVariant_boxMove     (GBL_SELF)     GBL_NOEXCEPT;
+GBL_EXPORT GblBox*       GblVariant_boxMove     (GBL_SELF)                GBL_NOEXCEPT;
 //! Attempts to fetch the value stored within the variant as a pointer to a GblBox derived type
-GBL_EXPORT GblBox*             GblVariant_boxPeek     (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblBox*       GblVariant_boxPeek     (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempts to fetch a copy of the value of the variant by making a new generic GblObject reference, raising an error upon type mismatch
-GBL_EXPORT GblObject*          GblVariant_objectCopy  (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblObject*    GblVariant_objectCopy  (GBL_CSELF)               GBL_NOEXCEPT;
 //! Attempts to take the value stored within the variant as generic GblObject pointer, claiming ownerships of it
-GBL_EXPORT GblObject*          GblVariant_objectMove  (GBL_SELF)     GBL_NOEXCEPT;
+GBL_EXPORT GblObject*    GblVariant_objectMove  (GBL_SELF)                GBL_NOEXCEPT;
 //! Attempts to fetch the value stored within the variant as a pointer to a GblObject derived type
-GBL_EXPORT GblObject*          GblVariant_objectPeek  (GBL_CSELF)    GBL_NOEXCEPT;
+GBL_EXPORT GblObject*    GblVariant_objectPeek  (GBL_CSELF)               GBL_NOEXCEPT;
 //! @}
 //!
 /*! \name Table Accessors
@@ -449,43 +442,43 @@ GBL_EXPORT size_t      GblVariant_count      (GBL_CSELF)                GBL_NOEX
  *  @{
  */
 //! Convenience method that attempts to convert the variant's type to bool and return its value
-GBL_EXPORT GblBool             GblVariant_toBool       (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblBool       GblVariant_toBool       (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to char and return its value
-GBL_EXPORT char                GblVariant_toChar       (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT char          GblVariant_toChar       (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to uint8 and return its value
-GBL_EXPORT uint8_t             GblVariant_toUint8      (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT uint8_t       GblVariant_toUint8      (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to uint16 and return its value
-GBL_EXPORT uint16_t            GblVariant_toUint16     (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT uint16_t      GblVariant_toUint16     (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to int16 and return its value
-GBL_EXPORT int16_t             GblVariant_toInt16      (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT int16_t       GblVariant_toInt16      (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to uint32 and return its value
-GBL_EXPORT uint32_t            GblVariant_toUint32     (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT uint32_t      GblVariant_toUint32     (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to int32 and return its value
-GBL_EXPORT int32_t             GblVariant_toInt32      (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT int32_t       GblVariant_toInt32      (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to uint64 and return its value
-GBL_EXPORT uint64_t            GblVariant_toUint64     (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT uint64_t      GblVariant_toUint64     (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to int64 and return its value
-GBL_EXPORT int64_t             GblVariant_toInt64      (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT int64_t       GblVariant_toInt64      (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to a generic enum and return its value
-GBL_EXPORT GblEnum             GblVariant_toEnum       (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblEnum       GblVariant_toEnum       (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to a generic GblFlags and return its value
-GBL_EXPORT GblFlags            GblVariant_toFlags      (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblFlags      GblVariant_toFlags      (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to float and return its value
-GBL_EXPORT float               GblVariant_toFloat      (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT float         GblVariant_toFloat      (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to double and return its value
-GBL_EXPORT double              GblVariant_toDouble     (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT double        GblVariant_toDouble     (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to pointer and return its value
-GBL_EXPORT void*               GblVariant_toPointer    (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT void*         GblVariant_toPointer    (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to string and return its value
-GBL_EXPORT const GblStringRef* GblVariant_toString     (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblVariant_toString     (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to string view and return its value
-GBL_EXPORT GblStringView       GblVariant_toStringView (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblStringView GblVariant_toStringView (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to GblType and return its value
-GBL_EXPORT GblType             GblVariant_toTypeValue  (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblType       GblVariant_toTypeValue  (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to size_t and return its value
-GBL_EXPORT size_t              GblVariant_toSize       (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT size_t        GblVariant_toSize       (GBL_SELF) GBL_NOEXCEPT;
 //! Convenience method that attempts to convert the variant's type to GblDateTime and return its value
-GBL_EXPORT GblDateTime*        GblVariant_toDateTime   (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblDateTime*  GblVariant_toDateTime   (GBL_SELF) GBL_NOEXCEPT;
 //! @}
 
 /*! \name Generic Conversions

@@ -50,7 +50,7 @@ GBL_INLINE GblPropertyRoot_* propertyRoot_(GblType objectType) {
     return pProperty;
 }
 
-GBL_INLINE  GblProperty* propertyFirst_(GblType objectType) {
+GBL_INLINE GblProperty* propertyFirst_(GblType objectType) {
     GblProperty* pProperty = NULL;
     GBL_CTX_BEGIN(GblHashSet_context(&propertyRegistry_));
     const GblPropertyRoot_* pRoot = propertyRoot_(objectType);
@@ -102,14 +102,17 @@ extern GBL_RESULT GblProperty_final_(GblContext* pCtx) {
     GBL_CTX_END();
 }
 
+// Returns the very first starting property for a given type.
 GBL_INLINE const GblPropertyRoot_* propertyRootBase_(GblType objectType) {
     const GblPropertyRoot_* pRoot = NULL;
     const uint8_t depth = GblType_depth(objectType);
+
     for(uint8_t d = 0; d <= depth; ++d) {
         GblType type = GblType_base(objectType, d);
         pRoot = propertyRoot_(type);
         if(pRoot) break;
     }
+
     return pRoot;
 }
 

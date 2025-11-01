@@ -12,14 +12,14 @@
 #define GBL_SCANNER_CHAR_(self, idx)            (GblStringView_at(GBL_SCANNER_(self)->streamBuffer, idx))
 
 GBL_DECLARE_STRUCT(GblScannerClass_) {
-    const GblStringRef* pDefaultDelimeters;
+    GblStringRef* pDefaultDelimeters;
 };
 
 GBL_DECLARE_STRUCT(GblScanner_) {
     GblArrayList        cursorStack;
     GblStringView       streamBuffer;
-    const GblStringRef* pInputString;
-    const GblStringRef* pDelimeters;
+    GblStringRef* pInputString;
+    GblStringRef* pDelimeters;
 };
 
 GBL_EXPORT GblStringRef* GblScannerClass_defaultDelimeters(const GblScannerClass* pClass) {
@@ -33,7 +33,7 @@ GBL_EXPORT void GblScannerClass_setDefaultDelimeters(GblScannerClass* pClass, co
     if(pStr) pClass_->pDefaultDelimeters = GblStringRef_create(pStr);
 }
 
-GBL_EXPORT void GblScannerClass_setDefaultDelimetersRef(GblScannerClass* pClass, const GblStringRef* pRef) {
+GBL_EXPORT void GblScannerClass_setDefaultDelimetersRef(GblScannerClass* pClass, GblStringRef* pRef) {
     GblScannerClass_* pClass_ = GBL_SCANNER_CLASS_(pClass);
 
     GblStringRef_unref(pClass_->pDefaultDelimeters);
@@ -81,7 +81,7 @@ GBL_EXPORT GblStringRef* GblScanner_input(const GblScanner* pSelf) {
     return GBL_SCANNER_(pSelf)->pInputString;
 }
 
-GBL_EXPORT void GblScanner_setInputRef(GblScanner* pSelf, const GblStringRef* pRef) {
+GBL_EXPORT void GblScanner_setInputRef(GblScanner* pSelf, GblStringRef* pRef) {
     GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
     GblStringRef_unref(pSelf_->pInputString);

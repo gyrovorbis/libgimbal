@@ -7,13 +7,13 @@ typedef struct GblStringRef_ {
     char        data[1];
 } GblStringRef_;
 
-GBL_INLINE GblStringRef_* GblStringRef_header_(const GblStringRef* pString) {
+GBL_INLINE GblStringRef_* GblStringRef_header_(GblStringRef* pString) {
     return (GblStringRef_*)(pString - offsetof(GblStringRef_, data));
 }
 
-GBL_EXPORT const GblStringRef* (GblStringRef_create)(const char* pString,
-                                                     size_t      length,
-                                                     GblContext* pCtx)
+GBL_EXPORT GblStringRef* (GblStringRef_create)(const char* pString,
+                                               size_t      length,
+                                               GblContext* pCtx)
 {
     GblStringRef* pStr = NULL;
     GBL_CTX_BEGIN(pCtx);
@@ -38,7 +38,7 @@ GBL_EXPORT const GblStringRef* (GblStringRef_create)(const char* pString,
     return pStr;
 }
 
-GBL_EXPORT GblContext* GblStringRef_context(const GblStringRef* pSelf) {
+GBL_EXPORT GblContext* GblStringRef_context(GblStringRef* pSelf) {
     GblContext* pCtx = NULL;
 
     if(pSelf) {
@@ -49,7 +49,7 @@ GBL_EXPORT GblContext* GblStringRef_context(const GblStringRef* pSelf) {
     return pCtx;
 }
 
-GBL_EXPORT GblRefCount GblStringRef_refCount(const GblStringRef* pSelf) {
+GBL_EXPORT GblRefCount GblStringRef_refCount(GblStringRef* pSelf) {
     GblRefCount refCount = 0;
 
     if(pSelf) {
@@ -60,7 +60,7 @@ GBL_EXPORT GblRefCount GblStringRef_refCount(const GblStringRef* pSelf) {
     return refCount;
 }
 
-GBL_EXPORT size_t  GblStringRef_length(const GblStringRef* pSelf) {
+GBL_EXPORT size_t  GblStringRef_length(GblStringRef* pSelf) {
     size_t  length = 0;
 
     if(pSelf) {
@@ -71,21 +71,21 @@ GBL_EXPORT size_t  GblStringRef_length(const GblStringRef* pSelf) {
     return length;
 }
 
-GBL_EXPORT GblBool GblStringRef_blank(const GblStringRef* pSelf) {
+GBL_EXPORT GblBool GblStringRef_blank(GblStringRef* pSelf) {
     return pSelf?
                 GblStringView_blank(GblStringView_fromString(pSelf, GblStringRef_length(pSelf))) :
                 GBL_TRUE;
 }
 
-GBL_EXPORT GblBool GblStringRef_empty(const GblStringRef* pSelf) {
+GBL_EXPORT GblBool GblStringRef_empty(GblStringRef* pSelf) {
     return !GblStringRef_length(pSelf);
 }
 
-GBL_EXPORT GblBool GblStringRef_valid(const GblStringRef* pSelf) {
+GBL_EXPORT GblBool GblStringRef_valid(GblStringRef* pSelf) {
     return !!pSelf;
 }
 
-GBL_EXPORT GblStringView (GblStringRef_view)(const GblStringRef* pSelf, size_t offset, size_t length) {
+GBL_EXPORT GblStringView (GblStringRef_view)(GblStringRef* pSelf, size_t offset, size_t length) {
     const size_t strLen = GblStringRef_length(pSelf);
 
     if(!length)
@@ -112,9 +112,7 @@ GBL_EXPORT GblStringView (GblStringRef_view)(const GblStringRef* pSelf, size_t o
     };
 }
 
-
-
-GBL_EXPORT GblStringRef* GblStringRef_ref(const GblStringRef* pSelf) {
+GBL_EXPORT GblStringRef* GblStringRef_ref(GblStringRef* pSelf) {
     GblStringRef* pOut = NULL;
 
     if(pSelf) {
@@ -130,7 +128,7 @@ GBL_EXPORT GblStringRef* GblStringRef_ref(const GblStringRef* pSelf) {
     return pOut;
 }
 
-GBL_EXPORT GblRefCount GblStringRef_unref(const GblStringRef* pSelf) {
+GBL_EXPORT GblRefCount GblStringRef_unref(GblStringRef* pSelf) {
     GblRefCount count = 0;
 
     if(pSelf) {
@@ -145,7 +143,7 @@ GBL_EXPORT GblRefCount GblStringRef_unref(const GblStringRef* pSelf) {
     return count;
 }
 
-GBL_EXPORT char GblStringRef_at(const GblStringRef* pSelf, size_t index) {
+GBL_EXPORT char GblStringRef_at(GblStringRef* pSelf, size_t index) {
     char value = '\0';
 
     if(index >= GblStringRef_length(pSelf)) {
@@ -162,6 +160,6 @@ GBL_EXPORT char GblStringRef_at(const GblStringRef* pSelf, size_t index) {
     return value;
 }
 
-GBL_EXPORT GblHash GblStringRef_hash(const GblStringRef* pSelf) {
+GBL_EXPORT GblHash GblStringRef_hash(GblStringRef* pSelf) {
     return gblHash(pSelf, GblStringRef_length(pSelf));
 }

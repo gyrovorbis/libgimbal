@@ -932,14 +932,14 @@ GBL_EXPORT void GblObject_setName(GblObject* pSelf, const char* pName) {
                             GblObject_nameDestruct_);
 }
 
-GBL_EXPORT void GblObject_setNameRef(GblObject* pSelf, const GblStringRef* pRef) {
+GBL_EXPORT void GblObject_setNameRef(GblObject* pSelf, GblStringRef* pRef) {
     GblArrayMap_setUserdata(&GBL_PRIV(pSelf->base).pFields,
                             objectNameQuark_,
                             (uintptr_t)pRef,
                             GblObject_nameDestruct_);
 }
 
-GBL_EXPORT const GblStringRef* GblObject_name(const GblObject* pSelf) {
+GBL_EXPORT GblStringRef* GblObject_name(const GblObject* pSelf) {
     return (GblStringRef*)GblArrayMap_getValue(&GBL_PRIV(pSelf->base).pFields,
                                                objectNameQuark_);
 }
@@ -1582,7 +1582,7 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
 
     switch(pProp->id) {
     case GblObject_Property_Id_name: {
-        const GblStringRef* pName = NULL;
+        GblStringRef* pName = NULL;
         GBL_CTX_CALL(GblVariant_valueMove(pValue, &pName));
         GblObject_setNameRef(pSelf, pName);
         break;
