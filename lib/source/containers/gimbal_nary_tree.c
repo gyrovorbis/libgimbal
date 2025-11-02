@@ -315,13 +315,15 @@ GBL_EXPORT void GblNaryTree_reverseChildren(GblNaryTreeNode* pSelf) {
     pSelf->pChildFirst = pPrev;
 }
 
-GBL_EXPORT size_t  GblNaryTree_depth(const GblNaryTreeNode* pSelf) {
-    size_t  depth = 0;
+GBL_EXPORT size_t GblNaryTree_depth(const GblNaryTreeNode* pSelf) {
+    size_t depth = 0;
     const GblNaryTreeNode* pNode = pSelf;
-    while(pNode->pParent) GBL_LIKELY {
+
+    while GBL_LIKELY(pNode->pParent) {
         ++depth;
         pNode = pNode->pParent;
     }
+
     return depth;
 }
 
@@ -337,14 +339,16 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_root(GblNaryTreeNode* pSelf)  {
 }
 
 GBL_EXPORT GblNaryTreeNode* GblNaryTree_ancestor(const GblNaryTreeNode* pSelf, size_t  height) {
-    size_t  i = 0;
+    size_t i = 0;
     GblNaryTreeNode* pNode = pSelf->pParent;
-    while(pNode && i <= height) GBL_LIKELY {
-        if(i++ == height) {
+
+    while GBL_LIKELY(pNode && i <= height) {
+        if(i++ == height)
             return pNode;
-        }
+
         pNode = pNode->pParent;
     }
+
     return GBL_NULL;
 }
 

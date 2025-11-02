@@ -174,7 +174,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVariantByQuark(const GblObject* pSelf,
 {
     const GblProperty* pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf),
                                                      name);
-    if(!pProp) GBL_UNLIKELY {
+    if GBL_UNLIKELY(!pProp) {
         GBL_CTX_BEGIN(NULL);
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -192,7 +192,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVariant(const GblObject* pSelf,
 {
     const GblQuark name = GblQuark_tryString(pName);
 
-    if(name == GBL_QUARK_INVALID) GBL_UNLIKELY {
+    if GBL_UNLIKELY(name == GBL_QUARK_INVALID) {
         GBL_CTX_BEGIN(NULL);
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -249,7 +249,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVariantByQuark(GblObject*  pSelf,
 
     const GblProperty* pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf), name);
 
-    if(!pProp) GBL_UNLIKELY {
+    if GBL_UNLIKELY(!pProp) {
         GBL_CTX_BEGIN(NULL);
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -267,7 +267,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVariant(GblObject* pSelf,
 {
     const GblQuark name = GblQuark_tryString(pName);
 
-    if(name == GBL_QUARK_INVALID) GBL_UNLIKELY {
+    if GBL_UNLIKELY(name == GBL_QUARK_INVALID) {
         GBL_CTX_BEGIN(NULL);
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -1693,7 +1693,7 @@ GBL_EXPORT GblType GblObject_type(void) {
         .pInterfaceImpls    = ifaceEntries
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         ifaceEntries[0].interfaceType = GBL_ITABLE_VARIANT_TYPE;
         ifaceEntries[1].interfaceType = GBL_IEVENT_HANDLER_TYPE;
         ifaceEntries[2].interfaceType = GBL_IEVENT_FILTER_TYPE;

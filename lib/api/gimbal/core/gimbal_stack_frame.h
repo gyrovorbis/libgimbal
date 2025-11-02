@@ -108,7 +108,7 @@ GBL_INLINE void GblCallRecord_construct(GblCallRecord* pRecord, GBL_RESULT resul
     pRecord->result = GBL_RESULT_UNKNOWN;
     pRecord->message[0] = '\0';
     pRecord->srcLocation.pFile = pRecord->srcLocation.pFunc = GBL_NULL;
-    if(pFmt) GBL_UNLIKELY vsprintf(pRecord->message, pFmt, varArgs);
+    if GBL_UNLIKELY(pFmt) vsprintf(pRecord->message, pFmt, varArgs);
     va_end(varArgs);
     pRecord->srcLocation    = source;
     pRecord->result         = resultCode;
@@ -118,16 +118,16 @@ GBL_INLINE GBL_RESULT GblStackFrame_construct(GblStackFrame* pFrame, GblObject* 
     GBL_RESULT result               = GBL_RESULT_SUCCESS;
     GblContext* pContext            = GBL_NULL;
 
-    if(pObject) GBL_UNLIKELY {
+    if GBL_UNLIKELY(pObject) {
         const GblStackFrame* pPrev = GblThd_stackFrameTop(NULL);
-        if(pPrev && pPrev->pObject == pObject) GBL_LIKELY {
+        if GBL_LIKELY(pPrev && pPrev->pObject == pObject) {
             pContext = pPrev->pContext;
-        } else GBL_UNLIKELY {
+        } else {
             pContext = GblObject_findContext(pObject);
         }
     }
 
-    if(!pContext) GBL_LIKELY {
+    if GBL_LIKELY(!pContext) {
         pContext = GblThd_context(NULL);
     }
 

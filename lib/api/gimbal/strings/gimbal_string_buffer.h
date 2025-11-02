@@ -117,8 +117,7 @@ GBL_EXPORT GblBool     GblStringBuffer_stack       (GBL_CSELF) GBL_NOEXCEPT;
  *  @{
  */
 //! Creates and returns a new GblStringRef based on the contents of the given buffer (don't forget to unref it)
-GBL_EXPORT const GblStringRef*
-                         GblStringBuffer_createRef (GBL_CSELF)        GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblStringBuffer_createRef (GBL_CSELF)        GBL_NOEXCEPT;
 //! Returns a pointer to a constant NULL-terminated C string for the given GblStringBuffer
 GBL_EXPORT const char*   GblStringBuffer_cString   (GBL_CSELF)        GBL_NOEXCEPT;
 //! Returns a pointer to the interned string representation of the buffer, interning it if it hasn't been already

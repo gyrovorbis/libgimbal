@@ -121,11 +121,11 @@ static GblArrayMapEntry* GblArrayMap_entryAdd_(GblArrayMap** ppSelf, uintptr_t k
     // regular-ass unordered insertion at the end for unsorted or initial entry
     } else {
         // initial allocation
-        if(!*ppSelf) GBL_UNLIKELY {
+        if GBL_UNLIKELY(!*ppSelf) {
             *ppSelf = (GblArrayMap*)GBL_CTX_MALLOC(GBL_ARRAY_MAP_SIZE(1));
             memset(*ppSelf, 0, sizeof(GblArrayMap));
         //appending to the end
-        } else GBL_LIKELY {
+        } else {
             *ppSelf = (GblArrayMap*)GBL_CTX_REALLOC(*ppSelf, GBL_ARRAY_MAP_SIZE(size + 1));
         }
         ++GBL_PRIV_REF(*ppSelf).size;
@@ -211,31 +211,33 @@ GBL_EXPORT GblVariant* GblArrayMap_getVariant(GblArrayMap*const* ppSelf, uintptr
 GBL_EXPORT uintptr_t GblArrayMap_atValue(GblArrayMap*const* ppSelf, uintptr_t key) {
     uintptr_t value = 0;
     GblArrayMapEntry* pEntry = GblArrayMap_find_entry_(ppSelf, key);
-    if(!pEntry) GBL_UNLIKELY {
+
+    if GBL_UNLIKELY(!pEntry) {
         GBL_CTX_BEGIN(NULL);
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_OUT_OF_RANGE);
 
         GBL_CTX_END_BLOCK();
-    } else GBL_LIKELY {
+    } else {
         value = GblArrayMap_valueFromVariant_(&pEntry->value);
     }
+
     return value;
 }
 
 GBL_EXPORT GblVariant* GblArrayMap_atVariant(GblArrayMap*const* ppSelf, uintptr_t key) {
     GblVariant* pVariant = GBL_NULL;
     GblArrayMapEntry* pEntry = GblArrayMap_find_entry_(ppSelf, key);
-    if(!pEntry) GBL_UNLIKELY {
+
+    if GBL_UNLIKELY(!pEntry) {
         GBL_CTX_BEGIN(NULL);
         GBL_CTX_VERIFY(GBL_FALSE,
                        GBL_RESULT_ERROR_OUT_OF_RANGE);
 
         GBL_CTX_END_BLOCK();
-    } else GBL_LIKELY {
-        if(pEntry->value.type != GBL_INVALID_TYPE)
-            pVariant = &pEntry->value;
-    }
+    } else if GBL_LIKELY(pEntry->value.type != GBL_INVALID_TYPE)
+        pVariant = &pEntry->value;
+
     return pVariant;
 }
 
@@ -420,10 +422,10 @@ static GblBool GblArrayMap_erase_(GblArrayMap** ppSelf, uintptr_t key, GblBool f
     if(*ppSelf) {
         const size_t  index = GblArrayMap_find(ppSelf, key);
 
-        if(index != GBL_ARRAY_MAP_NPOS) GBL_UNLIKELY {
-            if(GblArrayMap_size(ppSelf) == 1) {
+        if(index != GBL_ARRAY_MAP_NPOS) {
+            if GBL_UNLIKELY(GblArrayMap_size(ppSelf) == 1) {
                 GblArrayMap_clear(ppSelf);
-            } else GBL_LIKELY {
+            } else {
                 if(free)
                     GBL_CTX_CALL(GblArrayMap_entryDestruct_(ppSelf, GblArrayMap_entry_(ppSelf, index)));
 

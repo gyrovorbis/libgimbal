@@ -70,11 +70,11 @@ GBL_DECLS_BEGIN
 #define GBL_CTX_RECORD_SET_JMP_CND_(expr, result, label, srcLoc, ...)          \
     GBL_STMT_START {                                                           \
         GBL_CTX_SOURCE_LOC_PUSH(srcLoc);                                       \
-        if(!(expr)) GBL_UNLIKELY {                                             \
+        if GBL_UNLIKELY(!(expr)) {                                             \
             GBL_CTX_RECORD_SET(result, __VA_ARGS__);                           \
             GBL_CTX_SOURCE_POP();                                              \
             label;                                                             \
-        } else GBL_LIKELY {                                                    \
+        } else {                                                               \
             GBL_CTX_SOURCE_POP();                                              \
         }                                                                      \
     } GBL_STMT_END
@@ -183,7 +183,7 @@ GBL_DECLS_BEGIN
 #ifdef GBL_CONFIG_ERRNO_CHECKS
 #   define GBL_CTX_PERROR(...)                      \
     GBL_STMT_START {                                \
-        if(errno) GBL_UNLIKELY {                    \
+        if GBL_UNLIKELY(errno) {                    \
             const GBL_RESULT code =                 \
                 GBL_ERRNO_RESULT(errno);            \
             GBL_CTX_VERIFY(                         \
@@ -435,7 +435,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GblFlags level, const char* pFm
 // Base Enabled Logic (uses a prefix prefix for all magic)
 #define GBL_CTX_RECORD_LOG_(prefix, record)                                     \
         GBL_STMT_START {                                                        \
-            if(GBL_RESULT_##prefix(record->result)) GBL_UNLIKELY {              \
+            if GBL_UNLIKELY(GBL_RESULT_##prefix(record->result)) {              \
                 GBL_CTX_LOG(GBL_CONFIG_LOG_##prefix##_LEVEL,                    \
                             "%s: %s",                                           \
                              gblResultString(record->result), record->message); \
@@ -523,7 +523,7 @@ GBL_MAYBE_UNUSED GBL_CTX_INLINE(LOG, GBL_RESULT, GblFlags level, const char* pFm
     GBL_STMT_START {                                                            \
         GBL_CTX_SOURCE_LOC_PUSH(src);                                           \
         GBL_MAYBE_UNUSED const GBL_RESULT localResult = (funcCall);             \
-        if(!GBL_RESULT_SUCCESS(localResult)) GBL_UNLIKELY {                     \
+        if GBL_UNLIKELY(!GBL_RESULT_SUCCESS(localResult)) {                     \
             GBL_CTX_RESULT() = localResult;                                     \
         }                                                                       \
         GBL_CTX_SOURCE_POP();                                                   \

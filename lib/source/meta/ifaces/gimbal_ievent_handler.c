@@ -21,11 +21,12 @@ GBL_EXPORT GblType GblIEventHandler_type(void) {
         .classSize = sizeof(GblIEventHandlerClass)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblIEventHandler"),
                                 GBL_INTERFACE_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
+
     return type;
 }

@@ -16,10 +16,10 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, cons
     //Check if shit's empty
     expectedSize = GblStringBuffer_length(pSelf) + strlen(pFmt) + 1;
     originalSize = GblStringBuffer_length(pSelf);
-    if(expectedSize <= 1) GBL_UNLIKELY {
+    if GBL_UNLIKELY(expectedSize <= 1) {
         if(GBL_PRIV(pSelf->data).pData) GBL_PRIV(pSelf->data).pData[0] = '\0';
         GBL_PRIV(pSelf->data).size = 0;
-    } else GBL_LIKELY {
+    } else {
         //Make a first guess at the required size
         newCapacity = gblPow2Next(expectedSize);
         GBL_CTX_CALL(GblStringBuffer_reserve(pSelf, newCapacity));
@@ -34,7 +34,7 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, cons
         va_end(varArgsCopy);
         GBL_CTX_PERROR("vsnprintf failed with code: %zu", expectedSize);
         //Multi-pass, try again with real size!
-        if(expectedSize >= GBL_PRIV(pSelf->data).capacity) GBL_UNLIKELY {
+        if GBL_UNLIKELY(expectedSize >= GBL_PRIV(pSelf->data).capacity) {
             newCapacity = gblPow2Next(expectedSize + 1);
             GBL_CTX_CALL(GblStringBuffer_reserve(pSelf, newCapacity));
             GBL_CTX_ERRNO_CLEAR();
@@ -381,9 +381,11 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_shrink(GblStringBuffer* pSelf, size_t  del
 GBL_EXPORT int GblStringBuffer_compare(const GblStringBuffer* pSelf, const GblStringBuffer* pOther) {
     GBL_ASSERT(pSelf);
     GBL_ASSERT(pOther);
+
     int result = INT_MAX;
     const char* pCStr1 = NULL;
     const char* pCStr2 = NULL;
+
     GBL_CTX_BEGIN(GBL_PRIV(pSelf->data).pCtx);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pOther);
@@ -391,16 +393,17 @@ GBL_EXPORT int GblStringBuffer_compare(const GblStringBuffer* pSelf, const GblSt
     pCStr1 = GblStringBuffer_cString(pSelf);
     pCStr2 = GblStringBuffer_cString(pOther);
 
-    if(pCStr1 == pCStr2) GBL_UNLIKELY {
+    if GBL_UNLIKELY(pCStr1 == pCStr2)
         result = 0;
-    } else if(!pCStr1) {
+    else if GBL_UNLIKELY(!pCStr1)
         result = INT_MIN;
-    } else if(!pCStr2) {
+    else if GBL_UNLIKELY(!pCStr2)
         result = INT_MAX;
-    } else GBL_LIKELY { //both valid
+    else //both valid
         result = strcmp(pCStr1, pCStr2);
-    }
+
     GBL_CTX_END_BLOCK();
+
     return result;
 }
 

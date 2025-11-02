@@ -75,7 +75,7 @@ GBL_EXPORT GblType GblILogger_type(void) {
         .classSize        = sizeof(GblILoggerClass)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblILogger"),
                                 GBL_INTERFACE_TYPE,
                                 &info,

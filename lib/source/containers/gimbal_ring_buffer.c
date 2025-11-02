@@ -67,11 +67,11 @@ GBL_EXPORT void* GblRingBuffer_at(const GblRingBuffer* pSelf, size_t  index) GBL
     const size_t  size = GblRingBuffer_size(pSelf);
     void* pData = GBL_NULL;
 
-    if(index >= size) GBL_UNLIKELY {
+    if GBL_UNLIKELY(index >= size) {
         GBL_CTX_BEGIN(GBL_PRIV_REF(pSelf).pCtx);
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
         GBL_CTX_END_BLOCK();
-    } else GBL_LIKELY {
+    } else {
         pData = &GBL_PRIV_REF(pSelf).pData[GblRingBuffer_mappedIndex_(pSelf, index) *
                                            GBL_PRIV_REF(pSelf).elementSize];
     }
@@ -96,8 +96,12 @@ GBL_EXPORT void* GblRingBuffer_emplaceBack(GblRingBuffer* pSelf) GBL_NOEXCEPT {
 GBL_EXPORT GBL_RESULT GblRingBuffer_pushBack(GblRingBuffer* pSelf, const void* pData) GBL_NOEXCEPT {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
     void* pBuffer = GblRingBuffer_emplaceBack(pSelf);
-    if(pBuffer) GBL_LIKELY memcpy(pBuffer, pData, GBL_PRIV_REF(pSelf).elementSize);
-    else GBL_UNLIKELY result = GblThd_callRecord(GBL_NULL)->result;
+
+    if GBL_LIKELY(pBuffer)
+        memcpy(pBuffer, pData, GBL_PRIV_REF(pSelf).elementSize);
+    else
+        result = GblThd_callRecord(GBL_NULL)->result;
+
     return result;
 }
 

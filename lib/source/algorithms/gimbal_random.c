@@ -41,14 +41,15 @@ GBL_EXPORT int gblRandLehmer(void) {
 }
 
 GBL_EXPORT uint64_t gblSeed(uint8_t index) {
-
-    if(!init_) GBL_UNLIKELY {
+    if GBL_UNLIKELY(!init_) {
         seeds_[0] = (uint64_t)time(NULL);
-        for(unsigned i = 1; i < GBL_SEED_COUNT; ++i) {
+
+        for(unsigned i = 1; i < GBL_SEED_COUNT; ++i)
             seeds_[i] = gblHashCrc(&seeds_[i-1], sizeof(uint64_t));
-        }
+
         init_ = GBL_TRUE;
     }
+
     return seeds_[index];
 }
 

@@ -13,10 +13,10 @@
 
 #define GBL_MODULE_ENSURE_INITIALIZED_()                \
     GBL_STMT_START {                                    \
-        if(!initializing_) GBL_LIKELY {                 \
-            if(!inittedOnce_) GBL_UNLIKELY              \
+        if GBL_LIKELY(!initializing_) {                 \
+            if GBL_UNLIKELY(!inittedOnce_)              \
                 call_once(&initOnce_, GblModule_init_); \
-            else if(!initialized_) GBL_UNLIKELY         \
+            else if GBL_UNLIKELY(!initialized_)         \
                 GblModule_init_();                      \
         }                                               \
     } GBL_STMT_END
@@ -70,7 +70,7 @@ static GBL_RESULT GblModule_arrayMapDtor_(const GblArrayMap* pMap,
     GblModule* pModule = GBL_MODULE(pEntry);
     const size_t  uses = GblModule_useCount(pModule);
 
-    if(uses) GBL_UNLIKELY {
+    if GBL_UNLIKELY(uses) {
         GBL_LOG_WARN("gimbal",
                      "[Module] Unregistering %s which still has %u uses!",
                      GblQuark_toString(key),
@@ -98,7 +98,7 @@ GBL_EXPORT GBL_RESULT GblModule_register(GblModule* pSelf) {
 
     const size_t prevPos = GblArrayMap_find(&pModules_, quark);
 
-    if(prevPos != GBL_ARRAY_MAP_NPOS) GBL_UNLIKELY {
+    if GBL_UNLIKELY(prevPos != GBL_ARRAY_MAP_NPOS) {
         GblModule* pOld = GBL_MODULE(GblArrayMap_probeValue(&pModules_, prevPos));
 
         GBL_LOG_WARN("gimbal",
@@ -152,21 +152,19 @@ GBL_EXPORT GblModule* GblModule_findQuark(GblQuark quark) {
     GBL_CTX_BEGIN(NULL);
     GBL_MODULE_ENSURE_INITIALIZED_();
 
-    if(quark != GBL_QUARK_INVALID) GBL_LIKELY {
+    if GBL_LIKELY(quark != GBL_QUARK_INVALID) {
         mtx_lock(&moduleMtx_);
 
         uintptr_t value = 0;
         const size_t  index = GblArrayMap_find(&pModules_, quark);
 
-        if(index != GBL_ARRAY_MAP_NPOS) GBL_LIKELY {
+        if GBL_LIKELY(index != GBL_ARRAY_MAP_NPOS)
             value = GblArrayMap_probeValue(&pModules_, index);
-        }
 
         mtx_unlock(&moduleMtx_);
 
-        if(value) {
+        if(value)
             pModule = GBL_MODULE(value);
-        }
     }
 
     GBL_CTX_END_BLOCK();
@@ -205,10 +203,10 @@ GBL_EXPORT GblBool GblModule_foreach(GblModuleIterFn pFnIter,
 
     size_t count = GblArrayMap_size(&pModules_);
 
-    for(size_t m = 0; m < count; ++m) GBL_LIKELY {
+    for(size_t m = 0; m < count; ++m) {
         GblModule* pModule = GBL_MODULE(GblArrayMap_probeValue(&pModules_, m));
 
-        if((retVal = pFnIter(pModule, pUserdata))) GBL_UNLIKELY {
+        if GBL_UNLIKELY((retVal = pFnIter(pModule, pUserdata))) {
             break;
         }
     }
@@ -240,14 +238,13 @@ GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
 {
     GblModule* pModule = GblModule_findQuark(quark);
 
-    if(!pModule) GBL_UNLIKELY {
+    if GBL_UNLIKELY(!pModule) {
         GblLogger_write(pFile, pFunc, line, "gimbal", GBL_LOG_ERROR,
                         "Module [%s] could not be imported: Not Found",
                         GblQuark_toString(quark));
 
-    } else if(pVersion &&
-              GblVersion_parse(pVersion) != pModule->version) GBL_UNLIKELY
-    {
+    } else if GBL_UNLIKELY(pVersion &&
+                           GblVersion_parse(pVersion) != pModule->version) {
         char versionBuffer[GBL_VERSION_STRING_SIZE];
 
         GblLogger_write(pFile, pFunc, line, "gimbal", GBL_LOG_ERROR,
@@ -259,7 +256,7 @@ GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
 
         pModule = NULL;
 
-    } else GBL_LIKELY {
+    } else {
         GblModule_use(pModule);
     }
 
@@ -346,7 +343,7 @@ static GBL_RESULT GblModule_IPlugin_use_(GblIPlugin* pPlugin) {
     GblModule*  pSelf  = GBL_MODULE(pPlugin);
     GblModule_* pSelf_ = GBL_MODULE_(pSelf);
 
-    if(!atomic_fetch_add(&pSelf_->useCount, 1)) GBL_UNLIKELY {
+    if GBL_UNLIKELY(!atomic_fetch_add(&pSelf_->useCount, 1)) {
         GBL_VCALL(GblModule, pFnLoad, pSelf);
     }
 
@@ -359,7 +356,7 @@ static GBL_RESULT GblModule_IPlugin_unuse_(GblIPlugin* pPlugin) {
     GblModule*  pSelf  = GBL_MODULE(pPlugin);
     GblModule_* pSelf_ = GBL_MODULE_(pSelf);
 
-    if(atomic_fetch_sub(&pSelf_->useCount, 1) == 1) GBL_UNLIKELY {
+    if GBL_UNLIKELY(atomic_fetch_sub(&pSelf_->useCount, 1) == 1) {
         GBL_VCALL(GblModule, pFnUnload, pSelf);
     }
 
@@ -493,7 +490,7 @@ GBL_EXPORT GblType GblModule_type(void) {
         .pInterfaceImpls        = &iface
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         iface.interfaceType = GBL_IPLUGIN_TYPE;
 
         type = GblType_register(GblQuark_internStatic("GblModule"),

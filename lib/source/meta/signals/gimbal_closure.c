@@ -114,7 +114,7 @@ GBL_EXPORT GblType GblClosure_type(void) {
         .instanceSize = sizeof(GblClosure)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblClosure"),
                                 GBL_BOX_TYPE,
                                 &info,

@@ -167,7 +167,7 @@ GBL_EXPORT GblType GblException_type(void) {
         .instanceSize    = sizeof(GblException)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblException"),
                                 GBL_OBJECT_TYPE,
                                 &info,

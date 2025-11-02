@@ -3,13 +3,23 @@
  *  \ingroup preprocessor
  *  \sa gimbal_macro_utilities.h
  *
- *  \author Falco Girgis
+ *  This header contains an assortment of preprocessor definitions
+ *  for the following:
+ *      - Compiler type
+ *      - Architecture type
+ *      - C/C++ language revision
+ *      - C/C++ language features
+ *      - Compiler extensions and features
+ *
+ *  \author    2023, 2025 Falco Girgis
+ *  \copyright MIT LIicense
  */
 
 #ifndef GIMBAL_COMPILER_H
 #define GIMBAL_COMPILER_H
 
 #define __STDC_WANT_LIB_EXT1__ 1
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -108,6 +118,10 @@
 #elif defined(_POSIX_VERSION)
     // POSIX
 #   define GBL_POSIX
+#endif
+
+#ifdef __GNUC__
+#   define GBL_GNUC 1
 #endif
 
 #ifdef _MSC_VER
@@ -332,16 +346,22 @@
 #endif
 
 // Likely
-#if defined(__has_cpp_attribute)
-#   if __has_cpp_attribute(likely)
-#       define GBL_LIKELY [[likely]]
-#   else
-#       define GBL_LIKELY
-#   endif
+#if defined(__has_cpp_attribute) && __has_cpp_attribute(likely)
+#   define GBL_LIKELY(exp) (exp) [[likely]]
+#elif defined(GBL_GNUC)
+#   define GBL_LIKELY(exp)  (__builtin_expect(!!(exp), 1))
 #else
-#   define GBL_LIKELY
+#   define GBL_LIKELY(exp) (exp)
 #endif
 
+// unlikely
+#if defined(__has_cpp_attribute) && __has_cpp_attribute(unlikely)
+#   define GBL_UNLIKELY(exp) (exp) [[unlikely]]
+#elif defined(GBL_GNUC)
+#   define GBL_UNLIKELY(exp)  (__builtin_expect(!!(exp), 0))
+#else
+#   define GBL_UNLIKELY(exp) (exp)
+#endif
 
 // Maybe_Unused
 #if defined(__has_cpp_attribute)
@@ -391,17 +411,6 @@
 #   else
 #       define GBL_NORETURN
 #   endif
-#endif
-
-// Unlikely
-#if defined(__has_cpp_attribute)
-#   if __has_cpp_attribute(unlikely)
-#       define GBL_UNLIKELY [[unlikely]]
-#   else
-#       define GBL_UNLIKELY
-#   endif
-#else
-#   define GBL_UNLIKELY
 #endif
 
 #if __cpp_static_assert

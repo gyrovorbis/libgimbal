@@ -1,6 +1,6 @@
 /*! \file
  *  \ingroup meta
- *  \brief  GblProperty instance, DSL, and management API
+ *  \brief   GblProperty instance, DSL, and management API
  *
  *  This file contains the type declarations and methods
  *  for GblProperty, the root property instance from

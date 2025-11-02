@@ -39,7 +39,7 @@ GBL_EXPORT GblType GblEvent_type(void) {
         .instanceSize = sizeof(GblEvent)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblEvent"),
                                 GBL_BOX_TYPE,
                                 &info,

@@ -590,7 +590,7 @@ GBL_EXPORT GblType GblTestScenario_type(void) {
         .instancePrivateSize    = sizeof(GblTestScenario_)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblTestScenario"),
                                 GBL_CONTEXT_TYPE,
                                 &typeInfo,

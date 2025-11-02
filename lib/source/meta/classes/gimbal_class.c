@@ -482,9 +482,9 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
     GblClass* pToClass    = NULL;
 
     // Casting a NULL pointer or to an invalid type returns NULL
-    if(pClass && toType != GBL_INVALID_TYPE) GBL_LIKELY {
+    if GBL_LIKELY(pClass && toType != GBL_INVALID_TYPE) {
         //early exit when class is already of desired type
-        if(GBL_CLASS_META_CLASS_(pClass) == GBL_META_CLASS_(toType)) GBL_LIKELY {
+        if GBL_LIKELY(GBL_CLASS_META_CLASS_(pClass) == GBL_META_CLASS_(toType)) {
             pToClass = pClass;
         } else {
             GblBool toInterface = GBL_FALSE;

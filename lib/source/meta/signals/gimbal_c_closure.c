@@ -40,11 +40,12 @@ GBL_EXPORT GblType GblCClosure_type(void) {
         .instanceSize = sizeof(GblCClosure)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblCClosure"),
                                 GBL_CLOSURE_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
+
     return type;
 }

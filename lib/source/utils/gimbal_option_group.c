@@ -382,7 +382,7 @@ GBL_EXPORT GblType GblOptionGroup_type(void) {
         .pFnInstanceInit = GblOptionGroup_init_
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblOptionGroup"),
                                 GBL_OBJECT_TYPE,
                                 &info,

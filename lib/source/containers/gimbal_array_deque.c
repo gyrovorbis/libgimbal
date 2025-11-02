@@ -319,11 +319,11 @@ GBL_EXPORT GblBool GblArrayDeque_full(const GblArrayDeque* pSelf) {
 GBL_EXPORT void* GblArrayDeque_at(const GblArrayDeque* pSelf, size_t  index) {
     void* pData = GBL_NULL;
 
-    if(index >= GBL_RING_PRIV_REF_(pSelf).size) GBL_UNLIKELY {
+    if GBL_UNLIKELY(index >= GBL_RING_PRIV_REF_(pSelf).size) {
         GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_OUT_OF_RANGE);
         GBL_CTX_END_BLOCK();
-    } else GBL_LIKELY {
+    } else {
 #if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
         const size_t  slot = (GBL_RING_PRIV_REF_(pSelf).frontPos + index)
                            & (GBL_RING_PRIV_REF_(pSelf).capacity-1);

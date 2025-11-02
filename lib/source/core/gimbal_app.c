@@ -89,11 +89,11 @@ GBL_EXPORT GblVersion GblApp_version(const GblApp* pSelf) {
     return GBL_APP_(pSelf)->version;
 }
 
-GBL_EXPORT const GblStringRef* GblApp_organization(const GblApp* pSelf) {
+GBL_EXPORT GblStringRef* GblApp_organization(const GblApp* pSelf) {
     return GBL_APP_(pSelf)->pOrganization;
 }
 
-GBL_EXPORT const GblStringRef* GblApp_domain(const GblApp* pSelf) {
+GBL_EXPORT GblStringRef* GblApp_domain(const GblApp* pSelf) {
     return GBL_APP_(pSelf)->pDomain;
 }
 
@@ -187,7 +187,7 @@ GBL_EXPORT GblType GblApp_type(void) {
         .instancePrivateSize = sizeof(GblApp_)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblApp"),
                                 GBL_OBJECT_TYPE,
                                 &info,

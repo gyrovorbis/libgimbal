@@ -475,7 +475,7 @@ GBL_EXPORT GblType GblCmdParser_type(void) {
         .instancePrivateSize = sizeof(GblCmdParser_)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblCmdParser"),
                                 GBL_OBJECT_TYPE,
                                 &info,

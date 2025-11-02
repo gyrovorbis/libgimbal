@@ -573,7 +573,7 @@ GBL_EXPORT GblType GblProperty_type(void) {
         .instanceSize = sizeof(GblProperty)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblProperty"),
                                 GBL_BOX_TYPE,
                                 &info,

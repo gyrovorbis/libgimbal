@@ -141,17 +141,11 @@ GBL_SIGNALS(GblScanner,
  * @{
  */
 //! Returns a string reference to the current default delimeter pattern on the given class
-GBL_EXPORT GblStringRef*
-                 GblScannerClass_defaultDelimeters
-                                        (GBL_CKLASS)                   GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblScannerClass_defaultDelimeters       (GBL_CKLASS)                        GBL_NOEXCEPT;
 //! Sets the default delimeter pattern on the given class to a copy of \p pStr
-GBL_EXPORT void  GblScannerClass_setDefaultDelimeters
-                                        (GBL_KLASS,
-                                         const char* pPattern)         GBL_NOEXCEPT;
+GBL_EXPORT void          GblScannerClass_setDefaultDelimeters    (GBL_KLASS, const char* pPattern)   GBL_NOEXCEPT;
 //! Moves the given string reference to be owned by the given class as its delimeter pattern
-GBL_EXPORT void  GblScannerClass_setDefaultDelimetersRef
-                                        (GBL_KLASS,
-                                         const GblStringRef* pPattern) GBL_NOEXCEPT;
+GBL_EXPORT void          GblScannerClass_setDefaultDelimetersRef (GBL_KLASS, GblStringRef* pPattern) GBL_NOEXCEPT;
 //! @}
 
 //! Returns the GblType UUID associated with GblScanner
@@ -176,21 +170,17 @@ GBL_EXPORT GblRefCount GblScanner_unref  (GBL_SELF)              GBL_NOEXCEPT;
  *  @{
  */
 //! Returns a string reference to the string current being used as the input stream
-GBL_EXPORT GblStringRef*
-                 GblScanner_input         (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*  GblScanner_input        (GBL_CSELF)                      GBL_NOEXCEPT;
 //! Sets the input stream to the given string, optionally taking its size, and resetting the stream
-GBL_EXPORT void  GblScanner_setInput      (GBL_SELF,
-                                           const char* pStr,
-                                           size_t      count/*=0*/)  GBL_NOEXCEPT;
+GBL_EXPORT void           GblScanner_setInput     (GBL_SELF,
+                                                   const char* pStr,
+                                                   size_t      count/*=0*/)        GBL_NOEXCEPT;
 //! Sets the input stream to given string reference, taking ownership of it, and resetting the sream
-GBL_EXPORT void  GblScanner_setInputRef   (GBL_SELF,
-                                           const GblStringRef* pRef) GBL_NOEXCEPT;
+GBL_EXPORT void          GblScanner_setInputRef   (GBL_SELF, GblStringRef* pRef)   GBL_NOEXCEPT;
 //! Returns a reference to the string used as the delimeter regular expression pattern
-GBL_EXPORT GblStringRef*
-                 GblScanner_delimeters    (GBL_CSELF)                GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblScanner_delimeters    (GBL_CSELF)                      GBL_NOEXCEPT;
 //! Sets the stream's delimeter regular expression pattern to \p pPattern
-GBL_EXPORT void  GblScanner_setDelimeters (GBL_SELF,
-                                           const char* pPattern)     GBL_NOEXCEPT;
+GBL_EXPORT void          GblScanner_setDelimeters (GBL_SELF, const char* pPattern) GBL_NOEXCEPT;
 //! @}
 
 /*! \name Errors

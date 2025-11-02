@@ -870,7 +870,7 @@ GBL_EXPORT GblType GblScanner_type(void) {
         .instancePrivateSize = sizeof(GblScanner_)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY  {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblScanner"),
                                 GBL_OBJECT_TYPE,
                                 &info,

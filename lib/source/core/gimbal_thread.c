@@ -585,7 +585,7 @@ GBL_EXPORT GblType GblThread_type(void) {
         .pFnInstanceInit     = GblThread_initialize_
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblThread"),
                                 GBL_OBJECT_TYPE,
                                 &info,

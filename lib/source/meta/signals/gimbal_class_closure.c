@@ -44,11 +44,12 @@ GBL_EXPORT GblType GblClassClosure_type(void) {
         .instanceSize   = sizeof(GblClassClosure)
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblClassClosure"),
                                 GBL_CLOSURE_TYPE,
                                 &info,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
+
     return type;
 }

@@ -106,7 +106,7 @@ GBL_EXPORT int gblGcd(int u, int v) {
     int R = 0;
     //if(!u) return v;
     //if(!v) return u;
-    while ((u % v) > 0) GBL_LIKELY {
+    while GBL_LIKELY((u % v) > 0) {
       R = u % v;
       u = v;
       v = R;
@@ -115,21 +115,24 @@ GBL_EXPORT int gblGcd(int u, int v) {
 }
 
 GBL_EXPORT int gblLcm(int u, int v) {
-    if(!u || !v) GBL_UNLIKELY return 0;
+    if GBL_UNLIKELY(!u || !v)
+        return 0;
+
     const int absU      = abs(u);
     const int absV      = abs(v);
     const int absHigher = GBL_MAX(absU, absV);
     const int absLower  = GBL_MIN(absU, absV);
     int       lcm       = absHigher;
-    while(lcm % absLower) {
+
+    while(lcm % absLower)
         lcm += absHigher;
-    }
+
     return lcm;
 }
 
 GBL_EXPORT int gblParity(uint8_t n) {
     int p = 0;
-    while(n) GBL_LIKELY {
+    while GBL_LIKELY(n) {
         p = !p;
         n &= (n-1);
     }

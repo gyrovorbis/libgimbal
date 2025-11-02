@@ -244,7 +244,7 @@ GBL_EXPORT GblType GblArenaAllocator_type(void) {
         .pInterfaceImpls  = ifaceEntries
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         ifaceEntries[0].interfaceType = GBL_IALLOCATOR_TYPE;
 
         type = GblType_register(GblQuark_internStatic("GblArenaAllocator"),

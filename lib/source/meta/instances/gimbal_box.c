@@ -398,16 +398,16 @@ GBL_EXPORT GblType GblBox_type(void) {
     };
 
     static const GblTypeInfo typeInfo = {
-        .classSize          = sizeof(GblBoxClass),
-        .pFnClassInit       = GblBoxClass_init_,
-        .pFnClassFinal      = GblBoxClass_final_,
-        .instanceSize       = sizeof(GblBox),
-        .pFnInstanceInit    = GblBox_init_,
-        .interfaceCount     = 1,
-        .pInterfaceImpls    = ifaceMap
+        .classSize       = sizeof(GblBoxClass),
+        .pFnClassInit    = GblBoxClass_init_,
+        .pFnClassFinal   = GblBoxClass_final_,
+        .instanceSize    = sizeof(GblBox),
+        .pFnInstanceInit = GblBox_init_,
+        .interfaceCount  = 1,
+        .pInterfaceImpls = ifaceMap
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         ifaceMap[0].interfaceType = GBL_IVARIANT_TYPE;
 
         type = GblType_register(GblQuark_internStatic("GblBox"),

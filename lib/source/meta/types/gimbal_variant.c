@@ -804,7 +804,7 @@ GBL_EXPORT void* GblVariant_toPointer(GblVariant* pSelf)  {
 }
 
 GBL_EXPORT const char* GblVariant_toString(GblVariant* pSelf)  {
-    const GblStringRef* pValue = GBL_NULL;
+    GblStringRef* pValue = GBL_NULL;
 
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_STRING_TYPE) {
@@ -1303,7 +1303,7 @@ GBL_EXPORT void* GblVariant_opaquePeek(const GblVariant* pSelf) {
     return pValue;
 }
 
-GBL_EXPORT const GblStringRef* GblVariant_string(const GblVariant* pSelf) {
+GBL_EXPORT GblStringRef* GblVariant_string(const GblVariant* pSelf) {
     GblStringRef* pValue = GBL_NULL;
     GBL_CTX_BEGIN(GBL_NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_STRING_TYPE);

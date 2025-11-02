@@ -547,18 +547,19 @@ GBL_EXPORT GblType GblLogger_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     static const GblTypeInfo typeInfo = {
-        .classSize          = sizeof(GblLoggerClass),
-        .pFnClassInit       = GblLoggerClass_init_,
-        .instanceSize       = sizeof(GblLogger),
-        .pFnInstanceInit    = GblLogger_init_,
+        .classSize       = sizeof(GblLoggerClass),
+        .pFnClassInit    = GblLoggerClass_init_,
+        .instanceSize    = sizeof(GblLogger),
+        .pFnInstanceInit = GblLogger_init_,
     };
 
-    if(type == GBL_INVALID_TYPE) GBL_UNLIKELY {
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         type = GblType_register(GblQuark_internStatic("GblLogger"),
                                 GBL_OBJECT_TYPE,
                                 &typeInfo,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);
 
     }
+
     return type;
 }

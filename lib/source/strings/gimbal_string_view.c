@@ -198,21 +198,20 @@ GBL_EXPORT GBL_RESULT GblStringView_copy(GblStringView self, void* pDst, size_t 
 
 GBL_EXPORT int (GblStringView_compare)(GblStringView self, const char* pString, size_t len) {
     GblStringView other = GblStringView_fromString(pString, len);
-    if(!self.length && !other.length)   return 0;
-    else if(self.length > other.length) return INT_MAX;
-    else if(self.length < other.length) return INT_MIN;
-    else GBL_LIKELY{
-            return memcmp(self.pData, other.pData, self.length);
-        }
+
+         if GBL_UNLIKELY(!self.length && !other.length) return 0;
+    else if GBL_UNLIKELY(self.length > other.length) return INT_MAX;
+    else if GBL_UNLIKELY(self.length < other.length) return INT_MIN;
+    else return memcmp(self.pData, other.pData, self.length);
 }
 
 GBL_EXPORT int (GblStringView_compareIgnoreCase)(GblStringView self, const char* pString, size_t len) {
     GblStringView other = GblStringView_fromString(pString, len);
 
-    if(!self.length && other.length) return INT_MIN;
-    else if(self.length && !other.length) return INT_MAX;
-    else if(!self.length && !other.length) return 0;
-    else GBL_LIKELY {
+    if GBL_UNLIKELY(!self.length && other.length) return INT_MIN;
+    else if GBL_UNLIKELY(self.length && !other.length) return INT_MAX;
+    else if GBL_UNLIKELY(!self.length && !other.length) return 0;
+    else {
             char* pString1 = GBL_STRING_VIEW_CSTR_ALLOCA(self);
             char* pString2 = GBL_STRING_VIEW_CSTR_ALLOCA(other);
             for(size_t  i = 0; i < self.length; ++i) {
@@ -593,14 +592,15 @@ GBL_EXPORT GblStringView (GblStringView_fromString)(const char* pString, size_t 
 
 GBL_EXPORT char GblStringView_at(GblStringView self, size_t index) GBL_NOEXCEPT {
     char value = '\0';
-    if(index >= self.length) GBL_UNLIKELY {
-            GBL_CTX_BEGIN(GBL_NULL);
-            GBL_CTX_VERIFY(GBL_FALSE,
-                           GBL_RESULT_ERROR_OUT_OF_RANGE);
-            GBL_CTX_END_BLOCK();
-        } else GBL_LIKELY {
-            value = self.pData[index];
-        }
+
+    if GBL_UNLIKELY(index >= self.length) {
+        GBL_CTX_BEGIN(GBL_NULL);
+        GBL_CTX_VERIFY(GBL_FALSE,
+                       GBL_RESULT_ERROR_OUT_OF_RANGE);
+        GBL_CTX_END_BLOCK();
+    } else
+        value = self.pData[index];
+
     return value;
 }
 
