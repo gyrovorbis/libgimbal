@@ -52,14 +52,14 @@ libGimbal is being actively tested on the following targets:
 
 # Compilers #
 libGimbal is being built in CI with the following compilers:
-- Microsoft Visual Studio
+- Microsoft Visual C++
 - GCC
 - Clang
 - MinGW-w64
 - Emscripten
 
 # Building #
-Building is done with standard CMake, and all generators and mainstream compilers should be supported. You should be able to open CMakeLists.txt directly as a project file in most IDEs such as MSVC, XCode, Qt Creator, CLion, etc if you wish to build from a UI.
+Building is done with standard CMake, and all generators and mainstream compilers should be supported. You should be able to open CMakeLists.txt directly as a project file in most IDEs such as Visual Studio, XCode, Qt Creator, CLion, etc if you wish to build from a UI.
 
 First, ensure submodules are installed with:
 ```
