@@ -113,7 +113,7 @@ GBL_EXPORT GblBitView* (GblBitView_assign)(GblBitView* pSelf, GblBool value, siz
     return GblBitView_reset(pSelf, index, count);
 }
 
-GBL_EXPORT GblBitView* (GblBitView_set)(GblBitView* pSelf, size_t  index, size_t  count) GBL_NOEXCEPT {
+GBL_EXPORT GblBitView* (GblBitView_set)(GblBitView* pSelf, size_t index, size_t count) GBL_NOEXCEPT {
     const size_t  start = pSelf->offset + index;
     const size_t  end = start + count;
     if(start/8 < end/8) {
@@ -128,7 +128,7 @@ GBL_EXPORT GblBitView* (GblBitView_set)(GblBitView* pSelf, size_t  index, size_t
     return pSelf;
 }
 
-GBL_EXPORT GblBitView* (GblBitView_reset)(GblBitView* pSelf, size_t  index, size_t  count) GBL_NOEXCEPT {
+GBL_EXPORT GblBitView* (GblBitView_reset)(GblBitView* pSelf, size_t index, size_t count) GBL_NOEXCEPT {
     const size_t  start = pSelf->offset + index;
     const size_t  end = start + count;
     if(start/8 < end/8) {

@@ -1,11 +1,14 @@
 #include <gimbal/meta/instances/gimbal_box.h>
+#include <gimbal/meta/signals/gimbal_marshal.h>
 #include "../types/gimbal_type_.h"
 
+#define GBL_BOX_(self)                 GBL_PRIV_REF(GBL_BOX(self))
+#define GBL_BOX_CLASS_(klass)          GBL_PRIV_REF(GBL_BOX_CLASS(klass))
 #define GBL_BOX_FIELD_KEY_DESTRUCTOR   "_dtor"
 #define GBL_BOX_FIELD_KEY_USERDATA     "_ud"
 
-GblQuark fieldKeyDtor_ = GBL_QUARK_INVALID;
-GblQuark fieldKeyUd_   = GBL_QUARK_INVALID;
+static GblQuark fieldKeyDtor_ = GBL_QUARK_INVALID;
+static GblQuark fieldKeyUd_   = GBL_QUARK_INVALID;
 
 // ============== GblBoxClass ====================
 GBL_EXPORT GblBoxClass* (GblBoxClass_createFloating)(GblType           derivedType,
@@ -137,7 +140,7 @@ GBL_EXPORT GBL_RESULT (GblBox_construct)(GblBox*           pSelf,
     GBL_CTX_VERIFY_CALL(GblInstance_construct((GblInstance*)pSelf,
                                               derivedType,
                                               GBL_CLASS(pClass)));
-    GBL_PRIV_REF(pSelf).constructedInPlace = 1;
+    GBL_BOX_(pSelf).constructedInPlace = GBL_TRUE;
 
     if(pUserdata)
         GBL_CTX_VERIFY_CALL(GblBox_setUserdata(pSelf, pUserdata));
@@ -149,218 +152,206 @@ GBL_EXPORT GBL_RESULT (GblBox_construct)(GblBox*           pSelf,
 
 
 GBL_EXPORT GBL_RESULT GblBox_setUserDestructor(GblBox* pSelf, GblArrayMapDtorFn pFnDtor) {
-    if(pFnDtor) {
-        return GblArrayMap_setUserdata(&GBL_PRIV_REF(pSelf).pFields,
+    if(pFnDtor)
+        return GblArrayMap_setUserdata(&GBL_BOX_(pSelf).pFields,
                                        fieldKeyDtor_,
                                        (uintptr_t)pSelf,
                                        pFnDtor);
-    } else {
-        return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields,
-                                 fieldKeyDtor_);
-    }
+    else
+        return GblArrayMap_erase(&GBL_BOX_(pSelf).pFields, fieldKeyDtor_);
 }
 
 GBL_EXPORT uintptr_t GblBox_field(const GblBox* pSelf, GblQuark key) {
-    return GblArrayMap_getValue(&GBL_PRIV_REF(pSelf).pFields, key);
+    return GblArrayMap_getValue(&GBL_BOX_(pSelf).pFields, key);
 }
 
 GBL_EXPORT uintptr_t GblBox_takeField(GblBox* pSelf, GblQuark key) {
     uintptr_t value = 0;
-    GblArrayMap_extractValue(&GBL_PRIV_REF(pSelf).pFields, key, &value);
+    GblArrayMap_extractValue(&GBL_BOX_(pSelf).pFields, key, &value);
     return value;
 }
 
 GBL_EXPORT GblBool GblBox_clearField(GblBox* pSelf, GblQuark key) {
-    return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields, key);
+    return GblArrayMap_erase(&GBL_BOX_(pSelf).pFields, key);
 }
 
 GBL_EXPORT GblBool GblBox_hasField(const GblBox* pSelf, GblQuark key) {
-    return GblArrayMap_contains(&GBL_PRIV_REF(pSelf).pFields, key);
+    return GblArrayMap_contains(&GBL_BOX_(pSelf).pFields, key);
 }
 
 GBL_EXPORT GBL_RESULT GblBox_setField(GblBox*           pSelf,
                                       GblQuark          key,
                                       uintptr_t         ud,
-                                      GblArrayMapDtorFn pFnDtor)
-{
-    return GblArrayMap_setUserdata(&GBL_PRIV_REF(pSelf).pFields, key, ud, pFnDtor);
+                                      GblArrayMapDtorFn pFnDtor) {
+    return GblArrayMap_setUserdata(&GBL_BOX_(pSelf).pFields, key, ud, pFnDtor);
 }
 
 GBL_EXPORT void* GblBox_userdata(const GblBox* pSelf) {
-    return (void*)GblArrayMap_getValue(&GBL_PRIV_REF(pSelf).pFields, fieldKeyUd_);
+    return (void*)GblArrayMap_getValue(&GBL_BOX_(pSelf).pFields, fieldKeyUd_);
 }
 
 GBL_EXPORT GBL_RESULT GblBox_setUserdata(GblBox* pSelf, void* pUserdata) {
-    if(pUserdata) {
-        return GblArrayMap_setUserdata(&GBL_PRIV_REF(pSelf).pFields,
+    if(pUserdata)
+        return GblArrayMap_setUserdata(&GBL_BOX_(pSelf).pFields,
                                        fieldKeyUd_,
                                        (uintptr_t)pUserdata,
                                        NULL);
-    } else {
-        return GblArrayMap_erase(&GBL_PRIV_REF(pSelf).pFields,
-                                 fieldKeyUd_);
-    }
+    else
+        return GblArrayMap_erase(&GBL_BOX_(pSelf).pFields, fieldKeyUd_);
 }
 
 GBL_EXPORT GblBox* GblBox_ref(GblBox* pSelf) {
-    GBL_CTX_BEGIN(NULL);
-
-    GBL_CTX_VERIFY_POINTER(pSelf);
-
-    if(pSelf)
-#if 0
-       atomic_fetch_add(&GBL_PRIV_REF(pSelf).refCounter, 1);
-#else
-        ++GBL_PRIV_REF(pSelf).refCounter;
-#endif
-
-    GBL_CTX_END_BLOCK();
+    GBL_ASSERT(pSelf);
+    ++GBL_BOX_(pSelf).refCounter;
     return pSelf;
 }
 
 GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
     GblRefCount count = 0;
-    GBL_CTX_BEGIN(NULL);
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
 
-    if(pSelf) {
-        GBL_CTX_VERIFY_EXPRESSION(GBL_PRIV_REF(pSelf).refCounter);
-#if 0
-       if((count = atomic_fetch_sub(&GBL_PRIV_REF(pSelf).refCounter, 1) - 1) == 0) {
-#else
-        if((count = GBL_PRIV_REF(pSelf).refCounter-- - 1) == 0) {
-#endif
-            GblBoxClass* pClass = GBL_BOX_GET_CLASS(pSelf);
-            GBL_CTX_CALL(pClass->pFnDestructor(pSelf));
+    // It's legal to call with a NULL pointer, just like free().
+    if GBL_LIKELY(pSelf) {
+        // Debug-only sanity check.
+        GBL_ASSERT(GBL_BOX_(pSelf).refCounter, "No references remaining to unref!");
 
-            if(!GBL_PRIV_REF(pSelf).constructedInPlace)
-                GBL_CTX_CALL(GblInstance_destroy(&pSelf->base));
+        // Check if we're releasing the final reference.
+        if(!(count = (GBL_BOX_(pSelf).refCounter--) - 1)) {
+            // Emit "finalizing" signal for any attached weak references.
+            GBL_EMIT(pSelf, "finalize");
+
+            // Invoke virtual destructor, which better fuckin' chain up.
+            result |= GBL_BOX_GET_CLASS(pSelf)->pFnDestructor(pSelf);
+
+            // Destruct or destroy depending on how it was constructed.
+            if GBL_UNLIKELY(GBL_BOX_(pSelf).constructedInPlace)
+                result |= GblInstance_destruct(&pSelf->base);
             else
-                GBL_CTX_CALL(GblInstance_destruct(&pSelf->base));
+                result |= GblInstance_destroy(&pSelf->base);
+
+            // \todo Raise an actual error.
+            //GBL_ASSERT(GBL_RESULT_SUCCESS(result));
         }
     }
 
-    GBL_CTX_END_BLOCK();
     return count;
 }
 
 GBL_EXPORT GblRefCount GblBox_refCount(const GblBox* pSelf) {
-#if 0
-    return atomic_load(&GBL_PRIV_REF(pSelf).refCounter);
-#else
     return GBL_PRIV_REF(pSelf).refCounter;
-#endif
 }
 
 static GBL_RESULT GblBox_IVariant_construct_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
-    GBL_CTX_BEGIN(NULL);
 
-    if(op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT) {
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+
+    switch(op) {
+    case GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT:
         pVariant->pBox = GblBox_create(pVariant->type);
+        break;
 
-    } else if(op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY ||
-              op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY)
-    {
-        pVariant->pBox = pArgs[0].pVoid?
-                         GBL_REF(pArgs[0].pVoid) : NULL;
-    } else {
+    case GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY:
+    case GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY:
+        pVariant->pBox = pArgs[0].pVoid? GBL_REF(pArgs[0].pVoid) : NULL;
+        break;
+
+    default:
         pVariant->pBox = pArgs[0].pVoid;
         if(op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE)
-            GblVariant_invalidate(&pArgs[0]);
+            result = GblVariant_invalidate(&pArgs[0]);
     }
 
-    GBL_CTX_END();
+    return result;
 }
 
 static GBL_RESULT GblBox_IVariant_destruct_(GblVariant* pVariant) {
-    GBL_CTX_BEGIN(NULL);
-
     GBL_UNREF(pVariant->pBox);
 
-    GBL_CTX_END();
+    return GBL_RESULT_SUCCESS;
 }
 
 static GBL_RESULT GblBox_IVariant_compare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
-    GBL_CTX_BEGIN(NULL);
-
     *pResult = pVariant->pBox - pOther->pBox;
 
-    GBL_CTX_END();
+    return GBL_RESULT_SUCCESS;
 }
 
-static GBL_RESULT GblBox_IVariant_get_(GblVariant* pSelf, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
+static GBL_RESULT GblBox_IVariant_get_(GblVariant* pSelf, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
 
-    GBL_CTX_BEGIN(NULL);
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
 
+    // Assign pointer-to-pointer to point to this GblBox.
     *(GblBox**)pArgs[0].pVoid = pSelf->pBox;
 
-    if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY) {
+    // Take a new reference if we're copying into the pointer.
+    if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY)
         GBL_REF(pSelf->pBox);
-    } else if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE) {
-        GblVariant_invalidate(pSelf);
-    }
+    // Invalidate old reference if we're moving into the pointer.
+    else if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE)
+        result = GblVariant_invalidate(pSelf);
 
-    GBL_CTX_END();
+    return result;
 }
 
 static GBL_RESULT GblBox_IVariant_set_(GblVariant* pSelf, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
-    GBL_CTX_BEGIN(NULL);
 
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+
+    // Release current reference.
     GBL_UNREF(pSelf->pBox);
+    // Assign to new reference.
     pSelf->pBox = pArgs[0].pVoid;
 
-    if(op == GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY || op == GBL_IVARIANT_OP_FLAG_SET_COPY) {
+    // Take a new reference if we're copying.
+    if(op == GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY || op == GBL_IVARIANT_OP_FLAG_SET_COPY)
         GBL_REF(pSelf->pBox);
-    } else if(op == GBL_IVARIANT_OP_FLAG_SET_MOVE || op == GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE) {
-        GblVariant_invalidate(&pArgs[0]);
-    }
+    // Invalidate the old reference if we're moving.
+    else if(op == GBL_IVARIANT_OP_FLAG_SET_MOVE || op == GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE)
+        result = GblVariant_invalidate(&pArgs[0]);
 
-    GBL_CTX_END();
+    return result;
 }
 
 static GBL_RESULT GblBox_destructor_(GblBox* pSelf) {
-    GBL_CTX_BEGIN(NULL);
-
-    GBL_CTX_VERIFY_CALL(GblArrayMap_destroy(&GBL_PRIV_REF(pSelf).pFields));
-
-    GBL_CTX_END();
+    return GblArrayMap_destroy(&GBL_PRIV_REF(pSelf).pFields);
 }
 
 static GBL_RESULT GblBox_init_(GblInstance* pInstance) {
-    GBL_CTX_BEGIN(NULL);
+    GBL_PRIV_REF(GBL_BOX(pInstance)).refCounter = 1;
 
-#if 0
-    atomic_store(&GBL_PRIV_REF((GblBox*)pInstance).refCounter, 1);
-#else
-    GBL_PRIV_REF((GblBox*)pInstance).refCounter = 1;
-#endif
-
-    GBL_CTX_END();
+    return GBL_RESULT_SUCCESS;
 }
 
 static GBL_RESULT GblBoxClass_init_(GblClass* pClass, const void* pUd) {
     GBL_UNUSED(pUd);
-    GBL_CTX_BEGIN(NULL);
 
-    if(!GblType_classRefCount(GBL_BOX_TYPE)) {
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+
+    if GBL_UNLIKELY(!GblType_classRefCount(GBL_BOX_TYPE)) {
         fieldKeyDtor_ = GblQuark_fromStatic(GBL_BOX_FIELD_KEY_DESTRUCTOR);
         fieldKeyUd_   = GblQuark_fromStatic(GBL_BOX_FIELD_KEY_USERDATA);
+
+        result = GblSignal_install(GBL_BOX_TYPE,
+                                   "finalize",
+                                   GblMarshal_CClosure_VOID__INSTANCE,
+                                   0);
     }
 
     static const GblIVariantVTable iVariantVTable = {
-        .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT      |
-                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY         |
-                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE         |
-                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY   |
-                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE   |
-                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY         |
-                        GBL_IVARIANT_OP_FLAG_SET_COPY               |
-                        GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE         |
-                        GBL_IVARIANT_OP_FLAG_SET_MOVE               |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY         |
-                        GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE         |
+        .supportedOps = GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT    |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY       |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE       |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY |
+                        GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY       |
+                        GBL_IVARIANT_OP_FLAG_SET_COPY             |
+                        GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE       |
+                        GBL_IVARIANT_OP_FLAG_SET_MOVE             |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY       |
+                        GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE       |
                         GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK,
         .pGetValueFmt = "p",
         .pSetValueFmt = "p",
@@ -374,17 +365,16 @@ static GBL_RESULT GblBoxClass_init_(GblClass* pClass, const void* pUd) {
     GBL_IVARIANT_CLASS(pClass)->pVTable       = &iVariantVTable;
     GBL_BOX_CLASS(pClass)     ->pFnDestructor = GblBox_destructor_;
 
-    GBL_CTX_END();
+    return result;
 }
 
 static GBL_RESULT GblBoxClass_final_(GblClass* pClass, const void* pUd) {
     GBL_UNUSED(pUd);
-    GBL_CTX_BEGIN(NULL);
 
-    GblBoxClass* pSelfClass = (GblBoxClass*)pClass;
-    GBL_CTX_VERIFY_CALL(GblArrayMap_destroy(&GBL_PRIV_REF(pSelfClass).pFields));
+    if GBL_UNLIKELY(!GblType_classRefCount(GBL_BOX_TYPE))
+        GblSignal_uninstall(GBL_BOX_TYPE, "finalize");
 
-    GBL_CTX_END();
+    return GblArrayMap_destroy(&GBL_BOX_CLASS_(pClass).pFields);
 }
 
 GBL_EXPORT GblType GblBox_type(void) {
@@ -415,5 +405,6 @@ GBL_EXPORT GblType GblBox_type(void) {
                                 &typeInfo,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
+
     return type;
 }

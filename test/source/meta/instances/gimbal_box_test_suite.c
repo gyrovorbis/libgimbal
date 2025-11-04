@@ -1,6 +1,7 @@
 #include "meta/instances/gimbal_box_test_suite.h"
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_ref.h>
+#include <gimbal/meta/signals/gimbal_closure.h>
 
 #define GBL_SELF_TYPE GblBoxTestSuite
 
@@ -15,6 +16,8 @@ GBL_TEST_FIXTURE {
     GblBoxClass* pBoxClass;
     GblBox*      pBox;
     GblVariant*  pVariant;
+    unsigned     finalizeSignalCounter1;
+    unsigned     finalizeSignalCounter2;
 };
 
 GBL_TEST_INIT()
@@ -27,9 +30,9 @@ GBL_TEST_CASE_END
 
 GBL_TEST_FINAL()
     GBL_CTX_FREE(pFixture->pVariant);
-    GBL_TEST_COMPARE(pFixture->classRefCount, GblType_classRefCount(GBL_BOX_TYPE));
-    GBL_TEST_COMPARE(pFixture->instanceCount, GblType_instanceCount(GBL_BOX_TYPE));
-    GBL_TEST_COMPARE(pFixture->refCount,      GblRef_activeCount());
+    GBL_TEST_COMPARE(GblType_classRefCount(GBL_BOX_TYPE), pFixture->classRefCount);
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_BOX_TYPE), pFixture->instanceCount);
+    GBL_TEST_COMPARE(GblRef_activeCount(),                pFixture->refCount);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(classCreateFloatingInvalid)
@@ -510,6 +513,35 @@ GBL_TEST_CASE(variantComparison)
     GBL_TEST_CALL(GblVariant_destruct(pFixture->pVariant));
 GBL_TEST_CASE_END
 
+static void onFinalize_(GblBox* pBox) {
+    (*(unsigned*)GblBox_userdata(pBox))++;
+}
+
+GBL_TEST_CASE(finalizeSignal)
+    GblBox box1;
+    GblBox_construct(&box1, GBL_BOX_TYPE, &pFixture->finalizeSignalCounter1);
+    GBL_CONNECT(&box1, "finalize", onFinalize_);
+    GBL_TEST_COMPARE(pFixture->finalizeSignalCounter1, 0);
+
+    GblBox* pBox2 = GblBox_create(GBL_BOX_TYPE, sizeof(GblBox), &pFixture->finalizeSignalCounter2);
+    GBL_CONNECT(pBox2, "finalize", onFinalize_);
+    GBL_TEST_COMPARE(pFixture->finalizeSignalCounter2, 0);
+
+    GBL_REF(&box1);
+    GBL_TEST_COMPARE(pFixture->finalizeSignalCounter1, 0);
+    GBL_UNREF(&box1);
+    GBL_TEST_COMPARE(pFixture->finalizeSignalCounter1, 0);
+    GBL_UNREF(&box1);
+    GBL_TEST_COMPARE(pFixture->finalizeSignalCounter1, 1);
+
+    GBL_REF(pBox2);
+    GBL_TEST_COMPARE(pFixture->finalizeSignalCounter2, 0);
+    GBL_UNREF(pBox2);
+    GBL_TEST_COMPARE(pFixture->finalizeSignalCounter2, 0);
+    GBL_UNREF(pBox2);
+    GBL_TEST_COMPARE(pFixture->finalizeSignalCounter2, 1);
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(classCreateFloatingInvalid,
                   classConstructFloatingInvalid,
                   classCreateDestroyFloating,
@@ -541,4 +573,5 @@ GBL_TEST_REGISTER(classCreateFloatingInvalid,
                   variantSetValueMove,
                   variantConstructCopy,
                   variantConstructMove,
-                  variantComparison)
+                  variantComparison,
+                  finalizeSignal)

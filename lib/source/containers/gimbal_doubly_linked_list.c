@@ -1,6 +1,5 @@
 #include <gimbal/containers/gimbal_doubly_linked_list.h>
 
-
 GBL_EXPORT void GblDoublyLinkedList_init(GblDoublyLinkedListNode* pSelf) {
     pSelf->pNext = pSelf->pPrev = pSelf;
 }
@@ -31,7 +30,7 @@ GBL_EXPORT void GblDoublyLinkedList_pushFront(GblDoublyLinkedListNode* pSelf, Gb
     pSelf->pNext = pNode;
 }
 
-GBL_EXPORT size_t  GblDoublyLinkedList_find(const GblDoublyLinkedListNode* pSelf, GblDoublyLinkedListNode* pNode) {
+GBL_EXPORT size_t GblDoublyLinkedList_find(const GblDoublyLinkedListNode* pSelf, GblDoublyLinkedListNode* pNode) {
     return GblLinkedList_find(&pSelf->singleNode, &pNode->singleNode);
 }
 

@@ -23,6 +23,7 @@
 
 #include "../meta/instances/gimbal_object.h"
 #include "../meta/signals/gimbal_signal.h"
+#include "../meta/signals/gimbal_closure.h"
 #include "gimbal_stack_frame.h"
 #include "gimbal_main_loop.h"
 #include "../allocators/gimbal_scope_allocator.h"

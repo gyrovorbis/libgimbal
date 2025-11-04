@@ -16,7 +16,7 @@
 #include "../types/gimbal_type.h"
 #include "../../core/gimbal_typedefs.h"
 #include "../../preprocessor/gimbal_macro_composition.h"
-#include "gimbal_closure.h"
+#include "gimbal_marshal.h"
 
 #define GBL_SIGNALS(instanceStruct, /* signals */...)
 #define GBL_SIGNALS_REGISTER(instanceStruct, /* marshals */...)

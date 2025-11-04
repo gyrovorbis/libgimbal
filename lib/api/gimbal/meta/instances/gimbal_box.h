@@ -1,17 +1,22 @@
 /*! \file
- *  \brief GblBox (reference-counted, opaque userdata), and related functions
+ *  \brief   GblBox (reference-counted, opaque userdata), and related functions
  *  \ingroup metaBuiltinTypes
  *
  *  GblBox represents the most minimal type within the type
  *  system that is still runtime extensible and still offers
  *  everything typically required for an object to have
- *  bindings to another language. A GblBox extends GblInstance with:
+ *  bindings to another language.
  *
- *  * Reference counting/shared pointer semantics
- *  * Arbitrary userdata storage corresponding destructors
+ *  A GblBox extends GblInstance with:
+ *      - Reference counting/shared pointer semantics
+ *      - Arbitrary userdata storage corresponding destructors
  *
- *  \author     2023 Falco Girgis
+ *  \author     2023, 2025 Falco Girgis
  *  \copyright  MIT License
+ *
+ *  \todo
+ *      - GblBox_destructing()?
+ *      - GblBoxClass_destructing()?
  */
 #ifndef GIMBAL_BOX_H
 #define GIMBAL_BOX_H
@@ -19,19 +24,25 @@
 #include "gimbal_instance.h"
 #include "../ifaces/gimbal_ivariant.h"
 #include "../../containers/gimbal_array_map.h"
+#include "../signals/gimbal_signal.h"
 
 /*! \name Type System
- *  \brief Type UUID and Cast operators
+ *  \brief Type UUID and Cast operators.
  *  @{
  */
-#define GBL_BOX_TYPE            (GBL_TYPEID(GblBox))            //!< GblType UUID of a GblBox
-#define GBL_BOX(self)           (GBL_CAST(GblBox, self))        //!< Casts a GblInstance to GblBox
-#define GBL_BOX_CLASS(klass)    (GBL_CLASS_CAST(GblBox, klass)) //!< Casts a GblClass to GblBoxClass
-#define GBL_BOX_GET_CLASS(self) (GBL_CLASSOF(GblBox, self))     //!< Gets a GblBoxClass from a GblInstance
+#define GBL_BOX_TYPE            GBL_TYPEID(GblBox)            //!< GblType UUID of a GblBox
+#define GBL_BOX(self)           GBL_CAST(GblBox, self)        //!< Casts a GblInstance to GblBox
+#define GBL_BOX_CLASS(klass)    GBL_CLASS_CAST(GblBox, klass) //!< Casts a GblClass to GblBoxClass
+#define GBL_BOX_GET_CLASS(self) GBL_CLASSOF(GblBox, self)     //!< Gets a GblBoxClass from a GblInstance
 //! @}
 
-#define GBL_REF(box)            (GblBox_ref(GBL_BOX(box)))          //!< Auto-casting convenience macro around GblBox_ref()
-#define GBL_UNREF(box)          (GblBox_unref(GBL_AS(GblBox, box))) //!< Auto-casting convenience macro around GblBox_unref()
+/*! \name  Reference Management
+ *  \brief Macros for convenient lifetime control.
+ *  @{
+ */
+#define GBL_REF(box)   GblBox_ref(GBL_BOX(box))          //!< Auto-casting convenience macro around GblBox_ref()
+#define GBL_UNREF(box) GblBox_unref(GBL_AS(GblBox, box)) //!< Auto-casting convenience macro around GblBox_unref()
+//! @}
 
 #define GBL_SELF_TYPE   GblBox
 
@@ -56,7 +67,7 @@ GBL_CLASS_BASE(GblBox, GblIVariant)
         GblArrayMap* pFields; //!< PRIVATE: Internal storage for userdata fields
     GBL_PRIVATE_END
 
-    //! Virtual method invoked when a GblBox is being destroyed
+    //! Virtual method invoked when a GblBox is being destroyed.
     GBL_RESULT (*pFnDestructor)(GBL_SELF);
 GBL_CLASS_END
 
@@ -91,6 +102,12 @@ GBL_INSTANCE_BASE(GblBox)                          // Size (32/64 bit)
         )
     GBL_PRIVATE_END
 GBL_INSTANCE_END
+
+//! \cond
+GBL_SIGNALS(GblBox,
+    (finalize, (GBL_INSTANCE_TYPE, pReceiver)) //!< Emitted just before a box is destroyed.
+)
+//! \endcond
 
 /*! \name  Floating Classes
  *  \brief Methods for managing floating classes

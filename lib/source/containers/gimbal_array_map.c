@@ -225,7 +225,7 @@ GBL_EXPORT uintptr_t GblArrayMap_atValue(GblArrayMap*const* ppSelf, uintptr_t ke
     return value;
 }
 
-GBL_EXPORT GblVariant* GblArrayMap_atVariant(GblArrayMap*const* ppSelf, uintptr_t key) {
+GBL_EXPORT GblVariant* GblArrayMap_atVariant(GblArrayMap* const* ppSelf, uintptr_t key) {
     GblVariant* pVariant = GBL_NULL;
     GblArrayMapEntry* pEntry = GblArrayMap_find_entry_(ppSelf, key);
 
