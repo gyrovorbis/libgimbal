@@ -49,6 +49,12 @@ typedef union GblPtr {
     GblFnPtr pFunc; //!< Function pointer
 } GblPtr;
 
+//! Casts a C function pointer to a generic callback type
+#ifndef __cplusplus
+#   define GBL_CALLBACK(fn)  ((GblFnPtr)fn)
+#else
+#   define GBL_CALLBACK(fn)  ((GblFnPtr)+fn)
+#endif
 
 #endif // GIMBAL_TYPEDEFS_H
 

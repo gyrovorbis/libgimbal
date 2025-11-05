@@ -27,13 +27,6 @@
 #define GBL_CLOSURE_GET_CLASS(self) (GBL_CLASSOF(GblClosure, self))     //!< Gets a GblClosureClass from GblInstance
 //! @}
 
-//! Casts a C function pointer to a generic callback type
-#ifndef __cplusplus
-#   define GBL_CALLBACK(fn)  ((GblFnPtr)fn)
-#else
-#   define GBL_CALLBACK(fn)  ((GblFnPtr)+fn)
-#endif
-
 #define GBL_SELF_TYPE GblClosure
 
 GBL_DECLS_BEGIN
