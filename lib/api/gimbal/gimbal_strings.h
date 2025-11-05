@@ -1,8 +1,13 @@
 /*! \file
- *  \brief Strings module-wide include
+ *  \brief   Aggregate header including entire string API.
  *  \ingroup strings
  *
- *  \author Falco Girgis
+ *  This file is a single-file aggregate header which includes
+ *  the header files for all strings contained within libGimbal's
+ *  string API, so you do not have to include them individually.
+ *
+ *  \author    2023, 2025 Falco Girgis
+ *  \copyright MIT License
  */
 #ifndef GIMBAL_STRINGS_H
 #define GIMBAL_STRINGS_H
@@ -16,8 +21,8 @@
 #include "strings/gimbal_string_list.h"
 
 /*! \defgroup strings Strings
-    \ingroup dataTypes
-* 	\brief Collection of specialized string types
+    \ingroup  dataTypes
+    \brief    Collection of specialized string types.
 
     LibGimbal provides a rich set of string manipulation functions with API functionality taken
     from various languages such as C++ and Java.
@@ -34,12 +39,14 @@
 ## Choosing the Right String
     The following table can be referenced when deciding which string type to use:
 
-    Type  			| Use-cases											| Header
-    ----------------|---------------------------------------------------|-------
-    GblStringView   | Reading or immutable data processing				| gimbal_string_view.h
-    GblStringBuffer | Writing or mutable data processing and building	| gimbal_string_buffer.h
-    ::GblStringRef	| Storing or managing ownership						| gimbal_string_ref.h
-    ::GblQuark		| Hashing or uniquely identifying  					| gimbal_quark.h
+    Type            | Use-cases                                            | Header
+    ----------------|------------------------------------------------------|-------
+    GblStringView   | Reading or immutable data processing                 | gimbal_string_view.h
+    GblStringBuffer | Writing or mutable data processing and building      | gimbal_string_buffer.h
+    ::GblStringRef  | Storing or managing ownership                        | gimbal_string_ref.h
+    ::GblQuark      | Hashing or uniquely identifying                      | gimbal_quark.h
+    GblStringList   | Storing or operating on multiple strings             | gimbal_string_list.h
+    GblPattern      | Searching or applying regular expressions to strings | gimbal_pattern.h
 */
 
 

@@ -270,28 +270,28 @@ GBL_EXPORT int GblVariant_compare(const GblVariant* pSelf, const GblVariant* pOt
     return result;
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_constructDefault(GblVariant* pSelf, GblType type)  {
+GBL_EXPORT GBL_RESULT GblVariant_constructDefault(GblVariant* pSelf, GblType type) {
     GBL_VARIANT_BEGIN_(type, ref);
     GBL_CTX_CALL(GblVariant_initDefault_(pSelf, type));
     GBL_CTX_CALL(GblIVariantClass_constructDefault(pIFace, pSelf));
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_constructCopy(GblVariant* pSelf,  const GblVariant* pOther)  {
+GBL_EXPORT GBL_RESULT GblVariant_constructCopy(GblVariant* pSelf,  const GblVariant* pOther) {
     GBL_VARIANT_BEGIN_(pOther->type, ref);
     GBL_CTX_CALL(GblVariant_initDefault_(pSelf, pOther->type));
     GBL_CTX_CALL(GblIVariantClass_constructCopy(pIFace, pSelf, pOther));
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_constructMove(GblVariant* pSelf, GblVariant* pOther)  {
+GBL_EXPORT GBL_RESULT GblVariant_constructMove(GblVariant* pSelf, GblVariant* pOther) {
     GBL_VARIANT_BEGIN_(pOther->type, ref); //still has to copy class reference
     GBL_CTX_CALL(GblVariant_initDefault_(pSelf, pOther->type));
     GBL_CTX_CALL(GblIVariantClass_constructMove(pIFace, pSelf, pOther));
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_setCopy(GblVariant* pSelf, const GblVariant* pOther)  {
+GBL_EXPORT GBL_RESULT GblVariant_setCopy(GblVariant* pSelf, const GblVariant* pOther) {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     if(pSelf->type != pOther->type) {
         GBL_CTX_CALL(GblVariant_destruct(pSelf));
@@ -302,7 +302,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setCopy(GblVariant* pSelf, const GblVariant* pO
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_setMove(GblVariant* pSelf, GblVariant* pOther)  {
+GBL_EXPORT GBL_RESULT GblVariant_setMove(GblVariant* pSelf, GblVariant* pOther) {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     /* you still have to destruct, what if it's another ref you're oving over!? */
     //if(pSelf->type != pOther->type) {
@@ -319,7 +319,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setMove(GblVariant* pSelf, GblVariant* pOther) 
  * and invalidating the variant, or because of a failed construction, assignment,
  * or conversion. This is analogous to free(NULL) being valid.
  */
-GBL_EXPORT GBL_RESULT GblVariant_destruct(GblVariant* pSelf)  {
+GBL_EXPORT GBL_RESULT GblVariant_destruct(GblVariant* pSelf) {
     if(GblVariant_typeOf(pSelf) != GBL_INVALID_TYPE) {
         GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
         GBL_CTX_CALL(GblIVariantClass_destruct(pIFace, pSelf));
@@ -329,19 +329,19 @@ GBL_EXPORT GBL_RESULT GblVariant_destruct(GblVariant* pSelf)  {
     } else return GBL_RESULT_SUCCESS;
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_save(const GblVariant* pSelf, GblStringBuffer* pString)  {
+GBL_EXPORT GBL_RESULT GblVariant_save(const GblVariant* pSelf, GblStringBuffer* pString) {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_CTX_CALL(GblIVariantClass_save(pIFace, pSelf, pString));
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_load(GblVariant* pSelf, const GblStringBuffer* pString)  {
+GBL_EXPORT GBL_RESULT GblVariant_load(GblVariant* pSelf, const GblStringBuffer* pString) {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_CTX_CALL(GblIVariantClass_load(pIFace, pSelf, pString));
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_constructValueCopyVa(GblVariant* pSelf, GblType type, va_list* pList)  {
+GBL_EXPORT GBL_RESULT GblVariant_constructValueCopyVa(GblVariant* pSelf, GblType type, va_list* pList) {
     GBL_VARIANT_BEGIN_(type, ref);
     GBL_CTX_CALL(GblVariant_initDefault_(pSelf, type));
     GBL_CTX_CALL(GblIVariantClass_constructValueCopy(pIFace, pSelf, pList));
@@ -353,7 +353,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructValueCopyVa(GblVariant* pSelf, GblType
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_constructValueMoveVa(GblVariant* pSelf, GblType type, va_list* pList)  {
+GBL_EXPORT GBL_RESULT GblVariant_constructValueMoveVa(GblVariant* pSelf, GblType type, va_list* pList) {
     GBL_VARIANT_BEGIN_(type, ref);
     GBL_CTX_CALL(GblVariant_initDefault_(pSelf, type));
     GBL_CTX_CALL(GblIVariantClass_constructValueMove(pIFace, pSelf, pList));
@@ -365,7 +365,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructValueMoveVa(GblVariant* pSelf, GblType
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_constructValueCopy(GblVariant* pSelf, GblType type, ...)  {
+GBL_EXPORT GBL_RESULT GblVariant_constructValueCopy(GblVariant* pSelf, GblType type, ...) {
     va_list list;
     va_start(list, type);
     GBL_CTX_BEGIN(NULL);
@@ -375,7 +375,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructValueCopy(GblVariant* pSelf, GblType t
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_constructValueMove(GblVariant* pSelf, GblType type, ...)  {
+GBL_EXPORT GBL_RESULT GblVariant_constructValueMove(GblVariant* pSelf, GblType type, ...) {
     GBL_CTX_BEGIN(NULL);
     va_list varArgs;
     va_start(varArgs, type);
@@ -385,7 +385,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructValueMove(GblVariant* pSelf, GblType t
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_setValueCopy(GblVariant* pSelf, GblType type, ...)  {
+GBL_EXPORT GBL_RESULT GblVariant_setValueCopy(GblVariant* pSelf, GblType type, ...) {
     va_list varArgs;
     va_start(varArgs, type);
     GBL_CTX_BEGIN(NULL);
@@ -395,7 +395,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueCopy(GblVariant* pSelf, GblType type, .
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_setValueMove(GblVariant* pSelf, GblType type, ...)  {
+GBL_EXPORT GBL_RESULT GblVariant_setValueMove(GblVariant* pSelf, GblType type, ...) {
     va_list varArgs;
     va_start(varArgs, type);
     GBL_CTX_BEGIN(NULL);
@@ -434,8 +434,8 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueCopyVa(GblVariant* pSelf,
 }
 
 GBL_EXPORT GBL_RESULT GblVariant_setValueMoveVa(GblVariant* pSelf,
-                                                    GblType  type,
-                                                    va_list* pVarArgs)
+                                                GblType     type,
+                                                va_list*    pVarArgs)
 {
     GBL_CTX_BEGIN(NULL);
     if(type != pSelf->type) {
@@ -461,7 +461,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueMoveVa(GblVariant* pSelf,
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_valueCopy(const GblVariant* pSelf, ...)  {
+GBL_EXPORT GBL_RESULT GblVariant_valueCopy(const GblVariant* pSelf, ...) {
     va_list varArgs;
     va_start(varArgs, pSelf);
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
@@ -471,7 +471,7 @@ GBL_EXPORT GBL_RESULT GblVariant_valueCopy(const GblVariant* pSelf, ...)  {
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_valuePeek(const GblVariant* pSelf, ...)  {
+GBL_EXPORT GBL_RESULT GblVariant_valuePeek(const GblVariant* pSelf, ...) {
     va_list varArgs;
     va_start(varArgs, pSelf);
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
@@ -481,7 +481,7 @@ GBL_EXPORT GBL_RESULT GblVariant_valuePeek(const GblVariant* pSelf, ...)  {
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_valueMove(GblVariant* pSelf,  ...)  {
+GBL_EXPORT GBL_RESULT GblVariant_valueMove(GblVariant* pSelf,  ...) {
     va_list varArgs;
     va_start(varArgs, pSelf);
     GBL_CTX_BEGIN(NULL);
@@ -491,25 +491,25 @@ GBL_EXPORT GBL_RESULT GblVariant_valueMove(GblVariant* pSelf,  ...)  {
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_valueMoveVa(GblVariant* pSelf, va_list* pVarArgs)  {
+GBL_EXPORT GBL_RESULT GblVariant_valueMoveVa(GblVariant* pSelf, va_list* pVarArgs) {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_CTX_CALL(GblIVariantClass_getValueMove(pIFace, pSelf, pVarArgs));
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_valuePeekVa(GblVariant* pSelf, va_list* pVarArgs)  {
+GBL_EXPORT GBL_RESULT GblVariant_valuePeekVa(GblVariant* pSelf, va_list* pVarArgs) {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_CTX_CALL(GblIVariantClass_getValuePeek(pIFace, pSelf, pVarArgs));
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_valueCopyVa(const GblVariant* pSelf, va_list* pVarArgs)  {
+GBL_EXPORT GBL_RESULT GblVariant_valueCopyVa(const GblVariant* pSelf, va_list* pVarArgs) {
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
     GBL_CTX_CALL(GblIVariantClass_getValueCopy(pIFace, pSelf, pVarArgs));
     GBL_VARIANT_END_();
 }
 
-GBL_EXPORT GblBox* GblVariant_boxCopy(const GblVariant* pSelf)  {
+GBL_EXPORT GblBox* GblVariant_boxCopy(const GblVariant* pSelf) {
     GblBox* pBox = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOX_TYPE);
@@ -518,7 +518,7 @@ GBL_EXPORT GblBox* GblVariant_boxCopy(const GblVariant* pSelf)  {
     return pBox;
 }
 
-GBL_EXPORT GblBox* GblVariant_boxMove(GblVariant* pSelf)  {
+GBL_EXPORT GblBox* GblVariant_boxMove(GblVariant* pSelf) {
     GblBox* pBox = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOX_TYPE);
@@ -527,7 +527,7 @@ GBL_EXPORT GblBox* GblVariant_boxMove(GblVariant* pSelf)  {
     return pBox;
 }
 
-GBL_EXPORT GblBox* GblVariant_boxPeek(const GblVariant* pSelf)  {
+GBL_EXPORT GblBox* GblVariant_boxPeek(const GblVariant* pSelf) {
     GblBox* pBox = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_BOX_TYPE);
@@ -536,7 +536,7 @@ GBL_EXPORT GblBox* GblVariant_boxPeek(const GblVariant* pSelf)  {
     return pBox;
 }
 
-GBL_EXPORT GblObject* GblVariant_objectCopy(const GblVariant* pSelf)  {
+GBL_EXPORT GblObject* GblVariant_objectCopy(const GblVariant* pSelf) {
     GblObject* pObject = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OBJECT_TYPE);
@@ -545,7 +545,7 @@ GBL_EXPORT GblObject* GblVariant_objectCopy(const GblVariant* pSelf)  {
     return pObject;
 }
 
-GBL_EXPORT GblObject* GblVariant_objectMove(GblVariant* pSelf)  {
+GBL_EXPORT GblObject* GblVariant_objectMove(GblVariant* pSelf) {
     GblObject* pObject = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OBJECT_TYPE);
@@ -554,7 +554,7 @@ GBL_EXPORT GblObject* GblVariant_objectMove(GblVariant* pSelf)  {
     return pObject;
 }
 
-GBL_EXPORT GblObject* GblVariant_objectPeek(const GblVariant* pSelf)  {
+GBL_EXPORT GblObject* GblVariant_objectPeek(const GblVariant* pSelf) {
     GblObject* pObject = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_OBJECT_TYPE);
@@ -563,7 +563,7 @@ GBL_EXPORT GblObject* GblVariant_objectPeek(const GblVariant* pSelf)  {
     return pObject;
 }
 
-GBL_EXPORT GblBool GblVariant_toBool(GblVariant* pSelf)  {
+GBL_EXPORT GblBool GblVariant_toBool(GblVariant* pSelf) {
     GblBool value = GBL_FALSE;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_BOOL_TYPE) {
@@ -579,7 +579,7 @@ GBL_EXPORT GblBool GblVariant_toBool(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT char GblVariant_toChar(GblVariant* pSelf)  {
+GBL_EXPORT char GblVariant_toChar(GblVariant* pSelf) {
     char value = '\0';
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_CHAR_TYPE) {
@@ -595,7 +595,7 @@ GBL_EXPORT char GblVariant_toChar(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT uint8_t GblVariant_toUint8(GblVariant* pSelf)  {
+GBL_EXPORT uint8_t GblVariant_toUint8(GblVariant* pSelf) {
     uint8_t value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_UINT8_TYPE) {
@@ -611,7 +611,7 @@ GBL_EXPORT uint8_t GblVariant_toUint8(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT uint16_t GblVariant_toUint16(GblVariant* pSelf)  {
+GBL_EXPORT uint16_t GblVariant_toUint16(GblVariant* pSelf) {
     uint16_t value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_UINT16_TYPE) {
@@ -627,7 +627,7 @@ GBL_EXPORT uint16_t GblVariant_toUint16(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT int16_t GblVariant_toInt16(GblVariant* pSelf)  {
+GBL_EXPORT int16_t GblVariant_toInt16(GblVariant* pSelf) {
     int16_t value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_INT16_TYPE) {
@@ -643,7 +643,7 @@ GBL_EXPORT int16_t GblVariant_toInt16(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT uint32_t GblVariant_toUint32(GblVariant* pSelf)  {
+GBL_EXPORT uint32_t GblVariant_toUint32(GblVariant* pSelf) {
     uint32_t value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_UINT32_TYPE) {
@@ -659,7 +659,7 @@ GBL_EXPORT uint32_t GblVariant_toUint32(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT int32_t GblVariant_toInt32(GblVariant* pSelf)  {
+GBL_EXPORT int32_t GblVariant_toInt32(GblVariant* pSelf) {
     int32_t value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_INT32_TYPE) {
@@ -675,7 +675,7 @@ GBL_EXPORT int32_t GblVariant_toInt32(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT uint64_t GblVariant_toUint64(GblVariant* pSelf)  {
+GBL_EXPORT uint64_t GblVariant_toUint64(GblVariant* pSelf) {
     uint64_t value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_UINT64_TYPE) {
@@ -691,7 +691,7 @@ GBL_EXPORT uint64_t GblVariant_toUint64(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT int64_t GblVariant_toInt64(GblVariant* pSelf)  {
+GBL_EXPORT int64_t GblVariant_toInt64(GblVariant* pSelf) {
     int64_t value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_INT64_TYPE) {
@@ -707,7 +707,7 @@ GBL_EXPORT int64_t GblVariant_toInt64(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT size_t  GblVariant_toSize(GblVariant* pSelf)  {
+GBL_EXPORT size_t  GblVariant_toSize(GblVariant* pSelf) {
     size_t  value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_INT64_TYPE) {
@@ -723,7 +723,7 @@ GBL_EXPORT size_t  GblVariant_toSize(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT GblEnum GblVariant_toEnum(GblVariant* pSelf)  {
+GBL_EXPORT GblEnum GblVariant_toEnum(GblVariant* pSelf) {
     GblEnum value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_ENUM_TYPE) {
@@ -739,7 +739,7 @@ GBL_EXPORT GblEnum GblVariant_toEnum(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT GblFlags GblVariant_toFlags(GblVariant* pSelf)  {
+GBL_EXPORT GblFlags GblVariant_toFlags(GblVariant* pSelf) {
     GblFlags value = 0;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_FLAGS_TYPE) {
@@ -755,7 +755,7 @@ GBL_EXPORT GblFlags GblVariant_toFlags(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT float GblVariant_toFloat(GblVariant* pSelf)  {
+GBL_EXPORT float GblVariant_toFloat(GblVariant* pSelf) {
     float value = 0.0f;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_FLOAT_TYPE) {
@@ -771,7 +771,7 @@ GBL_EXPORT float GblVariant_toFloat(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT double GblVariant_toDouble(GblVariant* pSelf)  {
+GBL_EXPORT double GblVariant_toDouble(GblVariant* pSelf) {
     double value = 0.0f;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_DOUBLE_TYPE) {
@@ -787,7 +787,7 @@ GBL_EXPORT double GblVariant_toDouble(GblVariant* pSelf)  {
     return value;
 }
 
-GBL_EXPORT void* GblVariant_toPointer(GblVariant* pSelf)  {
+GBL_EXPORT void* GblVariant_toPointer(GblVariant* pSelf) {
     void* pValue = GBL_NULL;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_POINTER_TYPE) {
@@ -803,7 +803,7 @@ GBL_EXPORT void* GblVariant_toPointer(GblVariant* pSelf)  {
     return pValue;
 }
 
-GBL_EXPORT const char* GblVariant_toString(GblVariant* pSelf)  {
+GBL_EXPORT const char* GblVariant_toString(GblVariant* pSelf) {
     GblStringRef* pValue = GBL_NULL;
 
     GBL_CTX_BEGIN(NULL);
@@ -820,11 +820,11 @@ GBL_EXPORT const char* GblVariant_toString(GblVariant* pSelf)  {
     return pValue;
 }
 
-GBL_EXPORT GblStringView GblVariant_toStringView(GblVariant* pSelf)  {
+GBL_EXPORT GblStringView GblVariant_toStringView(GblVariant* pSelf) {
     return GblStringView_fromString(GblVariant_toString(pSelf));
 }
 
-GBL_EXPORT GblType GblVariant_toTypeValue(GblVariant* pSelf)  {
+GBL_EXPORT GblType GblVariant_toTypeValue(GblVariant* pSelf) {
     GblType value = GBL_INVALID_TYPE;
     GBL_CTX_BEGIN(NULL);
     if(GblVariant_typeOf(pSelf) != GBL_TYPE_TYPE) {
@@ -915,8 +915,8 @@ GBL_EXPORT GBL_RESULT GblVariant_setField(GblVariant* pSelf,
 }
 
 GBL_EXPORT GBL_RESULT GblVariant_setElement(GblVariant* pSelf,
-                                            size_t            index,
-                                            GblVariant*       pValue)
+                                            size_t      index,
+                                            GblVariant* pValue)
 {
     GblVariant i;
     GblVariant_constructSize(&i, index);
@@ -1222,7 +1222,7 @@ GBL_EXPORT int64_t GblVariant_int64(const GblVariant* pSelf) {
     return value;
 }
 
-GBL_EXPORT size_t  GblVariant_size(const GblVariant* pSelf) {
+GBL_EXPORT size_t GblVariant_size(const GblVariant* pSelf) {
     size_t  value = 0;
     GBL_CTX_BEGIN(GBL_NULL);
     GBL_CTX_VERIFY_TYPE(GblVariant_typeOf(pSelf), GBL_SIZE_TYPE);
@@ -1452,14 +1452,14 @@ GBL_EXPORT GBL_RESULT GblVariant_setPointer(GblVariant* pSelf,
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_setOpaqueCopy(GblVariant* pSelf, GblType opaqueType, void*  pValue) {
+GBL_EXPORT GBL_RESULT GblVariant_setOpaqueCopy(GblVariant* pSelf, GblType opaqueType, void* pValue) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
     GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pSelf, opaqueType, pValue));
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblVariant_setOpaqueMove(GblVariant* pSelf, GblType opaqueType, void*  pValue) {
+GBL_EXPORT GBL_RESULT GblVariant_setOpaqueMove(GblVariant* pSelf, GblType opaqueType, void* pValue) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_TYPE(opaqueType, GBL_OPAQUE_TYPE);
     GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pSelf, opaqueType, pValue));
@@ -1521,7 +1521,6 @@ GBL_EXPORT GBL_RESULT GblVariant_setObjectMove(GblVariant* pSelf, GblObject* pVa
 GBL_EXPORT GblBool GblVariant_equals(const GblVariant* pSelf, const GblVariant* pOther) {
     return GblVariant_compare(pSelf, pOther) == 0;
 }
-
 
 GBL_EXPORT GBL_RESULT GblVariant_constructDateTime(GblVariant* pSelf, const GblDateTime* pDt) {
    return GblVariant_constructValueCopy(pSelf, GBL_DATE_TIME_TYPE, pDt);

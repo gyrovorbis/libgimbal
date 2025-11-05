@@ -6,16 +6,19 @@
  *  for GblPattern, which represents a compiled regular expression,
  *  used for string matching operations.
  *
- *  \note
+ *  \warning
  *  LibGimbal uses a highly modified fork of the the Tiny C RegEx
  *  library for its back-end, lowest-level regular expression
- *  pattern matching.
+ *  pattern matching, which prioritizes being lightweight and
+ *  efficient over having complete support for all that RegEx
+ *  has to offer. You may find some features missing, with others
+ *  getting added at a later date.
  *
  *  \todo
  *      - Wrap Tiny C Regex tests in gimbal Unit tests
  *      - `\b` word-boundary character class
  *
- *  \author     2023 Falco Girgis
+ *  \author     2023, 2025 Falco Girgis
  *  \copyright  MIT License
  */
 #ifndef GIMBAL_PATTERN_H
