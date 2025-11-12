@@ -348,10 +348,12 @@
 #       define GBL_LIKELY(exp) (exp) [[likely]]
 #   endif
 #endif
-#if !defined(GBL_LIKELY) && defined(GBL_GNUC)
-#   define GBL_LIKELY(exp)  (__builtin_expect(!!(exp), 1))
-#else
-#   define GBL_LIKELY(exp) (exp)
+#ifndef GBL_LIKELY
+#   ifdef GBL_GNUC
+#       define GBL_LIKELY(exp)  (__builtin_expect(!!(exp), 1))
+#   else
+#       define GBL_LIKELY(exp) (exp)
+#   endif
 #endif
 
 // unlikely
@@ -360,10 +362,12 @@
 #       define GBL_UNLIKELY(exp) (exp) [[unlikely]]
 #   endif
 #endif
-#if !defined(GBL_UNLIKELY) && defined(GBL_GNUC)
-#   define GBL_UNLIKELY(exp)  (__builtin_expect(!!(exp), 0))
-#else
-#   define GBL_UNLIKELY(exp) (exp)
+#ifndef defined(GBL_UNLIKELY)
+#   ifdef GBL_GNUC
+#       define GBL_UNLIKELY(exp)  (__builtin_expect(!!(exp), 0))
+#   else
+#       define GBL_UNLIKELY(exp) (exp)
+#   endif
 #endif
 
 // Maybe_Unused
