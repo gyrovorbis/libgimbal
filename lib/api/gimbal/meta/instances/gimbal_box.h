@@ -1,6 +1,6 @@
 /*! \file
  *  \brief   GblBox (reference-counted, opaque userdata), and related functions
- *  \ingroup metaBuiltinTypes
+ *  \ingroup meta
  *
  *  GblBox represents the most minimal type within the type
  *  system that is still runtime extensible and still offers
@@ -15,7 +15,6 @@
  *  \copyright  MIT License
  *
  *  \todo
- *      - GblBox_destructing()?
  *      - GblBoxClass_destructing()?
  */
 #ifndef GIMBAL_BOX_H
@@ -53,7 +52,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblBox);
 /*! \struct     GblBoxClass
  *  \extends    GblClass
  *  \implements GblIVariantClass
- *  \ingroup    metaBuiltinTypes
+ *  \ingroup    meta
  *  \brief      GblClass VTable/static data structure for GblBox
  *
  *  GblBoxClass extends GblClass and implements the GblIVariant
@@ -74,7 +73,7 @@ GBL_CLASS_END
 /*! \struct     GblBox
  *  \extends    GblInstance
  *  \implements GblIVariant
- *  \ingroup    metaBuiltinTypes
+ *  \ingroup    meta
  *  \brief      Minimally bindable GblInstance with reference semantics and opaque userdata
  *
  *  A GblBox is a GblInstance-derived type which simply adds the bare minimal set of

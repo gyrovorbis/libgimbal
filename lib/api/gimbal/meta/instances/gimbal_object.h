@@ -48,12 +48,12 @@
 /*! \brief DSL macro used to heap-construct a GblObject-derived type.
  *  It takes the struct name followed by an optional list of property KV pairs.
  */
-#define GBL_NEW(/*type,*/ ...)                  GBL_OBJECT_NEW(__VA_ARGS__)
+#define GBL_NEW(/*type, ("key", value),*/ ...)                  GBL_OBJECT_NEW(__VA_ARGS__)
 
 /*! \brief DSL macro used to placement-construct a GblObject-derived type
  *  It takes the struct name followed by an optional list of property KV pairs.
  */
-#define GBL_PLACEMENT_NEW(/*self, type,*/ ...)  GBL_OBJECT_CONSTRUCT(__VA_ARGS__)
+#define GBL_PLACEMENT_NEW(/*self, type, ("key", value),*/ ...)  GBL_OBJECT_CONSTRUCT(__VA_ARGS__)
 //! @}
 
 #define GBL_SELF_TYPE GblObject

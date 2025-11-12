@@ -1,8 +1,6 @@
 #ifndef GIMBAL_STRING_REF_HPP
 #define GIMBAL_STRING_REF_HPP
 
-#include <cstdint>
-
 #include "gimbal_string_ref.h"
 #include "gimbal_string_view.hpp"
 
@@ -86,11 +84,12 @@ public:
             };
 
 
-        return GblStringView {
-            .pData = pRef_ + offset,
-            .nullTerminated = (offset + len == length()),
-            .length = len
-        };
+        GblStringView view;
+        view.pData          = pRef_ + offset;
+        view.length         = len;
+        view.nullTerminated = (offset + len == length());
+
+        return view;
     }
 
     std::size_t refCount() const noexcept {
