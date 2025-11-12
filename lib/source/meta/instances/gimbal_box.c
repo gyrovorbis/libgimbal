@@ -217,6 +217,9 @@ GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
 
         // Check if we're releasing the final reference.
         if(!(count = (GBL_BOX_(pSelf).refCounter--) - 1)) {
+            // Mark the Box as being in the finalization stage.
+            GBL_BOX_(pSelf).finalizing = GBL_TRUE;
+
             // Emit "finalizing" signal for any attached weak references.
             GBL_EMIT(pSelf, "finalize");
 
@@ -239,6 +242,14 @@ GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
 
 GBL_EXPORT GblRefCount GblBox_refCount(const GblBox* pSelf) {
     return GBL_PRIV_REF(pSelf).refCounter;
+}
+
+GBL_EXPORT GblBool GblBox_isFinalizing(const GblBox* pSelf) {
+    return GBL_PRIV_REF(pSelf).finalizing;
+}
+
+GBL_EXPORT GblBool GblBox_isDestructing(const GblBox* pSelf) {
+    return GBL_PRIV_REF(pSelf).destructing;
 }
 
 static GBL_RESULT GblBox_IVariant_construct_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
@@ -316,6 +327,7 @@ static GBL_RESULT GblBox_IVariant_set_(GblVariant* pSelf, size_t argc, GblVarian
 }
 
 static GBL_RESULT GblBox_destructor_(GblBox* pSelf) {
+    GBL_PRIV_REF(pSelf).destructing = GBL_TRUE;
     return GblArrayMap_destroy(&GBL_PRIV_REF(pSelf).pFields);
 }
 

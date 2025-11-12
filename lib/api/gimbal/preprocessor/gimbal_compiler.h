@@ -20,9 +20,6 @@
 
 #define __STDC_WANT_LIB_EXT1__ 1
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -346,18 +343,24 @@
 #endif
 
 // Likely
-#if defined(__has_cpp_attribute) && __has_cpp_attribute(likely)
-#   define GBL_LIKELY(exp) (exp) [[likely]]
-#elif defined(GBL_GNUC)
+#if defined(__has_cpp_attribute)
+#   if __has_cpp_attribute(likely)
+#       define GBL_LIKELY(exp) (exp) [[likely]]
+#   endif
+#endif
+#if !defined(GBL_LIKELY) && defined(GBL_GNUC)
 #   define GBL_LIKELY(exp)  (__builtin_expect(!!(exp), 1))
 #else
 #   define GBL_LIKELY(exp) (exp)
 #endif
 
 // unlikely
-#if defined(__has_cpp_attribute) && __has_cpp_attribute(unlikely)
-#   define GBL_UNLIKELY(exp) (exp) [[unlikely]]
-#elif defined(GBL_GNUC)
+#if defined(__has_cpp_attribute)
+#   if __has_cpp_attribute(unlikely)
+#       define GBL_UNLIKELY(exp) (exp) [[unlikely]]
+#   endif
+#endif
+#if !defined(GBL_UNLIKELY) && defined(GBL_GNUC)
 #   define GBL_UNLIKELY(exp)  (__builtin_expect(!!(exp), 0))
 #else
 #   define GBL_UNLIKELY(exp) (exp)

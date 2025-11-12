@@ -692,17 +692,17 @@ static GBL_RESULT GblSignal_emit_(GblInstance* pEmitter,
 
             // Don't bother setting up stack frame if there's no connections
             if(pNode) {
-                Connection_*    pConnection = GBL_DOUBLY_LINKED_LIST_ENTRY(pNode, Connection_, emitterList);
-                const size_t    argCount    = pConnection->pSignal->argCount + 1;
-                GblVariant*     pArgValues  = GBL_ALLOCA(sizeof(GblVariant) * argCount);
+                Connection_* pConnection = GBL_DOUBLY_LINKED_LIST_ENTRY(pNode, Connection_, emitterList);
+                const size_t argCount    = pConnection->pSignal->argCount + 1;
+                GblVariant*  pArgValues  = GBL_ALLOCA(sizeof(GblVariant) * argCount);
 
                 // initialize argument values
                 GBL_CTX_VERIFY_CALL(GblVariant_constructPointer(&pArgValues[0], GBL_POINTER_TYPE, pConnection->pReceiver));
                 if(pVarArgs) {
-                    for(size_t  a = 1; a < argCount; ++a) {
+                    for(size_t a = 1; a < argCount; ++a) {
                         GBL_CTX_VERIFY_CALL(GblVariant_constructValueCopyVa(&pArgValues[a],
-                                                                                pConnection->pSignal->argTypes[a-1],
-                                                                                pVarArgs));
+                                                                            pConnection->pSignal->argTypes[a-1],
+                                                                            pVarArgs));
                     }
                 } else if(pVariantArgs) {
                     for(size_t  a = 1; a < argCount; ++a) {

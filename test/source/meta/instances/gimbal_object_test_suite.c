@@ -34,6 +34,12 @@ typedef struct TestObjectClass {
 GBL_INSTANCE_DERIVE(TestObject, GblObject)
     float               floater;
     char                stringer[256];
+    unsigned            propertyChangedCounter;
+    unsigned            floaterChangedCounter;
+    unsigned            stringerChangedCounter;
+    unsigned            parentChangedCounter;
+    unsigned            nameChangedCounter;
+    unsigned            otherChangedCounter;
     int                 eventHandlerCount;
     GblType             eventHandlerLastType;
     GblBool             eventHandlerAccept;
@@ -349,13 +355,12 @@ GBL_TEST_CASE(propertyGet)
     GblObject* pObj0 = GblObject_create(GBL_OBJECT_TYPE, NULL);
     GBL_TEST_VERIFY(pObj0);
 
-    GblObject* pObj1 = GblObject_create(TEST_OBJECT_TYPE,
-                                    "name",     "Bulbasaur",
-                                    "userdata", (void*)0xdeadbeef,
-                                    "parent",   pObj0,
-                                    "floater",  -77.7,
-                               //     "stringer", "truckin Inheritance!",
-                                    NULL);
+    TestObject* pObj1 = GBL_NEW(TestObject,
+                                "name",     "Bulbasaur",
+                                "userdata", (void*)0xdeadbeef,
+                                "parent",   pObj0,
+                                "floater",  -77.7f);
+                            //     "stringer", "truckin Inheritance!");
     GBL_TEST_VERIFY(pObj1);
 
     uint16_t    refCount    = 0;
@@ -365,7 +370,8 @@ GBL_TEST_CASE(propertyGet)
     float       floater     = 0.0f;
    // const char* pStringer   = NULL;
 
-    GBL_RESULT result = GblObject_properties(pObj1, "userdata", &pUserdata,
+    GBL_RESULT result = GblObject_properties(GBL_OBJECT(pObj1),
+                                             "userdata", &pUserdata,
                                              "refCount", &refCount,
                                              "name",     &pName,
                                              "parent",   &pParent,
@@ -417,6 +423,98 @@ GBL_TEST_CASE(propertySet)
     GBL_TEST_COMPARE(floater, 33.33f);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
+GBL_TEST_CASE_END
+
+static void GblObject_onPropertyChange_(TestObject* pSelf, GblProperty* pProp) {
+    ++pSelf->propertyChangedCounter;
+
+    if(GblProperty_objectType(pProp) == TEST_OBJECT_TYPE) {
+        switch(pProp->id) {
+        case TestObject_Property_Id_floater:
+            ++pSelf->floaterChangedCounter; break;
+        case TestObject_Property_Id_stringer:
+            ++pSelf->stringerChangedCounter; break;
+        default:
+            ++pSelf->otherChangedCounter; break;
+        }
+    } else if(GblProperty_objectType(pProp) == GBL_OBJECT_TYPE) {
+        switch(pProp->id) {
+        case GblObject_Property_Id_name:
+            ++pSelf->nameChangedCounter; break;
+        case GblObject_Property_Id_parent:
+            ++pSelf->parentChangedCounter; break;
+        default:
+            ++pSelf->otherChangedCounter; break;
+        }
+    }
+}
+
+GBL_TEST_CASE(propertyChange)
+    TestObject* pObj = GBL_NEW(TestObject,
+                               "name",     "Bulbasaur",
+                               "userdata", (void*)0xdeadbeef,
+                               "parent",   NULL,
+                               "floater",  -77.7,
+                               "stringer", "truckin Inheritance!");
+
+    GBL_CONNECT(pObj, "propertyChange", GblObject_onPropertyChange_);
+
+    GblObject_setProperty(GBL_OBJECT(pObj), "userdata", (void*)0xdeadbeef);
+    GBL_TEST_COMPARE(pObj->propertyChangedCounter, 0);
+
+    GblObject_setProperty(GBL_OBJECT(pObj), "userdata", (void*)0xcafebabe);
+    GBL_TEST_COMPARE(pObj->propertyChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->floaterChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->stringerChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->parentChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->otherChangedCounter, 1);
+
+    GblObject_setProperty(GBL_OBJECT(pObj), "name", "Bulbasaur");
+    GBL_TEST_COMPARE(pObj->propertyChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->floaterChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->stringerChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->parentChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->otherChangedCounter, 1);
+
+    GblObject_setProperty(GBL_OBJECT(pObj), "name", "Squirtle");
+    GBL_TEST_COMPARE(pObj->propertyChangedCounter, 2);
+    GBL_TEST_COMPARE(pObj->floaterChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->stringerChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->parentChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->nameChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->otherChangedCounter, 1);
+
+    GblObject_setProperty(GBL_OBJECT(pObj), "floater", -77.7);
+    GBL_TEST_COMPARE(pObj->propertyChangedCounter, 2);
+    GBL_TEST_COMPARE(pObj->floaterChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->stringerChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->parentChangedCounter, 0);
+
+    GblObject_setProperty(GBL_OBJECT(pObj), "floater", -67.7);
+    GBL_TEST_COMPARE(pObj->propertyChangedCounter, 3);
+    GBL_TEST_COMPARE(pObj->floaterChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->stringerChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->parentChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->nameChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->otherChangedCounter, 1);
+
+    GblObject_emitPropertyChange(GBL_OBJECT(pObj), "parent");
+    GBL_TEST_COMPARE(pObj->propertyChangedCounter, 4);
+    GBL_TEST_COMPARE(pObj->floaterChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->stringerChangedCounter, 0);
+    GBL_TEST_COMPARE(pObj->parentChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->nameChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->otherChangedCounter, 1);
+
+    GblObject_emitPropertyChangeByQuark(GBL_OBJECT(pObj), GblQuark_tryString("stringer"));
+    GBL_TEST_COMPARE(pObj->propertyChangedCounter, 5);
+    GBL_TEST_COMPARE(pObj->floaterChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->stringerChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->parentChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->nameChangedCounter, 1);
+    GBL_TEST_COMPARE(pObj->otherChangedCounter, 1);
+
+    GBL_UNREF(pObj);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(parenting)
@@ -972,6 +1070,7 @@ GBL_TEST_REGISTER(newDefault,
                   newInPlaceVariantsWithClass,
                   propertyGet,
                   propertySet,
+                  propertyChange,
                   parenting,
                   classSwizzle,
                   eventNotify,
@@ -1009,10 +1108,10 @@ static GBL_RESULT TestObject_IEventFilter_filterEvent(GblIEventFilter* pFilter, 
     GBL_CTX_END();
 }
 
-static GBL_RESULT TestObject_constructor(GblObject* pSelf) {
+static GBL_RESULT TestObject_init_(GblInstance* pInstance) {
+    GblObject* pSelf = GBL_OBJECT(pInstance);
     GBL_CTX_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GblClass_super(GBL_INSTANCE_GET_CLASS(pSelf)));
-    pParentClass->pFnConstructor(pSelf);
+;
     TestObject* pTest = TEST_OBJECT(pSelf);
     pTest->floater = -NAN;
     strcpy(pTest->stringer, "INVALID");
@@ -1089,22 +1188,11 @@ static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd) {
     GBL_CTX_BEGIN(NULL);
     if(!GblType_classRefCount(TEST_OBJECT_TYPE)) {
         GBL_PROPERTIES_REGISTER(TestObject);
-#if 0
-        size_t  p = 0;
-        const GblProperty* pProp = NULL;
-        while((pProp = GblProperty_next(TEST_OBJECT_TYPE, pProp, 0xfffff))) {
-            GBL_CTX_INFO("Property[%u] = %s[%s]",
-                         p++,
-                         GblType_name(GblProperty_objectType(pProp)),
-                         GblProperty_nameString(pProp));
-        }
-#endif
     }
     pTestClass->staticInt32 = 77;
     strcpy(pTestClass->string, (const char*)pUd);
     pTestClass->base.GblIEventHandlerImpl.pFnEvent = TestObject_IEventHandler_handleEvent;
     pTestClass->base.GblIEventFilterImpl.pFnEventFilter = TestObject_IEventFilter_filterEvent;
-    pTestClass->base.pFnConstructor      = TestObject_constructor;
     pTestClass->base.base.pFnDestructor  = TestObject_destructor;
     pTestClass->base.pFnConstructed      = TestObject_constructed;
     pTestClass->base.pFnProperty         = TestObject_property_;
@@ -1116,10 +1204,11 @@ static GblType TestObject_type(void) {
     static GblType type = GBL_INVALID_TYPE;
     if(type == GBL_INVALID_TYPE) {
         const GblTypeInfo info = {
-            .pFnClassInit   = TestObjectClass_init_,
-            .classSize      = sizeof(TestObjectClass),
-            .pClassData     = (void*)"Davey Havoc",
-            .instanceSize   = sizeof(TestObject)
+            .pFnClassInit    = TestObjectClass_init_,
+            .classSize       = sizeof(TestObjectClass),
+            .pClassData      = (void*)"Davey Havoc",
+            .pFnInstanceInit = TestObject_init_,
+            .instanceSize    = sizeof(TestObject)
         };
 
         type = GblType_register("TestObject",

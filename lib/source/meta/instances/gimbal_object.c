@@ -7,15 +7,38 @@
 #include <gimbal/containers/gimbal_linked_list.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/containers/gimbal_nary_tree.h>
-#include <gimbal/meta/signals/gimbal_signal.h>
+#include <gimbal/meta/signals/gimbal_marshal.h>
 #include "../types/gimbal_type_.h"
 
-#define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        (sizeof(GblArrayList))
+#define GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_        sizeof(GblArrayList)
+#define GBL_OBJECT_DERIVED_FLAG_INSTANTIATED_MASK_  0x1
+#define GBL_OBJECT_DERIVED_FLAG_CONSTRUCTED_MASK_   0x2
+
 
 static GblQuark objectNameQuark_         = GBL_QUARK_INVALID;
 static GblQuark objectParentQuark_       = GBL_QUARK_INVALID;
 static GblQuark objectFamilyQuark_       = GBL_QUARK_INVALID;
 static GblQuark objectEventFiltersQuark_ = GBL_QUARK_INVALID;
+
+static uint16_t GblObject_derivedFlags_(const GblObject* pObject) {
+    return GBL_PRIV_REF(GBL_BOX(pObject)).derivedFlags;
+}
+
+static void GblObject_setDerivedFlags_(GblObject* pObject, uint16_t mask) {
+    GBL_PRIV_REF(GBL_BOX(pObject)).derivedFlags |= mask;
+}
+
+static void GblObject_clearDerivedFlags_(GblObject* pObject, uint16_t mask) {
+    GBL_PRIV_REF(GBL_BOX(pObject)).derivedFlags &= ~mask;
+}
+
+GblBool GblObject_isInstantiating(const GblObject* pObject) {
+    return !(GblObject_derivedFlags_(pObject) & GBL_OBJECT_DERIVED_FLAG_INSTANTIATED_MASK_);
+}
+
+GblBool GblObject_isConstructing(const GblObject* pObject) {
+    return !(GblObject_derivedFlags_(pObject) & GBL_OBJECT_DERIVED_FLAG_CONSTRUCTED_MASK_);
+}
 
 GBL_EXPORT GBL_RESULT GblObject_sendEvent(GblObject* pSelf, GblEvent* pEvent) {
     GBL_CTX_BEGIN(NULL);
@@ -207,38 +230,85 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVariant(const GblObject* pSelf,
 static GBL_RESULT GblObject_setPropertyVCall_(GblObject*         pSelf,
                                               const GblProperty* pProp,
                                               GblVariant*        pValue,
-                                              GblFlags           flag)
-{
+                                              GblFlags           flag) {
+    // Clear status code and any pending errors.
     GBL_CTX_BEGIN(NULL);
 
-    if((pProp->flags & flag)) {
+    // Check whether the property we're attempting to set even supports being set from here.
+    if GBL_LIKELY(pProp->flags & flag) {
 
-        if(!GblType_check(GblVariant_typeOf(pValue), pProp->valueType)) {
+        // Check whether the incoming value is of the expected property type
+        if GBL_UNLIKELY(!GblType_check(GblVariant_typeOf(pValue), pProp->valueType)) {
+            GBL_RESULT result;
             GblVariant v;
+
+            // Convert the incoming value to the expected property type.
             GblVariant_constructDefault(&v, pProp->valueType);
-            GBL_CTX_VERIFY_CALL(GblVariant_convert(pValue, &v));
-            GblVariant_setMove(pValue, &v);
+            result = GblVariant_convert(pValue, &v);
+
+            // Move the converted value back into the incoming value's variant as its new value.
+            if(GBL_RESULT_SUCCESS(result))
+                GblVariant_setMove(pValue, &v);
+
+            // Clean up our conversion buffer variant regardless of whether conversion succeeded.
             GblVariant_destruct(&v);
+
+            // Exit early if the result signified a failure.
+            GBL_CTX_VERIFY_CALL(result);
         }
 
-        if(!GblProperty_checkValue(pProp, pValue)) {
+        // Check whether the incoming value is valid for the given property.
+        if GBL_UNLIKELY(!GblProperty_checkValue(pProp, pValue))
+            // Attempt to modify the incoming value to be within the valid range.
             GBL_CTX_VERIFY_CALL(GblProperty_validateValue(pProp, pValue));
+
+        // Check whether the incoming value is actually different from the current value.
+        GblBool changed = GBL_TRUE;
+        {
+            GblVariant currentValue = GBL_VARIANT_INIT;
+            GBL_RESULT result       = GBL_RESULT_UNKNOWN;
+
+            // If we're constructing the property, we compare it to the default property value.
+            if GBL_UNLIKELY(flag & GBL_PROPERTY_FLAG_CONSTRUCT)
+                result = GblProperty_defaultValue(pProp, &currentValue);
+            // If we're writing the property, we compare it to the current property value.
+            else if GBL_LIKELY(pProp->flags & GBL_PROPERTY_FLAG_READ)
+                result = GblObject_propertyVCall_(pSelf, pProp, &currentValue);
+
+            // If we failed to retrieve a comparison value or the values different, the property has changed.
+            changed = (!GBL_RESULT_SUCCESS(result) ||
+                        GblProperty_compareValues(pProp, pValue, &currentValue) != 0);
+
+            // Destroy the variant containing the current property value.
+            GblVariant_destruct(&currentValue);
         }
 
-        const GblObjectClass* pClass =
-                GBL_OBJECT_CLASS(GblClass_weakRefDefault(GblProperty_objectType(pProp)));
+        // Only set the property to its new value if it actually changed.
+        if GBL_LIKELY(changed) {
+            // Retrieve GblClass vtable of the type associated with the property we're setting.
+            const GblObjectClass* pClass =
+                    GBL_OBJECT_CLASS(GblClass_weakRefDefault(GblProperty_objectType(pProp)));
 
-        GBL_CTX_VERIFY_CALL(pClass->pFnSetProperty(pSelf, pProp, pValue));
+            /* Call into virtual function to perform actual setting of the property from the variant,
+               exiting early upon encountering reest. */
+            GBL_CTX_VERIFY_CALL(pClass->pFnSetProperty(pSelf, pProp, pValue));
 
+            /* Only bother signalling that the property has been modified if not done during construction,
+               since you cannot even connect a signal to an instance until it has been constructed. */
+            if(!GblObject_isInstantiating(pSelf))
+                GBL_EMIT(pSelf, "propertyChange", pProp);
+        }
     } else {
+        // Report back that we tried to do an invalid write to a property that didn't support the operation.
         GBL_CTX_RECORD_SET(GBL_RESULT_UNSUPPORTED,
-                           (flag&GBL_PROPERTY_FLAG_WRITE)?
+                           (flag & GBL_PROPERTY_FLAG_WRITE)?
                                "[GblObject] Attempt to set NON-WRITE property %s[%s]." :
                                "{GblObject] Attempt to construct NON-CONSTRUCT property %s[%s].",
                            GblType_name(GBL_TYPEOF(pSelf)),
                            GblProperty_nameString(pProp));
     }
 
+    // Return accumulated status code.
     GBL_CTX_END();
 }
 
@@ -471,14 +541,16 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVaList(GblObject* pSelf, va_list* p
     GBL_CTX_VERIFY_POINTER(pVarArgs);
 
     size_t  count = GblProperty_count(GBL_TYPEOF(pSelf));
-    GblVariant*  pVariants  = GBL_ALLOCA(sizeof(GblVariant) * count);
-    const char** pKeys      = GBL_ALLOCA(sizeof(const char*) * count);
+    GblVariant*  pVariants = GBL_ALLOCA(sizeof(GblVariant) * count);
+    const char** pKeys     = GBL_ALLOCA(sizeof(const char*) * count);
 
-    size_t  p = 0;
+    size_t p = 0;
     const char* pKey = NULL;
+
     while((pKey = va_arg(*pVarArgs, const char*))) {
         pKeys[p] = pKey;
         const GblProperty* pProp = GblProperty_find(GBL_TYPEOF(pSelf), pKey);
+
         if(pProp) {
             GBL_CTX_CALL(GblVariant_constructValueCopyVa(&pVariants[p], pProp->valueType, pVarArgs));
             if(pProp->flags & GBL_PROPERTY_FLAG_WRITE) {
@@ -502,7 +574,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVaList(GblObject* pSelf, va_list* p
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_propertiesVariant(const GblObject* pSelf, size_t  propertyCount, const char* pNames[], GblVariant* pValues) {
+GBL_EXPORT GBL_RESULT GblObject_propertiesVariant(const GblObject* pSelf, size_t propertyCount, const char* pNames[], GblVariant* pValues) {
     GBL_CTX_BEGIN(NULL);
     for(size_t  p = 0; p < propertyCount; ++p) {
         GBL_CTX_CALL(GblObject_propertyVariant(pSelf, pNames[p], &pValues[p]));
@@ -510,12 +582,18 @@ GBL_EXPORT GBL_RESULT GblObject_propertiesVariant(const GblObject* pSelf, size_t
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants(GblObject* pSelf, size_t  propertyCount, const char* pNames[], GblVariant* pValues) {
-    GBL_CTX_BEGIN(NULL);
+GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants(GblObject* pSelf, size_t propertyCount, const char* pNames[], GblVariant* pValues) {
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+
     for(size_t  p = 0; p < propertyCount; ++p) {
-        GBL_CTX_CALL(GblObject_setPropertyVariant(pSelf, pNames[p], &pValues[p]));
+        GBL_RESULT result2 = GblObject_setPropertyVariant(pSelf, pNames[p], &pValues[p]);
+
+        if(!GBL_RESULT_SUCCESS(result2))
+            result = result2;
     }
-    GBL_CTX_END();
+
+    // Return last error code.
+    return result;
 }
 
 GBL_DECLARE_STRUCT_PRIVATE(GblObjectCtorIterClosure) {
@@ -536,7 +614,6 @@ static GblBool GblObject_iterateCtorProperties_(const GblProperty* pProp,
 
     // Check whether we were passed a value for the property
     for(size_t  v = 0; v < pSelf->argCount; ++v) {
-
          // Set the required property to the given value
         if(pSelf->ppProperties[v] == pProp) {
             GBL_CTX_VERIFY_CALL(GblObject_setPropertyVCall_(pSelf->pObject,
@@ -558,6 +635,22 @@ static GblBool GblObject_iterateCtorProperties_(const GblProperty* pProp,
 
     GBL_CTX_END_BLOCK();
     return exitLoop;
+}
+
+GBL_EXPORT GBL_RESULT GblObject_emitPropertyChange(const GblObject* pSelf, const char* pName) {
+    return GblObject_emitPropertyChangeByQuark(pSelf, GblQuark_tryString(pName));
+}
+
+GBL_EXPORT GBL_RESULT GblObject_emitPropertyChangeByQuark(const GblObject* pSelf, GblQuark name) {
+    const GblProperty* pProp;
+
+    if(name == GBL_QUARK_INVALID)
+        return GBL_RESULT_ERROR_INVALID_PROPERTY;
+
+    if(!(pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf), name)))
+        return GBL_RESULT_ERROR_INVALID_PROPERTY;
+
+    return GBL_EMIT(pSelf, "propertyChange", pProp);
 }
 
 static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
@@ -596,6 +689,8 @@ static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
                                                      GBL_PROPERTY_FLAG_WRITE));
         }
     }
+
+    GBL_VCALL(GblObject, pFnInstantiated, pSelf);
 
     GBL_CTX_END();
 }
@@ -1522,9 +1617,9 @@ static GBL_RESULT GblObject_IEventHandlerIFace_event_(GblIEventHandler* pHandler
 
 // ======== OBJECT CLASS ==========
 
-static GBL_RESULT GblObject_constructor_(GblObject* pSelf) {
-    GBL_CTX_BEGIN(pSelf);
-    GBL_CTX_END();
+static GBL_RESULT GblObject_instantiated_(GblObject* pSelf) {
+    GblObject_setDerivedFlags_(pSelf, GBL_OBJECT_DERIVED_FLAG_INSTANTIATED_MASK_);
+    return GBL_RESULT_SUCCESS;
 }
 
 static GBL_RESULT GblObject_Box_destructor_(GblBox* pBox) {
@@ -1548,11 +1643,15 @@ static GBL_RESULT GblObject_property_(const GblObject* pSelf, const GblProperty*
     GBL_CTX_BEGIN(NULL);
 
     switch(pProp->id) {
-    case GblObject_Property_Id_name:
-        GblVariant_setValueMove(pValue,
-                                pProp->valueType,
-                                GblStringRef_ref(GblObject_name(pSelf)));
-        break;
+    case GblObject_Property_Id_name: {
+        GblStringRef* pName = GblObject_name(pSelf);
+        if(pName)
+            GblVariant_setValueMove(pValue,
+                                    pProp->valueType,
+                                    GblStringRef_ref(pName));
+        else
+            GblVariant_setNil(pValue);
+    } break;
     case GblObject_Property_Id_parent:
         GblVariant_setValueMove(pValue,
                                 pProp->valueType,
@@ -1608,7 +1707,7 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
 }
 
 static GBL_RESULT GblObject_constructed_(GblObject* pSelf) {
-    GBL_UNUSED(pSelf);
+    GblObject_setDerivedFlags_(pSelf, GBL_OBJECT_DERIVED_FLAG_CONSTRUCTED_MASK_);
     return GBL_RESULT_SUCCESS;
 }
 
@@ -1620,29 +1719,35 @@ static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData) {
 
     // static constructor for first instance of class
     if(!GblType_classRefCount(GBL_OBJECT_TYPE)) {
-        objectNameQuark_            = GblQuark_fromStatic("_name");
-        objectParentQuark_          = GblQuark_fromStatic("_parent");
-        objectFamilyQuark_          = GblQuark_fromStatic("_family");
-        objectEventFiltersQuark_    = GblQuark_fromStatic("_eventFilters");
+        objectNameQuark_         = GblQuark_fromStatic("_name");
+        objectParentQuark_       = GblQuark_fromStatic("_parent");
+        objectFamilyQuark_       = GblQuark_fromStatic("_family");
+        objectEventFiltersQuark_ = GblQuark_fromStatic("_eventFilters");
 
         GBL_PROPERTIES_REGISTER(GblObject);
+
+        GblSignal_install(GBL_OBJECT_TYPE,
+                          "propertyChange",
+                          GblMarshal_CClosure_VOID__INSTANCE_BOX,
+                          1,
+                          GBL_BOX_TYPE);
 
         memcpy(&iVariantVTable, GBL_IVARIANT_CLASS(pClass)->pVTable, sizeof(GblIVariantVTable));
         iVariantVTable.pFnLoad = GblObject_IVariant_load_;
         iVariantVTable.pFnSave = GblObject_IVariant_save_;
     }
 
-    GBL_IVARIANT_CLASS(pClass)      ->pVTable        = &iVariantVTable;
-    GBL_BOX_CLASS(pClass)           ->pFnDestructor  = GblObject_Box_destructor_;
-    GBL_OBJECT_CLASS(pClass)        ->pFnConstructor = GblObject_constructor_;
-    GBL_OBJECT_CLASS(pClass)        ->pFnConstructed = GblObject_constructed_;
-    GBL_OBJECT_CLASS(pClass)        ->pFnProperty    = GblObject_property_;
-    GBL_OBJECT_CLASS(pClass)        ->pFnSetProperty = GblObject_setProperty_;
-    GBL_IEVENT_HANDLER_CLASS(pClass)->pFnEvent       = GblObject_IEventHandlerIFace_event_;
-    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnIndex       = GblObject_ITableVariant_index_;
-    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnSetIndex    = GblObject_ITableVariant_setIndex_;
-    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnNext        = GblObject_ITableVariant_next_;
-    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnCount       = GblObject_ITableVariant_count_;
+    GBL_IVARIANT_CLASS(pClass)      ->pVTable         = &iVariantVTable;
+    GBL_BOX_CLASS(pClass)           ->pFnDestructor   = GblObject_Box_destructor_;
+    GBL_OBJECT_CLASS(pClass)        ->pFnConstructed  = GblObject_constructed_;
+    GBL_OBJECT_CLASS(pClass)        ->pFnInstantiated = GblObject_instantiated_;
+    GBL_OBJECT_CLASS(pClass)        ->pFnProperty     = GblObject_property_;
+    GBL_OBJECT_CLASS(pClass)        ->pFnSetProperty  = GblObject_setProperty_;
+    GBL_IEVENT_HANDLER_CLASS(pClass)->pFnEvent        = GblObject_IEventHandlerIFace_event_;
+    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnIndex        = GblObject_ITableVariant_index_;
+    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnSetIndex     = GblObject_ITableVariant_setIndex_;
+    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnNext         = GblObject_ITableVariant_next_;
+    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnCount        = GblObject_ITableVariant_count_;
 
     GBL_CTX_END();
 }
@@ -1653,17 +1758,12 @@ static GBL_RESULT GblObjectClass_final_(GblClass* pClass, const void* pClassData
 
     if(!GblType_classRefCount(GBL_CLASS_TYPEOF(pClass))) {
         GBL_CTX_CALL(GblProperty_uninstallAll(GBL_CLASS_TYPEOF(pClass)));
-        //GBL_CTX_CALL(GblSignal_uninstall(GBL_CLASS_TYPEOF(pClass), NULL));
+
+        if(GBL_CLASS_TYPEOF(pClass) == GBL_OBJECT_TYPE)
+            GblSignal_uninstall(GBL_OBJECT_TYPE, "propertyChange");
     }
 
     GBL_CTX_END();
-}
-
-static GBL_RESULT GblObject_init_(GblInstance* pInstance) {
-    GBL_CTX_BEGIN(NULL); {
-        GblObjectClass* pClass = GBL_OBJECT_GET_CLASS(pInstance);
-        GBL_CTX_CALL(pClass->pFnConstructor(GBL_OBJECT(pInstance)));
-    } GBL_CTX_END();
 }
 
 
@@ -1687,7 +1787,6 @@ GBL_EXPORT GblType GblObject_type(void) {
         .pFnClassInit     = GblObjectClass_init_,
         .pFnClassFinal    = GblObjectClass_final_,
         .classSize        = sizeof(GblObjectClass),
-        .pFnInstanceInit  = GblObject_init_,
         .instanceSize     = sizeof(GblObject),
         .interfaceCount   = 3,
         .pInterfaceImpls    = ifaceEntries

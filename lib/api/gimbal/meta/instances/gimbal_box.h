@@ -98,7 +98,9 @@ GBL_INSTANCE_BASE(GblBox)                          // Size (32/64 bit)
         GBL_BIT_FIELDS (
             uint16_t      contextType         : 1, //!< PRIVATE: GblContext type flag \deprecated
             uint16_t      constructedInPlace  : 1, //!< PRIVATE: Flag for whether memory is deallocated upon destruction
-            uint16_t      derivedFlags        : 14 //!< PRIVATE: Extra flags for use in derived classes
+            uint16_t      finalizing          : 1, //!< PRIVATE: Flag for whether the GblBox is being finalized or scheduled to be destructed.
+            uint16_t      destructing         : 1, //!< PRIVATE: Flag for whether the GblBox's destructor chain has begun to be called.
+            uint16_t      derivedFlags        : 12 //!< PRIVATE: Extra flags for use in derived classes
         )
     GBL_PRIVATE_END
 GBL_INSTANCE_END
@@ -191,6 +193,17 @@ GBL_EXPORT GblBox*     GblBox_ref      (GBL_SELF)  GBL_NOEXCEPT;
 GBL_EXPORT GblRefCount GblBox_unref    (GBL_SELF)  GBL_NOEXCEPT;
 //! Returns the number of active references held to the given GblBox
 GBL_EXPORT GblRefCount GblBox_refCount (GBL_CSELF) GBL_NOEXCEPT;
+//! @}
+
+/*! \name Lifetime Management
+ *  \brief Methods for querying information about the Box's lifetime.
+ *  \relatesalso GblBox
+ *  @{
+ */
+//! Returns true of the box's reference count has hit zero and it is going to be destroyed.
+GBL_EXPORT GblBool GblBox_isFinalizing  (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns true if the box's destructor chain has already begun to be called, and destruction is in-progress.
+GBL_EXPORT GblBool GblBox_isDestructing (GBL_CSELF) GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Userdata

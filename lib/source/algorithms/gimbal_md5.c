@@ -1,4 +1,5 @@
 #include <gimbal/algorithms/gimbal_md5.h>
+#include <stdio.h>
 
 
 /*

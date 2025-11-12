@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <gimbal/core/gimbal_tls.h>
 #include <gimbal/core/gimbal_error.h>

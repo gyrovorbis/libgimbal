@@ -370,10 +370,11 @@ static GBL_RESULT GblTestScenarioClass_IAllocator_free_(GblIAllocator* pIAllocat
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestScenarioClass_constructor_(GblObject* pObject) {
+static GBL_RESULT GblTestScenario_init_(GblInstance* pInstance) {
+    GblObject* pObject = GBL_OBJECT(pInstance);
+
     GBL_CTX_BEGIN(pObject);
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
-    GBL_CTX_VERIFY_CALL(pCtxClass->base.pFnConstructor(pObject));
 
     GblTestScenario*    pSelf   = GBL_TEST_SCENARIO(pObject);
     GblTestScenario_*   pSelf_  = GBL_TEST_SCENARIO_(pSelf);
@@ -469,7 +470,6 @@ static GBL_RESULT GblTestScenarioClass_init_(GblClass* pClass, const void* pUd) 
     pSelfClass->pFnRun                            = GblTestScenarioClass_run_;
     pSelfClass->pFnSuiteBegin                     = GblTestScenarioClass_suiteBegin_;
     pSelfClass->pFnSuiteEnd                       = GblTestScenarioClass_suiteEnd_;
-    pSelfClass->base.base.pFnConstructor          = GblTestScenarioClass_constructor_;
     pSelfClass->base.base.base.pFnDestructor      = GblTestScenarioClass_destructor_;
     pSelfClass->base.base.pFnProperty             = GblTestScenarioClass_property_;
     pSelfClass->base.GblILoggerImpl.pFnWrite      = GblTestScenarioClass_ILogger_write_;
@@ -586,6 +586,7 @@ GBL_EXPORT GblType GblTestScenario_type(void) {
     static const GblTypeInfo typeInfo = {
         .pFnClassInit           = GblTestScenarioClass_init_,
         .classSize              = sizeof(GblTestScenarioClass),
+        .pFnInstanceInit        = GblTestScenario_init_,
         .instanceSize           = sizeof(GblTestScenario),
         .instancePrivateSize    = sizeof(GblTestScenario_)
     };

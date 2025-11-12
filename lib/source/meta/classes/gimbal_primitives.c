@@ -723,9 +723,11 @@ static GBL_RESULT f32Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs,
 
 static GBL_RESULT f32Compare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
     GBL_CTX_BEGIN(NULL);
-    if(pVariant->f32 > pOther->f32)         *pResult = 1;
-    else if (pVariant->f32 < pOther->f32)   *pResult = -1;
-    else                                    *pResult = 0;
+
+    if(pVariant->f32 > pOther->f32)       *pResult = 1;
+    else if(pVariant->f32 < pOther->f32)  *pResult = -1;
+    else if(pVariant->f32 == pOther->f32) *pResult = 0;
+    else /* NaNs */                       *pResult = 1;
     GBL_CTX_END();
 }
 
@@ -792,9 +794,10 @@ static GBL_RESULT f64Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs,
 
 static GBL_RESULT f64Compare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
     GBL_CTX_BEGIN(NULL);
-    if(pVariant->f64 > pOther->f64)         *pResult = 1;
-    else if (pVariant->f64 < pOther->f64)   *pResult = -1;
-    else                                    *pResult = 0;
+    if(pVariant->f64 > pOther->f64)       *pResult = 1;
+    else if(pVariant->f64 < pOther->f64)  *pResult = -1;
+    else if(pVariant->f64 == pOther->f64) *pResult = 0;
+    else /* NaNs */                       *pResult = 1;
     GBL_CTX_END();
 }
 

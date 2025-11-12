@@ -242,8 +242,9 @@ GBL_EXPORT int GblVariant_compare(const GblVariant* pSelf, const GblVariant* pOt
     int result = INT_MAX;
     GBL_VARIANT_BEGIN_(pSelf->type, weakRef);
 
-    GBL_CTX_VERIFY(GblVariant_typeOf(pSelf)  != GBL_INVALID_TYPE &&
-                   GblVariant_typeOf(pOther) != GBL_INVALID_TYPE,
+
+    GBL_CTX_VERIFY(GblVariant_typeOf(pSelf) != GBL_INVALID_TYPE &&
+                   GblVariant_typeOf(pOther)!= GBL_INVALID_TYPE,
                    GBL_RESULT_ERROR_INVALID_TYPE);
 
     if(GblType_check(GblVariant_typeOf(pSelf), GblVariant_typeOf(pOther))) {
@@ -406,8 +407,8 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueMove(GblVariant* pSelf, GblType type, .
 }
 
 GBL_EXPORT GBL_RESULT GblVariant_setValueCopyVa(GblVariant* pSelf,
-                                                    GblType  type,
-                                                    va_list* pVarArgs)
+                                                GblType     type,
+                                                va_list*    pVarArgs)
 {
     GBL_CTX_BEGIN(NULL);
     if(type != pSelf->type) {

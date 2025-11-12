@@ -6,18 +6,18 @@
 #include <gimbal/meta/types/gimbal_variant.h>
 #include <gimbal/meta/signals/gimbal_signal.h>
 
-GBL_EXPORT GBL_RESULT GblCClosureMarshal_VOID__VOID(GblClosure*        pClosure,
-                                                    GblVariant*        pRetValue,
-                                                    size_t             argCount,
-                                                    GblVariant*        pArgs,
-                                                    GblPtr             pMarshalData)
+GBL_EXPORT GBL_RESULT GblCClosureMarshal_VOID__VOID(GblClosure* pClosure,
+                                                    GblVariant* pRetValue,
+                                                    size_t      argCount,
+                                                    GblVariant* pArgs,
+                                                    GblPtr      pMarshalData)
 {
     GBL_UNUSED(pRetValue && argCount && pArgs);
 
     typedef void (*CFunction)(void* pReceiver);
 
-    GblCClosure*    pCClosure   = (GblCClosure*)pClosure;
-    GblFnPtr        pFnPtr      = (CFunction)pMarshalData.pFunc?
+    GblCClosure* pCClosure = (GblCClosure*)pClosure;
+    GblFnPtr     pFnPtr    = (CFunction)pMarshalData.pFunc?
                                              pMarshalData.pFunc : GBL_PRIV_REF(pCClosure).pFnCallback;
 
     pFnPtr();
@@ -119,6 +119,11 @@ GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_INSTANCE,
                                    2,
                                    (GblInstance*, GblInstance*),
                                    (GblVariant_toPointer(&pArgs[0]), GblVariant_toPointer(&pArgs[1])))
+
+GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOX,
+                                   2,
+                                   (GblInstance*, GblInstance*),
+                                   (GblVariant_toPointer(&pArgs[0]), GblVariant_boxPeek(&pArgs[1])))
 
 GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_INSTANCE_SIZE,
                                    3,

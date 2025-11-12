@@ -193,7 +193,7 @@ GBL_TEST_CASE(classReplaceField)
     GBL_TEST_COMPARE(pFixture->fieldDtorsCalled, 1);
 
     GBL_TEST_COMPARE((const char*)GblBoxClass_field(pFixture->pBoxClass,
-                                                       pFixture->testQuark),
+                                                    pFixture->testQuark),
                      "Treamcast2");
 GBL_TEST_CASE_END
 
@@ -247,7 +247,8 @@ static GBL_RESULT instanceUserDtor_(const GblArrayMap* pMap, uintptr_t key, void
     GblBox*         pBox     = pEntry;
     GblTestFixture* pFixture = GblBox_userdata(pBox);
 
-    pFixture->userDtorCalled = GBL_TRUE;
+    if(GblBox_isDestructing(pBox))
+        pFixture->userDtorCalled = GBL_TRUE;
 
     return GBL_RESULT_SUCCESS;
 }
@@ -258,6 +259,7 @@ GBL_TEST_CASE(createDestroy)
                                  pFixture,
                                  instanceUserDtor_);
     GBL_TEST_VERIFY(pBox);
+    GBL_TEST_VERIFY(!GblBox_isDestructing(pBox));
 
     pFixture->userDtorCalled = GBL_FALSE;
 
@@ -514,7 +516,8 @@ GBL_TEST_CASE(variantComparison)
 GBL_TEST_CASE_END
 
 static void onFinalize_(GblBox* pBox) {
-    (*(unsigned*)GblBox_userdata(pBox))++;
+    if(GblBox_isFinalizing(pBox))
+        (*(unsigned*)GblBox_userdata(pBox))++;
 }
 
 GBL_TEST_CASE(finalizeSignal)
@@ -531,6 +534,7 @@ GBL_TEST_CASE(finalizeSignal)
     GBL_TEST_COMPARE(pFixture->finalizeSignalCounter1, 0);
     GBL_UNREF(&box1);
     GBL_TEST_COMPARE(pFixture->finalizeSignalCounter1, 0);
+    GBL_TEST_VERIFY(!GblBox_isFinalizing(&box1));
     GBL_UNREF(&box1);
     GBL_TEST_COMPARE(pFixture->finalizeSignalCounter1, 1);
 

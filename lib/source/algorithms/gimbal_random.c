@@ -2,6 +2,7 @@
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <math.h>
 #include <time.h>
+#include <string.h>
 
 #define LEHMER_MODULUS    2147483647 /* DON'T CHANGE THIS VALUE                  */
 #define LEHMER_MULTIPLIER 48271      /* DON'T CHANGE THIS VALUE                  */

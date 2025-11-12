@@ -192,18 +192,25 @@ static GBL_RESULT GblClosureTestSuite_closureUnref_(GblTestSuite* pSelf, GblCont
     GBL_CTX_END();
 }
 
+typedef void (*CClosureFn)(void*, const char*);
+
 static void cClosureFunction_(void* pPointer, const char* pString) {
     GblClosureTestSuite_* pSelf_ = pPointer;
     pSelf_->pCClosureArg = pString;
 }
 
-static GBL_RESULT cClosureMarshal_(GblClosure* pClosure, GblVariant* pRetValue, size_t  argCount, GblVariant* pArgs, GblPtr pMarshalData) {
+static GBL_RESULT cClosureMarshal_(GblClosure* pClosure, GblVariant* pRetValue, size_t argCount, GblVariant* pArgs, GblPtr pMarshalData) {
     GBL_UNUSED(pRetValue && argCount);
+
     if(!pMarshalData.pFunc) {
-        GblCClosure* pCClosure = GBL_C_CLOSURE(pClosure);
-        GBL_PRIV_REF(pCClosure).pFnCallback(GblVariant_toPointer(&pArgs[0]), GblVariant_toPointer(&pArgs[1]));
+        GblCClosure* pCClosure  = GBL_C_CLOSURE(pClosure);
+        CClosureFn   pClosureFn = GBL_PRIV_REF(pCClosure).pFnCallback;
+        pClosureFn(GblVariant_toPointer(&pArgs[0]), GblVariant_toPointer(&pArgs[1]));
+    } else {
+        CClosureFn pClosureFn = pMarshalData.pFunc;
+        pClosureFn(GblVariant_toPointer(&pArgs[0]), GblVariant_toPointer(&pArgs[1]));
     }
-    else pMarshalData.pFunc(GblVariant_toPointer(&pArgs[0]), GblVariant_toPointer(&pArgs[1]));
+
     return GBL_RESULT_SUCCESS;
 }
 

@@ -8,15 +8,19 @@
  *  such as properties, hierarchial relationships, event management,
  *  generic construction, named instances, etc.
  *
- *  \todo
- *  - Uninstall all signals upon class destructor (with property uninstallation)
- *  - Fix construction
- *      * initializer calls constructor? Wtf?
- *  - implement class property
- *  - Get rid of GblObject_findContext()
- *
- *  \author    2023, 2024 Falco Girgis
+ *  \author    2023, 2024, 2025 Falco Girgis
  *  \copyright MIT License
+ *
+ *  \todo
+ *      - Uninstall all signals upon class destructor (with property uninstallation)
+ *      - Get rid of GblObject_findContext()
+ *
+ *  \test
+ *      - GblObjectClass::pFnConstructed() with CONSTRUCTOR properties.
+ *      - GblObjectClass::pFnInitialized() with WRITE properties.
+ *      - GblObject_isConstructing().
+ *      - GblObject_isInstantiating().
+ *      - GblObject implementing ABSTRACT properties from GblInterface.
  */
 #ifndef GIMBAL_OBJECT_H
 #define GIMBAL_OBJECT_H
@@ -37,14 +41,20 @@
 #define GBL_OBJECT_GET_CLASS(self)  (GBL_CLASSOF(GblObject, self))     //!< Gets a GblObjectClass from a GblInstance
 //! @}
 
+/*! \name  Construction Macros
+    \brief Helper macros for creating new GblObject instances.
+    @{
+*/
 /*! \brief DSL macro used to heap-construct a GblObject-derived type.
  *  It takes the struct name followed by an optional list of property KV pairs.
  */
 #define GBL_NEW(/*type,*/ ...)                  GBL_OBJECT_NEW(__VA_ARGS__)
+
 /*! \brief DSL macro used to placement-construct a GblObject-derived type
  *  It takes the struct name followed by an optional list of property KV pairs.
  */
 #define GBL_PLACEMENT_NEW(/*self, type,*/ ...)  GBL_OBJECT_CONSTRUCT(__VA_ARGS__)
+//! @}
 
 #define GBL_SELF_TYPE GblObject
 
@@ -65,14 +75,14 @@ GBL_FORWARD_DECLARE_STRUCT(GblObject);
  */
 GBL_CLASS_DERIVE(GblObject, GblBox,
                  GblITableVariant, GblIEventHandler, GblIEventFilter)
-    //! Virtual method called immediately during instance construction
-    GBL_RESULT (*pFnConstructor)(GBL_SELF);
     //! Virtual method called during construction after CONSTRUCT properties but before extra WRITE properties are set
-    GBL_RESULT (*pFnConstructed)(GBL_SELF);
+    GBL_RESULT (*pFnConstructed) (GBL_SELF);
+    //! Virtual method called when the object has been fully instantiated with all properties it was createed with (including extra WRITE properties being set).
+    GBL_RESULT (*pFnInstantiated)(GBL_SELF);
     //! Virtual method for reading properties
-    GBL_RESULT (*pFnProperty)   (GBL_CSELF, const GblProperty* pProp, GblVariant* pValue);
+    GBL_RESULT (*pFnProperty)    (GBL_CSELF, const GblProperty* pProp, GblVariant* pValue);
     //! Virtaul method for writing properties
-    GBL_RESULT (*pFnSetProperty)(GBL_SELF, const GblProperty* pProp, GblVariant* pValue);
+    GBL_RESULT (*pFnSetProperty) (GBL_SELF, const GblProperty* pProp, GblVariant* pValue);
 GBL_CLASS_END
 
 /*! \class      GblObject
@@ -110,13 +120,17 @@ GBL_PROPERTIES(GblObject,
     (refCount, GBL_GENERIC, (READ),                    GBL_UINT16_TYPE)
 //  (class,    GBL_GENERIC, (READ, WRITE, CONSTRUCT),  GBL_POINTER_TYPE)
 )
+
+GBL_SIGNALS(GblObject,
+    (propertyChange, (GBL_INSTANCE_TYPE, pReciever), (GBL_INSTANCE_TYPE, pProperty))
+)
 //! \endcond
 
 //! Returns the GblType UUID associated with GblObject
 GBL_EXPORT GblType GblObject_type(void) GBL_NOEXCEPT;
 
 /*! \name Constructors
- *  \brief Methods for constructing GblObject-derived types
+ *  \brief Methods for constructing GblObject-derived types.
  *  @{
  */
 //! Creates an object-derived type on the heap, intializing it with a NULL-terminated K,V pair listing of properties
@@ -189,8 +203,8 @@ GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass
                                                     GblVariant*     pValues)                   GBL_NOEXCEPT;
 //! @}
 
-/*! \name  Property Accessors
- *  \brief Methods for reading and writing properties
+/*! \name  Property Management
+ *  \brief Methods for accessing and working with properties.
  *  \relatesalso GblObject
  *  @{
  */
@@ -242,6 +256,22 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants
                                                      size_t      count,
                                                      const char* pNames[],
                                                      GblVariant* pValue)                               GBL_NOEXCEPT;
+//! Notifies any listeners that the value of a property has changed internally, by emitting the "propertyChanged" signal.
+GBL_EXPORT GBL_RESULT GblObject_emitPropertyChange  (GBL_CSELF, const char* pName)                     GBL_NOEXCEPT;
+//! Equivalent to GblObject_emitPropertyChange(), except that the property lookup is done more efficiently by using a quark for its name.
+GBL_EXPORT GBL_RESULT GblObject_emitPropertyChangeByQuark
+                                                    (GBL_CSELF, GblQuark name)                         GBL_NOEXCEPT;
+//! @}
+
+/*! \name State Management
+ *  \brief Methods for querying GblObject state.
+ *  \relatesalso GblObject
+ *  @{
+ */
+//! Returns true from the time the object has been allocated to the time its final (possibly optional) initial properties have been set.
+GBL_EXPORT GblBool GblObject_isInstantiating (GBL_CSELF) GBL_NOEXCEPT;
+//! Returns true immediately after type initializers are called, but before GblObject::pFnConstructed() is called with the initial constructor properties.
+GBL_EXPORT GblBool GblObject_isConstructing  (GBL_CSELF) GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Name Accessors
@@ -250,9 +280,9 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants
  *  @{
  */
 //! Retrieves the name of the given object or returns an empty string if it doesn't have one
-GBL_EXPORT GblStringRef* GblObject_name       (GBL_CSELF)                          GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef* GblObject_name       (GBL_CSELF)                    GBL_NOEXCEPT;
 //! Sets the name of the given object to \p pName, making a copy of its contents to store internally
-GBL_EXPORT void          GblObject_setName    (GBL_SELF, const char* pName)        GBL_NOEXCEPT;
+GBL_EXPORT void          GblObject_setName    (GBL_SELF, const char* pName)  GBL_NOEXCEPT;
 //! Sets the name of the given object to \p pRef, taking ownership of the given reference
 GBL_EXPORT void          GblObject_setNameRef (GBL_SELF, GblStringRef* pRef) GBL_NOEXCEPT;
 //! @}

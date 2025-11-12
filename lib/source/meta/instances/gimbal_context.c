@@ -176,15 +176,11 @@ static GBL_RESULT GblContext_ILogger_push_(GblILogger* pILogger, const GblStackF
     return GBL_RESULT_SUCCESS;
 }
 
-static GBL_RESULT GblContext_constructor_(GblObject* pSelf) GBL_NOEXCEPT {
+static GBL_RESULT GblContext_init_(GblInstance* pInstance) GBL_NOEXCEPT {
+    GblObject* pSelf = GBL_OBJECT(pInstance);
     GBL_PRIV(pSelf->base).contextType = 1;
     ((GblContext*)pSelf)->logFilter = 0xffffffff;
     GBL_CTX_BEGIN(pSelf);
-
-    GblObjectClass* pObjClass = GBL_OBJECT_CLASS(GblClass_weakRefDefault(GBL_OBJECT_TYPE));
-
-    GBL_CTX_VERIFY_CALL(pObjClass->pFnConstructor(pSelf));
-
     GBL_CTX_END();
 }
 
@@ -202,7 +198,6 @@ static GBL_RESULT GblContextClass_init_(GblContextClass* pClass, void* pData) {
     GBL_ILOGGER_CLASS(pClass)   ->pFnWrite       = GblContext_ILogger_write_;
     GBL_ILOGGER_CLASS(pClass)   ->pFnPush        = GblContext_ILogger_push_;
     GBL_ILOGGER_CLASS(pClass)   ->pFnPop         = GblContext_ILogger_pop_;
-    GBL_OBJECT_CLASS(pClass)    ->pFnConstructor = GblContext_constructor_;
 
     GBL_CTX_END();
 }
@@ -475,9 +470,10 @@ GBL_EXPORT GblType GblContext_type(void) {
     static GblTypeInfo info = {
         .pFnClassInit     = (GblClassInitFn)GblContextClass_init_,
         .classSize        = sizeof(GblContextClass),
+        .pFnInstanceInit  = GblContext_init_,
         .instanceSize     = sizeof(GblContext),
         .interfaceCount   = 2,
-        .pInterfaceImpls    = ifaceEntries
+        .pInterfaceImpls  = ifaceEntries
     };
 
     if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
