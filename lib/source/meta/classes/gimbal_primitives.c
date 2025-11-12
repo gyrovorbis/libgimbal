@@ -721,6 +721,7 @@ static GBL_RESULT f32Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
+GBL_FP_PRECISE
 static GBL_RESULT f32Compare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
     GBL_CTX_BEGIN(NULL);
 
@@ -792,6 +793,7 @@ static GBL_RESULT f64Get_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs,
     GBL_CTX_END();
 }
 
+GBL_FP_PRECISE
 static GBL_RESULT f64Compare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
     GBL_CTX_BEGIN(NULL);
     if(pVariant->f64 > pOther->f64)       *pResult = 1;

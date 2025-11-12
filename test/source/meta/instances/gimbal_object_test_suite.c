@@ -359,7 +359,7 @@ GBL_TEST_CASE(propertyGet)
                                 "name",     "Bulbasaur",
                                 "userdata", (void*)0xdeadbeef,
                                 "parent",   pObj0,
-                                "floater",  -77.7f);
+                                "floater",  -77.7);
                             //     "stringer", "truckin Inheritance!");
     GBL_TEST_VERIFY(pObj1);
 
