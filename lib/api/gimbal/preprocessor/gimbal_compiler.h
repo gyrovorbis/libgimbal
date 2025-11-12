@@ -362,7 +362,7 @@
 #       define GBL_UNLIKELY(exp) (exp) [[unlikely]]
 #   endif
 #endif
-#ifndef defined(GBL_UNLIKELY)
+#ifndef GBL_UNLIKELY
 #   ifdef GBL_GNUC
 #       define GBL_UNLIKELY(exp)  (__builtin_expect(!!(exp), 0))
 #   else
