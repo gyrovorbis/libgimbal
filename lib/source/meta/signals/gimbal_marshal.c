@@ -122,7 +122,7 @@ GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_INSTANCE,
 
 GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_BOX,
                                    2,
-                                   (GblInstance*, GblInstance*),
+                                   (GblInstance*, GblBox*),
                                    (GblVariant_toPointer(&pArgs[0]), GblVariant_boxPeek(&pArgs[1])))
 
 GBL_DEFINE_CCLOSURE_MARSHAL_VOID__(INSTANCE_INSTANCE_SIZE,
