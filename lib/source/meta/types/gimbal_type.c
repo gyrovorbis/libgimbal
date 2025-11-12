@@ -386,44 +386,36 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
                                                    const GblTypeInfo* pInfo);
 
 
-static GblType typeRegister_(GblType parent,
-                            const char* pName,
+static GblType typeRegister_(GblType           parent,
+                            const char*        pName,
                             const GblTypeInfo* pInfo,
-                            GblFlags flags)
-{
-    GblBool hasMutex = GBL_FALSE;
-    GblType newType = GBL_INVALID_TYPE;
-    GblMetaClass* pParent = GBL_META_CLASS_(parent);
-    static const GblTypeInfo defaultTypeInfo = {
-        .pFnClassInit = NULL,
-        .pFnClassFinal = NULL,
-        .classSize = 0,
-        .classPrivateSize = 0,
-        .pClassData = NULL,
-        .interfaceCount = 0,
-        .pInterfaceImpls = NULL,
-        .dependencyCount = 0,
-        .pDependencies = NULL,
-        .pFnInstanceInit = NULL,
-        .instanceSize = 0,
-        .instancePrivateSize = 0
-    };
-    pInfo = pInfo? pInfo : &defaultTypeInfo;
-    GBL_CTX_BEGIN(pCtx_);
-    GBL_CTX_VERIFY_POINTER(pName);
-    GBL_CTX_VERIFY_POINTER(pInfo);
+                            GblFlags           flags) {
+    static const GblTypeInfo defaultTypeInfo = { 0 };
 
+    GBL_ASSERT(pName);
+
+    GblBool       hasMutex = GBL_FALSE;
+    GblType       newType  = GBL_INVALID_TYPE;
+    GblMetaClass* pParent  = GBL_META_CLASS_(parent);
+
+    if(!pInfo)
+        pInfo = &defaultTypeInfo;
+
+    GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_PUSH_VERBOSE("[GblType] Register Type: %s", pName);
 
     GBL_CTX_VERIFY(GblType_find(pName) == GBL_INVALID_TYPE,
                    GBL_RESULT_ERROR_INVALID_TYPE,
                    "An existing entry was found with the same type name!");
     GBL_CTX_CALL(typeLog_(parent, pInfo, flags));
+
+    // Tack-on any flags that we don't explicitly require but are implied by other details.
     flags = typeFlagsWithImplied_(parent, pInfo, flags);
+
+    // Validate that the type would form a valid type, exiting upon failure.
     GBL_CTX_VERIFY_CALL(typeValidate_(parent, pInfo, flags));
-
-
     {
+        // Find the number of base classes in the class heirarchy (class depth).
         uint8_t baseCount = 0;
         GblMetaClass* pParentIt = pParent;
         while(pParentIt) {
@@ -431,81 +423,89 @@ static GblType typeRegister_(GblType parent,
             pParentIt = pParentIt->pParent;
         }
 
-        const size_t  classPrivateOffset  =  ((!pParent? 0 : pParent->classPrivateOffset) - pInfo->classPrivateSize);
-
-        size_t  metaSize = sizeof(GblMetaClass) + baseCount * sizeof(GblMetaClass*);
-
+        // Determine the size of our meta class allocation chunk, which is a metaclass + pointers to all base classes.
+        size_t metaSize = sizeof(GblMetaClass) + baseCount * sizeof(GblMetaClass*);
         metaSize = gblAlignedAllocSize(metaSize, GBL_META_CLASS_ALIGNMENT_);
 
         GBL_CTX_PUSH_VERBOSE("MetaClass Info");
-        GBL_CTX_VERBOSE("%-20s: %-100u", "total size",      metaSize);
-        GBL_CTX_VERBOSE("%-20s: %-100u", "metaclass size",  sizeof(GblMetaClass));
+        GBL_CTX_VERBOSE("%-20s: %-100u", "total size",     metaSize);
+        GBL_CTX_VERBOSE("%-20s: %-100u", "metaclass size", sizeof(GblMetaClass));
         GBL_CTX_POP(2);
 
-        GblMetaClass* pMeta = GBL_CTX_MALLOC(metaSize,
-                                             GBL_META_CLASS_ALIGNMENT_,
-                                             pName);
-
-        GBL_CTX_VERIFY_EXPRESSION(!((uintptr_t)pMeta & GBL_CLASS_FLAGS_BIT_MASK_),
-                                  "malloc returned a misaligned pointer!");
-
+        // Allocate and zero-initialize our meta class chunk.
+        GblMetaClass* pMeta = GBL_CTX_MALLOC(metaSize, GBL_META_CLASS_ALIGNMENT_, pName);
+        GBL_ASSERT(!((uintptr_t)pMeta & GBL_CLASS_FLAGS_BIT_MASK_), "malloc returned a misaligned pointer!");
         memset(pMeta, 0, metaSize);
 
+        // Initialize atomics atomically.
         atomic_store(&pMeta->refCount, 0);
         atomic_store(&pMeta->instanceRefCount, 0);
-        pMeta->flags                = flags;
+
+        // Start initializing metaclass info
+        pMeta->pParent = GBL_META_CLASS_(parent);
+        pMeta->name    = GblQuark_fromString(pName);
+        pMeta->depth   = baseCount;
+
+        // Initialize flags for this class layer.
+        pMeta->flags = flags;
+        // Include inherited flags from the root node.
         if(parent != GBL_INVALID_TYPE)
             pMeta->flags |= (GBL_META_CLASS_(GblType_root(parent))->flags & GBL_TYPE_ROOT_FLAGS_MASK);
-        pMeta->depth                = baseCount;
-        pMeta->classPrivateOffset   = classPrivateOffset;
-        pMeta->instancePrivateOffset= (!pParent? 0 : pParent->instancePrivateOffset) - pInfo->instancePrivateSize;
-        pMeta->pParent              = GBL_META_CLASS_(parent);
-        pMeta->name                 = GblQuark_fromString(pName);
 
+        // Store offset from public class pointer to beginning of private class structure.
+        pMeta->classPrivateOffset    = ((!pParent)? 0 : pParent->classPrivateOffset)
+                                        - gblAlignedAllocSizeDefault(pInfo->classPrivateSize);
+        // Store offset from public instance pointer to beginning of private instance structure.
+        pMeta->instancePrivateOffset = ((!pParent)? 0 : pParent->instancePrivateOffset)
+                                        - gblAlignedAllocSizeDefault(pInfo->instancePrivateSize);
+
+        // Initialize class heirarchy, iterating over linearly inherited ancestral classes.
         pParentIt = pParent;
         baseCount = 0;
         if(pParent) {
+            // Initialize type tree pointers.
             GblNaryTree_addChildFront(&pParent->treeNode, &pMeta->treeNode);
 
+            // Initialize metaclass' base class pointers.
             while(pParentIt) {
                 pMeta->pBases[pMeta->depth-(++baseCount)] = pParentIt;
                 pParentIt = pParentIt->pParent;
             }
         }
-        GBL_CTX_VERIFY_EXPRESSION(baseCount == pMeta->depth);
+        GBL_ASSERT(baseCount == pMeta->depth);
 
-        if(flags & GBL_TYPE_FLAG_TYPEINFO_STATIC) {
+        // Initialize metaclass' typeinfo pointer -- use user's if it's static.
+        if(flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)
              pMeta->pInfo = pInfo;
-
-        } else {
-
+        else  // Dynamically allocate + copy in typeInfo if it doesn't persist.
             GBL_CTX_VERIFY_EXPRESSION(GblType_updateTypeInfoClassChunk_(pMeta, pInfo));
-        }
 
+        // Critical section where we're adding type to registry, grab mutex.
         mtx_lock(&typeRegMtx_);
         hasMutex = GBL_TRUE;
 
-        const GblMetaClass* pOldData = GblHashSet_set(&typeRegistry_,
-                                                      &pMeta);
+        // Add our new metaclass to the registry
+        const GblMetaClass* pOldData = GblHashSet_set(&typeRegistry_, &pMeta);
+        GBL_ASSERT(!pOldData, "A previous metatype entry already existed!");
 
-        GBL_CTX_VERIFY(!pOldData, GBL_RESULT_ERROR_INVALID_ARG,
-                       "A previous metatype entry named %s existed already!", pName);
-
+        // Add type to our builtins table, if it's not a dynamic user-type.
         newType = (GblType)pMeta;
-        if(flags & GBL_TYPE_FLAG_BUILTIN) {
+        if(flags & GBL_TYPE_FLAG_BUILTIN)
              GBL_CTX_CALL(GblArrayList_pushBack(&typeBuiltins_.vector, &newType));
-        }
 
+        // Preconstruct the class for the type IMMEDIATELY if marked PREINIT.
         if(flags & GBL_TYPE_FLAG_CLASS_PREINIT) {
             GblClass* pClass = GblClass_refDefault(newType);
-            GBL_CTX_VERIFY(pClass,
-                           GBL_RESULT_ERROR_INVALID_CLASS,
-                           "Class immediate construction failed!");
+            GBL_CTX_VERIFY(pClass, GBL_RESULT_ERROR_INVALID_CLASS, "Class preinitialization failure!");
         }
-
     }
+
+    // End critical section, give back mutex, return new type.
     GBL_CTX_END_BLOCK();
-    if(hasMutex) mtx_unlock(&typeRegMtx_);
+
+    if(hasMutex) 
+        mtx_unlock(&typeRegMtx_);
+
     return newType;
 }
 
@@ -567,28 +567,28 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
     GblType_freeTypeInfoClassChunk_(pMeta);
 
     // Calculate sizes and offsets for chunk and subchunks contained within it
-    size_t  chunkSize               = 0;
-    size_t  ifaceOffset             = 0;
-    size_t  prereqOffset            = 0;
+    size_t chunkSize    = 0;
+    size_t ifaceOffset  = 0;
+    size_t prereqOffset = 0;
 
     // Only include typeinfo within the chunk if it isn't statically allocated
     if(!(pMeta->flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)) {
-        ifaceOffset  =  chunkSize += sizeof(GblTypeInfo);
-        prereqOffset =  chunkSize += sizeof(GblInterfaceImpl) * pInfo->interfaceCount;
-                        chunkSize += sizeof(GblType)                  * pInfo->dependencyCount;
+        ifaceOffset  = chunkSize += sizeof(GblTypeInfo);
+        prereqOffset = chunkSize += sizeof(GblInterfaceImpl) * pInfo->interfaceCount;
+                       chunkSize += sizeof(GblType)          * pInfo->dependencyCount;
     }
 
     // Class subchunk is private struct data followed by public struct data
-    const size_t  classPublicOffset = chunkSize += -pMeta->classPrivateOffset;
-    const size_t  classTotalSize    = pInfo->classSize + -(pMeta->classPrivateOffset);
+    const size_t classPublicOffset = chunkSize        += -pMeta->classPrivateOffset;
+    const size_t classTotalSize    = pInfo->classSize +  -pMeta->classPrivateOffset;
     chunkSize += classTotalSize;
 
     // Log stats so we can optimize
     GBL_CTX_PUSH_VERBOSE("TypeInfoClass Chunk Info");
-    GBL_CTX_VERBOSE("%-20s: %-100u", "total size",      chunkSize);
-    GBL_CTX_VERBOSE("%-20s: %-100u", "TypeInfo size",   sizeof(GblTypeInfo));
-    GBL_CTX_VERBOSE("%-20s: %-100u", "Interface size",  sizeof(GblInterfaceImpl) * pInfo->interfaceCount);
-    GBL_CTX_VERBOSE("%-20s: %-100u", "Class size",      classTotalSize);
+    GBL_CTX_VERBOSE("%-20s: %-100u", "total size",     chunkSize);
+    GBL_CTX_VERBOSE("%-20s: %-100u", "TypeInfo size",  sizeof(GblTypeInfo));
+    GBL_CTX_VERBOSE("%-20s: %-100u", "Interface size", sizeof(GblInterfaceImpl) * pInfo->interfaceCount);
+    GBL_CTX_VERBOSE("%-20s: %-100u", "Class size",     classTotalSize);
     GBL_CTX_POP(1);
 
     // Allocate and set chunk data
@@ -599,12 +599,12 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
     if(!(pMeta->flags & GBL_TYPE_FLAG_TYPEINFO_STATIC)) {
 
         // Copy outer typeinfo struct
-        pMeta->pInfo    = (const GblTypeInfo*)pChunk;
+        pMeta->pInfo = (const GblTypeInfo*)pChunk;
         memcpy((void*)pMeta->pInfo, pInfo, sizeof(GblTypeInfo));
 
         // copy interface tables
         if(pInfo->interfaceCount) {
-            ((GblTypeInfo*)pMeta->pInfo)->pInterfaceImpls  =  (GblInterfaceImpl*)((char*)pChunk + ifaceOffset);
+            ((GblTypeInfo*)pMeta->pInfo)->pInterfaceImpls = (GblInterfaceImpl*)((char*)pChunk + ifaceOffset);
 
             memcpy((GblInterfaceImpl*)pMeta->pInfo->pInterfaceImpls,
                    pInfo->pInterfaceImpls,
@@ -613,7 +613,7 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
 
         // copy dependency tables
         if(pInfo->dependencyCount) {
-            ((GblTypeInfo*)pMeta->pInfo)->pDependencies  = (GblType*)((char*)pChunk + prereqOffset);
+            ((GblTypeInfo*)pMeta->pInfo)->pDependencies = (GblType*)((char*)pChunk + prereqOffset);
 
             memcpy((GblType*)pMeta->pInfo->pDependencies,
                    pInfo->pDependencies,
@@ -622,7 +622,7 @@ static GBL_RESULT GblType_updateTypeInfoClassChunk_(GblMetaClass* pMeta,
     }
 
     // set metaclass's class pointer to class subchunk
-    pMeta->pClass   = classTotalSize > 0? (GblClass*)(uint8_t*)(pChunk + classPublicOffset) : NULL;
+    pMeta->pClass = (classTotalSize > 0)? (GblClass*)(uint8_t*)(pChunk + classPublicOffset) : NULL;
     GBL_CTX_END();
 }
 

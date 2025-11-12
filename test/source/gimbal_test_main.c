@@ -125,7 +125,7 @@ int start_logger(const char *app_name)
        but is nice for being able to draw the error message to the screen or
        whatnot (not that we do any of that here). */
     void __stack_chk_fail(void) {
-        unsigned int pr = (unsigned int)arch_get_ret_addr();
+        unsigned int pr = (unsigned int)0xdeadbeef;
         GBL_CTX_ERROR("Stack smashed: [%x], aborting...", pr);
         exit(-1);
     }

@@ -1,7 +1,9 @@
 #ifndef GIMBAL_NUMERIC_C
 #define GIMBAL_NUMERIC_C
 
+#include <assert.h>
 #include <gimbal/algorithms/gimbal_numeric.h>
+
 
 GBL_EXPORT uint8_t gblPow2Next_u8(uint8_t n) {
     GBL_ASSERT(n >= 2);
@@ -35,15 +37,13 @@ GBL_EXPORT GblBool gblPow2Check(size_t n) {
     return (n & (n - 1)) == 0;
 }
 
-GBL_EXPORT
-GblBool gblPrimeCheck(int n) {
+GBL_EXPORT GblBool gblPrimeCheck(int n) {
     for(int i = 2; i <= n/2; i++)
         if(n % i == 0) return GBL_FALSE;
     return GBL_TRUE;
 }
 
-GBL_EXPORT
-int gblFibonacci(int n) {
+GBL_EXPORT int gblFibonacci(int n) {
     int num1 = 0, num2 = 1, num3 = 0;
 
     if(!n)
@@ -57,8 +57,7 @@ int gblFibonacci(int n) {
     return num2;
 }
 
-GBL_EXPORT
-unsigned long gblBinomialCoeff(unsigned n, unsigned k) {
+GBL_EXPORT unsigned long gblBinomialCoeff(unsigned n, unsigned k) {
     unsigned long int res = 1;
 
     // Since C(n, k) = C(n, n-k)
@@ -90,15 +89,15 @@ GBL_EXPORT size_t gblAlignedAllocSizeDefault(size_t bytes) {
 }
 
 GBL_EXPORT size_t (gblAlignedAllocSize)(size_t size, size_t align) {
-    if(!align) align = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
-    const size_t alignRem = size % align;
-    size_t newSize = size;
+    if(!align) 
+        align = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
 
-    if(alignRem) {
-        newSize += (align - (alignRem));
-    }
+    GBL_ASSERT(gblPow2Check(align), "Non power-of-two alignment requested!");
 
-    return newSize;
+    size += align - 1;
+    size &= ~(align - 1);
+
+    return size;
 }
 
 // GCD using Euclid's algorithm, only >0 values
