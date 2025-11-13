@@ -1,6 +1,6 @@
 /*! \file
  *  \ingroup meta
- *  \brief   GblInstance structure and related functions
+ *  \brief   GblInstance structure and related functions.
  *
  *  This file contains the API for the GblInstance type,
  *  which is the most low-level, minimalistic primitive
@@ -10,7 +10,7 @@
  *
  *  \sa gimbal_type.h, gimbal_class.h
  *
- *  \author    2023 Falco Girgis
+ *  \author    2023, 2025 Falco Girgis
  *  \copyright MIT License
  */
 #ifndef GIMBAL_INSTANCE_H
@@ -41,7 +41,7 @@
 #define GBL_PUBLIC(cType, selfPriv)           GBL_PUBLIC_(cType, selfPriv)
 //! Returns GBL_TRUE if the instance can be casted to the given type safely
 #define GBL_TYPECHECK(cType, self)            GBL_TYPECHECK_(cType, self)
-//! Wraps GblInstance_cast() for the given type, implementing a convenient cast operator
+//! Dynamically validated, error throwing cast in `DEBUG` builds, 0 overhead C-style cast in `RELEASE` builds (with `NDEBUG` defined).
 #define GBL_CAST(cType, self)                 GBL_CAST_(cType, self)
 //! Wraps GblInstance_as() for the given type, providing a gracefully-failing case
 #define GBL_AS(cType, self)                   GBL_AS_(cType, self)
@@ -173,7 +173,11 @@ GBL_DECLS_END
 #define GBL_PRIVATE_(cType, self)    ((GBL_INSTANCE_PRIVATE_STRUCT(cType)*) GblInstance_private(GBL_INSTANCE(self), GBL_TYPEID(cType)))
 #define GBL_PUBLIC_(cType, selfPriv) ((cType*)GblInstance_public((const void*)selfPriv, GBL_TYPEID(cType)))
 #define GBL_TYPECHECK_(cType, self)  (GblInstance_check(GBL_INSTANCE(self), GBL_TYPEID(cType)))
-#define GBL_CAST_(cType, self)       ((cType*)GblInstance_cast((GblInstance*)self,GBL_TYPEID(cType)))
+#ifndef NDEBUG
+#   define GBL_CAST_(cType, self)    ((cType*)GblInstance_cast((GblInstance*)self, GBL_TYPEID(cType)))
+#else
+#   define GBL_CAST_(cType, self)    ((cType*)self)
+#endif
 #define GBL_AS_(cType, self)         ((cType*)GblInstance_as((GblInstance*)self, GBL_TYPEID(cType)))
 #define GBL_CLASSOF_(cType, self)    ((GBL_CLASS_STRUCT(cType)*)GblClass_cast(GblInstance_class((GblInstance*)self), GBL_TYPEID(cType)))
 #define GBL_CLASSOF_AS_(cType, self) ((GBL_CLASSOF(cType)*)GblClass_as(GblInstance_class((GblInstance*)self), GBL_TYPEID(cType)))

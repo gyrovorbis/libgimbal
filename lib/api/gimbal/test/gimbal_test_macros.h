@@ -19,10 +19,6 @@
 #include <inttypes.h>
 
 #define GBL_TEST_VERIFY(expr)                   GBL_CTX_VERIFY_EXPRESSION(expr)
-#define GBL_TEST_COMPARE_FMT_(value)            GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_FMT_TABLE_, value)()
-#define GBL_TEST_COMPARE_CMP_(actual, expected) GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_CMP_TABLE_, actual)(actual, expected)
-
-GBL_DECLS_BEGIN
 
 /// \cond
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_DFLT_ (void) { return "Values differed"; }
@@ -35,24 +31,39 @@ GBL_INLINE const char* GBL_TEST_COMPARE_FMT_STR_  (void) { return "Values differ
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_FLT_  (void) { return "Values differed [actual: %f, expected: %f]"; }
 GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_  (void) { return "Values differed [actual: %p, expected: %p]"; }
 
-#define GBL_TEST_COMPARE_FMT_TABLE_  (                      \
-        GBL_TEST_COMPARE_FMT_PTR_,                          \
-        (                                                   \
-            (char,          GBL_TEST_COMPARE_FMT_CHAR_),    \
-            (int16_t,       GBL_TEST_COMPARE_FMT_INT_),     \
-            (int32_t,       GBL_TEST_COMPARE_FMT_INT_),     \
-            (int64_t,       GBL_TEST_COMPARE_FMT_LINT_),    \
-            (uint8_t,       GBL_TEST_COMPARE_FMT_UINT_),    \
-            (uint16_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
-            (uint32_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
-            (uint64_t,      GBL_TEST_COMPARE_FMT_LUINT_),   \
-            (const char*,   GBL_TEST_COMPARE_FMT_STR_),     \
-            (char*,         GBL_TEST_COMPARE_FMT_STR_),     \
-            (float,         GBL_TEST_COMPARE_FMT_FLT_),     \
-            (double,        GBL_TEST_COMPARE_FMT_FLT_),     \
-            (const void*,   GBL_TEST_COMPARE_FMT_PTR_)      \
-        )                                                   \
-    )
+#ifndef __cplusplus
+#   define GBL_TEST_COMPARE_FMT_TABLE_  (                       \
+            GBL_TEST_COMPARE_FMT_PTR_,                          \
+            (                                                   \
+                (char,          GBL_TEST_COMPARE_FMT_CHAR_),    \
+                (int16_t,       GBL_TEST_COMPARE_FMT_INT_),     \
+                (int32_t,       GBL_TEST_COMPARE_FMT_INT_),     \
+                (int64_t,       GBL_TEST_COMPARE_FMT_LINT_),    \
+                (uint8_t,       GBL_TEST_COMPARE_FMT_UINT_),    \
+                (uint16_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
+                (uint32_t,      GBL_TEST_COMPARE_FMT_UINT_),    \
+                (uint64_t,      GBL_TEST_COMPARE_FMT_LUINT_),   \
+                (const char*,   GBL_TEST_COMPARE_FMT_STR_),     \
+                (char*,         GBL_TEST_COMPARE_FMT_STR_),     \
+                (float,         GBL_TEST_COMPARE_FMT_FLT_),     \
+                (double,        GBL_TEST_COMPARE_FMT_FLT_),     \
+                (const void*,   GBL_TEST_COMPARE_FMT_PTR_)      \
+            )                                                   \
+        )
+
+#   define GBL_TEST_COMPARE_FMT_(value)            GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_FMT_TABLE_, value)()
+#else
+
+inline const char* GBL_TEST_COMPARE_FMT_(char value)      { return GBL_TEST_COMPARE_FMT_CHAR_();  }
+inline const char* GBL_TEST_COMPARE_FMT_(int32_t value)   { return GBL_TEST_COMPARE_FMT_INT_();   }
+inline const char* GBL_TEST_COMPARE_FMT_(int64_t value)   { return GBL_TEST_COMPARE_FMT_LINT_();  }
+inline const char* GBL_TEST_COMPARE_FMT_(uint32_t value)  { return GBL_TEST_COMPARE_FMT_UINT_();  }
+inline const char* GBL_TEST_COMPARE_FMT_(uint64_t value)  { return GBL_TEST_COMPARE_FMT_LUINT_(); }
+inline const char* GBL_TEST_COMPARE_FMT_(const char* str) { return GBL_TEST_COMPARE_FMT_STR_();   }
+inline const char* GBL_TEST_COMPARE_FMT_(double value)    { return GBL_TEST_COMPARE_FMT_FLT_();   }
+inline const char* GBL_TEST_COMPARE_FMT_(auto* ptr)       { return GBL_TEST_COMPARE_FMT_PTR_();   }
+
+#endif
 
 
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_UINTPTR_(uintptr_t actual, uintptr_t expected)       { return actual == expected; }
@@ -65,9 +76,9 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_DBL_    (double actual, double expected)
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char* pExpected) { return pActual == pExpected ||
                                                                                                      (pActual && pExpected && \
                                                                                                      strcmp(pActual, pExpected) == 0); }
-GBL_DECLS_END
 
-#if defined(GBL_DREAMCAST) || defined(GBL_GAMECUBE)
+#ifndef __cplusplus
+#if     defined(GBL_DREAMCAST) || defined(GBL_GAMECUBE)
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
         (size_t , GBL_TEST_COMPARE_CMP_UINT32_), \
         (int,     GBL_TEST_COMPARE_CMP_INT32_),
@@ -83,29 +94,37 @@ GBL_DECLS_END
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
         (size_t , GBL_TEST_COMPARE_CMP_UINT64_), \
         (int8_t,  GBL_TEST_COMPARE_CMP_UINT32_),
-#else
-#    define GBL_TEST_CMP_PLATFORM_ENTRIES()
-#endif
+#   else
+#       define GBL_TEST_CMP_PLATFORM_ENTRIES()
+#   endif
 
-#define GBL_TEST_COMPARE_CMP_TABLE_  (                      \
-        GBL_TEST_COMPARE_CMP_PTR_,                          \
-        (                                                   \
-            (char,          GBL_TEST_COMPARE_CMP_INT32_),   \
-            (int16_t,       GBL_TEST_COMPARE_CMP_INT32_),   \
-            (int32_t,       GBL_TEST_COMPARE_CMP_INT32_),   \
-            (int64_t,       GBL_TEST_COMPARE_CMP_INT64_),   \
-            (uint8_t,       GBL_TEST_COMPARE_CMP_UINT32_),  \
-            (uint16_t,      GBL_TEST_COMPARE_CMP_UINT32_),  \
-            (uint32_t,      GBL_TEST_COMPARE_CMP_UINT32_),  \
-            (uint64_t,      GBL_TEST_COMPARE_CMP_UINT64_),  \
-            GBL_TEST_CMP_PLATFORM_ENTRIES()                 \
-            (const char*,   GBL_TEST_COMPARE_CMP_STR_),     \
-            (char*,         GBL_TEST_COMPARE_CMP_STR_),     \
-            (float,         GBL_TEST_COMPARE_CMP_DBL_),     \
-            (double,        GBL_TEST_COMPARE_CMP_DBL_),     \
-            (const void*,   GBL_TEST_COMPARE_CMP_PTR_)      \
-        )                                                   \
-    )
+#   define GBL_TEST_COMPARE_CMP_TABLE_  (                       \
+            GBL_TEST_COMPARE_CMP_PTR_,                          \
+            (                                                   \
+                (char,          GBL_TEST_COMPARE_CMP_INT32_),   \
+                (int16_t,       GBL_TEST_COMPARE_CMP_INT32_),   \
+                (int32_t,       GBL_TEST_COMPARE_CMP_INT32_),   \
+                (int64_t,       GBL_TEST_COMPARE_CMP_INT64_),   \
+                (uint8_t,       GBL_TEST_COMPARE_CMP_UINT32_),  \
+                (uint16_t,      GBL_TEST_COMPARE_CMP_UINT32_),  \
+                (uint32_t,      GBL_TEST_COMPARE_CMP_UINT32_),  \
+                (uint64_t,      GBL_TEST_COMPARE_CMP_UINT64_),  \
+                GBL_TEST_CMP_PLATFORM_ENTRIES()                 \
+                (const char*,   GBL_TEST_COMPARE_CMP_STR_),     \
+                (char*,         GBL_TEST_COMPARE_CMP_STR_),     \
+                (float,         GBL_TEST_COMPARE_CMP_DBL_),     \
+                (double,        GBL_TEST_COMPARE_CMP_DBL_),     \
+                (const void*,   GBL_TEST_COMPARE_CMP_PTR_)      \
+            )                                                   \
+        )
+
+#   define GBL_TEST_COMPARE_CMP_(actual, expected) GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_CMP_TABLE_, actual)(actual, expected)
+
+#else
+inline GblBool GBL_TEST_COMPARE_CMP_(auto actual, auto expected) { return actual == expected; }
+inline GblBool GBL_TEST_COMPARE_CMP_(const char* pActual, const char *pExpected) { return GBL_TEST_COMPARE_CMP_STR_(pActual, pExpected); }
+
+#endif
 /// \endcond
 
 #define GBL_TEST_COMPARE(actual, expected)           GBL_CTX_VERIFY_EXPRESSION(GBL_TEST_COMPARE_CMP_(actual, expected),      \

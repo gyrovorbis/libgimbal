@@ -51,7 +51,7 @@ GBL_TEST_CASE(constructMove)
         {
             auto pat2 = std::move(pat);
 
-            GBL_TEST_VERIFY(pat2.refCount() == 1);
+            GBL_TEST_COMPARE(pat2.refCount(), 1);
         }
     }
     GBL_TEST_VERIFY(GblPattern_totalCount() == activeCount);

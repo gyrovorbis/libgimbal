@@ -2,7 +2,11 @@
  *  \brief GblInterface and related functions.
  *  \ingroup meta
  *
- *  \author Falco Girgis
+ *  This file contains the GblInterface structure and its
+ *  type system API.
+ *
+ *  \author    2023, 2025 Falco Girgis
+ *  \copyright MIT License
  */
 #ifndef GIMBAL_INTERFACE_H
 #define GIMBAL_INTERFACE_H
@@ -20,10 +24,10 @@
 
 GBL_DECLS_BEGIN
 
-/// Base struct for all interfaces, inherits from GblClass
+//! Base struct for all interfaces, inherits from GblClass
 typedef struct GblInterface {
-    GblClass    base;               ///< inherited GblClass base info
-    size_t      outerClassOffset_;  ///< offset from the interface to the class containing it (private, managed by internals)
+    GblClass    base;               //!< inherited GblClass base info
+    size_t      outerClassOffset_;  //!< offset from the interface to the class containing it (private, managed by internals)
 } GblInterface;
 
 GBL_EXPORT GblClass* GblInterface_outerClass     (GBL_SELF) GBL_NOEXCEPT;
