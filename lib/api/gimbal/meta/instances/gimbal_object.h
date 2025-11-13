@@ -21,6 +21,7 @@
  *      - GblObject_isConstructing().
  *      - GblObject_isInstantiating().
  *      - GblObject implementing ABSTRACT properties from GblInterface.
+ *      - emit propertyChange when setting property values from raw C API.
  */
 #ifndef GIMBAL_OBJECT_H
 #define GIMBAL_OBJECT_H
@@ -119,7 +120,7 @@ GBL_PROPERTIES(GblObject,
 )
 
 GBL_SIGNALS(GblObject,
-    (propertyChange, (GBL_INSTANCE_TYPE, pReciever), (GBL_INSTANCE_TYPE, pProperty))
+    (propertyChange, (GBL_INSTANCE_TYPE, pReciever), (GBL_BOX_TYPE, pProperty))
 )
 //! \endcond
 
@@ -133,7 +134,7 @@ GBL_EXPORT GblType GblObject_type(void) GBL_NOEXCEPT;
 //! Creates an object-derived type on the heap, intializing it with a NULL-terminated K,V pair listing of properties
 GBL_EXPORT GblObject* GblObject_create             (GblType type, ...)                         GBL_NOEXCEPT;
 //! Variant of GblObject_create(), where the object is created with an extended size
-GBL_EXPORT GblObject* GblObject_createExt          (GblType type, size_t size, ...)           GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_createExt          (GblType type, size_t size, ...)            GBL_NOEXCEPT;
 //! Constructs an object-derived type in-place, initializing it with a NULL-terminated K,V pair listing of properties
 GBL_EXPORT GBL_RESULT GblObject_construct          (GBL_SELF, GblType type, ...)               GBL_NOEXCEPT;
 //! Creates an object-derived type on the heap, with the given class, initializing it with a NULL-terminated K,V pair property list

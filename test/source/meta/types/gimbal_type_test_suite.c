@@ -782,14 +782,15 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_register_invalid_(GblTe
 
     // Multiple primary/non-dependent dependencies:
     pSelf_->dependent = GblType_register("Dependent",
-                                                   GBL_INVALID_TYPE,
-                                                    &(const GblTypeInfo) {
-                                                        .dependencyCount = 2,
-                                                        .pDependencies = (const GblType[]) {
-                                                            pSelf_->instanced,
-                                                            pSelf_->classedDerived
-                                                        }
-                                                    }, GBL_TYPE_ROOT_FLAG_DEPENDENT);
+                                         GBL_INVALID_TYPE,
+                                         &(const GblTypeInfo) {
+                                              .dependencyCount = 2,
+                                              .pDependencies = (const GblType[]) {
+                                                  pSelf_->instanced,
+                                                  pSelf_->classedDerived
+                                              }
+                                          },
+                                          GBL_TYPE_ROOT_FLAG_DEPENDENT);
     GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_TYPE);
     GBL_TEST_COMPARE(pSelf_->dependent, GBL_INVALID_TYPE);
     GBL_CTX_CLEAR_LAST_RECORD();
@@ -803,19 +804,20 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_register_valid_(GblTest
 
     // Dependencies on non-dependent types
     pSelf_->dependent = GblType_register("ClassedDependent",
-                                               GBL_INVALID_TYPE,
-                                               &(const GblTypeInfo) {
-                                                   .dependencyCount = 1,
-                                                   .pDependencies = (const GblType[]) {
-                                                       pSelf_->classed
-                                                   }
-                                               },
-                                               0);
+                                         GBL_INVALID_TYPE,
+                                         &(const GblTypeInfo) {
+                                             .dependencyCount = 1,
+                                             .pDependencies = (const GblType[]) {
+                                                 pSelf_->classed
+                                             }
+                                         },
+                                         GBL_TYPE_FLAGS_NONE);
 
     GBL_TEST_VERIFY(pSelf_->dependent != GBL_INVALID_TYPE);
     GBL_TEST_VERIFY(GBL_TYPE_DEPENDENT_CHECK(pSelf_->dependent));
     GBL_TEST_VERIFY(GblType_depends(pSelf_->dependent, pSelf_->classed));
     GBL_TEST_VERIFY(GblType_conforms(pSelf_->classed, pSelf_->dependent));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependent, pSelf_->classed));
     GBL_CTX_END();
 }
 
@@ -837,6 +839,9 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_depends_dependent_valid
     GBL_TEST_VERIFY(GBL_TYPE_DEPENDENT_CHECK(pSelf_->dependentDependent));
     GBL_TEST_VERIFY(GblType_depends(pSelf_->dependentDependent, pSelf_->classed));
     GBL_TEST_VERIFY(GblType_depends(pSelf_->dependentDependent, pSelf_->ifaced));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependent, pSelf_->dependent));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependent, pSelf_->ifaced));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependent, pSelf_->classed));
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->blankType, pSelf_->dependentDependent));
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->classed, pSelf_->dependentDependent));
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->ifaced, pSelf_->dependentDependent));

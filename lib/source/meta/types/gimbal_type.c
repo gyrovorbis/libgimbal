@@ -965,10 +965,10 @@ GBL_EXPORT const GblTypeInfo* GblType_info(GblType type) {
 
 // If this ever needs to be optimized, make it non-recursive
 static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChecks, GblBool ifaceChecks, GblBool castChecks) {
-    GblBool         result   = GBL_FALSE;
-    GblMetaClass*   pDerived = GBL_META_CLASS_(derived);
-    GblMetaClass*   pBase    = GBL_META_CLASS_(base);
-    GblMetaClass*   pIter    = pDerived;
+    GblBool       result   = GBL_FALSE;
+    GblMetaClass* pDerived = GBL_META_CLASS_(derived);
+    GblMetaClass* pBase    = GBL_META_CLASS_(base);
+    GblMetaClass* pIter    = pDerived;
 
     if(derived == GBL_INVALID_TYPE && base == GBL_INVALID_TYPE) {
         result = GBL_TRUE;
@@ -1017,7 +1017,12 @@ GBL_EXPORT GblBool GblType_verify(GblType type) {
 }
 
 GBL_EXPORT GblBool GblType_check(GblType type, GblType other) {
-    return GblType_typeIsA_(type, other, GBL_TRUE, GBL_TRUE, GBL_TRUE);
+    if(GblType_typeIsA_(type, other, GBL_TRUE, GBL_TRUE, GBL_TRUE))
+        return GBL_TRUE;
+    else if(GblType_depends(type, other))
+        return GBL_TRUE;
+    else
+        return GBL_FALSE;
 }
 
 // subtyping is inclusive
