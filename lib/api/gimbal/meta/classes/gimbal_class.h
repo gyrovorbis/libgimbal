@@ -79,6 +79,10 @@ typedef struct GblClass {
     GBL_PRIVATE_END
 } GblClass;
 
+typedef struct GblStaticClass {
+    GblClass base;
+} GblStaticClass;
+
 /*! \name  Default Class Management
  *  \brief Methods for managing references to internally-managed default class instances
  *  @{
