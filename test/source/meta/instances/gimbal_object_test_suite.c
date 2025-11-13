@@ -46,7 +46,7 @@ GBL_INSTANCE_DERIVE(TestObject, GblObject)
     int                 eventFilterCount;
     GblType             eventFilterLastType;
     GblBool             eventFilterAccept;
-    GblIEventHandler*   eventFilterLastTarget;
+    GblIEventReceiver*  eventFilterLastTarget;
 GBL_INSTANCE_END
 
 GBL_PROPERTIES(TestObject,
@@ -89,12 +89,12 @@ GBL_TEST_CASE(newDefault)
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIVariantIFace));
     GBL_TEST_COMPARE(pIVariantIFace->pVTable->pGetValueFmt, "p");
 
-    GblIEventHandlerClass* pIEventHandlerIFace = GBL_IEVENT_HANDLER_GET_CLASS(pObj);
-    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventHandlerIFace), GBL_IEVENT_HANDLER_TYPE);
+    GblIEventReceiverClass* pIEventHandlerIFace = GBL_IEVENT_RECEIVER_CLASSOF(pObj);
+    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventHandlerIFace), GBL_IEVENT_RECEIVER_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventHandlerIFace));
 
-    GblIEventFilterClass* pIEventFilterIFace = GBL_IEVENT_FILTER_GET_CLASS(pObj);
-    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventFilterIFace), GBL_IEVENT_FILTER_TYPE);
+    GblIEventReceiverClass* pIEventFilterIFace = GBL_IEVENT_RECEIVER_CLASSOF(pObj);
+    GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIEventFilterIFace), GBL_IEVENT_RECEIVER_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIEventFilterIFace));
 
     // validate sanity of random casts
@@ -107,12 +107,12 @@ GBL_TEST_CASE(newDefault)
     //GBL_TEST_VERIFY(GBL_ITABLE_IFACE_CHECK(GBL_OBJECT_CLASS(pITableIFace)));
 
     //validate insanity
-    GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(GBL_OBJECT_CLASS(GBL_IEVENT_FILTER_CLASS(TEST_OBJECT_GET_CLASS(pObj)))));
+    GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(GBL_OBJECT_CLASS(GBL_IEVENT_RECEIVER_CLASS(TEST_OBJECT_GET_CLASS(pObj)))));
 
     // validate instance checks and casts
     //GBL_TEST_VERIFY(GBL_IVARIANT_CHECK(pObj));
     //GBL_TEST_VERIFY(GBL_IEVENT_FILTER_CHECK(GBL_OBJECT(GBL_IEVENT_FILTER(pObj))));
-    GBL_TEST_COMPARE(pObj, TEST_OBJECT(GBL_IVARIANT(GBL_OBJECT(GBL_IEVENT_FILTER(TEST_OBJECT(pObj))))));
+    GBL_TEST_COMPARE(pObj, TEST_OBJECT(GBL_IVARIANT(GBL_OBJECT(GBL_IEVENT_RECEIVER(TEST_OBJECT(pObj))))));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(name)
@@ -706,7 +706,7 @@ GBL_TEST_CASE(eventFilters)
                                     "parent", pParent,
                                     NULL);
 
-    GBL_TEST_CALL(GblObject_installEventFilter(GBL_OBJECT(pParent), GBL_IEVENT_FILTER(pChild)));
+    GBL_TEST_CALL(GblObject_installEventFilter(GBL_OBJECT(pParent), GBL_IEVENT_RECEIVER(pChild)));
 
     GblEvent event;
     GBL_TEST_CALL(GblEvent_construct(&event, GBL_EVENT_TYPE));
@@ -718,7 +718,7 @@ GBL_TEST_CASE(eventFilters)
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 1);
     GBL_TEST_COMPARE(pChild->eventFilterCount, 1);
     GBL_TEST_COMPARE(pChild->eventFilterLastType, GBL_EVENT_TYPE);
-    GBL_TEST_COMPARE(pChild->eventFilterLastTarget, GBL_IEVENT_HANDLER(pParent));
+    GBL_TEST_COMPARE(pChild->eventFilterLastTarget, GBL_IEVENT_RECEIVER(pParent));
 
     pChild->eventFilterAccept = GBL_TRUE;
 
@@ -728,7 +728,7 @@ GBL_TEST_CASE(eventFilters)
     GBL_TEST_COMPARE(pGrand->eventHandlerCount, 1);
     GBL_TEST_COMPARE(pChild->eventFilterCount, 2);
 
-    GBL_TEST_CALL(GblObject_uninstallEventFilter(GBL_OBJECT(pParent), GBL_IEVENT_FILTER(pChild)));
+    GBL_TEST_CALL(GblObject_uninstallEventFilter(GBL_OBJECT(pParent), GBL_IEVENT_RECEIVER(pChild)));
 
     GblEvent_reset(&event);
     GBL_TEST_CALL(GblObject_notifyEvent(GBL_OBJECT(pChild), &event));
@@ -1089,22 +1089,26 @@ GBL_TEST_REGISTER(newDefault,
                   childIndex
                 )
 
-static GBL_RESULT TestObject_IEventHandler_handleEvent(GblIEventHandler* pHandler, GblEvent* pEvent) {
-    GBL_CTX_BEGIN(pHandler);
-    TestObject* pTest = TEST_OBJECT(pHandler);
-    pTest->eventHandlerCount++;
-    pTest->eventHandlerLastType = GBL_TYPEOF(pEvent);
-    if(pTest->eventHandlerAccept) GblEvent_accept(pEvent);
-    GBL_CTX_END();
-}
+static GBL_RESULT TestObject_IEventReceiver_receiveEvent(GblIEventReceiver* pSelf, GblIEventReceiver* pDest, GblEvent* pEvent) {
+    GBL_CTX_BEGIN(pSelf);
 
-static GBL_RESULT TestObject_IEventFilter_filterEvent(GblIEventFilter* pFilter, GblIEventHandler* pTarget, GblEvent* pEvent) {
-    GBL_CTX_BEGIN(pFilter);
-    TestObject* pTest = TEST_OBJECT(pFilter);
-    pTest->eventFilterCount++;
-    pTest->eventFilterLastType = GBL_TYPEOF(pEvent);
-    pTest->eventFilterLastTarget = pTarget;
-    if(pTest->eventFilterAccept) GblEvent_accept(pEvent);
+    TestObject* pTest = TEST_OBJECT(pSelf);
+
+    if(pSelf == pDest) {
+        pTest->eventHandlerCount++;
+        pTest->eventHandlerLastType = GBL_TYPEOF(pEvent);
+
+        if(pTest->eventHandlerAccept)
+            GblEvent_accept(pEvent);
+    } else {
+        pTest->eventFilterCount++;
+        pTest->eventFilterLastType   = GBL_TYPEOF(pEvent);
+        pTest->eventFilterLastTarget = pDest;
+
+        if(pTest->eventFilterAccept)
+            GblEvent_accept(pEvent);
+    }
+
     GBL_CTX_END();
 }
 
@@ -1184,24 +1188,26 @@ static GBL_RESULT TestObject_setProperty_(GblObject* pSelf, const GblProperty* p
 
 
 static GBL_RESULT TestObjectClass_init_(GblClass* pClass, const void* pUd) {
-    TestObjectClass* pTestClass = TEST_OBJECT_CLASS(pClass);
     GBL_CTX_BEGIN(NULL);
-    if(!GblType_classRefCount(TEST_OBJECT_TYPE)) {
+
+    if(!GblType_classRefCount(TEST_OBJECT_TYPE))
         GBL_PROPERTIES_REGISTER(TestObject);
-    }
-    pTestClass->staticInt32 = 77;
-    strcpy(pTestClass->string, (const char*)pUd);
-    pTestClass->base.GblIEventHandlerImpl.pFnEvent = TestObject_IEventHandler_handleEvent;
-    pTestClass->base.GblIEventFilterImpl.pFnEventFilter = TestObject_IEventFilter_filterEvent;
-    pTestClass->base.base.pFnDestructor  = TestObject_destructor;
-    pTestClass->base.pFnConstructed      = TestObject_constructed;
-    pTestClass->base.pFnProperty         = TestObject_property_;
-    pTestClass->base.pFnSetProperty      = TestObject_setProperty_;
+
+    TEST_OBJECT_CLASS(pClass)->staticInt32 = 77;
+    strcpy(TEST_OBJECT_CLASS(pClass)->string, (const char*)pUd);
+
+    GBL_IEVENT_RECEIVER_CLASS(pClass)->pFnReceiveEvent = TestObject_IEventReceiver_receiveEvent;
+    GBL_BOX_CLASS(pClass)            ->pFnDestructor   = TestObject_destructor;
+    GBL_OBJECT_CLASS(pClass)         ->pFnConstructed  = TestObject_constructed;
+    GBL_OBJECT_CLASS(pClass)         ->pFnProperty     = TestObject_property_;
+    GBL_OBJECT_CLASS(pClass)         ->pFnSetProperty  = TestObject_setProperty_;
+
     GBL_CTX_END();
 }
 
 static GblType TestObject_type(void) {
     static GblType type = GBL_INVALID_TYPE;
+
     if(type == GBL_INVALID_TYPE) {
         const GblTypeInfo info = {
             .pFnClassInit    = TestObjectClass_init_,
@@ -1216,5 +1222,6 @@ static GblType TestObject_type(void) {
                                 &info,
                                 GBL_TYPE_FLAGS_NONE);
     }
+
     return type;
 }

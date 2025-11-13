@@ -54,20 +54,19 @@ GBL_EXPORT GBL_RESULT GblObject_notifyEvent(GblObject* pSelf, GblEvent* pEvent) 
     GBL_CTX_BEGIN(NULL);
     GblObject* pObject = GBL_OBJECT(pSelf);
 
-
      // Run the event through the event filters
-     const size_t  eventFilterCount = GblObject_eventFilterCount(pObject);
+     const size_t eventFilterCount = GblObject_eventFilterCount(pObject);
      for(size_t  f = 0; f < eventFilterCount; ++f)
      {
-         GblIEventFilter* pFilter = GblObject_eventFilter(pSelf, f);
-         GBL_CTX_CALL(GblIEventFilter_eventFilter(pFilter, GBL_IEVENT_HANDLER(pObject), pEvent));
+         GblIEventReceiver* pFilter = GblObject_eventFilter(pSelf, f);
+         GBL_CTX_CALL(GblIEventReceiver_receiveEvent(pFilter, GBL_IEVENT_RECEIVER(pObject), pEvent));
          if(GblEvent_state(pEvent) == GBL_EVENT_STATE_ACCEPTED) {
              GBL_CTX_DONE();
          }
      }
 
      // Send it to the event handler if the event handler
-    GBL_CTX_CALL(GblIEventHandler_event(GBL_IEVENT_HANDLER(pSelf), pEvent));
+    GBL_CTX_CALL(GblIEventReceiver_receiveEvent(GBL_IEVENT_RECEIVER(pSelf), GBL_IEVENT_RECEIVER(pSelf), pEvent));
     if(GblEvent_state(pEvent) == GBL_EVENT_STATE_ACCEPTED) {
         GBL_CTX_DONE();
     }
@@ -100,10 +99,10 @@ static GblArrayList* GblObject_ensureEventFilters_(GblObject* pSelf) {
         pEventFilters = GBL_CTX_MALLOC(GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_);
 
         GBL_CTX_CALL(GblArrayList_construct(pEventFilters,
-                                        sizeof(GblIEventFilter*),
-                                        0,
-                                        NULL,
-                                        GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_));
+                                            sizeof(GblIEventReceiver*),
+                                            0,
+                                            NULL,
+                                            GBL_OBJECT_EVENT_FILTER_VECTOR_SIZE_));
         GBL_CTX_CALL(GblArrayMap_setUserdata(&GBL_PRIV(pSelf->base).pFields,
                                              objectEventFiltersQuark_,
                                              (uintptr_t)pEventFilters,
@@ -115,32 +114,32 @@ static GblArrayList* GblObject_ensureEventFilters_(GblObject* pSelf) {
     return pEventFilters;
 }
 
-GBL_EXPORT GBL_RESULT GblObject_installEventFilter(GblObject* pSelf, GblIEventFilter* pFilter) {
+GBL_EXPORT GBL_RESULT GblObject_installEventFilter(GblObject* pSelf, GblIEventReceiver* pFilter) {
     GBL_CTX_BEGIN(NULL);
 
-    GBL_CTX_VERIFY_POINTER(pFilter);
+    GBL_ASSERT(pFilter);
     GblArrayList* pFilters = GblObject_ensureEventFilters_(pSelf);
     GBL_CTX_CALL(GblArrayList_pushBack(pFilters, &pFilter));
 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_uninstallEventFilter(GblObject* pSelf, GblIEventFilter* pFilter) {
+GBL_EXPORT GBL_RESULT GblObject_uninstallEventFilter(GblObject* pSelf, GblIEventReceiver* pFilter) {
     GblArrayList* pVector = NULL;
     GBL_CTX_BEGIN(NULL);
 
-    GBL_CTX_VERIFY_POINTER(pFilter);
+    GBL_ASSERT(pFilter);
 
     pVector = GblObject_eventFilters_(pSelf);
     GBL_CTX_VERIFY_POINTER(pVector);
 
-    size_t  count = GblArrayList_size(pVector);
+    size_t count = GblArrayList_size(pVector);
     GBL_CTX_VERIFY(count, GBL_RESULT_ERROR_INVALID_HANDLE,
                    "Object has no event filter list to remove filter from: %x", pFilter);
 
     GblBool found = GBL_FALSE;
-    for(size_t  f = 0; f < count; ++f) {
-        GblIEventFilter** ppFilter = GblArrayList_at(pVector, f);
+    for(size_t f = 0; f < count; ++f) {
+        GblIEventReceiver** ppFilter = GblArrayList_at(pVector, f);
         if(*ppFilter == pFilter) {
             found = GBL_TRUE;
             GBL_CTX_CALL(GblArrayList_erase(pVector, f, 1));
@@ -154,8 +153,8 @@ GBL_EXPORT GBL_RESULT GblObject_uninstallEventFilter(GblObject* pSelf, GblIEvent
     GBL_CTX_END();
 }
 
-GBL_EXPORT GblIEventFilter* GblObject_eventFilter(const GblObject* pSelf, size_t index) {
-    GblIEventFilter** ppFilter = NULL;
+GBL_EXPORT GblIEventReceiver* GblObject_eventFilter(const GblObject* pSelf, size_t index) {
+    GblIEventReceiver** ppFilter = NULL;
 
     GBL_CTX_BEGIN(NULL);
 
@@ -783,8 +782,8 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
-    GBL_CTX_VERIFY_POINTER(pSelf);
-    GBL_CTX_VERIFY_POINTER(pVarArgs);
+    GBL_ASSERT(pSelf);
+    GBL_ASSERT(pVarArgs);
 
     const GblType       selfType     = GBL_TYPEOF(pSelf);
     const size_t        totalCount   = GblProperty_count(selfType);
@@ -802,13 +801,12 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
             GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                "[GblObject] Failed to construct with unknown property: %s[%s]",
                                GblType_name(type), pKey);
-        }
-
-        GBL_CTX_VERIFY_CALL(
-            GblVariant_constructValueCopyVa(&pVariants[count],
-                                            ppProperties[count]->valueType,
-                                            pVarArgs)
-        );
+        } else
+            GBL_CTX_VERIFY_CALL(
+                GblVariant_constructValueCopyVa(&pVariants[count],
+                                                ppProperties[count]->valueType,
+                                                pVarArgs)
+            );
 
         ++count;
 
@@ -1067,7 +1065,7 @@ static GblObjectFamily_* GblObject_ensureFamily_(GblObject* pSelf) {
     if(!pFamily) {
         pFamily = GBL_CTX_MALLOC(gblAlignedAllocSizeDefault(sizeof(GblObjectFamily_)),
                                  GBL_ALIGNOF(GBL_MAX_ALIGN_T),
-                                  "family");
+                                 "family");
 
         memset(pFamily, 0, sizeof(GblObjectFamily_));
         pFamily->pSelf = pSelf;
@@ -1120,19 +1118,19 @@ GBL_EXPORT GblObject* GblObject_siblingNext(const GblObject* pSelf) {
     return pSibling;
 }
 
-GBL_EXPORT GblObject *GblObject_siblingNextByType(const GblObject *pSelf, GblType type) {
+GBL_EXPORT GblObject* GblObject_siblingNextByType(const GblObject *pSelf, GblType type) {
     do pSelf = GblObject_siblingNext(pSelf);
     while (pSelf != NULL && GBL_TYPEOF(pSelf) != type);
     return pSelf;
 }
 
-GBL_EXPORT GblObject *GblObject_siblingNextByName(const GblObject *pSelf, const char *name) {
+GBL_EXPORT GblObject* GblObject_siblingNextByName(const GblObject *pSelf, const char *name) {
     do pSelf = GblObject_siblingNext(pSelf);
     while (pSelf != NULL && strcmp(GblObject_name(pSelf), name) != 0);
     return pSelf;
 }
 
-GBL_EXPORT GblObject *GblObject_siblingPrevious(const GblObject *pSelf) {
+GBL_EXPORT GblObject* GblObject_siblingPrevious(const GblObject *pSelf) {
     GblObject *pParent = GblObject_parent(pSelf);
     if(!pParent) return NULL;
 
@@ -1147,13 +1145,13 @@ GBL_EXPORT GblObject *GblObject_siblingPrevious(const GblObject *pSelf) {
     return NULL;
 }
 
-GBL_EXPORT GblObject *GblObject_siblingPreviousByType(const GblObject *pSelf, GblType type) {
+GBL_EXPORT GblObject* GblObject_siblingPreviousByType(const GblObject *pSelf, GblType type) {
     do pSelf = GblObject_siblingPrevious(pSelf);
     while (pSelf != NULL && GBL_TYPEOF(pSelf) != type);
     return pSelf;
 }
 
-GBL_EXPORT GblObject *GblObject_siblingPreviousByName(const GblObject *pSelf, const char *name) {
+GBL_EXPORT GblObject* GblObject_siblingPreviousByName(const GblObject *pSelf, const char *name) {
     do pSelf = GblObject_siblingPrevious(pSelf);
     while (pSelf != NULL && strcmp(GblObject_name(pSelf), name) != 0);
     return pSelf;
@@ -1287,7 +1285,7 @@ GBL_EXPORT size_t GblObject_childIndex(const GblObject *pSelf) {
     return GBL_INDEX_INVALID;
 }
 
-GBL_EXPORT size_t  GblObject_depth(const GblObject* pSelf) {
+GBL_EXPORT size_t GblObject_depth(const GblObject* pSelf) {
     size_t  depth = 0;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
 
@@ -1599,21 +1597,10 @@ static GBL_RESULT GblObject_ITableVariant_next_(const GblVariant* pSelf,
 }
 
 static GBL_RESULT GblObject_ITableVariant_count_(const GblVariant* pSelf,
-                                                 size_t*           pSize)
-{
+                                                 size_t*           pSize) {
     *pSize = GblProperty_count(GblVariant_typeOf(pSelf));
     return GBL_RESULT_SUCCESS;
 }
-
-
-// ========== IEVENTHANDLER IFACE ==========
-
-static GBL_RESULT GblObject_IEventHandlerIFace_event_(GblIEventHandler* pHandler, GblEvent* pEvent) {
-    GBL_UNUSED(pHandler && pEvent);
-    GBL_CTX_BEGIN(NULL);
-    GBL_CTX_END();
-}
-
 
 // ======== OBJECT CLASS ==========
 
@@ -1743,7 +1730,6 @@ static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData) {
     GBL_OBJECT_CLASS(pClass)        ->pFnInstantiated = GblObject_instantiated_;
     GBL_OBJECT_CLASS(pClass)        ->pFnProperty     = GblObject_property_;
     GBL_OBJECT_CLASS(pClass)        ->pFnSetProperty  = GblObject_setProperty_;
-    GBL_IEVENT_HANDLER_CLASS(pClass)->pFnEvent        = GblObject_IEventHandlerIFace_event_;
     GBL_ITABLE_VARIANT_CLASS(pClass)->pFnIndex        = GblObject_ITableVariant_index_;
     GBL_ITABLE_VARIANT_CLASS(pClass)->pFnSetIndex     = GblObject_ITableVariant_setIndex_;
     GBL_ITABLE_VARIANT_CLASS(pClass)->pFnNext         = GblObject_ITableVariant_next_;
@@ -1776,10 +1762,7 @@ GBL_EXPORT GblType GblObject_type(void) {
             .classOffset   = offsetof(GblObjectClass, GblITableVariantImpl)
         }, {
             .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, GblIEventHandlerImpl)
-        }, {
-            .interfaceType = GBL_INVALID_TYPE,
-            .classOffset   = offsetof(GblObjectClass, GblIEventFilterImpl)
+            .classOffset   = offsetof(GblObjectClass, GblIEventReceiverImpl)
         }
     };
 
@@ -1788,14 +1771,13 @@ GBL_EXPORT GblType GblObject_type(void) {
         .pFnClassFinal    = GblObjectClass_final_,
         .classSize        = sizeof(GblObjectClass),
         .instanceSize     = sizeof(GblObject),
-        .interfaceCount   = 3,
-        .pInterfaceImpls    = ifaceEntries
+        .interfaceCount   = 2,
+        .pInterfaceImpls  = ifaceEntries
     };
 
     if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         ifaceEntries[0].interfaceType = GBL_ITABLE_VARIANT_TYPE;
-        ifaceEntries[1].interfaceType = GBL_IEVENT_HANDLER_TYPE;
-        ifaceEntries[2].interfaceType = GBL_IEVENT_FILTER_TYPE;
+        ifaceEntries[1].interfaceType = GBL_IEVENT_RECEIVER_TYPE;
 
         type = GblType_register(GblQuark_internStatic("GblObject"),
                                 GBL_BOX_TYPE,

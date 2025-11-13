@@ -16,8 +16,7 @@
 #include "meta/classes/gimbal_bit_struct.h"
 
 #include "meta/ifaces/gimbal_iallocator.h"
-#include "meta/ifaces/gimbal_ievent_filter.h"
-#include "meta/ifaces/gimbal_ievent_handler.h"
+#include "meta/ifaces/gimbal_ievent_receiver.h"
 #include "meta/ifaces/gimbal_ilogger.h"
 #include "meta/ifaces/gimbal_interface.h"
 #include "meta/ifaces/gimbal_iplugin.h"

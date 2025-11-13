@@ -27,18 +27,17 @@
 
 #include "gimbal_box.h"
 #include "../ifaces/gimbal_itable_variant.h"
-#include "../ifaces/gimbal_ievent_handler.h"
-#include "../ifaces/gimbal_ievent_filter.h"
+#include "../ifaces/gimbal_ievent_receiver.h"
 #include "../properties/gimbal_property.h"
 
 /*! \name  Type System
  *  \brief Type UUID and Cast operators
  *  @{
  */
-#define GBL_OBJECT_TYPE             (GBL_TYPEID(GblObject))            //!< GblType UUID for GblObject
-#define GBL_OBJECT(self)            (GBL_CAST(GblObject, self))        //!< Casts a GblInstance to a GblObject
-#define GBL_OBJECT_CLASS(klass)     (GBL_CLASS_CAST(GblObject, klass)) //!< Casts a GblClass to a GblObjectClass
-#define GBL_OBJECT_GET_CLASS(self)  (GBL_CLASSOF(GblObject, self))     //!< Gets a GblObjectClass from a GblInstance
+#define GBL_OBJECT_TYPE             GBL_TYPEID(GblObject)            //!< GblType UUID for GblObject
+#define GBL_OBJECT(self)            GBL_CAST(GblObject, self)        //!< Casts a GblInstance to a GblObject
+#define GBL_OBJECT_CLASS(klass)     GBL_CLASS_CAST(GblObject, klass) //!< Casts a GblClass to a GblObjectClass
+#define GBL_OBJECT_GET_CLASS(self)  GBL_CLASSOF(GblObject, self)     //!< Gets a GblObjectClass from a GblInstance
 //! @}
 
 /*! \name  Construction Macros
@@ -65,8 +64,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblObject);
 /*! \struct     GblObjectClass
  *  \extends    GblBoxClass
  *  \implements GblITableVariantClass
- *  \implements GblIEventHandlerClass
- *  \implements GblIEventFilterClass
+ *  \implements GblIEventReceiverClass
  *  \brief      GblClass structure for GblObject
  *
  *  GblObjectClass provides the virtual table for all types
@@ -74,7 +72,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblObject);
  *  handlers, as well as accessors for reading and writing properties.
  */
 GBL_CLASS_DERIVE(GblObject, GblBox,
-                 GblITableVariant, GblIEventHandler, GblIEventFilter)
+                 GblITableVariant, GblIEventReceiver)
     //! Virtual method called during construction after CONSTRUCT properties but before extra WRITE properties are set
     GBL_RESULT (*pFnConstructed) (GBL_SELF);
     //! Virtual method called when the object has been fully instantiated with all properties it was createed with (including extra WRITE properties being set).
@@ -88,10 +86,9 @@ GBL_CLASS_END
 /*! \class      GblObject
  *  \extends    GblBox
  *  \implements GblITableVariant
- *  \implements GblIEventHandler
- *  \implements GblIEventFilter
- *  \ingroup    metaBuiltinTypes
- *  \brief      Main Object-Oriented Instance with Properties, EventHandlers, and Parenting
+ *  \implements GblIEventReceiver
+ *  \ingroup    meta
+ *  \brief      Main Object-Oriented Instance with Properties, EventReceivers, and Parenting
  *
  *  A GblObject is the default, full-blown object-oriented instantiable type.
  *  It is analogous to Qt's "QObject" or GNOME's "GObject" root type. It extends
@@ -350,17 +347,17 @@ GBL_EXPORT GblObject* GblObject_findSiblingByIndex   (GBL_CSELF, size_t  index) 
  *  @{
  */
 //! Emits an event upwards through the object hierarchy, notifying the parent of the given object of the event
-GBL_EXPORT GBL_RESULT       GblObject_sendEvent            (GBL_SELF, GblEvent* pEvent)         GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT         GblObject_sendEvent            (GBL_SELF, GblEvent* pEvent)           GBL_NOEXCEPT;
 //! Notifies the given object of an event, which first propagates through its event filters before going through its event handler and propagating up if still unhandled
-GBL_EXPORT GBL_RESULT       GblObject_notifyEvent          (GBL_SELF, GblEvent* pEvent)         GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT         GblObject_notifyEvent          (GBL_SELF, GblEvent* pEvent)           GBL_NOEXCEPT;
 //! Installs the event filter on the given object, allowing it to intercept event notifications
-GBL_EXPORT GBL_RESULT       GblObject_installEventFilter   (GBL_SELF, GblIEventFilter* pFilter) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT         GblObject_installEventFilter   (GBL_SELF, GblIEventReceiver* pFilter) GBL_NOEXCEPT;
 //! Removes the event filter from the given object, so that it no longer intercepts event notifications
-GBL_EXPORT GBL_RESULT       GblObject_uninstallEventFilter (GBL_SELF, GblIEventFilter* pFilter) GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT         GblObject_uninstallEventFilter (GBL_SELF, GblIEventReceiver* pFilter) GBL_NOEXCEPT;
 //! Returns the number of event filters currently installed on the given object
-GBL_EXPORT size_t           GblObject_eventFilterCount     (GBL_CSELF)                          GBL_NOEXCEPT;
+GBL_EXPORT size_t             GblObject_eventFilterCount     (GBL_CSELF)                            GBL_NOEXCEPT;
 //! Returns a pointer to the event filter installed on the given object at the \p index position
-GBL_EXPORT GblIEventFilter* GblObject_eventFilter          (GBL_CSELF, size_t index)            GBL_NOEXCEPT;
+GBL_EXPORT GblIEventReceiver* GblObject_eventFilter          (GBL_CSELF, size_t index)              GBL_NOEXCEPT;
 //! @}
 
 //! \deprecated
