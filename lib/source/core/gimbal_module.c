@@ -331,7 +331,7 @@ static GBL_RESULT GblModule_unload_(GblModule* pModule) {
 
     GBL_CTX_BEGIN(NULL);
 
-    GBL_LOG_WARN("gimbal", "[GblModule: %s] Unload: UNIMPLEMENTED!");
+    GBL_LOG_WARN("gimbal", "[GblModule: %s] Unload: UNIMPLEMENTED!", GblObject_name(GBL_OBJECT(pModule)));
     GBL_CTX_RESULT() = GBL_RESULT_UNIMPLEMENTED;
 
     GBL_CTX_END();
