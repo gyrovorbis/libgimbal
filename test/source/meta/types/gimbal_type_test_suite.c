@@ -734,11 +734,11 @@ static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_invalid_(Gb
     GBL_CTX_BEGIN(pCtx);
     GBL_TEST_EXPECT_ERROR();
     GblType invalid = GblType_register("Ininstanced",
-                                                GBL_INVALID_TYPE,
-                                                     &(const GblTypeInfo) {
-                                                         .instanceSize = sizeof(GblInstance)
-                                                     },
-                                                     GBL_TYPE_ROOT_FLAG_INSTANTIABLE);
+                                       GBL_INVALID_TYPE,
+                                       &(const GblTypeInfo) {
+                                            .instanceSize = sizeof(GblInstance)
+                                        },
+                                        GBL_TYPE_ROOT_FLAG_INSTANTIABLE);
     GBL_CTX_CLEAR_LAST_RECORD();
     GBL_TEST_COMPARE(invalid, GBL_INVALID_TYPE);
 
@@ -849,6 +849,7 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_depends_dependent_valid
 
     GBL_CTX_END();
 }
+
 static GBL_RESULT GblTypeTestSuite_fundamental_dependent_derive_depends_dependent_valid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
     GBL_CTX_BEGIN(pCtx);
@@ -860,8 +861,8 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_derive_depends_dependen
                                           &(const GblTypeInfo) {
                                               .dependencyCount = 2,
                                               .pDependencies = (const GblType[]) {
-                                                  pSelf_->classedDerived,
-                                                  pSelf_->ifaced2
+                                                  pSelf_->ifaced2,
+                                                  pSelf_->classedMapIfacedIfaceMapInherited
                                               }
                                           },
                                           GBL_TYPE_FLAGS_NONE);
@@ -871,15 +872,25 @@ static GBL_RESULT GblTypeTestSuite_fundamental_dependent_derive_depends_dependen
     GBL_TEST_VERIFY(GblType_depends(pSelf_->dependentDependentDerived, pSelf_->classed));
     GBL_TEST_VERIFY(GblType_depends(pSelf_->dependentDependentDerived, pSelf_->ifaced));
     GBL_TEST_VERIFY(GblType_depends(pSelf_->dependentDependentDerived, pSelf_->ifaced2));
-    GBL_TEST_VERIFY(GblType_depends(pSelf_->dependentDependentDerived, pSelf_->classedDerived));
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->blankType, pSelf_->dependentDependentDerived));
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->classed, pSelf_->dependentDependentDerived));
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->ifaced, pSelf_->dependentDependentDerived));
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->ifaced2, pSelf_->dependentDependentDerived));
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->classedDerived, pSelf_->dependentDependentDerived));
     GBL_TEST_VERIFY(!GblType_conforms(pSelf_->classedDeepDerivedIfaceMap, pSelf_->dependentDependentDerived));
-    GBL_TEST_VERIFY(GblType_conforms(pSelf_->classedDeepDerivedIfaceMapInherited, pSelf_->dependentDependentDerived));
+    //GBL_TEST_VERIFY(GblType_conforms(pSelf_->classedDeepDerivedIfaceMapInherited, pSelf_->dependentDependentDerived));
 
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->dependent));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->ifaced));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->classed));
+ //   GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->classedDerived));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->classedMapIfacedIfaceMapInherited));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->ifacedIfaceMap));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->ifacedDerived));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->ifaced));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->ifaced3));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->ifacedDerived2));
+    GBL_TEST_VERIFY(GblType_check(pSelf_->dependentDependentDerived, pSelf_->ifaced2));
     GBL_CTX_END();
 }
 

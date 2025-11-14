@@ -60,44 +60,7 @@ static GblIPlugin* GblType_plugin(GblType type) {
     return type == GBL_INVALID_TYPE? NULL : (GblIPlugin*)GblType_extension_(type, GBL_IPLUGIN_TYPE);
 }
 
-static GblBool GblType_conforms_(GblType type, GblType dependent, GblBool verify) {
-    GblBool conforms = GBL_FALSE;
-    GBL_CTX_BEGIN(pCtx_);
-    if(dependent != GBL_INVALID_TYPE && type != GBL_INVALID_TYPE) {
-        GblBool classConforms   = GBL_TRUE;
-        if(GblType_flags(dependent) & GBL_TYPE_ROOT_FLAG_CLASSED) {
-            classConforms = GblType_check(type, dependent);
-        }
-
-        if(classConforms && (GblType_flags(dependent) & GBL_TYPE_ROOT_FLAG_DEPENDENT)) {
-            for(int a = (int)GblType_depth(dependent); a >= 0; --a) {
-                GblType ancestor = GblType_ancestor(dependent, a);
-                GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
-                for(size_t  p = 0; p < pMeta->pInfo->dependencyCount; ++p) {
-                    if(GblType_check(type, pMeta->pInfo->pDependencies[p]) ||
-                            GblType_conforms_(type, pMeta->pInfo->pDependencies[p], verify))
-                    {
-                        continue;
-                    } else if(verify) {
-                        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_TYPE,
-                                           "Type [%s] failed to conform to type [%s] "
-                                           "due to not satisfying dependency: [%s]",
-                                           GblType_name(type),
-                                           GblType_name(dependent),
-                                           GblType_name(pMeta->pInfo->pDependencies[p]));
-                    } else GBL_CTX_DONE(); //if even one check fails, you're done.
-                }
-            }
-        }
-
-        conforms = classConforms; // oh shit, you made it to the end!
-
-    } else if(dependent == GBL_INVALID_TYPE && type == GBL_INVALID_TYPE) {
-        conforms = GBL_TRUE;
-    }
-    GBL_CTX_END_BLOCK();
-    return conforms;
-}
+static GblBool GblType_conforms_(GblType type, GblType dependent, GblBool verify);
 
 static GBL_RESULT typeLog_(GblType parent,
                         const GblTypeInfo* pInfo,
@@ -869,11 +832,12 @@ GBL_EXPORT GblType GblType_next(GblType prevType) {
 }
 
 GBL_EXPORT GblQuark GblType_nameQuark(GblType type) {
-    GblQuark name         = GBL_QUARK_INVALID;
-    GblMetaClass* pMeta   = GBL_META_CLASS_(type);
-    if(pMeta) {
+    GblQuark name       = GBL_QUARK_INVALID;
+    GblMetaClass* pMeta = GBL_META_CLASS_(type);
+
+    if(pMeta)
         name = pMeta->name;
-    }
+
     return name;
 }
 
@@ -934,7 +898,7 @@ GBL_EXPORT GblType GblType_ancestor(GblType type, size_t level) {
     return ancestor;
 }
 
-GBL_EXPORT size_t  GblType_depth(GblType type) {
+GBL_EXPORT size_t GblType_depth(GblType type) {
     size_t  depth = 0;
     GBL_CTX_BEGIN(pCtx_);
     GblMetaClass* pMeta = GBL_META_CLASS_(type);
@@ -963,16 +927,17 @@ GBL_EXPORT const GblTypeInfo* GblType_info(GblType type) {
     return NULL;
 }
 
-// If this ever needs to be optimized, make it non-recursive
-static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChecks, GblBool ifaceChecks, GblBool castChecks) {
+// WELCOME TO THE TYPE CHECKER SHISTORM!!!!!
+static GblBool GblType_typeIsA_(GblType derived, GblType base,
+                                GblBool classChecks, GblBool ifaceChecks, GblBool depsChecks) {
     GblBool       result   = GBL_FALSE;
     GblMetaClass* pDerived = GBL_META_CLASS_(derived);
     GblMetaClass* pBase    = GBL_META_CLASS_(base);
     GblMetaClass* pIter    = pDerived;
 
-    if(derived == GBL_INVALID_TYPE && base == GBL_INVALID_TYPE) {
+    if GBL_UNLIKELY(derived == GBL_INVALID_TYPE && base == GBL_INVALID_TYPE)
         result = GBL_TRUE;
-    } else if(derived != GBL_INVALID_TYPE && base != GBL_INVALID_TYPE) {
+    else if GBL_LIKELY(derived != GBL_INVALID_TYPE && base != GBL_INVALID_TYPE) {
         GBL_ASSERT(GblType_verify(derived));
         GBL_ASSERT(GblType_verify(base));
 
@@ -980,28 +945,87 @@ static GblBool GblType_typeIsA_(GblType derived, GblType base, GblBool classChec
         if(!GBL_TYPE_INTERFACED_CHECK(base) || (pBase->flags & GBL_TYPE_FLAG_UNMAPPABLE))
             ifaceChecks = GBL_FALSE;
 
+        // Traverse inherited ancestors in derived-to-base order.
         while(pIter) {
-            if(pIter == pBase) {    // check if current class level is base
-                result = classChecks? GBL_TRUE : GBL_FALSE;
+            // Check if the current class is what we're looking for.
+            if(pIter == pBase) {
+                result = classChecks;
                 break;
-            } else if(ifaceChecks) {
+            // Conditionally check interfaces
+            } else if (ifaceChecks) {
                 // recurse over interfaces checking
                 for(size_t i = 0; i < pIter->pInfo->interfaceCount; ++i) {
                     if(GblType_typeIsA_(pIter->pInfo->pInterfaceImpls[i].interfaceType,
                                         base,
                                         GBL_TRUE,
-                                        ifaceChecks,
-                                        castChecks)) {
+                                        GBL_TRUE,
+                                        depsChecks)) {
                         result = GBL_TRUE;
                         goto done;
                     }
                 }
             }
+
+            if(depsChecks) {
+                // recurse over type dependencies checking
+                for(size_t d = 0; d < pIter->pInfo->dependencyCount; ++d) {
+                    if(GblType_typeIsA_(pIter->pInfo->pDependencies[d],
+                                        base,
+                                        GBL_TRUE,
+                                        ifaceChecks,
+                                        GBL_TRUE)) {
+                        result = GBL_TRUE;
+                        goto done;
+                    }
+                }
+            }
+
             pIter = pIter->pParent;
         }
     }
     done:
     return result;
+}
+
+
+
+static GblBool GblType_conforms_(GblType type, GblType dependent, GblBool verify) {
+    GblBool conforms = GBL_FALSE;
+    GBL_CTX_BEGIN(pCtx_);
+    if(dependent != GBL_INVALID_TYPE && type != GBL_INVALID_TYPE) {
+        GblBool classConforms   = GBL_TRUE;
+        if(GblType_flags(dependent) & GBL_TYPE_ROOT_FLAG_CLASSED) {
+            classConforms = GblType_typeIsA_(type, dependent, GBL_TRUE, GBL_TRUE, GBL_TRUE);
+        }
+
+        if(classConforms && (GblType_flags(dependent) & GBL_TYPE_ROOT_FLAG_DEPENDENT)) {
+            for(int a = (int)GblType_depth(dependent); a >= 0; --a) {
+                GblType ancestor = GblType_ancestor(dependent, a);
+                GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
+                for(size_t  p = 0; p < pMeta->pInfo->dependencyCount; ++p) {
+                    if(GblType_typeIsA_(type, pMeta->pInfo->pDependencies[p], GBL_TRUE, GBL_TRUE, GBL_TRUE) ||
+                       GblType_conforms_(type, pMeta->pInfo->pDependencies[p], verify))
+                    {
+                        continue;
+                    } else if(verify) {
+                        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_TYPE,
+                                           "Type [%s] failed to conform to type [%s] "
+                                           "due to not satisfying dependency: [%s]",
+                                           GblType_name(type),
+                                           GblType_name(dependent),
+                                           GblType_name(pMeta->pInfo->pDependencies[p]));
+                    } else GBL_CTX_DONE(); //if even one check fails, you're done.
+                }
+            }
+        }
+
+        conforms = classConforms; // oh shit, you made it to the end!
+
+    } else if(dependent == GBL_INVALID_TYPE && type == GBL_INVALID_TYPE) {
+        conforms = GBL_TRUE;
+    }
+    GBL_CTX_END_BLOCK();
+    return conforms;
 }
 
 GBL_EXPORT GblBool GblType_verify(GblType type) {
@@ -1017,12 +1041,7 @@ GBL_EXPORT GblBool GblType_verify(GblType type) {
 }
 
 GBL_EXPORT GblBool GblType_check(GblType type, GblType other) {
-    if(GblType_typeIsA_(type, other, GBL_TRUE, GBL_TRUE, GBL_TRUE))
-        return GBL_TRUE;
-    else if(GblType_depends(type, other))
-        return GBL_TRUE;
-    else
-        return GBL_FALSE;
+    return GblType_typeIsA_(type, other, GBL_TRUE, GBL_TRUE, GBL_TRUE);
 }
 
 // subtyping is inclusive
@@ -1071,11 +1090,14 @@ GBL_EXPORT GblType GblType_common(GblType type, GblType other) {
 GBL_EXPORT GblBool GblType_depends(GblType dependent, GblType dependency) {
     GblBool result = GBL_FALSE;
     GBL_CTX_BEGIN(pCtx_);
+
     if(dependent != GBL_INVALID_TYPE && dependency != GBL_INVALID_TYPE) {
         if(GblType_flags(dependent) & GBL_TYPE_ROOT_FLAG_DEPENDENT) {
+
             for(int a = (int)GblType_depth(dependent); a >= 0; --a) {
-                GblType ancestor = GblType_ancestor(dependent, a);
-                GblMetaClass* pMeta = GBL_META_CLASS_(ancestor);
+                GblType       ancestor = GblType_ancestor(dependent, a);
+                GblMetaClass* pMeta    = GBL_META_CLASS_(ancestor);
+
                 for(size_t  p = 0; p < pMeta->pInfo->dependencyCount; ++p) {
                     if(pMeta->pInfo->pDependencies[p] == dependency ||
                             GblType_depends(pMeta->pInfo->pDependencies[p], dependency))
