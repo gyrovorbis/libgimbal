@@ -105,4 +105,7 @@ extern "C" {
 }
 #endif
 
+#define GBL_SCOPE(begin, end) for (int i = ((begin), 0); i < 1; ++i, (end))
+#define GBL_SCOPE_EXIT continue
+
 #endif // GIMBAL_MACRO_UTILS_H

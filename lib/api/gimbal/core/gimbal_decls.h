@@ -64,6 +64,19 @@ extern "C" {
     GBL_CLASS_DERIVE(__VA_ARGS__)   \
     GBL_CLASS_END
 
+#define GBL_STATIC_CLASS_DERIVE_N(klass, ...) \
+    GBL_CLASS_DERIVE_N(klass, GblStatic, __VA_ARGS__)
+
+#define GBL_STATIC_CLASS_DERIVE_1(klass) \
+    GBL_CLASS_DERIVE_2(klass, GblStatic)
+
+#define GBL_STATIC_CLASS_DERIVE(...)   \
+    GBL_VA_OVERLOAD_CALL(GBL_STATIC_CLASS_DERIVE, GBL_VA_OVERLOAD_SUFFIXER_1_N, __VA_ARGS__)
+
+#define GBL_STATIC_CLASS_DERIVE_EMPTY(...) \
+    GBL_STATIC_CLASS_DERIVE(__VA_ARGS__)   \
+    GBL_CLASS_END
+
 #define GBL_INTERFACE_DERIVE_N(instance, klass, baseClass, ...) \
     GBL_INTERFACE_DERIVE_3(instance, klass, baseClass)          \
     GBL_MAP(GBL_CLASS_IMPL_INTERFACE, __VA_ARGS__)
