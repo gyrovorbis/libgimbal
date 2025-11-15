@@ -70,7 +70,7 @@ GBL_DECLS_BEGIN
  *  class structures within the meta type system. This means placing
  *  it or a type "inheriting" from it as the first member of a
  *  class struct, when using C.
-
+ *
  *  \sa GblInstance, GblType
  */
 typedef struct GblClass {
@@ -79,8 +79,19 @@ typedef struct GblClass {
     GBL_PRIVATE_END
 } GblClass;
 
+/*! Base GblClass VTable structure for static classes.
+ *  \ingroup meta
+ *
+ *  This is the base class structure which is to be extended to
+ *  create static class subtypes.
+ *
+ *  A "static class" is simply a GblType which only has a Gblclass
+ *  structure, with no associated GblInstance structure, so it
+ *  cannot be instantiated. it's typically ussed to implement
+ *  singleton-style data types.
+ */
 typedef struct GblStaticClass {
-    GblClass base;
+    GblClass base;    //!< "Inherited" GblClass base structure.
 } GblStaticClass;
 
 /*! \name  Default Class Management
