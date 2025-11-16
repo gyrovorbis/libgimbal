@@ -126,11 +126,6 @@ language, and any langauge which can provide glue code to a C API.
  *  \ingroup meta
 */ 
 
-/*! \defgroup signals Signals
-	\brief Signal emission mechanism and its related components
- *  \ingroup meta
-*/ 
-
 /*! \defgroup interfaces Interfaces
 	\brief Built-in abstract interface types
  *  \ingroup meta
