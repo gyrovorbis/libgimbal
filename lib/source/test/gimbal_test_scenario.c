@@ -86,7 +86,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
     GBL_CTX_BEGIN(pSelf);
 
     GblContext*           pCtx   = GblObject_findContext(GBL_OBJECT(pSelf));
-    GblTestScenarioClass* pClass = GBL_TEST_SCENARIO_GET_CLASS(pSelf);
+    GblTestScenarioClass* pClass = GBL_TEST_SCENARIO_CLASSOF(pSelf);
     GblTestScenario_*     pSelf_ = GBL_TEST_SCENARIO_(pSelf);
 
     pSelf->result = GBL_RESULT_SUCCESS;
