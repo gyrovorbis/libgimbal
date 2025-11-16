@@ -342,7 +342,7 @@ static GblBool GblScanner_readBytes_(GblScanner*    pSelf,
     pSelf->status &= ~GBL_SCANNER_ERROR;
 
     if(count <= pSelf_->streamBuffer.length) {
-        *pView = GblStringView_removePrefix(pSelf_->streamBuffer, count);
+        *pView = GblStringView_substr(pSelf_->streamBuffer, 0, count);
 
         if(advanceStream)
             return GblScanner_advance_(pSelf, count);

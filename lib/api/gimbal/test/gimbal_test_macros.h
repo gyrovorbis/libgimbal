@@ -54,14 +54,20 @@ GBL_INLINE const char* GBL_TEST_COMPARE_FMT_PTR_  (void) { return "Values differ
 #   define GBL_TEST_COMPARE_FMT_(value)            GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_FMT_TABLE_, value)()
 #else
 
-inline const char* GBL_TEST_COMPARE_FMT_(char value)      { return GBL_TEST_COMPARE_FMT_CHAR_();  }
-inline const char* GBL_TEST_COMPARE_FMT_(int32_t value)   { return GBL_TEST_COMPARE_FMT_INT_();   }
-inline const char* GBL_TEST_COMPARE_FMT_(int64_t value)   { return GBL_TEST_COMPARE_FMT_LINT_();  }
-inline const char* GBL_TEST_COMPARE_FMT_(uint32_t value)  { return GBL_TEST_COMPARE_FMT_UINT_();  }
-inline const char* GBL_TEST_COMPARE_FMT_(uint64_t value)  { return GBL_TEST_COMPARE_FMT_LUINT_(); }
-inline const char* GBL_TEST_COMPARE_FMT_(const char* str) { return GBL_TEST_COMPARE_FMT_STR_();   }
-inline const char* GBL_TEST_COMPARE_FMT_(double value)    { return GBL_TEST_COMPARE_FMT_FLT_();   }
-inline const char* GBL_TEST_COMPARE_FMT_(auto* ptr)       { return GBL_TEST_COMPARE_FMT_PTR_();   }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(char)               { return "Values differed [actual: %c, expected: %c]";     }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(short)              { return "Values differed [actual: %d, expected: %d]";     }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(unsigned short)     { return "Values differed [actual: %u, expected: %u]";     }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(int)                { return "Values differed [actual: %d, expected: %d]";     }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(unsigned)           { return "Values differed [actual: %u, expected: %u]";     }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(long)               { return "Values differed [actual: %ld, expected: %ld]";   }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(unsigned long)      { return "Values differed [actual: %lu, expected: %lu]";   }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(long long)          { return "Values differed [actual: %lld, expected: %lld]"; }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(unsigned long long) { return "Values differed [actual: %llu, expected: %llu]"; }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(const char*)        { return "Values differed [actual: %s, expected: %s]";     }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(float)              { return "Values differed [actual: %f, expected: %f]";     }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(double)             { return "Values differed [actual: %f, expected: %f]";     }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(auto*)              { return "Values differed [actual: %p, expected: %p]";     }
+inline constexpr const char* GBL_TEST_COMPARE_FMT_(auto)               { return "Values differed";                                }
 
 #endif
 
@@ -121,7 +127,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
 #   define GBL_TEST_COMPARE_CMP_(actual, expected) GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_CMP_TABLE_, actual)(actual, expected)
 
 #else
-inline GblBool GBL_TEST_COMPARE_CMP_(auto actual, auto expected) { return actual == expected; }
+inline GblBool GBL_TEST_COMPARE_CMP_(auto actual, auto expected) { return static_cast<decltype(expected)>(actual) == expected; }
 inline GblBool GBL_TEST_COMPARE_CMP_(const char* pActual, const char *pExpected) { return GBL_TEST_COMPARE_CMP_STR_(pActual, pExpected); }
 
 #endif

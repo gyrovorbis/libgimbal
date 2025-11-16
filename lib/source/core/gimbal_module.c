@@ -487,7 +487,7 @@ GBL_EXPORT GblType GblModule_type(void) {
         .instanceSize         = sizeof(GblModule),
         .instancePrivateSize  = sizeof(GblModule_),
         .interfaceCount       = 1,
-        .pInterfaceImpls        = &iface
+        .pInterfaceImpls      = &iface
     };
 
     if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {

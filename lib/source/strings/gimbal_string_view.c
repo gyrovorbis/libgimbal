@@ -272,7 +272,7 @@ GBL_EXPORT char GblStringView_last(GblStringView self) {
     return value;
 }
 
-GBL_EXPORT GblStringView GblStringView_removePrefix(GblStringView self, size_t  length) {
+GBL_EXPORT GblStringView GblStringView_removePrefix(GblStringView self, size_t length) {
     GblStringView view = {
         .pData          = GBL_NULL,
         .nullTerminated = 0,

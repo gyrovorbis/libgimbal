@@ -375,7 +375,7 @@ GBL_TEST_CASE(peekBytes)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(scanBytes)
-    GBL_TEST_VERIFY(GblScanner_scanBytes(pFixture->pScanner, 28));
+    GBL_TEST_VERIFY(GblScanner_scanBytes(pFixture->pScanner, 38));
     GBL_TEST_VERIFY(GblStringView_equals(pFixture->pScanner->token, "123456789\nabcdefghijklmnop\nqrstuvyxyz\n"));
     GBL_TEST_COMPARE(pFixture->pScanner->status, GBL_SCANNER_EOF);
 GBL_TEST_CASE_END
@@ -796,6 +796,8 @@ GBL_TEST_REGISTER(createEmpty,
                   scanLines,
                   peekBytesInvalid,
                   scanBytesInvalid,
+                  peekBytes,
+                  scanBytes,
                   scanMatchMultiContiguous,
                   peekBoolInvalid,
                   peekBool,
