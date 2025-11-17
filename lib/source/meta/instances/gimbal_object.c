@@ -7,6 +7,7 @@
 #include <gimbal/containers/gimbal_linked_list.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/containers/gimbal_nary_tree.h>
+#include <gimbal/containers/gimbal_ring_list.h>
 #include <gimbal/meta/signals/gimbal_marshal.h>
 #include "../types/gimbal_type_.h"
 
@@ -1677,6 +1678,15 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
         GblObject* pParent = NULL;
         GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pParent));
         GblObject_setParent(pSelf, pParent);
+        break;
+    }
+    case GblObject_Property_Id_children: {
+        // GblRingList* pChildren = NULL;
+        // GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pChildren));
+        // for (size_t i = 0; i < GblRingList_size(pChildren); i++) {
+        //     GblObject* pChild = GBL_OBJECT(GblRingList_at(pChildren, i));
+        //     GblObject_setParent(pChild, pSelf);
+        // }
         break;
     }
     case GblObject_Property_Id_userdata: {

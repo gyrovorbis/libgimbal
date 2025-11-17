@@ -50,12 +50,13 @@
 #define GblSize_type()      GBL_SIZE_TYPE
 
 /*! \struct GblPrimitiveClass
+ *  \extends GblStaticClass
  *  \implements GblIVariantClass
  *  \brief Static GblClass structure for any primitive tyes
  *
  *  No public members.
  */
-GBL_CLASS_BASE_EMPTY(GblPrimitive, GblIVariant)
+GBL_CLASS_BASE_EMPTY(GblPrimitive, GblStatic, GblIVariant)
 
 typedef uint64_t GblBitmask;
 

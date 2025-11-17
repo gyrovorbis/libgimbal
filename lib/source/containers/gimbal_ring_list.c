@@ -506,3 +506,109 @@ GBL_EXPORT size_t  GblRingList_find(const GblRingList* pSelf,
     }
     return GBL_RING_LIST_NPOS;
 }
+
+static GBL_RESULT GblRingList_Opaque_copy_(void* pOpaque, void** ppNewOpaque) {
+    *ppNewOpaque = (void*)GblRingList_ref((GblRingList*)pOpaque);
+    return GBL_RESULT_SUCCESS;
+}
+
+static GBL_RESULT GblRingList_Opaque_free_(void* pOpaque) {
+    GblRingList_unref(pOpaque);
+    return GBL_RESULT_SUCCESS;
+}
+
+static GBL_RESULT GblRingList_ITableVariant_index_(const GblVariant* pSelf,
+                                                   const GblVariant* pKey,
+                                                   GblVariant* pValue)
+{
+    intptr_t          index       = GblVariant_toInt32(pKey);
+    GblRingList*      pRingList   = (GblRingList*)GblVariant_pointer(pSelf);
+    GblRingListClass* pClass      = GBL_RING_LIST_CLASS(GblVariant_classOf(pSelf));
+
+    void *pResult = GblRingList_at(pRingList, index);
+    if (!pResult) return GBL_RESULT_ERROR_INVALID_ARG;
+
+    return GblVariant_setValueCopy(pValue, pClass->innerType, pResult);
+}
+
+static GBL_RESULT GblRingList_ITableVariant_setIndex_(const GblVariant* pSelf,
+                                                      const GblVariant* pKey,
+                                                      GblVariant* pValue)
+{
+    intptr_t          index       = GblVariant_toInt32(pKey);
+    GblRingList*      pRingList   = (GblRingList*)GblVariant_pointer(pSelf);
+    void*             pCopied     = NULL;
+    if (!GblVariant_valueCopy(pValue, &pCopied)) return GBL_RESULT_ERROR_INVALID_ARG;
+
+    if (!GblRingList_at(pRingList, index)) {
+        return GblRingList_insert(pRingList, index, pCopied);
+    }
+
+    GblRingList_replace(pRingList, index, pCopied);
+    return GBL_RESULT_SUCCESS;
+}
+
+static GBL_RESULT GblRingList_ITableVariant_next_(const GblVariant* pSelf,
+                                                  GblVariant* pKey,
+                                                  GblVariant* pValue)
+{
+    GblRingList*      pRingList   = (GblRingList*)GblVariant_pointer(pSelf);
+    GblRingList*      pNext       = pRingList->ringNode.pNext;
+    GblRingListClass* pClass      = GBL_RING_LIST_CLASS(GblVariant_classOf(pSelf));
+
+    if (!pNext) {
+        return GBL_RESULT_ERROR_OUT_OF_RANGE;
+    }
+
+    GblVariant_setValueCopy(pValue, pClass->innerType, pNext->pData);
+    return GBL_RESULT_SUCCESS;
+}
+
+static GBL_RESULT GblRingList_ITableVariant_count_(const GblVariant* pSelf,
+                                                   size_t* pSize)
+{
+    GblRingList* pRingList = (GblRingList*)GblVariant_pointer(pSelf);
+    *pSize = GblRingList_size(pRingList);
+    return GBL_RESULT_SUCCESS;
+}
+
+static GBL_RESULT GblRingListClass_init_(GblClass* pClass, const void* pUd) {
+    GBL_RING_LIST_CLASS(pClass)->innerType = pUd? GBL_POINTER_TYPE : (GblType)pUd;
+
+    const static GblOpaqueVTable vtbl = {
+        GblRingList_Opaque_copy_,
+        GblRingList_Opaque_free_
+    };
+
+    GBL_OPAQUE_CLASS(pClass)->pVTable = &vtbl;
+
+    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnIndex    = GblRingList_ITableVariant_index_;
+    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnSetIndex = GblRingList_ITableVariant_setIndex_;
+    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnNext     = GblRingList_ITableVariant_next_;
+    GBL_ITABLE_VARIANT_CLASS(pClass)->pFnCount    = GblRingList_ITableVariant_count_;
+
+    return GBL_RESULT_SUCCESS;
+}
+
+GblType GblRingList_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+    static GblInterfaceImpl ifaceEntries[] = {
+        {
+            .interfaceType = GBL_INVALID_TYPE,
+            .classOffset   = offsetof(GblRingListClass, GblITableVariantImpl)
+        }
+    };
+
+    if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
+        ifaceEntries[0].interfaceType = GBL_ITABLE_VARIANT_TYPE;
+        type = GblType_register(GblQuark_internStatic("GblRingList"),
+                                GBL_OPAQUE_TYPE,
+                                &(GblTypeInfo){ .classSize        = sizeof(GblRingListClass),
+                                                .pFnClassInit     = GblRingListClass_init_,
+                                                .interfaceCount   = 1,
+                                                .pInterfaceImpls  = ifaceEntries},
+                                GBL_TYPE_FLAG_TYPEINFO_STATIC);
+    }
+
+    return type;
+}

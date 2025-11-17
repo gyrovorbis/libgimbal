@@ -30,6 +30,7 @@
 #include "../ifaces/gimbal_itable_variant.h"
 #include "../ifaces/gimbal_ievent_receiver.h"
 #include "../properties/gimbal_property.h"
+#include "../../containers/gimbal_ring_list.h"
 
 /*! \name  Type System
  *  \brief Type UUID and Cast operators
@@ -76,7 +77,7 @@ GBL_CLASS_DERIVE(GblObject, GblBox,
                  GblITableVariant, GblIEventReceiver)
     //! Virtual method called during construction after CONSTRUCT properties but before extra WRITE properties are set
     GBL_RESULT (*pFnConstructed) (GBL_SELF);
-    //! Virtual method called when the object has been fully instantiated with all properties it was createed with (including extra WRITE properties being set).
+    //! Virtual method called when the object has been fully instantiated with all properties it was created with (including extra WRITE properties being set).
     GBL_RESULT (*pFnInstantiated)(GBL_SELF);
     //! Virtual method for reading properties
     GBL_RESULT (*pFnProperty)    (GBL_CSELF, const GblProperty* pProp, GblVariant* pValue);
@@ -114,6 +115,7 @@ GBL_INSTANCE_DERIVE_EMPTY(GblObject, GblBox)
 GBL_PROPERTIES(GblObject,
     (name,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
     (parent,   GBL_GENERIC, (READ, WRITE),             GBL_OBJECT_TYPE),
+    (children, GBL_GENERIC, (READ, WRITE),             GBL_RING_LIST_TYPE),
     (userdata, GBL_GENERIC, (READ, WRITE),             GBL_POINTER_TYPE),
     (refCount, GBL_GENERIC, (READ),                    GBL_UINT16_TYPE)
 //  (class,    GBL_GENERIC, (READ, WRITE, CONSTRUCT),  GBL_POINTER_TYPE)

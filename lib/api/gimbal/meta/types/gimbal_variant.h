@@ -315,6 +315,8 @@ GBL_EXPORT GBL_RESULT GblVariant_setObjectMove   (GBL_SELF, GblObject* pValue)  
 
 //! Retrieves the name of the type of value contained by the given variant
 GBL_EXPORT GblType     GblVariant_typeOf   (GBL_CSELF) GBL_NOEXCEPT;
+//! Attempts to fetch the class associated with the type stored within the variant
+GBL_EXPORT GblClass*   GblVariant_classOf  (GBL_CSELF) GBL_NOEXCEPT;
 //! Retrives the GblType UUID of the value contained by the given variant
 GBL_EXPORT const char* GblVariant_typeName (GBL_CSELF) GBL_NOEXCEPT;
 
