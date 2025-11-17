@@ -46,17 +46,17 @@
 #define GBL_LOG_PUSH()                      GblLogger_push()                                           //!< Pushes level to log stack
 #define GBL_LOG_POP(n)                      GblLogger_pop(n)                                           //!< Pops N levels from log stack
 
-#define GBL_LOG_DEBUG_PUSH(domain, ...)     GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_DEBUG, __VA_ARGS__)     //!< Pushes level to log stack, then writes to log with GBL_LOG_DEBUG
-#define GBL_LOG_VERBOSE_PUSH(domain, ...)   GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_VERBOSE, __VA_ARGS__)   //!< Pushes level to log stack, then writes to log with GBL_LOG_VERBOSE
-#define GBL_LOG_INFO_PUSH(domain, ...)      GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_INFO, __VA_ARGS__)      //!< Pushes level to log stack, then writes to log with GBL_LOG_INFO
-#define GBL_LOG_WARN_PUSH(domain, ...)      GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_WARN, __VA_ARGS__)      //!< Pushes level to log stack, then writes to log with GBL_LOG_WARN
-#define GBL_LOG_ERROR_PUSH(domain, ...)     GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_ERROR, __VA_ARGS__)     //!< Pushes level to log stack, then writes to log with GBL_LOG_ERROR
+#define GBL_LOG_DEBUG_PUSH(domain, ...)     GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_DEBUG, __VA_ARGS__)     //!< Writes to log with GBL_LOG_DEBUG,   then pushes level to log stack
+#define GBL_LOG_VERBOSE_PUSH(domain, ...)   GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_VERBOSE, __VA_ARGS__)   //!< Writes to log with GBL_LOG_VERBOSE, then pushes level to log stack
+#define GBL_LOG_INFO_PUSH(domain, ...)      GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_INFO, __VA_ARGS__)      //!< Writes to log with GBL_LOG_INFO,    then pushes level to log stack
+#define GBL_LOG_WARN_PUSH(domain, ...)      GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_WARN, __VA_ARGS__)      //!< Writes to log with GBL_LOG_WARN,    then pushes level to log stack
+#define GBL_LOG_ERROR_PUSH(domain, ...)     GBL_LOG_MAKE_PUSH_(domain, GBL_LOG_ERROR, __VA_ARGS__)     //!< Writes to log with GBL_LOG_ERROR,   then pushes level to log stack
 
-#define GBL_LOG_DEBUG_SCOPE(domain, ...)    GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_DEBUG, __VA_ARGS__)    //!< Writes to log with GBL_LOG_DEBUG, then pushes level to log stack. Pops level when scope ends
+#define GBL_LOG_DEBUG_SCOPE(domain, ...)    GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_DEBUG, __VA_ARGS__)    //!< Writes to log with GBL_LOG_DEBUG,   then pushes level to log stack. Pops level when scope ends
 #define GBL_LOG_VERBOSE_SCOPE(domain, ...)  GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_VERBOSE, __VA_ARGS__)  //!< Writes to log with GBL_LOG_VERBOSE, then pushes level to log stack. Pops level when scope ends
-#define GBL_LOG_INFO_SCOPE(domain, ...)     GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_INFO, __VA_ARGS__)     //!< Writes to log with GBL_LOG_INFO, then pushes level to log stack. Pops level when scope ends
-#define GBL_LOG_WARN_SCOPE(domain, ...)     GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_WARN, __VA_ARGS__)     //!< Writes to log with GBL_LOG_WARN, then pushes level to log stack. Pops level when scope ends
-#define GBL_LOG_ERROR_SCOPE(domain, ...)    GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_ERROR, __VA_ARGS__)    //!< Writes to log with GBL_LOG_ERROR, then pushes level to log stack. Pops level when scope ends
+#define GBL_LOG_INFO_SCOPE(domain, ...)     GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_INFO, __VA_ARGS__)     //!< Writes to log with GBL_LOG_INFO,    then pushes level to log stack. Pops level when scope ends
+#define GBL_LOG_WARN_SCOPE(domain, ...)     GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_WARN, __VA_ARGS__)     //!< Writes to log with GBL_LOG_WARN,    then pushes level to log stack. Pops level when scope ends
+#define GBL_LOG_ERROR_SCOPE(domain, ...)    GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_ERROR, __VA_ARGS__)    //!< Writes to log with GBL_LOG_ERROR,   then pushes level to log stack. Pops level when scope ends
 
 //! @}
 
@@ -209,8 +209,8 @@ GBL_DECLS_END
 // Helper macro for GBL_LOG_XXX_PUSH
 #define GBL_LOG_MAKE_PUSH_(domain, level_macro, ...)    \
     GBL_STMT_START {                                    \
-        GBL_LOG_PUSH();                                 \
         level_macro(domain, __VA_ARGS__);               \
+        GBL_LOG_PUSH();                                 \
     } GBL_STMT_END
 
 // Helper macro for GBL_LOG_XXX_SCOPE
