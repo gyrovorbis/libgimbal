@@ -1657,17 +1657,16 @@ static GBL_RESULT GblObject_property_(const GblObject* pSelf, const GblProperty*
         break;
     case GblObject_Property_Id_children: {
         GblObject*   pChild    = GblObject_childFirst(pSelf);
-        GblRingList* pChildren = GblRingList_create(pChild);
+        GblRingList* pChildren = GblRingList_createEmpty();
 
         while (pChild) {
             GblRingList_pushBack(pChildren, pChild);
-            pChild = GblObject_siblingNext(pSelf);
+            pChild = GblObject_siblingNext(pChild);
         }
 
         GblVariant_setValueMove(pValue,
                                 pProp->valueType,
                                 pChildren);
-
         break;
     }
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
@@ -1699,8 +1698,9 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
         GblRingList* pChildren = NULL;
         GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pChildren));
 
-        GblRingList_for(pChildren, pObject, GblObject*)
+        GblRingList_foreach(pChildren, pObject, GblObject*)
             GblObject_setParent(pObject, pSelf);
+
         break;
     }
     case GblObject_Property_Id_userdata: {

@@ -479,7 +479,7 @@ GBL_EXPORT void GblRingList_reverse(GblRingList* pSelf) {
     GblDoublyLinkedList_reverse(&pSelf->listNode);
 }
 
-GBL_EXPORT GblBool (GblRingList_foreach)(GblRingList* pSelf, GblRingListIterFn pFnIt, void* pCl) {
+GBL_EXPORT GblBool (GblRingList_iterate)(GblRingList* pSelf, GblRingListIterFn pFnIt, void* pCl) {
     for(GblRingList* pIt = pSelf->ringNode.pNext;
         pIt != pSelf;
         pIt = pIt->ringNode.pNext)
@@ -599,14 +599,18 @@ GblType GblRingList_type(void) {
         }
     };
 
+    static GblTypeInfo typeInfo = {
+        .classSize = sizeof(GblRingListClass),
+        .pFnClassInit     = GblRingListClass_init_,
+        .interfaceCount   = 1,
+        .pInterfaceImpls  = ifaceEntries
+    };
+
     if GBL_UNLIKELY(type == GBL_INVALID_TYPE) {
         ifaceEntries[0].interfaceType = GBL_ITABLE_VARIANT_TYPE;
         type = GblType_register(GblQuark_internStatic("GblRingList"),
                                 GBL_OPAQUE_TYPE,
-                                &(static GblTypeInfo){ .classSize = sizeof(GblRingListClass),
-                                                .pFnClassInit     = GblRingListClass_init_,
-                                                .interfaceCount   = 1,
-                                                .pInterfaceImpls  = ifaceEntries},
+                                &typeInfo,
                                 GBL_TYPE_FLAG_TYPEINFO_STATIC);
     }
 

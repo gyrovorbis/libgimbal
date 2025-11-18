@@ -1,4 +1,5 @@
 #include "meta/instances/gimbal_object_test_suite.h"
+#include <gimbal/containers/gimbal_ring_list.h>
 #include <gimbal/meta/instances/gimbal_object.h>
 #include <gimbal/meta/instances/gimbal_event.h>
 #include <gimbal/meta/types/gimbal_variant.h>
@@ -747,7 +748,7 @@ GBL_TEST_CASE(variantITableCount)
     GblVariant v;
 
     GBL_TEST_CALL(GblVariant_constructValueMove(&v, GBL_OBJECT_TYPE, GBL_NEW(GblObject)));
-    GBL_TEST_COMPARE(GblVariant_count(&v), 4);
+    GBL_TEST_COMPARE(GblVariant_count(&v), 5);
     GBL_TEST_CALL(GblVariant_destruct(&v));
 
 GBL_TEST_CASE_END
@@ -818,7 +819,6 @@ GBL_TEST_CASE(variantITableNext)
                                                         "userdata", (void*)0xdeadbeef,
                                                         "floater",  -77.7,
                                                         "stringer", "Charmander")));
-
     size_t i = 0;
     while(GblVariant_next(&t, &k, &v)) {
         switch(i) {
@@ -831,22 +831,25 @@ GBL_TEST_CASE(variantITableNext)
             GBL_TEST_COMPARE(GblVariant_objectPeek(&v), NULL);
             break;
         case 2:
+            GBL_TEST_COMPARE(GblVariant_string(&k), "children");
+            break;
+        case 3:
             GBL_TEST_COMPARE(GblVariant_string(&k), "userdata");
             GBL_TEST_COMPARE(GblVariant_pointer(&v), (void*)0xdeadbeef);
             break;
-        case 3:
+        case 4:
             GBL_TEST_COMPARE(GblVariant_string(&k), "refCount");
             GBL_TEST_COMPARE(GblVariant_uint16(&v), 1);
             break;
-        case 4:
+        case 5:
             GBL_TEST_COMPARE(GblVariant_string(&k), "floater");
             GBL_TEST_COMPARE(GblVariant_float(&v), -77.7f);
             break;
-        case 5:
+        case 6:
             GBL_TEST_COMPARE(GblVariant_string(&k), "stringer");
             GBL_TEST_COMPARE(GblVariant_string(&v), "Charmander");
             break;
-        case 6:
+        case 7:
             GBL_TEST_COMPARE(GblVariant_string(&k), "staticInt32");
             GBL_TEST_COMPARE(GblVariant_int32(&v), 77);
             break;
@@ -1054,6 +1057,36 @@ GBL_TEST_CASE(childIndex)
     GBL_UNREF(pParent);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(childrenProp)
+    GblObject* pChild1 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pChild2 = GblObject_create(GBL_OBJECT_TYPE, NULL);
+    GblObject* pChild3 = GblObject_create(TEST_OBJECT_TYPE, NULL);
+    GblObject* pChild4 = GblObject_create(GBL_OBJECT_TYPE, NULL);
+    GblObject* pParent = GblObject_create(GBL_OBJECT_TYPE,
+                                    "children", GblRingList_createEmpty(),
+                                    NULL);
+
+    GblRingList *pChildren = NULL;
+    GblObject_property(pParent, "children", &pChildren);
+
+    GBL_TEST_COMPARE(GblRingList_size(pChildren), 4);
+    GBL_TEST_COMPARE(GblRingList_at(pChildren, 0), pChild1);
+    GBL_TEST_COMPARE(GblRingList_at(pChildren, 1), pChild2);
+    GBL_TEST_COMPARE(GblRingList_at(pChildren, 2), pChild3);
+    GBL_TEST_COMPARE(GblRingList_at(pChildren, 3), pChild4);
+
+    GblRingList_unref(pChildren);
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(childrenPropVariant)
+        //
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(newDefault,
                   name,
                   ref,
@@ -1086,7 +1119,9 @@ GBL_TEST_REGISTER(newDefault,
                   siblingPrevious,
                   siblingPreviousByType,
                   siblingPreviousByName,
-                  childIndex
+                  childIndex,
+                  childrenProp,
+                  childrenPropVariant
                 )
 
 static GBL_RESULT TestObject_IEventReceiver_receiveEvent(GblIEventReceiver* pSelf, GblIEventReceiver* pDest, GblEvent* pEvent) {
