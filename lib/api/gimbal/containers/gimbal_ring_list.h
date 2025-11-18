@@ -230,7 +230,7 @@ GBL_EXPORT void    GblRingList_sort    (GBL_SELF,
                                         void*            pCl/*=NULL*/)  GBL_NOEXCEPT;
 //! Rotates the positions of all entries within the given GblRingList, such that they ahve been offset by \p n, where positives rotate right and negatives rotate left.
 GBL_EXPORT void    GblRingList_rotate  (GBL_SELF, intptr_t n)           GBL_NOEXCEPT;
-//1 Reverses the order of the entire GblRingList, such that the tail becomes the head entry, and all values are now in opposite order.
+//! Reverses the order of the entire GblRingList, such that the tail becomes the head entry, and all values are now in opposite order.
 GBL_EXPORT void    GblRingList_reverse (GBL_SELF)                       GBL_NOEXCEPT;
 //! Iterates over every entry within the given GblRingList, passing their values to the given iterator function, wich may optionally take a closure data pointer. Iteration ends early when the iterator returns GBL_TRUE.
 GBL_EXPORT GblBool GblRingList_foreach (GBL_SELF,
@@ -255,6 +255,7 @@ GBL_DECLS_END
 #define GblRingList_popFront(...)               GblRingList_popFrontDefault_(__VA_ARGS__)
 #define GblRingList_remove(...)                 GblRingList_removeDefault_(__VA_ARGS__)
 #define GblRingList_sort(...)                   GblRingList_sortDefault_(__VA_ARGS__)
+#define GblRingList_for(...)                    GblRingList_forDefault_(__VA_ARGS__)
 #define GblRingList_foreach(...)                GblRingList_foreachDefault_(__VA_ARGS__)
 #define GblRingList_find(...)                   GblRingList_findDefault_(__VA_ARGS__)
 
@@ -300,6 +301,17 @@ GBL_DECLS_END
     GblRingList_sortDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL)
 #define GblRingList_sortDefault__(list, cmp, cl, ...) \
     (GblRingList_sort)(list, cmp, cl)
+
+#define GblRingList_forDefault_(...) \
+    GblRingList_forDefault__(__VA_ARGS__, void*)
+#define GblRingList_forDefault__(list, item, type, ...) \
+    GblRingList_forImpl_(list, item, type)
+#define GblRingList_forImpl_(list, item, type)                              \
+    GblRingList* GBL_APPEND_LINE(pNode) = list->ringNode.pNext;             \
+    for(type item = (type)GBL_APPEND_LINE(pNode)->pData;                    \
+        GBL_APPEND_LINE(pNode) != list;                                     \
+        GBL_APPEND_LINE(pNode) = GBL_APPEND_LINE(pNode)->ringNode.pNext,    \
+        item = (type)GBL_APPEND_LINE(pNode)->pData)                         \
 
 #define GblRingList_foreachDefault_(...) \
     GblRingList_foreachDefault__(__VA_ARGS__, GBL_NULL)

@@ -108,4 +108,8 @@ extern "C" {
 #define GBL_SCOPE(begin, end) for (int i = ((begin), 0); i < 1; ++i, (end))
 #define GBL_SCOPE_EXIT continue
 
+#define GBL_APPEND_LINE(a)      GBL_APPEND_LINE_(a, __LINE__)
+#define GBL_APPEND_LINE_(a, b)  GBL_APPEND_LINE_2(a, b)
+#define GBL_APPEND_LINE_2(a, b) a##b
+
 #endif // GIMBAL_MACRO_UTILS_H

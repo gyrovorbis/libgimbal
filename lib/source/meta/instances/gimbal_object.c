@@ -1655,6 +1655,21 @@ static GBL_RESULT GblObject_property_(const GblObject* pSelf, const GblProperty*
                                 pProp->valueType,
                                 GblBox_userdata(GBL_BOX(pSelf)));
         break;
+    case GblObject_Property_Id_children: {
+        GblObject*   pChild    = GblObject_childFirst(pSelf);
+        GblRingList* pChildren = GblRingList_create(pChild);
+
+        while (pChild) {
+            GblRingList_pushBack(pChildren, pChild);
+            pChild = GblObject_siblingNext(pSelf);
+        }
+
+        GblVariant_setValueMove(pValue,
+                                pProp->valueType,
+                                pChildren);
+
+        break;
+    }
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Reading unhandled property: %s",
                                 GblProperty_nameString(pProp));
@@ -1681,12 +1696,11 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
         break;
     }
     case GblObject_Property_Id_children: {
-        // GblRingList* pChildren = NULL;
-        // GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pChildren));
-        // for (size_t i = 0; i < GblRingList_size(pChildren); i++) {
-        //     GblObject* pChild = GBL_OBJECT(GblRingList_at(pChildren, i));
-        //     GblObject_setParent(pChild, pSelf);
-        // }
+        GblRingList* pChildren = NULL;
+        GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pChildren));
+
+        GblRingList_for(pChildren, pObject, GblObject*)
+            GblObject_setParent(pObject, pSelf);
         break;
     }
     case GblObject_Property_Id_userdata: {

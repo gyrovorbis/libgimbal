@@ -603,7 +603,7 @@ GblType GblRingList_type(void) {
         ifaceEntries[0].interfaceType = GBL_ITABLE_VARIANT_TYPE;
         type = GblType_register(GblQuark_internStatic("GblRingList"),
                                 GBL_OPAQUE_TYPE,
-                                &(GblTypeInfo){ .classSize        = sizeof(GblRingListClass),
+                                &(static GblTypeInfo){ .classSize = sizeof(GblRingListClass),
                                                 .pFnClassInit     = GblRingListClass_init_,
                                                 .interfaceCount   = 1,
                                                 .pInterfaceImpls  = ifaceEntries},
