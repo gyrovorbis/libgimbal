@@ -352,7 +352,7 @@ GBL_EXPORT void GblStringList_reverse(GblStringList* pSelf) {
 }
 
 GBL_EXPORT GblBool (GblStringList_foreach)(GblStringList* pSelf, GblStringListIterFn pFnIt, void* pCl) {
-    return GblRingList_foreach(pSelf, (GblRingListIterFn)pFnIt, pCl);
+    return GblRingList_iterate(pSelf, (GblRingListIterFn)pFnIt, pCl);
 }
 
 GBL_EXPORT GblStringRef* GblStringList_extract(GblStringList* pSelf, GblStringList* pNode) {

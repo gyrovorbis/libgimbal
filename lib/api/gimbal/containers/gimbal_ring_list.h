@@ -2,10 +2,11 @@
  *  \brief GblRingList structure and related functions
  *  \ingroup containers
  *
- *  This file provides the GblStringList container structure and its public API
+ *  This file provides the GblRingList container structure and its public API
  *  for operating upon it.
  *
  *  \author    2023, 2025 Falco Girgis
+ *  \author          2025 Agustín Bellagamba
  *  \copyright MIT License
  */
 #ifndef GIMBAL_RING_LIST_H
@@ -14,16 +15,46 @@
 #include <stdarg.h>
 
 #include "../core/gimbal_result.h"
+#include <gimbal/meta/classes/gimbal_opaque.h>
+#include <gimbal/meta/ifaces/gimbal_itable_variant.h>
 #include "gimbal_doubly_linked_list.h"
 
-//! size_t type denoting an invalid array index or position within ga GblRingList
+//! size_t type denoting an invalid array index or position within a GblRingList
 #define GBL_RING_LIST_NPOS  GBL_NPOS
 
 #define GBL_SELF_TYPE       GblRingList
 
+/*! \name Type System
+ *  \brief Type UUID and cast macros
+ *  @{
+ */
+#define GBL_RING_LIST_TYPE         (GBL_TYPEID(GblRingList))             //!< Type UUID for GblRingList
+#define GBL_RING_LIST_CLASS(klass) (GBL_CLASS_CAST(GblRingList, klass))  //!< Casts a GblClass to a GblRingListClass
+//! @}
+
+/*! \brief For-loop style iteration over a GblRingList
+
+    Iterates over every entry within a GblRingList, setting the \p item variable to the current entry's value.
+    Optionally takes in a \p type parameter to specify the type of the \p item variable, which defaults to void*.
+*/
+#define GblRingList_foreach(/* list, item, type=void* */...)                    GblRingList_foreachDefault_(__VA_ARGS__)
+
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblRingList);
+
+/*! \struct     GblRingListClass
+ *  \extends    GblOpaqueClass
+ *  \implements GblITableVariantClass
+ *  \brief      GblClass structure for GblRingList
+ *
+ *  GblRingListClass is the class structure for the GblRingList container.
+ *  It also provides an inner GblType that defaults to GBL_POINTER_TYPE,
+ *  used by its GblITableVariant implementation, for the GblType of each element.
+ */
+GBL_CLASS_DERIVE(GblRingList, GblOpaque, GblITableVariant)
+    GblType innerType; //!< GblType UUID representing the type of values stored within the GblRingList.
+GBL_CLASS_END
 
 /*! \name  User-Operator Callbacks
  *  \brief Typedefs for applying various user-supplied functions over a ring list.
@@ -86,7 +117,7 @@ typedef GBL_RESULT (*GblRingListDtorFn)(void* pValue, void* pClosure);
  *  maintaining a free list to reuse nodes as they become
  *  available.
  *
- *  \sa GblDoublyLinkedListNode, GblStringList
+ *  \sa GblDoublyLinkedListNode, GblRingList
  */
 typedef struct GblRingList {
     union {                                 //!< Unionization of linked list node pointers, so they can be referred to generically or strongly-typed.
@@ -101,6 +132,9 @@ typedef struct GblRingList {
         void*     pData;                    //!< List entries contain void* pointers to arbitrary data payloads.
     };
 } GblRingList;
+
+//! Returns the GblType UUID associated with GblRingList.
+GblType GblRingList_type(void);
 
 /*! \name  Lifetime
  *  \brief Methods for creating, acquring, and releasing a list.
@@ -164,7 +198,7 @@ GBL_EXPORT GBL_RESULT GblRingList_pushBackVaList  (GBL_SELF, va_list* pList)    
 GBL_EXPORT GBL_RESULT GblRingList_pushFront       (GBL_SELF, ...)                 GBL_NOEXCEPT;
 //! Equivalent to GblRingList_pushFront(), except taking a va_list*, rather than a variadic argument list.
 GBL_EXPORT GBL_RESULT GblRingList_pushFrontVaList (GBL_SELF, va_list* plist)      GBL_NOEXCEPT;
-//! Inserts the comma-separated list of values into the given GblStringList, so that the first value is at the position of the given index.
+//! Inserts the comma-separated list of values into the given GblRingList, so that the first value is at the position of the given index.
 GBL_EXPORT GBL_RESULT GblRingList_insert          (GBL_SELF, intptr_t index, ...) GBL_NOEXCEPT;
 //! Equivalent to GblRingList_insert(), except taking a va_list* rather than a variadic argument list.
 GBL_EXPORT GBL_RESULT GblRingList_insertVaList    (GBL_SELF,
@@ -175,11 +209,11 @@ GBL_EXPORT GBL_RESULT GblRingList_insertSorted    (GBL_SELF,
                                                    void*            pData,
                                                    GblRingListCmpFn pFnCmp/*=NULL*/,
                                                    void*            pCl/*=NULL*/) GBL_NOEXCEPT;
-//! Joins \p pOther into the given GblRingList such that its first entry is positioned at the given \p index, returning GBL_TRUE if it succeeded. Do NOT forget to still call GblStringList_unref() on the now empty \p pOther list.
+//! Joins \p pOther into the given GblRingList such that its first entry is positioned at the given \p index, returning GBL_TRUE if it succeeded. Do NOT forget to still call GblRingList_unref() on the now empty \p pOther list.
 GBL_EXPORT GblBool    GblRingList_splice          (GBL_SELF,
                                                    GblRingList* pOther,
                                                    int32_t      index)            GBL_NOEXCEPT;
-//! Replaces the entry within the given GblStringList located at \p pIndex with the \p pData value, returning its old value (or NULL upon failure).
+//! Replaces the entry within the given GblRingList located at \p pIndex with the \p pData value, returning its old value (or NULL upon failure).
 GBL_EXPORT void*      GblRingList_replace         (GBL_SELF,
                                                    intptr_t index,
                                                    void*    pData)                GBL_NOEXCEPT;
@@ -193,14 +227,14 @@ GBL_EXPORT void*      GblRingList_replace         (GBL_SELF,
 GBL_EXPORT void*      GblRingList_popBack  (GBL_SELF, size_t count) GBL_NOEXCEPT;
 //! Removes the first entry from the given list, returning its previously held value, or NULL if the list was empty.
 GBL_EXPORT void*      GblRingList_popFront (GBL_SELF, size_t count) GBL_NOEXCEPT;
-//! Removes \p count items from the given GblStringList, starting at the given \p index, returning the value previously held by the last item which was removed.
+//! Removes \p count items from the given GblRingList, starting at the given \p index, returning the value previously held by the last item which was removed.
 GBL_EXPORT void*      GblRingList_remove   (GBL_SELF,
                                             intptr_t index,
                                             size_t   count/*=1*/)   GBL_NOEXCEPT;
 //! Returns the value which was held by the given GblRingList node within the given list, also removing it from the list.
 GBL_EXPORT void*      GblRingList_extract  (GBL_SELF,
                                             GblRingList* pNode)     GBL_NOEXCEPT;
-//! Erases all entries from the GblStringList, returning its size back to 0.
+//! Erases all entries from the GblRingList, returning its size back to 0.
 GBL_EXPORT GBL_RESULT GblRingList_clear    (GBL_SELF)               GBL_NOEXCEPT;
 //! @}
 
@@ -212,12 +246,12 @@ GBL_EXPORT GBL_RESULT GblRingList_clear    (GBL_SELF)               GBL_NOEXCEPT
 GBL_EXPORT void    GblRingList_sort    (GBL_SELF,
                                         GblRingListCmpFn pFnCmp/*=NULL*/,
                                         void*            pCl/*=NULL*/)  GBL_NOEXCEPT;
-//! Rotates the positions of all entries within the given GblStringList, such that they ahve been offset by \p n, where positives rotate right and negatives rotate left.
+//! Rotates the positions of all entries within the given GblRingList, such that they ahve been offset by \p n, where positives rotate right and negatives rotate left.
 GBL_EXPORT void    GblRingList_rotate  (GBL_SELF, intptr_t n)           GBL_NOEXCEPT;
-//1 Reverses the order of the entire GblStringList, such that the tail becomes the head entry, and all values are now in opposite order.
+//! Reverses the order of the entire GblRingList, such that the tail becomes the head entry, and all values are now in opposite order.
 GBL_EXPORT void    GblRingList_reverse (GBL_SELF)                       GBL_NOEXCEPT;
 //! Iterates over every entry within the given GblRingList, passing their values to the given iterator function, wich may optionally take a closure data pointer. Iteration ends early when the iterator returns GBL_TRUE.
-GBL_EXPORT GblBool GblRingList_foreach (GBL_SELF,
+GBL_EXPORT GblBool GblRingList_iterate (GBL_SELF,
                                         GblRingListIterFn pFnIt,
                                         void*             pCl/*=NULL*/) GBL_NOEXCEPT;
 //! @}
@@ -239,7 +273,7 @@ GBL_DECLS_END
 #define GblRingList_popFront(...)               GblRingList_popFrontDefault_(__VA_ARGS__)
 #define GblRingList_remove(...)                 GblRingList_removeDefault_(__VA_ARGS__)
 #define GblRingList_sort(...)                   GblRingList_sortDefault_(__VA_ARGS__)
-#define GblRingList_foreach(...)                GblRingList_foreachDefault_(__VA_ARGS__)
+#define GblRingList_iterate(...)                GblRingList_iterateDefault_(__VA_ARGS__)
 #define GblRingList_find(...)                   GblRingList_findDefault_(__VA_ARGS__)
 
 // ===== IMPL =====
@@ -286,9 +320,20 @@ GBL_DECLS_END
     (GblRingList_sort)(list, cmp, cl)
 
 #define GblRingList_foreachDefault_(...) \
-    GblRingList_foreachDefault__(__VA_ARGS__, GBL_NULL)
-#define GblRingList_foreachDefault__(list, it, cl, ...) \
-    (GblRingList_foreach)(list, it, cl)
+    GblRingList_foreachDefault__(__VA_ARGS__, void*)
+#define GblRingList_foreachDefault__(list, item, type, ...) \
+    GblRingList_foreachImpl_(list, item, type)
+#define GblRingList_foreachImpl_(list, item, type)                          \
+    GblRingList* GBL_APPEND_LINE(pNode) = list->ringNode.pNext;             \
+    for(type item = (type)GBL_APPEND_LINE(pNode)->pData;                    \
+        GBL_APPEND_LINE(pNode) != list;                                     \
+        GBL_APPEND_LINE(pNode) = GBL_APPEND_LINE(pNode)->ringNode.pNext,    \
+        item = (type)GBL_APPEND_LINE(pNode)->pData)                         \
+
+#define GblRingList_iterateDefault_(...) \
+    GblRingList_iterateDefault__(__VA_ARGS__, GBL_NULL)
+#define GblRingList_iterateDefault__(list, it, cl, ...) \
+    (GblRingList_iterate)(list, it, cl)
 
 #define GblRingList_findDefault_(...) \
     GblRingList_findDefault__(__VA_ARGS__, GBL_NULL, GBL_NULL)

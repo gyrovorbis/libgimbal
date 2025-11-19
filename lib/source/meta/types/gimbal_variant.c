@@ -964,6 +964,11 @@ GBL_EXPORT GblType GblVariant_typeOf(const GblVariant* pSelf) {
     return pSelf->type;
 }
 
+GBL_EXPORT GblClass* GblVariant_classOf(const GblVariant* pSelf) {
+    if (!GblVariant_isValid(pSelf)) return NULL;
+    return GblClass_weakRefDefault(pSelf->type);
+}
+
 GBL_EXPORT const char* GblVariant_typeName(const GblVariant* pSelf) {
     return GblType_name(GblVariant_typeOf(pSelf));
 }

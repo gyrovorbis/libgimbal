@@ -7,6 +7,7 @@
 #include <gimbal/containers/gimbal_linked_list.h>
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/containers/gimbal_nary_tree.h>
+#include <gimbal/containers/gimbal_ring_list.h>
 #include <gimbal/meta/signals/gimbal_marshal.h>
 #include "../types/gimbal_type_.h"
 
@@ -1654,6 +1655,20 @@ static GBL_RESULT GblObject_property_(const GblObject* pSelf, const GblProperty*
                                 pProp->valueType,
                                 GblBox_userdata(GBL_BOX(pSelf)));
         break;
+    case GblObject_Property_Id_children: {
+        GblObject*   pChild    = GblObject_childFirst(pSelf);
+        GblRingList* pChildren = GblRingList_createEmpty();
+
+        while (pChild) {
+            GblRingList_pushBack(pChildren, pChild);
+            pChild = GblObject_siblingNext(pChild);
+        }
+
+        GblVariant_setValueMove(pValue,
+                                pProp->valueType,
+                                pChildren);
+        break;
+    }
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Reading unhandled property: %s",
                                 GblProperty_nameString(pProp));
@@ -1677,6 +1692,15 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
         GblObject* pParent = NULL;
         GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pParent));
         GblObject_setParent(pSelf, pParent);
+        break;
+    }
+    case GblObject_Property_Id_children: {
+        GblRingList* pChildren = NULL;
+        GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pChildren));
+
+        GblRingList_foreach(pChildren, pObject, GblObject*)
+            GblObject_setParent(pObject, pSelf);
+
         break;
     }
     case GblObject_Property_Id_userdata: {
