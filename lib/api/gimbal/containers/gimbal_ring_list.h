@@ -50,10 +50,10 @@ GBL_FORWARD_DECLARE_STRUCT(GblRingList);
  *
  *  GblRingListClass is the class structure for the GblRingList container.
  *  It also provides an inner GblType that defaults to GBL_POINTER_TYPE,
- *  used for its GblITableVariant implementation.
+ *  used by its GblITableVariant implementation, for the GblType of each element.
  */
 GBL_CLASS_DERIVE(GblRingList, GblOpaque, GblITableVariant)
-    GblType innerType;
+    GblType innerType; //!< GblType UUID representing the type of values stored within the GblRingList.
 GBL_CLASS_END
 
 /*! \name  User-Operator Callbacks
@@ -133,6 +133,7 @@ typedef struct GblRingList {
     };
 } GblRingList;
 
+//! Returns the GblType UUID associated with GblRingList.
 GblType GblRingList_type(void);
 
 /*! \name  Lifetime

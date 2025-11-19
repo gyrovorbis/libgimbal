@@ -526,7 +526,8 @@ static GBL_RESULT GblRingList_ITableVariant_index_(const GblVariant* pSelf,
     GblRingListClass* pClass      = GBL_RING_LIST_CLASS(GblVariant_classOf(pSelf));
 
     void *pResult = GblRingList_at(pRingList, index);
-    if (!pResult) return GBL_RESULT_ERROR_INVALID_ARG;
+    if (!pResult)
+        return GBL_RESULT_ERROR_INVALID_ARG;
 
     return GblVariant_setValueCopy(pValue, pClass->innerType, pResult);
 }
@@ -538,11 +539,12 @@ static GBL_RESULT GblRingList_ITableVariant_setIndex_(const GblVariant* pSelf,
     intptr_t          index       = GblVariant_toInt32(pKey);
     GblRingList*      pRingList   = (GblRingList*)GblVariant_pointer(pSelf);
     void*             pCopied     = NULL;
-    if (!GblVariant_valueCopy(pValue, &pCopied)) return GBL_RESULT_ERROR_INVALID_ARG;
 
-    if (!GblRingList_at(pRingList, index)) {
+    if (!GblVariant_valueCopy(pValue, &pCopied))
+        return GBL_RESULT_ERROR_INVALID_ARG;
+
+    if (!GblRingList_at(pRingList, index))
         return GblRingList_insert(pRingList, index, pCopied);
-    }
 
     GblRingList_replace(pRingList, index, pCopied);
     return GBL_RESULT_SUCCESS;
@@ -556,9 +558,8 @@ static GBL_RESULT GblRingList_ITableVariant_next_(const GblVariant* pSelf,
     GblRingList*      pNext       = pRingList->ringNode.pNext;
     GblRingListClass* pClass      = GBL_RING_LIST_CLASS(GblVariant_classOf(pSelf));
 
-    if (!pNext) {
+    if (!pNext)
         return GBL_RESULT_ERROR_OUT_OF_RANGE;
-    }
 
     GblVariant_setValueCopy(pValue, pClass->innerType, pNext->pData);
     return GBL_RESULT_SUCCESS;
@@ -600,7 +601,7 @@ GblType GblRingList_type(void) {
     };
 
     static GblTypeInfo typeInfo = {
-        .classSize = sizeof(GblRingListClass),
+        .classSize        = sizeof(GblRingListClass),
         .pFnClassInit     = GblRingListClass_init_,
         .interfaceCount   = 1,
         .pInterfaceImpls  = ifaceEntries
