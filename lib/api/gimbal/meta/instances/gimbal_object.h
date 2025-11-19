@@ -9,6 +9,7 @@
  *  generic construction, named instances, etc.
  *
  *  \author    2023, 2024, 2025 Falco Girgis
+ *  \author                2025 Agustín Bellagamba
  *  \copyright MIT License
  *
  *  \todo

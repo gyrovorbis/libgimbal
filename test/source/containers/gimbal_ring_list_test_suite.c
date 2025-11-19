@@ -636,17 +636,31 @@ static GblBool ringListIterator_(void* pValue, void* pClosure) {
     return retValue;
 }
 
-static GBL_RESULT GblRingListTestSuite_foreach_(GblTestSuite* pSelf, GblContext* pCtx) {
+static GBL_RESULT GblRingListTestSuite_iterate_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
     GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
 
     int state = 0;
-    GBL_TEST_VERIFY(GblRingList_foreach(pSelf_->ringLists[0], ringListIterator_, &state));
+    GBL_TEST_VERIFY(GblRingList_iterate(pSelf_->ringLists[0], ringListIterator_, &state));
     GBL_TEST_COMPARE(state, 4);
 
     GBL_CTX_VERIFY_CALL(GblRingListTestSuite_verify_(pCtx, pSelf_->ringLists[0],
                         "GameCube", "Xbox", "Playstation 2", "Dreamcast", NULL));
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblRingListTestSuite_foreach_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+
+    GblRingListTestSuite_* pSelf_ = GBL_RING_LIST_TEST_SUITE_(pSelf);
+    int count = 0;
+
+    const char* entries[] = {"GameCube", "Xbox", "Playstation 2", "Dreamcast"};
+    GblRingList_foreach(pSelf_->ringLists[0], pEntry, const char*) {
+        GBL_TEST_COMPARE(pEntry, entries[count]);
+        ++count;
+    }
     GBL_CTX_END();
 }
 
@@ -760,6 +774,7 @@ GBL_EXPORT GblType GblRingListTestSuite_type(void) {
         { "rotate",                     GblRingListTestSuite_rotate_                    },
         { "rotateNegative",             GblRingListTestSuite_rotateNegative_            },
         { "reverse",                    GblRingListTestSuite_reverse_                   },
+        { "iterate",                    GblRingListTestSuite_iterate_                   },
         { "foreach",                    GblRingListTestSuite_foreach_                   },
         { "find",                       GblRingListTestSuite_find_                      },
         { "extract",                    GblRingListTestSuite_extract_                   },
