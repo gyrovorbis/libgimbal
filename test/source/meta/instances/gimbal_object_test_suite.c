@@ -163,8 +163,7 @@ GBL_TEST_CASE_END
 GBL_TEST_CASE(newVaArgs)
     GblObject* pObj = GBL_OBJECT(GBL_NEW(TestObject,
                                         "name",     "truckwad",
-                                        "userdata", (void*)0xdeadbeef,
-                                        NULL));
+                                        "userdata", (void*)0xdeadbeef));
 
     GBL_TEST_COMPARE(GblObject_name(pObj), "truckwad");
     GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)), (void*)0xdeadbeef);
@@ -398,8 +397,7 @@ GBL_TEST_CASE(propertySet)
                                     "userdata", (void*)0xdeadbeef,
                                     "parent",   NULL,
                                     "floater",  -77.7,
-                                    "stringer", "truckin Inheritance!",
-                                    NULL));
+                                    "stringer", "truckin Inheritance!"));
     GblVariant variant;
     void* pUd;
     GBL_TEST_CALL(GblVariant_constructValueCopy(&variant, GBL_POINTER_TYPE, (void*)0xcafebabe));
