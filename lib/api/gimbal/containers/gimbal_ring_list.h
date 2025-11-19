@@ -6,6 +6,7 @@
  *  for operating upon it.
  *
  *  \author    2023, 2025 Falco Girgis
+ *  \author          2025 Agustín Bellagamba
  *  \copyright MIT License
  */
 #ifndef GIMBAL_RING_LIST_H
@@ -31,10 +32,12 @@
 #define GBL_RING_LIST_CLASS(klass) (GBL_CLASS_CAST(GblRingList, klass))  //!< Casts a GblClass to a GblRingListClass
 //! @}
 
-/*! Iterates over every entry within a GblRingList, setting the \p item variable to the current entry's value.
+/*! \brief For-loop style iteration over a GblRingList
+
+    Iterates over every entry within a GblRingList, setting the \p item variable to the current entry's value.
     Optionally takes in a \p type parameter to specify the type of the \p item variable, which defaults to void*.
 */
-#define GblRingList_foreach(/*list, item, type*/...)                    GblRingList_foreachDefault_(__VA_ARGS__)
+#define GblRingList_foreach(/* list, item, type=void* */...)                    GblRingList_foreachDefault_(__VA_ARGS__)
 
 GBL_DECLS_BEGIN
 
