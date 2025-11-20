@@ -8,7 +8,6 @@
  *  \author 2023 Falco Girgis
  *  \copyright MIT License
  */
-
 #ifndef GIMBAL_IVARIANT_H
 #define GIMBAL_IVARIANT_H
 
@@ -33,23 +32,23 @@ GBL_FORWARD_DECLARE_STRUCT(GblVariant);
 GBL_FORWARD_DECLARE_STRUCT(GblStringBuffer);
 
 GBL_DECLARE_FLAGS(GBL_IVARIANT_OP_FLAGS) {
-    GBL_IVARIANT_OP_FLAG_RELOCATABLE           = 0x00001,
-    GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT     = 0x00002,
-    GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY        = 0x00004,
-    GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE        = 0x00008,
-    GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY  = 0x00010,
-    GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE  = 0x00020,
-    GBL_IVARIANT_OP_FLAG_CONSTRUCT_MASK        = 0x0003e,
-    GBL_IVARIANT_OP_FLAG_SET_COPY              = 0x00040,
-    GBL_IVARIANT_OP_FLAG_SET_MOVE              = 0x00080,
-    GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY        = 0x00100,
-    GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE        = 0x00200,
-    GBL_IVARIANT_OP_FLAG_SET_MASK              = 0x003c0,
-    GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY        = 0x00400,
-    GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK        = 0x00800,
-    GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE        = 0x01000,
-    GBL_IVARIANT_OP_FLAG_GET_MASK              = 0x01c00,
-    GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE        = 0x40000
+    GBL_IVARIANT_OP_FLAG_RELOCATABLE          = 0x00001,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT    = 0x00002,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY       = 0x00004,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_MOVE       = 0x00008,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_COPY = 0x00010,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE = 0x00020,
+    GBL_IVARIANT_OP_FLAG_CONSTRUCT_MASK       = 0x0003e,
+    GBL_IVARIANT_OP_FLAG_SET_COPY             = 0x00040,
+    GBL_IVARIANT_OP_FLAG_SET_MOVE             = 0x00080,
+    GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY       = 0x00100,
+    GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE       = 0x00200,
+    GBL_IVARIANT_OP_FLAG_SET_MASK             = 0x003c0,
+    GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY       = 0x00400,
+    GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK       = 0x00800,
+    GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE       = 0x01000,
+    GBL_IVARIANT_OP_FLAG_GET_MASK             = 0x01c00,
+    GBL_IVARIANT_OP_FLAG_VALUELESS_TYPE       = 0x40000
 };
 
 #define VARIANT     GblVariant* pVariant
@@ -107,7 +106,7 @@ GBL_EXPORT GBL_RESULT GblIVariantClass_destruct           (GBL_CSELF, VARIANT)  
 GBL_EXPORT GBL_RESULT GblIVariantClass_compare            (GBL_CSELF,
                                                            CVARIANT,
                                                            const GblVariant* pOther,
-                                                           int* pCmpResult)                            GBL_NOEXCEPT;
+                                                           int* pCmpResult)                               GBL_NOEXCEPT;
 
 GBL_EXPORT GBL_RESULT GblIVariantClass_save               (GBL_CSELF, CVARIANT, GblStringBuffer* pString) GBL_NOEXCEPT;
 

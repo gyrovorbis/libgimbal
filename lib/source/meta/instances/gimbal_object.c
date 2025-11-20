@@ -358,7 +358,7 @@ GBL_EXPORT GBL_RESULT GblObject_properties(const GblObject* pSelf, ...) {
     va_start(varArgs, pSelf);
 
     GBL_CTX_BEGIN(NULL);
-    GBL_CTX_CALL(GblObject_propertiesVaList(pSelf, &varArgs));
+    GBL_CTX_CALL(GblObject_propertiesVa(pSelf, &varArgs));
 
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
@@ -370,14 +370,14 @@ GBL_EXPORT GBL_RESULT GblObject_setProperties(GblObject* pSelf, ...) {
     va_start(varArgs, pSelf);
 
     GBL_CTX_BEGIN(NULL);
-    GBL_CTX_CALL(GblObject_setPropertiesVaList(pSelf, &varArgs));
+    GBL_CTX_CALL(GblObject_setPropertiesVa(pSelf, &varArgs));
 
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_propertyVaList_(const GblObject* pSelf, const GblProperty* pProp, va_list* pList) {
+GBL_EXPORT GBL_RESULT GblObject_propertyVa_(const GblObject* pSelf, const GblProperty* pProp, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
     GblVariant variant;
 
@@ -394,7 +394,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVaList_(const GblObject* pSelf, const Gb
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_propertyVaList(const GblObject* pSelf, const char* pName, va_list* pList) {
+GBL_EXPORT GBL_RESULT GblObject_propertyVa(const GblObject* pSelf, const char* pName, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
     const GblProperty* pProp = GblProperty_find(GBL_TYPEOF(pSelf), pName);
@@ -404,12 +404,12 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVaList(const GblObject* pSelf, const cha
                    GblType_name(GBL_TYPEOF(pSelf)),
                    pName);
 
-    GBL_CTX_CALL(GblObject_propertyVaList_(pSelf, pProp, pList));
+    GBL_CTX_CALL(GblObject_propertyVa_(pSelf, pProp, pList));
 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_propertyVaListByQuark(const GblObject* pSelf, GblQuark name, va_list* pList) {
+GBL_EXPORT GBL_RESULT GblObject_propertyVaByQuark(const GblObject* pSelf, GblQuark name, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
     const GblProperty* pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf), name);
@@ -419,7 +419,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVaListByQuark(const GblObject* pSelf, Gb
                    GblType_name(GBL_TYPEOF(pSelf)),
                    GblQuark_toString(name));
 
-    GBL_CTX_CALL(GblObject_propertyVaList_(pSelf, pProp, pList));
+    GBL_CTX_CALL(GblObject_propertyVa_(pSelf, pProp, pList));
 
     GBL_CTX_END();
 }
@@ -428,7 +428,7 @@ GBL_EXPORT GBL_RESULT GblObject_property(const GblObject* pSelf, const char* pNa
     va_list varArgs;
 
     va_start(varArgs, pName);
-    const GBL_RESULT result = GblObject_propertyVaList(pSelf, pName, &varArgs);
+    const GBL_RESULT result = GblObject_propertyVa(pSelf, pName, &varArgs);
     va_end(varArgs);
 
     return result;
@@ -438,13 +438,13 @@ GBL_EXPORT GBL_RESULT GblObject_propertyByQuark(const GblObject* pSelf, GblQuark
     va_list varArgs;
 
     va_start(varArgs, name);
-    const GBL_RESULT result = GblObject_propertyVaListByQuark(pSelf, name, &varArgs);
+    const GBL_RESULT result = GblObject_propertyVaByQuark(pSelf, name, &varArgs);
     va_end(varArgs);
 
     return result;
 }
 
-GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList_(GblObject* pSelf, const GblProperty* pProp, va_list* pList) {
+GBL_EXPORT GBL_RESULT GblObject_setPropertyVa_(GblObject* pSelf, const GblProperty* pProp, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
     GblVariant variant;
@@ -461,7 +461,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList_(GblObject* pSelf, const GblPr
 }
 
 
-GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList(GblObject* pSelf, const char* pName, va_list* pList) {
+GBL_EXPORT GBL_RESULT GblObject_setPropertyVa(GblObject* pSelf, const char* pName, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
     const GblProperty* pProp = GblProperty_find(GBL_TYPEOF(pSelf), pName);
@@ -469,12 +469,12 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVaList(GblObject* pSelf, const char* 
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unwritable property: [%s]", pName);
 
-    GBL_CTX_VERIFY_CALL(GblObject_setPropertyVaList_(pSelf, pProp, pList));
+    GBL_CTX_VERIFY_CALL(GblObject_setPropertyVa_(pSelf, pProp, pList));
 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_setPropertyVaListByQuark(GblObject* pSelf, GblQuark name, va_list* pList) {
+GBL_EXPORT GBL_RESULT GblObject_setPropertyVaByQuark(GblObject* pSelf, GblQuark name, va_list* pList) {
     GBL_CTX_BEGIN(NULL);
 
     const GblProperty* pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf), name);
@@ -482,7 +482,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVaListByQuark(GblObject* pSelf, GblQu
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
                    "[GblObject] Tried to get unwritable property: [%s]", GblQuark_toString(name));
 
-    GBL_CTX_VERIFY_CALL(GblObject_setPropertyVaList_(pSelf, pProp, pList));
+    GBL_CTX_VERIFY_CALL(GblObject_setPropertyVa_(pSelf, pProp, pList));
 
     GBL_CTX_END();
 }
@@ -492,7 +492,7 @@ GBL_EXPORT GBL_RESULT GblObject_setProperty(GblObject* pSelf, const char* pName,
     va_list varArgs;
     va_start(varArgs, pName);
 
-    const GBL_RESULT result = GblObject_setPropertyVaList(pSelf, pName, &varArgs);
+    const GBL_RESULT result = GblObject_setPropertyVa(pSelf, pName, &varArgs);
 
     va_end(varArgs);
     return result;
@@ -502,13 +502,13 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyByQuark(GblObject* pSelf, GblQuark na
     va_list varArgs;
     va_start(varArgs, name);
 
-    const GBL_RESULT result = GblObject_setPropertyVaListByQuark(pSelf, name, &varArgs);
+    const GBL_RESULT result = GblObject_setPropertyVaByQuark(pSelf, name, &varArgs);
 
     va_end(varArgs);
     return result;
 }
 
-GBL_EXPORT GBL_RESULT GblObject_propertiesVaList(const GblObject* pSelf, va_list* pVarArgs) {
+GBL_EXPORT GBL_RESULT GblObject_propertiesVa(const GblObject* pSelf, va_list* pVarArgs) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pVarArgs);
@@ -539,7 +539,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertiesVaList(const GblObject* pSelf, va_list
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_setPropertiesVaList(GblObject* pSelf, va_list* pVarArgs) {
+GBL_EXPORT GBL_RESULT GblObject_setPropertiesVa(GblObject* pSelf, va_list* pVarArgs) {
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pVarArgs);
@@ -721,7 +721,7 @@ GBL_EXPORT GblObject* GblObject_create(GblType type, ...) {
 
     GBL_CTX_BEGIN(NULL);
 
-    pObject = GblObject_createVaList(type, &varArgs);
+    pObject = GblObject_createVa(type, &varArgs);
 
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
@@ -735,7 +735,7 @@ GBL_EXPORT GblObject* GblObject_createExt(GblType type, size_t size, ...) {
 
     GBL_CTX_BEGIN(NULL);
 
-    pObject = GblObject_createExtVaList(type, size, &varArgs);
+    pObject = GblObject_createExtVa(type, size, &varArgs);
 
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
@@ -750,7 +750,7 @@ GBL_EXPORT GblObject* GblObject_createWithClass(GblObjectClass* pClass, ...)
 
     GBL_CTX_BEGIN(NULL);
 
-    pObject = GblObject_createVaListWithClass(pClass, &varArgs);
+    pObject = GblObject_createVaWithClass(pClass, &varArgs);
 
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
@@ -764,7 +764,7 @@ GBL_EXPORT GblObject* GblObject_createExtWithClass(GblObjectClass* pClass, size_
 
     GBL_CTX_BEGIN(NULL);
 
-    pObject = GblObject_createExtVaListWithClass(pClass, size, &varArgs);
+    pObject = GblObject_createExtVaWithClass(pClass, size, &varArgs);
 
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
@@ -776,7 +776,7 @@ GBL_EXPORT GBL_RESULT GblObject_construct(GblObject* pSelf, GblType type, ...) {
     va_start(varArgs, type);
 
     GBL_CTX_BEGIN(NULL);
-    GBL_CTX_CALL(GblObject_constructVaList(pSelf, type, &varArgs));
+    GBL_CTX_CALL(GblObject_constructVa(pSelf, type, &varArgs));
 
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
@@ -789,14 +789,14 @@ GBL_EXPORT GBL_RESULT GblObject_constructWithClass(GblObject* pSelf, GblObjectCl
 
     GBL_CTX_BEGIN(NULL);
 
-    GBL_CTX_CALL(GblObject_constructVaListWithClass(pSelf, pClass, &varArgs));
+    GBL_CTX_CALL(GblObject_constructVaWithClass(pSelf, pClass, &varArgs));
 
     GBL_CTX_END_BLOCK();
     va_end(varArgs);
     return GBL_CTX_RESULT();
 }
 
-static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va_list* pVarArgs) {
+static  GBL_RESULT GblObject_constructVa_(GblObject* pSelf, GblType type, va_list* pVarArgs) {
     size_t count = 0;
     GBL_CTX_BEGIN(NULL);
 
@@ -842,28 +842,28 @@ static  GBL_RESULT GblObject_constructVaList_(GblObject* pSelf, GblType type, va
     return GBL_CTX_RESULT();
 }
 
-GBL_EXPORT GblObject* GblObject_createVaList(GblType type, va_list* pVarArgs) {
-    return GblObject_createExtVaList(type, 0, pVarArgs);
+GBL_EXPORT GblObject* GblObject_createVa(GblType type, va_list* pVarArgs) {
+    return GblObject_createExtVa(type, 0, pVarArgs);
 }
 
-GBL_EXPORT GblObject* GblObject_createExtVaList(GblType type, size_t size, va_list* pVarArgs) {
+GBL_EXPORT GblObject* GblObject_createExtVa(GblType type, size_t size, va_list* pVarArgs) {
     GblObject* pObject = NULL;
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
 
     pObject = GBL_OBJECT(GblBox_create(type, size));
-    GBL_CTX_CALL(GblObject_constructVaList_(pObject, type, pVarArgs));
+    GBL_CTX_CALL(GblObject_constructVa_(pObject, type, pVarArgs));
 
     GBL_CTX_END_BLOCK();
     return pObject;
 }
 
-GBL_EXPORT GblObject* GblObject_createVaListWithClass(GblObjectClass* pClass, va_list* pVarArgs) {
-    return GblObject_createExtVaListWithClass(pClass, 0, pVarArgs);
+GBL_EXPORT GblObject* GblObject_createVaWithClass(GblObjectClass* pClass, va_list* pVarArgs) {
+    return GblObject_createExtVaWithClass(pClass, 0, pVarArgs);
 }
 
-GBL_EXPORT GblObject* GblObject_createExtVaListWithClass(GblObjectClass* pClass, size_t size, va_list* pVarArgs) {
+GBL_EXPORT GblObject* GblObject_createExtVaWithClass(GblObjectClass* pClass, size_t size, va_list* pVarArgs) {
     GblObject* pObject = NULL;
     GBL_CTX_BEGIN(NULL);
 
@@ -875,24 +875,24 @@ GBL_EXPORT GblObject* GblObject_createExtVaListWithClass(GblObjectClass* pClass,
                                        NULL,
                                        GBL_BOX_CLASS(pClass)));
 
-    GBL_CTX_CALL(GblObject_constructVaList_(pObject, GBL_CLASS_TYPEOF(pClass), pVarArgs));
+    GBL_CTX_CALL(GblObject_constructVa_(pObject, GBL_CLASS_TYPEOF(pClass), pVarArgs));
 
     GBL_CTX_END_BLOCK();
     return pObject;
 }
 
-GBL_EXPORT GBL_RESULT GblObject_constructVaList(GblObject *pSelf, GblType type, va_list* pVarArgs) {
+GBL_EXPORT GBL_RESULT GblObject_constructVa(GblObject *pSelf, GblType type, va_list* pVarArgs) {
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
 
     GBL_CTX_CALL(GblBox_construct((GblBox*)pSelf, type));
-    GBL_CTX_CALL(GblObject_constructVaList_(pSelf, type, pVarArgs));
+    GBL_CTX_CALL(GblObject_constructVa_(pSelf, type, pVarArgs));
 
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblObject_constructVaListWithClass(GblObject* pSelf, GblObjectClass* pClass, va_list* pVarArgs) {
+GBL_EXPORT GBL_RESULT GblObject_constructVaWithClass(GblObject* pSelf, GblObjectClass* pClass, va_list* pVarArgs) {
     const GblType type = GBL_CLASS_TYPEOF(pClass);
 
     GBL_CTX_BEGIN(NULL);
@@ -904,7 +904,7 @@ GBL_EXPORT GBL_RESULT GblObject_constructVaListWithClass(GblObject* pSelf, GblOb
                                   NULL,
                                   NULL,
                                   GBL_BOX_CLASS(pClass)));
-    GBL_CTX_CALL(GblObject_constructVaList_(pSelf, type, pVarArgs));
+    GBL_CTX_CALL(GblObject_constructVa_(pSelf, type, pVarArgs));
 
     GBL_CTX_END();
 }

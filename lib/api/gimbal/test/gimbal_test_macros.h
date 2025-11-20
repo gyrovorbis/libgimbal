@@ -131,7 +131,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
 #   define GBL_TEST_COMPARE_CMP_(actual, expected) GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_CMP_TABLE_, actual)(actual, expected)
 
 #else
-inline GblBool GBL_TEST_COMPARE_CMP_(auto actual, auto expected) noexcept {
+inline constexpr GblBool GBL_TEST_COMPARE_CMP_(auto actual, auto expected) noexcept {
     if constexpr(std::convertible_to<decltype(actual), decltype(expected)>)
         return static_cast<decltype(expected)>(actual) == expected;
     else if constexpr(std::convertible_to<decltype(expected), decltype(actual)>)

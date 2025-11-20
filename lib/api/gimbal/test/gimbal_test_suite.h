@@ -139,15 +139,15 @@ GBL_EXPORT GblType GblTestSuite_register (const char*               pName,
  *  @{
  */
 //! Creates a new GblTestSuite instance with the given properties (or defaults if not specified).
-GBL_EXPORT GblTestSuite* GblTestSuite_create   (GblType                   type,
-                                                const char*               pName  /*=NULL*/,
-                                                const GblTestSuiteVTable* pVTable/*=NULL*/,
-                                                size_t                    size   /*=0*/,
-                                                GblTestSuiteClass*        pClass /*=NULL*/) GBL_NOEXCEPT;
+GBL_EXPORT GblTestSuite* GblTestSuite_create (GblType                   type,
+                                              const char*               pName  /*=NULL*/,
+                                              const GblTestSuiteVTable* pVTable/*=NULL*/,
+                                              size_t                    size   /*=0*/,
+                                              GblTestSuiteClass*        pClass /*=NULL*/) GBL_NOEXCEPT;
 //! Returns a new reference to the GblTestSuite, incrementing its reference count by 1.
-GBL_EXPORT GblTestSuite* GblTestSuite_ref      (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblTestSuite* GblTestSuite_ref    (GBL_SELF) GBL_NOEXCEPT;
 //! Decrements the refcount of the given GblTestSuite by 1, destroying it if it reaches 0.
-GBL_EXPORT GblRefCount   GblTestSuite_unref    (GBL_SELF) GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount   GblTestSuite_unref  (GBL_SELF) GBL_NOEXCEPT;
 //! @}
 
 /** \name  Test Suite Properties

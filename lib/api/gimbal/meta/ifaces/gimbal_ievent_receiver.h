@@ -21,7 +21,7 @@
 #define GBL_IEVENT_RECEIVER_TYPE          GBL_TYPEID(GblIEventReceiver)             //!< Type UUID for GblIEventReceiver.
 #define GBL_IEVENT_RECEIVER(self)         GBL_CAST(GblIEventReceiver, self)         //!< Casts a GblInstance to a GblIEventReceiver.
 #define GBL_IEVENT_RECEIVER_CLASS(klass)  GBL_CLASS_CAST(GblIEventReceiver, klass)  //!< Casts a GblClass to a GblIEventReceiverClass.
-#define GBL_IEVENT_RECEIVER_CLASSOF(self) GBL_CLASSOF(GblIEventReceiver, self)       //!< Extracts a GblIEventReceiverClass from a GblInstance.
+#define GBL_IEVENT_RECEIVER_CLASSOF(self) GBL_CLASSOF(GblIEventReceiver, self)      //!< Extracts a GblIEventReceiverClass from a GblInstance.
 //! @}
 
 #define GBL_SELF_TYPE GblIEventReceiver

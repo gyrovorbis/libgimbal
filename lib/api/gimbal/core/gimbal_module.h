@@ -12,6 +12,8 @@
  *      - plan out type registration/management
  *      - rig up option group parsery
  *      - stop inheriting GblContext
+ *      - propertyChange signal emission
+ *      - loaded/unloaded signals
  *
  *  \author     2023, 2025 Falco Girgis
  *  \copyright  MIT License

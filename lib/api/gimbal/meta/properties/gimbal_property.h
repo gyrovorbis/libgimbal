@@ -50,19 +50,21 @@ GBL_FORWARD_DECLARE_STRUCT(GblProperty);
 typedef GblBool (*GblPropertyIterFn)(const GblProperty* pProp, void* pClosure);
 
 /*! \enum  GBL_PROPERTY_FLAG
- *  \brief Flags used to denote property attributes
+ *  \brief Flags used to denote property attributes.
  */
 GBL_DECLARE_ENUM(GBL_PROPERTY_FLAG) {
-    GBL_PROPERTY_FLAG_CONSTRUCT     = 0x1,   //!< Property must be given to the constructor.
-    GBL_PROPERTY_FLAG_READ          = 0x2,   //!< Property value can be read.
-    GBL_PROPERTY_FLAG_WRITE         = 0x4,   //!< Property value can be modified.
-    GBL_PROPERTY_FLAG_SAVE          = 0x8,   //!< Property is serialized when saving.
-    GBL_PROPERTY_FLAG_LOAD          = 0x10,  //!< Property is deserialized when loading.
-    GBL_PROPERTY_FLAG_ABSTRACT      = 0x20,  //!< Property must be implemented by deriving type.
-    GBL_PROPERTY_FLAG_OVERRIDE      = 0x40,  //!< Property overrides an existing property.
-    GBL_PROPERTY_FLAG_READ_WRITE    = 0x6,   //!< Property is both readable and writable.
-    GBL_PROPERTY_FLAG_SAVE_LOAD     = 0x18,  //!< Property is both savable and loadable.
-    GBL_PROPERTY_FLAG_ALL           = 0xffff //!< Mask for all property flags.
+    GBL_PROPERTY_FLAG_CONSTRUCT  = 0x001, //!< Property must be given to the constructor.
+    GBL_PROPERTY_FLAG_READ       = 0x002, //!< Property value can be read.
+    GBL_PROPERTY_FLAG_WRITE      = 0x004, //!< Property value can be modified.
+    GBL_PROPERTY_FLAG_IN         = 0x008, //!< Property assumes ownership of data when writing.
+    GBL_PROPERTY_FLAG_OUT        = 0x010, //!< Property releases ownership of data when reading.
+    GBL_PROPERTY_FLAG_SAVE       = 0x020, //!< Property is serialized when saving.
+    GBL_PROPERTY_FLAG_LOAD       = 0x040, //!< Property is deserialized when loading.
+    GBL_PROPERTY_FLAG_ABSTRACT   = 0x080, //!< Property must be implemented by deriving type.
+    GBL_PROPERTY_FLAG_OVERRIDE   = 0x100, //!< Property overrides an existing property.
+    GBL_PROPERTY_FLAG_READ_WRITE = 0x006, //!< Property is both readable and writable.
+    GBL_PROPERTY_FLAG_SAVE_LOAD  = 0x060, //!< Property is both savable and loadable.
+    GBL_PROPERTY_FLAG_ALL        = 0xfff  //!< Mask for all property flags combined.
 };
 
 /*! \struct  GblPropertyClass
