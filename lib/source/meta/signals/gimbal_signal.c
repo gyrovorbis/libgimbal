@@ -613,6 +613,37 @@ GBL_RESULT GblSignal_removeInstance_(GblInstance* pInstance) {
     GBL_CTX_END();
 }
 
+GBL_EXPORT GblBool GblSignal_blocked(GblInstance* pInstance,
+                                     const char*  pSignalName)
+{
+    GblBool value = GBL_FALSE;
+    GBL_CTX_BEGIN(GblHashSet_context(&instanceConnectionTableSet_));
+
+    if(pSignalName) {
+        EmitterHandler_* pHandler = EmitterHandler_findOrCreate_(pInstance,
+                                                                 pSignalName,
+                                                                 GBL_QUARK_INVALID,
+                                                                 NULL,
+                                                                 NULL,
+                                                                 NULL,
+                                                                 NULL);
+        GBL_CTX_VERIFY_LAST_RECORD();
+
+        if(pHandler)
+            value = pHandler->blocked;
+    } else {
+        InstanceConnectionTable_* pTable = InstanceConnectionTable_findOrCreate_(pInstance);
+        GBL_CTX_VERIFY_LAST_RECORD();
+
+        if(pTable)
+            value = pTable->signalsBlocked;
+    }
+
+    GBL_CTX_END_BLOCK();
+    return value;
+}
+
+
 GBL_EXPORT GblBool GblSignal_block(GblInstance* pInstance,
                                    const char*  pSignalName,
                                    GblBool      blocked)

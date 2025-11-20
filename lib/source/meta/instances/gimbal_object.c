@@ -15,11 +15,15 @@
 #define GBL_OBJECT_DERIVED_FLAG_INSTANTIATED_MASK_  0x1
 #define GBL_OBJECT_DERIVED_FLAG_CONSTRUCTED_MASK_   0x2
 
+static GblQuark objectNameQuark_           = GBL_QUARK_INVALID;
+static GblQuark objectParentQuark_         = GBL_QUARK_INVALID;
+static GblQuark objectFamilyQuark_         = GBL_QUARK_INVALID;
+static GblQuark objectEventFiltersQuark_   = GBL_QUARK_INVALID;
+static GblQuark objectNamePropertyQuark_   = GBL_QUARK_INVALID;
+static GblQuark objectParentPropertyQuark_ = GBL_QUARK_INVALID;
 
-static GblQuark objectNameQuark_         = GBL_QUARK_INVALID;
-static GblQuark objectParentQuark_       = GBL_QUARK_INVALID;
-static GblQuark objectFamilyQuark_       = GBL_QUARK_INVALID;
-static GblQuark objectEventFiltersQuark_ = GBL_QUARK_INVALID;
+// External private function for doing raw-dogged GblBox::userdata set.
+GBL_RESULT GblBox_setUserdata_(GblBox* pSelf, void* pUserdata);
 
 static uint16_t GblObject_derivedFlags_(const GblObject* pObject) {
     return GBL_PRIV_REF(GBL_BOX(pObject)).derivedFlags;
@@ -642,15 +646,29 @@ GBL_EXPORT GBL_RESULT GblObject_emitPropertyChange(const GblObject* pSelf, const
 }
 
 GBL_EXPORT GBL_RESULT GblObject_emitPropertyChangeByQuark(const GblObject* pSelf, GblQuark name) {
+    GBL_CTX_BEGIN(NULL);
+
     const GblProperty* pProp;
 
-    if(name == GBL_QUARK_INVALID)
-        return GBL_RESULT_ERROR_INVALID_PROPERTY;
+    GBL_CTX_VERIFY(name != GBL_QUARK_INVALID,
+                   GBL_RESULT_ERROR_INVALID_PROPERTY);
 
-    if(!(pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf), name)))
-        return GBL_RESULT_ERROR_INVALID_PROPERTY;
+    GBL_CTX_VERIFY((pProp = GblProperty_findQuark(GBL_TYPEOF(pSelf), name)),
+                   GBL_RESULT_ERROR_INVALID_PROPERTY,
+                   "Failed to emit propertyChange: [%s]",
+                   GblQuark_toString(name));
 
-    return GBL_EMIT(pSelf, "propertyChange", pProp);
+    GBL_EMIT(pSelf, "propertyChange", pProp);
+
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GblBool GblObject_blockPropertyChange(GblObject* pSelf, GblBool blocked) {
+    return GblSignal_block(GBL_INSTANCE(pSelf), "propertyChange", blocked);
+}
+
+GBL_EXPORT GblBool GblObject_propertyChangeBlocked(const GblObject* pSelf) {
+    return GblSignal_blocked(GBL_INSTANCE(pSelf), "propertyChange");
 }
 
 static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
@@ -1019,18 +1037,31 @@ static GBL_RESULT GblObject_nameDestruct_(const GblArrayMap* pMap, uintptr_t key
     return GBL_RESULT_SUCCESS;
 }
 
-GBL_EXPORT void GblObject_setName(GblObject* pSelf, const char* pName) {
-    GblArrayMap_setUserdata(&GBL_PRIV(pSelf->base).pFields,
-                            objectNameQuark_,
-                            (uintptr_t)GblStringRef_create(pName),
-                            GblObject_nameDestruct_);
+
+static GBL_RESULT GblObject_setNameRef_(GblObject* pSelf, GblStringRef* pRef) {
+    return GblArrayMap_setUserdata(&GBL_PRIV(pSelf->base).pFields,
+                                   objectNameQuark_,
+                                   (uintptr_t)pRef,
+                                   GblObject_nameDestruct_);
 }
 
 GBL_EXPORT void GblObject_setNameRef(GblObject* pSelf, GblStringRef* pRef) {
-    GblArrayMap_setUserdata(&GBL_PRIV(pSelf->base).pFields,
-                            objectNameQuark_,
-                            (uintptr_t)pRef,
-                            GblObject_nameDestruct_);
+    GblStringRef* pName = GblObject_name(pSelf);
+
+    if(!pName && !pRef)
+        return;
+    else if(pName && pRef) {
+        if(!strcmp(pName, pRef))
+            return;
+    }
+
+    GblObject_setNameRef_(pSelf, pRef);
+
+    GblObject_emitPropertyChangeByQuark(pSelf, objectNamePropertyQuark_);
+}
+
+GBL_EXPORT void GblObject_setName(GblObject* pSelf, const char* pName) {
+    GblObject_setNameRef(pSelf, GblStringRef_create(pName));
 }
 
 GBL_EXPORT GblStringRef* GblObject_name(const GblObject* pSelf) {
@@ -1087,14 +1118,24 @@ GBL_EXPORT GblObject* GblObject_parent(const GblObject* pSelf) {
     return pFamily? GBL_OBJECT_FAMILY_ENTRY_(pFamily->treeNode.pParent): NULL;
 }
 
-GBL_EXPORT void GblObject_setParent(GblObject* pSelf, GblObject* pParent) {
+static GblBool GblObject_setParent_(GblObject* pSelf, GblObject* pParent) {
     GblObject* pOldParent = GblObject_parent(pSelf);
 
-    if(pOldParent) {
-        GblObject_removeChild(pOldParent, pSelf);
-    }
+    if(pParent == pOldParent)
+        return GBL_FALSE;
 
-    if(pParent) GblObject_addChild(pParent, pSelf);
+    if(pOldParent)
+        GblObject_removeChild(pOldParent, pSelf);
+
+    if(pParent)
+        GblObject_addChild(pParent, pSelf);
+
+    return GBL_TRUE;
+}
+
+GBL_EXPORT void GblObject_setParent(GblObject* pSelf, GblObject* pParent) {
+    if(GblObject_setParent_(pSelf, pParent))
+        GblObject_emitPropertyChangeByQuark(pSelf, objectParentPropertyQuark_);
 }
 
 GBL_EXPORT GblObject* GblObject_childFirst(const GblObject* pSelf) {
@@ -1685,13 +1726,13 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
     case GblObject_Property_Id_name: {
         GblStringRef* pName = NULL;
         GBL_CTX_CALL(GblVariant_valueMove(pValue, &pName));
-        GblObject_setNameRef(pSelf, pName);
+        GblObject_setNameRef_(pSelf, pName);
         break;
     }
     case GblObject_Property_Id_parent: {
         GblObject* pParent = NULL;
         GBL_CTX_CALL(GblVariant_valuePeek(pValue, &pParent));
-        GblObject_setParent(pSelf, pParent);
+        GblObject_setParent_(pSelf, pParent);
         break;
     }
     case GblObject_Property_Id_children: {
@@ -1706,12 +1747,12 @@ static GBL_RESULT GblObject_setProperty_(GblObject* pSelf, const GblProperty* pP
     case GblObject_Property_Id_userdata: {
         void* pUserdata = NULL;
         GBL_CTX_CALL(GblVariant_valueCopy(pValue, &pUserdata));
-        GblBox_setUserdata(GBL_BOX(pSelf), pUserdata);
+        GblBox_setUserdata_(GBL_BOX(pSelf), pUserdata);
         break;
     }
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
-                           "Writing unhandled property: %s",
-                           GblProperty_nameString(pProp));
+                                "Writing unhandled property: %s",
+                                GblProperty_nameString(pProp));
     }
 
     GBL_CTX_END();
@@ -1730,10 +1771,12 @@ static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData) {
 
     // static constructor for first instance of class
     if(!GblType_classRefCount(GBL_OBJECT_TYPE)) {
-        objectNameQuark_         = GblQuark_fromStatic("_name");
-        objectParentQuark_       = GblQuark_fromStatic("_parent");
-        objectFamilyQuark_       = GblQuark_fromStatic("_family");
-        objectEventFiltersQuark_ = GblQuark_fromStatic("_eventFilters");
+        objectNameQuark_           = GblQuark_fromStatic("_name");
+        objectParentQuark_         = GblQuark_fromStatic("_parent");
+        objectFamilyQuark_         = GblQuark_fromStatic("_family");
+        objectEventFiltersQuark_   = GblQuark_fromStatic("_eventFilters");
+        objectNamePropertyQuark_   = GblQuark_fromStatic("name");
+        objectParentPropertyQuark_ = GblQuark_fromStatic("parent");
 
         GBL_PROPERTIES_REGISTER(GblObject);
 

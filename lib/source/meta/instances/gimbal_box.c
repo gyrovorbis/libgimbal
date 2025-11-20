@@ -1,4 +1,5 @@
 #include <gimbal/meta/instances/gimbal_box.h>
+#include <gimbal/meta/instances/gimbal_object.h>
 #include <gimbal/meta/signals/gimbal_marshal.h>
 #include "../types/gimbal_type_.h"
 
@@ -7,8 +8,10 @@
 #define GBL_BOX_FIELD_KEY_DESTRUCTOR   "_dtor"
 #define GBL_BOX_FIELD_KEY_USERDATA     "_ud"
 
-static GblQuark fieldKeyDtor_ = GBL_QUARK_INVALID;
-static GblQuark fieldKeyUd_   = GBL_QUARK_INVALID;
+static GblQuark fieldKeyDtor_  = GBL_QUARK_INVALID;
+static GblQuark fieldKeyUd_    = GBL_QUARK_INVALID;
+static GblQuark userdataQuark_ = GBL_QUARK_INVALID;
+static GblQuark refCountQuark_ = GBL_QUARK_INVALID;
 
 // ============== GblBoxClass ====================
 GBL_EXPORT GblBoxClass* (GblBoxClass_createFloating)(GblType           derivedType,
@@ -190,7 +193,7 @@ GBL_EXPORT void* GblBox_userdata(const GblBox* pSelf) {
     return (void*)GblArrayMap_getValue(&GBL_BOX_(pSelf).pFields, fieldKeyUd_);
 }
 
-GBL_EXPORT GBL_RESULT GblBox_setUserdata(GblBox* pSelf, void* pUserdata) {
+GBL_RESULT GblBox_setUserdata_(GblBox* pSelf, void* pUserdata) {
     if(pUserdata)
         return GblArrayMap_setUserdata(&GBL_BOX_(pSelf).pFields,
                                        fieldKeyUd_,
@@ -200,9 +203,33 @@ GBL_EXPORT GBL_RESULT GblBox_setUserdata(GblBox* pSelf, void* pUserdata) {
         return GblArrayMap_erase(&GBL_BOX_(pSelf).pFields, fieldKeyUd_);
 }
 
+GBL_EXPORT GBL_RESULT GblBox_setUserdata(GblBox* pSelf, void* pUserdata) {
+    GblObject* pObject;
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+
+    if(pUserdata != GblBox_userdata(pSelf)) {
+        result = GblBox_setUserdata_(pSelf, pUserdata);
+
+        /* Disgusting down-cast, because GblObject adds a "userdata" property which
+           must get notified of changes outside the property system. */
+        if(pObject = GBL_AS(GblObject, pSelf))
+            GblObject_emitPropertyChangeByQuark(pObject, userdataQuark_);
+    }
+
+    return result;
+}
+
 GBL_EXPORT GblBox* GblBox_ref(GblBox* pSelf) {
+    GblObject* pObject;
+
     GBL_ASSERT(pSelf);
-    ++GBL_BOX_(pSelf).refCounter;
+    GBL_BOX_(pSelf).refCounter++;
+
+    /* Disgusting down-cast, because GblObject adds a "userdata" property which
+       must get notified of changes outside the property system. */
+    if((pObject = GBL_AS(GblObject, pSelf)))
+        GblObject_emitPropertyChangeByQuark(pObject, refCountQuark_);
+
     return pSelf;
 }
 
@@ -212,6 +239,8 @@ GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
 
     // It's legal to call with a NULL pointer, just like free().
     if GBL_LIKELY(pSelf) {
+        GblObject* pObject;
+
         // Debug-only sanity check.
         GBL_ASSERT(GBL_BOX_(pSelf).refCounter, "No references remaining to unref!");
 
@@ -219,6 +248,9 @@ GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
         if(!(count = (GBL_BOX_(pSelf).refCounter--) - 1)) {
             // Mark the Box as being in the finalization stage.
             GBL_BOX_(pSelf).finalizing = GBL_TRUE;
+
+            if((pObject = GBL_AS(GblObject, pSelf)))
+                GblObject_emitPropertyChangeByQuark(pObject, refCountQuark_);
 
             // Emit "finalizing" signal for any attached weak references.
             GBL_EMIT(pSelf, "finalize");
@@ -234,7 +266,8 @@ GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
 
             // \todo Raise an actual error.
             //GBL_ASSERT(GBL_RESULT_SUCCESS(result));
-        }
+        } else if((pObject = GBL_AS(GblObject, pSelf)))
+            GblObject_emitPropertyChangeByQuark(pObject, refCountQuark_);
     }
 
     return count;
@@ -343,8 +376,10 @@ static GBL_RESULT GblBoxClass_init_(GblClass* pClass, const void* pUd) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
 
     if GBL_UNLIKELY(!GblType_classRefCount(GBL_BOX_TYPE)) {
-        fieldKeyDtor_ = GblQuark_fromStatic(GBL_BOX_FIELD_KEY_DESTRUCTOR);
-        fieldKeyUd_   = GblQuark_fromStatic(GBL_BOX_FIELD_KEY_USERDATA);
+        fieldKeyDtor_  = GblQuark_fromStatic(GBL_BOX_FIELD_KEY_DESTRUCTOR);
+        fieldKeyUd_    = GblQuark_fromStatic(GBL_BOX_FIELD_KEY_USERDATA);
+        userdataQuark_ = GblQuark_fromStatic("userdata");
+        refCountQuark_ = GblQuark_fromStatic("refCount");
 
         result = GblSignal_install(GBL_BOX_TYPE,
                                    "finalize",

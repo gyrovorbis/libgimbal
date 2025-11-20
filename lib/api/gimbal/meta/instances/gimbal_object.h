@@ -15,6 +15,7 @@
  *  \todo
  *      - Uninstall all signals upon class destructor (with property uninstallation)
  *      - Get rid of GblObject_findContext()
+ *      - GblObject_set/addChildren() with propertyChange() signal
  *
  *  \test
  *      - GblObjectClass::pFnConstructed() with CONSTRUCTOR properties.
@@ -204,7 +205,7 @@ GBL_EXPORT GBL_RESULT GblObject_constructVariantsWithClass
                                                     GblVariant*     pValues)                   GBL_NOEXCEPT;
 //! @}
 
-/*! \name  Property Management
+/*! \name  Property Access
  *  \brief Methods for accessing and working with properties.
  *  \relatesalso GblObject
  *  @{
@@ -257,11 +258,20 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants
                                                      size_t      count,
                                                      const char* pNames[],
                                                      GblVariant* pValue)                               GBL_NOEXCEPT;
+
+/*! \name  Property Notification
+ *  \brief Methods involving property changed notifiers.
+ *  \relatesalso GblObject
+ *  @{
+ */
 //! Notifies any listeners that the value of a property has changed internally, by emitting the "propertyChanged" signal.
-GBL_EXPORT GBL_RESULT GblObject_emitPropertyChange  (GBL_CSELF, const char* pName)                     GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblObject_emitPropertyChange        (GBL_CSELF, const char* pName) GBL_NOEXCEPT;
 //! Equivalent to GblObject_emitPropertyChange(), except that the property lookup is done more efficiently by using a quark for its name.
-GBL_EXPORT GBL_RESULT GblObject_emitPropertyChangeByQuark
-                                                    (GBL_CSELF, GblQuark name)                         GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblObject_emitPropertyChangeByQuark (GBL_CSELF, GblQuark name)     GBL_NOEXCEPT;
+//! Disables or enables emission of the "propertyChange" signal, returning its previous enablement. Typically you want to only do this temporarily and restore its previous state when done.
+GBL_EXPORT GblBool    GblObject_blockPropertyChange       (GBL_SELF, GblBool blocked)    GBL_NOEXCEPT;
+//! Returns true if emission of the "propertyChange" signal has been blocked on the current object or false if it is enabled.
+GBL_EXPORT GblBool    GblObject_propertyChangeBlocked     (GBL_CSELF)                    GBL_NOEXCEPT;
 //! @}
 
 /*! \name State Management

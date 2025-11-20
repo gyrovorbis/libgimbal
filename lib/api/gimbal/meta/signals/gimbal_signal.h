@@ -181,7 +181,7 @@ GBL_EXPORT size_t     GblSignal_disconnect     (GblInstance* pEmitter,
                                                 GblClosure*  pClosure)       GBL_NOEXCEPT;
 //! @}
 
-/*! \name  Disabling
+/*! \name  Blocking
  *  \brief Routines for temporarily disabling and enabling signal emission.
  *  @{
  */
@@ -192,6 +192,9 @@ GBL_EXPORT GblBool GblSignal_block    (GblInstance* pInstance,
 //! Blocks all signals from being emitted from \p pinstance if \p block is `true`, otherwise enables them.
 GBL_EXPORT GblBool GblSignal_blockAll (GblInstance* pInstance,
                                        GblBool      blocked)     GBL_NOEXCEPT;
+//! Returns true if the signal is blocked on the given instance or if all signals are blocked, if no signal name is provided.
+GBL_EXPORT GblBool GblSignal_blocked  (GblInstance* pInstance,
+                                       const char*  pSignalName) GBL_NOEXCEPT;
 //! @}
 
 

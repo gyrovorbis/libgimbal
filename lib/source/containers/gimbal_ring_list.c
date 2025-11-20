@@ -489,10 +489,10 @@ GBL_EXPORT GblBool (GblRingList_iterate)(GblRingList* pSelf, GblRingListIterFn p
     return GBL_FALSE;
 }
 
-GBL_EXPORT size_t  GblRingList_find(const GblRingList* pSelf,
-                                    const void*        pVal,
-                                    GblRingListCmpFn   pFnCmp,
-                                    void*              pCl)
+GBL_EXPORT size_t GblRingList_find(const GblRingList* pSelf,
+                                   const void*        pVal,
+                                   GblRingListCmpFn   pFnCmp,
+                                   void*              pCl)
 {
     size_t  index = 0;
     for(GblRingList* pIt = pSelf->ringNode.pNext;
