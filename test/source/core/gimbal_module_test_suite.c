@@ -138,9 +138,9 @@ static GblBool nullTestIter_(GblModule* pIt, void* pClosure) {
     return GBL_FALSE;
 }
 
-GBL_TEST_CASE(foreachEmpty) {
+GBL_TEST_CASE(iterateEmpty) {
 
-    GBL_TEST_COMPARE(GblModule_foreach(nullTestIter_,
+    GBL_TEST_COMPARE(GblModule_iterate(nullTestIter_,
                                        pFixture),
                      GBL_FALSE);
 
@@ -204,7 +204,7 @@ GBL_RESULT registerVerify_(GblModule* pModule, GblModuleTestSuite_* pFixture) {
     GBL_TEST_VERIFY(found);
 
     pFixture->foreachCount = newCount;
-    GBL_TEST_COMPARE(GblModule_foreach(findIter_, pFixture), GBL_TRUE);
+    GBL_TEST_COMPARE(GblModule_iterate(findIter_, pFixture), GBL_TRUE);
     GBL_TEST_COMPARE(pFixture->foreachCount, 0);
 
     GBL_CTX_END();
@@ -256,7 +256,7 @@ GBL_TEST_REGISTER(findFail,
                   findQuarkFail,
                   atInvalid,
                   countEmpty,
-                  foreachEmpty,
+                  iterateEmpty,
                   createBase,
                   registerBase,
                   registerDerived,

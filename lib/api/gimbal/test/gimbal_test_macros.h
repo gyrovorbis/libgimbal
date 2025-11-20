@@ -18,6 +18,10 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+#ifdef __cplusplus
+#   include <concepts>
+#endif
+
 #define GBL_TEST_VERIFY(expr)                   GBL_CTX_VERIFY_EXPRESSION(expr)
 
 /// \cond
@@ -127,8 +131,17 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
 #   define GBL_TEST_COMPARE_CMP_(actual, expected) GBL_META_GENERIC_MACRO_GENERATE(GBL_TEST_COMPARE_CMP_TABLE_, actual)(actual, expected)
 
 #else
-inline GblBool GBL_TEST_COMPARE_CMP_(auto actual, auto expected) { return static_cast<decltype(expected)>(actual) == expected; }
-inline GblBool GBL_TEST_COMPARE_CMP_(const char* pActual, const char *pExpected) { return GBL_TEST_COMPARE_CMP_STR_(pActual, pExpected); }
+inline GblBool GBL_TEST_COMPARE_CMP_(auto actual, auto expected) noexcept {
+    if constexpr(std::convertible_to<decltype(actual), decltype(expected)>)
+        return static_cast<decltype(expected)>(actual) == expected;
+    else if constexpr(std::convertible_to<decltype(expected), decltype(actual)>)
+        return actual == static_cast<decltype(actual)>(expected);
+    else static_assert("Incompatible types!");
+}
+
+inline GblBool GBL_TEST_COMPARE_CMP_(const char* pActual, const char *pExpected) noexcept {
+    return GBL_TEST_COMPARE_CMP_STR_(pActual, pExpected);
+}
 
 #endif
 /// \endcond

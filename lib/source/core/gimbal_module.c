@@ -184,7 +184,7 @@ GBL_EXPORT GblModule* GblModule_at(size_t index) {
     return pModule;
 }
 
-GBL_EXPORT size_t  GblModule_count(void) {
+GBL_EXPORT size_t GblModule_count(void) {
     GBL_MODULE_ENSURE_INITIALIZED_();
     mtx_lock(&moduleMtx_);
 
@@ -194,8 +194,8 @@ GBL_EXPORT size_t  GblModule_count(void) {
     return count;
 }
 
-GBL_EXPORT GblBool GblModule_foreach(GblModuleIterFn pFnIter,
-                                     void*           pUserdata) {
+GBL_EXPORT GblBool (GblModule_iterate)(GblModuleIterFn pFnIter,
+                                       void*           pUserdata) {
     GblBool retVal = GBL_FALSE;
 
     GBL_MODULE_ENSURE_INITIALIZED_();
@@ -308,13 +308,6 @@ GBL_EXPORT GblRefCount GblModule_unref(GblModule* pSelf) {
     return GBL_UNREF(pSelf);
 }
 
-// Fix for Windows: "Redefinition with different linkage"
-// Removed GBL_EXPORT from here and added to declaration in gimbal_module.h
-size_t GblModule_typeCount(const GblModule* pSelf) {
-    GBL_UNUSED(pSelf);
-    return 0;
-}
-
 static GBL_RESULT GblModule_load_(GblModule* pModule) {
     GBL_UNUSED(pModule);
 
@@ -391,8 +384,6 @@ static GBL_RESULT GblModule_GblObject_property_(const GblObject*   pObject,
         GblVariant_setStringRef(pValue, pSelf->pDescription); break;
     case GblModule_Property_Id_useCount:
         GblVariant_setUint16(pValue, GblModule_useCount(pSelf)); break;
-    case GblModule_Property_Id_typeCount:
-        GblVariant_setUint32(pValue, GblModule_typeCount(pSelf)); break;
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Attemping to read invalid property [%s] on GblModule",
