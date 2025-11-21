@@ -57,7 +57,6 @@
 #define GBL_LOG_INFO_SCOPE(domain, ...)     GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_INFO, __VA_ARGS__)     //!< Writes to log with GBL_LOG_INFO,    then pushes level to log stack. Pops level when scope ends
 #define GBL_LOG_WARN_SCOPE(domain, ...)     GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_WARN, __VA_ARGS__)     //!< Writes to log with GBL_LOG_WARN,    then pushes level to log stack. Pops level when scope ends
 #define GBL_LOG_ERROR_SCOPE(domain, ...)    GBL_LOG_MAKE_SCOPE_(domain, GBL_LOG_ERROR, __VA_ARGS__)    //!< Writes to log with GBL_LOG_ERROR,   then pushes level to log stack. Pops level when scope ends
-
 //! @}
 
 #define GBL_SELF_TYPE GblLogger

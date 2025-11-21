@@ -12,8 +12,6 @@
  *      - plan out type registration/management
  *      - rig up option group parsery
  *      - stop inheriting GblContext
- *      - propertyChange signal emission
- *      - loaded/unloaded signals
  *
  *  \author     2023, 2025 Falco Girgis
  *  \copyright  MIT License
@@ -25,15 +23,16 @@
 #include "../meta/ifaces/gimbal_iplugin.h"
 #include "../strings/gimbal_string_ref.h"
 #include "../utils/gimbal_version.h"
+#include "../utils/gimbal_option_group.h"
 
 /*! \name Type System
- *  \brief Type UUID and cast operators
+ *  \brief Type UUID and cast operators.
  *  @{
  */
-#define GBL_MODULE_TYPE             (GBL_TYPEID(GblModule))            //!< Type UUID for GblModule
-#define GBL_MODULE(self)            (GBL_CAST(GblModule, self))        //!< Function-style GblInstance cast
-#define GBL_MODULE_CLASS(klass)     (GBL_CLASS_CAST(GblModule, klass)) //!< Function-style GblClass cast
-#define GBL_MODULE_GET_CLASS(self)  (GBL_CLASSOF(GblModule, self))     //!< Gets a GblModuleClass from GblInstance
+#define GBL_MODULE_TYPE           GBL_TYPEID(GblModule)            //!< Type UUID for GblModule
+#define GBL_MODULE(self)          GBL_CAST(GblModule, self)        //!< Function-style GblInstance cast
+#define GBL_MODULE_CLASS(klass)   GBL_CLASS_CAST(GblModule, klass) //!< Function-style GblClass cast
+#define GBL_MODULE_CLASSOF(self)  GBL_CLASSOF(GblModule, self)     //!< Gets a GblModuleClass from GblInstance
 //! @}
 
 /*! Macro directive for importing a module.
@@ -52,7 +51,7 @@
     \retval GblModule*   An auto-casted pointer to the instance of the desire module.
     \retval NULL         The module wasn't present or the version was too low.
 */
-#define GBL_REQUIRE(.../* typename (, version) */)   GBL_REQUIRE_(__VA_ARGS__)   //!< Returns the module for the given type
+#define GBL_REQUIRE(.../* typename (, version) */)   GBL_REQUIRE_(__VA_ARGS__)
 
 #define GBL_SELF_TYPE   GblModule
 
@@ -77,8 +76,8 @@ typedef GblBool (*GblModuleIterFn)(GblModule* pIt, void* pClosure);
  *  \sa GblModule, GblIPluginClass
  */
 GBL_CLASS_DERIVE(GblModule, GblContext, GblIPlugin)
-    GBL_RESULT (*pFnLoad)  (GBL_SELF); //!< Called when a GblModule is first loaded
-    GBL_RESULT (*pFnUnload)(GBL_SELF); //!< Called after the GblModule is done being referenced
+    GBL_RESULT (*pFnLoad)  (GBL_SELF);  //!< Called when a GblModule is first loaded
+    GBL_RESULT (*pFnUnload)(GBL_SELF);  //!< Called after the GblModule is done being referenced
 GBL_CLASS_END
 
 /*! \struct     GblModule
@@ -106,11 +105,17 @@ GBL_INSTANCE_END
 
 //! \cond
 GBL_PROPERTIES(GblModule,
-    (prefix,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
-    (version,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_UINT32_TYPE),
-    (author,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
-    (description, GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
-    (useCount,    GBL_GENERIC, (READ),                    GBL_INT16_TYPE )
+    (prefix,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE),     GBL_STRING_TYPE),
+    (version,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE),     GBL_UINT32_TYPE),
+    (author,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE),     GBL_STRING_TYPE),
+    (description, GBL_GENERIC, (READ, WRITE, LOAD, SAVE),     GBL_STRING_TYPE),
+    (optionGroup, GBL_GENERIC, (READ, WRITE, LOAD, SAVE, IN), GBL_OPTION_GROUP_TYPE),
+    (useCount,    GBL_GENERIC, (READ),                        GBL_INT16_TYPE)
+)
+
+GBL_SIGNALS(GblModule,
+    (loaded),
+    (unloaded)
 )
 //! \endcond
 
