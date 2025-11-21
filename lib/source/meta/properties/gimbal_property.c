@@ -267,33 +267,40 @@ static GBL_RESULT GblProperty_validate_(const GblProperty* pProp) {
 
     GBL_CTX_VERIFY(pProp->name != GBL_QUARK_INVALID,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
-                   "Attempted to add property without a valid name!");
+                   "Attempted to add property without a valid name: [%s]",
+                   GblType_name(GblProperty_objectType(pProp)));
 
     GBL_CTX_VERIFY(pProp->valueType != GBL_INVALID_TYPE &&
                    pProp->valueType != GBL_NIL_TYPE,
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
-                   "Attempted to add property with invalid or nil type: [%s]",
+                   "Attempted to add property with invalid or nil type: [%s::%s]",
+                   GblType_name(GblProperty_objectType(pProp)),
                    GblProperty_name(pProp));
 
     GBL_CTX_VERIFY(pProp->flags,
                   GBL_RESULT_ERROR_INVALID_PROPERTY,
-                  "Attempted to add property with no flags: [%s]",
+                  "Attempted to add property with no flags: [%s::%s]",
+                  GblType_name(GblProperty_objectType(pProp)),
                   GblProperty_name(pProp));
 
     GBL_CTX_VERIFY(!(!(pProp->flags & GBL_PROPERTY_FLAG_READ) && (pProp->flags & GBL_PROPERTY_FLAG_OUT)),
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
-                   "Attempted to add OUT flag without READ flag: [%s]",
+                   "Attempted to add OUT flag without READ flag: [%s::%s]",
+                   GblType_name(GblProperty_objectType(pProp)),
                    GblProperty_name(pProp));
 
     GBL_CTX_VERIFY(!(!(pProp->flags & (GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT)) &&
                     (pProp->flags & GBL_PROPERTY_FLAG_OUT)),
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
-                   "Attempted to add IN flag without WRITE or CONSTRUCT flag: [%s]",
+                   "Attempted to add IN flag without WRITE or CONSTRUCT flag: [%s::%s]",
+                   GblType_name(GblProperty_objectType(pProp)),
                    GblProperty_name(pProp));
 
-    GBL_CTX_VERIFY(!(pProp->flags & (GBL_PROPERTY_FLAG_ABSTRACT | GBL_PROPERTY_FLAG_OVERRIDE)),
+    GBL_CTX_VERIFY(!((pProp->flags & (GBL_PROPERTY_FLAG_ABSTRACT | GBL_PROPERTY_FLAG_OVERRIDE)) ==
+                    (GBL_PROPERTY_FLAG_ABSTRACT | GBL_PROPERTY_FLAG_OVERRIDE)),
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
-                   "Attempted to add property marked both ABSTRACT and OVERRIDE: [%s]",
+                   "Attempted to add property marked both ABSTRACT and OVERRIDE: [%s::%s]",
+                   GblType_name(GblProperty_objectType(pProp)),
                    GblProperty_name(pProp));
 
     GBL_CTX_END();

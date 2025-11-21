@@ -22,8 +22,6 @@
 //! size_t type denoting an invalid array index or position within a GblRingList
 #define GBL_RING_LIST_NPOS  GBL_NPOS
 
-#define GBL_SELF_TYPE       GblRingList
-
 /*! \name Type System
  *  \brief Type UUID and cast macros
  *  @{
@@ -39,6 +37,8 @@
 */
 #define GblRingList_foreach(/* list, item, type=void* */...)                    GblRingList_foreachDefault_(__VA_ARGS__)
 
+#define GBL_SELF_TYPE       GblRingList
+
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblRingList);
@@ -53,7 +53,7 @@ GBL_FORWARD_DECLARE_STRUCT(GblRingList);
  *  used by its GblITableVariant implementation, for the GblType of each element.
  */
 GBL_CLASS_DERIVE(GblRingList, GblOpaque, GblITableVariant)
-    GblType innerType; //!< GblType UUID representing the type of values stored within the GblRingList.
+    GblType innerType; //!< GblType UUID representing the type of values stored within the GblRingList, defaulting to GBL_POINTER_TYPE.
 GBL_CLASS_END
 
 /*! \name  User-Operator Callbacks

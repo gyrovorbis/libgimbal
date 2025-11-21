@@ -866,7 +866,8 @@ static GBL_RESULT stringConstruct_(GblVariant* pVariant, size_t  argc, GblVarian
     } else if(op & GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE) {
         GBL_CTX_VERIFY_ARG(argc == 1);
         GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
-        GBL_CTX_VERIFY_POINTER(pArgs[0].pVoid);
+        // Moving in a NULL as the new string value is valid?
+        //GBL_CTX_VERIFY_POINTER(pArgs[0].pVoid);
         GblStringRef_unref(pVariant->pString);
         pVariant->pString = pArgs[0].pVoid;
     }
