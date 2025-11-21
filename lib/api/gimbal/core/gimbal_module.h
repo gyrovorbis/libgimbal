@@ -14,6 +14,7 @@
  *      - stop inheriting GblContext
  *
  *  \author     2023, 2025 Falco Girgis
+ *  \author           2025 Agustín Bellagamba
  *  \copyright  MIT License
  */
 #ifndef GIMBAL_MODULE_H
@@ -36,24 +37,31 @@
 //! @}
 
 /*! Macro directive for importing a module.
-
-    Used to "import" a GblModule whose type has been registered with the type system,
-    lazily loading it the fist time and returning references to it subsequently.
-
-    \code {.c}
-        MyModule* module = GBL_REQUIRE(MyModule, "1.0.1");
-        GBL_ASSERT(module, "Failed to load MyModule!");
-    \endcode
-
-    \param  typename     Struct name for desired GblModule instance structure.
-    \param  version      [optional] Major.minor.patch string for specific version.
-
-    \retval GblModule*   An auto-casted pointer to the instance of the desire module.
-    \retval NULL         The module wasn't present or the version was too low.
+ *
+ *  Used to "import" a GblModule whose type has been registered with the type system,
+ *  lazily loading it the fist time and returning references to it subsequently.
+ *
+ *  \code {.c}
+ *      MyModule* module = NULL;
+ *      GBL_REQUIRE(MyModule, &MyModule);
+ *      GBL_ASSERT(module, "Failed to load MyModule!");
+ *  \endcode
+ *
+ *  \param  instanceStruct Struct name for desired GblModule instance structure.
+ *  \param  selfAddr       The address of a pointer to the instance to store the reference in.
+ *  \param  name           [optional] Name of the module to import.
+ *  \param  version        [optional] Major.minor.patch string for specific version.
+ *
+ *  \note
+ *  If the provided pointer is not NULL, this macro will not do anything, so it's recommended to mark the reference static.
 */
-#define GBL_REQUIRE(.../* typename (, version) */)   GBL_REQUIRE_(__VA_ARGS__)
+#define GBL_REQUIRE(/*instanceStruct, selfAddr, name=NULL, versionMin=NULL*/ ...)       GBL_REQUIRE_(__VA_ARGS__)
+//! TODO: Comment me!
+#define GBL_RELEASE(selfAddr)                                                           GBL_RELEASE_(selfAddr)
+//! TODO: Comment me!
+#define GBL_REQUIRE_SCOPE(/*instanceStruct, selfAddr, name=NULL, versionMin=NULL*/ ...) GBL_REQUIRE_SCOPE_(__VA_ARGS__)
 
-#define GBL_SELF_TYPE   GblModule
+#define GBL_SELF_TYPE GblModule
 
 GBL_DECLS_BEGIN
 
@@ -203,17 +211,36 @@ GBL_DECLS_END
 #define GBL_REQUIRE_(...) \
     GBL_VA_OVERLOAD_CALL(GBL_REQUIRE_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
-#define GBL_REQUIRE__1(type) \
-    GBL_CAST(type, GblModule_require(GblType_name(GBL_TYPEID(type)), \
-                                                     GBL_NULL, __FILE__, __func__, \
-                                                     __LINE__))
-#define GBL_REQUIRE__2(type, name) \
-    GBL_CAST(type, GblModule_require(name, GBL_NULL, __FILE__, __func__, \
-                                        __LINE__))
+#define GBL_REQUIRE__2(type, pPtr)                                      \
+        (GBL_UNLIKELY(!(*pPtr)) ?                                       \
+        (*pPtr = GBL_CAST(type, GblModule_require(                      \
+                 GblType_name(GBL_TYPEID(type)), GBL_NULL,              \
+                              __FILE__, __func__, __LINE__))) : 0)
 
-#define GBL_REQUIRE__3(type, name, version) \
-    GBL_CAST(type, GblModule_require(name, version, __FILE__, __func__, \
-                                        __LINE__))
+#define GBL_REQUIRE__3(type, pPtr, name)                                \
+        (GBL_UNLIKELY(!(*pPtr)) ?                                       \
+        (*pPtr = GBL_CAST(type, GblModule_require(                      \
+                 name, GBL_NULL, __FILE__, __func__, __LINE__))) : 0)
+
+#define GBL_REQUIRE__4(type, pPtr, name, version)                       \
+        (GBL_UNLIKELY(!(*pPtr)) ?                                       \
+        (*pPtr = GBL_CAST(type, GblModule_require(                      \
+                 name, version, __FILE__, __func__, __LINE__))) : 0)
+
+#define GBL_RELEASE_(pPtr)                               \
+    ( (GBL_LIKELY(*pPtr)) ?                              \
+      GblModule_unuse(GBL_CAST(GblModule, *pPtr))        \
+    : 0)
+
+#define GBL_REQUIRE_SCOPE_(...) \
+    GBL_VA_OVERLOAD_CALL(GBL_REQUIRE_SCOPE_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
+
+#define GBL_REQUIRE_SCOPE__2(type, pPtr)                                        \
+        GBL_SCOPE(GBL_REQUIRE__2(type, pPtr), GBL_RELEASE(pPtr))
+#define GBL_REQUIRE_SCOPE__3(type, pPtr, name)                                  \
+        GBL_SCOPE(GBL_REQUIRE__3(type, pPtr, name), GBL_RELEASE(pPtr))
+#define GBL_REQUIRE_SCOPE__4(type, pPtr, name, version)                         \
+        GBL_SCOPE(GBL_REQUIRE__4(type, pPtr, name, version), GBL_RELEASE(pPtr))
 
 #define GblModule_iterate(...) \
     GblModule_iterateDefault_(__VA_ARGS__)
