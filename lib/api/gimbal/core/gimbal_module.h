@@ -212,23 +212,23 @@ GBL_DECLS_END
     GBL_VA_OVERLOAD_CALL(GBL_REQUIRE_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
 
 #define GBL_REQUIRE__2(type, pPtr)                                      \
-        (GBL_UNLIKELY(!(*pPtr)) ?                                       \
+        (!(*pPtr) ?                                                     \
         (*pPtr = GBL_CAST(type, GblModule_require(                      \
                  GblType_name(GBL_TYPEID(type)), GBL_NULL,              \
-                              __FILE__, __func__, __LINE__))) : 0)
+                              __FILE__, __func__, __LINE__))) : *pPtr)
 
 #define GBL_REQUIRE__3(type, pPtr, name)                                \
-        (GBL_UNLIKELY(!(*pPtr)) ?                                       \
+        (!(*pPtr) ?                                                     \
         (*pPtr = GBL_CAST(type, GblModule_require(                      \
-                 name, GBL_NULL, __FILE__, __func__, __LINE__))) : 0)
+                 name, GBL_NULL, __FILE__, __func__, __LINE__))) : *pPtr)
 
 #define GBL_REQUIRE__4(type, pPtr, name, version)                       \
-        (GBL_UNLIKELY(!(*pPtr)) ?                                       \
+        (!(*pPtr) ?                                                     \
         (*pPtr = GBL_CAST(type, GblModule_require(                      \
-                 name, version, __FILE__, __func__, __LINE__))) : 0)
+                 name, version, __FILE__, __func__, __LINE__))) : *pPtr)
 
 #define GBL_RELEASE_(pPtr)                               \
-    ( (GBL_LIKELY(*pPtr)) ?                              \
+    ( (*pPtr) ?                                          \
       GblModule_unuse(GBL_CAST(GblModule, *pPtr))        \
     : 0)
 

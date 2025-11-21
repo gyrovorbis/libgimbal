@@ -252,6 +252,7 @@ GBL_TEST_CASE(requireScope)
 
     GBL_REQUIRE_SCOPE(TestModule1, &pModule1) {
         // sexy, sexy macro
+        GBL_TEST_COMPARE(pModule1, pFixture->pModule1);
     }
 
     GblRefCount newUseCount = GblModule_useCount(GBL_MODULE(pFixture->pModule1));
