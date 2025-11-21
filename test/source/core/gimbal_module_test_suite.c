@@ -247,15 +247,15 @@ GBL_TEST_CASE(require) {
 }
 
 GBL_TEST_CASE(requireScope)
-    GblRefCount prevUseCount;
+    TestModule1 *pModule1 = NULL;
+    GblRefCount prevUseCount = GblModule_useCount(GBL_MODULE(pFixture->pModule1));
 
-    GBL_REQUIRE_SCOPE(TestModule1, &pFixture->pModule1) {
-        prevUseCount = GblModule_useCount(GBL_MODULE(pFixture->pModule1));
+    GBL_REQUIRE_SCOPE(TestModule1, &pModule1) {
         // sexy, sexy macro
     }
 
     GblRefCount newUseCount = GblModule_useCount(GBL_MODULE(pFixture->pModule1));
-    GBL_TEST_COMPARE(newUseCount + 1, prevUseCount);
+    GBL_TEST_COMPARE(newUseCount, prevUseCount);
 GBL_TEST_CASE_END
 
 // option group checking
