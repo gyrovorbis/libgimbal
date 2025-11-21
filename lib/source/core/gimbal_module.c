@@ -380,7 +380,7 @@ static GBL_RESULT GblModule_GblObject_property_(const GblObject*   pObject,
     case GblModule_Property_Id_description:
         GblVariant_setStringRef(pValue, pSelf->pDescription); break;
     case GblModule_Property_Id_optionGroup:
-        GblVariant_setObjectCopy(pValue, pSelf->pOptionGroup); break;
+        GblVariant_setObjectCopy(pValue, GBL_OBJECT(pSelf->pOptionGroup)); break;
     case GblModule_Property_Id_useCount:
         GblVariant_setUint16(pValue, GblModule_useCount(pSelf)); break;
     default:
@@ -486,7 +486,6 @@ static GBL_RESULT GblModuleClass_final_(GblClass* pClass, const void* pData) {
     }
 
     return GBL_RESULT_SUCCESS;
-
 }
 
 GBL_EXPORT GblType GblModule_type(void) {
