@@ -161,10 +161,10 @@ The following is a closer look at the contents of each API:
 
 # Credits #
 ## Author ##
-[Falco Girgis](https://github.com/gyrovorbis) (gyrovorbis@gmail.com)
+- [Falco Girgis](https://github.com/gyrovorbis) (gyrovorbis@gmail.com)
 ## Collaborators ##
-[Agustín Bellagamba](https://github.com/Haikuno)
-[Mike Santiago](https://github.com/suicvne) (axiom@ignoresolutions.xyz)
+- [Agustín Bellagamba](https://github.com/Haikuno)
+- [Mike Santiago](https://github.com/suicvne) (axiom@ignoresolutions.xyz)
 ## Dependencies ##
 - GblHashSet and GblTreeSet original back-ends: Josh Baker (tidwall) 
   - https://github.com/tidwall/hashmap.c
