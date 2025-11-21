@@ -746,7 +746,7 @@ static GBL_RESULT GblScanner_GblObject_setProperty_(GblObject*         pObject,
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Attempted to set invalid property %s for GblScanner",
-                            GblProperty_nameString(pProp));
+                            GblProperty_name(pProp));
     }
 
     GBL_CTX_END();
@@ -777,7 +777,7 @@ static GBL_RESULT GblScanner_GblObject_property_(const GblObject*   pObject,
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Attempted to get invalid property %s for GblScanner",
-                           GblProperty_nameString(pProp));
+                           GblProperty_name(pProp));
     }
 
     GBL_CTX_END();

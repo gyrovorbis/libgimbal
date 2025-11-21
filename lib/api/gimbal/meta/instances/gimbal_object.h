@@ -23,7 +23,6 @@
  *      - GblObject_isConstructing().
  *      - GblObject_isInstantiating().
  *      - GblObject implementing ABSTRACT properties from GblInterface.
- *      - emit propertyChange when setting property values from raw C API.
  */
 #ifndef GIMBAL_OBJECT_H
 #define GIMBAL_OBJECT_H
@@ -119,7 +118,7 @@ GBL_INSTANCE_DERIVE_EMPTY(GblObject, GblBox)
 GBL_PROPERTIES(GblObject,
     (name,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE), GBL_STRING_TYPE),
     (parent,   GBL_GENERIC, (READ, WRITE),             GBL_OBJECT_TYPE),
-    (children, GBL_GENERIC, (READ, WRITE),             GBL_RING_LIST_TYPE),
+    (children, GBL_GENERIC, (READ, WRITE, IN, OUT),    GBL_RING_LIST_TYPE),
     (userdata, GBL_GENERIC, (READ, WRITE),             GBL_POINTER_TYPE),
     (refCount, GBL_GENERIC, (READ),                    GBL_UINT16_TYPE)
 //  (class,    GBL_GENERIC, (READ, WRITE, CONSTRUCT),  GBL_POINTER_TYPE)

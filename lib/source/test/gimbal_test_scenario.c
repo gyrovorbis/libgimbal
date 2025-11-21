@@ -330,7 +330,7 @@ static GBL_RESULT GblTestScenarioClass_property_(const GblObject* pSelf, const G
         break;
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "[GblTestScenario] Reading unhandled property: %s",
-                                GblProperty_nameString(pProp));
+                                GblProperty_name(pProp));
     }
     GBL_CTX_END();
 }

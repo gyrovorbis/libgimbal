@@ -454,7 +454,7 @@ static GBL_RESULT GblThread_GblObject_setProperty_(GblObject* pObject, const Gbl
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Failed to set property %s for type %s",
-                           GblProperty_nameString(pProp), GblType_name(GBL_TYPEOF(pSelf)));
+                           GblProperty_name(pProp), GblType_name(GBL_TYPEOF(pSelf)));
     }
     GBL_CTX_END();
 }
@@ -481,7 +481,7 @@ static GBL_RESULT GblThread_GblObject_property_(const GblObject* pObject, const 
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Failed to get property %s for type %s",
-                           GblProperty_nameString(pProp), GblType_name(GBL_TYPEOF(pSelf)));
+                           GblProperty_name(pProp), GblType_name(GBL_TYPEOF(pSelf)));
     }
 
     GBL_CTX_END();

@@ -222,7 +222,7 @@ GBL_EXPORT GBL_RESULT GblProperty_createOrConstruct (GblProperty** ppSelf,
 //! Returns the UUID of the type associated with the given property.
 GBL_EXPORT GblType     GblProperty_objectType (GBL_CSELF) GBL_NOEXCEPT;
 //! Returns the string name of the given property.
-GBL_EXPORT const char* GblProperty_nameString (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT const char* GblProperty_name       (GBL_CSELF) GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Methods

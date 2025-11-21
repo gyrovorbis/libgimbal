@@ -1000,7 +1000,6 @@ GBL_TEST_CASE(childIndex)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(childrenProperty)
-    GBL_TEST_SKIP("Owning properties leak for now");
     GblObject* pChild1 = GBL_NEW(GblObject);
     GblObject* pChild2 = GBL_NEW(GblObject);
     GblObject* pChild3 = GBL_NEW(GblObject);
@@ -1027,7 +1026,6 @@ GBL_TEST_CASE(childrenProperty)
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(childrenPropertyVariant)
-    GBL_TEST_SKIP("Owning properties leak for now");
     GblVariant variant;
     GblVariant_constructValueMove(&variant, GBL_RING_LIST_TYPE,
                                   GblRingList_create(
@@ -1037,7 +1035,8 @@ GBL_TEST_CASE(childrenPropertyVariant)
                                     GBL_NEW(GblObject, "name", "Child4")
                                   ));
 
-    GblObject* pParent = GblObject_createVariants(GBL_OBJECT_TYPE, 1, (const char*[]){"children"}, (GblVariant[]){variant});
+    GblObject* pParent = GblObject_createVariants(GBL_OBJECT_TYPE, 1,
+                                                  (const char*[]){"children"}, &variant);
 
     GblRingList *pChildren = NULL;
     GblObject_property(pParent, "children", &pChildren);
@@ -1048,9 +1047,13 @@ GBL_TEST_CASE(childrenPropertyVariant)
     GBL_TEST_COMPARE(GblObject_name(GblRingList_at(pChildren, 2)), "Child3");
     GBL_TEST_COMPARE(GblObject_name(GblRingList_at(pChildren, 3)), "Child4");
 
+    GblRingList_foreach(pChildren, pChild)
+        GBL_UNREF(pChild);
+
+    GBL_UNREF(pParent);
+
     GblVariant_destruct(&variant);
     GblRingList_unref(pChildren);
-    GBL_UNREF(pParent);
 GBL_TEST_CASE_END
 
 GBL_TEST_REGISTER(newDefault,
@@ -1154,7 +1157,7 @@ static GBL_RESULT TestObject_property_(const GblObject* pSelf, const GblProperty
         break;*/
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Attempt to get unregistered property: %s",
-                                GblProperty_nameString(pProp));
+                                GblProperty_name(pProp));
     }
     GBL_CTX_END();
 }
@@ -1182,7 +1185,7 @@ static GBL_RESULT TestObject_setProperty_(GblObject* pSelf, const GblProperty* p
     }*/
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Attempt to set unregistered property: %s",
-                                GblProperty_nameString(pProp));
+                                GblProperty_name(pProp));
     }
     GBL_CTX_END();
 }

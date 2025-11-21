@@ -77,7 +77,7 @@ static GblBool GblProperty_final_iterator_(const GblHashSet* pHash, void* pEntry
     GblProperty* pProp = pEntry;
 
     GBL_CTX_WARN("%-20s: %40s", "Object",   GblType_name(GBL_PRIV_REF(pProp).objectType));
-    GBL_CTX_WARN("%-20s: %40s", "Name",     GblProperty_nameString(pProp));
+    GBL_CTX_WARN("%-20s: %40s", "Name",     GblProperty_name(pProp));
     //GBL_CTX_VERBOSE("%-20s: %40u", "RefCount", GblBox_refCount(GBL_BOX(pProp)));
 
     return GBL_FALSE;
@@ -132,7 +132,7 @@ GBL_INLINE const GblProperty* propertyFirstNextBase_(GblType objectType, GblType
     return pRoot;
 }
 
-GBL_EXPORT const char* GblProperty_nameString(const GblProperty* pSelf) {
+GBL_EXPORT const char* GblProperty_name(const GblProperty* pSelf) {
     return pSelf? GblQuark_toString(pSelf->name) : NULL;
 }
 
@@ -260,40 +260,80 @@ GBL_EXPORT const GblProperty* GblProperty_next(GblType objectType, const GblProp
     return pNext;
 }
 
+static GBL_RESULT GblProperty_validate_(const GblProperty* pProp) {
+    GBL_CTX_BEGIN(GblHashSet_context(&propertyRegistry_));
+
+    GBL_CTX_VERIFY_TYPE(GblProperty_objectType(pProp), GBL_OBJECT_TYPE);
+
+    GBL_CTX_VERIFY(pProp->name != GBL_QUARK_INVALID,
+                   GBL_RESULT_ERROR_INVALID_PROPERTY,
+                   "Attempted to add property without a valid name!");
+
+    GBL_CTX_VERIFY(pProp->valueType != GBL_INVALID_TYPE &&
+                   pProp->valueType != GBL_NIL_TYPE,
+                   GBL_RESULT_ERROR_INVALID_PROPERTY,
+                   "Attempted to add property with invalid or nil type: [%s]",
+                   GblProperty_name(pProp));
+
+    GBL_CTX_VERIFY(pProp->flags,
+                  GBL_RESULT_ERROR_INVALID_PROPERTY,
+                  "Attempted to add property with no flags: [%s]",
+                  GblProperty_name(pProp));
+
+    GBL_CTX_VERIFY(!(!(pProp->flags & GBL_PROPERTY_FLAG_READ) && (pProp->flags & GBL_PROPERTY_FLAG_OUT)),
+                   GBL_RESULT_ERROR_INVALID_PROPERTY,
+                   "Attempted to add OUT flag without READ flag: [%s]",
+                   GblProperty_name(pProp));
+
+    GBL_CTX_VERIFY(!(!(pProp->flags & (GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT)) &&
+                    (pProp->flags & GBL_PROPERTY_FLAG_OUT)),
+                   GBL_RESULT_ERROR_INVALID_PROPERTY,
+                   "Attempted to add IN flag without WRITE or CONSTRUCT flag: [%s]",
+                   GblProperty_name(pProp));
+
+    GBL_CTX_VERIFY(!(pProp->flags & (GBL_PROPERTY_FLAG_ABSTRACT | GBL_PROPERTY_FLAG_OVERRIDE)),
+                   GBL_RESULT_ERROR_INVALID_PROPERTY,
+                   "Attempted to add property marked both ABSTRACT and OVERRIDE: [%s]",
+                   GblProperty_name(pProp));
+
+    GBL_CTX_END();
+}
+
 GBL_EXPORT GBL_RESULT GblProperty_install(GblType objectType, GblProperty* pProperty) {
     GBL_CTX_BEGIN(GblHashSet_context(&propertyRegistry_));
-    GBL_CTX_VERIFY_TYPE(objectType, GBL_OBJECT_TYPE);
-    GBL_CTX_VERIFY_POINTER(pProperty->name);
+
     GBL_PRIV_REF(pProperty).objectType = objectType;
-    GBL_CTX_PUSH_VERBOSE("[GblObject] Installing property: %s[%s]",
+
+    GBL_CTX_PUSH_VERBOSE("[GblObject] Installing property: [%s::%s]",
                          GblType_name(GBL_PRIV_REF(pProperty).objectType),
                          GblQuark_toString(pProperty->name));
-    GBL_CTX_VERIFY_ARG(pProperty->valueType != GBL_NIL_TYPE);
-    GBL_CTX_VERIFY_ARG(pProperty->flags); // make sure SOME flag is there
+
+    GBL_CTX_VERIFY_CALL(GblProperty_validate_(pProperty));
 
     GblPropertyRoot_* pRoot = propertyRoot_(GBL_PRIV_REF(pProperty).objectType);
-    if(!pRoot) { // adding root node
+    if GBL_UNLIKELY(!pRoot) { // adding root node
         pRoot = GBL_CTX_MALLOC(sizeof(GblPropertyRoot_));
+        memset(pRoot, 0, sizeof(GblPropertyRoot_));
         GBL_PRIV(pRoot->base).objectType = GBL_PRIV_REF(pProperty).objectType;
-        pRoot->base.name                 = GBL_QUARK_INVALID;
-        pRoot->base.flags                = 0;
-        pRoot->pLast                     = NULL;
-        pRoot->count                     = 0;
-        GBL_PRIV(pRoot->base).pNext      = NULL;
+
         GblBool isFirst = GblHashSet_insert(&propertyRegistry_, &pRoot);
         GBL_CTX_VERIFY_EXPRESSION(isFirst, "Somehow our root node wasn't the first node for the type!");
     }
 
     ++pRoot->count;
     pRoot->base.flags |= pProperty->flags;
-    if(pRoot->pLast) GBL_PRIV_REF(pRoot->pLast).pNext = pProperty;
+
+    if(pRoot->pLast)
+        GBL_PRIV_REF(pRoot->pLast).pNext = pProperty;
+
     pRoot->pLast = pProperty;
-    if(!GBL_PRIV(pRoot->base).pNext) GBL_PRIV(pRoot->base).pNext = pProperty;
+
+    if(!GBL_PRIV(pRoot->base).pNext)
+        GBL_PRIV(pRoot->base).pNext = pProperty;
 
     GblBool isFirst = GblHashSet_insert(&propertyRegistry_, &pProperty);
     if(!isFirst) GBL_CTX_WARN("Overwrote existing property!");
 
-    GBL_CTX_POP(1);
     GBL_CTX_END();
 }
 

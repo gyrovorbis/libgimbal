@@ -387,7 +387,7 @@ static GBL_RESULT GblModule_GblObject_property_(const GblObject*   pObject,
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Attemping to read invalid property [%s] on GblModule",
-                           GblProperty_nameString(pProperty));
+                           GblProperty_name(pProperty));
     }
 
     GBL_CTX_END();
@@ -413,7 +413,7 @@ static GBL_RESULT GblModule_GblObject_setProperty_(GblObject*         pObject,
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Attemping to write invalid property [%s] on GblModule",
-                           GblProperty_nameString(pProperty));
+                           GblProperty_name(pProperty));
     }
 
     GBL_CTX_END();

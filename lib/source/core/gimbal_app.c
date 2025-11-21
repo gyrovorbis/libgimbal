@@ -105,7 +105,7 @@ static GBL_RESULT GblApp_Object_property_(const GblObject* pObject, const GblPro
     //case GblOptionGroup_Property_Id_name:
     //    GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_ref(GblObject_name(pObject))));
     //    break;
-    default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY, "Reading unhandled property: %s", GblProperty_nameString(pProp));
+    default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY, "Reading unhandled property: %s", GblProperty_name(pProp));
     }
     GBL_CTX_END();
 }
@@ -124,7 +124,7 @@ static GBL_RESULT GblApp_Object_setProperty_(GblObject* pObject, const GblProper
     //}
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                                 "Writing unhandled property: %s",
-                                GblProperty_nameString(pProp));
+                                GblProperty_name(pProp));
     }
     GBL_CTX_END();
 }

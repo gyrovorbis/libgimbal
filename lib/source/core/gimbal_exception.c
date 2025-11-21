@@ -118,7 +118,7 @@ static GBL_RESULT GblException_GblObject_property_(const GblObject* pObject, con
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Attempt to read invalid property %s on %s",
-                           GblProperty_nameString(pProp),
+                           GblProperty_name(pProp),
                            GblObject_name(pObject));
     }
     GBL_CTX_END();
@@ -131,7 +131,7 @@ static GBL_RESULT GblException_GblObject_setProperty_(GblObject* pObject, const 
     default:
         GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY,
                            "Attempt to write invalid property %s on %s",
-                           GblProperty_nameString(pProp),
+                           GblProperty_name(pProp),
                            GblObject_name(pObject));
     }
     GBL_CTX_END();
