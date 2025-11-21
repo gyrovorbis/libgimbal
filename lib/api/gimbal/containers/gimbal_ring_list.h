@@ -134,7 +134,7 @@ typedef struct GblRingList {
 } GblRingList;
 
 //! Returns the GblType UUID associated with GblRingList.
-GblType GblRingList_type(void);
+GBL_EXPORT GblType GblRingList_type(void);
 
 /*! \name  Lifetime
  *  \brief Methods for creating, acquring, and releasing a list.

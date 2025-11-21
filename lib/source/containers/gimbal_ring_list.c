@@ -591,7 +591,7 @@ static GBL_RESULT GblRingListClass_init_(GblClass* pClass, const void* pUd) {
     return GBL_RESULT_SUCCESS;
 }
 
-GblType GblRingList_type(void) {
+GBL_EXPORT GblType GblRingList_type(void) {
     static GblType type = GBL_INVALID_TYPE;
     static GblInterfaceImpl ifaceEntries[] = {
         {
