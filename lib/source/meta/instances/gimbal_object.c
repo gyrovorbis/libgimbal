@@ -707,7 +707,7 @@ static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
         .pValues      = pValues
     };
 
-    GblBool earlyExit = GblProperty_foreach(selfType,
+    GblBool earlyExit = GblProperty_iterate(selfType,
                                             GBL_PROPERTY_FLAG_CONSTRUCT,
                                             GblObject_iterateCtorProperties_,
                                             &closure);
