@@ -218,23 +218,33 @@ GBL_EXPORT GblBool (GblModule_iterate)(GblModuleIterFn pFnIter,
 }
 
 
-GBL_EXPORT GblModule* GblModule_require(const char* pName,
-                                        GblModule** ppSelf,
+GBL_EXPORT GblModule* GblModule_require(GblModule** ppSelf,
+                                        const char* pName,
                                         const char* pVersion,
                                         const char* pFile,
                                         const char* pFunc,
                                         size_t      line)
 {
-    return GblModule_requireQuark(GblQuark_tryString(pName),
-                                  ppSelf,
+    return GblModule_requireQuark(ppSelf,
+                                  GblQuark_tryString(pName),
                                   pVersion,
                                   pFile,
                                   pFunc,
                                   line);
 }
 
-GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
-                                             GblModule** ppSelf,
+GBL_EXPORT GBL_RESULT GblModule_release(GblModule** ppModule) {
+    GBL_RESULT result = GBL_RESULT_ERROR_INVALID_POINTER;
+    if (!ppModule || !GBL_AS(GblModule, *ppModule))
+        return result;
+
+    result = GblModule_unuse(*ppModule);
+    *ppModule = NULL;
+    return result;
+}
+
+GBL_EXPORT GblModule* GblModule_requireQuark(GblModule** ppSelf,
+                                             GblQuark    quark,
                                              const char* pVersion,
                                              const char* pFile,
                                              const char* pFunc,
@@ -285,12 +295,6 @@ GBL_EXPORT GBL_RESULT GblModule_use(GblModule* pSelf) {
 
 GBL_EXPORT GBL_RESULT GblModule_unuse(GblModule* pSelf) {
     return GblIPlugin_unuse(GBL_IPLUGIN(pSelf));
-}
-
-GBL_EXPORT GBL_RESULT GblModule_release(GblModule** ppModule) {
-    GBL_RESULT result = GblModule_unuse(*ppModule);
-    *ppModule = NULL;
-    return result;
 }
 
 GBL_EXPORT GblModule* GblModule_create(GblType     derivedType,

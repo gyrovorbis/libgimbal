@@ -185,25 +185,26 @@ GBL_EXPORT GblBool    GblModule_iterate   (GblModuleIterFn pFnIter,
                                            void*           pCl/*=NULL*/) GBL_NOEXCEPT;
 //! @}
 
-/*! \name  Importing
- *  \brief Routines for returning a module
+/*! \name  Opening and Closing
+ *  \brief Routines for acquiring and releasing a module.
  *  @{
  */
-//  TODO: update comment
-//! Loads or returns a module matching the given name and optional version identifier, raising an error and returning NULL if there was no match.
-GBL_EXPORT GblModule* GblModule_require      (const char* pName,
-                                              GblModule** ppSelf,
+//! Underlying method backing GBL_REQUIRE() macro, which should be used instead of calling this directly.
+GBL_EXPORT GblModule* GblModule_require      (GblModule** ppSelf,
+                                              const char* pName,
                                               const char* pVersion/*=NULL*/,
                                               const char* pFile/*=__FILE__*/,
                                               const char* pFunc/*=__func__*/,
                                               size_t      line/*=__LINE__*/) GBL_NOEXCEPT;
 //! Equivalent to GblModule_require(), except using a faster quark for the name identifier.
-GBL_EXPORT GblModule* GblModule_requireQuark (GblQuark    name,
-                                              GblModule** ppSelf,
+GBL_EXPORT GblModule* GblModule_requireQuark (GblModule** ppSelf,
+                                              GblQuark    name,
                                               const char* pVersion/*=NULL*/,
                                               const char* pFile/*=__FILE__*/,
                                               const char* pFunc/*=__func__*/,
                                               size_t      line/*=__LINE__*/) GBL_NOEXCEPT;
+//! Manually decrements the given module's usage count, and points the passed \param ppModule to NULL.
+GBL_EXPORT GBL_RESULT GblModule_release      (GblModule** ppModule)          GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Lifetime
@@ -239,8 +240,6 @@ GBL_EXPORT GBL_RESULT  GblModule_unregister (GBL_SELF) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblModule_use      (GBL_SELF)  GBL_NOEXCEPT;
 //! Manually decrements the given module's usage count, unloading it when the last user is done. You can manually control unloading it like this.
 GBL_EXPORT GBL_RESULT  GblModule_unuse    (GBL_SELF)  GBL_NOEXCEPT;
-//! Manually decrements the given module's usage count, and points the passed \param ppModule to NULL.
-GBL_EXPORT GBL_RESULT  GblModule_release  (GblModule** ppModule)  GBL_NOEXCEPT;
 //! Retrieves the current usage counter for the given module.
 GBL_EXPORT GblRefCount GblModule_useCount (GBL_CSELF) GBL_NOEXCEPT;
 //! Returns true if the given module is currently loaded and has active uses, return false otherwise.
@@ -255,16 +254,15 @@ GBL_DECLS_END
     GBL_REQUIRE_DEFAULT_(__VA_ARGS__)
 #define GBL_REQUIRE_DEFAULT_(...) \
     GBL_REQUIRE_DEFAULT__(__VA_ARGS__, NULL)
-#define GBL_REQUIRE_DEFAULT__(type, pPtr, name, version, ...)   \
-        (!GBL_AS(GblModule, *pPtr) ?                            \
-        (GblModule_require(name, (GblModule**)pPtr, version,    \
-                                __FILE__, __func__, __LINE__))  \
-        : GBL_CAST(GblModule, *pPtr))
+#define GBL_REQUIRE_DEFAULT__(type, pPtr, name, version, ...)        \
+        (!GBL_AS(GblModule, *pPtr) ?                                 \
+          GBL_CAST(type,                                             \
+                (GblModule_require((GblModule**)pPtr, name, version, \
+                                   __FILE__, __func__, __LINE__)))   \
+        : GBL_CAST(type, *pPtr))
 
-#define GBL_RELEASE_(pPtr)                  \
-    (GBL_AS(GblModule, *pPtr) ?             \
-     GblModule_release((GblModule**)pPtr)   \
-     : GBL_RESULT_ERROR_INVALID_POINTER)
+#define GBL_RELEASE_(pPtr) \
+    (GblModule_release((GblModule**)pPtr))
 
 #define GBL_REQUIRE_SCOPE_(...) \
     GBL_REQUIRE_SCOPE_DEFAULT_(__VA_ARGS__)
