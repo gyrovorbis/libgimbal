@@ -151,7 +151,7 @@ GBL_TEST_CASE(iterateEmpty) {
 
 GBL_TEST_CASE(createBase) {
     GblModule* pModule = GblModule_create(GBL_MODULE_TYPE,
-                                          "TestModule3",
+                                          "CustomName",
                                           GblVersion_make(1, 2, 3),
                                           "David Bowie",
                                           "Ziggy Stardust's Module",
@@ -163,7 +163,7 @@ GBL_TEST_CASE(createBase) {
     GBL_TEST_VERIFY(pModule);
 
     GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(pModule)),
-                                            "TestModule3");
+                                            "CustomName");
     GBL_TEST_COMPARE(pModule->pPrefix,      "ziggy");
     GBL_TEST_COMPARE(pModule->version,      GblVersion_make(1, 2, 3));
     GBL_TEST_COMPARE(pModule->pAuthor,      "David Bowie");
@@ -226,22 +226,39 @@ GBL_TEST_CASE(registerDerived) {
 }
 
 GBL_TEST_CASE(requireVersion) {
-    GblModule* pModule = GBL_REQUIRE(GblModule, "TestModule3", "1.2.3");
+    GblModule* pModule = NULL;
+    GBL_REQUIRE(GblModule, &pModule, "CustomName", "1.2.3");
     GBL_TEST_COMPARE(pModule, pFixture->pModule3);
     GBL_TEST_CASE_END;
 }
 
 GBL_TEST_CASE(requireName) {
-    TestModule2* pModule = GBL_REQUIRE(TestModule2, "TestModule2");
+    TestModule2* pModule = NULL;
+    GBL_REQUIRE(TestModule2, &pModule, "TestModule2");
     GBL_TEST_COMPARE(pModule, pFixture->pModule2);
     GBL_TEST_CASE_END;
 }
 
-GBL_TEST_CASE(require) {
-    TestModule1* pModule = GBL_REQUIRE(TestModule1);
+GBL_TEST_CASE(require)
+    TestModule1* pModule = GBL_REQUIRE(TestModule1, NULL, "TestModule1");
     GBL_TEST_COMPARE(pModule, pFixture->pModule1);
-    GBL_TEST_CASE_END;
-}
+    GBL_TEST_VERIFY(GBL_RELEASE(&pModule));
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(requireScope)
+    TestModule1 *pModule1 = NULL;
+    GblRefCount prevUseCount = GblModule_useCount(GBL_MODULE(pFixture->pModule1));
+
+    // sexy, sexy macro
+    GBL_REQUIRE_SCOPE(TestModule1, &pModule1, "TestModule1") {
+        GBL_TEST_COMPARE(pModule1, pFixture->pModule1);
+    }
+
+    GblRefCount newUseCount = GblModule_useCount(GBL_MODULE(pFixture->pModule1));
+
+    GBL_TEST_COMPARE(newUseCount, prevUseCount);
+    GBL_TEST_COMPARE(pModule1, NULL);
+GBL_TEST_CASE_END
 
 // option group checking
 
@@ -263,4 +280,5 @@ GBL_TEST_REGISTER(findFail,
                   requireVersion,
                   requireName,
                   require,
+                  requireScope,
                   unregister)

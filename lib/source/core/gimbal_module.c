@@ -218,25 +218,31 @@ GBL_EXPORT GblBool (GblModule_iterate)(GblModuleIterFn pFnIter,
 }
 
 
-GBL_EXPORT GblModule* GblModule_require(const char* pName,
+GBL_EXPORT GblModule* GblModule_require(GblModule** ppSelf,
+                                        const char* pName,
                                         const char* pVersion,
                                         const char* pFile,
                                         const char* pFunc,
                                         size_t      line)
 {
-    return GblModule_requireQuark(GblQuark_tryString(pName),
+    return GblModule_requireQuark(ppSelf,
+                                  GblQuark_tryString(pName),
                                   pVersion,
                                   pFile,
                                   pFunc,
                                   line);
 }
 
-GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
+GBL_EXPORT GblModule* GblModule_requireQuark(GblModule** ppSelf,
+                                             GblQuark    quark,
                                              const char* pVersion,
                                              const char* pFile,
                                              const char* pFunc,
                                              size_t      line)
 {
+    if (ppSelf && GBL_AS(GblModule, *ppSelf))
+        return (GblModule*)*ppSelf;
+
     GblModule* pModule = GblModule_findQuark(quark);
 
     if GBL_UNLIKELY(!pModule) {
@@ -261,7 +267,20 @@ GBL_EXPORT GblModule* GblModule_requireQuark(GblQuark    quark,
         GblModule_use(pModule);
     }
 
+    if (ppSelf && !*ppSelf)
+        *ppSelf = pModule;
+
     return pModule;
+}
+
+GBL_EXPORT GBL_RESULT GblModule_release(GblModule** ppSelf) {
+    GBL_RESULT result = GBL_RESULT_ERROR_INVALID_POINTER;
+    if (!ppSelf || !GBL_AS(GblModule, *ppSelf))
+        return result;
+
+    result = GblModule_unuse(*ppSelf);
+    *ppSelf = NULL;
+    return result;
 }
 
 GBL_EXPORT GblRefCount GblModule_useCount(const GblModule* pSelf) {
