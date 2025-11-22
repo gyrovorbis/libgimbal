@@ -1,6 +1,7 @@
 #include <gimbal/containers/gimbal_hash_set.h>
 #include <gimbal/algorithms/gimbal_hash.h>
 #include <gimbal/algorithms/gimbal_numeric.h>
+#include <gimbal/utils/gimbal_ref.h>
 
 struct GblHashSetBucket_ {
     uint32_t hash;
@@ -20,15 +21,22 @@ GBL_INLINE uint32_t GblHashSet_getHash_(const struct GblHashSet *map, const void
 }
 /// \endcond
 
+static GblHash GblHashSet_hash_(const GblHashSet* pSet, const void* pEntry) {
+    return gblHash(pEntry, GBL_PRIV_REF(pSet).entrySize);
+}
 
-GBL_EXPORT GBL_RESULT GblHashSet_construct_8(GblHashSet*      pSet,
-                                             size_t           elsize,
-                                             GblHashSetHashFn pFnHash,
-                                             GblHashSetCmpFn  pFnCompare,
-                                             GblHashSetDtorFn pFnDestruct,
-                                             size_t           capacity,
-                                             GblContext*      pCtx,
-                                             void*            pUserdata)
+static GblBool GblHashSet_compare_(const GblHashSet* pSet, const void* pA, const void* pB) {
+    return !memcmp(pA, pB, GBL_PRIV_REF(pSet).entrySize);
+}
+
+GBL_EXPORT GBL_RESULT GblHashSet_construct(GblHashSet*      pSet,
+                                           size_t           elsize,
+                                           GblHashSetHashFn pFnHash,
+                                           GblHashSetCmpFn  pFnCompare,
+                                           GblHashSetDtorFn pFnDestruct,
+                                           size_t           capacity,
+                                           GblContext*      pCtx,
+                                           void*            pUserdata)
 {
 
     GBL_CTX_BEGIN(pCtx);
@@ -53,8 +61,8 @@ GBL_EXPORT GBL_RESULT GblHashSet_construct_8(GblHashSet*      pSet,
         GBL_PRIV_REF(pSet).pUserdata      = pUserdata;
         GBL_PRIV_REF(pSet).entrySize      = elsize;
         GBL_PRIV_REF(pSet).bucketSize     = bucketsz;
-        GBL_PRIV_REF(pSet).pFnHash        = pFnHash;
-        GBL_PRIV_REF(pSet).pFnCompare     = pFnCompare;
+        GBL_PRIV_REF(pSet).pFnHash        = pFnHash? pFnHash : GblHashSet_hash_;
+        GBL_PRIV_REF(pSet).pFnCompare     = pFnCompare? pFnCompare? : GblHashSet_compare_;
         GBL_PRIV_REF(pSet).pFnDestruct    = pFnDestruct;
         GBL_PRIV_REF(pSet).pSpare         = GBL_CTX_MALLOC(GBL_PRIV_REF(pSet).bucketSize);
         GBL_PRIV_REF(pSet).capacity       = capacity;
@@ -66,54 +74,56 @@ GBL_EXPORT GBL_RESULT GblHashSet_construct_8(GblHashSet*      pSet,
     GBL_CTX_END();
 
 }
-GBL_EXPORT GBL_RESULT             GblHashSet_construct_7(GblHashSet*                 pSet,
-                                           size_t                      entrySize,
-                                           GblHashSetHashFn       pFnHash,
-                                           GblHashSetCmpFn    pFnCompare,
-                                           GblHashSetDtorFn   pFnDestruct,
-                                           size_t                      capacity,
-                                           GblContext*                 pCtx)  {
-    return GblHashSet_construct_8(pSet, entrySize, pFnHash, pFnCompare, pFnDestruct, capacity, pCtx, NULL);
+
+static GBL_RESULT GblHashSet_RefDestructor_(GblRef* pRef) {
+    GblHashSet* pSet = (GblHashSet*)pRef;
+    return GblHashSet_destruct(pSelf);
 }
 
-GBL_EXPORT GBL_RESULT             GblHashSet_construct_6(GblHashSet*                 pSet,
-                                           size_t                      entrySize,
-                                           GblHashSetHashFn       pFnHash,
-                                           GblHashSetCmpFn    pFnCompare,
-                                           GblHashSetDtorFn   pFnDestruct,
-                                           size_t                      capacity)
+GBL_EXPORT GblHashSet* GblHashSet_create(size_t           entrySize,
+                                         GblHashSetHashFn pFnHash,
+                                         GblHashSetCmpFn  pFnCompare,
+                                         GblHashSetDtorFn pFnDestruct,
+                                         size_t           capacity,
+                                         GblContext*      pCtx,
+                                         void*            pUd)
 {
-    return GblHashSet_construct_7(pSet, entrySize, pFnHash, pFnCompare, pFnDestruct, capacity, NULL);
+    GblHashSet* pSet = GblRef_create(sizeof(GblHashSet), pCtx);
+    GBL_RESULT result = GblHashSet_construct(pSet,
+                                             entrySize,
+                                             pFnHash,
+                                             pFnCompare,
+                                             pFnDestruct,
+                                             capacity,
+                                             pCtx,
+                                             pUd);
+    if(GBL_RESLT_ERROR(result)) {
+        GblRef_release(pSet);
+        return NULL;
+    }
+
+    return pSet;
 }
 
-GBL_EXPORT GBL_RESULT             GblHashSet_construct_5(GblHashSet*                 pSet,
-                                           size_t                      entrySize,
-                                           GblHashSetHashFn       pFnHash,
-                                           GblHashSetCmpFn    pFnCompare,
-                                           GblHashSetDtorFn   pFnDestruct)
-{
-    return GblHashSet_construct_6(pSet, entrySize, pFnHash, pFnCompare, pFnDestruct, 0);
+GBL_EXPORT GblHashSet* GblHashSet_ref(GblHashSet* pSelf) {
+    return GblRef_ref(pSelf);
 }
 
-GBL_EXPORT GBL_RESULT             GblHashSet_construct_4(GblHashSet*                 pSet,
-                                           size_t                      entrySize,
-                                           GblHashSetHashFn       pFnHash,
-                                           GblHashSetCmpFn    pFnCompare)  {
-    return GblHashSet_construct_5(pSet, entrySize, pFnHash, pFnCompare, NULL);
+GBL_EXPORT GblRefCount GblHashSet_unref(GblHashSet* pSelf) {
+    return GblRef_unref(pSelf, GblHashSet_RefDestructor_);
 }
-
 
 GBL_EXPORT GBL_RESULT  GblHashSet_clone(GblHashSet* pSelf, const GblHashSet* pRhs, GblContext* pCtx)  {
     if(!pCtx) pCtx = GBL_PRIV_REF(pRhs).pCtx;
     GBL_CTX_BEGIN(pCtx);
-    GBL_CTX_CALL(GblHashSet_construct_8(pSelf,
-                                       GBL_PRIV_REF(pRhs).entrySize,
-                                       GBL_PRIV_REF(pRhs).pFnHash,
-                                       GBL_PRIV_REF(pRhs).pFnCompare,
-                                       GBL_PRIV_REF(pRhs).pFnDestruct,
-                                       GBL_PRIV_REF(pRhs).capacity,
-                                       pCtx,
-                                       GBL_PRIV_REF(pRhs).pUserdata));
+    GBL_CTX_CALL(GblHashSet_construct(pSelf,
+                                      GBL_PRIV_REF(pRhs).entrySize,
+                                      GBL_PRIV_REF(pRhs).pFnHash,
+                                      GBL_PRIV_REF(pRhs).pFnCompare,
+                                      GBL_PRIV_REF(pRhs).pFnDestruct,
+                                      GBL_PRIV_REF(pRhs).capacity,
+                                      pCtx,
+                                      GBL_PRIV_REF(pRhs).pUserdata));
 
     for(size_t  s = 0; s < GBL_PRIV_REF(pRhs).bucketCount; ++s) {
         void* pEntry = GblHashSet_probe(pRhs, s);
@@ -399,7 +409,7 @@ GBL_EXPORT GBL_RESULT GblHashSet_destruct(GblHashSet *map)  {
 // hashmap_scan iterates over all items in the hash map
 // Param `iter` can return false to stop iteration early.
 // Returns false if the iteration has been stopped early.
-GBL_EXPORT GblBool GblHashSet_foreach(const GblHashSet *map,
+GBL_EXPORT GblBool GblHashSet_iterate(const GblHashSet *map,
                   GblHashSetIterFn iter, void* udata)
 {
     for (size_t i = 0; i < GBL_PRIV_REF(map).bucketCount; i++) {

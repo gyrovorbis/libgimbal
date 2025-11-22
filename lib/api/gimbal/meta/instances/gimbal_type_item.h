@@ -34,6 +34,7 @@
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblTypeItem);
+GBL_FORWARD_DECLARE_STRUCT(GblHashSet);
 
 //! Callback called for each matching \p pItem, getting optionally passed back \p pClosure. Returns GBL_TRUE to end iteration early.
 typedef GblBool (*GblTypeItemIterFn)(GblTypeItem* pItem, void* pClosure);
@@ -51,19 +52,21 @@ typedef GblBool (*GblTypeItemIterFn)(GblTypeItem* pItem, void* pClosure);
 GBL_CLASS_DERIVE(GblTypeItem, GblBox)
     //! Minimal base type required to own an instance of a GblTypeItem.
     GblType baseType;
+    //! Hash set serving as the global "registry" of a particlar type of GblTypeItem.
+    GblHashSet* pRegistry;
     //! Virtual function for checking whether a given owning type has implemented all of its requireemnts for its type items.
-    GBL_RESULT (*pFnCheck)    (GBL_CKLASS, GblType owner);
+    GBL_RESULT (*pFnCheck)     (GBL_CKLASS, GblType owner);
     //! Virtual function for implementing iteration behavior over a series of type items associated with a given owner within the registry.
-    GBL_RESULT (*pFnNext)     (GBL_CKLASS, GblType owner, GblTypeItem** ppItem, GblFlags mask);
+    GBL_RESULT (*pFnNext)      (GBL_CKLASS, GblType owner, GblTypeItem** ppItem, GblFlags mask);
     //! Virtual function for installing a new type item onto an owning type within the registry.
-    GBL_RESULT (*pFnInstall)  (GBL_SELF);
+    GBL_RESULT (*pFnRegister)  (GBL_SELF);
     //! Virtual function for uninstalling a new type item onto an owning type within the registry.
-    GBL_RESULT (*pFnUninstall)(GBL_SELF)
+    GBL_RESULT (*pFnUnregister)(GBL_SELF)
     //! Virtual function for checking the validity of a type item based on its current values.
     GBL_RESULT (*pFnValidate) (GBL_CSELF);
     //! Virtual function for returning the GblHash associated with a given type item.
     GBL_RESULT (*pFnHash)     (GBL_CSELF, GblHash* pHash);
-    //! Virtual function for comparing two given type items.
+    //! Virtual function for comparing two given type items for equality.
     GBL_RESULT (*pFnCompare)  (GBL_CSELF, const GblTypeItem* pOther, int* pResult);
 GBL_CLASS_END
 
@@ -80,12 +83,14 @@ GBL_CLASS_END
  *  \sa GblTypeItemClass, GblProperty, GblSignal
  */
 GBL_INSTANCE_DERIVE(GblTypeItem, GblBox)
-    union {             //!< Convenience unionization between generic list node and strongly typed next pointer.
-        GblLinkedListNode   listNode;   //!< Generic listNode entry, linking to the next item within the registry.
-        struct GblTypeItem* pNext;      //!< Strongly-typed pointer to the next GblTypeItem within the registry.
+    union {                           //!< Convenience unionization between generic list node and strongly typed next pointer.
+        GblLinkedListNode   listNode; //!< Generic listNode entry, linking to the next item within the registry.
+        struct GblTypeItem* pNext;    //!< Strongly-typed pointer to the next GblTypeItem within the registry.
     };
-    GblType  owner;     //!< The GblType UUID of the owning type associated with this GblTypeItem.
-    GblQuark name;      //!< Name of this GblTypeItem, as an optimized GblQuark value.
+    struct {
+        GblType  owner; //!< The GblType UUID of the owning type associated with this GblTypeItem.
+        GblQuark name;  //!< Name of this GblTypeItem, as an optimized GblQuark value.
+    } key;              //!< Inner struct holding the key data used for internal hashing and comparisons.
     GblFlags flags;     //!< Arbitrary flags associated with the given GblTypeItem, given meaning by their derived classes.
 GBL_INSTANCE_END
 
@@ -114,10 +119,10 @@ GBL_EXPORT GblFlags GblTypeItem_combinedFlags (GblType typeItem,
  */
 //! Returns GBL_TRUE if the \p owner type satisfies all of its type requirements within the \p typeItem registry.
 GBL_EXPORT GblBool    GblTypeItem_check        (GblType typeItem,
-                                                GblType owner) GBL_NOEXCEPT;
+                                                GblType owner)    GBL_NOEXCEPT;
 //! Uninstalls all GblTypeItem instances associated with \p owner within the \p typeItem registry.
 GBL_EXPORT GBL_RESULT GblTypeItem_uninstallAll (GblType typeItem,
-                                                GblType owner) GBL_NOEXCEPT;
+                                                GblType owner)    GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Searching
@@ -127,11 +132,11 @@ GBL_EXPORT GBL_RESULT GblTypeItem_uninstallAll (GblType typeItem,
 //! Retrieves the item from the \p typeItem registry which is owned by \p owner and named \p pName.
 GBL_EXPORT GblTypeItem* GblTypeItem_find      (GblType     typeItem, 
                                                GblType     owner,
-                                               const char* pName) GBL_NOEXCEPT;
+                                               const char* pName)    GBL_NOEXCEPT;
 //! Equivalent to GblTypeItem_find(), except taking \p name as a GblQuark, which is faster for lookups.
 GBL_EXPORT GblTypeItem* GblTypeItem_findQuark (GblType  typeItem,
                                                GblType  owner,
-                                               GblQuark name)     GBL_NOEXCEPT;
+                                               GblQuark name)        GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Iterating
@@ -176,12 +181,15 @@ GBL_EXPORT const char* GblTypeItem_name (GBL_CSELF) GBL_NOEXCEPT;
  *  @{
  */
 //! Returns GBL_TRUE if the given type item is considered to be valid, based on its values.
-GBL_EXPORT GBL_RESULT GblTypeItem_validate (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblTypeItem_validate (GBL_CSELF)               GBL_NOEXCEPT;
 //! Returns a GblHash representing the combination of the owner type and name fields on the given item.
-GBL_EXPORT GblHash    GblTypeItem_hash     (GBL_CSELF)                 GBL_NOEXCEPT;
-//! Compares the given item with another item from the same type, returning 0 if equal, or their difference.
+GBL_EXPORT GblHash    GblTypeItem_hash     (GBL_CSELF)               GBL_NOEXCEPT;
+//! Compares the given item with another item from the same type, lexacographically, return 0 if equal or their diffence otherwise.
 GBL_EXPORT int        GblTypeItem_compare  (GBL_CSELF,
-                                            const GblTypeItem* pOther) GBL_NOEXCEPT;
+                                            const GblTypeItem* pRhs) GBL_NOEXCEPT;
+//! Compares the given item with another item from the same type, returning GBL_TRUE if they are both equal.
+GBL_EXPORT GblBool    GblTypeItem_equals   (GBL_CSELF,
+                                            const GblTypeItem* pRhs) GBL_NOEXCEPT;
 //! @}
 
 GBL_DECLS_END
