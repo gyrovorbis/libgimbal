@@ -41,25 +41,63 @@
  *  Used to "import" a GblModule whose type has been registered with the type system,
  *  lazily loading it the fist time and returning references to it subsequently.
  *
+ *  \note
+ *  If the supplied pointer is non-NULL, the module is considered cached and is not going
+ *  to be reloaded. This allows you to avoid dynamic lookups for subsequent calls when using
+ *  the same pointer.
+ *
  *  \code {.c}
- *      MyModule* module = NULL;
- *      GBL_REQUIRE(MyModule, &MyModule);
- *      GBL_ASSERT(module, "Failed to load MyModule!");
+ *      static MyModule* pModule = NULL;
+ *      if(!GBL_REQUIRE(MyModule, &pModule, "MyModule", "1.1.0"))
+ *          GBL_LOG_ERROR("MyModule", "Failed to import module!");
  *  \endcode
  *
  *  \param  instanceStruct Struct name for desired GblModule instance structure.
  *  \param  selfAddr       The address of a pointer to the instance to store the reference in.
- *  \param  name           [optional] Name of the module to import.
+ *  \param  name           Name of the module to import.
  *  \param  version        [optional] Major.minor.patch string for specific version.
  *
+ *  \returns               A pointer to the imported module, or NULL if the import failed.
+ */
+#define GBL_REQUIRE(/*instanceStruct, selfAddr, name, versionMin=NULL*/ ...)       GBL_REQUIRE_(__VA_ARGS__)
+
+/*! Macro directive for releasing a module.
+ *
+ *  Used to optionally "release" a module which has been previously
+ *  imported, decrementing is "useCount" property, which causes the
+ *  module to be dynamically unloaded upon hitting zero uses.
+ *
  *  \note
- *  If the provided pointer is not NULL, this macro will not do anything, so it's recommended to mark the reference static.
-*/
-#define GBL_REQUIRE(/*instanceStruct, selfAddr, name=NULL, versionMin=NULL*/ ...)       GBL_REQUIRE_(__VA_ARGS__)
-//! TODO: Comment me!
-#define GBL_RELEASE(selfAddr)                                                           GBL_RELEASE_(selfAddr)
-//! TODO: Comment me!
-#define GBL_REQUIRE_SCOPE(/*instanceStruct, selfAddr, name=NULL, versionMin=NULL*/ ...) GBL_REQUIRE_SCOPE_(__VA_ARGS__)
+ *  This does not necessarily need to be called if you do not wish for
+ *  your module to be dynamically unloaded at run-time.
+ *
+ *  \param  selfAddr      The address of a pointer pointing to a module.
+ *  \returns              GBL_RESULT status code.
+ */
+#define GBL_RELEASE(selfAddr)   GBL_RELEASE_(selfAddr)
+
+/*! Scoped macro directive for using a module.
+ *
+ *  Used to define a local scope in which a module will be imported upon
+ *  entry and released upon exit.
+ *
+ *  \code {.c}
+ *      TestModule* pModule = NULL;
+ *      GBL_REQUIRE_SCOPE(TestModule, &pModule) {
+ *          TestModule_doStuff(pModule);
+ *      }
+ *  \endcode
+ *
+ *  \warning
+ *  GBL_SCOPE_EXIT must be used to early-break from the scope without
+ *  causing unwanted side-effects.
+ *
+ *  \param instanceStruct  Struct name for desired GblModule instance structure.
+ *  \param selfAddr        Address of a pointer to the GblModule struct, which holds the reference.
+ *  \param name            Name of the module to import.
+ *  \param version         [optional] Major.minor.patch string for specific version.
+ */
+#define GBL_REQUIRE_SCOPE(/*instanceStruct, selfAddr, name, versionMin=NULL*/ ...) GBL_REQUIRE_SCOPE_(__VA_ARGS__)
 
 #define GBL_SELF_TYPE GblModule
 
@@ -151,14 +189,17 @@ GBL_EXPORT GblBool    GblModule_iterate   (GblModuleIterFn pFnIter,
  *  \brief Routines for returning a module
  *  @{
  */
+//  TODO: update comment
 //! Loads or returns a module matching the given name and optional version identifier, raising an error and returning NULL if there was no match.
 GBL_EXPORT GblModule* GblModule_require      (const char* pName,
+                                              GblModule** ppSelf,
                                               const char* pVersion/*=NULL*/,
                                               const char* pFile/*=__FILE__*/,
                                               const char* pFunc/*=__func__*/,
                                               size_t      line/*=__LINE__*/) GBL_NOEXCEPT;
 //! Equivalent to GblModule_require(), except using a faster quark for the name identifier.
 GBL_EXPORT GblModule* GblModule_requireQuark (GblQuark    name,
+                                              GblModule** ppSelf,
                                               const char* pVersion/*=NULL*/,
                                               const char* pFile/*=__FILE__*/,
                                               const char* pFunc/*=__func__*/,
@@ -198,6 +239,8 @@ GBL_EXPORT GBL_RESULT  GblModule_unregister (GBL_SELF) GBL_NOEXCEPT;
 GBL_EXPORT GBL_RESULT  GblModule_use      (GBL_SELF)  GBL_NOEXCEPT;
 //! Manually decrements the given module's usage count, unloading it when the last user is done. You can manually control unloading it like this.
 GBL_EXPORT GBL_RESULT  GblModule_unuse    (GBL_SELF)  GBL_NOEXCEPT;
+//! Manually decrements the given module's usage count, and points the passed \param ppModule to NULL.
+GBL_EXPORT GBL_RESULT  GblModule_release  (GblModule** ppModule)  GBL_NOEXCEPT;
 //! Retrieves the current usage counter for the given module.
 GBL_EXPORT GblRefCount GblModule_useCount (GBL_CSELF) GBL_NOEXCEPT;
 //! Returns true if the given module is currently loaded and has active uses, return false otherwise.
@@ -209,38 +252,26 @@ GBL_DECLS_END
 // ====== IMPLEMENTATION =====
 ///\cond
 #define GBL_REQUIRE_(...) \
-    GBL_VA_OVERLOAD_CALL(GBL_REQUIRE_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
+    GBL_REQUIRE_DEFAULT_(__VA_ARGS__)
+#define GBL_REQUIRE_DEFAULT_(...) \
+    GBL_REQUIRE_DEFAULT__(__VA_ARGS__, NULL)
+#define GBL_REQUIRE_DEFAULT__(type, pPtr, name, version, ...)   \
+        (!GBL_AS(GblModule, *pPtr) ?                            \
+        (GblModule_require(name, (GblModule**)pPtr, version,    \
+                                __FILE__, __func__, __LINE__))  \
+        : GBL_CAST(GblModule, *pPtr))
 
-#define GBL_REQUIRE__2(type, pPtr)                                      \
-        (!(*pPtr) ?                                                     \
-        (*pPtr = GBL_CAST(type, GblModule_require(                      \
-                 GblType_name(GBL_TYPEID(type)), GBL_NULL,              \
-                              __FILE__, __func__, __LINE__))) : *pPtr)
-
-#define GBL_REQUIRE__3(type, pPtr, name)                                \
-        (!(*pPtr) ?                                                     \
-        (*pPtr = GBL_CAST(type, GblModule_require(                      \
-                 name, GBL_NULL, __FILE__, __func__, __LINE__))) : *pPtr)
-
-#define GBL_REQUIRE__4(type, pPtr, name, version)                       \
-        (!(*pPtr) ?                                                     \
-        (*pPtr = GBL_CAST(type, GblModule_require(                      \
-                 name, version, __FILE__, __func__, __LINE__))) : *pPtr)
-
-#define GBL_RELEASE_(pPtr)                               \
-    ( (*pPtr) ?                                          \
-      GblModule_unuse(GBL_CAST(GblModule, *pPtr))        \
-    : 0)
+#define GBL_RELEASE_(pPtr)                  \
+    (GBL_AS(GblModule, *pPtr) ?             \
+     GblModule_release((GblModule**)pPtr)   \
+     : GBL_RESULT_ERROR_INVALID_POINTER)
 
 #define GBL_REQUIRE_SCOPE_(...) \
-    GBL_VA_OVERLOAD_CALL(GBL_REQUIRE_SCOPE_, GBL_VA_OVERLOAD_SUFFIXER_ARGC, __VA_ARGS__)
-
-#define GBL_REQUIRE_SCOPE__2(type, pPtr)                                        \
-        GBL_SCOPE(GBL_REQUIRE__2(type, pPtr), GBL_RELEASE(pPtr))
-#define GBL_REQUIRE_SCOPE__3(type, pPtr, name)                                  \
-        GBL_SCOPE(GBL_REQUIRE__3(type, pPtr, name), GBL_RELEASE(pPtr))
-#define GBL_REQUIRE_SCOPE__4(type, pPtr, name, version)                         \
-        GBL_SCOPE(GBL_REQUIRE__4(type, pPtr, name, version), GBL_RELEASE(pPtr))
+    GBL_REQUIRE_SCOPE_DEFAULT_(__VA_ARGS__)
+#define GBL_REQUIRE_SCOPE_DEFAULT_(...) \
+    GBL_REQUIRE_SCOPE_DEFAULT__(__VA_ARGS__, NULL)
+#define GBL_REQUIRE_SCOPE_DEFAULT__(type, pPtr, name, version, ...)   \
+    GBL_SCOPE(GBL_REQUIRE_DEFAULT__(type, pPtr, name, version), GBL_RELEASE_(pPtr))
 
 #define GblModule_iterate(...) \
     GblModule_iterateDefault_(__VA_ARGS__)
