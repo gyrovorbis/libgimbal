@@ -240,8 +240,7 @@ GBL_TEST_CASE(requireName) {
 }
 
 GBL_TEST_CASE(require)
-    TestModule1* pModule = NULL;
-    GBL_REQUIRE(TestModule1, &pModule, "TestModule1");
+    TestModule1* pModule = GBL_REQUIRE(TestModule1, NULL, "TestModule1");
     GBL_TEST_COMPARE(pModule, pFixture->pModule1);
     GBL_TEST_VERIFY(GBL_RELEASE(&pModule));
 GBL_TEST_CASE_END

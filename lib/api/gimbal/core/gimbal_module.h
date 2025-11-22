@@ -254,12 +254,10 @@ GBL_DECLS_END
     GBL_REQUIRE_DEFAULT_(__VA_ARGS__)
 #define GBL_REQUIRE_DEFAULT_(...) \
     GBL_REQUIRE_DEFAULT__(__VA_ARGS__, NULL)
-#define GBL_REQUIRE_DEFAULT__(type, pPtr, name, version, ...)        \
-        (!GBL_AS(GblModule, *pPtr) ?                                 \
-          GBL_CAST(type,                                             \
-                (GblModule_require((GblModule**)pPtr, name, version, \
-                                   __FILE__, __func__, __LINE__)))   \
-        : GBL_CAST(type, *pPtr))
+#define GBL_REQUIRE_DEFAULT__(type, pPtr, name, version, ...)   \
+    GBL_AS(type, (GblModule_require(                            \
+                    (GblModule**)pPtr, name, version,           \
+                    __FILE__, __func__, __LINE__)))
 
 #define GBL_RELEASE_(pPtr) \
     (GblModule_release((GblModule**)pPtr))

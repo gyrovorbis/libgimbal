@@ -233,16 +233,6 @@ GBL_EXPORT GblModule* GblModule_require(GblModule** ppSelf,
                                   line);
 }
 
-GBL_EXPORT GBL_RESULT GblModule_release(GblModule** ppModule) {
-    GBL_RESULT result = GBL_RESULT_ERROR_INVALID_POINTER;
-    if (!ppModule || !GBL_AS(GblModule, *ppModule))
-        return result;
-
-    result = GblModule_unuse(*ppModule);
-    *ppModule = NULL;
-    return result;
-}
-
 GBL_EXPORT GblModule* GblModule_requireQuark(GblModule** ppSelf,
                                              GblQuark    quark,
                                              const char* pVersion,
@@ -250,6 +240,9 @@ GBL_EXPORT GblModule* GblModule_requireQuark(GblModule** ppSelf,
                                              const char* pFunc,
                                              size_t      line)
 {
+    if (ppSelf && GBL_AS(GblModule, *ppSelf))
+        return (GblModule*)*ppSelf;
+
     GblModule* pModule = GblModule_findQuark(quark);
 
     if GBL_UNLIKELY(!pModule) {
@@ -274,11 +267,20 @@ GBL_EXPORT GblModule* GblModule_requireQuark(GblModule** ppSelf,
         GblModule_use(pModule);
     }
 
-    if (ppSelf && !*ppSelf) {
+    if (ppSelf && !*ppSelf)
         *ppSelf = pModule;
-    }
 
     return pModule;
+}
+
+GBL_EXPORT GBL_RESULT GblModule_release(GblModule** ppSelf) {
+    GBL_RESULT result = GBL_RESULT_ERROR_INVALID_POINTER;
+    if (!ppSelf || !GBL_AS(GblModule, *ppSelf))
+        return result;
+
+    result = GblModule_unuse(*ppSelf);
+    *ppSelf = NULL;
+    return result;
 }
 
 GBL_EXPORT GblRefCount GblModule_useCount(const GblModule* pSelf) {
