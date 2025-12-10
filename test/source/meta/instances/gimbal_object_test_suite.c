@@ -1056,6 +1056,173 @@ GBL_TEST_CASE(childrenPropertyVariant)
     GblRingList_unref(pChildren);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(foreachChild)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "name", "Child1", "parent", pParent);
+    GblObject* pChild2 = GBL_NEW(GblObject, "name", "Child2", "parent", pParent);
+    GblObject* pChild3 = GBL_NEW(GblObject, "name", "Child3", "parent", pParent);
+    GblObject* pChild4 = GBL_NEW(GblObject, "name", "Child4", "parent", pParent);
+
+    int count = 0;
+
+    GblObject_foreachChild(pParent, child) {
+        GBL_TEST_COMPARE(GblObject_name(child),
+                         GblObject_name(GblObject_findChildByIndex(pParent, count)));
+        ++count;
+    }
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(foreachChildType)
+    GblObject*  pParent = GBL_NEW(GblObject);
+    TestObject* pChild1 = GBL_NEW(TestObject, "name", "Child1", "parent", pParent);
+    TestObject* pChild2 = GBL_NEW(TestObject, "name", "Child2", "parent", pParent);
+    TestObject* pChild3 = GBL_NEW(TestObject, "name", "Child3", "parent", pParent);
+    TestObject* pChild4 = GBL_NEW(TestObject, "name", "Child4", "parent", pParent);
+
+    int count = 0;
+
+    GblObject_foreachChild(pParent, child, TestObject*) {
+        TestObjectClass* pClass = TEST_OBJECT_GET_CLASS(child);
+        GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(child)),
+                         GblObject_name(GblObject_findChildByIndex(pParent, count)));
+        GBL_TEST_COMPARE(strcmp(child->stringer, "INVALID"), 0);
+        GBL_TEST_COMPARE(pClass->staticInt32, 77);
+        ++count;
+    }
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(addChildren)
+    GblObject*   pParent    = GBL_NEW(GblObject);
+    GblRingList* pChildList = GblRingList_create(
+        GBL_NEW(GblObject, "name", "Child1"),
+        GBL_NEW(GblObject, "name", "Child2"),
+        GBL_NEW(GblObject, "name", "Child3"),
+        GBL_NEW(GblObject, "name", "Child4")
+    );
+
+    GblObject_addChildren(pParent, pChildList);
+
+    int count = 0;
+    GblObject_foreachChild(pParent, child) {
+        GBL_TEST_COMPARE(GblObject_name(child),
+                         GblObject_name(GblObject_findChildByIndex(pParent, count)));
+        ++count;
+    }
+
+    GblRingList_foreach(pChildList, pChild)
+        GBL_UNREF(pChild);
+    GblRingList_unref(pChildList);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(setChildren)
+    GblObject*   pParent    = GBL_NEW(GblObject);
+    GblRingList* pChildList = GblRingList_create(
+        GBL_NEW(GblObject, "name", "Child1"),
+        GBL_NEW(GblObject, "name", "Child2"),
+        GBL_NEW(GblObject, "name", "Child3"),
+        GBL_NEW(GblObject, "name", "Child4")
+    );
+
+    GblObject *pChildDummy = GBL_NEW(GblObject, "name", "Dummy");
+    GblObject_setChildren(pParent, pChildList);
+
+    int count = 0;
+    GblObject_foreachChild(pParent, child) {
+        GBL_TEST_COMPARE(GblObject_name(child),
+                         GblObject_name(GblObject_findChildByIndex(pParent, count)));
+        ++count;
+    }
+
+    GblRingList_foreach(pChildList, pChild)
+        GBL_UNREF(pChild);
+    GblRingList_unref(pChildList);
+
+    GBL_UNREF(pChildDummy);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+
+static GblBool gblObjectIterator_(GblObject* pChild, void* pClosure) {
+    int* pState = (int*)pClosure;
+    GblBool retValue = GBL_FALSE;
+    switch(*pState) {
+    case 0:
+        if(strcmp(GblObject_name(pChild), "Child1") == 0)
+            ++(*pState);
+        break;
+    case 1:
+        if(strcmp(GblObject_name(pChild), "Child2") == 0)
+            ++(*pState);
+        break;
+    case 2:
+        if(strcmp(GblObject_name(pChild), "Child3") == 0)
+            ++(*pState);
+            retValue = GBL_TRUE;
+        break;
+    case 3:
+        if(strcmp(GblObject_name(pChild), "Child4") == 0) {
+            ++(*pState);
+        }
+        break;
+    default: break;
+    }
+    return retValue;
+}
+
+GBL_TEST_CASE(iterateChildren)
+    GblObject* pParent = GBL_NEW(GblObject, "children",
+                                            GblRingList_create(
+                                                GBL_NEW(GblObject, "name", "Child1"),
+                                                GBL_NEW(GblObject, "name", "Child2"),
+                                                GBL_NEW(GblObject, "name", "Child3"),
+                                                GBL_NEW(GblObject, "name", "Child4")
+                                            ));
+
+    int state = 0;
+    GblObject_iterateChildren(pParent, gblObjectIterator_, &state);
+    GBL_TEST_COMPARE(state, 3);
+
+    GblRingList* pChildren = NULL;
+    GblObject_property(pParent, "children", &pChildren);
+
+    GblRingList_foreach(pChildren, pChild)
+        GBL_UNREF(pChild);
+    GblRingList_unref(pChildren);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(childLast)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "parent", pParent);
+    GblObject* pChild2 = GBL_NEW(GblObject, "parent", pParent);
+    GblObject* pChild3 = GBL_NEW(GblObject, "parent", pParent);
+    GblObject* pChild4 = GBL_NEW(GblObject, "parent", pParent);
+
+    GBL_TEST_COMPARE(GblObject_childLast(pParent), pChild4);
+    GBL_UNREF(pChild4);
+    GBL_TEST_COMPARE(GblObject_childLast(pParent), pChild3);
+    GBL_UNREF(pChild3);
+    GBL_TEST_COMPARE(GblObject_childLast(pParent), pChild2);
+    GBL_UNREF(pChild2);
+    GBL_TEST_COMPARE(GblObject_childLast(pParent), pChild1);
+    GBL_UNREF(pChild1);
+    GBL_TEST_COMPARE(GblObject_childLast(pParent), NULL);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(newDefault,
                   name,
                   ref,
@@ -1090,7 +1257,13 @@ GBL_TEST_REGISTER(newDefault,
                   siblingPreviousByName,
                   childIndex,
                   childrenProperty,
-                  childrenPropertyVariant
+                  childrenPropertyVariant,
+                  foreachChild,
+                  foreachChildType,
+                  addChildren,
+                  setChildren,
+                  iterateChildren,
+                  childLast
                 )
 
 static GBL_RESULT TestObject_IEventReceiver_receiveEvent(GblIEventReceiver* pSelf, GblIEventReceiver* pDest, GblEvent* pEvent) {

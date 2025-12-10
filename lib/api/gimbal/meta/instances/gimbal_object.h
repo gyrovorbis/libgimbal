@@ -15,7 +15,6 @@
  *  \todo
  *      - Uninstall all signals upon class destructor (with property uninstallation)
  *      - Get rid of GblObject_findContext()
- *      - GblObject_set/addChildren() with propertyChange() signal
  *
  *  \test
  *      - GblObjectClass::pFnConstructed() with CONSTRUCTOR properties.
@@ -27,11 +26,15 @@
 #ifndef GIMBAL_OBJECT_H
 #define GIMBAL_OBJECT_H
 
+#include "gimbal/core/gimbal_decls.h"
+#include "gimbal/preprocessor/gimbal_compiler.h"
 #include "gimbal_box.h"
 #include "../ifaces/gimbal_itable_variant.h"
 #include "../ifaces/gimbal_ievent_receiver.h"
 #include "../properties/gimbal_property.h"
 #include "../../containers/gimbal_ring_list.h"
+
+#define GBL_SELF_TYPE GblObject
 
 /*! \name  Type System
  *  \brief Type UUID and Cast operators
@@ -60,7 +63,12 @@
 
 //! @}
 
-#define GBL_SELF_TYPE GblObject
+/*! \brief For-loop style iteration over the children of a GblObject
+ *
+ *  Iterates over every child within the given object, setting the \p item variable to the current child.
+ *  Optionally takes in a \p type parameter to secify the type of the children to iterate over.
+*/
+#define GblObject_foreachChild(/*GBL_SELF, name, type=GblObject* */ ...) GblObject_foreachChildDefault_(__VA_ARGS__)
 
 GBL_DECLS_BEGIN
 
@@ -87,6 +95,15 @@ GBL_CLASS_DERIVE(GblObject, GblBox,
     //! Virtaul method for writing properties
     GBL_RESULT (*pFnSetProperty) (GBL_SELF, const GblProperty* pProp, GblVariant* pValue);
 GBL_CLASS_END
+
+/*! \name  User-Operator Callbacks
+ *  \brief Tyedefs for applying various user-supplied functions over a GblObject.
+ *  @{
+*/
+
+//! Iterator callback function which gets called over every child of a GblObject, being passed back a GblObject and an arbitrary closure, returning true should iteration cease early.
+typedef GblBool (*GblObjectIterFn)(GblObject* pChild, void* pClosure);
+//! @}
 
 /*! \class      GblObject
  *  \extends    GblBox
@@ -303,34 +320,43 @@ GBL_EXPORT void          GblObject_setNameRef (GBL_SELF, GblStringRef* pRef) GBL
  *  @{
  */
 //! Returns a poiner to the parent of the given object, or NULL if it doesn't have one
-GBL_EXPORT GblObject* GblObject_parent                (GBL_CSELF)                    GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_parent                (GBL_CSELF)                                               GBL_NOEXCEPT;
 //! Sets the parent of the given object to \p pParent
-GBL_EXPORT void       GblObject_setParent             (GBL_SELF, GblObject* pParent) GBL_NOEXCEPT;
+GBL_EXPORT void       GblObject_setParent               (GBL_SELF, GblObject* pParent)                          GBL_NOEXCEPT;
 //! Adds \p pChild as a child of the given object, setting itself as the parent
-GBL_EXPORT void       GblObject_addChild              (GBL_SELF, GblObject* pChild)  GBL_NOEXCEPT;
+GBL_EXPORT void       GblObject_addChild                (GBL_SELF, GblObject* pChild)                           GBL_NOEXCEPT;
 //! Removes \p pChild from being a child of the given object, setting its parent to NULL
-GBL_EXPORT GblBool    GblObject_removeChild           (GBL_SELF, GblObject* pChild)  GBL_NOEXCEPT;
+GBL_EXPORT GblBool    GblObject_removeChild             (GBL_SELF, GblObject* pChild)                           GBL_NOEXCEPT;
+//! Adds all the objects in \p pList as children of the given object
+GBL_EXPORT void       GblObject_addChildren             (GBL_SELF, const GblRingList *pList)                    GBL_NOEXCEPT;
+//! Sets the children of the given object to \p pList
+GBL_EXPORT void       GblObject_setChildren             (GBL_SELF, const GblRingList* pList)                    GBL_NOEXCEPT;
+/*! Iterates over every child of the given object, passing them to the given iterator function, which may optionally take a user data pointer.
+    Iteration ends early when the iterator returns GBL_TRUE.
+*/
+GBL_EXPORT GblBool    GblObject_iterateChildren         (GBL_CSELF, GblObjectIterFn pFnIt, void* pUd/*=NULLL*/) GBL_NOEXCEPT;
 //! Returns the number of levels deep the given object is in the object tree formed by its ancestors
-GBL_EXPORT size_t     GblObject_depth                 (GBL_CSELF)                    GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblObject_depth                   (GBL_CSELF)                                             GBL_NOEXCEPT;
 //! Returns a pointer to the first child of the given object, or NULL if it has none
-GBL_EXPORT GblObject* GblObject_childFirst            (GBL_CSELF)                    GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_childFirst              (GBL_CSELF)                                             GBL_NOEXCEPT;
+//! Returns a pointer to the last child of the given object, or NULL if it has none
+GBL_EXPORT GblObject* GblObject_childLast               (GBL_CSELF)                                             GBL_NOEXCEPT;
 //! Returns the number of children with the given object as their parent
-GBL_EXPORT size_t     GblObject_childCount            (GBL_CSELF)                    GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblObject_childCount              (GBL_CSELF)                                             GBL_NOEXCEPT;
 //! Returns the index of the given object in its parent's list of children
-GBL_EXPORT size_t     GblObject_childIndex            (GBL_CSELF)                    GBL_NOEXCEPT;
+GBL_EXPORT size_t     GblObject_childIndex              (GBL_CSELF)                                             GBL_NOEXCEPT;
 //! Returns the next sibling after the given object, forming a linked list of their parents' children
-GBL_EXPORT GblObject* GblObject_siblingNext           (GBL_CSELF)                    GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_siblingNext             (GBL_CSELF)                                             GBL_NOEXCEPT;
 //! Returns the next sibling after the given object that is of \p type, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_siblingNextByType     (GBL_CSELF, GblType type)      GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_siblingNextByType       (GBL_CSELF, GblType type)                               GBL_NOEXCEPT;
 //! Returns the next sibling after the given object with the given name, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_siblingNextByName     (GBL_CSELF, const char *pName) GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_siblingNextByName       (GBL_CSELF, const char *pName)                          GBL_NOEXCEPT;
 //! Returns the previous sibling before the given object, forming a linked list of their parents' children
-GBL_EXPORT GblObject* GblObject_siblingPrevious       (GBL_CSELF)                    GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_siblingPrevious         (GBL_CSELF)                                             GBL_NOEXCEPT;
 //! Returns the previous sibling before the given object that is of \p type, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_siblingPreviousByType (GBL_CSELF, GblType type)      GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_siblingPreviousByType   (GBL_CSELF, GblType type)                               GBL_NOEXCEPT;
 //! Returns the previous sibling before the given object with the given name, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_siblingPreviousByName (GBL_CSELF, const char *pName) GBL_NOEXCEPT;
-
+GBL_EXPORT GblObject* GblObject_siblingPreviousByName   (GBL_CSELF, const char *pName)                          GBL_NOEXCEPT;
 
 //! Returns a pointer to the closest ancestor object of the given object that is of \p ancestorType, or NULL if there isn't one
 GBL_EXPORT GblObject* GblObject_findAncestorByType   (GBL_CSELF, GblType ancestorType) GBL_NOEXCEPT;
@@ -386,6 +412,15 @@ GBL_DECLS_END
                                                                                                      GBL_TUPLE_REST(__VA_ARGS__), NULL))
 
 #define GBL_OBJECT_NEW_AT(cType, instance, ...)   (GblObject_construct(instance,GBL_TYPEID(cType), __VA_ARGS__, NULL))
+
+#define GblObject_foreachChildDefault_(...) \
+    GblObject_foreachChildDefault__(__VA_ARGS__, GblObject*)
+#define GblObject_foreachChildDefault__(self, name, type, ...) \
+    GblObject_foreachChildImpl_(self, name, type)
+#define GblObject_foreachChildImpl_(self, name, type)                       \
+    for(type name = (type)GblObject_childFirst(self);                       \
+        name;                                                               \
+        name = (type)GblObject_siblingNext(GBL_OBJECT(name)))               \
 ///\endcond
 
 #undef GBL_SELF_TYPE
