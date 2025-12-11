@@ -346,7 +346,7 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
     GBL_CTX_PUSH();
     GBL_CTX_INFO("%-20s: %-100.100s", "Version", GIMBAL_VERSION);
     GBL_CTX_POP(1);
-
+#if 0
     GBL_CTX_INFO("Project Info");
     GBL_CTX_PUSH();
     GBL_CTX_INFO("%-20s: %-100.100s", "Name", GBL_PROJECT_NAME);
@@ -354,11 +354,11 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
     GBL_CTX_INFO("%-20s: %-100.100s", "URL", GBL_PROJECT_URL);
     GBL_CTX_INFO("%-20s: %-100.100s", "Description", GBL_PROJECT_DESCRIPTION);
     GBL_CTX_POP(1);
-
+#endif
     GBL_CTX_INFO("Build Info");
     GBL_CTX_PUSH();
     GBL_CTX_INFO("%-20s: %-100.100s", "Timestamp", GBL_BUILD_TIMESTAMP);
-    GBL_CTX_INFO("%-20s: %-100.100s", "Type", GBL_BUILD_TYPE);
+    //GBL_CTX_INFO("%-20s: %-100.100s", "Type", GBL_BUILD_TYPE);
     //GBL_CTX_INFO("%-20s: %-100.100s", "Config", GBL_BUILD_CONFIG);
     GBL_CTX_POP(1);
 
@@ -401,7 +401,7 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
     GBL_CTX_WARN("UNOFFICIAL LOCAL BUILD !");
     #endif
     GBL_CTX_POP(1);
-
+#if 0
     GBL_CTX_INFO("Compiler Info");
     GBL_CTX_PUSH();
     GBL_CTX_INFO("C");
@@ -453,8 +453,9 @@ GBL_EXPORT void GblContext_logBuildInfo(const GblContext* pSelf) {
 //    GBL_CTX_INFO("%-20s: %-100u", "Word Size", GBL_PTR_SIZE * 8);
     GBL_CTX_INFO("%-20s: %-100.100s", "Endianness", GBL_BIG_ENDIAN? "Big" : "Little");
     GBL_CTX_POP(2);
-
+#endif
     GBL_CTX_END_BLOCK();
+
 }
 GBL_EXPORT GblType GblContext_type(void) {
     static GblType type = GBL_INVALID_TYPE;

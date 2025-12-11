@@ -1,7 +1,6 @@
 #include <gimbal/objects/gimbal_context.h>
 #include <gimbal/types/gimbal_typedefs.h>
 #include <gimbal/core/gimbal_api_frame.h>
-#include <gimbal/core/gimbal_config.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>

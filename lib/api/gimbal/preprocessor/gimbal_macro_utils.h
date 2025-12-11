@@ -3,8 +3,9 @@
  *  \ingroup preprocessor
  *  \sa gimbal_macro_composition.h, gimbal_macro_sequences.h
  *
- *  \author Falco Girgis
+ *  \author 2025 Falco Girgis
  *  \author 2025 Agustín Bellagamba
+ *  \copyright MIT License
  */
 
 #ifndef GIMBAL_MACRO_UTILS_H
@@ -12,7 +13,7 @@
 
 #include "gimbal_compiler.h"
 #include "gimbal_macro_composition.h"
-#include <gimbal/core/gimbal_config.h>
+#include "../core/gimbal_config.h"
 #include <stdint.h>
 
 #ifdef __cplusplus

@@ -75,11 +75,9 @@ GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_NAME GITLAB_USER_NAME)
 GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_LOGIN GITLAB_USER_LOGIN)
 GBL_GITLAB_CI_DEFINE(GBL_BUILD_CI_USER_EMAIL GITLAB_USER_EMAIL)
 
-GBL_CONFIG_VARIABLE(GBL_CONFIGURATION_INPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/api/gimbal/core/gimbal_config.h.in FILEPATH "Path to user API configuration file")
-
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL    GBL_LOG_LEVEL_WARNING STRING   "Log level for reporting partial results")
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL      GBL_LOG_LEVEL_ERROR STRING     "Log level for reporting error results")
-GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL    GBL_LOG_LEVEL_ERROR STRING     "Log level for reporting unknown results")
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL    GBL_LOG_LEVEL_WARNING STRING "Log level for reporting partial results")
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL      GBL_LOG_LEVEL_ERROR   STRING "Log level for reporting error results")
+GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL    GBL_LOG_LEVEL_ERROR   STRING "Log level for reporting unknown results")
 
 GBL_CONFIG_OPTION(GBL_TLS_EMULATED                  "Emulate thread_local keyword with OS-level TLS"       OFF)
 GBL_CONFIG_OPTION(GBL_CONFIG_PREFETCH_ENABLED       "Enable prefetching macro"                             ON)
@@ -100,8 +98,6 @@ if ((CMAKE_COMPILER_IS_GNUCC))
 endif()
 
 set(GIMBAL_INCLUDES
-    ${GBL_CONFIGURATION_INPUT_PATH}
-    ${GIMBAL_CONFIGURATION_OUTPUT_PATH}
     api/gimbal/gimbal.h
     api/gimbal/gimbal_allocators.h
     api/gimbal/gimbal_algorithms.h
@@ -134,6 +130,7 @@ set(GIMBAL_INCLUDES
     api/gimbal/containers/gimbal_ring_list.h
     api/gimbal/containers/gimbal_array_deque.h
     api/gimbal/containers/gimbal_array_heap.h
+    api/gimbal/core/gimbal_config.h
     api/gimbal/core/gimbal_decls.h
     api/gimbal/core/gimbal_ctx.h
     api/gimbal/core/gimbal_error.h
@@ -442,10 +439,6 @@ target_compile_definitions(libGimbal
     -DGIMBAL_VERSION_MINOR=${GIMBAL_VERSION_MINOR}
     -DGIMBAL_VERSION_PATCH=${GIMBAL_VERSION_PATCH}
     -DGIMBAL_VERSION="${GIMBAL_VERSION}")
-
-configure_file(${GBL_CONFIGURATION_INPUT_PATH}
-    ${GIMBAL_CONFIGURATION_OUTPUT_PATH})
-
 
 #install(TARGETS libGimbal
 #        LIBRARY DESTINATION lib
