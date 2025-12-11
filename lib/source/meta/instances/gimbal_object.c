@@ -1723,12 +1723,13 @@ static GBL_RESULT GblObject_Box_destructor_(GblBox* pBox) {
     GblObject* pSelf = (GblObject*)pBox;
 
     GblObject_setParent(pSelf, NULL);
-    for(GblObject* pIt = GblObject_childFirst(pSelf);
-         pIt != NULL;
-         pIt = GblObject_siblingNext(pSelf))
-    {
-        GblObject_setParent(pIt, NULL);
-    }
+
+    GblRingList* pChildren;
+    GblObject_property(pSelf, "children", &pChildren);
+
+    GblRingList_foreach(pChildren, pChild)
+        GBL_UNREF(pChild);
+    GblRingList_unref(pChildren);
 
     GblBoxClass* pBoxClass = GBL_BOX_CLASS(GblClass_weakRefDefault(GBL_BOX_TYPE));
     GBL_CTX_VERIFY_CALL(pBoxClass->pFnDestructor(pBox));

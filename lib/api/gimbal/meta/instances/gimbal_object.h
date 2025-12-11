@@ -26,10 +26,7 @@
 #ifndef GIMBAL_OBJECT_H
 #define GIMBAL_OBJECT_H
 
-#include "gimbal/core/gimbal_decls.h"
-#include "gimbal/preprocessor/gimbal_compiler.h"
 #include "gimbal_box.h"
-#include "../ifaces/gimbal_itable_variant.h"
 #include "../ifaces/gimbal_ievent_receiver.h"
 #include "../properties/gimbal_property.h"
 #include "../../containers/gimbal_ring_list.h"
