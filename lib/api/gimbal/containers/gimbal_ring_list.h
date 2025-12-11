@@ -31,9 +31,9 @@
 //! @}
 
 /*! \brief For-loop style iteration over a GblRingList
-
-    Iterates over every entry within a GblRingList, setting the \p item variable to the current entry's value.
-    Optionally takes in a \p type parameter to specify the type of the \p item variable, which defaults to void*.
+ *
+ *   Iterates over every entry within a GblRingList, setting the \p item variable to the current entry's value.
+ *   Optionally takes in a \p type parameter to specify the type of the \p item variable, which defaults to void*.
 */
 #define GblRingList_foreach(/* list, item, type=void* */...)                    GblRingList_foreachDefault_(__VA_ARGS__)
 
