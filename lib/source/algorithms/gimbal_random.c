@@ -3,6 +3,7 @@
 #include <math.h>
 #include <time.h>
 #include <string.h>
+#include <float.h>
 
 #define LEHMER_MODULUS    2147483647 /* DON'T CHANGE THIS VALUE                  */
 #define LEHMER_MULTIPLIER 48271      /* DON'T CHANGE THIS VALUE                  */
@@ -69,6 +70,10 @@ GBL_EXPORT void gblSeedRand(uint8_t index, uint64_t seed) {
 
 GBL_EXPORT GblBool gblRandBool(void) {
     return gblRand() & 0x1;
+}
+
+GBL_EXPORT float gblRandf(void) {
+    return gblRandUniform(FLT_MIN, FLT_MAX);
 }
 
 GBL_EXPORT int gblRandString(char* pBuffer, int minSize, int maxSize, const char* pCharList) {

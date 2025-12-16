@@ -74,6 +74,8 @@ GBL_EXPORT int gblRandLehmer (void) GBL_NOEXCEPT;
  */
 //! Generates a random boolean value using the current generator
 GBL_EXPORT GblBool gblRandBool   (void)                           GBL_NOEXCEPT;
+//! Generates a random single-precision float from FLT_MIN to FLT_MAX.
+GBL_EXPORT float   gblRandf      (void)                           GBL_NOEXCEPT;
 //! Fills in the given buffer with random bytes using the current generator
 GBL_EXPORT void    gblRandBuffer (void* pData, size_t size)       GBL_NOEXCEPT;
 //! Fills in buffer with a sized random word (optionally generated using a list of characters)
