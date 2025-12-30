@@ -5,7 +5,7 @@
  *  This file contains the type definitions and API for
  *  GblObject and GblObjectClass. This is the instantiable
  *  type which provides the OO meat of the instantiable types--
- *  such as properties, hierarchial relationships, event management,
+ *  such as properties, hierarchical relationships, event management,
  *  generic construction, named instances, etc.
  *
  *  \author    2023, 2024, 2025 Falco Girgis
@@ -63,7 +63,7 @@
 /*! \brief For-loop style iteration over the children of a GblObject
  *
  *  Iterates over every child within the given object, setting the \p item variable to the current child.
- *  Optionally takes in a \p type parameter to secify the type of the children to iterate over.
+ *  Optionally takes in a \p type parameter to specify the type of the children to iterate over.
 */
 #define GblObject_foreachChild(/*GBL_SELF, name, type=GblObject* */ ...) GblObject_foreachChildDefault_(__VA_ARGS__)
 
@@ -89,12 +89,12 @@ GBL_CLASS_DERIVE(GblObject, GblBox,
     GBL_RESULT (*pFnInstantiated)(GBL_SELF);
     //! Virtual method for reading properties
     GBL_RESULT (*pFnProperty)    (GBL_CSELF, const GblProperty* pProp, GblVariant* pValue);
-    //! Virtaul method for writing properties
+    //! Virtual method for writing properties
     GBL_RESULT (*pFnSetProperty) (GBL_SELF, const GblProperty* pProp, GblVariant* pValue);
 GBL_CLASS_END
 
 /*! \name  User-Operator Callbacks
- *  \brief Tyedefs for applying various user-supplied functions over a GblObject.
+ *  \brief Typedefs for applying various user-supplied functions over a GblObject.
  *  @{
 */
 
@@ -111,7 +111,7 @@ typedef GblBool (*GblObjectIterFn)(GblObject* pChild, void* pClosure);
  *
  *  A GblObject is the default, full-blown object-oriented instantiable type.
  *  It is analogous to Qt's "QObject" or GNOME's "GObject" root type. It extends
- *  GblBox to add the following additonal functionality:
+ *  GblBox to add the following additional functionality:
  *      - properties
  *      - GblVariant table operations
  *      - constructor / post-constructor
@@ -139,7 +139,7 @@ GBL_PROPERTIES(GblObject,
 )
 
 GBL_SIGNALS(GblObject,
-    (propertyChange, (GBL_INSTANCE_TYPE, pReciever), (GBL_BOX_TYPE, pProperty))
+    (propertyChange, (GBL_INSTANCE_TYPE, pReceiver), (GBL_BOX_TYPE, pProperty))
 )
 //! \endcond
 
@@ -150,7 +150,7 @@ GBL_EXPORT GblType GblObject_type(void) GBL_NOEXCEPT;
  *  \brief Methods for constructing GblObject-derived types.
  *  @{
  */
-//! Creates an object-derived type on the heap, intializing it with a NULL-terminated K,V pair listing of properties
+//! Creates an object-derived type on the heap, initializing it with a NULL-terminated K,V pair listing of properties
 GBL_EXPORT GblObject* GblObject_create               (GblType type, ...)                         GBL_NOEXCEPT;
 //! Variant of GblObject_create(), where the object is created with an extended size
 GBL_EXPORT GblObject* GblObject_createExt            (GblType type, size_t size, ...)            GBL_NOEXCEPT;
@@ -174,7 +174,7 @@ GBL_EXPORT GblObject* GblObject_createVaWithClass    (GblObjectClass* pClass, va
 GBL_EXPORT GblObject* GblObject_createExtVaWithClass (GblObjectClass* pClass,
                                                       size_t          size,
                                                       va_list*        pList)                     GBL_NOEXCEPT;
-//! Variant of GblObjecT_constructWithClass(), where the property list is provided as a va_list pointer
+//! Variant of GblObject_constructWithClass(), where the property list is provided as a va_list pointer
 GBL_EXPORT GBL_RESULT GblObject_constructVaWithClass (GBL_SELF,
                                                       GblObjectClass* pClass,
                                                       va_list*        pList)                     GBL_NOEXCEPT;
@@ -189,7 +189,7 @@ GBL_EXPORT GblObject* GblObject_createVariantsExt    (GblType     type,
                                                       size_t      propertyCount,
                                                       const char* pNames[],
                                                       GblVariant* pValues)                       GBL_NOEXCEPT;
-//! Creates an object-derived type in-place, initiailzing it with an array of property values and a corresponding array of names
+//! Creates an object-derived type in-place, initializing it with an array of property values and a corresponding array of names
 GBL_EXPORT GBL_RESULT GblObject_constructVariants    (GBL_SELF,
                                                       GblType     type,
                                                       size_t      propertyCount,
@@ -245,7 +245,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertiesVariants     (GBL_CSELF,
                                                         GblVariant* pValue)                               GBL_NOEXCEPT;
 
 /*! \name  Writing Properties
- *  \brief Methods for settingproperty values.
+ *  \brief Methods for setting property values.
  *  \relatesalso GblObject
  *  @{
  */
@@ -263,7 +263,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVariant        (GBL_SELF, const char*
 GBL_EXPORT GBL_RESULT GblObject_setPropertyVariantByQuark (GBL_SELF, GblQuark name, GblVariant* pValue)     GBL_NOEXCEPT;
 //! Sets multiple properties by taking a NULL-terminated K,V pairs list of string names and pointers to store the values within
 GBL_EXPORT GBL_RESULT GblObject_setProperties             (GBL_SELF, ...)                                   GBL_NOEXCEPT;
-//! Variant of Gblobject_setProperties() where the NULL-termianted K,V pairs list is specified as apointer to a va_list
+//! Variant of GblObject_setProperties() where the NULL-terminated K,V pairs list is specified as a pointer to a va_list
 GBL_EXPORT GBL_RESULT GblObject_setPropertiesVa           (GBL_SELF, va_list* pList)                        GBL_NOEXCEPT;
 //! Sets the properties specified by the list of names to the corresponding values specified as the list of GblVariants
 GBL_EXPORT GBL_RESULT GblObject_setPropertiesVariants     (GBL_SELF,
@@ -316,7 +316,7 @@ GBL_EXPORT void          GblObject_setNameRef (GBL_SELF, GblStringRef* pRef) GBL
  *  \relatesalso GblObject
  *  @{
  */
-//! Returns a poiner to the parent of the given object, or NULL if it doesn't have one
+//! Returns a pointer to the parent of the given object, or NULL if it doesn't have one
 GBL_EXPORT GblObject* GblObject_parent                (GBL_CSELF)                                               GBL_NOEXCEPT;
 //! Sets the parent of the given object to \p pParent
 GBL_EXPORT void       GblObject_setParent               (GBL_SELF, GblObject* pParent)                          GBL_NOEXCEPT;
@@ -325,13 +325,13 @@ GBL_EXPORT void       GblObject_addChild                (GBL_SELF, GblObject* pC
 //! Removes \p pChild from being a child of the given object, setting its parent to NULL
 GBL_EXPORT GblBool    GblObject_removeChild             (GBL_SELF, GblObject* pChild)                           GBL_NOEXCEPT;
 //! Adds all the objects in \p pList as children of the given object
-GBL_EXPORT void       GblObject_addChildren             (GBL_SELF, const GblRingList *pList)                    GBL_NOEXCEPT;
+GBL_EXPORT void       GblObject_addChildren             (GBL_SELF, const GblRingList* pList)                    GBL_NOEXCEPT;
 //! Sets the children of the given object to \p pList
 GBL_EXPORT void       GblObject_setChildren             (GBL_SELF, const GblRingList* pList)                    GBL_NOEXCEPT;
 /*! Iterates over every child of the given object, passing them to the given iterator function, which may optionally take a user data pointer.
     Iteration ends early when the iterator returns GBL_TRUE.
 */
-GBL_EXPORT GblBool    GblObject_iterateChildren         (GBL_CSELF, GblObjectIterFn pFnIt, void* pUd/*=NULLL*/) GBL_NOEXCEPT;
+GBL_EXPORT GblBool    GblObject_iterateChildren         (GBL_CSELF, GblObjectIterFn pFnIt, void* pUd/*=NULL*/) GBL_NOEXCEPT;
 //! Returns the number of levels deep the given object is in the object tree formed by its ancestors
 GBL_EXPORT size_t     GblObject_depth                   (GBL_CSELF)                                             GBL_NOEXCEPT;
 //! Returns a pointer to the first child of the given object, or NULL if it has none
@@ -347,13 +347,13 @@ GBL_EXPORT GblObject* GblObject_siblingNext             (GBL_CSELF)             
 //! Returns the next sibling after the given object that is of \p type, or NULL if there isn't one
 GBL_EXPORT GblObject* GblObject_siblingNextByType       (GBL_CSELF, GblType type)                               GBL_NOEXCEPT;
 //! Returns the next sibling after the given object with the given name, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_siblingNextByName       (GBL_CSELF, const char *pName)                          GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_siblingNextByName       (GBL_CSELF, const char* pName)                          GBL_NOEXCEPT;
 //! Returns the previous sibling before the given object, forming a linked list of their parents' children
 GBL_EXPORT GblObject* GblObject_siblingPrevious         (GBL_CSELF)                                             GBL_NOEXCEPT;
 //! Returns the previous sibling before the given object that is of \p type, or NULL if there isn't one
 GBL_EXPORT GblObject* GblObject_siblingPreviousByType   (GBL_CSELF, GblType type)                               GBL_NOEXCEPT;
 //! Returns the previous sibling before the given object with the given name, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_siblingPreviousByName   (GBL_CSELF, const char *pName)                          GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_siblingPreviousByName   (GBL_CSELF, const char* pName)                          GBL_NOEXCEPT;
 
 //! Returns a pointer to the closest ancestor object of the given object that is of \p ancestorType, or NULL if there isn't one
 GBL_EXPORT GblObject* GblObject_findAncestorByType   (GBL_CSELF, GblType ancestorType) GBL_NOEXCEPT;
@@ -373,7 +373,7 @@ GBL_EXPORT GblObject* GblObject_findChildByIndex     (GBL_CSELF, size_t index)  
 GBL_EXPORT GblObject* GblObject_findSiblingByType    (GBL_CSELF, GblType siblingType)  GBL_NOEXCEPT;
 //! Iterates sequentially over the list of siblings to the given object, returning a pointer to the first one with the given name, or NULL if there isn't one
 GBL_EXPORT GblObject* GblObject_findSiblingByName    (GBL_CSELF, const char* pName)    GBL_NOEXCEPT;
-//! Iterates sequentially over thelist of siblings to the given object, returning a pointer to the one at the given index, or NULL if there isn't one
+//! Iterates sequentially over the list of siblings to the given object, returning a pointer to the one at the given index, or NULL if there isn't one
 GBL_EXPORT GblObject* GblObject_findSiblingByIndex   (GBL_CSELF, size_t  index)        GBL_NOEXCEPT;
 //! @}
 
