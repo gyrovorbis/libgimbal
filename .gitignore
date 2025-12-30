@@ -56,3 +56,10 @@ ui_*
 # Visual Studio Shit
 ####################
 .vs
+.cache/
+
+# Doxygen files
+####################
+doc/*/
+doc/*.txt
+doc/*.tag
