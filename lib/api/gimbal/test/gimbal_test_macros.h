@@ -82,7 +82,8 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_UINT32_ (uint32_t actual, uint32_t expec
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_UINT64_ (uint64_t actual, uint64_t expected)         { return actual == expected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_INT32_  (int32_t actual, int32_t expected)           { return actual == expected; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_INT64_  (int64_t actual, int64_t expected)           { return actual == expected; }
-GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_DBL_    (double actual, double expected)             { return actual == expected; }
+GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_FLT_    (float actual, float expected)               { return fabsf(actual - expected) < FLT_EPSILON; }
+GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_DBL_    (double actual, double expected)             { return fabs(actual - expected) < DBL_EPSILON; }
 GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char* pExpected) { return pActual == pExpected ||
                                                                                                      (pActual && pExpected && \
                                                                                                      strcmp(pActual, pExpected) == 0); }
@@ -122,7 +123,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
                 GBL_TEST_CMP_PLATFORM_ENTRIES()                 \
                 (const char*,   GBL_TEST_COMPARE_CMP_STR_),     \
                 (char*,         GBL_TEST_COMPARE_CMP_STR_),     \
-                (float,         GBL_TEST_COMPARE_CMP_DBL_),     \
+                (float,         GBL_TEST_COMPARE_CMP_FLT_),     \
                 (double,        GBL_TEST_COMPARE_CMP_DBL_),     \
                 (const void*,   GBL_TEST_COMPARE_CMP_PTR_)      \
             )                                                   \
@@ -132,7 +133,11 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
 
 #else
 inline constexpr GblBool GBL_TEST_COMPARE_CMP_(auto actual, auto expected) noexcept {
-    if constexpr(std::convertible_to<decltype(actual), decltype(expected)>)
+    if constexpr(std::floating_point<decltype(actual)> || std::floating_point<decltype(expected)>) {
+        constexpr double epsilon = std::is_same_v<float, decltype(actual)> ? FLT_EPSILON : DBL_EPSILON;
+        return std::abs(static_cast<double>(actual) - static_cast<double>(expected)) < epsilon;
+    }
+    else if constexpr(std::convertible_to<decltype(actual), decltype(expected)>)
         return static_cast<decltype(expected)>(actual) == expected;
     else if constexpr(std::convertible_to<decltype(expected), decltype(actual)>)
         return actual == static_cast<decltype(actual)>(expected);
@@ -162,7 +167,11 @@ inline GblBool GBL_TEST_COMPARE_CMP_(const char* pActual, const char *pExpected)
                                                                           "Values differed [expected: %s, actual: %s]",      \
                                                                           actual, expected)
 
-#define GBL_TEST_COMPARE_FLOAT(actual, expected)     GBL_CTX_VERIFY_EXPRESSION(actual == expected,                           \
+#define GBL_TEST_COMPARE_FLOAT(actual, expected)     GBL_CTX_VERIFY_EXPRESSION(fabsf((actual) - (expected)) < FLT_EPSILON,   \
+                                                                          "Values differed [expected: %f, actual: %f]",      \
+                                                                          actual, expected)
+
+#define GBL_TEST_COMPARE_DOUBLE(actual, expected)    GBL_CTX_VERIFY_EXPRESSION(fabs((actual) - (expected)) < DBL_EPSILON,    \
                                                                           "Values differed [expected: %f, actual: %f]",      \
                                                                           actual, expected)
 
