@@ -100,7 +100,7 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_WARN("UNOFFICIAL LOCAL BUILD !");
 #endif
     GBL_API_POP(1);
-
+#if 0
     GBL_API_PUSH_VERBOSE("Compiler Info");
     GBL_API_PUSH_VERBOSE("C");
     GBL_API_VERBOSE("%-20s: %-100.100s", "ID", GBL_BUILD_C_COMPILER_ID);
@@ -144,7 +144,7 @@ static GBL_API gblContextBuildInfoLog_(GblContext hCtx) {
     GBL_API_VERBOSE("%-20s: %-100u", "Word Size", GBL_PTR_SIZE * 8);
     GBL_API_VERBOSE("%-20s: %-100.100s", "Endianness", GBL_BIG_ENDIAN? "Big" : "Little");
     GBL_API_POP(2);
-
+#endif
     GBL_API_END();
 }
 
