@@ -3,7 +3,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/gyrovorbis/libgimbal">
-    <img src="http://libgimbal.elysianshadows.com/libgimbal_icon.png" alt="libGimbal">
+    <img src="http://libgimbal.falcogirgis.net/libgimbal_icon.png" alt="libGimbal">
   </a>
 
   <h3 align="center">libGimbal</h3>
