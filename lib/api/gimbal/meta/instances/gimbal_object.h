@@ -31,8 +31,6 @@
 #include "../properties/gimbal_property.h"
 #include "../../containers/gimbal_ring_list.h"
 
-#define GBL_SELF_TYPE GblObject
-
 /*! \name  Type System
  *  \brief Type UUID and Cast operators
  *  @{
@@ -67,6 +65,8 @@
 */
 #define GblObject_foreachChild(/*GBL_SELF, name, type=GblObject* */ ...) GblObject_foreachChildDefault_(__VA_ARGS__)
 
+#define GBL_SELF_TYPE GblObject
+
 GBL_DECLS_BEGIN
 
 GBL_FORWARD_DECLARE_STRUCT(GblObject);
@@ -97,7 +97,6 @@ GBL_CLASS_END
  *  \brief Typedefs for applying various user-supplied functions over a GblObject.
  *  @{
 */
-
 //! Iterator callback function which gets called over every child of a GblObject, being passed back a GblObject and an arbitrary closure, returning true should iteration cease early.
 typedef GblBool (*GblObjectIterFn)(GblObject* pChild, void* pClosure);
 //! @}
@@ -317,16 +316,20 @@ GBL_EXPORT void          GblObject_setNameRef (GBL_SELF, GblStringRef* pRef) GBL
  *  @{
  */
 //! Returns a pointer to the parent of the given object, or NULL if it doesn't have one
-GBL_EXPORT GblObject* GblObject_parent                (GBL_CSELF)                                               GBL_NOEXCEPT;
-//! Sets the parent of the given object to \p pParent
+GBL_EXPORT GblObject* GblObject_parent                  (GBL_CSELF)                                             GBL_NOEXCEPT;
+//! Sets the parent of the given object to \p pParent, handing ownership to it.
 GBL_EXPORT void       GblObject_setParent               (GBL_SELF, GblObject* pParent)                          GBL_NOEXCEPT;
-//! Adds \p pChild as a child of the given object, setting itself as the parent
+//! Adds \p pChild as a child of the given object, setting itself as the parent and taking ownership of it.
 GBL_EXPORT void       GblObject_addChild                (GBL_SELF, GblObject* pChild)                           GBL_NOEXCEPT;
 //! Removes \p pChild from being a child of the given object, setting its parent to NULL
 GBL_EXPORT GblBool    GblObject_removeChild             (GBL_SELF, GblObject* pChild)                           GBL_NOEXCEPT;
-//! Adds all the objects in \p pList as children of the given object
+//! Adds all the objects in \p pList as children of the given object, taking ownership of them.
 GBL_EXPORT void       GblObject_addChildren             (GBL_SELF, const GblRingList* pList)                    GBL_NOEXCEPT;
-//! Sets the children of the given object to \p pList
+//! Removes all the objects in \p pList as children of the given object, giving up ownership of them.
+GBL_EXPORT void       GblObject_removeChildren          (GBL_SELF, const GblRingList* pList)                    GBL_NOEXCEPT;
+//! Clears the children list of the given object, giving up ownership of them.
+GBL_EXPORT void       GblObject_clearChildren           (GBL_SELF)                                              GBL_NOEXCEPT;
+//! Sets the children of the given object to \p pList, replacing the current children list and taking ownership of the new one.
 GBL_EXPORT void       GblObject_setChildren             (GBL_SELF, const GblRingList* pList)                    GBL_NOEXCEPT;
 /*! Iterates over every child of the given object, passing them to the given iterator function, which may optionally take a user data pointer.
     Iteration ends early when the iterator returns GBL_TRUE.

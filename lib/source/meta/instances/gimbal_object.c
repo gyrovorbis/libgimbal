@@ -1271,8 +1271,7 @@ GBL_EXPORT GblBool GblObject_removeChild(GblObject* pSelf, GblObject* pChild) {
 }
 
 GBL_EXPORT void GblObject_addChildren(GblObject* pSelf, const GblRingList* pList) {
-    if (!pSelf || GBL_TYPEOF(pSelf) != GBL_OBJECT_TYPE)    return;
-    if (!pList || GBL_TYPEOF(pList) != GBL_RING_LIST_TYPE) return;
+    GBL_ASSERT(pSelf && GBL_TYPEOF(pSelf) == GBL_OBJECT_TYPE);
 
     GblRingList_foreach(pList, pChild, GblObject*)
         GblObject_addChild(pSelf, pChild);
@@ -1280,20 +1279,33 @@ GBL_EXPORT void GblObject_addChildren(GblObject* pSelf, const GblRingList* pList
     GblObject_emitPropertyChange(pSelf, "children");
 }
 
-GBL_EXPORT void GblObject_setChildren(GblObject* pSelf, const GblRingList* pList) {
-    if (!pSelf || GBL_TYPEOF(pSelf) != GBL_OBJECT_TYPE)    return;
-    if (!pList || GBL_TYPEOF(pList) != GBL_RING_LIST_TYPE) return;
+GBL_EXPORT void GblObject_removeChildren(GblObject* pSelf, const GblRingList* pList) {
+    GBL_ASSERT(pSelf && GBL_TYPEOF(pSelf) == GBL_OBJECT_TYPE);
+
+    GblRingList_foreach(pList, pChild, GblObject*)
+        GblObject_removeChild(pSelf, pChild);
+
+    GblObject_emitPropertyChange(pSelf, "children");
+}
+
+GBL_EXPORT void GblObject_clearChildren(GblObject* pSelf) {
+    GBL_ASSERT(pSelf && GBL_TYPEOF(pSelf) == GBL_OBJECT_TYPE);
 
     GblObject_foreachChild(pSelf, pChild)
         GblObject_removeChild(pSelf, pChild);
 
+    GblObject_emitPropertyChange(pSelf, "children");
+}
+
+GBL_EXPORT void GblObject_setChildren(GblObject* pSelf, const GblRingList* pList) {
+    GblObject_clearChildren(pSelf);
     GblObject_addChildren(pSelf, pList);
 
     GblObject_emitPropertyChange(pSelf, "children");
 }
 
 GBL_EXPORT GblBool GblObject_iterateChildren(const GblObject* pSelf, GblObjectIterFn pFnIt, void* pUd) {
-    if (!pSelf || GBL_TYPEOF(pSelf) != GBL_OBJECT_TYPE) return GBL_FALSE;
+    GBL_ASSERT(pSelf && GBL_TYPEOF(pSelf) == GBL_OBJECT_TYPE);
 
     GblObject_foreachChild(pSelf, pChild)
         if (pFnIt(pChild, pUd)) return GBL_TRUE;
