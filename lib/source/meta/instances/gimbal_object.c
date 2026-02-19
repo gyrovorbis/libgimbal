@@ -1181,9 +1181,9 @@ GBL_EXPORT GblObject* GblObject_childFirst(const GblObject* pSelf) {
 
 GBL_EXPORT GblObject* GblObject_childLast(const GblObject* pSelf) {
     GblObject* pChildLast = NULL;
-    GblObject_foreachChild(pSelf, pChild) {
+    GblObject_foreachChild(pSelf, pChild)
         pChildLast = pChild;
-    }
+
     return pChildLast;
 }
 

@@ -1061,6 +1061,49 @@ GBL_TEST_CASE(addChildren)
     GBL_UNREF(pParent);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(removeChildren)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "name", "Child1", "parent", pParent);
+    GblObject* pChild2 = GBL_NEW(GblObject, "name", "Child2", "parent", pParent);
+    GblObject* pChild3 = GBL_NEW(GblObject, "name", "Child3", "parent", pParent);
+    GblObject* pChild4 = GBL_NEW(GblObject, "name", "Child4", "parent", pParent);
+
+    GblRingList* pChildList = GblRingList_create(pChild1, pChild2, pChild3);
+
+    GBL_TEST_COMPARE(GblObject_childCount(pParent), 4);
+
+    GblObject_removeChildren(pParent, pChildList);
+
+    GBL_TEST_COMPARE(GblObject_childCount(pParent), 1);
+    GBL_TEST_COMPARE(GblObject_name(GblObject_childFirst(pParent)), "Child4");
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GblRingList_unref(pChildList);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(clearChildren)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "name", "Child1", "parent", pParent);
+    GblObject* pChild2 = GBL_NEW(GblObject, "name", "Child2", "parent", pParent);
+    GblObject* pChild3 = GBL_NEW(GblObject, "name", "Child3", "parent", pParent);
+    GblObject* pChild4 = GBL_NEW(GblObject, "name", "Child4", "parent", pParent);
+
+    GBL_TEST_COMPARE(GblObject_childCount(pParent), 4);
+
+    GblObject_clearChildren(pParent);
+
+    GBL_TEST_COMPARE(GblObject_childCount(pParent), 0);
+
+    GBL_UNREF(pChild1);
+    GBL_UNREF(pChild2);
+    GBL_UNREF(pChild3);
+    GBL_UNREF(pChild4);
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
 GBL_TEST_CASE(setChildren)
     GblObject*   pParent    = GBL_NEW(GblObject);
     GblRingList* pChildList = GblRingList_create(
@@ -1070,7 +1113,7 @@ GBL_TEST_CASE(setChildren)
         GBL_NEW(GblObject, "name", "Child4")
     );
 
-    GblObject *pChildDummy = GBL_NEW(GblObject, "name", "Dummy");
+    GblObject *pChildDummy = GBL_NEW(GblObject, "name", "Dummy", "parent", pParent);
     GblObject_setChildren(pParent, pChildList);
 
     int index = 0;
@@ -1189,6 +1232,8 @@ GBL_TEST_REGISTER(newDefault,
                   foreachChild,
                   foreachChildType,
                   addChildren,
+                  removeChildren,
+                  clearChildren,
                   setChildren,
                   iterateChildren,
                   childLast

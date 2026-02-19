@@ -56,6 +56,7 @@ ui_*
 # Visual Studio Shit
 ####################
 .vs
+.vscode
 .cache/
 
 # Doxygen files

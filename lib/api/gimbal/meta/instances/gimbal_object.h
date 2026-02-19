@@ -417,10 +417,19 @@ GBL_DECLS_END
     GblObject_foreachChildDefault__(__VA_ARGS__, GblObject*)
 #define GblObject_foreachChildDefault__(self, name, type, ...) \
     GblObject_foreachChildImpl_(self, name, type)
-#define GblObject_foreachChildImpl_(self, name, type)                       \
-    for(type name = (type)GblObject_childFirst(self);                       \
-        name;                                                               \
-        name = (type)GblObject_siblingNext(GBL_OBJECT(name)))               \
+#define GblObject_foreachChildImpl_(self, name, type)                               \
+    for(type name       =   GblObject_childCount(self) != 0 ?                       \
+                            (type)GblObject_childFirst(self) :                      \
+                            NULL,                                                   \
+        *name##_next_   =   GblObject_childCount(self) > 1 ?                        \
+                            (type)GblObject_siblingNext(GBL_OBJECT(name)) :         \
+                            NULL;                                                   \
+                                                                                    \
+        name;                                                                       \
+                                                                                    \
+        name = name##_next_, name##_next_ = name ?                                  \
+                             (type)GblObject_siblingNext(GBL_OBJECT(name))          \
+                             : NULL)
 ///\endcond
 
 #undef GBL_SELF_TYPE
