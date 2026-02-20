@@ -1204,7 +1204,7 @@ GBL_EXPORT GblObject* GblObject_siblingNextByType(const GblObject* pSelf, GblTyp
     return pSelf;
 }
 
-GBL_EXPORT GblObject* GblObject_siblingNextByName(const GblObject* pSelf, const char *name) {
+GBL_EXPORT GblObject* GblObject_siblingNextByName(const GblObject* pSelf, const char* name) {
     do pSelf = GblObject_siblingNext(pSelf);
     while (pSelf != NULL && strcmp(GblObject_name(pSelf), name) != 0);
     return pSelf;
@@ -1230,7 +1230,7 @@ GBL_EXPORT GblObject* GblObject_siblingPreviousByType(const GblObject* pSelf, Gb
     return pSelf;
 }
 
-GBL_EXPORT GblObject* GblObject_siblingPreviousByName(const GblObject *pSelf, const char *name) {
+GBL_EXPORT GblObject* GblObject_siblingPreviousByName(const GblObject* pSelf, const char* name) {
     do pSelf = GblObject_siblingPrevious(pSelf);
     while (pSelf != NULL && strcmp(GblObject_name(pSelf), name) != 0);
     return pSelf;
@@ -1300,8 +1300,6 @@ GBL_EXPORT void GblObject_clearChildren(GblObject* pSelf) {
 GBL_EXPORT void GblObject_setChildren(GblObject* pSelf, const GblRingList* pList) {
     GblObject_clearChildren(pSelf);
     GblObject_addChildren(pSelf, pList);
-
-    GblObject_emitPropertyChange(pSelf, "children");
 }
 
 GBL_EXPORT GblBool GblObject_iterateChildren(const GblObject* pSelf, GblObjectIterFn pFnIt, void* pUd) {

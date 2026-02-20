@@ -418,7 +418,7 @@ GBL_DECLS_END
 #define GblObject_foreachChildDefault__(self, name, type, ...) \
     GblObject_foreachChildImpl_(self, name, type)
 #define GblObject_foreachChildImpl_(self, name, type)                               \
-    for(type name       =   GblObject_childCount(self) != 0 ?                       \
+    for(type name       =   GblObject_childFirst(self) ?                            \
                             (type)GblObject_childFirst(self) :                      \
                             NULL,                                                   \
         *name##_next_   =   name ?                                                  \
