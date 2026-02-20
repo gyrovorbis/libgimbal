@@ -911,7 +911,7 @@ GBL_EXPORT GblObject* GblObject_createExtVaWithClass(GblObjectClass* pClass, siz
     return pObject;
 }
 
-GBL_EXPORT GBL_RESULT GblObject_constructVa(GblObject *pSelf, GblType type, va_list* pVarArgs) {
+GBL_EXPORT GBL_RESULT GblObject_constructVa(GblObject* pSelf, GblType type, va_list* pVarArgs) {
     GBL_CTX_BEGIN(NULL);
 
     GBL_CTX_VERIFY_TYPE(type, GBL_OBJECT_TYPE);
@@ -1179,6 +1179,14 @@ GBL_EXPORT GblObject* GblObject_childFirst(const GblObject* pSelf) {
     return pChild;
 }
 
+GBL_EXPORT GblObject* GblObject_childLast(const GblObject* pSelf) {
+    GblObject* pChildLast = NULL;
+    GblObject_foreachChild(pSelf, pChild)
+        pChildLast = pChild;
+
+    return pChildLast;
+}
+
 GBL_EXPORT GblObject* GblObject_siblingNext(const GblObject* pSelf) {
     GblObject* pSibling = NULL;
     GblObjectFamily_* pFamily = GblObject_family_(pSelf);
@@ -1190,40 +1198,39 @@ GBL_EXPORT GblObject* GblObject_siblingNext(const GblObject* pSelf) {
     return pSibling;
 }
 
-GBL_EXPORT GblObject* GblObject_siblingNextByType(const GblObject *pSelf, GblType type) {
+GBL_EXPORT GblObject* GblObject_siblingNextByType(const GblObject* pSelf, GblType type) {
     do pSelf = GblObject_siblingNext(pSelf);
     while (pSelf != NULL && GBL_TYPEOF(pSelf) != type);
     return pSelf;
 }
 
-GBL_EXPORT GblObject* GblObject_siblingNextByName(const GblObject *pSelf, const char *name) {
+GBL_EXPORT GblObject* GblObject_siblingNextByName(const GblObject* pSelf, const char* name) {
     do pSelf = GblObject_siblingNext(pSelf);
     while (pSelf != NULL && strcmp(GblObject_name(pSelf), name) != 0);
     return pSelf;
 }
 
-GBL_EXPORT GblObject* GblObject_siblingPrevious(const GblObject *pSelf) {
-    GblObject *pParent = GblObject_parent(pSelf);
+GBL_EXPORT GblObject* GblObject_siblingPrevious(const GblObject* pSelf) {
+    GblObject* pParent   = GblObject_parent(pSelf);
+    GblObject* pPrevious = NULL;
     if(!pParent) return NULL;
 
-    size_t childCount = GblObject_childCount(pParent);
-    for (size_t i = 0; i < childCount; i++) {
-        GblObject *childObj = GblObject_findChildByIndex(pParent, i);
-        if (childObj == pSelf && i != 0) {
-            return GblObject_findChildByIndex(pParent, i - 1);
-        }
+    GblObject_foreachChild(pParent, pChild) {
+        if (pChild == pSelf)
+            return pPrevious;
+        pPrevious = pChild;
     }
 
     return NULL;
 }
 
-GBL_EXPORT GblObject* GblObject_siblingPreviousByType(const GblObject *pSelf, GblType type) {
+GBL_EXPORT GblObject* GblObject_siblingPreviousByType(const GblObject* pSelf, GblType type) {
     do pSelf = GblObject_siblingPrevious(pSelf);
     while (pSelf != NULL && GBL_TYPEOF(pSelf) != type);
     return pSelf;
 }
 
-GBL_EXPORT GblObject* GblObject_siblingPreviousByName(const GblObject *pSelf, const char *name) {
+GBL_EXPORT GblObject* GblObject_siblingPreviousByName(const GblObject* pSelf, const char* name) {
     do pSelf = GblObject_siblingPrevious(pSelf);
     while (pSelf != NULL && strcmp(GblObject_name(pSelf), name) != 0);
     return pSelf;
@@ -1261,6 +1268,47 @@ GBL_EXPORT GblBool GblObject_removeChild(GblObject* pSelf, GblObject* pChild) {
 
     GBL_CTX_END_BLOCK();
     return success;
+}
+
+GBL_EXPORT void GblObject_addChildren(GblObject* pSelf, const GblRingList* pList) {
+    GBL_ASSERT(pSelf && GBL_TYPEOF(pSelf) == GBL_OBJECT_TYPE);
+
+    GblRingList_foreach(pList, pChild, GblObject*)
+        GblObject_addChild(pSelf, pChild);
+
+    GblObject_emitPropertyChange(pSelf, "children");
+}
+
+GBL_EXPORT void GblObject_removeChildren(GblObject* pSelf, const GblRingList* pList) {
+    GBL_ASSERT(pSelf && GBL_TYPEOF(pSelf) == GBL_OBJECT_TYPE);
+
+    GblRingList_foreach(pList, pChild, GblObject*)
+        GblObject_removeChild(pSelf, pChild);
+
+    GblObject_emitPropertyChange(pSelf, "children");
+}
+
+GBL_EXPORT void GblObject_clearChildren(GblObject* pSelf) {
+    GBL_ASSERT(pSelf && GBL_TYPEOF(pSelf) == GBL_OBJECT_TYPE);
+
+    GblObject_foreachChild(pSelf, pChild)
+        GblObject_removeChild(pSelf, pChild);
+
+    GblObject_emitPropertyChange(pSelf, "children");
+}
+
+GBL_EXPORT void GblObject_setChildren(GblObject* pSelf, const GblRingList* pList) {
+    GblObject_clearChildren(pSelf);
+    GblObject_addChildren(pSelf, pList);
+}
+
+GBL_EXPORT GblBool GblObject_iterateChildren(const GblObject* pSelf, GblObjectIterFn pFnIt, void* pUd) {
+    GBL_ASSERT(pSelf && GBL_TYPEOF(pSelf) == GBL_OBJECT_TYPE);
+
+    GblObject_foreachChild(pSelf, pChild)
+        if (pFnIt(pChild, pUd)) return GBL_TRUE;
+
+    return GBL_FALSE;
 }
 
 GBL_EXPORT GblObject* GblObject_findChildByType(const GblObject* pSelf, GblType childType) {
@@ -1342,16 +1390,15 @@ GBL_EXPORT size_t  GblObject_childCount(const GblObject* pSelf) {
     return count;
 }
 
-GBL_EXPORT size_t GblObject_childIndex(const GblObject *pSelf) {
-    GblObject *pParent = GblObject_parent(pSelf);
+GBL_EXPORT size_t GblObject_childIndex(const GblObject* pSelf) {
+    GblObject* pParent = GblObject_parent(pSelf);
     if (!pParent) return GBL_INDEX_INVALID;
 
-    size_t childCount = GblObject_childCount(pParent);
-    for (size_t i = 0; i < childCount; i++) {
-        GblObject *childObj = GblObject_findChildByIndex(pParent, i);
-        if (childObj == pSelf) {
+    size_t i = 0;
+    GblObject_foreachChild(pParent, pChild) {
+        if (pChild == pSelf)
             return i;
-        }
+        i++;
     }
 
     return GBL_INDEX_INVALID;
@@ -1686,12 +1733,13 @@ static GBL_RESULT GblObject_Box_destructor_(GblBox* pBox) {
     GblObject* pSelf = (GblObject*)pBox;
 
     GblObject_setParent(pSelf, NULL);
-    for(GblObject* pIt = GblObject_childFirst(pSelf);
-         pIt != NULL;
-         pIt = GblObject_siblingNext(pSelf))
-    {
-        GblObject_setParent(pIt, NULL);
-    }
+
+    GblRingList* pChildren;
+    GblObject_property(pSelf, "children", &pChildren);
+
+    GblRingList_foreach(pChildren, pChild)
+        GBL_UNREF(pChild);
+    GblRingList_unref(pChildren);
 
     GblBoxClass* pBoxClass = GBL_BOX_CLASS(GblClass_weakRefDefault(GBL_BOX_TYPE));
     GBL_CTX_VERIFY_CALL(pBoxClass->pFnDestructor(pBox));
