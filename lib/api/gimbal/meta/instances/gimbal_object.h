@@ -421,7 +421,7 @@ GBL_DECLS_END
     for(type name       =   GblObject_childCount(self) != 0 ?                       \
                             (type)GblObject_childFirst(self) :                      \
                             NULL,                                                   \
-        *name##_next_   =   GblObject_childCount(self) > 1 ?                        \
+        *name##_next_   =   name ?                                                  \
                             (type)GblObject_siblingNext(GBL_OBJECT(name)) :         \
                             NULL;                                                   \
                                                                                     \
