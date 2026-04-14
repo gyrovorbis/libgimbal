@@ -108,7 +108,7 @@ GBL_INLINE void GblCallRecord_construct(GblCallRecord* pRecord, GBL_RESULT resul
     pRecord->result = GBL_RESULT_UNKNOWN;
     pRecord->message[0] = '\0';
     pRecord->srcLocation.pFile = pRecord->srcLocation.pFunc = GBL_NULL;
-    if GBL_UNLIKELY(pFmt) vsprintf(pRecord->message, pFmt, varArgs);
+    if GBL_UNLIKELY(pFmt) vsnprintf(pRecord->message, GBL_CTX_RESULT_MSG_BUFFER_SIZE, pFmt, varArgs);
     va_end(varArgs);
     pRecord->srcLocation    = source;
     pRecord->result         = resultCode;
