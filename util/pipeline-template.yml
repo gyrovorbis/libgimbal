@@ -109,6 +109,7 @@ build win-msvc:
     CC: cl
     CXX: cl
     PREFIX_PATH: ${QT_PATH}/msvc2019_64
+    TOOLCHAIN_FILE: ${VCPKG_PATH}/scripts/buildsystems/vcpkg.cmake
 
 build win-mingw:
   extends: .build_win
