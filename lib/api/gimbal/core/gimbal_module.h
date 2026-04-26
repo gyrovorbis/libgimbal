@@ -151,12 +151,12 @@ GBL_INSTANCE_END
 
 //! \cond
 GBL_PROPERTIES(GblModule,
-    (prefix,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE),     GBL_STRING_TYPE),
-    (version,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE),     GBL_UINT32_TYPE),
-    (author,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE),     GBL_STRING_TYPE),
-    (description, GBL_GENERIC, (READ, WRITE, LOAD, SAVE),     GBL_STRING_TYPE),
-    (optionGroup, GBL_GENERIC, (READ, WRITE, LOAD, SAVE, IN), GBL_OPTION_GROUP_TYPE),
-    (useCount,    GBL_GENERIC, (READ),                        GBL_INT16_TYPE)
+    (prefix,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE),          GBL_STRING_TYPE),
+    (version,     GBL_GENERIC, (READ, WRITE, LOAD, SAVE),          GBL_UINT32_TYPE),
+    (author,      GBL_GENERIC, (READ, WRITE, LOAD, SAVE),          GBL_STRING_TYPE),
+    (description, GBL_GENERIC, (READ, WRITE, LOAD, SAVE),          GBL_STRING_TYPE),
+    (optionGroup, GBL_GENERIC, (READ, WRITE, LOAD, SAVE, ACQUIRE), GBL_OPTION_GROUP_TYPE),
+    (useCount,    GBL_GENERIC, (READ),                             GBL_INT16_TYPE)
 )
 
 GBL_SIGNALS(GblModule,

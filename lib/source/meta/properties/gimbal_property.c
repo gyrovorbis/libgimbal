@@ -283,16 +283,16 @@ static GBL_RESULT GblProperty_validate_(const GblProperty* pProp) {
                   GblType_name(GblProperty_objectType(pProp)),
                   GblProperty_name(pProp));
 
-    GBL_CTX_VERIFY(!(!(pProp->flags & GBL_PROPERTY_FLAG_READ) && (pProp->flags & GBL_PROPERTY_FLAG_OUT)),
+    GBL_CTX_VERIFY(!(!(pProp->flags & GBL_PROPERTY_FLAG_READ) && (pProp->flags & GBL_PROPERTY_FLAG_RELEASE)),
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
-                   "Attempted to add OUT flag without READ flag: [%s::%s]",
+                   "Attempted to add RELEASE flag without READ flag: [%s::%s]",
                    GblType_name(GblProperty_objectType(pProp)),
                    GblProperty_name(pProp));
 
     GBL_CTX_VERIFY(!(!(pProp->flags & (GBL_PROPERTY_FLAG_WRITE | GBL_PROPERTY_FLAG_CONSTRUCT)) &&
-                    (pProp->flags & GBL_PROPERTY_FLAG_OUT)),
+                    (pProp->flags & GBL_PROPERTY_FLAG_ACQUIRE)),
                    GBL_RESULT_ERROR_INVALID_PROPERTY,
-                   "Attempted to add IN flag without WRITE or CONSTRUCT flag: [%s::%s]",
+                   "Attempted to add ACQUIRE flag without WRITE or CONSTRUCT flag: [%s::%s]",
                    GblType_name(GblProperty_objectType(pProp)),
                    GblProperty_name(pProp));
 

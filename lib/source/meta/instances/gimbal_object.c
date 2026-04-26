@@ -389,7 +389,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertyVa_(const GblObject* pSelf, const GblPro
     GBL_CTX_CALL(GblVariant_constructDefault(&variant, GBL_NIL_TYPE));
     GBL_CTX_CALL(GblObject_propertyVCall_(pSelf, pProp, &variant));
 
-    if(pProp->flags & GBL_PROPERTY_FLAG_OUT)
+    if(pProp->flags & GBL_PROPERTY_FLAG_RELEASE)
         GBL_CTX_CALL(GblVariant_valueMoveVa(&variant, pList));
     else
         GBL_CTX_CALL(GblVariant_valueCopyVa(&variant, pList));
@@ -459,7 +459,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVa_(GblObject* pSelf, const GblProper
                    GblType_name(GBL_TYPEOF(pSelf)),
                    GblProperty_name(pProp));
 
-    if(pProp->flags & GBL_PROPERTY_FLAG_IN)
+    if(pProp->flags & GBL_PROPERTY_FLAG_ACQUIRE)
         GBL_CTX_CALL(GblVariant_constructValueMoveVa(&variant, pProp->valueType, pList));
     else
         GBL_CTX_CALL(GblVariant_constructValueCopyVa(&variant, pProp->valueType, pList));
@@ -536,7 +536,7 @@ GBL_EXPORT GBL_RESULT GblObject_propertiesVa(const GblObject* pSelf, va_list* pV
             GBL_CTX_CALL(GblVariant_constructDefault(&variant, GBL_NIL_TYPE));
             GBL_CTX_CALL(GblObject_propertyVCall_(pSelf, pProp, &variant));
 
-            if(pProp->flags & GBL_PROPERTY_FLAG_OUT)
+            if(pProp->flags & GBL_PROPERTY_FLAG_RELEASE)
                 GBL_CTX_CALL(GblVariant_valueMoveVa(&variant, pVarArgs));
             else
                 GBL_CTX_CALL(GblVariant_valueCopyVa(&variant, pVarArgs));
@@ -573,7 +573,7 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertiesVa(GblObject* pSelf, va_list* pVarA
         const GblProperty* pProp = GblProperty_find(GBL_TYPEOF(pSelf), pKey);
 
         if(pProp) {
-            if(pProp->flags & GBL_PROPERTY_FLAG_IN)
+            if(pProp->flags & GBL_PROPERTY_FLAG_ACQUIRE)
                 GBL_CTX_CALL(GblVariant_constructValueMoveVa(&pVariants[p], pProp->valueType, pVarArgs));
             else
                 GBL_CTX_CALL(GblVariant_constructValueCopyVa(&pVariants[p], pProp->valueType, pVarArgs));
@@ -843,7 +843,7 @@ static  GBL_RESULT GblObject_constructVa_(GblObject* pSelf, GblType type, va_lis
                                GblType_name(type), pKey);
         } else {
 
-            if(ppProperties[count]->flags & GBL_PROPERTY_FLAG_IN)
+            if(ppProperties[count]->flags & GBL_PROPERTY_FLAG_ACQUIRE)
                 GBL_CTX_VERIFY_CALL(
                     GblVariant_constructValueMoveVa(&pVariants[count],
                                                     ppProperties[count]->valueType,

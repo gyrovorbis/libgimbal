@@ -79,19 +79,19 @@ GBL_EXPORT GblRefCount   GblStringRef_unref  (GblStringRef* pRef)        GBL_NOE
  *  @{
  */
 //! Returns the GblContext that was created with the given GblStringRef
-GBL_EXPORT GblContext* GblStringRef_context  (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT GblContext* GblStringRef_context  (GBL_SELF) GBL_NOEXCEPT;
 //! Returns the number of active references remaining to the given GblStringRef
-GBL_EXPORT GblRefCount GblStringRef_refCount (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT GblRefCount GblStringRef_refCount (GBL_SELF) GBL_NOEXCEPT;
 //! Returns the cached length of the given GblStringRef
-GBL_EXPORT size_t      GblStringRef_length   (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT size_t      GblStringRef_length   (GBL_SELF) GBL_NOEXCEPT;
 //! Returns whether the given GblStringRef is valid (not NULL)
-GBL_EXPORT GblBool     GblStringRef_valid    (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblStringRef_valid    (GBL_SELF) GBL_NOEXCEPT;
 //! Returns whether the given GblStringRef is empty, with nothing but a NULL terminator
-GBL_EXPORT GblBool     GblStringRef_empty    (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblStringRef_empty    (GBL_SELF) GBL_NOEXCEPT;
 //! Returns whether the given GblStringRef is blank, containing only NULL or spacing characters
-GBL_EXPORT GblBool     GblStringRef_blank    (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT GblBool     GblStringRef_blank    (GBL_SELF) GBL_NOEXCEPT;
 //! Calculates and returns the 32-bit hash value associated with the givne GblStringRef
-GBL_EXPORT GblHash     GblStringRef_hash     (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT GblHash     GblStringRef_hash     (GBL_SELF) GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Accessors
@@ -99,9 +99,9 @@ GBL_EXPORT GblHash     GblStringRef_hash     (GBL_CSELF) GBL_NOEXCEPT;
  *  @{
  */
 //! Returns the character located at position \p idx, raising an error upon out-of-range
-GBL_EXPORT char          GblStringRef_at   (GBL_CSELF, size_t idx) GBL_NOEXCEPT;
+GBL_EXPORT char          GblStringRef_at   (GBL_SELF, size_t idx) GBL_NOEXCEPT;
 //! Returns a GblStringView containing the character window given by \p offset and \p len
-GBL_EXPORT GblStringView GblStringRef_view (GBL_CSELF,
+GBL_EXPORT GblStringView GblStringRef_view (GBL_SELF,
                                             size_t offset/*=0*/,
                                             size_t len/*=0*/)      GBL_NOEXCEPT;
 //! @}

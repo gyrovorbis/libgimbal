@@ -56,8 +56,8 @@ GBL_DECLARE_ENUM(GBL_PROPERTY_FLAG) {
     GBL_PROPERTY_FLAG_CONSTRUCT  = 0x001, //!< Property must be given to the constructor.
     GBL_PROPERTY_FLAG_READ       = 0x002, //!< Property value can be read.
     GBL_PROPERTY_FLAG_WRITE      = 0x004, //!< Property value can be modified.
-    GBL_PROPERTY_FLAG_IN         = 0x008, //!< Property assumes ownership of data when writing.
-    GBL_PROPERTY_FLAG_OUT        = 0x010, //!< Property releases ownership of data when reading.
+    GBL_PROPERTY_FLAG_ACQUIRE    = 0x008, //!< Property acquires ownership of data when writing.
+    GBL_PROPERTY_FLAG_RELEASE    = 0x010, //!< Property releases ownership of data when reading.
     GBL_PROPERTY_FLAG_SAVE       = 0x020, //!< Property is serialized when saving.
     GBL_PROPERTY_FLAG_LOAD       = 0x040, //!< Property is deserialized when loading.
     GBL_PROPERTY_FLAG_ABSTRACT   = 0x080, //!< Property must be implemented by deriving type.
