@@ -135,7 +135,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
 inline constexpr GblBool GBL_TEST_COMPARE_CMP_(auto actual, auto expected) noexcept {
     if constexpr(std::floating_point<decltype(actual)> || std::floating_point<decltype(expected)>) {
         constexpr double epsilon = std::is_same_v<float, decltype(actual)> ? FLT_EPSILON : DBL_EPSILON;
-        return std::abs(static_cast<double>(actual) - static_cast<double>(expected)) < epsilon;
+        return abs(static_cast<double>(actual) - static_cast<double>(expected)) < epsilon;
     }
     else if constexpr(std::convertible_to<decltype(actual), decltype(expected)>)
         return static_cast<decltype(expected)>(actual) == expected;
