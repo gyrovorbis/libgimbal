@@ -127,7 +127,7 @@ build win-mingw:
 .build_macos:
   extends: .build_cmake
   variables:
-    PREFIX_PATH: ${QT_PATH}/macos
+    PREFIX_PATH: ${CMAKE_PREFIX_PATH}
     DEPLOY_CMD: ${PREFIX_PATH}/bin/macdeployqt
   tags:
     - macos
