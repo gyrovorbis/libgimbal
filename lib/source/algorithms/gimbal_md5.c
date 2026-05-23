@@ -298,10 +298,10 @@ GBL_EXPORT const char* GblMd5_string(const uint8_t digest[GBL_MD5_DIGEST_SIZE], 
     char *c = output;
     for (i = 0; i < GBL_MD5_DIGEST_SIZE/4; i++) {
         for (j = 0; j < 4; j++) {
-            sprintf(c,"%02X", digest[i*4+j]);
+            snprintf(c, 3, "%02X", digest[i*4+j]);
             c += 2;
         }
-        sprintf(c, " ");
+        snprintf(c, 2, " ");
         c += 1;
     }
     *(c - 1) = '\0';
