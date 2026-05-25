@@ -274,8 +274,8 @@ build webasm:
     variables:
       - $BUILD_WEBASM_DISABLED
   variables:
-    CC:
-    CXX:
+    CC: null
+    CXX: null
     CMAKE_CONFIGURE: emcmake cmake
     CMAKE_BUILD: cmake
     BINARY_EXTENSION: .js
