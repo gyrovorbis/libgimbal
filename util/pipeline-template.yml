@@ -275,6 +275,7 @@ build webasm:
       - $BUILD_WEBASM_DISABLED
   variables:
     CMAKE_CONFIGURE: emcmake cmake
+    CMAKE_BUILD: cmake
     BINARY_EXTENSION: .js
     ARTIFACT_EXTENSIONS: >
       .wasm
