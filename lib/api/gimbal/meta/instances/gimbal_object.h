@@ -65,6 +65,13 @@
 */
 #define GblObject_foreachChild(/*GBL_SELF, name, type=GblObject* */ ...) GblObject_foreachChildDefault_(__VA_ARGS__)
 
+/*! \brief For-loop style iteration over the children of a GblObject, in reverse order
+ *
+ *  Iterates over every child within the given object, setting the \p item variable to the current child.
+ *  Optionally takes in a \p type parameter to specify the type of the children to iterate over.
+*/
+#define GblObject_foreachChildReverse(/*GBL_SELF, name, type=GblObject* */ ...) GblObject_foreachChildReverseDefault_(__VA_ARGS__)
+
 #define GBL_SELF_TYPE GblObject
 
 GBL_DECLS_BEGIN
@@ -418,9 +425,7 @@ GBL_DECLS_END
 #define GblObject_foreachChildDefault__(self, name, type, ...) \
     GblObject_foreachChildImpl_(self, name, type)
 #define GblObject_foreachChildImpl_(self, name, type)                               \
-    for(type name       =   GblObject_childFirst(self) ?                            \
-                            (type)GblObject_childFirst(self) :                      \
-                            NULL,                                                   \
+    for(type name       =   (type)GblObject_childFirst(self),                       \
         *name##_next_   =   name ?                                                  \
                             (type)GblObject_siblingNext(GBL_OBJECT(name)) :         \
                             NULL;                                                   \
@@ -430,6 +435,23 @@ GBL_DECLS_END
         name = name##_next_, name##_next_ = name ?                                  \
                              (type)GblObject_siblingNext(GBL_OBJECT(name))          \
                              : NULL)
+
+#define GblObject_foreachChildReverseDefault_(...) \
+    GblObject_foreachChildReverseDefault__(__VA_ARGS__, GblObject*)
+#define GblObject_foreachChildReverseDefault__(self, name, type, ...) \
+    GblObject_foreachChildReverseImpl_(self, name, type)
+#define GblObject_foreachChildReverseImpl_(self, name, type)                        \
+    for(type name       =   (type)GblObject_childLast(self),                        \
+        *name##_prev_   =   name ?                                                  \
+                            (type)GblObject_siblingPrevious(GBL_OBJECT(name)) :     \
+                            NULL;                                                   \
+                                                                                    \
+        name;                                                                       \
+                                                                                    \
+        name = name##_prev_, name##_prev_ = name ?                                  \
+                             (type)GblObject_siblingPrevious(GBL_OBJECT(name))      \
+                             : NULL)
+
 ///\endcond
 
 #undef GBL_SELF_TYPE
