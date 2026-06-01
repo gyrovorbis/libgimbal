@@ -1016,6 +1016,22 @@ GBL_TEST_CASE(foreachChild)
     GBL_UNREF(pParent);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(foreachChildMutating)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "name", "Child1", "parent", pParent);
+    GblObject* pChild2 = GBL_NEW(GblObject, "name", "Child2", "parent", pParent);
+    GblObject* pChild3 = GBL_NEW(GblObject, "name", "Child3", "parent", pParent);
+    GblObject* pChild4 = GBL_NEW(GblObject, "name", "Child4", "parent", pParent);
+
+    GblObject_foreachChild(pParent, pChild) {
+        GBL_TEST_COMPARE(GblObject_name(pChild),
+                         GblObject_name(GblObject_childFirst(pParent)));
+        GBL_UNREF(pChild);
+    }
+
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
 GBL_TEST_CASE(foreachChildType)
     GblObject*  pParent = GBL_NEW(GblObject);
     TestObject* pChild1 = GBL_NEW(TestObject, "name", "Child1", "parent", pParent);
@@ -1032,6 +1048,61 @@ GBL_TEST_CASE(foreachChildType)
         GBL_TEST_COMPARE(strcmp(pChild->stringer, "INVALID"), 0);
         GBL_TEST_COMPARE(pClass->staticInt32, 77);
         ++index;
+    }
+
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(foreachChildReverse)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "name", "Child1", "parent", pParent);
+    GblObject* pChild2 = GBL_NEW(GblObject, "name", "Child2", "parent", pParent);
+    GblObject* pChild3 = GBL_NEW(GblObject, "name", "Child3", "parent", pParent);
+    GblObject* pChild4 = GBL_NEW(GblObject, "name", "Child4", "parent", pParent);
+
+    int index = 3;
+
+    GblObject_foreachChildReverse(pParent, pChild) {
+        GBL_TEST_COMPARE(GblObject_name(pChild),
+                         GblObject_name(GblObject_findChildByIndex(pParent, index)));
+        --index;
+    }
+
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(foreachChildReverseMutating)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "name", "Child1", "parent", pParent);
+    GblObject* pChild2 = GBL_NEW(GblObject, "name", "Child2", "parent", pParent);
+    GblObject* pChild3 = GBL_NEW(GblObject, "name", "Child3", "parent", pParent);
+    GblObject* pChild4 = GBL_NEW(GblObject, "name", "Child4", "parent", pParent);
+
+    GblObject_foreachChildReverse(pParent, pChild) {
+        GBL_TEST_COMPARE(GblObject_name(pChild),
+                         GblObject_name(GblObject_childLast(pParent)));
+        GBL_UNREF(pChild);
+    }
+
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(foreachChildReverseType)
+    GblObject*  pParent = GBL_NEW(GblObject);
+    TestObject* pChild1 = GBL_NEW(TestObject, "name", "Child1", "parent", pParent);
+    TestObject* pChild2 = GBL_NEW(TestObject, "name", "Child2", "parent", pParent);
+    TestObject* pChild3 = GBL_NEW(TestObject, "name", "Child3", "parent", pParent);
+    TestObject* pChild4 = GBL_NEW(TestObject, "name", "Child4", "parent", pParent);
+
+    int index = 3;
+
+    GblObject_foreachChildReverse(pParent, pChild, TestObject*) {
+        TestObjectClass* pClass = TEST_OBJECT_GET_CLASS(pChild);
+        GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(pChild)),
+                         GblObject_name(GblObject_findChildByIndex(pParent, index)));
+        GBL_TEST_COMPARE(strcmp(pChild->stringer, "INVALID"), 0);
+        GBL_TEST_COMPARE(pClass->staticInt32, 77);
+        --index;
     }
 
     GBL_UNREF(pParent);
@@ -1230,7 +1301,11 @@ GBL_TEST_REGISTER(newDefault,
                   childrenProperty,
                   childrenPropertyVariant,
                   foreachChild,
+                  foreachChildMutating,
                   foreachChildType,
+                  foreachChildReverse,
+                  foreachChildReverseMutating,
+                  foreachChildReverseType,
                   addChildren,
                   removeChildren,
                   clearChildren,
