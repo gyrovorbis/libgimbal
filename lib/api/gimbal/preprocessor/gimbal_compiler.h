@@ -552,7 +552,7 @@
        defined(__sun)          || defined(__CYGWIN__) || \
        defined(__EMSCRIPTEN__) || defined(VITA)       || \
        defined(__DREAMCAST__)  || defined(PSP)        || \
-       defined(__GAMECUBE__)
+       defined(__GAMECUBE__)   || defined(__DEVKITARM__)
 #       include <alloca.h>        // Sane platforms
 #   elif defined(_WIN32)
 #       include <malloc.h>        // Windoez

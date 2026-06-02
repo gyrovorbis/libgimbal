@@ -107,7 +107,7 @@ extern "C" {
 }
 #endif
 
-#define GBL_SCOPE(begin, end) for (int GBL_APPEND_LINE(gblscope_) = ((begin), 0); GBL_APPEND_LINE(gblscope_) < 1; ++GBL_APPEND_LINE(gblscope_), (end))
+#define GBL_SCOPE(begin, end) for (int GBL_APPEND_LINE(gblscope_) = ((void)(begin), 0); GBL_APPEND_LINE(gblscope_) < 1; ++GBL_APPEND_LINE(gblscope_), (end))
 #define GBL_SCOPE_EXIT continue
 
 #define GBL_APPEND_LINE(a)  GBL_GLUE(GBL_GLUE(a, ), __LINE__)
