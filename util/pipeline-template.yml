@@ -35,15 +35,17 @@ variables:
     TOOLCHAIN_FILE: ""  
     EXTRA_GENERATOR_ARGS: ""
     DEPLOY_CMD: echo
+    CONFIGURE_CMD: CC=${CC} CXX=${CXX} ${CMAKE_CONFIGURE} ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH}
+      -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE}
+      -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS} ${PROJECT_CMAKE_ARGS}
+    BUILD_CMD: ${ANALYZER} ${CMAKE_BUILD} --build . --target ${BUILD_TARGET} --config ${BUILD_CONFIG}
+      -- ${EXTRA_GENERATOR_ARGS}
   script:
     - set -x #echo on
     - mkdir -p ${BUILD_DIR}
     - cd ${BUILD_DIR}
-    - CC=${CC} CXX=${CXX} ${CMAKE_CONFIGURE} ../ -DCMAKE_PREFIX_PATH=${PREFIX_PATH}
-      -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE} 
-      -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS} ${PROJECT_CMAKE_ARGS}
-    - ${ANALYZER} ${CMAKE_BUILD} --build . --target ${BUILD_TARGET} --config ${BUILD_CONFIG} 
-      -- ${EXTRA_GENERATOR_ARGS}
+    - $(CONFIGURE_CMD)
+    - $(BUILD_CMD)
   after_script:
     - mkdir -p ${BUILD_DIR}/${ARTIFACT_DIR}
     - cp ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
@@ -274,9 +276,8 @@ build webasm:
     variables:
       - $BUILD_WEBASM_DISABLED
   variables:
-    CC: emcc
-    CXX: em++
-    CMAKE_CONFIGURE: emcmake cmake
+    CONFIGURE_CMD: emcmake cmake ../ -DCMAKE_BUILD_TYPE:String=${BUILD_TYPE}
+      -G"${GENERATOR}" ${EXTRA_CMAKE_ARGS} ${PROJECT_CMAKE_ARGS}
     CMAKE_BUILD: cmake
     BINARY_EXTENSION: .js
     ARTIFACT_EXTENSIONS: >
