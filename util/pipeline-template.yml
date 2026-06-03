@@ -44,8 +44,8 @@ variables:
     - set -x #echo on
     - mkdir -p ${BUILD_DIR}
     - cd ${BUILD_DIR}
-    - $(CONFIGURE_CMD)
-    - $(BUILD_CMD)
+    - ${CONFIGURE_CMD}
+    - ${BUILD_CMD}
   after_script:
     - mkdir -p ${BUILD_DIR}/${ARTIFACT_DIR}
     - cp ${BUILD_DIR}/${BINARY_PATH}/${BINARY_NAME}${BINARY_EXTENSION} 
