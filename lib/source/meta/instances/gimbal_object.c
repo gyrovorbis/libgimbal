@@ -1760,7 +1760,7 @@ static GBL_RESULT GblObject_property_(const GblObject* pSelf, const GblProperty*
             GblVariant_setNil(pValue);
     } break;
     case GblObject_Property_Id_parent:
-        GblVariant_setValueMove(pValue,
+        GblVariant_setValueCopy(pValue,
                                 pProp->valueType,
                                 GblObject_parent(pSelf));
         break;
