@@ -2434,6 +2434,43 @@ static GBL_RESULT GblVariantTestSuite_to_(GblTestSuite* pSuite, GblContext* pCtx
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblVariantTestSuite_as_(GblTestSuite* pSuite, GblContext* pCtx) {
+    GBL_UNUSED(pSuite);
+    GBL_CTX_BEGIN(pCtx);
+
+    GblVariant v;
+    GBL_CTX_VERIFY_CALL(GblVariant_construct(&v, (uint8_t)7));
+    GBL_TEST_COMPARE(GblVariant_asChar(&v),      (char)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asUint8(&v),     (uint8_t)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asUint16(&v),    (uint16_t)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asInt16(&v),     (int16_t)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asUint32(&v),    (uint32_t)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asInt32(&v),     (int32_t)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asUint64(&v),    (uint64_t)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asInt64(&v),     (int64_t)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asUint64(&v),    (uint64_t)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asFloat(&v),     7.0f);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asDouble(&v),    7.0);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asBool(&v),      1);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_asString(&v),    "7");
+    GBL_CTX_VERIFY_LAST_RECORD();
+
+    GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
+
+    GBL_CTX_END();
+}
 
 GBL_EXPORT GblType GblVariantTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
@@ -2477,6 +2514,7 @@ GBL_EXPORT GblType GblVariantTestSuite_type(void) {
         { "typeName",               GblVariantTestSuite_typeName_                   },
         { "toInvalid",              GblVariantTestSuite_to_invalid_                 },
         { "to",                     GblVariantTestSuite_to_                         },
+        { "as",                     GblVariantTestSuite_as_                         },
         { NULL,                     NULL                                            }
     };
 
