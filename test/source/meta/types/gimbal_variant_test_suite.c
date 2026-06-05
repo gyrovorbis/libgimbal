@@ -2,6 +2,7 @@
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/core/gimbal_ctx.h>
 #include <gimbal/meta/types/gimbal_variant.h>
+#include <gimbal/utils/gimbal_date_time.h>
 #include <string.h>
 
 static GBL_RESULT GblVariantTestSuite_checkTypeCompatible_(GblTestSuite* pSelf, GblContext* pCtx) {
@@ -2458,13 +2459,34 @@ static GBL_RESULT GblVariantTestSuite_as_(GblTestSuite* pSuite, GblContext* pCtx
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(GblVariant_asUint64(&v),    (uint64_t)7);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GblVariant_asFloat(&v),     7.0f);
+    GBL_TEST_COMPARE(GblVariant_asFloat(&v),            7.0f);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GblVariant_asDouble(&v),    7.0);
+    GBL_TEST_COMPARE(GblVariant_asDouble(&v),            7.0);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GblVariant_asBool(&v),      1);
+    GBL_TEST_COMPARE(GblVariant_asBool(&v),                1);
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GblVariant_asString(&v),    "7");
+    GBL_TEST_COMPARE(GblVariant_asSize(&v),        (size_t)7);
+    GBL_CTX_VERIFY_LAST_RECORD();
+
+    GblStringRef* pStr = GblVariant_asString(&v);
+    GBL_TEST_COMPARE(pStr, "7");
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GblStringRef_unref(pStr);
+
+    int* pInt = (int*)0xdeadbabe;
+    GBL_CTX_VERIFY_CALL(GblVariant_setPointer(&v, GBL_POINTER_TYPE, pInt));
+    GBL_TEST_COMPARE(GblVariant_asPointer(&v), pInt);
+    GBL_CTX_VERIFY_LAST_RECORD();
+
+    GblDateTime* date = GblDateTime_create(2001, 6, 11);
+    GBL_CTX_VERIFY_CALL(GblVariant_setDateTime(&v, date));
+    GBL_TEST_COMPARE(GblVariant_asDateTime(&v), date);
+    GBL_CTX_VERIFY_LAST_RECORD();
+    GblDateTime_unref(date);
+
+    GblEnum testEnum = 1;
+    GBL_CTX_VERIFY_CALL(GblVariant_setEnum(&v, GBL_ENUM_TYPE, testEnum));
+    GBL_TEST_COMPARE(GblVariant_asEnum(&v), testEnum);
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
