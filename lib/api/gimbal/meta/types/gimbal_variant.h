@@ -402,47 +402,51 @@ GBL_EXPORT GblObject*    GblVariant_objectPeek   (GBL_CSELF)                GBL_
 //! @}
 
 /*! \name Conditional Conversions
- *  \brief TODO: DOCUMENT THIS
+ *  \brief Methods for retrieving values in a requested type without modifying the source variant.
  *  \relatesalso GblVariant
  *  @{
  */
-//! TODO: doc
+//! Attempts to retrieve the variant's value as the specified type and store it in the provided destination.
+//! If the requested type is reference-counted, the returned value is a reference owned by the caller.
 GBL_EXPORT GBL_RESULT    GblVariant_asValue      (GBL_CSELF, GblType type, ...)            GBL_NOEXCEPT;
-//! TODO: doc
+//! va_list* variation of GblVariant_asValue().
 GBL_EXPORT GBL_RESULT    GblVariant_asValueVa    (GBL_CSELF, GblType type, va_list* pList) GBL_NOEXCEPT;
-//! TODO: doc
+
+//! Convenience method that attempts to retrieve the variant's value as a bool.
 GBL_EXPORT GblBool       GblVariant_asBool       (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a char.
 GBL_EXPORT char          GblVariant_asChar       (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a uint8.
 GBL_EXPORT uint8_t       GblVariant_asUint8      (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a uint16.
 GBL_EXPORT uint16_t      GblVariant_asUint16     (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as an int16.
 GBL_EXPORT int16_t       GblVariant_asInt16      (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a uint32.
 GBL_EXPORT uint32_t      GblVariant_asUint32     (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as an int32.
 GBL_EXPORT int32_t       GblVariant_asInt32      (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a uint64.
 GBL_EXPORT uint64_t      GblVariant_asUint64     (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as an int64.
 GBL_EXPORT int64_t       GblVariant_asInt64      (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as an enum.
 GBL_EXPORT GblEnum       GblVariant_asEnum       (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a flags.
 GBL_EXPORT GblFlags      GblVariant_asFlags      (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a float.
 GBL_EXPORT float         GblVariant_asFloat      (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a double.
 GBL_EXPORT double        GblVariant_asDouble     (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a pointer.
 GBL_EXPORT void*         GblVariant_asPointer    (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a GblStringRef.
+//! The returned reference is owned by the caller.
 GBL_EXPORT GblStringRef* GblVariant_asString     (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a size_t.
 GBL_EXPORT size_t        GblVariant_asSize       (GBL_CSELF)                               GBL_NOEXCEPT;
-//! TODO: doc
+//! Convenience method that attempts to retrieve the variant's value as a GblDateTime reference.
+//! The returned reference is owned by the caller.
 GBL_EXPORT GblDateTime*  GblVariant_asDateTime   (GBL_CSELF)                               GBL_NOEXCEPT;
 //! @}
 
