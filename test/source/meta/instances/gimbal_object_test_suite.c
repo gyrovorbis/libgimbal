@@ -143,7 +143,7 @@ GBL_TEST_CASE(extendedData)
     GblObject* pObj = GBL_OBJECT(GBL_NEW(TestObject));
 
     GBL_TEST_COMPARE(GblObject_name(pObj),           NULL);
-    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)),       NULL);
+    GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)), NULL);
     GBL_TEST_COMPARE(GblObject_parent(pObj),         NULL);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
@@ -154,7 +154,7 @@ GBL_TEST_CASE(extendedData)
     GBL_TEST_COMPARE(GblBox_userdata(GBL_BOX(pObj)), (void*)0xbadbeef);
 
     // make sure we didn't screw up other extended data
-    GBL_TEST_COMPARE(GblObject_parent(pObj),            NULL);
+    GBL_TEST_COMPARE(GblObject_parent(pObj),         NULL);
     GBL_TEST_COMPARE(GblObject_eventFilterCount(pObj),  0);
 
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj)), 0);
@@ -363,11 +363,11 @@ GBL_TEST_CASE(propertyGet)
                             //     "stringer", "truckin Inheritance!");
     GBL_TEST_VERIFY(pObj1);
 
-    uint16_t    refCount    = 0;
-    void*       pUserdata   = NULL;
-    const char* pName       = NULL;
-    GblObject*  pParent     = NULL;
-    float       floater     = 0.0f;
+    uint16_t      refCount    = 0;
+    void*         pUserdata   = NULL;
+    GblStringRef* pName       = NULL;
+    GblObject*    pParent     = NULL;
+    float         floater     = 0.0f;
    // const char* pStringer   = NULL;
 
     GBL_RESULT result = GblObject_properties(GBL_OBJECT(pObj1),
@@ -387,8 +387,11 @@ GBL_TEST_CASE(propertyGet)
     GBL_TEST_COMPARE(floater,        -77.7f);
    // GBL_TEST_COMPARE(pStringer, "truckin Inheritance!");
 
-    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj1)), 0);
-    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pObj0)), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pObj0),   1);
+    GBL_TEST_COMPARE(GBL_UNREF(pObj1),   0);
+    GBL_TEST_COMPARE(GBL_UNREF(pParent), 0);
+
+    GblStringRef_unref(pName);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(propertySet)
@@ -737,10 +740,10 @@ GBL_TEST_CASE(variantITableIndex)
     GblObject* pParent = GblVariant_objectPeek(GblVariant_field(&t, "parent", &v));
     GBL_TEST_VERIFY(pParent);
     GBL_TEST_COMPARE(GblObject_name(pParent), "dynamicParent");
-    //GBL_TEST_COMPARE(GBL_UNREF(pParent), 0);
 
     GBL_TEST_CALL(GblVariant_destruct(&t));
     GBL_TEST_CALL(GblVariant_destruct(&v));
+    GBL_TEST_COMPARE(GBL_UNREF(pParent), 0);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(variantITableSetIndex)

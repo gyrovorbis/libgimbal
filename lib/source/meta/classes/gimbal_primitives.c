@@ -937,7 +937,7 @@ static GBL_RESULT stringGet_(GblVariant* pVariant, size_t  argc, GblVariant* pAr
     GBL_CTX_VERIFY_TYPE(pArgs[0].type, GBL_POINTER_TYPE);
     GBL_CTX_VERIFY_POINTER(pArgs[0].pVoid);
     if(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY) {
-        *((const char**)pArgs->pVoid) = GblStringView_strdup(GblStringRef_view(pVariant->pString));
+        *((GblStringRef**)pArgs->pVoid) = GblStringRef_ref(pVariant->pString);
     } else if(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_PEEK) {
         *((const char**)pArgs->pVoid) = pVariant->pString? pVariant->pString : "";
     } else if(op & GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE) {
