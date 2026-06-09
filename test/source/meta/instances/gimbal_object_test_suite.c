@@ -363,11 +363,11 @@ GBL_TEST_CASE(propertyGet)
                             //     "stringer", "truckin Inheritance!");
     GBL_TEST_VERIFY(pObj1);
 
-    uint16_t    refCount    = 0;
-    void*       pUserdata   = NULL;
-    const char* pName       = NULL;
-    GblObject*  pParent     = NULL;
-    float       floater     = 0.0f;
+    uint16_t      refCount    = 0;
+    void*         pUserdata   = NULL;
+    GblStringRef* pName       = NULL;
+    GblObject*    pParent     = NULL;
+    float         floater     = 0.0f;
    // const char* pStringer   = NULL;
 
     GBL_RESULT result = GblObject_properties(GBL_OBJECT(pObj1),
@@ -390,6 +390,8 @@ GBL_TEST_CASE(propertyGet)
     GBL_TEST_COMPARE(GBL_UNREF(pObj0),   1);
     GBL_TEST_COMPARE(GBL_UNREF(pObj1),   0);
     GBL_TEST_COMPARE(GBL_UNREF(pParent), 0);
+
+    GblStringRef_unref(pName);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(propertySet)
