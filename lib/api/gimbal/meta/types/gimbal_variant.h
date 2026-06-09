@@ -406,8 +406,8 @@ GBL_EXPORT GblObject*    GblVariant_objectPeek   (GBL_CSELF)                GBL_
  *  \relatesalso GblVariant
  *  @{
  */
-//! Attempts to retrieve the variant's value as the specified type and store it in the provided destination.
-//! If the requested type is reference-counted, the returned value is a reference owned by the caller.
+/*! Attempts to retrieve the variant's value as the specified type and store it in the provided destination.
+    \warning If the requested type is reference-counted, the returned value is a reference owned by the caller. */
 GBL_EXPORT GBL_RESULT    GblVariant_asValue      (GBL_CSELF, GblType type, ...)            GBL_NOEXCEPT;
 //! va_list* variation of GblVariant_asValue().
 GBL_EXPORT GBL_RESULT    GblVariant_asValueVa    (GBL_CSELF, GblType type, va_list* pList) GBL_NOEXCEPT;
@@ -440,13 +440,13 @@ GBL_EXPORT float         GblVariant_asFloat      (GBL_CSELF)                    
 GBL_EXPORT double        GblVariant_asDouble     (GBL_CSELF)                               GBL_NOEXCEPT;
 //! Convenience method that attempts to retrieve the variant's value as a pointer.
 GBL_EXPORT void*         GblVariant_asPointer    (GBL_CSELF)                               GBL_NOEXCEPT;
-//! Convenience method that attempts to retrieve the variant's value as a GblStringRef.
-//! The returned reference is owned by the caller.
+/*! Convenience method that attempts to retrieve the variant's value as a GblStringRef.
+    \warning The returned reference is owned by the caller. */
 GBL_EXPORT GblStringRef* GblVariant_asString     (GBL_CSELF)                               GBL_NOEXCEPT;
 //! Convenience method that attempts to retrieve the variant's value as a size_t.
 GBL_EXPORT size_t        GblVariant_asSize       (GBL_CSELF)                               GBL_NOEXCEPT;
-//! Convenience method that attempts to retrieve the variant's value as a GblDateTime reference.
-//! The returned reference is owned by the caller.
+/*! Convenience method that attempts to retrieve the variant's value as a GblDateTime reference.
+    \warning The returned reference is owned by the caller. */
 GBL_EXPORT GblDateTime*  GblVariant_asDateTime   (GBL_CSELF)                               GBL_NOEXCEPT;
 //! @}
 
