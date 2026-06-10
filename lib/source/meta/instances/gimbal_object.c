@@ -15,6 +15,18 @@
 #define GBL_OBJECT_DERIVED_FLAG_INSTANTIATED_MASK_  0x1
 #define GBL_OBJECT_DERIVED_FLAG_CONSTRUCTED_MASK_   0x2
 
+static int GblObject_cmpFn_type_(const GblObject* pObj, void* pClosure) {
+    GblType type = (GblType)pClosure;
+    if (GblInstance_check(GBL_INSTANCE(pObj), type))
+        return 0;
+    return -1;
+}
+
+static int GblObject_cmpFn_Name_(const GblObject* pObj, void* pClosure) {
+    const char* name = (const char*)pClosure;
+    return strcmp(GblObject_name(pObj), name);
+}
+
 static GblQuark objectNameQuark_           = GBL_QUARK_INVALID;
 static GblQuark objectParentQuark_         = GBL_QUARK_INVALID;
 static GblQuark objectFamilyQuark_         = GBL_QUARK_INVALID;
@@ -1524,6 +1536,48 @@ GBL_EXPORT GblObject* GblObject_findSiblingByIndex(const GblObject* pSelf, size_
     return pAncestor;
 }
 
+GBL_EXPORT GblObject* GblObject_findDescendantByCmpFn(const GblObject* pSelf, GblObjectCmpFn pCmpFn, void* pClosure) {
+    struct {
+        GblArrayList array;
+        GblObject*   stackData[32];
+    } queue;
+
+    GblArrayList_construct(&queue.array,
+                           sizeof(GblObject*),
+                           0,
+                           queue.stackData,
+                           sizeof(queue.stackData));
+
+    GblArrayList_pushBack(&queue.array, &pSelf);
+
+    size_t head = 0;
+
+    while(head < GblArrayList_size(&queue.array)) {
+        GblObject* pObject =
+            *(GblObject**)GblArrayList_at(&queue.array, head++);
+
+        GblObject_foreachChild(pObject, pChild) {
+            if(!pCmpFn(pChild, pClosure)) {
+                GblArrayList_destruct(&queue.array);
+                return pChild;
+            }
+
+            GblArrayList_pushBack(&queue.array, &pChild);
+        }
+    }
+
+    GblArrayList_destruct(&queue.array);
+    return NULL;
+}
+
+GBL_EXPORT GblObject* GblObject_findDescendantByType(const GblObject* pSelf, GblType descendantType) {
+    return GblObject_findDescendantByCmpFn(pSelf, GblObject_cmpFn_type_, (void*)descendantType);
+}
+
+GBL_EXPORT GblObject* GblObject_findDescendantByName(const GblObject* pSelf, const char* pName) {
+    return GblObject_findDescendantByCmpFn(pSelf, GblObject_cmpFn_Name_, (void*)pName);
+}
+
 static GBL_RESULT GblObject_IVariant_construct_(GblVariant* pVariant, size_t  argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
     GBL_CTX_BEGIN(NULL);
@@ -1775,12 +1829,10 @@ static GBL_RESULT GblObject_property_(const GblObject* pSelf, const GblProperty*
                                 GblBox_userdata(GBL_BOX(pSelf)));
         break;
     case GblObject_Property_Id_children: {
-        GblObject*   pChild    = GblObject_childFirst(pSelf);
         GblRingList* pChildren = GblRingList_createEmpty();
 
-        while (pChild) {
+        GblObject_foreachChild(pSelf, pChild) {
             GblRingList_pushBack(pChildren, pChild);
-            pChild = GblObject_siblingNext(pChild);
         }
 
         GblVariant_setValueMove(pValue,

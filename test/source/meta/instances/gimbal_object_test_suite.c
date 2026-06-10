@@ -1268,6 +1268,44 @@ GBL_TEST_CASE(childLast)
     GBL_UNREF(pParent);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(descendantByType)
+    GblObject* pParent               = GBL_NEW(GblObject);
+        GblObject* pChild1           = GBL_NEW(GblObject,  "parent", pParent);
+            GblObject* pDescendant1  = GBL_NEW(GblObject,  "parent", pChild1);
+        GblObject* pChild2           = GBL_NEW(GblObject,  "parent", pParent);
+        GblObject* pChild3           = GBL_NEW(GblObject,  "parent", pParent);
+            TestObject* pDescendant2 = GBL_NEW(TestObject, "parent", pChild3);
+        GblObject* pChild4           = GBL_NEW(GblObject,  "parent", pParent);
+            TestObject* pDescendant3 = GBL_NEW(TestObject, "parent", pChild4);
+
+    GBL_TEST_COMPARE(GblObject_findDescendantByType(pParent, TEST_OBJECT_TYPE), pDescendant2);
+    GBL_TEST_COMPARE(GblObject_findDescendantByType(pParent, GBL_OBJECT_TYPE),  pChild1);
+    GBL_TEST_COMPARE(GblObject_findDescendantByType(pChild1, GBL_OBJECT_TYPE),  pDescendant1);
+    GBL_TEST_COMPARE(GblObject_findDescendantByType(pChild2, GBL_OBJECT_TYPE),  NULL);
+    GBL_TEST_COMPARE(GblObject_findDescendantByType(pParent, GBL_STRING_TYPE),  NULL);
+
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(descendantByName)
+    GblObject* pParent              = GBL_NEW(GblObject, "name", "Parent");
+        GblObject* pChild1          = GBL_NEW(GblObject, "name", "Child1",      "parent", pParent);
+            GblObject* pDescendant1 = GBL_NEW(GblObject, "name", "Descendant1", "parent", pChild1);
+        GblObject* pChild2          = GBL_NEW(GblObject, "name", "Child2",      "parent", pParent);
+        GblObject* pChild3          = GBL_NEW(GblObject, "name", "Child3",      "parent", pParent);
+            GblObject* pDescendant2 = GBL_NEW(GblObject, "name", "Descendant2", "parent", pChild3);
+        GblObject* pChild4          = GBL_NEW(GblObject, "name", "Child4",      "parent", pParent);
+            GblObject* pDescendant3 = GBL_NEW(GblObject, "name", "Descendant3", "parent", pChild4);
+
+    GBL_TEST_COMPARE(GblObject_findDescendantByName(pParent, "Descendant2"), pDescendant2);
+    GBL_TEST_COMPARE(GblObject_findDescendantByName(pChild1, "Descendant1"), pDescendant1);
+    GBL_TEST_COMPARE(GblObject_findDescendantByName(pChild4, "Descendant3"), pDescendant3);
+    GBL_TEST_COMPARE(GblObject_findDescendantByName(pChild3, "kek"),         NULL);
+    GBL_TEST_COMPARE(GblObject_findDescendantByName(pParent, "mink"),        NULL);
+
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(newDefault,
                   name,
                   ref,
@@ -1314,7 +1352,9 @@ GBL_TEST_REGISTER(newDefault,
                   clearChildren,
                   setChildren,
                   iterateChildren,
-                  childLast
+                  childLast,
+                  descendantByType,
+                  descendantByName
                 )
 
 static GBL_RESULT TestObject_IEventReceiver_receiveEvent(GblIEventReceiver* pSelf, GblIEventReceiver* pDest, GblEvent* pEvent) {
