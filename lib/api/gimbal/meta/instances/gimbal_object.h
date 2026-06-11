@@ -74,8 +74,8 @@
 
 #define GBL_SELF_TYPE GblObject
 
-//! Comparator callback function which gets called with a GblObject and an arbitrary closure, returning 0 if the object matches the desired criteria.
-typedef int (*GblObjectCmpFn)(const GblObject* pObj, void* pClosure);
+//! Comparator callback function which gets called with a GblObject and an arbitrary closure, returning true if the object matches the desired criteria.
+typedef GblBool (*GblObjectCmpFn)(const GblObject* pObj, void* pClosure);
 
 GBL_DECLS_BEGIN
 

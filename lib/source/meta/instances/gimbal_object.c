@@ -15,16 +15,16 @@
 #define GBL_OBJECT_DERIVED_FLAG_INSTANTIATED_MASK_  0x1
 #define GBL_OBJECT_DERIVED_FLAG_CONSTRUCTED_MASK_   0x2
 
-static int GblObject_cmpFn_type_(const GblObject* pObj, void* pClosure) {
+static GblBool GblObject_cmpFn_type_(const GblObject* pObj, void* pClosure) {
     GblType type = (GblType)pClosure;
     if (GblInstance_check(GBL_INSTANCE(pObj), type))
-        return 0;
-    return -1;
+        return GBL_TRUE;
+    return GBL_FALSE;
 }
 
-static int GblObject_cmpFn_Name_(const GblObject* pObj, void* pClosure) {
+static GblBool GblObject_cmpFn_Name_(const GblObject* pObj, void* pClosure) {
     const char* name = (const char*)pClosure;
-    return strcmp(GblObject_name(pObj), name);
+    return strcmp(GblObject_name(pObj), name) == 0;
 }
 
 static GblQuark objectNameQuark_           = GBL_QUARK_INVALID;
@@ -1557,7 +1557,7 @@ GBL_EXPORT GblObject* GblObject_findDescendantByCmpFn(const GblObject* pSelf, Gb
             *(GblObject**)GblArrayList_at(&queue.array, head++);
 
         GblObject_foreachChild(pObject, pChild) {
-            if(!pCmpFn(pChild, pClosure)) {
+            if(pCmpFn(pChild, pClosure)) {
                 GblArrayList_destruct(&queue.array);
                 return pChild;
             }
