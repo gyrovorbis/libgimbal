@@ -36,6 +36,7 @@
  *      - when you have an instance/box/object type, have to propagate inner type to box's outer type
  *
  *  \author     2023 Falco Girgis
+ *  \author     2026 Agustín Bellagamba
  *  \copyright  MIT License
  */
 #ifndef GIMBAL_VARIANT_H

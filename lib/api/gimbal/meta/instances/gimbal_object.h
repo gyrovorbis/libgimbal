@@ -9,7 +9,7 @@
  *  generic construction, named instances, etc.
  *
  *  \author    2023, 2024, 2025 Falco Girgis
- *  \author                2025 Agustín Bellagamba
+ *  \author                2025, 2026 Agustín Bellagamba
  *  \copyright MIT License
  *
  *  \todo
@@ -73,6 +73,9 @@
 #define GblObject_foreachChildReverse(/*GBL_SELF, name, type=GblObject* */ ...) GblObject_foreachChildReverseDefault_(__VA_ARGS__)
 
 #define GBL_SELF_TYPE GblObject
+
+//! Comparator callback function which gets called with a GblObject and an arbitrary closure, returning true if the object matches the desired criteria.
+typedef GblBool (*GblObjectCmpFn)(const GblObject* pObj, void* pClosure);
 
 GBL_DECLS_BEGIN
 
@@ -366,25 +369,31 @@ GBL_EXPORT GblObject* GblObject_siblingPreviousByType   (GBL_CSELF, GblType type
 GBL_EXPORT GblObject* GblObject_siblingPreviousByName   (GBL_CSELF, const char* pName)                          GBL_NOEXCEPT;
 
 //! Returns a pointer to the closest ancestor object of the given object that is of \p ancestorType, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_findAncestorByType   (GBL_CSELF, GblType ancestorType) GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findAncestorByType    (GBL_CSELF, GblType ancestorType)                  GBL_NOEXCEPT;
 //! Returns a pointer to the first ancestor found with the given name or NULL if none were found
-GBL_EXPORT GblObject* GblObject_findAncestorByName   (GBL_CSELF, const char* pName)    GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findAncestorByName    (GBL_CSELF, const char* pName)                     GBL_NOEXCEPT;
 //! Returns a pointer to the ancestor object of the given object at the specified \p height, with 1 being the direct parent
-GBL_EXPORT GblObject* GblObject_findAncestorByHeight (GBL_CSELF, size_t height)        GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findAncestorByHeight  (GBL_CSELF, size_t height)                         GBL_NOEXCEPT;
 //! Starting at the root object, returns a pointer to the ancestor of the given object at the specified depth, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_findBaseByDepth      (GBL_CSELF, size_t depth)         GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findBaseByDepth       (GBL_CSELF, size_t depth)                          GBL_NOEXCEPT;
 //! Searches through the list of children on the given object, returning a pointer to the first one with the given type, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_findChildByType      (GBL_CSELF, GblType childType)    GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findChildByType       (GBL_CSELF, GblType childType)                     GBL_NOEXCEPT;
 //! Searches through the list of children on the given object, returning a pointer to the first one with the given name, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_findChildByName      (GBL_CSELF, const char* pName)    GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findChildByName       (GBL_CSELF, const char* pName)                     GBL_NOEXCEPT;
 //! Iterates sequentially over the list of children on the given object, returning a pointer to the one at the given type, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_findChildByIndex     (GBL_CSELF, size_t index)         GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findChildByIndex      (GBL_CSELF, size_t index)                          GBL_NOEXCEPT;
 //! Iterates sequentially over the list of siblings to the given object, returning a pointer to the first one of the given type, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_findSiblingByType    (GBL_CSELF, GblType siblingType)  GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findSiblingByType     (GBL_CSELF, GblType siblingType)                   GBL_NOEXCEPT;
 //! Iterates sequentially over the list of siblings to the given object, returning a pointer to the first one with the given name, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_findSiblingByName    (GBL_CSELF, const char* pName)    GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findSiblingByName     (GBL_CSELF, const char* pName)                     GBL_NOEXCEPT;
 //! Iterates sequentially over the list of siblings to the given object, returning a pointer to the one at the given index, or NULL if there isn't one
-GBL_EXPORT GblObject* GblObject_findSiblingByIndex   (GBL_CSELF, size_t  index)        GBL_NOEXCEPT;
+GBL_EXPORT GblObject* GblObject_findSiblingByIndex    (GBL_CSELF, size_t  index)                         GBL_NOEXCEPT;
+//! Returns a pointer to the closest descendant found that satisfies the provided comparator callback
+GBL_EXPORT GblObject* GblObject_findDescendantByCmpFn (GBL_CSELF, GblObjectCmpFn pCmpFn, void* pClosure) GBL_NOEXCEPT;
+//! Returns a pointer to the closest descendant found that is of \p descendantType, or NULL if there isn't one
+GBL_EXPORT GblObject* GblObject_findDescendantByType  (GBL_CSELF, GblType descendantType)                GBL_NOEXCEPT;
+//! Returns a pointer to the closest descendant found with the given name or NULL if none were found
+GBL_EXPORT GblObject* GblObject_findDescendantByName  (GBL_CSELF, const char* pName)                     GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Event Management

@@ -4,7 +4,7 @@
  *  \sa gimbal_macro_composition.h, gimbal_macro_sequences.h
  *
  *  \author 2025 Falco Girgis
- *  \author 2025 Agustín Bellagamba
+ *  \author 2025, 2026 Agustín Bellagamba
  *  \copyright MIT License
  */
 
