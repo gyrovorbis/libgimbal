@@ -1210,6 +1210,12 @@ GBL_EXPORT GblObject* GblObject_siblingNext(const GblObject* pSelf) {
     return pSibling;
 }
 
+GBL_EXPORT GblObject* GblObject_siblingNextByCmpFn(const GblObject* pSelf, GblObjectCmpFn pCmpFn, void* pClosure) {
+    do pSelf = GblObject_siblingNext(pSelf);
+    while (pSelf != NULL && !pCmpFn(pSelf, pClosure));
+    return pSelf;
+}
+
 GBL_EXPORT GblObject* GblObject_siblingNextByType(const GblObject* pSelf, GblType type) {
     do pSelf = GblObject_siblingNext(pSelf);
     while (pSelf != NULL && GBL_TYPEOF(pSelf) != type);
@@ -1234,6 +1240,12 @@ GBL_EXPORT GblObject* GblObject_siblingPrevious(const GblObject* pSelf) {
     }
 
     return NULL;
+}
+
+GBL_EXPORT GblObject* GblObject_siblingPreviousByCmpFn(const GblObject* pSelf, GblObjectCmpFn pCmpFn, void* pClosure) {
+    do pSelf = GblObject_siblingPrevious(pSelf);
+    while (pSelf != NULL && !pCmpFn(pSelf, pClosure));
+    return pSelf;
 }
 
 GBL_EXPORT GblObject* GblObject_siblingPreviousByType(const GblObject* pSelf, GblType type) {
@@ -1321,6 +1333,16 @@ GBL_EXPORT GblBool GblObject_iterateChildren(const GblObject* pSelf, GblObjectIt
         if (pFnIt(pChild, pUd)) return GBL_TRUE;
 
     return GBL_FALSE;
+}
+
+GBL_EXPORT GblObject* GblObject_findChildByCmpFn(const GblObject* pSelf, GblObjectCmpFn pCmpFn, void* pClosure) {
+    GblObject* pChild = GblObject_childFirst(pSelf);
+    if (!pChild)
+        return NULL;
+
+    if (pCmpFn(pChild, pClosure))
+        return pChild;
+    return GblObject_siblingNextByCmpFn(pChild, pCmpFn, pClosure);
 }
 
 GBL_EXPORT GblObject* GblObject_findChildByType(const GblObject* pSelf, GblType childType) {
@@ -1443,6 +1465,22 @@ GBL_EXPORT GblContext* GblObject_findContext(GblObject* pSelf) {
     return (GblContext*)pContext;
 }
 
+GBL_EXPORT GblObject* GblObject_findAncestorByCmpFn(const GblObject* pSelf, GblObjectCmpFn pCmpFn, void* pClosure) {
+    GblObject* pAncestor = NULL;
+    GblObject* pNode     = GblObject_parent(pSelf);
+
+    while(pNode) {
+        if(pCmpFn(pNode, pClosure)) {
+            pAncestor = pNode;
+            break;
+        }
+
+        pNode = GblObject_parent(pNode);
+    }
+
+    return pAncestor;
+}
+
 GBL_EXPORT GblObject* GblObject_findAncestorByType(const GblObject* pSelf, GblType ancestorType) {
     GblObject* pAncestor = NULL;
     GblObject* pNode = GblObject_parent(pSelf);
@@ -1503,37 +1541,40 @@ GBL_EXPORT GblObject* GblObject_findAncestorBaseByDepth(const GblObject* pSelf, 
     return pBase;
 }
 
+GBL_EXPORT GblObject* GblObject_findSiblingByCmpFn(const GblObject* pSelf, GblObjectCmpFn pCmpFn, void* pClosure) {
+    if(!GblObject_parent(pSelf))
+        return NULL;
+
+    GblObject* pSibling = GblObject_childFirst(GblObject_parent(pSelf));
+    while (pSibling && !pCmpFn(pSibling, pClosure) || pSibling == pSelf)
+        pSibling = GblObject_siblingNextByCmpFn(pSibling, pCmpFn, pClosure);
+    return pSibling;
+}
 
 GBL_EXPORT GblObject* GblObject_findSiblingByType(const GblObject* pSelf, GblType siblingType) {
-    GblObject* pObject = NULL;
+    if(!GblObject_parent(pSelf))
+        return NULL;
 
-    if(GblObject_parent(pSelf)) {
-        GblObject_findChildByType(GblObject_parent(pSelf), siblingType);
-    }
-
-    return pObject;
+    GblObject* pSibling = GblObject_childFirst(GblObject_parent(pSelf));
+    while (pSibling && GBL_TYPEOF(pSibling) != siblingType || pSibling == pSelf)
+        pSibling = GblObject_siblingNextByType(pSibling, siblingType);
+    return pSibling;
 }
 
 GBL_EXPORT GblObject* GblObject_findSiblingByName(const GblObject* pSelf, const char* pName) {
-    GblObject* pObject = NULL;
-    GblObject* pParent = GblObject_parent(pSelf);
+    if(!GblObject_parent(pSelf))
+        return NULL;
 
-    if(pParent) {
-        pObject = GblObject_findChildByName(pParent, pName);
-    }
-
-    return pObject;
+    GblObject* pSibling = GblObject_childFirst(GblObject_parent(pSelf));
+    while (pSibling && strcmp(GblObject_name(pSibling), pName) != 0 || pSibling == pSelf)
+        pSibling = GblObject_siblingNextByName(pSibling, pName);
+    return pSibling;
 }
 
 GBL_EXPORT GblObject* GblObject_findSiblingByIndex(const GblObject* pSelf, size_t  index) {
-    GblObject* pAncestor = NULL;
-    GblObjectFamily_* pFamily = GblObject_family_(pSelf);
-
-    if(pFamily) {
-        pAncestor = GBL_OBJECT_FAMILY_ENTRY_(GblNaryTree_siblingAt(&pFamily->treeNode, index));
-    }
-
-    return pAncestor;
+    if(!GblObject_parent(pSelf) || GblObject_childIndex(pSelf) == index)
+        return NULL;
+    return GblObject_findChildByIndex(GblObject_parent(pSelf), index);
 }
 
 GBL_EXPORT GblObject* GblObject_findDescendantByCmpFn(const GblObject* pSelf, GblObjectCmpFn pCmpFn, void* pClosure) {

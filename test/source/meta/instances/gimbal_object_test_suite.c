@@ -525,6 +525,7 @@ GBL_TEST_CASE(parenting)
     GblObject* pChild3 = GBL_NEW(GblObject, "name", "Child3",
                                             "parent", pChild2);
     GblObject* pParent = GBL_OBJECT(GBL_NEW(TestObject, "name", "Parent"));
+    GblObject* pChild4 = GBL_OBJECT(GBL_NEW(TestObject, "name", "Child4"));
 
     GblObject_setParent(pChild1, pParent);
     GBL_TEST_COMPARE(GblObject_findChildByIndex(pParent, 0), pChild1);
@@ -534,12 +535,20 @@ GBL_TEST_CASE(parenting)
     GBL_TEST_COMPARE(GblObject_parent(pChild2), pParent);
     GBL_TEST_COMPARE(GblObject_siblingNext(pChild1), pChild2);
 
+    GblObject_addChild(pParent, pChild4);
+
     GBL_TEST_COMPARE(GblObject_parent(pChild3), pChild2);
 
     GBL_TEST_COMPARE(GblObject_findAncestorByType(pChild3, TEST_OBJECT_TYPE), pParent);
     GBL_TEST_COMPARE(GblObject_findAncestorByName(pChild2, "Parent"), pParent);
     GBL_TEST_COMPARE(GblObject_findChildByType(pChild2, GBL_OBJECT_TYPE), pChild3);
     GBL_TEST_COMPARE(GblObject_findSiblingByName(pChild1, "Child2"), pChild2);
+    GBL_TEST_COMPARE(GblObject_findSiblingByType(pChild1, TEST_OBJECT_TYPE), pChild4);
+    GBL_TEST_COMPARE(GblObject_findSiblingByType(pChild4, TEST_OBJECT_TYPE), NULL);
+    GBL_TEST_COMPARE(GblObject_findSiblingByIndex(pChild4, 1), pChild2);
+    GBL_TEST_COMPARE(GblObject_findSiblingByIndex(pChild4, 5), NULL);
+    GBL_TEST_COMPARE(GblObject_findSiblingByIndex(pChild3, 1), NULL);
+    GBL_TEST_COMPARE(GblObject_findSiblingByIndex(pChild3, 0), NULL);
     GBL_TEST_COMPARE(GblObject_findChildByName(pParent, "Child1"), pChild1);
 
     GblObject_removeChild(pParent, pChild1);
@@ -551,6 +560,7 @@ GBL_TEST_CASE(parenting)
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild3)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild1)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild2)), 0);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pChild4)), 0);
     GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(pParent)), 0);
 GBL_TEST_CASE_END
 
@@ -831,6 +841,31 @@ GBL_TEST_CASE(variantITableNext)
     GblVariant_destruct(&v);
 GBL_TEST_CASE_END
 
+static GblBool GblObject_cmpFn_Name_(const GblObject* pObj, void* pClosure) {
+    const char* name = (const char*)pClosure;
+    return strcmp(GblObject_name(pObj), name) == 0;
+}
+
+GBL_TEST_CASE(siblingNextByCmpFn)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "parent", pParent, "name", "Child1");
+    GblObject* pChild2 = GBL_NEW(GblObject, "parent", pParent, "name", "Child2");
+    GblObject* pChild3 = GBL_NEW(GblObject, "parent", pParent, "name", "Child3");
+    GblObject* pChild4 = GBL_NEW(GblObject, "parent", pParent, "name", "Child4");
+
+    GBL_TEST_COMPARE(GblObject_siblingNextByCmpFn(pChild1, GblObject_cmpFn_Name_, (void*)"Child3"), pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingNextByCmpFn(pChild2, GblObject_cmpFn_Name_, (void*)"Child3"), pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingNextByCmpFn(pChild3, GblObject_cmpFn_Name_, (void*)"Child3"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByCmpFn(pChild4, GblObject_cmpFn_Name_, (void*)"Child3"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByCmpFn(pChild1, GblObject_cmpFn_Name_, (void*)"Child2"), pChild2);
+    GBL_TEST_COMPARE(GblObject_siblingNextByCmpFn(pChild2, GblObject_cmpFn_Name_, (void*)"Child2"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByCmpFn(pChild1, GblObject_cmpFn_Name_, (void*)"mink"),   NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByCmpFn(pParent, GblObject_cmpFn_Name_, (void*)"Child1"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingNextByCmpFn(pChild1, GblObject_cmpFn_Name_, (void*)"Child4"), pChild4);
+
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
 GBL_TEST_CASE(siblingNextByType)
     TestObject* pParent = GBL_NEW(TestObject);
     GblObject*  pChild1 = GBL_NEW(GblObject,  "parent", pParent);
@@ -886,6 +921,27 @@ GBL_TEST_CASE(siblingPrevious)
     GBL_TEST_COMPARE(GblObject_siblingPrevious(pChild3), pChild2);
     GBL_TEST_COMPARE(GblObject_siblingPrevious(pChild4), pChild3);
     GBL_TEST_COMPARE(GblObject_siblingPrevious(pParent), NULL);
+
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(siblingPreviousByCmpFn)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "parent", pParent, "name", "Child1");
+    GblObject* pChild2 = GBL_NEW(GblObject, "parent", pParent, "name", "Child2");
+    GblObject* pChild3 = GBL_NEW(GblObject, "parent", pParent, "name", "Child3");
+    GblObject* pChild4 = GBL_NEW(GblObject, "parent", pParent, "name", "Child4");
+
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pChild1, GblObject_cmpFn_Name_, (void*)"Child3"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pChild2, GblObject_cmpFn_Name_, (void*)"Child3"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pChild3, GblObject_cmpFn_Name_, (void*)"Child3"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pChild4, GblObject_cmpFn_Name_, (void*)"Child3"), pChild3);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pChild1, GblObject_cmpFn_Name_, (void*)"Child2"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pChild2, GblObject_cmpFn_Name_, (void*)"Child2"), NULL);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pChild3, GblObject_cmpFn_Name_, (void*)"Child2"), pChild2);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pChild4, GblObject_cmpFn_Name_, (void*)"Child2"), pChild2);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pChild4, GblObject_cmpFn_Name_, (void*)"Child1"), pChild1);
+    GBL_TEST_COMPARE(GblObject_siblingPreviousByCmpFn(pParent, GblObject_cmpFn_Name_, (void*)"Child1"), NULL);
 
     GBL_UNREF(pParent);
 GBL_TEST_CASE_END
@@ -1306,6 +1362,63 @@ GBL_TEST_CASE(descendantByName)
     GBL_UNREF(pParent);
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(findAncestorByCmpFn)
+    GblObject* pParent              = GBL_NEW(GblObject, "name", "Parent");
+        GblObject* pChild1          = GBL_NEW(GblObject, "name", "Child1",      "parent", pParent);
+            GblObject* pDescendant1 = GBL_NEW(GblObject, "name", "Descendant1", "parent", pChild1);
+        GblObject* pChild2          = GBL_NEW(GblObject, "name", "Child2",      "parent", pParent);
+
+    GBL_TEST_COMPARE(GblObject_findAncestorByCmpFn(pDescendant1, GblObject_cmpFn_Name_, (void*)"Parent"),  pParent);
+    GBL_TEST_COMPARE(GblObject_findAncestorByCmpFn(pDescendant1, GblObject_cmpFn_Name_, (void*)"Child1"),  pChild1);
+    GBL_TEST_COMPARE(GblObject_findAncestorByCmpFn(pChild1,      GblObject_cmpFn_Name_, (void*)"Parent"),  pParent);
+    GBL_TEST_COMPARE(GblObject_findAncestorByCmpFn(pDescendant1, GblObject_cmpFn_Name_, (void*)"haikuno"), NULL);
+    GBL_TEST_COMPARE(GblObject_findAncestorByCmpFn(pParent,      GblObject_cmpFn_Name_, (void*)"Parent"),  NULL);
+
+    GBL_UNREF(pParent);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(findChildByCmpFn)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "parent", pParent, "name", "Child1");
+    GblObject* pChild2 = GBL_NEW(GblObject, "parent", pParent, "name", "Child2");
+    GblObject* pChild3 = GBL_NEW(GblObject, "parent", pParent, "name", "Child3");
+    GblObject* pChild4 = GBL_NEW(GblObject, "parent", pParent, "name", "Child4");
+    GblObject* pDummy  = GBL_NEW(GblObject,                    "name", "Dummy" );
+
+    GBL_TEST_COMPARE(GblObject_findChildByCmpFn(pParent, GblObject_cmpFn_Name_, (void*)"Child1"), pChild1);
+    GBL_TEST_COMPARE(GblObject_findChildByCmpFn(pParent, GblObject_cmpFn_Name_, (void*)"Child2"), pChild2);
+    GBL_TEST_COMPARE(GblObject_findChildByCmpFn(pParent, GblObject_cmpFn_Name_, (void*)"Child3"), pChild3);
+    GBL_TEST_COMPARE(GblObject_findChildByCmpFn(pParent, GblObject_cmpFn_Name_, (void*)"Child4"), pChild4);
+    GBL_TEST_COMPARE(GblObject_findChildByCmpFn(pParent, GblObject_cmpFn_Name_, (void*)"Child5"), NULL   );
+    GBL_TEST_COMPARE(GblObject_findChildByCmpFn(pParent, GblObject_cmpFn_Name_, (void*)"Dummy"),  NULL   );
+    GBL_TEST_COMPARE(GblObject_findChildByCmpFn(pChild1, GblObject_cmpFn_Name_, (void*)"Mink"),   NULL   );
+
+    GBL_UNREF(pParent);
+    GBL_UNREF(pDummy );
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(findSiblingByCmpFn)
+    GblObject* pParent = GBL_NEW(GblObject);
+    GblObject* pChild1 = GBL_NEW(GblObject, "parent", pParent, "name", "Child1");
+    GblObject* pChild2 = GBL_NEW(GblObject, "parent", pParent, "name", "Child2");
+    GblObject* pChild3 = GBL_NEW(GblObject, "parent", pParent, "name", "Child3");
+    GblObject* pChild4 = GBL_NEW(GblObject, "parent", pParent, "name", "Child4");
+    GblObject* pDummy  = GBL_NEW(GblObject,                    "name", "Dummy" );
+
+    GBL_TEST_COMPARE(GblObject_findSiblingByCmpFn(pParent, GblObject_cmpFn_Name_, (void*)"Child1"), NULL);
+    GBL_TEST_COMPARE(GblObject_findSiblingByCmpFn(pDummy , GblObject_cmpFn_Name_, (void*)"Mink"),   NULL);
+    GBL_TEST_COMPARE(GblObject_findSiblingByCmpFn(pChild1, GblObject_cmpFn_Name_, (void*)"Child2"), pChild2);
+    GBL_TEST_COMPARE(GblObject_findSiblingByCmpFn(pChild2, GblObject_cmpFn_Name_, (void*)"Child2"), NULL);
+    GBL_TEST_COMPARE(GblObject_findSiblingByCmpFn(pChild3, GblObject_cmpFn_Name_, (void*)"Child4"), pChild4);
+    GBL_TEST_COMPARE(GblObject_findSiblingByCmpFn(pChild4, GblObject_cmpFn_Name_, (void*)"Child5"), NULL   );
+    GBL_TEST_COMPARE(GblObject_findSiblingByCmpFn(pChild4, GblObject_cmpFn_Name_, (void*)"Child2"), pChild2);
+    GBL_TEST_COMPARE(GblObject_findSiblingByCmpFn(pChild4, GblObject_cmpFn_Name_, (void*)"Child1"), pChild1);
+    GBL_TEST_COMPARE(GblObject_findSiblingByCmpFn(pChild1, GblObject_cmpFn_Name_, (void*)"Dummy"),  NULL   );
+
+    GBL_UNREF(pParent);
+    GBL_UNREF(pDummy );
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(newDefault,
                   name,
                   ref,
@@ -1333,9 +1446,11 @@ GBL_TEST_REGISTER(newDefault,
                   variantITableIndex,
                   variantITableSetIndex,
                   variantITableNext,
+                  siblingNextByCmpFn,
                   siblingNextByType,
                   siblingNextByName,
                   siblingPrevious,
+                  siblingPreviousByCmpFn,
                   siblingPreviousByType,
                   siblingPreviousByName,
                   childIndex,
@@ -1354,7 +1469,10 @@ GBL_TEST_REGISTER(newDefault,
                   iterateChildren,
                   childLast,
                   descendantByType,
-                  descendantByName
+                  descendantByName,
+                  findAncestorByCmpFn,
+                  findChildByCmpFn,
+                  findSiblingByCmpFn
                 )
 
 static GBL_RESULT TestObject_IEventReceiver_receiveEvent(GblIEventReceiver* pSelf, GblIEventReceiver* pDest, GblEvent* pEvent) {
