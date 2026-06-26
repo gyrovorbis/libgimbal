@@ -10,10 +10,10 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-project(LibGimbal 
-    VERSION 
-        ${GIMBAL_VERSION} 
-    DESCRIPTION 
+project(LibGimbal
+    VERSION
+        ${GIMBAL_VERSION}
+    DESCRIPTION
         "Lightweight langauge independent cross-platform framework for creating static/dynamic libraries with a run-time extensible C API"
     HOMEPAGE_URL
         "libgimbal.elysianshadows.com"
@@ -347,12 +347,18 @@ if (EMSCRIPTEN)
     )
 endif()
 
-add_subdirectory(lib/tinycthread)
+if(GBL_ENABLE_THREADS)
+    add_subdirectory(lib/tinycthread)
+    set_property( TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE OFF )
+    list(APPEND
+     GBL_TARGET_LINK_LIBS
+     tinycthread)
+endif()
+
 add_subdirectory(lib/tiny-regex-c)
 
 
 # No Position Independent Lib for PSP on tinycthread either.
-set_property( TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE OFF )
 
 # PSP SDK flags and support
 if (PSP)
@@ -367,7 +373,6 @@ add_subdirectory(lib/lz4/build/cmake)
 
 list(APPEND
      GBL_TARGET_LINK_LIBS
-     tinycthread
      TinyRegexC
      lz4_static)
 
@@ -377,7 +382,7 @@ list(APPEND
           m)
  endif()
 
-if (NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA AND NOT DEFINED PLATFORM_N64)
+if (GBL_ENABLE_THREADS AND NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA AND NOT DEFINED PLATFORM_N64)
 
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
@@ -438,7 +443,8 @@ target_compile_definitions(libGimbal
     -DGIMBAL_VERSION_MAJOR=${GIMBAL_VERSION_MAJOR}
     -DGIMBAL_VERSION_MINOR=${GIMBAL_VERSION_MINOR}
     -DGIMBAL_VERSION_PATCH=${GIMBAL_VERSION_PATCH}
-    -DGIMBAL_VERSION="${GIMBAL_VERSION}")
+    -DGIMBAL_VERSION="${GIMBAL_VERSION}"
+    GBL_THREADS_ENABLED=$<BOOL:${GBL_ENABLE_THREADS}>)
 
 #install(TARGETS libGimbal
 #        LIBRARY DESTINATION lib

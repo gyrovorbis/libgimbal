@@ -2,9 +2,10 @@
 #define GIMBAL_TIME__H
 
 #include <time.h>
+#include <gimbal/preprocessor/gimbal_compiler.h>
 
 #if !defined(GBL_NO_TIMESPEC_)
-#   if defined(ANDROID) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA) || defined(PSP)
+#   if defined(ANDROID) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA) || defined(PSP) || defined(GBL_N64)
 #       define GBL_NO_TIMESPEC_
 #   endif
 #endif

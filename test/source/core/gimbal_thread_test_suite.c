@@ -3,7 +3,7 @@
 #include <gimbal/core/gimbal_thread.h>
 #include <gimbal/utils/gimbal_ref.h>
 
-#include <tinycthread.h>
+#include <gimbal/platform/gimbal_thread_primitives_.h>
 #include <stdatomic.h>
 
 #define GBL_SELF_TYPE GblThreadTestSuite

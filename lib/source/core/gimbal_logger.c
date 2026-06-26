@@ -1,5 +1,5 @@
 #include <gimbal/core/gimbal_logger.h>
-#include <tinycthread.h>
+#include <gimbal/platform/gimbal_thread_primitives_.h>
 
 #define GBL_LOGGER_THREAD_FILTER_FIELD_NAME_    "GblLogger.threadFilter"
 #define GBL_LOGGER_DOMAIN_FILTER_FIELD_NAME_    "GblLogger.domainFilter"

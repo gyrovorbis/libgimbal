@@ -5,7 +5,7 @@
 #include <gimbal/meta/signals/gimbal_marshal.h>
 #include <gimbal/core/gimbal_tls.h>
 
-#include <tinycthread.h>
+#include <gimbal/platform/gimbal_thread_primitives_.h>
 
 #define GBL_THREAD_(self)               (GBL_PRIVATE(GblThread, self))
 #define GBL_THREAD_PUBLIC_(priv)        (GBL_PUBLIC(GblThread, priv))

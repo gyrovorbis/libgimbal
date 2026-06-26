@@ -1,7 +1,7 @@
 #include <gimbal/core/gimbal_exception.h>
 #include <gimbal/core/gimbal_tls.h>
 
-#include <tinycthread.h>
+#include <gimbal/platform/gimbal_thread_primitives_.h>
 
 static GBL_TLS(GblException*, pCurrent_, NULL);
 

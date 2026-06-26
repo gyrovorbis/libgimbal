@@ -578,7 +578,7 @@ GBL_EXPORT GblHash    GblVariant_hash    (GBL_CSELF)                   GBL_NOEXC
 
 GBL_DECLS_END
 
-#if !defined(GBL_DREAMCAST) && !defined(GBL_GAMECUBE) && !defined(GBL_PSP)
+#if !defined(GBL_DREAMCAST) && !defined(GBL_GAMECUBE) && !defined(GBL_PSP) && !defined(GBL_N64)
 #   define GBL_VARIANT_CONSTRUCT_GENERIC_PLATFORM_ENTRIES()
 #else
 #   define GBL_VARIANT_CONSTRUCT_GENERIC_PLATFORM_ENTRIES() \

@@ -359,7 +359,7 @@ GBL_TEST_CASE(propertyGet)
                                 "name",     "Bulbasaur",
                                 "userdata", (void*)0xdeadbeef,
                                 "parent",   pObj0,
-                                "floater",  -77.7);
+                                "floater",  -77.7f);
                             //     "stringer", "truckin Inheritance!");
     GBL_TEST_VERIFY(pObj1);
 
@@ -399,7 +399,7 @@ GBL_TEST_CASE(propertySet)
                                     "name",     "Bulbasaur",
                                     "userdata", (void*)0xdeadbeef,
                                     "parent",   NULL,
-                                    "floater",  -77.7,
+                                    "floater",  -77.7f,
                                     "stringer", "truckin Inheritance!"));
     GblVariant variant;
     void* pUd;
@@ -456,7 +456,7 @@ GBL_TEST_CASE(propertyChange)
                                "name",     "Bulbasaur",
                                "userdata", (void*)0xdeadbeef,
                                "parent",   NULL,
-                               "floater",  -77.7,
+                               "floater",  -77.7f,
                                "stringer", "truckin Inheritance!");
 
     GBL_CONNECT(pObj, "propertyChange", GblObject_onPropertyChange_);
@@ -486,13 +486,13 @@ GBL_TEST_CASE(propertyChange)
     GBL_TEST_COMPARE(pObj->nameChangedCounter, 1);
     GBL_TEST_COMPARE(pObj->otherChangedCounter, 1);
 
-    GblObject_setProperty(GBL_OBJECT(pObj), "floater", -77.7);
+    GblObject_setProperty(GBL_OBJECT(pObj), "floater", -77.7f);
     GBL_TEST_COMPARE(pObj->propertyChangedCounter, 2);
     GBL_TEST_COMPARE(pObj->floaterChangedCounter, 0);
     GBL_TEST_COMPARE(pObj->stringerChangedCounter, 0);
     GBL_TEST_COMPARE(pObj->parentChangedCounter, 0);
 
-    GblObject_setProperty(GBL_OBJECT(pObj), "floater", -67.7);
+    GblObject_setProperty(GBL_OBJECT(pObj), "floater", -67.7f);
     GBL_TEST_COMPARE(pObj->propertyChangedCounter, 3);
     GBL_TEST_COMPARE(pObj->floaterChangedCounter, 1);
     GBL_TEST_COMPARE(pObj->stringerChangedCounter, 0);
@@ -792,7 +792,7 @@ GBL_TEST_CASE(variantITableNext)
                                                 GBL_NEW(TestObject,
                                                         "name",     "Bulbasaur",
                                                         "userdata", (void*)0xdeadbeef,
-                                                        "floater",  -77.7,
+                                                        "floater",  -77.7f,
                                                         "stringer", "Charmander")));
     size_t i = 0;
     while(GblVariant_next(&t, &k, &v)) {
@@ -1503,7 +1503,7 @@ static GBL_RESULT TestObject_init_(GblInstance* pInstance) {
     GBL_CTX_BEGIN(pSelf);
 
     TestObject* pTest = TEST_OBJECT(pSelf);
-    pTest->floater = -NAN;
+    pTest->floater = -69.420f;
     strcpy(pTest->stringer, "INVALID");
     GBL_CTX_END();
 }

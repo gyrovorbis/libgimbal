@@ -132,12 +132,23 @@ int start_logger(const char *app_name)
 
 #endif
 
+#ifdef GBL_N64
+#include <libdragon.h>
+#endif
+
 int main(int argc, const char* pArgv[]) {
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
   //  gdb_init();
 #elif defined(__ANDROID__)
     start_logger("");
+#elif defined (GBL_N64)
+    timer_init();
+    debug_init_isviewer();
+    console_init();
+    debug_init_usblog();
+    console_set_debug(true);
 #endif
+
     GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
 
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO    |
@@ -240,8 +251,10 @@ int main(int argc, const char* pArgv[]) {
                                  GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
+#if GBL_THREADS_ENABLED
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
+#endif
 #ifdef GBL_ENABLE_CPP
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_QUARK_TEST_SUITE_CPP_TYPE));

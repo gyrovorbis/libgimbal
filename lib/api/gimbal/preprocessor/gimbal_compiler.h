@@ -115,6 +115,8 @@
 #elif defined(_POSIX_VERSION)
     // POSIX
 #   define GBL_POSIX
+#elif defined(__mips64) //TODO: better N64 detection
+#   define GBL_N64 1
 #endif
 
 #ifdef __GNUC__
@@ -242,7 +244,7 @@
 #else
 #   if defined(__DREAMCAST__) || defined(__GAMECUBE__)
 #       define GBL_THREAD_LOCAL     _Thread_local
-#   elif defined(__PSP__)
+#   elif defined(__PSP__) || defined(GBL_N64)
 #       define GBL_THREAD_LOCAL
 #   else
 #       define GBL_THREAD_LOCAL     __thread
@@ -552,7 +554,8 @@
        defined(__sun)          || defined(__CYGWIN__) || \
        defined(__EMSCRIPTEN__) || defined(VITA)       || \
        defined(__DREAMCAST__)  || defined(PSP)        || \
-       defined(__GAMECUBE__)   || defined(__DEVKITARM__)
+       defined(__GAMECUBE__)   || defined(__DEVKITARM__) || \
+       defined(GBL_N64)
 #       include <alloca.h>        // Sane platforms
 #   elif defined(_WIN32)
 #       include <malloc.h>        // Windoez

@@ -22,12 +22,19 @@
 #ifndef GIMBAL_TLS_H
 #define GIMBAL_TLS_H
 
-#include <tinycthread.h>
 #include "../preprocessor/gimbal_compiler.h"
 
 #if defined(GBL_PSP)
 #   define GBL_TLS_EMULATED 1
 #endif
+
+#if !GBL_THREADS_ENABLED
+#   define GBL_TLS(type, name, ...) type name = __VA_ARGS__
+
+#elif !GBL_TLS_EMULATED
+#   define GBL_TLS(type, name, ...) GBL_THREAD_LOCAL type name = __VA_ARGS__
+
+#else
 
 /*! \def GBL_TLS(type, name, init)
  *
@@ -41,9 +48,7 @@
  *
  *  \sa GBL_TLS_LOAD()
  */
-#if !GBL_TLS_EMULATED
-#   define GBL_TLS(type, name, ...) GBL_THREAD_LOCAL type name = __VA_ARGS__
-#else
+#   include <tinycthread.h>
 #   define GBL_TLS(type, name, ...) \
         tss_t name; \
         static void tls_##name##_init_(void) { \
@@ -77,7 +82,7 @@
  *
  *  \sa GBL_TLS()
  */
-#if !GBL_TLS_EMULATED
+#if !GBL_TLS_EMULATED || !GBL_THREADS_ENABLED
 #   define GBL_TLS_LOAD(name)   &name
 #else
 #   define GBL_TLS_LOAD(name)   tls_##name##_load_()
