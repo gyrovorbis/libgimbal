@@ -163,10 +163,6 @@ else()
     )
 endif()
 
-if(PLATFORM_N64)
-    add_n64_rom(GimbalTests "Tests")
-endif()
-
 set(GBL_TEST_LINK_LIBS
     libGimbal)
 

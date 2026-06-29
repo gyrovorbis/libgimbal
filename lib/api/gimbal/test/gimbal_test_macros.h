@@ -89,7 +89,7 @@ GBL_INLINE GblBool GBL_TEST_COMPARE_CMP_STR_    (const char* pActual, const char
                                                                                                      strcmp(pActual, pExpected) == 0); }
 
 #ifndef __cplusplus
-#if     defined(GBL_DREAMCAST) || defined(GBL_GAMECUBE) || defined(GBL_N64)
+#if     defined(GBL_DREAMCAST) || defined(GBL_GAMECUBE)
 #    define GBL_TEST_CMP_PLATFORM_ENTRIES()      \
         (size_t , GBL_TEST_COMPARE_CMP_UINT32_), \
         (int,     GBL_TEST_COMPARE_CMP_INT32_),

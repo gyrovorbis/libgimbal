@@ -132,23 +132,12 @@ int start_logger(const char *app_name)
 
 #endif
 
-#ifdef GBL_N64
-#include <libdragon.h>
-#endif
-
 int main(int argc, const char* pArgv[]) {
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
   //  gdb_init();
 #elif defined(__ANDROID__)
     start_logger("");
-#elif defined (GBL_N64)
-    timer_init();
-    debug_init_isviewer();
-    console_init();
-    debug_init_usblog();
-    console_set_debug(true);
 #endif
-
     GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
 
     GblContext_setLogFilter(GBL_CONTEXT(pScenario), GBL_LOG_LEVEL_INFO    |
