@@ -136,17 +136,20 @@ GBL_DECLS_END
     };                                                          \
     GBL_ENUM_REGISTER_(name, __VA_ARGS__)
 
-#define GBL_ENUM_REGISTER_(name, ...)                                   \
-    GBL_INLINE GblType name##_type(void) GBL_NOEXCEPT {                 \
-        static GblType type_ = GBL_INVALID_TYPE;                        \
-        if(type_ == GBL_INVALID_TYPE) {                                 \
-            static const GblEnumEntry entries_[] = {                    \
-                GBL_TUPLE_FOREACH(GBL_ENUM_TABLE_, name, (__VA_ARGS__)) \
-                GBL_ENUM_ENTRY_LAST()                                   \
-            };                                                          \
-            type_ = GblEnum_register(GBL_STRINGIFY(name), entries_);    \
-        }                                                               \
-        return type_;                                                   \
+#define GBL_ENUM_REGISTER_(name, ...)                                       \
+    GBL_INLINE GblType name##_type(void) GBL_NOEXCEPT {                     \
+        static GblType type_ = GBL_INVALID_TYPE;                            \
+        if(type_ == GBL_INVALID_TYPE) {                                     \
+            type_ = GblType_find(GBL_STRINGIFY(name));                      \
+            if (type_ == GBL_INVALID_TYPE) {                                \
+                static const GblEnumEntry entries_[] = {                    \
+                    GBL_TUPLE_FOREACH(GBL_ENUM_TABLE_, name, (__VA_ARGS__)) \
+                    GBL_ENUM_ENTRY_LAST()                                   \
+                };                                                          \
+                type_ = GblEnum_register(GBL_STRINGIFY(name), entries_);    \
+            }                                                               \
+        }                                                                   \
+        return type_;                                                       \
     }
 
 #define GBL_ENUM_DECL_(name, entry)  GBL_ENUM_DECL__(GBL_EVAL entry)

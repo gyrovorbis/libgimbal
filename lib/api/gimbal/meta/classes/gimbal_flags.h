@@ -142,17 +142,20 @@ GBL_DECLS_END
     };                                                          \
     GBL_FLAGS_REGISTER_(name, __VA_ARGS__)
 
-#define GBL_FLAGS_REGISTER_(name, ...)                                   \
-    GBL_INLINE GblType name##_type(void) GBL_NOEXCEPT {                  \
-        static GblType type_ = GBL_INVALID_TYPE;                         \
-        if(type_ == GBL_INVALID_TYPE) {                                  \
-            static const GblFlagEntry entries_[] = {                     \
-                GBL_TUPLE_FOREACH(GBL_FLAGS_TABLE_, name, (__VA_ARGS__)) \
-                GBL_FLAGS_ENTRY_LAST()                                   \
-            };                                                           \
-            type_ = GblFlags_register(GBL_STRINGIFY(name), entries_);    \
-        }                                                                \
-        return type_;                                                    \
+#define GBL_FLAGS_REGISTER_(name, ...)                                       \
+    GBL_INLINE GblType name##_type(void) GBL_NOEXCEPT {                      \
+        static GblType type_ = GBL_INVALID_TYPE;                             \
+        if(type_ == GBL_INVALID_TYPE) {                                      \
+            type_ = GblType_find(GBL_STRINGIFY(name));                       \
+            if(type_ == GBL_INVALID_TYPE) {                                  \
+                static const GblFlagEntry entries_[] = {                     \
+                    GBL_TUPLE_FOREACH(GBL_FLAGS_TABLE_, name, (__VA_ARGS__)) \
+                    GBL_FLAGS_ENTRY_LAST()                                   \
+                };                                                           \
+                type_ = GblFlags_register(GBL_STRINGIFY(name), entries_);    \
+            }                                                                \
+        }                                                                    \
+        return type_;                                                        \
     }
 
 #define GBL_FLAGS_DECL_(name, entry)  GBL_FLAGS_DECL__(GBL_EVAL entry)
