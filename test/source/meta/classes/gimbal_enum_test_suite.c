@@ -11,11 +11,11 @@ typedef struct GblEnumTestSuite_ {
     GblEnumClass*   pEnumClass;
 } GblEnumTestSuite_;
 
-typedef enum COLOR {
-    RED     = 1,
-    GREEN   = 5,
-    BLUE    = 10
-} COLOR;
+GBL_ENUM(COLOR,
+    (RED,   "Red",    1),
+    (GREEN, "Green",  5),
+    (BLUE,  "Blue",  10)
+)
 
 static GBL_RESULT GblEnumTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
@@ -36,15 +36,7 @@ static GBL_RESULT GblEnumTestSuite_register_(GblTestSuite* pSelf, GblContext* pC
     GBL_CTX_BEGIN(pCtx);
     GblEnumTestSuite_* pSelf_ = GBL_ENUM_TEST_SUITE_(pSelf);
 
-    const static GblEnumEntry enumEntries[] = {
-        GBL_ENUM_ENTRY(RED,    "Red"),
-        GBL_ENUM_ENTRY(GREEN,  "Green"),
-        GBL_ENUM_ENTRY(BLUE,   "Blue"),
-        GBL_ENUM_ENTRY_LAST()
-    };
-
-    pSelf_->enumType = GblEnum_register("Color",
-                                enumEntries);
+    pSelf_->enumType = COLOR_type();
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_TEST_VERIFY(pSelf_->enumType != GBL_INVALID_TYPE);

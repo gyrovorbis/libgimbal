@@ -3,7 +3,6 @@
  *  \ingroup meta
  *
  *  \todo
- *  - Macro DSL for auto registering and declaring enum at the same time
  *  - Finish docs (method descriptions)
  *
  *  \author 2023 Falco Girgis
@@ -32,6 +31,14 @@
 //! @}
 
 #define GBL_SELF_TYPE GblEnumClass
+
+/*! \brief DSL macro used to declare and register a GblEnum
+ *
+ *  \param name Name of the GblEnum
+ *  \param ...  Enum entries in the form:
+ *              (value, nick, number)
+ */
+#define GBL_ENUM(name, ...)  GBL_ENUM_(name, __VA_ARGS__)
 
 GBL_DECLS_BEGIN
 
@@ -121,18 +128,38 @@ GBL_EXPORT GblBool     GblEnum_check     (GblEnum value, GblType type) GBL_NOEXC
 
 GBL_DECLS_END
 
-#if 0
-#define GBL_ENUM(name, ...)     GBL_ENUM_(name, __VA_ARGS__)
+//! \cond GRUG_FREE
 
-#define GBL_ENUM_ENTRY_(name, ...) \
-    GBL_ENUM_ENTRY(__VA_ARGS__)
+#define GBL_ENUM_(name, ...)                                    \
+    GBL_DECLARE_ENUM(name) {                                    \
+        GBL_TUPLE_FOREACH(GBL_ENUM_DECL_, name, (__VA_ARGS__))  \
+    };                                                          \
+    GBL_ENUM_REGISTER_(name, __VA_ARGS__)
 
-#define GBL_ENUM_(name, ...) \
-    GBL_DECLARE_ENUM(name) { \
-        GBL_TUPLE_FOREACH(GBL_ENUM_ENTRY_, name, __VA_ARGS__) \
-        GBL_ENUM_ENTRY_LAST()
-    };
-#endif
+#define GBL_ENUM_REGISTER_(name, ...)                                   \
+    GBL_INLINE GblType name##_type(void) GBL_NOEXCEPT {                 \
+        static GblType type_ = GBL_INVALID_TYPE;                        \
+        if(type_ == GBL_INVALID_TYPE) {                                 \
+            static const GblEnumEntry entries_[] = {                    \
+                GBL_TUPLE_FOREACH(GBL_ENUM_TABLE_, name, (__VA_ARGS__)) \
+                GBL_ENUM_ENTRY_LAST()                                   \
+            };                                                          \
+            type_ = GblEnum_register(GBL_STRINGIFY(name), entries_);    \
+        }                                                               \
+        return type_;                                                   \
+    }
+
+#define GBL_ENUM_DECL_(name, entry)  GBL_ENUM_DECL__(GBL_EVAL entry)
+#define GBL_ENUM_DECL__(...)         GBL_ENUM_DECL___(__VA_ARGS__)
+#define GBL_ENUM_DECL___(value, nick, num) \
+    value = num,
+
+#define GBL_ENUM_TABLE_(name, entry)  GBL_ENUM_TABLE__(GBL_EVAL entry)
+#define GBL_ENUM_TABLE__(...)         GBL_ENUM_TABLE___(__VA_ARGS__)
+#define GBL_ENUM_TABLE___(value, nick, num) \
+    GBL_ENUM_ENTRY(value, nick),
+
+//! \endcond
 
 #undef GBL_SELF_TYPE
 
