@@ -134,6 +134,8 @@ set(GIMBAL_TEST_SOURCES
     include/utils/gimbal_scanner_test_suite.h
     source/utils/gimbal_scanner_test_suite.c
     source/gimbal_test_main.c
+    include/gimbal_tests.h
+    source/gimbal_tests.c
 )
 
 if(GBL_ENABLE_CPP)
