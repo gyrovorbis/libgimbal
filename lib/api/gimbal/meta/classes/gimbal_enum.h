@@ -6,6 +6,7 @@
  *  - Finish docs (method descriptions)
  *
  *  \author 2023 Falco Girgis
+ *  \author 2026 Agustín Bellagamba
  *  \copyright MIT License
  */
 #ifndef GIMBAL_ENUM_H

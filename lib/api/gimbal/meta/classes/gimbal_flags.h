@@ -3,6 +3,7 @@
  *  \ingroup meta
  *
  *  \author 2023 Falco Girgis
+ *  \author 2026 Agustín Bellagamba
  *  \copyright MIT License
  */
 #ifndef GIMBAL_FLAGS_H
