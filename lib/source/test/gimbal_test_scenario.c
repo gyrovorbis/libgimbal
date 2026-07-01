@@ -1,10 +1,18 @@
 #include <gimbal/test/gimbal_test_scenario.h>
 #include <gimbal/test/gimbal_test_suite.h>
 #include <gimbal/utils/gimbal_timer.h>
+#include <gimbal/utils/gimbal_cmd_parser.h>
 #include <gimbal/algorithms/gimbal_random.h>
 #include <gimbal/allocators/gimbal_allocation_tracker.h>
 #include <gimbal/meta/signals/gimbal_marshal.h>
 #include <time.h>
+
+static const char* GBL_TERM_GREEN_  = "\x1b[32m";
+static const char* GBL_TERM_YELLOW_ = "\x1b[33m";
+static const char* GBL_TERM_RED_    = "\x1b[31m";
+static const char* GBL_TERM_GRAY_   = "\x1b[2m";
+static const char* GBL_TERM_BLINK_  = "\x1b[5m";
+static const char* GBL_TERM_RESET_  = "\x1b[0m";
 
 #define GBL_TEST_SCENARIO_(inst)    (GBL_PRIVATE(GblTestScenario, inst))
 
@@ -71,14 +79,20 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
 
     GBL_CTX_POP(1);
 
-    GBL_CTX_INFO("********************* %s *********************",
-                 !GBL_RESULT_SUCCESS(pSelf->result)? "[   FAIL   ]" : "[   PASS   ]");
+    GBL_CTX_INFO("%s%s********************* %s *********************%s", GBL_TERM_BLINK_,
+                 !GBL_RESULT_SUCCESS(pSelf->result)?  GBL_TERM_RED_ : GBL_TERM_GREEN_,
+                 !GBL_RESULT_SUCCESS(pSelf->result)? "[   FAIL   ]" : "[   PASS   ]",
+                 GBL_TERM_RESET_);
 
     //GBL_CTX_VERIFY_CALL(GblAllocationTracker_logActive(pSelf_->pAllocTracker));
 
     GBL_EMIT(pSelf, "ended");
 
     GBL_CTX_END();
+}
+
+static GblBool GblTestScenario_stringListIterFn_(GblStringRef* pRef, void* pClosure) {
+    return GblStringView_containsIgnoreCase(GBL_STRV((const char*)pClosure), pRef);
 }
 
 static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, const char* argv[]) {
@@ -92,6 +106,37 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
     pSelf->result = GBL_RESULT_SUCCESS;
     GBL_CTX_VERIFY_CALL(pClass->pFnBegin(pSelf));
 
+    const char* pOnly_       = NULL;
+    const char* pSkip_       = NULL;
+    GblBool     enableColor  = GBL_FALSE;
+
+    GblCmdParser* pParser = GBL_NEW(GblCmdParser,
+        "mainOptionGroup",  GBL_NEW(GblOptionGroup,
+            "name", "Test Suite",
+            "prefix", "test",
+            "options", (GblOption[]) {
+                { "only",     'o',   GBL_OPTION_TYPE_STRING, &pOnly_,       "Only runs the given tests", "pOnly_",       GBL_OPTION_FLAG_NONE          },
+                { "skip",     's',   GBL_OPTION_TYPE_STRING, &pSkip_,       "Skips the given tests",     "pSkip_",       GBL_OPTION_FLAG_NONE          },
+                { "color",    'c',   GBL_OPTION_TYPE_BOOL,   &enableColor,  "Enables colored output",    "enableColor",  GBL_OPTION_FLAG_BOOL_NO_VALUE },
+                { 0 }
+            }
+        )
+    );
+
+    GblCmdParser_parse(pParser, GblStringList_createWithArray(argv, argc));
+
+    GblStringList* pOnlyList_ = GblStringList_createSplit(pOnly_, " ");
+    GblStringList* pSkipList_ = GblStringList_createSplit(pSkip_, " ");
+
+    if (!enableColor) {
+        GBL_TERM_GREEN_  = "";
+        GBL_TERM_YELLOW_ = "";
+        GBL_TERM_RED_    = "";
+        GBL_TERM_GRAY_   = "";
+        GBL_TERM_BLINK_  = "";
+        GBL_TERM_RESET_  = "";
+    }
+
     for(GblTestSuite* pSuiteIt = GBL_AS(GblTestSuite, GblObject_childFirst(GBL_OBJECT(pSelf)));
         pSuiteIt              != NULL;
         pSuiteIt               = GBL_AS(GblTestSuite, GblObject_siblingNext(GBL_OBJECT(pSuiteIt))))
@@ -99,6 +144,18 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
         pSelf_->pCurSuite = pSuiteIt;
 
         GBL_CTX_RESULT() = GBL_RESULT_SUCCESS;
+
+        if (pOnly_ && !GblStringList_foreach(pOnlyList_, GblTestScenario_stringListIterFn_, GblTestSuite_name(pSuiteIt))) {
+            pSelf->casesSkipped += GblTestSuite_caseCount(pSuiteIt);
+            ++pSelf->suitesSkipped;
+            continue;
+        }
+
+        if (pSkip_ && GblStringList_foreach(pSkipList_, GblTestScenario_stringListIterFn_, GblTestSuite_name(pSuiteIt))) {
+            pSelf->casesSkipped += GblTestSuite_caseCount(pSuiteIt);
+            ++pSelf->suitesSkipped;
+            continue;
+        }
 
         GBL_CTX_VERIFY_CALL(pClass->pFnSuiteBegin(pSelf, pSuiteIt));
 
@@ -111,14 +168,14 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
         GBL_CTX_POP(1);
 
         if(GBL_CTX_RESULT() == GBL_RESULT_SKIPPED) {
-            GBL_CTX_INFO("%-12s: %s", "[      SKIP ]",
+            GBL_CTX_INFO("%s%s%-12s: %s%s", GBL_TERM_BLINK_, GBL_TERM_YELLOW_, "[      SKIP ]", GBL_TERM_RESET_,
                          GblTestSuite_name(pSelf_->pCurSuite));
 
             pSelf->casesSkipped += GblTestSuite_caseCount(pSuiteIt);
             ++pSelf->suitesSkipped;
 
         } else if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) {
-            GBL_CTX_INFO("%-12s: %s", "[      FAIL ]",
+            GBL_CTX_INFO("%s%s%-12s: %s%s", GBL_TERM_BLINK_, GBL_TERM_RED_,    "[      FAIL ]", GBL_TERM_RESET_,
                          GblTestSuite_name(pSelf_->pCurSuite));
 
             ++pSelf->suitesRun;
@@ -172,18 +229,18 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
 
                     if(result == GBL_RESULT_SKIPPED) {
                         ++pSelf->casesSkipped;
-                        GBL_CTX_INFO("%-12s: %s::%s", "[      SKIP ]",
+                        GBL_CTX_INFO("%s%s%-12s: %s%s::%s", GBL_TERM_BLINK_, GBL_TERM_YELLOW_, "[      SKIP ]", GBL_TERM_RESET_,
                                      GblTestSuite_name(pSelf_->pCurSuite),
                                      pCurCase);
                     } else if(!GBL_RESULT_ERROR(result)) {
                         ++pSelf->casesPassed;
-                        GBL_CTX_INFO("%-12s: %s::%s (%.3f ms)", "[      PASS ]",
+                        GBL_CTX_INFO("%s%s%-12s: %s%s::%s (%.3f ms)", GBL_TERM_BLINK_, GBL_TERM_GREEN_, "[      PASS ]", GBL_TERM_RESET_,
                                      GblTestSuite_name(pSelf_->pCurSuite),
                                      pCurCase,
                                      GblTimer_elapsedMs(&caseTimer));
                     } else {
                         ++pSelf->casesFailed;
-                        GBL_CTX_INFO("%-12s: %s::%s", "[      FAIL ]",
+                        GBL_CTX_INFO("%s%s%-12s: %s%s::%s (%.3f ms)", GBL_TERM_BLINK_, GBL_TERM_RED_,   "[      FAIL ]", GBL_TERM_RESET_,
                                      GblTestSuite_name(pSelf_->pCurSuite),
                                      pCurCase);
 
@@ -223,7 +280,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
 
             if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) {
 
-                GBL_CTX_INFO("%-12s: %s", "[      FAIL ]",
+                GBL_CTX_INFO("%s%s%-12s: %s", GBL_TERM_BLINK_, GBL_TERM_RED_, "[      FAIL ]", GBL_TERM_RESET_,
                              GblTestSuite_name(pSelf_->pCurSuite));
 
                 suiteFailed = GBL_TRUE;
@@ -235,6 +292,10 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
 
         GBL_CTX_CALL(pClass->pFnSuiteEnd(pSelf, pSuiteIt));
     }
+
+    GblCmdParser_unref(pParser);
+    GblStringList_unref(pOnlyList_);
+    GblStringList_unref(pSkipList_);
 
     pSelf->result = (pSelf->casesFailed || pSelf->suitesFailed)? GBL_RESULT_ERROR : GBL_RESULT_SUCCESS;
     GBL_CTX_CALL(pClass->pFnEnd(pSelf));
@@ -254,7 +315,7 @@ static GBL_RESULT GblTestScenarioClass_suiteBegin_(GblTestScenario* pSelf, const
 
     pSelf_->suiteMs = 0.0;
 
-    GBL_CTX_INFO("********* Starting TestSuite [%s] *********", pSuiteName);
+    GBL_CTX_INFO("%s********* Starting TestSuite [%s] *********%s", GBL_TERM_GRAY_, pSuiteName, GBL_TERM_RESET_);
 
     GBL_EMIT(pSelf, "suiteBegan", pSuite);
 
@@ -284,7 +345,7 @@ static GBL_RESULT GblTestScenarioClass_suiteEnd_(GblTestScenario* pSelf, const G
                  diffCounters.allocEvents,
                  diffCounters.bytesActive,
                  diffCounters.bytesAllocated);
-    GBL_CTX_INFO("********* Finished TestSuite [%s] *********", pSuiteName);
+    GBL_CTX_INFO("%s********* Finished TestSuite [%s] *********%s", GBL_TERM_GRAY_, pSuiteName, GBL_TERM_RESET_);
 
     GBL_EMIT(pSelf, "suiteEnded", pSuite);
 
