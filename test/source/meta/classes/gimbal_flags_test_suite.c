@@ -13,12 +13,12 @@ typedef struct GblFlagsTestSuite_ {
     GblFlagsClass*  pFlagsClass;
 } GblFlagsTestSuite_;
 
-GBL_DECLARE_FLAGS(PROPERTY_FLAGS) {
-    READ    = 0x1,
-    WRITE   = 0x2,
-    LOAD    = 0x4,
-    SAVE    = 0x8
-};
+GBL_FLAGS(PROPERTY_FLAGS,
+    (READ,  "Read",  0x1),
+    (WRITE, "Write", 0x2),
+    (LOAD,  "Load",  0x4),
+    (SAVE,  "Save",  0x8)
+)
 
 static GBL_RESULT GblFlagsTestSuite_init_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
@@ -38,14 +38,7 @@ static GBL_RESULT GblFlagsTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx
 static GBL_RESULT GblFlagsTestSuite_register_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
-    pSelf_->flagsType = GblFlags_register("PropertyFlags",
-                                   (const GblFlagEntry[]){
-                                       GBL_FLAGS_ENTRY(READ,    "Read"),
-                                       GBL_FLAGS_ENTRY(WRITE,   "Write"),
-                                       GBL_FLAGS_ENTRY(LOAD,    "Load"),
-                                       GBL_FLAGS_ENTRY(SAVE,    "Save"),
-                                       GBL_FLAGS_ENTRY_LAST()
-                                   });
+    pSelf_->flagsType = GBL_TYPEID(PROPERTY_FLAGS);
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_TEST_VERIFY(pSelf_->flagsType != GBL_INVALID_TYPE);

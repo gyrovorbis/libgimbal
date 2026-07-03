@@ -3,6 +3,7 @@
  *  \ingroup meta
  *
  *  \author 2023 Falco Girgis
+ *  \author 2026 Agustín Bellagamba
  *  \copyright MIT License
  */
 #ifndef GIMBAL_FLAGS_H
@@ -29,13 +30,21 @@
 
 #define GBL_SELF_TYPE GblFlagsClass
 
+/*! \brief DSL macro used to declare and register GblFlags
+ *
+ *  \param name Name of the GblFlags
+ *  \param ...  Flag entries in the form:
+ *              (value, nick, number)
+ */
+#define GBL_FLAGS(name, ...)  GBL_FLAGS_(name, __VA_ARGS__)
+
 GBL_DECLS_BEGIN
 
 //! Attributes for a single bit flag value within a group of GblFlag values
 typedef struct GblFlagEntry {
     GblFlags        value;  //!< Value of the flag
     const char*     pName;  //!< String name of the flag value
-    const char*     pNick;  //!< Alternat ename of the flag value
+    const char*     pNick;  //!< Alternate name of the flag value
 } GblFlagEntry;
 
 /*! \struct GblFlagsClass
@@ -125,6 +134,42 @@ GBL_EXPORT GBL_RESULT  GblFlags_appendString            (GblFlags value,
                                                          GblStringBuffer* pBuffer)        GBL_NOEXCEPT;
 
 GBL_DECLS_END
+
+//! \cond GRUG_FREE
+
+#define GBL_FLAGS_(name, ...)                                   \
+    GBL_DECLARE_FLAGS(name) {                                   \
+        GBL_TUPLE_FOREACH(GBL_FLAGS_DECL_, name, (__VA_ARGS__)) \
+    };                                                          \
+    GBL_FLAGS_REGISTER_(name, __VA_ARGS__)
+
+#define GBL_FLAGS_REGISTER_(name, ...)                                       \
+    GBL_INLINE GblType name##_type(void) GBL_NOEXCEPT {                      \
+        static GblType type_ = GBL_INVALID_TYPE;                             \
+        if(type_ == GBL_INVALID_TYPE) {                                      \
+            type_ = GblType_find(GBL_STRINGIFY(name));                       \
+            if(type_ == GBL_INVALID_TYPE) {                                  \
+                static const GblFlagEntry entries_[] = {                     \
+                    GBL_TUPLE_FOREACH(GBL_FLAGS_TABLE_, name, (__VA_ARGS__)) \
+                    GBL_FLAGS_ENTRY_LAST()                                   \
+                };                                                           \
+                type_ = GblFlags_register(GBL_STRINGIFY(name), entries_);    \
+            }                                                                \
+        }                                                                    \
+        return type_;                                                        \
+    }
+
+#define GBL_FLAGS_DECL_(name, entry)  GBL_FLAGS_DECL__(GBL_EVAL entry)
+#define GBL_FLAGS_DECL__(...)         GBL_FLAGS_DECL___(__VA_ARGS__)
+#define GBL_FLAGS_DECL___(value, nick, num) \
+    value = num,
+
+#define GBL_FLAGS_TABLE_(name, entry)  GBL_FLAGS_TABLE__(GBL_EVAL entry)
+#define GBL_FLAGS_TABLE__(...)         GBL_FLAGS_TABLE___(__VA_ARGS__)
+#define GBL_FLAGS_TABLE___(value, nick, num) \
+    GBL_FLAGS_ENTRY(value, nick),
+
+//! \endcond
 
 #undef GBL_SELF_TYPE
 
