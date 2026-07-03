@@ -36,7 +36,7 @@ static GBL_RESULT GblEnumTestSuite_register_(GblTestSuite* pSelf, GblContext* pC
     GBL_CTX_BEGIN(pCtx);
     GblEnumTestSuite_* pSelf_ = GBL_ENUM_TEST_SUITE_(pSelf);
 
-    pSelf_->enumType = COLOR_type();
+    pSelf_->enumType = GBL_TYPEID(COLOR);
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_TEST_VERIFY(pSelf_->enumType != GBL_INVALID_TYPE);

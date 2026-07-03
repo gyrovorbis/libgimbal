@@ -38,7 +38,7 @@ static GBL_RESULT GblFlagsTestSuite_final_(GblTestSuite* pSelf, GblContext* pCtx
 static GBL_RESULT GblFlagsTestSuite_register_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
-    pSelf_->flagsType = PROPERTY_FLAGS_type();
+    pSelf_->flagsType = GBL_TYPEID(PROPERTY_FLAGS);
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_TEST_VERIFY(pSelf_->flagsType != GBL_INVALID_TYPE);
