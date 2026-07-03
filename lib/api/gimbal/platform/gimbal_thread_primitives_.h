@@ -31,12 +31,12 @@ typedef int     once_flag;
 #define mtx_unlock(mtx)             (0)
 #define mtx_destroy(mtx)            ((void)0)
 
-#define call_once(flag, fn)                                                    \
-  do {                                                                         \
-    if (!(*(flag))) {                                                          \
-      (fn)();                                                                  \
-      *(flag) = 1;                                                             \
-    }                                                                          \
+#define call_once(flag, fn) \
+  do {                      \
+    if (!(*(flag))) {       \
+      (fn)();               \
+      *(flag) = 1;          \
+    }                       \
   } while (0)
 
 #define tss_create(key, dtor)       (0)

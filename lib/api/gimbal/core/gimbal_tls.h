@@ -36,6 +36,8 @@
 
 #else
 
+#   include <tinycthread.h>
+
 /*! \def GBL_TLS(type, name, init)
  *
  *  Defines a thread-local variable using the given information,
@@ -48,7 +50,6 @@
  *
  *  \sa GBL_TLS_LOAD()
  */
-#   include <tinycthread.h>
 #   define GBL_TLS(type, name, ...) \
         tss_t name; \
         static void tls_##name##_init_(void) { \
