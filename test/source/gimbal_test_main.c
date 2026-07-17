@@ -240,8 +240,10 @@ int main(int argc, const char* pArgv[]) {
                                  GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
+#if GBL_THREADS_ENABLED
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
+#endif
 #ifdef GBL_ENABLE_CPP
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_QUARK_TEST_SUITE_CPP_TYPE));

@@ -8,7 +8,7 @@
 #include <gimbal/strings/gimbal_quark.h>
 #include <stdatomic.h>
 
-#include <tinycthread.h>
+#include <gimbal/platform/gimbal_thread_primitives_.h>
 
 #define GBL_CLASS_FLAGS_BIT_COUNT_                      5
 #define GBL_CLASS_FLAGS_BIT_MASK_                       0x1f

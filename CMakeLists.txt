@@ -17,17 +17,18 @@ set(GIMBAL_VERSION
 
 include(util/gimbal_utils.cmake)
 
-project(LibGimbal 
+project(LibGimbal
     VERSION ${GIMBAL_VERSION}
-    DESCRIPTION "Aggregate project for libGimbal subprojects" 
+    DESCRIPTION "Aggregate project for libGimbal subprojects"
     HOMEPAGE_URL "libgimbal.elysianshadows.com"
     LANGUAGES C CXX)
 
 
 #kos_enable_sh4_math()
 
-option(GBL_ENABLE_TESTS "Enable LibGimbal unit tests" OFF)
-option(GBL_ENABLE_CPP   "Enable C++ libGimbal API"    OFF)
+option(GBL_ENABLE_TESTS   "Enable LibGimbal unit tests"   OFF)
+option(GBL_ENABLE_CPP     "Enable C++ libGimbal API"      OFF)
+option(GBL_ENABLE_THREADS "Enable multithreading support"  ON)
 
 add_subdirectory(lib)
 

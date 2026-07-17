@@ -6,7 +6,7 @@
 #include <gimbal/utils/gimbal_version.h>
 #include <gimbal/utils/gimbal_option_group.h>
 
-#include <tinycthread.h>
+#include <gimbal/platform/gimbal_thread_primitives_.h>
 #include <stdatomic.h>
 
 #define GBL_MODULE_(self)   (GBL_PRIVATE(GblModule, self))

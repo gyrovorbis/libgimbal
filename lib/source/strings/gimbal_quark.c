@@ -4,7 +4,7 @@
 #include <gimbal/allocators/gimbal_arena_allocator.h>
 #include <limits.h>
 
-#include <tinycthread.h>
+#include <gimbal/platform/gimbal_thread_primitives_.h>
 
 #define GBL_QUARK_PAGE_SIZE_DEFAULT_            1024
 #define GBL_QUARK_REGISTRY_CAPACITY_DEFAULT_    64
