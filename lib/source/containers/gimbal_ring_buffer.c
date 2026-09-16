@@ -1,11 +1,10 @@
 #include <gimbal/containers/gimbal_ring_buffer.h>
 
-
-GBL_INLINE size_t GblRingBuffer_mappedIndex_(const GblRingBuffer* pSelf, size_t  index) {
+GBL_INLINE size_t GblRingBuffer_mappedIndex_(const GblRingBuffer* pSelf, size_t index) {
     return (GBL_PRIV_REF(pSelf).frontPos + index) % GBL_PRIV_REF(pSelf).capacity;
 }
 
-GBL_INLINE void GblRingBuffer_advance_(GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_INLINE void GblRingBuffer_advance_(GblRingBuffer* pSelf) {
     if(GblRingBuffer_full(pSelf)) {
         ++GBL_PRIV_REF(pSelf).frontPos;
         GBL_PRIV_REF(pSelf).frontPos %= GBL_PRIV_REF(pSelf).capacity;
@@ -13,57 +12,56 @@ GBL_INLINE void GblRingBuffer_advance_(GblRingBuffer* pSelf) GBL_NOEXCEPT {
         ++GBL_PRIV_REF(pSelf).size;
     }
 }
-/// \endcond
 
 GBL_EXPORT GBL_RESULT GblRingBuffer_construct_5(GblRingBuffer* pSelf,
-                                                uint16_t    elementSize,
-                                                size_t      capacity,
-                                                size_t      initialSize,
-                                                const void* pInitialData) GBL_NOEXCEPT
+                                                uint16_t       elementSize,
+                                                size_t         capacity,
+                                                size_t         initialSize,
+                                                const void*    pInitialData)
 {
     return GblRingBuffer_construct_6(pSelf, elementSize, capacity, initialSize, pInitialData, GBL_NULL);
 }
 
 GBL_EXPORT GBL_RESULT GblRingBuffer_construct_4(GblRingBuffer* pSelf,
-                                                uint16_t   elementSize,
-                                                size_t     capacity,
-                                                size_t     initialSize) GBL_NOEXCEPT
+                                                uint16_t       elementSize,
+                                                size_t         capacity,
+                                                size_t         initialSize)
 {
     return GblRingBuffer_construct_5(pSelf, elementSize, capacity, initialSize, GBL_NULL);
 }
 
 GBL_EXPORT GBL_RESULT GblRingBuffer_construct_3(GblRingBuffer* pSelf,
-                                                uint16_t   elementSize,
-                                                size_t     capacity)        GBL_NOEXCEPT
+                                                uint16_t       elementSize,
+                                                size_t         capacity)
 {
     return GblRingBuffer_construct_4(pSelf, elementSize, capacity, 0);
 }
 
-GBL_EXPORT GblContext* GblRingBuffer_context(const GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblContext* GblRingBuffer_context(const GblRingBuffer* pSelf) {
     return GBL_PRIV_REF(pSelf).pCtx;
 }
 
-GBL_EXPORT size_t  GblRingBuffer_capacity(const GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT size_t GblRingBuffer_capacity(const GblRingBuffer* pSelf) {
     return GBL_PRIV_REF(pSelf).capacity;
 }
 
-GBL_EXPORT size_t  GblRingBuffer_size(const GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT size_t GblRingBuffer_size(const GblRingBuffer* pSelf) {
     return GBL_PRIV_REF(pSelf).size;
 }
 
-GBL_EXPORT size_t  GblRingBuffer_elementSize(const GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT size_t GblRingBuffer_elementSize(const GblRingBuffer* pSelf) {
     return GBL_PRIV_REF(pSelf).elementSize;
 }
 
-GBL_EXPORT GblBool GblRingBuffer_empty(const GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblRingBuffer_empty(const GblRingBuffer* pSelf) {
     return GblRingBuffer_size(pSelf) == 0? GBL_TRUE : GBL_FALSE;
 }
 
-GBL_EXPORT GblBool GblRingBuffer_full(const GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT GblBool GblRingBuffer_full(const GblRingBuffer* pSelf) {
     return GblRingBuffer_size(pSelf) == GBL_PRIV_REF(pSelf).capacity? GBL_TRUE : GBL_FALSE;
 }
 
-GBL_EXPORT void* GblRingBuffer_at(const GblRingBuffer* pSelf, size_t  index) GBL_NOEXCEPT {
+GBL_EXPORT void* GblRingBuffer_at(const GblRingBuffer* pSelf, size_t  index) {
     const size_t  size = GblRingBuffer_size(pSelf);
     void* pData = GBL_NULL;
 
@@ -79,21 +77,20 @@ GBL_EXPORT void* GblRingBuffer_at(const GblRingBuffer* pSelf, size_t  index) GBL
     return pData;
 }
 
-GBL_EXPORT void* GblRingBuffer_front(const GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT void* GblRingBuffer_front(const GblRingBuffer* pSelf) {
     return GblRingBuffer_at(pSelf, 0);
 }
 
-GBL_EXPORT void* GblRingBuffer_back(const GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT void* GblRingBuffer_back(const GblRingBuffer* pSelf) {
     return GblRingBuffer_at(pSelf, GBL_PRIV_REF(pSelf).size-1);
 }
 
-
-GBL_EXPORT void* GblRingBuffer_emplaceBack(GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT void* GblRingBuffer_emplaceBack(GblRingBuffer* pSelf) {
     GblRingBuffer_advance_(pSelf);
     return GblRingBuffer_back(pSelf);
 }
 
-GBL_EXPORT GBL_RESULT GblRingBuffer_pushBack(GblRingBuffer* pSelf, const void* pData) GBL_NOEXCEPT {
+GBL_EXPORT GBL_RESULT GblRingBuffer_pushBack(GblRingBuffer* pSelf, const void* pData) {
     GBL_RESULT result = GBL_RESULT_SUCCESS;
     void* pBuffer = GblRingBuffer_emplaceBack(pSelf);
 
@@ -105,7 +102,7 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_pushBack(GblRingBuffer* pSelf, const void* p
     return result;
 }
 
-GBL_EXPORT void* GblRingBuffer_popFront(GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT void* GblRingBuffer_popFront(GblRingBuffer* pSelf) {
     void* pFront = GblRingBuffer_front(pSelf);
     if(pFront) {
         --GBL_PRIV_REF(pSelf).size;
@@ -120,7 +117,7 @@ GBL_EXPORT void* GblRingBuffer_popFront(GblRingBuffer* pSelf) GBL_NOEXCEPT {
     return pFront;
 }
 
-GBL_EXPORT void GblRingBuffer_clear(GblRingBuffer* pSelf) GBL_NOEXCEPT {
+GBL_EXPORT void GblRingBuffer_clear(GblRingBuffer* pSelf) {
     GBL_PRIV_REF(pSelf).frontPos = 0;
     GBL_PRIV_REF(pSelf).size     = 0;
 }
@@ -144,11 +141,16 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_construct_6(GblRingBuffer* pSelf,
     GBL_PRIV_REF(pSelf).capacity    = capacity;
 
     if(capacity)
-        GBL_PRIV_REF(pSelf).pData       = GBL_CTX_MALLOC(capacity * elementSize, 0, "GblRingBuffer");
+        GBL_PRIV_REF(pSelf).pData = GBL_CTX_MALLOC(capacity * elementSize, 0, "GblRingBuffer");
 
-    for(size_t  i = 0; i < initialSize; ++i) {
-        GBL_CTX_VERIFY_CALL(GblRingBuffer_pushBack(pSelf, (void*)((uintptr_t)pInitialData + (elementSize * i))));
+    if(pInitialData) {
+        for(size_t i = 0; i < initialSize; ++i)
+            GBL_CTX_VERIFY_CALL(GblRingBuffer_pushBack(pSelf, (void*)((uintptr_t)pInitialData + (elementSize * i))));
+    } else {
+        for(size_t i = 0; i < initialSize; ++i)
+            memset(GblRingBuffer_emplaceBack(pSelf), 0, elementSize);
     }
+
     GBL_CTX_END();
 }
 
@@ -161,7 +163,7 @@ GBL_EXPORT GBL_RESULT GblRingBuffer_destruct(GblRingBuffer* pSelf) {
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblRingBuffer_copy(GblRingBuffer* pSelf,
+GBL_EXPORT GBL_RESULT GblRingBuffer_copy(GblRingBuffer*       pSelf,
                                          const GblRingBuffer* pOther)
 {
     GBL_CTX_BEGIN(GBL_PRIV_REF(pOther).pCtx);
