@@ -196,7 +196,7 @@ GBL_EXPORT const GblProperty* GblProperty_find(GblType objectType, const char* p
     return GblProperty_findQuark(objectType, GblQuark_tryString(pName));
 }
 
-GBL_EXPORT GblBool GblProperty_foreach(GblType           objectType,
+GBL_EXPORT GblBool GblProperty_iterate(GblType           objectType,
                                        GBL_PROPERTY_FLAG flags,
                                        GblPropertyIterFn pFnIt,
                                        void*             pClosure) {
