@@ -146,56 +146,85 @@ GBL_EXPORT void* GblArrayDeque_emplace(GblArrayDeque* pSelf, size_t  pos) {
     return GblArrayDeque_insert(pSelf, pos, NULL);
 }
 
+static size_t GblArrayDeque_slot_(const GblArrayDeque* pSelf, size_t index) {
+#if GBL_ARRAY_DEQUE_FORCE_POW2 == 1
+    return (GBL_RING_PRIV_REF_(pSelf).frontPos + index) & (GBL_RING_PRIV_REF_(pSelf).capacity - 1);
+#else
+    return (GBL_RING_PRIV_REF_(pSelf).frontPos + index) % GBL_RING_PRIV_REF_(pSelf).capacity;
+#endif
+}
+
+static void GblArrayDeque_moveRange_(GblArrayDeque* pSelf, size_t begin, size_t end, ptrdiff_t shift) {
+    uint8_t* const pData     = GBL_RING_PRIV_REF_(pSelf).pData;
+    const size_t   elemSize  = GBL_RING_PRIV_REF_(pSelf).elementSize;
+    const size_t   capacity  = GBL_RING_PRIV_REF_(pSelf).capacity;
+    size_t         remaining = end - begin;
+
+    if(shift < 0) {
+        size_t src = begin;
+        size_t dst = begin + shift;
+
+        while(remaining) {
+            const size_t srcSlot = GblArrayDeque_slot_(pSelf, src);
+            const size_t dstSlot = GblArrayDeque_slot_(pSelf, dst);
+            size_t       run     = remaining;
+
+            if(run > capacity - srcSlot) run = capacity - srcSlot;
+            if(run > capacity - dstSlot) run = capacity - dstSlot;
+
+            memmove(pData + dstSlot * elemSize,
+                    pData + srcSlot * elemSize,
+                    run * elemSize);
+
+            src       += run;
+            dst       += run;
+            remaining -= run;
+        }
+    } else {
+        size_t src = end;
+        size_t dst = end + shift;
+
+        while(remaining) {
+            const size_t srcSlot = GblArrayDeque_slot_(pSelf, src - 1);
+            const size_t dstSlot = GblArrayDeque_slot_(pSelf, dst - 1);
+            size_t       run     = remaining;
+
+            if(run > srcSlot + 1) run = srcSlot + 1;
+            if(run > dstSlot + 1) run = dstSlot + 1;
+
+            memmove(pData + (dstSlot + 1 - run) * elemSize,
+                    pData + (srcSlot + 1 - run) * elemSize,
+                    run * elemSize);
+
+            src       -= run;
+            dst       -= run;
+            remaining -= run;
+        }
+    }
+}
+
 GBL_EXPORT GBL_RESULT (GblArrayDeque_erase)(GblArrayDeque* pSelf, size_t  pos, size_t  count) {
-    return GBL_RESULT_UNIMPLEMENTED;
-#if 0
     GBL_CTX_BEGIN(GBL_RING_PRIV_REF_(pSelf).pCtx);
 
+    const size_t size = GblArrayDeque_size(pSelf);
+
     GBL_CTX_VERIFY_ARG(count);
-    GBL_CTX_VERIFY_ARG(pos+count <= GblArrayDeque_size(pSelf));
+    GBL_CTX_VERIFY(pos < size, GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_VERIFY(count <= size - pos, GBL_RESULT_ERROR_OUT_OF_RANGE);
 
-    const size_t  wrapIndex = GblArrayDeque_endSize_(pSelf);
-    const size_t  oldSize = GblArrayDeque_size(pSelf);
+    const size_t frontCount = pos;
+    const size_t backCount  = size - (pos + count);
 
-    if(pos < wrapIndex) {
-        size_t  endBegin = pos;
-        if(endBegin > wrapIndex) endBegin = wrapIndex;
-        size_t  endEnd = pos + count;
-        if(endEnd > wrapIndex) endEnd = wrapIndex;
-        const GblBool endRemoveChunk = endEnd - endBegin;
-
-        // check if we have anything to shave off of the end
-        const size_t  endRemovalSize = endEnd - endBegin;
-        if(endRemovalSize) {
-            const size_t  endSize = GblArrayDeque_endSize_(pSelf);
-
-            // scoot over remaining entries
-            if(endSize > endRemovalSize) {
-
-
-
-            }
-
-            GBL_RING_PRIV_REF_(pSelf).frontPos =
-        }
-
-
-
-        memmove((void*)(((uintptr_t)GBL_RING_PRIV_REF_(pSelf).pData +
-                (GBL_RING_PRIV_REF_(pSelf).frontPos - count) * GBL_RING_PRIV_REF_(pSelf).elementSize)),
-                GblArrayDeque_front(pSelf),
-                GblArrayDeque_elementSize(pSelf) * (pos+count));
-
-
+    if(frontCount < backCount) {
+        GblArrayDeque_moveRange_(pSelf, 0, frontCount, (ptrdiff_t)count);
+        GBL_RING_PRIV_REF_(pSelf).frontPos = GblArrayDeque_slot_(pSelf, count);
+    } else {
+        GblArrayDeque_moveRange_(pSelf, pos + count, size, -(ptrdiff_t)count);
     }
 
-
-
-
-
+    GBL_RING_PRIV_REF_(pSelf).size -= count;
 
     GBL_CTX_END();
-#endif
 }
 
 GBL_EXPORT void* GblArrayDeque_emplaceBack(GblArrayDeque* pSelf)  {

@@ -519,6 +519,139 @@ static GBL_RESULT GblArrayDequeTestSuite_insertMiddleEnd_(GblTestSuite* pSelf, G
 }
 
 
+static GBL_RESULT GblArrayDequeTestSuite_eraseInvalid_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_COMPARE(GblArrayDeque_erase(&pSelf_->deques[0], 33, 1), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+
+    GBL_TEST_COMPARE(GblArrayDeque_erase(&pSelf_->deques[0], 30, 4), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_OUT_OF_RANGE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+
+    GBL_TEST_COMPARE(GblArrayDeque_erase(&pSelf_->deques[0], 0, 0), GBL_RESULT_ERROR_INVALID_ARG);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_ARG);
+    GBL_CTX_CLEAR_LAST_RECORD();
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+                        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                        "k", "l", "m", "n", "o", "p",
+                        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                        "k", "l", "m",
+                        "q", "r", "s", "t", NULL));
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblArrayDequeTestSuite_eraseFront_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_erase(&pSelf_->deques[0], 0, 3));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+                        "d", "e", "f", "g", "h", "i", "j",
+                        "k", "l", "m", "n", "o", "p",
+                        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                        "k", "l", "m",
+                        "q", "r", "s", "t", NULL));
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblArrayDequeTestSuite_eraseBack_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_erase(&pSelf_->deques[0],
+                                            GblArrayDeque_size(&pSelf_->deques[0]) - 4,
+                                            4));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+                        "d", "e", "f", "g", "h", "i", "j",
+                        "k", "l", "m", "n", "o", "p",
+                        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                        "k", "l", "m", NULL));
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblArrayDequeTestSuite_eraseMiddleFront_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_erase(&pSelf_->deques[0], 2, 3));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+                        "d", "e", "i", "j",
+                        "k", "l", "m", "n", "o", "p",
+                        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                        "k", "l", "m", NULL));
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblArrayDequeTestSuite_eraseMiddleBack_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_erase(&pSelf_->deques[0], 15, 5));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[0],
+                        "d", "e", "i", "j",
+                        "k", "l", "m", "n", "o", "p",
+                        "a", "b", "c", "d", "e",
+                        "k", "l", "m", NULL));
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblArrayDequeTestSuite_eraseWrap_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
+                        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+                        "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", NULL));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_erase(&pSelf_->deques[2], 8, 4));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
+                        "a", "b", "c", "d", "e", "f", "g", "h",
+                        "m", "n", "o", "p", "q", "r", "s", "t", NULL));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_erase(&pSelf_->deques[2], 2, 8));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
+                        "a", "b", "o", "p", "q", "r", "s", "t", NULL));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_erase(&pSelf_->deques[2], 3, 2));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
+                        "a", "b", "o", "r", "s", "t", NULL));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_erase(&pSelf_->deques[2], 2));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
+                        "a", "b", "r", "s", "t", NULL));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_erase(&pSelf_->deques[2], 0, 5));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2], NULL));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_pushBack(&pSelf_->deques[2], &stringLiterals_[25]));
+    GBL_CTX_VERIFY_CALL(GblArrayDeque_pushFront(&pSelf_->deques[2], &stringLiterals_[24]));
+
+    GBL_CTX_VERIFY_CALL(GblArrayDequeTestSuite_verify_(pCtx, &pSelf_->deques[2],
+                        "y", "z", NULL));
+
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblArrayDequeTestSuite_clear_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayDequeTestSuite_* pSelf_ = GBL_ARRAY_DEQUE_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
@@ -624,6 +757,12 @@ GBL_EXPORT GblType GblArrayDequeTestSuite_type(void) {
         { "insertBack",         GblArrayDequeTestSuite_insertBack_          },
         { "insertMiddleFront",  GblArrayDequeTestSuite_insertMiddleFront_   },
         { "insertMiddleEnd",    GblArrayDequeTestSuite_insertMiddleEnd_     },
+        { "eraseInvalid",       GblArrayDequeTestSuite_eraseInvalid_        },
+        { "eraseFront",         GblArrayDequeTestSuite_eraseFront_          },
+        { "eraseBack",          GblArrayDequeTestSuite_eraseBack_           },
+        { "eraseMiddleFront",   GblArrayDequeTestSuite_eraseMiddleFront_    },
+        { "eraseMiddleBack",    GblArrayDequeTestSuite_eraseMiddleBack_     },
+        { "eraseWrap",          GblArrayDequeTestSuite_eraseWrap_           },
         { "clear",              GblArrayDequeTestSuite_clear_               },
         { "atProfile",          GblArrayDequeTestSuite_atProfile_           },
         { "pushBackProfile",    GblArrayDequeTestSuite_pushBackProfile_     },
