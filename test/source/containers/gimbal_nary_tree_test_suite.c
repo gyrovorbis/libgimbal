@@ -514,11 +514,11 @@ GblBool traversalIt_(const GblNaryTreeNode* pNode, void* pUd) {
     else return GBL_FALSE;
 }
 
-static GblBool GblNaryTreeTestSuite_traverse_(GblTestSuite* pSelf, uintptr_t mask, TraversalClosure_* pClosure) {
+static void GblNaryTreeTestSuite_buildTree_(GblTestSuite* pSelf) {
     GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
 
-    for(size_t  i = 0; i < NARY_OBJECT_COUNT_; ++i) {
-        memset(NARY_OBJECT_NODE_(pSelf_, i), 0, sizeof(NaryObject_));
+    for(size_t  i = 0; i < NARY_OBJECT_COUNT_+1; ++i) {
+        memset(NARY_OBJECT_(pSelf_, i), 0, sizeof(NaryObject_));
         NARY_OBJECT_(pSelf_, i)->id = i;
     }
 
@@ -535,6 +535,12 @@ static GblBool GblNaryTreeTestSuite_traverse_(GblTestSuite* pSelf, uintptr_t mas
     GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 6), NARY_OBJECT_NODE_(pSelf_, 8));
     GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 6), NARY_OBJECT_NODE_(pSelf_, 9));
     GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 6), NARY_OBJECT_NODE_(pSelf_, 10));
+}
+
+static GblBool GblNaryTreeTestSuite_traverse_(GblTestSuite* pSelf, uintptr_t mask, TraversalClosure_* pClosure) {
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
 
     pClosure->countReturnTrue = -1;
 
@@ -622,43 +628,298 @@ static GBL_RESULT GblNaryTreeTestSuite_traverseInOrder_(GblTestSuite* pSelf, Gbl
 }
 
 
+static GBL_RESULT GblNaryTreeTestSuite_traverseLevelOrder_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+    TraversalClosure_ closure = { 0 };
+
+    GBL_TEST_VERIFY(!GblNaryTreeTestSuite_traverse_(pSelf,
+                                                    GBL_NARY_TREE_TRAVERSAL_MASK(GBL_NARY_TREE_TRAVERSAL_ORDER_LEVEL,
+                                                                                 GBL_NARY_TREE_NODE_FLAGS_ALL),
+                                                    &closure));
+
+    GBL_TEST_COMPARE(closure.count, NARY_OBJECT_COUNT_);
+    for(int i = 0; i < NARY_OBJECT_COUNT_; ++i)
+        GBL_TEST_COMPARE(closure.index[i], i);
+
+    memset(&closure, 0, sizeof(closure));
+    closure.countReturnTrue = -1;
+
+    GBL_TEST_VERIFY(!GblNaryTree_traverse(NARY_OBJECT_NODE_(pSelf_, 0),
+                                          GBL_NARY_TREE_TRAVERSAL_MASK(GBL_NARY_TREE_TRAVERSAL_ORDER_LEVEL,
+                                                                       GBL_NARY_TREE_NODE_FLAG_LEAF),
+                                          traversalIt_,
+                                          &closure));
+
+    GBL_TEST_COMPARE(closure.count, 7);
+    GBL_TEST_COMPARE(closure.index[0], 2);
+    GBL_TEST_COMPARE(closure.index[1], 4);
+    GBL_TEST_COMPARE(closure.index[2], 5);
+    GBL_TEST_COMPARE(closure.index[3], 7);
+    GBL_TEST_COMPARE(closure.index[4], 8);
+    GBL_TEST_COMPARE(closure.index[5], 9);
+    GBL_TEST_COMPARE(closure.index[6], 10);
+
+    memset(&closure, 0, sizeof(closure));
+    closure.countReturnTrue = 4;
+
+    GBL_TEST_VERIFY(GblNaryTree_traverse(NARY_OBJECT_NODE_(pSelf_, 0),
+                                         GBL_NARY_TREE_TRAVERSAL_MASK(GBL_NARY_TREE_TRAVERSAL_ORDER_LEVEL,
+                                                                      GBL_NARY_TREE_NODE_FLAGS_ALL),
+                                         traversalIt_,
+                                         &closure));
+
+    GBL_TEST_COMPARE(closure.count, 4);
+    GBL_TEST_COMPARE(closure.index[3], 3);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_size_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_COMPARE(GblNaryTree_size(NARY_OBJECT_NODE_(pSelf_, 0)),  11);
+    GBL_TEST_COMPARE(GblNaryTree_size(NARY_OBJECT_NODE_(pSelf_, 1)),  3);
+    GBL_TEST_COMPARE(GblNaryTree_size(NARY_OBJECT_NODE_(pSelf_, 2)),  1);
+    GBL_TEST_COMPARE(GblNaryTree_size(NARY_OBJECT_NODE_(pSelf_, 3)),  6);
+    GBL_TEST_COMPARE(GblNaryTree_size(NARY_OBJECT_NODE_(pSelf_, 6)),  5);
+    GBL_TEST_COMPARE(GblNaryTree_size(NARY_OBJECT_NODE_(pSelf_, 10)), 1);
+    GBL_TEST_COMPARE(GblNaryTree_size(NARY_OBJECT_NODE_(pSelf_, 11)), 1);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_width_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 0), 0), 1);
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 0), 1), 3);
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 0), 2), 3);
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 0), 3), 4);
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 0), 4), 0);
+
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 3), 0), 1);
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 3), 1), 1);
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 3), 2), 4);
+
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 2), 0), 1);
+    GBL_TEST_COMPARE(GblNaryTree_width(NARY_OBJECT_NODE_(pSelf_, 2), 1), 0);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_height_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_COMPARE(GblNaryTree_height(NARY_OBJECT_NODE_(pSelf_, 0)),  3);
+    GBL_TEST_COMPARE(GblNaryTree_height(NARY_OBJECT_NODE_(pSelf_, 1)),  1);
+    GBL_TEST_COMPARE(GblNaryTree_height(NARY_OBJECT_NODE_(pSelf_, 2)),  0);
+    GBL_TEST_COMPARE(GblNaryTree_height(NARY_OBJECT_NODE_(pSelf_, 3)),  2);
+    GBL_TEST_COMPARE(GblNaryTree_height(NARY_OBJECT_NODE_(pSelf_, 6)),  1);
+    GBL_TEST_COMPARE(GblNaryTree_height(NARY_OBJECT_NODE_(pSelf_, 10)), 0);
+    GBL_TEST_COMPARE(GblNaryTree_height(NARY_OBJECT_NODE_(pSelf_, 11)), 0);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_breadth_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_COMPARE(GblNaryTree_breadth(NARY_OBJECT_NODE_(pSelf_, 0)),  7);
+    GBL_TEST_COMPARE(GblNaryTree_breadth(NARY_OBJECT_NODE_(pSelf_, 1)),  2);
+    GBL_TEST_COMPARE(GblNaryTree_breadth(NARY_OBJECT_NODE_(pSelf_, 2)),  1);
+    GBL_TEST_COMPARE(GblNaryTree_breadth(NARY_OBJECT_NODE_(pSelf_, 3)),  4);
+    GBL_TEST_COMPARE(GblNaryTree_breadth(NARY_OBJECT_NODE_(pSelf_, 6)),  4);
+    GBL_TEST_COMPARE(GblNaryTree_breadth(NARY_OBJECT_NODE_(pSelf_, 11)), 1);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_degree_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_COMPARE(GblNaryTree_degree(NARY_OBJECT_NODE_(pSelf_, 0)),  3);
+    GBL_TEST_COMPARE(GblNaryTree_degree(NARY_OBJECT_NODE_(pSelf_, 1)),  2);
+    GBL_TEST_COMPARE(GblNaryTree_degree(NARY_OBJECT_NODE_(pSelf_, 2)),  0);
+    GBL_TEST_COMPARE(GblNaryTree_degree(NARY_OBJECT_NODE_(pSelf_, 3)),  1);
+    GBL_TEST_COMPARE(GblNaryTree_degree(NARY_OBJECT_NODE_(pSelf_, 6)),  4);
+    GBL_TEST_COMPARE(GblNaryTree_degree(NARY_OBJECT_NODE_(pSelf_, 11)), 0);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_arity_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_COMPARE(GblNaryTree_arity(NARY_OBJECT_NODE_(pSelf_, 0)),  4);
+    GBL_TEST_COMPARE(GblNaryTree_arity(NARY_OBJECT_NODE_(pSelf_, 1)),  2);
+    GBL_TEST_COMPARE(GblNaryTree_arity(NARY_OBJECT_NODE_(pSelf_, 2)),  0);
+    GBL_TEST_COMPARE(GblNaryTree_arity(NARY_OBJECT_NODE_(pSelf_, 3)),  4);
+    GBL_TEST_COMPARE(GblNaryTree_arity(NARY_OBJECT_NODE_(pSelf_, 6)),  4);
+    GBL_TEST_COMPARE(GblNaryTree_arity(NARY_OBJECT_NODE_(pSelf_, 10)), 0);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_isBalanced_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_VERIFY(!GblNaryTree_isBalanced(NARY_OBJECT_NODE_(pSelf_, 0)));
+    GBL_TEST_VERIFY(GblNaryTree_isBalanced(NARY_OBJECT_NODE_(pSelf_, 1)));
+    GBL_TEST_VERIFY(GblNaryTree_isBalanced(NARY_OBJECT_NODE_(pSelf_, 2)));
+    GBL_TEST_VERIFY(GblNaryTree_isBalanced(NARY_OBJECT_NODE_(pSelf_, 3)));
+    GBL_TEST_VERIFY(GblNaryTree_isBalanced(NARY_OBJECT_NODE_(pSelf_, 6)));
+    GBL_TEST_VERIFY(GblNaryTree_isBalanced(NARY_OBJECT_NODE_(pSelf_, 11)));
+
+    while(GblNaryTree_childCount(NARY_OBJECT_NODE_(pSelf_, 6)))
+        GblNaryTree_removeChildFront(NARY_OBJECT_NODE_(pSelf_, 6));
+
+    GBL_TEST_VERIFY(GblNaryTree_isBalanced(NARY_OBJECT_NODE_(pSelf_, 0)));
+
+    GblNaryTree_addChildBack(NARY_OBJECT_NODE_(pSelf_, 4), NARY_OBJECT_NODE_(pSelf_, 7));
+
+    GBL_TEST_VERIFY(!GblNaryTree_isBalanced(NARY_OBJECT_NODE_(pSelf_, 0)));
+    GBL_TEST_VERIFY(GblNaryTree_isBalanced(NARY_OBJECT_NODE_(pSelf_, 1)));
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_isRelative_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_VERIFY(GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 10)));
+    GBL_TEST_VERIFY(GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 10), NARY_OBJECT_NODE_(pSelf_, 4)));
+    GBL_TEST_VERIFY(GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 0),  NARY_OBJECT_NODE_(pSelf_, 10)));
+    GBL_TEST_VERIFY(GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 0)));
+    GBL_TEST_VERIFY(GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 5)));
+
+    GBL_TEST_VERIFY(!GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 4)));
+    GBL_TEST_VERIFY(!GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 11)));
+    GBL_TEST_VERIFY(!GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 11), NARY_OBJECT_NODE_(pSelf_, 4)));
+    GBL_TEST_VERIFY(!GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 0),  NARY_OBJECT_NODE_(pSelf_, 11)));
+    GBL_TEST_VERIFY(!GblNaryTree_isRelative(NARY_OBJECT_NODE_(pSelf_, 11), NARY_OBJECT_NODE_(pSelf_, 11)));
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_lowestCommonAncestor_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 5)),  NARY_OBJECT_NODE_(pSelf_, 1));
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 5),  NARY_OBJECT_NODE_(pSelf_, 4)),  NARY_OBJECT_NODE_(pSelf_, 1));
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 10)), NARY_OBJECT_NODE_(pSelf_, 0));
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 10), NARY_OBJECT_NODE_(pSelf_, 4)),  NARY_OBJECT_NODE_(pSelf_, 0));
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 7),  NARY_OBJECT_NODE_(pSelf_, 8)),  NARY_OBJECT_NODE_(pSelf_, 6));
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 6),  NARY_OBJECT_NODE_(pSelf_, 10)), NARY_OBJECT_NODE_(pSelf_, 6));
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 10), NARY_OBJECT_NODE_(pSelf_, 6)),  NARY_OBJECT_NODE_(pSelf_, 6));
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 0),  NARY_OBJECT_NODE_(pSelf_, 9)),  NARY_OBJECT_NODE_(pSelf_, 0));
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 4)),  NARY_OBJECT_NODE_(pSelf_, 4));
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 0),  NARY_OBJECT_NODE_(pSelf_, 0)),  NARY_OBJECT_NODE_(pSelf_, 0));
+
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 11)), NULL);
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 11), NARY_OBJECT_NODE_(pSelf_, 4)),  NULL);
+    GBL_TEST_COMPARE(GblNaryTree_lowestCommonAncestor(NARY_OBJECT_NODE_(pSelf_, 0),  NARY_OBJECT_NODE_(pSelf_, 11)), NULL);
+
+    GBL_CTX_END();
+}
+
+static GBL_RESULT GblNaryTreeTestSuite_distance_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblNaryTreeTestSuite_* pSelf_ = GBL_NARY_TREE_TEST_SUITE_(pSelf);
+
+    GblNaryTreeTestSuite_buildTree_(pSelf);
+
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 5)),  2);
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 5),  NARY_OBJECT_NODE_(pSelf_, 4)),  2);
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 10)), 5);
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 10), NARY_OBJECT_NODE_(pSelf_, 4)),  5);
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 7),  NARY_OBJECT_NODE_(pSelf_, 8)),  2);
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 6),  NARY_OBJECT_NODE_(pSelf_, 10)), 1);
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 10), NARY_OBJECT_NODE_(pSelf_, 6)),  1);
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 0),  NARY_OBJECT_NODE_(pSelf_, 9)),  3);
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 4)),  0);
+
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 4),  NARY_OBJECT_NODE_(pSelf_, 11)), GBL_NARY_TREE_NPOS);
+    GBL_TEST_COMPARE(GblNaryTree_distance(NARY_OBJECT_NODE_(pSelf_, 11), NARY_OBJECT_NODE_(pSelf_, 4)),  GBL_NARY_TREE_NPOS);
+
+    GBL_CTX_END();
+}
+
 GBL_EXPORT GblType GblNaryTreeTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
     const static GblTestCase cases[] = {
-        { "empty",            GblNaryTreeTestSuite_empty_            },
-        { "addChildFront",    GblNaryTreeTestSuite_addChildFront_    },
-        { "addChildBack",     GblNaryTreeTestSuite_addChildBack_     },
-        { "addChildBefore",   GblNaryTreeTestSuite_addChildBefore_   },
-        { "addChildAfter",    GblNaryTreeTestSuite_addChildAfter_    },
-        { "addChildTo",       GblNaryTreeTestSuite_addChildTo_       },
-        { "moveChildFront",   GblNaryTreeTestSuite_moveChildFront_   },
-        { "moveChildBack",    GblNaryTreeTestSuite_moveChildBack_    },
-        { "moveChildTo",      GblNaryTreeTestSuite_moveChildTo_      },
-        { "removeChild",      GblNaryTreeTestSuite_removeChild_      },
-        { "removeChildFront", GblNaryTreeTestSuite_removeChildFront_ },
-        { "removeChildBack",  GblNaryTreeTestSuite_removeChildBack_  },
-        { "removeChildAt",    GblNaryTreeTestSuite_removeChildAt_    },
-        { "replaceChild",     GblNaryTreeTestSuite_replaceChild_     },
-        { "replaceChildAt",   GblNaryTreeTestSuite_replaceChildAt_   },
-        { "swapChildren",     GblNaryTreeTestSuite_swapChildren_     },
-        { "swapChildrenAt",   GblNaryTreeTestSuite_swapChildrenAt_   },
-        { "reverseChildren",  GblNaryTreeTestSuite_reverseChildren_  },
-        { "root",             GblNaryTreeTestSuite_root_             },
-        { "base",             GblNaryTreeTestSuite_base_             },
-        { "ancestor",         GblNaryTreeTestSuite_ancestor_         },
-        { "ancestorHeight",   GblNaryTreeTestSuite_ancestorHeight_   },
-        { "siblingCount",     GblNaryTreeTestSuite_siblingCount_     },
-        { "siblingLast",      GblNaryTreeTestSuite_siblingLast_      },
-        { "siblingBefore",    GblNaryTreeTestSuite_siblingBefore_    },
-        { "siblingFirst",     GblNaryTreeTestSuite_siblingFirst_     },
-        { "siblingAt",        GblNaryTreeTestSuite_siblingAt_        },
-        { "siblingIndex",     GblNaryTreeTestSuite_siblingIndex_     },
-        { "disconnect",       GblNaryTreeTestSuite_disconnect_       },
-        { "traversePreOrder", GblNaryTreeTestSuite_traversePreOrder_ },
-        { "traversePostOrder",GblNaryTreeTestSuite_traversePostOrder_},
-        { "traverseInOrder",  GblNaryTreeTestSuite_traverseInOrder_  },
-        { NULL,               NULL                                   }
+        { "empty",                GblNaryTreeTestSuite_empty_                },
+        { "addChildFront",        GblNaryTreeTestSuite_addChildFront_        },
+        { "addChildBack",         GblNaryTreeTestSuite_addChildBack_         },
+        { "addChildBefore",       GblNaryTreeTestSuite_addChildBefore_       },
+        { "addChildAfter",        GblNaryTreeTestSuite_addChildAfter_        },
+        { "addChildTo",           GblNaryTreeTestSuite_addChildTo_           },
+        { "moveChildFront",       GblNaryTreeTestSuite_moveChildFront_       },
+        { "moveChildBack",        GblNaryTreeTestSuite_moveChildBack_        },
+        { "moveChildTo",          GblNaryTreeTestSuite_moveChildTo_          },
+        { "removeChild",          GblNaryTreeTestSuite_removeChild_          },
+        { "removeChildFront",     GblNaryTreeTestSuite_removeChildFront_     },
+        { "removeChildBack",      GblNaryTreeTestSuite_removeChildBack_      },
+        { "removeChildAt",        GblNaryTreeTestSuite_removeChildAt_        },
+        { "replaceChild",         GblNaryTreeTestSuite_replaceChild_         },
+        { "replaceChildAt",       GblNaryTreeTestSuite_replaceChildAt_       },
+        { "swapChildren",         GblNaryTreeTestSuite_swapChildren_         },
+        { "swapChildrenAt",       GblNaryTreeTestSuite_swapChildrenAt_       },
+        { "reverseChildren",      GblNaryTreeTestSuite_reverseChildren_      },
+        { "root",                 GblNaryTreeTestSuite_root_                 },
+        { "base",                 GblNaryTreeTestSuite_base_                 },
+        { "ancestor",             GblNaryTreeTestSuite_ancestor_             },
+        { "ancestorHeight",       GblNaryTreeTestSuite_ancestorHeight_       },
+        { "siblingCount",         GblNaryTreeTestSuite_siblingCount_         },
+        { "siblingLast",          GblNaryTreeTestSuite_siblingLast_          },
+        { "siblingBefore",        GblNaryTreeTestSuite_siblingBefore_        },
+        { "siblingFirst",         GblNaryTreeTestSuite_siblingFirst_         },
+        { "siblingAt",            GblNaryTreeTestSuite_siblingAt_            },
+        { "siblingIndex",         GblNaryTreeTestSuite_siblingIndex_         },
+        { "disconnect",           GblNaryTreeTestSuite_disconnect_           },
+        { "traversePreOrder",     GblNaryTreeTestSuite_traversePreOrder_     },
+        { "traversePostOrder",    GblNaryTreeTestSuite_traversePostOrder_    },
+        { "traverseInOrder",      GblNaryTreeTestSuite_traverseInOrder_      },
+        { "traverseLevelOrder",   GblNaryTreeTestSuite_traverseLevelOrder_   },
+        { "size",                 GblNaryTreeTestSuite_size_                 },
+        { "width",                GblNaryTreeTestSuite_width_                },
+        { "height",               GblNaryTreeTestSuite_height_               },
+        { "breadth",              GblNaryTreeTestSuite_breadth_              },
+        { "degree",               GblNaryTreeTestSuite_degree_               },
+        { "arity",                GblNaryTreeTestSuite_arity_                },
+        { "isBalanced",           GblNaryTreeTestSuite_isBalanced_           },
+        { "isRelative",           GblNaryTreeTestSuite_isRelative_           },
+        { "lowestCommonAncestor", GblNaryTreeTestSuite_lowestCommonAncestor_ },
+        { "distance",             GblNaryTreeTestSuite_distance_             },
+        { NULL,                   NULL                                       }
     };
 
     const static GblTestSuiteVTable vTable = {

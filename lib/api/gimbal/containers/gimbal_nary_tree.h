@@ -1,9 +1,12 @@
 /*! \file
- *  \brief GblNaryTreeNode structure and related functions
- *  \todo Finish implementing commented out API operations
+ *  \brief GblNaryTreeNode structure and related functions.
  *  \ingroup containers
  *
- *  \author Falco Girgis
+ *  Public API for the GblNaryTree, intrusive tree node
+ *  container type.
+ *
+ *  \author Falco Girgis 2023, 2026
+ *  \copyright MIT License
  */
 
 #ifndef GIMBAL_NARY_TREE_H
@@ -53,81 +56,82 @@ typedef enum GBL_NARY_TREE_TRAVERSAL_ORDER {
  *  \ingroup containers
  */
 typedef struct GblNaryTreeNode {
-    struct GblNaryTreeNode* pParent;        ///< Node's parent
-    struct GblNaryTreeNode* pChildFirst;    ///< Node's first child (beginning of child linked list)
-    struct GblNaryTreeNode* pSiblingNext;   ///< Node's next sibling (next entry of child linked list)
+    struct GblNaryTreeNode* pParent;        //!< Node's parent
+    struct GblNaryTreeNode* pChildFirst;    //!< Node's first child (beginning of child linked list)
+    struct GblNaryTreeNode* pSiblingNext;   //!< Node's next sibling (next entry of child linked list)
 } GblNaryTreeNode;
 
-//GBL_EXPORT size_t         GblNaryTree_size                (GBL_CSELF)                                                    GBL_NOEXCEPT;
-//GBL_EXPORT size_t         GblNaryTree_width               (GBL_CSELF, size_t  depth);                                    GBL_NOEXCEPT;
-//GBL_EXPORT size_t         GblNaryTree_height              (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT size_t           GblNaryTree_depth               (GBL_CSELF)                                                    GBL_NOEXCEPT;
-//GBL_EXPORT size_t         GblNaryTree_breadth             (GBL_CSELF)                                                    GBL_NOEXCEPT;
-//GBL_EXPORT size_t         GblNaryTree_degree              (GBL_CSELF)                                                    GBL_NOEXCEPT;
-//GBL_EXPORT size_t         GblNaryTree_arity               (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblFlags         GblNaryTree_flags               (GBL_CSELF)                                                    GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_size                 (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_width                (GBL_CSELF, size_t depth)                                        GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_height               (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_depth                (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_breadth              (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_degree               (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_arity                (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblFlags         GblNaryTree_flags                (GBL_CSELF)                                                      GBL_NOEXCEPT;
 
-GBL_EXPORT GblBool          GblNaryTree_isConnected         (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_isRoot              (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_isInternal          (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_isLeaf              (GBL_CSELF)                                                    GBL_NOEXCEPT;
-//GBL_EXPORT GblBool        GblNaryTree_isBalanced          (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_isParent            (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_isAncestor          (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_isSibling           (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_isChild             (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_isDescendent        (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
-//GBL_EXPORT GblBool        GblNaryTree_isRelative          (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isConnected          (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isRoot               (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isInternal           (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isLeaf               (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isBalanced           (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isParent             (GBL_CSELF, const GblNaryTreeNode* pOther)                       GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isAncestor           (GBL_CSELF, const GblNaryTreeNode* pOther)                       GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isSibling            (GBL_CSELF, const GblNaryTreeNode* pOther)                       GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isChild              (GBL_CSELF, const GblNaryTreeNode* pOther)                       GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isDescendent         (GBL_CSELF, const GblNaryTreeNode* pOther)                       GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_isRelative           (GBL_CSELF, const GblNaryTreeNode* pOther)                       GBL_NOEXCEPT;
 
-GBL_EXPORT size_t           GblNaryTree_childCount          (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_childLast           (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_childBefore         (GBL_CSELF, const GblNaryTreeNode* pChild)                     GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_childAt             (GBL_CSELF, size_t  index)                                     GBL_NOEXCEPT;
-GBL_EXPORT size_t           GblNaryTree_childIndex          (GBL_CSELF, const GblNaryTreeNode* pChild)                     GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_childCount           (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_childLast            (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_childBefore          (GBL_CSELF, const GblNaryTreeNode* pChild)                       GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_childAt              (GBL_CSELF, size_t index)                                        GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_childIndex           (GBL_CSELF, const GblNaryTreeNode* pChild)                       GBL_NOEXCEPT;
 
-GBL_EXPORT void             GblNaryTree_addChildFront       (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
-GBL_EXPORT void             GblNaryTree_addChildBack        (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
-GBL_EXPORT void             GblNaryTree_addChildTo          (GBL_SELF, size_t  index, GblNaryTreeNode* pChild)             GBL_NOEXCEPT;
-GBL_EXPORT void             GblNaryTree_addChildBefore      (GBL_SELF, GblNaryTreeNode* pBefore,GblNaryTreeNode* pChild)   GBL_NOEXCEPT;
-GBL_EXPORT void             GblNaryTree_addChildAfter       (GBL_SELF, GblNaryTreeNode* pAfter, GblNaryTreeNode* pChild)   GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_addChildFront        (GBL_SELF, GblNaryTreeNode* pChild)                              GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_addChildBack         (GBL_SELF, GblNaryTreeNode* pChild)                              GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_addChildTo           (GBL_SELF, size_t index, GblNaryTreeNode* pChild)                GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_addChildBefore       (GBL_SELF, GblNaryTreeNode* pBefore, GblNaryTreeNode* pChild)    GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_addChildAfter        (GBL_SELF, GblNaryTreeNode* pAfter, GblNaryTreeNode* pChild)     GBL_NOEXCEPT;
 
-GBL_EXPORT void             GblNaryTree_moveChildFront      (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
-GBL_EXPORT void             GblNaryTree_moveChildBack       (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
-GBL_EXPORT void             GblNaryTree_moveChildTo         (GBL_SELF, size_t  index, GblNaryTreeNode* pChild)             GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_moveChildFront       (GBL_SELF, GblNaryTreeNode* pChild)                              GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_moveChildBack        (GBL_SELF, GblNaryTreeNode* pChild)                              GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_moveChildTo          (GBL_SELF, size_t index, GblNaryTreeNode* pChild)                GBL_NOEXCEPT;
 
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChild         (GBL_SELF, GblNaryTreeNode* pChild)                            GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildFront    (GBL_SELF)                                                     GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildBack     (GBL_SELF)                                                     GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildAt       (GBL_SELF, size_t  index)                                      GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChild          (GBL_SELF, GblNaryTreeNode* pChild)                              GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildFront     (GBL_SELF)                                                       GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildBack      (GBL_SELF)                                                       GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildAt        (GBL_SELF, size_t index)                                         GBL_NOEXCEPT;
 
-GBL_EXPORT void             GblNaryTree_replaceChild        (GBL_SELF, GblNaryTreeNode* pOld, GblNaryTreeNode* pNew)       GBL_NOEXCEPT;
-GBL_EXPORT void             GblNaryTree_replaceChildAt      (GBL_SELF, size_t  index, GblNaryTreeNode* pNewChild)          GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_replaceChild         (GBL_SELF, GblNaryTreeNode* pOld, GblNaryTreeNode* pNew)         GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_replaceChildAt       (GBL_SELF, size_t index, GblNaryTreeNode* pNewChild)             GBL_NOEXCEPT;
 
-GBL_EXPORT void             GblNaryTree_swapChildren        (GBL_SELF, GblNaryTreeNode* pChild1, GblNaryTreeNode* pChild2) GBL_NOEXCEPT;
-GBL_EXPORT void             GblNaryTree_swapChildrenAt      (GBL_SELF, size_t  index1, size_t  index2)                     GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_swapChildren         (GBL_SELF, GblNaryTreeNode* pChild1, GblNaryTreeNode* pChild2)   GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_swapChildrenAt       (GBL_SELF, size_t index1, size_t index2)                         GBL_NOEXCEPT;
 
-GBL_EXPORT void             GblNaryTree_reverseChildren     (GBL_SELF)                                                     GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_reverseChildren      (GBL_SELF)                                                       GBL_NOEXCEPT;
 
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_root                (GBL_SELF)                                                     GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_base                (GBL_SELF, size_t  depth)                                      GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_ancestor            (GBL_CSELF, size_t  height)                                    GBL_NOEXCEPT;
-GBL_EXPORT size_t           GblNaryTree_ancestorHeight      (GBL_CSELF, const GblNaryTreeNode* pParent)                    GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_root                 (GBL_SELF)                                                       GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_base                 (GBL_SELF, size_t depth)                                         GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_ancestor             (GBL_CSELF, size_t height)                                       GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_ancestorHeight       (GBL_CSELF, const GblNaryTreeNode* pParent)                      GBL_NOEXCEPT;
 
-GBL_EXPORT size_t           GblNaryTree_siblingCount        (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingLast         (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingBefore       (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingFirst        (GBL_CSELF)                                                    GBL_NOEXCEPT;
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingAt           (GBL_CSELF, size_t  index)                                     GBL_NOEXCEPT;
-GBL_EXPORT size_t           GblNaryTree_siblingIndex        (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_siblingCount         (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingLast          (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingBefore        (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingFirst         (GBL_CSELF)                                                      GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingAt            (GBL_CSELF, size_t index)                                        GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_siblingIndex         (GBL_CSELF, const GblNaryTreeNode* pOther)                       GBL_NOEXCEPT;
 
-GBL_EXPORT void             GblNaryTree_disconnect          (GBL_SELF)                                                     GBL_NOEXCEPT;
+GBL_EXPORT void             GblNaryTree_disconnect           (GBL_SELF)                                                       GBL_NOEXCEPT;
 
-GBL_EXPORT GblNaryTreeNode* GblNaryTree_lowestCommonAncestor(GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
-//GBL_EXPORT size_t           GblNaryTree_distance            (GBL_CSELF, const GblNaryTreeNode* pOther)                     GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_traverse            (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIt, void* pUd) GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_traverseInOrder     (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_traversePreOrder    (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
-GBL_EXPORT GblBool          GblNaryTree_traversePostOrder   (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
+GBL_EXPORT GblNaryTreeNode* GblNaryTree_lowestCommonAncestor (GBL_CSELF, const GblNaryTreeNode* pOther)                       GBL_NOEXCEPT;
+GBL_EXPORT size_t           GblNaryTree_distance             (GBL_CSELF, const GblNaryTreeNode* pOther)                       GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_traverse             (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIt, void* pUd)   GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_traverseInOrder      (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_traversePreOrder     (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_traversePostOrder    (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
+GBL_EXPORT GblBool          GblNaryTree_traverseLevelOrder   (GBL_CSELF, GblFlags mask, GblNaryTreeIterFn pFnIter, void* pUd) GBL_NOEXCEPT;
 
 GBL_DECLS_END
 
