@@ -3,12 +3,12 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_CLOSURE_TEST_SUITE_TYPE             (GblClosureTestSuite_type())
-#define GBL_CLOSURE_TEST_SUTE_STRUCT            GblClosureTestSuite
-#define GBL_CLOSURE_TEST_SUITE_CLASS_STRUCT     GblClosureTestSuiteClass
-#define GBL_CLOSURE_TEST_SUITE(inst)            (GBL_CAST_PREFIX(inst, GBL_CLOSURE_TEST_SUITE))
-#define GBL_CLOSURE_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST_PREFIX(klass, GBL_CLOSURE_TEST_SUITE))
-#define GBL_CLOSURE_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST_PREFIX(inst, GBL_CLOSURE_TEST_SUITE))
+#define GBL_CLOSURE_TEST_SUITE_TYPE           (GblClosureTestSuite_type())
+#define GBL_CLOSURE_TEST_SUTE_STRUCT          GblClosureTestSuite
+#define GBL_CLOSURE_TEST_SUITE_CLASS_STRUCT   GblClosureTestSuiteClass
+#define GBL_CLOSURE_TEST_SUITE(inst)          (GBL_CAST(GblClosureTestSuite, inst))
+#define GBL_CLOSURE_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblClosureTestSuite, klass))
+#define GBL_CLOSURE_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblClosureTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

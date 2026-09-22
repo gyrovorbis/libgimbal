@@ -8,10 +8,10 @@
 
 #define GBL_SELF_TYPE GblThreadTestSuite
 
-#define GBL_TEST_THREAD_TYPE_                   (GBL_TYPEID(GblTestThread))
-#define GBL_TEST_THREAD_(self)                  (GBL_CAST(GblTestThread, self))
-#define GBL_TEST_THREAD_CLASS_(klass)           (GBL_CLASS_CAST(GblTestThread, klass))
-#define GBL_TEST_THREAD_GET_CLASS_(self)        (GBL_CLASSOF(GblTestThread, self))
+#define GBL_TEST_THREAD_TYPE_                 (GBL_TYPEID(GblTestThread))
+#define GBL_TEST_THREAD_(self)                (GBL_CAST(GblTestThread, self))
+#define GBL_TEST_THREAD_CLASS_(klass)         (GBL_CLASS_CAST(GblTestThread, klass))
+#define GBL_TEST_THREAD_CLASSOF_(self)        (GBL_CLASSOF(GblTestThread, self))
 
 #define GBL_TEST_THREAD_TLS_THREAD_COUNT_       5
 #define GBL_TEST_THREAD_TLS_WRITE_ITERATIONS_   10

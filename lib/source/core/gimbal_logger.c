@@ -280,7 +280,7 @@ GBL_EXPORT GBL_RESULT GblLogger_push(void) {
     {
         GblLogger* pLogger = GBL_LOGGER_ENTRY_(pIt);
         if(GblLogger_hasThreadFilter(pLogger, pThread)) {
-            GBL_CTX_CALL(GBL_LOGGER_GET_CLASS(pLogger)->pFnPush(pLogger, pThread));
+            GBL_CTX_CALL(GBL_LOGGER_CLASSOF(pLogger)->pFnPush(pLogger, pThread));
         }
     }
 
@@ -305,7 +305,7 @@ GBL_EXPORT GBL_RESULT GblLogger_pop(size_t count) {
     {
         GblLogger* pLogger = GBL_LOGGER_ENTRY_(pIt);
         if(GblLogger_hasThreadFilter(pLogger, pThread)) {
-            GBL_CTX_CALL(GBL_LOGGER_GET_CLASS(pLogger)->pFnPop(pLogger,
+            GBL_CTX_CALL(GBL_LOGGER_CLASSOF(pLogger)->pFnPop(pLogger,
                                                                pThread,
                                                                count));
         }
@@ -370,7 +370,7 @@ GBL_EXPORT GBL_RESULT GblLogger_writeVa(const char*   pFile,
                 continue;
             } else GBL_PRIV_REF(pLogger).reentrant = GBL_TRUE;
 
-            GBL_CTX_CALL(GBL_LOGGER_GET_CLASS(pLogger)->pFnWrite(pLogger,
+            GBL_CTX_CALL(GBL_LOGGER_CLASSOF(pLogger)->pFnWrite(pLogger,
                                                                  pFile,
                                                                  pFunction,
                                                                  line,

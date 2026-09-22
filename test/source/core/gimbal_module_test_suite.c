@@ -3,16 +3,16 @@
 #include <gimbal/core/gimbal_module.h>
 #include <gimbal/utils/gimbal_ref.h>
 
-#define TEST_MODULE1_TYPE_            (GBL_TYPEID(TestModule1))
-#define TEST_MODULE1_(self)           (GBL_CAST(self, TestModule1))
-#define TEST_MODULE1_CLASS_(klass)    (GBL_CLASS_CAST(klass, TestModule1))
-#define TEST_MODULE1_GET_CLASS_(self) (GBL_CLASSOF(self, TestModule1))
+#define TEST_MODULE1_TYPE_          (GBL_TYPEID(TestModule1))
+#define TEST_MODULE1_(self)         (GBL_CAST(TestModule1, self))
+#define TEST_MODULE1_CLASS_(klass)  (GBL_CLASS_CAST(TestModule1, klass))
+#define TEST_MODULE1_CLASSOF_(self) (GBL_CLASSOF(TestModule1, self))
 
 
-#define TEST_MODULE2_TYPE_            (GBL_TYPEID(TestModule2))
-#define TEST_MODULE2_(self)           (GBL_CAST(self, TestModule2))
-#define TEST_MODULE2_CLASS_(klass)    (GBL_CLASS_CAST(klass, TestModule2))
-#define TEST_MODULE2_GET_CLASS_(self) (GBL_CLASSOF(self, TestModule2))
+#define TEST_MODULE2_TYPE_          (GBL_TYPEID(TestModule2))
+#define TEST_MODULE2_(self)         (GBL_CAST(TestModule2, self))
+#define TEST_MODULE2_CLASS_(klass)  (GBL_CLASS_CAST(TestModule2, klass))
+#define TEST_MODULE2_CLASSOF_(self) (GBL_CLASSOF(TestModule2, self))
 
 #define GBL_SELF_TYPE GblModuleTestSuite
 

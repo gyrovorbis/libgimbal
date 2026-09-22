@@ -26,10 +26,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_LOGGER_TYPE             (GBL_TYPEID(GblLogger))            //!< Type UUID for GblLogger
-#define GBL_LOGGER(self)            (GBL_CAST(GblLogger, self))        //!< Function-style cast to GblLogger
-#define GBL_LOGGER_CLASS(klass)     (GBL_CLASS_CAST(GblLogger, klass)) //!< Function-style cast to GblLoggerClass
-#define GBL_LOGGER_GET_CLASS(self)  (GBL_CLASSOF(GblLogger, self))     //!< Get GblLoggerClass from GblLogger
+#define GBL_LOGGER_TYPE           (GBL_TYPEID(GblLogger))            //!< Type UUID for GblLogger
+#define GBL_LOGGER(self)          (GBL_CAST(GblLogger, self))        //!< Function-style cast to GblLogger
+#define GBL_LOGGER_CLASS(klass)   (GBL_CLASS_CAST(GblLogger, klass)) //!< Function-style cast to GblLoggerClass
+#define GBL_LOGGER_CLASSOF(self)  (GBL_CLASSOF(GblLogger, self))     //!< Get GblLoggerClass from GblLogger
 //! @}
 
 /*! \name  Logging Macros

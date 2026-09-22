@@ -729,7 +729,7 @@ static GBL_RESULT GblObject_construct_(GblObject*         pSelf,
                    "Unexpected error finding CTOR property");
 
     // Notify post-constructor that we constructed the object with the required properties
-    GBL_CTX_VERIFY_CALL(GBL_OBJECT_GET_CLASS(pSelf)->pFnConstructed(pSelf));
+    GBL_CTX_VERIFY_CALL(GBL_OBJECT_CLASSOF(pSelf)->pFnConstructed(pSelf));
 
     // Iterate over the remaining properties, doing regular writes.
     for(size_t  v = 0; v < argCount; ++v) {

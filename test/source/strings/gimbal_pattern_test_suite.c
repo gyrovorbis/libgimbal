@@ -337,8 +337,6 @@ GBL_TEST_CASE(matchPhoneNumber)
     GblStringView view;
     int count = -1;
 
-    GBL_TEST_SKIP("FIXME");
-
     GBL_TEST_VERIFY(GblPattern_match(pFixture->pPhoneNumber,
                                      "256-721-1534",
                                      &view,
@@ -365,12 +363,57 @@ GBL_TEST_CASE(matchAlternation)
                                         &view));
     GBL_TEST_VERIFY(GblStringView_equals(view, "hello"));
 
-    GBL_TEST_SKIP("Todo: fix in tiny-regex-c");
+    GBL_TEST_VERIFY(GblPattern_matchStr("hello|world",
+                                        "world",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "world"));
 
     GBL_TEST_VERIFY(GblPattern_matchStr("hello|world",
                                         "worldzy",
                                         &view));
     GBL_TEST_VERIFY(GblStringView_equals(view, "world"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("hello|world",
+                                        "zzworld",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "world"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("ab|cd",
+                                        "cd",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "cd"));
+
+    GBL_TEST_VERIFY(!GblPattern_matchStr("ab|cd",
+                                         "ad",
+                                         &view));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("a|b|c",
+                                        "zc",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "c"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(a|b)c",
+                                        "bc",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "bc"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("x(ab|cd)",
+                                        "xcd",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "xcd"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("^hello|world$",
+                                        "world",
+                                        &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "world"));
+
+    GBL_TEST_VERIFY(!GblPattern_matchStr("^hello|world$",
+                                         "worldz",
+                                         &view));
+
+    GBL_TEST_VERIFY(!GblPattern_matchStr("(ab)c",
+                                         "ab",
+                                         &view));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(matchGroup)
@@ -403,6 +446,40 @@ GBL_TEST_CASE(matchGroup)
     GBL_TEST_VERIFY(!GblPattern_matchStr("(a(b(ce))e)",
                                         "abcde",
                                         &view));
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(matchGroupQuantifiers)
+    GblStringView view;
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(ab?)c", "ac", &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "ac"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(ab?)c", "abc", &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "abc"));
+
+    GBL_TEST_VERIFY(!GblPattern_matchStr("(ab?)c", "abbc", &view));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(ab*)c", "abbbc", &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "abbbc"));
+
+    GBL_TEST_VERIFY(!GblPattern_matchStr("(ab+)c", "ac", &view));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(ab+)c", "abbc", &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "abbc"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(a?b)c", "bc", &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "bc"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("x(a*)y", "xy", &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "xy"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(ab?|cd)e", "ae", &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "ae"));
+
+    GBL_TEST_VERIFY(GblPattern_matchStr("(\\d{2})-", "12-", &view));
+    GBL_TEST_VERIFY(GblStringView_equals(view, "12-"));
+
+    GBL_TEST_VERIFY(!GblPattern_matchStr("(\\d{2})-", "1-", &view));
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(unref)
@@ -438,6 +515,7 @@ GBL_TEST_REGISTER(createInvalid,
                   matchPhoneNumber,
                   matchAlternation,
                   matchGroup,
+                  matchGroupQuantifiers,
                   unref)
 #if 0
 

@@ -5,9 +5,9 @@
 
 #define GBL_SORT_TEST_SUITE_TYPE             (GBL_TYPEID(GblSortTestSuite))
 
-#define GBL_SORT_TEST_SUITE(inst)            (GBL_CAST(inst, GblSortTestSuite))
-#define GBL_SORT_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblSortTestSuite))
-#define GBL_SORT_TEST_SUITE_GET_CLASS(inst)  (GBL_CLASSOF(inst, GblSortTestSuite))
+#define GBL_SORT_TEST_SUITE(inst)          (GBL_CAST(GblSortTestSuite, inst))
+#define GBL_SORT_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblSortTestSuite, klass))
+#define GBL_SORT_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblSortTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

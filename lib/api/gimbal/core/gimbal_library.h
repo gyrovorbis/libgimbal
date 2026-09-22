@@ -2,8 +2,6 @@
  *  \brief   GblLibrary, dynamically linked library management
  *  \ingroup core
  *
-
- *
  *   \author    2023 Falco Girgis
  *   \copyright MIT License
  */

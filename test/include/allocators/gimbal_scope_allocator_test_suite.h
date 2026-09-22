@@ -5,9 +5,9 @@
 
 #define GBL_SCOPE_ALLOCATOR_TEST_SUITE_TYPE             (GBL_TYPEID(GblScopeAllocatorTestSuite))
 
-#define GBL_SCOPE_ALLOCATOR_TEST_SUITE(inst)            (GBL_CAST(inst, GblScopeAllocatorTestSuite))
-#define GBL_SCOPE_ALLOCATOR_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblScopeAllocatorTestSuite))
-#define GBL_SCOPE_ALLOCATOR_TEST_SUITE_GET_CLASS(inst)  (GBL_CLASSOF(inst, GblScopeAllocatorTestSuite))
+#define GBL_SCOPE_ALLOCATOR_TEST_SUITE(inst)          (GBL_CAST(GblScopeAllocatorTestSuite, inst))
+#define GBL_SCOPE_ALLOCATOR_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblScopeAllocatorTestSuite, klass))
+#define GBL_SCOPE_ALLOCATOR_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblScopeAllocatorTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

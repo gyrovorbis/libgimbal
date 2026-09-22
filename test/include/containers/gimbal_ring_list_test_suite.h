@@ -5,9 +5,9 @@
 
 #define GBL_RING_LIST_TEST_SUITE_TYPE             (GBL_TYPEID(GblRingListTestSuite))
 
-#define GBL_RING_LIST_TEST_SUITE(inst)            (GBL_CAST(inst, GblRingListTestSuite))
-#define GBL_RING_LIST_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblRingListTestSuite))
-#define GBL_RING_LIST_TEST_SUITE_GET_CLASS(inst)  (GBL_CLASSOF(inst, GblRingListTestSuite))
+#define GBL_RING_LIST_TEST_SUITE(inst)          (GBL_CAST(GblRingListTestSuite, inst))
+#define GBL_RING_LIST_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblRingListTestSuite, klass))
+#define GBL_RING_LIST_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblRingListTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

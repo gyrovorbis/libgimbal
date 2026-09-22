@@ -78,13 +78,13 @@ GBL_EXPORT GblRefCount GblException_unref(GblException* pSelf) {
 }
 
 GBL_EXPORT GblType GblException_resultType(const GblException* pError) {
-    return GBL_EXCEPTION_GET_CLASS(pError)->resultType;
+    return GBL_EXCEPTION_CLASSOF(pError)->resultType;
 }
 
 GBL_EXPORT const char* GblException_resultString(const GblException* pError) {
     const char* pStr = NULL;
 
-    GBL_EXCEPTION_GET_CLASS(pError)->pFnResultString(pError, pError->result, &pStr);
+    GBL_EXCEPTION_CLASSOF(pError)->pFnResultString(pError, pError->result, &pStr);
     return pStr? pStr : "?";
 }
 

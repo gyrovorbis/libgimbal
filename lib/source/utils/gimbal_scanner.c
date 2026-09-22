@@ -806,7 +806,7 @@ static GBL_RESULT GblScanner_init_(GblInstance* pInstance) {
 
     GblScanner*      pSelf  = GBL_SCANNER(pInstance);
     GblScanner_*     pSelf_ = GBL_SCANNER_(pSelf);
-    GblScannerClass* pClass = GBL_SCANNER_GET_CLASS(pSelf);
+    GblScannerClass* pClass = GBL_SCANNER_CLASSOF(pSelf);
 
     pSelf_->pDelimeters =
         GblStringRef_ref(GblScannerClass_defaultDelimeters(pClass));

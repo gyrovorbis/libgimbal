@@ -5,9 +5,9 @@
 
 #define GBL_HASH_TEST_SUITE_TYPE             (GBL_TYPEID(GblHashTestSuite))
 
-#define GBL_HASH_TEST_SUITE(inst)            (GBL_CAST(inst, GblHashTestSuite))
-#define GBL_HASH_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblHashTestSuite))
-#define GBL_HASH_TEST_SUITE_GET_CLASS(inst)  (GBL_CLASSOF(inst, GblHashTestSuite))
+#define GBL_HASH_TEST_SUITE(inst)          (GBL_CAST(GblHashTestSuite, inst))
+#define GBL_HASH_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblHashTestSuite, klass))
+#define GBL_HASH_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblHashTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

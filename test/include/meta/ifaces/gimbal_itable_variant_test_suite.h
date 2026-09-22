@@ -3,10 +3,10 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_ITABLE_VARIANT_TEST_SUITE_TYPE             (GBL_TYPEID(GblITableVariantTestSuite))
-#define GBL_ITABLE_VARIANT_TEST_SUITE(self)            (GBL_CAST(self, GblITableVariantTestSuite))
-#define GBL_ITABLE_VARIANT_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblITableVariantTestSuite))
-#define GBL_ITABLE_VARIANT_TEST_SUITE_GET_CLASS(self)  (GBL_CLASSOF(self, GblITableVariantTestSuite))
+#define GBL_ITABLE_VARIANT_TEST_SUITE_TYPE           (GBL_TYPEID(GblITableVariantTestSuite))
+#define GBL_ITABLE_VARIANT_TEST_SUITE(self)          (GBL_CAST(GblITableVariantTestSuite, self))
+#define GBL_ITABLE_VARIANT_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblITableVariantTestSuite, klass))
+#define GBL_ITABLE_VARIANT_TEST_SUITE_CLASSOF(self)  (GBL_CLASSOF(GblITableVariantTestSuite, self))
 
 GBL_DECLS_BEGIN
 

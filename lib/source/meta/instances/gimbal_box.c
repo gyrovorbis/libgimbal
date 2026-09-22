@@ -256,7 +256,7 @@ GBL_EXPORT GblRefCount GblBox_unref(GblBox* pSelf) {
             GBL_EMIT(pSelf, "finalize");
 
             // Invoke virtual destructor, which better fuckin' chain up.
-            result |= GBL_BOX_GET_CLASS(pSelf)->pFnDestructor(pSelf);
+            result |= GBL_BOX_CLASSOF(pSelf)->pFnDestructor(pSelf);
 
             // Destruct or destroy depending on how it was constructed.
             if GBL_UNLIKELY(GBL_BOX_(pSelf).constructedInPlace)

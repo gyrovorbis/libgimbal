@@ -118,7 +118,7 @@ static void GblThread_signalHandler_(int signal) {
     GBL_LOG_WARN("gimbal", "Caught signal [%d] on thread [%s].",
                  signal, GblObject_name(GBL_OBJECT(pSelf)));
 
-    GBL_THREAD_GET_CLASS(pSelf)->pFnSignal(pSelf, signal);
+    GBL_THREAD_CLASSOF(pSelf)->pFnSignal(pSelf, signal);
     pSelf->signalStatus = prevStatus;
 }
 

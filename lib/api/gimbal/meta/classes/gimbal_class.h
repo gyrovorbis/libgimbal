@@ -37,9 +37,9 @@
 //! Wraps GblClass_private(), returning the private structure on the class associated with the given type
 #define GBL_CLASS_PRIVATE(cType, klass)     GBL_CLASS_PRIVATE_(cType, klass)
 //! Wraps GblClass_public(), returning the public class structure from the given type's private structure
-#define GBL_CLASS_PUBLIC(cType, priv)       GBL_CLASS_PUBLIC_(cType, privKlass)
+#define GBL_CLASS_PUBLIC(cType, priv)       GBL_CLASS_PUBLIC_(cType, priv)
 //! Returns GBL_TRUE if the given class is type-compatible with and can be safely casted to the given type
-#define GBL_CLASS_TYPECHECK(cType, klass)   GBL_CLASS_TYPECHECK_(type, klass)
+#define GBL_CLASS_TYPECHECK(cType, klass)   GBL_CLASS_TYPECHECK_(cType, klass)
 //! Wraps GblClass_cast(), casting the given class to another type, returning NULL and raising an error upon failure
 #define GBL_CLASS_CAST(cType, klass)        GBL_CLASS_CAST_(cType, klass)
 //! Wraps GblClass_as(), returning the given class as another type or gracefully returning NULL upon failure
@@ -202,11 +202,11 @@ GBL_DECLS_END
 
 #define GBL_CLASS_TYPEOF_(klass)           (GblClass_typeOf(GBL_CLASS(klass)))
 #define GBL_CLASS_PRIVATE_(cType, klass)   ((GBL_CLASS_PRIVATE_STRUCT(cType)*)GblClass_private(GBL_CLASS(klass), GBL_TYPEID(cType)))
-#define GBL_CLASS_PUBLIC_(cType, priv)     ((GBL_CLASS_STRUCT(cType)*)GblClass_public(klassPriv, GBL_TYPEID(cType))
+#define GBL_CLASS_PUBLIC_(cType, priv)     ((GBL_CLASS_STRUCT(cType)*)GblClass_public(priv, GBL_TYPEID(cType)))
 #define GBL_CLASS_TYPECHECK_(cType, klass) (GblClass_check((GblClass*)klass, GBL_TYPEID(cType)))
 #define GBL_CLASS_CAST_(cType, klass)      ((GBL_CLASS_STRUCT(cType)*)GblClass_cast((GblClass*)klass, GBL_TYPEID(cType)))
 #define GBL_CLASS_AS_(cType, klass)        ((GBL_CLASS_STRUCT(cType)*)GblClass_as((GblClass*)klass, GBL_TYPEID(cType)))
-#define GBL_STATIC_CLASS_(klass) )         (GblClass_cast((GblClass*)klass, GBL_STATIC_CLASS_TYPE))
+#define GBL_STATIC_CLASS_(klass)           (GblClass_cast((GblClass*)klass, GBL_STATIC_CLASS_TYPE))
 //! \endcond
 
 /*! \def GBL_STATIC_CLASS_TYPE
@@ -229,116 +229,52 @@ GBL_DECLS_END
  * Convenience wrapper around GblClass_typeOf() which automatically casts.
  */
 
-/*! \fn GBL_CLASS_SUPER(klass)
+/*! \fn GBL_CLASS_PRIVATE(cType, klass)
+ *  \param cType C type name of the supertype owning the private data
  *  \param klass pointer to a GblClass-compatible
- *  \returns parent class of the given class, or GBL_INVALID_TYPE if NULL
- *  \relatesalso GblClass
- *  \sa GblClass_super()
- * Convenience wrapper around GblClass_super() which automatically casts.
- */
-
-/*! \fn GBL_CLASS_DEFAULT(klass)
- *  \param klass pointer to a GblClass-compatible
- *  \returns default class of the given class, or GBL_INVALID_TYPE if NULL
- *  \relatesalso GblClass
- *  \sa GblClass_default()
- * Convenience wrapper around GblClass_default() which automatically casts.
- */
-
-/*! \fn GBL_CLASS_PRIVATE(klass, type)
- *  \param klass pointer to a GblClass-compatible
- *  \param type supertype owning the private data
- *  \returns private data owned by the given superType or NULL if type there is
- *  none or type is not a parent, or type is invalid
+ *  \returns private data owned by the given supertype or NULL if there is
+ *  none, cType is not a parent, or cType is invalid
  *  \relatesalso GblClass
  *  \sa GblClass_private()
  * Convenience wrapper around GblClass_private() which automatically casts.
  */
 
-/*! \fn GBL_CLASS_PUBLIC(klassPrivate, type)
- *  \param klassPrivate void* pointer to private class data
- *  \param type supertype owning the private data
- *  \returns public GblClass* pointer or NULL if none could be found
+/*! \fn GBL_CLASS_PUBLIC(cType, priv)
+ *  \param cType C type name of the supertype owning the private data
+ *  \param priv void* pointer to private class data
+ *  \returns public class pointer or NULL if none could be found
  *  \relatesalso GblClass
  *  \sa GblClass_public()
- * Convenience wrapper around GblClass_public().
+ * Convenience wrapper around GblClass_public() which automatically casts.
  */
 
-/*! \fn GBL_CLASS_TYPECHECK(klass, toType)
+/*! \fn GBL_CLASS_TYPECHECK(cType, klass)
+ *  \param cType C type name of the desired destination type
  *  \param klass pointer to a GblClass-compatible
- *  \param toType the desired destination type
- *  \returns true if the given class can be casted to a calss of toType
+ *  \returns true if the given class can be casted to a class of cType
  *  \relatesalso GblClass
- *
- *  \sa GblClass_check(), GBL_CLASS_TYPECHECK_REFIX()
+ *  \sa GblClass_check()
  * Convenience wrapper around GblClass_check() which automatically casts.
  */
-/*! \fn GBL_CLASS_TYPECHECK_PREFIX(klass, typePrefix)
- *  \param klass pointer to a GblClass-compatible
- *  \param typePrefix prefix of the given type (type name macro identifier minus _TYPE postfix)
- *  \returns true if the given class can be casted to a calss of toType
- *  \relatesalso GblClass
- *  \sa GBL_CLASS_TYPECHECK_PREFIX(), GblClass_check()
- *
- * Convenience wrapper around GBL_CLASS_TYPECHECK() which automatically appends _TYPE suffix.
- *  \note
- * This macro is typically used for definining convenience function-style casting utilities
- * for derived types.
- */
 
-/*! \fn GBL_CLASS_CAST(klass, toType, cType)
+/*! \fn GBL_CLASS_CAST(cType, klass)
+ *  \param cType C type name of the destination type for the resulting class
  *  \param klass pointer to a GblClass-compatible
- *  \param toType desination type for resulting class
- *  \param cType C structure for the given type's class
- *  \returns klass casted to cType if the cast was successful, otherwise NULL
+ *  \returns klass casted to the class structure of cType if the cast was successful, otherwise NULL
  *  \relatesalso GblClass
- *  \sa GBL_CLASS_CAST_PREFIX(), GblClass_cast(
+ *  \sa GBL_CLASS_AS(), GblClass_cast()
  *
  * Convenience wrapper around GblClass_cast() which automatically performs casting.
  */
 
-/*! \fn GBL_CLASS_CAST_PREFIX(klass, typePrefix)
+/*! \fn GBL_CLASS_AS(cType, klass)
+ *  \param cType C type name of the destination type for the resulting class
  *  \param klass pointer to a GblClass-compatible
- *  \param typePrefix prefix of destination type (NAME macro minus the _TYPE suffix)
- *  \note This macro also requires a macro be defined that is the given typePrefix
- *   appended with _CLASS_STRUCT, which it uses as the destination class type for casting.
- *  \returns klass casted to the formed type identifier upon success, NULL otherwise
+ *  \returns klass casted to the class structure of cType if the cast was successful, otherwise NULL
  *  \relatesalso GblClass
- *  \sa GBL_CLASS_CAST(), GblClass_cast()
- *
- * Convenience wrapper around GBL_CLASS_CAST() which automatically deduces class structure
- * and type identifier.
- * \note
- * This macro is typically used for definining convenience function-style casting utilities
- * for derived types.
- */
-
-/*! \fn GBL_CLASS_TRY(klass, toType, cType)
- *  \param klass pointer to a GblClass-compatible
- *  \param toType desination type for resulting class
- *  \param cType C structure for the given type's class
- *  \returns klass casted to cType if the cast was successful, otherwise NULL
- *  \relatesalso GblClass
- *  \sa GBL_CLASS_TRY_PREFIX(), GblClass_as(
+ *  \sa GBL_CLASS_CAST(), GblClass_as()
  *
  * Convenience wrapper around GblClass_as() which automatically performs casting.
- */
-
-/*! \fn GBL_CLASS_TRY_PREFIX(klass, typePrefix)
- *  \param klass pointer to a GblClass-compatible
- *  \param typePrefix prefix of destination type (NAME macro minus the _TYPE suffix)
- *  \note This macro also requires a macro be defined that is the given typePrefix
- *   appended with _CLASS_STRUCT, which it uses as the destination class type for casting.
- *  \returns klass casted to the formed type identifier upon success, NULL otherwise
- *  \relatesalso GblClass
- *  \sa GBL_CLASS_TRY(), GblClass_as()
- *
- * Convenience wrapper around GBL_CLASS_TRY() which automatically deduces class structure
- * and type identifier.
- * \note
- * This macro is typically used for defining convenience function-style casting utilities
- * for derived types.
- *
  */
 
 /*!
@@ -473,7 +409,7 @@ GBL_DECLS_END
  * \param toType desired destination type
  * \returns pointer to GblClass or NULL upon failure
  * \relatesalso GblClass
- * \sa GBL_CLASS_TRY(), GblClass_cast(), GblClass_check()
+ * \sa GBL_CLASS_AS(), GblClass_cast(), GblClass_check()
 */
 
 /*!
@@ -758,7 +694,7 @@ GBL_DECLS_END
  *                                            "userdata", (void*)0xdeadbabe,
  *                                            NULL);
  *
- *      GblObjectClass* pClass = GBL_OBJECT_GET_CLASS(pObject);
+ *      GblObjectClass* pClass = GBL_OBJECT_CLASSOF(pObject);
  *
  *      //nothing fancy, regular-ass reference counted internally managed, instance-shared class...
  *      assert(GblClass_isDefault(GBL_CLASS(pClass));
@@ -809,13 +745,13 @@ GBL_DECLS_END
  *      #define GBL_OBJECT_TYPE                     (GBL_TYPEID(GblObject))
  *
  *      // instance function-style cast macro
- *      #define GBL_OBJECT(instance)                (GBL_CAST(instance, GblObject))
+ *      #define GBL_OBJECT(instance)                (GBL_CAST(GblObject, instance))
  *
  *      // class cast function-style cast macro
- *      #define GBL_OBJECT_CLASS(klass)             (GBL_CLASS_CAST(klass, GblObject))
+ *      #define GBL_OBJECT_CLASS(klass)             (GBL_CLASS_CAST(GblObject, klass))
  *
  *      // instance-to-class cast macro
- *      #define GBL_OBJECT_GET_CLASS(instance)      (GBL_CLASSOF(instance, GblObject))
+ *      #define GBL_OBJECT_CLASSOF(instance)        (GBL_CLASSOF(GblObject, instance))
  *  \endcode
  *  While these macros are obviously optional, they do add a lot to the codebase in terms of readability
  *  and convenience as well as uniform styling. With these sorts of macros defined, we then gain access to

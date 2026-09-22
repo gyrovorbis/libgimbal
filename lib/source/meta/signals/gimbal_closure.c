@@ -9,7 +9,7 @@ GBL_EXPORT GblBool GblClosure_hasMarshal(const GblClosure* pSelf) GBL_NOEXCEPT {
 }
 
 GBL_EXPORT GblBool GblClosure_hasMetaMarshal(const GblClosure* pSelf) GBL_NOEXCEPT {
-    return GBL_CLOSURE_GET_CLASS(pSelf)->pFnMetaMarshal? GBL_TRUE : GBL_FALSE;
+    return GBL_CLOSURE_CLASSOF(pSelf)->pFnMetaMarshal? GBL_TRUE : GBL_FALSE;
 }
 
 GBL_EXPORT void GblClosure_setMarshal(GblClosure* pSelf, GblMarshalFn pFnMarshal) GBL_NOEXCEPT {
@@ -50,8 +50,8 @@ GBL_EXPORT GBL_RESULT GblClosure_setMetaMarshal(GblClosure* pSelf,
 {
     GBL_CTX_BEGIN(NULL);
 
-    if(GblClass_isOwned(GBL_INSTANCE_GET_CLASS(pSelf))) {
-        GBL_CLOSURE_GET_CLASS(pSelf)->pFnMetaMarshal = pFnMeta;
+    if(GblClass_isOwned(GBL_INSTANCE_CLASSOF(pSelf))) {
+        GBL_CLOSURE_CLASSOF(pSelf)->pFnMetaMarshal = pFnMeta;
     } else {
         GblClosureClass* pClass =
             GBL_CLOSURE_CLASS(
@@ -77,7 +77,7 @@ GBL_EXPORT GBL_RESULT GblClosure_invoke(GblClosure* pSelf,
 {
     GBL_CTX_BEGIN(NULL);
 
-    GblClosureClass* pClass = GBL_CLOSURE_GET_CLASS(pSelf);
+    GblClosureClass* pClass = GBL_CLOSURE_CLASSOF(pSelf);
 
     GblMarshalFn    pFnMarshal;
     GblPtr          pMarshalData;

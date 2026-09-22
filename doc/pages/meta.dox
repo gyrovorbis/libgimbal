@@ -41,9 +41,9 @@ language, and any langauge which can provide glue code to a C API.
 		#define EVMU_BUZZER_TYPE                (GBL_TYPEOF(EvmuBuzzer))
 
 		// Convenience function-style cast operators
-		#define EVMU_BUZZER(instance)           (GBL_INSTANCE_CAST(instance, EvmuBuzzer))
-		#define EVMU_BUZZER_CLASS(klass)        (GBL_CLASS_CAST(klass, EvmuBuzzer))
-		#define EVMU_BUZZER_GET_CLASS(instance) (GBL_INSTANCE_GET_CLASS(instance, EvmuBuzzer))
+		#define EVMU_BUZZER(instance)         (GBL_INSTANCE_CAST(instance, EvmuBuzzer))
+		#define EVMU_BUZZER_CLASS(klass)      (GBL_CLASS_CAST(klass, EvmuBuzzer))
+		#define EVMU_BUZZER_CLASSOF(instance) (GBL_INSTANCE_GET_CLASS(instance, EvmuBuzzer))
 
 		// Define the "self" or "this" type for its methods
 		#define GBL_SELF_TYPE EvmuBuzzer

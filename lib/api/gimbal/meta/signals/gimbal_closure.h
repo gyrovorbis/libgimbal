@@ -21,10 +21,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_CLOSURE_TYPE            (GBL_TYPEID(GblClosure))            //!< Type UUID for GblClosure
-#define GBL_CLOSURE(self)           (GBL_CAST(GblClosure, self))        //!< Casts a GblInstance to GblClosure
-#define GBL_CLOSURE_CLASS(klass)    (GBL_CLASS_CAST(GblClosure, klass)) //!< Casts a GblClass to GblClosureClass
-#define GBL_CLOSURE_GET_CLASS(self) (GBL_CLASSOF(GblClosure, self))     //!< Gets a GblClosureClass from GblInstance
+#define GBL_CLOSURE_TYPE          (GBL_TYPEID(GblClosure))            //!< Type UUID for GblClosure
+#define GBL_CLOSURE(self)         (GBL_CAST(GblClosure, self))        //!< Casts a GblInstance to GblClosure
+#define GBL_CLOSURE_CLASS(klass)  (GBL_CLASS_CAST(GblClosure, klass)) //!< Casts a GblClass to GblClosureClass
+#define GBL_CLOSURE_CLASSOF(self) (GBL_CLASSOF(GblClosure, self))     //!< Gets a GblClosureClass from GblInstance
 //! @}
 
 #define GBL_SELF_TYPE GblClosure

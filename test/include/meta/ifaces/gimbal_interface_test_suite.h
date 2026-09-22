@@ -3,12 +3,12 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_INTERFACE_TEST_SUITE_TYPE             (GblInterfaceTestSuite_type())
-#define GBL_INTERFACE_TEST_SUTE_STRUCT            GblInterfaceTestSuite
-#define GBL_INTERFACE_TEST_SUITE_CLASS_STRUCT     GblInterfaceTestSuiteClass
-#define GBL_INTERFACE_TEST_SUITE(inst)            (GBL_CAST_PREFIX(inst, GBL_INTERFACE_TEST_SUITE))
-#define GBL_INTERFACE_TEST_SUITE_CLASS(klass)     (GBL_INTERFACE_CAST_PREFIX(klass, GBL_INTERFACE_TEST_SUITE))
-#define GBL_INTERFACE_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST_PREFIX(inst, GBL_INTERFACE_TEST_SUITE))
+#define GBL_INTERFACE_TEST_SUITE_TYPE           (GblInterfaceTestSuite_type())
+#define GBL_INTERFACE_TEST_SUTE_STRUCT          GblInterfaceTestSuite
+#define GBL_INTERFACE_TEST_SUITE_CLASS_STRUCT   GblInterfaceTestSuiteClass
+#define GBL_INTERFACE_TEST_SUITE(inst)          (GBL_CAST(GblInterfaceTestSuite, inst))
+#define GBL_INTERFACE_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblInterfaceTestSuite, klass))
+#define GBL_INTERFACE_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblInterfaceTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

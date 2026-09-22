@@ -5,9 +5,9 @@
 
 #define GBL_OPTION_GROUP_TEST_SUITE_TYPE             (GBL_TYPEID(GblOptionGroupTestSuite))
 
-#define GBL_OPTION_GROUP_TEST_SUITE(inst)            (GBL_CAST(inst, GBL_OPTION_GROUP_TEST_SUITE_TYPE, GblOptionGroupTestSuite))
-#define GBL_OPTION_GROUP_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GBL_OPTION_GROUP_TEST_SUITE_TYPE, GblOptionGroupTestSuiteClass))
-#define GBL_OPTION_GROUP_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST(inst, GBL_OPTION_GROUP_TEST_SUITE_TYPE, GblOptionGroupTestSuiteClass))
+#define GBL_OPTION_GROUP_TEST_SUITE(inst)          (GBL_CAST(GblOptionGroupTestSuite, inst))
+#define GBL_OPTION_GROUP_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblOptionGroupTestSuite, klass))
+#define GBL_OPTION_GROUP_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblOptionGroupTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

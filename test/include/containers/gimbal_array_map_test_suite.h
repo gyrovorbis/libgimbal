@@ -3,12 +3,12 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_ARRAY_MAP_TEST_SUITE_TYPE             (GblArrayMapTestSuite_type())
-#define GBL_ARRAY_MAP_TEST_SUTE_STRUCT            GblArrayMapTestSuite
-#define GBL_ARRAY_MAP_TEST_SUITE_CLASS_STRUCT     GblArrayMapTestSuiteClass
-#define GBL_ARRAY_MAP_TEST_SUITE(inst)            (GBL_CAST_PREFIX(inst, GBL_ARRAY_MAP_TEST_SUITE))
-#define GBL_ARRAY_MAP_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST_PREFIX(klass, GBL_ARRAY_MAP_TEST_SUITE))
-#define GBL_ARRAY_MAP_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST_PREFIX(inst, GBL_ARRAY_MAP_TEST_SUITE))
+#define GBL_ARRAY_MAP_TEST_SUITE_TYPE           (GblArrayMapTestSuite_type())
+#define GBL_ARRAY_MAP_TEST_SUTE_STRUCT          GblArrayMapTestSuite
+#define GBL_ARRAY_MAP_TEST_SUITE_CLASS_STRUCT   GblArrayMapTestSuiteClass
+#define GBL_ARRAY_MAP_TEST_SUITE(inst)          (GBL_CAST(GblArrayMapTestSuite, inst))
+#define GBL_ARRAY_MAP_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblArrayMapTestSuite, klass))
+#define GBL_ARRAY_MAP_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblArrayMapTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

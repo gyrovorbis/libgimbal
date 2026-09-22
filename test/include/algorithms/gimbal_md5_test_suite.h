@@ -3,10 +3,10 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_MD5_TEST_SUITE_TYPE             (GBL_TYPEID(GblMd5TestSuite))
-#define GBL_MD5_TEST_SUITE(self)            (GBL_CAST(self, GblMd5TestSuite))
-#define GBL_MD5_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblMd5TestSuite))
-#define GBL_MD5_TEST_SUITE_GET_CLASS(self)  (GBL_CLASSOF(self, GblMd5TestSuite))
+#define GBL_MD5_TEST_SUITE_TYPE           (GBL_TYPEID(GblMd5TestSuite))
+#define GBL_MD5_TEST_SUITE(self)          (GBL_CAST(GblMd5TestSuite, self))
+#define GBL_MD5_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblMd5TestSuite, klass))
+#define GBL_MD5_TEST_SUITE_CLASSOF(self)  (GBL_CLASSOF(GblMd5TestSuite, self))
 
 GBL_DECLS_BEGIN
 

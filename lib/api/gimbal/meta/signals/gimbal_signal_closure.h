@@ -17,9 +17,9 @@
 
 #define GBL_SIGNAL_CLOSURE_TYPE             (GBL_TYPEID(GblSignalClosure))
 
-#define GBL_SIGNAL_CLOSURE(self)            (GBL_CAST(GblSignalClosure, self))
-#define GBL_SIGNAL_CLOSURE_CLASS(klass)     (GBL_CLASS_CAST(GblSignalClosure, klass))
-#define GBL_SIGNAL_CLOSURE_GET_CLASS(self)  (GBL_CLASSOF(GblSignalClosure, self))
+#define GBL_SIGNAL_CLOSURE(self)          (GBL_CAST(GblSignalClosure, self))
+#define GBL_SIGNAL_CLOSURE_CLASS(klass)   (GBL_CLASS_CAST(GblSignalClosure, klass))
+#define GBL_SIGNAL_CLOSURE_CLASSOF(self)  (GBL_CLASSOF(GblSignalClosure, self))
 
 #define GBL_SELF_TYPE GblSignalClosure
 

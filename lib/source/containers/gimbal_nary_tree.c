@@ -26,10 +26,7 @@ GBL_EXPORT GblBool GblNaryTree_isAncestor(const GblNaryTreeNode* pSelf, const Gb
 }
 
 GBL_EXPORT GblBool GblNaryTree_isSibling(const GblNaryTreeNode* pSelf, const GblNaryTreeNode* pOther) {
-    if(pSelf->pParent && pSelf->pParent == pOther->pParent && pSelf != pOther)
-        return GBL_TRUE;
-
-    return GBL_FALSE;
+    return (pSelf->pParent && pSelf->pParent == pOther->pParent && pSelf != pOther);
 }
 
 GBL_EXPORT GblBool GblNaryTree_isChild(const GblNaryTreeNode* pSelf, const GblNaryTreeNode* pOther) {
@@ -43,8 +40,10 @@ GBL_EXPORT GblBool GblNaryTree_isDescendent(const GblNaryTreeNode* pSelf, const 
 GBL_EXPORT GblFlags GblNaryTree_flags(const GblNaryTreeNode* pSelf) {
     GblFlags flags = GblNaryTree_isRoot(pSelf)? GBL_NARY_TREE_NODE_FLAG_ROOT : 0;
 
-    if(GblNaryTree_isInternal(pSelf)) flags |= GBL_NARY_TREE_NODE_FLAG_INTERNAL;
-    else flags |= GBL_NARY_TREE_NODE_FLAG_LEAF;
+    if(GblNaryTree_isInternal(pSelf))
+        flags |= GBL_NARY_TREE_NODE_FLAG_INTERNAL;
+    else
+        flags |= GBL_NARY_TREE_NODE_FLAG_LEAF;
 
     return flags;
 }
@@ -61,9 +60,9 @@ GBL_EXPORT size_t GblNaryTree_size(const GblNaryTreeNode* pSelf) {
 }
 
 GBL_EXPORT size_t GblNaryTree_width(const GblNaryTreeNode* pSelf, size_t depth) {
-    if(!depth) return 1;
-
     size_t width = 0;
+
+    if(!depth) return 1;
 
     for(const GblNaryTreeNode* pNode = pSelf->pChildFirst;
         pNode;
@@ -88,9 +87,10 @@ GBL_EXPORT size_t GblNaryTree_height(const GblNaryTreeNode* pSelf) {
 }
 
 GBL_EXPORT size_t GblNaryTree_breadth(const GblNaryTreeNode* pSelf) {
-    if(!pSelf->pChildFirst) return 1;
-
     size_t breadth = 0;
+
+    if(!pSelf->pChildFirst)
+        return 1;
 
     for(const GblNaryTreeNode* pNode = pSelf->pChildFirst;
         pNode;
@@ -127,7 +127,10 @@ static GblBool GblNaryTree_isBalanced_(const GblNaryTreeNode* pSelf, size_t* pHe
         pNode = pNode->pSiblingNext)
     {
         size_t childHeight;
-        if(!GblNaryTree_isBalanced_(pNode, &childHeight)) return GBL_FALSE;
+
+        if(!GblNaryTree_isBalanced_(pNode, &childHeight))
+            return GBL_FALSE;
+
         ++childHeight;
         if(childHeight < minHeight) minHeight = childHeight;
         if(childHeight > maxHeight) maxHeight = childHeight;
@@ -176,7 +179,7 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_childBefore(const GblNaryTreeNode* pSelf
         pNode = pNode->pSiblingNext)
             if(pNode->pSiblingNext == pChild)
                 return pNode;
-    return GBL_NULL;
+    return NULL;
 }
 
 GBL_EXPORT GblNaryTreeNode* GblNaryTree_childAt(const GblNaryTreeNode* pSelf, size_t index) {
@@ -185,10 +188,10 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_childAt(const GblNaryTreeNode* pSelf, si
         pNode = pNode->pSiblingNext)
             if(index-- == 0) return pNode;
 
-    return GBL_NULL;
+    return NULL;
 }
 
-GBL_EXPORT size_t  GblNaryTree_childIndex(const GblNaryTreeNode* pSelf, const GblNaryTreeNode* pChild) {
+GBL_EXPORT size_t GblNaryTree_childIndex(const GblNaryTreeNode* pSelf, const GblNaryTreeNode* pChild) {
     size_t i = 0;
 
     for(GblNaryTreeNode* pNode = pSelf->pChildFirst;
@@ -215,7 +218,7 @@ GBL_EXPORT void GblNaryTree_addChildBack(GblNaryTreeNode* pSelf, GblNaryTreeNode
     else pSelf->pChildFirst = pChild;
 
     pChild->pParent = pSelf;
-    pChild->pSiblingNext = GBL_NULL;
+    pChild->pSiblingNext = NULL;
 }
 
 GBL_EXPORT void GblNaryTree_addChildTo(GblNaryTreeNode* pSelf, size_t index, GblNaryTreeNode* pChild) {
@@ -225,7 +228,7 @@ GBL_EXPORT void GblNaryTree_addChildTo(GblNaryTreeNode* pSelf, size_t index, Gbl
         pChild->pParent      = pSelf;
     } else {
         size_t i = 0;
-        GblNaryTreeNode* pPrev = GBL_NULL;
+        GblNaryTreeNode* pPrev = NULL;
 
         for(GblNaryTreeNode* pNode = pSelf->pChildFirst;
             pNode;
@@ -242,7 +245,7 @@ GBL_EXPORT void GblNaryTree_addChildTo(GblNaryTreeNode* pSelf, size_t index, Gbl
         if(i == index) { // insert end
             if(pPrev) pPrev->pSiblingNext = pChild;
 
-            pChild->pSiblingNext = GBL_NULL;
+            pChild->pSiblingNext = NULL;
             pChild->pParent = pSelf;
         }
     }
@@ -278,7 +281,7 @@ GBL_EXPORT void GblNaryTree_moveChildBack(GblNaryTreeNode* pSelf, GblNaryTreeNod
 }
 
 GBL_EXPORT void GblNaryTree_moveChildTo(GblNaryTreeNode* pSelf, size_t index, GblNaryTreeNode* pChild) {
-    GblNaryTreeNode* pPrev = index? GblNaryTree_childAt(pSelf, index-1) : GBL_NULL;
+    GblNaryTreeNode* pPrev = index? GblNaryTree_childAt(pSelf, index-1) : NULL;
 
     GblNaryTree_removeChild(pSelf, pChild);
 
@@ -295,28 +298,28 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChild(GblNaryTreeNode* pSelf, GblN
     if(pBefore) pBefore->pSiblingNext = pChild->pSiblingNext;
     else pSelf->pChildFirst = pChild->pSiblingNext;
 
-    pChild->pParent = GBL_NULL;
-    pChild->pSiblingNext = GBL_NULL;
+    pChild->pParent = NULL;
+    pChild->pSiblingNext = NULL;
 
-    return GBL_NULL;
+    return NULL;
 }
 
 GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildFront(GblNaryTreeNode* pSelf) {
     GblNaryTreeNode* pFirst = pSelf->pChildFirst;
 
     pSelf->pChildFirst   = pSelf->pChildFirst->pSiblingNext;
-    pFirst->pSiblingNext = GBL_NULL;
-    pFirst->pParent      = GBL_NULL;
+    pFirst->pSiblingNext = NULL;
+    pFirst->pParent      = NULL;
 
-    return GBL_NULL;
+    return NULL;
 }
 
 GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildBack(GblNaryTreeNode* pSelf) {
     if(pSelf->pChildFirst) {
         if(!pSelf->pChildFirst->pSiblingNext) {
-            pSelf->pChildFirst->pParent = GBL_NULL;
-            pSelf->pChildFirst->pSiblingNext = GBL_NULL;
-            pSelf->pChildFirst = GBL_NULL;
+            pSelf->pChildFirst->pParent = NULL;
+            pSelf->pChildFirst->pSiblingNext = NULL;
+            pSelf->pChildFirst = NULL;
         } else {
             GblNaryTreeNode* pNode = pSelf->pChildFirst;
 
@@ -325,13 +328,13 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildBack(GblNaryTreeNode* pSelf) 
                 pNode = pNode->pSiblingNext)
                 ;
 
-            pNode->pSiblingNext->pParent = GBL_NULL;
-            pNode->pSiblingNext->pSiblingNext = GBL_NULL;
-            pNode->pSiblingNext = GBL_NULL;
+            pNode->pSiblingNext->pParent = NULL;
+            pNode->pSiblingNext->pSiblingNext = NULL;
+            pNode->pSiblingNext = NULL;
         }
     }
 
-    return GBL_NULL;
+    return NULL;
 }
 
 GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildAt(GblNaryTreeNode* pSelf, size_t index) {
@@ -346,19 +349,19 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_removeChildAt(GblNaryTreeNode* pSelf, si
                 GblNaryTreeNode* pRemoved = pNode->pSiblingNext;
 
                 pNode->pSiblingNext    = pRemoved->pSiblingNext;
-                pRemoved->pSiblingNext = GBL_NULL;
-                pRemoved->pParent      = GBL_NULL;
+                pRemoved->pSiblingNext = NULL;
+                pRemoved->pParent      = NULL;
 
                 return pRemoved;
             }
         }
     }
 
-    return GBL_NULL;
+    return NULL;
 }
 
 GBL_EXPORT void GblNaryTree_replaceChild(GblNaryTreeNode* pSelf, GblNaryTreeNode* pOld, GblNaryTreeNode* pNew) {
-    GblNaryTreeNode* pPrev = GBL_NULL;
+    GblNaryTreeNode* pPrev = NULL;
     GblNaryTreeNode* pNode = pSelf->pChildFirst;
 
     while(pNode) {
@@ -380,11 +383,11 @@ GBL_EXPORT void GblNaryTree_replaceChildAt(GblNaryTreeNode* pSelf, size_t index,
     GblNaryTreeNode* pNode = pSelf->pChildFirst;
 
     if(!index) {
-        pNewChild->pSiblingNext = pSelf->pChildFirst? pSelf->pChildFirst->pSiblingNext: GBL_NULL;
+        pNewChild->pSiblingNext = pSelf->pChildFirst? pSelf->pChildFirst->pSiblingNext: NULL;
         pSelf->pChildFirst      = pNewChild;
         pNewChild->pParent      = pSelf;
     } else {
-        GblNaryTreeNode* pPrev = GBL_NULL;
+        GblNaryTreeNode* pPrev = NULL;
 
         while(pNode) {
             if(i++ == index) {
@@ -432,8 +435,8 @@ GBL_EXPORT void GblNaryTree_swapChildrenAt(GblNaryTreeNode* pSelf, size_t index1
 }
 
 GBL_EXPORT void GblNaryTree_reverseChildren(GblNaryTreeNode* pSelf) {
-    GblNaryTreeNode* pPrev = GBL_NULL;
-    GblNaryTreeNode* pNext = GBL_NULL;
+    GblNaryTreeNode* pPrev = NULL;
+    GblNaryTreeNode* pNext = NULL;
     GblNaryTreeNode* pNode = pSelf->pChildFirst;
 
     while(pNode) {
@@ -483,7 +486,7 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_ancestor(const GblNaryTreeNode* pSelf, s
         pNode = pNode->pParent;
     }
 
-    return GBL_NULL;
+    return NULL;
 }
 
 GBL_EXPORT size_t GblNaryTree_ancestorHeight(const GblNaryTreeNode* pSelf, const GblNaryTreeNode* pParent) {
@@ -491,9 +494,8 @@ GBL_EXPORT size_t GblNaryTree_ancestorHeight(const GblNaryTreeNode* pSelf, const
     const GblNaryTreeNode* pNode = pSelf->pParent;
 
     while(pNode) {
-        if(pNode == pParent) {
+        if(pNode == pParent)
             return i;
-        }
 
         ++i;
         pNode = pNode->pParent;
@@ -511,11 +513,13 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingAt(const GblNaryTreeNode* pSelf, 
     GblNaryTreeNode* pNode = pSelf->pParent->pChildFirst;
 
     while(pNode) {
-        if(pNode != pSelf && i++ == index) return pNode;
+        if(pNode != pSelf && i++ == index)
+            return pNode;
+
         pNode = pNode->pSiblingNext;
     }
 
-    return GBL_NULL;
+    return NULL;
 }
 
 GBL_EXPORT size_t GblNaryTree_siblingIndex(const GblNaryTreeNode* pSelf, const GblNaryTreeNode* pSibling) {
@@ -524,8 +528,10 @@ GBL_EXPORT size_t GblNaryTree_siblingIndex(const GblNaryTreeNode* pSelf, const G
 
     while(pNode) {
         if(pNode != pSelf) {
-            if(pNode != pSibling) ++index;
-            else return index;
+            if(pNode != pSibling)
+                ++index;
+            else
+                return index;
         }
 
         pNode = pNode->pSiblingNext;
@@ -539,7 +545,7 @@ GBL_EXPORT size_t GblNaryTree_siblingCount(const GblNaryTreeNode* pSelf) {
 }
 
 GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingLast(const GblNaryTreeNode* pSelf) {
-    GblNaryTreeNode* pLast = GBL_NULL;
+    GblNaryTreeNode* pLast = NULL;
     GblNaryTreeNode* pNode = pSelf->pSiblingNext;
 
     if(pSelf->pSiblingNext) {
@@ -559,12 +565,14 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingBefore(const GblNaryTreeNode* pSe
         GblNaryTreeNode* pNode = pSelf->pParent->pChildFirst;
 
         while(pNode) {
-           if(pNode->pSiblingNext == pSelf) return pNode;
-           pNode = pNode->pSiblingNext;
+            if(pNode->pSiblingNext == pSelf)
+                return pNode;
+
+            pNode = pNode->pSiblingNext;
         }
     }
 
-    return GBL_NULL;
+    return NULL;
 }
 
 GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingFirst(const GblNaryTreeNode* pSelf) {
@@ -575,7 +583,7 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_siblingFirst(const GblNaryTreeNode* pSel
             return pSelf->pSiblingNext;
     }
 
-    return GBL_NULL;
+    return NULL;
 }
 
 
@@ -717,7 +725,8 @@ GBL_EXPORT GblNaryTreeNode* GblNaryTree_lowestCommonAncestor(const GblNaryTreeNo
 GBL_EXPORT size_t GblNaryTree_distance(const GblNaryTreeNode* pSelf, const GblNaryTreeNode* pOther) {
     const GblNaryTreeNode* pAncestor = GblNaryTree_lowestCommonAncestor(pSelf, pOther);
 
-    if(!pAncestor) return GBL_NARY_TREE_NPOS;
+    if(!pAncestor)
+        return GBL_NARY_TREE_NPOS;
 
     return GblNaryTree_depth(pSelf) + GblNaryTree_depth(pOther) - 2 * GblNaryTree_depth(pAncestor);
 }

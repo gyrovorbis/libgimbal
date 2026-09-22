@@ -3,12 +3,12 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_ARRAY_LIST_TEST_SUITE_TYPE             (GblArrayListTestSuite_type())
-#define GBL_ARRAY_LIST_TEST_SUTE_STRUCT            GblArrayListTestSuite
-#define GBL_ARRAY_LIST_TEST_SUITE_CLASS_STRUCT     GblArrayListTestSuiteClass
-#define GBL_ARRAY_LIST_TEST_SUITE(inst)            (GBL_CAST_PREFIX(inst, GBL_ARRAY_LIST_TEST_SUITE))
-#define GBL_ARRAY_LIST_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST_PREFIX(klass, GBL_ARRAY_LIST_TEST_SUITE))
-#define GBL_ARRAY_LIST_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST_PREFIX(inst, GBL_ARRAY_LIST_TEST_SUITE))
+#define GBL_ARRAY_LIST_TEST_SUITE_TYPE           (GblArrayListTestSuite_type())
+#define GBL_ARRAY_LIST_TEST_SUTE_STRUCT          GblArrayListTestSuite
+#define GBL_ARRAY_LIST_TEST_SUITE_CLASS_STRUCT   GblArrayListTestSuiteClass
+#define GBL_ARRAY_LIST_TEST_SUITE(inst)          (GBL_CAST(GblArrayListTestSuite, inst))
+#define GBL_ARRAY_LIST_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblArrayListTestSuite, klass))
+#define GBL_ARRAY_LIST_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblArrayListTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

@@ -29,10 +29,10 @@
  *  \brief Type UUID and Cast operators.
  *  @{
  */
-#define GBL_BOX_TYPE            GBL_TYPEID(GblBox)            //!< GblType UUID of a GblBox
-#define GBL_BOX(self)           GBL_CAST(GblBox, self)        //!< Casts a GblInstance to GblBox
-#define GBL_BOX_CLASS(klass)    GBL_CLASS_CAST(GblBox, klass) //!< Casts a GblClass to GblBoxClass
-#define GBL_BOX_GET_CLASS(self) GBL_CLASSOF(GblBox, self)     //!< Gets a GblBoxClass from a GblInstance
+#define GBL_BOX_TYPE          GBL_TYPEID(GblBox)            //!< GblType UUID of a GblBox
+#define GBL_BOX(self)         GBL_CAST(GblBox, self)        //!< Casts a GblInstance to GblBox
+#define GBL_BOX_CLASS(klass)  GBL_CLASS_CAST(GblBox, klass) //!< Casts a GblClass to GblBoxClass
+#define GBL_BOX_CLASSOF(self) GBL_CLASSOF(GblBox, self)     //!< Gets a GblBoxClass from a GblInstance
 //! @}
 
 /*! \name  Reference Management

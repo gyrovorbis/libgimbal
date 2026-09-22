@@ -18,10 +18,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_IVARIANT_TYPE                   (GBL_BUILTIN_TYPE(IVARIANT))
-#define GBL_IVARIANT(instance)              ((GblIVariant*)GblInstance_cast(GBL_INSTANCE(instance), GBL_IVARIANT_TYPE))
-#define GBL_IVARIANT_CLASS(klass)           ((GblIVariantClass*)GblClass_cast(GBL_CLASS(klass), GBL_IVARIANT_TYPE))
-#define GBL_IVARIANT_GET_CLASS(instance)    (GBL_IVARIANT_CLASS(GblInstance_class(GBL_INSTANCE(instance))))
+#define GBL_IVARIANT_TYPE                 (GBL_BUILTIN_TYPE(IVARIANT))
+#define GBL_IVARIANT(instance)            ((GblIVariant*)GblInstance_cast(GBL_INSTANCE(instance), GBL_IVARIANT_TYPE))
+#define GBL_IVARIANT_CLASS(klass)         ((GblIVariantClass*)GblClass_cast(GBL_CLASS(klass), GBL_IVARIANT_TYPE))
+#define GBL_IVARIANT_CLASSOF(instance)    (GBL_IVARIANT_CLASS(GblInstance_class(GBL_INSTANCE(instance))))
 //! @}
 
 #define GBL_IVARIANT_VALUE_VAR_ARG_MAX          4
