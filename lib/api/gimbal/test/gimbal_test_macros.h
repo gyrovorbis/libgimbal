@@ -200,6 +200,14 @@ typedef enum GBL_TEST_ERROR_COMPARISON {
 
 #define GBL_TEST_CALL                                GBL_CTX_VERIFY_CALL
 
+//! Given an enum type, reports a result to the current test scenario.
+#define GBL_TEST_CUSTOM(enumType, expression)                                        \
+    GBL_STMT_START {                                                                 \
+        const GblEnum gblTestCustomValue_ = (expression);                            \
+        GBL_CTX_VERIFY_CALL(GblTestScenario_recordResult(                            \
+            GBL_TEST_SCENARIO(GBL_CTX_CONTEXT()), (enumType), gblTestCustomValue_)); \
+    } GBL_STMT_END
+
 #define GBL_TEST_SKIP(reason)                        GBL_CTX_VERIFY(GBL_FALSE,                                               \
                                                                     GBL_RESULT_SKIPPED,                                      \
                                                                     reason)
