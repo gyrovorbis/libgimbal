@@ -237,7 +237,9 @@
 #endif
 
 // Thread-local storage
-#ifdef _MSC_VER
+#if defined(TINYCTHREAD_ENABLE_THREADS) && !TINYCTHREAD_ENABLE_THREADS
+#   define GBL_THREAD_LOCAL
+#elif defined(_MSC_VER)
 #   define GBL_THREAD_LOCAL __declspec(thread)
 #else
 #   if defined(__DREAMCAST__) || defined(__GAMECUBE__)

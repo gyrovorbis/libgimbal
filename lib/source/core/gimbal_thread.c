@@ -1,4 +1,7 @@
 #include <gimbal/core/gimbal_thread.h>
+#include <gimbal/core/gimbal_thd.h>
+#include <gimbal/core/gimbal_error.h>
+#include <gimbal/core/gimbal_exception.h>
 #include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/utils/gimbal_date_time.h>
 #include <gimbal/containers/gimbal_linked_list.h>
@@ -209,7 +212,28 @@ static GBL_RESULT GblThread_exit_(GblThread* pSelf) {
 // Low-level thread entry point
 static int GblThread_start_(void* pThread) {
     // cast userdata back to GblThread instance
-    GblThread* pSelf = GBL_THREAD(pThread);
+    GblThread*      pSelf          = GBL_THREAD(pThread);
+    GblThread*      pPrevThread    = *GBL_TLS_LOAD(pCurThread_);
+    GblThd          prevThd        = *GblThd_current();
+    GblError        prevError      = { 0 };
+    GblException*   pPrevException = GblException_current();
+    const GblError* pPrevError     = GblError_pending();
+
+    if(pPrevError)
+        memcpy(&prevError, pPrevError, sizeof(prevError));
+    if(pPrevException)
+        GBL_REF(pPrevException);
+
+    GblThd* pThd = GblThd_current();
+    memset(pThd, 0, sizeof(*pThd));
+
+    pThd->callRecord.result = GBL_RESULT_UNKNOWN;
+    pThd->pName             = "Untitled";
+    pThd->pContext          = prevThd.pContext;
+    pThd->pStackFrameTop    = prevThd.pStackFrameTop;
+
+    GblError_clear();
+    GblException_clear();
 
     // initialize thread settings
     GblThread_initSelf_(pSelf, GBL_FALSE);
@@ -221,13 +245,35 @@ static int GblThread_start_(void* pThread) {
     GBL_EMIT(pSelf, "started");
 
     // clear thread-local status
+    GblCallRecord threadStatus;
     GBL_CTX_BEGIN(NULL);
     // perform actual virtual method dispatch for called logic
     GBL_VCALL(GblThread, pFnRun, pSelf);
     // end capturing thread status
     GBL_CTX_END_BLOCK();
+    memcpy(&threadStatus, &GBL_CTX_RECORD(), sizeof(threadStatus));
+    GblThd_setCallRecord(NULL, &threadStatus);
 
-    return GblThread_exit_(pSelf);
+    const GBL_RESULT result    = GblThread_exit_(pSelf);
+    *GBL_TLS_LOAD(pCurThread_) = pPrevThread;
+    *GblThd_current()          = prevThd;
+    GblError_clear();
+
+    if(prevError.pDomain) {
+        (GblError_raise)(prevError.srcLocation.pFile,
+                         prevError.srcLocation.pFunc,
+                         prevError.srcLocation.line,
+                         prevError.pDomain,
+                         prevError.code,
+                         "%s",
+                         prevError.message);
+    }
+    GblException_clear();
+
+    if(pPrevException)
+        GblException_throw(pPrevException);
+
+    return result;
 }
 
 GBL_EXPORT size_t GblThread_count(void) {

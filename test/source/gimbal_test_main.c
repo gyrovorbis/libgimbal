@@ -46,7 +46,9 @@
 #include "utils/gimbal_date_time_test_suite.h"
 #include "utils/gimbal_bit_view_test_suite.h"
 #include "core/gimbal_module_test_suite.h"
-#include "core/gimbal_thread_test_suite.h"
+#if TINYCTHREAD_ENABLE_THREADS
+#   include "core/gimbal_thread_test_suite.h"
+#endif
 #include "utils/gimbal_scanner_test_suite.h"
 #include "algorithms/gimbal_random_test_suite.h"
 #include "algorithms/gimbal_compression_test_suite.h"
@@ -72,13 +74,14 @@ PSP_MODULE_INFO("GimbalTests", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR( THREAD_ATTR_USER | THREAD_ATTR_VFPU );
 #endif
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) && TINYCTHREAD_ENABLE_THREADS
 #include <android/log.h>
+#include <tinycthread.h>
 static int pfd[2];
-static pthread_t thr;
+static thrd_t thr;
 static const char *tag = "myapp";
 
-static void *thread_func(void*)
+static int thread_func(void*)
 {
     ssize_t rdsz;
     char buf[128];
@@ -104,9 +107,9 @@ int start_logger(const char *app_name)
     dup2(pfd[1], 2);
 
     /* spawn the logging thread */
-    if(pthread_create(&thr, 0, thread_func, 0) == -1)
+    if(thrd_create(&thr, thread_func, 0) != thrd_success)
         return -1;
-    pthread_detach(thr);
+    thrd_detach(thr);
     return 0;
 }
 
@@ -135,7 +138,7 @@ int start_logger(const char *app_name)
 int main(int argc, const char* pArgv[]) {
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
   //  gdb_init();
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) && TINYCTHREAD_ENABLE_THREADS
     start_logger("");
 #endif
     GblTestScenario* pScenario = GblTestScenario_create("libGimbalTests");
@@ -240,8 +243,10 @@ int main(int argc, const char* pArgv[]) {
                                  GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
+#if TINYCTHREAD_ENABLE_THREADS
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
+#endif
 #ifdef GBL_ENABLE_CPP
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_QUARK_TEST_SUITE_CPP_TYPE));
