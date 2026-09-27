@@ -88,11 +88,11 @@ GBL_PROPERTIES(GblSettings,
 )
 
 GBL_SIGNALS(GblSettings,
-    (added,   (receiver, GBL_INSTANCE_TYPE), (key,    GBL_STRING_TYPE)),
-    (removed, (receiver, GBL_INSTANCE_TYPE), (key,    GBL_STRING_TYPE)),
-    (changed, (receiver, GBL_INSTANCE_TYPE), (key,    GBL_STRING_TYPE)),
-    (saved,   (receiver, GBL_INSTANCE_TYPE), (result, GBL_ENUM_TYPE)),
-    (loaded,  (receiver, GBL_INSTANCE_TYPE), (result, GBL_ENUM_TYPE))
+    (added,   (GBL_STRING_TYPE, key)),
+    (removed, (GBL_STRING_TYPE, key)),
+    (changed, (GBL_STRING_TYPE, key)),
+    (saved,   (GBL_ENUM_TYPE, result)),
+    (loaded,  (GBL_ENUM_TYPE, result))
 )
 //! \endcond
 

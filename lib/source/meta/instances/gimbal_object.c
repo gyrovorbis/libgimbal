@@ -1950,12 +1950,7 @@ static GBL_RESULT GblObjectClass_init_(GblClass* pClass, const void* pData) {
         objectParentPropertyQuark_ = GblQuark_fromStatic("parent");
 
         GBL_PROPERTIES_REGISTER(GblObject);
-
-        GblSignal_install(GBL_OBJECT_TYPE,
-                          "propertyChange",
-                          GblMarshal_CClosure_VOID__INSTANCE_BOX,
-                          1,
-                          GBL_BOX_TYPE);
+        GBL_SIGNALS_REGISTER(GblObject);
 
         memcpy(&iVariantVTable, GBL_IVARIANT_CLASS(pClass)->pVTable, sizeof(GblIVariantVTable));
         iVariantVTable.pFnLoad = GblObject_IVariant_load_;

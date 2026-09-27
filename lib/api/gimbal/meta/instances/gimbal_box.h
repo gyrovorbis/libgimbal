@@ -106,7 +106,7 @@ GBL_INSTANCE_END
 
 //! \cond
 GBL_SIGNALS(GblBox,
-    (finalize, (GBL_INSTANCE_TYPE, pReceiver)) //!< Emitted just before a box is destroyed.
+    (finalize) //!< Emitted just before a box is destroyed.
 )
 //! \endcond
 
