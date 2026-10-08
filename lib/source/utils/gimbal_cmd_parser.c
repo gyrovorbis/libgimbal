@@ -149,20 +149,12 @@ static void GblCmdParser_appendGroupHelp_(const GblOptionGroup* pGroup,
                                           GblBool               prefixed,
                                           GblStringBuffer*      pBuffer) {
     const char* pName = GblObject_name(GBL_OBJECT(pGroup));
-    GblStringBuffer_append(pBuffer, "\n");
-    GblStringBuffer_append(pBuffer, pName? pName : "Options");
-    GblStringBuffer_append(pBuffer, ":\n");
+    GblStringBuffer_appendPrintf(pBuffer, "\n%s:\n", pName? pName : "Options");
 
-    if(pGroup->pSummary) {
-        GblStringBuffer_append(pBuffer, "  ");
-        GblStringBuffer_append(pBuffer, pGroup->pSummary);
-        GblStringBuffer_append(pBuffer, "\n");
-    }
-    if(pGroup->pDescription) {
-        GblStringBuffer_append(pBuffer, "  ");
-        GblStringBuffer_append(pBuffer, pGroup->pDescription);
-        GblStringBuffer_append(pBuffer, "\n");
-    }
+    if(pGroup->pSummary)
+        GblStringBuffer_appendPrintf(pBuffer, "  %s\n", pGroup->pSummary);
+    if(pGroup->pDescription)
+        GblStringBuffer_appendPrintf(pBuffer, "  %s\n", pGroup->pDescription);
 
     GblBool optionWritten = GBL_FALSE;
     for(size_t o = 0; o < pGroup->optionCount; ++o) {
@@ -174,38 +166,24 @@ static void GblCmdParser_appendGroupHelp_(const GblOptionGroup* pGroup,
         optionWritten = GBL_TRUE;
 
         GblStringBuffer_append(pBuffer, "  ");
-        if(!prefixed && pOption->shortName) {
-            const char shortName[] = { '-', pOption->shortName, '\0' };
-            GblStringBuffer_append(pBuffer, shortName);
-            if(pOption->pLongName)
-                GblStringBuffer_append(pBuffer, ", ");
-        }
-        if(pOption->pLongName) {
-            GblStringBuffer_append(pBuffer, "--");
-            if(prefixed && pGroup->pPrefix) {
-                GblStringBuffer_append(pBuffer, pGroup->pPrefix);
-                GblStringBuffer_append(pBuffer, "-");
-            }
-            GblStringBuffer_append(pBuffer, pOption->pLongName);
-        }
+        if(!prefixed && pOption->shortName)
+            GblStringBuffer_appendPrintf(pBuffer, "-%c%s",
+                                         pOption->shortName, pOption->pLongName? ", " : "");
+        if(pOption->pLongName)
+            GblStringBuffer_appendPrintf(pBuffer, "--%s%s%s",
+                                         prefixed && pGroup->pPrefix? pGroup->pPrefix : "",
+                                         prefixed && pGroup->pPrefix? "-" : "", pOption->pLongName);
         if(!(pOption->type == GBL_OPTION_TYPE_BOOL &&
-             (pOption->flags & GBL_OPTION_FLAG_BOOL_NO_VALUE))) {
-            GblStringBuffer_append(pBuffer, " <");
-            GblStringBuffer_append(pBuffer,
-                                   pOption->pValueName? pOption->pValueName : "value");
-            GblStringBuffer_append(pBuffer, ">");
-        }
+             (pOption->flags & GBL_OPTION_FLAG_BOOL_NO_VALUE)))
+            GblStringBuffer_appendPrintf(pBuffer, " <%s>", pOption->pValueName? pOption->pValueName : "value");
         GblStringBuffer_append(pBuffer, "\n");
 
         GblStringView description = GBL_STRV(pOption->pDescription);
         while(!GblStringView_empty(description)) {
             size_t lineLength = GblStringView_find(description, "\n");
             if(lineLength == GBL_STRING_VIEW_NPOS) lineLength = description.length;
-            if(lineLength) {
-                GblStringBuffer_append(pBuffer, "    * ");
-                GblStringBuffer_append(pBuffer, description.pData, lineLength);
-                GblStringBuffer_append(pBuffer, "\n");
-            }
+            if(lineLength)
+                GblStringBuffer_appendPrintf(pBuffer, "    * %.*s\n", (int)lineLength, description.pData);
             description = GblStringView_removePrefix(description,
                                                      lineLength < description.length? lineLength + 1 : lineLength);
         }
@@ -218,15 +196,11 @@ GBL_EXPORT GBL_RESULT GblCmdParser_formatHelp(const GblCmdParser* pSelf,
 
     const GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
     GblStringBuffer_clear(pBuffer);
-    GblStringBuffer_append(pBuffer, "Usage: ");
-    GblStringBuffer_append(pBuffer,
-                           pSelf_->pExecutable? pSelf_->pExecutable : "program");
-    GblStringBuffer_append(pBuffer, " [options]");
+    GblStringBuffer_appendPrintf(pBuffer, "Usage: %s [options]",
+                                 pSelf_->pExecutable? pSelf_->pExecutable : "program");
     for(size_t a = 0; a < GblArrayList_size(&pSelf_->posArgs); ++a) {
         const GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, a);
-        GblStringBuffer_append(pBuffer, " <");
-        GblStringBuffer_append(pBuffer, pArg->pName);
-        GblStringBuffer_append(pBuffer, ">");
+        GblStringBuffer_appendPrintf(pBuffer, " <%s>", pArg->pName);
     }
     GblStringBuffer_append(pBuffer, "\n");
 
@@ -244,11 +218,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_formatHelp(const GblCmdParser* pSelf,
         GblStringBuffer_append(pBuffer, "\nArguments:\n");
         for(size_t a = 0; a < GblArrayList_size(&pSelf_->posArgs); ++a) {
             const GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, a);
-            GblStringBuffer_append(pBuffer, "  ");
-            GblStringBuffer_append(pBuffer, pArg->pName);
-            GblStringBuffer_append(pBuffer, "  ");
-            GblStringBuffer_append(pBuffer, pArg->pDesc? pArg->pDesc : "");
-            GblStringBuffer_append(pBuffer, "\n");
+            GblStringBuffer_appendPrintf(pBuffer, "  %s  %s\n", pArg->pName, pArg->pDesc? pArg->pDesc : "");
         }
     }
 
