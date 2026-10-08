@@ -8,10 +8,10 @@
  *  refer to the \ref signals overview.
  *
  *  \author    2023, 2025 Falco Girgis
+ *  \author    2026 Agustín Bellagamba
  *  \copyright MIT License
  *
  *  \todo
- *      - GBL_SIGNALS() DSL
  *      - GblSignal_next() for iteration
  *      - GblSignal_uninstallAll(GblType type)
  *      - thread-safety
@@ -19,17 +19,19 @@
 #ifndef GIMBAL_SIGNAL_H
 #define GIMBAL_SIGNAL_H
 
+#include "../../core/gimbal_error.h"
 #include "../types/gimbal_type.h"
+#include "../types/gimbal_variant.h"
 #include "gimbal_marshal.h"
 
 /*! \name  DSL Macros
  *  \brief Helper macros for declaring and managing signals.
  *  @{
  */
-//! Declares a list of signals to be associated with the given instanceStruct.
-#define GBL_SIGNALS(instanceStruct, /* signals */...)
-//! Registers the list of signals which has been associated with the given instanceStruct.
-#define GBL_SIGNALS_REGISTER(instanceStruct, /* marshals */...)
+//! Declares signals with an implicit GblInstance pReceiver as the first argument.
+#define GBL_SIGNALS(instanceStruct, /*name, (type, argument[, type])*/...) GBL_SIGNALS_(instanceStruct, __VA_ARGS__)
+//! Registers declared signals, returning a GBL_RESULT. Unsupported signatures fail before installation, installation errors stop registration.
+#define GBL_SIGNALS_REGISTER(instanceStruct) instanceStruct##_registerSignals_()
 //! Emits a signal from the given emitter with the given name and arguments.
 #define GBL_EMIT(emitter, /* name, */...)      (GblSignal_emit(GBL_INSTANCE(emitter), __VA_ARGS__))
 //! Connects the signal with the given name from the given emitter to a receiver with the given callback function and optional userdata.
@@ -55,9 +57,9 @@
  *
  *  \code{.c}
  *      GBL_SIGNALS(GblOptionGroup,
- *          (parsePrePass,  (GBL_POINTER_TYPE, stringList),
- *          (parsePostPass, (GBL_POINTER_TYPE, stringList),
- *          (parseError,    (GBL_ENUM_TYPE,    errorCode)
+ *          (parsePrePass,  (GBL_POINTER_TYPE, stringList)),
+ *          (parsePostPass, (GBL_POINTER_TYPE, stringList)),
+ *          (parseError,    (GBL_ENUM_TYPE,    errorCode))
  *      )
  *  \endcode
  *
@@ -65,6 +67,20 @@
  *  with `parsePrePass` and `parsePostPass` sending pointers to GblStringList
  *  as their parameters, and `parseError` passing along an error code as a
  *  GblEnum as its parameter.
+ *
+ *  Signatures without a builtin marshal require a C type on every payload.
+ *  The following declaration generates its marshal automatically:
+ *
+ *  \code{.c}
+ *      GBL_SIGNALS(MyTask,
+ *          (progress, (GBL_FLOAT_TYPE,  fraction, float),
+ *                     (GBL_STRING_TYPE, pMessage, const char*))
+ *      )
+ *
+ *      static void onProgress(GblInstance* pReceiver,
+ *                             float        fraction,
+ *                             const char*  pMessage);
+ *  \endcode
  *
  *  # Registration
  *  The first thing that must happen before signals can be used is that they
@@ -233,7 +249,7 @@ GBL_EXPORT GblInstance* GblSignal_receiver        (void)                     GBL
 
 // ===== IMPLEMENTATION =====
 
-///\cond
+///\cond GRUG_FREE
 #define GblSignal_connect_3(emitter, signal, callback) \
     (GblSignal_connect_4(emitter, signal, emitter, callback))
 #define GblSignal_connect_4(emitter, signal, receiver, callback) \
@@ -248,30 +264,153 @@ GBL_EXPORT GblInstance* GblSignal_receiver        (void)                     GBL
 #define GBL_CONNECT_5(emitter, signal, receiver, callback, userdata) \
     ((GblSignal_connect)(GBL_INSTANCE(emitter), signal, GBL_INSTANCE(receiver), GBL_CALLBACK(callback), (void*)userdata))
 
-#define GBL_SIGNALS_(instance, ...) \
-    GBL_INLINE GBL_RESULT instance##_registerSignals_(instance* pSelf, GblMarshalFn* pMarshals) { \
-        GBL_UNUSED(pSelf, pMarshals); \
-        GBL_CTX_BEGIN(NULL); \
-        GBL_TUPLE_FOREACH(GBL_SIGNAL_INSTALL_, instance, (__VA_ARGS__)) \
-        GBL_CTX_END(); \
+GBL_EXPORT GBL_RESULT GblSignal_resolveMarshal_(const char*    pName,
+                                                size_t         argCount,
+                                                const GblType* pArgTypes,
+                                                GblMarshalFn*  ppFnMarshal) GBL_NOEXCEPT;
+GBL_EXPORT GblFnPtr   GblSignal_callback_      (GblClosure* pClosure,
+                                                GblPtr      pMarshalData)   GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblSignal_peekBool_      (const GblVariant* pValue,
+                                                void*             pOutput)  GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT GblSignal_peekPointer_   (const GblVariant* pValue,
+                                                void*             pOutput)  GBL_NOEXCEPT;
+
+#define GBL_SIGNAL_SELECT_(type, scalar, boolean, pointer) \
+    _Generic((type){0},                                    \
+        _Bool:       boolean,                              \
+        char:        scalar,                               \
+        uint8_t:     scalar,                               \
+        uint16_t:    scalar,                               \
+        int16_t:     scalar,                               \
+        uint32_t:    scalar,                               \
+        int32_t:     scalar,                               \
+        uint64_t:    scalar,                               \
+        int64_t:     scalar,                               \
+        float:       scalar,                               \
+        double:      scalar,                               \
+        const char*: scalar,                               \
+        default:     pointer)
+
+#define GBL_SIGNALS_(instance, ...)                                                  \
+    GBL_EXPORT GblType instance##_type(void) GBL_NOEXCEPT;                           \
+    __VA_OPT__(GBL_TUPLE_FOREACH(GBL_SIGNAL_DEFINE_, instance, (__VA_ARGS__)))       \
+    GBL_INLINE GBL_RESULT instance##_registerSignals_(void) GBL_NOEXCEPT             \
+    {                                                                                \
+        GBL_RESULT result = GBL_RESULT_SUCCESS;                                      \
+        GBL_UNUSED(result);                                                          \
+                                                                                     \
+        __VA_OPT__(GBL_TUPLE_FOREACH(GBL_SIGNAL_VALIDATE_, instance, (__VA_ARGS__))) \
+        __VA_OPT__(GBL_TUPLE_FOREACH(GBL_SIGNAL_REGISTER_, instance, (__VA_ARGS__))) \
+                                                                                     \
+        return GBL_RESULT_SUCCESS;                                                   \
     }
 
+#define GBL_SIGNAL_MODE_(...) GBL_SIGNAL_MODE_IMPL_(GBL_TUPLE_FIRST(__VA_ARGS__ __VA_OPT__(,) (unused, unused)))
+#define GBL_SIGNAL_MODE_IMPL_(pair) GBL_NARG pair
 
-#define GBL_SIGNAL_INSTALL_(instance, signal)
+#define GBL_SIGNAL_DEFINE_(instance, signal)             \
+    GBL_SIGNAL_DEFINE_EXPAND_(instance, GBL_EVAL signal)
+#define GBL_SIGNAL_DEFINE_EXPAND_(...) GBL_SIGNAL_DEFINE_IMPL_(__VA_ARGS__)
 
-#if 0
-GBL_CTX_VERIFY_CALL(GblSignal_install(GBL_TYPEID(instance), \
-                                          GBL_STRINGIFY(GBL_TUPLE_FIRST signal), \
-                                          pMarshals++, \
-                                          GBL_NARG signal - 1, \
-                                          GBL_TUPLE_FOREACH(GBL_SIGNAL_ARG_TYPE_, instance, GBL_TUPLE_REST(signal) )));
-#endif
+#define GBL_SIGNAL_DEFINE_IMPL_(instance, name, ...)                                                               \
+    GBL_GLUE(GBL_SIGNAL_MARSHAL_, GBL_SIGNAL_MODE_(__VA_ARGS__))(instance, name, __VA_ARGS__)                      \
+    GBL_INLINE GBL_RESULT instance##_signal_##name##_(GblBool install) GBL_NOEXCEPT                                \
+    {                                                                                                              \
+        enum { gblSignalArity_ = GBL_SIGNAL_MODE_(__VA_ARGS__) };                                                  \
+        __VA_OPT__(GBL_MAP(GBL_SIGNAL_ARITY_ASSERT_, __VA_ARGS__))                                                 \
+        const GblType argTypes[] = { GBL_INVALID_TYPE __VA_OPT__(, GBL_MAP_LIST(GBL_SIGNAL_TYPE_, __VA_ARGS__)) }; \
+        const size_t  argCount   = GBL_COUNT_OF(argTypes) - 1;                                                     \
+        GblMarshalFn  pFnMarshal = GBL_GLUE(GBL_SIGNAL_MARSHAL_SELECT_,                                            \
+            GBL_SIGNAL_MODE_(__VA_ARGS__))(instance, name);                                                        \
+                                                                                                                   \
+        for(size_t  a = 1; a <= argCount; ++a) {                                                                   \
+            if(!GblType_verify(argTypes[a]))                                                                       \
+                return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_TYPE,                 \
+                    "Invalid payload type for signal '%s'", #name)->code;                                          \
+        }                                                                                                          \
+                                                                                                                   \
+        if(!pFnMarshal) {                                                                                          \
+            const GBL_RESULT result = GblSignal_resolveMarshal_(#name, argCount, argTypes + 1, &pFnMarshal);       \
+            if(!GBL_RESULT_SUCCESS(result)) return result;                                                         \
+        }                                                                                                          \
+                                                                                                                   \
+        if(install)                                                                                                \
+            return GblSignal_install(instance##_type(), #name, pFnMarshal, argCount                                \
+                __VA_OPT__(, GBL_MAP_LIST(GBL_SIGNAL_TYPE_, __VA_ARGS__)));                                        \
+                                                                                                                   \
+        return GBL_RESULT_SUCCESS;                                                                                 \
+    }
 
-#define GBL_SIGNAL_ARG_TYPE_(instance, pair) \
-    GBL_TUPLE_FIRST(pair),
+#define GBL_SIGNAL_ARITY_ASSERT_(pair)                                                     \
+    GBL_STATIC_ASSERT_MSG(GBL_NARG pair == gblSignalArity_,                                \
+        "A signal must use either all (type, name) or all (type, name, C type) payloads");
 
-#define GBL_SIGNALS_REGISTER_(instance, marshals) \
-    instance##_registerSignals_(instance, marshals)
+#define GBL_SIGNAL_TYPE_(pair) GBL_TUPLE_FIRST pair
+#define GBL_SIGNAL_CTYPE_(pair) GBL_SIGNAL_CTYPE_IMPL_ pair
+#define GBL_SIGNAL_CTYPE_IMPL_(runtimeType, name, cType) cType
+
+#define GBL_SIGNAL_LOCAL_(pair) GBL_SIGNAL_LOCAL_IMPL_ pair
+#define GBL_SIGNAL_LOCAL_IMPL_(runtimeType, name, cType)                                                      \
+    cType gblSignalArg_##name = { 0 };                                                                        \
+    {                                                                                                         \
+        if(!GblType_check(GblVariant_typeOf(&pArgs[gblSignalIndex_]), runtimeType))                           \
+            return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_TYPE_MISMATCH,               \
+                "Invalid signal argument '%s'", #name)->code;                                                 \
+        void* pPointer = NULL;                                                                                \
+        result = GBL_SIGNAL_SELECT_(cType, GblVariant_valuePeek, GblSignal_peekBool_, GblSignal_peekPointer_) \
+            (&pArgs[gblSignalIndex_++], (void*)GBL_SIGNAL_SELECT_(cType, &gblSignalArg_##name,                \
+                &gblSignalArg_##name, &pPointer));                                                            \
+        if(!GBL_RESULT_SUCCESS(result)) return result;                                                        \
+        gblSignalArg_##name = (cType)GBL_SIGNAL_SELECT_(cType, gblSignalArg_##name,                           \
+            gblSignalArg_##name, pPointer);                                                                   \
+    }
+
+#define GBL_SIGNAL_VALUE_(pair) GBL_SIGNAL_VALUE_IMPL_ pair
+#define GBL_SIGNAL_VALUE_IMPL_(runtimeType, name, cType) gblSignalArg_##name
+
+#define GBL_SIGNAL_MARSHAL_2(instance, name, ...)
+#define GBL_SIGNAL_MARSHAL_SELECT_2(instance, name) NULL
+#define GBL_SIGNAL_MARSHAL_SELECT_3(instance, name) instance##_marshal_##name##_
+
+#define GBL_SIGNAL_MARSHAL_3(instance, name, ...)                                                 \
+    GBL_INLINE GBL_RESULT instance##_marshal_##name##_(GblClosure* pClosure,                      \
+                                                         GblVariant* pRetValue,                   \
+                                                         size_t      argCount,                    \
+                                                         GblVariant* pArgs,                       \
+                                                         GblPtr      pMarshalData)                \
+    {                                                                                             \
+        typedef void (*Callback_)(GblInstance*, GBL_MAP_LIST(GBL_SIGNAL_CTYPE_, __VA_ARGS__));    \
+        GBL_UNUSED(pRetValue);                                                                    \
+                                                                                                  \
+        if(argCount != 1 + GBL_NARG(__VA_ARGS__))                                                 \
+            return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_ARG,     \
+                "Invalid argument count for signal '%s'", #name)->code;                           \
+        if(!pArgs || (!pClosure && !pMarshalData.pFunc))                                          \
+            return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_POINTER, \
+                "Invalid arguments for signal '%s'", #name)->code;                                \
+                                                                                                  \
+        Callback_ pFnCallback = (Callback_)GblSignal_callback_(pClosure, pMarshalData);           \
+        if(!pFnCallback)                                                                          \
+            return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_POINTER, \
+                "Missing callback for signal '%s'", #name)->code;                                 \
+                                                                                                  \
+        void* pReceiver = NULL;                                                                   \
+        GBL_RESULT result = GblSignal_peekPointer_(&pArgs[0], &pReceiver);                        \
+        if(!GBL_RESULT_SUCCESS(result)) return result;                                            \
+                                                                                                  \
+        size_t  gblSignalIndex_ = 1;                                                              \
+        GBL_MAP(GBL_SIGNAL_LOCAL_, __VA_ARGS__)                                                   \
+                                                                                                  \
+        pFnCallback((GblInstance*)pReceiver, GBL_MAP_LIST(GBL_SIGNAL_VALUE_, __VA_ARGS__));       \
+        return GBL_RESULT_SUCCESS;                                                                \
+    }
+
+#define GBL_SIGNAL_VALIDATE_(instance, signal)                                                       \
+    result = GBL_GLUE(GBL_GLUE(instance, _signal_), GBL_GLUE(GBL_TUPLE_FIRST signal, _))(GBL_FALSE); \
+    if(!GBL_RESULT_SUCCESS(result)) return result;
+#define GBL_SIGNAL_REGISTER_(instance, signal)                                                      \
+    result = GBL_GLUE(GBL_GLUE(instance, _signal_), GBL_GLUE(GBL_TUPLE_FIRST signal, _))(GBL_TRUE); \
+    if(!GBL_RESULT_SUCCESS(result)) return result;
 ///\endcond
 
 GBL_DECLS_END

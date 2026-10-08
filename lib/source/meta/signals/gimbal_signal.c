@@ -78,6 +78,125 @@ static void signalSetDestructor_(const GblHashSet* pSet, void* pEntry) {
     GBL_CTX_END_BLOCK();
 }
 
+GBL_EXPORT GBL_RESULT GblSignal_resolveMarshal_(const char*    pName,
+                                                size_t         argCount,
+                                                const GblType* pArgTypes,
+                                                GblMarshalFn*  ppFnMarshal)
+{
+    if(!ppFnMarshal || !pName || (argCount && !pArgTypes))
+        return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_POINTER,
+                                         "Invalid marshal lookup arguments")->code;
+
+    *ppFnMarshal = NULL;
+
+    switch(argCount) {
+    case 0:
+        *ppFnMarshal = GblMarshal_CClosure_VOID__INSTANCE;
+        break;
+    case 1: {
+        const struct {
+            GblType      type;
+            GblMarshalFn pFnMarshal;
+        } marshals[] = {
+            { GBL_BOX_TYPE,      GblMarshal_CClosure_VOID__INSTANCE_BOX      },
+            { GBL_ENUM_TYPE,     GblMarshal_CClosure_VOID__INSTANCE_ENUM     },
+            { GBL_FLAGS_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_FLAGS    },
+            { GBL_OPAQUE_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_OPAQUE   },
+            { GBL_POINTER_TYPE,  GblMarshal_CClosure_VOID__INSTANCE_POINTER  },
+            { GBL_INSTANCE_TYPE, GblMarshal_CClosure_VOID__INSTANCE_INSTANCE },
+            { GBL_BOOL_TYPE,     GblMarshal_CClosure_VOID__INSTANCE_BOOL     },
+            { GBL_CHAR_TYPE,     GblMarshal_CClosure_VOID__INSTANCE_CHAR     },
+            { GBL_UINT8_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_UINT8    },
+            { GBL_UINT16_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_UINT16   },
+            { GBL_INT16_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_INT16    },
+            { GBL_UINT32_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_UINT32   },
+            { GBL_INT32_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_INT32    },
+            { GBL_UINT64_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_UINT64   },
+            { GBL_INT64_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_INT64    },
+            { GBL_FLOAT_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_FLOAT    },
+            { GBL_DOUBLE_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_DOUBLE   },
+            { GBL_STRING_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_STRING   }
+        };
+
+        for(size_t  m = 0; m < GBL_COUNT_OF(marshals); ++m) {
+            if(GblType_check(pArgTypes[0], marshals[m].type)) {
+                *ppFnMarshal = marshals[m].pFnMarshal;
+                break;
+            }
+        }
+        break;
+    }
+    case 2:
+        if((GblType_check(pArgTypes[0], GBL_POINTER_TYPE)  ||
+           (GblType_check(pArgTypes[0], GBL_INSTANCE_TYPE) &&
+           !GblType_check(pArgTypes[0], GBL_BOX_TYPE)))    &&
+            pArgTypes[1] == GBL_SIZE_TYPE)
+           *ppFnMarshal = GblMarshal_CClosure_VOID__INSTANCE_INSTANCE_SIZE;
+        break;
+    default:
+        break;
+    }
+
+    if(!*ppFnMarshal)
+        return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_OPERATION,
+                                         "No C marshal for '%s'; specify C types for all %zu payloads",
+                                         pName, argCount)->code;
+
+    return GBL_RESULT_SUCCESS;
+}
+
+GBL_EXPORT GblFnPtr GblSignal_callback_(GblClosure* pClosure, GblPtr pMarshalData) {
+    return pMarshalData.pFunc? pMarshalData.pFunc :
+        (pClosure? GblCClosure_callback((GblCClosure*)pClosure) : NULL);
+}
+
+GBL_EXPORT GBL_RESULT GblSignal_peekBool_(const GblVariant* pValue, void* pOutput) {
+    if(!pValue || !pOutput)
+        return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_POINTER,
+                                         "Invalid boolean output")->code;
+
+    if(GblVariant_typeOf(pValue) != GBL_BOOL_TYPE)
+        return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_TYPE_MISMATCH,
+                                         "Signal argument is not a boolean value")->code;
+
+    GblBool value = GBL_FALSE;
+    const GBL_RESULT result = GblVariant_valuePeek(pValue, (void*)&value);
+    if(GBL_RESULT_SUCCESS(result)) *(_Bool*)pOutput = value != GBL_FALSE;
+
+    return result;
+}
+
+GBL_EXPORT GBL_RESULT GblSignal_peekPointer_(const GblVariant* pValue, void* pOutput) {
+    if(!pValue || !pOutput)
+        return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_POINTER,
+                                         "Invalid pointer output")->code;
+
+    const GblType type = GblVariant_typeOf(pValue);
+    GBL_RESULT result;
+
+    if(GblType_check(type, GBL_BOX_TYPE)) {
+        GblBox* pBox = NULL;
+        result = GblVariant_valuePeek(pValue, (void*)&pBox);
+        if(GBL_RESULT_SUCCESS(result)) *(void**)pOutput = pBox;
+
+    } else if(GblType_check(type, GBL_POINTER_TYPE) || GblType_check(type, GBL_OPAQUE_TYPE)) {
+        void* pPointer = NULL;
+        result = GblVariant_valuePeek(pValue, (void*)&pPointer);
+        if(GBL_RESULT_SUCCESS(result)) *(void**)pOutput = pPointer;
+
+    } else if(GblType_check(type, GBL_INSTANCE_TYPE)) {
+        GblInstance* pInstance = NULL;
+        result = GblVariant_valuePeek(pValue, (void*)&pInstance);
+        if(GBL_RESULT_SUCCESS(result)) *(void**)pOutput = pInstance;
+
+    } else {
+        return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_TYPE_MISMATCH,
+                                         "Signal argument is not a pointer value")->code;
+    }
+
+    return result;
+}
+
 GBL_EXPORT GBL_RESULT GblSignal_install(GblType      ownerType,
                                         const char*  pName,
                                         GblMarshalFn pFnCMarshal,
