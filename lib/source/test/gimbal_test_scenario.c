@@ -9,6 +9,7 @@
 #include <gimbal/containers/gimbal_array_list.h>
 #include <gimbal/strings/gimbal_string_ref.h>
 #include <time.h>
+#include <stdio.h>
 
 static const char* GBL_TERM_GREEN_  = "\x1b[32m";
 static const char* GBL_TERM_YELLOW_ = "\x1b[33m";
@@ -200,9 +201,21 @@ static GblBool GblTestScenario_stringListIterFn_(GblStringRef* pRef, void* pClos
     return GblStringView_containsIgnoreCase(GBL_STRV((const char*)pClosure), pRef);
 }
 
+static void GblTestScenario_printHelp_(const GblCmdParser* pParser) {
+    GblStringBuffer help;
+    GblStringBuffer_construct(&help);
+    GblCmdParser_formatHelp(pParser, &help);
+    printf("%s", GblStringBuffer_cString(&help));
+    GblStringBuffer_destruct(&help);
+}
+
 static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, const char* argv[]) {
-    GBL_UNUSED(argc, argv);
     GBL_CTX_BEGIN(pSelf);
+
+    GblCmdParser*  pParser    = NULL;
+    GblStringList* pOnlyList_ = NULL;
+    GblStringList* pSkipList_ = NULL;
+    GBL_RESULT     result     = GBL_RESULT_SUCCESS;
 
     GblContext*           pCtx   = GblObject_findContext(GBL_OBJECT(pSelf));
     GblTestScenarioClass* pClass = GBL_TEST_SCENARIO_CLASSOF(pSelf);
@@ -215,30 +228,42 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
     }
     GBL_CTX_VERIFY_CALL(GblArrayList_assign(&pSelf_->failures, NULL, 0));
 
-    pSelf->result = GBL_RESULT_SUCCESS;
-    GBL_CTX_VERIFY_CALL(pClass->pFnBegin(pSelf));
-
     const char* pOnly_       = NULL;
     const char* pSkip_       = NULL;
     GblBool     enableColor  = GBL_FALSE;
 
-    GblCmdParser* pParser = GBL_NEW(GblCmdParser,
+    pParser = GBL_NEW(GblCmdParser,
         "mainOptionGroup",  GBL_NEW(GblOptionGroup,
             "name", "Test Suite",
             "prefix", "test",
             "options", (GblOption[]) {
-                { "only",     'o',   GBL_OPTION_TYPE_STRING, &pOnly_,       "Only runs the given tests", "pOnly_",       GBL_OPTION_FLAG_NONE          },
-                { "skip",     's',   GBL_OPTION_TYPE_STRING, &pSkip_,       "Skips the given tests",     "pSkip_",       GBL_OPTION_FLAG_NONE          },
-                { "color",    'c',   GBL_OPTION_TYPE_BOOL,   &enableColor,  "Enables colored output",    "enableColor",  GBL_OPTION_FLAG_BOOL_NO_VALUE },
+                { "only",     'o',   GBL_OPTION_TYPE_STRING, &pOnly_,       "Only runs suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --only \"CmdParser OptionGroup\".", "test", GBL_OPTION_FLAG_NONE },
+                { "skip",     's',   GBL_OPTION_TYPE_STRING, &pSkip_,       "Skips suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --skip \"CmdParser OptionGroup\".",    "test", GBL_OPTION_FLAG_NONE },
+                { "color",    'c',   GBL_OPTION_TYPE_BOOL,   &enableColor,  "Enables colored output", "enableColor",  GBL_OPTION_FLAG_BOOL_NO_VALUE },
                 { 0 }
             }
         )
     );
 
-    GblCmdParser_parse(pParser, GblStringList_createWithArray(argv, argc));
+    if(!pParser) {
+        result = GBL_RESULT_ERROR_INVALID_POINTER;
+        goto cleanup;
+    }
+    result = GblCmdParser_parse(pParser, GblStringList_createWithArray(argv, argc));
+    if(!GBL_RESULT_SUCCESS(result)) {
+        GblTestScenario_printHelp_(pParser);
+        goto cleanup;
+    }
+    if(GblCmdParser_helpRequested(pParser)) {
+        GblTestScenario_printHelp_(pParser);
+        goto cleanup;
+    }
 
-    GblStringList* pOnlyList_ = GblStringList_createSplit(pOnly_, " ");
-    GblStringList* pSkipList_ = GblStringList_createSplit(pSkip_, " ");
+    pSelf->result = GBL_RESULT_SUCCESS;
+    GBL_CTX_VERIFY_CALL(pClass->pFnBegin(pSelf));
+
+    pOnlyList_ = GblStringList_createSplit(pOnly_, " ");
+    pSkipList_ = GblStringList_createSplit(pSkip_, " ");
 
     if (!enableColor) {
         GBL_TERM_GREEN_  = "";
@@ -424,15 +449,17 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
         GBL_CTX_CALL(pClass->pFnSuiteEnd(pSelf, pSuiteIt));
     }
 
-    GblCmdParser_unref(pParser);
-    GblStringList_unref(pOnlyList_);
-    GblStringList_unref(pSkipList_);
-
     pSelf->result = (pSelf->casesFailed || pSelf->suitesFailed)? GBL_RESULT_ERROR : GBL_RESULT_SUCCESS;
     GBL_CTX_CALL(pClass->pFnEnd(pSelf));
 
+    result = pSelf->result;
+cleanup:
     GBL_CTX_END_BLOCK();
-    return pSelf->result;
+    if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) result = GBL_CTX_RESULT();
+    GblCmdParser_unref(pParser);
+    GblStringList_unref(pOnlyList_);
+    GblStringList_unref(pSkipList_);
+    return result;
 }
 
 static GBL_RESULT GblTestScenarioClass_suiteBegin_(GblTestScenario* pSelf, const GblTestSuite* pSuite) {

@@ -15,6 +15,7 @@ GBL_DECLARE_STRUCT_PRIVATE(GblCmdParser) {
     GblStringRef*   pExecutable;
     GblStringList*  pArgValues;
     GblStringList*  pUnknownOptions;
+    GblBool         helpRequested;
 };
 
 GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pArgs) {
@@ -22,6 +23,8 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     GBL_CTX_VERIFY_POINTER(pArgs);
 
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+
+    pSelf_->helpRequested = GBL_FALSE;
 
     // 0. Destroy any existing cached/parsed values in case we've already made a pass
     GblStringRef_unref(pSelf->pErrorMsg);
@@ -62,6 +65,14 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
 
         // Check for options or "--" specifier
         if(!parseAsPositionals) {
+            if(pSelf->enableHelpOption &&
+               (GblStringView_equals(argView, "--help") ||
+                GblStringView_equals(argView, "-h"))) {
+                pSelf_->helpRequested = GBL_TRUE;
+                GblStringRef_unref(GblStringList_extract(pArgs, pIt));
+                pIt = pNext;
+                continue;
+            }
             // check whether we should consider all remaining args as positional
             if(GblStringView_equals(argView, "--")) {
                 parseAsPositionals = GBL_TRUE;
@@ -105,7 +116,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     const size_t  expectedCount = GblArrayList_size(&pSelf_->posArgs) +
                                     (pSelf_->pExecutable? 1 : 0);
 
-    GBL_CTX_VERIFY(actualCount == expectedCount ||
+    GBL_CTX_VERIFY(pSelf_->helpRequested || actualCount == expectedCount ||
                    (pSelf->allowExtraArgs && actualCount > expectedCount),
                    GBL_RESULT_ERROR_INVALID_CMDLINE_ARG,
                    "Expected %u arguments, but %u were provided",
@@ -128,6 +139,120 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     }
 
     return pSelf->parseResult;
+}
+
+GBL_EXPORT GblBool GblCmdParser_helpRequested(const GblCmdParser* pSelf) {
+    return pSelf && GBL_CMD_PARSER_(pSelf)->helpRequested;
+}
+
+static void GblCmdParser_appendGroupHelp_(const GblOptionGroup* pGroup,
+                                          GblBool               prefixed,
+                                          GblStringBuffer*      pBuffer) {
+    const char* pName = GblObject_name(GBL_OBJECT(pGroup));
+    GblStringBuffer_append(pBuffer, "\n");
+    GblStringBuffer_append(pBuffer, pName? pName : "Options");
+    GblStringBuffer_append(pBuffer, ":\n");
+
+    if(pGroup->pSummary) {
+        GblStringBuffer_append(pBuffer, "  ");
+        GblStringBuffer_append(pBuffer, pGroup->pSummary);
+        GblStringBuffer_append(pBuffer, "\n");
+    }
+    if(pGroup->pDescription) {
+        GblStringBuffer_append(pBuffer, "  ");
+        GblStringBuffer_append(pBuffer, pGroup->pDescription);
+        GblStringBuffer_append(pBuffer, "\n");
+    }
+
+    GblBool optionWritten = GBL_FALSE;
+    for(size_t o = 0; o < pGroup->optionCount; ++o) {
+        const GblOption* pOption = &pGroup->pOptions[o];
+        if(pOption->flags & GBL_OPTION_FLAG_HIDDEN) continue;
+
+        if(optionWritten)
+            GblStringBuffer_append(pBuffer, "\n");
+        optionWritten = GBL_TRUE;
+
+        GblStringBuffer_append(pBuffer, "  ");
+        if(!prefixed && pOption->shortName) {
+            const char shortName[] = { '-', pOption->shortName, '\0' };
+            GblStringBuffer_append(pBuffer, shortName);
+            if(pOption->pLongName)
+                GblStringBuffer_append(pBuffer, ", ");
+        }
+        if(pOption->pLongName) {
+            GblStringBuffer_append(pBuffer, "--");
+            if(prefixed && pGroup->pPrefix) {
+                GblStringBuffer_append(pBuffer, pGroup->pPrefix);
+                GblStringBuffer_append(pBuffer, "-");
+            }
+            GblStringBuffer_append(pBuffer, pOption->pLongName);
+        }
+        if(!(pOption->type == GBL_OPTION_TYPE_BOOL &&
+             (pOption->flags & GBL_OPTION_FLAG_BOOL_NO_VALUE))) {
+            GblStringBuffer_append(pBuffer, " <");
+            GblStringBuffer_append(pBuffer,
+                                   pOption->pValueName? pOption->pValueName : "value");
+            GblStringBuffer_append(pBuffer, ">");
+        }
+        GblStringBuffer_append(pBuffer, "\n");
+
+        GblStringView description = GBL_STRV(pOption->pDescription);
+        while(!GblStringView_empty(description)) {
+            size_t lineLength = GblStringView_find(description, "\n");
+            if(lineLength == GBL_STRING_VIEW_NPOS) lineLength = description.length;
+            if(lineLength) {
+                GblStringBuffer_append(pBuffer, "    * ");
+                GblStringBuffer_append(pBuffer, description.pData, lineLength);
+                GblStringBuffer_append(pBuffer, "\n");
+            }
+            description = GblStringView_removePrefix(description,
+                                                     lineLength < description.length? lineLength + 1 : lineLength);
+        }
+    }
+}
+
+GBL_EXPORT GBL_RESULT GblCmdParser_formatHelp(const GblCmdParser* pSelf,
+                                              GblStringBuffer*    pBuffer) {
+    if(!pSelf || !pBuffer) return GBL_RESULT_ERROR_INVALID_POINTER;
+
+    const GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+    GblStringBuffer_clear(pBuffer);
+    GblStringBuffer_append(pBuffer, "Usage: ");
+    GblStringBuffer_append(pBuffer,
+                           pSelf_->pExecutable? pSelf_->pExecutable : "program");
+    GblStringBuffer_append(pBuffer, " [options]");
+    for(size_t a = 0; a < GblArrayList_size(&pSelf_->posArgs); ++a) {
+        const GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, a);
+        GblStringBuffer_append(pBuffer, " <");
+        GblStringBuffer_append(pBuffer, pArg->pName);
+        GblStringBuffer_append(pBuffer, ">");
+    }
+    GblStringBuffer_append(pBuffer, "\n");
+
+    if(pSelf->enableHelpOption)
+        GblStringBuffer_append(pBuffer,
+                               "\nHelp:\n  -h, --help\n    * Show this help and exit\n");
+    if(pSelf_->pMainOptionGroup)
+        GblCmdParser_appendGroupHelp_(pSelf_->pMainOptionGroup, GBL_FALSE, pBuffer);
+    for(size_t o = 0; o < GblArrayList_size(&pSelf_->optionGroups); ++o) {
+        GblOptionGroup* pGroup = *(GblOptionGroup**)GblArrayList_at(&pSelf_->optionGroups, o);
+        GblCmdParser_appendGroupHelp_(pGroup, GBL_TRUE, pBuffer);
+    }
+
+    if(!GblArrayList_empty(&pSelf_->posArgs)) {
+        GblStringBuffer_append(pBuffer, "\nArguments:\n");
+        for(size_t a = 0; a < GblArrayList_size(&pSelf_->posArgs); ++a) {
+            const GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, a);
+            GblStringBuffer_append(pBuffer, "  ");
+            GblStringBuffer_append(pBuffer, pArg->pName);
+            GblStringBuffer_append(pBuffer, "  ");
+            GblStringBuffer_append(pBuffer, pArg->pDesc? pArg->pDesc : "");
+            GblStringBuffer_append(pBuffer, "\n");
+        }
+    }
+
+    return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT GblCmdParser* GblCmdParser_create(void) {
@@ -439,6 +564,7 @@ static GBL_RESULT GblCmdParser_init_(GblInstance* pInstance) {
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
 
     pSelf->firstArgAsExecutable = GBL_TRUE;
+    pSelf->enableHelpOption     = GBL_TRUE;
 
     GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->optionGroups, sizeof(GblOptionGroup*)));
     GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->posArgs, sizeof(GblCmdArg)));

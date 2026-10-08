@@ -2,19 +2,21 @@
  *  \brief   Modular command-line argument parser
  *  \ingroup utils
  *
- *  \todo More descriptive errors, help and version options,
+ *  \todo More descriptive errors and version options,
  *        use virtual methods for customization points,
  *        implement signals for events (probably),
  *        process(..) top-level method for handling exiting
  *        upon failure, version, or help.
  *
  *  \author     2023 Falco Girgis
+ *  \author     2026 Agustín Bellagamba
  *  \copyright  MIT License
  */
 #ifndef GIMBAL_CMD_PARSER_H
 #define GIMBAL_CMD_PARSER_H
 
 #include "gimbal_option_group.h"
+#include "../strings/gimbal_string_buffer.h"
 
 /*! \name  Type System
  *  \brief Type UUID and cast operators
@@ -176,12 +178,17 @@ GBL_EXPORT GBL_RESULT           GblCmdParser_positionalArgValue      (GBL_CSELF,
  *  @{
  */
 //! After parsing, returns a GblStringRef to the name of the current executable (first positional argument)
-GBL_EXPORT GblStringRef*        GblCmdParser_executable     (GBL_CSELF)            GBL_NOEXCEPT;
+GBL_EXPORT GblStringRef*        GblCmdParser_executable     (GBL_CSELF)                GBL_NOEXCEPT;
 //! After parsing, retuns a GblStringList to the internally maintained list of unknown command-line options
-GBL_EXPORT const GblStringList* GblCmdParser_unknownOptions (GBL_CSELF)            GBL_NOEXCEPT;
+GBL_EXPORT const GblStringList* GblCmdParser_unknownOptions (GBL_CSELF)                GBL_NOEXCEPT;
+//! Returns whether the last parse requested --help or -h, so the caller can display help and skip execution
+GBL_EXPORT GblBool              GblCmdParser_helpRequested  (GBL_CSELF)                GBL_NOEXCEPT;
+//! Replaces a constructed buffer with help generated from option groups and positional arguments
+GBL_EXPORT GBL_RESULT           GblCmdParser_formatHelp     (GBL_CSELF,
+                                                             GblStringBuffer* pBuffer) GBL_NOEXCEPT;
 //! Parses the list of arguments given by \p pArgs, populating internal structures, and returning the result
 GBL_EXPORT GBL_RESULT           GblCmdParser_parse          (GBL_SELF,
-                                                             GblStringList* pArgs) GBL_NOEXCEPT;
+                                                             GblStringList* pArgs)     GBL_NOEXCEPT;
 //! @}
 
 GBL_DECLS_END
