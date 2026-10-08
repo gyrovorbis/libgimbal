@@ -78,10 +78,6 @@ static void signalSetDestructor_(const GblHashSet* pSet, void* pEntry) {
     GBL_CTX_END_BLOCK();
 }
 
-static GblBool signalGetType_(GblType type, GblType base) {
-    return type == base || GblType_derives(type, base);
-}
-
 GBL_EXPORT GBL_RESULT GblSignal_resolveMarshal_(const char*    pName,
                                                 size_t         argCount,
                                                 const GblType* pArgTypes,
@@ -101,32 +97,29 @@ GBL_EXPORT GBL_RESULT GblSignal_resolveMarshal_(const char*    pName,
         const struct {
             GblType      type;
             GblMarshalFn pFnMarshal;
-            GblBool      acceptsDerived;
         } marshals[] = {
-            { GBL_BOX_TYPE,      GblMarshal_CClosure_VOID__INSTANCE_BOX,        GBL_TRUE  },
-            { GBL_ENUM_TYPE,     GblMarshal_CClosure_VOID__INSTANCE_ENUM,       GBL_TRUE  },
-            { GBL_FLAGS_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_FLAGS,      GBL_TRUE  },
-            { GBL_OPAQUE_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_OPAQUE,     GBL_TRUE  },
-            { GBL_POINTER_TYPE,  GblMarshal_CClosure_VOID__INSTANCE_POINTER,    GBL_TRUE  },
-            { GBL_INSTANCE_TYPE, GblMarshal_CClosure_VOID__INSTANCE_INSTANCE,   GBL_TRUE  },
-            { GBL_BOOL_TYPE,     GblMarshal_CClosure_VOID__INSTANCE_BOOL,       GBL_FALSE },
-            { GBL_CHAR_TYPE,     GblMarshal_CClosure_VOID__INSTANCE_CHAR,       GBL_FALSE },
-            { GBL_UINT8_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_UINT8,      GBL_FALSE },
-            { GBL_UINT16_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_UINT16,     GBL_FALSE },
-            { GBL_INT16_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_INT16,      GBL_FALSE },
-            { GBL_UINT32_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_UINT32,     GBL_FALSE },
-            { GBL_INT32_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_INT32,      GBL_FALSE },
-            { GBL_UINT64_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_UINT64,     GBL_FALSE },
-            { GBL_INT64_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_INT64,      GBL_FALSE },
-            { GBL_FLOAT_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_FLOAT,      GBL_FALSE },
-            { GBL_DOUBLE_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_DOUBLE,     GBL_FALSE },
-            { GBL_STRING_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_STRING,     GBL_FALSE }
+            { GBL_BOX_TYPE,      GblMarshal_CClosure_VOID__INSTANCE_BOX      },
+            { GBL_ENUM_TYPE,     GblMarshal_CClosure_VOID__INSTANCE_ENUM     },
+            { GBL_FLAGS_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_FLAGS    },
+            { GBL_OPAQUE_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_OPAQUE   },
+            { GBL_POINTER_TYPE,  GblMarshal_CClosure_VOID__INSTANCE_POINTER  },
+            { GBL_INSTANCE_TYPE, GblMarshal_CClosure_VOID__INSTANCE_INSTANCE },
+            { GBL_BOOL_TYPE,     GblMarshal_CClosure_VOID__INSTANCE_BOOL     },
+            { GBL_CHAR_TYPE,     GblMarshal_CClosure_VOID__INSTANCE_CHAR     },
+            { GBL_UINT8_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_UINT8    },
+            { GBL_UINT16_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_UINT16   },
+            { GBL_INT16_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_INT16    },
+            { GBL_UINT32_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_UINT32   },
+            { GBL_INT32_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_INT32    },
+            { GBL_UINT64_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_UINT64   },
+            { GBL_INT64_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_INT64    },
+            { GBL_FLOAT_TYPE,    GblMarshal_CClosure_VOID__INSTANCE_FLOAT    },
+            { GBL_DOUBLE_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_DOUBLE   },
+            { GBL_STRING_TYPE,   GblMarshal_CClosure_VOID__INSTANCE_STRING   }
         };
 
         for(size_t  m = 0; m < GBL_COUNT_OF(marshals); ++m) {
-            if(pArgTypes[0] == marshals[m].type ||
-               (marshals[m].acceptsDerived && GblType_derives(pArgTypes[0], marshals[m].type)))
-            {
+            if(GblType_check(pArgTypes[0], marshals[m].type)) {
                 *ppFnMarshal = marshals[m].pFnMarshal;
                 break;
             }
@@ -134,9 +127,9 @@ GBL_EXPORT GBL_RESULT GblSignal_resolveMarshal_(const char*    pName,
         break;
     }
     case 2:
-        if((signalGetType_(pArgTypes[0], GBL_POINTER_TYPE)  ||
-           (signalGetType_(pArgTypes[0], GBL_INSTANCE_TYPE) &&
-           !signalGetType_(pArgTypes[0], GBL_BOX_TYPE)))    &&
+        if((GblType_check(pArgTypes[0], GBL_POINTER_TYPE)  ||
+           (GblType_check(pArgTypes[0], GBL_INSTANCE_TYPE) &&
+           !GblType_check(pArgTypes[0], GBL_BOX_TYPE)))    &&
             pArgTypes[1] == GBL_SIZE_TYPE)
            *ppFnMarshal = GblMarshal_CClosure_VOID__INSTANCE_INSTANCE_SIZE;
         break;
@@ -181,17 +174,17 @@ GBL_EXPORT GBL_RESULT GblSignal_peekPointer_(const GblVariant* pValue, void* pOu
     const GblType type = GblVariant_typeOf(pValue);
     GBL_RESULT result;
 
-    if(signalGetType_(type, GBL_BOX_TYPE)) {
+    if(GblType_check(type, GBL_BOX_TYPE)) {
         GblBox* pBox = NULL;
         result = GblVariant_valuePeek(pValue, (void*)&pBox);
         if(GBL_RESULT_SUCCESS(result)) *(void**)pOutput = pBox;
 
-    } else if(signalGetType_(type, GBL_POINTER_TYPE) || signalGetType_(type, GBL_OPAQUE_TYPE)) {
+    } else if(GblType_check(type, GBL_POINTER_TYPE) || GblType_check(type, GBL_OPAQUE_TYPE)) {
         void* pPointer = NULL;
         result = GblVariant_valuePeek(pValue, (void*)&pPointer);
         if(GBL_RESULT_SUCCESS(result)) *(void**)pOutput = pPointer;
 
-    } else if(signalGetType_(type, GBL_INSTANCE_TYPE)) {
+    } else if(GblType_check(type, GBL_INSTANCE_TYPE)) {
         GblInstance* pInstance = NULL;
         result = GblVariant_valuePeek(pValue, (void*)&pInstance);
         if(GBL_RESULT_SUCCESS(result)) *(void**)pOutput = pInstance;
