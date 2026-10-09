@@ -236,12 +236,11 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
         "mainOptionGroup",  GBL_NEW(GblOptionGroup,
             "name", "Test Suite",
             "prefix", "test",
-            "options", (GblOption[]) {
-                { "only",     'o',   GBL_OPTION_TYPE_STRING, &pOnly_,       "Only runs suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --only \"CmdParser OptionGroup\".", "test", GBL_OPTION_FLAG_NONE },
-                { "skip",     's',   GBL_OPTION_TYPE_STRING, &pSkip_,       "Skips suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --skip \"CmdParser OptionGroup\".",    "test", GBL_OPTION_FLAG_NONE },
-                { "color",    'c',   GBL_OPTION_TYPE_BOOL,   &enableColor,  "Enables colored output", "enableColor",  GBL_OPTION_FLAG_BOOL_NO_VALUE },
-                { 0 }
-            }
+            "options", GblRingList_create(
+                &(GblOption) { "only",  'o', GBL_OPTION_TYPE_STRING, &pOnly_,      "Only runs suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --only \"CmdParser OptionGroup\".", "test", GBL_OPTION_FLAG_NONE },
+                &(GblOption) { "skip",  's', GBL_OPTION_TYPE_STRING, &pSkip_,      "Skips suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --skip \"CmdParser OptionGroup\".",     "test", GBL_OPTION_FLAG_NONE },
+                &(GblOption) { "color", 'c', GBL_OPTION_TYPE_BOOL,   &enableColor, "Enables colored output", "enableColor",  GBL_OPTION_FLAG_BOOL_NO_VALUE }
+            )
         )
     );
 

@@ -87,14 +87,14 @@ GBL_INSTANCE_END
 
 //! \cond
 GBL_PROPERTIES(GblCmdParser,
-    (allowExtraArgs,       GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
-    (allowUnknownOptions,  GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
-    (firstArgAsExecutable, GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
-    (enableVersionOption,  GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
-    (enableHelpOption,     GBL_GENERIC, (READ, WRITE), GBL_BOOL_TYPE),
-    (mainOptionGroup,      GBL_GENERIC, (READ, WRITE), GBL_POINTER_TYPE),
-    (optionGroups,         GBL_GENERIC, (READ, WRITE), GBL_POINTER_TYPE),
-    (positionalArgs,       GBL_GENERIC, (READ, WRITE), GBL_POINTER_TYPE)
+    (allowExtraArgs,       GBL_GENERIC, (READ, WRITE),                   GBL_BOOL_TYPE),
+    (allowUnknownOptions,  GBL_GENERIC, (READ, WRITE),                   GBL_BOOL_TYPE),
+    (firstArgAsExecutable, GBL_GENERIC, (READ, WRITE),                   GBL_BOOL_TYPE),
+    (enableVersionOption,  GBL_GENERIC, (READ, WRITE),                   GBL_BOOL_TYPE),
+    (enableHelpOption,     GBL_GENERIC, (READ, WRITE),                   GBL_BOOL_TYPE),
+    (mainOptionGroup,      GBL_GENERIC, (READ, WRITE, ACQUIRE, RELEASE), GBL_OPTION_GROUP_TYPE),
+    (optionGroups,         GBL_GENERIC, (READ, WRITE, ACQUIRE, RELEASE), GBL_RING_LIST_TYPE),
+    (positionalArgs,       GBL_GENERIC, (READ, WRITE, ACQUIRE, RELEASE), GBL_RING_LIST_TYPE)
 )
 
 GBL_SIGNALS(GblCmdParser,
@@ -126,22 +126,22 @@ GBL_EXPORT GblRefCount   GblCmdParser_unref  (GBL_SELF) GBL_NOEXCEPT;
  */
 //! Adds the GblOptionGroup \p pGroup to the list of option groups handled by the GblCmdParser
 GBL_EXPORT GBL_RESULT      GblCmdParser_addOptionGroup     (GBL_SELF,
-                                                            GblOptionGroup* pGroup)    GBL_NOEXCEPT;
-//! Sets the internal array of option groups to the list of pointers given by the \p ppGroups array, NULL-terminated
+                                                            GblOptionGroup* pGroup)     GBL_NOEXCEPT;
+//! Replaces option groups from a borrowed ring list, reusing existing references and acquiring ownership of new ones
 GBL_EXPORT GBL_RESULT      GblCmdParser_setOptionGroups    (GBL_SELF,
-                                                            GblOptionGroup** ppGroups) GBL_NOEXCEPT;
+                                                            const GblRingList* pGroups) GBL_NOEXCEPT;
 //! Returns a pointer to the GblOptionGroup at the given index
-GBL_EXPORT GblOptionGroup* GblCmdParser_optionGroup        (GBL_CSELF, size_t idx)     GBL_NOEXCEPT;
+GBL_EXPORT GblOptionGroup* GblCmdParser_optionGroup        (GBL_CSELF, size_t idx)      GBL_NOEXCEPT;
 //! Finds a GblOptionGroup from the internal list by its GblObject::name.
 GBL_EXPORT GblOptionGroup* GblCmdParser_findOptionGroup    (GBL_CSELF,
-                                                            const char* pName)         GBL_NOEXCEPT;
+                                                            const char* pName)          GBL_NOEXCEPT;
 //! Returns the number of option groups held within the internal list of them
-GBL_EXPORT size_t          GblCmdParser_optionGroupCount   (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT size_t          GblCmdParser_optionGroupCount   (GBL_CSELF)                  GBL_NOEXCEPT;
 //! Sets the main option group for the parser to the one given by \p pGroup, returning the result
 GBL_EXPORT GBL_RESULT      GblCmdParser_setMainOptionGroup (GBL_SELF,
-                                                            GblOptionGroup* pGroup)    GBL_NOEXCEPT;
+                                                            GblOptionGroup* pGroup)     GBL_NOEXCEPT;
 //! Returns the GblOptionGroup previously set as the main option group for the GblCmdParser
-GBL_EXPORT GblOptionGroup* GblCmdParser_mainOptionGroup    (GBL_CSELF)                 GBL_NOEXCEPT;
+GBL_EXPORT GblOptionGroup* GblCmdParser_mainOptionGroup    (GBL_CSELF)                  GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Positional Arguments
@@ -152,25 +152,25 @@ GBL_EXPORT GblOptionGroup* GblCmdParser_mainOptionGroup    (GBL_CSELF)          
 //! Dynamically creates a GblCmdArg struct from the given args and adds it to the internal list
 GBL_EXPORT GBL_RESULT           GblCmdParser_addPositionalArg        (GBL_SELF,
                                                                       const char* pName,
-                                                                      const char* pDesc)       GBL_NOEXCEPT;
-//! Sets the 0-terminated list of arguments pointed to by \p pArgs as the new positional argument list
+                                                                      const char* pDesc)        GBL_NOEXCEPT;
+//! Replaces positional arguments by copying the GblCmdArg entries from a borrowed ring list
 GBL_EXPORT GBL_RESULT           GblCmdParser_setPositionalArgs       (GBL_SELF,
-                                                                      const GblCmdArg* pArgs)  GBL_NOEXCEPT;
+                                                                      const GblRingList* pArgs) GBL_NOEXCEPT;
 //! Clears the currently held internal list of GblCmdArg structures, resetting its size to 0
-GBL_EXPORT GBL_RESULT           GblCmdParser_clearPositionalArgs     (GBL_SELF)                GBL_NOEXCEPT;
+GBL_EXPORT GBL_RESULT           GblCmdParser_clearPositionalArgs     (GBL_SELF)                 GBL_NOEXCEPT;
 //! Returns the size of the internally managed list of GblCmdArg structures represengin command-line arguments
-GBL_EXPORT size_t               GblCmdParser_positionalArgCount      (GBL_CSELF)               GBL_NOEXCEPT;
+GBL_EXPORT size_t               GblCmdParser_positionalArgCount      (GBL_CSELF)                GBL_NOEXCEPT;
 //! Returns a pointer to the GblCmdArg structure in the internally maintained list at the given index
-GBL_EXPORT const GblCmdArg*     GblCmdParser_positionalArg           (GBL_CSELF, size_t index) GBL_NOEXCEPT;
+GBL_EXPORT const GblCmdArg*     GblCmdParser_positionalArg           (GBL_CSELF, size_t index)  GBL_NOEXCEPT;
 //! After parsing, this function returns the number of positional arguments extracted
-GBL_EXPORT size_t               GblCmdParser_positionalArgValueCount (GBL_CSELF)               GBL_NOEXCEPT;
+GBL_EXPORT size_t               GblCmdParser_positionalArgValueCount (GBL_CSELF)                GBL_NOEXCEPT;
 //! After parsing, returns the GblStringList maintained internally, containing the extracted positional argument values
-GBL_EXPORT const GblStringList* GblCmdParser_positionalArgValues     (GBL_CSELF)               GBL_NOEXCEPT;
+GBL_EXPORT const GblStringList* GblCmdParser_positionalArgValues     (GBL_CSELF)                GBL_NOEXCEPT;
 //! After parsing, this function converts the value of the argument at the given \p index to the desired \p toType, copying its value to \p pData, and returning the result
 GBL_EXPORT GBL_RESULT           GblCmdParser_positionalArgValue      (GBL_CSELF,
                                                                       size_t  index,
                                                                       GblType toType,
-                                                                      void*   pData)           GBL_NOEXCEPT;
+                                                                      void*   pData)            GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Parsing
