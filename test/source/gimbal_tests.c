@@ -24,7 +24,9 @@
 #include "core/gimbal_error_test_suite.h"
 #include "core/gimbal_exception_test_suite.h"
 #include "core/gimbal_module_test_suite.h"
-#include "core/gimbal_thread_test_suite.h"
+#if TINYCTHREAD_ENABLE_THREADS
+#   include "core/gimbal_thread_test_suite.h"
+#endif
 
 #include "meta/classes/gimbal_class_test_suite.h"
 #include "meta/classes/gimbal_enum_test_suite.h"
@@ -79,13 +81,14 @@ PSP_MODULE_INFO("GimbalTests", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR( THREAD_ATTR_USER | THREAD_ATTR_VFPU );
 #endif
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) && TINYCTHREAD_ENABLE_THREADS
 #include <android/log.h>
+#include <tinycthread.h>
 static int pfd[2];
-static pthread_t thr;
+static thrd_t thr;
 static const char *tag = "myapp";
 
-static void *thread_func(void*)
+static int thread_func(void*)
 {
     ssize_t rdsz;
     char buf[128];
@@ -111,9 +114,9 @@ int start_logger(const char *app_name)
     dup2(pfd[1], 2);
 
     /* spawn the logging thread */
-    if(pthread_create(&thr, 0, thread_func, 0) == -1)
+    if(thrd_create(&thr, thread_func, 0) != thrd_success)
         return -1;
-    pthread_detach(thr);
+    thrd_detach(thr);
     return 0;
 }
 #endif
@@ -245,7 +248,7 @@ static GBL_RESULT GimbalTests_constructed_(GblObject* pSelf) {
                                  GblTestSuite_create(GBL_SCANNER_TEST_SUITE_TYPE));
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_MODULE_TEST_SUITE_TYPE));
-#if GBL_THREADS_ENABLED
+#if TINYCTHREAD_ENABLE_THREADS
     GblTestScenario_enqueueSuite(pScenario,
                                  GblTestSuite_create(GBL_THREAD_TEST_SUITE_TYPE));
 #endif
