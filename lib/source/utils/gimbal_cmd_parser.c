@@ -15,6 +15,7 @@ GBL_DECLARE_STRUCT_PRIVATE(GblCmdParser) {
     GblStringRef*   pExecutable;
     GblStringList*  pArgValues;
     GblStringList*  pUnknownOptions;
+    GblBool         helpRequested;
 };
 
 GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pArgs) {
@@ -22,6 +23,8 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     GBL_CTX_VERIFY_POINTER(pArgs);
 
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+
+    pSelf_->helpRequested = GBL_FALSE;
 
     // 0. Destroy any existing cached/parsed values in case we've already made a pass
     GblStringRef_unref(pSelf->pErrorMsg);
@@ -62,6 +65,14 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
 
         // Check for options or "--" specifier
         if(!parseAsPositionals) {
+            if(pSelf->enableHelpOption &&
+               (GblStringView_equals(argView, "--help") ||
+                GblStringView_equals(argView, "-h"))) {
+                pSelf_->helpRequested = GBL_TRUE;
+                GblStringRef_unref(GblStringList_extract(pArgs, pIt));
+                pIt = pNext;
+                continue;
+            }
             // check whether we should consider all remaining args as positional
             if(GblStringView_equals(argView, "--")) {
                 parseAsPositionals = GBL_TRUE;
@@ -105,7 +116,7 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     const size_t  expectedCount = GblArrayList_size(&pSelf_->posArgs) +
                                     (pSelf_->pExecutable? 1 : 0);
 
-    GBL_CTX_VERIFY(actualCount == expectedCount ||
+    GBL_CTX_VERIFY(pSelf_->helpRequested || actualCount == expectedCount ||
                    (pSelf->allowExtraArgs && actualCount > expectedCount),
                    GBL_RESULT_ERROR_INVALID_CMDLINE_ARG,
                    "Expected %u arguments, but %u were provided",
@@ -128,6 +139,90 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
     }
 
     return pSelf->parseResult;
+}
+
+GBL_EXPORT GblBool GblCmdParser_helpRequested(const GblCmdParser* pSelf) {
+    return pSelf && GBL_CMD_PARSER_(pSelf)->helpRequested;
+}
+
+static void GblCmdParser_appendGroupHelp_(const GblOptionGroup* pGroup,
+                                          GblBool               prefixed,
+                                          GblStringBuffer*      pBuffer) {
+    const char* pName = GblObject_name(GBL_OBJECT(pGroup));
+    GblStringBuffer_appendPrintf(pBuffer, "\n%s:\n", pName? pName : "Options");
+
+    if(pGroup->pSummary)
+        GblStringBuffer_appendPrintf(pBuffer, "  %s\n", pGroup->pSummary);
+    if(pGroup->pDescription)
+        GblStringBuffer_appendPrintf(pBuffer, "  %s\n", pGroup->pDescription);
+
+    GblBool optionWritten = GBL_FALSE;
+    for(size_t o = 0; o < pGroup->optionCount; ++o) {
+        const GblOption* pOption = &pGroup->pOptions[o];
+        if(pOption->flags & GBL_OPTION_FLAG_HIDDEN) continue;
+
+        if(optionWritten)
+            GblStringBuffer_append(pBuffer, "\n");
+        optionWritten = GBL_TRUE;
+
+        GblStringBuffer_append(pBuffer, "  ");
+        if(!prefixed && pOption->shortName)
+            GblStringBuffer_appendPrintf(pBuffer, "-%c%s",
+                                         pOption->shortName, pOption->pLongName? ", " : "");
+        if(pOption->pLongName)
+            GblStringBuffer_appendPrintf(pBuffer, "--%s%s%s",
+                                         prefixed && pGroup->pPrefix? pGroup->pPrefix : "",
+                                         prefixed && pGroup->pPrefix? "-" : "", pOption->pLongName);
+        if(!(pOption->type == GBL_OPTION_TYPE_BOOL &&
+             (pOption->flags & GBL_OPTION_FLAG_BOOL_NO_VALUE)))
+            GblStringBuffer_appendPrintf(pBuffer, " <%s>", pOption->pValueName? pOption->pValueName : "value");
+        GblStringBuffer_append(pBuffer, "\n");
+
+        GblStringView description = GBL_STRV(pOption->pDescription);
+        while(!GblStringView_empty(description)) {
+            size_t lineLength = GblStringView_find(description, "\n");
+            if(lineLength == GBL_STRING_VIEW_NPOS) lineLength = description.length;
+            if(lineLength)
+                GblStringBuffer_appendPrintf(pBuffer, "    * %.*s\n", (int)lineLength, description.pData);
+            description = GblStringView_removePrefix(description,
+                                                     lineLength < description.length? lineLength + 1 : lineLength);
+        }
+    }
+}
+
+GBL_EXPORT GBL_RESULT GblCmdParser_formatHelp(const GblCmdParser* pSelf,
+                                              GblStringBuffer*    pBuffer) {
+    if(!pSelf || !pBuffer) return GBL_RESULT_ERROR_INVALID_POINTER;
+
+    const GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+    GblStringBuffer_clear(pBuffer);
+    GblStringBuffer_appendPrintf(pBuffer, "Usage: %s [options]",
+                                 pSelf_->pExecutable? pSelf_->pExecutable : "program");
+    for(size_t a = 0; a < GblArrayList_size(&pSelf_->posArgs); ++a) {
+        const GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, a);
+        GblStringBuffer_appendPrintf(pBuffer, " <%s>", pArg->pName);
+    }
+    GblStringBuffer_append(pBuffer, "\n");
+
+    if(pSelf->enableHelpOption)
+        GblStringBuffer_append(pBuffer,
+                               "\nHelp:\n  -h, --help\n    * Show this help and exit\n");
+    if(pSelf_->pMainOptionGroup)
+        GblCmdParser_appendGroupHelp_(pSelf_->pMainOptionGroup, GBL_FALSE, pBuffer);
+    for(size_t o = 0; o < GblArrayList_size(&pSelf_->optionGroups); ++o) {
+        GblOptionGroup* pGroup = *(GblOptionGroup**)GblArrayList_at(&pSelf_->optionGroups, o);
+        GblCmdParser_appendGroupHelp_(pGroup, GBL_TRUE, pBuffer);
+    }
+
+    if(!GblArrayList_empty(&pSelf_->posArgs)) {
+        GblStringBuffer_append(pBuffer, "\nArguments:\n");
+        for(size_t a = 0; a < GblArrayList_size(&pSelf_->posArgs); ++a) {
+            const GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, a);
+            GblStringBuffer_appendPrintf(pBuffer, "  %s  %s\n", pArg->pName, pArg->pDesc? pArg->pDesc : "");
+        }
+    }
+
+    return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT GblCmdParser* GblCmdParser_create(void) {
@@ -159,19 +254,30 @@ GBL_EXPORT GBL_RESULT GblCmdParser_addOptionGroup(GblCmdParser* pSelf, GblOption
     GBL_CTX_END();
 }
 
-GBL_EXPORT GBL_RESULT GblCmdParser_setOptionGroups(GblCmdParser* pSelf, GblOptionGroup** ppGroups) {
-    GBL_CTX_BEGIN(NULL);
-    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+GBL_EXPORT GBL_RESULT GblCmdParser_setOptionGroups(GblCmdParser* pSelf, const GblRingList* pGroups) {
+    GblArrayList* pOptionGroups = &GBL_CMD_PARSER_(pSelf)->optionGroups;
+    GblRingList*  pOldGroups    = GblRingList_createEmpty();
 
-    GBL_CTX_VERIFY_CALL(GblArrayList_clear(&pSelf_->optionGroups));
+    for(size_t o = 0; o < GblArrayList_size(pOptionGroups); ++o)
+        GblRingList_pushBack(pOldGroups, *(GblOptionGroup**)GblArrayList_at(pOptionGroups, o));
+    GblArrayList_clear(pOptionGroups);
 
-    size_t  count = 0;
-    if(ppGroups) {
-        while(ppGroups[count])
-            ++count;
-        GBL_CTX_VERIFY_CALL(GblArrayList_append(&pSelf_->optionGroups, ppGroups, count));
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+    if(pGroups) {
+        GblRingList_foreach(pGroups, pGroup, GblOptionGroup*) {
+            result = GblCmdParser_addOptionGroup(pSelf, pGroup);
+            if(!GBL_RESULT_SUCCESS(result)) break;
+            const size_t index = GblRingList_find(pOldGroups, pGroup);
+            if(index != GBL_RING_LIST_NPOS)
+                GblRingList_remove(pOldGroups, index);
+        }
     }
-    GBL_CTX_END();
+
+    GblRingList_foreach(pOldGroups, pGroup, GblOptionGroup*)
+        GblOptionGroup_unref(pGroup);
+    GblRingList_unref(pOldGroups);
+
+    return result;
 }
 
 GBL_EXPORT size_t  GblCmdParser_optionGroupCount(const GblCmdParser* pSelf) {
@@ -205,50 +311,62 @@ GBL_EXPORT GblOptionGroup* GblCmdParser_findOptionGroup(const GblCmdParser* pSel
     return pGroup;
 }
 
-GBL_EXPORT GBL_RESULT GblCmdParser_addPositionalArg(GblCmdParser* pSelf, const char* pName, const char* pDesc) {
-    GBL_CTX_BEGIN(NULL);
-    GBL_CTX_VERIFY_POINTER(pName);
-
-    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+static GBL_RESULT GblCmdParser_addPositionalArg_(GblArrayList* pArgs, const char* pName, const char* pDesc) {
+    if(!pName) return GBL_RESULT_ERROR_INVALID_ARG;
     const GblCmdArg arg = {
         GblStringRef_create(pName),
         pDesc? GblStringRef_create(pDesc) : NULL
     };
 
-    GBL_CTX_VERIFY_CALL(GblArrayList_pushBack(&pSelf_->posArgs, &arg));
-
-    GBL_CTX_END();
-}
-
-GBL_EXPORT GBL_RESULT GblCmdParser_setPositionalArgs(GblCmdParser* pSelf, const GblCmdArg* pArgs) {
-    GBL_CTX_BEGIN(NULL);
-    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
-
-    GBL_CTX_VERIFY_CALL(GblArrayList_clear(&pSelf_->posArgs));
-
-    if(pArgs) {
-        while(pArgs->pName) {
-            GBL_CTX_VERIFY_CALL(GblCmdParser_addPositionalArg(pSelf,
-                                                              pArgs->pName,
-                                                              pArgs->pDesc));
-            ++pArgs;
-        }
+    const GBL_RESULT result = GblArrayList_pushBack(pArgs, &arg);
+    if(!GBL_RESULT_SUCCESS(result)) {
+        GblStringRef_unref(arg.pName);
+        GblStringRef_unref(arg.pDesc);
     }
-    GBL_CTX_END();
+    return result;
 }
 
-GBL_EXPORT GBL_RESULT GblCmdParser_clearPositionalArgs(GblCmdParser* pSelf) {
-    GBL_CTX_BEGIN(NULL);
-
-    GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
-    for(size_t  p = 0; p < GblArrayList_size(&pSelf_->posArgs); ++p) {
-        GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, p);
+static GBL_RESULT GblCmdParser_clearPositionalArgs_(GblArrayList* pArgs) {
+    for(size_t  a = 0; a < GblArrayList_size(pArgs); ++a) {
+        const GblCmdArg* pArg = GblArrayList_at(pArgs, a);
         GblStringRef_unref(pArg->pName);
         GblStringRef_unref(pArg->pDesc);
     }
-    GBL_CTX_VERIFY_CALL(GblArrayList_clear(&pSelf_->posArgs));
+    return GblArrayList_clear(pArgs);
+}
 
-    GBL_CTX_END();
+GBL_EXPORT GBL_RESULT GblCmdParser_addPositionalArg(GblCmdParser* pSelf, const char* pName, const char* pDesc) {
+    return GblCmdParser_addPositionalArg_(&GBL_CMD_PARSER_(pSelf)->posArgs, pName, pDesc);
+}
+
+GBL_EXPORT GBL_RESULT GblCmdParser_setPositionalArgs(GblCmdParser* pSelf, const GblRingList* pArgs) {
+    GblArrayList args;
+    GblArrayList_construct(&args, sizeof(GblCmdArg));
+    GBL_RESULT result = GBL_RESULT_SUCCESS;
+
+    if(pArgs) {
+        GblRingList_foreach(pArgs, pArg, const GblCmdArg*) {
+            result = GblCmdParser_addPositionalArg_(&args, pArg->pName, pArg->pDesc);
+            if(!GBL_RESULT_SUCCESS(result)) break;
+        }
+    }
+
+    if(GBL_RESULT_SUCCESS(result)) {
+        GblCmdParser_clearPositionalArgs(pSelf);
+        result = GblArrayList_assign(&GBL_CMD_PARSER_(pSelf)->posArgs,
+                                     GblArrayList_data(&args),
+                                     GblArrayList_size(&args));
+    }
+
+    if(!GBL_RESULT_SUCCESS(result))
+        GblCmdParser_clearPositionalArgs_(&args);
+
+    GblArrayList_destruct(&args);
+    return result;
+}
+
+GBL_EXPORT GBL_RESULT GblCmdParser_clearPositionalArgs(GblCmdParser* pSelf) {
+    return GblCmdParser_clearPositionalArgs_(&GBL_CMD_PARSER_(pSelf)->posArgs);
 }
 
 GBL_EXPORT size_t  GblCmdParser_positionalArgCount(const GblCmdParser* pSelf) {
@@ -335,11 +453,20 @@ static GBL_RESULT GblCmdParser_Object_property_(const GblObject* pObject, const 
     case GblCmdParser_Property_Id_mainOptionGroup:
         GblVariant_setValueCopy(pValue, pProp->valueType, pSelf_->pMainOptionGroup);
         break;
-    case GblCmdParser_Property_Id_optionGroups:
-        GblVariant_setValueCopy(pValue, pProp->valueType, GblArrayList_data(&pSelf_->optionGroups));
-    case GblCmdParser_Property_Id_positionalArgs:
-        GblVariant_setValueCopy(pValue, pProp->valueType, GblArrayList_data(&pSelf_->posArgs));
+    case GblCmdParser_Property_Id_optionGroups: {
+        GblRingList* pGroups = GblRingList_createEmpty();
+        for(size_t o = 0; o < GblArrayList_size(&pSelf_->optionGroups); ++o)
+            GblRingList_pushBack(pGroups, *(GblOptionGroup**)GblArrayList_at(&pSelf_->optionGroups, o));
+        GblVariant_setValueMove(pValue, pProp->valueType, pGroups);
         break;
+    }
+    case GblCmdParser_Property_Id_positionalArgs: {
+        GblRingList* pArgs = GblRingList_createEmpty();
+        for(size_t a = 0; a < GblArrayList_size(&pSelf_->posArgs); ++a)
+            GblRingList_pushBack(pArgs, GblArrayList_at(&pSelf_->posArgs, a));
+        GblVariant_setValueMove(pValue, pProp->valueType, pArgs);
+        break;
+    }
     default: GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_PROPERTY, "Reading unhandled property: %s", GblProperty_name(pProp));
     }
     GBL_CTX_END();
@@ -387,14 +514,14 @@ static GBL_RESULT GblCmdParser_Object_setProperty_(GblObject* pObject, const Gbl
         GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &pSelf_->pMainOptionGroup));
         break;
     case GblCmdParser_Property_Id_optionGroups: {
-        GblOptionGroup** ppGroups = NULL;
-        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &ppGroups));
-        GBL_CTX_VERIFY_CALL(GblCmdParser_setOptionGroups(pSelf, ppGroups));
+        GblRingList* pGroups = NULL;
+        GblVariant_valuePeek(pValue, &pGroups);
+        GBL_CTX_VERIFY_CALL(GblCmdParser_setOptionGroups(pSelf, pGroups));
         break;
     }
     case GblCmdParser_Property_Id_positionalArgs: {
-        GblCmdArg* pArgs = NULL;
-        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &pArgs));
+        GblRingList* pArgs = NULL;
+        GblVariant_valuePeek(pValue, &pArgs);
         GBL_CTX_VERIFY_CALL(GblCmdParser_setPositionalArgs(pSelf, pArgs));
         break;
     }
@@ -439,6 +566,7 @@ static GBL_RESULT GblCmdParser_init_(GblInstance* pInstance) {
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
 
     pSelf->firstArgAsExecutable = GBL_TRUE;
+    pSelf->enableHelpOption     = GBL_TRUE;
 
     GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->optionGroups, sizeof(GblOptionGroup*)));
     GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->posArgs, sizeof(GblCmdArg)));

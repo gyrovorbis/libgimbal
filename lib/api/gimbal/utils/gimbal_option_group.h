@@ -132,12 +132,12 @@ GBL_INSTANCE_END
 
 //! \cond
 GBL_PROPERTIES(GblOptionGroup,
-    (name,        GBL_GENERIC, (READ, CONSTRUCT, OVERRIDE), GBL_STRING_TYPE),
-    (prefix,      GBL_GENERIC, (READ, CONSTRUCT),           GBL_STRING_TYPE),
-    (options,     GBL_GENERIC, (READ, CONSTRUCT),           GBL_POINTER_TYPE),
-    (version,     GBL_GENERIC, (READ, WRITE),               GBL_UINT32_TYPE),
-    (summary,     GBL_GENERIC, (READ, WRITE),               GBL_STRING_TYPE),
-    (description, GBL_GENERIC, (READ, WRITE),               GBL_STRING_TYPE)
+    (name,        GBL_GENERIC, (READ, CONSTRUCT, OVERRIDE),         GBL_STRING_TYPE),
+    (prefix,      GBL_GENERIC, (READ, CONSTRUCT),                   GBL_STRING_TYPE),
+    (options,     GBL_GENERIC, (READ, CONSTRUCT, ACQUIRE, RELEASE), GBL_RING_LIST_TYPE),
+    (version,     GBL_GENERIC, (READ, WRITE),                       GBL_UINT32_TYPE),
+    (summary,     GBL_GENERIC, (READ, WRITE),                       GBL_STRING_TYPE),
+    (description, GBL_GENERIC, (READ, WRITE),                       GBL_STRING_TYPE)
 )
 
 GBL_SIGNALS(GblOptionGroup,
@@ -149,10 +149,10 @@ GBL_SIGNALS(GblOptionGroup,
 
 //! Returns the GblType UUID associated with GblOptionGroup
 GBL_EXPORT GblType         GblOptionGroup_type   (void)                         GBL_NOEXCEPT;
-//! Creates a GblOptionGroup with an option name, prefix, and NULL-terminated option list
-GBL_EXPORT GblOptionGroup* GblOptionGroup_create (const char*      pName,
-                                                  const char*      pPrefix,
-                                                  const GblOption* pOptions)    GBL_NOEXCEPT;
+//! Creates a GblOptionGroup by copying the GblOption entries from a borrowed ring list
+GBL_EXPORT GblOptionGroup* GblOptionGroup_create (const char*        pName,
+                                                  const char*        pPrefix,
+                                                  const GblRingList* pOptions)  GBL_NOEXCEPT;
 //! Decrements the reference counter of the given GblOptionGroup by 1, destructing when it hits 0
 GBL_EXPORT GblRefCount     GblOptionGroup_unref  (GBL_SELF)                     GBL_NOEXCEPT;
 //! Processes the given string list, optionally requiring prefixes on all options
