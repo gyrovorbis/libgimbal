@@ -7,6 +7,4 @@
 
 GBL_DERIVE_EMPTY_TYPE(GimbalTests, GblTestScenario)
 
-GBL_EXPORT GblType GimbalTestScenario_type(void) GBL_NOEXCEPT;
-
 #endif
