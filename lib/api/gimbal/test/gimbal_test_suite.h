@@ -16,10 +16,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_TEST_SUITE_TYPE            (GBL_TYPEID(GblTestSuite))            //!< GblType UUID
-#define GBL_TEST_SUITE(self)           (GBL_CAST(GblTestSuite, self))        //!< GblInstance cast operator
-#define GBL_TEST_SUITE_CLASS(klass)    (GBL_CLASS_CAST(GblTestSuite, klass)) //!< GblClass cast operator
-#define GBL_TEST_SUITE_GET_CLASS(self) (GBL_CLASSOF(GblTestSuite, self))     //!< GblInstance to GblClass operator
+#define GBL_TEST_SUITE_TYPE          (GBL_TYPEID(GblTestSuite))            //!< GblType UUID
+#define GBL_TEST_SUITE(self)         (GBL_CAST(GblTestSuite, self))        //!< GblInstance cast operator
+#define GBL_TEST_SUITE_CLASS(klass)  (GBL_CLASS_CAST(GblTestSuite, klass)) //!< GblClass cast operator
+#define GBL_TEST_SUITE_CLASSOF(self) (GBL_CLASSOF(GblTestSuite, self))     //!< GblInstance to GblClass operator
 //! @}
 
 //! Convenience macro for NULL-terminating the test case list

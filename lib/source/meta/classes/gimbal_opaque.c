@@ -240,10 +240,6 @@ GBL_EXPORT GblType GblOpaque_register(const char*            pName,
                             GBL_TYPE_FLAGS_NONE);
     GBL_CTX_VERIFY_LAST_RECORD();
 
-    GBL_CTX_CALL(GblVariant_registerConverter(GBL_NIL_TYPE, type, GblOpaque_convertFrom_));
-    GBL_CTX_CALL(GblVariant_registerConverter(GBL_POINTER_TYPE, type, GblOpaque_convertFrom_));
-
-
     GBL_CTX_END_BLOCK();
     return type;
 }

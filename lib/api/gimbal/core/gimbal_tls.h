@@ -10,24 +10,19 @@
  *  TLS by simply declaring the variable with the "thread_local" keyword
  *  and proceeding to access it normally.
  *
- *  If this preferred path is not available, using the same semantics, the
- *  back-end emulate this behavior by creating OS-level TLS storage using
- *  TinyCThread's C11 TLS API, which uses dynamically allocated storage
- *  and key-based lookups.
+ *  If this preferred path is not available, using the same semantics,
+ *  TinyCThread will emulate this behavior by creating OS-level TLS storage.
+ *  In a single-threaded build, it will use ordinary static storage.
  *
  *   \author    2023 Falco Girgis
+ *   \author    2026 Agustín Bellagamba
  *   \copyright MIT License
  */
 
 #ifndef GIMBAL_TLS_H
 #define GIMBAL_TLS_H
 
-#include <tinycthread.h>
-#include "../preprocessor/gimbal_compiler.h"
-
-#if defined(GBL_PSP)
-#   define GBL_TLS_EMULATED 1
-#endif
+#include <tinycthread_tls.h>
 
 /*! \def GBL_TLS(type, name, init)
  *
@@ -41,31 +36,7 @@
  *
  *  \sa GBL_TLS_LOAD()
  */
-#if !GBL_TLS_EMULATED
-#   define GBL_TLS(type, name, ...) GBL_THREAD_LOCAL type name = __VA_ARGS__
-#else
-#   define GBL_TLS(type, name, ...) \
-        tss_t name; \
-        static void tls_##name##_init_(void) { \
-            int res = tss_create(&name, free); \
-            GBL_ASSERT(res == thrd_success, \
-                       "Failed to create "#type" TLS for "#name); \
-        } \
-        static type* tls_##name##_load_(void) { \
-            static once_flag once = ONCE_FLAG_INIT; \
-            call_once(&once, tls_##name##_init_); \
-            type* pPtr = tss_get(name); \
-            if(!pPtr) { \
-                pPtr = malloc(sizeof(type)); \
-                type temp = __VA_ARGS__; \
-                memcpy(pPtr, &temp, sizeof(type)); \
-                const int res = tss_set(name, pPtr); \
-                GBL_ASSERT(res == thrd_success, \
-                           "Failed to set "#type" TLS for "#name); \
-            } \
-            return pPtr; \
-        }
-#endif
+#define GBL_TLS(type, name, ...) TTHREAD_TLS(type, name, __VA_ARGS__)
 
 /*! \def GBL_TLS_LOAD(name)
  *
@@ -77,10 +48,6 @@
  *
  *  \sa GBL_TLS()
  */
-#if !GBL_TLS_EMULATED
-#   define GBL_TLS_LOAD(name)   &name
-#else
-#   define GBL_TLS_LOAD(name)   tls_##name##_load_()
-#endif
+#define GBL_TLS_LOAD(name) TTHREAD_TLS_LOAD(name)
 
 #endif // GIMBAL_TLS_H

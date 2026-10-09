@@ -5,9 +5,9 @@
 
 #define GBL_EXCEPTION_TEST_SUITE_TYPE             (GBL_TYPEID(GblExceptionTestSuite))
 
-#define GBL_EXCEPTION_TEST_SUITE(inst)            (GBL_CAST(inst, GBL_EXCEPTION_TEST_SUITE_TYPE, GblExceptionTestSuite))
-#define GBL_EXCEPTION_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GBL_EXCEPTION_TEST_SUITE_TYPE, GblExceptionTestSuiteClass))
-#define GBL_EXCEPTION_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST(inst, GBL_EXCEPTION_TEST_SUITE_TYPE, GblExceptionTestSuiteClass))
+#define GBL_EXCEPTION_TEST_SUITE(inst)          (GBL_CAST(GblExceptionTestSuite, inst))
+#define GBL_EXCEPTION_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblExceptionTestSuite, klass))
+#define GBL_EXCEPTION_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblExceptionTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

@@ -69,8 +69,6 @@ set(GIMBAL_TEST_SOURCES
     source/containers/gimbal_array_heap_test_suite.c
     include/core/gimbal_module_test_suite.h
     source/core/gimbal_module_test_suite.c
-    include/core/gimbal_thread_test_suite.h
-    source/core/gimbal_thread_test_suite.c
     include/core/gimbal_error_test_suite.h
     source/core/gimbal_error_test_suite.c
     include/core/gimbal_exception_test_suite.h
@@ -137,6 +135,12 @@ set(GIMBAL_TEST_SOURCES
     include/gimbal_tests.h
     source/gimbal_tests.c
 )
+
+if(TINYCTHREAD_ENABLE_THREADS)
+    list(APPEND GIMBAL_TEST_SOURCES
+        include/core/gimbal_thread_test_suite.h
+        source/core/gimbal_thread_test_suite.c)
+endif()
 
 if(GBL_ENABLE_CPP)
     list(APPEND
@@ -258,7 +262,7 @@ endif()
 
 
 # Emscripten flags and support
-if (EMSCRIPTEN)
+if (EMSCRIPTEN AND TINYCTHREAD_ENABLE_THREADS)
     # Set compile and link flags for the WASM build
     set_target_properties(GimbalTests PROPERTIES
         COMPILE_FLAGS "-pthread -s USE_PTHREADS=1"

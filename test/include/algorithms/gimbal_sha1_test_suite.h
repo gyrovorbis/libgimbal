@@ -3,10 +3,10 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_SHA1_TEST_SUITE_TYPE             (GBL_TYPEID(GblSha1TestSuite))
-#define GBL_SHA1_TEST_SUITE(self)            (GBL_CAST(self, GblSha1TestSuite))
-#define GBL_SHA1_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblSha1TestSuite))
-#define GBL_SHA1_TEST_SUITE_GET_CLASS(self)  (GBL_CLASSOF(self, GblSha1TestSuite))
+#define GBL_SHA1_TEST_SUITE_TYPE           (GBL_TYPEID(GblSha1TestSuite))
+#define GBL_SHA1_TEST_SUITE(self)          (GBL_CAST(GblSha1TestSuite, self))
+#define GBL_SHA1_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblSha1TestSuite, klass))
+#define GBL_SHA1_TEST_SUITE_CLASSOF(self)  (GBL_CLASSOF(GblSha1TestSuite, self))
 
 GBL_DECLS_BEGIN
 

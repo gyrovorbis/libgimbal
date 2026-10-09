@@ -31,10 +31,10 @@
  *  \brief Type UUID and cast operators
  *  @{
  */
-#define GBL_EXCEPTION_TYPE            (GBL_TYPEID(GblException))            //!< Type UUID for GblException
-#define GBL_EXCEPTION(self)           (GBL_CAST(GblException, self))        //!< Casts a GblInstance to GblException
-#define GBL_EXCEPTION_CLASS(klass)    (GBL_CLASS_CAST(GblException, klass)) //!< Casts a GblClass to GblExceptionClass
-#define GBL_EXCEPTION_GET_CLASS(self) (GBL_CLASSOF(GblException, self))     //!< Retrieves a GblExceptionClass from a GblInstance
+#define GBL_EXCEPTION_TYPE          (GBL_TYPEID(GblException))            //!< Type UUID for GblException
+#define GBL_EXCEPTION(self)         (GBL_CAST(GblException, self))        //!< Casts a GblInstance to GblException
+#define GBL_EXCEPTION_CLASS(klass)  (GBL_CLASS_CAST(GblException, klass)) //!< Casts a GblClass to GblExceptionClass
+#define GBL_EXCEPTION_CLASSOF(self) (GBL_CLASSOF(GblException, self))     //!< Retrieves a GblExceptionClass from a GblInstance
 //! @}
 
 /*! \name  DSL Macros

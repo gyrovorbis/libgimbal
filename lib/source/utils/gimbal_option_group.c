@@ -39,7 +39,7 @@ GBL_EXPORT GBL_RESULT (GblOptionGroup_parse)(GblOptionGroup* pSelf,
                                              GblBool         prefixOnly) {
     GBL_CTX_BEGIN(NULL);
 
-    GblOptionGroupClass* pClass = GBL_OPTION_GROUP_GET_CLASS(pSelf);
+    GblOptionGroupClass* pClass = GBL_OPTION_GROUP_CLASSOF(pSelf);
     pSelf->parseResult = GBL_RESULT_SUCCESS;
 
     // Emit signal for preprocessing hook

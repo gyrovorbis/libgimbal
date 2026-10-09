@@ -3,10 +3,8 @@
  *  \ingroup containers
  *  \copydoc GblArrayDeque
  *
- *  \todo
- *    - GblArrayDeque_erase()
- *
- *  \author Falco Girgis
+ *  \author Falco Girgis 2023, 2026
+ *  \copyright MIT License
  */
 
 #ifndef GIMBAL_ARRAY_DEQUE_H
@@ -42,7 +40,7 @@ GBL_DECLS_BEGIN
  *  insertion (back or front) | O(1)
  *  insertion (middle)        | O(N)
  *  removal (back or front)   | O(1)
- *  removal (middle) (WIP)    | O(N)
+ *  removal (middle)          | O(N)
  *  access (front or back)    | O(1)
  *  random access (middle)    | O(1)
  *
@@ -159,7 +157,7 @@ GBL_DECLS_END
 #define GblArrayDeque_eraseDefault_(...) \
     GblArrayDeque_eraseDefault__(__VA_ARGS__, 1)
 #define GblArrayDeque_eraseDefault__(self, pos, count, ...) \
-    (GblArrayDeque_eraseDefault(self, pos, count))
+    ((GblArrayDeque_erase)(self, pos, count))
 //! \endcond
 
 #undef GBL_SELF_TYPE

@@ -31,7 +31,7 @@ GBL_EXPORT const char* GblTestSuite_name(const GblTestSuite* pSelf) {
 GBL_EXPORT GBL_RESULT GblTestSuite_initSuite(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
-    GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
+    GblTestSuiteClass* pClass = GBL_TEST_SUITE_CLASSOF(pSelf);
 
     if(!pClass->pVTable || !pClass->pVTable->pFnSuiteInit)
         GBL_CTX_DONE();
@@ -49,7 +49,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_initSuite(GblTestSuite* pSelf, GblContext* pC
 
 GBL_EXPORT GBL_RESULT GblTestSuite_finalSuite(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
+    GblTestSuiteClass* pClass = GBL_TEST_SUITE_CLASSOF(pSelf);
 
     if(!pClass->pVTable || !pClass->pVTable->pFnSuiteFinal)
         GBL_CTX_DONE();
@@ -62,7 +62,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_finalSuite(GblTestSuite* pSelf, GblContext* p
 
 GBL_EXPORT GBL_RESULT GblTestSuite_initCase(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
-    GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
+    GblTestSuiteClass* pClass = GBL_TEST_SUITE_CLASSOF(pSelf);
 
     if(!pClass->pVTable || !pClass->pVTable->pFnCaseInit)
         GBL_CTX_DONE();
@@ -76,7 +76,7 @@ GBL_EXPORT GBL_RESULT GblTestSuite_initCase(GblTestSuite* pSelf, GblContext* pCt
 GBL_EXPORT GBL_RESULT GblTestSuite_finalCase(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
 
-    GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
+    GblTestSuiteClass* pClass = GBL_TEST_SUITE_CLASSOF(pSelf);
 
     if(!pClass->pVTable || !pClass->pVTable->pFnCaseFinal)
         GBL_CTX_DONE();
@@ -431,7 +431,7 @@ static GBL_RESULT GblTestSuiteClass_constructed_(GblObject* pSelf) {
     if(!pName)
         GblObject_setName(pSelf, GblType_name(GBL_TYPEOF(pSelf)));
 
-    GblTestSuiteClass* pClass = GBL_TEST_SUITE_GET_CLASS(pSelf);
+    GblTestSuiteClass* pClass = GBL_TEST_SUITE_CLASSOF(pSelf);
 
     if(pClass->pVTable && pClass->pVTable->pCases)
         GBL_CTX_VERIFY_CALL(

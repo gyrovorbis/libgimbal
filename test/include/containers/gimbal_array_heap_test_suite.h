@@ -5,9 +5,9 @@
 
 #define GBL_ARRAY_HEAP_TEST_SUITE_TYPE             (GblArrayHeapTestSuite_type())
 
-#define GBL_ARRAY_HEAP_TEST_SUITE(inst)            (GBL_CAST(inst, GBL_ARRAY_HEAP_TEST_SUITE_TYPE, GblArrayHeapTestSuite))
-#define GBL_ARRAY_HEAP_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GBL_ARRAY_HEAP_TEST_SUITE_TYPE, GblArrayHeapTestSuiteClass))
-#define GBL_ARRAY_HEAP_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST(inst, GBL_ARRAY_HEAP_TEST_SUITE_TYPE, GblArrayHeapTestSuiteClass))
+#define GBL_ARRAY_HEAP_TEST_SUITE(inst)          (GBL_CAST(GblArrayHeapTestSuite, inst))
+#define GBL_ARRAY_HEAP_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblArrayHeapTestSuite, klass))
+#define GBL_ARRAY_HEAP_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblArrayHeapTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

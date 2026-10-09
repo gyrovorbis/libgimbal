@@ -119,6 +119,8 @@ GBL_EXPORT void gblSortBubble(void* pArray, size_t  count, size_t  elemSize, Gbl
 }
 
 GBL_EXPORT void gblSortComb(void* pArray, size_t count, size_t elemSize, GblSortComparatorFn pFnCmp) {
+    if(count <= 1) return;
+
     // Initialize gap
     int gap = count;
 

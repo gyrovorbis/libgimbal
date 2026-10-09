@@ -204,13 +204,13 @@ GBL_DECLS_END
  *      #define ISERIALIZABLE_TYPE                (GBL_TYPEID(ISerializable))
  *
  *      // function-style cast operator from an generic instance to our instance type
- *      #define ISERIALIZABLE(instance)           (GBL_CAST(instance, ISerializable))
+ *      #define ISERIALIZABLE(instance)           (GBL_CAST(ISerializable, instance))
  *
  *      // function-style cast operator from a generic class to our class/interface type
- *      #define ISERIALIZABLE_CLASS(klass)        (GBL_CLASS_CAST(klass, ISerializable))
+ *      #define ISERIALIZABLE_CLASS(klass)        (GBL_CLASS_CAST(ISerializable, klass))
  *
  *      // convenience macro to extract our interface from a generic instance
- *      #define ISERIALIZABLE_GET_CLASS(instance) (GBL_CLASSOF(instance, ISerializable))
+ *      #define ISERIALIZABLE_CLASSOF(instance)   (GBL_CLASSOF(ISerializable, instance))
  *  \endcode
  *
  * ### Public Methods
@@ -225,7 +225,7 @@ GBL_DECLS_END
  *          GBL_CTX_BEGIN(NULL);
  *
  *          // exttract our interface from the given instance
- *          ISerializableClass* pClass = ISERIALIZABLE_GET_CLASS(pSelf);
+ *          ISerializableClass* pClass = ISERIALIZABLE_CLASSOF(pSelf);
  *
  *          // check whether we managed to find the interface
  *          if(pClass) {

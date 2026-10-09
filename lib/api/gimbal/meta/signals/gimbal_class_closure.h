@@ -17,9 +17,9 @@
 
 #define GBL_CLASS_CLOSURE_TYPE              (GBL_TYPEID(GblClassClosure))           //!< GblType UUID for GblClassClosure
 
-#define GBL_CLASS_CLOSURE(self)             (GBL_CAST(GblClassClosure, self))       //!< Cast a GblInstance to GblClassClosure
-#define GBL_CLASS_CLOSURE_CLASS(klass)      (GBL_CLASS_CAST(GblClassClosure, self)) //!< Cast a GblClass ot GblClassClosureClass
-#define GBL_CLASS_CLOSURE_GET_CLASS(self)   (GBL_CLASSOF(GblClassClosure, self))    //!< Get a GblClassClosureClass from GblInstance
+#define GBL_CLASS_CLOSURE(self)           (GBL_CAST(GblClassClosure, self))       //!< Cast a GblInstance to GblClassClosure
+#define GBL_CLASS_CLOSURE_CLASS(klass)    (GBL_CLASS_CAST(GblClassClosure, self)) //!< Cast a GblClass ot GblClassClosureClass
+#define GBL_CLASS_CLOSURE_CLASSOF(self)   (GBL_CLASSOF(GblClassClosure, self))    //!< Get a GblClassClosureClass from GblInstance
 
 #define GBL_SELF_TYPE GblClassClosure
 

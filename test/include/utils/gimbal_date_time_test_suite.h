@@ -5,9 +5,9 @@
 
 #define GBL_DATE_TIME_TEST_SUITE_TYPE             (GBL_TYPEID(GblDateTimeTestSuite))
 
-#define GBL_DATE_TIME_TEST_SUITE(inst)            (GBL_CAST(inst, GBL_DATE_TIME_TEST_SUITE_TYPE, GblDateTimeTestSuite))
-#define GBL_DATE_TIME_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GBL_DATE_TIME_TEST_SUITE_TYPE, GblDateTimeTestSuiteClass))
-#define GBL_DATE_TIME_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST(inst, GBL_DATE_TIME_TEST_SUITE_TYPE, GblDateTimeTestSuiteClass))
+#define GBL_DATE_TIME_TEST_SUITE(inst)          (GBL_CAST(GblDateTimeTestSuite, inst))
+#define GBL_DATE_TIME_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblDateTimeTestSuite, klass))
+#define GBL_DATE_TIME_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblDateTimeTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

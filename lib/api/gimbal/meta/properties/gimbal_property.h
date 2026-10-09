@@ -21,10 +21,10 @@
  *  \brief UUID and Cast Operators
  *  @{
  */
-#define GBL_PROPERTY_TYPE               (GBL_TYPEID(GblProperty))            //!< Type UUID for GblProperty
-#define GBL_PROPERTY(self)              (GBL_CAST(GblProperty, self))        //!< Casts a GblInstance to GblProperty
-#define GBL_PROPERTY_CLASS(klass)       (GBL_CLASS_CAST(GblProperty, klass)) //!< Casts a GblClass to GblPropertyClass
-#define GBL_PROPERTY_GET_CLASS(self)    (GBL_CLASSOF(GblProperty, self))     //!< Gets a GblPropertyClass from GblInstance
+#define GBL_PROPERTY_TYPE             (GBL_TYPEID(GblProperty))            //!< Type UUID for GblProperty
+#define GBL_PROPERTY(self)            (GBL_CAST(GblProperty, self))        //!< Casts a GblInstance to GblProperty
+#define GBL_PROPERTY_CLASS(klass)     (GBL_CLASS_CAST(GblProperty, klass)) //!< Casts a GblClass to GblPropertyClass
+#define GBL_PROPERTY_CLASSOF(self)    (GBL_CLASSOF(GblProperty, self))     //!< Gets a GblPropertyClass from GblInstance
 //! @}
 
 //! Alternate type identifier for GblProperty

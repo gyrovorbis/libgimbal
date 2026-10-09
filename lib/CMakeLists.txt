@@ -79,7 +79,6 @@ GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_PARTIAL_LEVEL    GBL_LOG_LEVEL_WARNING STRING
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_ERROR_LEVEL      GBL_LOG_LEVEL_ERROR   STRING "Log level for reporting error results")
 GBL_CONFIG_VARIABLE(GBL_CONFIG_LOG_UNKNOWN_LEVEL    GBL_LOG_LEVEL_ERROR   STRING "Log level for reporting unknown results")
 
-GBL_CONFIG_OPTION(GBL_TLS_EMULATED                  "Emulate thread_local keyword with OS-level TLS"       OFF)
 GBL_CONFIG_OPTION(GBL_CONFIG_PREFETCH_ENABLED       "Enable prefetching macro"                             ON)
 GBL_CONFIG_OPTION(GBL_CONFIG_ERRNO_CHECKS           "Enable C errno verification macros"                   ON)
 
@@ -317,12 +316,21 @@ if(GBL_ENABLE_CPP)
          source/strings/gimbal_pattern.cpp)
 endif()
 
+if(PSP AND NOT DEFINED TINYCTHREAD_TLS_EMULATED)
+    set(TINYCTHREAD_TLS_EMULATED ON CACHE BOOL "Emulate compiler TLS with TSS")
+endif()
+
+add_subdirectory(lib/tinycthread)
+# No Position Independent Lib for PSP on tinycthread either.
+set_property(TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE OFF)
+list(APPEND GBL_TARGET_LINK_LIBS tinycthread)
+
 add_library(libGimbal STATIC
     ${GIMBAL_SOURCES}
     ${GIMBAL_INCLUDES})
 
 # Emscripten flags and support
-if (EMSCRIPTEN)
+if (EMSCRIPTEN AND TINYCTHREAD_ENABLE_THREADS)
     # Make sure LZ4 doesnt fuck the build
     set(LZ4_BUILD_LEGACY_LZ4C OFF)
     set(LZ4_BUILD_CLI OFF)
@@ -347,12 +355,7 @@ if (EMSCRIPTEN)
     )
 endif()
 
-add_subdirectory(lib/tinycthread)
 add_subdirectory(lib/tiny-regex-c)
-
-
-# No Position Independent Lib for PSP on tinycthread either.
-set_property( TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE OFF )
 
 # PSP SDK flags and support
 if (PSP)
@@ -367,7 +370,6 @@ add_subdirectory(lib/lz4/build/cmake)
 
 list(APPEND
      GBL_TARGET_LINK_LIBS
-     tinycthread
      TinyRegexC
      lz4_static)
 
@@ -376,16 +378,6 @@ list(APPEND
           GBL_TARGET_LINK_LIBS
           m)
  endif()
-
-if (NOT DEFINED PLATFORM_DREAMCAST AND NOT DEFINED BUILD_VITA AND NOT DEFINED PLATFORM_N64)
-
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    find_package(Threads REQUIRED)
-    list(APPEND
-         GBL_TARGET_LINK_LIBS
-         Threads::Threads)
-
-endif()
 
 target_link_libraries(libGimbal ${GBL_TARGET_LINK_LIBS})
 

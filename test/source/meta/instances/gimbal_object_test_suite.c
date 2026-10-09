@@ -9,12 +9,12 @@
 
 #define GBL_SELF_TYPE GblObjectTestSuite
 
-#define TEST_OBJECT_TYPE                    (GBL_TYPEID(TestObject))
-#define TEST_OBJECT(instance)               (GBL_CAST(TestObject, instance))
-#define TEST_OBJECT_CHECK(instance)         (GBL_TYPECHECK(instance, TestObject))
-#define TEST_OBJECT_CLASS(klass)            (GBL_CLASS_CAST(TestObject, klass))
-#define TEST_OBJECT_CLASS_CHECK(klass)      (GBL_CLASS_TYPECHECK(klass, TestObject))
-#define TEST_OBJECT_GET_CLASS(instance)     (GBL_CLASSOF(TestObject, instance))
+#define TEST_OBJECT_TYPE                  (GBL_TYPEID(TestObject))
+#define TEST_OBJECT(instance)             (GBL_CAST(TestObject, instance))
+#define TEST_OBJECT_CHECK(instance)       (GBL_TYPECHECK(instance, TestObject))
+#define TEST_OBJECT_CLASS(klass)          (GBL_CLASS_CAST(TestObject, klass))
+#define TEST_OBJECT_CLASS_CHECK(klass)    (GBL_CLASS_TYPECHECK(TestObject, klass))
+#define TEST_OBJECT_CLASSOF(instance)     (GBL_CLASSOF(TestObject, instance))
 
 GBL_FORWARD_DECLARE_STRUCT(TestObject);
 static GBL_DECLARE_TYPE(TestObject);
@@ -78,14 +78,14 @@ GBL_TEST_CASE(newDefault)
     GBL_TEST_COMPARE(GblType_classRefCount(TEST_OBJECT_TYPE), 1);
 
     // validate class
-    TestObjectClass* pClass = TEST_OBJECT_GET_CLASS(pObj);
+    TestObjectClass* pClass = TEST_OBJECT_CLASSOF(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pClass), TEST_OBJECT_TYPE);
     GBL_TEST_COMPARE(&pClass->base, GBL_OBJECT_CLASS(pClass));
     GBL_TEST_COMPARE(pClass->string, "Davey Havoc");
     GBL_TEST_COMPARE(pClass->staticInt32, 77);
 
     // validate interfaces
-    GblIVariantClass* pIVariantIFace = GBL_IVARIANT_GET_CLASS(pObj);
+    GblIVariantClass* pIVariantIFace = GBL_IVARIANT_CLASSOF(pObj);
     GBL_TEST_COMPARE(GBL_CLASS_TYPEOF(pIVariantIFace), GBL_IVARIANT_TYPE);
     GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(pIVariantIFace));
     GBL_TEST_COMPARE(pIVariantIFace->pVTable->pGetValueFmt, "p");
@@ -108,7 +108,7 @@ GBL_TEST_CASE(newDefault)
     //GBL_TEST_VERIFY(GBL_ITABLE_IFACE_CHECK(GBL_OBJECT_CLASS(pITableIFace)));
 
     //validate insanity
-    GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(GBL_OBJECT_CLASS(GBL_IEVENT_RECEIVER_CLASS(TEST_OBJECT_GET_CLASS(pObj)))));
+    GBL_TEST_COMPARE(pClass, TEST_OBJECT_CLASS(GBL_OBJECT_CLASS(GBL_IEVENT_RECEIVER_CLASS(TEST_OBJECT_CLASSOF(pObj)))));
 
     // validate instance checks and casts
     //GBL_TEST_VERIFY(GBL_IVARIANT_CHECK(pObj));
@@ -1101,7 +1101,7 @@ GBL_TEST_CASE(foreachChildType)
     int index = 0;
 
     GblObject_foreachChild(pParent, pChild, TestObject*) {
-        TestObjectClass* pClass = TEST_OBJECT_GET_CLASS(pChild);
+        TestObjectClass* pClass = TEST_OBJECT_CLASSOF(pChild);
         GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(pChild)),
                          GblObject_name(GblObject_findChildByIndex(pParent, index)));
         GBL_TEST_COMPARE(strcmp(pChild->stringer, "INVALID"), 0);
@@ -1156,7 +1156,7 @@ GBL_TEST_CASE(foreachChildReverseType)
     int index = 3;
 
     GblObject_foreachChildReverse(pParent, pChild, TestObject*) {
-        TestObjectClass* pClass = TEST_OBJECT_GET_CLASS(pChild);
+        TestObjectClass* pClass = TEST_OBJECT_CLASSOF(pChild);
         GBL_TEST_COMPARE(GblObject_name(GBL_OBJECT(pChild)),
                          GblObject_name(GblObject_findChildByIndex(pParent, index)));
         GBL_TEST_COMPARE(strcmp(pChild->stringer, "INVALID"), 0);
@@ -1510,14 +1510,14 @@ static GBL_RESULT TestObject_init_(GblInstance* pInstance) {
 
 static GBL_RESULT TestObject_constructed(GblObject* pSelf) {
     GBL_CTX_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GblClass_super(GBL_INSTANCE_GET_CLASS(pSelf)));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GblClass_super(GBL_INSTANCE_CLASSOF(pSelf)));
     if(pParentClass->pFnConstructed) pParentClass->pFnConstructed(pSelf);
     GBL_CTX_END();
 }
 
 static GBL_RESULT TestObject_destructor(GblBox* pSelf) {
     GBL_CTX_BEGIN(pSelf);
-    GblBoxClass* pParentClass = GBL_BOX_CLASS(GblClass_super(GBL_INSTANCE_GET_CLASS(pSelf)));
+    GblBoxClass* pParentClass = GBL_BOX_CLASS(GblClass_super(GBL_INSTANCE_CLASSOF(pSelf)));
     pParentClass->pFnDestructor(GBL_BOX(pSelf));
     GBL_CTX_END();
 }
@@ -1532,7 +1532,7 @@ static GBL_RESULT TestObject_property_(const GblObject* pSelf, const GblProperty
         GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT(pSelf)->stringer);
         break;
     case TestObject_Property_Id_staticInt32:
-        GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT_GET_CLASS(pSelf)->staticInt32);
+        GblVariant_setValueCopy(pValue, pProp->valueType, TEST_OBJECT_CLASSOF(pSelf)->staticInt32);
         break;
 /*    case TestObject_Property_Id_userdata:
         GblVariant_setValueCopy(pValue, pProp->valueType, GblBox_userdata(GBL_BOX(pSelf)));

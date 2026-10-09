@@ -35,10 +35,10 @@
  *  \brief Type UUID and Cast operators
  *  @{
  */
-#define GBL_OBJECT_TYPE             GBL_TYPEID(GblObject)            //!< GblType UUID for GblObject
-#define GBL_OBJECT(self)            GBL_CAST(GblObject, self)        //!< Casts a GblInstance to a GblObject
-#define GBL_OBJECT_CLASS(klass)     GBL_CLASS_CAST(GblObject, klass) //!< Casts a GblClass to a GblObjectClass
-#define GBL_OBJECT_GET_CLASS(self)  GBL_CLASSOF(GblObject, self)     //!< Gets a GblObjectClass from a GblInstance
+#define GBL_OBJECT_TYPE           GBL_TYPEID(GblObject)            //!< GblType UUID for GblObject
+#define GBL_OBJECT(self)          GBL_CAST(GblObject, self)        //!< Casts a GblInstance to a GblObject
+#define GBL_OBJECT_CLASS(klass)   GBL_CLASS_CAST(GblObject, klass) //!< Casts a GblClass to a GblObjectClass
+#define GBL_OBJECT_CLASSOF(self)  GBL_CLASSOF(GblObject, self)     //!< Gets a GblObjectClass from a GblInstance
 //! @}
 
 /*! \name  Construction Macros

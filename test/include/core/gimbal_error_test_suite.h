@@ -5,9 +5,9 @@
 
 #define GBL_ERROR_TEST_SUITE_TYPE             (GBL_TYPEID(GblErrorTestSuite))
 
-#define GBL_ERROR_TEST_SUITE(inst)            (GBL_CAST(inst, GBL_ERROR_TEST_SUITE_TYPE, GblErrorTestSuite))
-#define GBL_ERROR_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GBL_ERROR_TEST_SUITE_TYPE, GblErrorTestSuiteClass))
-#define GBL_ERROR_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST(inst, GBL_ERROR_TEST_SUITE_TYPE, GblErrorTestSuiteClass))
+#define GBL_ERROR_TEST_SUITE(inst)          (GBL_CAST(GblErrorTestSuite, inst))
+#define GBL_ERROR_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblErrorTestSuite, klass))
+#define GBL_ERROR_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblErrorTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

@@ -3,10 +3,10 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_COMPRESSION_TEST_SUITE_TYPE             (GBL_TYPEID(GblCompressionTestSuite))
-#define GBL_COMPRESSION_TEST_SUITE(self)            (GBL_CAST(self, GblCompressionTestSuite))
-#define GBL_COMPRESSION_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblCompressionTestSuite))
-#define GBL_COMPRESSION_TEST_SUITE_GET_CLASS(self)  (GBL_CLASSOF(self, GblCompressionTestSuite))
+#define GBL_COMPRESSION_TEST_SUITE_TYPE           (GBL_TYPEID(GblCompressionTestSuite))
+#define GBL_COMPRESSION_TEST_SUITE(self)          (GBL_CAST(GblCompressionTestSuite, self))
+#define GBL_COMPRESSION_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblCompressionTestSuite, klass))
+#define GBL_COMPRESSION_TEST_SUITE_CLASSOF(self)  (GBL_CLASSOF(GblCompressionTestSuite, self))
 
 GBL_DECLS_BEGIN
 

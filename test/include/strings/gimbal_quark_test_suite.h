@@ -3,12 +3,12 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_QUARK_TEST_SUITE_TYPE             (GblQuarkTestSuite_type())
-#define GBL_QUARK_TEST_SUTE_STRUCT            GblQuarkTestSuite
-#define GBL_QUARK_TEST_SUITE_CLASS_STRUCT     GblQuarkTestSuiteClass
-#define GBL_QUARK_TEST_SUITE(inst)            (GBL_CAST_PREFIX(inst, GBL_QUARK_TEST_SUITE))
-#define GBL_QUARK_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST_PREFIX(klass, GBL_QUARK_TEST_SUITE))
-#define GBL_QUARK_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST_PREFIX(inst, GBL_QUARK_TEST_SUITE))
+#define GBL_QUARK_TEST_SUITE_TYPE           (GblQuarkTestSuite_type())
+#define GBL_QUARK_TEST_SUTE_STRUCT          GblQuarkTestSuite
+#define GBL_QUARK_TEST_SUITE_CLASS_STRUCT   GblQuarkTestSuiteClass
+#define GBL_QUARK_TEST_SUITE(inst)          (GBL_CAST(GblQuarkTestSuite, inst))
+#define GBL_QUARK_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblQuarkTestSuite, klass))
+#define GBL_QUARK_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblQuarkTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

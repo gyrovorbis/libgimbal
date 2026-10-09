@@ -3,12 +3,12 @@
 
 #include <gimbal/test/gimbal_test_suite.h>
 
-#define GBL_FLAGS_TEST_SUITE_TYPE             (GblFlagsTestSuite_type())
-#define GBL_FLAGS_TEST_SUTE_STRUCT            GblFlagsTestSuite
-#define GBL_FLAGS_TEST_SUITE_CLASS_STRUCT     GblFlagsTestSuiteClass
-#define GBL_FLAGS_TEST_SUITE(inst)            (GBL_CAST_PREFIX(inst, GBL_FLAGS_TEST_SUITE))
-#define GBL_FLAGS_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST_PREFIX(klass, GBL_FLAGS_TEST_SUITE))
-#define GBL_FLAGS_TEST_SUITE_GET_CLASS(inst)  (GBL_INSTANCE_GET_CLASS_CAST_PREFIX(inst, GBL_FLAGS_TEST_SUITE))
+#define GBL_FLAGS_TEST_SUITE_TYPE           (GblFlagsTestSuite_type())
+#define GBL_FLAGS_TEST_SUTE_STRUCT          GblFlagsTestSuite
+#define GBL_FLAGS_TEST_SUITE_CLASS_STRUCT   GblFlagsTestSuiteClass
+#define GBL_FLAGS_TEST_SUITE(inst)          (GBL_CAST(GblFlagsTestSuite, inst))
+#define GBL_FLAGS_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblFlagsTestSuite, klass))
+#define GBL_FLAGS_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblFlagsTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

@@ -136,7 +136,7 @@ GBL_EXPORT GblInstance* (GblInstance_create)(GblType type, size_t size, GblClass
 }
 
 GBL_EXPORT GBL_RESULT GblInstance_classRelease_(GblInstance* pSelf) {
-    GblClass*       pClass      = GBL_INSTANCE_GET_CLASS(pSelf);
+    GblClass*       pClass      = GBL_INSTANCE_CLASSOF(pSelf);
     const GblFlags  flags       = GBL_CLASS_FLAGS_(pClass);
     GblType         type        = GBL_CLASS_TYPEOF(pClass);
     GBL_CTX_BEGIN(pCtx_);
@@ -189,7 +189,7 @@ GBL_EXPORT GBL_RESULT GblInstance_swizzleClass(GblInstance* pSelf, GblClass* pCl
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pClass);
-    GblClass* pClassOld = GBL_INSTANCE_GET_CLASS(pSelf);
+    GblClass* pClassOld = GBL_INSTANCE_CLASSOF(pSelf);
 
     // If we're replacing an existing class
     if(pClassOld) {
@@ -212,7 +212,7 @@ GBL_EXPORT GBL_RESULT GblInstance_swizzleClass(GblInstance* pSelf, GblClass* pCl
 }
 
 GBL_EXPORT GBL_RESULT GblInstance_sinkClass(GblInstance* pSelf)  {
-    GblClass* pClass = GBL_INSTANCE_GET_CLASS(pSelf);
+    GblClass* pClass = GBL_INSTANCE_CLASSOF(pSelf);
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_VERIFY_POINTER(pClass);
 
@@ -226,7 +226,7 @@ GBL_EXPORT GBL_RESULT GblInstance_sinkClass(GblInstance* pSelf)  {
 }
 
 GBL_EXPORT GBL_RESULT GblInstance_floatClass(GblInstance* pSelf) {
-    GblClass* pClass = GBL_INSTANCE_GET_CLASS(pSelf);
+    GblClass* pClass = GBL_INSTANCE_CLASSOF(pSelf);
     GBL_CTX_BEGIN(pCtx_);
     GBL_CTX_VERIFY_POINTER(pClass);
 

@@ -5,9 +5,9 @@
 
 #define GBL_POOL_ALLOCATOR_TEST_SUITE_TYPE             (GBL_TYPEID(GblPoolAllocatorTestSuite))
 
-#define GBL_POOL_ALLOCATOR_TEST_SUITE(inst)            (GBL_CAST(inst, GblPoolAllocatorTestSuite))
-#define GBL_POOL_ALLOCATOR_TEST_SUITE_CLASS(klass)     (GBL_CLASS_CAST(klass, GblPoolAllocatorTestSuite))
-#define GBL_POOL_ALLOCATOR_TEST_SUITE_GET_CLASS(inst)  (GBL_CLASSOF(inst, GblPoolAllocatorTestSuite))
+#define GBL_POOL_ALLOCATOR_TEST_SUITE(inst)          (GBL_CAST(GblPoolAllocatorTestSuite, inst))
+#define GBL_POOL_ALLOCATOR_TEST_SUITE_CLASS(klass)   (GBL_CLASS_CAST(GblPoolAllocatorTestSuite, klass))
+#define GBL_POOL_ALLOCATOR_TEST_SUITE_CLASSOF(inst)  (GBL_CLASSOF(GblPoolAllocatorTestSuite, inst))
 
 GBL_DECLS_BEGIN
 

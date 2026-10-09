@@ -21,7 +21,7 @@ function(GBL_CREATE_APP target)
           # BACKGROUND_PATH
           # PREVIEW_PATH
           )
-    elseif(EMSCRIPTEN)
+    elseif(EMSCRIPTEN AND TINYCTHREAD_ENABLE_THREADS)
         # Set compile and link flags for the WASM build
         set_target_properties(GimbalTests PROPERTIES
             COMPILE_FLAGS "-pthread -s USE_PTHREADS=1"

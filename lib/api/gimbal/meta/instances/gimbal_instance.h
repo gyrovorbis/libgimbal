@@ -23,9 +23,9 @@
  *  \brief UUID and cast operators
  *  @{
  */
-#define GBL_INSTANCE_TYPE               (GBL_BUILTIN_TYPE(INSTANCE))            //!< Type UUID for GblInstance
-#define GBL_INSTANCE(self)              ((GblInstance*)self)                    //!< Casts GblInstance-compatible to GblInstance
-#define GBL_INSTANCE_GET_CLASS(self)    (GblInstance_class(GBL_INSTANCE(self))) //!< Extracts the class from a GblInstance
+#define GBL_INSTANCE_TYPE             (GBL_BUILTIN_TYPE(INSTANCE))            //!< Type UUID for GblInstance
+#define GBL_INSTANCE(self)            ((GblInstance*)self)                    //!< Casts GblInstance-compatible to GblInstance
+#define GBL_INSTANCE_CLASSOF(self)    (GblInstance_class(GBL_INSTANCE(self))) //!< Extracts the class from a GblInstance
 //! @}
 
 /*! \name  Instance Operators
