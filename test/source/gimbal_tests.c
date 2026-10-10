@@ -73,7 +73,7 @@
 #if defined(__DREAMCAST__) && !defined(NDEBUG)
 #   include <arch/gdb.h>
 #endif
-\
+
 #ifdef GBL_PSP
 #include <pspkernel.h>
 
