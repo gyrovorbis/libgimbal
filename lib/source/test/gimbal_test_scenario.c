@@ -7,6 +7,7 @@
 #include <gimbal/meta/signals/gimbal_marshal.h>
 #include <gimbal/meta/classes/gimbal_enum.h>
 #include <gimbal/containers/gimbal_array_list.h>
+#include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/strings/gimbal_string_ref.h>
 #include <time.h>
 #include <stdio.h>
@@ -21,7 +22,6 @@ static const char* GBL_TERM_RESET_  = "\x1b[0m";
 #define GBL_TEST_SCENARIO_(inst)    (GBL_PRIVATE(GblTestScenario, inst))
 
 typedef struct GblTestResultGroup_ {
-    GblType        enumType;
     GblEnumClass*  pEnumClass;
     GblStringRef*  pTitle;
     GblArrayList   counts;
@@ -42,18 +42,21 @@ typedef struct GblTestScenario_ {
     GblAllocationCounters   suiteAllocCounters;
     GblBool                 runningCase;
     GblBool                 expectError;
-    GblArrayList            resultGroups;
+    GblArrayMap*            pResultGroups;
     GblArrayList            failures;
 } GblTestScenario_;
 
-static GblTestResultGroup_* GblTestScenario_findResultGroup_(const GblTestScenario* pSelf,
-                                                              GblType enumType) {
-    GblArrayList* pGroups = &GBL_TEST_SCENARIO_(pSelf)->resultGroups;
-    for(size_t idx = 0; idx < GblArrayList_size(pGroups); ++idx) {
-        GblTestResultGroup_* pGroup = GblArrayList_at(pGroups, idx);
-        if(pGroup->enumType == enumType) return pGroup;
-    }
-    return NULL;
+static GBL_RESULT GblTestScenario_resultGroupDestruct_(const GblArrayMap* pMap,
+                                                       uintptr_t key,
+                                                       void* pData) {
+    GBL_UNUSED(pMap, key);
+    GBL_CTX_BEGIN(NULL);
+    GblTestResultGroup_* pGroup = pData;
+    GBL_CTX_CALL(GblArrayList_destruct(&pGroup->counts));
+    GblStringRef_unref(pGroup->pTitle);
+    GblClass_unrefDefault(GBL_CLASS(pGroup->pEnumClass));
+    GBL_CTX_FREE(pGroup);
+    GBL_CTX_END();
 }
 
 static size_t GblTestScenario_resultIndex_(const GblTestResultGroup_* pGroup, GblEnum value) {
@@ -126,8 +129,8 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_CTX_INFO("%-20s: %20u", "Failed",  pSelf->casesFailed);
     GBL_CTX_POP(1);
 
-    for(size_t groupIdx = 0; groupIdx < GblArrayList_size(&pSelf_->resultGroups); ++groupIdx) {
-        const GblTestResultGroup_* pGroup = GblArrayList_at(&pSelf_->resultGroups, groupIdx);
+    for(size_t groupIdx = 0; groupIdx < GblArrayMap_size(&pSelf_->pResultGroups); ++groupIdx) {
+        const GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_probeValue(&pSelf_->pResultGroups, groupIdx);
         size_t total = 0;
         for(uint16_t valueIdx = 0; valueIdx < pGroup->pEnumClass->entryCount; ++valueIdx)
             total += *(size_t*)GblArrayList_at(&pGroup->counts, valueIdx);
@@ -221,8 +224,8 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
     GblTestScenarioClass* pClass = GBL_TEST_SCENARIO_CLASSOF(pSelf);
     GblTestScenario_*     pSelf_ = GBL_TEST_SCENARIO_(pSelf);
 
-    for(size_t idx = 0; idx < GblArrayList_size(&pSelf_->resultGroups); ++idx) {
-        GblTestResultGroup_* pGroup = GblArrayList_at(&pSelf_->resultGroups, idx);
+    for(size_t idx = 0; idx < GblArrayMap_size(&pSelf_->pResultGroups); ++idx) {
+        GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_probeValue(&pSelf_->pResultGroups, idx);
         GBL_CTX_VERIFY_CALL(GblArrayList_assign(&pGroup->counts, NULL,
                                                 pGroup->pEnumClass->entryCount));
     }
@@ -594,13 +597,12 @@ static GBL_RESULT GblTestScenario_init_(GblInstance* pInstance) {
     GBL_CTX_BEGIN(pObject);
     GblContextClass* pCtxClass = GBL_CONTEXT_CLASS(GblClass_weakRefDefault(GBL_CONTEXT_TYPE));
 
-    GblTestScenario*    pSelf   = GBL_TEST_SCENARIO(pObject);
-    GblTestScenario_*   pSelf_  = GBL_TEST_SCENARIO_(pSelf);
+    GblTestScenario*  pSelf  = GBL_TEST_SCENARIO(pObject);
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
 
-    GblContext* pParentCtx      = GblContext_parentContext(GBL_CONTEXT(pObject));
-    pSelf_->pAllocTracker       = GblAllocationTracker_create(pParentCtx);
-    GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->resultGroups,
-                                               sizeof(GblTestResultGroup_)));
+    GblContext* pParentCtx = GblContext_parentContext(GBL_CONTEXT(pObject));
+    pSelf_->pAllocTracker  = GblAllocationTracker_create(pParentCtx);
+    pSelf_->pResultGroups  = GblArrayMap_create(NULL, GBL_TRUE, NULL);
     GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->failures,
                                                sizeof(GblTestFailure_)));
 
@@ -610,16 +612,10 @@ static GBL_RESULT GblTestScenario_init_(GblInstance* pInstance) {
 static GBL_RESULT GblTestScenarioClass_destructor_(GblBox* pRecord) {
     GBL_CTX_BEGIN(pRecord);
 
-    GblTestScenario*    pSelf   = GBL_TEST_SCENARIO(pRecord);
-    GblTestScenario_*   pSelf_  = GBL_TEST_SCENARIO_(pSelf);
+    GblTestScenario*  pSelf  = GBL_TEST_SCENARIO(pRecord);
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
 
-    for(size_t idx = 0; idx < GblArrayList_size(&pSelf_->resultGroups); ++idx) {
-        GblTestResultGroup_* pGroup = GblArrayList_at(&pSelf_->resultGroups, idx);
-        GBL_CTX_CALL(GblArrayList_destruct(&pGroup->counts));
-        GblStringRef_unref(pGroup->pTitle);
-        GblClass_unrefDefault(GBL_CLASS(pGroup->pEnumClass));
-    }
-    GBL_CTX_CALL(GblArrayList_destruct(&pSelf_->resultGroups));
+    GBL_CTX_CALL(GblArrayMap_destroy(&pSelf_->pResultGroups));
     GBL_CTX_CALL(GblArrayList_destruct(&pSelf_->failures));
     GBL_CTX_VERIFY_CALL(GblAllocationTracker_destroy(pSelf_->pAllocTracker));
 
@@ -772,44 +768,25 @@ GBL_EXPORT GblTestSuite* GblTestScenario_findSuite(const GblTestScenario* pSelf,
 GBL_EXPORT GBL_RESULT GblTestScenario_registerResultGroup(GblTestScenario* pSelf,
                                                             const char* pTitle,
                                                             GblType enumType) {
-    GblTestResultGroup_ group = { 0 };
-    GblBool countsConstructed = GBL_FALSE;
-    GblBool committed         = GBL_FALSE;
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pTitle);
     GBL_CTX_VERIFY_ARG(pTitle[0]);
     GBL_CTX_VERIFY_TYPE(enumType, GBL_ENUM_TYPE);
-    GBL_CTX_VERIFY(!GblTestScenario_findResultGroup_(pSelf, enumType),
+    GBL_CTX_VERIFY(!GblArrayMap_contains(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups, enumType),
                    GBL_RESULT_ERROR_INVALID_OPERATION,
                    "Result group already registered: %s", GblType_name(enumType));
 
-    group.enumType = enumType;
-    group.pEnumClass = GBL_ENUM_CLASS(GblClass_refDefault(enumType));
-    if(!group.pEnumClass) {
-        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_INVALID_CLASS, "Could not reference enum class");
-        goto cleanup;
-    }
-    group.pTitle = GblStringRef_create(pTitle);
-    if(!group.pTitle) {
-        GBL_CTX_RECORD_SET(GBL_RESULT_ERROR_MEM_ALLOC, "Could not copy result group title");
-        goto cleanup;
-    }
-    GBL_CTX_CALL(GblArrayList_construct(&group.counts, sizeof(size_t)));
-    if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) goto cleanup;
-    countsConstructed = GBL_TRUE;
-    GBL_CTX_CALL(GblArrayList_assign(&group.counts, NULL, group.pEnumClass->entryCount));
-    if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) goto cleanup;
-    GBL_CTX_CALL(GblArrayList_pushBack(&GBL_TEST_SCENARIO_(pSelf)->resultGroups, &group));
-    if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) goto cleanup;
-    committed = GBL_TRUE;
-
-cleanup:
-    if(!committed) {
-        if(countsConstructed) GblArrayList_destruct(&group.counts);
-        GblStringRef_unref(group.pTitle);
-        if(group.pEnumClass) GblClass_unrefDefault(GBL_CLASS(group.pEnumClass));
-    }
+    GblTestResultGroup_* pGroup = GBL_CTX_MALLOC(sizeof(GblTestResultGroup_));
+    pGroup->pEnumClass          = GBL_ENUM_CLASS(GblClass_refDefault(enumType));
+    pGroup->pTitle              = GblStringRef_create(pTitle);
+    GBL_CTX_CALL(GblArrayList_construct(&pGroup->counts,
+                                        sizeof(size_t),
+                                        pGroup->pEnumClass->entryCount));
+    GBL_CTX_CALL(GblArrayMap_setUserdata(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups,
+                                         enumType,
+                                         (uintptr_t)pGroup,
+                                         GblTestScenario_resultGroupDestruct_));
     GBL_CTX_END();
 }
 
@@ -818,7 +795,8 @@ GBL_EXPORT GBL_RESULT GblTestScenario_recordResult(GblTestScenario* pSelf,
                                                     GblEnum value) {
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSelf);
-    GblTestResultGroup_* pGroup = GblTestScenario_findResultGroup_(pSelf, enumType);
+    GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_getValue(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups,
+                                                                             enumType);
     GBL_CTX_VERIFY(pGroup, GBL_RESULT_ERROR_INVALID_TYPE,
                    "Unregistered result group: %s", GblType_name(enumType));
     const size_t index = GblTestScenario_resultIndex_(pGroup, value);
@@ -836,7 +814,8 @@ GBL_EXPORT size_t GblTestScenario_resultCount(const GblTestScenario* pSelf,
     size_t count = 0;
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSelf);
-    const GblTestResultGroup_* pGroup = GblTestScenario_findResultGroup_(pSelf, enumType);
+    const GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_getValue(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups,
+                                                                                   enumType);
     GBL_CTX_VERIFY(pGroup, GBL_RESULT_ERROR_INVALID_TYPE,
                    "Unregistered result group: %s", GblType_name(enumType));
     const size_t index = GblTestScenario_resultIndex_(pGroup, value);
