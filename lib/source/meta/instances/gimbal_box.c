@@ -330,7 +330,7 @@ static GBL_RESULT GblBox_IVariant_get_(GblVariant* pSelf, size_t argc, GblVarian
     *(GblBox**)pArgs[0].pVoid = pSelf->pBox;
 
     // Take a new reference if we're copying into the pointer.
-    if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY)
+    if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_COPY && pSelf->pBox)
         GBL_REF(pSelf->pBox);
     // Invalidate old reference if we're moving into the pointer.
     else if(op == GBL_IVARIANT_OP_FLAG_GET_VALUE_MOVE)
@@ -350,7 +350,7 @@ static GBL_RESULT GblBox_IVariant_set_(GblVariant* pSelf, size_t argc, GblVarian
     pSelf->pBox = pArgs[0].pVoid;
 
     // Take a new reference if we're copying.
-    if(op == GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY || op == GBL_IVARIANT_OP_FLAG_SET_COPY)
+    if((op == GBL_IVARIANT_OP_FLAG_SET_VALUE_COPY || op == GBL_IVARIANT_OP_FLAG_SET_COPY) && pSelf->pBox)
         GBL_REF(pSelf->pBox);
     // Invalidate the old reference if we're moving.
     else if(op == GBL_IVARIANT_OP_FLAG_SET_MOVE || op == GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE)
