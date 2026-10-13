@@ -21,6 +21,11 @@ static const char* GBL_TERM_RESET_  = "\x1b[0m";
 
 #define GBL_TEST_SCENARIO_(inst)    (GBL_PRIVATE(GblTestScenario, inst))
 
+typedef struct GblTestResultCount_ {
+    size_t count;
+    size_t suiteStart;
+} GblTestResultCount_;
+
 typedef struct GblTestResultGroup_ {
     GblEnumClass*  pEnumClass;
     GblStringRef*  pTitle;
@@ -64,6 +69,57 @@ static size_t GblTestScenario_resultIndex_(const GblTestResultGroup_* pGroup, Gb
         if(GblEnumClass_valueFromIndex(pGroup->pEnumClass, idx) == value) return idx;
     }
     return GBL_NPOS;
+}
+
+static GBL_RESULT GblTestScenario_logResults_(GblTestScenario* pSelf, GblBool suite) {
+    GBL_CTX_BEGIN(pSelf);
+    const GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
+
+    for(size_t groupIdx = 0; groupIdx < GblArrayMap_size(&pSelf_->pResultGroups); ++groupIdx) {
+        const GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_probeValue(&pSelf_->pResultGroups, groupIdx);
+        size_t total = 0;
+
+        for(uint16_t valueIdx = 0; valueIdx < pGroup->pEnumClass->entryCount; ++valueIdx) {
+            const GblTestResultCount_* pCount = GblArrayList_at(&pGroup->counts, valueIdx);
+            total += pCount->count - (suite? pCount->suiteStart : 0);
+        }
+
+        if(suite && !total) continue;
+
+        if(suite) {
+            GblStringBuffer summary;
+            GblStringBuffer_construct(&summary);
+            GblStringBuffer_appendPrintf(&summary, "%s: %zu total", pGroup->pTitle, total);
+
+            for(uint16_t valueIdx = 0; valueIdx < pGroup->pEnumClass->entryCount; ++valueIdx) {
+                const char* pLabel = GblEnumClass_nickFromIndex(pGroup->pEnumClass, valueIdx);
+                if(!pLabel || !pLabel[0])
+                    pLabel = GblEnumClass_nameFromIndex(pGroup->pEnumClass, valueIdx);
+                const GblTestResultCount_* pCount = GblArrayList_at(&pGroup->counts, valueIdx);
+                GblStringBuffer_appendPrintf(&summary, ", %zu %s", pCount->count - pCount->suiteStart, pLabel);
+            }
+
+            GBL_CTX_INFO("%s", GblStringBuffer_cString(&summary));
+            GblStringBuffer_destruct(&summary);
+            continue;
+        }
+
+        GBL_CTX_INFO("%s", pGroup->pTitle);
+        GBL_CTX_PUSH();
+        GBL_CTX_INFO("%-20s: %20zu", "Total", total);
+
+        for(uint16_t valueIdx = 0; valueIdx < pGroup->pEnumClass->entryCount; ++valueIdx) {
+            const char* pLabel = GblEnumClass_nickFromIndex(pGroup->pEnumClass, valueIdx);
+            if(!pLabel || !pLabel[0])
+                pLabel = GblEnumClass_nameFromIndex(pGroup->pEnumClass, valueIdx);
+            const GblTestResultCount_* pCount = GblArrayList_at(&pGroup->counts, valueIdx);
+            GBL_CTX_INFO("%-20s: %20zu", pLabel, pCount->count);
+        }
+
+        GBL_CTX_POP(1);
+    }
+
+    GBL_CTX_END();
 }
 
 static GBL_RESULT GblTestScenario_recordFailure_(GblTestScenario* pSelf,
@@ -129,25 +185,7 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_CTX_INFO("%-20s: %20u", "Failed",  pSelf->casesFailed);
     GBL_CTX_POP(1);
 
-    for(size_t groupIdx = 0; groupIdx < GblArrayMap_size(&pSelf_->pResultGroups); ++groupIdx) {
-        const GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_probeValue(&pSelf_->pResultGroups, groupIdx);
-        size_t total = 0;
-        for(uint16_t valueIdx = 0; valueIdx < pGroup->pEnumClass->entryCount; ++valueIdx)
-            total += *(size_t*)GblArrayList_at(&pGroup->counts, valueIdx);
-
-        GBL_CTX_INFO("%s", pGroup->pTitle);
-        GBL_CTX_PUSH();
-        GBL_CTX_INFO("%-20s: %20zu", "Total", total);
-        for(uint16_t valueIdx = 0; valueIdx < pGroup->pEnumClass->entryCount; ++valueIdx) {
-            const char* pLabel = GblEnumClass_nickFromIndex(pGroup->pEnumClass, valueIdx);
-            if(!pLabel || !pLabel[0])
-                pLabel = GblEnumClass_nameFromIndex(pGroup->pEnumClass, valueIdx);
-            GBL_CTX_INFO("%-20s: %20zu",
-                         pLabel,
-                         *(size_t*)GblArrayList_at(&pGroup->counts, valueIdx));
-        }
-        GBL_CTX_POP(1);
-    }
+    GBL_CTX_CALL(GblTestScenario_logResults_(pSelf, GBL_FALSE));
 
     if(!GblArrayList_empty(&pSelf_->failures)) {
         size_t nameWidth = 0;
@@ -473,6 +511,14 @@ static GBL_RESULT GblTestScenarioClass_suiteBegin_(GblTestScenario* pSelf, const
     GblAllocationTracker_captureCounters(pSelf_->pAllocTracker,
                                          &pSelf_->suiteAllocCounters);
 
+    for(size_t groupIdx = 0; groupIdx < GblArrayMap_size(&pSelf_->pResultGroups); ++groupIdx) {
+        GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_probeValue(&pSelf_->pResultGroups, groupIdx);
+        for(uint16_t valueIdx = 0; valueIdx < pGroup->pEnumClass->entryCount; ++valueIdx) {
+            GblTestResultCount_* pCount = GblArrayList_at(&pGroup->counts, valueIdx);
+            pCount->suiteStart = pCount->count;
+        }
+    }
+
     pSelf_->suiteMs = 0.0;
 
     GBL_CTX_INFO("%s********* Starting TestSuite [%s] *********%s", GBL_TERM_GRAY_, pSuiteName, GBL_TERM_RESET_);
@@ -505,6 +551,7 @@ static GBL_RESULT GblTestScenarioClass_suiteEnd_(GblTestScenario* pSelf, const G
                  diffCounters.allocEvents,
                  diffCounters.bytesActive,
                  diffCounters.bytesAllocated);
+    GBL_CTX_CALL(GblTestScenario_logResults_(pSelf, GBL_TRUE));
     GBL_CTX_INFO("%s********* Finished TestSuite [%s] *********%s", GBL_TERM_GRAY_, pSuiteName, GBL_TERM_RESET_);
 
     GBL_EMIT(pSelf, "suiteEnded", pSuite);
@@ -781,7 +828,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_registerResultGroup(GblTestScenario* pSelf
     pGroup->pEnumClass          = GBL_ENUM_CLASS(GblClass_refDefault(enumType));
     pGroup->pTitle              = GblStringRef_create(pTitle);
     GBL_CTX_CALL(GblArrayList_construct(&pGroup->counts,
-                                        sizeof(size_t),
+                                        sizeof(GblTestResultCount_),
                                         pGroup->pEnumClass->entryCount));
     GBL_CTX_CALL(GblArrayMap_setUserdata(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups,
                                          enumType,
@@ -802,9 +849,50 @@ GBL_EXPORT GBL_RESULT GblTestScenario_recordResult(GblTestScenario* pSelf,
     const size_t index = GblTestScenario_resultIndex_(pGroup, value);
     GBL_CTX_VERIFY(index != GBL_NPOS, GBL_RESULT_ERROR_OUT_OF_RANGE,
                    "Invalid result value: %u", value);
-    size_t* pCount = GblArrayList_at(&pGroup->counts, index);
-    GBL_CTX_VERIFY(*pCount != SIZE_MAX, GBL_RESULT_ERROR_OVERFLOW);
-    ++*pCount;
+    GblTestResultCount_* pCount = GblArrayList_at(&pGroup->counts, index);
+    GBL_CTX_VERIFY(pCount->count != SIZE_MAX, GBL_RESULT_ERROR_OVERFLOW);
+    ++pCount->count;
+    GBL_CTX_END();
+}
+
+GBL_EXPORT GBL_RESULT GblTestScenario_reportResult(GblTestScenario* pSelf,
+                                                    GblType enumType,
+                                                    GblEnum value,
+                                                    const char* pFmt,
+                                                    ...) {
+    GBL_CTX_BEGIN(pSelf);
+    GBL_CTX_VERIFY_CALL(GblTestScenario_recordResult(pSelf, enumType, value));
+
+    const GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(enumType));
+    const char* pLabel = GblEnumClass_nickFromValue(pEnumClass, value);
+    if(!pLabel || !pLabel[0])
+        pLabel = GblEnumClass_nameFromValue(pEnumClass, value);
+
+    const GblBool runningCase = GBL_TEST_SCENARIO_(pSelf)->runningCase;
+    if(runningCase) {
+        GblThd_logPop(NULL, 1);
+        GblContext_logPop_(GBL_CONTEXT(pSelf), GBL_CTX_FRAME(), 1);
+    }
+
+    if(pFmt && pFmt[0]) {
+        GblStringBuffer details;
+        GblStringBuffer_construct(&details);
+
+        va_list varArgs;
+        va_start(varArgs, pFmt);
+        GBL_CTX_CALL(GblStringBuffer_appendVPrintf(&details, pFmt, varArgs));
+        va_end(varArgs);
+
+        GBL_CTX_INFO("[   %-6s  ]: %s", pLabel, GblStringBuffer_cString(&details));
+        GblStringBuffer_destruct(&details);
+    } else {
+        GBL_CTX_INFO("[   %-6s  ]", pLabel);
+    }
+
+    if(runningCase) {
+        GblThd_logPush(NULL);
+        GblContext_logPush_(GBL_CONTEXT(pSelf), GBL_CTX_FRAME());
+    }
     GBL_CTX_END();
 }
 
@@ -821,7 +909,8 @@ GBL_EXPORT size_t GblTestScenario_resultCount(const GblTestScenario* pSelf,
     const size_t index = GblTestScenario_resultIndex_(pGroup, value);
     GBL_CTX_VERIFY(index != GBL_NPOS, GBL_RESULT_ERROR_OUT_OF_RANGE,
                    "Invalid result value: %u", value);
-    count = *(size_t*)GblArrayList_at(&pGroup->counts, index);
+    const GblTestResultCount_* pCount = GblArrayList_at(&pGroup->counts, index);
+    count = pCount->count;
     GBL_CTX_END_BLOCK();
     return count;
 }
