@@ -4,7 +4,7 @@
 #include <time.h>
 
 #if !defined(GBL_NO_TIMESPEC_)
-#   if defined(ANDROID) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA) || defined(PSP)
+#   if defined(ANDROID) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(VITA) || defined(PSP) || defined(__gamecube__)
 #       define GBL_NO_TIMESPEC_
 #   endif
 #endif
