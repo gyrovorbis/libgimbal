@@ -124,7 +124,7 @@ build win-mingw:
   variables:
     CC: x86_64-w64-mingw32-gcc
     CXX: x86_64-w64-mingw32-g++
-    PREFIX_PATH: ${QT_PATH}/mingw_64
+#    PREFIX_PATH: ${QT_PATH}/mingw_64
 
 # Base MacOS build job
 .build_macos:
