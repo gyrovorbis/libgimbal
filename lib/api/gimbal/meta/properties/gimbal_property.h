@@ -165,7 +165,7 @@ GBL_EXPORT const GblProperty* GblProperty_next    (GblType            objectType
                                                    const GblProperty* pPrev,
                                                    GblFlags           mask)     GBL_NOEXCEPT;
 //! Iterates over the properties installed onto the given type containing any of the given flags, calling the given callback, which gets passed back an optional closure. Returns false if the callback returns false to end iteration.
-GBL_EXPORT GblBool            GblProperty_foreach (GblType            objectType,
+GBL_EXPORT GblBool            GblProperty_iterate (GblType            objectType,
                                                    GBL_PROPERTY_FLAG  flags,
                                                    GblPropertyIterFn  pFnIt,
                                                    void*              pClosure) GBL_NOEXCEPT;
