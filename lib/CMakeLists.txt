@@ -320,6 +320,10 @@ if(PSP AND NOT DEFINED TINYCTHREAD_TLS_EMULATED)
     set(TINYCTHREAD_TLS_EMULATED ON CACHE BOOL "Emulate compiler TLS with TSS")
 endif()
 
+if(NINTENDO_GAMECUBE OR NINTENDO_WII)
+    set(TINYCTHREAD_ENABLE_THREADS OFF CACHE BOOL "Build with threading support")
+endif()
+
 add_subdirectory(lib/tinycthread)
 # No Position Independent Lib for PSP on tinycthread either.
 set_property(TARGET tinycthread PROPERTY POSITION_INDEPENDENT_CODE OFF)
