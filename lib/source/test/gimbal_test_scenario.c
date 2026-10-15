@@ -52,8 +52,8 @@ typedef struct GblTestScenario_ {
 } GblTestScenario_;
 
 static GBL_RESULT GblTestScenario_resultGroupDestruct_(const GblArrayMap* pMap,
-                                                       uintptr_t key,
-                                                       void* pData) {
+                                                       uintptr_t          key,
+                                                       void*              pData) {
     GBL_UNUSED(pMap, key);
     GBL_CTX_BEGIN(NULL);
     GblTestResultGroup_* pGroup = pData;
@@ -122,11 +122,11 @@ static GBL_RESULT GblTestScenario_logResults_(GblTestScenario* pSelf, GblBool su
     GBL_CTX_END();
 }
 
-static GBL_RESULT GblTestScenario_recordFailure_(GblTestScenario* pSelf,
-                                                  const GblTestSuite* pSuite,
-                                                  const char* pCaseName,
-                                                  const char* pPhase,
-                                                  const GblCallRecord* pRecord) {
+static GBL_RESULT GblTestScenario_recordFailure_(GblTestScenario*     pSelf,
+                                                 const GblTestSuite*  pSuite,
+                                                 const char*          pCaseName,
+                                                 const char*          pPhase,
+                                                 const GblCallRecord* pRecord) {
     GBL_CTX_BEGIN(pSelf);
     GblTestFailure_ failure = { .pSuite = pSuite, .pCaseName = pCaseName, .pPhase = pPhase };
     if(pRecord) failure.record = *pRecord;
@@ -188,15 +188,18 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
     GBL_CTX_CALL(GblTestScenario_logResults_(pSelf, GBL_FALSE));
 
     if(!GblArrayList_empty(&pSelf_->failures)) {
-        size_t nameWidth = 0;
+        size_t nameWidth  = 0;
         size_t phaseWidth = 0;
         for(size_t idx = 0; idx < GblArrayList_size(&pSelf_->failures); ++idx) {
             const GblTestFailure_* pFailure = GblArrayList_at(&pSelf_->failures, idx);
+
             size_t nameLength = strlen(GblTestSuite_name(pFailure->pSuite));
-            if(pFailure->pCaseName) nameLength += 2 + strlen(pFailure->pCaseName);
-            if(nameLength > nameWidth) nameWidth = nameLength;
+            if(pFailure->pCaseName)
+                nameLength += 2 + strlen(pFailure->pCaseName);
+
+            nameWidth  = GBL_MAX(nameWidth, nameLength);
             const size_t phaseLength = strlen(pFailure->pPhase);
-            if(phaseLength > phaseWidth) phaseWidth = phaseLength;
+            phaseWidth = GBL_MAX(phaseWidth, phaseLength);
         }
 
         GBL_CTX_INFO("Failures");
@@ -213,13 +216,10 @@ static GBL_RESULT GblTestScenarioClass_end_(GblTestScenario* pSelf) {
             const char* pMessage     = pFailure->record.message[0]?
                                        pFailure->record.message : gblResultString(pFailure->record.result);
 
-            if(pFailure->pCaseName) {
-                GBL_CTX_INFO("%s::%s%*s(%s)%*s: %s", pSuiteName, pFailure->pCaseName,
-                             namePadding, "", pFailure->pPhase, phasePadding, "", pMessage);
-            } else {
-                GBL_CTX_INFO("%s%*s(%s)%*s: %s", pSuiteName, namePadding, "",
-                             pFailure->pPhase, phasePadding, "", pMessage);
-            }
+            GBL_CTX_INFO("%s%s%s%*s(%s)%*s: %s", pSuiteName,
+                         pFailure->pCaseName? "::" : "",
+                         pFailure->pCaseName? pFailure->pCaseName : "",
+                         namePadding, "", pFailure->pPhase, phasePadding, "", pMessage);
         }
         GBL_CTX_POP(1);
     }
@@ -267,11 +267,11 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
         GBL_CTX_VERIFY_CALL(GblArrayList_assign(&pGroup->counts, NULL,
                                                 pGroup->pEnumClass->entryCount));
     }
-    GBL_CTX_VERIFY_CALL(GblArrayList_assign(&pSelf_->failures, NULL, 0));
+    GBL_CTX_VERIFY_CALL(GblArrayList_resize(&pSelf_->failures, 0));
 
-    const char* pOnly_       = NULL;
-    const char* pSkip_       = NULL;
-    GblBool     enableColor  = GBL_FALSE;
+    const char* pOnly_      = NULL;
+    const char* pSkip_      = NULL;
+    GblBool     enableColor = GBL_FALSE;
 
     pParser = GBL_NEW(GblCmdParser,
         "mainOptionGroup",  GBL_NEW(GblOptionGroup,
@@ -289,12 +289,10 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
         result = GBL_RESULT_ERROR_INVALID_POINTER;
         goto cleanup;
     }
+
     result = GblCmdParser_parse(pParser, GblStringList_createWithArray(argv, argc));
-    if(!GBL_RESULT_SUCCESS(result)) {
-        GblTestScenario_printHelp_(pParser);
-        goto cleanup;
-    }
-    if(GblCmdParser_helpRequested(pParser)) {
+
+    if(!GBL_RESULT_SUCCESS(result) || GblCmdParser_helpRequested(pParser)) {
         GblTestScenario_printHelp_(pParser);
         goto cleanup;
     }
@@ -305,7 +303,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
     pOnlyList_ = GblStringList_createSplit(pOnly_, " ");
     pSkipList_ = GblStringList_createSplit(pSkip_, " ");
 
-    if (!enableColor) {
+    if(!enableColor) {
         GBL_TERM_GREEN_  = "";
         GBL_TERM_YELLOW_ = "";
         GBL_TERM_RED_    = "";
@@ -322,13 +320,8 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
 
         GBL_CTX_RESULT() = GBL_RESULT_SUCCESS;
 
-        if (pOnly_ && !GblStringList_foreach(pOnlyList_, GblTestScenario_stringListIterFn_, GblTestSuite_name(pSuiteIt))) {
-            pSelf->casesSkipped += GblTestSuite_caseCount(pSuiteIt);
-            ++pSelf->suitesSkipped;
-            continue;
-        }
-
-        if (pSkip_ && GblStringList_foreach(pSkipList_, GblTestScenario_stringListIterFn_, GblTestSuite_name(pSuiteIt))) {
+        if((pOnly_ && !GblStringList_foreach(pOnlyList_, GblTestScenario_stringListIterFn_, GblTestSuite_name(pSuiteIt))) ||
+           (pSkip_ &&  GblStringList_foreach(pSkipList_, GblTestScenario_stringListIterFn_, GblTestSuite_name(pSuiteIt)))) {
             pSelf->casesSkipped += GblTestSuite_caseCount(pSuiteIt);
             ++pSelf->suitesSkipped;
             continue;
@@ -476,7 +469,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
 
             if(GBL_RESULT_ERROR(GBL_CTX_RESULT())) {
 
-                GBL_CTX_INFO("%s%s%-12s: %s", GBL_TERM_BLINK_, GBL_TERM_RED_, "[      FAIL ]", GBL_TERM_RESET_,
+                GBL_CTX_INFO("%s%s%-12s: %s%s", GBL_TERM_BLINK_, GBL_TERM_RED_, "[      FAIL ]", GBL_TERM_RESET_,
                              GblTestSuite_name(pSelf_->pCurSuite));
 
                 suiteFailed = GBL_TRUE;
@@ -813,8 +806,8 @@ GBL_EXPORT GblTestSuite* GblTestScenario_findSuite(const GblTestScenario* pSelf,
 }
 
 GBL_EXPORT GBL_RESULT GblTestScenario_registerResultGroup(GblTestScenario* pSelf,
-                                                            const char* pTitle,
-                                                            GblType enumType) {
+                                                          const char*      pTitle,
+                                                          GblType          enumType) {
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GBL_CTX_VERIFY_POINTER(pTitle);
@@ -838,8 +831,8 @@ GBL_EXPORT GBL_RESULT GblTestScenario_registerResultGroup(GblTestScenario* pSelf
 }
 
 GBL_EXPORT GBL_RESULT GblTestScenario_recordResult(GblTestScenario* pSelf,
-                                                    GblType enumType,
-                                                    GblEnum value) {
+                                                   GblType          enumType,
+                                                   GblEnum          value) {
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSelf);
     GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_getValue(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups,
@@ -856,10 +849,10 @@ GBL_EXPORT GBL_RESULT GblTestScenario_recordResult(GblTestScenario* pSelf,
 }
 
 GBL_EXPORT GBL_RESULT GblTestScenario_reportResult(GblTestScenario* pSelf,
-                                                    GblType enumType,
-                                                    GblEnum value,
-                                                    const char* pFmt,
-                                                    ...) {
+                                                   GblType          enumType,
+                                                   GblEnum          value,
+                                                   const char*      pFmt,
+                                                   ...) {
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_CALL(GblTestScenario_recordResult(pSelf, enumType, value));
 
@@ -897,8 +890,8 @@ GBL_EXPORT GBL_RESULT GblTestScenario_reportResult(GblTestScenario* pSelf,
 }
 
 GBL_EXPORT size_t GblTestScenario_resultCount(const GblTestScenario* pSelf,
-                                               GblType enumType,
-                                               GblEnum value) {
+                                              GblType                enumType,
+                                              GblEnum                value) {
     size_t count = 0;
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSelf);

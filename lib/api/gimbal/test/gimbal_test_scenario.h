@@ -158,21 +158,21 @@ GBL_EXPORT GblTestSuite* GblTestScenario_findSuite    (GBL_CSELF,
 //! Registers a result group.
 GBL_EXPORT GBL_RESULT GblTestScenario_registerResultGroup (GBL_SELF,
                                                            const char* pTitle,
-                                                           GblType enumType) GBL_NOEXCEPT;
+                                                           GblType     enumType) GBL_NOEXCEPT;
 //! Increments the counter for an enum value in a registered group.
 GBL_EXPORT GBL_RESULT GblTestScenario_recordResult        (GBL_SELF,
                                                            GblType enumType,
-                                                           GblEnum value) GBL_NOEXCEPT;
+                                                           GblEnum value)        GBL_NOEXCEPT;
 //! Logs and counts an enum result, with optional formatted details when pFmt is non-NULL.
 GBL_EXPORT GBL_RESULT GblTestScenario_reportResult        (GBL_SELF,
-                                                           GblType enumType,
-                                                           GblEnum value,
+                                                           GblType     enumType,
+                                                           GblEnum     value,
                                                            const char* pFmt,
-                                                           ...) GBL_NOEXCEPT;
+                                                           ...)                  GBL_NOEXCEPT;
 //! Returns the number of reports for an enum value.
 GBL_EXPORT size_t     GblTestScenario_resultCount         (GBL_CSELF,
                                                            GblType enumType,
-                                                           GblEnum value) GBL_NOEXCEPT;
+                                                           GblEnum value)       GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Current Tests
