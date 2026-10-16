@@ -172,31 +172,39 @@ static void GblCmdParser_appendGroupHelp_(const GblOptionGroup* pGroup,
             GblStringBuffer_appendPrintf(pBuffer, "--%s%s%s",
                                          prefixed && pGroup->pPrefix? pGroup->pPrefix : "",
                                          prefixed && pGroup->pPrefix? "-" : "", pOption->pLongName);
-        if(!(pOption->type == GBL_OPTION_TYPE_BOOL &&
-             (pOption->flags & GBL_OPTION_FLAG_BOOL_NO_VALUE)))
-            GblStringBuffer_appendPrintf(pBuffer, " <%s>", pOption->pValueName? pOption->pValueName : "value");
+
+        if(!(pOption->type == GBL_OPTION_TYPE_BOOL && (pOption->flags & GBL_OPTION_FLAG_BOOL_NO_VALUE)))
+            GblStringBuffer_appendPrintf(pBuffer, " <%s>", (pOption->pValueName)? pOption->pValueName : "value");
+
         GblStringBuffer_append(pBuffer, "\n");
 
         GblStringView description = GBL_STRV(pOption->pDescription);
         while(!GblStringView_empty(description)) {
             size_t lineLength = GblStringView_find(description, "\n");
-            if(lineLength == GBL_STRING_VIEW_NPOS) lineLength = description.length;
+
+            if(lineLength == GBL_STRING_VIEW_NPOS)
+                lineLength = description.length;
+
             if(lineLength)
                 GblStringBuffer_appendPrintf(pBuffer, "    * %.*s\n", (int)lineLength, description.pData);
+
             description = GblStringView_removePrefix(description,
-                                                     lineLength < description.length? lineLength + 1 : lineLength);
+                                                     (lineLength < description.length)? lineLength + 1 : lineLength);
         }
     }
 }
 
 GBL_EXPORT GBL_RESULT GblCmdParser_formatHelp(const GblCmdParser* pSelf,
                                               GblStringBuffer*    pBuffer) {
-    if(!pSelf || !pBuffer) return GBL_RESULT_ERROR_INVALID_POINTER;
+    if(!pSelf || !pBuffer)
+        return GBL_RESULT_ERROR_INVALID_POINTER;
 
     const GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
+
     GblStringBuffer_clear(pBuffer);
     GblStringBuffer_appendPrintf(pBuffer, "Usage: %s [options]",
                                  pSelf_->pExecutable? pSelf_->pExecutable : "program");
+
     for(size_t a = 0; a < GblArrayList_size(&pSelf_->posArgs); ++a) {
         const GblCmdArg* pArg = GblArrayList_at(&pSelf_->posArgs, a);
         GblStringBuffer_appendPrintf(pBuffer, " <%s>", pArg->pName);
@@ -206,8 +214,10 @@ GBL_EXPORT GBL_RESULT GblCmdParser_formatHelp(const GblCmdParser* pSelf,
     if(pSelf->enableHelpOption)
         GblStringBuffer_append(pBuffer,
                                "\nHelp:\n  -h, --help\n    * Show this help and exit\n");
+
     if(pSelf_->pMainOptionGroup)
         GblCmdParser_appendGroupHelp_(pSelf_->pMainOptionGroup, GBL_FALSE, pBuffer);
+
     for(size_t o = 0; o < GblArrayList_size(&pSelf_->optionGroups); ++o) {
         GblOptionGroup* pGroup = *(GblOptionGroup**)GblArrayList_at(&pSelf_->optionGroups, o);
         GblCmdParser_appendGroupHelp_(pGroup, GBL_TRUE, pBuffer);

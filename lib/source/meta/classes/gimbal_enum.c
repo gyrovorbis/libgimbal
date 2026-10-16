@@ -124,9 +124,11 @@ static GBL_RESULT enumConvertFrom_(const GblVariant* pVariant, GblVariant* pOthe
 
 GBL_EXPORT uint16_t GblEnumClass_indexFromValue(const GblEnumClass* pSelf, GblEnum value) {
     const GblEnumClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_ENUM_TYPE);
-    for(uint16_t idx = 0; idx < pSelf->entryCount; ++idx) {
-        if(pSelf_->pEntries[idx].value == value) return idx;
-    }
+
+    for(uint16_t idx = 0; idx < pSelf->entryCount; ++idx)
+        if(pSelf_->pEntries[idx].value == value)
+            return idx;
+
     return UINT16_MAX;
 }
 
@@ -139,22 +141,28 @@ GBL_EXPORT uint16_t GblEnumClass_indexFromNick(const GblEnumClass* pSelf, const 
 }
 
 GBL_EXPORT uint16_t GblEnumClass_indexFromNameQuark(const GblEnumClass* pSelf, GblQuark name) {
-    if(name == GBL_QUARK_INVALID) return UINT16_MAX;
+    if(name == GBL_QUARK_INVALID)
+        return UINT16_MAX;
 
     const GblEnumClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_ENUM_TYPE);
-    for(uint16_t idx = 0; idx < pSelf->entryCount; ++idx) {
-        if(pSelf_->pEntries[idx].name == name) return idx;
-    }
+
+    for(uint16_t idx = 0; idx < pSelf->entryCount; ++idx)
+        if(pSelf_->pEntries[idx].name == name)
+            return idx;
+
     return UINT16_MAX;
 }
 
 GBL_EXPORT uint16_t GblEnumClass_indexFromNickQuark(const GblEnumClass* pSelf, GblQuark nick) {
-    if(nick == GBL_QUARK_INVALID) return UINT16_MAX;
+    if(nick == GBL_QUARK_INVALID)
+        return UINT16_MAX;
 
     const GblEnumClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_ENUM_TYPE);
-    for(uint16_t idx = 0; idx < pSelf->entryCount; ++idx) {
-        if(pSelf_->pEntries[idx].nick == nick) return idx;
-    }
+
+    for(uint16_t idx = 0; idx < pSelf->entryCount; ++idx)
+        if(pSelf_->pEntries[idx].nick == nick)
+            return idx;
+
     return UINT16_MAX;
 }
 
