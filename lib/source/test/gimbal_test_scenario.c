@@ -656,7 +656,7 @@ static GBL_RESULT GblTestScenario_init_(GblInstance* pInstance) {
 
     GblContext* pParentCtx = GblContext_parentContext(GBL_CONTEXT(pObject));
     pSelf_->pAllocTracker  = GblAllocationTracker_create(pParentCtx);
-    pSelf_->pResultGroups  = GblArrayMap_create(NULL, GBL_TRUE, NULL);
+    pSelf_->pResultGroups  = NULL;
     GBL_CTX_VERIFY_CALL(GblArrayList_construct(&pSelf_->failures,
                                                sizeof(GblTestFailure_)));
 
