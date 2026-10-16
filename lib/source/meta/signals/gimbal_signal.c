@@ -85,7 +85,7 @@ GBL_EXPORT GBL_RESULT GblSignal_resolveMarshal_(const char*    pName,
 {
     if(!ppFnMarshal || !pName || (argCount && !pArgTypes))
         return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_POINTER,
-                                         "Invalid marshal lookup arguments")->code;
+                                          "Invalid marshal lookup arguments")->code;
 
     *ppFnMarshal = NULL;
 
@@ -139,25 +139,25 @@ GBL_EXPORT GBL_RESULT GblSignal_resolveMarshal_(const char*    pName,
 
     if(!*ppFnMarshal)
         return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_OPERATION,
-                                         "No C marshal for '%s'; specify C types for all %zu payloads",
-                                         pName, argCount)->code;
+                                          "No C marshal for '%s'; specify C types for all %zu payloads",
+                                          pName, argCount)->code;
 
     return GBL_RESULT_SUCCESS;
 }
 
 GBL_EXPORT GblFnPtr GblSignal_callback_(GblClosure* pClosure, GblPtr pMarshalData) {
-    return pMarshalData.pFunc? pMarshalData.pFunc :
-        (pClosure? GblCClosure_callback((GblCClosure*)pClosure) : NULL);
+    return (pMarshalData.pFunc)? pMarshalData.pFunc :
+           ((pClosure)? GblCClosure_callback((GblCClosure*)pClosure) : NULL);
 }
 
 GBL_EXPORT GBL_RESULT GblSignal_peekBool_(const GblVariant* pValue, void* pOutput) {
     if(!pValue || !pOutput)
         return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_POINTER,
-                                         "Invalid boolean output")->code;
+                                          "Invalid boolean output")->code;
 
     if(GblVariant_typeOf(pValue) != GBL_BOOL_TYPE)
         return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_TYPE_MISMATCH,
-                                         "Signal argument is not a boolean value")->code;
+                                          "Signal argument is not a boolean value")->code;
 
     GblBool value = GBL_FALSE;
     const GBL_RESULT result = GblVariant_valuePeek(pValue, (void*)&value);
@@ -169,29 +169,35 @@ GBL_EXPORT GBL_RESULT GblSignal_peekBool_(const GblVariant* pValue, void* pOutpu
 GBL_EXPORT GBL_RESULT GblSignal_peekPointer_(const GblVariant* pValue, void* pOutput) {
     if(!pValue || !pOutput)
         return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_INVALID_POINTER,
-                                         "Invalid pointer output")->code;
+                                          "Invalid pointer output")->code;
 
     const GblType type = GblVariant_typeOf(pValue);
     GBL_RESULT result;
 
     if(GblType_check(type, GBL_BOX_TYPE)) {
         GblBox* pBox = NULL;
-        result = GblVariant_valuePeek(pValue, (void*)&pBox);
-        if(GBL_RESULT_SUCCESS(result)) *(void**)pOutput = pBox;
+        result       = GblVariant_valuePeek(pValue, (void*)&pBox);
+
+        if(GBL_RESULT_SUCCESS(result))
+            *(void**)pOutput = pBox;
 
     } else if(GblType_check(type, GBL_POINTER_TYPE) || GblType_check(type, GBL_OPAQUE_TYPE)) {
         void* pPointer = NULL;
-        result = GblVariant_valuePeek(pValue, (void*)&pPointer);
-        if(GBL_RESULT_SUCCESS(result)) *(void**)pOutput = pPointer;
+        result         = GblVariant_valuePeek(pValue, (void*)&pPointer);
+
+        if(GBL_RESULT_SUCCESS(result))
+            *(void**)pOutput = pPointer;
 
     } else if(GblType_check(type, GBL_INSTANCE_TYPE)) {
         GblInstance* pInstance = NULL;
-        result = GblVariant_valuePeek(pValue, (void*)&pInstance);
-        if(GBL_RESULT_SUCCESS(result)) *(void**)pOutput = pInstance;
+        result                 = GblVariant_valuePeek(pValue, (void*)&pInstance);
+
+        if(GBL_RESULT_SUCCESS(result))
+            *(void**)pOutput = pInstance;
 
     } else {
         return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_TYPE_MISMATCH,
-                                         "Signal argument is not a pointer value")->code;
+                                          "Signal argument is not a pointer value")->code;
     }
 
     return result;

@@ -310,6 +310,7 @@ GBL_EXPORT GBL_RESULT GblSignal_peekPointer_   (const GblVariant* pValue,
 
 #define GBL_SIGNAL_DEFINE_(instance, signal)             \
     GBL_SIGNAL_DEFINE_EXPAND_(instance, GBL_EVAL signal)
+
 #define GBL_SIGNAL_DEFINE_EXPAND_(...) GBL_SIGNAL_DEFINE_IMPL_(__VA_ARGS__)
 
 #define GBL_SIGNAL_DEFINE_IMPL_(instance, name, ...)                                                               \
@@ -356,11 +357,16 @@ GBL_EXPORT GBL_RESULT GblSignal_peekPointer_   (const GblVariant* pValue,
         if(!GblType_check(GblVariant_typeOf(&pArgs[gblSignalIndex_]), runtimeType))                           \
             return (GBL_RESULT)GblError_raise(GBL_ERROR_DOMAIN, GBL_RESULT_ERROR_TYPE_MISMATCH,               \
                 "Invalid signal argument '%s'", #name)->code;                                                 \
+                                                                                                              \
         void* pPointer = NULL;                                                                                \
+                                                                                                              \
         result = GBL_SIGNAL_SELECT_(cType, GblVariant_valuePeek, GblSignal_peekBool_, GblSignal_peekPointer_) \
-            (&pArgs[gblSignalIndex_++], (void*)GBL_SIGNAL_SELECT_(cType, &gblSignalArg_##name,                \
-                &gblSignalArg_##name, &pPointer));                                                            \
-        if(!GBL_RESULT_SUCCESS(result)) return result;                                                        \
+            (&pArgs[gblSignalIndex_++],                                                                       \
+            (void*)GBL_SIGNAL_SELECT_(cType, &gblSignalArg_##name, &gblSignalArg_##name, &pPointer));         \
+                                                                                                              \
+        if(!GBL_RESULT_SUCCESS(result))                                                                       \
+            return result;                                                                                    \
+                                                                                                              \
         gblSignalArg_##name = (cType)GBL_SIGNAL_SELECT_(cType, gblSignalArg_##name,                           \
             gblSignalArg_##name, pPointer);                                                                   \
     }
