@@ -257,6 +257,28 @@ static GBL_RESULT GblTestScenarioClass_run_begin_(GblTestScenario* pSelf) {
     GBL_CTX_END();
 }
 
+static GblCmdParser* GblTestScenario_createCmdParser_(const char** ppOnly,
+                                                      const char** ppSkip,
+                                                      GblBool*     pEnableColor) {
+    return GBL_NEW(GblCmdParser,
+        "mainOptionGroup",  GBL_NEW(GblOptionGroup,
+            "name", "Test Suite",
+            "prefix", "test",
+            "options", GblRingList_create(
+                &(GblOption) { "only",  'o', GBL_OPTION_TYPE_STRING, ppOnly,
+                               "Only runs suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --only \"CmdParser OptionGroup\".",
+                               "test", GBL_OPTION_FLAG_NONE },
+                &(GblOption) { "skip",  's', GBL_OPTION_TYPE_STRING, ppSkip,
+                               "Skips suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --skip \"CmdParser OptionGroup\".",
+                               "test", GBL_OPTION_FLAG_NONE },
+                &(GblOption) { "color", 'c', GBL_OPTION_TYPE_BOOL, pEnableColor,
+                               "Enables colored output",
+                               "enableColor",  GBL_OPTION_FLAG_BOOL_NO_VALUE }
+            )
+        )
+    );
+}
+
 static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, const char* argv[]) {
     GBL_CTX_BEGIN(pSelf);
 
@@ -275,17 +297,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
     const char* pSkip_      = NULL;
     GblBool     enableColor = GBL_FALSE;
 
-    pParser = GBL_NEW(GblCmdParser,
-        "mainOptionGroup",  GBL_NEW(GblOptionGroup,
-            "name", "Test Suite",
-            "prefix", "test",
-            "options", GblRingList_create(
-                &(GblOption) { "only",  'o', GBL_OPTION_TYPE_STRING, &pOnly_,      "Only runs suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --only \"CmdParser OptionGroup\".", "test", GBL_OPTION_FLAG_NONE },
-                &(GblOption) { "skip",  's', GBL_OPTION_TYPE_STRING, &pSkip_,      "Skips suites matching case-insensitive name substrings. Use a quoted, space-separated list.\ne.g. --skip \"CmdParser OptionGroup\".",     "test", GBL_OPTION_FLAG_NONE },
-                &(GblOption) { "color", 'c', GBL_OPTION_TYPE_BOOL,   &enableColor, "Enables colored output", "enableColor",  GBL_OPTION_FLAG_BOOL_NO_VALUE }
-            )
-        )
-    );
+    pParser = GblTestScenario_createCmdParser_(&pOnly_, &pSkip_, &enableColor);
 
     if(!pParser) {
         result = GBL_RESULT_ERROR_INVALID_POINTER;
