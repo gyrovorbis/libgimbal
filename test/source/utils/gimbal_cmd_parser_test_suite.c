@@ -59,26 +59,24 @@ GBL_TEST_CASE(create) {
                  "version",     GblVersion_make(0, 0, 1),
                  "summary",     "Da Main Group...",
                  "description", "Manages options for main group",
-                 "options",     (GblOption[]) {
-                     { "first",   '1', GBL_OPTION_TYPE_STRING, { &pFixture->pFirst }, "1st value", "value1", GBL_OPTION_FLAG_NONE },
-                     { "second",  '2', GBL_OPTION_TYPE_INT32,  { &pFixture->second }, "2nd value", "value2", GBL_OPTION_FLAG_NONE },
-                     { "third",   '3', GBL_OPTION_TYPE_BOOL,   { &pFixture->third  }, "3rd value", "value3", GBL_OPTION_FLAG_BOOL_NO_VALUE },
-                     { 0 }
-                 },
+                 "options",     GblRingList_create(
+                     &(GblOption) { "first",   '1', GBL_OPTION_TYPE_STRING, { &pFixture->pFirst }, "1st value", "value1", GBL_OPTION_FLAG_NONE },
+                     &(GblOption) { "second",  '2', GBL_OPTION_TYPE_INT32,  { &pFixture->second }, "2nd value", "value2", GBL_OPTION_FLAG_NONE },
+                     &(GblOption) { "third",   '3', GBL_OPTION_TYPE_BOOL,   { &pFixture->third  }, "3rd value", "value3", GBL_OPTION_FLAG_BOOL_NO_VALUE }
+                 ),
                  NULL
              ),
-             "optionGroups", (GblOptionGroup*[]) {
+             "optionGroups", GblRingList_create(
                 (GblOptionGroup*)GblObject_create(GBL_OPTION_GROUP_TYPE,
                      "name",        "Module 1",
                      "prefix",      "mod1",
                      "version",     GblVersion_make(6, 5, 0),
                      "summary",     "Da First Option Group...",
                      "description", "Manages options for first group",
-                     "options",     (GblOption[]) {
-                         { "fourth", '4', GBL_OPTION_TYPE_FLOAT, { &pFixture->fourth }, "4th value", "value4", GBL_OPTION_FLAG_HIDDEN },
-                         { "fifth",  '5', GBL_OPTION_TYPE_CHAR,  { &pFixture->fifth },  "5th value", "value5", GBL_OPTION_FLAG_NONE },
-                         { 0 }
-                     },
+                     "options",     GblRingList_create(
+                         &(GblOption) { "fourth", '4', GBL_OPTION_TYPE_FLOAT, { &pFixture->fourth }, "4th value", "value4", GBL_OPTION_FLAG_HIDDEN },
+                         &(GblOption) { "fifth",  '5', GBL_OPTION_TYPE_CHAR,  { &pFixture->fifth },  "5th value", "value5", GBL_OPTION_FLAG_NONE }
+                     ),
                      NULL
                  ),
                  (GblOptionGroup*)GblObject_create(GBL_OPTION_GROUP_TYPE,
@@ -88,20 +86,17 @@ GBL_TEST_CASE(create) {
                      "summary",     "Da second option group...",
                      "description", "Manages options for second group",
                      "userdata",    pFixture,
-                     "options",     (GblOption[]) {
-                         { "sixth", '6', GBL_OPTION_TYPE_CALLBACK, { .pFn = parseOpt6_ }, "6th value", "value1", GBL_OPTION_FLAG_NONE },
-                         { 0 }
-                     },
+                     "options",     GblRingList_create(
+                         &(GblOption) { "sixth", '6', GBL_OPTION_TYPE_CALLBACK, { .pFn = parseOpt6_ }, "6th value", "value1", GBL_OPTION_FLAG_NONE }
+                     ),
                      NULL
-                 ),
-                 NULL
-             },
-             "positionalArgs", (GblCmdArg[]) {
-                 { "arg1", "Positional arg #1 (string)" },
-                 { "arg2", "Positional arg #2 (int16)"  },
-                 { "arg3", "Positional arg #3 (double)" },
-                 { 0 }
-             },
+                 )
+             ),
+             "positionalArgs", GblRingList_create(
+                 &(GblCmdArg) { "arg1", "Positional arg #1 (string)" },
+                 &(GblCmdArg) { "arg2", "Positional arg #2 (int16)"  },
+                 &(GblCmdArg) { "arg3", "Positional arg #3 (double)" }
+             ),
              NULL
         );
 

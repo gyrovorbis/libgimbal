@@ -100,6 +100,18 @@ GBL_EXPORT GblEnum GblEnumClass_valueFromNickQuark (GBL_CSELF, GblQuark quark)  
 GBL_EXPORT GblBool GblEnumClass_valueCheck         (GBL_CSELF, GblEnum value)       GBL_NOEXCEPT;
 //! @}
 
+/*! \name Index Queries
+ *  \brief Methods for querying enum entry indices, returning UINT16_MAX when not found.
+ *  \relatesalso GblEnumClass
+ *  @{
+ */
+GBL_EXPORT uint16_t GblEnumClass_indexFromValue     (GBL_CSELF, GblEnum value)     GBL_NOEXCEPT;
+GBL_EXPORT uint16_t GblEnumClass_indexFromName      (GBL_CSELF, const char* pName) GBL_NOEXCEPT;
+GBL_EXPORT uint16_t GblEnumClass_indexFromNick      (GBL_CSELF, const char* pNick) GBL_NOEXCEPT;
+GBL_EXPORT uint16_t GblEnumClass_indexFromNameQuark (GBL_CSELF, GblQuark name)     GBL_NOEXCEPT;
+GBL_EXPORT uint16_t GblEnumClass_indexFromNickQuark (GBL_CSELF, GblQuark nick)     GBL_NOEXCEPT;
+//! @}
+
 // ========== GblEnum ==========
 GBL_EXPORT GblType GblEnum_type     (void)                         GBL_NOEXCEPT;
 GBL_EXPORT GblType GblEnum_register (const char*         pName,

@@ -29,20 +29,18 @@ GBL_EXPORT GBL_RESULT GblStringBuffer_appendVPrintf(GblStringBuffer* pSelf, cons
                                  GBL_PRIV(pSelf->data).capacity-originalSize,
                                  pFmt,
                                  varArgsCopy);
-        GBL_PRIV(pSelf->data).size = expectedSize + originalSize;
-        //GBL_PRIV(pSelf->data).pData[expectedSize] = '\0';
         va_end(varArgsCopy);
         GBL_CTX_PERROR("vsnprintf failed with code: %zu", expectedSize);
         //Multi-pass, try again with real size!
-        if GBL_UNLIKELY(expectedSize >= GBL_PRIV(pSelf->data).capacity) {
-            newCapacity = gblPow2Next(expectedSize + 1);
+        if GBL_UNLIKELY(expectedSize >= GBL_PRIV(pSelf->data).capacity - originalSize) {
+            newCapacity = gblPow2Next(originalSize + expectedSize + 1);
             GBL_CTX_CALL(GblStringBuffer_reserve(pSelf, newCapacity));
             GBL_CTX_ERRNO_CLEAR();
             expectedSize = vsnprintf((char*)GBL_PRIV(pSelf->data).pData+originalSize, GBL_PRIV(pSelf->data).capacity-originalSize, pFmt, varArgs);
-            GBL_PRIV(pSelf->data).size = expectedSize;
             GBL_CTX_PERROR("vsnprintf failed with code: %zu", expectedSize);
-            GBL_CTX_VERIFY(expectedSize < GBL_PRIV(pSelf->data).capacity, GBL_RESULT_TRUNCATED); //better have written it all
+            GBL_CTX_VERIFY(expectedSize < GBL_PRIV(pSelf->data).capacity - originalSize, GBL_RESULT_TRUNCATED); //better have written it all
         }
+        GBL_PRIV(pSelf->data).size = originalSize + expectedSize;
     }
     GBL_CTX_END();
 }

@@ -325,6 +325,38 @@ static GBL_RESULT GblFlagsTestSuite_variant_conversions_(GblTestSuite* pSelf, Gb
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblFlagsTestSuite_index_from_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblFlagsTestSuite_* pSelf_ = GBL_FLAGS_TEST_SUITE_(pSelf);
+    const GblRefCount refCountBegin = GblType_classRefCount(pSelf_->flagsType);
+
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromValue(pSelf_->pFlagsClass, READ), 0);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromValue(pSelf_->pFlagsClass, SAVE), 3);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromName(pSelf_->pFlagsClass, "LOAD"), 2);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromNick(pSelf_->pFlagsClass, "Write"), 1);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromNameQuark(pSelf_->pFlagsClass, GblQuark_fromString("READ")), 0);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromNickQuark(pSelf_->pFlagsClass, GblQuark_fromString("Save")), 3);
+
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromValue(pSelf_->pFlagsClass, 0), UINT16_MAX);
+    GBL_TEST_VERIFY(GblFlagsClass_valueCheck(pSelf_->pFlagsClass, READ|WRITE));
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromValue(pSelf_->pFlagsClass, READ|WRITE), UINT16_MAX);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromValue(pSelf_->pFlagsClass, 9999), UINT16_MAX);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromName(pSelf_->pFlagsClass, "Read"), UINT16_MAX);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromNick(pSelf_->pFlagsClass, "READ"), UINT16_MAX);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromNameQuark(pSelf_->pFlagsClass, GBL_QUARK_INVALID), UINT16_MAX);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromNickQuark(pSelf_->pFlagsClass, GBL_QUARK_INVALID), UINT16_MAX);
+
+    const size_t quarkCount = GblQuark_count();
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromName(pSelf_->pFlagsClass, "Missing"), UINT16_MAX);
+    GBL_TEST_COMPARE(GblFlagsClass_indexFromNick(pSelf_->pFlagsClass, "mink123"), UINT16_MAX);
+    GBL_TEST_COMPARE(GblQuark_count(), quarkCount);
+
+    // Reference leak check
+    GBL_TEST_COMPARE(refCountBegin, GblType_classRefCount(pSelf_->flagsType));
+
+    GBL_CTX_END();
+}
+
 GBL_EXPORT GblType GblFlagsTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
@@ -341,6 +373,7 @@ GBL_EXPORT GblType GblFlagsTestSuite_type(void) {
         { "variant",            GblFlagsTestSuite_variant_               },
         { "variantFail",        GblFlagsTestSuite_variant_fail_          },
         { "variantConversions", GblFlagsTestSuite_variant_conversions_   },
+        { "indexFrom",          GblFlagsTestSuite_index_from_            },
         { NULL,                 NULL                                     }
     };
 

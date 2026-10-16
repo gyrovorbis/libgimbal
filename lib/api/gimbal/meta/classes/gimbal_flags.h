@@ -102,6 +102,18 @@ GBL_EXPORT GBL_RESULT  GblFlagsClass_valueAppendString  (GBL_CSELF,
                                                          GblStringBuffer* pStr)           GBL_NOEXCEPT;
 //! @}
 
+/*! \name Index Queries
+ *  \brief Methods for querying flag entry indices, returning UINT16_MAX when not found.
+ *  \relatesalso GblFlagsClass
+ *  @{
+ */
+GBL_EXPORT uint16_t GblFlagsClass_indexFromValue     (GBL_CSELF, GblFlags value)    GBL_NOEXCEPT;
+GBL_EXPORT uint16_t GblFlagsClass_indexFromName      (GBL_CSELF, const char* pName) GBL_NOEXCEPT;
+GBL_EXPORT uint16_t GblFlagsClass_indexFromNick      (GBL_CSELF, const char* pNick) GBL_NOEXCEPT;
+GBL_EXPORT uint16_t GblFlagsClass_indexFromNameQuark (GBL_CSELF, GblQuark name)     GBL_NOEXCEPT;
+GBL_EXPORT uint16_t GblFlagsClass_indexFromNickQuark (GBL_CSELF, GblQuark nick)     GBL_NOEXCEPT;
+//! @}
+
 // ========== GblFlags ==========
 GBL_EXPORT GblType GblFlags_type     (void)                          GBL_NOEXCEPT;
 
