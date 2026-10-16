@@ -10,7 +10,6 @@
 #include <gimbal/containers/gimbal_array_map.h>
 #include <gimbal/strings/gimbal_string_ref.h>
 #include <time.h>
-#include <stdio.h>
 
 static const char* GBL_TERM_GREEN_  = "\x1b[32m";
 static const char* GBL_TERM_YELLOW_ = "\x1b[33m";
@@ -235,12 +234,14 @@ static GblBool GblTestScenario_stringListIterFn_(GblStringRef* pRef, void* pClos
     return GblStringView_containsIgnoreCase(GBL_STRV((const char*)pClosure), pRef);
 }
 
-static void GblTestScenario_printHelp_(const GblCmdParser* pParser) {
+static void GblTestScenario_logHelp_(const GblCmdParser* pParser) {
+    GBL_CTX_BEGIN(NULL);
     GblStringBuffer help;
     GblStringBuffer_construct(&help);
     GblCmdParser_formatHelp(pParser, &help);
-    printf("%s", GblStringBuffer_cString(&help));
+    GBL_CTX_INFO("%s", GblStringBuffer_cString(&help));
     GblStringBuffer_destruct(&help);
+    GBL_CTX_END_BLOCK();
 }
 
 static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, const char* argv[]) {
@@ -286,7 +287,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
     result = GblCmdParser_parse(pParser, GblStringList_createWithArray(argv, argc));
 
     if(!GBL_RESULT_SUCCESS(result) || GblCmdParser_helpRequested(pParser)) {
-        GblTestScenario_printHelp_(pParser);
+        GblTestScenario_logHelp_(pParser);
         goto cleanup;
     }
 
