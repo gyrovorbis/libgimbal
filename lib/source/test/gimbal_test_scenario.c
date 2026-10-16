@@ -244,6 +244,19 @@ static void GblTestScenario_logHelp_(const GblCmdParser* pParser) {
     GBL_CTX_END_BLOCK();
 }
 
+static GBL_RESULT GblTestScenarioClass_run_begin_(GblTestScenario* pSelf) {
+    GBL_CTX_BEGIN(pSelf);
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
+
+    for(size_t idx = 0; idx < GblArrayMap_size(&pSelf_->pResultGroups); ++idx) {
+        GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_probeValue(&pSelf_->pResultGroups, idx);
+        GBL_CTX_VERIFY_CALL(GblArrayList_assign(&pGroup->counts, NULL,
+                                                pGroup->pEnumClass->entryCount));
+    }
+    GBL_CTX_VERIFY_CALL(GblArrayList_resize(&pSelf_->failures, 0));
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, const char* argv[]) {
     GBL_CTX_BEGIN(pSelf);
 
@@ -256,12 +269,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
     GblTestScenarioClass* pClass = GBL_TEST_SCENARIO_CLASSOF(pSelf);
     GblTestScenario_*     pSelf_ = GBL_TEST_SCENARIO_(pSelf);
 
-    for(size_t idx = 0; idx < GblArrayMap_size(&pSelf_->pResultGroups); ++idx) {
-        GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_probeValue(&pSelf_->pResultGroups, idx);
-        GBL_CTX_VERIFY_CALL(GblArrayList_assign(&pGroup->counts, NULL,
-                                                pGroup->pEnumClass->entryCount));
-    }
-    GBL_CTX_VERIFY_CALL(GblArrayList_resize(&pSelf_->failures, 0));
+    GBL_CTX_VERIFY_CALL(GblTestScenarioClass_run_begin_(pSelf));
 
     const char* pOnly_      = NULL;
     const char* pSkip_      = NULL;
