@@ -349,7 +349,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
         GBL_CTX_PUSH();
         GBL_CTX_CALL(GblTestSuite_initSuite(pSuiteIt, pCtx));
         if(GBL_RESULT_ERROR(GBL_CTX_RESULT()))
-            (void)GblTestScenario_recordFailure_(pSelf, pSuiteIt, NULL,
+            GblTestScenario_recordFailure_(pSelf, pSuiteIt, NULL,
                                                  "suite init", &GBL_CTX_LAST_RECORD());
         GBL_CTX_CLEAR_LAST_RECORD();
         GBL_CTX_POP(1);
@@ -384,7 +384,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
                 GBL_CTX_RESULT() = GBL_RESULT_SUCCESS;
                 GBL_CTX_CALL(GblTestSuite_initCase(pSuiteIt, pCtx));
                 if(GBL_RESULT_ERROR(GBL_CTX_RESULT()))
-                    (void)GblTestScenario_recordFailure_(pSelf, pSuiteIt, pCurCase,
+                    GblTestScenario_recordFailure_(pSelf, pSuiteIt, pCurCase,
                                                          "case init", &GBL_CTX_LAST_RECORD());
                 GBL_CTX_CLEAR_LAST_RECORD();
                 GBL_CTX_POP(1);
@@ -432,7 +432,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
                                      GblTimer_elapsedMs(&caseTimer));
                     } else {
                         ++pSelf->casesFailed;
-                        (void)GblTestScenario_recordFailure_(pSelf, pSuiteIt, pCurCase,
+                        GblTestScenario_recordFailure_(pSelf, pSuiteIt, pCurCase,
                                                              "case", &caseRecord);
                         GBL_CTX_INFO("%s%s%-12s: %s%s::%s (%.3f ms)", GBL_TERM_BLINK_, GBL_TERM_RED_,   "[      FAIL ]", GBL_TERM_RESET_,
                                      GblTestSuite_name(pSelf_->pCurSuite),
@@ -456,7 +456,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
                     GBL_CTX_RESULT() = GBL_RESULT_SUCCESS;
                     GBL_CTX_CALL(GblTestSuite_finalCase(pSuiteIt, pCtx));
                     if(GBL_RESULT_ERROR(GBL_CTX_RESULT()))
-                        (void)GblTestScenario_recordFailure_(pSelf, pSuiteIt, pCurCase,
+                        GblTestScenario_recordFailure_(pSelf, pSuiteIt, pCurCase,
                                                              "case final", &GBL_CTX_LAST_RECORD());
                     GBL_CTX_CLEAR_LAST_RECORD();
 
@@ -476,7 +476,7 @@ static GBL_RESULT GblTestScenarioClass_run_(GblTestScenario* pSelf, int argc, co
             GBL_CTX_RESULT() = GBL_RESULT_SUCCESS;
             GBL_CTX_CALL(GblTestSuite_finalSuite(pSuiteIt, pCtx));
             if(GBL_RESULT_ERROR(GBL_CTX_RESULT()))
-                (void)GblTestScenario_recordFailure_(pSelf, pSuiteIt, NULL,
+                GblTestScenario_recordFailure_(pSelf, pSuiteIt, NULL,
                                                      "suite final", &GBL_CTX_LAST_RECORD());
             GBL_CTX_CLEAR_LAST_RECORD();
             GBL_CTX_POP(1);
