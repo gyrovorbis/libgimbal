@@ -25,10 +25,15 @@ typedef struct GblTestResultCount_ {
     size_t suiteStart;
 } GblTestResultCount_;
 
+typedef struct GblTestResultGroupKey_ {
+    GblQuark name;
+    GblType  enumType;
+} GblTestResultGroupKey_;
+
 typedef struct GblTestResultGroup_ {
-    GblEnumClass*  pEnumClass;
-    GblStringRef*  pTitle;
-    GblArrayList   counts;
+    GblTestResultGroupKey_ key;
+    GblEnumClass*          pEnumClass;
+    GblArrayList           counts;
 } GblTestResultGroup_;
 
 typedef struct GblTestFailure_ {
@@ -50,6 +55,27 @@ typedef struct GblTestScenario_ {
     GblArrayList            failures;
 } GblTestScenario_;
 
+static int GblTestScenario_resultGroupCompare_(const GblArrayMap* pMap,
+                                               uintptr_t          key1,
+                                               uintptr_t          key2) {
+    GBL_UNUSED(pMap);
+
+    const GblTestResultGroupKey_* pKey1 = (const GblTestResultGroupKey_*)key1;
+    const GblTestResultGroupKey_* pKey2 = (const GblTestResultGroupKey_*)key2;
+
+    if(pKey1->name != pKey2->name)
+        return pKey1->name < pKey2->name ? -1 : 1;
+
+    return pKey1->enumType < pKey2->enumType ? -1 : pKey1->enumType > pKey2->enumType;
+}
+
+static GblTestResultGroup_* GblTestScenario_resultGroup_(const GblTestScenario* pSelf,
+                                                         GblQuark               name,
+                                                         GblType                enumType) {
+    const GblTestResultGroupKey_ key = { name, enumType };
+    return (GblTestResultGroup_*)GblArrayMap_getValue(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups, (uintptr_t)&key);
+}
+
 static GBL_RESULT GblTestScenario_resultGroupDestruct_(const GblArrayMap* pMap,
                                                        uintptr_t          key,
                                                        void*              pData) {
@@ -57,7 +83,6 @@ static GBL_RESULT GblTestScenario_resultGroupDestruct_(const GblArrayMap* pMap,
     GBL_CTX_BEGIN(NULL);
     GblTestResultGroup_* pGroup = pData;
     GBL_CTX_CALL(GblArrayList_destruct(&pGroup->counts));
-    GblStringRef_unref(pGroup->pTitle);
     GblClass_unrefDefault(GBL_CLASS(pGroup->pEnumClass));
     GBL_CTX_FREE(pGroup);
     GBL_CTX_END();
@@ -81,7 +106,7 @@ static GBL_RESULT GblTestScenario_logResults_(GblTestScenario* pSelf, GblBool su
         if(suite) {
             GblStringBuffer summary;
             GblStringBuffer_construct(&summary);
-            GblStringBuffer_appendPrintf(&summary, "%s: %zu total", pGroup->pTitle, total);
+            GblStringBuffer_appendPrintf(&summary, "%s: %zu total", GblQuark_toString(pGroup->key.name), total);
 
             for(uint16_t valueIdx = 0; valueIdx < pGroup->pEnumClass->entryCount; ++valueIdx) {
                 const char* pLabel = GblEnumClass_nickFromIndex(pGroup->pEnumClass, valueIdx);
@@ -96,7 +121,7 @@ static GBL_RESULT GblTestScenario_logResults_(GblTestScenario* pSelf, GblBool su
             continue;
         }
 
-        GBL_CTX_INFO("%s", pGroup->pTitle);
+        GBL_CTX_INFO("%s", GblQuark_toString(pGroup->key.name));
         GBL_CTX_PUSH();
         GBL_CTX_INFO("%-20s: %20zu", "Total", total);
 
@@ -820,55 +845,61 @@ GBL_EXPORT GblTestSuite* GblTestScenario_findSuite(const GblTestScenario* pSelf,
 }
 
 GBL_EXPORT GBL_RESULT GblTestScenario_registerResultGroup(GblTestScenario* pSelf,
-                                                          const char*      pTitle,
+                                                          GblQuark         name,
                                                           GblType          enumType) {
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSelf);
-    GBL_CTX_VERIFY_POINTER(pTitle);
-    GBL_CTX_VERIFY_ARG(pTitle[0]);
+    const char* pName = GblQuark_toString(name);
+    GBL_CTX_VERIFY_POINTER(pName);
+    GBL_CTX_VERIFY_ARG(pName[0]);
     GBL_CTX_VERIFY_TYPE(enumType, GBL_ENUM_TYPE);
-    GBL_CTX_VERIFY(!GblArrayMap_contains(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups, enumType),
+    GBL_CTX_VERIFY(!GblTestScenario_resultGroup_(pSelf, name, enumType),
                    GBL_RESULT_ERROR_INVALID_OPERATION,
-                   "Result group already registered: %s", GblType_name(enumType));
+                   "Result group already registered: %s (%s)", pName, GblType_name(enumType));
+
+    GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
+    if(!pSelf_->pResultGroups)
+        pSelf_->pResultGroups = GblArrayMap_create(GblTestScenario_resultGroupCompare_, GBL_TRUE, NULL);
 
     GblTestResultGroup_* pGroup = GBL_CTX_MALLOC(sizeof(GblTestResultGroup_));
+    pGroup->key.name            = name;
+    pGroup->key.enumType        = enumType;
     pGroup->pEnumClass          = GBL_ENUM_CLASS(GblClass_refDefault(enumType));
-    pGroup->pTitle              = GblStringRef_create(pTitle);
     GBL_CTX_CALL(GblArrayList_construct(&pGroup->counts,
                                         sizeof(GblTestResultCount_),
                                         pGroup->pEnumClass->entryCount));
-    GBL_CTX_CALL(GblArrayMap_setUserdata(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups,
-                                         enumType,
+    GBL_CTX_CALL(GblArrayMap_setUserdata(&pSelf_->pResultGroups,
+                                         (uintptr_t)&pGroup->key,
                                          (uintptr_t)pGroup,
                                          GblTestScenario_resultGroupDestruct_));
     GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblTestScenario_recordResult(GblTestScenario* pSelf,
+                                                   GblQuark         name,
                                                    GblType          enumType,
                                                    GblEnum          value) {
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSelf);
-    GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_getValue(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups,
-                                                                             enumType);
+    GblTestResultGroup_* pGroup = GblTestScenario_resultGroup_(pSelf, name, enumType);
     GBL_CTX_VERIFY(pGroup, GBL_RESULT_ERROR_INVALID_TYPE,
-                   "Unregistered result group: %s", GblType_name(enumType));
+                   "Unregistered result group: %s (%s)", GblQuark_toString(name), GblType_name(enumType));
     const uint16_t index = GblEnumClass_indexFromValue(pGroup->pEnumClass, value);
     GBL_CTX_VERIFY(index != UINT16_MAX, GBL_RESULT_ERROR_OUT_OF_RANGE,
                    "Invalid result value: %u", value);
     GblTestResultCount_* pCount = GblArrayList_at(&pGroup->counts, index);
-    GBL_CTX_VERIFY(pCount->count != SIZE_MAX, GBL_RESULT_ERROR_OVERFLOW);
     ++pCount->count;
     GBL_CTX_END();
 }
 
 GBL_EXPORT GBL_RESULT GblTestScenario_reportResult(GblTestScenario* pSelf,
+                                                   GblQuark         name,
                                                    GblType          enumType,
                                                    GblEnum          value,
                                                    const char*      pFmt,
                                                    ...) {
     GBL_CTX_BEGIN(pSelf);
-    GBL_CTX_VERIFY_CALL(GblTestScenario_recordResult(pSelf, enumType, value));
+    GBL_CTX_VERIFY_CALL(GblTestScenario_recordResult(pSelf, name, enumType, value));
 
     const GblEnumClass* pEnumClass = GBL_ENUM_CLASS(GblClass_weakRefDefault(enumType));
     const char* pLabel = GblEnumClass_nickFromValue(pEnumClass, value);
@@ -904,15 +935,15 @@ GBL_EXPORT GBL_RESULT GblTestScenario_reportResult(GblTestScenario* pSelf,
 }
 
 GBL_EXPORT size_t GblTestScenario_resultCount(const GblTestScenario* pSelf,
+                                              GblQuark               name,
                                               GblType                enumType,
                                               GblEnum                value) {
     size_t count = 0;
     GBL_CTX_BEGIN(pSelf);
     GBL_CTX_VERIFY_POINTER(pSelf);
-    const GblTestResultGroup_* pGroup = (GblTestResultGroup_*)GblArrayMap_getValue(&GBL_TEST_SCENARIO_(pSelf)->pResultGroups,
-                                                                                   enumType);
+    const GblTestResultGroup_* pGroup = GblTestScenario_resultGroup_(pSelf, name, enumType);
     GBL_CTX_VERIFY(pGroup, GBL_RESULT_ERROR_INVALID_TYPE,
-                   "Unregistered result group: %s", GblType_name(enumType));
+                   "Unregistered result group: %s (%s)", GblQuark_toString(name), GblType_name(enumType));
     const uint16_t index = GblEnumClass_indexFromValue(pGroup->pEnumClass, value);
     GBL_CTX_VERIFY(index != UINT16_MAX, GBL_RESULT_ERROR_OUT_OF_RANGE,
                    "Invalid result value: %u", value);
