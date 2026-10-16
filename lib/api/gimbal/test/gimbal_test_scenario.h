@@ -172,7 +172,7 @@ GBL_EXPORT GBL_RESULT GblTestScenario_reportResult        (GBL_SELF,
 //! Returns the number of reports for an enum value.
 GBL_EXPORT size_t     GblTestScenario_resultCount         (GBL_CSELF,
                                                            GblType enumType,
-                                                           GblEnum value)       GBL_NOEXCEPT;
+                                                           GblEnum value)        GBL_NOEXCEPT;
 //! @}
 
 /*! \name  Current Tests

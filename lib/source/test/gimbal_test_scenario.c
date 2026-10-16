@@ -64,13 +64,6 @@ static GBL_RESULT GblTestScenario_resultGroupDestruct_(const GblArrayMap* pMap,
     GBL_CTX_END();
 }
 
-static size_t GblTestScenario_resultIndex_(const GblTestResultGroup_* pGroup, GblEnum value) {
-    for(uint16_t idx = 0; idx < pGroup->pEnumClass->entryCount; ++idx) {
-        if(GblEnumClass_valueFromIndex(pGroup->pEnumClass, idx) == value) return idx;
-    }
-    return GBL_NPOS;
-}
-
 static GBL_RESULT GblTestScenario_logResults_(GblTestScenario* pSelf, GblBool suite) {
     GBL_CTX_BEGIN(pSelf);
     const GblTestScenario_* pSelf_ = GBL_TEST_SCENARIO_(pSelf);
@@ -839,8 +832,8 @@ GBL_EXPORT GBL_RESULT GblTestScenario_recordResult(GblTestScenario* pSelf,
                                                                              enumType);
     GBL_CTX_VERIFY(pGroup, GBL_RESULT_ERROR_INVALID_TYPE,
                    "Unregistered result group: %s", GblType_name(enumType));
-    const size_t index = GblTestScenario_resultIndex_(pGroup, value);
-    GBL_CTX_VERIFY(index != GBL_NPOS, GBL_RESULT_ERROR_OUT_OF_RANGE,
+    const uint16_t index = GblEnumClass_indexFromValue(pGroup->pEnumClass, value);
+    GBL_CTX_VERIFY(index != UINT16_MAX, GBL_RESULT_ERROR_OUT_OF_RANGE,
                    "Invalid result value: %u", value);
     GblTestResultCount_* pCount = GblArrayList_at(&pGroup->counts, index);
     GBL_CTX_VERIFY(pCount->count != SIZE_MAX, GBL_RESULT_ERROR_OVERFLOW);
@@ -899,8 +892,8 @@ GBL_EXPORT size_t GblTestScenario_resultCount(const GblTestScenario* pSelf,
                                                                                    enumType);
     GBL_CTX_VERIFY(pGroup, GBL_RESULT_ERROR_INVALID_TYPE,
                    "Unregistered result group: %s", GblType_name(enumType));
-    const size_t index = GblTestScenario_resultIndex_(pGroup, value);
-    GBL_CTX_VERIFY(index != GBL_NPOS, GBL_RESULT_ERROR_OUT_OF_RANGE,
+    const uint16_t index = GblEnumClass_indexFromValue(pGroup->pEnumClass, value);
+    GBL_CTX_VERIFY(index != UINT16_MAX, GBL_RESULT_ERROR_OUT_OF_RANGE,
                    "Invalid result value: %u", value);
     const GblTestResultCount_* pCount = GblArrayList_at(&pGroup->counts, index);
     count = pCount->count;
