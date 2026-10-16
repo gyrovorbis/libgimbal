@@ -550,11 +550,12 @@
 
 // alloca()
 #ifndef GBL_ALLOCA
-#   if defined(__APPLE__)      || defined(__GLIBC__)  || \
-       defined(__sun)          || defined(__CYGWIN__) || \
-       defined(__EMSCRIPTEN__) || defined(VITA)       || \
-       defined(__DREAMCAST__)  || defined(PSP)        || \
-       defined(__GAMECUBE__)   || defined(__DEVKITARM__)
+#   if defined(__APPLE__)      || defined(__GLIBC__)    || \
+       defined(__sun)          || defined(__CYGWIN__)   || \
+       defined(__EMSCRIPTEN__) || defined(VITA)         || \
+       defined(__DREAMCAST__)  || defined(PSP)          || \
+       defined(__GAMECUBE__)   || defined(GEKKO)        || \
+       defined(__DEVKITARM__)
 #       include <alloca.h>        // Sane platforms
 #   elif defined(_WIN32)
 #       include <malloc.h>        // Windoez

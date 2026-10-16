@@ -293,6 +293,7 @@ static GBL_RESULT GblObject_setPropertyVCall_(GblObject*         pSelf,
 
             // If we failed to retrieve a comparison value or the values different, the property has changed.
             changed = (!GBL_RESULT_SUCCESS(result) ||
+                        GblVariant_typeOf(&currentValue) == GBL_INVALID_TYPE ||
                         GblProperty_compareValues(pProp, pValue, &currentValue) != 0);
 
             // Destroy the variant containing the current property value.
