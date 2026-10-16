@@ -96,11 +96,11 @@ GBL_PROPERTIES(GblCmdParser,
 )
 
 GBL_SIGNALS(GblCmdParser,
-    (parsePrePass,        (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pInitialArgs)),
-    (parsePostPass,       (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pRemainingArgs)),
-    (parseExtraArgs,      (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pExtraArgs)),
-    (parseUnknownOptions, (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pRemaininArgs)),
-    (parseError,          (GBL_INSTANCE_TYPE, pReceiver), (GBL_ENUM_TYPE,    errorCode))
+    (parsePrePass,        (GBL_POINTER_TYPE, pInitialArgs)),
+    (parsePostPass,       (GBL_POINTER_TYPE, pRemainingArgs)),
+    (parseExtraArgs,      (GBL_POINTER_TYPE, pExtraArgs)),
+    (parseUnknownOptions, (GBL_POINTER_TYPE, pRemaininArgs)),
+    (parseError,          (GBL_ENUM_TYPE,    errorCode))
 )
 //! \endcond
 

@@ -68,8 +68,8 @@ GBL_INSTANCE_DERIVE(GblMainLoop, GblObject)
 GBL_INSTANCE_END
 
 GBL_SIGNALS(GblMainLoop,
-    (execIdle,     GBL_INSTANCE_TYPE),
-    (taskEnqueued, GBL_INSTANCE_TYPE, GBL_INSTANCE_TYPE)
+    (execIdle),
+    (taskEnqueued, (GBL_INSTANCE_TYPE, pTask))
 )
 
 GBL_EXPORT GblType    GblMainLoop_type    (void) GBL_NOEXCEPT;

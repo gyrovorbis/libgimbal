@@ -148,7 +148,7 @@ GBL_PROPERTIES(GblObject,
 )
 
 GBL_SIGNALS(GblObject,
-    (propertyChange, (GBL_INSTANCE_TYPE, pReceiver), (GBL_BOX_TYPE, pProperty))
+    (propertyChange, (GBL_BOX_TYPE, pProperty))
 )
 //! \endcond
 
