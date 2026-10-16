@@ -8,7 +8,7 @@
  *        process(..) top-level method for handling exiting
  *        upon failure, version, or help.
  *
- *  \author     2023 Falco Girgis
+ *  \author     2023, 2026 Falco Girgis
  *  \author     2026 Agustín Bellagamba
  *  \copyright  MIT License
  */

@@ -36,12 +36,11 @@ GBL_EXPORT GBL_RESULT GblCmdParser_parse(GblCmdParser* pSelf, GblStringList* pAr
 
     // 1. Conditionally parse "executable" as first argument
     if(pSelf->firstArgAsExecutable) {
-        GBL_CTX_VERIFY(!GblStringList_empty(pArgs),
-                       GBL_RESULT_ERROR_INVALID_CMDLINE_ARG,
-                       "Expected executable name as first argument, "
-                       "but no arguments were provided.");
-
-        pSelf_->pExecutable = GblStringList_popFront(pArgs);
+        if(GblStringList_empty(pArgs))
+            GBL_CTX_WARN("Expected executable name as first argument, "
+                         "but no arguments were provided.");
+        else
+            pSelf_->pExecutable = GblStringList_popFront(pArgs);
     }
 
     // 2. Parse main option group
