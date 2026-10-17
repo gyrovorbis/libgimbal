@@ -21,13 +21,13 @@ GblType argToGblType_(GBL_OPTION_TYPE type) {
     }
 }
 
-GBL_EXPORT GblOptionGroup* GblOptionGroup_create(const char*      pName,
-                                                 const char*      pPrefix,
-                                                 const GblOption* pOptions) {
+GBL_EXPORT GblOptionGroup* GblOptionGroup_create(const char*        pName,
+                                                 const char*        pPrefix,
+                                                 const GblRingList* pOptions) {
     return GBL_OBJECT_NEW(GblOptionGroup,
                           "name",    pName,
                           "prefix",  pPrefix,
-                          "options", pOptions);
+                          "options", pOptions? GblRingList_ref(pOptions) : NULL);
 }
 
 GBL_EXPORT GblRefCount GblOptionGroup_unref(GblOptionGroup* pSelf) {
@@ -230,9 +230,13 @@ static GBL_RESULT GblOptionGroup_Object_property_(const GblObject* pObject, cons
     case GblOptionGroup_Property_Id_prefix:
         GBL_CTX_VERIFY_CALL(GblVariant_setValueMove(pValue, pProp->valueType, GblStringRef_ref(pSelf->pPrefix)));
         break;
-    case GblOptionGroup_Property_Id_options:
-        GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pValue, pProp->valueType, pSelf->pOptions));
+    case GblOptionGroup_Property_Id_options: {
+        GblRingList* pOptions = GblRingList_createEmpty();
+        for(size_t o = 0; o < pSelf->optionCount; ++o)
+            GblRingList_pushBack(pOptions, &pSelf->pOptions[o]);
+        GblVariant_setValueMove(pValue, pProp->valueType, pOptions);
         break;
+    }
     case GblOptionGroup_Property_Id_version:
         GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pValue, pProp->valueType, pSelf->version));
         break;
@@ -265,16 +269,17 @@ static GBL_RESULT GblOptionGroup_Object_setProperty_(GblObject* pObject, const G
     case GblOptionGroup_Property_Id_options: {
         GBL_CTX_FREE(pSelf->pOptions);
         pSelf->optionCount = 0;
-        const GblOption* pOpt;
-        GBL_CTX_VERIFY_CALL(GblVariant_valueMove(pValue, &pOpt));
-        const GblOption* pIt = pOpt;
-        while(pIt->pLongName || pIt->shortName) {
-            ++pSelf->optionCount;
-            ++pIt;
+        pSelf->pOptions = NULL;
+        GblRingList* pOptions = NULL;
+        GblVariant_valuePeek(pValue, &pOptions);
+        if(pOptions) {
+            pSelf->optionCount = GblRingList_size(pOptions);
+            if(pSelf->optionCount)
+                pSelf->pOptions = GBL_CTX_NEW(GblOption, pSelf->optionCount);
+            size_t o = 0;
+            GblRingList_foreach(pOptions, pOption, const GblOption*)
+                pSelf->pOptions[o++] = *pOption;
         }
-        GblOption* pNew = GBL_CTX_NEW(GblOption, pSelf->optionCount);
-        memcpy(pNew, pOpt, sizeof(GblOption) * pSelf->optionCount);
-        pSelf->pOptions = pNew;
         break;
     }
     case GblOptionGroup_Property_Id_version:

@@ -255,6 +255,39 @@ static GBL_RESULT GblEnumTestSuite_variant_conversions_(GblTestSuite* pSelf, Gbl
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblEnumTestSuite_index_from_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_CTX_BEGIN(pCtx);
+    GblEnumTestSuite_* pSelf_ = GBL_ENUM_TEST_SUITE_(pSelf);
+    const GblRefCount refCountBegin = GblType_classRefCount(pSelf_->enumType);
+
+    GBL_TEST_COMPARE(GblEnumClass_indexFromValue(pSelf_->pEnumClass, RED), 0);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromValue(pSelf_->pEnumClass, GREEN), 1);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromValue(pSelf_->pEnumClass, BLUE), 2);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromName(pSelf_->pEnumClass, "BLUE"), 2);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromNick(pSelf_->pEnumClass, "Green"), 1);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromNameQuark(pSelf_->pEnumClass, GblQuark_fromString("RED")), 0);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromNickQuark(pSelf_->pEnumClass, GblQuark_fromString("Blue")), 2);
+
+    GBL_TEST_COMPARE(GblEnumClass_indexFromValue(pSelf_->pEnumClass, 0), UINT16_MAX);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromValue(pSelf_->pEnumClass, 2), UINT16_MAX);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromValue(pSelf_->pEnumClass, 9999), UINT16_MAX);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromName(pSelf_->pEnumClass, "Blue"), UINT16_MAX);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromNick(pSelf_->pEnumClass, "BLUE"), UINT16_MAX);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromNameQuark(pSelf_->pEnumClass, GBL_QUARK_INVALID), UINT16_MAX);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromNickQuark(pSelf_->pEnumClass, GBL_QUARK_INVALID), UINT16_MAX);
+
+    const size_t quarkCount = GblQuark_count();
+    GBL_TEST_COMPARE(GblEnumClass_indexFromName(pSelf_->pEnumClass, "MissingEnumName"), UINT16_MAX);
+    GBL_TEST_COMPARE(GblEnumClass_indexFromNick(pSelf_->pEnumClass, "MissingEnumNick"), UINT16_MAX);
+    GBL_TEST_COMPARE(GblQuark_count(), quarkCount);
+
+    // Reference leak check
+    GBL_TEST_COMPARE(refCountBegin, GblType_classRefCount(pSelf_->enumType));
+
+    GBL_CTX_END();
+}
+
+
 GBL_EXPORT GblType GblEnumTestSuite_type(void) {
     static GblType type = GBL_INVALID_TYPE;
 
@@ -269,6 +302,7 @@ GBL_EXPORT GblType GblEnumTestSuite_type(void) {
         { "variant",            GblEnumTestSuite_variant_               },
         { "variantFail",        GblEnumTestSuite_variant_fail_          },
         { "variantConversions", GblEnumTestSuite_variant_conversions_   },
+        { "indexFrom",          GblEnumTestSuite_index_from_            },
         { NULL,                 NULL                                    }
     };
 

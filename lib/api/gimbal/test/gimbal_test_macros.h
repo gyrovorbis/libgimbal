@@ -200,6 +200,17 @@ typedef enum GBL_TEST_ERROR_COMPARISON {
 
 #define GBL_TEST_CALL                                GBL_CTX_VERIFY_CALL
 
+//! Reports an enum value to a registered result group, with an optional formatted message.
+#define GBL_TEST_CUSTOM(...) GBL_TEST_CUSTOM_(__VA_ARGS__, NULL)
+
+#define GBL_TEST_CUSTOM_(name, enumType, expression, ...)               \
+    GBL_STMT_START {                                                    \
+        const GblEnum gblTestCustomValue_ = (expression);               \
+        GBL_CTX_VERIFY_CALL(GblTestScenario_reportResult(               \
+            GBL_TEST_SCENARIO(GBL_CTX_CONTEXT()), (name), (enumType),   \
+            gblTestCustomValue_, __VA_ARGS__));                         \
+    } GBL_STMT_END
+
 #define GBL_TEST_SKIP(reason)                        GBL_CTX_VERIFY(GBL_FALSE,                                               \
                                                                     GBL_RESULT_SKIPPED,                                      \
                                                                     reason)

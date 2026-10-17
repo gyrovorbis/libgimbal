@@ -134,6 +134,50 @@ static GBL_RESULT flagsConvertFrom_(const GblVariant* pVariant, GblVariant* pOth
 
 // ------ GblFlagsClass ------
 
+GBL_EXPORT uint16_t GblFlagsClass_indexFromValue(const GblFlagsClass* pSelf, GblFlags value) {
+    const GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_FLAGS_TYPE);
+
+    for(uint16_t idx = 0; idx < pSelf->entryCount; ++idx)
+        if(pSelf_->pEntries[idx].value == value)
+            return idx;
+
+    return UINT16_MAX;
+}
+
+GBL_EXPORT uint16_t GblFlagsClass_indexFromName(const GblFlagsClass* pSelf, const char* pName) {
+    return GblFlagsClass_indexFromNameQuark(pSelf, GblQuark_tryString(pName));
+}
+
+GBL_EXPORT uint16_t GblFlagsClass_indexFromNick(const GblFlagsClass* pSelf, const char* pNick) {
+    return GblFlagsClass_indexFromNickQuark(pSelf, GblQuark_tryString(pNick));
+}
+
+GBL_EXPORT uint16_t GblFlagsClass_indexFromNameQuark(const GblFlagsClass* pSelf, GblQuark name) {
+    if(name == GBL_QUARK_INVALID)
+        return UINT16_MAX;
+
+    const GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_FLAGS_TYPE);
+
+    for(uint16_t idx = 0; idx < pSelf->entryCount; ++idx)
+        if(pSelf_->pEntries[idx].name == name)
+            return idx;
+
+    return UINT16_MAX;
+}
+
+GBL_EXPORT uint16_t GblFlagsClass_indexFromNickQuark(const GblFlagsClass* pSelf, GblQuark nick) {
+    if(nick == GBL_QUARK_INVALID)
+        return UINT16_MAX;
+
+    const GblFlagsClass_* pSelf_ = GblClass_private(GBL_CLASS(pSelf), GBL_FLAGS_TYPE);
+
+    for(uint16_t idx = 0; idx < pSelf->entryCount; ++idx)
+        if(pSelf_->pEntries[idx].nick == nick)
+            return idx;
+
+    return UINT16_MAX;
+}
+
 GBL_EXPORT const char* GblFlagsClass_nameFromIndex(const GblFlagsClass* pSelf, uint16_t index) {
     return GblQuark_toString(GblFlagsClass_nameQuarkFromIndex(pSelf, index));
 }
