@@ -285,14 +285,45 @@ GBL_EXPORT GblBool GblBox_isDestructing(const GblBox* pSelf) {
     return GBL_PRIV_REF(pSelf).destructing;
 }
 
+static GBL_RESULT GblBox_IVariant_checkValue_(const GblVariant* pVariant, const GblBox* pValue) {
+    GBL_CTX_BEGIN(NULL);
+
+    GBL_CTX_VERIFY(!pValue || GblType_check(GBL_TYPEOF(pValue), pVariant->type),
+                   GBL_RESULT_ERROR_TYPE_MISMATCH,
+                   "[GblBox] Cannot store instance of type [%s] in variant of type [%s]",
+                   GblType_name(GBL_TYPEOF(pValue)),
+                   GblType_name(pVariant->type));
+
+    GBL_CTX_END();
+}
+
+static void GblBox_IVariant_releaseRejected_(GblBox* pValue) {
+    const GblCallRecord record = *GblThd_callRecord(NULL);
+
+    GBL_UNREF(pValue);
+    GblThd_setCallRecord(NULL, &record);
+}
+
 static GBL_RESULT GblBox_IVariant_construct_(GblVariant* pVariant, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
 
     GBL_RESULT result = GBL_RESULT_SUCCESS;
 
+    if(op != GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT) {
+        result = GblBox_IVariant_checkValue_(pVariant, pArgs[0].pVoid);
+
+        if(!GBL_RESULT_SUCCESS(result)) {
+            if(op == GBL_IVARIANT_OP_FLAG_CONSTRUCT_VALUE_MOVE)
+                GblBox_IVariant_releaseRejected_(pArgs[0].pBox);
+
+            return result;
+        }
+    }
+
     switch(op) {
     case GBL_IVARIANT_OP_FLAG_CONSTRUCT_DEFAULT:
-        pVariant->pBox = GblBox_create(pVariant->type);
+        pVariant->pBox = GBL_TYPE_INSTANTIABLE_CHECK(pVariant->type)?
+                             GblBox_create(pVariant->type) : NULL;
         break;
 
     case GBL_IVARIANT_OP_FLAG_CONSTRUCT_COPY:
@@ -316,7 +347,10 @@ static GBL_RESULT GblBox_IVariant_destruct_(GblVariant* pVariant) {
 }
 
 static GBL_RESULT GblBox_IVariant_compare_(const GblVariant* pVariant, const GblVariant* pOther, int* pResult) {
-    *pResult = pVariant->pBox - pOther->pBox;
+    const uintptr_t lhs = (uintptr_t)pVariant->pBox;
+    const uintptr_t rhs = (uintptr_t)pOther->pBox;
+
+    *pResult = (lhs > rhs) - (lhs < rhs);
 
     return GBL_RESULT_SUCCESS;
 }
@@ -342,10 +376,16 @@ static GBL_RESULT GblBox_IVariant_get_(GblVariant* pSelf, size_t argc, GblVarian
 static GBL_RESULT GblBox_IVariant_set_(GblVariant* pSelf, size_t argc, GblVariant* pArgs, GBL_IVARIANT_OP_FLAGS op) {
     GBL_UNUSED(argc);
 
-    GBL_RESULT result = GBL_RESULT_SUCCESS;
+    GBL_RESULT result = GblBox_IVariant_checkValue_(pSelf, pArgs[0].pVoid);
 
-    // Release current reference.
-    GBL_UNREF(pSelf->pBox);
+    if(!GBL_RESULT_SUCCESS(result)) {
+        if(op == GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE)
+            GblBox_IVariant_releaseRejected_(pArgs[0].pBox);
+
+        return result;
+    }
+
+    GblBox* pOld = pSelf->pBox;
     // Assign to new reference.
     pSelf->pBox = pArgs[0].pVoid;
 
@@ -355,6 +395,9 @@ static GBL_RESULT GblBox_IVariant_set_(GblVariant* pSelf, size_t argc, GblVarian
     // Invalidate the old reference if we're moving.
     else if(op == GBL_IVARIANT_OP_FLAG_SET_MOVE || op == GBL_IVARIANT_OP_FLAG_SET_VALUE_MOVE)
         result = GblVariant_invalidate(&pArgs[0]);
+
+    // Release previous reference.
+    GBL_UNREF(pOld);
 
     return result;
 }

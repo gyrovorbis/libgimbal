@@ -3,6 +3,7 @@
 #include <gimbal/meta/instances/gimbal_object.h>
 #include <gimbal/meta/instances/gimbal_event.h>
 #include <gimbal/meta/types/gimbal_variant.h>
+#include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/test/gimbal_test_macros.h>
 #include <gimbal/utils/gimbal_ref.h>
 #include <math.h>
@@ -56,6 +57,65 @@ GBL_PROPERTIES(TestObject,
     (staticInt32, GBL_GENERIC, (READ),        GBL_INT32_TYPE)
 )
 
+#define ITEST_DEPENDENT_TYPE           (GBL_TYPEID(ITestDependent))
+#define TEST_DEPENDENT_BOX_TYPE        (GBL_TYPEID(TestDependentBox))
+#define TEST_DEPENDENT_HOLDER_TYPE     (GBL_TYPEID(TestDependentHolder))
+#define TEST_DEPENDENT_HOLDER(self)    ((TestDependentHolder*)(self))
+
+typedef struct ITestDependentClass {
+    GblInterface base;
+} ITestDependentClass;
+
+typedef struct TestDependentBoxClass {
+    GblBoxClass         base;
+    ITestDependentClass iTestDependent;
+} TestDependentBoxClass;
+
+typedef struct TestDependentHolder {
+    GblObject base;
+    GblBox*   pDependent;
+} TestDependentHolder;
+
+#define ITEST_DEPENDENT_DERIVED_TYPE   (GBL_TYPEID(ITestDependentDerived))
+#define TEST_DEPENDENT_OBJECT_TYPE     (GBL_TYPEID(TestDependentObject))
+
+typedef struct ITestDependentDerivedClass {
+    ITestDependentClass base;
+} ITestDependentDerivedClass;
+
+typedef struct TestDependentObjectClass {
+    GblObjectClass             base;
+    ITestDependentDerivedClass iTestDependentDerived;
+} TestDependentObjectClass;
+
+static GBL_DECLARE_TYPE(ITestDependent);
+static GBL_DECLARE_TYPE(TestDependentBox);
+static GBL_DECLARE_TYPE(TestDependentHolder);
+static GBL_DECLARE_TYPE(ITestDependentDerived);
+static GBL_DECLARE_TYPE(TestDependentObject);
+
+GBL_PROPERTIES(TestDependentHolder,
+    (dependent, GBL_GENERIC, (READ, WRITE), ITEST_DEPENDENT_TYPE)
+)
+
+#define TEST_DEPENDENT_REQUIRED_HOLDER_TYPE     (GBL_TYPEID(TestDependentRequiredHolder))
+#define TEST_DEPENDENT_REQUIRED_HOLDER(self)    ((TestDependentRequiredHolder*)(self))
+
+typedef struct TestDependentRequiredHolder {
+    TestDependentHolder base;
+    GblBox*             pRequired;
+    GblBox*             pOptional;
+    GblBox*             pAcquired;
+} TestDependentRequiredHolder;
+
+static GBL_DECLARE_TYPE(TestDependentRequiredHolder);
+
+GBL_PROPERTIES(TestDependentRequiredHolder,
+    (required, GBL_GENERIC, (READ, CONSTRUCT),        ITEST_DEPENDENT_TYPE),
+    (optional, GBL_GENERIC, (READ, WRITE, CONSTRUCT), ITEST_DEPENDENT_TYPE),
+    (acquired, GBL_GENERIC, (READ, WRITE, ACQUIRE),   ITEST_DEPENDENT_TYPE)
+)
+
 GBL_TEST_INIT()
     pFixture->classRefCount = GblType_classRefCount(GBL_OBJECT_TYPE);
     pFixture->instanceCount = GblType_instanceCount(GBL_OBJECT_TYPE);
@@ -69,6 +129,12 @@ GBL_TEST_FINAL()
     GBL_TEST_COMPARE(GblType_classRefCount(TEST_OBJECT_TYPE), 0);
     GBL_TEST_COMPARE(GblType_instanceCount(TEST_OBJECT_TYPE), 0);
     GblType_unregister(TEST_OBJECT_TYPE);
+    GblType_unregister(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE);
+    GblType_unregister(TEST_DEPENDENT_HOLDER_TYPE);
+    GblType_unregister(TEST_DEPENDENT_BOX_TYPE);
+    GblType_unregister(TEST_DEPENDENT_OBJECT_TYPE);
+    GblType_unregister(ITEST_DEPENDENT_DERIVED_TYPE);
+    GblType_unregister(ITEST_DEPENDENT_TYPE);
 GBL_TEST_CASE_END
 
 GBL_TEST_CASE(newDefault)
@@ -1419,6 +1485,528 @@ GBL_TEST_CASE(findSiblingByCmpFn)
     GBL_UNREF(pDummy );
 GBL_TEST_CASE_END
 
+GBL_TEST_CASE(dependentInterfaceVariant)
+    const GblRefCount boxClassRefCount = GblType_classRefCount(GBL_BOX_TYPE);
+    GblBox*           pBox             = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblVariant        v                = GBL_VARIANT_INIT;
+    GblVariant        c                = GBL_VARIANT_INIT;
+
+    GBL_TEST_VERIFY(GblVariant_checkTypeCompatible(ITEST_DEPENDENT_TYPE));
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&v, ITEST_DEPENDENT_TYPE, pBox));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), ITEST_DEPENDENT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_boxPeek(&v), pBox);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 2);
+
+    GBL_TEST_CALL(GblVariant_constructCopy(&c, &v));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&c), ITEST_DEPENDENT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_boxPeek(&c), pBox);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 3);
+    GBL_TEST_COMPARE(GblVariant_compare(&v, &c), 0);
+
+    GBL_TEST_CALL(GblVariant_destruct(&c));
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 1);
+
+    GBL_TEST_CALL(GblVariant_constructDefault(&v, ITEST_DEPENDENT_TYPE));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), ITEST_DEPENDENT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_boxPeek(&v), NULL);
+
+    GBL_TEST_CALL(GblVariant_setValueCopy(&v, ITEST_DEPENDENT_TYPE, pBox));
+    GBL_TEST_COMPARE(GblVariant_boxPeek(&v), pBox);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 2);
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+
+    GBL_TEST_COMPARE(GBL_UNREF(pBox), 0);
+    GBL_TEST_COMPARE(GblType_classRefCount(GBL_BOX_TYPE), boxClassRefCount);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(dependentInterfaceProperty)
+    GblBox*    pBox1    = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblBox*    pBox2    = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblBox*    pOut     = NULL;
+    GblVariant v        = GBL_VARIANT_INIT;
+    GblObject* pObj     = GblObject_create(TEST_DEPENDENT_HOLDER_TYPE, "dependent", pBox1, NULL);
+    GblObject* pDefault = GblObject_create(TEST_DEPENDENT_HOLDER_TYPE, NULL);
+
+    GBL_TEST_VERIFY(pObj);
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent, pBox1);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox1), 2);
+
+    GBL_TEST_VERIFY(pDefault);
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pDefault)->pDependent, NULL);
+    GBL_TEST_CALL(GblObject_property(pDefault, "dependent", &pOut));
+    GBL_TEST_COMPARE(pOut, NULL);
+
+    GBL_TEST_CALL(GblObject_property(pObj, "dependent", &pOut));
+    GBL_TEST_COMPARE(pOut, pBox1);
+    GBL_TEST_COMPARE(GBL_UNREF(pOut), 2);
+
+    GBL_TEST_CALL(GblObject_propertyVariant(pObj, "dependent", &v));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), ITEST_DEPENDENT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_boxPeek(&v), pBox1);
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+
+    GBL_TEST_CALL(GblObject_setProperty(pObj, "dependent", pBox2));
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent, pBox2);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox1), 1);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox2), 2);
+
+    GBL_TEST_CALL(GblVariant_constructBoxCopy(&v, pBox1));
+    GBL_TEST_CALL(GblObject_setPropertyVariant(pObj, "dependent", &v));
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent, pBox1);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox1), 2);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox2), 1);
+
+    GBL_TEST_COMPARE(GBL_UNREF(pDefault), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pObj),     0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox2),    0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox1),    0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(dependentInterfaceSideCast)
+    GblBox*    pBox     = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblBox*    pPlain   = GblBox_create(GBL_BOX_TYPE);
+    GblVariant iface    = GBL_VARIANT_INIT;
+    GblVariant box      = GBL_VARIANT_INIT;
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&iface, ITEST_DEPENDENT_TYPE, pBox));
+    GBL_TEST_CALL(GblVariant_constructDefault(&box, GBL_BOX_TYPE));
+    GBL_TEST_CALL(GblVariant_convert(&iface, &box));
+    GBL_TEST_VERIFY(GblType_check(GblVariant_typeOf(&box), GBL_BOX_TYPE));
+    GBL_TEST_COMPARE(GblVariant_boxPeek(&box), pBox);
+    GBL_TEST_CALL(GblVariant_destruct(&iface));
+    GBL_TEST_CALL(GblVariant_destruct(&box));
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 1);
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&box, GBL_BOX_TYPE, pBox));
+    GBL_TEST_CALL(GblVariant_constructDefault(&iface, ITEST_DEPENDENT_TYPE));
+    GBL_TEST_CALL(GblVariant_convert(&box, &iface));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&iface), ITEST_DEPENDENT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_boxPeek(&iface), pBox);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 3);
+    GBL_TEST_CALL(GblVariant_destruct(&box));
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&box, GBL_BOX_TYPE, NULL));
+    GBL_TEST_CALL(GblVariant_convert(&box, &iface));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&iface), ITEST_DEPENDENT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_boxPeek(&iface), NULL);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 1);
+    GBL_TEST_CALL(GblVariant_destruct(&box));
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&box, GBL_BOX_TYPE, pPlain));
+    GBL_TEST_EXPECT_ERROR();
+    GBL_TEST_COMPARE(GblVariant_convert(&box, &iface), GBL_RESULT_ERROR_INVALID_CONVERSION);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_typeOf(&iface), ITEST_DEPENDENT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_boxPeek(&iface), NULL);
+    GBL_TEST_CALL(GblVariant_destruct(&box));
+    GBL_TEST_CALL(GblVariant_destruct(&iface));
+
+    GBL_TEST_COMPARE(GBL_UNREF(pPlain), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox),   0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(dependentInterfaceInstanceType)
+    GblBox*    pBox = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblVariant v    = GBL_VARIANT_INIT;
+
+    GBL_TEST_COMPARE(GblVariant_instanceTypeOf(&v), GBL_INVALID_TYPE);
+
+    GBL_TEST_CALL(GblVariant_constructInt32(&v, 7));
+    GBL_TEST_COMPARE(GblVariant_instanceTypeOf(&v), GBL_INT32_TYPE);
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&v, GBL_BOX_TYPE, pBox));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v),         GBL_BOX_TYPE);
+    GBL_TEST_COMPARE(GblVariant_instanceTypeOf(&v), TEST_DEPENDENT_BOX_TYPE);
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&v, ITEST_DEPENDENT_TYPE, pBox));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v),         ITEST_DEPENDENT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_instanceTypeOf(&v), TEST_DEPENDENT_BOX_TYPE);
+
+    GBL_TEST_CALL(GblVariant_setValueCopy(&v, ITEST_DEPENDENT_TYPE, NULL));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v),         ITEST_DEPENDENT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_instanceTypeOf(&v), ITEST_DEPENDENT_TYPE);
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+
+    GBL_TEST_COMPARE(GBL_UNREF(pBox), 0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(dependentInterfaceDerivedVariant)
+    GblObject*      pObj   = GblObject_create(TEST_DEPENDENT_OBJECT_TYPE, NULL);
+    GblVariant      v      = GBL_VARIANT_INIT;
+    GblStringBuffer buffer;
+
+    GBL_TEST_VERIFY(pObj);
+    GBL_TEST_COMPARE(GblType_implementer(ITEST_DEPENDENT_DERIVED_TYPE, GBL_IVARIANT_TYPE), GBL_OBJECT_TYPE);
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&v, ITEST_DEPENDENT_DERIVED_TYPE, pObj));
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v),         ITEST_DEPENDENT_DERIVED_TYPE);
+    GBL_TEST_COMPARE(GblVariant_instanceTypeOf(&v), TEST_DEPENDENT_OBJECT_TYPE);
+    GBL_TEST_COMPARE(GblVariant_objectPeek(&v),     pObj);
+
+    GBL_TEST_CALL(GblStringBuffer_construct(&buffer));
+    GBL_TEST_CALL(GblVariant_save(&v, &buffer));
+    GBL_TEST_COMPARE(GblStringBuffer_cString(&buffer)[0], '{');
+    GBL_TEST_CALL(GblStringBuffer_destruct(&buffer));
+
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+    GBL_TEST_COMPARE(GBL_UNREF(pObj), 0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(dependentInterfaceValidation)
+    GblBox*    pBox   = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblBox*    pPlain = GblBox_create(GBL_BOX_TYPE);
+    GblVariant v      = GBL_VARIANT_INIT;
+    GblObject* pObj   = GblObject_create(TEST_DEPENDENT_HOLDER_TYPE, "dependent", pBox, NULL);
+
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_COMPARE(GblVariant_constructValueCopy(&v, ITEST_DEPENDENT_TYPE, pPlain),
+                     GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_typeOf(&v), GBL_INVALID_TYPE);
+    GBL_TEST_COMPARE(GblBox_refCount(pPlain), 1);
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&v, ITEST_DEPENDENT_TYPE, pBox));
+    GBL_TEST_COMPARE(GblVariant_setValueCopy(&v, ITEST_DEPENDENT_TYPE, pPlain),
+                     GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_VERIFY(!GblVariant_isValid(&v));
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 2);
+    GBL_TEST_COMPARE(GblBox_refCount(pPlain), 1);
+
+    GBL_TEST_COMPARE(GblObject_setProperty(pObj, "dependent", pPlain),
+                     GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent, pBox);
+
+    GBL_TEST_CALL(GblVariant_constructBoxCopy(&v, pPlain));
+    GBL_TEST_COMPARE(GblObject_setPropertyVariant(pObj, "dependent", &v),
+                     GBL_RESULT_ERROR_INVALID_CONVERSION);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent, pBox);
+
+    GBL_TEST_COMPARE(GBL_UNREF(pObj),   0);
+    GBL_TEST_COMPARE(GBL_UNREF(pPlain), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox),   0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(variantCompare)
+    GblObject* pA = GBL_NEW(GblObject);
+    GblObject* pB = GBL_NEW(GblObject);
+    GblVariant a  = GBL_VARIANT_INIT;
+    GblVariant a2 = GBL_VARIANT_INIT;
+    GblVariant b  = GBL_VARIANT_INIT;
+
+    GBL_TEST_CALL(GblVariant_constructObjectCopy(&a,  pA));
+    GBL_TEST_CALL(GblVariant_constructObjectCopy(&a2, pA));
+    GBL_TEST_CALL(GblVariant_constructObjectCopy(&b,  pB));
+
+    GBL_TEST_COMPARE(GblVariant_compare(&a, &a2), 0);
+    GBL_TEST_VERIFY(GblVariant_equals(&a, &a2));
+    GBL_TEST_VERIFY(GblVariant_compare(&a, &b) != 0);
+    GBL_TEST_VERIFY(!GblVariant_equals(&a, &b));
+    GBL_TEST_COMPARE(GblVariant_compare(&a, &b), -GblVariant_compare(&b, &a));
+
+    GBL_TEST_CALL(GblVariant_destruct(&a));
+    GBL_TEST_CALL(GblVariant_destruct(&a2));
+    GBL_TEST_CALL(GblVariant_destruct(&b));
+
+    GBL_TEST_COMPARE(GBL_UNREF(pA), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pB), 0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(variantSet)
+    GblObject* pA = GBL_NEW(GblObject);
+    GblObject* pB = GBL_NEW(GblObject);
+    GblVariant v  = GBL_VARIANT_INIT;
+
+    GBL_TEST_CALL(GblVariant_constructObjectCopy(&v, pA));
+    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pA)), 2);
+
+    GBL_TEST_CALL(GblVariant_setObjectCopy(&v, pB));
+    GBL_TEST_COMPARE(GblVariant_objectPeek(&v), pB);
+    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pA)), 1);
+    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pB)), 2);
+
+    GBL_TEST_CALL(GblVariant_setObjectCopy(&v, pB));
+    GBL_TEST_COMPARE(GblVariant_objectPeek(&v), pB);
+    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pB)), 2);
+
+    GBL_TEST_CALL(GblVariant_setValueCopy(&v, GBL_OBJECT_TYPE, NULL));
+    GBL_TEST_COMPARE(GblVariant_objectPeek(&v), NULL);
+    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pB)), 1);
+
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+
+    const GblRefCount instanceCount = GblType_instanceCount(GBL_OBJECT_TYPE);
+    GblObject*        pC            = GBL_NEW(GblObject);
+
+    GBL_TEST_CALL(GblVariant_constructValueMove(&v, GBL_OBJECT_TYPE, pC));
+    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pC)), 1);
+
+    GBL_TEST_CALL(GblVariant_setObjectCopy(&v, pC));
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_OBJECT_TYPE), instanceCount + 1);
+    GBL_TEST_COMPARE(GblVariant_objectPeek(&v), pC);
+    GBL_TEST_COMPARE(GblBox_refCount(GBL_BOX(pC)), 1);
+
+    GBL_TEST_CALL(GblVariant_destruct(&v));
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_OBJECT_TYPE), instanceCount);
+
+    GBL_TEST_COMPARE(GBL_UNREF(pA), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pB), 0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(propertySetDifferentObject)
+    GblObject* pA     = GBL_NEW(GblObject);
+    GblObject* pB     = GBL_NEW(GblObject);
+    GblObject* pChild = GBL_NEW(GblObject, "parent", pA);
+
+    GBL_TEST_COMPARE(GblObject_parent(pChild), pA);
+
+    GBL_TEST_CALL(GblObject_setProperty(pChild, "parent", pB));
+    GBL_TEST_COMPARE(GblObject_parent(pChild), pB);
+
+    GblObject_setParent(pChild, NULL);
+    GBL_TEST_COMPARE(GBL_UNREF(pChild), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pA),     0);
+    GBL_TEST_COMPARE(GBL_UNREF(pB),     0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(constructRequiredRejected)
+    GblBox*    pBox   = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblBox*    pPlain = GblBox_create(GBL_BOX_TYPE);
+    GblObject* pObj   = NULL;
+
+    GBL_TEST_EXPECT_ERROR();
+
+    pObj = GblObject_create(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE, "required", pPlain, NULL);
+    GBL_TEST_COMPARE(pObj, NULL);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblType_instanceCount(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE), 0);
+    GBL_TEST_COMPARE(GblBox_refCount(pPlain), 1);
+
+    pObj = GblObject_create(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE, "dependent", pBox, NULL);
+    GBL_TEST_COMPARE(pObj, NULL);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_PROPERTY);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblType_instanceCount(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE), 0);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 1);
+
+    GBL_TEST_COMPARE(GBL_UNREF(pPlain), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox),   0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(constructUnknownProperty)
+    GblBox*    pBox = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblObject* pObj = NULL;
+
+    GBL_TEST_EXPECT_ERROR();
+
+    pObj = GblObject_create(TEST_DEPENDENT_HOLDER_TYPE, "bogus", 42, "dependent", pBox, NULL);
+    GBL_TEST_COMPARE(pObj, NULL);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_PROPERTY);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblType_instanceCount(TEST_DEPENDENT_HOLDER_TYPE), 0);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 1);
+
+    pObj = GblObject_create(TEST_DEPENDENT_HOLDER_TYPE, NULL);
+    GBL_TEST_VERIFY(pObj);
+    GBL_TEST_COMPARE(GblObject_setProperties(pObj, "dependent", pBox, "bogus", 42, NULL),
+                     GBL_RESULT_ERROR_INVALID_PROPERTY);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent, pBox);
+
+    GBL_TEST_COMPARE(GBL_UNREF(pObj), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox), 0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(setPropertiesRejectedValue)
+    GblBox*    pBox   = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblBox*    pPlain = GblBox_create(GBL_BOX_TYPE);
+    GblObject* pObj   = GblObject_create(TEST_DEPENDENT_HOLDER_TYPE, "dependent", pBox, NULL);
+
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_COMPARE(GblObject_setProperties(pObj,
+                                             "dependent", pPlain,
+                                             "name",      "Rejected",
+                                             NULL),
+                     GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent, pBox);
+    GBL_TEST_COMPARE(GblObject_name(pObj), "Rejected");
+    GBL_TEST_COMPARE(GblBox_refCount(pPlain), 1);
+
+    GBL_TEST_COMPARE(GblObject_setProperties(pObj, "dependent", pBox, "bogus", 42, NULL),
+                     GBL_RESULT_ERROR_INVALID_PROPERTY);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_INVALID_PROPERTY);
+    GBL_CTX_CLEAR_LAST_RECORD();
+
+    GBL_TEST_COMPARE(GBL_UNREF(pObj),   0);
+    GBL_TEST_COMPARE(GBL_UNREF(pPlain), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox),   0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(moveRejectedConsumes)
+    GblBox*           pBox      = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblVariant        v         = GBL_VARIANT_INIT;
+    const GblRefCount instances = GblType_instanceCount(GBL_BOX_TYPE);
+
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_COMPARE(GblVariant_constructValueMove(&v, ITEST_DEPENDENT_TYPE, GblBox_create(GBL_BOX_TYPE)),
+                     GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_VERIFY(!GblVariant_isValid(&v));
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_BOX_TYPE), instances);
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&v, ITEST_DEPENDENT_TYPE, pBox));
+    GBL_TEST_COMPARE(GblVariant_setValueMove(&v, ITEST_DEPENDENT_TYPE, GblBox_create(GBL_BOX_TYPE)),
+                     GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_VERIFY(!GblVariant_isValid(&v));
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_BOX_TYPE), instances);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox), 1);
+
+    GblObject* pObj = GblObject_create(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE,
+                                       "required", pBox,
+                                       "acquired", GblBox_create(GBL_BOX_TYPE),
+                                       NULL);
+    GBL_TEST_VERIFY(pObj);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_INCOMPLETE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(TEST_DEPENDENT_REQUIRED_HOLDER(pObj)->pAcquired, NULL);
+    GBL_TEST_COMPARE(GblType_instanceCount(GBL_BOX_TYPE), instances);
+    GBL_TEST_COMPARE(GBL_UNREF(pObj), 0);
+
+    GblBox* pPlain = GblBox_create(GBL_BOX_TYPE);
+    GblBox* pMoved = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GBL_REF(pMoved);
+
+    GBL_TEST_COMPARE(GblObject_create(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE,
+                                      "required", pPlain,
+                                      "acquired", pMoved,
+                                      NULL),
+                     NULL);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblBox_refCount(pMoved), 1);
+    GBL_TEST_COMPARE(GblBox_refCount(pPlain), 1);
+
+    GBL_TEST_COMPARE(GBL_UNREF(pMoved), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pPlain), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox),   0);
+GBL_TEST_CASE_END
+
+#define TEST_DEPENDENT_KV_4_(value)  "dependent", value, "dependent", value, "dependent", value, "dependent", value
+#define TEST_DEPENDENT_KV_32_(value) TEST_DEPENDENT_KV_4_(value), TEST_DEPENDENT_KV_4_(value), \
+                                     TEST_DEPENDENT_KV_4_(value), TEST_DEPENDENT_KV_4_(value), \
+                                     TEST_DEPENDENT_KV_4_(value), TEST_DEPENDENT_KV_4_(value), \
+                                     TEST_DEPENDENT_KV_4_(value), TEST_DEPENDENT_KV_4_(value)
+
+GBL_TEST_CASE(duplicatePropertiesExceedCount)
+    GblBox* pBox1 = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblBox* pBox2 = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+
+    GBL_TEST_VERIFY(GblProperty_count(TEST_DEPENDENT_HOLDER_TYPE) < 32);
+
+    GblObject* pObj = GblObject_create(TEST_DEPENDENT_HOLDER_TYPE, TEST_DEPENDENT_KV_32_(pBox1), NULL);
+    GBL_TEST_VERIFY(pObj);
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent, pBox1);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox1), 2);
+
+    GBL_TEST_CALL(GblObject_setProperties(pObj, TEST_DEPENDENT_KV_32_(pBox2), NULL));
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent, pBox2);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox1), 1);
+    GBL_TEST_COMPARE(GblBox_refCount(pBox2), 2);
+
+    GBL_TEST_COMPARE(GBL_UNREF(pObj),  0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox2), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox1), 0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(constructIncomplete)
+    GblBox*    pBox      = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblBox*    pPlain    = GblBox_create(GBL_BOX_TYPE);
+    GblVariant values[2] = { GBL_VARIANT_INIT, GBL_VARIANT_INIT };
+
+    GBL_TEST_EXPECT_ERROR();
+
+    GblObject* pObj = GblObject_create(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE,
+                                       "required",  pBox,
+                                       "optional",  pPlain,
+                                       "dependent", pPlain,
+                                       NULL);
+    GBL_TEST_VERIFY(pObj);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_INCOMPLETE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(TEST_DEPENDENT_REQUIRED_HOLDER(pObj)->pRequired, pBox);
+    GBL_TEST_COMPARE(TEST_DEPENDENT_REQUIRED_HOLDER(pObj)->pOptional, NULL);
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent,         NULL);
+    GBL_TEST_COMPARE(GblBox_refCount(pPlain), 1);
+    GBL_TEST_COMPARE(GBL_UNREF(pObj), 0);
+
+    GBL_TEST_CALL(GblVariant_constructValueCopy(&values[0], ITEST_DEPENDENT_TYPE, pBox));
+    GBL_TEST_CALL(GblVariant_constructBoxCopy(&values[1], pPlain));
+
+    pObj = GblObject_createVariants(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE,
+                                    2,
+                                    (const char*[]) { "required", "dependent" },
+                                    values);
+    GBL_TEST_VERIFY(pObj);
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_INCOMPLETE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(TEST_DEPENDENT_REQUIRED_HOLDER(pObj)->pRequired, pBox);
+    GBL_TEST_COMPARE(TEST_DEPENDENT_HOLDER(pObj)->pDependent,         NULL);
+    GBL_TEST_COMPARE(GBL_UNREF(pObj), 0);
+
+    GBL_TEST_CALL(GblVariant_destruct(&values[0]));
+    GBL_TEST_CALL(GblVariant_destruct(&values[1]));
+
+    GBL_TEST_COMPARE(GBL_UNREF(pPlain), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox),   0);
+GBL_TEST_CASE_END
+
+GBL_TEST_CASE(constructInPlaceRollback)
+    TestDependentRequiredHolder obj;
+    GblBox* pBox   = GblBox_create(TEST_DEPENDENT_BOX_TYPE);
+    GblBox* pPlain = GblBox_create(GBL_BOX_TYPE);
+
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_COMPARE(GblObject_construct((GblObject*)&obj, TEST_DEPENDENT_REQUIRED_HOLDER_TYPE,
+                                         "required", pPlain,
+                                         NULL),
+                     GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblType_instanceCount(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE), 0);
+    GBL_TEST_COMPARE(GblBox_refCount(pPlain), 1);
+
+    GBL_TEST_COMPARE(GblObject_construct((GblObject*)&obj, TEST_DEPENDENT_REQUIRED_HOLDER_TYPE,
+                                         "required",  pBox,
+                                         "dependent", pPlain,
+                                         NULL),
+                     GBL_RESULT_INCOMPLETE);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblType_instanceCount(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE), 1);
+    GBL_TEST_COMPARE(obj.pRequired,       pBox);
+    GBL_TEST_COMPARE(obj.base.pDependent, NULL);
+    GBL_TEST_COMPARE(GblBox_unref(GBL_BOX(&obj)), 0);
+    GBL_TEST_COMPARE(GblType_instanceCount(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE), 0);
+
+    GBL_TEST_COMPARE(GBL_UNREF(pPlain), 0);
+    GBL_TEST_COMPARE(GBL_UNREF(pBox),   0);
+GBL_TEST_CASE_END
+
 GBL_TEST_REGISTER(newDefault,
                   name,
                   ref,
@@ -1436,6 +2024,9 @@ GBL_TEST_REGISTER(newDefault,
                   propertyGet,
                   propertySet,
                   propertyChange,
+                  propertySetDifferentObject,
+                  variantCompare,
+                  variantSet,
                   parenting,
                   classSwizzle,
                   eventNotify,
@@ -1472,7 +2063,20 @@ GBL_TEST_REGISTER(newDefault,
                   descendantByName,
                   findAncestorByCmpFn,
                   findChildByCmpFn,
-                  findSiblingByCmpFn
+                  findSiblingByCmpFn,
+                  dependentInterfaceVariant,
+                  dependentInterfaceProperty,
+                  dependentInterfaceSideCast,
+                  dependentInterfaceInstanceType,
+                  dependentInterfaceDerivedVariant,
+                  dependentInterfaceValidation,
+                  constructRequiredRejected,
+                  constructUnknownProperty,
+                  setPropertiesRejectedValue,
+                  moveRejectedConsumes,
+                  duplicatePropertiesExceedCount,
+                  constructIncomplete,
+                  constructInPlaceRollback
                 )
 
 static GBL_RESULT TestObject_IEventReceiver_receiveEvent(GblIEventReceiver* pSelf, GblIEventReceiver* pDest, GblEvent* pEvent) {
@@ -1510,14 +2114,14 @@ static GBL_RESULT TestObject_init_(GblInstance* pInstance) {
 
 static GBL_RESULT TestObject_constructed(GblObject* pSelf) {
     GBL_CTX_BEGIN(pSelf);
-    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GblClass_super(GBL_INSTANCE_CLASSOF(pSelf)));
+    GblObjectClass* pParentClass = GBL_OBJECT_CLASS(GblClass_weakRefDefault(GBL_OBJECT_TYPE));
     if(pParentClass->pFnConstructed) pParentClass->pFnConstructed(pSelf);
     GBL_CTX_END();
 }
 
 static GBL_RESULT TestObject_destructor(GblBox* pSelf) {
     GBL_CTX_BEGIN(pSelf);
-    GblBoxClass* pParentClass = GBL_BOX_CLASS(GblClass_super(GBL_INSTANCE_CLASSOF(pSelf)));
+    GblBoxClass* pParentClass = GBL_BOX_CLASS(GblClass_weakRefDefault(GBL_OBJECT_TYPE));
     pParentClass->pFnDestructor(GBL_BOX(pSelf));
     GBL_CTX_END();
 }
@@ -1604,6 +2208,210 @@ static GblType TestObject_type(void) {
         };
 
         type = GblType_register("TestObject",
+                                GBL_OBJECT_TYPE,
+                                &info,
+                                GBL_TYPE_FLAGS_NONE);
+    }
+
+    return type;
+}
+
+static GblType ITestDependent_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    if(type == GBL_INVALID_TYPE) {
+        const GblTypeInfo info = {
+            .classSize       = sizeof(ITestDependentClass),
+            .dependencyCount = 1,
+            .pDependencies   = (const GblType[]) { GBL_BOX_TYPE }
+        };
+
+        type = GblType_register("ITestDependent",
+                                GBL_INTERFACE_TYPE,
+                                &info,
+                                GBL_TYPE_FLAGS_NONE);
+    }
+
+    return type;
+}
+
+static GblType TestDependentBox_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    if(type == GBL_INVALID_TYPE) {
+        const GblTypeInfo info = {
+            .classSize       = sizeof(TestDependentBoxClass),
+            .instanceSize    = sizeof(GblBox),
+            .interfaceCount  = 1,
+            .pInterfaceImpls = (const GblInterfaceImpl[]) {
+                { ITEST_DEPENDENT_TYPE, offsetof(TestDependentBoxClass, iTestDependent) }
+            }
+        };
+
+        type = GblType_register("TestDependentBox",
+                                GBL_BOX_TYPE,
+                                &info,
+                                GBL_TYPE_FLAGS_NONE);
+    }
+
+    return type;
+}
+
+static GBL_RESULT TestDependentHolder_destructor_(GblBox* pSelf) {
+    GBL_CTX_BEGIN(pSelf);
+    GBL_UNREF(TEST_DEPENDENT_HOLDER(pSelf)->pDependent);
+    GblBoxClass* pParentClass = GBL_BOX_CLASS(GblClass_weakRefDefault(GBL_OBJECT_TYPE));
+    GBL_CTX_VERIFY_CALL(pParentClass->pFnDestructor(pSelf));
+    GBL_CTX_END();
+}
+
+static GBL_RESULT TestDependentHolder_property_(const GblObject* pSelf, const GblProperty* pProp, GblVariant* pValue) {
+    return GblVariant_setValueCopy(pValue, pProp->valueType, TEST_DEPENDENT_HOLDER(pSelf)->pDependent);
+}
+
+static GBL_RESULT TestDependentHolder_setProperty_(GblObject* pSelf, const GblProperty* pProp, GblVariant* pValue) {
+    GBL_UNUSED(pProp);
+    GBL_CTX_BEGIN(pSelf);
+    GblBox* pDependent = NULL;
+    GBL_CTX_VERIFY_CALL(GblVariant_valueCopy(pValue, &pDependent));
+    GBL_UNREF(TEST_DEPENDENT_HOLDER(pSelf)->pDependent);
+    TEST_DEPENDENT_HOLDER(pSelf)->pDependent = pDependent;
+    GBL_CTX_END();
+}
+
+static GBL_RESULT TestDependentHolderClass_init_(GblClass* pClass, const void* pUd) {
+    GBL_UNUSED(pUd);
+    GBL_CTX_BEGIN(NULL);
+
+    if(!GblType_classRefCount(TEST_DEPENDENT_HOLDER_TYPE))
+        GBL_PROPERTIES_REGISTER(TestDependentHolder);
+
+    GBL_BOX_CLASS(pClass)   ->pFnDestructor  = TestDependentHolder_destructor_;
+    GBL_OBJECT_CLASS(pClass)->pFnProperty    = TestDependentHolder_property_;
+    GBL_OBJECT_CLASS(pClass)->pFnSetProperty = TestDependentHolder_setProperty_;
+
+    GBL_CTX_END();
+}
+
+static GblType TestDependentHolder_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    if(type == GBL_INVALID_TYPE) {
+        const GblTypeInfo info = {
+            .pFnClassInit = TestDependentHolderClass_init_,
+            .classSize    = sizeof(GblObjectClass),
+            .instanceSize = sizeof(TestDependentHolder)
+        };
+
+        type = GblType_register("TestDependentHolder",
+                                GBL_OBJECT_TYPE,
+                                &info,
+                                GBL_TYPE_FLAGS_NONE);
+    }
+
+    return type;
+}
+
+static GBL_RESULT TestDependentRequiredHolder_destructor_(GblBox* pSelf) {
+    GBL_CTX_BEGIN(pSelf);
+    GBL_UNREF(TEST_DEPENDENT_REQUIRED_HOLDER(pSelf)->pRequired);
+    GBL_UNREF(TEST_DEPENDENT_REQUIRED_HOLDER(pSelf)->pOptional);
+    GBL_UNREF(TEST_DEPENDENT_REQUIRED_HOLDER(pSelf)->pAcquired);
+    GblBoxClass* pParentClass = GBL_BOX_CLASS(GblClass_weakRefDefault(TEST_DEPENDENT_HOLDER_TYPE));
+    GBL_CTX_VERIFY_CALL(pParentClass->pFnDestructor(pSelf));
+    GBL_CTX_END();
+}
+
+static GblBox** TestDependentRequiredHolder_field_(const GblObject* pSelf, const GblProperty* pProp) {
+    TestDependentRequiredHolder* pHolder = TEST_DEPENDENT_REQUIRED_HOLDER(pSelf);
+
+    switch(pProp->id) {
+    case TestDependentRequiredHolder_Property_Id_required: return &pHolder->pRequired;
+    case TestDependentRequiredHolder_Property_Id_optional: return &pHolder->pOptional;
+    default:                                               return &pHolder->pAcquired;
+    }
+}
+
+static GBL_RESULT TestDependentRequiredHolder_property_(const GblObject* pSelf, const GblProperty* pProp, GblVariant* pValue) {
+    return GblVariant_setValueCopy(pValue, pProp->valueType, *TestDependentRequiredHolder_field_(pSelf, pProp));
+}
+
+static GBL_RESULT TestDependentRequiredHolder_setProperty_(GblObject* pSelf, const GblProperty* pProp, GblVariant* pValue) {
+    GBL_CTX_BEGIN(pSelf);
+    GblBox** ppField = TestDependentRequiredHolder_field_(pSelf, pProp);
+    GblBox*  pValueBox = NULL;
+    GBL_CTX_VERIFY_CALL(GblVariant_valueCopy(pValue, &pValueBox));
+    GBL_UNREF(*ppField);
+    *ppField = pValueBox;
+    GBL_CTX_END();
+}
+
+static GBL_RESULT TestDependentRequiredHolderClass_init_(GblClass* pClass, const void* pUd) {
+    GBL_UNUSED(pUd);
+    GBL_CTX_BEGIN(NULL);
+
+    if(!GblType_classRefCount(TEST_DEPENDENT_REQUIRED_HOLDER_TYPE))
+        GBL_PROPERTIES_REGISTER(TestDependentRequiredHolder);
+
+    GBL_BOX_CLASS(pClass)   ->pFnDestructor  = TestDependentRequiredHolder_destructor_;
+    GBL_OBJECT_CLASS(pClass)->pFnProperty    = TestDependentRequiredHolder_property_;
+    GBL_OBJECT_CLASS(pClass)->pFnSetProperty = TestDependentRequiredHolder_setProperty_;
+
+    GBL_CTX_END();
+}
+
+static GblType TestDependentRequiredHolder_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    if(type == GBL_INVALID_TYPE) {
+        const GblTypeInfo info = {
+            .pFnClassInit = TestDependentRequiredHolderClass_init_,
+            .classSize    = sizeof(GblObjectClass),
+            .instanceSize = sizeof(TestDependentRequiredHolder)
+        };
+
+        type = GblType_register("TestDependentRequiredHolder",
+                                TEST_DEPENDENT_HOLDER_TYPE,
+                                &info,
+                                GBL_TYPE_FLAGS_NONE);
+    }
+
+    return type;
+}
+
+static GblType ITestDependentDerived_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    if(type == GBL_INVALID_TYPE) {
+        const GblTypeInfo info = {
+            .classSize       = sizeof(ITestDependentDerivedClass),
+            .dependencyCount = 1,
+            .pDependencies   = (const GblType[]) { GBL_OBJECT_TYPE }
+        };
+
+        type = GblType_register("ITestDependentDerived",
+                                ITEST_DEPENDENT_TYPE,
+                                &info,
+                                GBL_TYPE_FLAGS_NONE);
+    }
+
+    return type;
+}
+
+static GblType TestDependentObject_type(void) {
+    static GblType type = GBL_INVALID_TYPE;
+
+    if(type == GBL_INVALID_TYPE) {
+        const GblTypeInfo info = {
+            .classSize       = sizeof(TestDependentObjectClass),
+            .instanceSize    = sizeof(GblObject),
+            .interfaceCount  = 1,
+            .pInterfaceImpls = (const GblInterfaceImpl[]) {
+                { ITEST_DEPENDENT_DERIVED_TYPE, offsetof(TestDependentObjectClass, iTestDependentDerived) }
+            }
+        };
+
+        type = GblType_register("TestDependentObject",
                                 GBL_OBJECT_TYPE,
                                 &info,
                                 GBL_TYPE_FLAGS_NONE);

@@ -144,7 +144,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructValueCopy   (GBL_SELF, GblType type, .
 GBL_EXPORT GBL_RESULT GblVariant_constructValueCopyVa (GBL_SELF,
                                                        GblType type,
                                                        va_list* pList)                GBL_NOEXCEPT;
-//! Invokes the value move constructor, constructing then  moving the given value
+//! Invokes the value move constructor, constructing then moving the given value, which is consumed even upon failure
 GBL_EXPORT GBL_RESULT GblVariant_constructValueMove   (GBL_SELF, GblType type, ...)   GBL_NOEXCEPT;
 //! va_list* variation of GblVariant_constructValueMove()
 GBL_EXPORT GBL_RESULT GblVariant_constructValueMoveVa (GBL_SELF,
@@ -237,7 +237,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueCopy   (GBL_SELF,  GblType type, ...)  
 GBL_EXPORT GBL_RESULT GblVariant_setValueCopyVa (GBL_SELF,
                                                  GblType  type,
                                                  va_list* pVarArgs)              GBL_NOEXCEPT;
-//! Performs a generic value move assignment operation, moving the variadic argument into the variant
+//! Performs a generic value move assignment operation, moving the variadic argument into the variant, which is consumed even upon failure
 GBL_EXPORT GBL_RESULT GblVariant_setValueMove    (GBL_SELF,  GblType type, ...)  GBL_NOEXCEPT;
 //! va_list* variation of GblVariant_setValueMove(), where the value is sourced from a va_list*
 GBL_EXPORT GBL_RESULT GblVariant_setValueMoveVa  (GBL_SELF,
@@ -315,11 +315,13 @@ GBL_EXPORT GBL_RESULT GblVariant_setObjectMove   (GBL_SELF, GblObject* pValue)  
 //! @}
 
 //! Retrieves the name of the type of value contained by the given variant
-GBL_EXPORT GblType     GblVariant_typeOf   (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT GblType     GblVariant_typeOf         (GBL_CSELF) GBL_NOEXCEPT;
+//! Retrieves the runtime type of the GblInstance held by the given variant, or GblVariant_typeOf() if it doesn't hold one
+GBL_EXPORT GblType     GblVariant_instanceTypeOf (GBL_CSELF) GBL_NOEXCEPT;
 //! Attempts to fetch the class associated with the type stored within the variant
-GBL_EXPORT GblClass*   GblVariant_classOf  (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT GblClass*   GblVariant_classOf        (GBL_CSELF) GBL_NOEXCEPT;
 //! Retrives the GblType UUID of the value contained by the given variant
-GBL_EXPORT const char* GblVariant_typeName (GBL_CSELF) GBL_NOEXCEPT;
+GBL_EXPORT const char* GblVariant_typeName       (GBL_CSELF) GBL_NOEXCEPT;
 
 /*! \name Getters
  *  \brief Methods for retrieving the value of a constructed GblVariant
@@ -547,7 +549,19 @@ GBL_EXPORT GBL_RESULT GblVariant_unregisterConverter (GblType fromType,
                                                       GblType toType)                GBL_NOEXCEPT;
 //! Retrieves the current number of type conversion routines held by the type registry
 GBL_EXPORT size_t     GblVariant_converterCount      (void)                          GBL_NOEXCEPT;
-//! Returns GBL_TRUE if a method can be found to convert from one type to another type of variant
+/*! Returns GBL_TRUE if converting from \p fromType to \p toType is guaranteed to succeed
+
+    A return value of GBL_TRUE guarantees that a subsequent call to GblVariant_convert() from a
+    variant of \p fromType to a variant of \p toType will succeed for every possible value of
+    \p fromType, as the result is determined by the types alone, without inspecting any values.
+
+    A return value of GBL_FALSE makes no such guarantee, but does not mean that conversion will
+    necessarily fail. Some conversions depend upon the actual value being held, such as converting
+    a variant of a GblBox type to a variant of an interface type, which succeeds only when the
+    instance being held actually implements the interface.
+
+    \sa GblVariant_convert()
+*/
 GBL_EXPORT GblBool    GblVariant_canConvert          (GblType fromType,
                                                       GblType toType)                GBL_NOEXCEPT;
 //! Fills \p pToVariant with the value of \p pSelf, converted to the type contained by \p pToVariant

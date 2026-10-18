@@ -526,6 +526,51 @@ GBL_RESULT GblArrayListTestSuite_shrinkToFitStack_(GblTestSuite* pSelf, GblConte
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblArrayListTestSuite_stackAlignment_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+
+    struct {
+        GblArrayList list;
+        char         chars[7];
+    } charList;
+
+    struct {
+        GblArrayList list;
+        double       doubles[3];
+    } doubleList;
+
+    struct {
+        GblArrayList    list;
+        GBL_MAX_ALIGN_T maxes[2];
+    } maxList;
+
+    GBL_CTX_VERIFY_CALL(GblArrayList_construct(&charList.list, sizeof(char), 0, NULL, sizeof(charList)));
+    GBL_TEST_COMPARE(GblArrayList_stackBuffer(&charList.list), (void*)charList.chars);
+    GBL_TEST_VERIFY(GblArrayList_capacity(&charList.list) >= GBL_COUNT_OF(charList.chars));
+
+    GBL_CTX_VERIFY_CALL(GblArrayList_construct(&doubleList.list, sizeof(double), 0, NULL, sizeof(doubleList)));
+    GBL_TEST_COMPARE(GblArrayList_stackBuffer(&doubleList.list), (void*)doubleList.doubles);
+    GBL_TEST_COMPARE(GblArrayList_capacity(&doubleList.list), GBL_COUNT_OF(doubleList.doubles));
+    GBL_TEST_COMPARE((size_t)((uintptr_t)GblArrayList_stackBuffer(&doubleList.list) % GBL_ALIGNOF(double)), 0);
+
+    GBL_CTX_VERIFY_CALL(GblArrayList_construct(&maxList.list, sizeof(GBL_MAX_ALIGN_T), 0, NULL, sizeof(maxList)));
+    GBL_TEST_COMPARE(GblArrayList_stackBuffer(&maxList.list), (void*)maxList.maxes);
+    GBL_TEST_COMPARE(GblArrayList_capacity(&maxList.list), GBL_COUNT_OF(maxList.maxes));
+    GBL_TEST_COMPARE((size_t)((uintptr_t)GblArrayList_stackBuffer(&maxList.list) % GBL_ALIGNOF(GBL_MAX_ALIGN_T)), 0);
+
+    for(size_t m = 0; m < GBL_COUNT_OF(maxList.maxes); ++m)
+        GBL_CTX_VERIFY_CALL(GblArrayList_pushBack(&maxList.list, &maxList.maxes[m]));
+
+    GBL_TEST_VERIFY(GblArrayList_stack(&maxList.list));
+
+    GBL_CTX_VERIFY_CALL(GblArrayList_destruct(&charList.list));
+    GBL_CTX_VERIFY_CALL(GblArrayList_destruct(&doubleList.list));
+    GBL_CTX_VERIFY_CALL(GblArrayList_destruct(&maxList.list));
+
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblArrayListTestSuite_atProfile_(GblTestSuite* pSelf, GblContext* pCtx) {
     GblArrayListTestSuite_* pSelf_ = GBL_ARRAY_LIST_TEST_SUITE_(pSelf);
     GBL_CTX_BEGIN(pCtx);
@@ -618,6 +663,7 @@ GBL_EXPORT GblType GblArrayListTestSuite_type(void) {
         { "resizeLarger",           GblArrayListTestSuite_resizeSmaller_           },
         { "shrinkToFitHeap",        GblArrayListTestSuite_shrinkToFitHeap_         },
         { "shrinkToFitStack",       GblArrayListTestSuite_shrinkToFitStack_        },
+        { "stackAlignment",         GblArrayListTestSuite_stackAlignment_          },
         { "atProfile",              GblArrayListTestSuite_atProfile_               },
         { "pushBackProfile",        GblArrayListTestSuite_pushBackProfile_         },
         { "pushFrontProfile",       GblArrayListTestSuite_pushFrontProfile_        },

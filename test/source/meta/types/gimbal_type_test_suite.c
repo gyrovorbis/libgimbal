@@ -5,6 +5,7 @@
 #include <gimbal/strings/gimbal_quark.h>
 #include <gimbal/meta/classes/gimbal_class.h>
 #include <gimbal/meta/ifaces/gimbal_interface.h>
+#include <gimbal/meta/instances/gimbal_object.h>
 
 #define GBL_TYPE_TEST_SUITE_(inst)  (GBL_PRIVATE(GblTypeTestSuite, inst))
 
@@ -775,6 +776,84 @@ static GBL_RESULT GblTypeTestSuite_fundamental_instantiable_register_valid_(GblT
 }
 
 
+static GBL_RESULT GblTypeTestSuite_implementer_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+
+    const GblType iA = GblType_register("ImplementerIA",
+                                        GBL_INTERFACE_TYPE,
+                                        &(const GblTypeInfo) {
+                                            .classSize       = sizeof(GblInterface),
+                                            .dependencyCount = 1,
+                                            .pDependencies   = (const GblType[]) { GBL_BOX_TYPE }
+                                        },
+                                        GBL_TYPE_FLAGS_NONE);
+
+    const GblType iB = GblType_register("ImplementerIB",
+                                        iA,
+                                        &(const GblTypeInfo) {
+                                            .classSize       = sizeof(GblInterface),
+                                            .dependencyCount = 1,
+                                            .pDependencies   = (const GblType[]) { GBL_OBJECT_TYPE }
+                                        },
+                                        GBL_TYPE_FLAGS_NONE);
+
+    const GblType iC = GblType_register("ImplementerIC",
+                                        GBL_INTERFACE_TYPE,
+                                        &(const GblTypeInfo) {
+                                            .classSize       = sizeof(GblInterface),
+                                            .dependencyCount = 1,
+                                            .pDependencies   = (const GblType[]) { iA }
+                                        },
+                                        GBL_TYPE_FLAGS_NONE);
+
+    GBL_TEST_VERIFY(iA != GBL_INVALID_TYPE);
+    GBL_TEST_VERIFY(iB != GBL_INVALID_TYPE);
+    GBL_TEST_VERIFY(iC != GBL_INVALID_TYPE);
+
+    GBL_TEST_COMPARE(GblType_implementer(GBL_INVALID_TYPE, GBL_BOX_TYPE),     GBL_INVALID_TYPE);
+    GBL_TEST_COMPARE(GblType_implementer(GBL_BOX_TYPE,     GBL_INVALID_TYPE), GBL_INVALID_TYPE);
+
+    GBL_TEST_COMPARE(GblType_implementer(GBL_BOX_TYPE,    GBL_BOX_TYPE),      GBL_BOX_TYPE);
+    GBL_TEST_COMPARE(GblType_implementer(GBL_OBJECT_TYPE, GBL_BOX_TYPE),      GBL_OBJECT_TYPE);
+    GBL_TEST_COMPARE(GblType_implementer(GBL_BOX_TYPE,    GBL_IVARIANT_TYPE), GBL_BOX_TYPE);
+    GBL_TEST_COMPARE(GblType_implementer(GBL_BOX_TYPE,    GBL_OBJECT_TYPE),   GBL_INVALID_TYPE);
+
+    GBL_TEST_COMPARE(GblType_implementer(iA, iA),                iA);
+    GBL_TEST_COMPARE(GblType_implementer(iA, GBL_BOX_TYPE),      GBL_BOX_TYPE);
+    GBL_TEST_COMPARE(GblType_implementer(iA, GBL_IVARIANT_TYPE), GBL_BOX_TYPE);
+    GBL_TEST_COMPARE(GblType_implementer(iA, GBL_OBJECT_TYPE),   GBL_INVALID_TYPE);
+
+    GBL_TEST_COMPARE(GblType_implementer(iB, iA),                iB);
+    GBL_TEST_COMPARE(GblType_implementer(iB, GBL_IVARIANT_TYPE), GBL_OBJECT_TYPE);
+    GBL_TEST_COMPARE(GblType_implementer(iB, GBL_BOX_TYPE),      GBL_OBJECT_TYPE);
+    GBL_TEST_COMPARE(GblType_implementer(iB, GBL_OBJECT_TYPE),   GBL_OBJECT_TYPE);
+
+    GBL_TEST_COMPARE(GblType_implementer(iC, iA),                iA);
+    GBL_TEST_COMPARE(GblType_implementer(iC, GBL_IVARIANT_TYPE), GBL_BOX_TYPE);
+    GBL_TEST_COMPARE(GblType_implementer(iC, GBL_OBJECT_TYPE),   GBL_INVALID_TYPE);
+
+    const GblType types[]   = { GBL_BOX_TYPE, GBL_OBJECT_TYPE, iA, iB, iC };
+    const GblType targets[] = { GBL_BOX_TYPE, GBL_OBJECT_TYPE, GBL_IVARIANT_TYPE, iA, iB, iC };
+
+    for(size_t t = 0; t < GBL_COUNT_OF(types); ++t) {
+        for(size_t g = 0; g < GBL_COUNT_OF(targets); ++g) {
+            const GblType implementer = GblType_implementer(types[t], targets[g]);
+
+            GBL_TEST_COMPARE(implementer != GBL_INVALID_TYPE, GblType_check(types[t], targets[g]));
+
+            if(implementer != GBL_INVALID_TYPE)
+                GBL_TEST_VERIFY(GblType_implements(implementer, targets[g]));
+        }
+    }
+
+    GBL_CTX_VERIFY_CALL(GblType_unregister(iC));
+    GBL_CTX_VERIFY_CALL(GblType_unregister(iB));
+    GBL_CTX_VERIFY_CALL(GblType_unregister(iA));
+
+    GBL_CTX_END();
+}
+
 static GBL_RESULT GblTypeTestSuite_fundamental_dependent_register_invalid_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_CTX_BEGIN(pCtx);
     GblTypeTestSuite_* pSelf_ = GBL_TYPE_TEST_SUITE_(pSelf);
@@ -926,6 +1005,7 @@ GBL_EXPORT GblType GblTypeTestSuite_type(void) {
         { "dependent",                              GblTypeTestSuite_fundamental_dependent_register_valid_                  },
         { "dependentDependsDependent",              GblTypeTestSuite_fundamental_dependent_depends_dependent_valid_         },
         { "dependentDeriveDependsDependent",        GblTypeTestSuite_fundamental_dependent_derive_depends_dependent_valid_  },
+        { "implementer",                            GblTypeTestSuite_implementer_                                           },
         { NULL,                                     NULL                                                                    }
     };
 

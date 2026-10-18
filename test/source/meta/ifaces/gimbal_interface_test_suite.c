@@ -410,6 +410,24 @@ static GBL_RESULT GblInterfaceTestSuite_tryDefault_(GblTestSuite* pSelf, GblCont
     GBL_CTX_END();
 }
 
+static GBL_RESULT GblInterfaceTestSuite_castDefaultUnrelated_(GblTestSuite* pSelf, GblContext* pCtx) {
+    GBL_UNUSED(pSelf);
+    GBL_CTX_BEGIN(pCtx);
+
+    GBL_TEST_COMPARE(GblClass_as(GblClass_weakRefDefault(GBL_INTERFACE_TYPE), GBL_IVARIANT_TYPE),
+                     NULL);
+
+    GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_COMPARE(GblClass_cast(GblClass_weakRefDefault(GBL_INTERFACE_TYPE), GBL_IVARIANT_TYPE),
+                     NULL);
+
+    GBL_TEST_COMPARE(GBL_CTX_LAST_RESULT(), GBL_RESULT_ERROR_TYPE_MISMATCH);
+    GBL_CTX_CLEAR_LAST_RECORD();
+
+    GBL_CTX_END();
+}
+
 
 static GBL_RESULT GblInterfaceTestSuite_outerClassNull_(GblTestSuite* pSelf, GblContext* pCtx) {
     GBL_UNUSED(pSelf);
@@ -616,6 +634,7 @@ GBL_EXPORT GblType GblInterfaceTestSuite_type(void) {
         { "classRefDefault",        GblInterfaceTestSuite_classRefDefault_          },
         { "castDefault",            GblInterfaceTestSuite_castDefault_              },
         { "tryDefault",             GblInterfaceTestSuite_tryDefault_               },
+        { "castDefaultUnrelated",   GblInterfaceTestSuite_castDefaultUnrelated_     },
         { "outerClassNull",         GblInterfaceTestSuite_outerClassNull_           },
         { "outerClassDefault",      GblInterfaceTestSuite_outerClassDefault_        },
         { "outerMostClassNull",     GblInterfaceTestSuite_outerMostClassNull_       },

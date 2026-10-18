@@ -402,19 +402,32 @@ GBL_EXPORT size_t  GblCmdParser_positionalArgValueCount(const GblCmdParser* pSel
 }
 
 GBL_EXPORT GBL_RESULT GblCmdParser_positionalArgValue(const GblCmdParser* pSelf, size_t  index, GblType toType, void* pData) {
+    GblVariant src  = GBL_VARIANT_INIT;
+    GblVariant dest = GBL_VARIANT_INIT;
+
     GBL_CTX_BEGIN(NULL);
     GBL_CTX_VERIFY_ARG(index < GblCmdParser_positionalArgValueCount(pSelf));
     GBL_CTX_VERIFY_TYPE(toType, GBL_IVARIANT_TYPE);
-    GBL_CTX_VERIFY_ARG(GblVariant_canConvert(GBL_STRING_TYPE, toType));
     GBL_CTX_VERIFY_POINTER(pData);
 
     GblCmdParser_* pSelf_ = GBL_CMD_PARSER_(pSelf);
 
-    GblVariant src = GBL_VARIANT_INIT;
+    if(toType == GBL_CHAR_TYPE) {
+        const GblStringRef* pValue = GblStringList_at(pSelf_->pArgValues, index);
+        const size_t        length = GblStringRef_length(pValue);
+
+        GBL_CTX_VERIFY(length <= 1,
+                       GBL_RESULT_ERROR_INVALID_CONVERSION);
+
+        *(char*)pData = length? pValue[0] : '\0';
+        GBL_CTX_DONE();
+    }
+
+    GBL_CTX_VERIFY_ARG(GblVariant_canConvert(GBL_STRING_TYPE, toType));
+
     GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&src,
                                                       GBL_STRING_TYPE,
                                                       GblStringRef_ref(GblStringList_at(pSelf_->pArgValues, index))));
-    GblVariant dest = GBL_VARIANT_INIT;
     GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&dest, toType));
 
     GBL_CTX_VERIFY_CALL(GblVariant_convert(&src, &dest));

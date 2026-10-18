@@ -190,6 +190,11 @@ static GBL_RESULT GblOptionGroup_try_(GblOptionGroup* pSelf, GblStringView key, 
             } else if(pOption->type == GBL_OPTION_TYPE_STRING) {
                 *pConsumed = 2;
                 *(const char**)pOption->pOutput.pData = value.pData;
+            } else if(pOption->type == GBL_OPTION_TYPE_CHAR) {
+                *pConsumed = 2;
+                GBL_CTX_VERIFY(value.length <= 1,
+                               GBL_RESULT_ERROR_INVALID_CONVERSION);
+                *(char*)pOption->pOutput.pData = value.length? value.pData[0] : '\0';
             } else {
                 *pConsumed = 2;
                 GBL_CTX_VERIFY_CALL(GblVariant_constructValueMove(&v1,

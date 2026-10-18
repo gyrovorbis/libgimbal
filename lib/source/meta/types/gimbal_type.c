@@ -1059,6 +1059,33 @@ GBL_EXPORT GblBool GblType_implements(GblType type, GblType superType) {
     return type == superType || GblType_derives(type, superType) || GblType_maps(type, superType);
 }
 
+GBL_EXPORT GblType GblType_implementer(GblType type, GblType target) {
+    if(type == GBL_INVALID_TYPE || target == GBL_INVALID_TYPE)
+        return GBL_INVALID_TYPE;
+
+    if(GblType_implements(type, target))
+        return type;
+
+    for(GblMetaClass* pIter = GBL_META_CLASS_(type); pIter; pIter = pIter->pParent) {
+        for(size_t i = 0; i < pIter->pInfo->interfaceCount; ++i) {
+            const GblType implementer = GblType_implementer(pIter->pInfo->pInterfaceImpls[i].interfaceType,
+                                                            target);
+
+            if(implementer != GBL_INVALID_TYPE)
+                return implementer;
+        }
+
+        for(size_t d = 0; d < pIter->pInfo->dependencyCount; ++d) {
+            const GblType implementer = GblType_implementer(pIter->pInfo->pDependencies[d], target);
+
+            if(implementer != GBL_INVALID_TYPE)
+                return implementer;
+        }
+    }
+
+    return GBL_INVALID_TYPE;
+}
+
 GBL_EXPORT GblType GblType_common(GblType type, GblType other) {
     if(type == GBL_INVALID_TYPE || other == GBL_INVALID_TYPE)
         return GBL_INVALID_TYPE;

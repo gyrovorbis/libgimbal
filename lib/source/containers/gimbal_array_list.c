@@ -1,5 +1,15 @@
 #include <gimbal/containers/gimbal_array_list.h>
 
+static uint8_t* GblArrayList_alignedStackBuffer_(const GblArrayList* pSelf) GBL_NOEXCEPT {
+    const uintptr_t elementSize = GBL_PRIV_REF(pSelf).elementSize;
+    uintptr_t       alignment   = elementSize & (~elementSize + 1);
+
+    if(alignment > GBL_ALIGNOF(GBL_MAX_ALIGN_T))
+        alignment = GBL_ALIGNOF(GBL_MAX_ALIGN_T);
+
+    return (uint8_t*)(((uintptr_t)(pSelf + 1) + alignment - 1) & ~(alignment - 1));
+}
+
 GBL_INLINE void GblArrayList_initialize_(GblArrayList* pSelf) GBL_NOEXCEPT {
     GBL_ASSERT(GBL_PRIV_REF(pSelf).elementSize);
 
@@ -84,9 +94,14 @@ GBL_EXPORT GBL_RESULT GblArrayList_construct_7(GblArrayList* pSelf, uint16_t ele
     GBL_CTX_VERIFY_ARG(structSize >= sizeof(GblArrayList));
     GBL_CTX_VERIFY_ARG(elementSize);
     GBL_PRIV_REF(pSelf).pCtx           = pCtx;
-    GBL_PRIV_REF(pSelf).stackCapacity  = (structSize - sizeof(GblArrayList)) / elementSize;
     GBL_PRIV_REF(pSelf).elementSize    = elementSize;
     GBL_PRIV_REF(pSelf).zeroTerminated = zeroTerminated;
+
+    const uint8_t* pStackBegin = GblArrayList_alignedStackBuffer_(pSelf);
+    const uint8_t* pStackEnd   = (const uint8_t*)pSelf + structSize;
+
+    GBL_PRIV_REF(pSelf).stackCapacity  = (pStackEnd > pStackBegin)?
+                                            (size_t)(pStackEnd - pStackBegin) / elementSize : 0;
     GblArrayList_initialize_(pSelf);
     GBL_CTX_CALL(GblArrayList_assign(pSelf, pInitialData, elementCount));
     GBL_CTX_END();
@@ -264,7 +279,7 @@ GBL_EXPORT GBL_RESULT GblArrayList_popBack(GblArrayList* pSelf, void* pOut) {
 }
 
 GBL_EXPORT void* GblArrayList_stackBuffer(const GblArrayList* pSelf) {
-    return (uint8_t*)((pSelf && GBL_PRIV_REF(pSelf).stackCapacity)? (pSelf + 1) : NULL);
+    return (pSelf && GBL_PRIV_REF(pSelf).stackCapacity)? GblArrayList_alignedStackBuffer_(pSelf) : NULL;
 }
 
 GBL_EXPORT GblBool GblArrayList_empty(const GblArrayList* pSelf) {

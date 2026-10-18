@@ -964,14 +964,6 @@ static GBL_RESULT stringConvert_(const GblVariant* pVariant, GblVariant* pOther)
     const GblType type = GblVariant_typeOf(pOther);
     if(type == GBL_BOOL_TYPE)
         GblVariant_setBool(pOther, GblStringView_toBool(GblStringRef_view(pVariant->pString)));
-    else if(type == GBL_CHAR_TYPE) {
-        const size_t  len = GblStringRef_length(pVariant->pString);
-        GBL_CTX_VERIFY(len <= 1,
-                       GBL_RESULT_ERROR_INVALID_CONVERSION);
-        if(GblStringRef_length(pVariant->pString) == 1)
-            GblVariant_setChar(pOther, pVariant->pString[0]);
-        else GblVariant_setChar(pOther, '\0');
-    }
     else if(type == GBL_UINT8_TYPE)
         GblVariant_setUint8(pOther, GblStringView_toUint8(GblStringRef_view(pVariant->pString)));
     else if(type == GBL_UINT16_TYPE)
@@ -1653,7 +1645,6 @@ static GBL_RESULT GblPrimitive_valueTypesRegisterConverters_(GblContext* pCtx) {
 
     // =============== STRING ===============
     GBL_CTX_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_BOOL_TYPE, stringConvert_));
-    GBL_CTX_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_CHAR_TYPE, stringConvert_));
     GBL_CTX_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_UINT8_TYPE, stringConvert_));
     GBL_CTX_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_UINT16_TYPE, stringConvert_));
     GBL_CTX_CALL(GblVariant_registerConverter(GBL_STRING_TYPE, GBL_INT16_TYPE, stringConvert_));

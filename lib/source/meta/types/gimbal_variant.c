@@ -9,6 +9,12 @@
 #include <gimbal/strings/gimbal_string_buffer.h>
 #include <gimbal/utils/gimbal_date_time.h>
 
+static GblType GblVariant_vTableType_(GblType type) {
+    const GblType implementer = GblType_implementer(type, GBL_IVARIANT_TYPE);
+
+    return (implementer != GBL_INVALID_TYPE)? implementer : type;
+}
+
 #define GBL_VARIANT_BEGIN_(type, classGetterSuffix)                                         \
     GBL_CTX_BEGIN(NULL); {                                                                  \
         const GblType type_ = type;                                                         \
@@ -16,7 +22,8 @@
         GBL_CTX_VERIFY_TYPE(type_, GBL_IVARIANT_TYPE,                                       \
             "[GblVariant] Attempted to use type that doesn't implement IVariant: %s",       \
                 GblType_name(type_));                                                       \
-        GblClass* pClass_ = GblClass_##classGetterSuffix##Default(type_);                   \
+        GblClass* pClass_ = GblClass_##classGetterSuffix##Default(                          \
+                                GblVariant_vTableType_(type_));                             \
         GBL_CTX_VERIFY_POINTER(pClass_, "Failed to retrieve class for type: %s",            \
                                GblType_name(type_));                                        \
         const GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(pClass_);                       \
@@ -227,12 +234,26 @@ GBL_EXPORT GBL_RESULT GblVariant_convert(const GblVariant* pSelf, GblVariant* pO
             }
 
             done:
-            GBL_CTX_VERIFY(pEntry,
-                           GBL_RESULT_ERROR_INVALID_CONVERSION,
-                           "[GblVariant] Conversion failed: No converter found! [%s => %s],",
-                           GblType_name(GblVariant_typeOf(pSelf)), GblType_name(GblVariant_typeOf(pOther)));
-            GBL_CTX_VERIFY_LAST_RECORD();
-            GBL_CTX_VERIFY_CALL(pEntry->pFnConverter(pSelf, pOther));
+            if(!pEntry && GblType_check(GblVariant_typeOf(pSelf),  GBL_BOX_TYPE)
+                       && GblType_check(GblVariant_typeOf(pOther), GBL_BOX_TYPE))
+            {
+                GBL_CTX_VERIFY(!pSelf->pBox ||
+                               GblType_check(GblVariant_instanceTypeOf(pSelf), GblVariant_typeOf(pOther)),
+                               GBL_RESULT_ERROR_INVALID_CONVERSION,
+                               "[GblVariant] Conversion failed: [%s] holding [%s] is not a [%s]",
+                               GblType_name(GblVariant_typeOf(pSelf)),
+                               GblType_name(GblVariant_instanceTypeOf(pSelf)),
+                               GblType_name(GblVariant_typeOf(pOther)));
+
+                GBL_CTX_VERIFY_CALL(GblVariant_setValueCopy(pOther, GblVariant_typeOf(pOther), pSelf->pBox));
+            } else {
+                GBL_CTX_VERIFY(pEntry,
+                               GBL_RESULT_ERROR_INVALID_CONVERSION,
+                               "[GblVariant] Conversion failed: No converter found! [%s => %s],",
+                               GblType_name(GblVariant_typeOf(pSelf)), GblType_name(GblVariant_typeOf(pOther)));
+                GBL_CTX_VERIFY_LAST_RECORD();
+                GBL_CTX_VERIFY_CALL(pEntry->pFnConverter(pSelf, pOther));
+            }
         }
 
     } GBL_CTX_END();
@@ -252,7 +273,7 @@ GBL_EXPORT int GblVariant_compare(const GblVariant* pSelf, const GblVariant* pOt
     } else {
         if(GblVariant_canConvert(GblVariant_typeOf(pSelf), GblVariant_typeOf(pOther))) {
             GBL_VARIANT(temp);
-            const GblClass*         pOtherClass = GblClass_weakRefDefault(GblVariant_typeOf(pOther));
+            const GblClass*         pOtherClass = GblClass_weakRefDefault(GblVariant_vTableType_(GblVariant_typeOf(pOther)));
             const GblIVariantClass* pOtherIFace = GBL_IVARIANT_CLASS(pOtherClass);
             GBL_CTX_VERIFY_EXPRESSION(pOtherIFace);
             GBL_CTX_VERIFY_CALL(GblVariant_constructDefault(&temp, GblVariant_typeOf(pOther)));
@@ -413,22 +434,21 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueCopyVa(GblVariant* pSelf,
     GBL_CTX_BEGIN(NULL);
     if(type != pSelf->type) {
         GBL_CTX_VERIFY_TYPE(type, GBL_IVARIANT_TYPE);
-        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_refDefault(type));
+        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_refDefault(GblVariant_vTableType_(type)));
         GBL_CTX_CALL(GblVariant_destruct(pSelf));
         GBL_CTX_CALL(GblVariant_initDefault_(pSelf, type));
         GBL_CTX_CALL(GblIVariantClass_constructValueCopy(pIFace, pSelf, pVarArgs));
         if(GBL_RESULT_ERROR(GBL_CTX_LAST_RESULT())) {
             GBL_CTX_CLEAR_LAST_RECORD();
-            GblClass_unrefDefault(GblClass_weakRefDefault(type));
+            GblClass_unrefDefault(GblClass_weakRefDefault(GblVariant_vTableType_(type)));
             GBL_CTX_CALL(GblVariant_initDefault_(pSelf, GBL_INVALID_TYPE));
         }
     } else {
-        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_weakRefDefault(type));
+        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_weakRefDefault(GblVariant_vTableType_(type)));
         GBL_CTX_CALL(GblIVariantClass_setValueCopy(pIFace, pSelf, pVarArgs));
         if(GBL_RESULT_ERROR(GBL_CTX_LAST_RESULT())) {
             GBL_CTX_CLEAR_LAST_RECORD();
-            GblClass_unrefDefault(GblClass_weakRefDefault(type));
-            GBL_CTX_CALL(GblVariant_initDefault_(pSelf, GBL_INVALID_TYPE));
+            GBL_CTX_CALL(GblVariant_destruct(pSelf));
         }
     }
     GBL_CTX_END();
@@ -441,22 +461,21 @@ GBL_EXPORT GBL_RESULT GblVariant_setValueMoveVa(GblVariant* pSelf,
     GBL_CTX_BEGIN(NULL);
     if(type != pSelf->type) {
         GBL_CTX_VERIFY_TYPE(type, GBL_IVARIANT_TYPE);
-        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_refDefault(type));
+        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_refDefault(GblVariant_vTableType_(type)));
         GBL_CTX_CALL(GblVariant_destruct(pSelf));
         GBL_CTX_CALL(GblVariant_initDefault_(pSelf, type));
         GBL_CTX_CALL(GblIVariantClass_constructValueMove(pIFace, pSelf, pVarArgs));
         if(GBL_RESULT_ERROR(GBL_CTX_LAST_RESULT())) {
             GBL_CTX_CLEAR_LAST_RECORD();
-            GblClass_unrefDefault(GblClass_weakRefDefault(type));
+            GblClass_unrefDefault(GblClass_weakRefDefault(GblVariant_vTableType_(type)));
             GBL_CTX_CALL(GblVariant_initDefault_(pSelf, GBL_INVALID_TYPE));
         }
     } else {
-        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_weakRefDefault(type));
+        GblIVariantClass* pIFace = GBL_IVARIANT_CLASS(GblClass_weakRefDefault(GblVariant_vTableType_(type)));
         GBL_CTX_CALL(GblIVariantClass_setValueMove(pIFace, pSelf, pVarArgs));
         if(GBL_RESULT_ERROR(GBL_CTX_LAST_RESULT())) {
             GBL_CTX_CLEAR_LAST_RECORD();
-            GblClass_unrefDefault(GblClass_weakRefDefault(type));
-            GBL_CTX_CALL(GblVariant_initDefault_(pSelf, GBL_INVALID_TYPE));
+            GBL_CTX_CALL(GblVariant_destruct(pSelf));
         }
     }
     GBL_CTX_END();
@@ -1100,6 +1119,13 @@ GBL_EXPORT GblType GblVariant_typeOf(const GblVariant* pSelf) {
     return pSelf->type;
 }
 
+GBL_EXPORT GblType GblVariant_instanceTypeOf(const GblVariant* pSelf) {
+    if(pSelf->pInstance && GblType_check(pSelf->type, GBL_INSTANCE_TYPE))
+        return GblInstance_typeOf(pSelf->pInstance);
+
+    return pSelf->type;
+}
+
 GBL_EXPORT GblClass* GblVariant_classOf(const GblVariant* pSelf) {
     if (!GblVariant_isValid(pSelf)) return NULL;
     return GblClass_weakRefDefault(pSelf->type);
@@ -1479,7 +1505,7 @@ GBL_EXPORT GblInstance* GblVariant_instance(const GblVariant* pSelf) {
 GBL_EXPORT GBL_RESULT GblVariant_invalidate(GblVariant* pSelf) {
     if(GblVariant_typeOf(pSelf) != GBL_INVALID_TYPE &&
        GblVariant_typeOf(pSelf) != GBL_POINTER_TYPE) // Cheap hack because we use this type to denote Va_list read things, even though we don't actually instantiate the type itself
-        GblClass_unrefDefault(GblClass_weakRefDefault(GblVariant_typeOf(pSelf)));
+        GblClass_unrefDefault(GblClass_weakRefDefault(GblVariant_vTableType_(GblVariant_typeOf(pSelf))));
     memset(pSelf, 0, sizeof(GblVariant));
     pSelf->type = GBL_INVALID_TYPE;
     return GBL_RESULT_SUCCESS;

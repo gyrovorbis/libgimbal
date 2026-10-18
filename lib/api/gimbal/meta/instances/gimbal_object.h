@@ -157,6 +157,33 @@ GBL_EXPORT GblType GblObject_type(void) GBL_NOEXCEPT;
 
 /*! \name Constructors
  *  \brief Methods for constructing GblObject-derived types.
+ *
+ *  Each constructor takes a list of property names and values. Values for
+ *  CONSTRUCT properties are set before GblObjectClass::pFnConstructed is called,
+ *  and the remaining values are then set as regular writes, as though by
+ *  GblObject_setProperties().
+ *
+ *  Construction fails, and the object is torn down, when:
+ *      - A value for a CONSTRUCT property which is not also WRITE is rejected
+ *      - A CONSTRUCT property which is not also WRITE is not given a value
+ *      - GblObjectClass::pFnConstructed fails
+ *      - An unknown property name is given in a NULL-terminated K,V pair list,
+ *        as none of the remaining arguments can then be read
+ *
+ *  Upon failure, the create functions return NULL, and the construct functions
+ *  return the error with the given memory left destructed. The error remains
+ *  available from the thread's last call record.
+ *
+ *  Any other value which is rejected, either because its property is WRITE or
+ *  because setting it fails, is skipped. The object is still constructed, the
+ *  result is #GBL_RESULT_INCOMPLETE, and the object must be released as usual.
+ *  Since #GBL_RESULT_INCOMPLETE is not a success code, callers of the construct
+ *  functions should check for failure with #GBL_RESULT_ERROR(), not
+ *  #GBL_RESULT_SUCCESS(). Unknown property names given as variants are skipped
+ *  with a warning.
+ *
+ *  Values passed to ACQUIRE properties are moved, and are consumed even when
+ *  rejected or when construction fails.
  *  @{
  */
 //! Creates an object-derived type on the heap, initializing it with a NULL-terminated K,V pair listing of properties
@@ -270,7 +297,12 @@ GBL_EXPORT GBL_RESULT GblObject_setPropertyVaListByQuark  (GBL_SELF, GblQuark na
 GBL_EXPORT GBL_RESULT GblObject_setPropertyVariant        (GBL_SELF, const char* pName, GblVariant* pValue) GBL_NOEXCEPT;
 //! Variant of GblObject_setPropertyVariant() where the property name is provided as a quark (for faster lookups)
 GBL_EXPORT GBL_RESULT GblObject_setPropertyVariantByQuark (GBL_SELF, GblQuark name, GblVariant* pValue)     GBL_NOEXCEPT;
-//! Sets multiple properties by taking a NULL-terminated K,V pairs list of string names and pointers to store the values within
+/*! Sets multiple properties by taking a NULL-terminated K,V pairs list of string names and values
+
+    Each value which is rejected is skipped, while the remaining properties are still set, and the
+    last error is returned. An unknown property name stops processing of the list, as none of the
+    remaining arguments can then be read.
+*/
 GBL_EXPORT GBL_RESULT GblObject_setProperties             (GBL_SELF, ...)                                   GBL_NOEXCEPT;
 //! Variant of GblObject_setProperties() where the NULL-terminated K,V pairs list is specified as a pointer to a va_list
 GBL_EXPORT GBL_RESULT GblObject_setPropertiesVa           (GBL_SELF, va_list* pList)                        GBL_NOEXCEPT;

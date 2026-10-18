@@ -2044,29 +2044,22 @@ static GBL_RESULT GblVariantTestSuite_string_conversions_char_(GblTestSuite* pSe
     GBL_VARIANT(tVariant);
     const GblRefCount refCountBegin = GblType_classRefCount(GBL_STRING_TYPE);
 
+    GBL_TEST_VERIFY(!GblVariant_canConvert(GBL_STRING_TYPE, GBL_CHAR_TYPE));
+
     GBL_CTX_VERIFY_CALL(GblVariant_constructString(&variant, "9"));
-
-    // Length == 1
     GBL_CTX_VERIFY_CALL(GblVariant_constructChar(&tVariant, '\0'));
-    GBL_TEST_VERIFY(GblVariant_canConvert(GBL_STRING_TYPE, GBL_CHAR_TYPE));
-    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_char(&tVariant), '9');
-    GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
 
-    // Length == 0
-    GBL_CTX_VERIFY_CALL(GblVariant_setString(&variant, ""));
-    GBL_CTX_VERIFY_CALL(GblVariant_convert(&variant, &tVariant));
-    GBL_TEST_COMPARE(GblVariant_char(&tVariant), '\0');
-    GBL_TEST_VERIFY(GblVariant_equals(&variant, &tVariant));
-
-    // Length > 1 (Invalid)
     GBL_TEST_EXPECT_ERROR();
+
+    GBL_TEST_COMPARE(GblVariant_convert(&variant, &tVariant),
+                     GBL_RESULT_ERROR_INVALID_CONVERSION);
+    GBL_CTX_CLEAR_LAST_RECORD();
+    GBL_TEST_COMPARE(GblVariant_char(&tVariant), '\0');
 
     GBL_CTX_VERIFY_CALL(GblVariant_setString(&variant, "abc"));
     GBL_TEST_COMPARE(GblVariant_convert(&variant, &tVariant),
-                GBL_RESULT_ERROR_INVALID_CONVERSION);
+                     GBL_RESULT_ERROR_INVALID_CONVERSION);
     GBL_CTX_CLEAR_LAST_RECORD();
-
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&tVariant));
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&variant));

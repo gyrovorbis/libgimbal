@@ -172,6 +172,8 @@ GBL_EXPORT GblBool GblType_depends    (GBL_VSELF, GblType dependency) GBL_NOEXCE
 GBL_EXPORT GblBool GblType_derives    (GBL_VSELF, GblType superType)  GBL_NOEXCEPT;
 //! Returns GBL_TRUE if the given type has implemented \p ifaceType
 GBL_EXPORT GblBool GblType_implements (GBL_VSELF, GblType ifaceType)  GBL_NOEXCEPT;
+//! Returns the type which implements \p target for the given type: itself if GblType_implements() is satisfied, otherwise the most-derived dependency which does, or GBL_INVALID_TYPE
+GBL_EXPORT GblType GblType_implementer(GBL_VSELF, GblType target)     GBL_NOEXCEPT;
 //! Returns the most-derived, deepest common-type between the given type and \p other
 GBL_EXPORT GblType GblType_common     (GBL_VSELF, GblType other)      GBL_NOEXCEPT;
 //! Returns true if the given type's class contains an implementation of the \p iface interface

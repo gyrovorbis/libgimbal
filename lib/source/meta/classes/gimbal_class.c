@@ -493,7 +493,7 @@ static GblClass* GblClass_cast_(GblClass* pClass, GblType toType, GblBool check,
             // If current node is an interface class, attempt to "back out" to root class node
             // BUT ONLY IF WE AREN'T TRYING TO CHECK AN INTERFACE RECURSIVELY
             if(!recursing) {
-                while(GBL_TYPE_INTERFACED_CHECK(GBL_CLASS_TYPEOF(pClass))) {
+                while(GblClass_isInterfaceImpl(pClass)) {
                     // Move class pointer to interface's concrete class
                     pClass = GblInterface_outerClass((GblInterface*)pClass);
                     GBL_ASSERT(pClass);
