@@ -8,7 +8,7 @@
  *  such as properties, hierarchical relationships, event management,
  *  generic construction, named instances, etc.
  *
- *  \author    2023, 2024, 2025 Falco Girgis
+ *  \author    2023, 2024, 2025, 2026 Falco Girgis
  *  \author                2025, 2026 Agustín Bellagamba
  *  \copyright MIT License
  *
