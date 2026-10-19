@@ -147,12 +147,7 @@ GBL_EXPORT uint32_t gblNtohl(uint32_t n) {
 }
 
 GBL_EXPORT uint32_t gblHtonl(uint32_t x) {
-#if GBL_BIG_ENDIAN == 0
-    uint8_t *s = (uint8_t *)&x;
-    return (uint32_t)(s[0] << 24 | s[1] << 16 | s[2] << 8 | s[3]);
-#else
-    return x;
-#endif
+    return gblNtohl(x);
 }
 
 GBL_EXPORT GblBool gblFloatEquals(double a, double b, double e) {

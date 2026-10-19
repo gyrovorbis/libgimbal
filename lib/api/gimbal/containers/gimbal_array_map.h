@@ -69,11 +69,7 @@ typedef struct GblArrayMap {
         GblContext*             pCtx;                   //!< Optional custom context
         GblArrayMapCmpFn        pFnComparator;          //!< Optional custom comparator
         size_t                  binarySearches  : 1;    //!< Optionally sort values and use binary searches
-#ifdef GBL_64BIT
-        size_t                  size            : 63;   //!< Number of elements within the map
-#elif defined(GBL_32BIT)
-        size_t                  size            : 31;
-#endif
+        size_t                  size : GBL_SIZE_BITS - 1; //!< Number of elements within the map
     GBL_PRIVATE_END
 } GblArrayMap;
 

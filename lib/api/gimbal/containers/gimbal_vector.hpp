@@ -118,11 +118,11 @@ public:
     }
 
     bool isHeap(void) const { return !isStack(); }
-#ifdef GBL_PMR_VECTOR
-    std::pmr::vector<value_type> toStdPmrVector(void) const {
-        gimbal::pmr::vector<value_type> stdVec(&front(), &back(), getContext());
-    }
-#endif
+    GBL_PMR_VECTOR_ONLY_(
+        std::pmr::vector<value_type> toStdPmrVector(void) const {
+            gimbal::pmr::vector<value_type> stdVec(&front(), &back(), getContext());
+        }
+    )
 
     std::vector<value_type> toStdVector(void) const {
         std::vector<value_type> stdVec(&front(), &back());
@@ -204,11 +204,7 @@ public:
     }
 
     friend constexpr auto operator<=>(const CRTP& vec, const type_compatible_container_readable<T> auto& con) noexcept {
-#ifdef GBL_LEX_CMP_3WAY
-        return std::lexicographical_compare_three_way(std::cbegin(vec), std::cend(vec), std::cbegin(con), std::cend(con));
-#else
-        return std::lexicographical_compare(std::cbegin(vec), std::cend(vec), std::cbegin(con), std::cend(con));
-#endif
+        return GBL_LEXICOGRAPHICAL_COMPARE_(std::cbegin(vec), std::cend(vec), std::cbegin(con), std::cend(con));
     }
 
     friend bool operator==(const CRTP& vec, const VectorView<T>& rhs) {
@@ -217,11 +213,7 @@ public:
     }
 
     friend constexpr auto operator<=>(const CRTP& vec, const VectorView<T>& rhs) noexcept {
-#ifdef GBL_LEX_CMP_3WAY
-        return std::lexicographical_compare_three_way(std::cbegin(vec), std::cend(vec), std::cbegin(rhs), std::cend(rhs));
-#else
-        return std::lexicographical_compare(std::cbegin(vec), std::cend(vec), std::cbegin(rhs), std::cend(rhs));
-#endif
+        return GBL_LEXICOGRAPHICAL_COMPARE_(std::cbegin(vec), std::cend(vec), std::cbegin(rhs), std::cend(rhs));
     }
 
 };
@@ -572,17 +564,15 @@ public:
 
     const VectorType& operator=(const type_compatible_container<T> auto&& c) {
         // check for supported move semantics!
-#ifdef GBL_PMR_VECTOR
-        if constexpr(std::same_as<decltype(c), gimbal::pmr::vector<T>&&>) {
-            if(this->get_allocator() == c.get_allocator()) {
-                assign(c);
-            }
-        } else {
-#endif
+        GBL_PMR_VECTOR_ONLY_(
+            if constexpr(std::same_as<decltype(c), gimbal::pmr::vector<T>&&>) {
+                if(this->get_allocator() == c.get_allocator()) {
+                    assign(c);
+                }
+            } else
+        ) {
             assign(c);
-#ifdef GBL_PMR_VECTOR
         }
-#endif
         return *this;
     }
 

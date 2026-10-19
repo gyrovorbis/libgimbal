@@ -17,7 +17,6 @@
 #define GIMBAL_DATE_TIME_H
 
 #include "../gimbal_core.h"
-#include "../platform/gimbal_time_.h"
 
 #define GBL_DATE_TIME_TYPE          (GBL_TYPEID(GblDateTime))
 #define GBL_DATE_TIME_CLASS(klass)  (GBL_CLASS_CAST(GblDateTime, klass))

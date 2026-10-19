@@ -93,12 +93,6 @@ GBL_INLINE void gblMurmurHash3_x86_32_(const void* key,
 {
 #define	GBL_MURMUR_HASH_ROTL32_(x, r) ((x << r) | (x >> (32 - r)))
 #define GBL_MURMUR_HASH_FMIX32_(h) h^=h>>16; h*=0x85ebca6b; h^=h>>13; h*=0xc2b2ae35; h^=h>>16;
-// DO NOT DO UNALIGNED WORD ACCESSES ON THE RISC/EMBEDDED CPUS
-#if !defined(__DREAMCAST__) && !defined(__GAMECUBE__) && !defined(__VITA__)
-#   define GBL_MURMUR_HASH_GET_BLOCK_(k, p, i) (k = p[i])
-#else
-#   define GBL_MURMUR_HASH_GET_BLOCK_(k, p, i) memcpy(&k, p + i, sizeof(uint32_t))
-#endif
 
     const uint8_t * data = (const uint8_t*)key;
     const int nblocks = len / 4;
@@ -116,8 +110,7 @@ GBL_INLINE void gblMurmurHash3_x86_32_(const void* key,
 
     for(i = -nblocks; i; i++)
     {
-      uint32_t k1;
-      GBL_MURMUR_HASH_GET_BLOCK_(k1, blocks, i);
+      uint32_t k1 = gblLoadUnalignedU32_(blocks + i);
 
       k1 *= c1;
       k1 = GBL_MURMUR_HASH_ROTL32_(k1,15);
@@ -154,7 +147,6 @@ GBL_INLINE void gblMurmurHash3_x86_32_(const void* key,
 
 #undef GBL_MURMUR_HASH_ROTL32_
 #undef GBL_MURMUR_HASH_FMIX32_
-#undef GBL_MURMUR_HASH_GET_BLOCK_
 }
 
 GBL_EXPORT GblHash gblHashMurmur(const void* pData, size_t  size) {
@@ -203,11 +195,7 @@ GBL_MAYBE_UNUSED GBL_INLINE GblHash gblCrc32BigEndian(const void *pData, int siz
 }
 
 GBL_EXPORT GblHash gblHashCrc(const void* pData, size_t size) {
-#if GBL_BIG_ENDIAN == 0
-    return gblCrc32LittleEndian(pData, size);
-#else
-    return gblCrc32BigEndian(pData, size);
-#endif
+    return GBL_ENDIAN_SELECT_(gblCrc32BigEndian, gblCrc32LittleEndian)(pData, size);
 }
 
 //-----------------------------------------------------------------------------
