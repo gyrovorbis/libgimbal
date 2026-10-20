@@ -1,0 +1,82 @@
+name: Docs
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'lib/api/**'
+      - 'doc/**'
+      - 'README.md'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - 'lib/api/**'
+      - 'doc/**'
+      - 'README.md'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOXYGEN_VERSION: 1.13.2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: doc
+    steps:
+      - uses: actions/checkout@v5
+      - name: Cache Doxygen
+        id: doxygen-cache
+        uses: actions/cache@v4
+        with:
+          path: /opt/doxygen
+          key: doxygen-${{ env.DOXYGEN_VERSION }}
+      - name: Install Doxygen
+        if: steps.doxygen-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /opt/doxygen
+          curl -fsSL "https://github.com/doxygen/doxygen/releases/download/Release_${DOXYGEN_VERSION//./_}/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz" \
+            | tar xz -C /opt/doxygen --strip-components=1
+      - run: echo "/opt/doxygen/bin" >> "$GITHUB_PATH"
+      - name: Install Graphviz
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends graphviz
+      - name: Build
+        run: '{ cat Doxyfile; echo "GENERATE_LATEX = NO"; } | doxygen -'
+      - name: Report warnings
+        if: always()
+        run: |
+          if [ -s doxygen_warnings.txt ]; then
+            {
+              echo "### Doxygen warnings: $(wc -l < doxygen_warnings.txt)"
+              echo '```'
+              cat doxygen_warnings.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: doc/html
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
