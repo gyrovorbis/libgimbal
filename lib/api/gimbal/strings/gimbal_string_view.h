@@ -37,9 +37,9 @@
 //! Convenience shorthand macro for creating a GblStringView from an existing string or substring
 #define GBL_STRV(/*const char* pString, size_t len=0*/...)  GblStringView_fromString(__VA_ARGS__)
 //! Convenience macro for converting a GblStringView to a C string, elliding creation of a temporary when the view is already NULL terminated
-#define GBL_STRV_CSTR(view)                          ((view).nullTerminated? (view).pData : GBL_STRV_CSTR_ALLOCA((view)))
+#define GBL_STRV_CSTR(view)                                 ((view).nullTerminated? (view).pData : GBL_STRV_CSTR_ALLOCA((view)))
 //! Convenience macro for creating a NULL-terminated C string from a GblStringView on the stack, using alloca()
-#define GBL_STRV_CSTR_ALLOCA(view)                   GblStringView_toCString(view, (char*)GBL_ALLOCA(view.length + 1), view.length + 1)
+#define GBL_STRV_CSTR_ALLOCA(view)                          GblStringView_toCString(view, (char*)GBL_ALLOCA(view.length + 1), view.length + 1)
 
 #define GBL_SELF_TYPE GblStringView
 
