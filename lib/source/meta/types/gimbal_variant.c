@@ -1262,7 +1262,7 @@ GBL_EXPORT GBL_RESULT GblVariant_constructOpaqueMove(GblVariant* pSelf, GblType 
 }
 
 GBL_EXPORT GBL_RESULT GblVariant_constructStringView(GblVariant* pSelf, GblStringView view) {
-    return GblVariant_constructString(pSelf, GBL_STRING_VIEW_CSTR(view));
+    return GblVariant_constructString(pSelf, GBL_STRV_CSTR(view));
 }
 
 GBL_EXPORT GBL_RESULT GblVariant_constructTypeValue(GblVariant* pSelf, GblType type) {
@@ -1641,7 +1641,7 @@ GBL_EXPORT GBL_RESULT GblVariant_setString(GblVariant* pSelf, const char* pValue
 }
 
 GBL_EXPORT GBL_RESULT GblVariant_setStringView(GblVariant* pSelf, GblStringView value) {
-    return GblVariant_setString(pSelf, GBL_STRING_VIEW_CSTR(value));
+    return GblVariant_setString(pSelf, GBL_STRV_CSTR(value));
 }
 
 GBL_EXPORT GBL_RESULT GblVariant_setStringRef(GblVariant* pSelf, GblStringRef* pValue) {

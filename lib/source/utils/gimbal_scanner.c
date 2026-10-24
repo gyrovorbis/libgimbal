@@ -234,7 +234,7 @@ static GBL_RESULT GblScanner_nextToken_(GblScanner* pSelf, GblStringView* pToken
     GBL_CTX_BEGIN(NULL);
 
     GblScanner_* pSelf_        = GBL_SCANNER_(pSelf);
-    const char*  pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+    const char*  pStreamBuffer = GBL_STRV_CSTR(pSelf_->streamBuffer);
 
     GblPattern_matchNotStr(pSelf_->pDelimeters,
                            pStreamBuffer,
@@ -554,7 +554,7 @@ static GblBool GblScanner_readMatch_(GblScanner*    pSelf,
         return GBL_FALSE;
     }
 
-    const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(*pView);
+    const char* pStreamBuffer = GBL_STRV_CSTR(*pView);
     if(!GblPattern_matchExactStr(pPattern,
                                  pStreamBuffer))
     {
@@ -601,7 +601,7 @@ GBL_EXPORT GblBool GblScanner_scanPattern(GblScanner* pSelf, const GblPattern* p
 GBL_EXPORT GblBool GblScanner_skipMatch(GblScanner* pSelf, const char* pStr) {
     GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
-    const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+    const char* pStreamBuffer = GBL_STRV_CSTR(pSelf_->streamBuffer);
     if(!GblPattern_matchStr(pStr, pStreamBuffer, &pSelf->token)) {
         GblScanner_raiseError(pSelf,
                               GBL_SCANNER_SKIP_ERROR,
@@ -616,7 +616,7 @@ GBL_EXPORT GblBool GblScanner_skipMatch(GblScanner* pSelf, const char* pStr) {
 GBL_EXPORT GblBool GblScanner_skipPattern(GblScanner* pSelf, const GblPattern* pPattern) {
     GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
-    const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+    const char* pStreamBuffer = GBL_STRV_CSTR(pSelf_->streamBuffer);
     if(!GblPattern_match(pPattern, pStreamBuffer, &pSelf->token)) {
         struct {
             GblStringBuffer buff;
@@ -641,7 +641,7 @@ GBL_EXPORT GblBool GblScanner_skipPattern(GblScanner* pSelf, const GblPattern* p
 GBL_EXPORT GblBool GblScanner_skipToMatch(GblScanner* pSelf, const char* pStr) {
     GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
 
-    const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+    const char* pStreamBuffer = GBL_STRV_CSTR(pSelf_->streamBuffer);
     if(!GblPattern_matchStr(pStr, pStreamBuffer, &pSelf->token)) {
         GblScanner_raiseError(pSelf,
                               GBL_SCANNER_SKIP_ERROR,
@@ -713,7 +713,7 @@ GBL_EXPORT int GblScanner_scanf(GblScanner* pSelf, const char* pFmt, ...) {
 GBL_EXPORT int GblScanner_vscanf(GblScanner* pSelf, const char* pFmt, va_list* pList) {
     if(!(pSelf->status & GBL_SCANNER_EOF)) {
         GblScanner_* pSelf_ = GBL_SCANNER_(pSelf);
-        const char* pStreamBuffer = GBL_STRING_VIEW_CSTR(pSelf_->streamBuffer);
+        const char* pStreamBuffer = GBL_STRV_CSTR(pSelf_->streamBuffer);
         return vsscanf(pStreamBuffer, pFmt, *pList);
     } else return EOF;
 }

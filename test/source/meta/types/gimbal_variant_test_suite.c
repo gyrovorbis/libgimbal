@@ -2420,7 +2420,7 @@ static GBL_RESULT GblVariantTestSuite_to_(GblTestSuite* pSuite, GblContext* pCtx
     GBL_CTX_VERIFY_LAST_RECORD();
     GBL_TEST_COMPARE(GblVariant_toString(&v),    "true");
     GBL_CTX_VERIFY_LAST_RECORD();
-    GBL_TEST_COMPARE(GBL_STRING_VIEW_CSTR(GblVariant_toStringView(&v)), "true");
+    GBL_TEST_COMPARE(GBL_STRV_CSTR(GblVariant_toStringView(&v)), "true");
     GBL_CTX_VERIFY_LAST_RECORD();
 
     GBL_CTX_VERIFY_CALL(GblVariant_destruct(&v));
