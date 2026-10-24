@@ -1,12 +1,11 @@
 /*! \file
- *  \brief Helper Definitions for language, compiler, and platform
+ *  \brief Helper Definitions for language and compiler
  *  \ingroup preprocessor
  *  \sa gimbal_macro_utilities.h
  *
  *  This header contains an assortment of preprocessor definitions
  *  for the following:
  *      - Compiler type
- *      - Architecture type
  *      - C/C++ language revision
  *      - C/C++ language features
  *      - Compiler extensions and features
@@ -65,58 +64,6 @@
 #   endif
 #endif
 
-
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    // Common for all Windows platforms
-#   define GBL_WIN  1
-#   ifdef _WIN64
-        // 64-bit Windows only
-#       define GBL_WIN64    1
-#   else
-        // 32-bit Windows only
-#       define GBL_WIN32    1
-#   endif
-#elif __APPLE__
-    // Common to all Apple platforms
-#   define GBL_APPLE
-#   include <TargetConditionals.h>
-#   if TARGET_IPHONE_SIMULATOR
-        // iOS, tvOS, or watchOS Simulator
-#       define GBL_IOS_SIMULATOR     1
-#   elif TARGET_OS_MACCATALYST
-         // Mac's Catalyst (ports iOS API into Mac, like UIKit).
-#       define GBL_MACCATALYST  1
-#   elif TARGET_OS_IPHONE
-        // iOS, tvOS, or watchOS device
-#       define GBL_IOS  1
-#   elif TARGET_OS_MAC
-        // Other kinds of Apple platforms
-#       define GBL_MACOS    1
-#   else
-#       error "Unknown Apple platform"
-#   endif
-#elif __ANDROID__
-    // Below __linux__ check should be enough to handle Android,
-    // but something may be unique to Android.
-#   define GBL_ANDROID  1
-#elif defined(__DREAMCAST__)
-#   define GBL_DREAMCAST    1
-#elif defined(__GAMECUBE__)
-#   define GBL_GAMECUBE 1
-#elif defined(__PSP__)
-#   define GBL_PSP  1
-#elif defined(VITA)
-#   define GBL_PSVITA   1
-#elif __linux__
-#   define GBL_LINUX    1
-#elif __unix__ // all unices not caught above
-    // Unix
-#   define GBL_UNIX 1
-#elif defined(_POSIX_VERSION)
-    // POSIX
-#   define GBL_POSIX
-#endif
-
 #ifdef __GNUC__
 #   define GBL_GNUC 1
 #endif
@@ -143,62 +90,10 @@
 #   define GBL_IAR  1
 #endif
 
-#if defined(__x86_64__) || defined(_M_X64)
-#   define GBL_X86_64   1
-#elif defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
-#   define GBL_X86_32       1
-#elif defined(__ARM_ARCH_2__)
-#   define GBL_ARM2         1
-#elif defined(__ARM_ARCH_3__) || defined(__ARM_ARCH_3M__)
-#   define GBL_ARM3         1
-#elif defined(__ARM_ARCH_4T__) || defined(__TARGET_ARM_4T)
-#   define GBL_ARM4T        1
-#elif defined(__ARM_ARCH_5_) || defined(__ARM_ARCH_5E_)
-#   define GBL_ARM5         1
-#elif defined(__ARM_ARCH_6T2_) || defined(__ARM_ARCH_6T2_)
-#   define GBL_ARM6T2       1
-#elif defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6Z__) || defined(__ARM_ARCH_6ZK__)
-#   define GBL_ARM6         1
-#elif defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__)
-#   define GBL_ARM7         1
-#elif defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__)
-#   define GBL_ARM7A        1
-#elif defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__)
-#   define GBL_ARM7R        1
-#elif defined(__ARM_ARCH_7M__)
-#   define GBL_ARM7M        1
-#elif defined(__ARM_ARCH_7S__)
-#   define GBL_ARM7S        1
-#elif defined(__aarch64__) || defined(_M_ARM64)
-#   define GBL_ARM64        1
-#elif defined(mips) || defined(__mips__) || defined(__mips)
-#   define GBL_MIPS         1
-#elif defined(__sh__)
-#   define GBL_SUPERH       1
-#elif defined(__powerpc) || defined(__powerpc__) || defined(__powerpc64__) || defined(__POWERPC__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC)
-#   define GBL_POWERPC      1
-#elif defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
-#   define GBL_POWERPC64    1
-#elif defined(__sparc__) || defined(__sparc)
-#   define GBL_SPARC        1
-#elif defined(__m68k__)
-#   define GBL_M68K         1
-#endif
-
 #ifdef GBL_CPP11
 #   define GBL_NULL nullptr
 #else
 #   define GBL_NULL NULL
-#endif
-
-#if UINTPTR_MAX == 0xffff
-#   define GBL_16BIT
-#elif UINTPTR_MAX == 0xffffffff
-#   define GBL_32BIT
-#elif UINTPTR_MAX == 0xffffffffffffffff
-#   define GBL_64BIT
-#else
-    /* wtf, you're on your own, bro */
 #endif
 
 // Shared library symbol imports/exports
@@ -211,44 +106,6 @@
 #else
 #   define GBL_EXPORT_SHARED
 #   define GBL_IMPORT_SHARED
-#endif
-
-#ifdef __cplusplus
-#   define GBL_INITIALIZER(f) \
-        static void f(void); \
-        struct f##_t_ { f##_t_(void) { f(); } }; static f##_t_ f##_; \
-        static void f(void)
-#elif defined(_MSC_VER)
-#   pragma section(".CRT$XCU",read)
-#   define GBL_INITIALIZER2_(f,p) \
-        static void f(void); \
-        __declspec(allocate(".CRT$XCU")) void (*f##_)(void) = f; \
-        __pragma(comment(linker,"/include:" p #f "_")) \
-        static void f(void)
-#   ifdef _WIN64
-        #define GBL_INITIALIZER(f) GBL_INITIALIZER2_(f,"")
-#   else
-        #define GBL_INITIALIZER(f) GBL_INITIALIZER2_(f,"_")
-#   endif
-#else
-#   define GBL_INITIALIZER(f) \
-        static void f(void) __attribute__((constructor)); \
-        static void f(void)
-#endif
-
-// Thread-local storage
-#if defined(TINYCTHREAD_ENABLE_THREADS) && !TINYCTHREAD_ENABLE_THREADS
-#   define GBL_THREAD_LOCAL
-#elif defined(_MSC_VER)
-#   define GBL_THREAD_LOCAL __declspec(thread)
-#else
-#   if defined(__DREAMCAST__) || defined(__GAMECUBE__)
-#       define GBL_THREAD_LOCAL     _Thread_local
-#   elif defined(__PSP__)
-#       define GBL_THREAD_LOCAL
-#   else
-#       define GBL_THREAD_LOCAL     __thread
-#   endif
 #endif
 
 // Floating-point precision directives
@@ -463,40 +320,6 @@
 #   define GBL_ALIGNOF(e) _Alignof(e)
 #endif
 
-#if defined(_MSC_VER) || defined(__MINGW64__)
-#   define GBL_ALIGNED_ALLOC(a, s)      _aligned_malloc(s, a)
-#   define GBL_ALIGNED_REALLOC(p, a, s) _aligned_realloc(p, s, a)
-#   define GBL_ALIGNED_FREE(p)          _aligned_free(p)
-#elif defined(__MINGW32__)
-#   define GBL_ALIGNED_ALLOC(a, s)      __mingw_aligned_malloc(s, a)
-#   define GBL_ALIGNED_REALLOC(p, a, s) __mingw_aligned_realloc(p, s, a)
-#   define GBL_ALIGNED_FREE(p)          __mingw_aligned_free(p)
-#elif defined(GBL_C11) || defined(GBL_CPP17)
-#   include <stdlib.h>
-#   define GBL_ALIGNED_ALLOC(a, s)      aligned_alloc(a, s)
-#   define GBL_ALIGNED_REALLOC(p, a, s) realloc(p, s)
-#   define GBL_ALIGNED_FREE(p)          free(p)
-#endif
-
-#if GBL_CONFIG_PREFETCH_ENABLED
-#   ifndef GBL_PREFETCH
-#       if defined(_MSC_VER) || defined(__MINGW64__)
-#           if defined(_M_ARM64) || defined(_M_ARM64EC)
-#               include <intrin.h>
-#           else
-#               include <immintrin.h>
-#           endif
-#           define GBL_PREFETCH(addr) _mm_prefetch(addr, _MM_HINT_T0)
-#       elif defined(__GNUC__)
-#           define GBL_PREFETCH __builtin_prefetch
-#       endif
-#   else
-#       define GBL_PREFETCH(...)
-#   endif
-#else
-#   define GBL_PREFETCH(...)
-#endif
-
 #ifdef __cplusplus
 #   define GBL_INLINE_ inline
 #else
@@ -548,36 +371,6 @@
 #endif
 #endif
 
-// alloca()
-#ifndef GBL_ALLOCA
-#   if defined(__APPLE__)      || defined(__GLIBC__)    || \
-       defined(__sun)          || defined(__CYGWIN__)   || \
-       defined(__EMSCRIPTEN__) || defined(VITA)         || \
-       defined(__DREAMCAST__)  || defined(PSP)          || \
-       defined(__GAMECUBE__)   || defined(GEKKO)        || \
-       defined(__DEVKITARM__)
-#       include <alloca.h>        // Sane platforms
-#   elif defined(_WIN32)
-#       include <malloc.h>        // Windoez
-#       ifndef alloca
-#           define alloca _alloca // Clang with MS Codegen
-#       endif
-#   else
-#       include <stdlib.h>        // BSD extension
-#   endif
-#   define GBL_ALLOCA alloca
-#endif
-
-#if __APPLE__  // at very least fucking MacOS headers are missing it!
-#   define GBL_QUICK_EXIT(c) exit(c)
-#elif defined(GBL_CPP11)
-#   define GBL_QUICK_EXIT(c) quick_exit(c)
-#elif defined(GBL_C11)
-#   define GBL_QUICK_EXIT(c) quick_exit(c)
-#else
-#   define GBL_QUICK_EXIT(c) exit(c)
-#endif
-
 #ifndef GBL_PRAGMA_MACRO_PUSH
 #   define GBL_PRAGMA_MACRO_PUSH(X) push_macro(X)
 #endif
@@ -593,39 +386,6 @@
 #endif
 
 #define GBL_ALLOC_MIN_SIZE GBL_ALIGNOF(GBL_MAX_ALIGN_T)
-
-/* ==========================================================
- * Provide simple macro statement wrappers (adapted from Perl):
- *  G_STMT_START { statements; } G_STMT_END;
- *  can be used as a single statement, as in
- *  if (x) G_STMT_START { ... } G_STMT_END; else ...
- *
- *  For gcc we will wrap the statements within `({' and `})' braces.
- *  For SunOS they will be wrapped within `if (1)' and `else (void) 0',
- *  and otherwise within `do' and `while (0)'.
- *  ========================================================
- *  Graciously stolen from GLib. Imitation is the most sincere form of flattery.
- *          --Falco Girgis
- */
-/* REMOVED WHILE TRYING TO AVOID CLANG WARNINGS AND TO BE STANDARD COMPLIANT
- * #  if defined (__GNUC__) && !defined (__STRICT_ANSI__) && !defined (__cplusplus)
-#    define GBL_STMT_START    (void) __extension__ (
-#    define GBL_STMT_END      )
-# */
-#if !(defined (GBL_STMT_START) && defined (GBL_STMT_END))
-#  if defined (__GNUC__) && !defined (__STRICT_ANSI__) && !defined (__cplusplus)
-#    define GBL_STMT_START    do
-#    define GBL_STMT_END      while(0)
-#  else
-#    if (defined (sun) || defined (__sun__))
-#      define GBL_STMT_START  if(1)
-#      define GBL_STMT_END    else(void)0
-#    else
-#      define GBL_STMT_START  do
-#      define GBL_STMT_END    while(0)
-#    endif
-#  endif
-#endif
 
 #define GBL_NULL_TERMINATED
 

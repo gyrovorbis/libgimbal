@@ -25,7 +25,6 @@
 
 #include "../core/gimbal_ctx.h"
 #include "../algorithms/gimbal_hash.h"
-#include "../preprocessor/gimbal_compiler.h"
 #include "../preprocessor/gimbal_macro_utils.h"
 #include "gimbal_quark.h"
 #include <ctype.h>

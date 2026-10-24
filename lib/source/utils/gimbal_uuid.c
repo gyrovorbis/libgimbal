@@ -40,22 +40,12 @@ GBL_EXPORT const char* GblUuid_string(const GblUuid* pSelf, char* pStrBuffer) {
     size_t printedBytes =
         sprintf(pStrBuffer, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x"
                                        "-%02x%02x%02x%02x%02x%02x",
-#if GBL_BIG_ENDIAN
-
-                                       pSelf->bytes[ 3], pSelf->bytes[ 2], pSelf->bytes[ 1], pSelf->bytes[ 0],
-                                       pSelf->bytes[ 5], pSelf->bytes[ 4], pSelf->bytes[ 7], pSelf->bytes[ 6],
-                                       pSelf->bytes[ 8], pSelf->bytes[ 9], pSelf->bytes[10], pSelf->bytes[11],
-                                       pSelf->bytes[12], pSelf->bytes[13], pSelf->bytes[14], pSelf->bytes[15])
-
-#else
-
-                                       pSelf->bytes[ 0], pSelf->bytes[ 1], pSelf->bytes[ 2], pSelf->bytes[ 3],
-                                       pSelf->bytes[ 4], pSelf->bytes[ 5], pSelf->bytes[ 6], pSelf->bytes[ 7],
-                                       pSelf->bytes[ 8], pSelf->bytes[ 9], pSelf->bytes[10], pSelf->bytes[11],
-                                       pSelf->bytes[12], pSelf->bytes[13], pSelf->bytes[14], pSelf->bytes[15])
-
-#endif
-        ;
+                pSelf->bytes[GBL_ENDIAN_SELECT_(3, 0)], pSelf->bytes[GBL_ENDIAN_SELECT_(2, 1)],
+                pSelf->bytes[GBL_ENDIAN_SELECT_(1, 2)], pSelf->bytes[GBL_ENDIAN_SELECT_(0, 3)],
+                pSelf->bytes[GBL_ENDIAN_SELECT_(5, 4)], pSelf->bytes[GBL_ENDIAN_SELECT_(4, 5)],
+                pSelf->bytes[GBL_ENDIAN_SELECT_(7, 6)], pSelf->bytes[GBL_ENDIAN_SELECT_(6, 7)],
+                pSelf->bytes[ 8], pSelf->bytes[ 9], pSelf->bytes[10], pSelf->bytes[11],
+                pSelf->bytes[12], pSelf->bytes[13], pSelf->bytes[14], pSelf->bytes[15]);
 
     GBL_CTX_VERIFY(printedBytes == GBL_UUID_STRING_LENGTH, GBL_RESULT_ERROR_UNDERFLOW);
     pStr = pStrBuffer;
@@ -95,14 +85,12 @@ GBL_EXPORT GBL_RESULT GblUuid_parse(GblUuid* pSelf, const char* pStrBuffer) {
 
     }
 
-#if GBL_BIG_ENDIAN
     pSelf->private_.time_low
-        = GBL_BSWAP_U32(pSelf->private_.time_low);
+        = GBL_TO_LITTLE_ENDIAN_U32_(pSelf->private_.time_low);
     pSelf->private_.time_mid
-        = GBL_BSWAP_U16(pSelf->private_.time_mid);
+        = GBL_TO_LITTLE_ENDIAN_U16_(pSelf->private_.time_mid);
     pSelf->private_.time_hi_and_version
-        = GBL_BSWAP_U16(pSelf->private_.time_hi_and_version);
-#endif
+        = GBL_TO_LITTLE_ENDIAN_U16_(pSelf->private_.time_hi_and_version);
 
     GBL_CTX_END();
 }
