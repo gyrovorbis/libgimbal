@@ -71,7 +71,7 @@ GBL_EXPORT size_t (GblStringBuffer_remove)(GblStringBuffer* pSelf, const char* p
     if(!length)
         length = strlen(pString);
 
-    pNeedle = GBL_STRING_VIEW_CSTR(GBL_STRV(pString, length));
+    pNeedle = GBL_STRV_CSTR(GBL_STRV(pString, length));
 
     while(1) {
         const char* pLoc = strstr(GblStringBuffer_cString(pSelf), pNeedle);
@@ -106,7 +106,7 @@ GBL_EXPORT size_t (GblStringBuffer_replace)(GblStringBuffer* pSelf,
     if(!substrLen)
         substrLen = strlen(pSubstr);
 
-    pNeedle = GBL_STRING_VIEW_CSTR(GBL_STRV(pSubstr, substrLen));
+    pNeedle = GBL_STRV_CSTR(GBL_STRV(pSubstr, substrLen));
 
     while(iterations < limit) {
         const char* pLoc = strstr(GblStringBuffer_cString(pSelf), pNeedle);

@@ -11,7 +11,7 @@
         type        result      = 0; \
         GblBool     valid       = GBL_TRUE; \
         char*       pEnd        = NULL; \
-        const char* pCString    = GBL_STRING_VIEW_CSTR(self); \
+        const char* pCString    = GBL_STRV_CSTR(self); \
         \
         if(min == 0 && GblStringView_startsWith(self, "-")) { \
             result = 0; \
@@ -60,7 +60,7 @@ GBL_EXPORT float GblStringView_toFloat(GblStringView self, GblBool* pSuccess) {
     float       retVal      = 0.0f;
     GblBool     valid       = GBL_TRUE;
     char*       pEnd        = NULL;
-    const char* pCString    = GBL_STRING_VIEW_CSTR(self);
+    const char* pCString    = GBL_STRV_CSTR(self);
 
     errno = 0;
     retVal = strtof(pCString, &pEnd);
@@ -80,7 +80,7 @@ GBL_EXPORT double GblStringView_toDouble(GblStringView self, GblBool* pSuccess) 
     double      retVal      = 0.0;
     GblBool     valid       = GBL_TRUE;
     char*       pEnd        = NULL;
-    const char* pCString    = GBL_STRING_VIEW_CSTR(self);
+    const char* pCString    = GBL_STRV_CSTR(self);
 
     errno = 0;
     retVal = strtod(pCString, &pEnd);
@@ -97,7 +97,7 @@ GBL_EXPORT double GblStringView_toDouble(GblStringView self, GblBool* pSuccess) 
 }
 
 GBL_EXPORT GblBool GblStringView_toNil(GblStringView self) {
-    const char* pCStr = GBL_STRING_VIEW_CSTR(self);
+    const char* pCStr = GBL_STRV_CSTR(self);
     if(!self.length ||
        gblStrnCaseCmp(pCStr, "nil", sizeof("nil")) == 0 ||
        gblStrnCaseCmp(pCStr, "null", sizeof("null")) == 0) {
@@ -107,7 +107,7 @@ GBL_EXPORT GblBool GblStringView_toNil(GblStringView self) {
 }
 
 GBL_EXPORT GblBool GblStringView_toBool(GblStringView self, GblBool* pSuccess) {
-    const char* pCStr = GBL_STRING_VIEW_CSTR(self);
+    const char* pCStr = GBL_STRV_CSTR(self);
     if(gblStrnCaseCmp(pCStr, "true", sizeof("true")) == 0 ||
        gblStrnCaseCmp(pCStr, "yes",  sizeof("yes"))  == 0) {
         if(pSuccess)
@@ -128,7 +128,7 @@ GBL_EXPORT GblBool GblStringView_toBool(GblStringView self, GblBool* pSuccess) {
 }
 
 GBL_EXPORT void* GblStringView_toPointer(GblStringView self, GblBool* pSuccess) {
-    const char* pCStr = GBL_STRING_VIEW_CSTR(self);
+    const char* pCStr = GBL_STRV_CSTR(self);
     unsigned int tempUint = 0;
 
     const GblBool success = !!(sscanf(pCStr, "0x%x", &tempUint) == 1);
@@ -212,8 +212,8 @@ GBL_EXPORT int (GblStringView_compareIgnoreCase)(GblStringView self, const char*
     else if GBL_UNLIKELY(self.length && !other.length) return INT_MAX;
     else if GBL_UNLIKELY(!self.length && !other.length) return 0;
     else {
-            char* pString1 = GBL_STRING_VIEW_CSTR_ALLOCA(self);
-            char* pString2 = GBL_STRING_VIEW_CSTR_ALLOCA(other);
+            char* pString1 = GBL_STRV_CSTR_ALLOCA(self);
+            char* pString2 = GBL_STRV_CSTR_ALLOCA(other);
             for(size_t  i = 0; i < self.length; ++i) {
                 pString1[i] = toupper(pString1[i]);
             }
@@ -334,8 +334,8 @@ GBL_EXPORT GblBool (GblStringView_contains)(GblStringView self, const char* pStr
     if(!self.length && !substr.length) {
         result = GBL_TRUE;
     } else if(self.length && substr.length) {
-        const char* pCStr1 = GBL_STRING_VIEW_CSTR(self);
-        const char* pCStr2 = GBL_STRING_VIEW_CSTR(substr);
+        const char* pCStr1 = GBL_STRV_CSTR(self);
+        const char* pCStr2 = GBL_STRV_CSTR(substr);
         result = (strstr(pCStr1, pCStr2) != GBL_NULL);
     }
     return result;
@@ -347,8 +347,8 @@ GBL_EXPORT GblBool (GblStringView_containsIgnoreCase)(GblStringView self, const 
     if(!self.length && !substr.length) {
         result = GBL_TRUE;
     } else if(self.length && substr.length) {
-        const char* pCStr1 = GBL_STRING_VIEW_CSTR(self);
-        const char* pCStr2 = GBL_STRING_VIEW_CSTR(substr);
+        const char* pCStr1 = GBL_STRV_CSTR(self);
+        const char* pCStr2 = GBL_STRV_CSTR(substr);
         result = (gblStrCaseStr(pCStr1, pCStr2) != GBL_NULL);
     }
     return result;
@@ -389,8 +389,8 @@ GBL_EXPORT size_t (GblStringView_find)(GblStringView self, const char* pStr, siz
     GBL_CTX_VERIFY(offset < self.length,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
     if(self.length && substr.length) {
-        const char* pCStr1  = GBL_STRING_VIEW_CSTR(self);
-        const char* pCStr2  = GBL_STRING_VIEW_CSTR(substr);
+        const char* pCStr1  = GBL_STRV_CSTR(self);
+        const char* pCStr2  = GBL_STRV_CSTR(substr);
         const char* pSubstr = strstr(pCStr1 + offset, pCStr2);
         if(pSubstr) {
             pos = (size_t )(pSubstr - pCStr1);
@@ -409,8 +409,8 @@ GBL_EXPORT size_t (GblStringView_findIgnoreCase)(GblStringView self, const char*
     GBL_CTX_VERIFY(offset < self.length,
                    GBL_RESULT_ERROR_OUT_OF_RANGE);
     if(self.length && substr.length) {
-        const char* pCStr1  = GBL_STRING_VIEW_CSTR(self);
-        const char* pCStr2  = GBL_STRING_VIEW_CSTR(substr);
+        const char* pCStr1  = GBL_STRV_CSTR(self);
+        const char* pCStr2  = GBL_STRV_CSTR(substr);
         const char* pSubstr = gblStrCaseStr(pCStr1 + offset, pCStr2);
         if(pSubstr) {
             pos = (size_t )(pSubstr - pCStr1);
@@ -562,7 +562,7 @@ GBL_EXPORT int GblStringView_scanf(GblStringView self, const char* pFmt, ...) {
 }
 
 GBL_EXPORT int GblStringView_scanfVa(GblStringView self, const char* pFmt, va_list* pVarArgs) {
-    const char* pCString = GBL_STRING_VIEW_CSTR(self);
+    const char* pCString = GBL_STRV_CSTR(self);
     return vsscanf(pCString, pFmt, *pVarArgs);
 }
 
@@ -626,15 +626,15 @@ GBL_EXPORT GblBool GblStringView_blank(GblStringView self) {
 }
 
 GBL_EXPORT GblQuark GblStringView_quark(GblStringView self) {
-    return GblQuark_fromString(GBL_STRING_VIEW_CSTR(self));
+    return GblQuark_fromString(GBL_STRV_CSTR(self));
 }
 
 GBL_EXPORT GblQuark GblStringView_tryQuark(GblStringView self) {
-    return GblQuark_tryString(GBL_STRING_VIEW_CSTR(self));
+    return GblQuark_tryString(GBL_STRV_CSTR(self));
 }
 
 GBL_EXPORT const char* GblStringView_intern(GblStringView self) {
-    return GblQuark_internString(GBL_STRING_VIEW_CSTR(self));
+    return GblQuark_internString(GBL_STRV_CSTR(self));
 }
 
 GBL_EXPORT GblHash GblStringView_hash(GblStringView self) {
