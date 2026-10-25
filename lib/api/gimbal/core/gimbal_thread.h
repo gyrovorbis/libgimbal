@@ -117,9 +117,9 @@ GBL_PROPERTIES(GblThread,
 )
 
 GBL_SIGNALS(GblThread,
-    (started,  (GBL_INSTANCE_TYPE, pReceiver)),
-    (finished, (GBL_INSTANCE_TYPE, pReceiver), (GBL_ENUM_TYPE, result)),
-    (signaled, (GBL_INSTANCE_TYPE, pReceiver), (GBL_ENUM_TYPE, signal))
+    (started),
+    (finished, (GBL_ENUM_TYPE, result)),
+    (signaled, (GBL_ENUM_TYPE, signal))
 )
 //! \endcond
 

@@ -77,7 +77,7 @@ GBL_PROPERTIES(GblApp,
 )
 
 GBL_SIGNALS(GblApp,
-    (quitting, (GBL_INSTANCE_TYPE, pReceiver))
+    (quitting)
 )
 //! \endcond
 

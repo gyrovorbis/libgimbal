@@ -141,9 +141,9 @@ GBL_PROPERTIES(GblOptionGroup,
 )
 
 GBL_SIGNALS(GblOptionGroup,
-    (parsePrePass,  (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pStringList)),
-    (parsePostPass, (GBL_INSTANCE_TYPE, pReceiver), (GBL_POINTER_TYPE, pStringList)),
-    (parseError,    (GBL_INSTANCE_TYPE, pReceiver), (GBL_ENUM_TYPE,    errorCode))
+    (parsePrePass,  (GBL_POINTER_TYPE, pStringList)),
+    (parsePostPass, (GBL_POINTER_TYPE, pStringList)),
+    (parseError,    (GBL_ENUM_TYPE,    errorCode))
 )
 //! \endcond
 

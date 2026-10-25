@@ -127,11 +127,11 @@ GBL_PROPERTIES(GblScanner,
 )
 
 GBL_SIGNALS(GblScanner,
-    (reset,   (GBL_INSTANCE_TYPE, pReceiver)),
-    (eof,     (GBL_INSTANCE_TYPE, pReceiver)),
-    (peeked,  (GBL_INSTANCE_TYPE, pReceiver)),
-    (scanned, (GBL_INSTANCE_TYPE, pReceiver)),
-    (raised,  (GBL_INSTANCE_TYPE, pReceiver))
+    (reset),
+    (eof),
+    (peeked),
+    (scanned),
+    (raised)
 )
 //! \endcond
 
