@@ -45,12 +45,12 @@
 #include "../../core/gimbal_typedefs.h"
 #include "../../core/gimbal_ctx.h"
 #include "../../strings/gimbal_string_ref.h"
-#include "gimbal_pointer.h"
 #include "../classes/gimbal_primitives.h"
 #include "../classes/gimbal_enum.h"
 #include "../classes/gimbal_flags.h"
 #include "../classes/gimbal_opaque.h"
 #include "../instances/gimbal_instance.h"
+#include "gimbal_pointer.h"
 
 //! Convience macro for GblVariant value initialization
 #define GBL_VARIANT_INIT                        { .type = GBL_INVALID_TYPE }
@@ -591,13 +591,6 @@ GBL_EXPORT GblHash    GblVariant_hash    (GBL_CSELF)                   GBL_NOEXC
 //! @}
 
 GBL_DECLS_END
-
-#if !defined(GBL_DREAMCAST) && !defined(GBL_GAMECUBE) && !defined(GBL_PSP)
-#   define GBL_VARIANT_CONSTRUCT_GENERIC_PLATFORM_ENTRIES()
-#else
-#   define GBL_VARIANT_CONSTRUCT_GENERIC_PLATFORM_ENTRIES() \
-    (int, GblVariant_constructInt32),
-#endif
 
 //! \cond
 #define GBL_VARIANT_CONSTRUCT_TABLE  (                                  \

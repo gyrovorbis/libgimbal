@@ -11,7 +11,7 @@
 #ifndef GIMBAL_MACRO_UTILS_H
 #define GIMBAL_MACRO_UTILS_H
 
-#include "gimbal_compiler.h"
+#include "gimbal_platform.h"
 #include "gimbal_macro_composition.h"
 #include "../core/gimbal_config.h"
 #include <stdint.h>
@@ -86,12 +86,6 @@ extern "C" {
 // ===== Implementation ======
 ///\cond
 #define GBL_BIT_FIELDS_ENTRY_(a, b) b;
-
-#if GBL_BIG_ENDIAN
-#   define GBL_BIT_FIELDS_ENDIAN_XFORM_(...) (__VA_ARGS__)
-#else
-#   define GBL_BIT_FIELDS_ENDIAN_XFORM_(...) (GBL_REVERSE(__VA_ARGS__))
-#endif
 
 #define GBL_META_GENERIC_MACRO_TRAIT_PROPERTY_OVERLOADS_(defaultFunc, overloads)     overloads
 #define GBL_META_GENERIC_MACRO_TRAIT_OVERLOADS_PROPERTY_TYPE_(type, function)        type

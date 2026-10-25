@@ -177,10 +177,10 @@ set(GIMBAL_INCLUDES
     api/gimbal/meta/types/gimbal_variant.h
     api/gimbal/meta/types/gimbal_builtin_types.h
     source/meta/types/gimbal_type_.h
-    api/gimbal/platform/gimbal_time_.h
     api/gimbal/platform/gimbal_thread_.h
     api/gimbal/platform/gimbal_system_.h
     api/gimbal/preprocessor/gimbal_compiler.h
+    api/gimbal/preprocessor/gimbal_platform.h
     api/gimbal/preprocessor/gimbal_macro_composition.h
     api/gimbal/preprocessor/gimbal_macro_utils.h
     api/gimbal/preprocessor/gimbal_macro_sequences.h
@@ -286,7 +286,6 @@ set(GIMBAL_SOURCES
     source/meta/types/gimbal_variant.c
     source/meta/types/gimbal_type.c
     source/meta/types/gimbal_pointer.c
-    source/platform/gimbal_time_.c
     source/strings/gimbal_quark.c
     source/strings/gimbal_string_ref.c
     source/strings/gimbal_string_buffer.c

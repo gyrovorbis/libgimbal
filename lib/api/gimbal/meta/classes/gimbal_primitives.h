@@ -10,7 +10,6 @@
 
 #include "../types/gimbal_type.h"
 #include "../ifaces/gimbal_ivariant.h"
-#include "../../preprocessor/gimbal_compiler.h"
 
 #define GBL_NIL_TYPE        (GBL_BUILTIN_TYPE(NIL))     //!< Builtin ID for nil GblVariant type
 #define GBL_BOOL_TYPE       (GBL_BUILTIN_TYPE(BOOL))    //!< Builtin ID for boolean GblVariant type
@@ -27,12 +26,6 @@
 #define GBL_STRING_TYPE     (GBL_BUILTIN_TYPE(STRING))  //!< Builtin ID for string GblVariant type
 #define GBL_TYPE_TYPE       (GBL_TYPEID(GblType))       //!< Builtin ID for ::GblType GblVariant type
 #define GBL_BITMASK_TYPE    (GBL_TYPEID(GblBitMask))
-
-#ifdef GBL_64BIT
-#   define GBL_SIZE_TYPE GBL_UINT64_TYPE
-#else
-#   define GBL_SIZE_TYPE GBL_UINT32_TYPE
-#endif
 
 #define GblNil_type()       GBL_NIL_TYPE
 #define GblBool_type()      GBL_BOOL_TYPE
